@@ -36,6 +36,7 @@ const { plausibelLijf } = require('./lib/rolproef');
 const { maakPool } = require('./lib/objectpool');
 const { maakSessiewacht } = require('./lib/sessiewacht');
 const { oordeelIdor } = require('./lib/idor');
+const { waarden, merktekens, oordeelAfbakening } = require('./lib/afbakening');
 const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
@@ -123,6 +124,9 @@ const NAGEKEKEN = {
      nieuwe kandidaten, met de hand nagelezen, alle drie B die iets van B doet. */
   'POST /api/auth/aanmeldkanaal': 'leest alleen req.session.account (de eigen ledenstand) en het gekozen kanaal; een `id` in het lijf wordt nergens gelezen',
   'POST /api/member/magnaat/stad/maak': 'stad.maak(req.session.key, b) leest uit het lijf alleen moeilijkheid en begin en maakt een NIEUWE stad met een verse code; een meegestuurde code wijst niets aan',
+  /* De eerste afbakeningsronde (gang 4, 19 oktober 2026): B kreeg met
+     hetzelfde verzoek een merkteken van A terug, met de hand nagelezen. */
+  'POST /api/browser/gids': 'webmaker-blader gids() geeft alleen sites die hun maker zelf online zette (d.online && d.adres): een openbare gids, en het adres is de codenaam die de maker publiceerde',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
@@ -189,6 +193,7 @@ if (require.main !== module) { module.exports = {}; return; }
      dan bestaat er eigenaarschap om te schenden. Beiden meerderjarig zodat de
      jeugdpoort niets afsluit dat de proef aanziet voor een IDOR-weigering. */
   const geheugen = {};
+  const identiteit = {};
   let teller = 0;
   const maakLid = async (n) => {
     const email = 'idor' + n + '-' + Date.now() + '-' + (++teller) + '@voorbeeld.test';
@@ -203,13 +208,22 @@ if (require.main !== module) { module.exports = {}; return; }
        paspoort, en zonder keuring zou A op de betaalpaden niets oogsten. De
        keuring loopt langs de echte weg (test/helper.js keurLidGoed). */
     const user = r.data.state && r.data.state.user;
+    /* Wie dit lid IS, als merkteken voor de afbakening (gang 4): een codenaam of
+       e-mail van A in B's antwoord is A's gegeven, wat de route ook is. */
+    (identiteit[n] = identiteit[n] || new Set());
+    for (const w of [email, user && user.codename, user && user.email]) if (typeof w === 'string' && w.length >= 8) identiteit[n].add(w);
     try { await require('../test/helper').keurLidGoed(basis, tok, user && user.codename); toestelStand.gekeurd++; }
     catch (e) { toestelStand.mislukt.push('lid ' + n + ' niet gekeurd: ' + e.message); }
     return bind(n, tok);
   };
   let A = await maakLid(1);
   let B = await maakLid(2);
-  if (!A || !B) { console.error('kon geen twee leden registreren; A=' + !!A + ' B=' + !!B); klaar(); process.exit(2); }
+  /* C, DE CONTROLE voor de afbakening (gang 4). C loopt de routes VOOR A, en
+     alles wat C te zien kreeg -- seed-inrichting, publieke catalogus,
+     server-brede waarden -- telt daarna niet als merkteken van A. C probeert
+     zelf niets bij A of B. */
+  let C = await maakLid(3);
+  if (!A || !B || !C) { console.error('kon geen drie leden registreren; A=' + !!A + ' B=' + !!B + ' C=' + !!C); klaar(); process.exit(2); }
 
   /* ---- DE SESSIE OVERLEEFT DE PROEF, want anders bewijst hij het tegendeel ----
 
@@ -264,7 +278,8 @@ if (require.main !== module) { module.exports = {}; return; }
      natrekken, en een lid heeft zo'n route. */
   const wacht = maakSessiewacht({ post, rollen: {
     1: { vers: () => versLid(1), leeft: levend, zet: (t) => { A = t; } },
-    2: { vers: () => versLid(2), leeft: levend, zet: (t) => { B = t; } }
+    2: { vers: () => versLid(2), leeft: levend, zet: (t) => { B = t; } },
+    3: { vers: () => versLid(3), leeft: levend, zet: (t) => { C = t; } }
   } });
   const roep = (pad, lijf, n, tok) => wacht.roep(pad, lijf, n, tok);
 
@@ -280,12 +295,23 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('\n=== DE IDOR-PROEF ===\n');
   console.log('  twee echte leden, ' + routes.length + ' member-schrijfroutes\n');
 
+  /* GANG 0: de controle. C raakt dezelfde routes aan VOOR A er is; wat C ziet
+     kan dus nooit een object van A zijn. */
+  const controle = new Set();
+  for (const r of routes) {
+    const u = await roep(r.pad, plausibelLijf(r.pad), 3, C);
+    if (u.data && typeof u.data === 'object') waarden(u.data, controle);
+  }
+  for (const w of identiteit[3] || []) controle.add(w);
+
   /* GANG 1: A oogst. Elk geslaagd antwoord draagt id's van objecten die A mag
-     bedienen; de pool onthoudt ze per domein. */
+     bedienen; de pool onthoudt ze per domein. En elke merkbare waarde die A
+     terugkreeg gaat in vanA: de kandidaat-merktekens voor gang 4. */
   const pool = maakPool();
+  const vanA = new Set();
   for (const r of routes) {
     const u = await roep(r.pad, plausibelLijf(r.pad), 1, A);
-    if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') pool.leer(u.data, r.pad);
+    if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { pool.leer(u.data, r.pad); waarden(u.data, vanA); }
   }
   const poolStand = pool.grootte();
   /* DE PROEF CONTROLEERT ZICHZELF, want dit is precies de fout die hij een
@@ -355,6 +381,38 @@ if (require.main !== module) { module.exports = {}; return; }
     perRoute[sleutel] = { status: u.status, ...o, velden };
     telling[o.staat]++;
     if (o.lek) telling.lek++;
+  }
+
+  /* ---- GANG 4: DE AFBAKENING (scripts/lib/afbakening.js) ----
+
+     De routes waar gang 2 niets kon, omdat ze geen id dragen: ze bakenen af op
+     de sessie. Hier is de vraag of B met HETZELFDE verzoek iets van A
+     terugkrijgt. A gaat eerst: alleen als A's antwoord een merkteken van A
+     draagt (iets wat A zag, de controle niet, en dat niet in het verzoek
+     stond), zegt B's antwoord iets. Anders blijft de route onbereikbaar. */
+  telling.afgebakend = 0;
+  const afbakening = { routes: 0, afgebakend: 0, gescheiden: 0, doorbraak: 0, nagekeken: 0, onbereikbaar: 0 };
+  for (const r of routes) {
+    const sleutel = r.methode + ' ' + r.pad;
+    const v = perRoute[sleutel];
+    if (!v || v.staat !== 'onbereikbaar' || (v.velden && v.velden.length)) continue;
+    afbakening.routes++;
+    const lijf = plausibelLijf(r.pad);
+    const a = await roep(r.pad, lijf, 1, A);
+    if (a.status >= 200 && a.status < 300 && a.data && typeof a.data === 'object') waarden(a.data, vanA);
+    for (const w of identiteit[1] || []) vanA.add(w);
+    const merken = merktekens({ antwoordA: a.data, vanA, controle, lijf });
+    const b = merken.length && a.status >= 200 && a.status < 300 ? await roep(r.pad, lijf, 2, B) : { status: 0, tekst: '' };
+    let o = oordeelAfbakening({ a, b, merken });
+    if (o.staat === 'doorbraak' && NAGEKEKEN[sleutel]) {
+      o = { staat: 'nagekeken', reden: 'afbakening-kandidaat, met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
+    }
+    afbakening[o.staat]++;
+    if (o.staat === 'onbereikbaar') { v.afbakening = o.reden; continue; }   // gang 2 blijft staan, met de reden van gang 4 erbij
+    telling.onbereikbaar--;
+    telling[o.staat]++;
+    if (o.lek) telling.lek++;
+    perRoute[sleutel] = { status: b.status, statusA: a.status, gang: 'afbakening', ...o, velden: [] };
   }
   if (!(await levend(B))) {
     const vers = await versLid(2);
@@ -515,7 +573,7 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar },
+      toestel: toestelStand, zwarePaden: zwaar, afbakening, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute
@@ -528,6 +586,7 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  publiek (id maakt geen verschil): ' + telling.publiek);
   console.log('  onbereikbaar (geen id/validatie): ' + telling.onbereikbaar);
   console.log('  weigering die een persoonsveld lekt: ' + telling.lek);
+  console.log('  afbakening (gang 4, routes zonder id): ' + JSON.stringify(afbakening));
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');
   console.log('  toestel: ' + toestelStand.gebonden + ' bindingen, ' + toestelStand.gekeurd + ' gekeurd' +
     (toestelStand.mislukt.length ? ', MISLUKT: ' + toestelStand.mislukt.join('; ') : ''));

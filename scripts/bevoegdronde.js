@@ -55,7 +55,8 @@ const { stempel, versheid } = require('./lib/stempel');
 const { ingangRoutes } = require('./lib/bewijsbron');
 
 const GRENS_LID = 'samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als ' +
-  'gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af';
+  'gemeten als elke bekende route eronder gemeten is, een route die IDOR `publiek` noemt schermt niets af, en `afgebakend` ' +
+  'leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet';
 const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A\'s code met ' +
   'B\'s eigen token';
 
@@ -88,7 +89,12 @@ function laadRegisters({ lees, vers } = {}) {
   return uit;
 }
 
-const IDOR_GEMETEN = new Set(['gescheiden', 'nagekeken', 'publiek']);
+/* `afgebakend` is de vierde gang van de IDOR-proef (scripts/lib/afbakening.js):
+   een route zonder id, waar A een merkteken van zichzelf terugkreeg en B met
+   hetzelfde verzoek geen enkel daarvan. Dat is een uitgevoerd experiment met een
+   open deur als ijking. Een route waar A NIETS van zichzelf zag, heet daar
+   onbereikbaar en telt hier dus niet. */
+const IDOR_GEMETEN = new Set(['gescheiden', 'nagekeken', 'publiek', 'afgebakend']);
 const IDOR_GEBROKEN = new Set(['doorbraak', 'lek']);
 
 /* Het oordeel over een pad: gebroken, gemeten of open -- met de reden. Een

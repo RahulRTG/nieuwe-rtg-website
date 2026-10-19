@@ -35,6 +35,7 @@
       en het ledger is juist de plek die een mens DEELT.
    ========================================================================== */
 'use strict';
+const { lokaal } = require('../tijdzone');
 
 /* De zeven kapitalen uit CARRIERE.md punt 30, hier als zeven APARTE voorraden
    met hun opbouw -- nooit als een getal en nooit als sorteersleutel over
@@ -87,11 +88,14 @@ const HERKOMSTNAMEN = Object.keys(HERKOMST);
    bewaart wanneer iets GEBEURDE, en dat is iets anders dan wanneer het werd
    opgeschreven -- die tweede staat als `at` op de regel. Wie die twee samenneemt,
    maakt van een titel uit 2019 een prestatie van vandaag. */
+/* "Vandaag" is de kalenderdag in Nederland, niet het tijdstip 12:00 UTC: anders
+   gold de dag van vandaag tot 14:00 als toekomst en kon een lid 's ochtends
+   niets vastleggen wat die dag gebeurde. */
 function dagGeldig(op, nu) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(op || ''))) return 'Zet er een datum bij, als jjjj-mm-dd.';
   const t = Date.parse(op + 'T12:00:00Z');
   if (!Number.isFinite(t)) return 'Deze datum bestaat niet.';
-  if (t > (nu || Date.now())) return 'NOOIT.toekomst: ' + NOOIT.toekomst;
+  if (op > lokaal('Europe/Amsterdam', new Date(nu || Date.now())).datum) return 'NOOIT.toekomst: ' + NOOIT.toekomst;
   return null;
 }
 

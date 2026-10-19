@@ -135,6 +135,9 @@ const CONTRACT = {
   'link:labfonds': Object.assign({
     belofte: 'leden zeggen samen geld toe aan de pot van een plek, dienen een voorstel in en beslissen gezamenlijk met de scheidsrechter; alleen de indiener sluit de stemming, en een dubbele tik, een afgebroken verzoek of een crash legt een toezegging nooit twee keer in de pot'
   }, voltooi('labfonds', 'het scenario loopt /api/labfonds/overzicht, /doneer, /voorstel/maak, /stem en /beslis, de routes die /apps/geld.html#labfonds (apps/geld/labfondsb.js) zelf aanroept, met een tweede lid dat stemt en de stemming niet mag sluiten')),
+  'link:rtgcode': Object.assign({
+    belofte: 'een lid toont een levende, ondertekende code die alleen de RTG-app maakt en leest en die na een halve minuut vervalt; een valse, gewone of verlopen code wordt geweigerd, een ander lid leest er niets van het lid uit, en de code overleeft een herstart en een crash -- en hij is persoonlijk, zoals het scherm belooft'
+  }, voltooi('rtgcode', 'het scenario loopt /api/code/dyn en /api/code/scan, de routes die /apps/geld.html#rtgcode (apps/geld/rtgcode.js en rtgcodeb.js) zelf aanroept, met een tweede lid dat de code scant')),
   /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'

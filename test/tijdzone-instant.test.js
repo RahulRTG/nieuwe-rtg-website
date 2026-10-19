@@ -20,3 +20,16 @@ test('zonder geldige dag of uur geen tijdstip, en een onbekende zone valt zichtb
   assert.equal(instantIn('Europe/Amsterdam', '2026-07-15', 'later'), null);
   assert.equal(instantIn('Nergens/Niets', '2026-07-15', '10:00'), Date.parse('2026-07-15T10:00:00Z'));
 });
+
+
+test('dag/minuten en dag/klokuur delen dezelfde omzetting, inclusief zomertijdranden', () => {
+  const { moment } = require('../server/kern/tijdzone');
+  for (const zone of ['Europe/Amsterdam', 'America/New_York', 'Asia/Tokyo']) {
+    for (const dag of ['2026-03-29', '2026-10-25', '2026-07-15', '2026-01-15']) {
+      for (const minuten of [0, 90, 150, 600, 1410]) {
+        const tijd = String(Math.floor(minuten / 60)).padStart(2, '0') + ':' + String(minuten % 60).padStart(2, '0');
+        assert.equal(moment(dag, minuten, zone).getTime(), instantIn(zone, dag, tijd), zone + ' ' + dag + ' ' + tijd);
+      }
+    }
+  }
+});

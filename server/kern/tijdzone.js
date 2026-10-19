@@ -150,15 +150,10 @@ const weekdagVan = datum => new Date(kalender(datum)).getUTCDay();
 /* Het moment van `datum` + `minuten` in `zone` (wat new Date(j, m, d, u, mi)
    deed). Twee rondes voor de zomertijd; 02:30 in maart wordt 03:30. */
 function moment(datum, minuten, zone) {
-  const z = zoneOf(zone);
-  const wens = kalender(datum) + (Number(minuten) || 0) * 60000;
-  let t = wens;
-  for (let i = 0; i < 2; i++) {
-    const l = lokaal(z, new Date(t));
-    t += wens - (kalender(l.datum) + l.minuten * 60000);
-  }
-  return new Date(t);
+  return new Date(require('./tijdzone-instant').uitLokaleMinuten(
+    kalender(datum) + (Number(minuten) || 0) * 60000, zoneOf(zone)));
 }
+
 const middernacht = (datum, zone) => moment(datum, 0, zone);
 
 /* DE OMZETDAG van een zaak loopt tot 05:00 lokaal (eigenaarsbesluit 19 oktober

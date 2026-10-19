@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-19T22:32:44.333Z",
-    "commit": "df73e872b8",
+    "op": "2026-10-19T22:44:18.988Z",
+    "commit": "c1b1d0908b",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -1125,11 +1125,19 @@
       "scherp": "gezakt"
     },
     "assets.test.js": {
-      "soort": "server",
+      "soort": "gericht",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
+      "module": "server/opzet/assetsduurzaam.js",
+      "operator": "expliciete bronmutatie",
       "gezakt": 9,
-      "scherp": "gezakt"
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-owner-mutation-proof/assets.test.js.evidence.json",
+        "sha256": "c285fea79cd5955536e763b0a7c28c900cb44acaa42e7791d78e835119689f98",
+        "commit": "c1b1d0908bb17e58eedbe4ce197eb7ea50373fbf",
+        "sourceSha256": "4e1663dd31aaf9a6e4a4c64bf73e9050da35936da1e74cf7aa29e2f43b0dcebc",
+        "testSha256": "d39598f2b87e4c183bd0cdbf9136c2050937bae5ae66572c8afd1e6d9a3355df"
+      }
     },
     "ast-grens.test.js": {
       "soort": "puur",
@@ -1944,12 +1952,19 @@
       "geprobeerd": 1
     },
     "betaalregie.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
       "module": "server/kern/betaalregie.js",
-      "operator": "true->false#0",
-      "gezakt": 2,
-      "geprobeerd": 1
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-owner-mutation-proof/betaalregie.test.js.evidence.json",
+        "sha256": "76cf0f0b28e81b1fbdf2a818f11c462741615d488d9b1316c845eccb3e10de87",
+        "commit": "c1b1d0908bb17e58eedbe4ce197eb7ea50373fbf",
+        "sourceSha256": "b27d567195c266333c36fcc79899ecfbc8558ff79d0a2efe31403e448116c039",
+        "testSha256": "4e78f5187e3f8225d012127debb40d16c0f5e2439faa6638f64ff97db027ece6"
+      }
     },
     "betaalstop-spelling.test.js": {
       "soort": "server",
@@ -12815,11 +12830,19 @@
       "scherp": "gezakt"
     },
     "partnernetwerk-route.test.js": {
-      "soort": "server",
+      "soort": "gericht",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
+      "module": "server/kern/leverancier/zaak.js",
+      "operator": "expliciete bronmutatie",
       "gezakt": 1,
-      "scherp": "gezakt"
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-owner-mutation-proof/partnernetwerk-route.test.js.evidence.json",
+        "sha256": "88b954d76bd3178562ea530a1d9c853fb25c902cd2859142b281cf83e4a05396",
+        "commit": "c1b1d0908bb17e58eedbe4ce197eb7ea50373fbf",
+        "sourceSha256": "c425ad222021e19f069a8ae760f98207f8f2f2c32e115db1e83cfda691441a1b",
+        "testSha256": "e6ebb806e6a424982454b767052cce9c0a9d44c66c8f236a8302e31ab0500abd"
+      }
     },
     "partnernetwerk-scherm.test.js": {
       "soort": "puur",

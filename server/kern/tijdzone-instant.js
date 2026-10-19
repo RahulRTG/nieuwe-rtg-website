@@ -12,6 +12,10 @@ function instantIn(zone, datum, tijd) {
   const doel = Date.UTC(+d[1], +d[2] - 1, +d[3], +u[1], +u[2]);
   if (!Number.isFinite(doel)) return null;
   const z = T.geldigeZone(zone) ? zone : T.TERUGVAL;
+  return uitLokaleMinuten(doel, z);
+}
+
+function uitLokaleMinuten(doel, z) {
   let t = doel;
   for (let i = 0; i < 2; i++) {
     const l = T.lokaal(z, new Date(t));
@@ -21,3 +25,4 @@ function instantIn(zone, datum, tijd) {
 }
 
 module.exports = instantIn;
+module.exports.uitLokaleMinuten = uitLokaleMinuten;

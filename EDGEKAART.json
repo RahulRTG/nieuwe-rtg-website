@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-19T12:54:48.639Z",
-    "commit": "434dc233",
+    "op": "2026-10-19T13:05:20.263Z",
+    "commit": "3ea91112",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 5,
     "instrument": "scripts/edgekaart.js",
     "node": "v22.22.0"
   },

@@ -431,7 +431,7 @@ omlaag.
 
 ## `apps/residentie.js`
 
-`public/apps/residentie/` -- 16 delen, 2039 regels in de delen
+`public/apps/residentie/` -- 16 delen, 2053 regels in de delen
 
 | deel | onderwerp |
 |---|---|

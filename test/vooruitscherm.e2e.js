@@ -22,6 +22,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, pasAppAdres } = require('./helper');
+// de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
+const { GEHEIM, zetKop } = require('./mailpoort');
+zetKop();
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -42,7 +45,7 @@ const BERICHT = (naar, onderwerp, tekst) => [
 test('Vooruit en Uit uw post: van lege kaart naar een termijn, met EEN klik',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vooruit-e2e-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  const { child, base } = await startServer({ env: { RTG_MAILPOORT_GEHEIM: GEHEIM, SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const t = Date.now();

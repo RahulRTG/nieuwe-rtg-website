@@ -23,6 +23,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+// de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
+const { GEHEIM, zetKop } = require('./mailpoort');
+zetKop();
 
 const maakGesprek = require('../server/smtp-in');
 const { antwoordCode, maakOntvangst, MAX_BYTES } = require('../server/smtp-in-data');
@@ -238,7 +241,7 @@ const post = async (pad, body, tok) => {
 };
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '',
+  ({ child, base: BASE } = await startServer({ env: { RTG_MAILPOORT_GEHEIM: GEHEIM, RTG_DATA_DIR: TMP, SMTP_URL: '',
     MAIL_IN_POORT: String(SMTP_POORT), MAIL_IN_HOST: '127.0.0.1' } }));
   const reg = await post('/api/auth/register', { name: 'Smtp Lid', email: 'smtp@x.nl',
     phone: '0612345663', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
@@ -333,7 +336,7 @@ test('zonder eigen mailsleutel biedt de poort toch STARTTLS aan -- die van de si
   fs.writeFileSync(kPad, ss.keyPem); fs.writeFileSync(cPad, ss.certPem);
 
   const poort = SMTP_POORT + 1;
-  const eigen = await startServer({ env: { RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-smtptls-d-')),
+  const eigen = await startServer({ env: { RTG_MAILPOORT_GEHEIM: GEHEIM, RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-smtptls-d-')),
     SMTP_URL: '', MAIL_IN_POORT: String(poort), MAIL_IN_HOST: '127.0.0.1',
     RTG_TLS_KEY: kPad, RTG_TLS_CERT: cPad } });
   try {

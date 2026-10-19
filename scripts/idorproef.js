@@ -1015,6 +1015,21 @@ if (require.main !== module) { module.exports = {}; return; }
     }
   }
 
+  /* ---- STRUCTUREEL ONMEETBAAR IN DE WEGWERPWERELD ----
+
+     Een paar routes kan deze proef principieel niet kruisen omdat de
+     wegwerpwereld een productie-only koppeling of een externe staat mist. Dat is
+     geen bevoegdheidsgat en geen ongemeten luiheid: de reden staat met
+     bestand:regel erbij, zodat ze nagekeken en niet stilzwijgend groen zijn.
+     De overlay raakt alleen rijen die toch al onbereikbaar waren. */
+  const ONMEETBAAR = {
+    'POST /api/bedrijf/mijn': 'buiten productie krijgt een aanmeld-lid rtgKey=null (server/bedrijf/leden.js:37), dus een lid heeft nooit een sessie-gekoppelde werkruimte; bedrijf/mijn toont daarom altijd leeg. Alleen de eigenaar heeft een auto-ruimte (server/bedrijf/mijn.js:64)'
+  };
+  for (const [sleutel, reden] of Object.entries(ONMEETBAAR)) {
+    const v = perRoute[sleutel];
+    if (v && v.staat === 'onbereikbaar') { v.structureel = true; v.reden = reden; }
+  }
+
   klaar();
 
   const doorbraken = Object.entries(perRoute).concat(Object.entries(zaakPerRoute)).filter(([, v]) => v.staat === 'doorbraak');

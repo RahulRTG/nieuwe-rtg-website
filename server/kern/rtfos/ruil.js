@@ -107,10 +107,11 @@ module.exports = (ctx) => {
     const titel = schoon(b.titel, 80);
     if (titel.length < 3) return { status: 400, error: 'Wat is het? Een paar woorden is genoeg.' };
     const wat = schoon(b.wat, 600);
-    // een dubbele tik is geen tweede aanbod (grendel 5)
-    const al = S().ruil.find(r => r.codenaam === ik && r.status === 'open' && r.stad === stad.id &&
-      r.soort === b.soort && r.titel === titel && r.wat === wat);
-    if (al) return { ok: true, bestond: true, ruil: pub(al, true) };
+    // een herhaalsleutel per aanbod (grendel 5); twee bewust gelijke mogen wel
+    const idem = typeof b.idem === 'string' && b.idem ? b.idem.slice(0, 80) : null;
+    const al = idem && S().ruil.find(r => r.codenaam === ik && r.idem === idem);
+    if (al) return al.titel === titel ? { ok: true, herhaald: true, ruil: pub(al, true) }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een ander aanbod.' };
 
     /* EEN LID HOUDT ER TWINTIG TEGELIJK OPEN. Geen wet, wel een rem: wie er
        honderd plaatst, gebruikt de buurtruil als etalage. */
@@ -121,7 +122,7 @@ module.exports = (ctx) => {
 
     const rij = { id: rid(), stad: stad.id, codenaam: ik, soort: b.soort, titel,
       wat, staat: schoon(b.staat, 40), status: 'open',
-      interesse: [], meldingen: [], at: nu() };
+      interesse: [], meldingen: [], idem, at: nu() };
     S().ruil.push(rij);
     audit(ik, 'ruil.plaats', rij.id, stad.naam + ' / ' + rij.soort);
     return { ok: true, ruil: pub(rij, true) };
@@ -174,16 +175,14 @@ module.exports = (ctx) => {
     }
     audit(ik, 'ruil.meld', rij.id, verborgen ? 'verborgen na ' + rij.meldingen.length : String(rij.meldingen.length));
     return { ok: true, verborgen,
-      /* Wat de melder terugkrijgt is wat ER GEBEURDE en geen dankwoord: bij
-         een melding onder de grens gebeurt er nog niets, en dat hoort hij te
-         weten in plaats van te denken dat het weg is. */
+      /* Wat ER GEBEURDE en geen dankwoord: onder de grens gebeurt er nog niets,
+         en dat hoort de melder te weten. */
       bericht: verborgen
         ? 'Dit aanbod staat niet meer in de lijst. Iemand van de stichting kijkt ernaar.'
         : 'Genoteerd. Er is nog niets verborgen: daar is meer dan een melding voor nodig.' };
   }
 
-  /* De werkvoorraad van de stichting: wat is er verborgen en waarom. Alleen
-     voor wie in die stad iets te zoeken heeft -- de poort staat op de route. */
+  /* De werkvoorraad van de stichting; de poort staat op de route. */
   function gemeld(stadId) {
     const stad = stadVan(stadId);
     if (!stad) return { status: 404, error: 'Deze stadsafdeling kennen we niet.' };

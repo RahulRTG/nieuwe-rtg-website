@@ -212,14 +212,17 @@ $('#btnUndo').addEventListener('click', ()=>{ bord.undo(); api('/api/foundation/
 $('#btnWis').addEventListener('click', ()=>{ if(confirm('Het hele bord wissen voor de klas?')){ bord.clear(); api('/api/foundation/bord/wis',{}).catch(()=>{}); } });
 get('/api/foundation/bord/'+CODE).then(d=> bord.setStrokes(d.strokes||[]));
 
-$('#opgZet').addEventListener('click', async ()=>{ const t=$('#opgTekst').value.trim(); if(!t) return; try{ await api('/api/foundation/opgave',{ tekst:t }); $('#opgTekst').value=''; opgavenOphalen(); }catch(e){ alert(e.message); } });
+// een herhaalsleutel per opgestelde opgave en per agendapunt, gebonden aan de inhoud: een nieuwe
+// poging met dezelfde tekst is hetzelfde item, een aangepaste tekst een nieuw; na succes een nieuwe
+const sleutelVoor=(()=>{ const k={}; return (soort, inhoud)=>{ if(!k[soort]||k[soort].inhoud!==inhoud) k[soort]={ inhoud, idem:RTGId(soort) }; return k[soort]; }; })();
+$('#opgZet').addEventListener('click', async ()=>{ const t=$('#opgTekst').value.trim(); if(!t) return; const sl=sleutelVoor('opgave', t); try{ await api('/api/foundation/opgave',{ tekst:t, idem:sl.idem }); sl.inhoud=null; $('#opgTekst').value=''; opgavenOphalen(); }catch(e){ alert(e.message); } });
 async function opgavenOphalen(){
   const d = await get('/api/foundation/opgaven/'+CODE).catch(()=>({opgaven:[]}));
   $('#opgLijst').innerHTML = (d.opgaven||[]).slice().reverse().map(o=>{ const n=Object.keys(o.inzendingen||{}).length;
     return '<div class="ag"><div><div>'+esc(o.tekst)+'</div><span class="mini">'+n+' ingeleverd</span></div></div>'; }).join('') || '<div class="mini">Nog geen opgaven.</div>';
 }
 
-$('#agAdd').addEventListener('click', async ()=>{ const t=$('#agTekst').value.trim(); if(!t) return; try{ const d=await api('/api/foundation/agenda',{ tekst:t, datum:$('#agDatum').value }); $('#agTekst').value=''; $('#agDatum').value=''; toonAgenda(d.agenda); }catch(e){ alert(e.message); } });
+$('#agAdd').addEventListener('click', async ()=>{ const t=$('#agTekst').value.trim(); if(!t) return; const sl=sleutelVoor('agenda', t+'|'+$('#agDatum').value); try{ const d=await api('/api/foundation/agenda',{ tekst:t, datum:$('#agDatum').value, idem:sl.idem }); sl.inhoud=null; $('#agTekst').value=''; $('#agDatum').value=''; toonAgenda(d.agenda); }catch(e){ alert(e.message); } });
 function toonAgenda(list){
   $('#agLijst').innerHTML = (list||[]).map(a=> '<div class="ag"><div>'+(a.datum?'<time>'+esc(a.datum)+'</time>':'')+esc(a.tekst)+'</div><button data-del="'+esc(a.id)+'" title="Verwijder">×</button></div>').join('') || '<div class="mini">Nog niets in de agenda.</div>';
   $('#agLijst').querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{ const d=await api('/api/foundation/agenda/verwijder',{ itemId:b.dataset.del }); toonAgenda(d.agenda); }));

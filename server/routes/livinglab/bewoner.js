@@ -125,7 +125,8 @@ module.exports = (kern, hulp) => {
      subsidiegever of een buurtbewoner leest. Er staat alleen wat het lab zelf
      heeft geschreven en wat te tellen is -- geen aliassen, geen waarnemingen. */
   app.post('/api/lab2/bewoner/themas', remLezen, (req, res) => veilig(res, () => livinglab.themas.themas(lijf(req).labId)));
-  app.post('/api/lab2/bewoner/thema', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaBij(lijf(req))));
+  app.post('/api/lab2/bewoner/thema', remSchrijf, (req, res) => veilig(res, () =>
+    livinglab.themas.themaBij(Object.assign({}, lijf(req), { idem: req.body && req.body.idem }))));
   app.post('/api/lab2/bewoner/stem', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaStem(lijf(req))));
 
   /* ---------- het publieke beeld van een lab ----------

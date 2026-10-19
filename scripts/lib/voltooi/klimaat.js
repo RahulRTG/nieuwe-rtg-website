@@ -63,7 +63,7 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'de ouder stelt een vraag over duurzaamheid, en die staat in het lab zonder stemmen', async () => {
-    const r = await w.post(THEMA, { labId: lab.id, vraag: VRAAG, soort: SOORT, door: 'bewoner' });
+    const r = await w.post(THEMA, { labId: lab.id, vraag: VRAAG, soort: SOORT, door: 'bewoner', idem: 'vraag-' + merk + '-1' });
     const t = await mijnVraag();
     return { klopt: r.status === 200 && !!t && Number(t.stemmen) === 0, ziet: 'vraag ' + r.status + ', staat erin met ' + (t && t.stemmen) + ' stemmen' };
   });
@@ -120,7 +120,7 @@ async function loop(w, stap) {
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'een dubbele tik op Stuur zet een vraag een keer in het lab', async () => {
     const V = 'Hoe vangen we regenwater op bij de flats aan de rand van de wijk? ' + merk;
-    const [a, b] = await w.dubbel(THEMA, { labId: lab.id, vraag: V, soort: SOORT, door: 'bewoner' });
+    const [a, b] = await w.dubbel(THEMA, { labId: lab.id, vraag: V, soort: SOORT, door: 'bewoner', idem: 'vraag-' + merk + '-dubbel' });
     const n = (await themas()).filter((t) => t.vraag === V).length;
     return { klopt: a.status === 200 && b.status === 200 && n === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + n + ' vraag' };
   });
@@ -135,8 +135,9 @@ async function loop(w, stap) {
 
   await stap('herstelbaar', 'een afgebroken vraag en daarna opnieuw: de vraag staat er een keer', async () => {
     const V = 'Kan het buurthuis een deelauto voor de straat beheren? ' + merk;
-    const half = await w.afgebroken(THEMA, { labId: lab.id, vraag: V, soort: SOORT, door: 'bewoner' });
-    const opnieuw = await w.post(THEMA, { labId: lab.id, vraag: V, soort: SOORT, door: 'bewoner' });
+    const lijf = { labId: lab.id, vraag: V, soort: SOORT, door: 'bewoner', idem: 'vraag-' + merk + '-half' };
+    const half = await w.afgebroken(THEMA, lijf);
+    const opnieuw = await w.post(THEMA, lijf);
     const n = (await themas()).filter((t) => t.vraag === V).length;
     return { klopt: opnieuw.status === 200 && n === 1,
       ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', ' + n + ' vraag' };

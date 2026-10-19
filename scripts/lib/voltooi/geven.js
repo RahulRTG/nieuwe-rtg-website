@@ -100,7 +100,7 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'de ouder stelt een plan van vijf jaar voor, het kantoor legt het vast, en de ouder ziet het vastgelegd', async () => {
-    const v = await w.post(PLAN_VOORSTEL, { euroPerJaar: 120, jaren: 5 }, ouder.token);
+    const v = await w.post(PLAN_VOORSTEL, { euroPerJaar: 120, jaren: 5, idem: 'plan-' + merk + '-1' }, ouder.token);
     plan = v.data && v.data.plan;
     const kantoor = await w.post('/api/rtfos/gift/plan/lijst', {}, K);
     const gezien = ((kantoor.data && kantoor.data.plannen) || []).some((p) => plan && p.id === plan.id);
@@ -178,7 +178,7 @@ async function loop(w, stap) {
   });
 
   await stap('herstelbaar', 'een dubbele tik op Voorstellen zet een plan neer en geen twee', async () => {
-    const [a, b] = await w.dubbel(PLAN_VOORSTEL, { euroPerJaar: 60, jaren: 5 }, ouder.token);
+    const [a, b] = await w.dubbel(PLAN_VOORSTEL, { euroPerJaar: 60, jaren: 5, idem: 'plan-' + merk + '-dubbel' }, ouder.token);
     const p = ((((await w.post(PLAN_MIJN, {}, ouder.token)).data || {}).plannen) || []).filter((x) => x.euroPerJaar === 60);
     return { klopt: a.status === 200 && b.status === 200 && p.length === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + p.length + ' plan van 60 per jaar' };
   });

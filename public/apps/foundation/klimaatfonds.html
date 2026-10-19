@@ -212,6 +212,7 @@ const api = (pad, body) => fetch(pad, {
 });
 
 let LAB = null;
+let VRAAGSLEUTEL = null;
 
 /* De alias staat in deze browser en nergens anders: hij hoort bij het stemmen
    en niet bij een account. Kan localStorage niet (privémodus, geblokkeerd),
@@ -294,7 +295,11 @@ $('#stuur').addEventListener('click', async () => {
   const vraag = $('#nieuwIdee').value.trim();
   if (!LAB || !vraag) return;
   try {
-    await api('/api/lab2/bewoner/thema', { labId: LAB, vraag, soort: SOORT, door: 'bewoner' });
+    /* Een herhaalsleutel per opgestelde vraag: een dubbele tik of een nieuwe
+       poging na een fout is dezelfde vraag, een aangepaste vraag een nieuwe. */
+    if (!VRAAGSLEUTEL || VRAAGSLEUTEL.inhoud !== LAB + '|' + vraag) VRAAGSLEUTEL = { inhoud: LAB + '|' + vraag, idem: RTGId('thema') };
+    await api('/api/lab2/bewoner/thema', { labId: LAB, vraag, soort: SOORT, door: 'bewoner', idem: VRAAGSLEUTEL.idem });
+    VRAAGSLEUTEL = null;
     $('#nieuwIdee').value = '';
     $('#melding').innerHTML = '';
     await tekenThemas();

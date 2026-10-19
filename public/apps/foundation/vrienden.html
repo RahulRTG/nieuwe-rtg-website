@@ -819,11 +819,13 @@ $('#chatX').addEventListener('click', ()=> $('#chatOv').classList.remove('open')
 $('#chatSend').addEventListener('click', chatStuur);
 $('#chatIn').addEventListener('keydown', e=>{ if(e.key==='Enter') chatStuur(); });
 /* Een herhaalsleutel per opgesteld bericht: een dubbele tik of een nieuwe poging
-   na een fout is hetzelfde bericht, en de server zet het er een keer neer. */
+   na een fout is hetzelfde bericht, en de server zet het er een keer neer; een
+   aangepaste tekst is een nieuw bericht met een eigen sleutel. */
 let chatSleutel=null;
 async function chatStuur(){
   const t=$('#chatIn').value.trim(); if(!t||!chatMet) return; $('#chatIn').value='';
-  const idem=chatSleutel||(chatSleutel=RTGId('dm'));
+  if(!chatSleutel||chatSleutel.inhoud!==chatMet+'|'+t) chatSleutel={ inhoud:chatMet+'|'+t, idem:RTGId('dm') };
+  const idem=chatSleutel.idem;
   try{ const d=await soc('/api/rtf/social/dm/send',{ toKey:chatMet, text:t, idem }); chatSleutel=null; const box=$('#chatMsgs'); box.innerHTML=''; (d.messages||[]).forEach(m=> box.appendChild(chatBel(m))); box.scrollTop=box.scrollHeight; }
   catch(e){ $('#chatIn').value=t; alert(e.message); }
 }

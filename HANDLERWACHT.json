@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-19T07:08:17.581Z",
-  "commit": "987d3819",
+  "op": "2026-10-19T07:19:28.636Z",
+  "commit": "e2310f1c",
   "boomVuil": true,
   "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
@@ -1180,19 +1180,19 @@
   },
   {
    "sleutel": "POST /api/foundation/agenda",
-   "bestand": "server/foundation/onderwijs/schrift.js:66",
+   "bestand": "server/foundation/onderwijs/schrift.js:68",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/agenda/verwijder",
-   "bestand": "server/foundation/onderwijs/schrift.js:75",
+   "bestand": "server/foundation/onderwijs/schrift.js:80",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/ai",
-   "bestand": "server/foundation/onderwijs/schrift.js:85",
+   "bestand": "server/foundation/onderwijs/schrift.js:90",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
@@ -1849,13 +1849,13 @@
   },
   {
    "sleutel": "POST /api/foundation/opgave/inleveren",
-   "bestand": "server/foundation/onderwijs/schrift.js:50",
+   "bestand": "server/foundation/onderwijs/schrift.js:52",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/reis/aanvraag",
-   "bestand": "server/foundation/onderwijs/schrift.js:123",
+   "bestand": "server/foundation/onderwijs/schrift.js:128",
    "staat": "zonderWachtMetReden",
    "reden": "een open aanvraagformulier voor gezinnen zonder foundation-account -- dat is het punt ervan. Sinds deze meting met een rem per IP-adres, want de lijst kapt op duizend en een vloed duwde echte aanvragen eruit"
   },

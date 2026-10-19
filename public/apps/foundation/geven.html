@@ -218,6 +218,7 @@ let STAND = null;
    voornemen, en niet bij elke klik. Twee keer op bevestigen drukken is dan een
    gift -- de server herkent dezelfde sleutel. */
 let SLEUTEL = null;
+let PLANSLEUTEL = null;
 
 function zeg(t, goed) { $('#melding').innerHTML = '<div class="melder' + (goed ? ' goed' : '') + ' ruimte">' + esc(t) + '</div>'; }
 
@@ -444,8 +445,12 @@ async function planTeken() {
 }
 
 $('#planVoorstel').addEventListener('click', async () => {
+  // een herhaalsleutel per voorstel, gebonden aan bedrag en looptijd; na succes een nieuwe
+  const inhoud = $('#planEuro').value + '|' + $('#planJaren').value;
+  if (!PLANSLEUTEL || PLANSLEUTEL.inhoud !== inhoud) PLANSLEUTEL = { inhoud, idem: RTGId('plan') };
   try {
-    await api('/api/rtfos/gift/plan/voorstel', { euroPerJaar: Number($('#planEuro').value), jaren: Number($('#planJaren').value) });
+    await api('/api/rtfos/gift/plan/voorstel', { euroPerJaar: Number($('#planEuro').value), jaren: Number($('#planJaren').value), idem: PLANSLEUTEL.idem });
+    PLANSLEUTEL = null;
     $('#planEuro').value = '';
     $('#planMeld').innerHTML = '<div class="melder goed ruimte">Voorgesteld. De stichting legt de overeenkomst vast; tot dat moment is een betaling een gewone gift.</div>';
     planTeken();

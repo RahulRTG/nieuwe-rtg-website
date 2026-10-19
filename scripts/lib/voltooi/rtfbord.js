@@ -156,22 +156,22 @@ async function loop(w, stap) {
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'een dubbele tik op + zet een agendapunt een keer neer', async () => {
     const T = 'Excursie ' + merk;
-    const [a, b] = await w.dubbel(AGENDA, D({ tekst: T, datum: '2026-11-09' }));
+    const [a, b] = await w.dubbel(AGENDA, D({ tekst: T, datum: '2026-11-09', idem: 'ag-' + merk + '-dubbel' }));
     const n = ((b.data && b.data.agenda) || []).filter((x) => x.tekst === T).length;
     return { klopt: a.status === 200 && b.status === 200 && n === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + n + ' keer in de agenda' };
   });
 
   await stap('herstelbaar', 'een dubbele tik op Zet zet een opgave een keer neer', async () => {
     const T = 'Leer de tafel van 7 ' + merk;
-    const [a, b] = await w.dubbel(OPGAVE, D({ tekst: T }));
+    const [a, b] = await w.dubbel(OPGAVE, D({ tekst: T, idem: 'opg-' + merk + '-dubbel' }));
     const n = (((await opgaven()).data || {}).opgaven || []).filter((x) => x.tekst === T).length;
     return { klopt: a.status === 200 && b.status === 200 && n === 1, ziet: 'tikken ' + a.status + '/' + b.status + ', ' + n + ' opgave' };
   });
 
   await stap('herstelbaar', 'een afgebroken opgave en daarna opnieuw: de opgave staat er een keer', async () => {
     const T = 'Lees hoofdstuk 4 ' + merk;
-    const half = await w.afgebroken(OPGAVE, D({ tekst: T }));
-    const opnieuw = await w.post(OPGAVE, D({ tekst: T }));
+    const half = await w.afgebroken(OPGAVE, D({ tekst: T, idem: 'opg-' + merk + '-half' }));
+    const opnieuw = await w.post(OPGAVE, D({ tekst: T, idem: 'opg-' + merk + '-half' }));
     const n = (((await opgaven()).data || {}).opgaven || []).filter((x) => x.tekst === T).length;
     return { klopt: opnieuw.status === 200 && n === 1,
       ziet: 'afgebroken (' + (half.afgebroken ? 'client gaf op' : 'status ' + half.status) + '), opnieuw ' + opnieuw.status + ', ' + n + ' opgave' };

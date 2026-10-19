@@ -47,6 +47,11 @@ const EIGEN = [
   // een signaal in Connect onthoudt zijn sleutel per tik bij de horizon (kern/connect/horizon.js)
   '/api/connect/signaal',
   '/api/rtf/connect/signaal',
+  // een buurtvraag in het Living Lab draagt haar sleutel zelf (kern/livinglab/themas.js)
+  '/api/lab2/bewoner/thema',
+  // een buurtruilaanbod en een voorstel voor een meerjarig plan dragen hun sleutel zelf
+  '/api/rtfos/ruil/plaats',
+  '/api/rtfos/gift/plan/voorstel',
   // een pot onthoudt zijn reserveringssleutels en geeft 409 bij een ander bedrag (kern/geldbeleid/potten.js)
   '/api/geld/pot/reserveer'
 ];

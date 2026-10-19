@@ -110,14 +110,18 @@ test('het les-id is geen geloofsbrief, en de AI-bijles vraagt een geldige sleute
    tik op "+" of "Zet" op het bord -- twee gelijke verzoeken tegelijk, of opnieuw
    na een afgebroken verzoek -- zette het agendapunt of de opgave twee keer voor
    de klas. */
-test('een dubbele tik zet een opgave en een agendapunt een keer neer', async () => {
+/* De 409 voor dezelfde sleutel met een andere tekst staat in de route, maar
+   zolang de server draait staat de centrale antwoordkas ervoor: deze router hangt
+   onder app.use('/api/foundation') en de EIGEN-lijst kent hem niet
+   (test/idempotentie.test.js scant alleen app.post). Gemeld aan de integrator. */
+test('een herhaalsleutel per opgave en per agendapunt: dezelfde sleutel een keer, een bewust tweede gelijke wel', async () => {
   const d = (await post('/api/foundation/les/maak', { vak: 'Dubbel', naam: 'Juf' })).data;
   const D = (b) => Object.assign({ code: d.lesId, token: d.token }, b);
-  const [o1, o2] = await Promise.all([post('/api/foundation/opgave', D({ tekst: 'Som 1 tot 8' })), post('/api/foundation/opgave', D({ tekst: 'Som 1 tot 8' }))]);
+  const [o1, o2] = await Promise.all([post('/api/foundation/opgave', D({ tekst: 'Som 1 tot 8', idem: 'opg-1' })), post('/api/foundation/opgave', D({ tekst: 'Som 1 tot 8', idem: 'opg-1' }))]);
   assert.equal(o1.status, 200); assert.equal(o2.status, 200);
   assert.equal(o1.data.opgave.id, o2.data.opgave.id, 'een dubbele tik gaf twee opgaven');
-  const [, a2] = await Promise.all([post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-02' })), post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-02' }))]);
+  const tweede = await post('/api/foundation/opgave', D({ tekst: 'Som 1 tot 8', idem: 'opg-2' }));
+  assert.notEqual(tweede.data.opgave.id, o1.data.opgave.id, 'een bewust tweede gelijke opgave werd opgeslokt');
+  const [, a2] = await Promise.all([post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-02', idem: 'ag-1' })), post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-02', idem: 'ag-1' }))]);
   assert.equal(a2.data.agenda.filter(x => x.tekst === 'Toets').length, 1, 'een dubbele tik zette het agendapunt twee keer neer');
-  const ander = await post('/api/foundation/agenda', D({ tekst: 'Toets', datum: '2026-11-09' }));
-  assert.equal(ander.data.agenda.filter(x => x.tekst === 'Toets').length, 2, 'een ander agendapunt met dezelfde tekst werd opgeslokt');
 });

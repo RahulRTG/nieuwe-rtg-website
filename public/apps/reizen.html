@@ -77,11 +77,14 @@
     </div></article></div>
     </div>
 
+    <!-- De vier ingangen staan direct onder de Cover: zonder loading="lazy",
+         anders blijft de vierde op een telefoon half geladen buiten beeld
+         staan en is het scherm nooit "klaar" (scripts/lib/desktop-ds.js). -->
     <div class="ds-collectie__raster" aria-label="Ideeën voor uw reis">
-      <a class="ds-kaart ds-kaart--beeld" href="/apps/reisbureau.html"><img class="ds-kaart__beeld" src="/campagne/hero.jpg" alt="" loading="lazy"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Reisinspiratie</span><span class="ds-kaart__sub">Reizen met ledenprijzen</span></span></a>
-      <a class="ds-kaart ds-kaart--beeld" href="/apps/hotels.html"><img class="ds-kaart__beeld" src="/campagne/palacio.jpg" alt="" loading="lazy"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Verblijven</span><span class="ds-kaart__sub">Hotels, appartementen en villa’s</span></span></a>
-      <a class="ds-kaart ds-kaart--beeld" href="/apps/vluchten.html"><img class="ds-kaart__beeld" src="/campagne/jet.jpg" alt="" loading="lazy"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Vluchten</span><span class="ds-kaart__sub">Boeken, beheren, inchecken</span></span></a>
-      <a class="ds-kaart ds-kaart--beeld" href="/apps/residentie.html"><img class="ds-kaart__beeld" src="/campagne/kyoto-suite.jpg" alt="" loading="lazy"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Residentie</span><span class="ds-kaart__sub">Uw eigen adressen onderweg</span></span></a>
+      <a class="ds-kaart ds-kaart--beeld" href="/apps/reisbureau.html"><img class="ds-kaart__beeld" src="/campagne/hero.jpg" alt="" decoding="async"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Reisinspiratie</span><span class="ds-kaart__sub">Reizen met ledenprijzen</span></span></a>
+      <a class="ds-kaart ds-kaart--beeld" href="/apps/hotels.html"><img class="ds-kaart__beeld" src="/campagne/palacio.jpg" alt="" decoding="async"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Verblijven</span><span class="ds-kaart__sub">Hotels, appartementen en villa’s</span></span></a>
+      <a class="ds-kaart ds-kaart--beeld" href="/apps/vluchten.html"><img class="ds-kaart__beeld" src="/campagne/jet.jpg" alt="" decoding="async"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Vluchten</span><span class="ds-kaart__sub">Boeken, beheren, inchecken</span></span></a>
+      <a class="ds-kaart ds-kaart--beeld" href="/apps/residentie.html"><img class="ds-kaart__beeld" src="/campagne/kyoto-suite.jpg" alt="" decoding="async"><span class="ds-kaart__inhoud"><span class="ds-kaart__titel">Residentie</span><span class="ds-kaart__sub">Uw eigen adressen onderweg</span></span></a>
     </div>
 
     <section class="ds-sectie" aria-labelledby="worldTravelHelp">

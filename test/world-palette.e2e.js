@@ -85,7 +85,43 @@ async function palette(scope, world, card) {
     return performance.now() - v.sinds >= 300;
   }, null, { timeout: 15000 });
 }
+/* TravelOS (reizen.html) staat op het RTG Design System: geen V4-laag en geen
+   oude desktopschil, maar html[data-ds] met het wereldthema op body. Wat de
+   proef daar bewaakte blijft: de wereld (data-rtg-world en het palet) is
+   travel, de grond is dezelfde ivoren kamer, de wereldkleur (het ds-accent
+   uit thema/travel.css) overleeft het inbedden, het vlak is geschilderd, en
+   alleen de buitenste schil draagt een Edge. De buitenste schil (notities,
+   Command) wordt verderop met palette() getoetst zoals elke andere wereld. */
+const dsRoutes = new Set(['reizen']), dsAccent = {travel:'#4A0F1F'}, dsInkt = 'rgb(12, 12, 11)';
+async function dsPalette(scope, world, card) {
+  await scope.waitForFunction(world => document.documentElement.hasAttribute('data-ds') &&
+    document.body.dataset.rtgWorld === world && document.body.dataset.rtgPalette === world &&
+    !!getComputedStyle(document.body).getPropertyValue('--ds-accent').trim(), world, {timeout:10000});
+  const actual = await scope.evaluate(selector => {
+    const body = getComputedStyle(document.body), el = selector && document.querySelector(selector);
+    return {body:body.backgroundColor, ink:body.color, accent:body.getPropertyValue('--ds-accent').trim(),
+      card:el && getComputedStyle(el).backgroundColor, cardInk:el && getComputedStyle(el).color,
+      ingebed:window.top !== window, edges:document.querySelectorAll('.ds-edge__balk').length,
+      oud:document.querySelectorAll('.rtg-adaptive-bar,.wd-shell').length, style:document.body.getAttribute('style')};
+  }, card);
+  assert.equal(actual.body, paper, world+' ds paper '+JSON.stringify(actual));
+  assert.equal(actual.ink, dsInkt, world+' ds text');
+  assert.equal(actual.accent.toLowerCase(), dsAccent[world].toLowerCase(), world+' ds world accent');
+  assert.equal(actual.style, null, world+' ds body carries no inline style');
+  assert.equal(actual.oud, 0, world+' no legacy shell inside the ds screen');
+  assert.equal(actual.edges, actual.ingebed ? 0 : 1, world+' exactly one Edge, owned by the outermost shell');
+  if (card) { assert.ok(actual.card && actual.card !== 'rgba(0, 0, 0, 0)', world+' '+card+' surface is painted'); assert.ok(actual.cardInk, world+' '+card+' text is painted'); }
+  await scope.waitForFunction(() => {
+    if (document.readyState !== 'complete') return false;
+    const n = performance.getEntriesByType('resource').filter(e => !/\/api\/stream/.test(e.name)).length;
+    const v = window.__rtgPaletRust;
+    if (!v || v.n !== n) { window.__rtgPaletRust = { n, sinds: performance.now() }; return false; }
+    return performance.now() - v.sinds >= 300;
+  }, null, { timeout: 15000 });
+}
+async function kleur(scope, route, world, card) { return dsRoutes.has(route) ? dsPalette(scope, world, card) : palette(scope, world, card); }
 async function ready(page) { await page.waitForSelector('body[data-rtg-desktop-state="ready"]'); }
+async function klaar(page, route) { if (dsRoutes.has(route)) await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]'); else await ready(page); }
 async function activeFrame(page, selector) {
   const handle = await page.waitForSelector(selector);
   const frame = await handle.contentFrame(); await frame.waitForLoadState('load'); return frame;
@@ -105,11 +141,11 @@ for (const engine of engines) for (const width of [390,1440]) {
         localStorage.setItem('rtg_member_token',token);},token);
       const page = await ctx.newPage();
       // Same genuine app, standalone and in the desktop app frame.
-      for (const [route,world,card] of [['muziek','living','.speler'],['media','living','.media-bank'],['werk','work','#inlog'],['reizen','travel','.wh-service']]) {
-        await page.goto(srv.base+'/apps/'+route+'.html'); await ready(page); await palette(page,world,card);
+      for (const [route,world,card] of [['muziek','living','.speler'],['media','living','.media-bank'],['werk','work','#inlog'],['reizen','travel','.ds-kaart']]) {
+        await page.goto(srv.base+'/apps/'+route+'.html'); await klaar(page,route); await kleur(page,route,world,card);
         await page.goto(srv.base+'/apps/notities.html'); await ready(page);
         assert.equal(await page.evaluate(route => RTGDesktopFrame.open('/apps/'+route+'.html',route),route),true);
-        const frame = await activeFrame(page,'.wd-app-frame:not([hidden])'); await palette(frame,world,card);
+        const frame = await activeFrame(page,'.wd-app-frame:not([hidden])'); await kleur(frame,route,world,card);
         await palette(page,world,'.wd-focus');
         assert.equal(await page.getAttribute('body','data-rtg-world'),'living','opening an app cannot change route identity');
         await page.evaluate(() => RTGDesktopFrame.collapse()); await palette(page,'living');
@@ -118,11 +154,11 @@ for (const engine of engines) for (const width of [390,1440]) {
       await page.waitForSelector('.cmd-leeg');
       // Het onthaal van Foundation is een fotohero (donker beeld, lichte tekst),
       // geen ivoren vlak; daar toetst deze proef alleen grond, inkt en signatuur.
-      for (const [route,world,card] of [['werk','work','#inlog'],['reizen','travel','.wh-service'],['foundation/os-publiek','foundation',null],['muziek','living','.speler']]) {
+      for (const [route,world,card] of [['werk','work','#inlog'],['reizen','travel','.ds-kaart'],['foundation/os-publiek','foundation',null],['muziek','living','.speler']]) {
         await page.evaluate(route => RTGCommand.open('/apps/'+route+'.html',route),route);
         const frame = await activeFrame(page,'.cmd-pane.actief iframe');
         await page.waitForFunction(world => document.body.getAttribute('data-rtg-blad-wereld') === world,world);
-        await palette(frame,world,card); await palette(page,world);
+        await kleur(frame,route,world,card); await palette(page,world);
         const out = path.join(__dirname,'../artifacts/world-palette'); fs.mkdirSync(out,{recursive:true});
         await page.screenshot({path:path.join(out,engine+'-'+width+'-'+world+'.png')});
         await page.waitForFunction(() => {

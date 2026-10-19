@@ -20,6 +20,9 @@ const path = require('path');
 const crypto = require('crypto');
 const bank = require('../server/betaal/synthetisch');
 const { startServer, stop, keurLidGoed } = require('./helper');
+/* de afloop die de simulatiebank voor een bijlading kiest, uit de sleutel
+   (dezelfde afleiding als de zorgscenario's) */
+const { afloop } = require('../scripts/lib/voltooizorggeld');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-verhuur-geld-'));
 let srv;
@@ -100,4 +103,75 @@ test('een ongekeurd lid betaalt geen boeking en krijgt de paspoortweg', async ()
   const p = await api('/api/booking/pay', { ref: h.body.huur.ref }, C.token);
   assert.equal(p.status, 403, JSON.stringify(p.body));
   assert.equal(p.body.kyc, true);
+});
+
+/* DE AFLOOP VOORAF GEKOZEN. Een lid met een lege wallet betaalt; RTG Pay laadt
+   het tekort bij met de sleutel 'boeking:<ref>:autolaad' (kern/pay/opladen.js),
+   en de simulatiebank kiest de afloop uit die sleutel. De toets boekt dus tot
+   hij een huur heeft waarvan hij de afloop van tevoren weet -- nooit een
+   afloop die per run verschilt (eis van de eigenaar, 19 oktober 2026). */
+async function huurMetAfloop(L, gewenst, start) {
+  for (let i = 0; i < 80; i++) {
+    const h = await api('/api/huur/boek', { supplierCode: 'ISLAREN', autoId: 'c' + (1 + i % 3), van: D(start + 2 * i), tot: D(start + 2 * i + 1),
+      idem: 'afloop-' + gewenst + '-' + i + '-' + Date.now() }, L.token);
+    if (h.status !== 200) continue;
+    const ref = h.body.huur.ref;
+    if (afloop(L.codenaam, 'boeking:' + ref + ':autolaad') === gewenst) return ref;
+    await api('/api/annuleer', { soort: 'boeking', ref }, L.token);
+  }
+  throw new Error('geen huur gevonden waarvan de bijlading "' + gewenst + '" geeft');
+}
+const betaald = async (L, ref) => ((await api('/api/huur/mijn', {}, L.token)).body.huren || []).some((x) => x.ref === ref);
+
+test('WEIGERING: de bank zegt nee -- niets afgeschreven, niet betaald, en de zin zegt dat', async () => {
+  const L = await lid();
+  await keurLidGoed(srv.base, L.token, L.codenaam);
+  const ref = await huurMetAfloop(L, 'geweigerd', 40);
+  const voor = await saldo(L);
+  const p = await api('/api/booking/pay', { ref }, L.token);
+  assert.equal(p.status, 402, JSON.stringify(p.body));
+  assert.match(p.body.error, /niets afgeschreven/);
+  assert.equal(await saldo(L), voor, 'er ging niets af');
+  assert.equal(await betaald(L, ref), false, 'de huur heet nergens betaald');
+  assert.equal(await facturenVoor(L, ref), 0, 'en er is geen factuur');
+});
+
+test('HERSTEL: blijft de bank hangen, dan wacht de betaling en heet de huur niet betaald', async () => {
+  const L = await lid();
+  await keurLidGoed(srv.base, L.token, L.codenaam);
+  const ref = await huurMetAfloop(L, 'traag', 200);
+  const p = await api('/api/booking/pay', { ref }, L.token);
+  assert.equal(p.status, 402, JSON.stringify(p.body));
+  assert.match(p.body.error, /wacht op bevestiging/, 'het lid hoort dat het wacht, niet dat het mislukt of gelukt is');
+  assert.equal(await betaald(L, ref), false, 'nooit betaald voor de bank bevestigt');
+  assert.equal(await facturenVoor(L, ref), 0);
+  const weer = await api('/api/booking/pay', { ref }, L.token);
+  assert.equal(weer.status, 402, 'een tweede tik maakt van wachten geen betaling: ' + JSON.stringify(weer.body));
+  assert.equal(await betaald(L, ref), false);
+});
+
+test('HERSTEL: een bijlading die de bank terugboekt, betaalt de huur niet', async () => {
+  const L = await lid();
+  await keurLidGoed(srv.base, L.token, L.codenaam);
+  const ref = await huurMetAfloop(L, 'terugboeking', 360);
+  const voor = await saldo(L);
+  const p = await api('/api/booking/pay', { ref }, L.token);
+  assert.equal(p.status, 402, JSON.stringify(p.body));
+  assert.equal(await saldo(L), voor, 'er ging niets af');
+  assert.equal(await betaald(L, ref), false);
+  assert.equal(await facturenVoor(L, ref), 0);
+});
+
+test('HERHALING: een betaalde huur nog eens betalen boekt niets en zegt dat hij betaald is', async () => {
+  const L = await lid();
+  await keurLidGoed(srv.base, L.token, L.codenaam);
+  const ref = await huurMetAfloop(L, 'betaald', 520);
+  const eerst = await api('/api/booking/pay', { ref }, L.token);
+  assert.equal(eerst.status, 200, JSON.stringify(eerst.body));
+  const na = await saldo(L);
+  const weer = await api('/api/booking/pay', { ref }, L.token);
+  assert.equal(weer.status, 409, JSON.stringify(weer.body));
+  assert.match(weer.body.error, /betaald/i);
+  assert.equal(await saldo(L), na, 'de herhaling boekte niets');
+  assert.equal(await facturenVoor(L, ref), 1, 'een factuur, niet twee');
 });

@@ -3,7 +3,7 @@
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
     "bladen": 172,
-    "schermenMetStijlblok": 279,
+    "schermenMetStijlblok": 277,
     "important": 7615
   },
   "uitzonderingen": [],
@@ -2231,18 +2231,6 @@
       "bytes": 7866,
       "important": 0,
       "hex": 8
-    },
-    "public/apps/routedekking.html": {
-      "blokken": 1,
-      "bytes": 3210,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/routedossier.html": {
-      "blokken": 1,
-      "bytes": 4812,
-      "important": 0,
-      "hex": 2
     },
     "public/apps/rtg.html": {
       "blokken": 2,

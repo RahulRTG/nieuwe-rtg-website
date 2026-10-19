@@ -261,8 +261,8 @@ test('het routedossier opent een route en toont zijn assen',
     });
 
     /* BEWIJSLUS.md par. 7: een veld dat de server levert en geen scherm toont,
-       ziet niemand. MUTATIE: `kop +` en `+ staart` uit toonDossier() halen in
-       public/apps/routedossier.html -> deze deeltoets zakt. */
+       ziet niemand. MUTATIE: `kop` en `staart` uit toonDossier() halen in
+       public/apps/routedossier-voorzijde.js -> deze deeltoets zakt. */
     await t.test('het dossier toont de vervalstaat, de plek in de code en wat niemand meet', async () => {
       await page.fill('#zoek', '/api/pay/gezond');
       await page.click('#zoeken');

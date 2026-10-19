@@ -644,6 +644,9 @@ const EIGEN_MODULE = new Map([
   ['reisbureau-ds.e2e.js', ['public/apps/reisbureau-voorzijde.js']],
   ['vluchten-ds.e2e.js', ['public/apps/vluchten-voorzijde.js']],
   ['reisboek-ds.e2e.js', ['public/apps/reisboek.js']],
+  /* Stroom F: de kantoorschermen routedossier en routedekking op de werklaag. */
+  ['routedossier-ds.e2e.js', ['public/apps/routedossier-voorzijde.js']],
+  ['routedekking-ds.e2e.js', ['public/apps/routedekking-voorzijde.js']],
   ['ontwerpvoorbeeld.e2e.js', ['public/ds/voorbeeld.html']],
   /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
   ['move-gevolg.e2e.js', ['public/apps/move.html']],

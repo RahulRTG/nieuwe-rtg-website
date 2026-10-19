@@ -156,6 +156,8 @@
     "public/apps/residentie.html": "test/residentie-ds.e2e.js",
     "public/apps/boeken.html": "test/boeken-ds.e2e.js",
     "public/apps/stad.html": "test/stad-ds.e2e.js",
+    "public/apps/routedossier.html": "test/routedossier-ds.e2e.js",
+    "public/apps/routedekking.html": "test/routedekking-ds.e2e.js",
     "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
   }
 }

@@ -334,9 +334,12 @@ function stappen() {
     { pad: '/api/geld/grens/zet', lijf: { periode: 'maand', centen: 50000 } },
     /* Wie betaalt wat: een lijstje met C */
     { pad: '/api/wbw/maak', lijf: (c) => ({ naam: 'Weekendje', leden: [c.tegen.key] }) },
-    /* RTG Pay */
+    /* RTG Pay. A zet een uitbetaal-IBAN en laadt saldo op, zodat /api/pay/terug
+       in de kruisgang een echte terugbetaling van A heeft (de uitbetaalrail is
+       vrijgegeven in de proef-setup). */
     { pad: '/api/pay/rekening', lijf: { iban: 'NL91ABNA0417164300', naam: 'Proef Rekening' } },
     { pad: '/api/pay/oplaad', lijf: () => ({ centen: 5000, idem: idem() }) },
+    { pad: '/api/pay/terug', lijf: () => ({ centen: 100, idem: idem() }) },
     { pad: '/api/pay/tegoed/koop', lijf: (c) => ({ centen: 500, aan: c.tegen.codenaam, oms: 'proef', idem: idem() }),
       bewaar: (d, c) => { c.tegoed = zoek(d, { sleutel: 'tegoedId' }) || zoek(d, { sleutel: 'id' }); } },
     { pad: '/api/code/dyn', lijf: { soort: 'zegel', code: 'proefzegel1', ttlMs: 300000 },

@@ -197,7 +197,7 @@ if (require.main !== module) { module.exports = {}; return; }
      merkwoord van A in B's prompt valt op. Zonder model antwoordden die routes
      503 en bleef de vraag ongesteld. */
   const kaats = await require('./lib/kaatsmodel').start();
-  const server = await start({ naam: 'idor', env: Object.assign({ RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }, kaats.omgeving) });
+  const server = await start({ naam: 'idor', env: Object.assign({ RTG_DEMO: '1', RTG_SIMULATIEBANK: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }, kaats.omgeving) });
   const { basis } = server;
   const klaar = () => { kaats.stop(); server.klaar(); };
 
@@ -349,6 +349,40 @@ if (require.main !== module) { module.exports = {}; return; }
     3: { vers: () => versLid(3), leeft: levend, zet: (t) => { C = t; } }
   } });
   const roep = (pad, lijf, n, tok) => wacht.roep(pad, lijf, n, tok);
+
+  /* ---- DE UITBETAALRAIL VRIJGEVEN (voor /api/pay/terug) ----
+
+     /api/pay/terug valt op een compliance-poort (geld.lid_iban_uitbetaling) die
+     met opzet VOOR het werk staat; zonder vrijgave is de eigenaarschapsvraag niet
+     eens te stellen. De eigenaar geeft hem hier vrij langs de ECHTE weg -- een
+     besluit (emoney.b3) en de stand 'sandbox', allebei achter een verse passkey
+     -- precies zoals de leden-bank live gaat. ALLEEN deze capability op 'sandbox';
+     geld.terugstortbaar_saldo en het opladen blijven op hun eigen stand, anders
+     breekt het opladen (gemeten). Met RTG_SIMULATIEBANK=1 is er dan een
+     simulatieve uitbetaalrail. Lukt een stap niet, dan blijft pay/terug gewoon
+     onbereikbaar met zijn reden -- geen poort wordt versoepeld. */
+  const payterug = { vrijgegeven: false, reden: null };
+  try {
+    const { maakAuthenticator } = require('../test/webauthn-authenticator');
+    const url = new URL(basis);
+    const eigTok = ((await post('/api/auth/login', { login: process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com',
+      password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).data || {}).token;
+    const bt = eigTok ? await bindToestel({ post: kaal, token: eigTok, naam: 'vrijgave-toestel' }) : { klaar: null };
+    if (bt.klaar) toestelVan.set(eigTok, bt.klaar);
+    const sleutel = maakAuthenticator(url.hostname); let tel = 0;
+    const o = eigTok ? await post('/api/webauthn/registreer/opties', { huidig: process.env.DEMO_PASS || 'Imran' }, eigTok) : { status: 0 };
+    if (o.status === 200) await post('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(o.data.opties.challenge, url.origin), naam: 'vrijgave' }, eigTok);
+    const cer = async () => { const b = await post('/api/office/boardroom/bevestig/opties', { actie: 'eigenaar-vrijgave' }, eigTok);
+      if (b.status !== 200) throw new Error('ceremonie ' + b.status); tel++; return { ceremonie: b.data.ceremonie, antwoord: sleutel.loginAntwoord(b.data.opties.challenge, url.origin, tel) }; };
+    if (o.status === 200) {
+      const bes = await post('/api/office/vrijgave/besluit', { besluit: 'emoney.b3', bron: 'proef-besluit-emoney-b3-doc',
+        sha256: 'a'.repeat(64), reden: 'proef vrijgave in de wegwerpwereld', ...(await cer()) }, eigTok);
+      const st = await post('/api/office/vrijgave/stand', { id: 'geld.lid_iban_uitbetaling', stand: 'sandbox',
+        reden: 'proef uitbetaalrail in de wegwerpwereld', ...(await cer()) }, eigTok);
+      payterug.vrijgegeven = bes.status === 200 && st.status === 200;
+      if (!payterug.vrijgegeven) payterug.reden = 'besluit ' + bes.status + ', stand ' + st.status;
+    } else payterug.reden = 'de eigenaar kon geen passkey registreren (opties ' + o.status + ')';
+  } catch (e) { payterug.reden = String(e && e.message || e); }
 
   /* Alleen member-schrijfroutes: IDOR gaat over het bedienen van een object,
      niet over lezen of over een publieke deur. */
@@ -1105,7 +1139,7 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, passkey, werkruimte, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
+      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, passkey, werkruimte, payterug, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute,
@@ -1124,6 +1158,7 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  stroom (gang 6): ' + JSON.stringify(stroom));
   console.log('  passkey (gang 7): ' + JSON.stringify(passkey));
   console.log('  werkruimtes (gang 8): ' + JSON.stringify(werkruimte));
+  console.log('  pay/terug-vrijgave: ' + JSON.stringify(payterug));
   console.log('  opbouw (gang 1b): ' + opbouw.geslaagd + ' van ' + opbouw.stappen + ' stappen geslaagd' +
     (opbouw.mislukt.length ? '; mislukt: ' + opbouw.mislukt.join(' | ') : ''));
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');

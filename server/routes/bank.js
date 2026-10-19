@@ -72,7 +72,7 @@ module.exports = (kern) => {
     if (bezit.error) return stuur(res, bezit);
     const esc = require('../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', 'attachment; filename="rtg-afschrift-' + iban + '-' + new Date().toISOString().slice(0, 10) + '.csv"');
+    res.setHeader('Content-Disposition', 'attachment; filename="rtg-afschrift-' + iban + '-' + require('../kern/tijdzone').datumIn() + '.csv"');
     res.write('\uFEFF' + ['datum', 'af/bij', 'bedrag', 'soort', 'tegenrekening', 'omschrijving'].join(';') + '\n');
     // het hele afschrift, in blokken langs de vaste paginagrens van de kern
     for (let vanaf = 0; vanaf < 2000; vanaf += 200) {

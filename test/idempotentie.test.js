@@ -35,7 +35,7 @@ async function metApp(doe) {
 
 test('dezelfde sleutel: een uitvoering, het eerste antwoord, en het staat IN het lijf', () => metApp(async ({ post, telling }) => {
   const een = await post('/api/tel', { idem: 'a1', w: 'eerste' });
-  const twee = await post('/api/tel', { idem: 'a1', w: 'tweede' });
+  const twee = await post('/api/tel', { w: 'eerste', idem: 'a1' });
   assert.equal(telling(), 1, 'de handler draait een keer');
   /* HET EERSTE ANTWOORD, PLUS DE HUISMARKERING. Eerst stond hier alleen
      `deepEqual(twee.data, een.data)` en zat de melding uitsluitend in een KOP.
@@ -43,10 +43,27 @@ test('dezelfde sleutel: een uitvoering, het eerste antwoord, en het staat IN het
      (server/betaal.js: `Object.assign({}, bestaand, { herhaald: true })`), en
      zestien toetsen elders zakten omdat deze laag die taal niet sprak. */
   assert.deepEqual(twee.data, { ...een.data, herhaald: true },
-    'de herhaling krijgt het EERSTE antwoord met herhaald erbij, ook al is het lijf anders');
+    'de herhaling krijgt het EERSTE antwoord met herhaald erbij (de volgorde van de velden telt niet)');
   assert.equal(een.data.herhaald, undefined, 'de eerste uitvoering is geen herhaling');
   assert.equal(twee.herhaald, 'herhaald', 'de kop blijft er ook, voor wie hem wel leest');
   assert.equal(een.herhaald, null, 'de eerste uitvoering draagt geen herhaald-kop');
+}));
+
+test('dezelfde sleutel met een ANDER lijf is geen herhaling: 409 en de handler draait niet', () => metApp(async ({ post, telling }) => {
+  /* Tot 19 oktober 2026 gaf deze laag hier het eerste antwoord terug. Dat zei
+     "gelukt" over een verzoek dat nooit is uitgevoerd: zelfde sleutel, ander
+     kaartje, en het lid kreeg het oude kaartje als bewijs van het nieuwe. */
+  const een = await post('/api/tel', { idem: 'v1', w: 'eerste', diep: { a: 1 } });
+  assert.equal(een.status, 200);
+  const ander = await post('/api/tel', { idem: 'v1', w: 'tweede', diep: { a: 1 } });
+  assert.equal(ander.status, 409);
+  assert.equal(ander.data.code, 'IDEM_ANDER_VERZOEK');
+  const dieper = await post('/api/tel', { idem: 'v1', w: 'eerste', diep: { a: 2 } });
+  assert.equal(dieper.status, 409, 'ook een verschil diep in het lijf telt');
+  const zelfde = await post('/api/tel', { diep: { a: 1 }, w: 'eerste', idem: 'v1' });
+  assert.equal(zelfde.status, 200);
+  assert.equal(zelfde.data.herhaald, true);
+  assert.equal(telling(), 1, 'de handler draaide precies een keer');
 }));
 
 test('EN HIJ GAAT NIET VOOR EEN SPECIALIST STAAN', async () => {

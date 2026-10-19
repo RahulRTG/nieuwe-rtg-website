@@ -8,9 +8,9 @@ const path = require('node:path');
 const h = require('./helper');
 const pw = h.laadPlaywright(), skip = h.geenBrowser(pw);
 const engines = h.testMotoren();
-let srv, token, session;
-async function post(route, body, auth) {
-  const r = await fetch(srv.base + route, {method:'POST', headers:{'content-type':'application/json',
+let srv, srvZaak, token, session, supToken;
+async function post(route, body, auth, base) {
+  const r = await fetch((base || srv.base) + route, {method:'POST', headers:{'content-type':'application/json',
     ...(auth ? {Authorization:'Bearer ' + auth} : {})}, body:JSON.stringify(body)});
   const data = await r.json(); assert.equal(r.status, 200, route + ': ' + JSON.stringify(data)); return data;
 }
@@ -24,21 +24,31 @@ test.before(async () => {
   await post('/api/onboarding/teken', {naam:'Schermproef', akkoord:true, contractVersion:status.contract.versie}, token);
   const work = await post('/api/bedrijf/werkruimte/maak', {naam:'Schermproef BV', land:'NL'});
   session = {werkruimte:work.werkruimte, beheerToken:work.beheerToken};
+  /* Partner Network is de netwerkkant van een partnerzaak (public/apps/partner-network.js):
+     zonder zaaksessie stuurt hij naar /apps/app.html. Buiten de demo bestaat er
+     geen zaak om mee in te loggen (de openbare personeelskiezer is dicht), dus
+     dit ene scherm draait tegen een tweede server met de demozaak, en een
+     manager van die zaak logt echt in. */
+  srvZaak = await h.startServer({env:{SMTP_URL:'', RTG_AI_UIT:'1'}});
+  const roster = await post('/api/supplier/roster', {code:'KIKUNOI'}, null, srvZaak.base);
+  const man = roster.staff.find(x => x.role === 'manager');
+  supToken = (await post('/api/supplier/login', {code:'KIKUNOI', staffId:man.id, pin:'1234'}, null, srvZaak.base)).token;
 });
-test.after(async () => { if (srv) await h.stop(srv.child); });
+test.after(async () => { if (srv) await h.stop(srv.child); if (srvZaak) await h.stop(srvZaak.child); });
 async function context(browser, width, signedIn = true) {
   const ctx = await browser.newContext({...(width < 1000 ? pw.devices['iPhone 13'] : {}),
     viewport:{width, height:900}, serviceWorkers:'block', reducedMotion:'reduce'});
-  await ctx.addInitScript(({token,session}) => {
+  await ctx.addInitScript(({token,session,supToken}) => {
     localStorage.setItem('rtg_lang','nl'); localStorage.setItem('rtg_cookieinfo_v1','1');
     if (token) localStorage.setItem('rtg_member_token', token);
+    if (supToken) localStorage.setItem('rtg_sup_token', supToken);
     localStorage.setItem('rtg_werk_sessie',JSON.stringify(session));
     Object.defineProperty(navigator,'standalone',{value:true});
-  }, {token:signedIn ? token : null, session});
+  }, {token:signedIn ? token : null, session, supToken:signedIn ? supToken : null});
   return ctx;
 }
-async function open(page, route) {
-  await page.goto(srv.base + route, {waitUntil:'domcontentloaded'});
+async function open(page, route, base) {
+  await page.goto((base || srv.base) + route, {waitUntil:'domcontentloaded'});
   await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
   await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
   await page.evaluate(() => document.fonts.ready);
@@ -113,10 +123,11 @@ for (const engine of engines) {
       h.letOpFouten(page,errors,{eigenZeef:true});
       for (const [route,heading,stage] of [
         ['werk','.wk-briefing h1','.wk-stage'], ['horeca','.hq-stage h2','.hq-stage'],
-        ['partner-network','.pn-network h2','.pn-grid']
+        ['partner-network','.pn-network .pn-kpi strong','.pn-grid']
       ]) {
-        await open(page,'/apps/'+route+'.html');
+        await open(page,'/apps/'+route+'.html', route === 'partner-network' ? srvZaak.base : undefined);
         await painted(page,heading);
+        if (route === 'partner-network') await page.waitForFunction(() => document.querySelector('#pnStand').textContent === 'Elk getal met zijn bron');
         const geometry = await page.locator(stage).evaluate(el => ({height:el.clientHeight, content:el.scrollHeight}));
         assert.ok(geometry.height >= geometry.content - 2, route+' crops document content: '+JSON.stringify(geometry));
         await shot(page,engine+'-'+width+'-'+route);

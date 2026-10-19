@@ -16,8 +16,8 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const s = req.supplier;
   const en = req.body.lang === 'en';
   const nu = Date.now();
-  const dag = iso => String(iso || '').slice(0, 10);
-  const vandaag = new Date().toISOString().slice(0, 10);
+  const tz = require('../../kern/tijdzone'), dag = iso => tz.omzetdagVan(s, iso) || ''; // omzetdag tot 05:00 (HORECA.md)
+  const vandaag = tz.omzetdag(s);
   // Niet elke betaalde boeking heeft een genest service-object: ticket-/verblijf-
   // boekingen (en direct gezaaide rijen) dragen alleen een `kind`. Nooit blind
   // b.service.name lezen -- dat liet de hele backoffice crashen (500) op zulke rijen.
@@ -30,7 +30,7 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const kassa = (db.data.posSales[s.code] || []).filter(v => v.method !== 'rtg' && v.method !== 'kamer');
   const week = [];
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);
+    const d = tz.plusDagen(vandaag, -i);
     week.push({
       date: d,
       label: new Date(d + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short' }),
@@ -67,7 +67,7 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
     transactiesVandaag: week[6].aantal,
     kassaVandaag,
     omzetWeek: week.reduce((x, d2) => x + d2.omzet, 0),
-    binnenNu: [...new Set((db.data.klok[s.code] || []).filter(e => e.in.slice(0, 10) === vandaag && !e.out).map(e => e.name))].length,
+    binnenNu: [...new Set((db.data.klok[s.code] || []).filter(e => dag(e.in) === vandaag && !e.out).map(e => e.name))].length,
     openActies: alerts.length
   };
   // dagbriefing in gewone taal, altijd uit de echte cijfers

@@ -34,7 +34,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
+// de buurtdeuren van het lab vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per alias
+require('./labaccount').zetLabAccount();
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lab2-bewoner-'));
@@ -176,17 +179,20 @@ test('een vraag uit de buurt: de stem hangt aan het thema, niet aan de stemmer',
   assert.equal(eerst.themas[0].stemmen, 0, 'een vers thema heeft nul stemmen');
   assert.equal(eerst.themas[0].studieId, null, 'en hangt nog aan geen enkel onderzoek');
 
-  const naamloos = await pub('/api/lab2/bewoner/stem', { id: THEMA });
-  assert.equal(naamloos.status, 400, 'een stem draagt een naam of alias');
+  /* De stem hangt sinds het eigenaarsbesluit van 19 oktober 2026 aan het
+     ACCOUNT (routes/livinglab/bewoneraccount.js); de alias is alleen nog een
+     weergavenaam. Een stem zonder alias telt dus gewoon. */
+  const naamloos = await moetPub('bewoner/stem', { id: THEMA }, 'stemmen zonder alias');
+  assert.equal(naamloos.thema.stemmen, 1, 'het account is de stemmer, ook zonder alias');
 
   const stem = await moetPub('bewoner/stem', { id: THEMA, alias: 'BW-STEMMER' }, 'stemmen');
-  assert.equal(stem.thema.stemmen, 1, 'de stem telt');
+  assert.equal(stem.thema.stemmen, 2, 'een tweede account telt');
 
   const weer = await pub('/api/lab2/bewoner/stem', { id: THEMA, alias: 'BW-STEMMER' });
   assert.equal(weer.status, 409, 'twee keer stemmen kan niet');
 
   const na = await moetPub('bewoner/themas', { labId: LAB }, 'themalijst opnieuw');
-  assert.equal(na.themas[0].stemmen, 1, 'en de teller staat daarna nog steeds op een');
+  assert.equal(na.themas[0].stemmen, 2, 'en de teller staat daarna nog steeds op twee');
 
   const geenLijst = await pub('/api/lab2/bewoner/themas', { labId: 'bestaatniet' });
   assert.equal(geenLijst.status, 404, 'themas van een lab dat niet bestaat');
@@ -227,9 +233,21 @@ test('het labpaspoort draagt de punten die in een onderzoek zijn verdiend', asyn
   PUNTEN = kader.spel.punten.interview;
   assert.ok(PUNTEN > 0, 'een interview levert punten op');
 
-  PASPOORT = (await moetPub('bewoner/paspoort-maak', { labId: LAB, naam: 'Sam' }, 'paspoort maken')).paspoort.code;
+  /* Het paspoort is progressie (niveaus en badges) en hangt sinds het
+     eigenaarsbesluit van 19 oktober 2026 aan een gekeurd, volwassen account
+     (routes/livinglab/bewonerpas.js): Sam is dat. */
+  const sam = await registreerGratis(base);
+  await keurLidGoed(base, sam.token, sam.codenaam, '1985-05-05');
+  const alsSam = async (pad, body, wat) => {
+    const r = await fetch(base + '/api/lab2/' + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sam.token }, body: JSON.stringify(body || {}) })
+      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
+    assert.equal(r.status, 200, wat + ' -- ' + (r.body.error || ''));
+    return r.body;
+  };
+  PASPOORT = (await alsSam('bewoner/paspoort-maak', { labId: LAB, naam: 'Sam' }, 'paspoort maken')).paspoort.code;
 
-  const leeg = await moetPub('bewoner/paspoort', { pas: PASPOORT }, 'vers paspoort lezen');
+  const leeg = await alsSam('bewoner/paspoort', { pas: PASPOORT }, 'vers paspoort lezen');
   assert.equal(leeg.paspoort.naam, 'Sam', 'het paspoort draagt de roepnaam en geen echte naam');
   assert.equal(leeg.paspoort.punten, 0, 'een vers paspoort begint op nul');
   assert.equal(leeg.paspoort.niveau, 1);
@@ -251,13 +269,16 @@ test('het labpaspoort draagt de punten die in een onderzoek zijn verdiend', asyn
   assert.equal(obs.observatie.door, ALIAS,
     'de observatie staat op de alias van de pas en niet op de naam die de inzender zelf meestuurde');
 
-  const na = await moetPub('bewoner/paspoort', { pas: PASPOORT.toLowerCase() }, 'paspoort in kleine letters');
+  const na = await alsSam('bewoner/paspoort', { pas: PASPOORT.toLowerCase() }, 'paspoort in kleine letters');
   assert.equal(na.paspoort.punten, PUNTEN, 'de punten uit de studie staan op het paspoort');
   assert.equal(na.paspoort.volgende.teGaan, leeg.paspoort.volgende.teGaan - PUNTEN,
     'en het volgende niveau is precies die punten dichterbij');
 
-  const onbekend = await pub('/api/lab2/bewoner/paspoort', { pas: 'LABPAS-BESTAATNIET' });
+  const onbekend = await fetch(base + '/api/lab2/bewoner/paspoort', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sam.token }, body: JSON.stringify({ pas: 'LABPAS-BESTAATNIET' }) });
   assert.equal(onbekend.status, 404, 'een code die niemand heeft, geeft niets');
+  const kind = await pub('/api/lab2/bewoner/paspoort', { pas: PASPOORT });
+  assert.equal(kind.status, 403, 'een account dat de 18+-poort niet haalt, leest geen progressie');
 });
 
 /* De klachtenprocedure, van allebei de kanten. Het punt van deze laag is niet

@@ -107,7 +107,8 @@
   async function pas() {
     var t = pasToken();
     if (!t) return null;
-    var r = await api('/api/arrival/pass', { pass: t });
+    // de pass is een tweede sleutel naast de sessie van het lid (19 oktober 2026)
+    var r = await api('/api/arrival/pass', { pass: t }, lid());
     return (r && r.ok && r.pass) ? r.pass : null;
   }
 
@@ -143,7 +144,7 @@
       if (gemeld || w.doel !== 'nadering' || w.hek !== hekId || w.wat !== 'binnen') return;
       gemeld = true;
       var t = pasToken();
-      if (t) api('/api/arrival/pulse', { pass: t, pulse: 'in-de-buurt' });
+      if (t) api('/api/arrival/pulse', { pass: t, pulse: 'in-de-buurt' }, lid());
     });
     await window.RTGPlaats.start('nadering', {
       waarom: 'Om zelf te kunnen melden dat je in de buurt bent, zodat je tafel op tijd klaarstaat. Je locatie blijft op je toestel.'

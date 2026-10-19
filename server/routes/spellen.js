@@ -46,7 +46,7 @@ module.exports = (kern) => {
        wat mag (beleid), een variant zegt welk spel je speelt. Veilig is hij
        omdat de KEUZELIJST uit de descriptor komt en niet uit het verzoek --
        zie kern/spellen/variant.js. */
-    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, tempo: b.tempo, variant: b.variant, wereld }),
+    nieuw: (mij, b, wereld, idem) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, tempo: b.tempo, variant: b.variant, wereld, idem }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
     random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld, b.tempo, b.variant),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
@@ -117,7 +117,9 @@ module.exports = (kern) => {
     }
   }
   /* HET GEDEELDE SCHERM blijft zonder ledenaccount, maar niet zonder een
-     begrensde credential. De eenmalige koppeling en de blijvende schermsessie
+     begrensde credential (eigenaarsbesluit 19 oktober 2026, uitzondering 6):
+     de tv koppelt met de eenmalige code die een INGELOGD lid aanmaakte
+     (projectie-open vraagt auth), en hangt zo aan dat account. De eenmalige koppeling en de blijvende schermsessie
      reizen uitsluitend in POST-lijven. Zo belandt geen geheim in een URL,
      accesslog of Referer. Beide antwoorden zijn no-store. */
   app.post('/api/projectie/koppel', rem({ windowMs: 60000, limit: 20 }), (req, res) => {
@@ -137,12 +139,24 @@ module.exports = (kern) => {
     res.status(410).json({ error: 'Deze oude schermcode is gesloten. Vraag een speler om een nieuwe code.' });
   });
 
+  /* "Nodig uit en start" van een lid leest zijn eigen herhaalsleutel
+     (kern/spellen/dubbeltik.js), dus hij staat hier letterlijk, voor de lus: de
+     centrale laag gaat er niet voor staan (EIGEN in middleware/idempotentie-eigen.js).
+     De gezinsingang doet hetzelfde achter de gezinspoort rtfSpeler. */
+  app.post('/api/member/spel/nieuw', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => ACTIES.nieuw(req.session.key, req.body || {}, 'rtg', req.body && req.body.idem), 'nieuw', req);
+  });
+  app.post('/api/rtf/spel/nieuw', (req, res) => {
+    const mij = rtfSpeler(req, res); if (!mij) return;
+    veilig(res, () => ACTIES.nieuw(mij, req.body || {}, 'rtf', req.body && req.body.idem), 'nieuw', req);
+  });
   for (const [naam, doe] of Object.entries(ACTIES)) {
-    app.post('/api/member/spel/' + naam, auth, (req, res) => {
+    if (naam !== 'nieuw') app.post('/api/member/spel/' + naam, auth, (req, res) => {
       if (geenGast(req, res)) return;
       veilig(res, () => doe(req.session.key, req.body || {}, 'rtg'), naam, req);
     });
-    app.post('/api/rtf/spel/' + naam, (req, res) => {
+    if (naam !== 'nieuw') app.post('/api/rtf/spel/' + naam, (req, res) => {
       const mij = rtfSpeler(req, res); if (!mij) return;
       veilig(res, () => doe(mij, req.body || {}, 'rtf'), naam, req);
     });

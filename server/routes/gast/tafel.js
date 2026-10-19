@@ -1,7 +1,7 @@
 /* Guest OS (deellaag): DE TAFEL -- scannen, aanschuiven en de kaart lezen.
 
-   Dit is de enige plek in het gastdomein waar iemand binnenkomt zonder sleutel:
-   de QR op tafel is hier de poort. Dat token is geen gemakje maar de
+   Dit is de plek in het gastdomein waar iemand binnenkomt zonder tafelsleutel:
+   de QR op tafel is hier de sleutel, naast het account dat elke route eist. Dat token is geen gemakje maar de
    toegangscontrole, en daarom staat er een rem op (`tooManyTries`) -- anders is
    een tafelsessie te raden door genoeg te proberen.
 
@@ -13,8 +13,8 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, schoon, findSupplier, beleid, sessie, orderlaag, gastAuth, stuur,
-    tooManyTries, noteFailedTry } = kern;
+  const { app, auth, schoon, findSupplier, beleid, sessie, orderlaag, gastAuth, stuur,
+    tooManyTries, noteFailedTry, naad } = kern;
   /* Het doorgeefluik naar de hotellaag komt uit routes/gast.js en leest de
      ECHTE kern op het moment van aanroepen; de folio-laag wordt later gemount. */
   const { folioVan } = kern;
@@ -42,7 +42,7 @@ module.exports = (kern) => {
      Geeft nog geen sessie: eerst zie je waar je bent en wat er speelt. Pas bij
      aanschuiven ontstaat er een deelnemer. Dat scheelt lege deelnemers op elke
      rekening van iedereen die per ongeluk scant. */
-  app.post('/api/gast/tafel', (req, res) => {
+  app.post('/api/gast/tafel', auth, (req, res) => {
     if (geremd(req, res, 'qr')) return;
     const plek = sessie.zaakBijToken((req.body || {}).token);
     if (!plek) { noteFailedTry(req.gastBucket, req.ip); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel of kamer die wij kennen.', code: 'qr-onbekend' }); }
@@ -64,17 +64,20 @@ module.exports = (kern) => {
   });
 
   /* ---------- aanschuiven ----------
-     Een lid mag zijn codenaam meesturen; die staat al op zijn sessie en is
-     bewust NIET de echte naam. Wie geen lid is, geeft een voornaam of krijgt
-     "Gast 3". Beide zijn genoeg om te weten wie welk biertje bestelde. */
-  app.post('/api/gast/aanschuiven', (req, res) => {
+     Alleen met een account (eigenaarsbesluit 19 oktober 2026). De deelnemer
+     wordt de CODENAAM van dat account (kern/gast/naad.js), en die staat ook als
+     `account` bij de deelnemer: gastAuth laat de tafelsleutel alleen werken
+     voor de sessie die aanschoof. Een meegestuurde naam telt niet meer -- de
+     codenaam is genoeg om te weten wie welk biertje bestelde, en is bewust
+     NIET de echte naam. */
+  app.post('/api/gast/aanschuiven', auth, (req, res) => {
     if (geremd(req, res, 'aanschuif')) return;
     const b = req.body || {};
     const plek = sessie.zaakBijToken(b.token);
     if (!plek) { noteFailedTry(req.gastBucket, req.ip); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel die wij kennen.', code: 'qr-onbekend' }); }
     const uit = sessie.schuifAan(plek.zaakcode, plek.plek, {
       soort: plek.soort, folioVan,
-      naam: b.naam, codenaam: b.codenaam, lid: !!b.lid,
+      codenaam: naad.handleVan(req.session), account: naad.handleVan(req.session), lid: true,
       /* De leeftijd telt alleen als hij GEVERIFIEERD is. Een gast die zelf
          invult dat hij 19 is, opent hier geen alcoholdeur: beleid.js kijkt naar
          `leeftijdGeverifieerd`, en dat vlaggetje kan een gast niet zetten. */

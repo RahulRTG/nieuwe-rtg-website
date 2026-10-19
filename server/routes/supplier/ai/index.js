@@ -112,7 +112,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
       : 'Alle gastberichten zijn beantwoord.');
   }
   if (/(minibar)/.test(ql) && Array.isArray(s.minibar)) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = require('../../../kern/tijdzone').datumIn();
     const counted = [...new Set((db.data.minibarCounts[s.code] || []).filter(e => e.at.slice(0, 10) === today).map(e => e.room))];
     const todo = (s.rooms || []).map(r => r.name).filter(n => !counted.includes(n));
     return A(todo.length ? 'Nog te tellen: ' + todo.join(', ') + '.' : 'Alle minibars zijn vandaag geteld.');

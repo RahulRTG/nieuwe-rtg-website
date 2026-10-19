@@ -6,9 +6,11 @@
    collecties komen als lezers uit ./metrics.js, dat al een deur naar de opslag is. */
 const { TE_KLEINE_GROEP, KLASSEN } = require('../bedrijfsmaat/poort');
 const ZAKEN_GRENS = KLASSEN.zaken.grens;
+// het overzicht van RTG zelf, over alle zaken: de kalenderdag van het huis
+const tijdzone = require('../tijdzone');
 
 module.exports = ({ invoices, fondsAfdrachten, muntOntvangsten }) => {
-  const dagVan = iso => String(iso || '').slice(0, 10);
+  const dagVan = iso => tijdzone.datumVan(iso) || '';
 
   // de weektrend en de dagcijfers, plus foundation-afdracht en munt-ontvangsten
   function weekEnStats(betaaldeOrders, betaaldeRitten, live, nu) {
@@ -20,7 +22,7 @@ module.exports = ({ invoices, fondsAfdrachten, muntOntvangsten }) => {
     const week = [];
     const zakenWeek = new Set();
     for (let i = 6; i >= 0; i--) {
-      const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);
+      const d = tijdzone.plusDagen(tijdzone.datumIn(nu), -i);
       const dagOrders = betaaldeOrders.filter(o => dagVan(o.paidAt || o.at) === d);
       const dagRitten = betaaldeRitten.filter(r => dagVan(r.paidAt || r.at) === d);
       const zaken = new Set(dagOrders.concat(dagRitten).map(zaakVan).filter(Boolean));

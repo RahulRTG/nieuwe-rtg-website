@@ -336,7 +336,6 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
        Een 128-bits eenmalige koppeling in het POST-lijf wordt atomair verbruikt
        voor een aparte, intrekbare schermsessie. Beide geven uitsluitend
        zicht.publiek van één potje; de rem staat ervoor. */
-    'server/routes/spellen.js POST /api/projectie/koppel': 'spelscherm op tv: eenmalige gehashte koppeling is de deur tot alleen publiek zicht',
     'server/routes/lesmaker.js POST /api/les/leraar': 'klaslokaal: leraarToken is de sleutel, geen account',
     'server/routes/lesmaker.js POST /api/les/volgende': 'klaslokaal: leraarToken is de sleutel',
     'server/routes/lesmaker.js POST /api/les/sluit': 'klaslokaal: leraarToken is de sleutel',
@@ -344,12 +343,11 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
     'server/routes/lesmaker.js POST /api/les/kijk': 'klas-PDA: deelnemerToken is de sleutel',
     'server/routes/lesmaker.js POST /api/les/antwoord': 'klas-PDA: deelnemerToken is de sleutel',
     'server/routes/member/kopen/bezorg.js POST /api/partner': 'partnercode opzoeken: openbaar partnerprofiel',
-    'server/routes/member/partnerkanaal.js POST /api/book': 'partnerkanaal: boeken zonder RTG-account, de reis-id is openbaar',
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/club/portaal': 'clubportaal: de clubcode is de sleutel van het eigen dossier',
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/club/bericht': 'clubportaal: de clubcode is de sleutel',
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/partner/raad': 'stadsraad-portaal: de partnercode is de sleutel',
+    'server/routes/spellen.js POST /api/projectie/koppel': 'spelscherm op tv: eenmalige gehashte koppeling van een ingelogd lid is de deur tot alleen publiek zicht (uitzondering 6)',
     'server/routes/supplier/toegang.js POST /api/supplier/roster': 'openbaar rooster van een zaak op zaakcode',
-    'server/routes/supplier/werving/sollicitaties.js POST /api/supplier/apply': 'solliciteren kan zonder account: de vacaturecode is openbaar',
     // (b) openbare inhoud achter een inlog
     'server/routes/luchthaven.js POST /api/supplier/lucht/pass': 'boarding pass die de gast zelf toont aan de balie',
     'server/routes/member/winkel-bieb.js POST /api/foodcourt/tijden': 'vrije tijdsloten van een restaurant: openbare beschikbaarheid',

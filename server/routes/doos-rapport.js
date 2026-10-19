@@ -22,7 +22,7 @@ module.exports = ({ app, zaakdoos, doosSleutelOk, noteerRapport }) => {
        ./doos.js -- dit bestand raakt de opslag niet aan. */
     noteerRapport({
       doos: req.doosBewezen || String(b.doos || 'doos').replace(/[<>]/g, '').slice(0, 40), zaak: req.doosZaak || null,
-      datum: /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum)) ? String(b.datum) : new Date().toISOString().slice(0, 10),
+      datum: /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum)) ? String(b.datum) : require('../kern/tijdzone').datumIn(),
       pings: Math.max(0, Math.round(Number(b.pings) || 0)),
       rttGem: Math.max(0, Math.min(60000, Math.round(Number(b.rttGem) || 0))),
       uitval: Math.max(0, Math.round(Number(b.uitval) || 0)),

@@ -30,7 +30,7 @@
 
   /* ---- alle lijsten ---- */
   function lijsten() {
-    M.api('lijsten', {}).then(function (d) {
+    M.api('/api/mediaos/lijsten', {}).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
         vlak.appendChild(M.el('h3', null, 'Uw lijsten'));
@@ -57,13 +57,13 @@
           rij.appendChild(M.knop('Deel', '', function () {
             var wie = prompt('Met welke codenaam wilt u "' + l.naam + '" delen? Hij kan hem alleen lezen.');
             if (!wie) return;
-            M.api('lijst/deel', { id: l.id, codenaam: wie }).then(function (r) {
+            M.api('/api/mediaos/lijst/deel', { id: l.id, codenaam: wie }).then(function (r) {
               M.zeg(r.error || 'Gedeeld met ' + wie + '. Hij leest de lijst; veranderen doet u.');
               if (!r.error) lijsten();
             });
           }));
           rij.appendChild(M.knop('Weg', '', function () {
-            M.api('lijst/zet', { id: l.id, weg: true }).then(function (r) {
+            M.api('/api/mediaos/lijst/zet', { id: l.id, weg: true }).then(function (r) {
               if (r.error) return M.zeg(r.error);
               M.zeg('Lijst weg. Uw werk staat er nog: een lijst is een ordening, geen bezit.');
               lijsten();
@@ -76,8 +76,11 @@
         var veld = document.createElement('input');
         veld.id = 'lijstNaam'; veld.maxLength = 60; veld.placeholder = 'Naam van de nieuwe lijst';
         nieuw.appendChild(veld);
+        /* Een sleutel per formulier: een tweede tik of een herhaling na een
+           storing is dezelfde lijst; na het tekenen komt er een nieuwe. */
+        var maakIdem = RTGIdem('media-lijst-maak');
         nieuw.appendChild(M.knop('Maak lijst', 'vol', function () {
-          M.api('lijst/maak', { naam: veld.value }).then(function (r) {
+          M.api('/api/mediaos/lijst/maak', { naam: veld.value, idem: maakIdem }).then(function (r) {
             if (r.error) return M.zeg(r.error);
             lijsten();
           });
@@ -89,7 +92,7 @@
 
   /* ---- één lijst ---- */
   function lijst(id) {
-    M.api('lijst', { id: id }).then(function (d) {
+    M.api('/api/mediaos/lijst', { id: id }).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
         vlak.appendChild(M.el('h3', null, d.lijst.naam));
@@ -103,7 +106,7 @@
           var r = M.el('div', 'rij');
           r.appendChild(M.el('span', 'stil', s.titel));
           r.appendChild(M.knop('Omhoog', '', function () {
-            M.api('lijst/stuk', { id: id, stukId: s.id, naar: i - 1 }).then(function (x) {
+            M.api('/api/mediaos/lijst/stuk', { id: id, stukId: s.id, naar: i - 1 }).then(function (x) {
               if (x.error) return M.zeg(x.error);
               lijst(id);
             });
@@ -116,7 +119,7 @@
             var r = M.el('div', 'rij');
             r.appendChild(M.el('span', 'stil', v.id + ' -- erin gezet op ' + String(v.erinOp).slice(0, 10)));
             r.appendChild(M.knop('Haal eruit', '', function () {
-              M.api('lijst/stuk', { id: id, stukId: v.id, aan: false }).then(function () { lijst(id); });
+              M.api('/api/mediaos/lijst/stuk', { id: id, stukId: v.id, aan: false }).then(function () { lijst(id); });
             }));
             vlak.appendChild(r);
           });
@@ -127,14 +130,14 @@
 
   /* ---- een stuk in een lijst zetten, en een stuk delen ---- */
   function inLijst(stukId) {
-    M.api('lijsten', {}).then(function (d) {
+    M.api('/api/mediaos/lijsten', {}).then(function (d) {
       if (d.error) return M.zeg(d.error);
       if (!d.lijsten.length) return M.zeg('U heeft nog geen lijst. Maak er eerst een onder "Lijsten".');
       open(function (vlak) {
         vlak.appendChild(M.el('h3', null, 'In welke lijst?'));
         d.lijsten.forEach(function (l) {
           vlak.appendChild(M.knop(l.naam + ' (' + l.aantal + ')', '', function () {
-            M.api('lijst/stuk', { id: l.id, stukId: stukId }).then(function (r) {
+            M.api('/api/mediaos/lijst/stuk', { id: l.id, stukId: stukId }).then(function (r) {
               M.zeg(r.error || 'In "' + l.naam + '" gezet.');
             });
           }));

@@ -19,13 +19,14 @@
    Krijgt de gedeelde ctx van kern/stadsweefsel/index.js. */
 const { schoon, coordPaar } = require('../util');
 const { SOORTEN, STATUS, RISICO, CONDITIE } = require('./objectsoorten');
+const tijdzone = require('../tijdzone');
 
 module.exports = (ctx) => {
   const { bak, save, crypto, nu, geo } = ctx;
 
   const objecten = () => bak().objecten;
   const object = (id) => objecten()[String(id || '')] || null;
-  const jaarNu = () => new Date(nu()).getFullYear();
+  const jaarNu = () => tijdzone.jaarIn(nu());
 
   /* Een object schrijven. De plaats gaat door coordPaar() (een ontbrekende
      positie mag nooit stilletjes 0,0 worden) en daarna door de geografie, die

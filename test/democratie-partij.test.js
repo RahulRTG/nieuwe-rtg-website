@@ -205,8 +205,17 @@ async function lid() {
   return r.body.token;
 }
 const sleutel = (s) => ({ 'x-partij-sleutel': s });
+/* Wie namens een partij handelt, heeft een account met die rol (eigenaarsbesluit
+   19 oktober 2026, kern/democratie/partijrol.js): een lid koppelt zijn account
+   met de eenmalige koppelcode, en handelt daarna met zijn eigen sessie. */
+async function partijAccount(code) {
+  const tok = await lid();
+  const k = await api('/api/democratie/partij/koppel', {}, tok, sleutel(code));
+  assert.equal(k.status, 200, 'koppelen: ' + JSON.stringify(k.body));
+  return tok;
+}
 
-test('8. over HTTP: elke route, de partijdeur zonder sleutel dicht, de eigenaar zonder voordeel', async () => {
+test('8. over HTTP: elke route, de partijdeur alleen voor een account met de partijrol, de eigenaar zonder voordeel', async () => {
   const kantoor = await kantoorAlsPersoon(srv.base, OFFICE_CODE);
   assert.ok(kantoor, 'een kantoormens op naam');
   const gedeeld = (await api('/api/office/login', { code: OFFICE_CODE })).body.token;
@@ -220,33 +229,36 @@ test('8. over HTTP: elke route, de partijdeur zonder sleutel dicht, de eigenaar 
   const pid = reg.body.partij.id;
   assert.equal((await api('/api/office/democratie/partij/lijst', {}, kantoor)).body.partijen.find(p => p.id === pid).stand, 'actief');
 
-  assert.equal((await api('/api/democratie/partij/wie', {})).status, 401, 'zonder sleutel is de deur dicht');
+  assert.equal((await api('/api/democratie/partij/wie', {})).status, 401, 'zonder account is de deur dicht');
+  assert.equal((await api('/api/democratie/partij/wie', {}, null, sleutel(s))).status, 401,
+    'de koppelcode alleen is geen geloofsbrief (eigenaarsbesluit 19 oktober 2026)');
   const inbrenger = await lid();
-  assert.equal((await api('/api/democratie/partij/wie', {}, inbrenger)).status, 401, 'een ledensessie is geen partij');
+  assert.equal((await api('/api/democratie/partij/wie', {}, inbrenger)).status, 403, 'een ledensessie zonder partijrol is geen partij');
   const eigenaar = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(eigenaar, 'de eigenaar logt in');
-  assert.equal((await api('/api/democratie/partij/voorstel/plaats', voorstel(null), eigenaar)).status, 401,
-    'de eigenaar van RTG plaatst geen voorstel zonder partijsleutel (OWNER_NO_ADVANTAGE)');
+  assert.equal((await api('/api/democratie/partij/voorstel/plaats', voorstel(null), eigenaar)).status, 403,
+    'de eigenaar van RTG plaatst geen voorstel zonder partijrol (OWNER_NO_ADVANTAGE)');
 
-  const wie = await api('/api/democratie/partij/wie', {}, null, sleutel(s));
+  const ps = await partijAccount(s);
+  const wie = await api('/api/democratie/partij/wie', {}, ps);
   assert.equal(wie.status, 200);
   assert.equal(wie.body.partij.id, pid);
   assert.equal(wie.versie, 'v1', 'de API-versie staat in de kop');
 
   const k = (await api('/api/member/democratie/kwestie/inbreng', { onderwerp: 'Geen bankjes bij de bushalte', gebied: 'Centrum' }, inbrenger)).body.kwestie;
-  assert.equal((await api('/api/democratie/partij/kwesties', {}, null, sleutel(s))).body.kwesties.some(x => x.id === k.id), false,
+  assert.equal((await api('/api/democratie/partij/kwesties', {}, ps)).body.kwesties.some(x => x.id === k.id), false,
     'zonder actie is de kwestie niet openbaar');
   await api('/api/member/democratie/actie/start', { kwestie: k.id, wat: 'Samen een bankje voorstellen', zichtbaar: true }, inbrenger);
-  assert.equal((await api('/api/democratie/partij/kwesties', {}, null, sleutel(s))).body.kwesties.some(x => x.id === k.id), true);
+  assert.equal((await api('/api/democratie/partij/kwesties', {}, ps)).body.kwesties.some(x => x.id === k.id), true);
 
-  const pl = await api('/api/democratie/partij/voorstel/plaats', voorstel(k.id), null, sleutel(s));
+  const pl = await api('/api/democratie/partij/voorstel/plaats', voorstel(k.id), ps);
   assert.equal(pl.status, 200, 'plaats: ' + JSON.stringify(pl.body));
   const vid = pl.body.voorstel.id;
-  assert.equal((await api('/api/democratie/partij/voorstel/toelicht', { id: vid, tekst: 'Twee bankjes, betaald uit het wijkbudget.' }, null, sleutel(s))).status, 200);
-  assert.ok((await api('/api/democratie/partij/voorstel/mijn', {}, null, sleutel(s))).body.voorstellen
+  assert.equal((await api('/api/democratie/partij/voorstel/toelicht', { id: vid, tekst: 'Twee bankjes, betaald uit het wijkbudget.' }, ps)).status, 200);
+  assert.ok((await api('/api/democratie/partij/voorstel/mijn', {}, ps)).body.voorstellen
     .find(v => v.id === vid).toelichtingen.some(t => t.tekst === 'Twee bankjes, betaald uit het wijkbudget.'));
-  assert.equal((await api('/api/democratie/partij/voorstel/aanname', { id: vid, veld: 'betaler', waarde: 'Wijkbudget', bron: 'Begroting 2027' }, null, sleutel(s))).status, 200);
-  assert.equal((await api('/api/democratie/partij/voorstel/mijn', {}, null, sleutel(s))).body.voorstellen[0].id, vid);
+  assert.equal((await api('/api/democratie/partij/voorstel/aanname', { id: vid, veld: 'betaler', waarde: 'Wijkbudget', bron: 'Begroting 2027' }, ps)).status, 200);
+  assert.equal((await api('/api/democratie/partij/voorstel/mijn', {}, ps)).body.voorstellen[0].id, vid);
 
   const buur = await lid();
   const gezien = await api('/api/member/democratie/kwestie/voorstellen', { id: k.id }, buur);
@@ -259,9 +271,12 @@ test('8. over HTTP: elke route, de partijdeur zonder sleutel dicht, de eigenaar 
 
   const nieuw = await api('/api/office/democratie/partij/sleutel', { id: pid }, kantoor);
   assert.equal(nieuw.status, 200);
-  assert.equal((await api('/api/democratie/partij/wie', {}, null, sleutel(s))).status, 401, 'de oude sleutel is dicht');
+  assert.equal((await api('/api/democratie/partij/koppel', {}, await lid(), sleutel(s))).status, 401, 'de oude code koppelt niets meer');
+  assert.equal((await api('/api/democratie/partij/wie', {}, ps)).status, 200, 'een nieuwe code laat het gekoppelde account staan');
   assert.equal((await api('/api/office/democratie/partij/uitschrijf', { id: pid, reden: 'Registratie vervallen volgens het register.' }, kantoor)).status, 200);
-  assert.equal((await api('/api/democratie/partij/wie', {}, null, sleutel(nieuw.body.sleutel))).status, 401, 'uitgeschreven is dicht');
+  assert.equal((await api('/api/democratie/partij/wie', {}, ps)).status, 403, 'uitgeschreven is dicht');
+  assert.equal((await api('/api/democratie/partij/koppel', {}, await lid(), sleutel(nieuw.body.sleutel))).status, 401,
+    'en een code van een uitgeschreven partij koppelt niets');
 });
 
 test('9. twee keer hetzelfde verzoek: wat idempotent is en wat een toestandscontrole is', async () => {
@@ -269,25 +284,25 @@ test('9. twee keer hetzelfde verzoek: wat idempotent is en wat een toestandscont
   const reg = await api('/api/office/democratie/partij/registreer', inschrijving('Partij Herhaal'), kantoor);
   assert.equal((await api('/api/office/democratie/partij/registreer', inschrijving('Partij Herhaal'), kantoor)).status, 409,
     'een tweede inschrijving met dezelfde aanduiding wordt geweigerd, niet dubbel');
-  const s = reg.body.sleutel;
+  const s = await partijAccount(reg.body.sleutel);
   for (const pad of ['/api/democratie/partij/wie', '/api/democratie/partij/kwesties', '/api/democratie/partij/voorstel/mijn']) {
-    const [a, b] = [await api(pad, {}, null, sleutel(s)), await api(pad, {}, null, sleutel(s))];
+    const [a, b] = [await api(pad, {}, s), await api(pad, {}, s)];
     assert.deepEqual(a.body, b.body, pad + ' leest twee keer hetzelfde');
   }
-  const vid = (await api('/api/democratie/partij/voorstel/plaats', voorstel(null), null, sleutel(s))).body.voorstel.id;
+  const vid = (await api('/api/democratie/partij/voorstel/plaats', voorstel(null), s)).body.voorstel.id;
   const aan = { id: vid, veld: 'regel', waarde: 'Geen', bron: 'Gemeentewet art. 1' };
-  await api('/api/democratie/partij/voorstel/aanname', aan, null, sleutel(s));
-  assert.equal((await api('/api/democratie/partij/voorstel/aanname', aan, null, sleutel(s))).body.herhaling, true, 'dezelfde aanname nog eens verandert niets');
+  await api('/api/democratie/partij/voorstel/aanname', aan, s);
+  assert.equal((await api('/api/democratie/partij/voorstel/aanname', aan, s)).body.herhaling, true, 'dezelfde aanname nog eens verandert niets');
   /* Twee partijen achter hetzelfde adres, vlak na elkaar met hetzelfde lijf:
-     de partijdeur heeft geen sessie, dus een duplicaatlaag zou ze alleen op
-     het lijf en het ip-adres kunnen onderscheiden. Elke partij hoort haar
-     eigen antwoord te krijgen. */
-  const ander = (await api('/api/office/democratie/partij/registreer', inschrijving('Partij Buurman'), kantoor)).body.sleutel;
+     elke partij handelt met haar eigen account, en een duplicaatlaag mag ze
+     niet op het lijf en het ip-adres door elkaar halen. Elke partij hoort
+     haar eigen antwoord te krijgen. */
+  const ander = await partijAccount((await api('/api/office/democratie/partij/registreer', inschrijving('Partij Buurman'), kantoor)).body.sleutel);
   for (const pad of ['/api/democratie/partij/wie', '/api/democratie/partij/voorstel/mijn']) {
-    const [a, b] = [await api(pad, {}, null, sleutel(s)), await api(pad, {}, null, sleutel(ander))];
+    const [a, b] = [await api(pad, {}, s), await api(pad, {}, ander)];
     assert.notDeepEqual(a.body, b.body, pad + ': de tweede partij kreeg het antwoord van de eerste');
   }
-  const aanAnder = await api('/api/democratie/partij/voorstel/aanname', aan, null, sleutel(ander));
+  const aanAnder = await api('/api/democratie/partij/voorstel/aanname', aan, ander);
   assert.equal(aanAnder.status, 404, 'hetzelfde lijf van een andere partij raakt het voorstel niet en krijgt geen afgespeeld succes');
   const pid = reg.body.partij.id;
   await api('/api/office/democratie/partij/uitschrijf', { id: pid, reden: 'Op verzoek van de partij zelf, per brief.' }, kantoor);

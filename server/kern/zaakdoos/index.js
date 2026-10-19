@@ -22,6 +22,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const tijdzone = require('../tijdzone');
 
 module.exports = ({ db, save, log, dataDir }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakdoos', bezit: { doosJournaal: 'lijst' } });
@@ -158,8 +159,9 @@ module.exports = ({ db, save, log, dataDir }) => {
         await proxy.haalKloon();
       }
       // om vier uur in de nacht: huishouding en het dagrapport
-      const dag = new Date().toISOString().slice(0, 10);
-      if (new Date().getHours() === 4 && dag !== st.laatsteNachtDag) { st.laatsteNachtDag = dag; netwerk.nachtwerk(); }
+      const hier = tijdzone.huis();
+      const dag = hier.datum;
+      if (hier.uur === 4 && dag !== st.laatsteNachtDag) { st.laatsteNachtDag = dag; netwerk.nachtwerk(); }
     } catch (e) { naarLokaal('ping: ' + (e && e.message)); netwerk.meldViaBuur(); }
     st.bezig = false;
   }

@@ -11,7 +11,7 @@
 'use strict';
 
 module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag,
-  markProviderEvidence, vrijgave }) {
+  markProviderEvidence, vrijgave, simulatie }) {
   /* De vrijgavepoort (server/kern/vrijgave/). Standaard het ene exemplaar per
      proces; een toets kan een eigen exemplaar meegeven om de volgorde van de
      twee poorten na te trekken. */
@@ -54,6 +54,8 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
         valuta: p.amount && String(p.amount.currency || '').toLowerCase(),
         checkoutUrl: p.url, betaalId: p.pspReference || null }, 'adyen');
     }
+    /* de simulatiebank (./synthetisch-naslag.js); alleen doorgegeven als hij aan staat */
+    if (aanbieder === 'simulatie' && simulatie) return simulatie.haal(id);
     throw new Error('Deze betaalprovider is niet beschikbaar.');
   }
 
@@ -92,6 +94,12 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
       return { id: r.pspReference || r.id, status: r.status || 'received',
         aanbieder: 'adyen', providerId, bedrag: Math.round(bedrag), valuta };
     }
+    /* De simulatiebank: dezelfde vrijgavepoort, op de neprail; de grendel voor
+       echt geld naar buiten hoort er niet bij, want er gaat niets naar buiten. */
+    if (aanbieder === 'simulatie' && simulatie) {
+      poort().eis('geld.terugbetaling', { actor: { soort: 'systeem' }, provider: 'simulatie', rail: 'simulatie' });
+      return simulatie.terugbetaal({ providerId, bedrag, valuta, idempotentieSleutel, referentie: opdracht.referentie });
+    }
     if (aanbieder === 'magnaat-test' && !stripe && !mollie && !adyen)
       return { id: 'magnaat_ref_' + crypto.randomBytes(8).toString('hex'), status: 'refunded',
         aanbieder: 'magnaat-test', providerId, bedrag: Math.round(bedrag), valuta };
@@ -99,5 +107,27 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
   }
 
 
-  return { haalBetaling, maakTerugbetaling };
+  /* NAVRAAG NAAR EEN TERUGBETALING, voor de veegronde
+     (kern/betaalwaarheid/terugveeg.js): de webhook kan wegblijven. Adyen kent
+     geen opvraagbare refund; daar is de melding de enige weg, en een gooi hier
+     telt voor de veegronde als "geen uitsluitsel". */
+  async function haalTerugbetaling(aanbieder, { providerId, refundId } = {}) {
+    weigerUit();
+    if (!refundId) throw new Error('Navraag naar een terugbetaling heeft het refund-id van de provider nodig.');
+    if (aanbieder === 'stripe' && stripe) {
+      const r = await stripe.refunds.retrieve(refundId);
+      return { id: r.id, status: r.status, aanbieder: 'stripe', bedrag: Number.isFinite(r.amount) ? r.amount : undefined,
+        valuta: r.currency };
+    }
+    if (aanbieder === 'mollie' && mollie) {
+      const r = await mollie.refunds.retrieve(providerId, refundId);
+      return { id: r.id, status: r.status, aanbieder: 'mollie',
+        bedrag: r.amount ? Math.round(Number(r.amount.value) * 100) : undefined,
+        valuta: r.amount && String(r.amount.currency || '').toLowerCase() };
+    }
+    if (aanbieder === 'simulatie' && simulatie) return simulatie.haalTerugbetaling(refundId);
+    throw new Error('Deze betaalprovider meldt terugbetalingen alleen via de webhook; navragen kan niet.');
+  }
+
+  return { haalBetaling, maakTerugbetaling, haalTerugbetaling };
 };

@@ -3,6 +3,17 @@ const test=require('node:test'), assert=require('node:assert/strict');
 const fs=require('node:fs'), os=require('node:os'), path=require('node:path');
 const {startServer,stopHard,laadPlaywright,browserOpties,geenBrowser,letOpFouten}=require('./helper');
 const pw=laadPlaywright();
+/* De link is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026): wie hem opent,
+   maakt in het scherm zelf een gratis account (shared/accountdeur.js) en gaat daarna verder op dezelfde link. */
+async function gratisInScherm(p,naam){
+  await p.getByRole('heading',{name:'Maak gratis een account',exact:true}).waitFor();
+  const u=Date.now().toString().slice(-8)+Math.floor(Math.random()*90+10);
+  await p.getByLabel('Naam',{exact:true}).fill(naam);
+  await p.getByLabel('E-mailadres',{exact:true}).fill('scherm'+u+'@voorbeeld.nl');
+  await p.getByLabel('Geboortedatum',{exact:true}).fill('1985-05-05');
+  await p.getByLabel('Wachtwoord (minstens zes tekens)',{exact:true}).fill('geheim12345');
+  await p.getByRole('button',{name:'Account maken en doorgaan',exact:true}).click();
+}
 for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord op '+breedte+'px',{skip:geenBrowser(pw)},async()=>{
   const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-praktijk-browser-'));let srv,browser;
   try {
@@ -68,6 +79,7 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     const link=await paneel.locator('.pr-link').getAttribute('href');assert.ok(link.includes('#gast='));
     const gast=await browser.newPage({viewport:{width:breedte,height:900}});letOpFouten(gast,fouten);
     await gast.goto(srv.base+link,{waitUntil:'domcontentloaded'});
+    await gratisInScherm(gast,'Klant met link');
     await gast.getByRole('button',{name:'Akkoord met dit voorstel',exact:true}).click();
     await gast.locator('#praktijkGast').getByText('bevestigd',{exact:true}).waitFor();
     assert.equal(await gast.locator('#praktijkGast').getByText('Mijn buur',{exact:true}).count(),0);
@@ -90,6 +102,7 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     const partner=await browser.newPage({viewport:{width:breedte,height:900}});letOpFouten(partner,fouten);
     await partner.goto(srv.base+leverancierslink,{waitUntil:'domcontentloaded'});
     await partner.locator('#rtg-cookie button').click();
+    await gratisInScherm(partner,'Planner buurthuis');
     await partner.getByLabel('Uw naam',{exact:true}).fill('Planner buurthuis');
     await partner.getByLabel('Uw bevestigingsreferentie of toelichting',{exact:true}).fill('Ophaalafspraak BH-02');
     await partner.getByRole('button',{name:'Antwoord bevestigen',exact:true}).click();

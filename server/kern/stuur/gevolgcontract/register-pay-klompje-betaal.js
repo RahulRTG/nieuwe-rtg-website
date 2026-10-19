@@ -19,7 +19,7 @@ const KLOMPJE_BETAAL = Object.freeze({
       'DERDENCODE_UITVOEREN', 'ONVERTROUWDE_BYTES', 'BEVEILIGING_VERZWAKKEN', 'BULK_UITVOER',
       'PLAFOND_WIJZIGEN'],
     voorwaarden: [
-      { wat: 'een ledensessie en eenmalig het paspoort', bron: 'geenGast + onboarding.payGate' },
+      { wat: 'een account (ook gratis) en eenmalig het paspoort', bron: 'geenEchtAccount + onboarding.payGate' },
       { wat: 'een klompje dat OP JOUW NAAM staat en nog open is',
         bron: 'kern/pay/verzoeken.js zoekt op id EN `aan === codenaam` -- anders 404 "staat niet voor ' +
           'jou open"; een al afgehandeld klompje geeft 409' },

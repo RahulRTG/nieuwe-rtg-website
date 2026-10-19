@@ -130,3 +130,39 @@ test('een bevroren kopie die AL in de kern staat, komt in de oude berichtvorm al
   assert.ok(m, 'controle: het bevroren bericht wordt gelezen');
   assert.deepEqual(m.post, { id: 7 }, 'de oude berichtvorm gaf een bevroren kopie van de post door');
 });
+
+/* Een herhaalsleutel (opt-in) per afzender: het formulier van een RTG-site
+   (routes/webbrowser.js) stuurt na een afgebroken verbinding of een herstart
+   hetzelfde verzoek opnieuw. Dat is hetzelfde bericht, en de sleutel staat op
+   het bericht zelf -- een nieuwe kern op dezelfde opslag kent hem dus ook. */
+test('dezelfde herhaalsleutel geeft geen tweede bericht, ook niet na een herstart', () => {
+  const { db, dm } = opzet();
+  const eerste = dm.stuur('a', 'b', { tekst: 'Offerte voor een lamp', idem: 'web:1' });
+  const save = () => {};
+  const db2 = { data: JSON.parse(JSON.stringify(db.data)) };   // wat er na de herstart van schijf komt
+  const comm2 = maakComm({ db: db2, save, crypto, codenaamVan: (k) => NAMEN[k] || k });
+  const dm2 = maakCommDm({ db: db2, save, comm: comm2, dmSleutel: (x, y) => [x, y].sort().join('|') });
+  const herhaling = dm2.stuur('a', 'b', { tekst: 'Offerte voor een lamp', idem: 'web:1' });
+  assert.equal(herhaling.herhaald, true);
+  assert.equal(herhaling.id, eerste.id);
+  assert.equal(dm2.berichten('a', 'b').filter((m) => m.text === 'Offerte voor een lamp').length, 1);
+  assert.notEqual(dm2.stuur('b', 'a', { tekst: 'Offerte voor een lamp', idem: 'web:1' }).herhaald, true,
+    'dezelfde sleutel van de ander is een eigen bericht');
+  assert.equal(dm2.stuur('a', 'b', { tekst: 'Zonder sleutel' }).herhaald, undefined);
+  assert.equal(dm2.stuur('a', 'b', { tekst: 'Zonder sleutel' }).herhaald, undefined, 'zonder sleutel blijft elk bericht een eigen bericht');
+});
+
+/* Een herhaalsleutel per opgesteld bericht (voltooiproef van Vrienden, 19 oktober
+   2026). De centrale antwoordkas vangt een dubbele tik alleen zolang hij in het
+   geheugen staat; na een herstart is de sleutel op het bericht de enige grens.
+   Dit draait daarom op de kern zelf, zonder die kas ervoor. */
+test('dezelfde herhaalsleutel is hetzelfde bericht, een nieuwe sleutel een nieuw bericht', () => {
+  const { dm } = opzet();
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-1' });
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-1' });
+  assert.equal(dm.berichten('a', 'b', 80).filter((m) => m.text === 'Kom je spelen?').length, 1,
+    'dezelfde sleutel zette het bericht twee keer neer');
+  dm.stuur('a', 'b', { tekst: 'Kom je spelen?', idem: 'dm-sleutel-2' });
+  assert.equal(dm.berichten('a', 'b', 80).filter((m) => m.text === 'Kom je spelen?').length, 2,
+    'een bewust tweede bericht met een eigen sleutel hoort er wel bij');
+});

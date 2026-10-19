@@ -37,10 +37,10 @@
    zonder code). Ze hebben eigen remmen nodig en horen daarom niet tussen de
    kantoorroutes.
 
-   De drie in portalen.js: de partnerstichting, de
-   gemeente en de lokale ondernemer komen binnen op een code en hebben geen
-   RTG-account. Die hebben hun eigen remmen nodig en horen daarom niet tussen
-   de kantoorroutes.
+   De drie in portalen.js: de partnerstichting, de gemeente en de lokale
+   ondernemer komen binnen met een account EN een code (eigenaarsbesluit 19
+   oktober 2026, kern/codekoppel.js). Die hebben hun eigen remmen nodig en
+   horen daarom niet tussen de kantoorroutes.
 
    De uitvoeringslaag (vrijwilligers, geld, casussen, meldingen, rapportages,
    gemeenten, ondernemers, subsidies, voorraad, activiteiten en communicatie)
@@ -101,9 +101,9 @@ module.exports = (kern) => {
 
   require('./uitvoering')({ app, officeAuth, rtfos, H });
   require('./netwerk')({ app, officeAuth, rtfos, H });
-  require('./doelgroepen')({ app, auth, officeAuth, rtfos, veilig, H });
+  require('./doelgroepen')({ app, auth, db: kern.db, save: kern.save, officeAuth, rtfos, veilig, H, rtf: kern.rtf, resolveSession: kern.resolveSession });
   require('./governance')({ app, officeAuth, rtfos, veilig, H });
-  require('./afmaak')({ app, officeAuth, rtfos, veilig, H });
+  require('./afmaak')({ app, auth, db: kern.db, save: kern.save, officeAuth, rtfos, veilig, H });
   /* De buurtruil hangt aan de LEDENdeur en niet aan de kantoordeur; hij krijgt
      daarom andere onderdelen mee dan de rest van dit domein. */
   require('./ruil')({ app, auth: kern.auth, geenGast: kern.geenGast,
@@ -137,6 +137,6 @@ module.exports = (kern) => {
   app.post('/api/rtfos/winkel/stand', officeAuth,
     (req, res) => veilig(res, () => rtfos.winkel.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
 
-  require('./portalen')({ app, rtfos, veilig, genootschapDrager: kern.genootschapDrager });
+  require('./portalen')({ app, auth, officeAuth, db: kern.db, save: kern.save, rtfos, veilig, genootschapDrager: kern.genootschapDrager });
   require('./voordeur')({ app, rtfos, veilig });
 };

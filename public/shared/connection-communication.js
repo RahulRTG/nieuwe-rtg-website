@@ -24,7 +24,7 @@
     }
     function bind() {
       var send=host.querySelector('[data-cc-send]'), input=host.querySelector('[data-cc-text]');
-      send.onclick=function(){var text=input.value.trim();if(!text)return;send.disabled=true;request('text',{id:contextId,text:text}).then(function(){input.value='';return load(true);}).catch(fail).finally(function(){send.disabled=false;});};
+      send.onclick=function(){var text=input.value.trim();if(!text)return;send.disabled=true;if(!input.dataset.idem)input.dataset.idem=RTGIdem('connection-tekst');request('text',{id:contextId,text:text,idem:input.dataset.idem}).then(function(){input.value='';delete input.dataset.idem;return load(true);}).catch(fail).finally(function(){send.disabled=false;});};
       input.onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send.click();}};
       host.querySelectorAll('[data-cc-consent]').forEach(function(el){el.onchange=function(){request('consent',{id:contextId,capability:el.dataset.ccConsent,active:el.checked}).then(function(){return load(true);}).catch(fail);};});
       var image=host.querySelector('[data-cc-image]');image.onchange=function(){if(image.files&&image.files[0])upload(image.files[0],'image');};

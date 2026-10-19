@@ -24,7 +24,7 @@ module.exports = (ctx) => {
         codenaam: x.codenaam, status: x.status, prijs: x.prijs,
         // de zorgcontext die het lid deelt: allergenen/dieet + (voor een
         // kliniek) de uitdrukkelijk gedeelde intake
-        zorg: x.zorg || null, intake: x.intake || null
+        zorg: x.zorg || null, intake: x.intake ? ctx.intakesleutel.open(x.intake, 'boeking|' + x.id) : null
       }));
     return { ok: true, datum, aanbieder: eigen[0].naam, behandelaars, afspraken };
   }
@@ -111,24 +111,11 @@ module.exports = (ctx) => {
     return { ok: true, pakket: pb, behandeling: r.boeking };
   }
 
-  /* Lezen zonder scheppen: pakketten() legt de boekingenlijst EN de catalogus
-     aan (met een save()), en die hoort te ontstaan waar hij getoond wordt --
-     niet bij een betaling die vier regels verder op 404 eindigt. */
-  function carePakketBetaal(sess, refIn, verdien) {
-    const boekingen = C.kijk('carePakketBoekingen');
-    const pb = boekingen.find(x => x.ref === String(refIn || '') && x.key === sess.key);
-    if (!pb) return { status: 404, error: 'Pakketboeking niet gevonden.' };
-    if (pb.paid) return { status: 409, error: 'Al betaald.' };
-    if (Date.now() - Date.parse(pb.at) > 30 * 60000) return { status: 410, error: 'Deze boeking is verlopen. Boek opnieuw.' };
-    // de behandeling in de agenda meebevestigen (zonder los te betalen)
-    const bk = C.kijk('careBoekingen').find(x => x.ref === pb.careRef && x.key === sess.key);
-    if (bk && !bk.paid) { bk.paid = true; bk.paidAt = nu(); bk.status = 'geboekt'; }
-    pb.paid = true; pb.paidAt = nu(); pb.status = 'geboekt';
-    save();
-    if (typeof verdien === 'function') { try { verdien(sess.key, pb.prijs, pb.naam); } catch (e) {} }
-    notify(sess.key, { icon: 'oogst', title: 'Pakket geboekt: ' + pb.naam, body: pb.nachten + ' nachten bij ' + pb.hotelNaam + ' + behandeling op ' + pb.datum + ' om ' + pb.tijd + '.', scope: 'care' });
-    return { ok: true, pakket: pb };
-  }
+  /* Betalen aan twee zaken, naar verhouding (besluit eigenaar 19 oktober
+     2026): ./pakketbetaal.js. Lezen zonder scheppen: de boekingenlijst en de
+     catalogus ontstaan waar ze getoond worden, niet bij een betaling. */
+  const pakketBetaal = require('./pakketbetaal')(ctx);
+  const carePakketBetaal = (sess, refIn, verdien) => pakketBetaal.carePakketBetaal(sess, refIn, verdien, { pakketVan, nachtprijsVan });
 
   function carePakketMijn(key) {
     pakketten();
@@ -141,7 +128,7 @@ module.exports = (ctx) => {
 
   /* Rahul-actie: exact dezelfde functies achter een gewone zin.
      "boek een massage bij Zenith morgen om 15:00" -> voorstel -> ja. */
-  function boekBehandelingActie(session, body, verdien) {
+  async function boekBehandelingActie(session, body, verdien) {
     const r = careBoek(session, body.codenaam || '', body);
     if (r.error) return r;
     return careBetaal(session, r.boeking.ref, verdien);

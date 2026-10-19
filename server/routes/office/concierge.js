@@ -8,7 +8,16 @@ module.exports = (octx) => {
   const { app, officeAuth, conciergeDesk, conciergeVoortgang } = kern;
   // alleen de balie: het kantoor kan de graaf en het mandaat van een lid niet zien
   const B = kern.bureauBalie;
-  const { boardroomWie, liveCodename } = kern;
+  const { boardroomWie, accounts } = kern;
+  /* boardroomWie geeft de SLEUTEL van de mens (`user-N`), geen sessie. De
+     codenaam staat op zijn account; liveCodename verwacht een sessie en gaf hier
+     altijd null, en de ledengids valt bij een onbekende sleutel terug op die
+     sleutel zelf -- dan las het lid "user-1". Geen account, geen naam. */
+  const naamVan = (wie) => {
+    const m = /^user-(\d+)$/.exec(String(wie || ''));
+    const u = m && accounts && accounts.getUserById ? accounts.getUserById(Number(m[1])) : null;
+    return (u && u.codename) || null;
+  };
 
   app.post('/api/office/concierge', officeAuth, (req, res) => res.json(conciergeDesk()));
 
@@ -47,7 +56,7 @@ module.exports = (octx) => {
   app.post('/api/office/bureau/lus', officeAuth, lus((k, id) => B.lusKantoor(k, id)));
   app.post('/api/office/bureau/lus/neem', officeAuth, lus((k, id, b, req) => {
     const wie = boardroomWie ? boardroomWie(req) : null;
-    return B.lusNeem(k, id, { naam: wie && liveCodename ? liveCodename(wie) : null });
+    return B.lusNeem(k, id, { naam: naamVan(wie) });
   }));
   app.post('/api/office/bureau/lus/weigering', officeAuth, lus((k, id, b) => B.lusWeigering(k, id, b)));
   app.post('/api/office/bureau/lus/aanbod', officeAuth, lus((k, id, b) => B.lusAanbod(k, id, b)));

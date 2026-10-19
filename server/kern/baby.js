@@ -6,6 +6,7 @@
    Alles hangt aan het gezin zelf (g.babyboek) en is onzichtbaar voor gasten. */
 
 const { toon } = require('../media/toegang');
+const tijdzone = require('./tijdzone');
 
 module.exports = ({ save, crypto, media, anthropic }) => {
 
@@ -17,10 +18,7 @@ module.exports = ({ save, crypto, media, anthropic }) => {
     if (!g.babyboek) g.babyboek = { kindNaam: '', geboren: '', gezin: [], entries: [], momenten: null };
     return g.babyboek;
   }
-  function vandaag() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
+  const vandaag = () => tijdzone.datumIn();
   // "3 maanden" / "1 jaar" / "2,5 jaar": warm en op de maat van een klein kind
   function leeftijdTekst(geboren) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(geboren || ''))) return null;

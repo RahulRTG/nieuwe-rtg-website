@@ -27,11 +27,18 @@ module.exports = (ctx) => {
     const s = suiteVan(key, codenaam);
     const M = MEUBELS[String((body || {}).soort || '')];
     if (!M) return { status: 400, error: 'Dit meubel kent de catalogus niet.' };
+    /* De herhaalsleutel staat bij het meubel: dezelfde tik geeft hetzelfde
+       meubel, dezelfde sleutel voor een ander meubel of een andere plek een 409. */
+    const idem = (body || {}).idem ? String(body.idem).slice(0, 80) : null;
+    const al = idem ? s.meubels.find(m => m.idem === idem) : null;
+    if (al) return al.soort === body.soort && al.x === Math.round(Number(body.x)) && al.y === Math.round(Number(body.y))
+      ? { status: 200, ok: true, herhaald: true, meubels: s.meubels }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een ander meubel.' };
     if (s.meubels.length >= SUITE.maxMeubels) return { status: 409, error: 'De suite is vol (' + SUITE.maxMeubels + ' stuks).' };
     const x = Math.round(Number((body || {}).x)), y = Math.round(Number((body || {}).y));
     if (!(x >= 0 && x + M.b <= SUITE.b && y >= 0 && y + M.d <= SUITE.d))
       return { status: 400, error: 'Dat past daar niet; kies een plek binnen de suite.' };
-    s.meubels.push({ soort: body.soort, x, y });
+    s.meubels.push(Object.assign({ soort: body.soort, x, y }, idem ? { idem } : {}));
     s.leeg = false;
     save();
     sein('suite:' + s.codenaam, 'meubel', { meubels: s.meubels.map(m => [m.soort, m.x, m.y]) });

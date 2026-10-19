@@ -278,18 +278,21 @@ const FAMILIES = [
     velden: ['code', 'token'],
     waarom: 'lesVan leest het les-id uit het lijf en de lessleutel via ' +
       'toegang.vanVerzoek(), die ook het lijfveld `token` leest (foundation/onderwijs/toegang.js)',
-    /* Bewust zonder inlog -- een quizbord in de klas -- en dus geeft de deur
-       code en sleutel gewoon terug. Wel met de uurgrens per IP die er sinds
-       kort op zit (test/foundation-lesrem.test.js); een fixture die er een
-       maakt, past ruim binnen die twintig.
+    /* Een les MAKEN vraagt sinds het eigenaarsbesluit van 19 oktober 2026 een
+       account (foundation/onderwijs/lesaccount.js), dus de bouwer maakt hem met
+       de ledensessie. Daarna draagt de les zijn eigen sleutel in het lijf; een
+       rol in de kop zou die sleutel verdringen (vanVerzoek leest de kop eerst),
+       dus de familie zelf blijft zonder rol. Met de uurgrens per IP
+       (test/foundation-lesrem.test.js); een fixture past ruim binnen die twintig.
 
        LET OP DE VELDNAMEN: `code` en `token` heten hier hetzelfde als bij het
        gezin, en dat is geen dubbeling maar toeval. De voorvoegsels overlappen
        niet, en de eerste treffer wint -- maar wie hier een pad toevoegt dat ook
        onder /api/foundation/gezin/ of /api/rtf/ valt, krijgt stil de verkeerde
        sleutel. Dat is de reden dat de prefixen expliciet en smal staan. */
-    async bouw({ post }) {
-      const r = await post('/api/foundation/les/maak', { vak: 'Proefles', naam: 'Proef Begeleider' }, null);
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens.member) return null;
+      const r = await post('/api/foundation/les/maak', { vak: 'Proefles', naam: 'Proef Begeleider' }, tokens.member);
       const d = r && r.data;
       if (!d || !d.lesId || !d.token) return null;
       return { code: d.lesId, token: d.token };
@@ -302,26 +305,28 @@ const FAMILIES = [
        (server/routes/gast.js). */
     prefixen: ['/api/gast/'],
     velden: ['sleutel'],
-    waarom: 'gastAuth herkent een TAFELSESSIE aan `sleutel` uit het lijf; die ontstaat pas ' +
-      'als iemand aan een tafel aanschuift, en die tafel bestaat pas als de zaak er een QR voor uitgaf',
+    rol: 'member',
+    waarom: 'gastAuth eist een account EN herkent de TAFELSESSIE aan `sleutel` uit het lijf; die ontstaat pas ' +
+      'als dat account aan een tafel aanschuift, en die tafel bestaat pas als de zaak er een QR voor uitgaf',
     /* DRIE ECHTE STAPPEN, en geen ervan is over te slaan:
          1. de zaak geeft een QR uit voor een tafel (supplier)
          2. de gast wisselt die QR-token voor de tafel in (openbaar -- dat is
             wat er gebeurt als je de sticker scant)
          3. de gast schuift aan en krijgt DAAR pas zijn sessiesleutel
 
-       De actor is hier een TAFEL en geen persoon: een gast hoeft zich niet te
-       identificeren om te bestellen, en de envelop zegt dat met zoveel woorden
-       ('anoniem'). Een fixture die dat overslaat en een sleutel verzint, zou
-       precies het ding omzeilen dat deze routes beschermt. */
+       Sinds het eigenaarsbesluit van 19 oktober 2026 schuift een ACCOUNT aan:
+       de QR is een extra sleutel bij de sessie, en de tafelsleutel werkt alleen
+       voor het account dat aanschoof. Vandaar de rol `member` hierboven. Een
+       fixture die dat overslaat en een sleutel verzint, zou precies het ding
+       omzeilen dat deze routes beschermt. */
     async bouw({ post, tokens }) {
-      if (!tokens || !tokens.supplier) return null;
+      if (!tokens || !tokens.supplier || !tokens.member) return null;
       const qr = await post('/api/supplier/horeca/gast/qr', { tafel: 'Proeftafel' }, tokens.supplier);
       const token = qr && qr.data && qr.data.token;
       if (!token) return null;
-      const tafel = await post('/api/gast/tafel', { token }, null);
+      const tafel = await post('/api/gast/tafel', { token }, tokens.member);
       if (!tafel || tafel.status !== 200) return null;
-      const aan = await post('/api/gast/aanschuiven', { token, naam: 'Proefgast' }, null);
+      const aan = await post('/api/gast/aanschuiven', { token }, tokens.member);
       const sleutel = aan && aan.data && aan.data.sleutel;
       if (!sleutel) return null;
       return { sleutel };

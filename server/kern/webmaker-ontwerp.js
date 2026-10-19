@@ -30,6 +30,8 @@ module.exports = ({ scho, crypto, schoonBlok, schoonKleuren }) => {
       plan: bestaand ? (bestaand.plan || undefined) : undefined,
       // net als de bevroren stand: een gekoppeld domein overleeft een bewaring
       domein: bestaand ? (bestaand.domein || undefined) : undefined,
+      // de herhaalsleutel van de eerste bewaring blijft bij de site (zie bewaar() in ./webmaker.js)
+      idem: bestaand ? (bestaand.idem || undefined) : (scho(d.idem, 60) || undefined),
       gemaakt: bestaand ? bestaand.gemaakt : new Date().toISOString(),
       bij: new Date().toISOString()
     };

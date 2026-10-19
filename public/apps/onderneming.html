@@ -120,7 +120,8 @@ const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 
-const api=(pad,body)=>fetch('/api/onderneming/'+pad,{method:'POST',
+let NIEUW_IDEM='';
+const api=(pad,body)=>fetch(pad,{method:'POST',
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
   body:JSON.stringify(body||{})}).then(async r=>{
     const d=await r.json().catch(()=>({}));
@@ -161,8 +162,12 @@ function toonLeeg(){
   $('#nieuwKnop').addEventListener('click',async()=>{
     const naam=$('#nieuwNaam').value.trim();
     if(!naam){meld('Geef een werktitel.');return;}
-    try{ const r=await api('nieuw',{naam}); meld('Aangemaakt.'); HUIDIG=r.onderneming.id;
-      ONDS=(await api('mijn')).ondernemingen||[]; vulKiezer(); await herlaad(); }
+    /* Een sleutel per poging: een tweede tik of een herhaling na een
+       afgebroken verbinding maakt geen tweede onderneming. Pas na succes een
+       nieuwe, want dan is de volgende tik een nieuwe onderneming. */
+    NIEUW_IDEM=NIEUW_IDEM||RTGId('ond');
+    try{ const r=await api('/api/onderneming/nieuw',{naam,idem:NIEUW_IDEM}); NIEUW_IDEM=''; meld('Aangemaakt.'); HUIDIG=r.onderneming.id;
+      ONDS=(await api('/api/onderneming/mijn')).ondernemingen||[]; vulKiezer(); await herlaad(); }
     catch(e){ meld(e.message); }
   });
 }
@@ -790,15 +795,15 @@ function haakKnoppen(){
   const p=$('#planKnop'); if(p) p.addEventListener('click',legVast);
   const rv=$('#rvKies'); if(rv) rv.addEventListener('change',async e=>{
     if(!e.target.value) return;
-    try{ await api('rechtsvorm',{id:HUIDIG,rechtsvorm:e.target.value}); meld('Rechtsvorm gezet.'); await herlaad(); }
+    try{ await api('/api/onderneming/rechtsvorm',{id:HUIDIG,rechtsvorm:e.target.value}); meld('Rechtsvorm gezet.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   document.querySelectorAll('.oprVink').forEach(el=>el.addEventListener('change',async e=>{
-    try{ await api('oprichting/zet',{id:HUIDIG,stap:e.target.dataset.stap,klaar:e.target.checked}); await herlaad(); }
+    try{ await api('/api/onderneming/oprichting/zet',{id:HUIDIG,stap:e.target.dataset.stap,klaar:e.target.checked}); await herlaad(); }
     catch(err){ meld(err.message); e.target.checked=!e.target.checked; }}));
   const av=$('#aanvKnop'); if(av) av.addEventListener('click',async()=>{
     const naam=($('#aanvNaam')||{}).value||'';
     if(!naam.trim()){meld('Vul uw naam in.');return;}
-    try{ await api('aanvraag',{id:HUIDIG,naam,contact:($('#aanvContact')||{}).value||''});
+    try{ await api('/api/onderneming/aanvraag',{id:HUIDIG,naam,contact:($('#aanvContact')||{}).value||''});
       meld('Aanvraag ingediend. Een mens beoordeelt hem.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   /* De inschrijving vastleggen. Deze aanroep bestond al aan de serverkant
@@ -807,19 +812,19 @@ function haakKnoppen(){
   const kv=$('#kvkKnop'); if(kv) kv.addEventListener('click',async()=>{
     const nr=(($('#kvkNr')||{}).value||'').trim();
     if(!nr){meld('Vul uw inschrijfnummer in.');return;}
-    try{ await api('ingeschreven',{id:HUIDIG,kvk:nr}); meld('Inschrijving vastgelegd.'); await herlaad(); }
+    try{ await api('/api/onderneming/ingeschreven',{id:HUIDIG,kvk:nr}); meld('Inschrijving vastgelegd.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   const ks=$('#kasKnop'); if(ks) ks.addEventListener('click',async()=>{
     const bedrag=($('#kasSaldo')||{}).value;
     if(bedrag==='') {meld('Vul uw banksaldo in.');return;}
-    try{ await api('kas/saldo',{id:HUIDIG,bedrag:Number(bedrag)}); meld('Doorgerekend op uw saldo.'); await herlaad(); }
+    try{ await api('/api/onderneming/kas/saldo',{id:HUIDIG,bedrag:Number(bedrag)}); meld('Doorgerekend op uw saldo.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   const wr=$('#wrKnop'); if(wr) wr.addEventListener('click',async()=>{
     const code=($('#wrCode')||{}).value||'';
-    try{ await api('werkruimte',{id:HUIDIG,code}); meld('Werkruimte gekoppeld.'); await herlaad(); }
+    try{ await api('/api/onderneming/werkruimte',{id:HUIDIG,code}); meld('Werkruimte gekoppeld.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   const st=$('#standKnop'); if(st) st.addEventListener('click',async()=>{
-    try{ const r=await api('aanvraag/stand',{id:HUIDIG});
+    try{ const r=await api('/api/onderneming/aanvraag/stand',{id:HUIDIG});
       meld(r.stand==='gekoppeld'?'Uw zaak staat klaar en is gekoppeld.':'Stand: '+r.stand);
       await herlaad(); }
     catch(err){ meld(err.message); }});
@@ -835,7 +840,7 @@ async function bewaar(){
   for(const k of TXT){const el=$('#f_'+k); if(el) idee[k]=el.value;}
   for(const k of PNUM){const el=$('#f_'+k); if(el&&el.value!=='') persoon[k]=Number(el.value);}
   try{
-    await api('intake',{id:HUIDIG,idee,persoon});
+    await api('/api/onderneming/intake',{id:HUIDIG,idee,persoon});
     await herlaad();
     meld('Doorgerekend.');
   }catch(e){meld(e.message);}
@@ -843,7 +848,7 @@ async function bewaar(){
 
 async function legVast(){
   try{
-    await api('plan/vastleggen',{id:HUIDIG});
+    await api('/api/onderneming/plan/vastleggen',{id:HUIDIG});
     meld('Plan vastgelegd.');
     await herlaad();
   }catch(e){
@@ -851,22 +856,22 @@ async function legVast(){
       const blok=(e.data.blokkerend||[]).map(b=>'- '+b.kop).join('\n');
       const ja=window.confirm(e.data.error+'\n\n'+blok+'\n\n'+e.data.uitleg+'\n\nToch vastleggen? Deze keuze wordt met het advies vastgelegd.');
       if(!ja) return;
-      try{ await api('plan/vastleggen',{id:HUIDIG,tochDoorzetten:true}); meld('Vastgelegd, met het advies erbij.'); await herlaad(); }
+      try{ await api('/api/onderneming/plan/vastleggen',{id:HUIDIG,tochDoorzetten:true}); meld('Vastgelegd, met het advies erbij.'); await herlaad(); }
       catch(e2){ meld(e2.message); }
     }else meld(e.message);
   }
 }
 
 async function herlaad(){
-  const [dag,verk,intake,stand]=await Promise.all([api('dagbeeld',{id:HUIDIG}),api('verkenning',{id:HUIDIG}),
-    api('intake',{id:HUIDIG}),api('aanvraag/stand',{id:HUIDIG})]);
+  const [dag,verk,intake,stand]=await Promise.all([api('/api/onderneming/dagbeeld',{id:HUIDIG}),api('/api/onderneming/verkenning',{id:HUIDIG}),
+    api('/api/onderneming/intake',{id:HUIDIG}),api('/api/onderneming/aanvraag/stand',{id:HUIDIG})]);
   DAG=dag;VERK=verk;INTAKE=intake.intake;AANVRAAG=stand;
   if(!RECHTSVORMEN){
-    try{ RECHTSVORMEN=(await (await fetch('/api/onderneming/rechtsvormen')).json()).rechtsvormen; }
+    try{ RECHTSVORMEN=(await (await fetch('/api/onderneming/rechtsvormen',{headers:{Authorization:'Bearer '+(localStorage.getItem('rtg_member_token')||'')}})).json()).rechtsvormen; }
     catch(e){ RECHTSVORMEN=[]; }
   }
   // de lijst met ondernemingen draagt de naam in de kiezer; die kan net gewijzigd zijn
-  try{ ONDS=(await api('mijn')).ondernemingen||ONDS; }catch(e){}
+  try{ ONDS=(await api('/api/onderneming/mijn')).ondernemingen||ONDS; }catch(e){}
   teken();
 }
 
@@ -876,7 +881,7 @@ if(kz)kz.addEventListener('change',async e=>{HUIDIG=e.target.value;await herlaad
 (async function start(){
   if(!TOKEN){ $('#hoofd').innerHTML='<div class="vak"><p class="stil">Log eerst in met uw RTG-account.</p></div>'; return; }
   try{
-    const d=await api('mijn');
+    const d=await api('/api/onderneming/mijn');
     ONDS=d.ondernemingen||[];
     if(!ONDS.length){ toonLeeg(); return; }
     HUIDIG=ONDS[0].id;

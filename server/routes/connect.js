@@ -142,12 +142,12 @@ module.exports = (kern) => {
   app.post('/api/connect/schuif', auth, schuif(lid));
   app.post('/api/rtf/connect/schuif', gezinsPoort, schuif(gezin));
 
-  const signaal = (wie) => (req, res) => veilig(res, () => {
+  const signaal = (wie) => (req, res, idem) => veilig(res, () => {
     const b = req.body || {};
-    return connect.signaal(wie(req).sleutel, b.onderwerp, b.signaal);
+    return connect.signaal(wie(req).sleutel, b.onderwerp, b.signaal, idem);
   });
-  app.post('/api/connect/signaal', auth, signaal(lid));
-  app.post('/api/rtf/connect/signaal', gezinsPoort, signaal(gezin));
+  app.post('/api/connect/signaal', auth, (req, res) => signaal(lid)(req, res, req.body.idem));
+  app.post('/api/rtf/connect/signaal', gezinsPoort, (req, res) => signaal(gezin)(req, res, req.body.idem));
 
   /* ------------------------------------------------------------------- KRING */
   /* De beschermd-vlag komt UIT de sessie en nooit uit het lijf. Zou hij uit

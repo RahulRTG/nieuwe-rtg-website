@@ -43,6 +43,12 @@ const stappen = [
      aanroep doet. Hij staat NA check.js, want die controleert of het register
      nog klopt met de code -- een poort op een verouderd register is geen poort. */
   ['Mutatiecontracten', process.execPath, ['scripts/mutatiepoort.js']],
+  /* DE VERSHEID VAN APPWERKT (BETROUWBAARHEID.md par. 4i). Een app die als 8/8
+     geldt terwijl een bestand in het raakvlak van een van zijn bewijzen sinds de
+     meting veranderde, is geen 8/8 meer. Hier en niet in check.js: check draait
+     bij elke commit en zou na elke kernwijziging rood staan tot de volgende
+     meetronde; een release mag die stand niet erven. */
+  ['APPWERKT-versheid', process.execPath, ['scripts/appwerkt-vers.js', '--controle']],
   ['Dependency-audit', 'npm', ['audit', '--audit-level=high']],
   ['Backup en herstel', process.execPath, ['--test', 'test/herstelproef.test.js', 'test/backupvolledig.test.js']],
   ['Releasebewijs maken', process.execPath, ['scripts/release-bewijs.js']],

@@ -71,11 +71,11 @@ module.exports = (ctx) => {
     notify, PRIJS_CENTEN, RTG_CENTEN });
 
   /* ---- de chatlijn (pas na een match) + blokkeren en melden ---- */
-  function bericht(key, mid, tekst) {
+  function bericht(key, mid, tekst, idem) {
     const m = d().matches.find(x => x.id === mid && (x.a === key || x.b === key));
     if (!m) return { status: 404, error: 'Deze match bestaat niet.' };
     if (geblokkeerd(key, m.a === key ? m.b : m.a)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
-    const gedeeld = communication ? communication.sendText(key, { id: mid }, tekst) : null;
+    const gedeeld = communication ? communication.sendText(key, { id: mid }, tekst, idem) : null;
     if (gedeeld && gedeeld.error) return gedeeld;
     if (!communication) {
       const t = schoon(tekst, 300);

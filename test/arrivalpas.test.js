@@ -191,24 +191,34 @@ async function zaak(base, code) {
   const mgr = roster.staff.find(x => x.role === 'manager') || roster.staff[0];
   return (await api(base, '/api/supplier/login', { code, staffId: mgr.id, pin: '1234' })).body.token;
 }
+/* Een account voor alles (besluit van 19 oktober 2026): de arrivalroutes staan
+   achter de ledeninlog, dus de echte-servertoetsen loggen eerst in. */
+let lidNr = 0;
+async function lidToken(base) {
+  const u = (Date.now() + (++lidNr)).toString().slice(-8);
+  const r = await api(base, '/api/auth/register', { name: 'Arrival Lid', email: 'ar' + u + '@voorbeeld.nl', phone: '06' + u,
+    password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  return r.body.token;
+}
 const morgen = () => { const d = new Date(Date.now() + 86400000); return d.toISOString().slice(0, 10); };
 
 test('8. echte server: de pass staat eenmaal in het antwoord, een herhaling roteert, en roteren en intrekken werken', async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
+    const L = await lidToken(base);
     const lijf = { requestToken: RT(1), supplierCode: 'KIKUNOI', datum: morgen(), tijd: '20:00', personen: 2, naam: 'Gast' };
-    const eerste = await api(base, '/api/arrival/request', lijf);
+    const eerste = await api(base, '/api/arrival/request', lijf, L);
     assert.equal(eerste.status, 200, eerste.tekst.slice(0, 200));
     assert.match(eerste.body.pass.accessToken, /^AR\.[0-9A-F]{32}$/);
     assert.equal(eerste.koppen.get('cache-control'), 'no-store');
-    const tweede = await api(base, '/api/arrival/request', lijf);
+    const tweede = await api(base, '/api/arrival/request', lijf, L);
     assert.equal(tweede.status, 200);
     assert.equal(tweede.body.pass.id, eerste.body.pass.id, 'een herhaling maakt geen tweede aankomst');
     assert.equal(tweede.tekst.includes(eerste.body.pass.accessToken), false, 'en toont de eerste pass nooit opnieuw');
-    assert.equal((await api(base, '/api/arrival/pass', { pass: eerste.body.pass.accessToken })).status, 401);
+    assert.equal((await api(base, '/api/arrival/pass', { pass: eerste.body.pass.accessToken }, L)).status, 401);
     const pas = tweede.body.pass.accessToken;
-    const lees = await api(base, '/api/arrival/pass', { pass: pas });
+    const lees = await api(base, '/api/arrival/pass', { pass: pas }, L);
     assert.equal(lees.status, 200);
     assert.equal(lees.tekst.includes(pas), false, 'lezen herhaalt de pass niet');
     assert.equal(lees.body.toegang.doel, 'arrival-pass');
@@ -219,28 +229,28 @@ test('8. echte server: de pass staat eenmaal in het antwoord, een herhaling rote
     assert.ok(lijst.body.arrivals.some(a => a.id === eerste.body.pass.id));
     assert.equal(/AR\.[0-9A-F]{32}|passHash|code_hash/.test(lijst.tekst), false, 'de zaak ziet geen pass en geen hash');
 
-    const rot = await api(base, '/api/arrival/pass/roteer', { pass: pas });
+    const rot = await api(base, '/api/arrival/pass/roteer', { pass: pas }, L);
     assert.equal(rot.status, 200);
     assert.match(rot.body.accessToken, /^AR\.[0-9A-F]{32}$/);
-    assert.equal((await api(base, '/api/arrival/pulse', { pass: pas, pulse: 'onderweg' })).status, 401, 'de geroteerde werkt niet meer');
-    assert.equal((await api(base, '/api/arrival/pulse', { pass: rot.body.accessToken, pulse: 'onderweg' })).status, 200);
-    assert.equal((await api(base, '/api/arrival/pass/intrek', { pass: rot.body.accessToken })).status, 200);
-    assert.equal((await api(base, '/api/arrival/pass', { pass: rot.body.accessToken })).status, 410, 'ingetrokken');
-    assert.equal((await api(base, '/api/arrival/request', lijf)).status, 409, 'een gebruikte aanvraag roteert niet meer');
-    assert.equal((await api(base, '/api/arrival/request', Object.assign({}, lijf, { requestToken: 'kort' }))).status, 400);
+    assert.equal((await api(base, '/api/arrival/pulse', { pass: pas, pulse: 'onderweg' }, L)).status, 401, 'de geroteerde werkt niet meer');
+    assert.equal((await api(base, '/api/arrival/pulse', { pass: rot.body.accessToken, pulse: 'onderweg' }, L)).status, 200);
+    assert.equal((await api(base, '/api/arrival/pass/intrek', { pass: rot.body.accessToken }, L)).status, 200);
+    assert.equal((await api(base, '/api/arrival/pass', { pass: rot.body.accessToken }, L)).status, 410, 'ingetrokken');
+    assert.equal((await api(base, '/api/arrival/request', lijf, L)).status, 409, 'een gebruikte aanvraag roteert niet meer');
+    assert.equal((await api(base, '/api/arrival/request', Object.assign({}, lijf, { requestToken: 'kort' }), L)).status, 400);
     /* geen generieke antwoordcache mag de pass herhalen, ook niet met een Idempotency-Key */
     const sleutel = { 'Idempotency-Key': 'arrival-e2e-' + Date.now() };
     const lijf5 = Object.assign({}, lijf, { requestToken: RT(5) });
-    const k1 = await api(base, '/api/arrival/request', lijf5, null, sleutel);
-    const k2 = await api(base, '/api/arrival/request', lijf5, null, sleutel);
+    const k1 = await api(base, '/api/arrival/request', lijf5, L, sleutel);
+    const k2 = await api(base, '/api/arrival/request', lijf5, L, sleutel);
     assert.equal(k1.status, 200); assert.equal(k2.status, 200);
     assert.equal(k2.tekst.includes(k1.body.pass.accessToken), false, 'de retrycache toont de pass geen tweede keer');
-    const r1 = await api(base, '/api/arrival/pass/roteer', { pass: k2.body.pass.accessToken }, null, sleutel);
-    const r2 = await api(base, '/api/arrival/pass/roteer', { pass: k2.body.pass.accessToken }, null, sleutel);
+    const r1 = await api(base, '/api/arrival/pass/roteer', { pass: k2.body.pass.accessToken }, L, sleutel);
+    const r2 = await api(base, '/api/arrival/pass/roteer', { pass: k2.body.pass.accessToken }, L, sleutel);
     assert.equal(r1.status, 200);
     assert.equal(r2.tekst.includes(r1.body.accessToken), false, 'een herhaalde rotatie heronthult niets');
     const ver = new Date(Date.now() + 70 * 86400000).toISOString().slice(0, 10);
-    assert.equal((await api(base, '/api/arrival/request', Object.assign({}, lijf, { requestToken: RT(2), datum: ver }))).status, 400,
+    assert.equal((await api(base, '/api/arrival/request', Object.assign({}, lijf, { requestToken: RT(2), datum: ver }), L)).status, 400,
       'buiten de horizon komt er geen pass');
   } finally {
     stop(child);
@@ -252,15 +262,16 @@ test('9. echte server: weigert de zaak de reservering, dan is de pass dicht', as
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
-    const v = await api(base, '/api/arrival/request', { requestToken: RT(3), supplierCode: 'KIKUNOI', datum: morgen(), tijd: '19:00', personen: 2 });
+    const L = await lidToken(base);
+    const v = await api(base, '/api/arrival/request', { requestToken: RT(3), supplierCode: 'KIKUNOI', datum: morgen(), tijd: '19:00', personen: 2 }, L);
     assert.equal(v.status, 200, v.tekst.slice(0, 200));
     const pas = v.body.pass.accessToken;
     const sup = await zaak(base, 'KIKUNOI');
     const nee = await api(base, '/api/supplier/reservering/beslis', { id: v.body.pass.reserveringId, action: 'weiger' }, sup);
     assert.equal(nee.status, 200, nee.tekst.slice(0, 200));
-    assert.equal((await api(base, '/api/arrival/pass', { pass: pas })).status, 410);
-    assert.equal((await api(base, '/api/arrival/pulse', { pass: pas, pulse: 'in-de-buurt' })).status, 410);
-    assert.equal((await api(base, '/api/arrival/pass/roteer', { pass: pas })).status, 410, 'en roteren helpt niet');
+    assert.equal((await api(base, '/api/arrival/pass', { pass: pas }, L)).status, 410);
+    assert.equal((await api(base, '/api/arrival/pulse', { pass: pas, pulse: 'in-de-buurt' }, L)).status, 410);
+    assert.equal((await api(base, '/api/arrival/pass/roteer', { pass: pas }, L)).status, 410, 'en roteren helpt niet');
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

@@ -21,6 +21,8 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+// de codeportalen vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per server
+require('./portaalaccount').zetPortaalAccount();
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-b2b2c-grens-'));
 const OFFICE_CODE = 'B2B2C-GRENS-KANTOOR';

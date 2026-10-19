@@ -4,7 +4,7 @@
   async function ensurePush(interactief){
     try{
       if (!('serviceWorker' in navigator) || !('PushManager' in window)){ if(interactief) toast('Push wordt op dit toestel niet ondersteund.'); return; }
-      const keyRes = await fetch('/api/push/key').then(r=>r.json()).catch(()=>({}));
+      const keyRes = await fetch('/api/push/key',{headers:{Authorization:'Bearer '+API.token}}).then(r=>r.json()).catch(()=>({}));
       if (!keyRes.key){ if(interactief) toast('Meldingen zijn nu niet beschikbaar.'); return; }
       if (interactief || Notification.permission==='default'){
         const perm = await Notification.requestPermission();
@@ -13,7 +13,7 @@
       const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
       if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8(keyRes.key) });
-      await API.call('/push/subscribe', { subscription: sub });
+      await API.call('/api/push/subscribe', { subscription: sub });
       if (interactief) toast('Top! Gezinsmeldingen komen nu ook op je telefoon binnen.');
     }catch(e){ if(interactief) toast('Meldingen aanzetten lukte niet.'); }
   }
@@ -59,7 +59,7 @@
       $('#tripList').insertAdjacentElement('afterend', wrap);
     }
     let dagen = [];
-    try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch(e){ return; }
+    try { dagen = (await API.call('/api/agenda/mijn')).dagen || []; } catch(e){ return; }
     if (!dagen.length){ wrap.innerHTML = ''; return; }
     const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang(), { weekday: 'long', day: 'numeric', month: 'long' });
     wrap.innerHTML = '<div class="sec-label h-mt120">' + T('erv.agenda','Mijn programma') + '</div>' +
@@ -84,7 +84,7 @@
   async function executePay(target){
     let foundation = 0;
     if (API.live){
-      const data = await API.call('/pay', target === 'all' ? {all:true} : {invoiceId: target});
+      const data = await API.call('/api/pay', target === 'all' ? {all:true} : {invoiceId: target});
       foundation = data.foundation;
       applyState(data.state);
     } else {

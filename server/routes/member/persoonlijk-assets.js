@@ -3,7 +3,7 @@
 'use strict';
 module.exports = (kern) => {
   const { app, auth, liveCodename, assetsOverzicht, assetDocument, assetKoop,
-    assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap } = kern;
+    assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap, assetAanvragenMijn, assetAanvraagBetaal } = kern;
 
   app.post('/api/assets', auth, (req, res) => res.json(assetsOverzicht(req.session.key)));
   // het essentiele-informatiedocument: lezen voordat er iets wordt afgerekend
@@ -13,13 +13,13 @@ module.exports = (kern) => {
     res.json(r);
   });
   app.post('/api/asset/koop', auth, (req, res) => {
-    const r = assetKoop(req.session, liveCodename(req.session), req.body.assetId, req.body.smaak, req.body.aantal, req.body.akkoord === true);
+    const r = assetKoop(req.session, liveCodename(req.session), req.body.assetId, req.body.smaak, req.body.aantal, req.body.akkoord === true, req.body.idem);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
   // veertien dagen bedenktijd: volledige terugbetaling, voor beide smaken
   app.post('/api/asset/herroep', auth, async (req, res) => {
-    const r = await assetHerroep(req.session, liveCodename(req.session), req.body.ticketId);
+    const r = await assetHerroep(req.session, liveCodename(req.session), req.body.ticketId || req.body.id);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
@@ -29,6 +29,14 @@ module.exports = (kern) => {
     res.json(r);
   });
   app.post('/api/asset/mijn', auth, (req, res) => res.json(assetMijn(req.session.key)));
+  /* Een koop is een aanvraag (kern/assets/aanvraag.js): het lid ziet zijn
+     aanvragen en betaalt pas nadat een mens van RTG goedkeurde. */
+  app.post('/api/asset/aanvragen', auth, (req, res) => res.json(assetAanvragenMijn(req.session.key)));
+  app.post('/api/asset/aanvraag/betaal', auth, async (req, res) => {
+    const r = await assetAanvraagBetaal(req.session, req.body.id, req.body.idem);
+    if (r.error) return res.status(r.status).json(r);
+    res.json(r);
+  });
   app.post('/api/asset/gebruik', auth, (req, res) => {
     const r = assetGebruik(req.session, req.body.assetId, req.body.datum);
     if (r.error) return res.status(r.status).json({ error: r.error });

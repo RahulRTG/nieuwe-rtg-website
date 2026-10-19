@@ -5,6 +5,7 @@
    Het leest de doos via Hlees (lezen zonder scheppen): een gastcheckout op een
    zaak zonder horecadoos legde hier eerder via H() een lege doos aan. */
 'use strict';
+const tijdzone = require('../tijdzone');
 
 /* Happy hour: een tijdvak met een percentage op bepaalde groepen. Bewust
    berekend op het moment van BESTELLEN en niet bij het afrekenen -- anders
@@ -13,8 +14,9 @@
 function happyKorting(h, groep, wanneer) {
   const lijst = Array.isArray(h.instel.happy) ? h.instel.happy : [];
   const t = wanneer ? new Date(wanneer) : new Date();
-  const dag = t.getDay(); // 0 = zondag
-  const klok = String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
+  const hier = tijdzone.huis(t); // het tijdvak staat in de tijd van de zaak, niet van de container
+  const dag = hier.dag; // 0 = zondag
+  const klok = hier.hhmm;
   for (const hh of lijst) {
     if (Array.isArray(hh.dagen) && hh.dagen.length && !hh.dagen.includes(dag)) continue;
     if (hh.van && klok < hh.van) continue;

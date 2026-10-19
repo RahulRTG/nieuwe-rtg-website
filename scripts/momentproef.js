@@ -41,6 +41,7 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+const { registreerGratis } = require('./lib/gratisaccount');
 /* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
    APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
    gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
@@ -652,14 +653,17 @@ async function storingen(basis, uit, s) {
   }
 
   /* 11 -- EEN GAST KOMT ER NIET IN. De publieke laag is voor leden; een gast
-     heeft geen relatie om op te zeggen. */
+     heeft geen relatie om op te zeggen. De gast is sinds het eigenaarsbesluit
+     van 19 oktober 2026 een GRATIS ACCOUNT (de gastinlog bestaat buiten de
+     demo niet meer), en de uitgelogde bezoeker komt er al helemaal niet in. */
   {
-    const gast = (await P('/api/login', { tier: 'guest' })).data;
+    const gast = await registreerGratis(basis);
     const r = gast && gast.token ? await P('/api/mediaos/aanwezig/mijn', {}, gast.token) : { status: 0 };
+    const uitgelogd = await P('/api/mediaos/aanwezig/mijn', {});
     noteer('een gast heeft geen publieke relaties',
-      'zonder lidmaatschap geen volglijst',
-      !!(gast && gast.token) && r.status === 403,
-      'gast kreeg ' + r.status + ' op /aanwezig/mijn');
+      'zonder lidmaatschap geen volglijst, en zonder account al helemaal niet',
+      !!(gast && gast.token) && r.status === 403 && uitgelogd.status === 401,
+      'gratis account kreeg ' + r.status + ', uitgelogd ' + uitgelogd.status + ' op /aanwezig/mijn');
   }
 
   /* 12 -- EEN TWEEDE FESTIVAL HERNOEMT DE AANWEZIGHEID NIET.

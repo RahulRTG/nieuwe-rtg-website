@@ -203,16 +203,24 @@
 
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/poortgesprek.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const euro = n => '€ ' + (Math.round((Number(n)||0)*100)/100);
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3500); }
-const api = (pad, body) => fetch('/api/thuis/' + pad, {
+/* Het volle pad staat bij de aanroep (zie public/apps/pay.html): met een stam
+   plus staart zag de routetelling van dit scherm geen enkele Thuis-route. */
+const api = (pad, body, herkans) => fetch(pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
   body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  // 428 = de gegevenspoort (boeken bij een ander): Rahul vraagt wat er mist, daarna gaat het gewoon door
+  const p = herkans ? null : (window.RTGGegevensPoort && window.RTGGegevensPoort.vang(d, r.status, () => api(pad, body, true), api));
+  if (p) return p;
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 const TABS = { tabZoek: 'secZoek', tabReizen: 'secReizen', tabHost: 'secHost' };
 let TAB = 'secZoek', AANBOD = null, REIZEN = null, MIJNHUIZEN = null;
@@ -261,7 +269,7 @@ function huisKaart(h){
 }
 async function zoek(){
   try {
-    const d = await api('zoek', { plaats: $('#zPlaats').value, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined,
+    const d = await api('/api/thuis/zoek', { plaats: $('#zPlaats').value, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined,
       gasten: Number($('#zGasten').value)||1, instant: $('#zInstant').checked || undefined });
     /* Zonder lijst geen "Niets gevonden" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
     if (!(d && Array.isArray(d.huizen))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
@@ -276,7 +284,7 @@ $('#zGo').addEventListener('click', zoek);
 let HUIDIG = null;
 async function openHuis(id){
   try {
-    const d = await api('detail', { id, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined });
+    const d = await api('/api/thuis/detail', { id, van: $('#zVan').value || undefined, tot: $('#zTot').value || undefined });
     HUIDIG = d.huis;
     $('#bMeta').textContent = HUIDIG.plaats + ' · ' + HUIDIG.typeLabel + (HUIDIG.superhost ? ' · Superhost' : '');
     $('#bTitel').textContent = HUIDIG.titel;
@@ -321,7 +329,7 @@ async function openHuis(id){
 }
 async function laadReviews(id){
   try {
-    const d = await api('reviews', { id });
+    const d = await api('/api/thuis/reviews', { id });
     $('#bReviews').innerHTML = '<h3 style="font-size:1rem;">Reviews'+(d.rating.sterren?' · ★ '+d.rating.sterren+' ('+d.rating.aantal+')':'')+'</h3>'+
       (d.reviews.length ? d.reviews.map(r=>'<div class="r"><span class="k">'+esc(r.door)+' · ★ '+r.sterren+'</span><span class="s-dkemdj">'+esc(r.tekst||'')+'</span></div>').join('') : '<div class="leeg">Nog geen reviews.</div>');
   } catch(e){}
@@ -331,22 +339,27 @@ async function boek(){
   const van = $('#zVan').value, tot = $('#zTot').value;
   if (!van || !tot) { meld('Kies eerst aankomst- en vertrekdatum in de zoekbalk.'); return; }
   try {
-    const kost = $('#bKost');
-    const d = await api('boek', { id: HUIDIG.id, van, tot, gasten: Number($('#zGasten').value)||1,
+    const kost = $('#bKost'), gasten = Number($('#zGasten').value)||1;
+    // een sleutel per aanvraag: een herhaling na een weggevallen verbinding vindt de eigen aanvraag terug
+    const vorm = [HUIDIG.id, van, tot, gasten].join('|');
+    if (boek.vorm !== vorm) { boek.idem = RTGId('thuis-boek'); boek.vorm = vorm; }
+    const d = await api('/api/thuis/boek', { id: HUIDIG.id, van, tot, gasten, idem: boek.idem,
       kostenplaats: (kost && kost.value) || undefined });
+    boek.vorm = null;
     $('#blad').classList.remove('open');
+    if (d.herhaald) { meld('Je aanvraag stond er al; er is niets dubbel geboekt.'); return; }
     meld((d.boeking.status === 'bevestigd' ? 'Geboekt! ' : 'Aangevraagd -- de host beslist. ') +
       (d.boeking.opFactuur ? 'De factuur volgt van de zaak; er is nog niets afgeschreven. ' : '') +
       (d.reiswijzer ? 'Je hebt alle regels van ' + d.reiswijzer.naam + ' meegekregen.' : ''));
   } catch(e){ meld(e.message); }
 }
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
-$('#bWens').addEventListener('click', async () => { if (!HUIDIG) return; try { await api('wens', { id: HUIDIG.id }); meld('Wenslijst bijgewerkt.'); } catch(e){ meld(e.message); } });
+$('#bWens').addEventListener('click', async () => { if (!HUIDIG) return; try { await api('/api/thuis/wens', { id: HUIDIG.id }); meld('Wenslijst bijgewerkt.'); } catch(e){ meld(e.message); } });
 
 /* ---------- mijn reizen ---------- */
 async function laadReizen(){
   try {
-    const d = await api('mijn');
+    const d = await api('/api/thuis/mijn');
     REIZEN = d.reizen;
     $('#rUit').innerHTML = d.reizen.length ? d.reizen.map(b =>
       '<div class="boeking"><div class="st">'+esc(b.status)+'</div><b>'+esc(b.titel)+'</b> · '+esc(b.plaats)+'<br>'+
@@ -367,12 +380,14 @@ async function doeActie(doe, ref){
     if (doe === 'review'){
       const sterren = prompt('Hoeveel sterren (1-5)?'); if (sterren == null) return;
       const tekst = prompt('Je review (optioneel):') || '';
-      await api('review', { ref, sterren: Number(sterren), tekst }); meld('Dank voor je review.');
+      await api('/api/thuis/review', { ref, sterren: Number(sterren), tekst }); meld('Dank voor je review.');
     } else if (doe === 'bericht'){
       const tekst = prompt('Je bericht aan de andere kant:'); if (!tekst) return;
-      await api('bericht', { ref, tekst }); meld('Bericht verstuurd.');
+      await api('/api/thuis/bericht', { ref, tekst }); meld('Bericht verstuurd.');
     } else {
-      const d = await api(doe, { ref });
+      const pad = { annuleer: '/api/thuis/annuleer', checkin: '/api/thuis/checkin', checkuit: '/api/thuis/checkuit' }[doe];
+      if (!pad) return;
+      const d = await api(pad, { ref });
       meld(doe === 'annuleer' ? 'Geannuleerd; ' + d.terugPct + '% terug volgens het beleid.' : 'Gedaan.');
     }
     laadReizen();
@@ -380,7 +395,7 @@ async function doeActie(doe, ref){
 }
 async function laadWens(){
   try {
-    const d = await api('wenslijst');
+    const d = await api('/api/thuis/wenslijst');
     $('#wUit').innerHTML = d.huizen.length ? d.huizen.map(huisKaart).join('') : '<div class="leeg">Nog leeg. Tik het hartje bij een huis.</div>';
     $('#wUit').querySelectorAll('.huis').forEach(b => b.addEventListener('click', () => openHuis(b.dataset.id)));
   } catch(e){}
@@ -389,7 +404,7 @@ async function laadWens(){
 /* ---------- host ---------- */
 async function laadBord(){
   try {
-    const d = await api('bord');
+    const d = await api('/api/thuis/bord');
     $('#hBord').innerHTML =
       '<div class="r"><span class="k">Huizen live</span><span>'+d.live+' van '+d.huizen+'</span></div>'+
       '<div class="r"><span class="k">Inkomsten (afgerond)</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+euro(d.inkomstenTotaal)+'</b></div>'+
@@ -399,13 +414,13 @@ async function laadBord(){
       (d.aanvragen.length ? '<div class="sec">Aanvragen</div>'+d.aanvragen.map(a =>
         '<div class="boeking"><b>'+esc(a.titel)+'</b> · '+esc(a.van)+' tot '+esc(a.tot)+' · gast '+esc(a.gast)+(a.gastRating?' (★ '+a.gastRating+')':'')+
         '<div class="rij h-mt40"><button class="knop" data-ok="'+esc(a.ref)+'">Accepteer</button><button class="knop stil" data-nee="'+esc(a.ref)+'">Wijs af</button></div></div>').join('') : '');
-    $('#hBord').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', async () => { try { await api('beslis', { ref: b.dataset.ok, akkoord: true }); meld('Geaccepteerd.'); laadBord(); } catch(e){ meld(e.message); } }));
-    $('#hBord').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => { try { await api('beslis', { ref: b.dataset.nee, akkoord: false }); meld('Afgewezen.'); laadBord(); } catch(e){ meld(e.message); } }));
+    $('#hBord').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', async () => { try { await api('/api/thuis/beslis', { ref: b.dataset.ok, akkoord: true }); meld('Geaccepteerd.'); laadBord(); } catch(e){ meld(e.message); } }));
+    $('#hBord').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => { try { await api('/api/thuis/beslis', { ref: b.dataset.nee, akkoord: false }); meld('Afgewezen.'); laadBord(); } catch(e){ meld(e.message); } }));
   } catch(e){ $('#hBord').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 async function laadHuizen(){
   try {
-    const d = await api('huizen');
+    const d = await api('/api/thuis/huizen');
     MIJNHUIZEN = d.huizen;
     $('#hHuizen').innerHTML = d.huizen.length ? d.huizen.map(h =>
       '<div class="boeking"><b>'+esc(h.titel)+'</b> · '+esc(h.plaats)+' · '+euro(h.prijs)+'/nacht'+(h.rating.sterren?' · ★ '+h.rating.sterren:'')+
@@ -415,28 +430,32 @@ async function laadHuizen(){
       '<button class="knop stil" data-cohost="'+esc(h.id)+'">Co-host</button></div>'+
       '<div class="s-wafi2m" data-uit="'+esc(h.id)+'"></div></div>').join('') : '<div class="leeg">Nog geen huizen. Zet er hieronder een live.</div>';
     $('#hHuizen').querySelectorAll('[data-advies]').forEach(b => b.addEventListener('click', async () => {
-      try { const d2 = await api('prijsadvies', { id: b.dataset.advies });
+      try { const d2 = await api('/api/thuis/prijsadvies', { id: b.dataset.advies });
         document.querySelector('[data-uit="'+b.dataset.advies+'"]').textContent = 'Advies: ' + euro(d2.advies) + '/nacht (nu ' + euro(d2.huidig) + ', bezetting ' + d2.bezettingPct + '%). ' + d2.uitleg;
       } catch(e){ meld(e.message); } }));
     $('#hHuizen').querySelectorAll('[data-blok]').forEach(b => b.addEventListener('click', async () => {
       const van = prompt('Blokkeer van (JJJJ-MM-DD):'); if (!van) return;
       const tot = prompt('tot (JJJJ-MM-DD):'); if (!tot) return;
-      try { await api('blokkeer', { id: b.dataset.blok, van, tot }); meld('Geblokkeerd.'); } catch(e){ meld(e.message); } }));
+      try { await api('/api/thuis/blokkeer', { id: b.dataset.blok, van, tot }); meld('Geblokkeerd.'); } catch(e){ meld(e.message); } }));
     $('#hHuizen').querySelectorAll('[data-cohost]').forEach(b => b.addEventListener('click', async () => {
       const wie = prompt('Codenaam van de co-host:'); if (!wie) return;
-      try { await api('cohost', { id: b.dataset.cohost, wie }); meld('Co-host toegevoegd.'); } catch(e){ meld(e.message); } }));
+      try { await api('/api/thuis/cohost', { id: b.dataset.cohost, wie }); meld('Co-host toegevoegd.'); } catch(e){ meld(e.message); } }));
   } catch(e){ $('#hHuizen').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 async function vulTypen(){
-  try { const d = await api('typen'); if (!(d && d.types && typeof d.types === 'object')) return; $('#nType').innerHTML = Object.entries(d.types).map(([k,v])=>'<option value="'+esc(k)+'">'+esc(v)+'</option>').join(''); } catch(e){}
+  try { const d = await api('/api/thuis/typen'); if (!(d && d.types && typeof d.types === 'object')) return; $('#nType').innerHTML = Object.entries(d.types).map(([k,v])=>'<option value="'+esc(k)+'">'+esc(v)+'</option>').join(''); } catch(e){}
 }
 $('#nZet').addEventListener('click', async () => {
+  /* een sleutel per ingevuld huis: een tweede tik of een herhaling is hetzelfde huis */
+  const knop = $('#nZet'), vorm = $('#nTitel').value + '|' + $('#nPlaats').value;
+  if (knop.dataset.idemVorm !== vorm) { knop.dataset.idem = RTGId('thuis-huis'); knop.dataset.idemVorm = vorm; }
   try {
-    await api('huis', { huis: { titel: $('#nTitel').value, plaats: $('#nPlaats').value, type: $('#nType').value,
+    await api('/api/thuis/huis', { idem: knop.dataset.idem, huis: { titel: $('#nTitel').value, plaats: $('#nPlaats').value, type: $('#nType').value,
       prijs: Number($('#nPrijs').value), maxGasten: Number($('#nGasten').value), schoonmaak: Number($('#nSchoon').value),
       kortingWeek: Number($('#nWeek').value), annulering: $('#nAnnul').value,
       instant: $('#nInstant').checked, keyless: $('#nKeyless').checked, visual: Math.floor(Math.random()*8) } });
     meld('Je huis staat live op RTG Thuis.');
+    delete knop.dataset.idem; delete knop.dataset.idemVorm;
     $('#nTitel').value = ''; laadHuizen(); laadBord();
   } catch(e){ meld(e.message); }
 });

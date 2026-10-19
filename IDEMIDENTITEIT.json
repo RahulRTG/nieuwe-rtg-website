@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-18T17:45:55.643Z",
-    "commit": "0b79bad50",
+    "op": "2026-10-19T10:56:37.996Z",
+    "commit": "c550f85f",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v22.22.0"
   },
@@ -65,7 +65,7 @@
     },
     {
       "bestand": "server/kern/bank/overboeken.js",
-      "regel": 39,
+      "regel": 40,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -86,7 +86,7 @@
     },
     {
       "bestand": "server/kern/bank/overboeken.js",
-      "regel": 72,
+      "regel": 68,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -107,7 +107,7 @@
     },
     {
       "bestand": "server/kern/bank/overboeken.js",
-      "regel": 90,
+      "regel": 86,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -312,7 +312,7 @@
     },
     {
       "bestand": "server/kern/pay/opladen.js",
-      "regel": 29,
+      "regel": 30,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -596,7 +596,7 @@
     },
     {
       "bestand": "server/kern/podium/interactie.js",
-      "regel": 33,
+      "regel": 40,
       "soort": "eigen",
       "binding": "server/kern/podium/index.js",
       "uitspraak": "nietTeLezen",
@@ -604,7 +604,7 @@
     },
     {
       "bestand": "server/kern/podium/interactie.js",
-      "regel": 52,
+      "regel": 59,
       "soort": "eigen",
       "binding": "server/kern/podium/index.js",
       "uitspraak": "nietTeLezen",
@@ -683,7 +683,7 @@
     },
     {
       "bestand": "server/kern/directpay/betalen.js",
-      "regel": 100,
+      "regel": 109,
       "opzoeker": "idemZoek",
       "gevondenAls": "al",
       "vergeleken": [

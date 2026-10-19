@@ -6,7 +6,7 @@ const kostenhaak = require('../kern/kosten/haak');
 
 module.exports = function maakDiensten2(deps) {
   const {
-    DATA_DIR, PERSONAS, accounts, crypto, db, dirTouch, eigenaarAccount, findSupplier, 
+    DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, dirTouch, eigenaarAccount, findSupplier, 
     kernGeef, lidBoardUit, lidPadFunctie, mail, rtf, save, schild, schoon, sendPushToUser, sessionFor
   } = deps;
 /* De archiefkast: houdt de levende kast klein door afgeronde tickets ouder
@@ -175,6 +175,8 @@ const contractStandVoor = require('./contractstand')({ kernVoorAuth, lidpoort })
 function resolveSession(token) {
   if (!token) return null;
   const demo = sessionFor(token);
+  // buiten de demo is een persona zonder account en zonder rol geen sessie (eigenaarsbesluit 19-10-2026)
+  if (demo && !DEMO && !demo.account && !demo.role && PERSONAS[demo.tier]) return null;
   if (demo) return demo.sid ? metContext(demo, demo.sid) : demo;
   const user = accounts.verifyToken(token);
   if (user) {
@@ -229,6 +231,9 @@ function auth(req, res, next) {
   // en zonder tier) worden geweigerd i.p.v. verderop de ledengids te laten
   // crashen op een ontbrekende codenaam.
   if (!sess.account && !PERSONAS[sess.tier]) return res.status(401).json({ error: 'Niet ingelogd als lid.' });
+  // Buiten de demo is een persona zonder account geen lid (eigenaarsbesluit
+  // 19 oktober 2026): ook een oude sessie uit de sessiebak komt hier niet door.
+  if (!sess.account && !DEMO) return res.status(401).json({ error: 'Niet ingelogd als lid.', accountNodig: true });
   req.session = sess;
   // Recheck after a document operation waited for its collection lock.
   req.documentAuthority = () => {

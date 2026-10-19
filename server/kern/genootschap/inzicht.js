@@ -22,6 +22,7 @@
    Wat hier NIET komt, hoe gratis ook: bereik dat je kunt kopen, een vinkje dat
    je kunt kopen (bevestiging komt bij ons uit een gebeurtenis, zie
    kern/eenaccount.js), en meldingen die alleen bestaan om je terug te halen. */
+const tijdzone = require('../tijdzone');
 module.exports = ({ db, save, genootschap, prikbord, bijeenkomst }) => {
   const nu = () => new Date().toISOString();
   const DAG = 86400000;
@@ -74,7 +75,7 @@ module.exports = ({ db, save, genootschap, prikbord, bijeenkomst }) => {
     for (const b of berichten) {
       if (binnen(b.at, 30)) { dezeMaand++; if (b.vanKey) actief.add(b.vanKey); }
       else if (vorigeMaand(b.at)) vorige++;
-      if (b.at) perDag[new Date(b.at).getDay()]++;
+      if (b.at) perDag[tijdzone.weekdagIn(b.at)]++;
       const r = b.reacties || [];
       reacties += r.length;
       if (!r.length && !b.peiling) zonderReactie++;

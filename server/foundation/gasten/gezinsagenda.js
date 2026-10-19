@@ -113,10 +113,10 @@ module.exports = (ctx) => {
   router.post('/gezin/agenda/bereik', (req, res) => {
     const s = sessieVan(req, res); if (!s) return;
     if (!motorKlaar(res)) return;
-    const van = /^\d{4}-\d{2}-\d{2}$/.test(req.body.van || '') ? req.body.van : new Date().toISOString().slice(0, 10);
+    const van = /^\d{4}-\d{2}-\d{2}$/.test(req.body.van || '') ? req.body.van : require('../../kern/tijdzone').datumIn();
     let totD = /^\d{4}-\d{2}-\d{2}$/.test(req.body.tot || '') ? req.body.tot : '';
     if (!totD || totD < van) totD = keerN(van, 'maand', 2);
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = require('../../kern/tijdzone').datumIn();
     const r = agenda.bereik(sleutel(s.g), van, totD);
     const uit = (r.items || []).map(i => {
       const p = i.wie && s.g.profielen[i.wie];
@@ -142,7 +142,7 @@ module.exports = (ctx) => {
     res.json({ ok: true });
   });
   function agendaPubliek(g) {
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = require('../../kern/tijdzone').datumIn();
     return punten(g)
       .map(a => ({ id: a.id, titel: a.titel, datum: a.datum, tijd: a.tijd || '', wie: a.wie || '', wieNaam: a.wie && g.profielen[a.wie] ? g.profielen[a.wie].naam : '', voorbij: a.datum < vandaag, vandaag: a.datum === vandaag }))
       .sort((a, b) => (a.datum + (a.tijd || '99:99')).localeCompare(b.datum + (b.tijd || '99:99')));

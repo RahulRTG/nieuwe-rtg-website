@@ -159,8 +159,13 @@
       if (!Array.isArray(data.apps)) throw new Error('Catalogus ontbreekt');
       var gezien = new Set(Array.from(lijst.querySelectorAll('a[href]')).map(function (a) { return a.getAttribute('href'); }));
       var groepen = {}, namen = { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' };
+      /* De poort van de gids, als de pagina er een heeft (de ledenapp zet
+         RTGAppCatalogusPoort, app-main-29d.js): wat de gids verbergt, toont de
+         catalogus ook niet. Zonder poort blijft het zoals het was. */
+      var poort = typeof w.RTGAppCatalogusPoort === 'function' ? w.RTGAppCatalogusPoort : null;
       data.apps.forEach(function (app) {
         if (!app || !Object.prototype.hasOwnProperty.call(namen, app.world) || typeof app.name !== 'string' || typeof app.url !== 'string' || !/^\/apps\/(?:[\w-]+\/)*[\w-]+\.html(?:[?#][^\s]*)?$/.test(app.url) || gezien.has(app.url)) return;
+        if (poort && poort(app.url) === false) return;
         gezien.add(app.url);
         if (!groepen[app.world]) {
           var groep = d.createElement('section'), kop = d.createElement('h3');

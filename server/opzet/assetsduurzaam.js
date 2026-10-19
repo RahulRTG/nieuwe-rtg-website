@@ -21,4 +21,4 @@
    een plek waar het te lezen is. */
 module.exports = (hulp, kern) => require('../kern/assets')({
   db: hulp.db, save: hulp.save, bijeen: hulp.bijeen, inBundel: hulp.inBundel,
-  crypto: hulp.crypto, schoon: hulp.schoon, notify: hulp.notify, pay: kern.pay });
+  crypto: hulp.crypto, schoon: hulp.schoon, notify: hulp.notify, pay: kern.pay, betaalWaarheid: kern.betaalWaarheid });

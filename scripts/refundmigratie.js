@@ -266,6 +266,7 @@ const GEEN_LEZER = {
      db.data.boekingen lezen. Er bestaat voor die collectie ook geen
      terugstortweg (annuleren.js kent order, ride en boeking). */
   'server/kern/care/leden.js': 'leest `careBoekingen[].paid` en `carePakketBoekingen[].paid` -- de eigen collecties van de zorgwereld, niet db.data.boekingen',
+  'server/kern/care/pakketbetaal.js': 'leest en zet `carePakketBoekingen[].paid` en `careBoekingen[].paid` -- de eigen collecties van de zorgwereld, niet db.data.boekingen',
   'server/kern/care/zaak.js': 'idem: de zorgagenda van de zaak leest `careBoekingen`, een eigen collectie zonder terugstortweg',
   'public/apps/app-main/app-main-13.js': 'toont de betaalstand van de eigen zorgafspraken (`/care/mijn`, careBoekingen), geen db.data.boekingen',
   'public/apps/foundation/zorg-hulp-weergave.js': 'toont de betaalstand van een zorgafspraak uit careBoekingen, geen db.data.boekingen',

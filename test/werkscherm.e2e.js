@@ -279,8 +279,9 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
 
     // en de werkplek staat ook gewoon in de app-bibliotheek
     const inBieb = await page.evaluate(async () => {
-      const r = await fetch('/api/gids/app', { method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pad: '/apps/werk.html' }) });
+      // de gids hoort bij een ingelogd scherm (eigenaarsbesluit 19 oktober 2026): de sessie van de eigenaar reist mee
+      const r = await fetch('/api/gids/app', { method: 'POST', body: JSON.stringify({ pad: '/apps/werk.html' }),
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('rtg_member_token') || '') } });
       return r.status;
     });
     assert.equal(inBieb, 200, 'de app-gids kent de werkplek');

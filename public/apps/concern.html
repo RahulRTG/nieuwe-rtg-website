@@ -323,7 +323,7 @@ async function herlaad(){
 async function vulRechtsvormen(){
   const sel=$('#nRv'); if(!sel) return;
   try{
-    const r=await (await fetch('/api/onderneming/rechtsvormen')).json();
+    const r=await (await fetch('/api/onderneming/rechtsvormen',{headers:{Authorization:'Bearer '+(localStorage.getItem('rtg_member_token')||'')}})).json();
     const land=(($('#nLand')||{}).value||'NL').toUpperCase();
     sel.innerHTML='<option value="">Weet ik nog niet</option>'+
       (r.rechtsvormen||[]).filter(v=>!v.land||v.land===land)

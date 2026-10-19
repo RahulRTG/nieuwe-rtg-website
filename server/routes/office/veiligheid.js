@@ -39,6 +39,16 @@ module.exports = (octx) => {
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
+  /* De aanvragen van Shared Assets: een mens van RTG OP NAAM beoordeelt
+     (kern/assets/aanvraag.js). De sleutel komt uit de kantoorsessie, nooit uit
+     het lijf; de gedeelde code heeft er geen en wordt geweigerd. */
+  app.post('/api/office/asset/aanvragen', officeAuth, (req, res) => res.json(kern.assetAanvragenKantoor()));
+  app.post('/api/office/asset/aanvraag/beslis', officeAuth, (req, res) => {
+    const r = kern.assetAanvraagBeslis({ id: req.body.id, besluit: String(req.body.besluit || ''), reden: req.body.reden,
+      doorKey: req.officeKey || null });
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
   // de jaarlijkse servicefee innen (per actief ticket een keer per jaar)
   app.post('/api/office/asset/fees', officeAuth, async (req, res) => res.json(await kern.assetFeesInnen('RTG-kantoor')));
 

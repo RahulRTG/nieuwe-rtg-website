@@ -32,9 +32,12 @@ module.exports = (kern) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Pay is voor leden.' }); return true; }
     return false;
   };
-  // Een anonieme demo-gast heeft geen wallet; een GRATIS ACCOUNT wel: die mag
-  // opladen en met de QR-kassacode betalen (bv. eten bestellen als niet-lid).
-  // De sociale kant van Pay (tikken, verzoeken) blijft voor leden.
+  // Een anonieme demo-gast heeft geen wallet; een GRATIS ACCOUNT wel, met alles
+  // erop: opladen, het overzicht, de kassacode, en sinds de derde reeks van 19
+  // oktober 2026 ook sturen, Klompjes en tikken -- elk geldmoment achter de
+  // paspoortpoort, die nu voor elk account geldt (test/sociaal-gratisaccount).
+  // Sinds de vierde reeks ook het tegoed en de terugstorting (./pay-tegoed.js,
+  // ./pay-terug.js): wie kan inleggen, moet terug kunnen halen.
   const geenEchtAccount = (req, res) => {
     if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account om met RTG Pay te betalen.' }); return true; }
     return false;
@@ -51,7 +54,7 @@ module.exports = (kern) => {
 
   // alles van het lid in een scherm: saldo, verzoeken, geschiedenis
   app.post('/api/pay/overzicht', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     res.json(pay.overzicht(liveCodename(req.session)));
   });
   // opladen (Apple Pay/kaart via de betaal-naad)
@@ -64,23 +67,23 @@ module.exports = (kern) => {
   });
   // geld sturen naar een codenaam: EEN knop, autolaad inbegrepen
   app.post('/api/pay/stuur', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     stuur(res, await pay.stuur({ van: liveCodename(req.session), aanCodenaam: req.body.aan, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem }));
   });
   // een Klompje vragen (een of meer vrienden, met of zonder splitsen)
   app.post('/api/pay/verzoek', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     stuur(res, await pay.verzoekMaak({ van: liveCodename(req.session), aan: req.body.aan, totaalCenten: req.body.totaalCenten, perCenten: req.body.perCenten, oms: req.body.oms, splitsMetMij: req.body.splitsMetMij === true, idem: req.body.idem }));
   });
   // een Klompje betalen: EEN knop
   app.post('/api/pay/verzoek/betaal', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
     stuur(res, await pay.verzoekBetaal({ codenaam: liveCodename(req.session), verzoekId: String(req.body.id || ''), idem: req.body.idem }));
   });
   app.post('/api/pay/verzoek/intrek', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenEchtAccount(req, res)) return;
     stuur(res, pay.verzoekIntrek({ codenaam: liveCodename(req.session), verzoekId: String(req.body.id || '') }));
   });
   /* De maandfactuur betalen uit het eigen saldo: de derde betaalweg naast de
@@ -122,7 +125,7 @@ module.exports = (kern) => {
      geld het huis verlaat richting het LID, en sinds die weg bestaat is
      walletsaldo elektronisch geld (zie WALLET_SALDO in kern/bevoegdheid). Zo
      zwaar iets hoort niet tussen de dunne routes hierboven te staan. */
-  require('./pay-terug')(kern, { stuur, geenGast, kyc });
+  require('./pay-terug')(kern, { stuur, geenEchtAccount, kyc });
 
   /* De ZAAKKANT (./pay-zaak.js): budget geven, vooraf vastzetten, innen,
      saldo en uitbetalen. Afgesplitst omdat dit bestand anders over de

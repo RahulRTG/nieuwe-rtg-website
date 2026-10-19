@@ -202,7 +202,7 @@ const eur = n => '€ ' + Number(n || 0).toFixed(2).replace('.', ',');
 
 function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
 
-const api = (pad, body) => fetch('/api/rtfos/gift/' + pad, {
+const api = (pad, body) => fetch(pad, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
   body: JSON.stringify(body || {})
@@ -218,6 +218,7 @@ let STAND = null;
    voornemen, en niet bij elke klik. Twee keer op bevestigen drukken is dan een
    gift -- de server herkent dezelfde sleutel. */
 let SLEUTEL = null;
+let PLANSLEUTEL = null;
 
 function zeg(t, goed) { $('#melding').innerHTML = '<div class="melder' + (goed ? ' goed' : '') + ' ruimte">' + esc(t) + '</div>'; }
 
@@ -228,7 +229,7 @@ async function start() {
   try { if (projectUitUrl()) { const v = $('#vorm'); if (v) v.value = 'geoormerkt'; } } catch (e) {}
   if (!token()) { $('#poort').classList.remove('verborgen'); return; }
   try {
-    STAND = await api('stand', {});
+    STAND = await api('/api/rtfos/gift/stand', {});
   } catch (e) { $('#poort').classList.remove('verborgen'); return; }
 
   if (STAND.stand !== 'open') {
@@ -269,7 +270,7 @@ function invoer() {
 $('#reken').addEventListener('click', async () => {
   $('#melding').innerHTML = '';
   try {
-    const r = await api('voorbereid', invoer());
+    const r = await api('/api/rtfos/gift/voorbereid', invoer());
     /* RTGId en niet Date.now()+Math.random(): die tweede is milliseconde-grof en
        levert een handvol bits, en dit is precies de sleutel waarop de server
        twee klikken herkent als EEN gift (shared/id.js). */
@@ -297,7 +298,7 @@ $('#bevestig').addEventListener('click', async () => {
   const knop = $('#bevestig');
   knop.disabled = true;
   try {
-    const r = await api('bevestig', Object.assign(invoer(), { idem: SLEUTEL }));
+    const r = await api('/api/rtfos/gift/bevestig', Object.assign(invoer(), { idem: SLEUTEL }));
     $('#voornemen').classList.add('verborgen');
     $('#klaarIn').innerHTML =
       '<div class="bedrag">' + esc(eur(r.gegeven)) + '</div>' +
@@ -319,7 +320,6 @@ $('#nogeen').addEventListener('click', () => {
 });
 
 /* ---------------------------------------------------------------- het plan */
-const planApi = (pad, body) => api('plan/' + pad, body);
 
 /* DE MACHTIGING BIJ EEN PLAN. Twee dingen die hier op het scherm horen en niet
    in een voetnoot: dat er NIETS wordt afgeschreven (dit huis heeft geen
@@ -341,7 +341,7 @@ async function projectenVullen() {
   const kies = $('#project');
   if (!kies || PROJECTEN) return;
   try {
-    const r = await api('projecten', {});
+    const r = await api('/api/rtfos/gift/projecten', {});
     PROJECTEN = r.projecten || [];
     kies.innerHTML = '<option value="">Kies een project</option>' +
       PROJECTEN.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) +
@@ -383,8 +383,8 @@ function machtigingBlok(p) {
 
 async function planTeken() {
   try {
-    const r = await planApi('mijn', {});
-    try { MACHTIGINGEN = (await api('machtiging/mijn', {})).machtigingen || []; } catch (e) { MACHTIGINGEN = []; }
+    const r = await api('/api/rtfos/gift/plan/mijn', {});
+    try { MACHTIGINGEN = (await api('/api/rtfos/gift/machtiging/mijn', {})).machtigingen || []; } catch (e) { MACHTIGINGEN = []; }
     $('#planLijst').innerHTML = (r.plannen || []).length ? r.plannen.map(p =>
       '<div class="gevolg"><b>' + esc(eur(p.euroPerJaar)) + ' per jaar, ' + p.jaren + ' jaar</b>' +
         ' &middot; ' + esc(p.stand) +
@@ -407,7 +407,7 @@ async function planTeken() {
     $('#planLijst').querySelectorAll('[data-mteken]').forEach(b => b.addEventListener('click', async () => {
       const id = b.dataset.mteken;
       try {
-        const r2 = await api('machtiging/teken', { planId: id,
+        const r2 = await api('/api/rtfos/gift/machtiging/teken', { planId: id,
           houder: $('[data-mh="' + id + '"]').value.trim(),
           ibanEinde: $('[data-mi="' + id + '"]').value.trim(),
           max: Number($('[data-mm="' + id + '"]').value), kanaal: 'app' });
@@ -418,13 +418,13 @@ async function planTeken() {
     }));
     $('#planLijst').querySelectorAll('[data-mweg]').forEach(b => b.addEventListener('click', async () => {
       try {
-        const r2 = await api('machtiging/intrek', { id: b.dataset.mweg });
+        const r2 = await api('/api/rtfos/gift/machtiging/intrek', { id: b.dataset.mweg });
         $('#planMeld').innerHTML = '<div class="melder goed ruimte">' + r2.zegt.map(z => esc(z)).join('<br>') + '</div>';
         planTeken();
       } catch (e) { mMeld(e.message); }
     }));
     $('#planLijst').querySelectorAll('[data-stop]').forEach(b => b.addEventListener('click', async () => {
-      try { const r2 = await planApi('stop', { id: b.dataset.stop });
+      try { const r2 = await api('/api/rtfos/gift/plan/stop', { id: b.dataset.stop });
         $('#planMeld').innerHTML = '<div class="melder goed ruimte">' + esc(r2.melding) + '</div>'; planTeken(); }
       catch (e) { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
     }));
@@ -434,7 +434,7 @@ async function planTeken() {
     $('#planLijst').querySelectorAll('[data-termijn]').forEach(b => b.addEventListener('click', async () => {
       b.disabled = true;
       try {
-        const r2 = await api('bevestig', { euro: Number(b.dataset.euro), vorm: 'periodiek',
+        const r2 = await api('/api/rtfos/gift/bevestig', { euro: Number(b.dataset.euro), vorm: 'periodiek',
           planId: b.dataset.termijn, idem: RTGId('termijn') });
         $('#planMeld').innerHTML = '<div class="melder goed ruimte">Termijn voldaan: ' + esc(eur(r2.gegeven)) + '.</div>';
         planTeken();
@@ -445,8 +445,12 @@ async function planTeken() {
 }
 
 $('#planVoorstel').addEventListener('click', async () => {
+  // een herhaalsleutel per voorstel, gebonden aan bedrag en looptijd; na succes een nieuwe
+  const inhoud = $('#planEuro').value + '|' + $('#planJaren').value;
+  if (!PLANSLEUTEL || PLANSLEUTEL.inhoud !== inhoud) PLANSLEUTEL = { inhoud, idem: RTGId('plan') };
   try {
-    await planApi('voorstel', { euroPerJaar: Number($('#planEuro').value), jaren: Number($('#planJaren').value) });
+    await api('/api/rtfos/gift/plan/voorstel', { euroPerJaar: Number($('#planEuro').value), jaren: Number($('#planJaren').value), idem: PLANSLEUTEL.idem });
+    PLANSLEUTEL = null;
     $('#planEuro').value = '';
     $('#planMeld').innerHTML = '<div class="melder goed ruimte">Voorgesteld. De stichting legt de overeenkomst vast; tot dat moment is een betaling een gewone gift.</div>';
     planTeken();

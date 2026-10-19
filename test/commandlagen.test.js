@@ -31,12 +31,25 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lagen-'));
 const CODE = 'KANTOOR-LAGEN-1';
 let srv, base, office;
 
-const api = (pad, body, tok) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/' + pad), {
+/* De gast aan tafel heeft een gratis account (eigenaarsbesluit 19 oktober 2026):
+   de QR is een extra sleutel bij de sessie, nooit een vervanging. Een /api/gast-
+   aanroep zonder eigen token reist met dat account mee; een expliciete null is
+   een aanroep zonder account. */
+const gastLeden = new Map();
+async function api(pad, body, token) {
+  if (token === undefined && String(pad).startsWith('/api/gast/')) {
+    if (!gastLeden.has(base)) gastLeden.set(base, await registreerGratis(base));
+    token = (gastLeden.get(base) || {}).token;
+  }
+  return apiKaal(pad, body, token);
+}
+const apiKaal = (pad, body, tok) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || office) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -300,20 +313,26 @@ test('de resterende enterprise-ingangen zijn anoniem fail-closed', async () => {
   }
 });
 
-test('open bewijs-, arrival-, webhook- en projectie-ingangen weigeren onbetrouwbare invoer veilig', async () => {
+test('open bewijs-, webhook- en projectie-ingangen en de arrivalingangen (achter de inlog) weigeren onbetrouwbare invoer veilig', async () => {
   const bewijs = await fetch(base + '/api/aanmelding/bewijs', { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.ok([400, 404].includes(bewijs.status), 'een bewijs zonder aanvraag-id wordt geweigerd');
 
-  const interpret = await fetch(base + '/api/arrival/interpret', { method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, body: '{}' });
-  const plan = await interpret.json();
+  /* Een account voor alles (besluit van 19 oktober 2026): de arrivalingangen
+     zijn niet meer open. Zonder sessie een 401; met een sessie gelden de
+     inhoudelijke grenzen van eerst. */
+  assert.equal(await zonder('/api/arrival/interpret'), 401, 'zonder sessie geen wensontleding');
+  assert.equal(await zonder('/api/arrival/request'), 401, 'zonder sessie geen aanvraag');
+  const u = Date.now().toString().slice(-8);
+  const lid = (await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Arrival Lid', email: 'cl' + u + '@voorbeeld.nl', phone: '06' + u, password: 'geheim12345',
+      geboortedatum: '1985-05-05', tier: 'rtg' }) })).json()).token;
+  const interpret = await api('/api/arrival/interpret', {}, lid);
   assert.equal(interpret.status, 200);
-  assert.match(plan.let || '', /nog niets aangevraagd/i,
+  assert.match(interpret.body.let || '', /nog niets aangevraagd/i,
     'taal interpreteren voert zonder menselijke controle nog niets uit');
 
-  const aanvraag = await fetch(base + '/api/arrival/request', { method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const aanvraag = await api('/api/arrival/request', {}, lid);
   assert.equal(aanvraag.status, 400, 'een arrival-aanvraag zonder tijdelijke request-token blijft dicht');
 
   for (const pad of ['/api/betaal/webhook/adyen', '/api/betaal/webhook/mollie']) {

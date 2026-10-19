@@ -18,7 +18,7 @@
       niets zonder een "ja", en niet langer dan nodig.
 
    Alleen voor leden (geen gasten). */
-module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingVanBehandelaar }) => {
+module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingVanBehandelaar, betaalZaak }) => {
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const eur = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
@@ -79,8 +79,10 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingV
      gedeelde context, een keer opgebouwd bij het opstarten; de ledenlaag
      gaat eerst de context in omdat de pakketlaag careBoek/careBetaal
      hergebruikt. */
-  const ctx = { db, opslag: C, save, crypto, schoon, notify, zorgVoor, zorgMee,
-    nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief };
+  const ctx = { db, opslag: C, save, crypto, schoon, notify, zorgVoor, zorgMee, betaalZaak,
+    nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief,
+    // de medische context van een intake, per veld versleuteld (./care/intakesleutel.js)
+    intakesleutel: require('./care/intakesleutel')() };
   /* De wachtlijst gaat VOOR de ledenlaag de context in: careAnnuleer meldt een
      vrijgekomen slot en pakt slotVrij op aanroepmoment uit diezelfde context. */
   const deelWacht = require('./care/wachtlijst')(ctx);

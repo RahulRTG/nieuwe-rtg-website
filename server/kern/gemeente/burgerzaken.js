@@ -3,6 +3,7 @@
    (dubbel voor hetzelfde product wordt geweigerd), een verhuizing doorgeven en de
    eigen afspraken volgen/annuleren. De medewerker ziet de dagplanning. Krijgt de
    gedeelde ctx van kern/gemeente/index.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { save, nu, vandaag, isDatum, id, ref, schoon, seed, deGemeente, sseToSupplier, BURGERZAKEN, BALIE_SLOTS } = ctx;
   const G = ctx.opslag; // ./opslag.js
@@ -31,7 +32,7 @@ module.exports = (ctx) => {
     if (!isDatum(datum) || datum < vandaag()) return { status: 400, error: 'Kies een datum vanaf vandaag.' };
     const g = deGemeente();
     const cap = (g && g.gemeente && g.gemeente.balie.capaciteitPerSlot) || 2;
-    const nuTijd = new Date().toTimeString().slice(0, 5);
+    const nuTijd = tijdzone.hhmmIn();
     const slots = BALIE_SLOTS
       .filter(t => datum > vandaag() || t > nuTijd)
       .map(t => ({ tijd: t, vol: bezetOp(datum, t) >= cap }));

@@ -25,7 +25,7 @@ module.exports = (ctx) => {
     if (sleutel.length < 16) return { status: 400, error: 'De aanvraagsleutel ontbreekt.' };
     const eerder = (caseLijst(key) || []).find(x => x.sleutel === sleutel);
     if (eerder) return { status: 200, ok: true, herhaald: true, zaak: eerder, vragen: [] };
-    const r = intake(b.zin, new Date().toISOString().slice(0, 10));
+    const r = intake(b.zin, require('../tijdzone').datumIn());
     if (r.fout) return { status: 400, error: r.fout };
     const v = r.velden;
     // wat het lid zelf aanvult, gaat voor wat wij uit de zin lazen

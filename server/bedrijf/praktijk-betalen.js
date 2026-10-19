@@ -62,7 +62,7 @@ module.exports = ({ kern = {}, W, save, log, rechtenVan }, env = process.env) =>
     x.betaalVerzoek = b.aan ? { door: g.l.id || null, ontvanger: ontvanger(g.w,x) } : null;
     x.versie++; log(g.w,g.l,'praktijk-betaalverzoek',p.id); return { ok:true };
   }
-  function voorbereid(g,b) {
+  function voorbereid(g,b,account) {
     const { w,p,x,d } = g, v = beeld(w,p,x);
     if (!v.magStarten || b.akkoord !== true || b.versie !== x.versie)
       return V.fout('Vernieuw de afspraak en bevestig de actuele betaalopdracht.', 409);
@@ -75,7 +75,7 @@ module.exports = ({ kern = {}, W, save, log, rechtenVan }, env = process.env) =>
         JSON.stringify(r.context.ontvanger) !== JSON.stringify(o))) return V.fout('De betaling vraagt controle.', 409);
     if (!r) {
       r = bw.maak({ actor:'werk:'+w.code+':'+p.id, idem:'opdracht', soort:'werk-opdracht', bronRef:p.id,
-        centen:x.bedragMinor, valuta:x.valuta, context:{ werkruimte:w.code, ontvanger:o, linkId:d.id } });
+        centen:x.bedragMinor, valuta:x.valuta, context:{ werkruimte:w.code, ontvanger:o, linkId:d.id, betaler:account || null } });
       if (r.valuta !== x.valuta.toLowerCase() || r.context?.werkruimte !== w.code ||
           JSON.stringify(r.context?.ontvanger) !== JSON.stringify(o)) return V.fout('De bestaande betaling vraagt controle.',409);
       x.betalingRef = r.id;

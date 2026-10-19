@@ -84,7 +84,9 @@ module.exports = (kern) => {
   app.post('/api/staff/ov/lijn/zet', supplierAuth, (req, res) => {
     if (ovZaakOnly(req, res)) return;
     if (!managerOnly(req, res)) return;
-    stuur(res, ovLijnZet(req.supplier, req.body || {}));
+    // de herhaalsleutel hoort bij de lijn; de kern beslist (EIGEN in middleware/idempotentie-eigen.js)
+    const b = req.body || {};
+    stuur(res, ovLijnZet(req.supplier, Object.assign({}, b, { idem: b.idem })));
   });
 
   // het zaakoverzicht

@@ -2016,7 +2016,7 @@
         const r = await api('/api/residentie/meubel/weg', { i });
         S.kamer.meubels = r.meubels.map(m => [m.soort, m.x, m.y]);
       } else {
-        const r = await api('/api/residentie/meubel/zet', { soort: S.editor.soort, x: t2.x, y: t2.y });
+        const r = await api('/api/residentie/meubel/zet', { soort: S.editor.soort, x: t2.x, y: t2.y, idem: RTGIdem('meubel') });
         S.kamer.meubels = r.meubels.map(m => [m.soort, m.x, m.y]);
         if (window.RTGWauw) RTGWauw.tik && RTGWauw.tik();
       }

@@ -21,6 +21,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, kantoorKoppelBody } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosaf-e2e-'));
@@ -139,6 +140,11 @@ test('het donateursscherm toont de eigen gift en nergens die van een ander',
   try {
     const d = await decor(srv.base);
     s = await scherm(srv.base, '/apps/foundation/os-donateur.html');
+    /* De gever draagt een (gratis) account; zijn code koppelt het aan zijn
+       giften (eigenaarsbesluit 19 oktober 2026). */
+    const gever = await registreerGratis(srv.base);
+    await s.page.evaluate(t => localStorage.setItem('rtg_member_token', t), gever.token);
+    await s.page.reload({ waitUntil: 'domcontentloaded' });
 
     // eerst een code met het verkeerde voorvoegsel
     await s.page.fill('#code', 'RTFX-FOUT');

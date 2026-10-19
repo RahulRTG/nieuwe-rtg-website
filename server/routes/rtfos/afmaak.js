@@ -7,9 +7,10 @@
 
    TWEE SOORTEN DEUR IN EEN BESTAND, en dat verschil is de moeite van het lezen
    waard. De veld-app draait op een gewone kantoorsessie -- de medewerker heeft
-   een RTG-account, want hij werkt hier. Het donateursportaal draait op een code
-   (RTFS-), want een gever heeft geen account en hoort er ook geen te moeten
-   maken om te zien waar zijn geld heen ging. Vandaar dezelfde twee remmen als
+   een RTG-account, want hij werkt hier. Het donateursportaal draait op een
+   account EN een code (RTFS-): sinds het eigenaarsbesluit van 19 oktober 2026
+   maakt ook een gever een (gratis) account, en de code koppelt dat account de
+   eerste keer aan zijn giften (kern/codekoppel.js). Vandaar dezelfde twee remmen als
    bij de andere code-deuren: per bron tegen het afgrazen, per code tegen veel
    bronnen op een code (routes/rtfkantoor/codedeuren.js legt uit waarom de
    sleutel niet ip+code mag zijn).
@@ -17,7 +18,9 @@
    ELK PAD STAAT LETTERLIJK -- zie de kop van ./index.js. */
 const rem = require('../../rem');
 
-module.exports = ({ app, officeAuth, rtfos, veilig, H }) => {
+module.exports = ({ app, auth, db, save, officeAuth, rtfos, veilig, H }) => {
+  // de code koppelt een account aan het dossier (eigenaarsbesluit 19 oktober 2026)
+  const koppel = require('../../kern/codekoppel')({ db, save });
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfoscode|' + codeVan(req) });
@@ -36,10 +39,10 @@ module.exports = ({ app, officeAuth, rtfos, veilig, H }) => {
   app.post('/api/rtfos/casus/toewijzen', officeAuth, H((req, b) => rtfos.veld.wijsToe(req, b.id, b.key, b.weg === true)));
 
   // ---------- het donateursportaal, op code ----------
-  app.post('/api/rtfos/portaal/donateur', ipRem, codeRem, (req, res) =>
-    veilig(res, () => rtfos.donateur.portaal(codeVan(req))));
-  app.post('/api/rtfos/portaal/donateur/bewijs', ipRem, codeRem, (req, res) =>
-    veilig(res, () => rtfos.donateur.bewijs(codeVan(req), (req.body || {}).giftId)));
+  app.post('/api/rtfos/portaal/donateur', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'donateur', codeVan(req), () => rtfos.donateur.portaal(codeVan(req)))));
+  app.post('/api/rtfos/portaal/donateur/bewijs', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'donateur', codeVan(req), () => rtfos.donateur.bewijs(codeVan(req), (req.body || {}).giftId))));
   // de kantoorkant: de code uitgeven en de periodieke overeenkomst vastleggen
   app.post('/api/rtfos/donateur/code', officeAuth, H((req, b) => rtfos.donateur.codeVoor(req, b.bronId, b)));
   app.post('/api/rtfos/donateur/code/intrekken', officeAuth,

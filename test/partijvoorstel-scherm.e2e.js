@@ -27,7 +27,7 @@ const pw = laadPlaywright();
 const OFFICE_CODE = 'PARTIJVOORSTEL-SCHERM';
 const TITEL = 'Een verlicht zebrapad bij de basisschool';
 
-test('Partijvoorstel: inschrijven op naam, plaatsen met de sleutel, lezen bij de kwestie',
+test('Partijvoorstel: inschrijven op naam, een account koppelen met de code, plaatsen, lezen bij de kwestie',
   { skip: geenBrowser(pw) }, async () => {
     const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-partijvoorstel-'));
     const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
@@ -79,16 +79,21 @@ test('Partijvoorstel: inschrijven op naam, plaatsen met de sleutel, lezen bij de
       await kp.locator('#pRegistreer').click();
       await wachtOpTekst(kp, /Ingeschreven/, { in: '#melding' });
       const sleutel = (await kp.locator('#pSleutel code').textContent()).trim();
-      assert.match(sleutel, /^PP\.[0-9A-F]{32}$/, 'de sleutel staat een keer op het scherm');
+      assert.match(sleutel, /^PP\.[0-9A-F]{32}$/, 'de koppelcode staat een keer op het scherm');
       await wachtOpTekst(kp, /Partij Noord/, { in: '#partijen' });
 
-      /* 2. De partij plaatst met haar sleutel. */
+      /* 2. Een mens van de partij koppelt zijn account met de koppelcode, en
+         plaatst daarna met zijn eigen sessie (eigenaarsbesluit 19 oktober 2026). */
+      const C = await lid('Cor Partij', 3);
       const kop = { 'x-partij-sleutel': sleutel };
+      assert.equal((await post('/api/democratie/partij/koppel', {}, C, kop)).status, 200, 'het account koppelt met de code');
       const pl = await post('/api/democratie/partij/voorstel/plaats', { kwestie: k.id, titel: TITEL,
-        tekst: 'Een zebrapad met verlichting en een klaarover in de ochtendspits.', bron: 'Verkiezingsprogramma 2026, par. 4' }, null, kop);
+        tekst: 'Een zebrapad met verlichting en een klaarover in de ochtendspits.', bron: 'Verkiezingsprogramma 2026, par. 4' }, C);
       assert.equal(pl.status, 200, JSON.stringify(pl.body));
       assert.equal((await post('/api/democratie/partij/voorstel/aanname', { id: pl.body.voorstel.id, veld: 'kosten',
-        waarde: '40.000 euro', bron: 'Raming wegbeheer 2026' }, null, kop)).status, 200);
+        waarde: '40.000 euro', bron: 'Raming wegbeheer 2026' }, C)).status, 200);
+      await kp.reload({ waitUntil: 'domcontentloaded' });
+      await wachtOpTekst(kp, /namens de partij:/, { in: '#partijen' });
 
       /* 3. De inbrenger leest het bij zijn eigen kwestie. */
       const ap = await pagina({ rtg_member_token: A });

@@ -14,6 +14,7 @@
    de To-kop van het bericht zelf. Een poort die de ontvanger uit een parameter
    haalt, is een open relay met extra stappen. */
 const maakRtmailOpslag = require('../kern/rtmail-opslag');
+const { mailpoort } = require('../kern/mailpoort');
 module.exports = (kern) => {
   const { app, express, officeAuth, auth, supplierAuth, db, save, mailQ, mailIn,
     mailBijlage, mailAanname, rtmail, rtmailRecht, codenaamVan } = kern;
@@ -41,8 +42,10 @@ module.exports = (kern) => {
   });
 
   /* ---- de buitenpoort ----
-     PUBLIEK met opzet: een vreemde mailserver heeft geen inlog. De rem staat
-     hieronder en de baan is altijd de onbetrouwde.
+     Zonder ledeninlog, want een mailserver is geen lid, maar sinds het
+     eigenaarsbesluit van 19 oktober 2026 alleen van de EIGEN mailserver: het
+     gedeelde geheim in de kop (kern/mailpoort.js). De rem staat hieronder en de
+     baan is altijd de onbetrouwde.
 
      DE KETEN ZELF STAAT HIER NIET MEER. Ontleden, stempelen, het origineel
      bewaren, de ontvanger toetsen, bezorgen en de bijlagen scannen doet
@@ -55,7 +58,7 @@ module.exports = (kern) => {
      geen postvak is, wordt nu geweigerd (550) in plaats van bezorgd. Dat was
      eerder een berg post voor niemand, in een postvak dat vanzelf ontstond. */
   let venster = 0, teller = 0;
-  app.post('/api/mail/binnen', async (req, res) => {
+  app.post('/api/mail/binnen', mailpoort, async (req, res) => {
     if (String(process.env.MAIL_INBOUND_PROVIDER || '').toLowerCase() === 'aws-ses')
       return res.status(404).json({ error:'Deze lokale proefpoort staat in de SES-stand dicht.' });
     const min = Math.floor(Date.now() / 60000);

@@ -226,6 +226,8 @@
       "status"
     ],
     "code": [
+      "betaalcode",
+      "codenaamVan",
       "dyncode",
       "resolveSession",
       "sessionFor"
@@ -510,7 +512,9 @@
       "ghostSimuleer"
     ],
     "gids": [
-      "appgids"
+      "appgids",
+      "resolveSession",
+      "rtf"
     ],
     "home": [
       "homeMerken",
@@ -653,6 +657,7 @@
       "beleidsmotor",
       "betaal",
       "betaalRegie",
+      "betaalWaarheid",
       "bevoegd",
       "boardroomAuth",
       "boardroomLijst",
@@ -820,9 +825,12 @@
       "livinglab",
       "remLezen",
       "remSchrijf",
+      "resolveSession",
+      "rtf",
       "staf",
       "veilig",
       "veiligAsync",
+      "volwassen",
       "wie"
     ],
     "loop-fabric": [
@@ -922,6 +930,8 @@
       "appbieb",
       "appbrug",
       "applyChatVertaald",
+      "assetAanvraagBetaal",
+      "assetAanvragenMijn",
       "assetDocument",
       "assetGebruik",
       "assetHerroep",
@@ -1538,6 +1548,8 @@
       "ankerpost",
       "appUrl",
       "archief",
+      "assetAanvraagBeslis",
+      "assetAanvragenKantoor",
       "assetFeesInnen",
       "assetHertaxeer",
       "assetKantoor",
@@ -1794,6 +1806,8 @@
     "rtfos": [
       "boardroomAuth",
       "genootschapDrager",
+      "resolveSession",
+      "rtf",
       "rtfos"
     ],
     "rtfschool": [
@@ -2771,6 +2785,7 @@
       "vrijheid"
     ],
     "wbw": [
+      "onboarding",
       "wbwGroep",
       "wbwMaak",
       "wbwMijn",

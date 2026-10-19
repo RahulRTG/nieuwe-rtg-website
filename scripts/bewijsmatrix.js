@@ -814,6 +814,21 @@ function bouw(invoer) {
       cellen[s.id] = { staat: 'ongemeten' };
     }
 
+    /* ONGEMETEN ZONDER REDEN BESTAAT NIET. Het routedossier belooft "ongemeten
+       met de reden erbij" (routes/office/dossier.js), maar de terugval van elke
+       tak hierboven gaf { staat: 'ongemeten' } -- ruim 9.700 cellen zonder een
+       woord (scripts/lib/voltooi/routedossier.js). De meest voorkomende reden
+       is dat geen register de route voor die schakel noemt; dat staat er nu.
+       En een 'verklaard' zegt door wie en waar, want dat is alles wat het is. */
+    for (const s of SCHAKELS) {
+      const c = cellen[s.id];
+      if (c.staat === 'ongemeten' && !c.reden) c.reden = c.bron
+        ? c.bron + ' gaf voor deze route geen oordeel'
+        : 'geen register noemt deze route voor ' + s.id;
+      if (c.staat === 'verklaard' && !c.reden) c.reden = 'verklaard door ' + (c.bron || 'de brontekst') +
+        (c.waar ? ' (' + c.waar + ')' : '') + '; niemand heeft het nagevraagd';
+    }
+
     rijen.push({
       methode: r.methode,
       pad: r.pad,

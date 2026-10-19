@@ -173,13 +173,21 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
 
   // gestrande afhandelingen, dan de veegronde zonder uitsluitsel (./hervat.js)
   const veeg = require('./hervat')({ doos, save, nuIso, gebeurtenis, STATUS, definitiefBetaald, log });
+  // en de terugbetalingen die op een providerbevestiging wachten (./terugveeg.js)
+  const terugveeg = require('./terugveeg')({ doos, save, nuIso, gebeurtenis, betaal,
+    providerTerugbetaling: terug.providerTerugbetaling, log });
   async function ronde(opties) {
     const a = await afhandeling.ronde(opties);
     const h = await veeg.hervat(Object.assign({}, opties || {}, { begin }));
-    return Object.assign(a, { hervat: h });
+    const t = await terugveeg.veeg(opties || {});
+    return Object.assign(a, { hervat: h, terug: t });
   }
+  const openstaand = () => Object.assign(veeg.openstaand(), terugveeg.openstaand());
+  // een betaling op controle afronden: alleen een mens op naam (./controle.js)
+  const controle = require('./controle')({ doos, save, nuIso, gebeurtenis, STATUS });
 
   return { STATUS, maak, bereidVoor: veeg.bereidVoor, begin, publiek, van, vanActor, providerMelding,
     terugbetalen: terug.terugbetalen, providerTerugbetaling: terug.providerTerugbetaling,
-    registreerAfhandeling, ronde, openstaand: veeg.openstaand, definitiefBetaald };
+    registreerAfhandeling, ronde, openstaand, definitiefBetaald,
+    terugAfhandelen: terugveeg.terugAfhandelen, controleAfronden: controle.controleAfronden };
 };

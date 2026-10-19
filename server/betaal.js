@@ -100,7 +100,7 @@ const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
   markProviderEvidence: providerBewijs.mark });
 const {
   maakBetaling: maakProviderBetaling,
-  haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder
+  haalBetaling, maakTerugbetaling, haalTerugbetaling, mogelijkheden, kiesAanbieder
 } = ontvangst;
 
 const maakBetaling = require('./betaal-connect')({
@@ -123,7 +123,7 @@ const maakBetaling = require('./betaal-connect')({
 const maakUitbetaling = require('./betaal/uitbetaling')({ betalenUit: BETALEN_UIT,
   haalOp: k => haalOp(k), bewaar: (k, v) => bewaar(k, v), regie, sandbox, stripe,
   demoBetalen: DEMO_BETALEN, aanbieder, eisBetaalrail, crypto,
-  uitgaandBewustDicht: UITGAAND_BEWUST_DICHT });
+  uitgaandBewustDicht: UITGAAND_BEWUST_DICHT, simulatie: SIMULATIE_AAN ? simulatie : null });
 
 /* De webhook van buiten woont in ./betaal/webhook.js -- dat is de kant die
    BINNENKOMT, en die snede houdt dit bestand onder de grens van keuringsregel 13.
@@ -139,7 +139,7 @@ function verifieerAdyenMelding(item) {
 }
 
 module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
-  maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
+  maakBetaling, haalBetaling, maakTerugbetaling, haalTerugbetaling, maakUitbetaling,
   verifieerWebhook, koppelStore, tekenDemo, mogelijkheden, kiesAanbieder,
   CONNECT_SANDBOX: sandbox.CONNECT, SEPA_SANDBOX: sandbox.SEPA,
   zetSandbox: (kanaal, aan) => regie.zet(kanaal, aan), sandboxStand: regie.stand,

@@ -20,6 +20,8 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtTot, wachtOpTekst } = require('./helper');
+// de les vraagt een account (eigenaarsbesluit 19 oktober 2026): de juf maakt hem met een gratis account
+require('./lesaccount').zetLesAccount();
 const Scanner = require('../public/shared/scanner');
 
 const pw = laadPlaywright();

@@ -61,8 +61,19 @@ module.exports.maakMove = ({ kern }) => {
      met opzet alleen waar het domein er een heeft), en een onderdeel zonder
      bekende duur levert geen klaarAt. Een duur van nul aannemen zou betekenen
      dat je een restaurant op hetzelfde moment binnenkomt en verlaat. */
+  /* IN WELKE ZONE STAAT HET UUR? Dat van de zaak waar het onderdeel plaatsvindt
+     (kern/tijdzone.js zaakZone: haar eigen instelling, anders haar land).
+     Zonder zaak -- een vrij voornemen, een reispakket -- de zone van het huis,
+     Europe/Amsterdam; Ibiza heeft dezelfde offset. Dat is een aanname en geen
+     meting: voor een onderdeel zonder zaak buiten deze zone klopt hij niet. */
+  function zoneVan(rij) {
+    const code = rij && rij.plek && rij.plek.zaak;
+    const s = code && kern.findSupplier ? kern.findSupplier(code) : null;
+    return s ? require('../tijdzone').zaakZone(s).zone : 'Europe/Amsterdam';
+  }
+
   function tijdenVan(rij) {
-    const start = tijdstip(rij.van, rij.tijd);
+    const start = tijdstip(rij.van, rij.tijd, zoneVan(rij));
     /* EEN ONBEKENDE DUUR IS GEEN DUUR VAN NUL. `Number(null)` is 0 en `0 >= 0`
        is waar, dus kreeg elk onderdeel zonder duur `klaarAt === nodigAt` -- "u
        kunt weg op het moment dat u er moet zijn". Dat gold voor de meerderheid
@@ -118,11 +129,15 @@ module.exports.maakMove = ({ kern }) => {
      Een Continue Key die een bestemming raadt, stuurt iemand met één tik naar de
      verkeerde stad -- en dat is precies het defect dat RTG Navigatie al een keer
      had (een kaart rond een eiland waar de gebruiker niet was). */
+  /* DE EERSTE IN DE TIJD, NIET DE EERSTE IN DE RIJ. reiswereld.komend()
+     sorteert op zijn eigen rangorde en niet op het uur -- dezelfde val als in
+     ./haalbaar.js. De voltooiproef zag het: met afspraken om 10:00 en 13:00
+     bood de knop de afspraak van 13:00 aan. */
   function moveVolgende(key, nuMs) {
     const nu = Number.isFinite(nuMs) ? nuMs : Date.now();
-    const onderdelen = onderdelenVan(key);
+    const onderdelen = onderdelenVan(key).filter(o => o.nodigAt != null).sort((a, b) => a.nodigAt - b.nodigAt);
     for (const o of onderdelen) {
-      if (o.nodigAt != null && o.nodigAt > nu && o.plek) {
+      if (o.nodigAt > nu && o.plek) {
         return { status: 200, volgende: {
           titel: o.titel || '', soort: o.soort || '', kenmerk: o.kenmerk || '',
           nodigAt: new Date(o.nodigAt).toISOString(),
@@ -147,7 +162,7 @@ module.exports.maakMove = ({ kern }) => {
         titel: String(b.titel || 'Dit voornemen').slice(0, 80),
         soort: String(b.soort || 'voornemen').slice(0, 40),
         plek: plekVan({ plek: b.plek })
-      }, tijdenVan({ van: b.dag, tijd: b.uur, duurMin: b.duurMin })),
+      }, tijdenVan({ van: b.dag, tijd: b.uur, duurMin: b.duurMin, plek: b.plek })),
       reisTijd, afstandM
     });
   }

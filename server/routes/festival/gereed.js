@@ -19,7 +19,7 @@ module.exports = (kern, deur) => {
   const { app, festival, logActivity, managerOnly, supplierAuth } = kern;
   const { mijn, editieVan, geenFestival, stuur } = deur;
 
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => require('../../kern/tijdzone').datumIn();
   const wie = (req) => (req.actor && req.actor.name) || null;
 
   app.post('/api/festival/controls/seed', supplierAuth, (req, res) => {

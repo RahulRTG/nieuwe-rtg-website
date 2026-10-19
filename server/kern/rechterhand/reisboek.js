@@ -5,7 +5,7 @@
 module.exports = (ctx) => {
   const { save, rid, nu, schoon, isDatum, L } = ctx;
   const LIJSTEN = { legs: 1, verblijven: 1, documenten: 1, programma: 1 };
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => require('../tijdzone').datumIn();
 
   function reisVan(l, id) { return l.reizen.find(r => r.id === id); }
 
@@ -46,7 +46,7 @@ module.exports = (ctx) => {
   }
 
   function reizen(key) {
-    const l = L(key), t = vandaag(), grens = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
+    const l = L(key), t = vandaag(), grens = require('../tijdzone').plusDagen(t, 90);
     const attenties = [];
     for (const r of l.reizen) for (const d of (r.documenten || []))
       if (d.geldigTot && d.geldigTot <= grens) attenties.push({ reis: r.naam, soort: d.soort, houder: d.houder, geldigTot: d.geldigTot, verlopen: d.geldigTot < t });

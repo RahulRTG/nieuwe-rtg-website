@@ -113,6 +113,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-reisherkomst').CONTRACTEN,
   require('./mutatiecontracten-conciergelus').CONTRACTEN,
+  require('./mutatiecontracten-partnernetwerk').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */
   require('./mutatiecontracten-lidabonnement').CONTRACTEN,

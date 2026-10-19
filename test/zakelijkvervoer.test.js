@@ -188,15 +188,16 @@ test('6. kostenplaats: verplicht, en alleen een die bestaat', async () => {
 });
 
 test('7. tijden, dagen, steden en ritsoorten: elk met hun eigen zin', async () => {
-  // een moment dat gegarandeerd BUITEN het venster valt, in de tijdzone van de server
-  const nacht = new Date(); nacht.setHours(3, 30, 0, 0);
+  // een moment dat gegarandeerd BUITEN het venster valt, op de klok van het lid (het huis)
+  const tijdzone = require('../server/kern/tijdzone');
+  const nacht = tijdzone.moment(tijdzone.datumIn(), 3 * 60 + 30);
   await beleidZet({ van: '08:00', tot: '18:00' });
   const laat = await zakelijkeRit(werker, { vertrek: nacht.toISOString() });
   assert.equal(laat.status, 403);
   assert.match(laat.body.error, /tussen 08:00 en 18:00; het is nu 03:30/);
 
   // alleen de dag van vandaag NIET toestaan, zodat de toets niet op de kalender leunt
-  const vandaag = new Date().getDay();
+  const vandaag = tijdzone.weekdagIn();
   await beleidZet({ dagen: [0, 1, 2, 3, 4, 5, 6].filter(d => d !== vandaag) });
   const dag = await zakelijkeRit(werker);
   assert.equal(dag.status, 403);

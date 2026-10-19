@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-10-18",
+  "vastgelegd": "2026-10-19",
   "gemeten": {
-    "bestanden": 2971,
-    "vormen": 1617,
-    "velden": 2319,
-    "modules": 906,
-    "domeinen": 323,
+    "bestanden": 2998,
+    "vormen": 1620,
+    "velden": 2318,
+    "modules": 910,
+    "domeinen": 325,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1625,
+    "veldenDomeineigen": 1622,
     "veldenGedeeldVanafVier": 237,
-    "gelijkendeVormparen": 65
+    "gelijkendeVormparen": 64
   },
   "envelop": [
     "aantal",
@@ -154,6 +154,18 @@
       ]
     },
     {
+      "veld": "versie",
+      "domeinen": 15,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/envelop",
+        "kern/fluister"
+      ]
+    },
+    {
       "veld": "onderwerp",
       "domeinen": 15,
       "waar": [
@@ -175,18 +187,6 @@
         "kern/commerce",
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport"
-      ]
-    },
-    {
-      "veld": "versie",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/envelop",
-        "kern/fluister"
       ]
     },
     {
@@ -322,6 +322,18 @@
       ]
     },
     {
+      "veld": "plek",
+      "domeinen": 12,
+      "waar": [
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/commerce",
+        "kern/festival",
+        "kern/hulpdienst",
+        "kern/mall"
+      ]
+    },
+    {
       "veld": "zaak",
       "domeinen": 12,
       "waar": [
@@ -451,18 +463,6 @@
         "kern/festival",
         "kern/leerhuis",
         "kern/mobiliteit"
-      ]
-    },
-    {
-      "veld": "plek",
-      "domeinen": 11,
-      "waar": [
-        "kern/afdelingen",
-        "kern/agenda-pro",
-        "kern/commerce",
-        "kern/festival",
-        "kern/hulpdienst",
-        "kern/mall"
       ]
     },
     {

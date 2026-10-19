@@ -75,8 +75,15 @@ module.exports = ({ db, save, schoon, crypto, catalogus, codenaamVan, keyVanCode
     const naam = schoon((opdracht || {}).naam, 60);
     if (!naam) return { status: 400, error: 'Geef de lijst een naam.' };
     const rij = mijne(sess.key);
+    /* De sleutel staat OP de lijst: de centrale idempotentielaag vergeet bij
+       een crash, en dan maakte dezelfde tik een tweede lijst
+       (test/medialijst-herhaal.test.js). */
+    const idem = String((opdracht || {}).idem || '').slice(0, 200);
+    const al = idem && rij.find(l => l.idem === idem);
+    if (al) return { status: 200, ok: true, herhaald: true, lijst: kort(al) };
     if (rij.length >= MAX_LIJSTEN) return { status: 409, error: 'U heeft de bovengrens van ' + MAX_LIJSTEN + ' lijsten bereikt.' };
     const l = { id: id(), naam, stukken: [], gedeeld: [], at: nu(), bijgewerkt: nu() };
+    if (idem) l.idem = idem;
     rij.unshift(l); save();
     return { status: 200, ok: true, lijst: kort(l) };
   }

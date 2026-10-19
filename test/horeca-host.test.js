@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
 
-let BASE, child, tok;
+let BASE, child, tok, lid;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-host-'));
 const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
@@ -42,6 +42,11 @@ test.before(async () => {
   const mgr = roster.staff.find(x => x.role === 'manager') || roster.staff[0];
   tok = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
   assert.ok(tok, 'de zaak-inlog werkt');
+  /* een account voor alles (19 oktober 2026): de aanvraag doet een ingelogd lid */
+  const u = Date.now().toString().slice(-8);
+  lid = (await api('/api/auth/register', { name: 'Host Lid', email: 'hh' + u + '@voorbeeld.nl', phone: '06' + u,
+    password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' })).body.token;
+  assert.ok(lid, 'het lid is ingelogd');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -71,7 +76,7 @@ async function aanvraag(n, opties) {
   const r = await api('/api/arrival/request', Object.assign({
     requestToken: code(n), supplierCode: 'KIKUNOI', naam: 'Gast ' + n,
     datum: m.datum, tijd: m.tijd, personen: 2
-  }, opties || {}));
+  }, opties || {}), lid);
   assert.equal(r.status, 200, 'de aanvraag lukt: ' + JSON.stringify(r.body).slice(0, 160));
   return r.body.pass;
 }

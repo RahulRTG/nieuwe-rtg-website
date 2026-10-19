@@ -28,8 +28,17 @@ function maakBericht({ B, eis, nu, id, save, standZet, standVan, seinNaarDeRest,
       const bron = (B()[g.id] || []).find((m) => m.id === o.antwoordOp);
       if (!bron) throw new Error('Dat bericht staat niet in dit gesprek.');
     }
+    /* EEN HERHAALSLEUTEL PER BERICHT (19 oktober 2026). Een dubbele tik of een
+       verzoek dat na een afgebroken verbinding opnieuw gaat, plaatste het
+       bericht twee keer: de voltooiproef van Berichten zag er twee bij de
+       ontvanger. Het scherm stuurt per opgesteld bericht een sleutel mee; komt
+       die van dezelfde afzender terug in dit gesprek, dan is het hetzelfde
+       bericht -- ook na een herstart, want de sleutel staat op het bericht. */
+    const idem = typeof o.idem === 'string' && o.idem.trim() ? o.idem.trim().slice(0, 80) : null;
+    const al = idem && (B()[g.id] || []).find((x) => x.van === o.van && x.idem === idem);
+    if (al) return al;
     const m = {
-      id: id('brc'), van: o.van, at: nu(),
+      id: id('brc'), van: o.van, at: nu(), idem,
       /* Namens wie er geschreven wordt (`van`) en WIE het typte (`door`) zijn
          bij een zaak niet hetzelfde. Alleen ingevuld als het iemand uit
          dezelfde zaak is: `door` van een vreemde sleutel zou een manier zijn

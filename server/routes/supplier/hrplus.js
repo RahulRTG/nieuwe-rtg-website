@@ -48,7 +48,7 @@ module.exports = (kern) => {
       if (!Number.isFinite(start)) return null;
       const dagen = Math.max(0, Math.floor((nu - start) / 86400000));
       const jaren = Math.floor(dagen / 365);
-      const volgend = new Date(start); volgend.setFullYear(volgend.getFullYear() + jaren + 1);
+      const volgend = new Date(start); volgend.setUTCFullYear(volgend.getUTCFullYear() + jaren + 1);
       return { staffId: s.id, name: s.name, func: s.func || null, sinds: s.created_at.slice(0, 10), dagen, jaren, volgendJubileum: volgend.toISOString().slice(0, 10) };
     }).filter(Boolean);
   }
@@ -113,7 +113,7 @@ module.exports = (kern) => {
     if (!managerOnly(req, res)) return;
     const st = accounts.getStaffById(Number(req.body.staffId));
     if (!st || String(st.supplier_code).toUpperCase() !== req.supplier.code) return res.status(404).json({ error: 'Teamlid niet gevonden.' });
-    const g = { id: rid(), staffId: st.id, name: st.name, datum: txt(req.body.datum, 10) || new Date().toISOString().slice(0, 10),
+    const g = { id: rid(), staffId: st.id, name: st.name, datum: txt(req.body.datum, 10) || require('../../kern/tijdzone').datumIn(),
       onderwerp: txt(req.body.onderwerp, 80) || 'Groeigesprek', verslag: txt(req.body.verslag, 2000),
       afspraken: txt(req.body.afspraken, 600), door: req.actor.name, at: new Date().toISOString() };
     bak('groeigesprekken', req.supplier.code).push(g);

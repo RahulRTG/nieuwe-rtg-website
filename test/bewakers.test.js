@@ -309,7 +309,10 @@ test('en de verdeling bereikt die tak ook werkelijk', () => {
    ========================================================================== */
 test('een openbare route met alleen een rem ervoor is beproefbaar', () => {
   const { PUBLIEK } = require('../scripts/lib/publiek');
-  const pad = '/api/arrival/interpret';
+  /* /api/arrival/interpret en daarna /api/lab2/bewoner/thema stonden hier; sinds
+     19 oktober 2026 vragen beide een account (AUTHORITY.md par. 7a). De start van
+     de identiteitsstroom blijft openbaar (uitzondering 1: vóór er een sessie is). */
+  const pad = '/api/rtgid/start';
   assert.ok(PUBLIEK.has(pad), 'deze route hoort met een reden op de openbaar-lijst te staan');
   const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['mw'], pad, methode: 'POST' });
   assert.equal(u.rol, 'openbaar', 'een rem is geen identiteitslaag, maar ook geen reden om niet te meten');

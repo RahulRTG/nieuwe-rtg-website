@@ -22,7 +22,7 @@ module.exports = (kern) => {
   require('./magnaatstad')({ app, auth, geenGast, magnaatWereld }); // samen in een Oudwijk
   app.post('/api/member/magnaat/overzicht', auth, (req, res) => alsLid(req, res, key => magnaatWereld.overzicht(key)));
   app.post('/api/member/magnaat/taak/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakStart(key, b.functieId, b.apparaat)));
-  app.post('/api/member/magnaat/taak/antwoord', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakAntwoord(key, b.taakId, b.keuze)));
+  app.post('/api/member/magnaat/taak/antwoord', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakAntwoord(key, b.taakId, b.keuze, b.stap)));
   app.post('/api/member/magnaat/taak/handeling', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakHandeling(key, b.taakId, b.handeling)));
   app.post('/api/member/magnaat/taak/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakActie(key, b.taakId, b.invoer)));
   app.post('/api/member/magnaat/kantoor/kies', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.kiesKantoor(key, b.kantoorId, b.rol)));
@@ -39,7 +39,7 @@ module.exports = (kern) => {
   app.post('/api/member/magnaat/partner/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.partnerTrainingStart(key, b.code)));
   app.post('/api/member/magnaat/partner/stap', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.partnerTrainingAntwoord(key, b.trainingId, b.keuze)));
   app.post('/api/member/magnaat/teamkamer/mijn', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMijn(key, b.id)));
-  app.post('/api/member/magnaat/teamkamer/maak', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMaak(key, b)));
+  app.post('/api/member/magnaat/teamkamer/maak', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerMaak(key, b, b.idem)));
   app.post('/api/member/magnaat/teamkamer/deelnemen', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerDeelnemen(key, b.code)));
   app.post('/api/member/magnaat/teamkamer/code', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerCode(key, b.id)));
   app.post('/api/member/magnaat/teamkamer/code/intrek', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.teamkamerCodeIntrek(key, b.id)));

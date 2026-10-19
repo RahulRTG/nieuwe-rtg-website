@@ -6,6 +6,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, klasgenotenVan } = ctx;
+  const herhaling = require('./dubbeltik');
   const uitnodigen = require('./uitnodigen')({ zijnVrienden, socialZoek, isGeblokkeerd, klasgenotenVan });
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
@@ -30,7 +31,7 @@ module.exports = (ctx) => {
     if (t === 'keuze' && modus === 'teams' && grootte === SPEL[soort].max) return 'teams';
     return 'vrij';
   }
-  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld, tempo, context, bron, variant }) {
+  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld, tempo, context, bron, variant, idem }) {
     opschonen();
     /* Alle toetredingsvragen in een keer, in volgorde: bestaat het spel, mag
        deze app het starten, mag DEZE speler mee. Ze stonden hier los; nu staat
@@ -63,6 +64,8 @@ module.exports = (ctx) => {
     // zodat er hier geen tweede lus staat die de vraag net anders stelt
     const neeGasten = beleid.mag(uitgenodigd, soort, { wereld });
     if (neeGasten) return neeGasten;
+    const h = herhaling.vind(crypto, S().potjes, mij, idem, { soort, grootte: max, uitgenodigd, modus, variant: vv.variant, tempo });
+    if (h.antwoord) return h.antwoord;
     const potje = Object.assign({ id: rid(5), soort, grootte: max, modus: teamModus(soort, max, modus),
       taal: taal === 'en' ? 'en' : 'nl',
       teams: TEAMS, spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) },
@@ -70,7 +73,7 @@ module.exports = (ctx) => {
          wordt daar tegen een gesloten lijst gelegd, want wie zijn eigen context
          mag meesturen opent straks een 18+-spel als schoolsessie. `host` is de
          starter, en die weten we hier. */
-      beleid.roomVelden({ context, bron, host: mij, tempo, variant: vv.variant }));
+      beleid.roomVelden({ context, bron, host: mij, tempo, variant: vv.variant }), h.velden);
     S().potjes[potje.id] = potje;
     save();
     uitgenodigd.forEach(v => nudge(v, potje));

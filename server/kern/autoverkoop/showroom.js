@@ -1,6 +1,7 @@
 /* Autoverkoop (deelmodule): de showroom: verkoop aan/uit, auto's beheren
    met foto's, de publieke showroom, aanbevolen auto's en vindAuto. Krijgt
    de gedeelde context een keer bij het opstarten vanuit kern/autoverkoop.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, media,
     KETEN_PROEFRIT, KETEN_KOOP, KLAAR, BRANDSTOF,
@@ -19,7 +20,7 @@ module.exports = (ctx) => {
     if (!a) { a = { id: id('AUTO') }; v.showroom.push(a); }
     a.merk = merk;
     a.model = schoon(data.model, 40) || a.model || '';
-    a.jaar = getal(data.jaar, 1950, 2100, a.jaar || new Date().getFullYear());
+    a.jaar = getal(data.jaar, 1950, 2100, a.jaar || tijdzone.jaarIn());
     a.km = getal(data.km, 0, 2e6, a.km || 0);
     a.prijs = getal(data.prijs, 0, 1e7, a.prijs || 0);
     a.brandstof = BRANDSTOF.includes(data.brandstof) ? data.brandstof : (a.brandstof || 'Benzine');

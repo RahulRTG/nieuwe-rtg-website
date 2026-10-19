@@ -23,10 +23,8 @@ module.exports = (kern) => {
   // de leeftijd uit het profiel; bepaalt welke fases gekozen mogen worden
   function leeftijdVan(md) {
     if (!md || !md.geboren) return null;
-    const g = new Date(md.geboren), nu = klok.datum();
-    let l = nu.getFullYear() - g.getFullYear();
-    if (nu < new Date(nu.getFullYear(), g.getMonth(), g.getDate())) l -= 1;
-    return l;
+    // lib/leeftijd rekent de verjaardag op de kalender van het huis, niet van de container
+    return require('../lib/leeftijd').leeftijdVan(md.geboren);
   }
   const FASE_NAMEN = {
     kind: ['Kind', 'Rahul is je grote broer: lief, geduldig en beschermend.'],

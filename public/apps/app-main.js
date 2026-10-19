@@ -2065,6 +2065,12 @@ var RTG_BOUW = '10fced1a';
     try { return await RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }); }
     catch(e){ toast((e.rtg && e.rtg.kort) || T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
   }
+  /* De rand draagt Opnemen en Ophangen boven de werktafel. Stond hij er nog
+     niet (app net open), dan kon niemand opnemen: probeer tot hij staat. */
+  function toonRand(spec, nog){
+    (function p(n){ if (!nog()) return; const ok = window.RTGAdaptiveEdgeVisual && RTGAdaptiveEdgeVisual.present(spec);
+      if (!ok && n < 40) setTimeout(() => p(n + 1), 250); })(0);
+  }
   function toonGesprek(naam, video){
     $('#csNaam').textContent = naam; $('#csNaam2').textContent = naam;
     $('#csAv').textContent = initCN(naam);
@@ -2073,7 +2079,7 @@ var RTG_BOUW = '10fced1a';
     $('#csCam').style.display = video ? '' : 'none';
     $('#csTijd').textContent = T('sal.belt','gaat over…');
     belUI(true);
-    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'active-call',name:naam,duration:T('sal.belt','gaat over…')});
+    const c = call; toonRand({kind:'active-call',name:naam,duration:T('sal.belt','gaat over…')}, () => call === c);
   }
   async function beginGesprek(video){
     if (!dmWith) return;
@@ -2155,7 +2161,7 @@ var RTG_BOUW = '10fced1a';
       $('#ciNaam').textContent = d.codename;
       $('#ciSoort').textContent = d.video ? T('sal.videogesprek','Videogesprek') : T('sal.spraakoproep','Spraakoproep');
       $('#callIncoming').classList.add('open');
-      if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'incoming-call',name:d.codename});
+      const wie = inkomend; toonRand({kind:'incoming-call',name:d.codename}, () => inkomend === wie);
       return;
     }
     if (!call || d.from !== call.withKey) return;

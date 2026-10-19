@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**62 bundels, 493 delen, 0 zonder onderwerp.**
+**62 bundels, 492 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 101 delen, 10025 regels in de delen
+`public/apps/app-main/` -- 100 delen, 10001 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -81,7 +81,6 @@ omlaag.
 | `app-main-31.js` | Achtergrond (wallpaper) in het bedieningspaneel |
 | `app-main-31c.js` | Onderweg: de live reis |
 | `app-main-32.js` | het live-paneel: van modus wisselen |
-| `app-main-32a.js` | RTG Shared Assets: een koop is een aanvraag (kern/assets/aanvraag.js) |
 | `app-main-33.js` | een asset herroepen binnen de bedenktijd |
 | `app-main-34.js` | mijn zorgprofiel |
 | `app-main-34b.js` | het Onderweg-paneel: kaart, partners, handelingen en de bevestigde aankomst |
@@ -204,7 +203,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 422 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 442 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -215,7 +214,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9900 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9899 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -367,7 +366,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 9 delen, 1021 regels in de delen
+`public/apps/office/app/` -- 9 delen, 1027 regels in de delen
 
 | deel | onderwerp |
 |---|---|

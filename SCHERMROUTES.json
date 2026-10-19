@@ -3,12 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "f6b7d1bc",
+  "commit": "34e0b230",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
-   "ongecommitteInvoer": [],
+   "boomVuil": true,
+   "ongecommitteInvoer": [
+    "public/apps/arrival.html"
+   ],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1041,
-  "verwijzingen": 1266,
-  "voorvoegsels": 142,
+  "exactePaden": 1043,
+  "verwijzingen": 1270,
+  "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8254,6 +8256,22 @@
    "schermen": [
     "public/apps/appstore-dossier.html",
     "public/apps/mall.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/arrival/pass",
+   "schermen": [
+    "public/apps/arrival.html",
+    "public/shared/plaatsnadering.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/arrival/pulse",
+   "schermen": [
+    "public/apps/arrival.html",
+    "public/shared/plaatsnadering.js"
    ],
    "aantal": 2
   },
@@ -9085,6 +9103,20 @@
    "pad": "/api/appstore/naslag",
    "schermen": [
     "public/apps/appstore-uitgever.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/arrival/interpret",
+   "schermen": [
+    "public/apps/arrival.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/arrival/request",
+   "schermen": [
+    "public/apps/arrival.html"
    ],
    "aantal": 1
   },
@@ -15074,20 +15106,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/arrival/pass",
-   "schermen": [
-    "public/shared/plaatsnadering.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/arrival/pulse",
-   "schermen": [
-    "public/shared/plaatsnadering.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/plaats/venster",
    "schermen": [
     "public/shared/plaatsnadering.js"
@@ -15445,10 +15463,13 @@
   },
   {
    "bestand": "public/apps/arrival.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/arrival/"
-   ]
+   "exact": [
+    "/api/arrival/interpret",
+    "/api/arrival/pass",
+    "/api/arrival/pulse",
+    "/api/arrival/request"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/attenties.html",

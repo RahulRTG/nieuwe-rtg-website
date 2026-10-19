@@ -216,6 +216,10 @@ const CONTRACT = {
   'link:attenties': Object.assign({
     belofte: 'een Lifestyle-lid onderhoudt zijn relaties: wie binnen dertig dagen een attentie verdient, met de giftgeschiedenis'
   }, voltooi('attenties', 'het scenario loopt /api/member/rechterhand/attenties, /relatie en /gift, onder het voorvoegsel dat /apps/attenties.html aanroept')),
+  /* TravelOS: aankomst, vervoer en verblijf (19 oktober 2026). */
+  'link:aankomst': Object.assign({
+    belofte: 'een gast zet zijn wens om in een aanvraag bij de zaak, krijgt een tijdelijke pass met beloften die de zaak persoonlijk bevestigt, en deelt vrijwillig zijn aankomststatus'
+  }, voltooi('aankomst', 'het scenario loopt /api/arrival/interpret, /request, /pass en /pulse, de routes die /apps/arrival.html zelf aanroept, met de zaak die de beloften bevestigt en een tweede zaak die niets ziet')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

@@ -35,7 +35,9 @@ const ONBEKEND = 'Deze code kennen we niet. Vraag de stichting om de code.';
 
 module.exports = ({ db, save, nu }) => {
   const tijd = () => (typeof nu === 'function' ? nu() : new Date().toISOString());
-  const bak = () => (db.data.codekoppelingen = db.data.codekoppelingen || {});
+  const opslag = require('./eigencollectie')({ db, domein: 'kern/codekoppel', bezit: { codekoppelingen: 'kaart' } });
+  const bak = () => opslag.bak('codekoppelingen');
+  const kijk = () => opslag.kijk('codekoppelingen');
   const sleutel = (soort, code) => crypto.createHash('sha256')
     .update('codekoppel|' + soort + '|' + String(code || '').trim().toUpperCase()).digest('hex').slice(0, 40);
   const wie = (req) => {
@@ -53,13 +55,13 @@ module.exports = ({ db, save, nu }) => {
     const w = wie(req);
     if (!w.key) return { status: 401, error: 'Log in met je RTG-account; een gratis account is genoeg.', accountNodig: true };
     const k = sleutel(soort, code);
-    if (vreemd(bak()[k], w)) return { status: 404, error: ONBEKEND };
+    if (vreemd(kijk()[k], w)) return { status: 404, error: ONBEKEND };
     const r = werk();
     return r && typeof r.then === 'function' ? r.then(x => leg(k, soort, w, x)) : leg(k, soort, w, r);
   }
   function leg(k, soort, w, r) {
     if (!r || r.error) return r;
-    const rij = bak()[k];
+    const rij = kijk()[k];
     if (vreemd(rij, w)) return { status: 404, error: ONBEKEND };
     const nu_ = tijd();
     bak()[k] = Object.assign(rij || { soort, key: w.key, codenaam: w.codenaam, sinds: nu_, aantal: 0 },
@@ -74,7 +76,7 @@ module.exports = ({ db, save, nu }) => {
   function vervalt(soort, code) {
     if (!code) return false;
     const k = sleutel(soort, code);
-    if (!bak()[k]) return false;
+    if (!kijk()[k]) return false;
     delete bak()[k];
     if (typeof save === 'function') save();
     return true;
@@ -82,7 +84,7 @@ module.exports = ({ db, save, nu }) => {
 
   // voor het kantoor en de toetsen: hangt deze code aan een account, en aan welke codenaam
   function koppelingVan(soort, code) {
-    const rij = bak()[sleutel(soort, code)];
+    const rij = kijk()[sleutel(soort, code)];
     return rij ? { soort: rij.soort, codenaam: rij.codenaam, sinds: rij.sinds, laatst: rij.laatst, aantal: rij.aantal } : null;
   }
 

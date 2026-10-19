@@ -78,3 +78,16 @@ test('de code koppelt een account aan een dossier, en daarna alleen dat account'
   assert.equal((await post('/api/rtfos/portaal/partner/genootschap', { code: codeA }, b.token)).status, 404,
     'ook niet langs de deur ernaast, want het is hetzelfde dossier');
 });
+
+
+test('codekoppelingen lezen en geweigerde toegang leggen niets aan; beschadigde opslag blijft dicht', () => {
+  const db = { data: {} };
+  const k = require('../server/kern/codekoppel')({ db, save() {} });
+  assert.equal(k.koppelingVan('partner', 'onbekend'), null);
+  assert.equal(k.vervalt('partner', 'onbekend'), false);
+  assert.equal(k.met({ session: { key: 'lid-a' } }, 'partner', 'onbekend', () => ({ status: 404, error: 'Onbekend' })).status, 404);
+  assert.deepEqual(db.data, {});
+  db.data.codekoppelingen = [];
+  assert.throws(() => k.met({ session: { key: 'lid-a' } }, 'partner', 'code', () => ({ ok: true })), /niet de verklaarde vorm/);
+  assert.deepEqual(db.data.codekoppelingen, []);
+});

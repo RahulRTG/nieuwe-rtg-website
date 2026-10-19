@@ -2,6 +2,7 @@
 (function (w) {
   'use strict';
   w.RTGPublicatieInfo = function (a, esc) {
+    a = a || {};
     function datum(t) { return t ? esc(new Date(t).toLocaleString(document.documentElement.lang || 'nl-NL',
       { dateStyle: 'medium', timeStyle: 'short' })) : 'Onbekend'; }
     return '<p>Gepubliceerd: ' + datum(a.gepubliceerd) + ' · Editie ' + (Number(a.versie) || 1)

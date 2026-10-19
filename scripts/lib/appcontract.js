@@ -247,6 +247,9 @@ const CONTRACT = {
   'link:huis': Object.assign({
     belofte: 'een lid zet zijn huis open, een ander lid vindt en vraagt het aan zonder dat er iets wordt afgeschreven, de host beslist, en het verblijf loopt van inchecken tot review; een bezette periode blijft bezet'
   }, voltooi('huis', 'het scenario loopt /api/thuis/huis, /huizen, /zoek, /detail, /boek, /bord, /beslis, /mijn, /checkin, /checkuit, /bericht, /review en /reviews, de routes die /apps/thuis.html zelf aanroept, met een host, een gast en een derde lid')),
+  'link:leven': Object.assign({
+    belofte: 'een lid ziet op zijn lijn alleen wat hij zelf ergens vastlegde en wat deze week speelt, zonder knop die iets voor hem doet, en niemand anders ziet het'
+  }, voltooi('leven', 'het scenario loopt /api/leven/cockpit, /api/foodcourt en /api/uitgaan, de routes die /apps/leven.html zelf aanroept, met een afspraak uit de eigen agenda en een tweede lid')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

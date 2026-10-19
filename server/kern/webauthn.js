@@ -20,11 +20,13 @@ const SLEUTELS_MAX = 8;                 // passkeys per account
 const RP_NAAM = 'Rahul Travel Group';
 
 function maakWebauthn({ db, save, accounts, schoon }) {
-  const ceremonies = maakCeremonieOpslag();
   let credentialIndex = null;            // credential-id -> userId
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => new Uint8Array(Buffer.from(String(s), 'base64url'));
-  const eigen = require('./eigencollectie')({ db, domein: 'kern/webauthn', bezit: { webauthn: 'kaart', webauthnSpoor: 'kaart' } });
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/webauthn',
+    bezit: { webauthn: 'kaart', webauthnSpoor: 'kaart', webauthnUitdaging: 'kaart' } });
+  // de uitdaging staat in de gedeelde opslag, niet in het RAM van een proces (X4)
+  const ceremonies = maakCeremonieOpslag({ kast: () => eigen.bak('webauthnUitdaging'), save });
 
   const lijsten = () => eigen.bak('webauthn');   // userId -> [credentials]
   // lezen schept niets: bak() gaf een 500 op de 1e passkey onder PG

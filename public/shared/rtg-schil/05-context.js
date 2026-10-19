@@ -6,9 +6,12 @@
   function context(ref) {
     /* Ook "context weg" (null) gaat rond: anders bleven de andere surfaces op
        de oude verwijzing staan (samenproef, keten context-naar-agenda). */
+    var oud = schil.huidigeContext;
     schil.huidigeContext = (!ref || !ref.id) ? null
       : { soort: String(ref.soort || ''), id: String(ref.id), label: String(ref.label || '') };
-    schil.volgt = {}; // wie de vorige context volgde, volgt deze niet vanzelf
+    // wie de vorige context volgde, volgt deze niet vanzelf; dezelfde ref opnieuw is geen nieuwe context
+    var c = schil.huidigeContext;
+    if (!c || !oud || oud.soort !== c.soort || oud.id !== c.id) schil.volgt = {};
     schil.luisteraars.forEach(function (fn) {
       try { fn(schil.huidigeContext); } catch (e) { /* een luisteraar die stukgaat neemt de rest niet mee */ }
     });
@@ -26,7 +29,8 @@
   /* Een surface meldt dat hij de huidige context volgt (contract van de
      samenproef, keten context-naar-agenda): soort en id moeten de huidige
      context zijn -- een laat antwoord op een oude context telt niet -- en `wat`
-     is een zin, geen gegevens. De naam komt van de surface zelf. */
+     is een zin, geen gegevens. De naam komt van de surface zelf. schil.volgt en
+     data-volgt dragen het id van de SURFACE, niet dat van de context. */
   function contextVolgt(s, m) {
     var c = schil.huidigeContext;
     if (!s || !c || !m || String(m.soort || '') !== c.soort || String(m.id || '') !== c.id) return;

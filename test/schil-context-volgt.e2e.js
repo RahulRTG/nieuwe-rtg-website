@@ -47,6 +47,13 @@ test('de console toont wie volgt, alleen voor de huidige context en alleen van e
     await meld({ rtg: 'context-volgt', soort: 'reis', id: 'r1', wat: '1 afspraak <b>bij</b> het hotel' });
     assert.equal(await regel(), naam + ' volgt: 1 afspraak <b>bij</b> het hotel', 'de surface staat er, als tekst');
 
+    await page.evaluate(() => RTGSchil.context({ soort: 'reis', id: 'r1', label: 'Lissabon' }));
+    assert.equal(await regel(), naam + ' volgt: 1 afspraak <b>bij</b> het hotel', 'dezelfde ref twee keer: de regel blijft staan');
+
+    await page.evaluate(() => RTGSchil.context({ soort: 'reis', id: 'r2', label: 'Porto' }));
+    assert.equal(await regel(), null, 'een andere context wist de regel');
+    await meld({ rtg: 'context-volgt', soort: 'reis', id: 'r2', wat: 'geen afspraken' });
+
     await page.evaluate(() => RTGSchil.context(null));
     assert.equal(await regel(), null, 'bij context weg vervalt de regel');
     assert.deepEqual(fouten, []);

@@ -25,6 +25,11 @@ const EIGEN = [
   '/api/comment',
   // een snap draagt zijn eigen sleutel (kern/sociaal/snaps.js)
   '/api/member/snap/send',
+  // proefrit en koop in de autoshowroom dragen hun sleutel bij de deal (kern/autoverkoop/deal.js)
+  '/api/verkoop/proefrit',
+  '/api/verkoop/koop',
+  // een huur draagt zijn sleutel bij de boeking (routes/member/voertuigen/huur.js)
+  '/api/huur/boek',
   '/api/supplier/salon/deal/redeem',
   '/api/office/bank/mislukking',
   '/api/festival/verkoop/rond',

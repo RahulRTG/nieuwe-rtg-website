@@ -2,14 +2,12 @@
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/member/voertuigen.js. */
 const { coord } = require('../../../kern/util');
+const { huurHerhaling } = require('../../../kern/huurherhaal');
 module.exports = (vctx) => {
-  const { app, auth, crypto, db, eisAccount, overheid,
+  const { app, auth, crypto, db, overheid,
     express, findSupplier, geborenVan, leeftijdVan, liveCodename,
     notifySupplier, save, schoon, sseToOffice, sseToSupplier,
-    salonZichtbaar, ontmoetZet, ontmoetPos, ontmoetKies, ontmoetTeken,
-    ontmoetHier, ontmoetStop, ontmoetSos, ontmoetSignaalKantoor, ontmoetMijnState,
-    avShowroom, avAanbevolen, avProefrit, avKoop, avInruil,
-    avTeken, avMijnDeals, zorgVoor, zorgMee, zorgContact, media,
+    salonZichtbaar, zorgMee, media,
     boekingMetRef, boekingenVanZaak, boekingenVoegToe, openLijn, gegevensStop } = vctx;
 /* ================== autoverhuur: eerlijk huren ==================
    Tegen de schimmige verhuurders in: vaste dagprijs vooraf betaald (geen
@@ -50,6 +48,9 @@ app.post('/api/huur/boek', auth, (req, res) => {
   const auto = (s.autos || []).find(a => a.id === req.body.autoId && a.actief !== false);
   if (!auto) return res.status(404).json({ error: 'Deze auto is niet (meer) beschikbaar.' });
   const van = String(req.body.van || ''), tot = String(req.body.tot || '');
+  const idem = schoon(req.body.idem, 80); // kern/huurherhaal.js
+  const h = huurHerhaling(db.data.boekingen, req.session.key, idem, { supplierCode: s.code, autoId: auto.id, van, tot });
+  if (h) return h.huur ? res.json({ ok: true, herhaald: true, huur: h.huur }) : res.status(h.status).json({ error: h.error });
   const vandaag = new Date().toISOString().slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(van) || !/^\d{4}-\d{2}-\d{2}$/.test(tot) || van < vandaag || tot <= van)
     return res.status(400).json({ error: 'Kies een periode vanaf vandaag; inleveren na de ophaaldag.' });
@@ -82,6 +83,7 @@ app.post('/api/huur/boek', auth, (req, res) => {
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false,
     sos: [], at: new Date().toISOString()
   };
+  if (idem) huur.idem = idem;
   boekingenVoegToe(huur);
   openLijn(s, req);
   save();

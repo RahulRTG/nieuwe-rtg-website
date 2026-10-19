@@ -42,8 +42,8 @@
       const body = { supplierCode: code, bootId, van: $('#chVan').value, tot: $('#chTot').value, gasten: Number($('#chGasten').value), metSkipper };
       if (!metSkipper && $('#chVaarbewijs')) body.vaarbewijs = $('#chVaarbewijs').checked;
       try {
-        const c = await API.call('/charter/boek', body);
-        await API.call('/booking/pay', { ref: c.charter.ref });
+        const c = await API.call('/api/charter/boek', body);
+        await API.call('/api/booking/pay', { ref: c.charter.ref });
         toast(T('ch.ok','Geboekt en betaald: ') + eur(c.charter.price) + T('ch.ok2',' vast. Behouden vaart.'));
         chOpen = null; chKeuze = null;
         laadCharter();
@@ -57,7 +57,7 @@
   async function laadVastgoed(){
     if (!API.live) return;
     let d = { panden: [], bezichtigingen: [], biedingen: [] };
-    try { d = await API.call('/vastgoed/aanbod'); } catch(e){}
+    try { d = await API.call('/api/vastgoed/aanbod'); } catch(e){}
     const el = $('#vgMijn'); if (!el) return;
     if (!d.panden.length && !d.bezichtigingen.length && !d.biedingen.length){ el.innerHTML = ''; return; }
     let html = '';

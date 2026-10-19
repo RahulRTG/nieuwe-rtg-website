@@ -229,6 +229,29 @@ const CONTRACT = {
     via: '#tab=zorg',
     bestanden: ['public/apps/app-main/app-main-13.js', 'public/apps/app-main/app-main-14.js', 'public/apps/app-main/app-main-15.js']
   }, voltooi('tabzorg', 'het scenario loopt /api/care, /mijn, /boek, /betaal, /annuleer, /intake/deel, /intake/stop en /pakket/*, de routes die de zorgtab in app-main-13, -14 en -15 aanroept')),
+  /* TravelOS zonder eigen adres: de stand Reizen van de ledenapp (sprong
+     #tab=reizen in app-main-12a.js). LADERS_PER_TAB (app-main-12.js) vult hem
+     met renderTrip (app-main-45.js: het dagprogramma, /api/agenda/mijn) en
+     laadShowroom (app-main-18.js: showroom, proefrit, tekenen; app-main-19.js:
+     de koopknop van diezelfde showroom). */
+  'tab:reizen': Object.assign({
+    belofte: 'de reistab toont het dagprogramma van de reis en de autoshowroom: het lid vraagt een proefrit aan die de zaak inplant, doet een bod, en tekent het koopcontract zodra de zaak aanvaardt',
+    ingang: '/apps/app.html',
+    via: '#tab=reizen',
+    bestanden: ['public/apps/app-main/app-main-45.js', 'public/apps/app-main/app-main-18.js', 'public/apps/app-main/app-main-19.js']
+  }, voltooi('reistab', 'het scenario loopt /api/agenda/mijn, /api/verkoop/showroom, /mijn, /proefrit, /koop en /teken, de routes die de reistab in app-main-45, -18 en -19 aanroept, met de zaak die inplant en aanvaardt en een tweede lid')),
+  /* TravelOS zonder eigen adres: de stand Ter plaatse (sprong #tab=terplaatse
+     in app-main-12a.js). Gekoppeld op de delen van de keten die het scenario
+     loopt: app-main-15.js (verhuuraanbod, Mijn huur, locatie delen),
+     app-main-16.js (boeken en betalen) en app-main-18.js (contracten tekenen
+     en weigeren). Tickets (12b), charter (16/17), vastgoed (17/18) en bezorgen
+     (20) staan op dezelfde tab maar zijn door dit scenario niet bewezen. */
+  'tab:terplaatse': Object.assign({
+    belofte: 'ter plaatse huurt het lid een auto tegen een vaste dagprijs, betaalt vooraf, deelt vrijwillig zijn locatie, en tekent of weigert het huurcontract dat de zaak opstelt',
+    ingang: '/apps/app.html',
+    via: '#tab=terplaatse',
+    bestanden: ['public/apps/app-main/app-main-15.js', 'public/apps/app-main/app-main-16.js', 'public/apps/app-main/app-main-18.js']
+  }, voltooi('terplaatse', 'het scenario loopt /api/verhuur/aanbod, /api/huur/boek, /api/booking/pay, /api/huur/mijn, /api/huur/locatie, /api/contracten/mijn, /api/contract/teken en /weiger, de routes die de verhuur- en contractdelen van de tab Ter plaatse aanroepen, met de zaak die het contract opstelt en tekent en een tweede lid')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

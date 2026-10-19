@@ -232,15 +232,31 @@ const CONTRACT = {
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),
-  'link:horeca': {
-    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'TAFELPROEF.json',
-      instrument: 'scripts/tafelproef.js',
-      waarom: 'de tafelproef loopt exact die stroom over /api/supplier/horeca/*, de routes die /apps/horeca.html zelf aanroept'
-    }
-  },
+  /* WorkOS, de kantoorkant van RTG One (19 oktober 2026): een medewerker op naam,
+     met de kantoorrol via een uitnodiging van de eigenaar. */
+  'link:rtgone': Object.assign({
+    belofte: 'een medewerker op naam legt beloften, bedoelingen en frictie vast in het werkgeheugen en rondt een belofte omkeerbaar af, en dat staat er na een herstart en een crash precies een keer'
+  }, voltooi('rtgone', 'het scenario loopt /api/account/start, /api/rtgone/state, /belofte, /intentie, /frictie, /overdracht en /automatisering/*, de routes die /apps/rtgone.html zelf aanroept, met een lid zonder kantoorrol dat er niet bij komt')),
+  'link:decisionroom': Object.assign({
+    belofte: 'een medewerker legt een voorstel neer en mensen met de juiste rol beslissen het, nooit de aanvrager zelf en boven de drempel met twee stemmen'
+  }, voltooi('decisionroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /goedkeuring en /goedkeuring/beslis, de routes die /apps/decision-room.html zelf aanroept, met drie mensen: aanvrager, beoordelaar met rol en de eigenaar')),
+  'link:projectroom': Object.assign({
+    belofte: 'een medewerker voert een project dat uit een RTMAIL ontstond aantoonbaar uit, met taken, bewijs en een menselijke oplevering, en een collega wijzigt er niets aan'
+  }, voltooi('projectroom', 'het scenario loopt /api/account/start, /api/rtgone/state, /project/taak, /project/bewijs en /project/oplever, de routes die /apps/project-room.html zelf aanroept, met een collega en een lid die er niet bij komen')),
+  'link:loonstrook': Object.assign({
+    belofte: 'een medewerker ziet zijn eigen loonstrook met uitleg en dossier, en een ander lid ziet hem niet'
+  }, voltooi('loonstrook', 'het scenario loopt /api/member/loonstroken, /api/member/dossier en /api/member/identiteit/verzoeken, de routes die /apps/loonstrook.html zelf aanroept, met de strook langs zaak en kantoor op naam en een ander lid dat er niet bij komt')),
+  'link:vertegenwoordiging': Object.assign({
+    belofte: 'een lid bepaalt zelf wie namens hem mag handelen, met een eigen grens, simulatie vooraf, spoor en intrekken per direct'
+  }, voltooi('vertegenwoordiging', 'het scenario loopt /api/vertegenwoordiging/bevoegdheden, /mijn, /grens, /simulatie, /aanvaard en /intrek, de routes die /apps/vertegenwoordiging.html zelf aanroept, met de vertegenwoordiger via /voorstel en /handel en een derde lid dat er niet bij komt')),
+  /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
+     voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
+     afrekenen en meet daarnaast de herstart, de crash en de offline sync; een
+     scenario levert alle vier of geen (test/voltooiproef.test.js). De
+     tafelproef blijft zijn eigen register, voor de overdracht naar de gast. */
+  'link:horeca': Object.assign({
+    belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en een offline opgenomen bestelling komt precies een keer binnen'
+  }, voltooi('horeca', 'het scenario loopt /api/supplier/horeca/rekening/*, /keuken/*, /betaal en /offline/sync onder het voorvoegsel dat /apps/horeca.html via RTGHoreca.api aanroept, met een tweede zaak die de rekening niet ziet')),
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
      link:connect is /apps/connect.html, dat acht /api/connect-routes met de proef

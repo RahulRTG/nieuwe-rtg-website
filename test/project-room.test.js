@@ -21,10 +21,10 @@ test('Project Room gebruikt echte RTG One-projecten en geen presentatiedata', ()
   const uitvoering = lees('public/apps/project-room-uitvoering.js');
   const dossier = lees('public/apps/project-room-dossier.js');
   const oplevering = lees('public/apps/project-room-oplevering.js');
-  assert.match(controller, /api\('state'/);
-  assert.match(controller, /api\('project\/taak'/);
-  assert.match(controller, /api\('project\/bewijs'/);
-  assert.match(controller, /api\('project\/oplever'/);
+  assert.match(controller, /api\('\/api\/rtgone\/state'/);
+  assert.match(controller, /api\('\/api\/rtgone\/project\/taak'/);
+  assert.match(controller, /api\('\/api\/rtgone\/project\/bewijs'/);
+  assert.match(controller, /api\('\/api\/rtgone\/project\/oplever'/);
   assert.match(dossier, /staat\.intenties/);
   assert.match(oplevering, /een resultaat op zichzelf/);
   assert.doesNotMatch(controller + uitvoering + dossier + oplevering, /Meridian|Noor Koster|Rotterdam/);

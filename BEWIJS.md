@@ -1160,7 +1160,7 @@ toets omvalt.
 | `lokaaladres.test.js` | 3 | gezakt op `true->false#0` | WELKE ADRESSEN STUREN WE NIET NAAR HTTPS, EN WAAROM DIE PRECIES. server/lib/lokaaladres.js beantwoordt één vraag: kan er voor dit adres een certificaat bestaan? |
 | `lokale-ai-poort.test.js` | 7 | gezakt op `true->false#0` | DE POORT VOOR DE EIGEN MODELSERVER. Een externe aanbieder schaalt mee; een eigen modelserver niet. |
 | `lokale-taal.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loonstrook-portaal.test.js` | 1 | gezakt op `liegpoort /api/` | Het werknemersportaal: komt er een LOONSTROOK uit, van de klok tot het scherm van de medewerker? WAAROM DEZE TOETS ER IS. |
+| `loonstrook-portaal.test.js` | 2 | gezakt op `liegpoort /api/` | Het werknemersportaal: komt er een LOONSTROOK uit, van de klok tot het scherm van de medewerker? WAAROM DEZE TOETS ER IS. |
 | `loop-fabric-academy-slice.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | Derde bewijsslice: Leerhuis gebruikt een eigen append-only bronspoor, governance en kennisversies. De Fabric vervoert alleen refs en receipts. |
 | `loop-fabric-architecture-gate.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-constitution.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1835,7 +1835,7 @@ toets omvalt.
 | `rtgjson-takken.test.js` | 10 | gezakt op `voorwaarde-omkeren#0` | WAAROM DEZE TOETSEN ER ZIJN. De dekkingsmeting over de hele suite liet in server/lib/rtgjson.js een reeks takken zien die geen enkele toets raakte: de diepte-grens via opties (en de val terug op de standaard), elke... |
 | `rtgjson.test.js` | 6 | gezakt op `liegpoort /api/` | De eigen JSON-motor (server/lib/rtgjson): in huis gecodeerd in plaats van de ingebouwde JSON, en op de grenzen ingebouwd (HTTP-body in, res.json uit, db-snapshots). Bewijs in drie lagen: (1) spec-randgevallen en een... |
 | `rtgone-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rtgone.test.js` | 8 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtgone.test.js` | 9 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtgzetel.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtmail-ai.test.js` | 9 | gezakt op `liegpoort /api/` | De AI-hulp bij een gesprek: samenvatten, actiepunten en het uitleggen van phishing-risico. Drie beweringen, en de eerste is de voorwaarde waaronder de andere twee mogen bestaan: 1. |
 | `rtmail-alias.test.js` | 8 | gezakt op `liegpoort /api/` | RTMAIL: komt post aan die naar een ALIAS gaat? Tot 11 oktober 2026 kon een lid een alias aanzetten (de route bestond, de instellingen toonden hem) terwijl de bezorging er niets mee deed: post aan `inkoop-een@...`... |

@@ -108,7 +108,7 @@
         this.disabled = true;
         var bericht;
         try {
-          var r = await api('lus/beslis', { id: id, akkoord: akkoord });
+          var r = await api('/api/member/bureau/lus/beslis', { id: id, akkoord: akkoord });
           bericht = r.vastgezet ? 'Vastgezet. Wij regelen de rest.' : 'Genoteerd. Wij zoeken verder.';
         } catch (e) { bericht = e.message; }
         await window.RTGLusLid.open(id);
@@ -120,14 +120,14 @@
     if (nee) nee.onclick = beslis(false);
     el.querySelector('.js-lus-verr').onclick = async function () {
       this.disabled = true;
-      try { await api('lus/verrassing', { id: id, aan: this.dataset.aan === '1' }); window.RTGLusLid.open(id); }
+      try { await api('/api/member/bureau/lus/verrassing', { id: id, aan: this.dataset.aan === '1' }); window.RTGLusLid.open(id); }
       catch (e) { meld(e.message); this.disabled = false; }
     };
     el.querySelector('.js-lus-stuur').onclick = async function () {
       var t = el.querySelector('.js-lus-tekst').value.trim();
       if (!t) return meld('Wat wilt u ons laten weten?');
       this.disabled = true; // een toelichting is met opzet elke keer een nieuwe regel: niet twee keer drukken
-      try { await api('lus/toelichting', { id: id, tekst: t }); meld('Ontvangen. U hoeft het niet nog eens te vertellen.'); window.RTGLusLid.open(id); }
+      try { await api('/api/member/bureau/lus/toelichting', { id: id, tekst: t }); meld('Ontvangen. U hoeft het niet nog eens te vertellen.'); window.RTGLusLid.open(id); }
       catch (e) { meld(e.message); this.disabled = false; }
     };
   }
@@ -135,7 +135,7 @@
   async function open(id) {
     var el = document.querySelector('.lus-detail[data-lus="' + CSS.escape(id) + '"]');
     if (!el) return;
-    try { tekenDetail(el, await api('lus/zaak', { id: id })); }
+    try { tekenDetail(el, await api('/api/member/bureau/lus/zaak', { id: id })); }
     catch (e) { el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
   }
 
@@ -150,7 +150,7 @@
       if (document.getElementById('lusVerrassing').checked) body.verrassing = true; // nooit false meesturen: zie regel 2
       this.disabled = true;
       try {
-        var r = await api('lus/intake', body);
+        var r = await api('/api/member/bureau/lus/intake', body);
         vragen[r.zaak.id] = r.vragen || [];
         nieuweSleutel();
         meld(r.herhaald ? 'Dit hadden wij al van u ontvangen.' : 'Ontvangen. Wij gaan ermee aan de slag.');

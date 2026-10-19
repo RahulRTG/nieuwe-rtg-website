@@ -164,7 +164,7 @@ const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN = localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
-const api = (pad, body) => fetch('/api/member/bureau/'+pad, {
+const api = (pad, body) => fetch(pad, {
   method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+TOKEN}, body:JSON.stringify(body||{})
 }).then(async r=>{ const d=await r.json().catch(()=>({})); if(!r.ok){ const e=new Error(d.error||'Er ging iets mis.'); e.status=r.status; throw e; } return d; });
 const euro = c => '€ ' + Math.round(Number(c||0)/100).toLocaleString('nl-NL');
@@ -183,7 +183,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
 
 async function start(){
   if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p class="fijn mt">Het Privékantoor is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p class="mt-l"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
-  try{ await api('overzicht'); }catch(e){
+  try{ await api('/api/member/bureau/overzicht'); }catch(e){
     if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; }
     $('#main').innerHTML='<div class="leeg">Kon het Privékantoor niet laden.</div>'; return;
   }
@@ -203,7 +203,7 @@ const fout = e => P('<div class="leeg">'+esc(e.message)+'</div>');
    krijgen hier meteen hun twee knoppen: wie op dit scherm ziet dat er iets op
    hem wacht, hoort het niet ergens anders te moeten gaan zoeken. */
 async function vNu(){
-  let d; try{ d = await api('nu'); /* Ontbreekt een deel, dan de melding -- nooit een lege situation room (LIEGRONDE.json). */ if(!(d && d.tellingen && typeof d.tellingen === 'object' && Array.isArray(d.regels))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/nu'); /* Ontbreekt een deel, dan de melding -- nooit een lege situation room (LIEGRONDE.json). */ if(!(d && d.tellingen && typeof d.tellingen === 'object' && Array.isArray(d.regels))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ return fout(e); }
   const t = d.tellingen;
   let h = '<div class="kop '+esc(d.ernst)+'"><div class="datum">'+esc(datum(d.datum))+'</div><h2>'+esc(d.kop)+'</h2>'
     + '<div class="telling">'+t.knopen+' zaken in uw kantoor'
@@ -254,7 +254,7 @@ async function vNu(){
   async function brief(moment){
     const u = $('#brUit'); u.innerHTML = '<div class="leeg">Een moment…</div>';
     try{
-      const d = await api('briefing', {moment});
+      const d = await api('/api/member/bureau/briefing', {moment});
       const lijst = (t, a, hoe) => a.length ? '<div class="lbl">'+t+'</div>' + a.map(hoe).join('') : '';
       const punt = x => '<div class="meta">' + esc((x.waarvan? x.waarvan+' · ':'') + x.naam) + ' · ' + esc(datum(x.datum)) + '</div>';
       u.innerHTML = '<div class="briefkop">' + esc(d.kop) + '</div>'
@@ -278,7 +278,7 @@ async function vNu(){
   $('#rvK').onclick = async () => {
     const u = $('#rvUit'); u.innerHTML = '<div class="leeg">Een moment…</div>';
     try{
-      const r = await api('raakvlak', { van:$('#rvV').value, tot:$('#rvT').value, domein:'reizen' });
+      const r = await api('/api/member/bureau/raakvlak', { van:$('#rvV').value, tot:$('#rvT').value, domein:'reizen' });
       u.innerHTML = '<div class="lbl">' + r.dagen + ' dagen · ' + r.raakt.length + ' punten uit uw apps</div>'
         + (r.raakt.length ? r.raakt.map(x=>'<div class="regel e2"><div class="streep"></div><div class="body"><b>'
             + esc((x.waarvan? x.waarvan+' · ':'')+x.naam) + '</b><div class="meta">' + esc(x.bron) + ' · ' + esc(datum(x.datum)) + '</div></div></div>').join('')
@@ -292,11 +292,11 @@ async function vNu(){
   $('#aiK').onclick = async () => {
     const v = $('#aiV').value.trim(); if(!v) return;
     const u = $('#aiUit'); u.style.display='block'; u.textContent='Een moment…';
-    try{ const a = await api('ai', {vraag:v}); u.textContent = a.antwoord; }
+    try{ const a = await api('/api/member/bureau/ai', {vraag:v}); u.textContent = a.antwoord; }
     catch(e){ u.textContent = e.message; }
   };
   $('#paneel').querySelectorAll('.js-ja,.js-nee').forEach(b => b.onclick = async () => {
-    try{ await api('zaak/beslis', {id:b.dataset.id, akkoord:b.classList.contains('js-ja')});
+    try{ await api('/api/member/bureau/zaak/beslis', {id:b.dataset.id, akkoord:b.classList.contains('js-ja')});
       meld(b.classList.contains('js-ja')?'Akkoord genoteerd.':'Genoteerd; wij zien ervan af.'); vNu(); }
     catch(e){ meld(e.message); }
   });
@@ -306,7 +306,7 @@ async function vNu(){
    Alle datums uit alle premium-apps, in vier vensters. Achterstallig staat
    bovenaan en apart: dat venster bestond nergens. */
 async function vVooruit(){
-  let d; try{ d = await api('tower'); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/tower'); }catch(e){ return fout(e); }
   const regel = r => '<div class="item"><div class="body"><b>'+esc((r.waarvan? r.waarvan+' · ':'')+r.naam)+'</b>'
     + '<div class="meta">'+esc(r.bron)+' · '+esc(datum(r.datum))
     + (r.dagen<0 ? ' · <span class="rood">'+Math.abs(r.dagen)+' dagen te laat</span>'
@@ -336,7 +336,7 @@ const SOORT_UITLEG = {
   warroom:'Er is iets misgegaan. Wij zetten er direct mensen op en vragen pas om een besluit als het nodig is.'
 };
 async function vZaken(){
-  let d, del; try{ [d, del] = await Promise.all([api('zaken'), api('delegatie')]); }catch(e){ return fout(e); }
+  let d, del; try{ [d, del] = await Promise.all([api('/api/member/bureau/zaken'), api('/api/member/bureau/delegatie')]); }catch(e){ return fout(e); }
   const doms = del.domeinen.map(x=>'<option value="'+esc(x.domein)+'">'+esc(x.naam)+'</option>').join('');
   /* De concierge-lus (apps/lifestyle-lus.js): een wens in een zin bovenaan, en
      bij een zaak uit de lus een knop naar het voorstel. Geen tweede scherm. */
@@ -376,21 +376,21 @@ async function vZaken(){
   $('#zK').onclick = async () => {
     const titel = $('#zT').value.trim(); if(!titel) return meld('Waarmee kunnen wij u van dienst zijn?');
     try{
-      const r = await api('zaak/open', { titel, wat:$('#zW').value.trim(), soort:$('#zS').value,
+      const r = await api('/api/member/bureau/zaak/open', { titel, wat:$('#zW').value.trim(), soort:$('#zS').value,
         domein:$('#zD').value, bedragCenten: Math.round((Number($('#zB').value)||0)*100) });
       meld(r.zaak.beslissing.nodig ? 'Aangelegd. Er ligt een besluit voor u klaar.' : 'Aangelegd. Wij pakken het op.');
       vZaken();
     }catch(e){ meld(e.message); }
   };
   $('#paneel').querySelectorAll('.js-ja,.js-nee').forEach(b => b.onclick = async () => {
-    try{ await api('zaak/beslis', {id:b.dataset.id, akkoord:b.classList.contains('js-ja')}); vZaken(); }
+    try{ await api('/api/member/bureau/zaak/beslis', {id:b.dataset.id, akkoord:b.classList.contains('js-ja')}); vZaken(); }
     catch(e){ meld(e.message); }
   });
 }
 
 /* ==================== KANTOOR -- de plattegrond van twintig ==================== */
 async function vKantoor(){
-  let d; try{ d = await api('kamers'); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/kamers'); }catch(e){ return fout(e); }
   const kaart = k => '<div class="kamer'+(k.status==='in aanbouw'?' aanbouw':'')+'">'
     + '<h3>'+esc(k.naam)+'</h3><div class="wat">'+esc(k.wat)+'</div>'
     + (k.apps.length ? '<div class="apps">'+k.apps.map(a=>'<a href="'+esc(a.url)+'">'+esc(a.naam)+'</a>').join('')+'</div>' : '')
@@ -409,7 +409,7 @@ async function vKantoor(){
    verzekeringen -- deze pagina heeft geen eigen waarschuwingen. */
 let twinHuis='';
 async function vWoning(){
-  let d; try{ d = await api('twin', {huisId:twinHuis}); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/twin', {huisId:twinHuis}); }catch(e){ return fout(e); }
   if(!d.woningen.length) return P('<div class="kaart"><h2>Uw woningen</h2>'
     + '<div class="leeg">U heeft nog geen vastgoed in uw register staan. Leg een woning vast onder Zaken → uw bezittingen, dan kunt u hem hier inrichten.</div></div>');
   let h = '<div class="kaart"><h2>Uw woningen</h2><div class="sub">Kies een woning om hem in te richten.</div>'
@@ -442,19 +442,19 @@ async function vWoning(){
   $('#paneel').querySelectorAll('.js-huis').forEach(b=> b.onclick=()=>{ twinHuis=b.dataset.h; vWoning(); });
   const rk = $('#rK'); if(rk) rk.onclick = async () => {
     const naam = $('#rNaam').value.trim(); if(!naam) return meld('Hoe heet de ruimte?');
-    try{ await api('twin/ruimte', {huisId:twinHuis, naam}); vWoning(); }catch(e){ meld(e.message); }
+    try{ await api('/api/member/bureau/twin/ruimte', {huisId:twinHuis, naam}); vWoning(); }catch(e){ meld(e.message); }
   };
   $('#paneel').querySelectorAll('.js-iK').forEach(b=> b.onclick = async () => {
     const q = sel => $('#paneel').querySelector(sel + '[data-r="' + b.dataset.r + '"]');
     const naam = q('.js-iNaam').value.trim(); if(!naam) return meld('Wat staat hier?');
-    try{ await api('twin/installatie', {huisId:twinHuis, ruimteId:b.dataset.r, naam,
+    try{ await api('/api/member/bureau/twin/installatie', {huisId:twinHuis, ruimteId:b.dataset.r, naam,
       merk:q('.js-iMerk').value.trim(), onderhoudOp:q('.js-iDat').value}); vWoning(); }
     catch(e){ meld(e.message); }
   });
   $('#paneel').querySelectorAll('.js-beurt').forEach(b=> b.onclick = async () => {
     const wat = prompt('Wat is er gedaan?'); if(!wat) return;
     const vlg = prompt('Volgende beurt (jjjj-mm-dd, mag leeg)') || '';
-    try{ await api('twin/beurt', {huisId:twinHuis, id:b.dataset.i, wat, volgende:vlg}); vWoning(); }
+    try{ await api('/api/member/bureau/twin/beurt', {huisId:twinHuis, id:b.dataset.i, wat, volgende:vlg}); vWoning(); }
     catch(e){ meld(e.message); }
   });
 }
@@ -465,7 +465,7 @@ async function vWoning(){
    dossier. */
 let kringId='';
 async function vKring(){
-  let d; try{ d = await api('relaties', {relatieId:kringId}); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/relaties', {relatieId:kringId}); }catch(e){ return fout(e); }
   if(!d.relaties.length) return P('<div class="kaart"><h2>Uw kring</h2><div class="leeg">'
     + 'U heeft nog geen relaties vastgelegd. Dat doet u in Attenties; hier komt daarna de kring eromheen.</div>'
     + '<div class="mt-m"><a class="knop stil" href="/apps/attenties.html">Naar Attenties</a></div></div>');
@@ -501,10 +501,10 @@ async function vKring(){
   zetUit('Kring', ['Naam','Band','Banden','Laatst gezien'], d.relaties.map(r=>[r.naam,r.band,r.banden,r.laatstGezien]));
   $('#paneel').querySelectorAll('.js-rel').forEach(b=> b.onclick=()=>{ kringId=b.dataset.r; vKring(); });
   const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
-  bind('bK', async()=>{ try{ await api('relaties/band',{relatieId:kringId, naarId:$('#bR').value, wat:$('#bW').value}); vKring(); }catch(e){ meld(e.message); } });
-  bind('cK', async()=>{ try{ await api('relaties/context',{relatieId:kringId, werk:$('#cW').value, onderwerpen:$('#cO').value, nooitOver:$('#cN').value}); meld('Vastgelegd.'); vKring(); }catch(e){ meld(e.message); } });
+  bind('bK', async()=>{ try{ await api('/api/member/bureau/relaties/band',{relatieId:kringId, naarId:$('#bR').value, wat:$('#bW').value}); vKring(); }catch(e){ meld(e.message); } });
+  bind('cK', async()=>{ try{ await api('/api/member/bureau/relaties/context',{relatieId:kringId, werk:$('#cW').value, onderwerpen:$('#cO').value, nooitOver:$('#cN').value}); meld('Vastgelegd.'); vKring(); }catch(e){ meld(e.message); } });
   bind('oK', async()=>{ const wat=$('#oWat').value.trim(); if(!wat) return meld('Waar ging het over?');
-    try{ await api('relaties/ontmoeting',{relatieId:kringId, waar:$('#oWaar').value, wat}); vKring(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/relaties/ontmoeting',{relatieId:kringId, waar:$('#oWaar').value, wat}); vKring(); }catch(e){ meld(e.message); } });
 }
 
 /* ===================== BEZIT -- het collectiedossier ==========================
@@ -512,7 +512,7 @@ async function vKring(){
    horloges en sieraden uit uw register: die drie zijn het waard. */
 let colId='';
 async function vBezit(){
-  let d; try{ d = await api('collectie', {bezitId:colId}); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/collectie', {bezitId:colId}); }catch(e){ return fout(e); }
   if(!d.stukken.length) return P('<div class="kaart"><h2>Uw collectie</h2><div class="leeg">'
     + 'Er staat nog geen kunst, horloge of sieraad in uw register.</div></div>');
   let h = '<div class="kaart"><h2>Uw collectie</h2><div class="sub">'+d.stukken.length+' stukken</div>'
@@ -547,17 +547,17 @@ async function vBezit(){
   $('#paneel').querySelectorAll('.js-col').forEach(b=> b.onclick=()=>{ colId=b.dataset.c; vBezit(); });
   const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
   bind('hK', async()=>{ const naar=$('#hN').value.trim(); if(!naar) return meld('Naar wie ging het?');
-    try{ await api('collectie/herkomst',{bezitId:colId, van:$('#hV').value, naar, op:$('#hD').value}); vBezit(); }catch(e){ meld(e.message); } });
-  bind('tK', async()=>{ try{ await api('collectie/taxatie',{bezitId:colId, bedrag:Number($('#tB').value)||0, door:$('#tD').value, volgende:$('#tV').value}); vBezit(); }catch(e){ meld(e.message); } });
-  bind('lK', async()=>{ try{ await api('collectie/bruikleen',{bezitId:colId, aan:$('#lA').value, tot:$('#lT').value}); vBezit(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/collectie/herkomst',{bezitId:colId, van:$('#hV').value, naar, op:$('#hD').value}); vBezit(); }catch(e){ meld(e.message); } });
+  bind('tK', async()=>{ try{ await api('/api/member/bureau/collectie/taxatie',{bezitId:colId, bedrag:Number($('#tB').value)||0, door:$('#tD').value, volgende:$('#tV').value}); vBezit(); }catch(e){ meld(e.message); } });
+  bind('lK', async()=>{ try{ await api('/api/member/bureau/collectie/bruikleen',{bezitId:colId, aan:$('#lA').value, tot:$('#lT').value}); vBezit(); }catch(e){ meld(e.message); } });
   $('#paneel').querySelectorAll('.js-terug').forEach(b=> b.onclick=async()=>{
-    try{ await api('collectie/terug',{bezitId:colId, id:b.dataset.b}); meld('Terug genoteerd.'); vBezit(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/collectie/terug',{bezitId:colId, id:b.dataset.b}); meld('Terug genoteerd.'); vBezit(); }catch(e){ meld(e.message); } });
 }
 
 /* ===================== REIS -- verstoringen en nazorg ========================= */
 let reisId='';
 async function vReis(){
-  let d; try{ d = await api('reisdek', {reisId}); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/reisdek', {reisId}); }catch(e){ return fout(e); }
   if(!d.reizen.length) return P('<div class="kaart"><h2>Uw reizen</h2><div class="leeg">'
     + 'Er staat nog geen reis in uw reisboek.</div><div class="mt-m"><a class="knop stil" href="/apps/reisboek.html">Naar het Reisboek</a></div></div>');
   let h = '<div class="kaart"><h2>Uw reizen</h2><div class="niv">'
@@ -593,15 +593,15 @@ async function vReis(){
   $('#paneel').querySelectorAll('.js-reis').forEach(b=> b.onclick=()=>{ reisId=b.dataset.r; vReis(); });
   const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
   bind('vK', async()=>{ const wat=$('#vW').value.trim(); if(!wat) return meld('Wat ging er mis?');
-    try{ await api('reisdek/verstoring',{reisId, wat, minuten:Number($('#vM').value)||0,
+    try{ await api('/api/member/bureau/reisdek/verstoring',{reisId, wat, minuten:Number($('#vM').value)||0,
       gevolgen:$('#vG').value.split(',').map(x=>x.trim()).filter(Boolean)}); vReis(); }catch(e){ meld(e.message); } });
   bind('kK', async()=>{ const wat=$('#kW').value.trim(); if(!wat) return meld('Wat is er blijven liggen?');
-    try{ await api('reisdek/vergeten',{reisId, wat, waar:$('#kR').value, terugOp:$('#kD').value}); vReis(); }catch(e){ meld(e.message); } });
-  bind('nK', async()=>{ try{ await api('reisdek/bon',{reisId, wat:$('#nW').value, bedragCenten:Math.round((Number($('#nB').value)||0)*100)}); vReis(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/reisdek/vergeten',{reisId, wat, waar:$('#kR').value, terugOp:$('#kD').value}); vReis(); }catch(e){ meld(e.message); } });
+  bind('nK', async()=>{ try{ await api('/api/member/bureau/reisdek/bon',{reisId, wat:$('#nW').value, bedragCenten:Math.round((Number($('#nB').value)||0)*100)}); vReis(); }catch(e){ meld(e.message); } });
   $('#paneel').querySelectorAll('.js-gev').forEach(b=> b.onclick=async()=>{
-    try{ await api('reisdek/gevolg',{reisId, verstoringId:b.dataset.v, id:b.dataset.g, stand:'geregeld'}); vReis(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/reisdek/gevolg',{reisId, verstoringId:b.dataset.v, id:b.dataset.g, stand:'geregeld'}); vReis(); }catch(e){ meld(e.message); } });
   $('#paneel').querySelectorAll('.js-terugv').forEach(b=> b.onclick=async()=>{
-    try{ await api('reisdek/vergeten',{reisId, id:b.dataset.v, wat:b.dataset.w, stand:'terug'}); vReis(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/reisdek/vergeten',{reisId, id:b.dataset.v, wat:b.dataset.w, stand:'terug'}); vReis(); }catch(e){ meld(e.message); } });
 }
 
 /* ============ VEILIG -- beveiliging, reputatie en de dieren ==================
@@ -609,7 +609,7 @@ async function vReis(){
    hetzelfde gaan: wat er klaarstaat voordat er iets gebeurt. */
 async function vVeilig(){
   let b, r, d;
-  try{ [b, r, d] = await Promise.all([api('beveiliging'), api('reputatie'), api('dieren')]); }
+  try{ [b, r, d] = await Promise.all([api('/api/member/bureau/beveiliging'), api('/api/member/bureau/reputatie'), api('/api/member/bureau/dieren')]); }
   catch(e){ return fout(e); }
   let h = '<div class="kaart"><h2>Beveiliging</h2><div class="sub">'+esc(b.bron)+'</div>'
     + (b.posten.length ? b.posten.map(p=>'<div class="meta">'+esc(p.waar)+' · '+esc(p.soort)
@@ -662,17 +662,17 @@ async function vVeilig(){
       .concat(r.optredens.map(o=>['optreden',o.wat,o.datum]))
       .concat(d.dieren.map(x=>['dier',x.naam,x.verzekerdTot])));
   const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
-  bind('pB', async()=>{ try{ await api('beveiliging/post',{waar:$('#pW').value, keuringOp:$('#pK').value}); vVeilig(); }catch(e){ meld(e.message); } });
-  bind('rB', async()=>{ try{ await api('beveiliging/risico',{land:$('#rL').value, niveau:$('#rN').value, tot:$('#rT').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('pB', async()=>{ try{ await api('/api/member/bureau/beveiliging/post',{waar:$('#pW').value, keuringOp:$('#pK').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('rB', async()=>{ try{ await api('/api/member/bureau/beveiliging/risico',{land:$('#rL').value, niveau:$('#rN').value, tot:$('#rT').value}); vVeilig(); }catch(e){ meld(e.message); } });
   bind('iB', async()=>{ const wat=$('#iW').value.trim(); if(!wat) return meld('Wat is er gebeurd?');
-    try{ await api('beveiliging/incident',{wat}); meld('Gemeld. Er staat een team op.'); vVeilig(); }catch(e){ meld(e.message); } });
-  bind('oB', async()=>{ try{ await api('reputatie/optreden',{wat:$('#oW').value, datum:$('#oD').value, embargoTot:$('#oE').value}); vVeilig(); }catch(e){ meld(e.message); } });
-  bind('lB', async()=>{ try{ await api('reputatie/lijn',{onderwerp:$('#lO').value, lijn:$('#lL').value, nooit:$('#lN').value}); vVeilig(); }catch(e){ meld(e.message); } });
-  bind('dB', async()=>{ try{ await api('dieren/dier',{naam:$('#dN').value, soort:$('#dS').value, oppas:$('#dO').value}); vVeilig(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/beveiliging/incident',{wat}); meld('Gemeld. Er staat een team op.'); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('oB', async()=>{ try{ await api('/api/member/bureau/reputatie/optreden',{wat:$('#oW').value, datum:$('#oD').value, embargoTot:$('#oE').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('lB', async()=>{ try{ await api('/api/member/bureau/reputatie/lijn',{onderwerp:$('#lO').value, lijn:$('#lL').value, nooit:$('#lN').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('dB', async()=>{ try{ await api('/api/member/bureau/dieren/dier',{naam:$('#dN').value, soort:$('#dS').value, oppas:$('#dO').value}); vVeilig(); }catch(e){ meld(e.message); } });
   $('#paneel').querySelectorAll('.js-zorg').forEach(b2=> b2.onclick=async()=>{
     const wat=prompt('Wat is er gedaan?'); if(!wat) return;
     const vlg=prompt('Volgende keer (jjjj-mm-dd, mag leeg)')||'';
-    try{ await api('dieren/zorg',{id:b2.dataset.d, wat, volgende:vlg}); vVeilig(); }catch(e){ meld(e.message); } });
+    try{ await api('/api/member/bureau/dieren/zorg',{id:b2.dataset.d, wat, volgende:vlg}); vVeilig(); }catch(e){ meld(e.message); } });
 }
 
 /* ======================== MANDAAT -- de delegatie-engine =======================
@@ -680,7 +680,7 @@ async function vVeilig(){
    staat erbij: een niveau dat niet kan, is uitgeschakeld en niet stiekem
    weggelaten -- dan zou het lijken of het er nooit was. */
 async function vMandaat(){
-  let d; try{ d = await api('delegatie'); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/delegatie'); }catch(e){ return fout(e); }
   let h = '<div class="kaart"><h2>Wat mogen wij zelf?</h2><div class="sub">Per onderwerp bepaalt u hoe ver wij gaan, en tot welk bedrag. '
     + 'Alles staat standaard op voorbereiden: wij doen niets zonder uw akkoord tot u dat verandert.</div>'
     + d.niveaus.map(n=>'<div class="meta fijn"><b>L'+n.n+' '+esc(n.label)+'</b> · '+esc(n.uitleg)+'</div>').join('')
@@ -710,7 +710,7 @@ async function vMandaat(){
   P(h);
   const zet = async (domein, niveau, grensCenten) => {
     const huidig = d.domeinen.find(x=>x.domein===domein);
-    try{ await api('delegatie/zet', { domein, niveau: niveau==null?huidig.niveau:niveau,
+    try{ await api('/api/member/bureau/delegatie/zet', { domein, niveau: niveau==null?huidig.niveau:niveau,
       grensCenten: grensCenten==null?huidig.grensCenten:grensCenten });
       meld('Vastgelegd.'); vMandaat(); }
     catch(e){ meld(e.message); }
@@ -727,7 +727,7 @@ async function vMandaat(){
    en dat is een lijst: dit ding, waar het onder hangt, en wat eraan hangt. */
 let graafKamer='';
 async function vGraaf(){
-  let d; try{ d = await api('graaf'); }catch(e){ return fout(e); }
+  let d; try{ d = await api('/api/member/bureau/graaf'); }catch(e){ return fout(e); }
   const knopen = d.graaf.knopen;
   const kamers = [...new Set(knopen.map(k=>k.kamer))].sort();
   const zicht = graafKamer ? knopen.filter(k=>k.kamer===graafKamer) : knopen;
@@ -752,7 +752,7 @@ async function vGraaf(){
   $('#paneel').querySelectorAll('.js-kam').forEach(b=> b.onclick=()=>{ graafKamer=b.dataset.k; vGraaf(); });
   $('#paneel').querySelectorAll('.js-kn').forEach(b=> b.onclick=async()=>{
     try{
-      const r = await api('knoop',{id:b.dataset.id});
+      const r = await api('/api/member/bureau/knoop',{id:b.dataset.id});
       const lijst = (t,a) => a.length ? '<div class="lbl">'+t+'</div>'+a.map(x=>'<div class="meta">'+esc(x.naam)+' · '+esc(x.bron)+(x.vervalt?' · '+esc(datum(x.vervalt)):'')+'</div>').join('') : '';
       const el = document.createElement('div');
       el.className='kaart'; el.style.borderColor='var(--gold)';

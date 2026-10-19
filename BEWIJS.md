@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2824 bestanden en 19547 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2825 bestanden en 19548 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2824 |
-| losse beweringen (`test(...)`) | 19547 |
+| toetsbestanden | 2825 |
+| losse beweringen (`test(...)`) | 19548 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 8 |
+| niets van beide | 9 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2486 bestanden, 18975 beweringen.
+2487 bestanden, 18976 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -434,6 +434,7 @@ toets omvalt.
 | `concernduiding.test.js` | 2 | gezakt op `liegpoort /api/` | CONCERN: EEN VRIJE NAAM ALSNOG DUIDEN (server/kern/concern/duiding.js). Een bestuurder van voor 23 september 2026 draagt een vrije naam en telt niet mee voor de tekengrens in het Werk OS. |
 | `conciergelus-dubbel.test.js` | 1 | gezakt op `liegpoort /api/` | De dubbeltik op elke schrijfroute van de concierge-lus, tegen een echte server. Voor elke route: dezelfde aanroep twee keer, en daarna moet de case er precies zo bij liggen als na de eerste -- dezelfde stand,... |
 | `conciergelus-kern.test.js` | 4 | gezakt op `===->!==#0` | De concierge-lus op kernniveau, met een klok die je kunt verzetten. Het verval van een aanbod hangt aan de tijd, en een toets die daarvoor een minuut wacht wordt de eerste die iemand overslaat -- dus staat de klok... |
+| `conciergelus-naam.test.js` | 1 | -- | De naam van wie een lus-case oppakt (CONCIERGE.md, CON-11). De naam komt uit de SESSIE: met de gedeelde kantoorcode is er geen mens, en dan ziet het lid een rol; neemt een herleidbaar mens van het kantoor de case,... |
 | `conciergelus-regels.test.js` | 9 | gezakt op `===->!==#0` | De regels van de concierge-lus zonder server (kern/bureau/lus-regels.js en lus-intake.js). Elke toets hoort te zakken als zijn regel sneuvelt; bij de dragende regels staat de mutatie erbij die hem laat zakken. |
 | `conciergelus.test.js` | 3 | gezakt op `liegpoort /api/` | De concierge-lus tegen een echte server (CONCIERGE.md). Een lid vertelt een wens in een zin; het kantoor zoekt, de gewone route weigert, een manager biedt iets anders aan dat twaalf minuten wordt vastgehouden, het... |
 | `conciergeproef.test.js` | 5 | gezakt op `===->!==#1` | DE CONCIERGEPROEF EN ZIJN REGISTER -- sinds 11 oktober 2026 een bron van bewijs voor APPWERKT (het Privékantoor, link:rechterhand). scripts/conciergeproef.js loopt de concierge-lus af (CONCIERGE.md) tegen een... |

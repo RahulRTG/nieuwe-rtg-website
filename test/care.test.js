@@ -50,6 +50,16 @@ test('een behandeling boeken en betalen: referentie, agenda-schaarste per behand
   assert.equal(r.body.boeking.status, 'wacht-op-betaling');
   const betaald = await api('care/betaal', { ref: r.body.boeking.ref }, lid);
   assert.ok(betaald.body.boeking.paid && betaald.body.boeking.status === 'geboekt');
+  /* BETAALD BETEKENT DAT ER GELD BEWOOG. Hier stond alleen de bewering hierboven,
+     en die klopte ook toen er geen cent bewoog (test/carebetaal.test.js). Nu
+     staat de betaling aan de zorgaanbieder in RTG Pay, precies een keer, en een
+     tweede tik schrijft niets extra af. */
+  const zorgregels = async () => (((await api('pay/overzicht', {}, lid)).body.geschiedenis) || [])
+    .filter(g => g.soort === 'zorg' && Math.abs(g.centen) === beh.prijs * 100);
+  assert.equal((await zorgregels()).length, 1, 'de betaling staat in RTG Pay: ' + JSON.stringify(await zorgregels()));
+  const nogeens = await api('care/betaal', { ref: r.body.boeking.ref }, lid);
+  assert.equal(nogeens.status, 409, 'al betaald');
+  assert.equal((await zorgregels()).length, 1, 'een tweede tik betaalt niet dubbel');
   // hetzelfde slot bij dezelfde behandelaar is nu bezet, ook voor een ander lid
   const bezet = await api('care/boek', { aanbiederId: spa.id, behandelingId: beh.id, datum: morgen(), tijd }, lid2);
   assert.equal(bezet.status, 409, 'een behandelaar kan maar een gezelschap per slot hebben');

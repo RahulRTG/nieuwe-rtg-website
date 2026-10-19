@@ -141,7 +141,7 @@ module.exports = (ctx) => {
 
   /* Rahul-actie: exact dezelfde functies achter een gewone zin.
      "boek een massage bij Zenith morgen om 15:00" -> voorstel -> ja. */
-  function boekBehandelingActie(session, body, verdien) {
+  async function boekBehandelingActie(session, body, verdien) {
     const r = careBoek(session, body.codenaam || '', body);
     if (r.error) return r;
     return careBetaal(session, r.boeking.ref, verdien);

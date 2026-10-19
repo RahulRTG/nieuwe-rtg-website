@@ -91,15 +91,31 @@ module.exports = (ctx) => {
     return { ok: true, boeking };
   }
 
-  function careBetaal(sess, refIn, verdien) {
+  /* BETAALD IS: ER BEWOOG GELD. Hier stond `bk.paid = true` zonder dat er een
+     cent bewoog -- geen RTG Pay, geen betaalnaad -- terwijl het scherm
+     "Betalen" zegt (gevonden door FoundationOS bij link:foundationzorg). Nu
+     betaalt het lid de zorgaanbieder via RTG Pay (pay.betaalZaak, de vaste weg
+     voor een lid dat een zaak betaalt); een tekort laadt bij via de
+     betaalwaarheid. De sleutel hangt aan de boeking: een herhaling voor
+     dezelfde boeking is dezelfde betaling (test/carebetaal.test.js). */
+  async function careBetaal(sess, refIn, verdien) {
     lijsten();
     const bk = C.bak('careBoekingen').find(x => x.ref === String(refIn || '') && x.key === sess.key);
     if (!bk) return { status: 404, error: 'Boeking niet gevonden.' };
     if (bk.paid) return { status: 409, error: 'Al betaald.' };
     if (Date.now() - Date.parse(bk.at) > 30 * 60000) return { status: 410, error: 'Deze boeking is verlopen. Boek opnieuw.' };
+    const a = aanbiederVan(bk.aanbiederId);
+    if (!a || !a.supplierCode) return { status: 409, error: 'Deze aanbieder kan nog geen betaling ontvangen. Er is niets afgeschreven.' };
+    if (typeof ctx.betaalZaak !== 'function') return { status: 503, error: 'RTG Pay is niet aangesloten; er is niets afgeschreven.' };
+    const r = await ctx.betaalZaak({ codenaam: bk.codenaam, supplierCode: a.supplierCode,
+      centen: Math.round(Number(bk.prijs) * 100), soort: 'zorg',
+      oms: 'Zorg bij ' + bk.aanbiederNaam + ': ' + bk.behandelingNaam, ref: bk.ref, idem: 'care:' + bk.ref });
+    if (r.error) return r;
+    if (bk.paid) return { ok: true, herhaald: true, boeking: bk }; // een gelijktijdige tik was eerst
     bk.paid = true;
     bk.paidAt = nu();
     bk.status = 'geboekt';
+    bk.betaling = { boeking: r.boeking || null, centen: r.betaaldCenten };
     save();
     if (typeof verdien === 'function') { try { verdien(sess.key, bk.prijs, bk.aanbiederNaam); } catch (e) {} }
     notify(sess.key, { icon: 'agenda', title: bk.aanbiederNaam + ': ' + bk.behandelingNaam, body: bk.datum + ' om ' + bk.tijd + ' bij ' + (bk.behandelaarNaam || 'de behandelaar') + '. Tot dan.', scope: 'care' });

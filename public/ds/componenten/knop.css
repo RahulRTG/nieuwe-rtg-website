@@ -37,6 +37,9 @@
     letter-spacing: 0;
   }
   .ds-knop--breed { inline-size: 100%; }
+  /* [hidden] staat in rtg.reset, en een laag hoger wint display van de knop;
+     een verborgen knop moet hier dus zelf verdwijnen. */
+  .ds-knop[hidden] { display: none; }
   .ds-knop[disabled], .ds-knop[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
   .ds-knop__pijl { inline-size: 16px; block-size: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
   [dir="rtl"] .ds-knop__pijl { transform: scaleX(-1); }

@@ -134,14 +134,14 @@ async function loop(w, stap) {
     return { klopt: b.paid === true && b.status === 'geboekt' && i.length === 1, ziet: 'afspraak ' + b.status + ', ' + i.length + ' deling' };
   });
 
-  /* De medische context van een intake staat zonder opslagsleutel (RTG_ENC_KEY)
-     leesbaar in de opslag; de gezondheidskaart van de Foundation versleutelt per
-     veld (./foundationzorg.js). Dat is hier niet geeist maar wel getoond, en
-     gemeld bij de integrator: het is een besluit voor het Care-domein. */
-  await stap('persistent', 'een read-only lezer vindt de boeking in de opslag', async () => {
+  /* De medische context van een intake (art. 9 AVG) staat per veld versleuteld,
+     gebonden aan de rij (kern/care/intakesleutel.js) -- ook zonder RTG_ENC_KEY. */
+  await stap('persistent', 'een read-only lezer vindt de boeking in de opslag, en de medische context nergens leesbaar', async () => {
     const r = w.vindInOpslag(eerste);
     const kaal = w.opslag('store.db', 'SELECT key FROM kv WHERE deleted = 0 AND val LIKE ?', '%Nieuwe deling ' + merk + '%');
-    return { klopt: r.length > 0, ziet: 'boeking in ' + r.length + ' vindplaats(en); medische context leesbaar zonder opslagsleutel: ' + kaal.length };
+    const ontsleuteld = w.vindInOpslag('Nieuwe deling ' + merk);
+    return { klopt: r.length > 0 && kaal.length === 0 && ontsleuteld.length === 0,
+      ziet: 'boeking in ' + r.length + ' vindplaats(en); medische context leesbaar: ' + kaal.length + ' (ook met de opslagsleutel: ' + ontsleuteld.length + ')' };
   });
 
   await stap('persistent', 'na de herstart logt het lid opnieuw in en ziet in een nieuwe sessie dezelfde afspraak', async () => {
@@ -188,6 +188,6 @@ module.exports = {
   persona: 'gezin',
   omgeving: GEZINSWERELD,
   belofte: 'het lid ziet het zorgaanbod, boekt en betaalt een behandeling of pakket, deelt medische context apart met een kliniek en stopt dat zelf, en annuleert wat hij niet meer wil -- een ander lid of een kind kan er niets mee',
-  grens: 'De proef loopt over de routes die de zorgtab (app-main-13, -14 en -15) aanroept, niet door de app zelf; de tab bereik je via #tab=zorg of de knop in de tabbalk. Betalen bij Care zet een boeking op betaald zonder dat er geld beweegt (kern/care/leden.js); dat is hier niet beproefd en ligt bij Geld. Wat de kliniek met een gedeelde intake ziet, loopt hier niet mee. Er is geen Redis of PostgreSQL in de wereld.',
+  grens: 'De proef loopt over de routes die de zorgtab (app-main-13, -14 en -15) aanroept, niet door de app zelf; de tab bereik je via #tab=zorg of de knop in de tabbalk. Betalen bij Care zet een boeking op betaald zonder dat er geld beweegt (kern/care/leden.js); dat is hier niet beproefd en ligt bij Geld. Wat de kliniek met een gedeelde intake ziet, toetst test/care-intake-versleuteld.test.js. Er is geen Redis of PostgreSQL in de wereld.',
   loop
 };

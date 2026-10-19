@@ -80,7 +80,9 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, zorgMee, metingV
      gaat eerst de context in omdat de pakketlaag careBoek/careBetaal
      hergebruikt. */
   const ctx = { db, opslag: C, save, crypto, schoon, notify, zorgVoor, zorgMee,
-    nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief };
+    nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief,
+    // de medische context van een intake, per veld versleuteld (./care/intakesleutel.js)
+    intakesleutel: require('./care/intakesleutel')() };
   /* De wachtlijst gaat VOOR de ledenlaag de context in: careAnnuleer meldt een
      vrijgekomen slot en pakt slotVrij op aanroepmoment uit diezelfde context. */
   const deelWacht = require('./care/wachtlijst')(ctx);

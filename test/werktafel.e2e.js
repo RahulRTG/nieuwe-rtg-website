@@ -551,6 +551,10 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       const b = document.querySelector('.rtg-adaptive-bar');
       return document.styleSheets.length > 0 && b && b.getBoundingClientRect().height > 0;
     }, null, { timeout: 20000 });
+    await page.waitForFunction(() => {
+      const beeld = document.querySelector('.cmd-startwereld:first-child .cmd-wereldbeeld');
+      return beeld && beeld.complete && beeld.naturalWidth > 0;
+    }, null, { timeout: 20000 });
 
     assert.equal(optiesBody.login, undefined, 'de eerste optiesvraag bevat geen login');
     assert.equal(optiesBody.email, undefined, 'de eerste optiesvraag bevat geen e-mailadres');
@@ -565,6 +569,9 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),
       bladen: document.querySelectorAll('.cmd-pane').length,
       poortVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
+      intentie: document.querySelector('.cmd-intentie').getBoundingClientRect().toJSON(),
+      eersteWereld: document.querySelector('.cmd-startwereld').getBoundingClientRect().toJSON(),
+      beeldLaden: [...document.querySelectorAll('.cmd-wereldbeeld')].map(x => x.loading),
     }));
     assert.equal(geland.poortVerborgen, true, 'de passkey sluit de inlogpoort na de echte sessie');
     assert.equal(geland.bladen, 0, 'de snelle deur opent geen demo-activiteit');
@@ -588,8 +595,14 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       'het beginscherm draagt geen begroeting');
     assert.match(geland.tekst || '', /LivingOS/,
       'de werelden staan niet met hun naam op het beginscherm');
-    assert.match(geland.tekst || '', /geregeld moet worden/,
+    assert.match(geland.tekst || '', /Vraag Rahul om iets te regelen/,
       'er staat geen ingang in gewone taal');
+    assert.ok(geland.intentie.height >= 44, 'de Rahul-ingang is kleiner dan een toegankelijk raakvlak');
+    assert.ok(geland.eersteWereld.left >= 15 && geland.eersteWereld.right <= 375,
+      'de filmische wereld respecteert de mobiele schermrand niet');
+    assert.ok(geland.eersteWereld.height >= 280, 'de primaire wereld mist de bedoelde filmische diepte');
+    assert.deepEqual(geland.beeldLaden, ['eager','lazy','lazy','lazy'],
+      'alle wereldbeelden worden tegelijk geladen in plaats van op zichtbaarheid');
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
     await ctx.close();
@@ -689,7 +702,7 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
       'het beginscherm draagt geen begroeting');
     assert.match(geland.tekst || '', /LivingOS/,
       'de werelden staan niet met hun naam op het beginscherm');
-    assert.match(geland.tekst || '', /geregeld moet worden/,
+    assert.match(geland.tekst || '', /Vraag Rahul om iets te regelen/,
       'er staat geen ingang in gewone taal');
     /* WAT DEZE REGEL BEWAAKT is dat er ONDERAAN NIETS ANDERS STAAT: een tweede
        rij, een tabbalk of een teruggekeerd springboard maakt deze strook meteen

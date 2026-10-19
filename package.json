@@ -541,7 +541,7 @@
     "bezorgproef": "node scripts/bezorgproef.js"
   },
   "devDependencies": {
-    "playwright": "^1.64.0"
+    "playwright": "^1.64.1"
   },
   "bin": {
     "rtg": "scripts/rtg.js"

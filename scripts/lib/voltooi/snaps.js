@@ -1,8 +1,9 @@
 /* ============================================================================
    VOLTOOIPROEF: SNAPS (os:snaps, in de ledenapp /apps/app.html).
 
-   HOE DE PROEF DE APP BEREIKT. Snaps heeft geen eigen adres: in de ledenapp
-   opent de os-tegel Snaps een kiezer met de contacten uit De Salon
+   HOE DE PROEF DE APP BEREIKT. Snaps heeft geen eigen adres en geen tegel: de
+   werktafel is het beginscherm (WERELD.md). Een lid tikt in de rand op "Praat
+   met Rahul" en zegt "open snaps"; dat opent een kiezer met de contacten uit De Salon
    (apps/app-main.js, openOsApp('snaps')); een tik op een vriend kiest een foto
    en stuurt hem met /api/member/snap/send (app-main-07.js). De ontvanger ziet
    hem in de strip bovenaan zijn contacten (/api/member/snaps, app-main-08b.js)
@@ -153,7 +154,7 @@ async function loop(w, stap) {
 module.exports = {
   functie: 'os:snaps',
   ingang: '/apps/app.html',
-  via: 'de os-tegel Snaps, die de kiezer met Salon-contacten opent',
+  via: "Praat met Rahul in de rand, 'open snaps', dan de kiezer met Salon-contacten",
   persona: 'lid',
   belofte: 'een lid stuurt een vriend een snap, de vriend ziet hem een keer en daarna is de foto weg, ook uit de opslag -- zonder inlog, als vreemde of na een blokkade stuurt of opent niemand er een, en een herstart, dubbele tik, afgebroken verzoek of crash verliest, verdubbelt of herstelt niets',
   grens: 'De proef loopt de routes die de kiezer en de snapstrip van de ledenapp aanroepen, niet het scherm zelf; het verkleinen van de foto in de browser loopt niet mee. Verhalen (24 uur) en de dag-opdracht lopen hier niet. De vriendschap ontstaat langs De Salon. Geen Redis of PostgreSQL in de wereld.',

@@ -449,10 +449,17 @@ const CONTRACT = {
   'os:snaps': Object.assign({
     belofte: 'een lid stuurt een vriend een snap, de vriend ziet hem een keer en daarna is de foto weg, ook uit de opslag',
     ingang: '/apps/app.html',
-    via: 'de os-tegel Snaps, die de kiezer met Salon-contacten opent',
+    via: "Praat met Rahul in de rand, 'open snaps', dan de kiezer met Salon-contacten",
     // app-main-07.js stuurt de snap, 08b.js tekent de strip, 09.js opent hem een keer
     bestanden: ['public/apps/app-main/app-main-07.js', 'public/apps/app-main/app-main-08b.js', 'public/apps/app-main/app-main-09.js']
   }, voltooi('snaps', 'het scenario loopt /api/member/snap/send, /api/member/snaps en /api/member/snap/view, de routes die de snapkiezer en de snapstrip van /apps/app.html zelf aanroepen, met een vriend, een derde lid en een blokkade')),
+  /* Het tweede scherm is van de zaak (werkrol zaak, app-main-23b.js): het leest
+     alleen /api/supplier/state. Gekoppeld op het scherm zelf, niet op de schil. */
+  'link:tweedescherm': Object.assign({
+    belofte: 'een zaak zet haar kassa, keuken, bar of reserveringen op een tweede scherm en ziet daar wat er in de zaak gebeurt; een andere zaak, een lid of een anonieme bezoeker ziet het niet',
+    // scherm.html roept zelf alleen /api/supplier/state aan; de rest is de gedeelde schil
+    bestanden: ['public/apps/scherm.html']
+  }, voltooi('tweedescherm', 'het scenario loopt /api/supplier/state, de enige route die /apps/scherm.html zelf aanroept, met een verkoop op de kassa van dezelfde zaak en een tweede zaak ernaast')),
   /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
      scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
      (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies

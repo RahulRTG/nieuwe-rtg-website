@@ -165,6 +165,7 @@ const SCENARIOS = {
   'tabzorg.js': require('./lib/voltooi/tabzorg'),
   'table.js': require('./lib/voltooi/table'),
   'theater.js': require('./lib/voltooi/theater'),
+  'tweedescherm.js': require('./lib/voltooi/tweedescherm'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),
   'vandaag.js': require('./lib/voltooi/vandaag'),
   'veilig.js': require('./lib/voltooi/veilig'),

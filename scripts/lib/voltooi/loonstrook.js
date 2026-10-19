@@ -93,6 +93,13 @@ async function loop(w, stap) {
       ziet: 'stroken ' + (s.data && s.data.stroken.length) + ', dossier ' + d.status };
   });
 
+  await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
+    const l = await w.post(STROKEN, {});
+    const s = await w.post(DOSSIER, { runId: 'x' });
+    return { klopt: l.status === 401 && s.status === 401 && !!(l.data && l.data.error) && !!(s.data && s.data.error),
+      ziet: 'lezen ' + l.status + ', schrijven ' + s.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staat de strook er met hetzelfde netto', async () => {

@@ -95,6 +95,13 @@ async function loop(w, stap) {
       ziet: 'intrekken ' + i.status + ', stand ' + m.team.find((x) => x.id === id).stand + ', handelen daarna ' + h.status };
   });
 
+  await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
+    const l = await w.post(MIJN, {});
+    const s = await w.post(GRENS, { bevoegdheden: [] });
+    return { klopt: l.status === 401 && s.status === 401 && !!(l.data && l.data.error) && !!(s.data && s.data.error),
+      ziet: 'lezen ' + l.status + ', schrijven ' + s.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staan grens, ingetrokken machtiging en spoor er nog', async () => {

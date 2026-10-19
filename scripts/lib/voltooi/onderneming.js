@@ -87,6 +87,13 @@ async function loop(w, stap) {
       ziet: 'rechtsvorm ' + r.status + ', dagbeeld ' + d.status + ', kas ' + k.status + '; rechtsvorm blijft ' + (o.rechtsvorm && o.rechtsvorm.id) };
   });
 
+  await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
+    const l = await w.post(MIJN, {});
+    const s = await w.post(NIEUW, { naam: 'Anoniem' });
+    return { klopt: l.status === 401 && s.status === 401 && !!(l.data && l.data.error) && !!(s.data && s.data.error),
+      ziet: 'lezen ' + l.status + ', schrijven ' + s.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staat de onderneming er een keer, met vorm, plan en inschrijving', async () => {

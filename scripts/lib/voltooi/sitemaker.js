@@ -94,6 +94,13 @@ async function loop(w, stap) {
       ziet: 'haal ' + h.status + ', offline ' + o.status + ', publiceren ' + p.status + ', bewaren met andermans id maakt een eigen site; online blijft "' + kopVan(na) + '"' };
   });
 
+  await stap('voltooibaar', 'zonder sessie leest of schrijft niemand iets: beide geven 401 met een melding', async () => {
+    const l = await w.post(MIJN, {});
+    const s = await w.post(BEWAAR, { design: { titel: 'Anoniem' } });
+    return { klopt: l.status === 401 && s.status === 401 && !!(l.data && l.data.error) && !!(s.data && s.data.error),
+      ziet: 'lezen ' + l.status + ', schrijven ' + s.status };
+  });
+
   /* ---------------- persistent ---------------- */
   await w.herstart();
   await stap('persistent', 'na een nette herstart staat de site online met de gepubliceerde stand', async () => {

@@ -634,7 +634,9 @@ const EIGEN_MODULE = new Map([
   ['voertuig-ds.e2e.js', ['public/apps/voertuig.js']],
   /* Stroom G (plaatsbepaling): De Résidence, Boeken en Mijn Stad op het
      Design System; elke toets beoordeelt de bron die zijn scherm tekent. */
-  ['residentie-ds.e2e.js', ['public/apps/residentie/residentie-04.js']],
+  /* De residence laadt de bundel public/apps/residentie.js; de delen in
+     residentie/ zijn los geen programma (zelfde vorm als werkruimte.e2e.js). */
+  ['residentie-ds.e2e.js', ['public/apps/residentie.js']],
   ['boeken-ds.e2e.js', ['public/apps/boeken/app.js']],
   ['stad-ds.e2e.js', ['public/apps/stad.js']],
   /* Stroom D van de TravelOS-migratie: Hangar, Zakelijk vervoer, de

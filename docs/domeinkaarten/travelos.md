@@ -249,4 +249,185 @@ Vult de acht bestaande bewijzen aan, vervangt ze nooit. Elk punt is een toets di
 | RTG-ketens | Reis → betaalbewijs (Geld) → agendapunt (projectie) → dossier, zonder dat één app de gegevens van een ander kopieert; logeren bij leden verschijnt in dezelfde keten. |
 | Bewezen betrouwbaarheid | Het ketenscenario van par. 1.3 slaagt in de voltooiwereld met dubbeltik, afgebroken verzoek, crash en herstart, en nergens heet iets betaald dat niet betaald is. |
 
-*Deel 2 (Ter plaatse, Aankomst, Vluchten, Hangar, Move, OV, OV-routes, Navigatie, Stad, Residentie, Flits) volgt in hetzelfde formaat.*
+---
+
+# Deel 2: de andere TravelOS-apps
+
+Zelfde legenda als deel 1. Per app: (a) bewezen werkelijkheid, (b) markt, (c) domein, (d) catalogus, (e) RTG-exclusief, (f) bouwstenen en gaten. De prioritering en het eindcontract per app staan onderaan (par. 9-10).
+
+## 7. Onderweg en ter plaatse
+
+### 7.1 Ter plaatse (`tab:terplaatse`)
+
+**a.** Op deze tak: voltooiscenario `terplaatse.js` (voltooibaar 9/9, persistent 3/3, herstelbaar 4/4, menselijk 3/3) voor verhuur en huurcontract, met de herhaalsleutel op `/api/huur/boek` (commit b102eaef). Niet bewezen: tickets en transfer, charter (boten), vastgoed, bezorgen. Eén annuleerroute `/api/annuleer` voor order/rit/ticket/boeking (kern/ervaring/leden/annuleren.js:53-121).
+**b.** Huur: Hertz Gold Plus en Sixt ONE zijn gratis loyaliteitsprogramma's, geen betaalmuur (hertz.com/us/en/gold-plus-rewards; sixt.com help-center, 19-10-2026).
+**c.** Autohuur valt niet onder de SGR als losse dienst (zie 2.1). Huurrechten: vaste prijs vooraf, schadestaat bij uitgifte en inname.
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Geld echt bewegen bij `/api/booking/pay` | L5/L6 | half | lidacties.js:75-106 zet alleen `paid=true`; annuleren.js:22-24 | Een ticket of huur heet betaald na een RTG Pay-boeking; bij annuleren gaat het geld aantoonbaar terug. | M | NU (met Geld) |
+| Huur of charter wijzigen | L5 | ontbreekt | huur.js | Een lid verzet zijn huurperiode zolang de auto niet is uitgegeven; overlap geeft een weigering in woorden; de prijs wordt opnieuw gerekend en hij bevestigt. | M | LATER |
+| Bod of bezichtiging intrekken | L5 | ontbreekt | vastgoed.js | Een lid trekt zijn eigen bod of bezichtiging in; de makelaar ziet dat meteen. | K | NU |
+| Tickets met transfer als keten | L6 | half | kopen/tickets.js:66 | Een ticket met transfer staat in de reis en de agenda; vertraagt het evenement, dan geeft Move het gevolg voor de transfer. | M | LATER |
+| Scenario's tickets/charter/vastgoed/bezorgen | — | ontbreekt | — | Elk onderdeel heeft een eigen voltooiscenario. | M | NU |
+
+**e.** Schadestaat met foto's door beide partijen en SOS tijdens de huur: tegen schimmig verhuren (huur.js-kop).
+
+### 7.2 Aankomst (`link:aankomst`, Invisible Arrival)
+
+**a.** Voltooiscenario `aankomst.js` 10/3/4/3; arrival-security- en arrivalpas-toetsen 13/13; account verplicht met de pass als tweede sleutel (17fe7717); accountdeur in het scherm (e2b57ad6, browsertoets). Een ander account met dezelfde pass: 404.
+**b.** OpenTable, Resy en SevenRooms: de gast betaalt niets; het restaurant betaalt per maand (OpenTable Basic $149, Core $299, Pro $499 plus per gast; Resy $289-459; SevenRooms prijs niet openbaar) — restaurant.opentable.com/products, resy.com/resyos/plans-and-pricing, sevenrooms.com/pricing (19-10-2026). Extra voor gasten loopt bij Resy via een creditcard (Amex Global Dining Access).
+**c.** Allergie en toegankelijkheid zijn veiligheidsbeloften die alleen een mens van de zaak bevestigt (dat doet het scherm al: `wacht-op-mens`).
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Reservering annuleren vanuit de pass | L5 | ontbreekt | arrival-toegang.js:63 (intrekken laat reservering staan) | Het lid annuleert zijn tafel in hetzelfde scherm; de zaak ziet het en de pass sluit. | K | NU |
+| Aankomst in de reis en Move | L6 | half | reserveringen in agendaVoor | Een tafel uit Aankomst staat in de reis; Move rekent de naad van de vorige afspraak naar de tafel. | K | NU |
+| Kop plaatsnadering.js bijwerken | — | verouderd | "pass is anoniem" | De kop zegt dat de pass aan een account hangt. | K | NU |
+| Capaciteitsscore uitleggen | L4 | half | heuristiek (invisible-arrival.js:20) | De score toont waarop hij rekent en heet "schatting". | K | LATER |
+
+### 7.3 Vluchten (`link:vluchten`)
+
+**a.** Voltooiscenario `vluchten.js`; herhaalsleutel op charter (416d8740). Bord, boeken met paspoortpoort (428), inchecken, boarding pass met eenmalige code, roteren en intrekken. **Demo**: de luchthaven LUCHT en de vluchten bestaan alleen met `RTG_MAGNAAT_TEST` (luchthaven/index.js:71-95). Er bestaat geen prijs of betaling.
+**b.** Flighty Pro $59,99/jaar: Where's My Plane, vertragingsvoorspelling, meldingen vóór de airline (flighty.com/pricing). Flightradar24 Silver/Gold/Business (flightradar24.com/premium). TripIt Pro alternatieve vluchten. AirHelp+ compensatie zonder commissie.
+**c.** EU261: zorg 2/3/4 uur, omboeken of terugbetalen, compensatie €250/400/600 vanaf 3 uur; PRM-melding 48 uur; documenten (Schengen, ETA, ESTA).
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Eigen vlucht annuleren | L5 | ontbreekt | geen route | Een lid annuleert een niet-ingecheckte boeking; de pass sluit en de agenda vervalt. | K | NU |
+| Melding bij charterbesluit | L5 | ontbreekt | royaal.js | Bevestigt of weigert operations een charter, dan hoort het lid het met de reden. | K | NU |
+| EU261-rechtenkaart bij vertraging | L4 | ontbreekt | 261/2004 | Bij een door de luchthaven gemelde vertraging ziet het lid welke zorg en welke compensatie de regel noemt voor deze afstand, als "regel, de maatschappij beslist", met de drempels. | M | LATER |
+| Realtime vluchtdata | L4 | ontbreekt | TRAVELCOMMERCE.md:199 | — | G | NIET nu: licentie en jaren weg; tot dan "demo op eigen gegevens" (REIZEN.md:180-183). |
+| Charter buiten de transactie | L5 | defect | royaal.js:58-61 | charterBeslis schrijft binnen dezelfde transactie als de boarding pass. | K | NU |
+
+### 7.4 Hangar (`link:hangar`, Lifestyle)
+
+**a.** Logboek van eigen toestellen en vluchten in het levensdossier; AI-vraag met "u belooft nooit een slot of vergunning". Geen planning of boeking. Los van kern/luchthaven, terwijl reiswereld charters als "Hangar" labelt (reiswereld-bronnen-rtg.js:60-63).
+**b.** Jetkaarten en lidmaatschappen (NetJets Private Jet Card; Wheels Up vanaf $200.000) — netjets.com, investors.wheelsup.com (19-10-2026; uurprijzen niet bevestigd).
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Charters uit Vluchten tonen | L6 | ontbreekt | reiswereld-bronnen-rtg.js | Een charteraanvraag staat in de Hangar, met link naar Vluchten waar hij woont. | K | NU |
+| Bemanningsuren en onderhoudsdatum | L2 | ontbreekt | hangar.js | Het logboek telt uren per toestel en waarschuwt bij een opgegeven onderhoudsgrens; "u voert het in, RTG keurt niets". | M | LATER |
+| Slots, vliegplannen, vergunningen | L2 | ontbreekt | — | — | G | NIET: luchtvaartautoriteit en operator; RTG belooft het niet. |
+
+## 8. Bewegen
+
+### 8.1 Move (`link:move`)
+
+**a.** Voltooiscenario `move.js`; tijdzone van de zaak (fa381ae6). Rekent per overgang ruim/krap/onhaalbaar/niet te bepalen, met reden; `gevolg` geeft voorstellen met `uitgevoerd:false, bevestigt:'een mens'`. Schrijft niets.
+**c.** MCT per luchthaven; zelf samengestelde overstap onbeschermd; trein 100 minuten; de reis als klok (2.2).
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Hoteltijd uit de zaak | L4 | ontbreekt | MOVE.md:198-202 | Zie 3.2. | K | NU |
+| Overstapbescherming herkennen | L4 | ontbreekt | IATA MCT | Twee vluchten op aparte boekingen krijgen "zelf samengestelde overstap: niet beschermd" naast het oordeel; een eigen MCT-waarde wordt alleen gebruikt met bron. | M | LATER |
+| Gevolg naar herstelvoorstel | L4/L5 | half | gevolg.js | Zie 3.2. | M | NU |
+| Bereikbaarheid met OV | L4 | ontbreekt | navRoute modus auto | De naad rekent ook met de lijnen uit OV (frequentie, geen dienstregeling) en zegt dat. | M | LATER |
+| `vooraf` op het scherm | L1 | ontbreekt | MOVE.md:179 | Het lid ziet vóór hij iets toevoegt wat het met zijn reis doet. | K | NU |
+
+### 8.2 OV (`link:ov`) en OV-routes (`link:ovroutes`)
+
+**a.** OV: voltooiscenario `ov.js`; kaartje en abonnement met herhaalsleutel en 409 bij een ander product (91a1b432). Inchecken met eenmalige QR of GPS binnen 150 m; teruggave alleen via een storing van de vervoerder (50/100%). OV-routes: voltooiscenario `ovroutes.js`, persona `personeel` (0defbbf5); lijnen direct live, zonder concept, versie of audit. Demo-vervoerder TRANSIT.
+**b.** Citymapper Club (nu vooral advertentievrij), Moovit+ (SafeRide, routes vergelijken), Transit Royale (vervoerders betalen het voor hun reizigers) — citymapper.com/news/2589, moovit.com/press-releases/moovit-plus-features, help.transitapp.com (19-10-2026).
+**c.** Treinrechten 2021/782 (25/50%, zelf omreizen na 100 min); busrechten 181/2011.
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Kaartje of abonnement zelf terugvragen | L5 | ontbreekt | storing.js | Een ongebruikt kaartje is terug te vragen volgens de regel uit de overeenkomst; wordt het geweigerd, dan staat de reden erbij. | M | LATER (regel komt uit de overeenkomst) |
+| Lijn als concept en daarna publiceren | L3 | ontbreekt | dienst.js | Een gewijzigde lijn is pas zichtbaar voor leden na "publiceren"; er is een vorige versie. | M | NU |
+| Audit op lijnwijzigingen | L3 | ontbreekt | dienst.js (geen logActivity) | Elke wijziging staat in het logboek van de zaak met wie en wanneer. | K | NU |
+| Verwijderen met lopende ritten | L5 | ontbreekt | dienst.js:91-97 | Een lijn met lopende ritten of geldige kaartjes is niet te verwijderen; de manager hoort waarom. | K | NU |
+| Rit in de agenda | L6 | ontbreekt | geen agendakoppeling | Een geplande OV-reis staat in de agenda als projectie. | K | LATER |
+| ovOverzicht filteren op de zaak | L3 | defect | dienst.js:130 | Het overzicht van een zaak telt alleen de eigen operaties. | K | NU |
+| Echte dienstregeling (GTFS/NDOV) | L4 | ontbreekt | — | — | G | NIET nu: externe bron en licentie. |
+
+### 8.3 Navigatie (`link:navigatie`)
+
+**a.** Voltooiscenario `navigatie.js` met een NWB-fixture langs de echte importroute (3396809e); 13/3/5, menselijk open door de bewust bewaarde 503. Eigen A*, gebieden, pakketten met ODbL-vermelding, partnerevents.
+**b.** TomTom GO (abonnement, offline, flitspalen), Sygic Premium+ (offline 3D, rijstroken), HERE WeGo (gratis, offline) — tomtom.com newsroom, sygic.com, here.com (19-10-2026; prijzen niet bevestigd).
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Offline routeren | L1 | ontbreekt | KAARTEN.md:149-154 | Met een gedownload gebied rekent het toestel een route zonder netwerk en zegt dat verkeer niet meetelt. | G | LATER |
+| OSM-bouwer voor gebieden | L2 | ontbreekt | KAARTEN.md:137-148 | Een gekozen gebied wordt een pakket uit OSM met vermelding. | G | LATER (extern: download geweigerd) |
+| Huisnummers en postcodes | L1 | ontbreekt | NAVIGATIE.md:918-923 | Zoeken op adres vindt een huisnummer, met bron (BAG). | M | LATER |
+| Manifest ondertekenen | L3 | ontbreekt | pakket.js | Een pakket draagt een handtekening die het toestel controleert. | K | NU |
+
+### 8.4 Flits (`link:flits`, "Verkeer")
+
+**a.** Voltooiscenario `flits.js` 8/3/4/3; eigen melding niet zelf bevestigen (af180843). Vijf soorten met levensduur, ontdubbelen binnen 300 m, stemmen.
+**b.** Flitsmeister PRO €1,99/mnd (geen reclame, CarPlay, trajectcontrole-snelheid) — flitsmeister.nl/pro; Coyote Premium €14,99/mnd — moncoyote.com; Waze flitsers standaard aan — support.google.com/waze (19-10-2026).
+**c.** Flitswaarschuwing tijdens het rijden verboden in Duitsland (€75 en 1 punt), volledig verboden in Zwitserland, in Frankrijk alleen "zones de danger" (bronnen: TomTom-help, recht24-7.de; geen overheidsbron). Nederland: geen bron gevonden.
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Land bepalen op de server | L4 | defect | flits.html:136 `LAND='ES'`, client kiest | De landregel gebruikt de positie van de melding op de server; een flitser melden in DE, CH, FR (als exacte plek) geeft de weigering, ongeacht wat de client stuurt. | K | NU (juridisch) |
+| Eigen melding intrekken | L5 | ontbreekt | flits.js | Een melder trekt zijn eigen melding in; hij verdwijnt voor iedereen. | K | NU |
+| Codenaam van de melder niet tonen | L1 | ontbreekt | flits.html:199,234 | Andere leden zien soort, plek en leeftijd, niet wie het meldde. | K | NU (privacy) |
+| Wegwerk uit het stadsweefsel | L6 | ontbreekt | geen koppeling | Een werkorder van de gemeente op een weg verschijnt als wegwerk met bron "gemeente". | M | LATER |
+| Vooruitblik niet hard op Ibiza | L1 | defect | flits.html:247 | De vooruitblik volgt de plek van het lid. | K | NU |
+
+## 9. Verblijven en de plek
+
+### 9.1 Stad (`link:stad`)
+
+**a.** Voltooiscenario `stad.js`; herhaalsleutel op de melding (416d8740). Het scherm is een bewonersscherm: stand van de stad, melden, mijn meldingen. Onder de motorkap veel meer: stadsweefsel (assets, werkorders, voorzieningen, begroting, inspraak, algoritmeregister), ~80 kantoorroutes zonder scherm, en openbare API's voor algoritmes, besluiten en raadplegingen zonder scherm. Demo: één fictieve stad met 6 zones.
+**b.** FixMyStreet Pro (gemeente betaalt £15.000-56.000/jaar; G-Cloud 2026), SeeClickFix (gemeente betaalt), BuitenBeter (gratis voor de bewoner) — bronnen 19-10-2026.
+**c.** De ambitie van de eigenaar: een digitaal stadsmodel met meldingen, voorzieningen, werkzaamheden, participatie en transparantie.
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Doel in SCHERMEIGENAAR rechtzetten | — | fout | :2470-2474 "verkennen tijdens een reis" | De doeltekst zegt wat het scherm doet; of verkennen erbij hoort is een besluit. | K | NU |
+| Melding aanvullen, intrekken, heropenen | L5 | ontbreekt | bewoner.js | De melder voegt een foto of tekst toe, trekt in, of heropent binnen 14 dagen na "klaar"; de ploeg ziet het. | M | NU |
+| Werkzaamheden op een kaart | L3/L6 | half (kantoor) | weefsel2.js:116 hinder | De bewoner ziet lopende en geplande werkzaamheden in zijn zone met einddatum en bron "gemeente". | M | NU |
+| Raadplegingen en besluiten zichtbaar | L3 | half (API zonder scherm) | stad.js:49-58 | Een open raadpleging is te lezen en te beantwoorden; een besluit staat met datum en motivering. | M | NU |
+| Algoritmeregister zichtbaar | L3 | half (API zonder scherm) | stad.js:40-41 | Elk gebruikt algoritme staat met doel, gegevens en wie verantwoordelijk is. | K | NU |
+| Voorzieningen per wijk | L3 | half | voorzieningen.js | De bewoner ziet de voorzieningen in zijn wijk, zonder personen. | K | LATER |
+
+### 9.2 Residentie (`link:residentie`, menulabel "Verblijven")
+
+**a.** Voltooiscenario `residentie.js` 9/3/4/3; suite begint dicht (dd55bcf7). Een virtueel grandhotel: zalen, chat, spellen, eigen suite. Heeft niets met echte verblijven te maken (dat is `verblijf.hotel` → hotels.html).
+**b.** Habbo Club $3,99/31 dagen (exclusieve items, groter vriendenlijstje) — help.habbo.com (19-10-2026).
+**d.**
+
+| Functie | Laag | Stand | Bron | Acceptatiecriterium | Kosten | Bak |
+|---|---|---|---|---|---|---|
+| Menulabel "Verblijven" corrigeren | — | fout | app-main.js:4040 | Het menu noemt dit "Residentie"; "Verblijven" is de hotelboeking. | K | NU |
+| Melden en blokkeren van leden | L1/L3 | ontbreekt | grep leeg | Een lid meldt of blokkeert een ander in een zaal; een geblokkeerd lid ziet zijn chat niet; het kantoor ziet de melding. | M | NU (veiligheid) |
+| 18+-poort op het gewaagde vragendek | L1 | ontbreekt | rahul.js:4-5, spel.js:123-131 | Het gewaagde dek opent alleen voor twee volwassen, gekeurde accounts (`volwassen()`). | K | NU |
+| Suite resetten | L5 | ontbreekt | suite.js | Het lid zet zijn suite terug naar de standaardinrichting. | K | LATER |
+
+## 10. Prioritering en eindcontract, deel 2
+
+**Aanbevolen nu, klein** (veiligheid, eerlijkheid of een kapotte belofte): Flits landregel op de server, codenaam melder verbergen en vooruitblik niet hard op Ibiza; Residentie 18+-poort, melden/blokkeren en menulabel; Stad doeltekst, algoritmeregister zichtbaar; OV-routes audit, verwijderen met lopende ritten, overzicht per zaak; Vluchten eigen annuleren, melding charterbesluit, charter in de transactie; Aankomst annuleren vanuit de pass, kop bijwerken; Hangar charters tonen; Move `vooraf` op het scherm; Navigatie manifest ondertekenen; Ter plaatse bod intrekken.
+
+**Aanbevolen nu, middel**: Ter plaatse geld echt bewegen bij `booking/pay` (met Geld) en de ontbrekende scenario's; Stad melding aanvullen en heropenen, werkzaamheden en raadplegingen zichtbaar; OV-routes concept en publiceren; Move herstelvoorstel (met deel 1).
+
+**Later**: offline routeren en OSM-bouwer, huisnummers, EU261-rechtenkaart, overstapbescherming, OV-bereikbaarheid, kaartjes terugvragen, huur wijzigen, Hangar-onderhoud.
+
+**Niet doen nu, en waarom**: realtime vlucht- en spoordata en een dienstregeling (externe licentie, "jaren weg"; tot dan heet het een demonstratie op eigen gegevens); slots en vergunningen in de Hangar (luchtvaartautoriteit); GDS/NDC (deel 1).
+
+**Eindcontract per app, acht dimensies.** Voor elke app in deel 2 geldt hetzelfde contract als in par. 6, met deze app-eigen toetsen:
+
+| App | Los functioneren | RTG-keten | Bewezen betrouwbaarheid (naast de acht bewijzen) |
+|---|---|---|---|
+| Ter plaatse | huren en tekenen lukken zonder Agenda | huur → betaalbewijs → reis | verhuur, tickets, charter, vastgoed, bezorgen elk een scenario |
+| Aankomst | pass werkt zonder plaatslaag (handknoppen) | tafel → reis → Move | ander account 404, browsertoets accountdeur |
+| Vluchten | bord en pass zonder Agenda | boeking → visumtaak → reis → Move | annuleren en charterbesluit in het scenario |
+| Hangar | logboek zonder Vluchten | charter uit Vluchten zichtbaar | ander lid ziet niets |
+| Move | oordeel zonder navigatie heet "niet te bepalen" | gevolg → herstelvoorstel → domein voert uit na ja | onbekende tijd nooit "ruim" |
+| OV / OV-routes | inchecken zonder Geld zegt waarom niet | lijn → kaart → kaartje → teruggave bij storing | geen lijnwijziging zonder audit |
+| Navigatie | met gedownload gebied (later) | route → Move | 503 zonder net in woorden |
+| Flits | melden zonder navigatie | melding → navigatie; werkorder → wegwerk | landregel op de server getoetst |
+| Stad | melden zonder gemeente-koppeling zegt dat | melding → zaak → werkorder → klaar → melder | melder blijft codenaam |
+| Residentie | zalen zonder Salon | suite dicht tot het lid opent | 18+-poort en blokkeren getoetst |

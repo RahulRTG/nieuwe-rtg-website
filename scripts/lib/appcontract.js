@@ -141,6 +141,12 @@ const CONTRACT = {
   'link:geldcommand': Object.assign({
     belofte: 'een lid ziet hoe het er financieel voor staat, zet potten en regels binnen de harde grens van GELD.md en leest elke handeling terug in het actielog -- een ander lid ziet of raakt er niets van, en een dubbele tik, een afgebroken verzoek of een crash zet een bedrag nooit twee keer opzij'
   }, voltooi('geldcommand', 'het scenario loopt /api/geld/cockpit, /beleid, /beleid/zet, /api/geld/pot/zet, /reserveer, /weg en /api/geld/actielog, de routes die de eerste stand van /apps/geld.html (apps/geld/overzichtb.js en overzichtc.js) zelf aanroept, met een tweede lid dat er niet bij mag')),
+  /* Het geldscherm laadt de delen van alle standen (Balans telde zo 113 routes);
+     gekoppeld wordt op de twee delen die de stand Balans zelf tekenen. */
+  'link:balans': Object.assign({
+    belofte: 'een lid ziet zijn komende week uit zijn eigen agenda, met eerlijke adviezen over rust en avonden, zonder dat RTG er iets nieuws over hem vastlegt -- een ander lid ziet er niets van, en een dubbele tik, een afgebroken verzoek of een crash verandert het beeld niet',
+    bestanden: ['public/apps/geld/balans.js', 'public/apps/geld/balansb.js']
+  }, voltooi('balans', 'het scenario loopt /api/balans, de route die /apps/geld.html#balans (apps/geld/balans.js en balansb.js) zelf aanroept, met de agenda gevuld langs /api/agenda/toevoegen en /wijzig en een tweede lid dat er niets van ziet')),
   /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'

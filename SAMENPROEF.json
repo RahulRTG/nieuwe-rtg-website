@@ -1,0 +1,192 @@
+{
+  "stempel": {
+    "op": "2026-10-19T16:03:06.830Z",
+    "commit": "dc2640ed",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/samenproef.js",
+    "node": "v22.22.0"
+  },
+  "uitleg": "Modus SAMEN (eigenaarsbesluit 19 oktober 2026): ketens die een app met een andere app afmaakt via een verwijzing, gemeten in een echte browser per SCHAKEL en per STORING. Een keten per sleutel onder `ketens`; de verklaring staat in scripts/lib/appcontract.js (SAMEN, KETENS_ZONDER_APP).",
+  "grens": "Een browser, de werkruimte met drie surfaces, twee leden en het reisbureau voor een echte reis. Het oppakken gebeurt met pointer-events op de echte regel in het frame (een muissleep over de framegrens is in een headless browser niet betrouwbaar); het loslaten, het voorstel en de bevestiging met de muis in de werkruimte. Geen herstart en geen crash: dat is herstelbaar, en dat meet deze proef niet.",
+  "ketens": {
+    "reis-naar-agenda": {
+      "schakels": [
+        {
+          "nr": 1,
+          "wat": "Reizen toont de echte reis van het lid als sleepbare regel (soort reis, met datum)",
+          "stand": "gesloten",
+          "detail": "regel \"Hotel Aurora naar Lissabon\""
+        },
+        {
+          "nr": 2,
+          "wat": "het oppakken in Reizen laat alleen de Agenda oplichten; de surface die geen reis kent zwijgt",
+          "stand": "gesloten",
+          "detail": "oplichtend: [\"agenda\"]"
+        },
+        {
+          "nr": 3,
+          "wat": "loslaten op de Agenda geeft een voorstel dat zegt welk object en wat er gebeurt -- en er staat nog niets",
+          "stand": "gesloten",
+          "detail": "Hotel Aurora naar Lissabon: als afspraak in uw agenda zetten"
+        },
+        {
+          "nr": 4,
+          "wat": "annuleren laat de agenda zoals hij was",
+          "stand": "gesloten",
+          "detail": "0 afspraken na annuleren"
+        },
+        {
+          "nr": 5,
+          "wat": "na bevestigen zet de Agenda er met haar eigen sessie precies een afspraak in, met de titel en datum die Reizen toonde",
+          "stand": "gesloten",
+          "detail": "1 afspraak/afspraken: \"Hotel Aurora naar Lissabon\" op 2026-11-18"
+        },
+        {
+          "nr": 6,
+          "wat": "de Agenda kreeg pas NA de bevestiging een opdracht, en een keer",
+          "stand": "gesloten",
+          "detail": "1 keer sleep-doe ontvangen"
+        },
+        {
+          "nr": 7,
+          "wat": "het lid vindt de afspraak terug in de kalender van het agendascherm (lijstweergave)",
+          "stand": "gesloten",
+          "detail": "staat in de kalender"
+        }
+      ],
+      "storingen": [
+        {
+          "nr": 1,
+          "wat": "valt de Agenda uit, dan komt er geen afspraak bij, zegt de Agenda het in woorden, en blijft Reizen bruikbaar",
+          "stand": "gehouden",
+          "detail": "afspraken 1 -> 1; melding \"De agenda is even niet bereikbaar.\"; Reizen daarna nog bruikbaar"
+        },
+        {
+          "nr": 2,
+          "wat": "valt Reizen uit, dan laadt de Agenda gewoon met wat er al stond, zonder kale fout",
+          "stand": "gehouden",
+          "detail": "agenda toont de afspraak; 0 kale fout(en)"
+        },
+        {
+          "nr": 3,
+          "wat": "een reis zonder bruikbare datum laat de Agenda niet oplichten: geen loze belofte",
+          "stand": "gehouden",
+          "detail": "geen aanbod"
+        },
+        {
+          "nr": 4,
+          "wat": "een verwijzing die niet uit een surface komt, start geen sleep",
+          "stand": "gehouden",
+          "detail": "genegeerd"
+        },
+        {
+          "nr": 5,
+          "wat": "een dossier in de verwijzing komt niet aan: de Agenda krijgt alleen soort, id, label en hooguit acht korte velden",
+          "stand": "gehouden",
+          "detail": "ontvangen sleutels soort,id,label,velden, label 120 tekens, 8 velden"
+        },
+        {
+          "nr": 6,
+          "wat": "de verwijzing van lid A opent niets voor lid B: geen afspraak bij B, en A's reis blijft dicht met het id uit de verwijzing",
+          "stand": "gehouden",
+          "detail": "B: 0 afspraken; reis met kenmerk 404, met id 404 (A zelf: 200)"
+        },
+        {
+          "nr": 7,
+          "wat": "de hele keten loopt zonder kale JS-fout in de werkruimte",
+          "stand": "gehouden",
+          "detail": "geen"
+        }
+      ],
+      "telling": {
+        "schakels": 7,
+        "gesloten": 7,
+        "openBekend": 0,
+        "stuk": 0,
+        "storingen": 7,
+        "gehouden": 7,
+        "gebroken": 0
+      },
+      "sluitMetBevinding": true,
+      "sluit": true
+    },
+    "context-naar-agenda": {
+      "schakels": [
+        {
+          "nr": 1,
+          "wat": "een app in de werkruimte stuurt de gekozen reis als context",
+          "stand": "openBekend",
+          "detail": "geen enkele app stuurt vandaag {rtg: 'context'}; de proef zet de context met RTGSchil.context (de console-API)"
+        },
+        {
+          "nr": 2,
+          "wat": "de Agenda lost de verwijzing op met haar eigen afspraken en springt naar de dag van de reis",
+          "stand": "gesloten",
+          "detail": "Context: 1 afspraak bij Hotel Aurora naar Lissabon; de afspraak staat in beeld"
+        },
+        {
+          "nr": 3,
+          "wat": "de Agenda meldt de schil dat ze volgt, met wat ze doet en zonder gegevens",
+          "stand": "gesloten",
+          "detail": "[{\"rtg\":\"context-volgt\",\"soort\":\"reis\",\"id\":\"SAMEN1\",\"wat\":\"1 afspraak bij Hotel Aurora naar Lissabon\"}]"
+        },
+        {
+          "nr": 4,
+          "wat": "de schil toont in de console wie de context volgt, met de zin van de Agenda",
+          "stand": "stuk",
+          "detail": "[]"
+        },
+        {
+          "nr": 5,
+          "wat": "context weg (null) zet de Agenda terug zoals ze was, en de console laat los",
+          "stand": "stuk",
+          "detail": "context bleef staan"
+        }
+      ],
+      "storingen": [
+        {
+          "nr": 1,
+          "wat": "een soort die de Agenda niet kent: ze zwijgt en toont niets",
+          "stand": "gehouden",
+          "detail": "gezwegen"
+        },
+        {
+          "nr": 2,
+          "wat": "een context uit een ander venster dan de schil wordt niet gehoord",
+          "stand": "gehouden",
+          "detail": "genegeerd"
+        },
+        {
+          "nr": 3,
+          "wat": "kan de Agenda haar eigen afspraken niet lezen, dan volgt ze niet en gooit ze niets",
+          "stand": "gehouden",
+          "detail": "gezwegen; 0 kale fout(en)"
+        },
+        {
+          "nr": 4,
+          "wat": "de verwijzing van lid A opent niets voor lid B: B's Agenda zwijgt en toont niets van A",
+          "stand": "gehouden",
+          "detail": "B zweeg"
+        },
+        {
+          "nr": 5,
+          "wat": "geen kale JS-fout in de werkruimte",
+          "stand": "gehouden",
+          "detail": "geen"
+        }
+      ],
+      "telling": {
+        "schakels": 5,
+        "gesloten": 2,
+        "openBekend": 1,
+        "stuk": 2,
+        "storingen": 5,
+        "gehouden": 5,
+        "gebroken": 0
+      },
+      "sluitMetBevinding": false,
+      "sluit": false
+    }
+  }
+}

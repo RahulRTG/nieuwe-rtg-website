@@ -144,6 +144,8 @@ const EIGENAAR = {
   /* Twee registers uit de afbouw van APPWERKT (24 september 2026). Beide zijn
      een bron voor een bewijs en worden via versheid() gelezen, dus hun eigenaar
      staat hier en niet alleen in de detectie. */
+  'SAMENPROEF.json': { schrijver: 'scripts/samenproef.js',
+    waarom: 'samenproef.js --vastleggen schrijft het na een browserronde over de ketens van modus SAMEN (een app maakt een keten af met een andere via een verwijzing); APPWERKT leest het per keten onder ketens.<naam> (SAMEN en KETENS_ZONDER_APP in scripts/lib/appcontract.js).' },
   'LUSPROEF.json': { schrijver: 'scripts/lusproef.js',
     waarom: 'lusproef.js --vastleggen schrijft het na een volledige keten tegen een wegwerpserver; APPWERKT leest het als bron voor voltooibaar van Ontdekken (scripts/lib/appcontract.js).' },
   'VOLTOOIPROEF.json': { schrijver: 'scripts/voltooiproef.js',

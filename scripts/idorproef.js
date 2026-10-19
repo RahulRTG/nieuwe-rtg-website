@@ -461,7 +461,7 @@ if (require.main !== module) { module.exports = {}; return; }
      (LAT.md regel 4). */
   const verzonnen = () => 'ZZ-' + Math.random().toString(36).slice(2, 10);
   const spoor = (pad) => process.env.IDOR_SPOOR && new RegExp(process.env.IDOR_SPOOR).test(pad);
-  async function kruis({ routes, pool, basis, eigenVan, vanA, controle, wie, roepA, roepB, tegenB }) {
+  async function kruis({ routes, pool, basis, eigenVan, vanA, controle, wie, roepA, roepB, tegenB, ijkAltijd }) {
     const perRoute = {};
     const telling = { gescheiden: 0, doorbraak: 0, nagekeken: 0, publiek: 0, onbereikbaar: 0, lek: 0, afgebakend: 0 };
     for (const r of routes) {
@@ -539,6 +539,29 @@ if (require.main !== module) { module.exports = {}; return; }
             continue;
           }
         }
+      }
+      /* IJKEN OOK BIJ EEN WEIGERING (ijkAltijd), ALLEEN waar de deur een token in
+         het lijf is (de werkruimtes). Daar komt A's standing uit zijn eigen token,
+         niet uit een object-id, dus A's ijk met hetzelfde lijf is eerlijk: komt A
+         er met zijn token wel in en B niet, dan is dat scheiding; komt A er ook
+         niet in, dan is het een muur. Bij de leden NIET: daar draagt het lijf A's
+         geoogste id, de pool kan dat door een ander id overschrijven, en dan zou
+         A's ijk vals falen -- een 404 voor B op A's object is dan al scheiding
+         (A's sessie opent zijn eigen id, B's niet). Een 401/403/404 voor B bewijst
+         pas scheiding als de deur voor A WEL opengaat -- anders is het een muur
+         (gang 3 zegt hetzelfde). Waar de deur een token in het lijf is, zoals bij
+         de werkruimtes, is dat geen formaliteit: een lid zonder recht krijgt
+         dezelfde 403 als een vreemde. */
+      if (ijkAltijd && o.staat === 'gescheiden') {
+        const ijk = await roepA(r.pad, lijf);
+        if (spoor(r.pad)) console.error('SPOORIJK', r.pad, 'B', u.status, String(u.tekst).slice(0, 120), 'A', ijk.status, String(ijk.tekst).slice(0, 160));
+        if (!(ijk.status >= 200 && ijk.status < 300)) {
+          telling.onbereikbaar++;
+          perRoute[sleutel] = { status: u.status, statusA: ijk.status, staat: 'onbereikbaar', velden,
+            reden: 'B kreeg ' + u.status + ', maar ook A kwam er met zijn eigen sleutel niet in (' + ijk.status + '): een muur, geen scheiding' };
+          continue;
+        }
+        o.reden += ' (geijkt: A kwam erin, ' + ijk.status + ')';
       }
       perRoute[sleutel] = { status: u.status, ...o, velden };
       telling[o.staat]++;
@@ -843,6 +866,68 @@ if (require.main !== module) { module.exports = {}; return; }
     if (stroom.staat !== 'onbereikbaar') perRoute['POST /api/stroom/ticket'] = { gang: 'stroom', ...stroom };
   }
 
+  /* ---- GANG 8: DE WERKRUIMTES (bedrijf A tegen bedrijf B) ----
+
+     RTG Werk OS draait op een werkruimte met een lid-token en een
+     beheer-token in het lijf (server/bedrijf/deuren.js): die tokens zijn hier
+     de identiteit, zoals de sessie in de kop bij een lid. Drie werkruimtes
+     langs de echte routes -- A, B en de controle C -- elk met een toegelaten lid
+     met alle rollen. Dan dezelfde kruisfunctie: B noemt A's werkruimte met B's
+     EIGEN tokens. De vraag is precies "kan een ander bedrijf hier iets".
+
+     De uitslag vervangt die van gang 2 alleen waar gang 2 onbereikbaar bleef: daar
+     stuurde het lid geen werkruimte-tokens mee, dus stond elke deur dicht. */
+  const werkruimte = { routes: 0, reden: null };
+  {
+    const ROLLEN = ['directie', 'bestuur', 'hr', 'financieel', 'verkoop', 'service', 'engineering', 'projectleider',
+      'jurist', 'it', 'marketing', 'medewerker'];
+    const maakRuimte = async (wie, tok, merk) => {
+      const w = await post('/api/bedrijf/werkruimte/maak', { naam: 'Bedrijf ' + merk, land: 'NL', valuta: 'EUR', taal: 'nl' }, tok);
+      const code = w.data && w.data.werkruimte, beheer = w.data && w.data.beheerToken;
+      if (!code || !beheer) return { fout: wie + ': werkruimte/maak gaf ' + w.status };
+      const l = await post('/api/bedrijf/lid/aanmeld', { werkruimte: code, naam: 'Lid ' + merk, functie: 'directie' }, tok);
+      const lidId = l.data && l.data.lidId, lidToken = l.data && l.data.lidToken;
+      if (!lidId || !lidToken) return { fout: wie + ': lid/aanmeld gaf ' + l.status };
+      const bes = await post('/api/bedrijf/lid/besluit', { werkruimte: code, beheerToken: beheer, lidId, akkoord: true }, tok);
+      const rol = await post('/api/bedrijf/lid/rollen', { werkruimte: code, beheerToken: beheer, lidId, rollen: ROLLEN }, tok);
+      if (bes.status !== 200) return { fout: wie + ': lid/besluit gaf ' + bes.status };
+      return { code, beheer, lidToken, rollen: rol.status };
+    };
+    const WA = await maakRuimte('A', A, ctx.merk), WB = await maakRuimte('B', B, 'B' + Date.now()), WC = await maakRuimte('C', C, 'C' + Date.now());
+    const fout = [WA, WB, WC].map((x) => x.fout).filter(Boolean);
+    const wRoutes = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler');
+    werkruimte.routes = wRoutes.length;
+    if (fout.length) werkruimte.reden = fout.join('; ');
+    else {
+      const met = (W, w) => (lijf) => Object.assign({}, lijf, { werkruimte: W.code, lidToken: w.lidToken, beheerToken: w.beheer });
+      const wControle = new Set();
+      for (const r of wRoutes) {
+        const u = await roep(r.pad, met(WC, WC)(basisLijf(r.pad)), 3, C);
+        if (u.data && typeof u.data === 'object') waarden(u.data, wControle);
+      }
+      const wPool = maakPool();
+      const vanWA = new Set();
+      for (const r of wRoutes) {
+        const u = await roep(r.pad, met(WA, WA)(basisLijf(r.pad)), 1, A);
+        if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { wPool.leer(u.data, r.pad); waarden(u.data, vanWA); }
+      }
+      /* B noemt A's werkruimte met B's EIGEN tokens; A ijkt met zijn eigen. De
+         pool zet A's id's; de werkruimtecode en tokens gaan er daarna op, want
+         de pool zou anders een `code` uit A's antwoorden over A's werkruimte
+         heen kunnen leggen. */
+      const z = await kruis({ routes: wRoutes, pool: wPool, basis: basisLijf, eigenVan: () => ({ werkruimte: WA.code }),
+        vanA: vanWA, controle: wControle, wie: () => [ctx.merk],
+        roepA: (pad, lijf) => roep(pad, met(WA, WA)(lijf), 1, A),
+        roepB: (pad, lijf) => roep(pad, met(WA, WB)(lijf), 2, B),
+        tegenB: (pad, lijf) => post(pad, met(WA, WB)(lijf), B), ijkAltijd: true });
+      Object.assign(werkruimte, z.telling, { afbakening: z.afbakening, pool: wPool.grootte() });
+      for (const [k, v] of Object.entries(z.perRoute)) {
+        const eerder = perRoute[k];
+        if (!eerder || eerder.staat === 'onbereikbaar') perRoute[k] = { gang: 'werkruimte', ...v, eerder: eerder && eerder.reden };
+      }
+    }
+  }
+
   /* ---- GANG 7: DE PASSKEY (/api/webauthn/registreer, /weg, /bevestig/opties) ----
 
      Een passkey-ceremonie is niet na te doen met een verzonnen lijf, en dus
@@ -927,7 +1012,7 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
         herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen,
-      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, passkey, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
+      toestel: toestelStand, zwarePaden: zwaar, zaak, stroom, passkey, werkruimte, kaatsmodel: { verzoeken: kaats.verzoeken() }, afbakening, opbouw, merktekens: { vanA: vanA.size, controle: controle.size } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute,
@@ -945,6 +1030,7 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  zaken (gang 5, KIKUNOI tegen PONTO): ' + JSON.stringify(zaak));
   console.log('  stroom (gang 6): ' + JSON.stringify(stroom));
   console.log('  passkey (gang 7): ' + JSON.stringify(passkey));
+  console.log('  werkruimtes (gang 8): ' + JSON.stringify(werkruimte));
   console.log('  opbouw (gang 1b): ' + opbouw.geslaagd + ' van ' + opbouw.stappen + ' stappen geslaagd' +
     (opbouw.mislukt.length ? '; mislukt: ' + opbouw.mislukt.join(' | ') : ''));
   console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');

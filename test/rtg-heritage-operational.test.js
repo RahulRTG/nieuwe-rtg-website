@@ -32,8 +32,12 @@ test('alle echte appschermen lopen door dezelfde gedeelde schermlaag', () => {
     const html = fs.readFileSync(bestand, 'utf8');
     assert.match(html, /<script\b[^>]*src=["'][^"']*\/shared\/basis\.js["'][^>]*>/i,
       route + ' mist de gedeelde schermruntime');
-    assert.match(html, /<link\b[^>]*href=["']\/shared\/rtg-heritage\.css["'][^>]*>/i,
-      route + ' mist de gedeelde schermstijl');
+    /* Een scherm op het Design System (public/ds/contract.json) heeft als
+       gedeelde schermstijl /ds/rtg-ds.css in plaats van het Heritage-blad. */
+    const stijl = /<script\b[^>]*src=["']\/ds\/shell\.js["']/i.test(html)
+      ? /<link\b[^>]*href=["']\/ds\/rtg-ds\.css["'][^>]*>/i
+      : /<link\b[^>]*href=["']\/shared\/rtg-heritage\.css["'][^>]*>/i;
+    assert.match(html, stijl, route + ' mist de gedeelde schermstijl');
   }
   assert.equal(echt, 298); // inclusief Living World en LibraryOS
 });

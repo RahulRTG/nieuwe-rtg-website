@@ -30,7 +30,7 @@ test('de voorbeeldpagina toont elk schermtype uit het contract, alleen met het D
   const ctx = await browser.newContext({ viewport: { width: 3400, height: 1000 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
   const page = await ctx.newPage();
   const fouten = letOpFouten(page, []);
-  await page.goto(srv.base + '/ds/voorbeeld.html', { waitUntil: 'load' });
+  await page.goto(srv.base + '/ds/voorbeeld.html', { waitUntil: 'domcontentloaded' });
   const hrefs = await page.evaluate(() => [...document.styleSheets].map(s => s.href).filter(Boolean));
   const bladen = hrefs.flatMap(h => { const u = new URL(h); return u.pathname === PAD ? decodeer(u.searchParams.get('f')) : [u.pathname]; });
   for (const b of bladen) assert.ok(/^\/(ds|fonts)\//.test(b), 'erfenisblad op de voorbeeldpagina: ' + b);

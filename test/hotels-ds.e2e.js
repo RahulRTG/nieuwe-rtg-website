@@ -37,7 +37,7 @@ async function open(breedte, hoogte, taal = 'nl') {
     localStorage.setItem('rtg_member_token', t); }, [token, taal]);
   const page = await ctx.newPage();
   const fouten = letOpFouten(page, []);
-  await page.goto(srv.base + '/apps/hotels.html', { waitUntil: 'load' });
+  await page.goto(srv.base + '/apps/hotels.html', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
   await page.waitForSelector('#inhoud .ds-kaart, #inhoud .ds-status__titel');
   return { ctx, page, fouten };

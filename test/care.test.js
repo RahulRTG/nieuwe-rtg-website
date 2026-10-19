@@ -148,6 +148,14 @@ test('herstel- & verblijfpakket: overzicht met voordeel, boeken, betalen en mijn
   assert.equal(boek.body.pakket.status, 'wacht-op-betaling');
   const bet = await api('care/pakket/betaal', { ref: boek.body.pakket.ref }, lid);
   assert.ok(bet.body.pakket.paid && bet.body.pakket.status === 'geboekt');
+  /* Betaald betekent geld bij BEIDE zaken, naar verhouding (besluit eigenaar
+     19 oktober 2026, test/carepakket.test.js): twee regels in RTG Pay die samen
+     precies de pakketprijs zijn. */
+  const v = bet.body.pakket.verdeling;
+  assert.equal(v.zorgCenten + v.hotelCenten, p.prijs * 100, 'de verdeling is exact de pakketprijs');
+  const regels = ((await api('pay/overzicht', {}, lid)).body.geschiedenis || []).filter(g => /^Pakket /.test(g.oms || ''));
+  assert.equal(regels.length, 2, 'twee betalingen, aan de zorgaanbieder en het hotel: ' + JSON.stringify(regels));
+  assert.equal(regels.reduce((s, g) => s + Math.abs(g.centen), 0), p.prijs * 100);
   const mijn = (await api('care/pakket/mijn', {}, lid)).body.pakketten;
   assert.ok(mijn.some(x => x.ref === boek.body.pakket.ref && x.paid), 'het pakket staat betaald in mijn overzicht');
   // de gekoppelde behandeling is meebevestigd in de gewone agenda

@@ -1,32 +1,31 @@
 {
  "stempel": {
-  "op": "2026-10-19T07:58:33.976Z",
-  "commit": "a15947d1",
+  "op": "2026-10-19T07:46:11.390Z",
+  "commit": "58c343fd",
   "boomVuil": true,
-  "boomAnders": 4,
+  "boomAnders": 5,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 654,
+  "zonderBewakerslaag": 670,
   "bewaakt": 568,
-  "openbaarMetReden": 43,
-  "eigenControle": 26,
-  "sleutelDoorgegeven": 10,
-  "zonderWachtMetReden": 7,
+  "openbaarMetReden": 58,
+  "eigenControle": 24,
+  "sleutelDoorgegeven": 12,
+  "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 18
+  "publiekeLijstenVerschillen": 19
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
    "/api/foundation/health",
    "/api/metrics",
    "/api/metrics/kort",
-   "/api/loop/operations",
    "/api/doos/rapport",
    "/api/foundation/impact",
    "/api/foundation/tip",
@@ -40,7 +39,9 @@
    "/api/auth/resend",
    "/api/account/start",
    "/api/foundation/school/school/maak",
-   "/api/foundation/school/personeel/inloglink"
+   "/api/foundation/school/personeel/inloglink",
+   "/api/foundation/les/maak",
+   "/api/foundation/les/join"
   ],
   "alleenInDeKeuring": []
  },
@@ -1119,6 +1120,11 @@
    "reden": "het betaaldiensttarief staat in de partnervoorwaarden"
   },
   {
+   "sleutel": "POST /api/book",
+   "bestand": "server/routes/member/partnerkanaal.js:28",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
    "sleutel": "POST /api/carriere/regel/toon",
    "bestand": "server/routes/carriereledger.js:91",
    "staat": "openbaar",
@@ -1174,37 +1180,37 @@
   },
   {
    "sleutel": "POST /api/foundation/agenda",
-   "bestand": "server/foundation/onderwijs/schrift.js:68",
+   "bestand": "server/foundation/onderwijs/schrift.js:63",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/agenda/verwijder",
-   "bestand": "server/foundation/onderwijs/schrift.js:80",
+   "bestand": "server/foundation/onderwijs/schrift.js:71",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/ai",
-   "bestand": "server/foundation/onderwijs/schrift.js:90",
+   "bestand": "server/foundation/onderwijs/schrift.js:81",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/stroke",
-   "bestand": "server/foundation/onderwijs/les.js:126",
+   "bestand": "server/foundation/onderwijs/les.js:121",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/undo",
-   "bestand": "server/foundation/onderwijs/les.js:146",
+   "bestand": "server/foundation/onderwijs/les.js:141",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/bord/wis",
-   "bestand": "server/foundation/onderwijs/les.js:142",
+   "bestand": "server/foundation/onderwijs/les.js:137",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
@@ -1682,8 +1688,8 @@
   },
   {
    "sleutel": "POST /api/foundation/les/join",
-   "bestand": "server/foundation/onderwijs/les.js:53",
-   "staat": "eigenControle"
+   "bestand": "server/foundation/onderwijs/les.js:49",
+   "staat": "sleutelDoorgegeven"
   },
   {
    "sleutel": "POST /api/foundation/les/leerling/intrekken",
@@ -1693,8 +1699,9 @@
   },
   {
    "sleutel": "POST /api/foundation/les/maak",
-   "bestand": "server/foundation/onderwijs/les.js:35",
-   "staat": "eigenControle"
+   "bestand": "server/foundation/onderwijs/les.js:32",
+   "staat": "zonderWachtMetReden",
+   "reden": "een les openen is als een kamer openen: wie hem maakt krijgt de docenttoken terug, en zonder lescode komt er niemand binnen"
   },
   {
    "sleutel": "POST /api/foundation/les/sluit",
@@ -1704,7 +1711,7 @@
   },
   {
    "sleutel": "POST /api/foundation/les/stroomticket",
-   "bestand": "server/foundation/onderwijs/les.js:95",
+   "bestand": "server/foundation/onderwijs/les.js:90",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
@@ -1842,13 +1849,13 @@
   },
   {
    "sleutel": "POST /api/foundation/opgave/inleveren",
-   "bestand": "server/foundation/onderwijs/schrift.js:52",
+   "bestand": "server/foundation/onderwijs/schrift.js:47",
    "staat": "bewaakt",
    "wacht": "lesVan"
   },
   {
    "sleutel": "POST /api/foundation/reis/aanvraag",
-   "bestand": "server/foundation/onderwijs/schrift.js:128",
+   "bestand": "server/foundation/onderwijs/schrift.js:119",
    "staat": "zonderWachtMetReden",
    "reden": "een open aanvraagformulier voor gezinnen zonder foundation-account -- dat is het punt ervan. Sinds deze meting met een rem per IP-adres, want de lijst kapt op duizend en een vloed duwde echte aanvragen eruit"
   },
@@ -3155,9 +3162,22 @@
    "reden": "een fout uit de browser: JUIST zonder poort, want een fout die het inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden (zie server/routes/fout.js voor wat er wel en niet meegaat)"
   },
   {
+   "sleutel": "POST /api/gast/aanschuiven",
+   "bestand": "server/routes/gast/tafel.js:70",
+   "staat": "openbaar",
+   "reden": "aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)"
+  },
+  {
+   "sleutel": "POST /api/gast/tafel",
+   "bestand": "server/routes/gast/tafel.js:45",
+   "staat": "openbaar",
+   "reden": "de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)"
+  },
+  {
    "sleutel": "POST /api/gids/app",
-   "bestand": "server/routes/gids.js:11",
-   "staat": "eigenControle"
+   "bestand": "server/routes/gids.js:8",
+   "staat": "openbaar",
+   "reden": "de app-gids is openbaar"
   },
   {
    "sleutel": "POST /api/herstel/eigenaar/passkey",
@@ -3183,7 +3203,7 @@
   },
   {
    "sleutel": "POST /api/ice",
-   "bestand": "server/routes/social.js:103",
+   "bestand": "server/routes/social.js:99",
    "staat": "openbaar",
    "reden": "ijs-servers voor WebRTC: zonder sessie alleen STUN (401, geen gegevens); een kortlevend TURN-credential pas na een geldige Bearer-sessie, met een plafond per actor (kern/rtc/ijs.js)"
   },
@@ -3198,6 +3218,24 @@
    "bestand": "server/routes/kantoorgesprek.js:17",
    "staat": "openbaar",
    "reden": "loopt verder op het gespreks-id dat bij de start is uitgegeven"
+  },
+  {
+   "sleutel": "POST /api/krant/artikel",
+   "bestand": "server/routes/journalistiek.js:64",
+   "staat": "openbaar",
+   "reden": "idem"
+  },
+  {
+   "sleutel": "POST /api/krant/gids",
+   "bestand": "server/routes/journalistiek.js:62",
+   "staat": "openbaar",
+   "reden": "de krant is openbaar; er is een toets die dat vastlegt"
+  },
+  {
+   "sleutel": "POST /api/krant/open",
+   "bestand": "server/routes/journalistiek.js:63",
+   "staat": "openbaar",
+   "reden": "idem"
   },
   {
    "sleutel": "POST /api/les/antwoord",
@@ -3260,8 +3298,14 @@
    "staat": "eigenControle"
   },
   {
+   "sleutel": "POST /api/mail/binnen",
+   "bestand": "server/routes/mailpost.js:58",
+   "staat": "openbaar",
+   "reden": "de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)"
+  },
+  {
    "sleutel": "POST /api/mail/ses",
-   "bestand": "server/routes/mailpost.js:85",
+   "bestand": "server/routes/mailpost.js:82",
    "staat": "openbaar",
    "reden": "AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht"
   },
@@ -3305,7 +3349,7 @@
   },
   {
    "sleutel": "POST /api/partnertrips",
-   "bestand": "server/routes/member/partnerkanaal.js:16",
+   "bestand": "server/routes/member/partnerkanaal.js:15",
    "staat": "sleutelDoorgegeven"
   },
   {
@@ -3712,259 +3756,259 @@
   },
   {
    "sleutel": "POST /api/rtf/spel/antwoord",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/arcade-bord",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/arcade-score",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/dag",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/dag-klaar",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/dag-start",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/kijk",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/klasgenoten",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/mijn",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/nabespreking",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/naspelen",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/nieuw",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/online",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/opgeven",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/praat",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/praat-stuur",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/prestaties",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/projectie-open",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/projectie-sluit",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/rahul",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/random",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/replay",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sneek-bord",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sneek-score",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/staat",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/stand",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sudoku-klaar",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/sudoku-nieuw",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-antwoord",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-mijn",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-nieuw",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-nodig",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/team-verlaat",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-antwoord",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-mijn",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-nieuw",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toernooi-staat",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/toewijzen",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/uitslagen",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/varianten",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/zet",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/zichtbaar",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/spel/zichtbaar-zet",
-   "bestand": "server/routes/spellen.js:155",
+   "bestand": "server/routes/spellen.js:145",
    "staat": "bewaakt",
    "wacht": "rtfSpeler -> rtf.verifieerProfiel"
   },
@@ -4030,13 +4074,13 @@
   },
   {
    "sleutel": "POST /api/stad/algoritmes",
-   "bestand": "server/routes/stad.js:40",
+   "bestand": "server/routes/stad.js:38",
    "staat": "openbaar",
    "reden": "het openbare algoritmeregister: beschrijft regels, geen personen"
   },
   {
    "sleutel": "POST /api/stad/besluiten",
-   "bestand": "server/routes/stad.js:49",
+   "bestand": "server/routes/stad.js:47",
    "staat": "openbaar",
    "reden": "het openbare besluitenregister: wat de stad besloot, met welke stemverhouding; fracties stemmen met zetels, geen personen"
   },
@@ -4053,9 +4097,20 @@
    "reden": "idem"
   },
   {
+   "sleutel": "POST /api/staff",
+   "bestand": "server/routes/staff.js:46",
+   "staat": "eigenControle"
+  },
+  {
    "sleutel": "POST /api/stroom/ticket",
    "bestand": "server/opzet/stroomtoegang.js:31",
    "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/supplier/apply",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
+   "staat": "openbaar",
+   "reden": "solliciteren bij een zaak kan zonder account"
   },
   {
    "sleutel": "POST /api/supplier/login",
@@ -4183,6 +4238,48 @@
    "bestand": "server/routes/auth/webauthn.js:96",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
+  },
+  {
+   "sleutel": "POST /api/werk-gast/beeld",
+   "bestand": "server/bedrijf/praktijk-gast.js:11",
+   "staat": "openbaar",
+   "reden": "Een gast heeft geen RTG-account: een tijdelijk 256-bit geheim toont precies één afspraak; opslag bewaart alleen de hash en iedere lezing controleert intrekking en tenantstatus."
+  },
+  {
+   "sleutel": "POST /api/werk-gast/besluit",
+   "bestand": "server/bedrijf/praktijk-gast.js:16",
+   "staat": "openbaar",
+   "reden": "Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten."
+  },
+  {
+   "sleutel": "POST /api/werk-gast/betaling/start",
+   "bestand": "server/bedrijf/praktijk-betalen-routes.js:9",
+   "staat": "openbaar",
+   "reden": "Actuele klantcapability plus financieel bevoegd vrijgegeven betaalverzoek; serverbedrag en ontvanger duurzaam vast vóór provideroproep, nooit zelf betaald verklaren."
+  },
+  {
+   "sleutel": "POST /api/werk-gast/betaling/status",
+   "bestand": "server/bedrijf/praktijk-betalen-routes.js:24",
+   "staat": "openbaar",
+   "reden": "Actuele klantcapability toont uitsluitend de centrale providerwaarheid van de eigen opdracht; geen betalingId uit de client."
+  },
+  {
+   "sleutel": "POST /api/werk-leverancier/beeld",
+   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:10",
+   "staat": "openbaar",
+   "reden": "Tijdelijk hash-only capabilitygeheim voor één leveranciersopdracht; huidige uitgeversrechten en tenant worden iedere keer gecontroleerd."
+  },
+  {
+   "sleutel": "POST /api/werk-leverancier/besluit",
+   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:14",
+   "staat": "openbaar",
+   "reden": "Eenmalig leveranciersantwoord op precies één versie, met actuele capabilitycontrole en duurzame opslag. Geen accounttoegang."
+  },
+  {
+   "sleutel": "POST /api/werkmail/bezorg",
+   "bestand": "server/routes/werkmail.js:58",
+   "staat": "openbaar",
+   "reden": "inkomende post van de mailserver, met een eigen venster-rem per minuut"
   },
   {
    "sleutel": "POST /api/werkplek/mijn",

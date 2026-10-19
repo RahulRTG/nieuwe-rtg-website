@@ -3,14 +3,15 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "3d0e386f2",
+  "commit": "d0f4061c1",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/app-main/app-main-29d.js",
-    "public/shared/interface/workspace-world-catalog.js"
+    "public/shared/rtg-schil/01-kern.js",
+    "public/shared/rtg-schil/05-context.js",
+    "public/shared/rtg-schil/07-start.js"
    ],
    "bestanden": [
     "ROUTEBRON.json",

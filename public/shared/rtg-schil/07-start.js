@@ -39,6 +39,7 @@
       /* Ook een context komt alleen van een open surface: een ander venster op
          dezelfde herkomst (een pop-up, een tweede tab) zet hem niet. */
       if (e.data.rtg === 'context') { context(e.data.ref); return; }
+      if (e.data.rtg === 'context-volgt') { contextVolgt(s, e.data); return; }
       if (e.data.rtg === 'sleep-start') {
         var v = schoneVerwijzing(e.data.object);
         if (v) sleepStart(s, v);

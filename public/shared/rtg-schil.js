@@ -23,6 +23,7 @@
     surfaces: [],       // { id, naam, el, zoom }
     actief: null,
     huidigeContext: null,
+    volgt: {},          // surface-id -> korte zin: wie de huidige context volgt
     luisteraars: []
   };
 
@@ -345,6 +346,7 @@
        de oude verwijzing staan (samenproef, keten context-naar-agenda). */
     schil.huidigeContext = (!ref || !ref.id) ? null
       : { soort: String(ref.soort || ''), id: String(ref.id), label: String(ref.label || '') };
+    schil.volgt = {}; // wie de vorige context volgde, volgt deze niet vanzelf
     schil.luisteraars.forEach(function (fn) {
       try { fn(schil.huidigeContext); } catch (e) { /* een luisteraar die stukgaat neemt de rest niet mee */ }
     });
@@ -359,6 +361,16 @@
     tekenConsole();
   }
   function opContext(fn) { if (typeof fn === 'function') schil.luisteraars.push(fn); }
+  /* Een surface meldt dat hij de huidige context volgt (contract van de
+     samenproef, keten context-naar-agenda): soort en id moeten de huidige
+     context zijn -- een laat antwoord op een oude context telt niet -- en `wat`
+     is een zin, geen gegevens. De naam komt van de surface zelf. */
+  function contextVolgt(s, m) {
+    var c = schil.huidigeContext;
+    if (!s || !c || !m || String(m.soort || '') !== c.soort || String(m.id || '') !== c.id) return;
+    schil.volgt[s.id] = String(m.wat || '').slice(0, 120);
+    tekenConsole();
+  }
 
   /* --------------------------------------------------------- de console -- */
   function tekenConsole() {
@@ -398,6 +410,13 @@
       ctx.innerHTML = schil.huidigeContext
         ? 'Alles op <b>' + esc(schil.huidigeContext.id) + '</b><br>' + esc(schil.huidigeContext.label)
         : 'Geen gedeelde context. Kies iets in een app; de rest volgt.';
+      // wie volgt: alleen als tekst, met de naam van een surface die nog open is
+      schil.surfaces.forEach(function (s) {
+        if (!schil.huidigeContext || !schil.volgt[s.id]) return;
+        var r = document.createElement('span'); r.className = 'stil'; r.dataset.volgt = s.id;
+        r.textContent = s.naam + ' volgt: ' + schil.volgt[s.id];
+        ctx.appendChild(document.createElement('br')); ctx.appendChild(r);
+      });
     }
   }
 
@@ -791,6 +810,7 @@
       /* Ook een context komt alleen van een open surface: een ander venster op
          dezelfde herkomst (een pop-up, een tweede tab) zet hem niet. */
       if (e.data.rtg === 'context') { context(e.data.ref); return; }
+      if (e.data.rtg === 'context-volgt') { contextVolgt(s, e.data); return; }
       if (e.data.rtg === 'sleep-start') {
         var v = schoneVerwijzing(e.data.object);
         if (v) sleepStart(s, v);

@@ -23,6 +23,7 @@
     surfaces: [],       // { id, naam, el, zoom }
     actief: null,
     huidigeContext: null,
+    volgt: {},          // surface-id -> korte zin: wie de huidige context volgt
     luisteraars: []
   };
 

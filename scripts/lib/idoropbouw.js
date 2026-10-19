@@ -218,6 +218,19 @@ const LIJVEN = {
   '/api/push/subscribe': { subscription: { endpoint: 'https://fcm.googleapis.com/fcm/send/proef123', keys: { p256dh: 'x', auth: 'y' } } },
   '/api/rtgid/machtig': (c) => ({ dienst: 'gemeente', dagen: 7, codenaam: c.tegen && c.tegen.codenaam }),
   '/api/supplier/ai': { vraag: 'Hoe druk wordt het vanavond?' },
+  /* Horeca-createroutes (gang 5, de zaken): met een geldig lijf maakt elke zaak
+     zijn EIGEN object. Een uniek kenmerk per aanroep voorkomt dat de tweede
+     poging op een 409 van zijn eigen eerste strandt; zo komen A, B en de
+     tegenpoging alledrie binnen en heet de route publiek -- er is geen object
+     van A om te schenden, elke zaak schrijft in zijn eigen doos. */
+  '/api/supplier/horeca/folio/open': () => ({ kamer: 'K' + randomUUID().slice(0, 6), gastnaam: 'Proefgast', gasten: 2 }),
+  '/api/supplier/horeca/haccp/punt': () => ({ naam: 'Koeling ' + randomUUID().slice(0, 5), min: 2, max: 7 }),
+  '/api/supplier/horeca/recovery/open': () => ({ tafel: 'T' + randomUUID().slice(0, 4), wat: 'Soep was koud, opnieuw gebracht' }),
+  '/api/supplier/horeca/fooienpot': () => ({ datum: over(-Math.floor(Math.random() * 300) - 1), deelnemers: [{ naam: 'Proef', uren: 8, weging: 1 }] }),
+  '/api/supplier/horeca/event/offerte': () => ({ naam: 'Feest ' + randomUUID().slice(0, 5), datum: over(30), posten: [{ naam: 'Zaalhuur', centen: 50000 }] }),
+  '/api/supplier/horeca/haccp/batch': () => ({ naam: 'Soep ' + randomUUID().slice(0, 5), tht: over(3) }),
+  '/api/supplier/horeca/offline/sync': () => ({ bonnen: [{ clientId: randomUUID(), soort: 'opgenomen', regels: [{ naam: 'Koffie', aantal: 1, centen: 250 }] }] }),
+  '/api/supplier/horeca/bezorg/route': { stops: [{ id: 'a', lat: 52.40, lng: 4.90 }, { id: 'b', lat: 52.372, lng: 4.893 }, { id: 'c', lat: 52.38, lng: 4.895 }] },
   '/api/verify/selfie': { image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' }
 };
 
@@ -444,4 +457,34 @@ function vanA(pad, ctx) {
    het nooit, dus wie het in een antwoord ziet, ziet iets van A. */
 function merkwoord() { return 'mrk' + randomUUID().replace(/-/g, '').slice(0, 10); }
 
-module.exports = { LIJVEN, VAN_A, stappen, lijfVoor, vanA, zoek, vandaag, merkwoord };
+/* ---- DE ZAAK-OPBOUW (gang 5): zaak A maakt een object dat B moet opzoeken ----
+
+   De meeste Horeca-routes schrijven in de EIGEN doos van de zaak (H(req.supplier
+   .code)); een geldig lijf maakt dan B's eigen object en dat is geen lek. Twee
+   routes zoeken een object OP code of nummer op: /bon leest een bon op zijn
+   bonCode, /club/band/terug betaalt het restsaldo van een band op zijn nummer.
+   Zaak A maakt daarom een echte band (club/band geeft een eenmalige bonCode en
+   een nummer); zaak B probeert die daarna. bandVan/bon().lees filteren op de
+   zaak, dus B krijgt niets -- de scheiding die deze gang wil meten. */
+function zaakStappen() {
+  return [
+    { pad: '/api/supplier/horeca/club/band', lijf: () => ({ nummer: 'IDOR-A-' + randomUUID().slice(0, 8), bedrag: 50 }),
+      bewaar: (d, c) => { c.bandNummer = d.band && d.band.nummer; c.bonCode = (d.band && d.band.bonCode) || (d.band && d.band.bonId); } }
+  ];
+}
+
+const ZAAK_VAN_A = {
+  '/api/supplier/horeca/bon': (c) => ({ bonCode: c.bonCode }),
+  '/api/supplier/horeca/club/band/terug': (c) => ({ nummer: c.bandNummer }),
+  '/api/supplier/horeca/club/band/betaal': (c) => ({ nummer: c.bandNummer })
+};
+
+function zaakVanA(pad, ctx) {
+  const f = ZAAK_VAN_A[pad];
+  if (!f) return {};
+  const uit = {};
+  for (const [k, v] of Object.entries(f(ctx || {}) || {})) if (v !== undefined && v !== null && v !== '') uit[k] = v;
+  return uit;
+}
+
+module.exports = { LIJVEN, VAN_A, stappen, lijfVoor, vanA, zoek, vandaag, over, merkwoord, zaakStappen, zaakVanA };

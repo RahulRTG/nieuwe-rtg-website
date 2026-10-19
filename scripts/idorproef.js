@@ -178,6 +178,11 @@ const NAGEKEKEN = {
   'POST /api/residentie/gids': 'de gids toont suites met s.open op codenaam; let wel: een suite ONTSTAAT open (kern/residentie/index.js suiteVan, open: true), dus wie zijn suite opent staat in de gids zonder zelf voor open te kiezen -- een productvraag over de standaard, geen IDOR',
   'POST /api/carriere/ledger/zet': 'carriereledger.zet(key, data) leest geen id en schrijft een NIEUW feit in reeks(key) van B; de tegenpoging gaf 409 "staat er al, woord voor woord" door B\'s eigen eerste regel',
   'POST /api/member/rtmail/team/maak': 'rtmailTeam.maak(sess, invoer) leest geen id en maakt een NIEUW team voor B op de naam uit het lijf; de tegenpoging met dezelfde naam gaf 400 "Dit adres bestaat al" door B\'s eigen eerste team',
+  /* Horeca-createroutes (gang 5): folio/open maakt een gastrekening per kamer in
+     de EIGEN zaak (F(req.supplier.code)); folioVan filtert op de zaak. B's 200 is
+     B's eigen folio, en de tegenpoging gaf 409 omdat B met hetzelfde kamernummer
+     een tweede keer opende -- geen object van A. Met de hand nagelezen. */
+  'POST /api/supplier/horeca/folio/open': 'folio/open schrijft in F(req.supplier.code): B opent zijn EIGEN gastrekening, en de 409 van de tegenpoging is B\'s eigen dubbele kamer',
   'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) leest het lijf niet: B verlaat zijn EIGEN stad, en de code van A doet niets'
 };
 const argv = process.argv.slice(2);
@@ -795,7 +800,16 @@ if (require.main !== module) { module.exports = {}; return; }
       const u = await zroep(r.pad, zLijf(r.pad), 11);
       if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { zPool.leer(u.data, r.pad); waarden(u.data, vanZaakA); }
     }
-    const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: () => ({}),
+    /* De zaak-opbouw (./lib/idoropbouw.js zaakStappen): zaak A maakt een band, en
+       bonCode + nummer gaan via ZAAK_VAN_A in B's lijf, zodat B een object van A
+       opzoekt (bon, club/band/terug). */
+    const zctx = {};
+    for (const st of opbouwLib.zaakStappen()) {
+      const lijf = typeof st.lijf === 'function' ? st.lijf(zctx) : (st.lijf || {});
+      const u = await zroep(st.pad, lijf, 11);
+      if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object' && typeof st.bewaar === 'function') { try { st.bewaar(u.data, zctx); } catch (e) {} }
+    }
+    const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: (pad) => opbouwLib.zaakVanA(pad, zctx),
       vanA: vanZaakA, controle: zControle, wie: () => [],
       roepA: (pad, lijf) => zroep(pad, lijf, 11), roepB: (pad, lijf) => zroep(pad, lijf, 12),
       tegenB: (pad, lijf) => post(pad, lijf, zaakTok[12]) });
@@ -895,7 +909,17 @@ if (require.main !== module) { module.exports = {}; return; }
     };
     const WA = await maakRuimte('A', A, ctx.merk), WB = await maakRuimte('B', B, 'B' + Date.now()), WC = await maakRuimte('C', C, 'C' + Date.now());
     const fout = [WA, WB, WC].map((x) => x.fout).filter(Boolean);
-    const wRoutes = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler');
+    /* EEN ROUTE DIE DE SLEUTEL VAN DE AANROEPER ROTEERT OF INTREKT, poisont de
+       rest van de gang: roteer je A's beheertoken, dan faalt elke A-ijk daarna.
+       Dezelfde klasse als /api/logout in de ledengang. Die routes meet deze gang
+       niet (ze zouden een eigen verse werkruimte per route vragen); ze krijgen
+       onbereikbaar met de reden. De 14 schermroutes van RTG Werk OS muteren geen
+       sleutel, dus die blijven gewoon meetbaar. */
+    const muteertEigenSleutel = (p) => /\/(sleutel\/(roteer|intrek)|lid\/(ontkoppel|uit-dienst|tekengrens|koppel))/.test(p);
+    const wRoutes = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler' && !muteertEigenSleutel(r.pad));
+    const wGeskipt = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler' && muteertEigenSleutel(r.pad));
+    for (const r of wGeskipt) perRoute[r.methode + ' ' + r.pad] = { gang: 'werkruimte', staat: 'onbereikbaar',
+      reden: 'deze route roteert of trekt de sleutel van de aanroeper in; in deze gang niet los te meten zonder een verse werkruimte per route' };
     werkruimte.routes = wRoutes.length;
     if (fout.length) werkruimte.reden = fout.join('; ');
     else {

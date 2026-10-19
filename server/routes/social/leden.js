@@ -156,7 +156,8 @@ app.post('/api/member/call', auth, (req, res) => {
   const c = connectieTussen(req.session.key, ander);
   if (!verbActief(c)) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
   const kind = String(req.body.kind || '');
-  if (!['ring', 'accept', 'offer', 'answer', 'ice', 'hangup', 'decline', 'busy'].includes(kind))
+  // 'tekst' is de meeleesregel (app-main-10.js csBaan, app-main-11.js toont hem)
+  if (!['ring', 'accept', 'offer', 'answer', 'ice', 'tekst', 'hangup', 'decline', 'busy'].includes(kind))
     return res.status(400).json({ error: 'Onbekend signaal.' });
   sseToCustomer(ander, 'call', {
     kind, from: req.session.key, codename: liveCodename(req.session),

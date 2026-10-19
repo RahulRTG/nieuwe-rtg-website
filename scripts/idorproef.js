@@ -895,7 +895,17 @@ if (require.main !== module) { module.exports = {}; return; }
     };
     const WA = await maakRuimte('A', A, ctx.merk), WB = await maakRuimte('B', B, 'B' + Date.now()), WC = await maakRuimte('C', C, 'C' + Date.now());
     const fout = [WA, WB, WC].map((x) => x.fout).filter(Boolean);
-    const wRoutes = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler');
+    /* EEN ROUTE DIE DE SLEUTEL VAN DE AANROEPER ROTEERT OF INTREKT, poisont de
+       rest van de gang: roteer je A's beheertoken, dan faalt elke A-ijk daarna.
+       Dezelfde klasse als /api/logout in de ledengang. Die routes meet deze gang
+       niet (ze zouden een eigen verse werkruimte per route vragen); ze krijgen
+       onbereikbaar met de reden. De 14 schermroutes van RTG Werk OS muteren geen
+       sleutel, dus die blijven gewoon meetbaar. */
+    const muteertEigenSleutel = (p) => /\/(sleutel\/(roteer|intrek)|lid\/(ontkoppel|uit-dienst|tekengrens|koppel))/.test(p);
+    const wRoutes = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler' && !muteertEigenSleutel(r.pad));
+    const wGeskipt = routes.filter((r) => /^\/api\/(bedrijf|tenant)\//.test(r.pad) && r.rol === 'handler' && muteertEigenSleutel(r.pad));
+    for (const r of wGeskipt) perRoute[r.methode + ' ' + r.pad] = { gang: 'werkruimte', staat: 'onbereikbaar',
+      reden: 'deze route roteert of trekt de sleutel van de aanroeper in; in deze gang niet los te meten zonder een verse werkruimte per route' };
     werkruimte.routes = wRoutes.length;
     if (fout.length) werkruimte.reden = fout.join('; ');
     else {

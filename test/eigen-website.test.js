@@ -203,3 +203,19 @@ test('6. de fotobibliotheek is per lid, en neemt alleen eigen media aan', async 
   assert.equal(weg.status, 200);
   assert.equal(weg.body.fotos.length, 0, 'en een foto gaat er weer af');
 });
+
+/* Een nieuw ontwerp heeft nog geen id. Kwam het antwoord op de eerste bewaring
+   niet aan, dan stuurt de maker dezelfde herhaalsleutel opnieuw mee (de knop of
+   de volgende autosave): dat hoort dezelfde site te zijn, geen tweede. */
+test('7. een herhaalde eerste bewaring maakt geen tweede site', async () => {
+  const ontwerp = (kop) => ({ design: { titel: 'Herhaal', idem: 'eerste-bewaring-1', blokken: [{ type: 'hero', kop }] } });
+  const a = await api('/api/site/bewaar', ontwerp('een'), lid);
+  const b = await api('/api/site/bewaar', ontwerp('twee'), lid);
+  assert.equal(a.status, 200);
+  assert.equal(b.status, 200);
+  assert.equal(b.body.design.id, a.body.design.id, 'de herhaling bewaart in dezelfde site');
+  const mijn = (await api('/api/site/mijn', {}, lid)).body.lijst.filter(x => x.titel === 'Herhaal');
+  assert.equal(mijn.length, 1);
+  const c = await api('/api/site/bewaar', ontwerp('van de buur'), buur);
+  assert.notEqual(c.body.design.id, a.body.design.id, 'dezelfde sleutel van een ander lid is een eigen site');
+});

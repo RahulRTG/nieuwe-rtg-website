@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "bce1c2e8",
+  "commit": "10397ba5",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/office/app/app-01b.js"
+    "public/apps/sitemaker.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,9 +7822,9 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1078,
-  "verwijzingen": 1306,
-  "voorvoegsels": 139,
+  "exactePaden": 1092,
+  "verwijzingen": 1320,
+  "voorvoegsels": 138,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -14393,6 +14393,104 @@
    "aantal": 1
   },
   {
+   "pad": "/api/site/ai",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/bewaar",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/foto",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/fotos",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/haal",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/herstel",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/live",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/mijn",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/offline",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/persoonlijk",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/publiceer",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/sjablonen",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/sjabloon",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/site/versies",
+   "schermen": [
+    "public/apps/sitemaker.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/sociaal/command",
    "schermen": [
     "public/apps/sociaal.html"
@@ -18801,11 +18899,23 @@
   {
    "bestand": "public/apps/sitemaker.html",
    "exact": [
-    "/api/salon/promo"
+    "/api/salon/promo",
+    "/api/site/ai",
+    "/api/site/bewaar",
+    "/api/site/foto",
+    "/api/site/fotos",
+    "/api/site/haal",
+    "/api/site/herstel",
+    "/api/site/live",
+    "/api/site/mijn",
+    "/api/site/offline",
+    "/api/site/persoonlijk",
+    "/api/site/publiceer",
+    "/api/site/sjablonen",
+    "/api/site/sjabloon",
+    "/api/site/versies"
    ],
-   "voorvoegsels": [
-    "/api/site/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/sociaal.html",

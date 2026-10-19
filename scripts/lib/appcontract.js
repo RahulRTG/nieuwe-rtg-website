@@ -245,6 +245,9 @@ const CONTRACT = {
   'link:office': Object.assign({
     belofte: 'een medewerker maakt een document in de kantoordrive, bewaart met versies en zet een versie terug; een oud venster schrijft er niet overheen en een zaak of lid komt er niet bij'
   }, voltooi('office', 'het scenario loopt /api/office/kantoorpakket/mijn, /maak, /open, /bewaar, /versies en /terug, het voorvoegsel dat /apps/office.html in de kantoorstand aanroept, met een zaak en een lid die er niet bij komen')),
+  'link:sitemaker': Object.assign({
+    belofte: 'een lid bouwt een eigen website, zet hem online en bepaalt zelf wanneer een wijziging naar buiten gaat, en een ander lid komt er niet aan'
+  }, voltooi('sitemaker', 'het scenario loopt /api/site/sjablonen, /mijn, /haal, /bewaar, /publiceer, /live, /versies, /herstel en /offline, de routes die /apps/sitemaker.html zelf aanroept, met een bezoeker via /api/browser/open en een ander lid dat er niet bij komt')),
   /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
      voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
      afrekenen en meet daarnaast de herstart, de crash en de offline sync; een

@@ -77,6 +77,11 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
     const s = store();
     let bestaand = null;
     if (d.id) bestaand = s.lijst.find(x => x.id === scho(d.id, 20) && x.eigenaar === key);
+    /* Een NIEUW ontwerp heeft nog geen id, dus de maker stuurt een herhaalsleutel
+       mee. Kwam het antwoord op de eerste bewaring niet aan (afgebroken, een
+       herstart), dan bewaart de volgende in dezelfde site in plaats van een
+       tweede te maken (gevonden door scripts/lib/voltooi/sitemaker.js). */
+    if (!bestaand && !d.id && d.idem) bestaand = s.lijst.find(x => x.eigenaar === key && x.idem && x.idem === scho(d.idem, 60)) || null;
     if (!bestaand && s.lijst.filter(x => x.eigenaar === key).length >= PER_LID) {
       return { error: 'Je hebt het maximum aantal websites bereikt. Verwijder er eerst een.', status: 400 };
     }

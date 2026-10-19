@@ -215,7 +215,7 @@
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
-const api=(pad,body)=>fetch('/api/site/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+const api=(pad,body)=>fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
 function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
 
 const BEELDEN=['bamboe','hero','huis-omslag','jet','kaiseki','kyoto-suite','onsen','palacio','riad'].map(n=>'/campagne/'+n+'.jpg');
@@ -287,7 +287,7 @@ $('#aiKnop').addEventListener('click',async()=>{
   stashPagina();
   meld('De assistent denkt na…');
   try{
-    const r=await api('ai',{design:Object.assign({},DESIGN,{blokken:HOMEBLOK}),opdracht});
+    const r=await api('/api/site/ai',{design:Object.assign({},DESIGN,{blokken:HOMEBLOK}),opdracht});
     if(!r.design){ meld(r.antwoord||'Geen wijziging.'); return; }
     const d=r.design;
     if(d.titel)DESIGN.titel=d.titel;
@@ -483,7 +483,7 @@ function bouwBeeldgrid(){
   MIJNFOTOS.forEach(src=>beeldTegel(g,src,'Eigen foto'));
   salon.forEach(f=>beeldTegel(g,f.src,f.naam?('Uit De Salon · '+f.naam):'Uit De Salon'));
 }
-async function laadMijnFotos(){ try{ const r=await api('fotos',{}); MIJNFOTOS=(r.fotos||[]); }catch(e){} }
+async function laadMijnFotos(){ try{ const r=await api('/api/site/fotos',{}); MIJNFOTOS=(r.fotos||[]); }catch(e){} }
 async function laadSalon(){ try{ const r=await fetch('/api/salon/promo',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:'{}'}); const d=await r.json().catch(()=>({})); if(r.ok)SALONFOTOS=(d.fotos||[]); }catch(e){} }
 function leesBestand(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>rej(new Error('lezen mislukt')); fr.readAsDataURL(file); }); }
 function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{const nb=nieuwBlok(bt.t);DESIGN.blokken.push(nb);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>DESIGN.volgorde[k].push(nb.id));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
@@ -510,8 +510,11 @@ function lintBij(){
 async function bewaar(stil){
   DESIGN.titel=$('#titel').value.trim()||'Mijn website';
   stashPagina();
+  /* Een nieuw ontwerp heeft nog geen id: een herhaalsleutel zorgt dat een
+     herhaling na een afgebroken bewaring geen tweede site maakt. */
+  if(!DESIGN.id&&!DESIGN.idem) DESIGN.idem=RTGId('site');
   const payload=Object.assign({},DESIGN,{blokken:HOMEBLOK});
-  try{ const d=await api('bewaar',{design:payload});
+  try{ const d=await api('/api/site/bewaar',{design:payload});
     DESIGN.id=d.design.id; DESIGN.adres=d.design.adres||''; DESIGN.online=!!d.design.online;
     // bewaren verandert het concept: staat de site online, dan wacht dit op publiceren
     DESIGN.wacht=!!DESIGN.online;
@@ -536,9 +539,9 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
 });
 async function openen(){
   $('#versievak').hidden=true;   // het sheet doet twee dingen; toon alleen wat je vroeg
-  try{ const d=await api('mijn'); MIJNSITES=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
+  try{ const d=await api('/api/site/mijn'); MIJNSITES=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div class="s-1eltjr2">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
-    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
+    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('/api/site/haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
     laadSjablonen();
   }catch(e){ meld(e.message); }
@@ -554,14 +557,14 @@ function laadOntwerp(d,bericht){
 /* wat je bewaarde staat in je concept; hiermee gaat het naar buiten */
 $('#liveKnop').addEventListener('click',async()=>{
   if(!DESIGN.id)return;
-  try{ await api('live',{id:DESIGN.id}); DESIGN.wacht=false; lintBij(); meld('Je wijzigingen staan online.'); }
+  try{ await api('/api/site/live',{id:DESIGN.id}); DESIGN.wacht=false; lintBij(); meld('Je wijzigingen staan online.'); }
   catch(e){ meld(e.message); }
 });
 $('#terugKnop').addEventListener('click',async()=>{
   if(!DESIGN.id){ meld('Bewaar je site eerst; daarna houdt hij zijn geschiedenis bij.'); return; }
   const vak=$('#versievak'),l=$('#versielijst');
   try{
-    const d=await api('versies',{id:DESIGN.id});
+    const d=await api('/api/site/versies',{id:DESIGN.id});
     const lijst=d.lijst||[];
     l.textContent='';
     if(!lijst.length){ l.innerHTML='<div class="s-1eltjr2">Nog geen eerdere versies. Vanaf je volgende bewaring staat de vorige stand hier.</div>'; }
@@ -572,7 +575,7 @@ $('#terugKnop').addEventListener('click',async()=>{
       const hb=document.createElement('button');hb.textContent='Zet terug';
       hb.addEventListener('click',async()=>{
         if(!confirm('Deze versie terugzetten? Je huidige stand gaat naar de geschiedenis, dus je kunt weer vooruit.'))return;
-        try{ const rr=await api('herstel',{id:DESIGN.id,i:v.i}); laadOntwerp(rr.design,'Teruggezet. Je adres en online-stand zijn ongemoeid gebleven.'); }
+        try{ const rr=await api('/api/site/herstel',{id:DESIGN.id,i:v.i}); laadOntwerp(rr.design,'Teruggezet. Je adres en online-stand zijn ongemoeid gebleven.'); }
         catch(e){ meld(e.message); }
       });
       r.appendChild(hb);l.appendChild(r);
@@ -583,13 +586,13 @@ $('#terugKnop').addEventListener('click',async()=>{
 /* de persoonlijke pagina: in een keer gegenereerd op je codenaam en meteen online */
 $('#persoonlijkKnop').addEventListener('click',async()=>{
   try{
-    const r=await api('persoonlijk');
+    const r=await api('/api/site/persoonlijk');
     laadOntwerp(r.design, r.bestond?'Je persoonlijke pagina stond er al -- hier is hij.':'Je pagina staat online op '+r.adres+'.rtg. Maak hem nu van jou.');
   }catch(e){ meld(e.message); }
 });
 /* de etalage van het Atelier: een sjabloon als startpunt voor een NIEUWE site */
 async function laadSjablonen(){
-  let d; try{ d=await api('sjablonen'); }catch(e){ return; }
+  let d; try{ d=await api('/api/site/sjablonen'); }catch(e){ return; }
   const lijst=d.lijst||[]; if(!lijst.length) return;
   const vak=$('#sjabloonvak'); vak.hidden=false;
   const l=$('#sjabloonlijst'); l.textContent='';
@@ -599,7 +602,7 @@ async function laadSjablonen(){
     const kb=document.createElement('button');kb.textContent='Gebruik';
     kb.addEventListener('click',async()=>{
       try{
-        const s=(await api('sjabloon',{id:it.id})).sjabloon;
+        const s=(await api('/api/site/sjabloon',{id:it.id})).sjabloon;
         DESIGN={id:null,titel:s.titel,thema:s.thema,accent:s.accent,kleuren:s.kleuren||{},adres:'',online:false,
           blokken:(s.blokken||[]).map(b=>Object.assign({},b)),volgorde:s.volgorde||undefined};
         paginaReset();
@@ -622,11 +625,11 @@ function onlineSheet(){
 }
 async function publiceer(){
   const adres=$('#adresIn').value.trim();
-  try{ const r=await api('publiceer',{id:DESIGN.id,adres}); DESIGN.adres=r.adres; DESIGN.online=true; DESIGN.wacht=false; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je staat online op '+r.adres+'.rtg'); }
+  try{ const r=await api('/api/site/publiceer',{id:DESIGN.id,adres}); DESIGN.adres=r.adres; DESIGN.online=true; DESIGN.wacht=false; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je staat online op '+r.adres+'.rtg'); }
   catch(e){ meld(e.message); }
 }
 async function offline(){
-  try{ await api('offline',{id:DESIGN.id}); DESIGN.online=false; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je site is uit de lucht gehaald.'); }
+  try{ await api('/api/site/offline',{id:DESIGN.id}); DESIGN.online=false; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je site is uit de lucht gehaald.'); }
   catch(e){ meld(e.message); }
 }
 
@@ -640,7 +643,7 @@ else {
     const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f)return;
     if(f.size>2.2*1024*1024){ $('#uploadStatus').textContent='Te groot (max ~2 MB).'; return; }
     $('#uploadStatus').textContent='Scannen en opslaan…';
-    try{ const dataUrl=await leesBestand(f); const r=await api('foto',{dataUrl}); MIJNFOTOS=r.fotos||MIJNFOTOS; bouwBeeldgrid(); $('#uploadStatus').textContent='Toegevoegd. Klik de foto om hem te plaatsen.'; }
+    try{ const dataUrl=await leesBestand(f); const r=await api('/api/site/foto',{dataUrl}); MIJNFOTOS=r.fotos||MIJNFOTOS; bouwBeeldgrid(); $('#uploadStatus').textContent='Toegevoegd. Klik de foto om hem te plaatsen.'; }
     catch(err){ $('#uploadStatus').textContent=err.message||'Uploaden mislukt.'; }
   });
   $('#blokKnop').addEventListener('click',()=>$('#blokSheet').classList.add('open'));

@@ -57,7 +57,7 @@ async function loop(w, stap) {
   const open = await w.post('/api/rtfos/gift/stand/zet', { ontvanger: { soort: 'wallet', code: 'RTFOUNDATION' },
     vormen: ['eenmalig', 'geoormerkt', 'periodiek'], stand: 'open' }, K);
   if (open.status !== 200) throw new Error('de giftstand openzetten lukte niet (' + open.status + ')');
-  const ouder = await accountGezin(w, 'geef', { kind: true, tier: 'rtg' }); // RTG Pay vraagt een gebonden toestel, en dat bindt geen gratis account (routes/member/toestellen.js)
+  const ouder = await accountGezin(w, 'geef', { kind: true }); // een gratis account, met paspoort gezien: wallet en toestel horen bij elk account (AUTHORITY.md par. 7a)
   const vreemde = await nieuwLid(w, 'vreemd', 'guest');
   const toestel = await gebondenToestel(w, ouder.token);
   /* Wat er van de wallet van de gever afging, gelezen over RTG Pay: dat is de

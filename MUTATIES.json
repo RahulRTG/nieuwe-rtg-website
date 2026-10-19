@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-19T13:27:52.643Z",
-    "commit": "ac75cecb",
-    "boomVuil": true,
+    "op": "2026-10-19T14:23:09.061Z",
+    "commit": "cd8b32e2",
+    "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
@@ -1038,6 +1038,16 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "arrival-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/arrival-voorzijde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "arrival-security.test.js": {
       "soort": "puur",
@@ -5093,6 +5103,16 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 7
+    },
+    "flits-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/flits-voorzijde.js",
+      "operator": "api-actie-weg#0",
+      "geprobeerd": 3
     },
     "flits.test.js": {
       "soort": "server",
@@ -9581,6 +9601,16 @@
       "gezakt": 1,
       "geprobeerd": 10
     },
+    "luchthaven-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 6,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/luchthaven-bord.js",
+      "operator": "browser-export-weg#0",
+      "geprobeerd": 1
+    },
     "luchthaven-vip.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10189,6 +10219,16 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 16
+    },
+    "marechaussee-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/marechaussee.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "marechaussee.test.js": {
       "soort": "server",
@@ -11228,6 +11268,16 @@
       "module": "scripts/lib/native-artifact.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "navigatie-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/navigatie-zoek.js",
+      "operator": "api-actie-weg#0",
       "geprobeerd": 2
     },
     "navigatie-index.test.js": {
@@ -12316,6 +12366,26 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "ovcontrol-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 5,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/ovcontrol.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
+    "ovdienst-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/apps/ovdienst.js",
+      "operator": "route-doel-weg#0",
+      "geprobeerd": 4
+    },
     "overdracht.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12390,6 +12460,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 12,
       "scherp": "gezakt"
+    },
+    "ovroutes-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/ovroutes.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "padgrens.test.js": {
       "soort": "puur",
@@ -14120,6 +14198,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "reizen-ds.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reizen-register.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "reizen-veilig-ds.e2e.js": {
       "soort": "puur",

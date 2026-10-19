@@ -37,10 +37,18 @@ function socialeRoutes(kern) {
    Een gezinslid (geen gast) doet mee met dezelfde vriendenlaag als de RTG-app,
    zodat RTF en RTG elkaar op codenaam vinden, chatten, snappen en verhalen delen.
    Kinderen hebben ouderakkoord nodig. */
+const { padFunctie } = require('../kern/lidboard/catalogus');
 function rtfSociaal(req, res) {
   const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
   if (!sess) { res.status(403).json({ error: 'Log opnieuw in bij je gezin.' }); return null; }
   if (sess.gast) { res.status(403).json({ error: 'Als oppas of familielid doe je hier niet mee.' }); return null; }
+  /* Het bord geldt ook hier (test/kindboard-afdwingen.test.js): wat een ouder
+     op het bord van zijn kind uitzet, is op deze routes dicht. */
+  const fid = padFunctie(req.originalUrl || req.path);
+  if (fid && sess.handle && kern.lidboard.lidBoardUit(sess.handle, fid)) {
+    res.status(403).json({ error: 'Dit staat uit op je bord. Je ouder of verzorger kan het weer aanzetten.', functie: fid });
+    return null;
+  }
   return sess;
 }
 

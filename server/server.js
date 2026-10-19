@@ -1642,7 +1642,9 @@ const lidboard = { LIDBOARD_CAPS: _lidboard.LIDBOARD_CAPS, lidBoard: _lidboard.l
   lidBoardZet: _lidboard.lidBoardZet, lidBoardZetVeel: _lidboard.lidBoardZetVeel,
   lidBoardHerstel: _lidboard.lidBoardHerstel, lidBoardAan: _lidboard.lidBoardAan,
   lidBoardVersie: _lidboard.lidBoardVersie, lidBoardLog: _lidboard.lidBoardLog,
-  lidBoardLogWis: _lidboard.lidBoardLogWis };
+  lidBoardLogWis: _lidboard.lidBoardLogWis,
+  // de vriendenlaag van RTF handhaaft het bord zelf (routes/social.js, rtfSociaal)
+  lidBoardUit: _lidboard.lidBoardUit };
 
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,

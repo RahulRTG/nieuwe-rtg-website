@@ -94,6 +94,12 @@ const PAD_FUNCTIE = [
   ['/api/paspoort', 'paspoort'],
   ['/api/locatie', 'locatie'],
   ['/api/dm', 'dm'],
+  /* De vriendenlaag van de RTFoundation, op de gezinssessie: hier handhaaft
+     rtfSociaal (routes/social.js) en niet de ledenpoort. Een snap is een
+     privébericht met een foto, dus hij hoort bij dezelfde knop. */
+  ['/api/rtf/social/dm', 'dm'],
+  ['/api/rtf/social/snap', 'dm'],
+  ['/api/rtf/social/snaps', 'dm'],
   ['/api/salon', 'salon'],
   ['/api/ticket', 'tickets'],
   ['/api/order', 'bestellen'],

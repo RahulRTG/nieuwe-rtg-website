@@ -81,7 +81,7 @@
       waar.appendChild(b);
     });
   }
-  const centen = el => Math.round((Number(el.value) || 0) * 100);
+  const invoerInCenten = el => Math.round((Number(el.value) || 0) * 100);
   const naarEuro = c => (c ? (c / 100) : '');
 
   function vulBeleid(b) {
@@ -133,8 +133,8 @@
     /* Maak alle oudere GETs ongeldig voordat de mutatie onderweg gaat. */
     beleidVraag++;
     const r = await api('beleid', { zet: true,
-      maxPrijs: centen($('#bMax')), goedkeuringVanaf: centen($('#bDrempel')),
-      budgetPerMaand: centen($('#bBudget')),
+      maxPrijs: invoerInCenten($('#bMax')), goedkeuringVanaf: invoerInCenten($('#bDrempel')),
+      budgetPerMaand: invoerInCenten($('#bBudget')),
       van: $('#bVan').value || null, tot: $('#bTot').value || null,
       dagen, steden: lijst($('#bSteden').value), kostenplaatsen: lijst($('#bKp').value),
       kostenplaatsVerplicht: $('#bKpVerplicht').value === '1' });

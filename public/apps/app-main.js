@@ -4066,7 +4066,9 @@ var RTG_BOUW = '7be75ecc';
     uitgaan:     { naam: 'Uitgaan',       url: '/apps/uitgaan.html' },
     foodcourt:   { naam: 'Food Court',    url: '/apps/foodcourt.html' },
     spelavond:   { naam: 'Game Night',    url: '/apps/spelscherm.html' },
-    tweedescherm:{ naam: 'Tweede scherm', url: '/apps/scherm.html' },
+    /* Het tweede scherm toont keuken, bar en kassa van een zaak en leest alleen de
+       zaaksessie (rtg_sup_token); een lid zag een tegel die nooit opende. */
+    tweedescherm:{ naam: 'Tweede scherm', url: '/apps/scherm.html', werkrol: 'zaak' }, // zie app-main-24a3.js
     /* Het inkoopdossier staat bij het LID en niet achter een kantoorpoort
        (APPSTORE.md). Dat het nergens aan hing, maakte die belofte leeg. */
     appdossier:  { naam: 'App-dossier',   url: '/apps/appstore-dossier.html' },

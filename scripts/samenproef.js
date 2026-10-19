@@ -308,7 +308,9 @@ async function reisNaarAgenda({ pw, browserOpties, base, api }) {
    (rtg-schil/05-context.js) en volgt de Agenda: ze zoekt in de EIGEN afspraken
    en springt naar de dag. Geen enkele app stuurt vandaag context; de proef zet
    hem met RTGSchil.context, de API van de console. Schakel 1 staat daarom open
-   met de reden: zonder afzender is de keten niet af. */
+   met de reden: zonder afzender is de keten niet af. Schakel 4 en 5 lezen de
+   console van de schil (context-volgt, LivingOS-B ddf06dded op
+   appwerkt/living-b); op een schil zonder die lezer zakken ze, terecht. */
 async function contextNaarAgenda({ pw, browserOpties, base, api }) {
   const t = teller();
   const nieuwLid = async (naam) => {
@@ -347,10 +349,18 @@ async function contextNaarAgenda({ pw, browserOpties, base, api }) {
     const v = await volgden(a);
     t.schakel(3, 'de Agenda meldt de schil dat ze volgt, met wat ze doet en zonder gegevens',
       v.length === 1 && v[0].id === REF.id && Object.keys(v[0]).sort().join() === 'id,rtg,soort,wat', JSON.stringify(v).slice(0, 200));
+    /* De schil toont in haar console wie volgt (contract context-volgt): een
+       regel per volgende surface, met de naam van de surface en de zin `wat`. */
+    const consoleRegel = async () => a.page.evaluate(() => [...document.querySelectorAll('[data-context] [data-volgt]')].map((e) => e.textContent));
+    const getoond = await wachtOp(async () => (await consoleRegel()).some((r) => /volgt: 1 afspraak/.test(r)), 3000);
+    t.schakel(4, 'de schil toont in de console wie de context volgt, met de zin van de Agenda',
+      getoond, JSON.stringify(await consoleRegel()));
     await zet(a, null);
     const weg = await wachtOp(async () => (await stand(a)).context === null);
     const na = await stand(a);
-    t.schakel(4, 'context weg (null) zet de Agenda terug zoals ze was', weg && !na.regel, weg ? 'contextregel weg' : 'context bleef staan');
+    const consoleNa = await consoleRegel();
+    t.schakel(5, 'context weg (null) zet de Agenda terug zoals ze was, en de console laat los', weg && !na.regel && consoleNa.length === 0,
+      (weg ? 'contextregel weg' : 'context bleef staan') + (consoleNa.length ? '; console toont nog ' + JSON.stringify(consoleNa) : ''));
 
     /* ===== storingen ===== */
     /* Elke storing begint zonder context. Een soort die de Agenda niet kent zet

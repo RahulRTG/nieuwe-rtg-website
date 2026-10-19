@@ -138,6 +138,9 @@ const CONTRACT = {
   'link:rtgcode': Object.assign({
     belofte: 'een lid toont een levende, ondertekende code die alleen de RTG-app maakt en leest en die na een halve minuut vervalt; een valse, gewone of verlopen code wordt geweigerd, een ander lid leest er niets van het lid uit, en de code overleeft een herstart en een crash -- en hij is persoonlijk, zoals het scherm belooft'
   }, voltooi('rtgcode', 'het scenario loopt /api/code/dyn en /api/code/scan, de routes die /apps/geld.html#rtgcode (apps/geld/rtgcode.js en rtgcodeb.js) zelf aanroept, met een tweede lid dat de code scant')),
+  'link:geldcommand': Object.assign({
+    belofte: 'een lid ziet hoe het er financieel voor staat, zet potten en regels binnen de harde grens van GELD.md en leest elke handeling terug in het actielog -- een ander lid ziet of raakt er niets van, en een dubbele tik, een afgebroken verzoek of een crash zet een bedrag nooit twee keer opzij'
+  }, voltooi('geldcommand', 'het scenario loopt /api/geld/cockpit, /beleid, /beleid/zet, /api/geld/pot/zet, /reserveer, /weg en /api/geld/actielog, de routes die de eerste stand van /apps/geld.html (apps/geld/overzichtb.js en overzichtc.js) zelf aanroept, met een tweede lid dat er niet bij mag')),
   /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'

@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "e1eed930",
+  "commit": "d267186e",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/foundation/os-publiek.html"
+    "public/apps/foundation/os-portaal.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -7822,8 +7822,8 @@
  "gemeten": {
   "schermenMetPad": 450,
   "nietGelezen": 0,
-  "exactePaden": 1104,
-  "verwijzingen": 1331,
+  "exactePaden": 1107,
+  "verwijzingen": 1334,
   "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
@@ -10678,6 +10678,27 @@
    "pad": "/api/rtf/leven/deel/zet",
    "schermen": [
     "public/apps/foundation/mijnbanden.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/gemeente",
+   "schermen": [
+    "public/apps/foundation/os-portaal.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/ondernemer",
+   "schermen": [
+    "public/apps/foundation/os-portaal.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/partner",
+   "schermen": [
+    "public/apps/foundation/os-portaal.html"
    ],
    "aantal": 1
   },
@@ -16745,10 +16766,12 @@
   },
   {
    "bestand": "public/apps/foundation/os-portaal.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfos/portaal/"
-   ]
+   "exact": [
+    "/api/rtfos/portaal/gemeente",
+    "/api/rtfos/portaal/ondernemer",
+    "/api/rtfos/portaal/partner"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/foundation/os-publiek.html",

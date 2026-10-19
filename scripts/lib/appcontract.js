@@ -188,6 +188,9 @@ const CONTRACT = {
   'link:rtfbuurt': Object.assign({
     belofte: 'wie in een stad woont ziet welke RTF-afdeling open is, wat er loopt, waar hij binnen kan lopen en welke campagne er is -- en niets wat niet op een poster in het buurthuis zou hangen'
   }, voltooi('rtfbuurt', 'het scenario loopt /api/rtfos/publiek/steden, /stad en /campagnes, de routes die /apps/foundation/os-publiek.html zelf aanroept, met wat het kantoor opent en stopt')),
+  'link:rtfportaal': Object.assign({
+    belofte: 'een partnerstichting, gemeente of ondernemer opent met de code van het kantoor zijn eigen dossier -- de gemeente alleen getelde cijfers -- en elke code opent precies een dossier'
+  }, voltooi('rtfportaal', 'het scenario loopt /api/rtfos/portaal/partner, /gemeente en /ondernemer, de routes die /apps/foundation/os-portaal.html zelf aanroept, met codes die het kantoor uitgaf en een tweede stichting')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

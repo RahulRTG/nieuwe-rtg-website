@@ -103,6 +103,9 @@ setInterval(function(){if(!d.hidden&&!busy)load();},60000);
    (elk element met data-ds-actie, /ds/edge-modi.js). Precies een: de
    hoofdactie van wat nu open staat, en anders de tab Wereld. */
 function syncEdge(){
+  /* Het adaptieve register (RTGAdaptief) weet waar het lid is; dat is gedrag
+     en geen vorm, dus het blijft ook op het Design System. */
+  if(w.RTGAdaptief)w.RTGAdaptief.context({bron:'living-world',titel:selection?'Living World · '+selection.type:tab==='plans'?'Mijn ervaringen':tab==='studio'?'Werkplaats':'Living World'});
   var primary=d.querySelector('#lwContent [data-lw-primary]')||d.querySelector('[data-lw-tab="world"]');
   d.querySelectorAll('#lwMain [data-ds-actie]').forEach(function(b){b.removeAttribute('data-ds-actie');});
   if(primary)primary.setAttribute('data-ds-actie',primary.textContent.trim()||'Ontdek uw wereld');

@@ -417,9 +417,7 @@ const ALLEEN_ANONIEM = new Map([
 
      WAAROM HIER EN NIET BIJ PUBLIEK: keuringsregel 28 leest alleen
      `app.post('/api/...')`; deze route hangt aan de router onder /api/foundation. */
-  ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend'],
-  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js'],
-  ['/api/foundation/les/join', 'meedoen zonder account: de 128-bit lescode IS de geloofsbrief en wordt atomair geclaimd (B17); rem per ip, plafond 60 per les']
+  ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend']
 ]);
 
 /* De som, voor de poortwacht. Een pad dat in beide lijsten zou staan is een

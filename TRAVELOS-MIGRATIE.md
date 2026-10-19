@@ -217,3 +217,134 @@ Een route telt pas als gemigreerd als alle punten hieronder aantoonbaar zijn.
   TravelOS-primitieven in `tokens.css`. Voor tekst kunnen ze pas worden
   vastgezet als het contrast is gemeten (WCAG 2.2 AA), en na de keuring van
   `check.js` regel 23 dat geen ervan een haar naast een logokleur ligt.
+
+## 5. Eindrapport (19 oktober 2026)
+
+Alle 30 TravelOS-schermen staan op het RTG Design System. Elk scherm laadt
+alleen `/fonts/fonts.css` en `/ds/rtg-ds.css`, draagt geen `<style>`-blok en
+geen `style=""`, en heeft zijn eigen browsertoets tegen de echte server
+(`contract.json` → `bewijs`). `node scripts/ontwerpsysteem.js --controle`:
+geen schendingen, 30 schermen gemigreerd.
+
+### 5a. De drie getallen
+
+| Wat | Voor (basis #688) | Na | Verschil |
+|---|---|---|---|
+| Erfenisbladen in de repository | 179 | 168 | 11 weg, 140.454 bytes |
+| Inline `<style>`-blokken op de 30 schermen | 38 (118.363 bytes) | 0 | alle 38 weg |
+| Erfenisbladen die één TravelOS-scherm laadt | 45 tot 58 | 0 | |
+| `!important` in de erfenis | 7.503 | 7.393 | 110 minder |
+| Losse hexkleuren in de erfenis | 5.639 | 5.304 | 335 minder |
+
+Weggehaalde bladen (geen enkel scherm laadt ze nog): `reizen-performance.css`
+(41.881), `chauffeur.css` (20.668), `navigatie-premium.css` (15.416),
+`rtg-reisboek-2026.css` (15.624), `rtg-vlucht-2026.css` (10.236),
+`rtg-verblijven-2026.css` (8.629), `rtg-aankomst-momenten-2026.css` (8.724),
+`rtg-aankomst-2026.css` (8.168), `living-world/world.css` (4.929),
+`rtg-verblijven-momenten-2026.css` (3.626), `travelos-materiaal.css` (2.553).
+De overige bladen die deze schermen vroeger laadden, worden nog door andere
+werelden gebruikt en blijven dus staan.
+
+**Gebruikersstromen die aantoonbaar blijven werken.** 30 nieuwe
+ds-browsertoetsen met samen 175 deeltoetsen, op het eindresultaat in één ronde
+gedraaid: 174 groen en 1 wedloop in de toets zelf (boeken), gerepareerd en
+daarna groen. Elke nieuwe toets heeft een mutatieproef: met een opzettelijke
+fout in de code van zijn scherm zakt hij (`MUTATIES.json`). Daarnaast zijn 57
+bestaande toetsbestanden herschreven naar wat ze bewaakten; geen enkele is
+verwijderd of overgeslagen. De 24 bestaande toetsbestanden die een
+gemigreerd scherm openen en de oude Edge kenden: 199 van 199 groen.
+
+### 5b. Per scherm
+
+| Scherm | Schermtype(n) | Erfenis voor → na | Inline stijl weg | Browsertoets |
+|---|---|---|---|---|
+| reizen | Cover, Collectie, Taak, Gesprek | 58 → 0 | 1.550 B + blad 41.881 B | `reizen-ds` |
+| reisbureau | Collectie, Gesprek, Detail, Taak | 54 → 0 | 7.363 B | `reisbureau-ds` |
+| hotels | Collectie, Detail, Taak, Status | 56 → 0 | 575 B + 2 bladen | `hotels-ds` |
+| vluchten | Collectie, Detail, Taak | 55 → 0 | 5.224 B + blad | `vluchten-ds` |
+| reisboek | Detail, Collectie, Taak | 54 → 0 | blad 15.624 B | `reisboek-ds` |
+| rit | Taak, Detail, Status | 55 → 0 | 2 bladen | `rit-ds` |
+| ov | Taak, Detail | 53 → 0 | 12.718 B | `ov-ds` |
+| navigatie | Canvas | 54 → 0 | 13.025 B + blad 15.416 B | `navigatie-ds` |
+| move | Status, Collectie | 51 → 0 | 8.602 B | `move-ds` |
+| reizen-veilig | Collectie, Taak, Status | 53 → 0 | | `reizen-veilig-ds` |
+| arrival | Gesprek, Taak, Detail | 45 → 0 | 1.896 B | `arrival-ds` |
+| flits | Collectie, Taak | 53 → 0 | 4.232 B | `flits-ds` |
+| hangar | Collectie, Detail, Taak, Gesprek | 53 → 0 | 4.446 B | `hangar-ds` |
+| zakelijk | Collectie, Taak | 51 → 0 | 4.399 B | `zakelijk-ds` |
+| reisuitnodiging | Detail, Taak, Status | 54 → 0 | 593 B | `reisuitnodiging-ds` |
+| living-world | Collectie, Detail, Taak | 52 → 0 | blad 4.929 B | `living-world-ds` |
+| luchthaven | Taak, Collectie | 53 → 0 | 5.697 B | `luchthaven-ds` |
+| marechaussee | Taak, Collectie | 52 → 0 | 5.296 B | `marechaussee-ds` |
+| ovdienst | Taak, Detail, Status | 54 → 0 | 4.406 B | `ovdienst-ds` |
+| ovroutes | Collectie, Taak | 53 → 0 | 4.373 B | `ovroutes-ds` |
+| ovcontrol | Collectie, Status | 46 → 0 | 2.179 B | `ovcontrol-ds` |
+| dispatch | Collectie, Taak | 51 → 0 | 3.982 B | `dispatch-ds` |
+| chauffeur | Taak, Status | 46 → 0 | blad 20.668 B | `chauffeur-ds` |
+| ghost | Collectie | 52 → 0 | 2.431 B | `ghost-ds` |
+| voertuig | Detail, Collectie | 51 → 0 | 1.924 B | `voertuig-ds` |
+| routedossier | Collectie, Detail | 52 → 0 | 4.812 B | `routedossier-ds` |
+| routedekking | Collectie | 51 → 0 | 3.210 B | `routedekking-ds` |
+| residentie | Canvas | 53 → 0 | 8.333 B | `residentie-ds` |
+| boeken | Collectie, Detail | 53 → 0 | 3.009 B | `boeken-ds` |
+| stad | Taak, Status | 53 → 0 | 4.088 B | `stad-ds` |
+
+### 5c. Wat er tijdens de migratie aan het systeem is bijgekomen
+
+Componenten: `paneel`, `overgang`, `meter`, `lezer`, `canvaslaag`,
+`handelingen`, `rooster`, `sectie`, `vel`, `beeldsnede`. Gedeeld gedrag:
+`/ds/register.js` (de vier acties per reisregel), ingebedde schermen zonder
+tweede Edge of kop, `[hidden]` dat altijd wint (de enige toegestane
+`!important`, in `reset.css`), de mediamelding en de Meenemen-knop in ds-vorm.
+Overgangsscripts erbij, elk met reden en vervaldatum 31 januari 2027:
+`plek.js` (locatie voor inchecken), `plaatsnadering.js` (de aankomstpuls) en
+`magnaat-sandbox.js` (de zichtbaar gemarkeerde Magnaat-proef).
+
+### 5d. Functies die eerst wegvielen en terug zijn gezet
+
+- Het eigen hoofdbeeld van de TravelOS-wereld (Foto wijzigen, desktop- en
+  mobiele snede): terug op de Cover, zonder inline stijl.
+- Delen, Kenmerk en Overnemen per reisregel (vroeger veeggebaren): terug als
+  rustige knoppen onder elke regel, uit één gedeelde bouwer.
+- Het adaptieve register op Living World.
+- De aankomstpuls op arrival.
+
+Gerepareerde bestaande fouten: voertuigpapieren toonden "geen einddatum" bij
+geldige papieren; een Moment starten op Reizen & Veilig gaf een fout na de
+serveraanroep; de scanknop van ovdienst opende nooit de camera omdat de
+scanner niet geladen werd (zie 5f).
+
+### 5e. Bewuste afwijkingen
+
+- **Beeld.** Nieuwe fotografie kan in deze omgeving niet worden gemaakt
+  (de beeldgenerator is niet bereikbaar). Alle beelden komen uit
+  `public/campagne/` en `public/images/worlds/`; er is geen eigen beeld per
+  bestemming, boek, kamer of stadsloket. Die plekken dragen tekstkaarten.
+- **Weggelaten oude modules die zelf stijl zetten:** `klok.js` en
+  `uurwerk.js` (de klok is nu een gewone tijd), `gebaar.js` (vervangen, zie
+  5d), `deur.js` (vervangen door een ds-deur met dezelfde tekst),
+  `deelmenu.js`, `rtg-onthul.js`, `mond.js` (de Edge draagt de lippen).
+- **Betekeniskleur** (ruim, krap, rood, groen) bestaat niet als token; die
+  uitkomsten staan in woorden.
+- **Desktop-wereldcompositie van TravelOS:** het inlogpaneel, de
+  favoriete widgets en de widgetbibliotheek op 1440 px bestaan niet op het
+  Design System.
+- **Edge-modi** oproep, carrousel en e-mail opstellen: nog niet aangesloten
+  (zie par. 4).
+
+### 5f. Besluiten voor de eigenaar
+
+1. **Wereld van residentie, boeken en stad.** De code wijst bij residentie
+   en boeken naar LivingOS en bij stad naar bewoners. Aanbeveling: residentie
+   en boeken naar LivingOS; stad blijft in TravelOS met tekst voor
+   bezoekers, of gaat naar FoundationOS naast het gemeenteloket.
+2. **Desktop-widgets op TravelOS** terugbouwen op het Design System, of
+   bewust laten vallen.
+3. **"Geboekt:"** in de melding na een door de server bevestigde interne
+   vluchtboeking: zo laten of "Vastgelegd:".
+4. **ovdienst-scanknop** opent nu echt de camera; bevestigen.
+5. **Rahul-concept en taakbeeld** naar de ds-Edge brengen.
+6. **Demovlag** op `/api/stad/bewoner`, zodat de demovloot van stad
+   zichtbaar gemarkeerd kan worden.
+7. **Zakelijk vervoer voor hotels** (de genre-matrix van mobiliteit sluit ze
+   nu uit).

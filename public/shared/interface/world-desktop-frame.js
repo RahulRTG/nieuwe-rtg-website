@@ -64,7 +64,7 @@
         x.observer = new MutationObserver(function () { if (current === x) refreshEdge(); });
         x.observer.observe(doc.body, { subtree: true, childList: true, attributes: true,
           attributeFilter: ['disabled', 'hidden', 'aria-disabled', 'aria-selected'] });
-        if (win.RTGi18n && win.document.documentElement.lang !== d.documentElement.lang) win.RTGi18n.set(d.documentElement.lang);
+        if (win.RTGi18n && win.document.documentElement.lang !== d.documentElement.lang) win.RTGi18n.set(d.documentElement.lang, false);
         x.ready = true; if (current === x) { notice.hidden = true; direct.hidden = true; retry.hidden = true; refreshEdge(); prepare(x.action); }
       } catch (e) { failed(x); }
     }
@@ -120,7 +120,7 @@
       if (source && !source.disabled) { current.action = null; source.click(); }
     }
     w.addEventListener('rtglang', function () {
-      entries.forEach(function (x) { try { if (x.frame.contentWindow.RTGi18n) x.frame.contentWindow.RTGi18n.set(d.documentElement.lang); } catch (e) {} });
+      entries.forEach(function (x) { try { if (x.frame.contentWindow.RTGi18n) x.frame.contentWindow.RTGi18n.set(d.documentElement.lang, false); } catch (e) {} });
     });
     w.addEventListener('pagehide', function () { entries.forEach(function (x) { clearTimeout(x.timer); if (x.observer) x.observer.disconnect(); }); });
     w.addEventListener('storage', function (e) { if (e.key == null || e.key === 'rtg_member_token' || e.key === 'rtf_sessie') w.location.reload(); });

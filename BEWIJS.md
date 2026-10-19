@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2844 bestanden en 19601 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2844 bestanden en 19602 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2844 |
-| losse beweringen (`test(...)`) | 19601 |
+| losse beweringen (`test(...)`) | 19602 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2504 bestanden, 19027 beweringen.
+2504 bestanden, 19028 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2018,7 +2018,7 @@ toets omvalt.
 | `sonde-bewaking.test.js` | 8 | gezakt op `liegpoort /api/` | DE SONDE VAN BUITENAF, ONAFHANKELIJK GETOETST (WEERBAARHEID.md par. 9a stap 2 en par. |
 | `sospositie.test.js` | 8 | gezakt op `true->false#0` | EEN SOS-POSITIE HOORT BIJ DE MELDING (NAVIGATIE.md N18). Vijf stromen, een regel (server/kern/sospositie.js): zolang de melding open is blijft de positie, 90 dagen na het sluiten gaat hij eraf, en een proef of een... |
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
-| `spel-dubbeltik.test.js` | 3 | -- | DE DUBBELE TIK OP "NODIG UIT EN START" maakt een potje, niet twee. Gevonden door de voltooiproef van Spelen (scripts/lib/voltooi/spelen.js): twee gelijke verzoeken tegelijk gaven twee potjes en de vriend twee... |
+| `spel-dubbeltik.test.js` | 4 | -- | "NODIG UIT EN START" MET EEN HERHAALSLEUTEL maakt een potje, niet twee. Gevonden door de voltooiproef van Spelen (scripts/lib/voltooi/spelen.js): twee gelijke verzoeken tegelijk gaven twee potjes en de vriend twee... |
 | `spelaandeel.test.js` | 13 | gezakt op `===->!==#0` | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
 | `spelbank.test.js` | 21 | gezakt op `===->!==#0` | MAGNAAT: DE BANK -- de eerste laag waar geld de wereld verlaat. Alles hiervoor VERPLAATSTE: een contract betaalt de een en verrijkt de ander, een veiling verschuift een zaak, een deelneming splitst een resultaat. |
 | `spelbeleid.test.js` | 11 | gezakt op `return-weg#0` | De beleidslaag: alle toetredingsvragen op een plek, in volgorde. Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er juist niet. |

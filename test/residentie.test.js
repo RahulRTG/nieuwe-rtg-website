@@ -84,6 +84,20 @@ test('de suite: inrichten met het atelier, open of dicht voor bezoek', async () 
   assert.equal((await api(base, '/api/residentie/meubel/weg', { i: 0 }, a.token)).status, 200);
 });
 
+test('een dubbeltik op neerzetten of weghalen werkt een keer, niet twee', async () => {
+  /* De voltooiproef (scripts/lib/voltooi/residentie.js) zag twee banken op
+     dezelfde plek, en weghalen op volgnummer haalde ook het meubel weg dat
+     daarna op dat nummer schoof. Verklaard in server/lib/idemsleutels-travelos.js. */
+  const zet = { soort: 'kruk', x: 3, y: 6 };
+  const voor = (await api(base, '/api/residentie/suite', {}, b.token)).body.suite.meubels.length;
+  await Promise.all([api(base, '/api/residentie/meubel/zet', zet, b.token), api(base, '/api/residentie/meubel/zet', zet, b.token)]);
+  const na = (await api(base, '/api/residentie/suite', {}, b.token)).body.suite.meubels;
+  assert.equal(na.length, voor + 1, 'een kruk erbij, niet twee');
+  const i = na.findIndex(m => m.soort === 'kruk' && m.x === 3 && m.y === 6);
+  await Promise.all([api(base, '/api/residentie/meubel/weg', { i }, b.token), api(base, '/api/residentie/meubel/weg', { i }, b.token)]);
+  assert.equal((await api(base, '/api/residentie/suite', {}, b.token)).body.suite.meubels.length, voor, 'precies die kruk weg, niet ook het volgende meubel');
+});
+
 test('de gids: alle zalen met wie er is, en open suites op codenaam', async () => {
   await api(base, '/api/residentie/suite/zet', { open: true }, a.token);
   const ik = (await api(base, '/api/residentie/betreed', { kamer: 'lobby' }, a.token)).body.ik;

@@ -76,7 +76,19 @@ function smalVoorvoegsel(v) {
   return v.replace(/^\/+|\/+$/g, '').split('/').length >= 3;
 }
 
-function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
+/* EEN GEGENEREERDE BUNDEL IS ZIJN DELEN. scripts/schermroutes.js slaat de
+   bundels (bouwuitvoer, scripts/bundel.js) bewust over en schrijft de paden
+   toe aan de delen ernaast. Een ingang die de bundel laadt, roept dus de
+   routes van die delen aan; zonder deze stap zag de koppeling van
+   /apps/residentie.html alleen /api/stroom/ticket. */
+function bundelRegister() {
+  try {
+    const b = require('../bundel');
+    return new Map(Object.entries(b.bundels).map(([uit, map]) => ['public/' + uit, 'public/' + map + '/']));
+  } catch (e) { return new Map(); }
+}
+
+function ingangRoutes(ingang, { lees = leesStandaard, schermroutes, bundels } = {}) {
   if (!ingang || !ingang.startsWith('/')) return null;
   const sr = schermroutes || JSON.parse(lees('SCHERMROUTES.json') || '{"perScherm":[]}');
   const perBestand = new Map(sr.perScherm.map((x) => [x.bestand, x]));
@@ -85,10 +97,14 @@ function ingangRoutes(ingang, { lees = leesStandaard, schermroutes } = {}) {
   const bron = lees(html);
   if (bron !== null) {
     const map = path.posix.dirname(ingang);
+    const delen = bundels || bundelRegister();
     for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+\.js)[^"]*"/g)) {
       const src = m[1];
       if (/^[a-z]+:\/\//i.test(src)) continue;
-      bestanden.push('public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src)));
+      const b = 'public' + (src.startsWith('/') ? src : path.posix.normalize(map + '/' + src));
+      bestanden.push(b);
+      const deelmap = delen.get(b);
+      if (deelmap) for (const x of sr.perScherm) if (x.bestand.startsWith(deelmap)) bestanden.push(x.bestand);
     }
   }
   const exact = new Set(), voor = new Set();

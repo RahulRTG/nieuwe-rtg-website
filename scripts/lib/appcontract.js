@@ -235,6 +235,9 @@ const CONTRACT = {
   'link:stad': Object.assign({
     belofte: 'een bewoner ziet hoe de stad erbij staat en meldt iets dat kapot of vol is; de melding staat meteen op de werklijst van de veldploeg en hij ziet op codenaam wanneer die klaar is'
   }, voltooi('stad', 'het scenario loopt /api/stad/bewoner en /api/stad/melding, de routes die /apps/stad.html zelf aanroept, met de veldploeg die klaarmeldt en een tweede lid dat de melding niet ziet')),
+  'link:residentie': Object.assign({
+    belofte: 'een lid richt zijn eigen suite in met de Maison-catalogus, geeft hem een naam en zet hem open of dicht; de gids toont een open suite en een ander lid kan hem binnenlopen, een gesloten niet'
+  }, voltooi('residentie', 'het scenario loopt /api/residentie/suite, /suite/zet, /meubel/zet, /meubel/weg, /gids en /betreed, de routes die de bundel van /apps/residentie.html aanroept, met een tweede lid als bezoeker')),
   'link:werkos': Object.assign({
     belofte: 'een toegelaten medewerker opent zijn eigen WorkOS-werkruimte, maakt werk aan en vindt dat na een herstart, netwerkherhaling en crash precies een keer terug'
   }, voltooi('werkos', 'het scenario loopt /api/bedrijf/start, /taak/maak en /taken, dezelfde routes die /apps/werk.html via zijn gedeelde modules aanroept; de beheerder laat de medewerker langs de bestaande werkruimtedeur toe')),

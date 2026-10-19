@@ -211,7 +211,7 @@ test('8. de dienst overleeft een herlaadbeurt: de stand zegt of hij loopt', asyn
 test('9. een dubbeltik op "Bewaren" bij een nieuwe lijn maakt er een, geen twee', async () => {
   /* De voltooiproef (scripts/lib/voltooi/ovroutes.js) zag twee gelijke lijnen
      op de OV-kaart na een dubbeltik. De verklaring in
-     server/lib/idemsleutels-ov.js maakt een woordelijk gelijke herhaling
+     server/lib/idemsleutels-travelos.js maakt een woordelijk gelijke herhaling
      binnen het venster tot een herhaling. */
   const roster = await api('/api/supplier/roster', { code: 'TRANSIT' });
   const m = roster.body.staff.find(x => x.role === 'manager');

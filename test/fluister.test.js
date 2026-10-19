@@ -10,6 +10,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const assetkoop = require('./lib/assetkoop');
+const { betaaldeSleutel } = require('../scripts/lib/voltooizorggeld');
 
 let srv, base;
 let lid, pda;
@@ -162,6 +163,13 @@ test('betaalverzoeken: Rahul maakt ze, toont ze en betaalt ze pas na "ja"', asyn
 });
 
 test('Rahul bestelt en rekent af: voorstel, "ja", ophaalcode en een echte order', async () => {
+  /* Het lid heeft tegoed, zodat het afrekenen uit het saldo gaat en niet langs
+     de simulatiebank: die kiest per bestelnummer een afloop (geweigerd, traag),
+     en dan hing deze toets van het lot af. Opladen gebeurt met een sleutel die
+     de bank "betaald" laat zeggen (scripts/lib/voltooizorggeld.js). */
+  const ik = (await api('auth/me', {}, lid)).body.user.codename;
+  const op = await api('pay/oplaad', { centen: 50000, idem: betaaldeSleutel(ik, 'fluister-oplaad-') }, lid);
+  assert.equal(op.status, 200, 'het tegoed staat erop: ' + JSON.stringify(op.body));
   const r = await api('fluister', { q: 'bestel 2 sangria en 1 bravas bij Sunset Ibiza' }, lid);
   assert.equal(r.status, 200);
   assert.ok(r.body.voorstel && !r.body.gedaan, 'bestellen is geld: eerst een voorstel');

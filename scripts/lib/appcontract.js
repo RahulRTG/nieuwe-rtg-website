@@ -179,6 +179,9 @@ const CONTRACT = {
   'link:rtfschrift': Object.assign({
     belofte: 'een leerling doet mee met een les, schrijft in zijn eigen schrift, levert in en vraagt de bijleshulp -- een klasgenoot of een andere les leest zijn schrift niet'
   }, voltooi('rtfschrift', 'het scenario loopt /api/foundation/schrift/opslaan, /schrift, /opgave/inleveren, /ai, /tip, /les en /bord, de routes die /apps/foundation/schrift.html zelf aanroept, met het kind van het gezin als leerling en een klasgenoot')),
+  'link:klimaat': Object.assign({
+    belofte: 'wie in de buurt woont ziet de lopende duurzaamheidsprojecten en geeft erheen, stelt in het Living Lab een vraag over duurzaamheid, steunt die van een ander en ziet welk onderzoek er loopt'
+  }, voltooi('klimaat', 'het scenario loopt /api/rtfos/gift/projecten en /api/lab2/bewoner/labs, /themas, /thema, /stem en /overzicht, de routes die /apps/foundation/klimaatfonds.html zelf aanroept, met een buur die steunt')),
   'link:wereldlaag': Object.assign({
     belofte: 'een lid plaatst een post in De Salon, een verbonden lid reageert, de maker ziet het en haalt de post weg -- en dan is hij voor iedereen weg'
   }, voltooi('wereldlaag', 'het scenario loopt /api/salon/plaats, /feed, /reacties, /reageer en /weg, waarvan /apps/wereld.html er drie zelf aanroept')),

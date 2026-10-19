@@ -35,6 +35,9 @@ module.exports = (ctx) => {
     const lab = vindLab(b.labId); if (!lab) return { status: 404, error: 'Dit lab bestaat niet.' };
     const vraag = schoon(b.vraag, 300);
     if (vraag.length < 10) return { status: 400, error: 'Welke vraag leeft er in de buurt? Schrijf hem als vraag op.' };
+    // een dubbele tik is geen tweede vraag
+    const al = S().themas.find(t => t.labId === lab.id && t.vraag.toLowerCase() === vraag.toLowerCase());
+    if (al) return { ok: true, bestond: true, thema: pub(al) };
     if (S().themas.filter(t => t.labId === lab.id).length >= 5000) return { status: 400, error: 'Het themaregister van dit lab zit vol.' };
     const t = { id: rid(), labId: lab.id, vraag, soort: (kader.soort(b.soort) || {}).soort || null,
       door: schoon(b.alias, 40) || 'bewoner', stemmen: [], studieId: null, at: nu() };

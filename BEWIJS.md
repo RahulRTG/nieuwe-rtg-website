@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2856 bestanden en 19686 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2856 bestanden en 19688 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2856 |
-| losse beweringen (`test(...)`) | 19686 |
+| losse beweringen (`test(...)`) | 19688 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2666 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -2527,7 +2527,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-369 bestanden, 687 beweringen.
+369 bestanden, 689 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2774,7 +2774,7 @@ toets omvalt.
 | `reisuitnodiging-ds.e2e.js` | 3 | gezakt op `voorwaarde-omkeren#0` | De reisuitnodiging op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom D). |
 | `reisuitnodiging.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE HELE KETEN IN EEN BROWSER: het reisbureau zet een reis klaar, een vreemde opent de link, wordt lid, en heeft zijn reis. WAAROM DIT ALS SCHERMTOETS BESTAAT. |
 | `reiswacht.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-toets op DE REISWACHT in /apps/reizen.html (REIZEN.md fase 3). De serverkant staat in test/reiswacht.test.js. |
-| `reizen-ds.e2e.js` | 5 | gezakt op `voorwaarde-omkeren#0` | TravelOS (reizen) op het RTG Design System: het bewijs van stroom A uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
+| `reizen-ds.e2e.js` | 7 | gezakt op `voorwaarde-omkeren#0` | TravelOS (reizen) op het RTG Design System: het bewijs van stroom A uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `reizen-veilig-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | Reizen & Veilig op het RTG Design System: het bewijs van batch 4 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `reizen-veilig.e2e.js` | 2 | gezakt op `browser-export-weg#0` | REIZEN & VEILIG ZONDER SCHIJNINHOUD -- in een echte browser, op een echte server. De werkruimte toonde drie dingen die niet uit de data kwamen: - "Uw eerstvolgende moment · LIVE" was een vaste regel "Nu: Vertrek... |
 | `reizenscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op DE REIS in /apps/reizen.html (REIZEN.md fase 1). WAAROM DIT BESTAND ER IS. |

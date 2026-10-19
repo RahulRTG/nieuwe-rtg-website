@@ -1,30 +1,30 @@
 {
  "stempel": {
-  "op": "2026-10-19T08:42:45.337Z",
-  "commit": "21938d15",
+  "op": "2026-10-19T09:05:49.085Z",
+  "commit": "d3388345",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 7,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5400,
-  "geclassificeerd": 5375,
+  "totaal": 5405,
+  "geclassificeerd": 5376,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
-   "NOT_APPLICABLE": 1298,
-   "LEGACY_PENDING_CLASSIFICATION": 25,
+   "NOT_APPLICABLE": 1299,
+   "LEGACY_PENDING_CLASSIFICATION": 29,
    "PROTECTED": 707,
    "INTENTIONALLY_NON_IDEMPOTENT": 206
   },
-  "vastgesteldDoorMens": 2263,
+  "vastgesteldDoorMens": 2264,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4468,
-   "PUBLIC": 105,
-   "OBJECT_SCOPED": 785,
+   "AUTHENTICATED": 4479,
+   "PUBLIC": 101,
+   "OBJECT_SCOPED": 783,
    "(niet af te leiden -- vraagt een verklaring)": 26,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 253
+   "niet gemeten": 258
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -42,15 +42,39 @@
  },
  "tegenspraken": [
   {
+   "route": "POST /api/arrival/interpret",
+   "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/arrival/pass",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
    "route": "POST /api/arrival/pass/intrek",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
    "route": "POST /api/arrival/pass/roteer",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/arrival/pulse",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/arrival/request",
+   "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -3120,11 +3144,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3147,11 +3171,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "OBJECT_SCOPED",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
-     "mw",
+     "auth",
      "arrivalPassAuth"
     ]
    },
@@ -3175,11 +3199,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3202,11 +3226,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3229,11 +3253,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "OBJECT_SCOPED",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
-     "mw",
+     "auth",
      "arrivalPassAuth"
     ]
    },
@@ -3257,11 +3281,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3275,6 +3299,44 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "asset.aanvraag.betaal",
+   "route": "POST /api/asset/aanvraag/betaal",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "asset.aanvragen",
+   "route": "POST /api/asset/aanvragen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "asset.document",
@@ -21264,7 +21326,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
@@ -33406,7 +33468,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -54600,7 +54662,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen anonieme demo-gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -55920,7 +55982,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -60462,6 +60524,44 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.asset.aanvraag.beslis",
+   "route": "POST /api/office/asset/aanvraag/beslis",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "office.asset.aanvragen",
+   "route": "POST /api/office/asset/aanvragen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "office.asset.fees",
@@ -86419,7 +86519,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -86446,7 +86546,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -86716,7 +86816,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -86743,7 +86843,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -105620,7 +105720,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
@@ -105647,7 +105747,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
@@ -122723,6 +122823,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "partnernetwerk.overzicht",
+   "route": "POST /api/supplier/netwerk/overzicht",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -140001,7 +140122,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"

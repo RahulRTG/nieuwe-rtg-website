@@ -21,6 +21,16 @@ function poging(pas, aanvraagId, afloop) {
   throw new Error('geen sleutel voor ' + afloop);
 }
 
+/* Wat de simulatiebank met de herroeping van dit ticket doet. Volgt uit de
+   betaling (de poging hierboven) en het ticket, zoals kern/betaalwaarheid/terug.js
+   en server/betaal/synthetisch-naslag.js het rekenen: een toets kiest zo een
+   ticket waarvan de terugbetaling blijft lopen, in plaats van op de spreiding te gokken. */
+function terugAfloop(pas, aanvraagId, ticketId) {
+  const betaling = 'BW-' + sha('asset:' + pas + '|asset-koop:' + aanvraagId + ':' + poging(pas, aanvraagId, 'betaald')).slice(0, 20).toUpperCase();
+  const sleutel = 'terug:' + betaling + ':' + sha('idem:' + sha('herroep-' + ticketId)).slice(0, 24);
+  return bank.scenarioVan({ idempotentieSleutel: 'terug|' + sleutel });
+}
+
 let volg = 0;
 async function gekocht(api, { token, pas, opNaam, body }) {
   const a = await api('asset/koop', Object.assign({ idem: 'koop-' + process.pid + '-' + (++volg) }, body), token);
@@ -33,4 +43,4 @@ async function gekocht(api, { token, pas, opNaam, body }) {
   return { status: 200, body: { aanvraag: p.body.aanvraag, ticketIds: p.body.aanvraag.ticketIds, totaal: p.body.aanvraag.totaal } };
 }
 
-module.exports = { gekocht, poging };
+module.exports = { gekocht, poging, terugAfloop };

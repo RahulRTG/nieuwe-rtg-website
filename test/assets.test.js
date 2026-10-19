@@ -216,12 +216,16 @@ test('uitstappen met wachtlijst: directe overdracht, koper betaalt de 5% naar de
 });
 
 test('bedenktijd: herroepen na betaling heet pas terugbetaald als de bank het bevestigt', async () => {
-  /* De simulatiebank bevestigt geen terugbetaling (server/betaal/naslag.js
-     kent haar niet als rail); de bevestigde afloop staat in de kerntoetsen
-     onderaan. Hier: wat het lid hoort zolang er niets bevestigd is. */
+  /* De simulatiebank kiest de afloop van een terugbetaling uit haar sleutel
+     (server/betaal/synthetisch-naslag.js); de bevestigde afloop staat in de
+     kerntoetsen onderaan. Hier: wat het lid hoort zolang er niets bevestigd is,
+     dus een ticket waarvan de bank de terugbetaling laat lopen. */
   const pos = (await api('asset/mijn', {}, zakelijk)).body.posities.find(p => p.assetId === villa.id);
   assert.ok(pos.herroepbaar.length >= 1, 'verse tickets zitten in de bedenktijd');
-  const h = pos.herroepbaar[0];
+  const aanvragen = (await api('asset/aanvragen', {}, zakelijk)).body.aanvragen;
+  const aanvraagVan = id => aanvragen.find(a => a.ticketIds.includes(id));
+  const h = pos.herroepbaar.find(t => aanvraagVan(t.id) && assetkoop.terugAfloop('business', aanvraagVan(t.id).id, t.id) === 'traag');
+  assert.ok(h, 'onder ' + pos.herroepbaar.length + ' tickets laat de bank er een terugbetaling lopen');
   const r = await api('asset/herroep', { ticketId: h.id }, zakelijk);
   const eerlijk = r.status === 409 || (r.status === 200 && r.body.pending === true);
   assert.ok(eerlijk, 'onbevestigd: loopt of niet gestart (' + r.status + ' ' + JSON.stringify(r.body) + ')');

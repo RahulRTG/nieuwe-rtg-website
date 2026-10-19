@@ -18,7 +18,7 @@ const post = (base, pad, lijf, tok) => fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
   body: JSON.stringify(lijf || {}) }).then((r) => r.json());
 
-test('een dubbelklik op Overboeken stuurt een sleutel en boekt een keer', { skip: geenBrowser(pw) }, async () => {
+test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boekt een keer', { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -60,6 +60,21 @@ test('een dubbelklik op Overboeken stuurt een sleutel en boekt een keer', { skip
     const na = await post(base, '/api/bank/overzicht', {}, tok);
     assert.equal(na.rekeningen.find((r) => r.iban === spaar.iban).saldoCenten, 1200, 'een keer overgeboekt');
     assert.equal(na.rekeningen.find((r) => r.iban === betaal.iban).saldoCenten, 3800);
+
+    /* Dezelfde regel op Pas uitgeven: die knop vraagt niets (geen prompt) en
+       is dus het makkelijkst dubbel te tikken. */
+    const pasSleutels = [];
+    await page.route('**/api/bank/pas/uitgeven', async (route) => {
+      pasSleutels.push(JSON.parse(route.request().postData() || '{}').idem);
+      await new Promise((r) => setTimeout(r, 400));
+      await route.continue();
+    });
+    await page.dblclick('[data-bkpas="' + betaal.iban + '"]');
+    await page.waitForTimeout(1500);
+    assert.equal(pasSleutels.length, 2);
+    assert.equal(pasSleutels[0], pasSleutels[1], 'twee tikken op Pas uitgeven, een sleutel');
+    const passen = await post(base, '/api/bank/passen', {}, tok);
+    assert.equal((passen.passen || []).filter((p) => p.iban === betaal.iban).length, 1, 'een pas uitgegeven: ' + JSON.stringify(passen).slice(0, 200));
     assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
   } finally {
     if (browser) await browser.close();

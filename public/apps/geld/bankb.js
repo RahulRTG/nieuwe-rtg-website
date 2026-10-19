@@ -100,25 +100,29 @@
       var euroS = prompt('Hoeveel storten op deze rekening? (euro)');
       if (euroS == null) return;
       try {
+        var c = Math.round(Number(euroS) * 100);
         var r = await Geld.api('/api/bank/storten',
-          { iban: b.dataset.bkstort, centen: Math.round(Number(euroS) * 100), idem: B.sleutel('stort') });
+          { iban: b.dataset.bkstort, centen: c, idem: bedoeling('stort', b.dataset.bkstort + '|' + c) });
+        klaar('stort');
         Geld.melding('Gestort via ' + r.via + '. Saldo: ' + Geld.euro(r.saldoCenten));
         await B.herlaad();
-      } catch (e) { Geld.melding(e.message); }
+      } catch (e) { klaar('stort', e); Geld.melding(e.message); }
     });
     elk('[data-bkwallet]', async function (b) {
       var euroS = prompt('Hoeveel naar je RTG Pay-wallet? (euro)');
       if (euroS == null) return;
       try {
-        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: Math.round(Number(euroS) * 100), idem: B.sleutel('naarwallet') });
-        await B.herlaad();
-      } catch (e) { Geld.melding(e.message); }
+        var c = Math.round(Number(euroS) * 100);
+        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: c, idem: bedoeling('naarwallet', b.dataset.bkwallet + '|' + c) });
+        klaar('naarwallet'); await B.herlaad();
+      } catch (e) { klaar('naarwallet', e); Geld.melding(e.message); }
     });
     elk('[data-bkpas]', async function (b) {
       try {
-        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit', idem: B.sleutel('pasuit') });
+        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit', idem: bedoeling('pasuit', b.dataset.bkpas) });
+        klaar('pasuit');
         Geld.melding('Pas uitgegeven: ' + r.pas.nummer);
-      } catch (e) { Geld.melding(e.message); }
+      } catch (e) { klaar('pasuit', e); Geld.melding(e.message); }
     });
     elk('[data-bkdoel]', async function (b) {
       var euroS = prompt('Wat is je spaardoel? (euro)');

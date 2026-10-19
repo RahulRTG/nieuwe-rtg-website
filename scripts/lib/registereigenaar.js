@@ -111,6 +111,7 @@ const EIGENAAR = {
     waarom: 'npm run trust:manifest schrijft het; keuringsregel 74 (scripts/check.js) eist dat het bij de uitvoerbare kern hoort.' },
   'TOEZEGKLASSEN.json': { handmatig: true, lezer: 'scripts/lib/toezegklassen.js',
     waarom: 'Handgeschreven besluitbestand van de inventaris (AFBOUWPROGRAMMA.md): afgewezen en extern zijn een oordeel en geen markering. scripts/lib/toezegklassen.js leest het en schrijft het niet; test/toezegklassen.test.js houdt elk citaat tegen zijn document.' },
+  'ONTWERPSYSTEEM.md': { soort: 'BRON', waarom: 'Handgeschreven eigenaarsbesluit en architectuur van het RTG Design System (19 oktober 2026); scripts/ontwerpsysteem.js en test/ontwerpsysteem.test.js leveren het bewijs.' },
   'ONTWERPSTANDAARD-METING.md': { soort: 'BRON', waarom: 'Handgeschreven meetverslag van website tegenover app (#585), op een genoemde commit; verandert geen code.' },
   'TRAVELOS-SPATIAL-VERTICAL-SLICE.md': { soort: 'BRON',
     waarom: 'Handgeschreven implementatiepassport voor de eerste TravelOS Spatial-proef; het beschrijft een voorstel en bestaand bronbewijs, geen generator schrijft dit document.' },
@@ -377,6 +378,13 @@ const EIGENAAR = {
 
   /* NORM.json is met OPZET gedeeld: elke meter schrijft zijn eigen getal in de
      ratel. Dat is geen botsing maar de vorm van dat register. */
+  /* ONTWERPNORM.json is de per-bestand-ratel op de CSS-erfenis: --vastleggen
+     zet hem alleen strakker en weigert bij elke schending. Een vuile boom maakt
+     hier niets onherhaalbaar: de lat wordt nooit losser, alleen een getal
+     lager, en de controle meet er bij elke CI-ronde vers tegen. */
+  'ONTWERPNORM.json': { schrijver: 'scripts/ontwerpsysteem.js',
+    waarom: 'de ratel op de CSS-erfenis (ONTWERPSYSTEEM.md); --vastleggen kan alleen strakker zetten en ' +
+      'weigert bij een schending, dus een eisSchoneBoom-poort voegt niets toe; --controle meet in CI vers.' },
   'NORM.json': { schrijver: 'scripts/norm.js',
     waarom: 'de ratel is gedeeld bezit: elke meter schrijft zijn eigen getal erin (dekking, samenhang, ' +
       'schermen, wetten). norm.js is de eigenaar van de VORM, niet van elke waarde.' },

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2887 bestanden en 19791 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2887 bestanden en 19792 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2887 |
-| losse beweringen (`test(...)`) | 19791 |
+| losse beweringen (`test(...)`) | 19792 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2544 bestanden, 19212 beweringen.
+2544 bestanden, 19213 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2232,7 +2232,7 @@ toets omvalt.
 | `tiener.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor de tiener-tools: de toetsplanner (leerplan gespreid over de dagen, stappen afvinken, opruimen), het zakgeldpotje (boeken, saldo-bewaking, spaardoelen met inleg en teruggave), de gast-poort en de... |
 | `tijdlijn.test.js` | 7 | gezakt op `liegpoort /api/` | DE CONFIGURATIETIJDLIJN: acht beweringen, en ze gaan allemaal over de manier waarop een "wat is er veranderd"-scherm normaal gesproken onwaar wordt. 1. |
 | `tijdzone-instant.test.js` | 2 | -- | instantIn (server/kern/tijdzone.js): een lokale dag en een uur in een IANA-zone als tijdstip. "Om 10:00" bij een zaak is 10:00 op de klok van die zaak, ook in de zomertijd. |
-| `tijdzone-plekken.test.js` | 10 | -- | DE PLEKKEN DIE DE KLOK VAN DE CONTAINER LAZEN. Elke toets hieronder draait in een proces met TZ=UTC -- precies zoals de server in productie draait -- op een vast moment (RTG_KLOK of een meegegeven Date) waarop de... |
+| `tijdzone-plekken.test.js` | 11 | -- | DE PLEKKEN DIE DE KLOK VAN DE CONTAINER LAZEN. Elke toets hieronder draait in een proces met TZ=UTC -- precies zoals de server in productie draait -- op een vast moment (RTG_KLOK of een meegegeven Date) waarop de... |
 | `tijdzone.test.js` | 13 | -- | DE KLOK VAN HET HUIS (server/kern/tijdzone.js). De server draait in productie in een UTC-container. |
 | `tls-acme-boot.test.js` | 2 | gezakt op `===->!==#0` | Bewijst de boot-lijm (server/lib/tls-acme.js): de ACME-accountsleutel en het opgehaalde certificaat persisteren, en -- het echte werk -- dat startAcme een vers uitgegeven certificaat LIVE in een draaiende native... |
 | `tls-acme.test.js` | 3 | gezakt op `===->!==#0` | Bewijst de JOSE/JWS-laag en de VOLLEDIGE ACME-toestandsmachine offline: een nep-CA (een injecteerbare transport) speelt Let's Encrypt na en VERIFIEERT elke JWS-handtekening met de accountsleutel, en "valideert" de... |

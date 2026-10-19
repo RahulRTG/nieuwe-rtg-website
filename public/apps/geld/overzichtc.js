@@ -1,7 +1,6 @@
-/* Stand Overzicht, deel 3 van 3: registratie, kliks en het beleid-paneel;
-   gesplitst om de 10 KB-maat. Beleid staat ACHTER een kalme knop
-   (uitzonderingsgestuurd, ONTWERP.md); de harde grens van GELD.md par. 3
-   staat in het paneel. */
+/* Stand Overzicht, deel 3 van 3: registratie, kliks en het beleid-paneel.
+   Beleid staat ACHTER een kalme knop (ONTWERP.md); de harde grens van
+   GELD.md par. 3 staat in het paneel. */
 (function (w, d) {
   'use strict';
   var V = w.RTGGeld = w.RTGGeld || { standen: [] };
@@ -21,8 +20,7 @@
   var SOORT = { minimumbuffer: 'Minimumbuffer', maanddrempel: 'Maanddrempel',
     'reserveer-maandelijks': 'Maandelijks reserveren', 'gift-bevestiging': 'Gift-bevestiging' };
 
-  /* Naar centen via Geld.naarCenten (hulp.js), op EEN plek: een eigen regeltje
-     las "1.000" als een euro (een buffer duizend keer te laag). */
+  /* naar centen op EEN plek (hulp.js): "1.000" is duizend, geen euro */
   function naarCenten(v) { return w.Geld.naarCenten(v); }
 
   function kn(attr, txt) { return '<button class="knop" type="button" ' + attr + '>' + txt + '</button>'; }
@@ -113,22 +111,27 @@
     zet(ZET, body);
   }
 
+  /* EEN sleutel per bedoeling (shared/id.js): een tweede tik maakt geen tweede
+     pot en zet niets nog eens opzij; pas een antwoord sluit de bedoeling af. */
+  var lopend = {};
+  function metSleutel(pad, body, voor) {
+    if (!lopend[pad] || lopend[pad].voor !== voor) lopend[pad] = { voor: voor, idem: w.RTGId('pot') };
+    body.idem = lopend[pad].idem;
+    api(pad, body).then(function () { delete lopend[pad]; ververs(); },
+      function (e) { if (e.status) delete lopend[pad]; meld(e.message); });
+  }
   function potNieuw() {
     var naam = $('#ovPNaam').value.trim(), doel = naarCenten($('#ovPDoel').value);
     if (!naam || doel == null || doel <= 0) return meld('Naam en doel?');
-    zet('/api/geld/pot/zet', { naam: naam, doelCenten: doel });
+    metSleutel('/api/geld/pot/zet', { naam: naam, doelCenten: doel }, naam + '|' + doel);
   }
 
-  /* vrijgeven is negatief reserveren: een route, een waarheid. EEN sleutel
-     per bedoeling (shared/id.js): een tweede tik zet niets nog eens opzij. */
-  var potSleutel = null;
+  /* vrijgeven is negatief reserveren: een route, een waarheid */
   function potDoe(b) {
     var c = naarCenten((b.parentNode.querySelector('input') || {}).value);
     if (c == null || c <= 0) return meld('Bedrag?');
-    var centen = b.dataset.doe === 'vrij' ? -c : c, voor = b.dataset.ovpot + '|' + centen;
-    if (!potSleutel || potSleutel.voor !== voor) potSleutel = { voor: voor, idem: w.RTGId('pot') };
-    api('/api/geld/pot/reserveer', { id: b.dataset.ovpot, centen: centen, idem: potSleutel.idem })
-      .then(function () { potSleutel = null; ververs(); }, function (e) { if (e.status) potSleutel = null; meld(e.message); });
+    var centen = b.dataset.doe === 'vrij' ? -c : c;
+    metSleutel('/api/geld/pot/reserveer', { id: b.dataset.ovpot, centen: centen }, b.dataset.ovpot + '|' + centen);
   }
 
   /* gedelegeerd: de vlakken hertekenen, de omhulling gaat mee weg */

@@ -23,6 +23,12 @@ module.exports = (ctx) => {
     if (!nm) return { status: 400, error: 'Geef de pot een naam.' };
     const doel = bedragVan(p.doelCenten != null ? p.doelCenten : (bestaand ? bestaand.doelCenten : null));
     if (doel == null) return { status: 400, error: 'Geef een doel in hele centen (0 tot ' + MAX_CENTEN + ').' };
+    /* EEN NIEUWE POT PER TIK: zonder id maakt een tweede tik anders een tweede
+       pot. Dezelfde sleutel geeft de eerste terug, een andere pot is een 409. */
+    const sleutel = !bestaand && p.idem != null ? String(p.idem).trim().slice(0, 80) : '';
+    const eerder = sleutel && rec.potten.find(x => x.idem === sleutel);
+    if (eerder) return eerder.naam === nm && eerder.doelCenten === doel ? { status: 200, ok: true, herhaald: true, pot: zichtPot(eerder) }
+      : { status: 409, error: 'Deze sleutel hoort al bij een andere pot.' };
     if (!bestaand && rec.potten.length >= MAX_POTTEN) return { status: 400, error: 'Meer dan ' + MAX_POTTEN + ' potten; ruim eerst op.' };
     /* NIETS VERANDERD IS GEEN HANDELING. Een pot hernoemen naar dezelfde naam
        is geldig, maar het hoort niet in het log: met tweehonderdtien van die
@@ -30,7 +36,7 @@ module.exports = (ctx) => {
        verantwoordt het niets meer (de keuring toonde dat aan). Het log draagt
        veranderingen, geen kliks. */
     const zelfde = bestaand && bestaand.naam === nm && bestaand.doelCenten === doel;
-    const pot = bestaand || { id: maakId('pot'), standCenten: 0 };
+    const pot = bestaand || Object.assign({ id: maakId('pot'), standCenten: 0 }, sleutel ? { idem: sleutel } : {});
     pot.naam = nm; pot.doelCenten = doel;
     if (!bestaand) rec.potten.push(pot);
     // ook dit in het log: beleid over geld is zelf een geldhandeling (GELD.md par. 5)

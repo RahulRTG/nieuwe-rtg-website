@@ -42,3 +42,22 @@ test('zonder sleutel (Rahul, het oude scherm) telt elke reservering', () => {
   p.potReserveer('Codenaam', pot.id, 100);
   assert.equal(p.potten('Codenaam')[0].standCenten, 200);
 });
+
+/* Een nieuwe pot per tik (potZet zonder id): een dubbele tik op Pot toevoegen
+   gaf twee potten met dezelfde naam. */
+test('dezelfde sleutel maakt een pot een keer', () => {
+  const p = potten();
+  const a = p.potZet('Codenaam', { naam: 'Vakantie', doelCenten: 50000, idem: 'p1' });
+  const b = p.potZet('Codenaam', { naam: 'Vakantie', doelCenten: 50000, idem: 'p1' });
+  assert.equal(a.status, 200);
+  assert.equal(b.herhaald, true);
+  assert.equal(b.pot.id, a.pot.id);
+  assert.equal(p.potten('Codenaam').length, 1);
+});
+
+test('dezelfde sleutel voor een andere pot is een conflict', () => {
+  const p = potten();
+  p.potZet('Codenaam', { naam: 'Vakantie', doelCenten: 50000, idem: 'p1' });
+  assert.equal(p.potZet('Codenaam', { naam: 'Auto', doelCenten: 50000, idem: 'p1' }).status, 409);
+  assert.equal(p.potten('Codenaam').length, 1);
+});

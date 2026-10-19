@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2831 bestanden en 19566 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2831 bestanden en 19570 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2831 |
-| losse beweringen (`test(...)`) | 19566 |
+| losse beweringen (`test(...)`) | 19570 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2492 bestanden, 18993 beweringen.
+2492 bestanden, 18997 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -731,7 +731,7 @@ toets omvalt.
 | `gelding.test.js` | 8 | gezakt op `false->true#0` | DE DRIE GELDINGSASSEN -- en de ene eigenschap die ze waardevol maakt. CLAIM, DRAAG en WACHT beantwoorden drie verschillende vragen: waar GELDT een wet, waar LEEFT hij, en waar kan iemand hem ZIEN. |
 | `geldkaart.test.js` | 7 | gezakt op `===->!==#0` | DE ZELFIJKING VAN DE GELDKAART. Deze meter beweert iets dat een mens niet kan nakijken: dat elke waardemutatie op de vier kernbakken door haar eigen poort ging. |
 | `geldketen.test.js` | 16 | gezakt op `===->!==#0` | DE GOUDEN WEG (server/kern/kantoor/geldketen.js). Deze toets beproeft de BAAN en niet de motoren: die hebben hun eigen toetsen. |
-| `geldpot-idem.test.js` | 3 | -- | Een reservering per tik (server/kern/geldbeleid/potten.js, potReserveer). Gevonden door de voltooiproef van het geldoverzicht (scripts/lib/voltooi/geldcommand.js): een reservering, een SIGKILL en dezelfde tik opnieuw... |
+| `geldpot-idem.test.js` | 5 | -- | Een reservering per tik (server/kern/geldbeleid/potten.js, potReserveer). Gevonden door de voltooiproef van het geldoverzicht (scripts/lib/voltooi/geldcommand.js): een reservering, een SIGKILL en dezelfde tik opnieuw... |
 | `geldregie.test.js` | 5 | gezakt op `liegpoort /api/` | De geld-regie van de boardroom: RTG bepaalt de pasprijzen (publiek zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de zaak... |
 | `geldroutes.test.js` | 5 | gezakt op `!==->===#0` | GEEN SLEUTEL IS GEEN VERZOEK -- op de handelingen die geld verplaatsen. Overal elders in dit huis is een idem-sleutel een vangnet: is hij er niet, dan gebeurt het werk gewoon. |
 | `geldveilig.test.js` | 7 | gezakt op `true->false#0` | Veiligheidsgrenzen rond echt geld. Deze toetsen sturen niets naar buiten: Stripe wijst naar een dichte lokale poort en de DirectPay-provider is nep. |
@@ -1060,7 +1060,7 @@ toets omvalt.
 | `lab-geheim.test.js` | 3 | gezakt op `true->false#0` | Bedrijfsgeheimen in het Onderzoekslab (kern/onderzoekslab.js): wie aan een project werkt (op het team) ziet het; de boardroom ziet alles; een buitenstaander ziet niets. Draai: npm test |
 | `lab2-bewoner.test.js` | 13 | gezakt op `liegpoort /api/` | De BEWONERSKANT van het RTF Living Lab, plus het kantoorwerk eromheen dat nergens anders in de suite langskomt: het apparatuurregister (uitgifte, storing sluiten, reservering intrekken), de klachtenprocedure van... |
 | `lab2-werk.test.js` | 14 | gezakt op `liegpoort /api/` | Het KANTOORWERK van het RTF Living Lab: het bestuur van een lab (budget, partners), het stafbeeld op een lab, het vraagstuk, "wat nu", de deelnemers en hun rollen, de werkplaats (taken, agenda, documenten, logboek,... |
-| `labfonds-idem.test.js` | 4 | -- | Een toezegging per tik (server/kern/labfonds.js, doneer). Gevonden door de voltooiproef van het Lab-fonds (scripts/lib/voltooi/labfonds.js): een toezegging, een SIGKILL, en dezelfde tik opnieuw zette de bijdrage twee... |
+| `labfonds-idem.test.js` | 6 | -- | Een toezegging per tik (server/kern/labfonds.js, doneer). Gevonden door de voltooiproef van het Lab-fonds (scripts/lib/voltooi/labfonds.js): een toezegging, een SIGKILL, en dezelfde tik opnieuw zette de bijdrage twee... |
 | `labfonds-onderzoek.test.js` | 8 | gezakt op `===->!==#0` | DE SCHAKEL TUSSEN HET LAB-FONDS EN HET ONDERZOEK -- wat is er met mijn bijdrage onderzocht? Het fonds haalde geld op VOOR onderzoek en wist niet WELK; een lid kon zien dat het aan de pot van Amsterdam had bijgedragen... |
 | `labfonds.test.js` | 4 | gezakt op `===->!==#0` | Het Lab-fonds (kern/labfonds.js): leden zamelen in voor het RTF Onderzoekslab, per locatie verdeeld, en beslissen gezamenlijk met de AI-scheidsrechter. |
 | `labfondsduurzaam.test.js` | 3 | -- | HET LAB-FONDS BEVESTIGT NIET WAT DE OPSLAG NOG NIET HEEFT. Het fonds is een toezeggingen-grootboek: een toezegging, een voorstel, een stem en een besluit zijn wat het IS. |

@@ -10,8 +10,8 @@
 
    Wat blijft: een bezoeker zonder account heeft geen wallet, en elk account
    ziet alleen zijn eigen wallet. De grenzen eronder (het plafond per wallet,
-   de betaalwaarheid, de bezitspoort) zijn niet aangeraakt. Hier met de
-   simulatiebank als rail. */
+   de betaalwaarheid, de bezitspoort, de paspoortpoort) zijn niet aangeraakt;
+   de accounts hier zijn daarom gekeurd. Hier met de simulatiebank als rail. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -20,7 +20,7 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const bank = require('../server/betaal/synthetisch');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wallet-gratis-'));
 let srv;
@@ -35,6 +35,9 @@ async function gratisAccount() {
     password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'guest' });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.state.user.tier, 'guest', 'een gratis account, zonder pas');
+  /* gekeurd: RTG Pay vraagt elk account eenmalig het paspoort
+     (test/paspoort-gratisaccount.test.js, besluit 19 oktober 2026) */
+  await keurLidGoed(srv.base, r.body.token, r.body.state.user.codename);
   return { token: r.body.token, codenaam: r.body.state.user.codename };
 }
 /* een idem-sleutel waarmee de simulatiebank betaalt (zie test/simulatiebank.test.js toets 7) */

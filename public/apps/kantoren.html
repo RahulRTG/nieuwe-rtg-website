@@ -1711,10 +1711,10 @@ async function laadBetaalKamer(kamer){
         '<div class="s-ohiako"><span class="betaal-stip '+klas+'"></span>'+esc(p.faseLabel)+(d.voorkeur===p.id?' · voorkeur':'')+'</div>'+
         p.checklist.map(x => '<div class="betaal-check">'+(x.ingesteld?'✓':'○')+' '+esc(x.label)+'</div>').join('')+'</div>';
     }).join('');
-    // een vastgelopen terugbetaling krijgt een eigen regel met knop (kantoren-terugbetaling.js)
+    // een vastgelopen terugbetaling en een betaling op controle krijgen een regel met knop (kantoren-terugbetaling.js)
     const terugVast = RTGTerugVastgelopen({ api, meld, esc });
     $('#kBetaalProblemen').innerHTML = (d.problemen||[]).length
-      ? d.problemen.map(p => p.code === 'TERUGBETALING-VASTGELOPEN' ? terugVast.regel(p)
+      ? d.problemen.map(p => terugVast.kent(p.code) ? terugVast.regel(p)
         : '<div class="betaal-waarschuwing"><strong>'+esc(p.code)+'</strong> · '+esc(p.tekst)+'</div>').join('')
       : '<div class="leeg">Alle betaalcontroles zijn groen.</div>';
     terugVast.bedraad($('#kBetaalProblemen'), () => laadBetaalKamer(kamer));

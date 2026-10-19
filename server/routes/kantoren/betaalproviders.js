@@ -22,4 +22,15 @@ module.exports = ({ app, officeAuth, veilig, afdelingen, kern }) => {
       ' afgehandeld: ' + (b.uitkomst === 'terug' ? 'het geld is terug' : 'het geld is niet terug'));
     return r;
   }));
+
+  /* EEN BETALING OP CONTROLE AFRONDEN (eigenaarsbesluit 19 oktober 2026, derde
+     reeks): de regel "betaling op controle" op dezelfde lijst. Zelfde deur en
+     dezelfde naamregel; de overgang zelf staat in kern/betaalwaarheid/controle.js. */
+  app.post('/api/office/betalingen/controle/afrond', kern.naamAuth, (req, res) => veilig(res, async () => {
+    if (!kern.betaalWaarheid) return { status: 503, error: 'De betaalwaarheid draait hier niet.' };
+    const b = req.body || {};
+    const r = await kern.betaalWaarheid.controleAfronden({ betalingId: b.betalingId, reden: b.reden, door: wie(req) });
+    if (r.ok && afdelingen && afdelingen.audit) afdelingen.audit(wie(req), 'Controle afgerond van betaling ' + r.betalingId + ': terug naar ' + r.stand);
+    return r;
+  }));
 };

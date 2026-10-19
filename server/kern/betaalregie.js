@@ -46,7 +46,7 @@ const FASE_LABEL = Object.freeze({
 });
 const IT_FASES = new Set(['aanvraag', 'controle', 'goedgekeurd', 'techniek', 'proef', 'gepauzeerd', 'probleem']);
 
-module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
+module.exports = function maakBetaalregie({ d, save, betaal, env, nu, afhandeling }) {
   const omgeving = env || process.env;
   const nuIso = nu || (() => klokDatum().toISOString());
 
@@ -186,5 +186,10 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
       : 'De configuratie is nog niet compleet.', overzicht: overzicht() };
   }
 
-  return { PROVIDERS, FASES, overzicht, zetFase, kiesVoorkeur, proef };
+  // De betaalkamer krijgt alleen haar twee herstelacties; de betaalwaarheid
+  // blijft eigenaar van transities, idempotentie en financiële controles.
+  const herstel = naam => body => afhandeling && typeof afhandeling[naam] === 'function'
+    ? afhandeling[naam](body) : { status: 503, error: 'De betaalwaarheid draait hier niet.' };
+  return { PROVIDERS, FASES, overzicht, zetFase, kiesVoorkeur, proef,
+    terugAfhandelen: herstel('terugAfhandelen'), controleAfronden: herstel('controleAfronden') };
 };

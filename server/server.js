@@ -192,7 +192,8 @@ const betaalWaarheid = require('./kern/betaalwaarheid')({
   d: () => db.data, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log
 });
 const betaalRegie = require('./kern/betaalregie')({
-  d: () => db.data, save, betaal, env: process.env, nu: () => systeemKlok.datum().toISOString()
+  d: () => db.data, save, betaal, env: process.env, nu: () => systeemKlok.datum().toISOString(),
+  afhandeling: { terugAfhandelen: b => betaalWaarheid.terugAfhandelen(b), controleAfronden: b => betaalWaarheid.controleAfronden(b) }
 });
 
 /* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde

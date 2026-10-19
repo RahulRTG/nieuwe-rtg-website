@@ -84,3 +84,21 @@ test('Financien krijgt provider-onafhankelijke betaalcijfers en controleprobleme
   assert.equal(beeld.problemen.some(x => x.code === 'AFHANDELING-WACHT'), true);
   assert.equal(beeld.problemen.some(x => x.code === 'TERUGBETALING-WACHT'), true);
 });
+
+test('herstel zonder betaalwaarheid weigert expliciet', async () => {
+  const { r } = regie();
+  for (const naam of ['terugAfhandelen', 'controleAfronden'])
+    assert.deepEqual(await r[naam]({ betalingId: 'b1' }), { status: 503, error: 'De betaalwaarheid draait hier niet.' });
+});
+
+test('de betaalkamer geeft herstel ongewijzigd aan de financiële eigenaar door', async () => {
+  const gezien = [], antwoord = { status: 409, error: 'Eerst beoordelen.' };
+  const r = maak({ d: () => ({}), env: {}, afhandeling: {
+    terugAfhandelen: async b => { gezien.push(['terug', b]); return antwoord; },
+    controleAfronden: async b => { gezien.push(['controle', b]); return antwoord; }
+  } });
+  const vraag = { betalingId: 'b1', opdrachtId: 'o1', reden: 'Onderzocht', door: 'persoon-1' };
+  assert.equal(await r.terugAfhandelen(vraag), antwoord, 'de eigenaar bepaalt de uitkomst');
+  assert.equal(await r.controleAfronden(vraag), antwoord);
+  assert.deepEqual(gezien, [['terug', vraag], ['controle', vraag]], 'geen actor, bedrag of status door de regie verzonnen');
+});

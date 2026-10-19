@@ -14,9 +14,8 @@ module.exports = ({ app, officeAuth, veilig, afdelingen, kern }) => {
      (dezelfde regel als routes/uitgifte.js). */
   const wie = (req) => String(req.kantoorKey || (req.eigenaar ? req.officeKey : '') || '');
   app.post('/api/office/betalingen/terug/afhandel', kern.naamAuth, (req, res) => veilig(res, async () => {
-    if (!kern.betaalWaarheid) return { status: 503, error: 'De betaalwaarheid draait hier niet.' };
     const b = req.body || {};
-    const r = await kern.betaalWaarheid.terugAfhandelen({ betalingId: b.betalingId, opdrachtId: b.opdrachtId,
+    const r = await kern.betaalRegie.terugAfhandelen({ betalingId: b.betalingId, opdrachtId: b.opdrachtId,
       uitkomst: b.uitkomst, reden: b.reden, door: wie(req) });
     if (r.ok && afdelingen && afdelingen.audit) afdelingen.audit(wie(req), 'Vastgelopen terugbetaling ' + r.opdrachtId +
       ' afgehandeld: ' + (b.uitkomst === 'terug' ? 'het geld is terug' : 'het geld is niet terug'));
@@ -27,9 +26,8 @@ module.exports = ({ app, officeAuth, veilig, afdelingen, kern }) => {
      reeks): de regel "betaling op controle" op dezelfde lijst. Zelfde deur en
      dezelfde naamregel; de overgang zelf staat in kern/betaalwaarheid/controle.js. */
   app.post('/api/office/betalingen/controle/afrond', kern.naamAuth, (req, res) => veilig(res, async () => {
-    if (!kern.betaalWaarheid) return { status: 503, error: 'De betaalwaarheid draait hier niet.' };
     const b = req.body || {};
-    const r = await kern.betaalWaarheid.controleAfronden({ betalingId: b.betalingId, reden: b.reden, door: wie(req) });
+    const r = await kern.betaalRegie.controleAfronden({ betalingId: b.betalingId, reden: b.reden, door: wie(req) });
     if (r.ok && afdelingen && afdelingen.audit) afdelingen.audit(wie(req), 'Controle afgerond van betaling ' + r.betalingId + ': terug naar ' + r.stand);
     return r;
   }));

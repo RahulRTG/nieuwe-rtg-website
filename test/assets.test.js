@@ -395,3 +395,20 @@ test('kern: herroepen voor betaling sluit de aanvraag; vol is vol voordat er gel
   assert.match(h.let, /is terugbetaald/);
   assert.equal(h.terug, tickets(LID.key)[0].prijs);
 });
+
+
+test('assetbedrading houdt leden- en kantoorhandelingen gescheiden', () => {
+  const oud = require('../server/kern/assets')({ db: { data: {} } });
+  const nieuw = require('../server/opzet/assetsduurzaam')({ db: { data: {} } }, {});
+  assert.deepEqual(Object.keys(nieuw).sort(), ['assetsKantoor', 'assetsLid']);
+  assert.deepEqual([...Object.keys(nieuw.assetsLid), ...Object.keys(nieuw.assetsKantoor)].sort(), Object.keys(oud).sort(), 'alle bestaande handelingen blijven beschikbaar');
+  assert.equal(nieuw.assetsLid.assetAanvraagBeslis, undefined, 'ledeninterface heeft geen goedkeuring');
+  assert.equal(nieuw.assetsKantoor.assetAanvraagBetaal, undefined, 'kantoorinterface heeft geen ledenbetaling');
+  for (const [rol, naam] of [['member', 'assetsLid'], ['office', 'assetsKantoor']]) {
+    assert.ok(Object.isFrozen(nieuw[naam]));
+    const toegestaan = require('../GRENZEN.json').domeinen[rol];
+    assert.ok(toegestaan.includes(naam));
+    assert.ok(!toegestaan.includes(naam === 'assetsLid' ? 'assetsKantoor' : 'assetsLid'));
+    assert.ok(!Object.keys(oud).some(n => toegestaan.includes(n)), 'geen oude losse globaalrechten');
+  }
+});

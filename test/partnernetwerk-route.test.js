@@ -46,3 +46,24 @@ test('een zaak krijgt haar netwerk met een bron bij elk getal; een lid en een an
   assert.equal((await api('/api/supplier/netwerk/overzicht', {}, lid)).status, 401, 'een lid zonder zaak komt er niet in');
   assert.equal((await api('/api/supplier/netwerk/overzicht', {})).status, 401, 'zonder sessie ook niet');
 });
+
+
+test('netwerk leest de volledige eigen werklijst via de leverancier, zonder opslag te maken', () => {
+  const { ticketsVanZaak } = require('../server/kern/leverancier/zaak');
+  const maak = require('../server/kern/partnernetwerk');
+  const db = { data: {} };
+  assert.deepEqual(ticketsVanZaak(db, 'A'), []);
+  assert.deepEqual(db.data, {}, 'een lege leesvraag maakt geen opslag');
+  db.data.tickets = { A: Array.from({ length: 65 }, (_, i) => ({ id: String(i), status: i < 60 ? 'open' : 'klaar', text: 'Eigen klus' })),
+    B: [{ id: 'geheim', status: 'open', text: 'Andere zaak' }] };
+  const voor = JSON.stringify(db.data);
+  const netwerk = maak({ ticketsVanZaak: code => ticketsVanZaak(db, code) });
+  const r = netwerk.overzicht({ code: 'A', name: 'Eigen zaak' });
+  assert.equal(r.getallen.klussenOpen.waarde, 60, 'geen afkapping op de veertig dashboardrijen');
+  assert.equal(r.aandacht.filter(x => x.soort === 'klus').length, 5);
+  assert.ok(!JSON.stringify(r).includes('geheim'), 'andere zaak blijft afgeschermd');
+  assert.equal(JSON.stringify(db.data), voor);
+  assert.deepEqual(ticketsVanZaak(db, '__proto__'), []);
+  db.data.tickets.A = {};
+  assert.throws(() => ticketsVanZaak(db, 'A'), /Ongeldige werklijst/, 'corrupte gegevens worden geen lege succesuitkomst');
+});

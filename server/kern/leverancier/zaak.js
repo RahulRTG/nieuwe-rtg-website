@@ -167,3 +167,12 @@ module.exports = (ctx) => {
   // nu plus een korte staart; de rest loopt via gepagineerde endpoints en totalen.
   return { publicSupplier, magBezorgen, ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor, makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor };
 };
+
+// Leesprojecties delen de werklijst van de eigenaar; geen tweede opslagdeur.
+module.exports.ticketsVanZaak = (db, code) => {
+  const alle = db.data.tickets;
+  if (!alle || !Object.prototype.hasOwnProperty.call(alle, code)) return [];
+  const lijst = alle[code];
+  if (!Array.isArray(lijst)) throw new TypeError('Ongeldige werklijst van de zaak.');
+  return lijst;
+};

@@ -83,7 +83,7 @@ kern.rahulActies = {
    de toetsen ernaast. */
 kern.fluister = require('../kern/fluister')({
   db, save, schoon, anthropic, notify,
-  reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee, pay: kern.pay,
+  reserveerTafel, annuleerReservering, assetGebruik: kern.assetsLid.assetGebruik, zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee, pay: kern.pay,
   acties: kern.rahulActies,
   // de reislaag van Rahul: een hele reis op een vraag, kleding apart
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen

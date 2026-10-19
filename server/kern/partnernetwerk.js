@@ -37,7 +37,7 @@ const NIET_GEBOUWD = [
 
 const { mediaan } = require('./util');
 
-module.exports = ({ db, mall, bureauZaak, samenwerking, nu = () => new Date() }) => {
+module.exports = ({ ticketsVanZaak, mall, bureauZaak, samenwerking, nu = () => new Date() }) => {
   const gemeten = (waarde, bron) => ({ waarde, bron });
   const niet = (reden) => ({ waarde: null, nietGemeten: reden });
 
@@ -99,7 +99,7 @@ module.exports = ({ db, mall, bureauZaak, samenwerking, nu = () => new Date() })
     }
 
     /* 4. aandacht: open klussen uit de eigen werklijst */
-    const klussen = ((db.data.tickets || {})[code] || []).filter((t) => t && t.status !== 'klaar');
+    const klussen = ticketsVanZaak(code).filter((t) => t && t.status !== 'klaar');
     getallen.klussenOpen = gemeten(klussen.length, 'de werklijst van uw zaak (tickets)');
     for (const t of klussen.slice(0, 5)) aandacht.push({ soort: 'klus', id: t.id, titel: t.text, wanneer: t.at || null, bron: 'de werklijst van uw zaak (tickets)' });
 

@@ -47,7 +47,7 @@ test('elk getalvak wordt door de server gevuld, met bron, en "niet gemeten" is g
 test('de kern geeft een bron bij elk getal, en "niet gemeten" als een bron ontbreekt', () => {
   const maak = require('../server/kern/partnernetwerk');
   const opslag = { data: { tickets: { Z1: [{ id: 't1', text: 'Lamp kapot', status: 'open' }, { id: 't2', text: 'Klaar', status: 'klaar' }] } } };
-  const k = maak({ db: opslag, mall: null, bureauZaak: null, samenwerking: null });
+  const k = maak({ ticketsVanZaak: code => require('../server/kern/leverancier/zaak').ticketsVanZaak(opslag, code), mall: null, bureauZaak: null, samenwerking: null });
   const voor = JSON.stringify(opslag.data);
   const o = k.overzicht({ code: 'Z1', name: 'Zaak Een', rooms: [] });
   assert.equal(JSON.stringify(opslag.data), voor, 'het overzicht schrijft niets: de opslag is gelijk aan ervoor');

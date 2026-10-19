@@ -7,7 +7,7 @@ module.exports = (ctx) => {
   const { db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
     assetGebruik, zorgVoor, pay, acties, nu, wieBen, lijsten, van,
     fluisterOnthoud, fluisterVergeet, teSnel, fluisterSeintjes, standVan, topFocus, eur, datumInZin,
-    rahulExtra, voerReisUit, voerKledingUit } = ctx;
+    rahulExtra, voerReisUit, voerKledingUit, payGate } = ctx;
 
   /* De gegevenspoort geldt ook hier. Rahul doet dit met exact dezelfde functies
      als de app-knoppen, maar hij komt NIET langs de routes -- en daar zit de
@@ -22,7 +22,21 @@ module.exports = (ctx) => {
   };
   const poort = require('./gegevens')(ctx);
 
+  /* EN DE PASPOORTPOORT, om dezelfde reden: een "ja" op een voorstel dat geld
+     verplaatst is hetzelfde geldmoment als de app-knop, en die vraagt eenmalig
+     het paspoort (besluit 19 oktober 2026; test/fluister-paspoortpoort.test.js).
+     Rahul zegt dan waarom het niet doorgaat en doet niets. */
+  /* Een reisplan zet alleen klaar (./reis/reisplan.js) en een rit betaalt alleen
+     als hij vooraf moet; die poort staat bij het afrekenen hieronder. */
+  const GELD_SOORT = new Set(['bestelling', 'tik', 'ticket', 'behandeling', 'klompjes']);
+  const poortTekst = (sess, key) => {
+    const g = payGate ? payGate(sess || { key, tier: 'guest' }) : { ok: true };
+    return g.ok ? null : (g.error || 'Hiervoor vraagt RTG Pay eenmalig je paspoort.');
+  };
+
   async function voerUit(key, codenaam, w, sess) {
+    const nee = w && GELD_SOORT.has(w.soort) && poortTekst(sess, key);
+    if (nee) return { tekst: nee };
     const soortP = POORT_SOORT[w && w.soort];
     if (soortP && sess) {
       const vraag = poort.poortVraag(key, sess, soortP, { soort: 'voorstel', w });
@@ -75,6 +89,8 @@ module.exports = (ctx) => {
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       let slot = '';
       if (r.ride.status === 'wacht-op-betaling') {
+        const nee = poortTekst(sess, key);
+        if (nee) return { tekst: 'De rit staat klaar (' + r.ride.ref + '), maar afrekenen kan nog niet: ' + nee, gedaan: true };
         const b = await acties.betaalRit(sess, { ref: r.ride.ref });
         if (b.error) return { tekst: 'De rit staat klaar (' + r.ride.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
         slot = ' De offerte van ' + eur(r.ride.quote * 100) + ' is betaald;';

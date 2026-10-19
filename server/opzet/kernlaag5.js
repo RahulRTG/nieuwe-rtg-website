@@ -85,6 +85,8 @@ kern.fluister = require('../kern/fluister')({
   db, save, schoon, anthropic, notify,
   reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee, pay: kern.pay,
   acties: kern.rahulActies,
+  // de paspoortpoort voor een "ja" op geld, laat gelezen (onboarding komt later op de kern)
+  payGate: (s) => (kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(s) : { ok: true }),
   // de reislaag van Rahul: een hele reis op een vraag, kleding apart
   // leggen en voorspellen -- via exact dezelfde functies als de app-knoppen
   verblijfBoek: (session, body) => kern.verblijfBoek(session, liveCodename(session), body),

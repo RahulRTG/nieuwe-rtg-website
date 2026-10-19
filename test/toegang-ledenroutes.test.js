@@ -9,7 +9,10 @@
      - zonder sessie: 401;
      - de app-gids en de pushsleutel horen bij ELK ingelogd scherm (lid, zaak,
        kantoor, gezinsprofiel), dus een zaaksessie komt erdoor;
-     - de krant, de rechtsvormen en de projectie vragen een ledenaccount;
+     - de krant en de rechtsvormen vragen een ledenaccount;
+     - de projectie (het tv-scherm) valt onder uitzondering 6: hij koppelt met
+       de eenmalige code van een ingelogd lid, en zonder geldige code komt hij
+       er niet in;
      - /api/ice gaf al 401 zonder sessie (alleen de openbare STUN-lijst), en
        dat blijft zo. */
 'use strict';
@@ -27,8 +30,7 @@ const vraag = (methode, pad, body, token) => fetch(BASE + pad, {
 }).then(r => r.status);
 
 const LEDEN = [['POST', '/api/krant/gids', {}], ['POST', '/api/krant/open', { code: 'ONBEKEND' }],
-  ['POST', '/api/krant/artikel', { code: 'ONBEKEND', id: 'x' }], ['GET', '/api/onderneming/rechtsvormen'],
-  ['POST', '/api/projectie/koppel', { code: 'ONBEKEND' }], ['POST', '/api/projectie/kijk', { token: 'onbekend' }]];
+  ['POST', '/api/krant/artikel', { code: 'ONBEKEND', id: 'x' }], ['GET', '/api/onderneming/rechtsvormen']];
 const ELKE = [['POST', '/api/gids/app', { pad: '/apps/app.html' }], ['GET', '/api/push/key']];
 
 test.before(async () => { ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } })); });
@@ -52,4 +54,15 @@ test('de app-gids en de pushsleutel horen ook bij een zaaksessie', async () => {
   const zaak = (await post('/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).token;
   assert.ok(zaak, 'de zaak-inlog werkt');
   for (const [m, pad, lijf] of ELKE) assert.equal(await vraag(m, pad, lijf, zaak), 200, m + ' ' + pad + ' met een zaaksessie');
+});
+
+test('het tv-scherm: koppelen zonder geldige code wordt geweigerd, en een code maken vraagt een account', async () => {
+  for (const code of ['', 'ONBEKEND', 'GAME.' + '0'.repeat(32)]) {
+    const st = await vraag('POST', '/api/projectie/koppel', { code });
+    assert.ok([400, 404].includes(st), 'koppelen met "' + code + '" gaf ' + st);
+  }
+  assert.ok([400, 401, 404].includes(await vraag('POST', '/api/projectie/kijk', { token: 'SCREEN.' + '0'.repeat(32) })),
+    'een verzonnen schermsessie ziet niets');
+  /* De code ontstaat alleen bij een ingelogd lid: projectie-open zonder sessie is 401. */
+  assert.equal(await vraag('POST', '/api/member/spel/projectie-open', { id: 'x' }), 401);
 });

@@ -346,6 +346,7 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/club/portaal': 'clubportaal: de clubcode is de sleutel van het eigen dossier',
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/club/bericht': 'clubportaal: de clubcode is de sleutel',
     'server/routes/rtfkantoor/codedeuren.js POST /api/rtf/partner/raad': 'stadsraad-portaal: de partnercode is de sleutel',
+    'server/routes/spellen.js POST /api/projectie/koppel': 'spelscherm op tv: eenmalige gehashte koppeling van een ingelogd lid is de deur tot alleen publiek zicht (uitzondering 6)',
     'server/routes/supplier/toegang.js POST /api/supplier/roster': 'openbaar rooster van een zaak op zaakcode',
     // (b) openbare inhoud achter een inlog
     'server/routes/luchthaven.js POST /api/supplier/lucht/pass': 'boarding pass die de gast zelf toont aan de balie',

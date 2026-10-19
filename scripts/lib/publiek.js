@@ -280,6 +280,8 @@ const PUBLIEK = new Map([
      `zicht.publiek` van dat ene potje. Er kan niets terug: geen zet en geen
      chat. Beide deuren hebben een rem en antwoorden nooit cachebaar. Zie
      server/kern/spellen/projectie.js. */
+  ['/api/projectie/koppel', 'eigenaarsbesluit 19 oktober 2026, uitzondering 6: het tv-scherm wisselt de eenmalige 128-bits code van een INGELOGD lid (projectie-open vraagt auth) in voor een gehashte schermsessie; zonder geldige code 404, rem per adres'],
+  ['/api/projectie/kijk', 'eigenaarsbesluit 19 oktober 2026, uitzondering 6: de intrekbare schermsessie uit die koppeling leest alleen de publieke laag van het gekoppelde potje'],
   ['/api/projectie/:code', 'oude projectie-URL is uitsluitend een cacheloze 410-eindstatus en opent nooit meer een potje'],
   /* De rechtsvormen zijn voorlichting, geen bedrijfsdata: wat een B.V. van
      een stichting onderscheidt, en waar je met elk van de twee aan vastzit,

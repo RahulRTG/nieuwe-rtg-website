@@ -11,11 +11,9 @@
   function vergeet(){ token = ''; try { sessionStorage.removeItem(OPSLAG); } catch (e) {} }
   function bewaar(waarde){ token = waarde; try { sessionStorage.setItem(OPSLAG, waarde); } catch (e) {} }
   async function post(pad, lijf){
-    // het scherm draagt een account (eigenaarsbesluit 19 oktober 2026); de koppelcode blijft een extra sleutel
     const r = await fetch(pad, { method:'POST', credentials:'omit', cache:'no-store',
-      referrerPolicy:'no-referrer', headers:window.RTGAccountDeur.kop({ 'Content-Type':'application/json' }), body:JSON.stringify(lijf) });
+      referrerPolicy:'no-referrer', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(lijf) });
     const d = await r.json().catch(()=>({}));
-    if (r.status === 401) { window.RTGAccountDeur.vergeet(); vergeet(); }
     if (!r.ok) { const fout = new Error(d.error || 'Het gedeelde scherm is niet bereikbaar.'); fout.status = r.status; throw fout; }
     return d;
   }
@@ -51,8 +49,7 @@
   }
 
   async function koppel(code){
-    if (bezig) return;
-    await account(); bezig = true;
+    if (bezig) return; bezig = true;
     const melding = $('#melding'); if (melding) melding.textContent = 'Veilig koppelen…';
     let gekoppeld = false;
     try {
@@ -96,14 +93,7 @@
       midden + '<div class="rij">' + rij + '</div><div class="klein">Veilig gekoppeld</div>';
   }
 
-  async function account(){
-    if (window.RTGAccountDeur.token()) return;
-    if (timer) { clearInterval(timer); timer = null; }
-    $('#hoofd').innerHTML = '<div class="merk">RTG Game Night</div><div id="schermAccount"></div>';
-    await window.RTGAccountDeur.eis($('#schermAccount'), { waarom: 'Dit scherm toont het spel van een potje. Log in, of maak gratis een account; daarna koppel je het scherm met de code van een speler.' });
-  }
-  async function start(){
-    await account();
+  function start(){
     if (!token) return toonInvoer();
     if (timer) clearInterval(timer);
     haal(); timer = setInterval(haal, 3000);
@@ -111,5 +101,5 @@
   bindInvoer();
   document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && token) haal(); });
   if (window.RTGWauw) window.RTGWauw.wakker(true);
-  if (window.__spelKoppeling) koppel(window.__spelKoppeling); else start();
+  if (window.__spelKoppeling) koppel(window.__spelKoppeling); else if (token) start();
 })();

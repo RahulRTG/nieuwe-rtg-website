@@ -116,17 +116,18 @@ module.exports = (kern) => {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
     }
   }
-  /* HET GEDEELDE SCHERM vraagt sinds het eigenaarsbesluit van 19 oktober 2026
-     een account (op het scherm zelf, via shared/accountdeur.js), en daarnaast
-     een begrensde credential: de koppelcode blijft een extra sleutel. De eenmalige koppeling en de blijvende schermsessie
+  /* HET GEDEELDE SCHERM blijft zonder ledenaccount, maar niet zonder een
+     begrensde credential (eigenaarsbesluit 19 oktober 2026, uitzondering 6):
+     de tv koppelt met de eenmalige code die een INGELOGD lid aanmaakte
+     (projectie-open vraagt auth), en hangt zo aan dat account. De eenmalige koppeling en de blijvende schermsessie
      reizen uitsluitend in POST-lijven. Zo belandt geen geheim in een URL,
      accesslog of Referer. Beide antwoorden zijn no-store. */
-  app.post('/api/projectie/koppel', auth, rem({ windowMs: 60000, limit: 20 }), (req, res) => {
+  app.post('/api/projectie/koppel', rem({ windowMs: 60000, limit: 20 }), (req, res) => {
     res.set('Cache-Control', 'no-store'); res.set('Pragma', 'no-cache');
     veilig(res, () => projectieKoppel(String((req.body || {}).code || '')),
       'projectie-koppel', req);
   });
-  app.post('/api/projectie/kijk', auth, rem({ windowMs: 60000, limit: 90 }), (req, res) => {
+  app.post('/api/projectie/kijk', rem({ windowMs: 60000, limit: 90 }), (req, res) => {
     res.set('Cache-Control', 'no-store'); res.set('Pragma', 'no-cache');
     veilig(res, () => projectieStand(String((req.body || {}).token || '')),
       'projectie-kijk', req);

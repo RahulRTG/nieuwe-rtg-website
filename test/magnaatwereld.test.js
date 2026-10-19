@@ -90,6 +90,21 @@ test('een missie controleert dat de speler het juiste echte RTG-scherm opent', (
   assert.ok(goed.taak.punten >= 75);
 });
 
+test('een herhaald antwoord beantwoordt niet stil de volgende vraag', () => {
+  const { w } = wereld();
+  const c = w.catalogus.find(x => x.id === 'betalen');
+  const t = w.taakStart('user-herhaal', c.id, 'computer').taak;
+  const open = w.taakHandeling('user-herhaal', t.id, t.huidig.doel).taak;
+  const eerste = w.taakAntwoord('user-herhaal', t.id, 0, open.stap);
+  assert.equal(eerste.ok, true);
+  /* Het antwoord kwam nooit bij het scherm aan, dus het stuurt hetzelfde
+     antwoord voor dezelfde vraag opnieuw. */
+  const herhaling = w.taakAntwoord('user-herhaal', t.id, 0, open.stap);
+  assert.equal(herhaling.status, 409, 'de herhaling hoort bij de vorige vraag');
+  assert.equal(herhaling.taak.stap, open.stap + 1, 'de opdracht gaat een stap verder en niet twee');
+  assert.equal(herhaling.taak.punten, eerste.taak.punten, 'en de herhaling levert geen punten op');
+});
+
 test('spelers zien elkaars opdrachten niet, maar delen wel dezelfde wereldtotalen', () => {
   const { w } = wereld();
   const c = w.catalogus[0];

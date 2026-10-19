@@ -239,6 +239,9 @@ const CONTRACT = {
   'link:onderneming': Object.assign({
     belofte: 'een ondernemer begint met een werktitel, kiest een rechtsvorm, werkt de oprichting af en schrijft zich in, en dat staat precies een keer op zijn naam'
   }, voltooi('onderneming', 'het scenario loopt /api/onderneming/nieuw, /mijn, /rechtsvorm, /oprichting/zet, /intake, /verkenning, /plan/vastleggen, /ingeschreven, /kas/saldo en /dagbeeld, de routes die /apps/onderneming.html zelf aanroept, met een ander lid dat er niet bij komt')),
+  'link:magnaat': Object.assign({
+    belofte: 'een lid pakt een dossier uit zijn dagdienst op, opent het juiste RTG-scherm en beantwoordt de keuzes; wat hij verdient blijft van hem en telt een keer'
+  }, voltooi('magnaat', 'het scenario loopt /api/member/magnaat/overzicht, /taak/start, /taak/handeling en /taak/antwoord, onder het voorvoegsel dat /apps/magnaat.html via api() aanroept, met een tweede speler die er niet bij komt')),
   /* Tot 19 oktober 2026 droeg de tafelproef (scripts/tafelproef.js) hier
      voltooibaar. De voltooiproef loopt nu dezelfde stroom van openen tot
      afrekenen en meet daarnaast de herstart, de crash en de offline sync; een

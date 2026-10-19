@@ -36,6 +36,16 @@ async function loop(w, stap) {
     return { klopt: a.status === 200 && b.status === 200 && l.aantal === 2 && !!partner && !!kind, ziet: l.aantal + ' personen' };
   });
 
+  await stap('voltooibaar', 'een allergeen van een reisgenoot uit de EU-lijst, met tot wanneer het bewaard blijft; een code buiten de lijst wordt geweigerd met de reden', async () => {
+    const r = await w.post(PERSOON, { id: kind.id, naam: 'Kind ' + merk, band: 'kind', allergenen: ['pinda'] }, T);
+    const fout = await w.post(PERSOON, { id: kind.id, naam: 'Kind ' + merk, band: 'kind', allergenen: ['aardbei'] }, T);
+    const k = await wie('Kind ' + merk);
+    const terug = await w.post(PERSOON, { id: kind.id, naam: 'Kind ' + merk, band: 'kind', allergenen: [] }, T);
+    const na = await wie('Kind ' + merk);
+    return { klopt: r.status === 200 && k.allergenen.join() === 'pinda' && k.dieetTot === dag(365) && fout.status === 400 && /lijst/.test((fout.data && fout.data.error) || '') && terug.status === 200 && na.allergenen.length === 0 && !na.dieetTot,
+      ziet: 'kind: ' + k.allergenen.join() + ' t/m ' + k.dieetTot + '; aardbei: ' + fout.status + '; weer leeg: ' + na.allergenen.length };
+  });
+
   await stap('voltooibaar', 'een verlopen visum en een paspoort dat over een maand verloopt: verlopen staat bovenaan', async () => {
     const a = await w.post(DOC, { id: partner.id, soort: 'paspoort', tot: dag(30) }, T);
     const b = await w.post(DOC, { id: kind.id, soort: 'visum', tot: dag(-5) }, T);

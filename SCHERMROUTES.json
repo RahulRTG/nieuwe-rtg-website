@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "c5d6e935e",
+  "commit": "7f926b6f0",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": true,
    "ongecommitteInvoer": [
-    "public/apps/table.html"
+    "public/apps/entourage.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -2004,8 +2004,8 @@
  "gemeten": {
   "schermenMetPad": 480,
   "nietGelezen": 0,
-  "exactePaden": 1572,
-  "verwijzingen": 1857,
+  "exactePaden": 1578,
+  "verwijzingen": 1864,
   "voorvoegsels": 115,
   "basisPaden": 1,
   "doodPad": 0,
@@ -2175,6 +2175,17 @@
    "aantal": 5
   },
   {
+   "pad": "/api/member/rechterhand/ai",
+   "schermen": [
+    "public/apps/entourage.html",
+    "public/apps/geld/logboekb.js",
+    "public/apps/geld/mecenaatb.js",
+    "public/apps/geld/nalatenschapb.js",
+    "public/apps/table.html"
+   ],
+   "aantal": 5
+  },
+  {
    "pad": "/api/foundation",
    "schermen": [
     "public/apps/app-main/app-main-43.js",
@@ -2201,16 +2212,6 @@
     "public/apps/foundation/voorzijde.js",
     "public/shared/interface/world-desktop-home.js",
     "public/shared/interface/world-widget-data.js"
-   ],
-   "aantal": 4
-  },
-  {
-   "pad": "/api/member/rechterhand/ai",
-   "schermen": [
-    "public/apps/geld/logboekb.js",
-    "public/apps/geld/mecenaatb.js",
-    "public/apps/geld/nalatenschapb.js",
-    "public/apps/table.html"
    ],
    "aantal": 4
   },
@@ -5274,6 +5275,48 @@
    "pad": "/api/doos/rapport",
    "schermen": [
     "public/apps/doos.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/doc",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/doc/weg",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/gezelschap",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/persoon",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/persoon/weg",
+   "schermen": [
+    "public/apps/entourage.html"
    ],
    "aantal": 1
   },
@@ -14026,10 +14069,16 @@
   },
   {
    "bestand": "public/apps/entourage.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
-   ]
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/entourage",
+    "/api/member/rechterhand/entourage/doc",
+    "/api/member/rechterhand/entourage/doc/weg",
+    "/api/member/rechterhand/entourage/gezelschap",
+    "/api/member/rechterhand/entourage/persoon",
+    "/api/member/rechterhand/entourage/persoon/weg"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/festival/beeld.js",

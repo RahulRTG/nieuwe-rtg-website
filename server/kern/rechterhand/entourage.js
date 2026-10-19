@@ -20,15 +20,46 @@
 
    Wat hier NIET komt: inreisvereisten per land. Die veranderen per week en per
    nationaliteit; iets beweren wat wij niet kunnen naslaan is erger dan niets
-   zeggen. De app waarschuwt over data die U heeft ingevuld, en zegt dat erbij. */
+   zeggen. De app waarschuwt over data die U heeft ingevuld, en zegt dat erbij.
+
+   ALLERGIE EN DIEET ZIJN VAN DE REISGENOOT. Een derde zonder account; een
+   allergie of medisch dieet is een gezondheidsgegeven (art. 9 AVG). Zoals bij
+   Table (./table.js): de allergenen uit de lijst van bijlage II
+   (kern/allergenen.js), `dieet` alleen als aanvulling, en alleen het lid ziet
+   het per persoon. Entourage is een vaste lijst en geen gelegenheid, dus de
+   termijn loopt vanaf de laatste keer dat het lid het opsloeg: DIEET_DAGEN.
+   Daarna is het weg uit de opslag en zegt het gezelschap "dieet onbekend".
+   test/entourage-dieet.test.js houdt het vast. */
 module.exports = (ctx) => {
-  const { save, rid, nu, schoon, isDatum, L } = ctx;
+  const { save, rid, nu, schoon, isDatum, L, levens } = ctx;
+  const klok = require('../../lib/klok');
+  const { ALLERGENEN, kiesAllergenen, LIJSTFOUT } = require('../allergenen');
+  const DAG = 86400000, DIEET_DAGEN = 365;
+  const heeftDieet = p => !!((p.allergenen && p.allergenen.length) || p.dieet);
+  const dieetTot = p => { const op = Date.parse(p.dieetOp || '') || 0; return op ? new Date(op + DIEET_DAGEN * DAG).toISOString().slice(0, 10) : ''; };
+  function vergeetIn(l, t) {
+    let n = 0;
+    for (const p of (l && Array.isArray(l.entourage) ? l.entourage : [])) {
+      if (!heeftDieet(p)) { delete p.dieetOp; continue; }
+      if (!p.dieetOp) p.dieetOp = new Date(t).toISOString();   // van voor deze regel: de termijn begint nu
+      if (t >= (Date.parse(p.dieetOp) || 0) + DIEET_DAGEN * DAG) { p.allergenen = []; p.dieet = ''; delete p.dieetOp; n++; }
+    }
+    return n;
+  }
+  /* De bewaarveger (opzet/start.js): alle dossiers, door de eigen deur. */
+  function entourageVergeetDieet(t) {
+    let n = 0;
+    const alle = levens.alleLezend();
+    for (const key of Object.keys(alle)) n += vergeetIn(alle[key], Number(t) || klok.nu());
+    if (n) save();
+    return n;
+  }
   const BANDEN = ['partner', 'familie', 'vriend', 'zakelijk', 'kind', 'overig'];
   const SOORTEN = ['paspoort', 'visum', 'rijbewijs', 'verzekering', 'vaccinatie', 'overig'];
   const VENSTER = 90;   // dagen vooruit waarin we waarschuwen
   const vandaag = () => new Date().toISOString().slice(0, 10);
 
-  function E(key) { const l = L(key); if (!Array.isArray(l.entourage)) l.entourage = []; return l.entourage; }
+  function E(key) { const l = L(key); if (!Array.isArray(l.entourage)) l.entourage = []; if (vergeetIn(l, klok.nu())) save(); return l.entourage; }
 
   /* De documenten van een persoon, met het oude paspoortveld erbij gelezen. Zo
      ziet de rest van de module maar EEN soort gegeven. */
@@ -43,12 +74,20 @@ module.exports = (ctx) => {
   function enPersoon(key, b) {
     const naam = schoon(b.naam, 80);
     if (!naam) return { status: 400, error: 'Naam van de persoon?' };
+    const allergenen = kiesAllergenen(b.allergenen);
+    if (allergenen === false) return LIJSTFOUT;
     const lijst = E(key);
     const rec = { naam, band: BANDEN.includes(b.band) ? b.band : 'overig', telefoon: schoon(b.telefoon, 40),
       dieet: schoon(b.dieet, 80), paspoortTot: isDatum(b.paspoortTot) ? b.paspoortTot : '',
       voorkeuren: schoon(b.voorkeuren, 200), notitie: schoon(b.notitie, 200) };
-    if (b.id) { const p = lijst.find(x => x.id === b.id); if (!p) return { status: 404, error: 'Niet gevonden.' }; Object.assign(p, rec); save(); return { status: 200, ok: true }; }
+    if (allergenen) rec.allergenen = allergenen;
+    else if (!b.id) rec.allergenen = [];
+    /* opslaan is bevestigen: wie het lid opnieuw bewaart, zet de termijn opnieuw */
+    rec.dieetOp = (rec.dieet || (allergenen && allergenen.length)) ? nu() : undefined;
+    if (b.id) { const p = lijst.find(x => x.id === b.id); if (!p) return { status: 404, error: 'Niet gevonden.' }; Object.assign(p, rec);
+      if (heeftDieet(p) && !p.dieetOp) p.dieetOp = nu(); if (!heeftDieet(p)) delete p.dieetOp; save(); return { status: 200, ok: true }; }
     if (lijst.length >= 300) return { status: 400, error: 'De lijst is vol.' };
+    if (!rec.dieetOp) delete rec.dieetOp;
     lijst.unshift(Object.assign({ id: rid(), at: nu(), documenten: [] }, rec)); save();
     return { status: 200, ok: true };
   }
@@ -94,8 +133,10 @@ module.exports = (ctx) => {
     }
     attenties.sort((a, b) => a.tot.localeCompare(b.tot));
     return { status: 200,
-      gezelschap: lijst.map(p => Object.assign({}, p, { documenten: docsVan(p) })),
+      gezelschap: lijst.map(p => Object.assign({}, p, { documenten: docsVan(p), allergenen: p.allergenen || [] },
+        heeftDieet(p) ? { dieetTot: dieetTot(p) } : {})),
       banden: BANDEN, soorten: SOORTEN, aantal: lijst.length, venster: VENSTER, attenties,
+      allergenen: ALLERGENEN, dieetDagen: DIEET_DAGEN,
       bron: 'Gebaseerd op de datums die u zelf invult. Inreisvereisten per land staan hier bewust niet in: die wisselen te snel om ze te beloven.' };
   }
 
@@ -115,8 +156,8 @@ module.exports = (ctx) => {
         else if (d.tot && d.tot <= grens) punten.push({ naam: p.naam, wat: d.soort + ' verloopt binnenkort (' + d.tot + ')' });
       }
       if (!p.telefoon) punten.push({ naam: p.naam, wat: 'geen telefoonnummer' });
-      if (!p.dieet) punten.push({ naam: p.naam, wat: 'dieet onbekend' });
-      else dieten.push({ naam: p.naam, dieet: p.dieet });
+      if (!heeftDieet(p)) punten.push({ naam: p.naam, wat: 'dieet onbekend' });
+      else dieten.push({ naam: p.naam, dieet: (p.allergenen || []).concat(p.dieet ? [p.dieet] : []).join(', ') });
     }
     return { status: 200, personen: mee.length,
       namen: mee.map(p => p.naam), dieten, punten,
@@ -126,5 +167,5 @@ module.exports = (ctx) => {
         : 'Er zijn ' + punten.length + ' punten die aandacht vragen voordat u vertrekt.' };
   }
 
-  return { entourage, enPersoon, enPersoonWeg, enDoc, enDocWeg, enGezelschap };
+  return { entourage, enPersoon, enPersoonWeg, enDoc, enDocWeg, enGezelschap, entourageVergeetDieet };
 };

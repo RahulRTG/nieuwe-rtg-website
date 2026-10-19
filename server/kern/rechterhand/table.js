@@ -18,17 +18,9 @@
 module.exports = (ctx) => {
   const { save, rid, nu, schoon, isDatum, L, levens } = ctx;
   const klok = require('../../lib/klok');
-  const { ALLERGENEN } = require('../allergenen');
+  const { ALLERGENEN, kiesAllergenen: allergenenUit, LIJSTFOUT } = require('../allergenen');
   const DAG = 86400000, DIEET_DAGEN = 30;
 
-  /* null = geen keuze gegeven; false = een code die niet op de lijst staat. */
-  function allergenenUit(ruw) {
-    if (ruw === undefined) return null;
-    const lijst = Array.isArray(ruw) ? ruw.map(x => String(x)) : [];
-    if (lijst.some(x => !ALLERGENEN.includes(x))) return false;
-    return ALLERGENEN.filter(a => lijst.includes(a));
-  }
-  const LIJSTFOUT = { status: 400, error: 'Kies de allergenen uit de lijst; iets anders kan als korte aanvulling.' };
   const heeftDieet = g => !!((g.allergenen && g.allergenen.length) || g.dieet);
   /* Tot en met deze dag blijft het staan (JJJJ-MM-DD). */
   function dieetTot(e, g) {

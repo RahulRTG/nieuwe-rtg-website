@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2904 bestanden en 19843 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2905 bestanden en 19849 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2904 |
-| losse beweringen (`test(...)`) | 19843 |
+| toetsbestanden | 2905 |
+| losse beweringen (`test(...)`) | 19849 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 362 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 84 |
+| niets van beide | 85 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2556 bestanden, 19257 beweringen.
+2557 bestanden, 19263 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -596,6 +596,7 @@ toets omvalt.
 | `eigenpoort.test.js` | 5 | gezakt op `&&->||#0` | DE POORT IN DE HANDLER IS IETS ANDERS DAN OPENBAAR. WAT ER MIS GING, en het was mijn eigen keuze. |
 | `eindpoort.test.js` | 5 | gezakt op `&&->||#5` | WAT AF IS, BLIJFT AF -- de eindpoort op de bakken die op nul staan. De eigenaar wil uiteindelijk een build die alleen groen wordt als ELKE bak van scripts/onbewezen.js op nul staat. |
 | `entiteitrekening.test.js` | 2 | gezakt op `liegpoort /api/` | DE RTG-REKENING OP NAAM VAN EEN ENTITEIT (kern/bank/entiteit.js), en de uitgave uit het Werk OS die ervan betaalt (bedrijf/entiteitbetaling.js). Besluit van de eigenaar, 24 september 2026. |
+| `entourage-dieet.test.js` | 6 | -- | ENTOURAGE: ALLERGIE EN DIEET VAN EEN REISGENOOT (besluit van de integrator van 19 oktober 2026, hetzelfde als Table: test/table-dieet.test.js). Een reisgenoot is een derde zonder account; zijn allergie of medisch... |
 | `envelop-kantooridentiteit.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE ENVELOP ZEGT NIET `bewezen` OVER EEN WACHTWOORDSESSIE (11 oktober 2026). Een opgegeven naam, een bestaande sessie en een bewezen identiteit zijn drie dingen (besluit van de eigenaar). |
 | `envelop.test.js` | 13 | gezakt op `!==->===#0` | DE EVENTENVELOP: de taal op de bus. OS.md par. |
 | `envelopv2.test.js` | 6 | gezakt op `===->!==#0` | ENVELOP v2 -- de bus leest het verzoekframe (Fase 2, PR 5; besluit B3b). Vier dingen worden hier vastgehouden, en elk zakt op een eigen mutatie: 1. |

@@ -97,8 +97,8 @@ module.exports = function start(deps) {
     sosVeeg: [(t, data) => require('../kern/voertuigsos').vergeetVoertuigSos(data.boekingen, t)].concat(
       ['ontmoetVergeetSosPosities', 'veiligVergeetSosPosities', 'veiligVergeetVerlopenPlekken',
         'bevVergeetSosPosities', 'bevVergeetRondePosities',
-        // allergie en dieet van een gast aan Table: de dag na de gelegenheid weg (kern/rechterhand/table.js)
-        'tableVergeetDieet']
+        // allergie en dieet van een derde: Table de dag na de gelegenheid, Entourage na een jaar zonder bevestiging
+        'tableVergeetDieet', 'entourageVergeetDieet']
         .map(n => (t) => (typeof kern[n] === 'function' ? kern[n](t) : 0))),
     // sollicitatiepost op de leidingsplek van RTMail (584A): de ronde blijft van het domein
     leidingVeeg: (t) => (kern.rtmailBewaar ? kern.rtmailBewaar.leiding.ronde(t,

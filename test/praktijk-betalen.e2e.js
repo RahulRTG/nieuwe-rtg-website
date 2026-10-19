@@ -10,10 +10,18 @@ for(const width of [390,1440])test('klant bedient betaalpagina en status op '+wi
     srv=await startServer();browser=await pw.chromium.launch(browserOpties(pw));
     const page=await browser.newPage({viewport:{width,height:900}});
     await page.addInitScript(()=>localStorage.setItem('rtg_cookieinfo_v1','1'));
+    // De link is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026): zonder token toont het scherm de accountdeur.
+    await page.goto(srv.base+'/apps/werk.html#gast=lokale-browserfixture',{waitUntil:'domcontentloaded'});
+    await page.getByRole('heading',{name:'Maak gratis een account',exact:true}).waitFor();
+    await page.getByRole('button',{name:'Ik heb al een account',exact:true}).click();
+    await page.getByRole('heading',{name:'Log in',exact:true}).waitFor();
+    await page.addInitScript(()=>localStorage.setItem('rtg_member_token','lokale-tokenfixture'));
+    await page.goto('about:blank');
     let betaald=false,starten=0;
     await page.route('**/api/werk-gast/**',async route=>{
       const pad=new URL(route.request().url()).pathname,b=route.request().postDataJSON();
       assert.equal(b.sleutel,'lokale-browserfixture');
+      assert.equal(route.request().headers().authorization,'Bearer lokale-tokenfixture','de link reist mee met de sessie, niet in plaats ervan');
       const betaling={beschikbaar:true,aangezet:true,ontvanger:'RTG Fixture',magStarten:!betaald,
         uitleg:'U bevestigt bij de betaalprovider.',stand:betaald?{status:'BEVESTIGD',label:'Betaling bevestigd'}:null};
       let uit={ok:true,organisatie:'Werkplek',titel:'Afgesproken opdracht',omschrijving:'Dienstverlening',voorstel:'Alle afgesproken werkzaamheden',

@@ -3,20 +3,20 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-19T09:52:24.841Z",
-  "commit": "2c39db7a",
-  "boomVuil": true,
+  "op": "2026-10-19T10:08:40.992Z",
+  "commit": "2f07f243",
+  "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.0"
  },
  "gemeten": {
   "artefacten": 394,
-  "bron": 55,
+  "bron": 56,
   "afgeleid": 207,
   "fragmenten": 28,
   "momentopname": 1,
-  "onbeslist": 103,
+  "onbeslist": 102,
   "afgeleidZonderEigenaar": 0,
   "metEigenaar": 236,
   "afgeleidEigenaarHard": 207,
@@ -3272,7 +3272,7 @@
    "naam": "ONTWERPNORM.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/ontwerpsysteem.js",
-   "graad": "gemeten",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/ontwerpsysteem.js"
    ],
@@ -3296,7 +3296,7 @@
   },
   {
    "naam": "ONTWERPSYSTEEM.md",
-   "soort": "ONBESLIST",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],

@@ -187,6 +187,8 @@ test('dezelfde herhaalsleutel maakt geen tweede onderneming, ook niet na een her
   assert.notEqual(K.ondernemingNieuw('LID2', { naam: 'Koffiebar', idem: 'poging-1' }).herhaald, true,
     'de sleutel van een ander lid is een eigen onderneming');
   assert.equal(K.ondernemingNieuw('LID1', { naam: 'Koffiebar' }).herhaald, undefined, 'zonder sleutel blijft het een nieuwe');
+  const ander = K.ondernemingNieuw('LID1', { naam: 'Iets anders', idem: 'poging-1' });
+  assert.equal(ander.status, 409, 'dezelfde sleutel bij een ander verzoek is een fout, geen stille herhaling');
 });
 
 test('koppelen dicht de naad: de naam woont daarna op precies één plek', () => {

@@ -145,3 +145,13 @@ test('een herhaalsleutel overleeft een herstart: dezelfde belofte of hetzelfde v
   assert.equal(tweede.goedkeuringMaak({ huis: 'rtg', titel: 'Nieuwe leverancier', reden: 'Sneller leveren', idem: 'dr-1' }, ctx).goedkeuring.id, g.goedkeuring.id);
   assert.equal(tweede.state('rtg').goedkeuringen.length, 1);
 });
+
+test('dezelfde herhaalsleutel bij een ANDER verzoek is een fout (409), geen stille herhaling', () => {
+  const crypto = require('node:crypto'), db = { data: {} };
+  const one = require('../server/kern/rtgone')({ db, save: () => {}, crypto }).rtgone;
+  assert.equal(one.belofteMaak({ huis: 'rtg', belofte: 'Offerte vrijdag', idem: 'form-9' }, 'Noordster').ok, true);
+  const ander = one.belofteMaak({ huis: 'rtg', belofte: 'Iets heel anders', idem: 'form-9' }, 'Noordster');
+  assert.equal(ander.status, 409);
+  assert.match(ander.error, /ander verzoek/);
+  assert.equal(one.state('rtg').beloften.length, 1);
+});

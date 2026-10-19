@@ -18,10 +18,17 @@
 
 /* Het antwoord voor een document dat deze eigenaar met deze sleutel al
    maakte, of null als het een nieuwe poging is. */
-function gemaakt(alle, key, idem) {
+function gemaakt(alle, key, idem, verzoek) {
   const d = idem && Object.values(alle).find(x => x.key === key && x.idem === idem);
-  return d ? { status: 200, ok: true, id: d.id, soort: d.soort, titel: d.titel, herhaald: true } : null;
+  if (!d) return null;
+  /* Dezelfde sleutel bij een ander verzoek is geen herhaling maar een fout. */
+  if (d.idemVerzoek && d.idemVerzoek !== verzoek)
+    return { status: 409, error: 'Deze herhaalsleutel hoort bij een ander document; er is niets aangemaakt.' };
+  return { status: 200, ok: true, id: d.id, soort: d.soort, titel: d.titel, herhaald: true };
 }
+
+/* Wat een maak-verzoek IS: soort, sjabloon en titel zoals ze binnenkwamen. */
+const verzoekVan = (data) => JSON.stringify([data.soort || '', data.sjabloon || '', data.titel || '']);
 
 /* Staat wat er binnenkomt er al? Titel telt alleen als die is meegestuurd. */
 function staatEr(d, data, schoonInhoud, titelVan) {
@@ -30,4 +37,7 @@ function staatEr(d, data, schoonInhoud, titelVan) {
   return typeof data.titel !== 'string' || (titelVan(data.titel) || d.titel) === d.titel;
 }
 
-module.exports = { gemaakt, staatEr };
+/* De sleutel en het verzoek bij een nieuw document vastleggen. */
+function merk(d, idem, data) { if (idem) { d.idem = idem; d.idemVerzoek = verzoekVan(data); } }
+
+module.exports = { gemaakt, staatEr, verzoekVan, merk };

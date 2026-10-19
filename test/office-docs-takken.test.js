@@ -288,6 +288,8 @@ test('dezelfde herhaalsleutel maakt geen tweede document, ook niet na een hersta
   assert.equal(b.id, a.id);
   assert.equal(d.officeMijn('a').docs.filter((x) => x.titel === 'Notulen').length, 1);
   assert.notEqual(d.officeMaak('b', { soort: 'tekst', idem: 'poging-1' }).id, a.id, 'de sleutel van een ander is een eigen document');
+  const ander = d.officeMaak('a', { soort: 'blad', titel: 'Begroting', idem: 'poging-1' });
+  assert.equal(ander.status, 409, 'dezelfde sleutel bij een ander verzoek is een fout, geen stille herhaling');
 });
 
 test('dezelfde autosave nog eens geeft geen vals versieconflict; een andere inhoud op een oude stand wel', () => {

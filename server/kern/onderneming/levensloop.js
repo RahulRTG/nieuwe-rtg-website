@@ -29,6 +29,8 @@ module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernem
        tweede onderneming met dezelfde naam (scripts/lib/voltooi/onderneming.js). */
     const idem = scho((body || {}).idem, 80) || null;
     const eerder = idem && bak().find(x => x.eigenaar === eigenaar && x.idem === idem);
+    if (eerder && (eerder.naam !== naam || (eerder.rechtsvorm || null) !== (rvIn || null)))
+      return { status: 409, error: 'Deze herhaalsleutel hoort bij een andere onderneming; er is niets aangemaakt.' };
     if (eerder) return { ok: true, herhaald: true, onderneming: ondernemingBeeld(eerder) };
     const o = {
       id: 'ond_' + crypto.randomBytes(6).toString('hex'),

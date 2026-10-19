@@ -58,6 +58,7 @@ module.exports = (kern) => {
     res.json({ groothandels: ghMarkt(soort, { zoek: req.body.zoek, categorie: req.body.categorie }), categorieen: GROOTHANDEL_CATEGORIEEN });
   });
   app.post('/api/supplier/inkoop/bestel', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return; // een bestelling verplicht de zaak: werk van de leiding
     const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koperVan(req.supplier), req.body.regels, { bezorgen: req.body.bezorgen !== false });
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true, order: r.order });
@@ -66,6 +67,7 @@ module.exports = (kern) => {
     res.json({ bestellingen: ghMijnBestellingen(koperVan(req.supplier)) });
   });
   app.post('/api/supplier/inkoop/annuleer', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return; // een bestelling verplicht de zaak: werk van de leiding
     const r = ghAnnuleer(koperVan(req.supplier), String(req.body.ref || ''));
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true });
@@ -78,6 +80,7 @@ module.exports = (kern) => {
   });
   // het AI-voorstel (of een bijgewerkte versie) bevestigen tot een bestelling
   app.post('/api/supplier/inkoop/ai-bevestig', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return; // een bestelling verplicht de zaak: werk van de leiding
     const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koperVan(req.supplier), req.body.regels, { bezorgen: req.body.bezorgen !== false, bron: 'ai' });
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true, order: r.order });

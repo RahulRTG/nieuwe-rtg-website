@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2913 bestanden en 19869 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2914 bestanden en 19871 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2913 |
-| losse beweringen (`test(...)`) | 19869 |
+| toetsbestanden | 2914 |
+| losse beweringen (`test(...)`) | 19871 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 5 |
-| niets van beide | 93 |
+| niets van beide | 94 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2566 bestanden, 19284 beweringen.
+2567 bestanden, 19286 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -945,6 +945,7 @@ toets omvalt.
 | `incidentcontrole.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `infra.test.js` | 9 | geen module gevonden | DE INFRASTRUCTUURPOORT VAN DE TOETSEN (test/infra.js). Lokaal mag een toets zich overslaan als er een database, Redis of een browser ontbreekt -- met een etiket dat de draaier telt. |
 | `inhoudswacht.test.js` | 2 | gezakt op `liegpoort /api/` | DE INHOUDSWACHT -- elke blinde route krijgt zijn vormcontract terug. INHOUDSKAART.json draagt per (voorheen) blinde route het ware antwoordprofiel: status, sleutels, en welke velden dragend zijn. |
+| `inkoop-manager.test.js` | 2 | -- | Horeca-inkoop: BESTELLEN EN ANNULEREN BIJ EEN GROOTHANDEL IS MANAGERWERK. Een bestelling verplicht de zaak tot betalen; annuleren raakt een leverancier. |
 | `inkoopketen.test.js` | 5 | gezakt op `liegpoort /api/` | DE KETEN VAN BESTELLEN NAAR KEUKEN -- 5 endpoints uit de supplier-groep. groothandel/product, groothandel/voorraad, inkoop/annuleer, inkoop/ai-bevestig en mep/daily/done stonden als nooit aangeroepen in de... |
 | `inlinestijl.test.js` | 9 | gezakt op `&&->||#0` | DE OMZETTING VAN INLINE STIJLEN NAAR KLASSEN (TAKEN.md 4.51). WAT HIER OP HET SPEL STAAT. |
 | `inlogherkomst-weerbaar.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | DE HERKOMST VAN EEN INLOG EN HET INLOGSPOOR (server/kern/identiteit/inlogherkomst.js). Wat deze module beschermt: twee dingen die op het moment van inloggen moeten gebeuren en niet achteraf kunnen. |

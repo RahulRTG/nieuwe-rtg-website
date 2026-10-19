@@ -81,6 +81,7 @@ const AFGELEID = 'menselijk';
 const SCENARIOS = {
   'appdossier.js': require('./lib/voltooi/appdossier'),
   'attenties.js': require('./lib/voltooi/attenties'),
+  'berichten.js': require('./lib/voltooi/berichten'),
   'bescherming.js': require('./lib/voltooi/bescherming'),
   'cellier.js': require('./lib/voltooi/cellier'),
   'cercle.js': require('./lib/voltooi/cercle'),

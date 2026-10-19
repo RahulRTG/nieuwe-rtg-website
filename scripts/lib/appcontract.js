@@ -223,6 +223,9 @@ const CONTRACT = {
   'link:appdossier': Object.assign({
     belofte: 'een lid leest over een app van een derde wie de leverancier is en wie hem toeliet, wat er draait, wat hij nooit krijgt en wat het dossier niet kan zeggen -- pas nadat een mens van RTG publiceerde'
   }, voltooi('appdossier', 'het scenario loopt /api/appstore/kanaal en /api/appstore/dossier, de routes die /apps/appstore-dossier.html zelf aanroept, met een uitgever die inzendt en een kantoormens op naam die publiceert')),
+  'link:berichten': Object.assign({
+    belofte: 'een lid begint een gesprek met iemand die het kent, stuurt, antwoordt, wijzigt en trekt in, en de ander ziet precies dat; wie niet in het gesprek zit leest en schrijft niets'
+  }, voltooi('berichten', 'het scenario loopt /api/comm/begin, /stuur, /inbox, /gesprek, /lees, /reactie, /wijzig en /wis, de routes die /apps/comm.html zelf aanroept, met een verbonden tweede lid en een derde dat buiten blijft')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

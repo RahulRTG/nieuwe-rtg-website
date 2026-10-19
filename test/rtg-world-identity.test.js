@@ -116,8 +116,11 @@ test('basis laadt de routekaart vroeg en het heritage-blad laat en uniek', () =>
   assert.ok(bron.includes("getElementById('rtgHeritageCss')"));
   assert.ok(bron.indexOf('/shared/rtg-world-identity.js') < bron.indexOf('/shared/i18n.js'),
     'wereldidentiteit hoort voor de overige gedeelde lagen te starten');
-  assert.ok(/window\.RTGWorldIdentity\.apply\([\s\S]*finally \{ laadHeritageBlad\(\); \}/.test(bron),
-    'de heritage-stylesheet hoort pas na de identiteit te worden toegevoegd');
+  /* Op een scherm van het RTG Design System (html[data-ds]) laadt het
+     heritage-blad helemaal niet (ONTWERPSYSTEEM.md par. 5); elders nog steeds
+     pas na de identiteit. */
+  assert.ok(/window\.RTGWorldIdentity\.apply\([\s\S]*finally \{ if \(!ds\) laadHeritageBlad\(\); \}/.test(bron),
+    'de heritage-stylesheet hoort pas na de identiteit te worden toegevoegd, en niet op een ds-scherm');
 });
 
 

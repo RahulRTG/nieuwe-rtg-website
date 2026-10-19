@@ -258,6 +258,9 @@ test('12. een reis ZONDER samenstelling wordt geweigerd met de reden', async () 
       password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
     const token = reg.body.token;
     assert.ok(token, 'registratie mislukt: ' + JSON.stringify(reg.body).slice(0, 200));
+    /* gekeurd: betalen vraagt sinds 19 oktober 2026 de paspoortpoort
+       (test/reisbetaal-poorten.test.js); deze toets gaat over de samenstelling */
+    await keurLidGoed(srv.base, token, reg.body.state.user.codename, '1990-01-01');
 
     const aanvraag = await post(srv.base, '/api/reisbureau/boek', { tripId: 'lissabon-nieuw', personen: 1 }, token);
     assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 200));

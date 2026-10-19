@@ -26,11 +26,22 @@ app.post('/api/uitgaan', auth, (req, res) => res.json(uitgaan.overzicht()));
 app.post('/api/uitgaan/mijn', auth, (req, res) => res.json({ avonden: uitgaan.mijnAvonden(req.session.key) }));
 
 /* ---- het RTG-reisbureau: samengestelde reizen, tegen de nettoprijs ---- */
+/* Boeken en betalen: elk account (eigenaarsbesluit 19 oktober 2026; dit verving
+   "Alleen voor leden"), en betalen pas na de paspoortpoort, net als opladen --
+   aanvragen beweegt geen geld. Een bezoeker zonder account komt er niet in
+   (test/reisbetaal-poorten.test.js). */
+const reisPoort = (req, res, geld) => {
+  const s = req.session || {};
+  if (s.tier === 'guest' && !s.account) { res.status(403).json({ error: 'Maak een gratis account om een reis te boeken.' }); return true; }
+  const g = geld && kern.onboarding && kern.onboarding.payGate ? kern.onboarding.payGate(s) : { ok: true };
+  if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; }
+  return false;
+};
 // het overzicht van de reizen
 app.post('/api/reisbureau', auth, (req, res) => res.json(reisbureau.overzicht()));
 // een lid vraagt een reis aan (aangevraagd; een reisadviseur bevestigt)
 app.post('/api/reisbureau/boek', auth, async (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  if (reisPoort(req, res)) return;
   if (gegevensStop(req, res, 'reservering')) return;
   const r = await reisbureau.boek(req.session, liveCodename(req.session), req.body || {});
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
@@ -60,7 +71,7 @@ app.post('/api/reisbureau/mijn', auth, (req, res) => {
    de reis simpelweg niet is uitgesplitst, ziet er in de meter uit als een meting
    en is een gok. */
 app.post('/api/reisbureau/betaal', auth, async (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  if (reisPoort(req, res, true)) return;
   const r = await kern.reisbetaling.betaal(req.session, liveCodename(req.session), String(req.body.ref || ''));
   if (r.error) return res.status(r.status || 400).json({ error: r.error, hoe: r.hoe || undefined });
   res.json(r);

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20005 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20007 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2941 |
-| losse beweringen (`test(...)`) | 20005 |
+| losse beweringen (`test(...)`) | 20007 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2743 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2752 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
-| alleen in de kop *genoemd*, nog niet gemeten | 2 |
-| niets van beide | 16 |
+| alleen in de kop *genoemd*, nog niet gemeten | 1 |
+| niets van beide | 8 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2563 bestanden, 19302 beweringen.
+2563 bestanden, 19303 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2267,7 +2267,7 @@ toets omvalt.
 | `toegang-partnerkanaal.test.js` | 1 | gezakt op `liegpoort /api/` | BOEKEN EN DE PERSONEELSDEUR VAN HET PARTNERKANAAL VRAGEN EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). POST /api/book boekte zonder sessie, en POST /api/staff opende het... |
 | `toegang-poortwacht.test.js` | 1 | gezakt op `liegpoort /api/` | GEEN NIEUWE ANONIEME DEUR (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). Buiten de demo bestaat er geen gastsessie meer, en een uitgelogde bezoeker bereikt alleen de uitzonderingen:... |
 | `toegang-portaalrotatie.test.js` | 1 | gezakt op `liegpoort /api/` | ROTEREN VOOR ELK CODEPORTAAL (eigenaarsbesluit 19 oktober 2026: een code per medewerker, en roteren voor elk portaal). De vrijwilliger, de hulpvrager en de donateur konden al roteren; nu ook de partnerstichting, de... |
-| `toegang-portalen.test.js` | 2 | gezakt op `liegpoort /api/` | DE CODEPORTALEN VAN DE RTFOUNDATION VRAGEN EEN ACCOUNT, EN DE CODE KOPPELT DAT ACCOUNT AAN HET DOSSIER (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). De partnerstichting, de gemeente, de... |
+| `toegang-portalen.test.js` | 3 | gezakt op `liegpoort /api/` | DE CODEPORTALEN VAN DE RTFOUNDATION VRAGEN EEN ACCOUNT, EN DE CODE KOPPELT DAT ACCOUNT AAN HET DOSSIER (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). De partnerstichting, de gemeente, de... |
 | `toegang-sollicitatie.test.js` | 1 | gezakt op `liegpoort /api/` | SOLLICITEREN BIJ EEN ZAAK VRAAGT EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). POST /api/supplier/apply nam een sollicitatie aan van iedereen zonder sessie. |
 | `toegang-tafel.test.js` | 1 | gezakt op `liegpoort /api/` | DE TAFEL-QR IS EEN EXTRA SLEUTEL BIJ EEN ACCOUNT, GEEN VERVANGING ERVAN (eigenaarsbesluit 19 oktober 2026, AGENTS.md: gebruiken vraagt een account). Wie de QR scant, maakt in het scherm een gratis account en schuift... |
 | `toegang-toestel.test.js` | 2 | gezakt op `liegpoort /api/` | EEN PASSKEY HOORT BIJ ELK ACCOUNT, OOK EEN GRATIS ACCOUNT (eigenaarsbesluit 19 oktober 2026; uitwerking bij AUTHORITY.md par. 7a). |
@@ -2603,7 +2603,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-378 bestanden, 703 beweringen.
+378 bestanden, 704 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2618,11 +2618,11 @@ toets omvalt.
 | `appwerkt-bestemming.e2e.js` | 1 | gezakt op `===->!==#0` | BEREIKBAAR IN EEN ECHTE BROWSER -- doorverwijzingen die pas na het laden gebeuren. Een synthetisch huis met vier schermen en een eigen register. |
 | `appwerkt-glad.e2e.js` | 1 | gezakt op `!==->===#4` | DE BEDEKT-METING MAG NIET OP EEN ANIMATIE WACHTEN (scripts/appwerkt.js bedektDoorSchil, 6 oktober 2026). Een scherm met `scroll-behavior: smooth` laat scrollIntoView animeren. |
 | `appwerkt-schil.e2e.js` | 1 | gezakt op `-->+#0` | BEDIENBAAR MEET HET SCHERM, NIET DE SCHIL -- in een echte browser. Een synthetisch scherm met de gedeelde schil erop (30 knoppen onder .rtg-edge-chrome, plus de toetsknop van het veeggebaar die met opzet buiten beeld... |
-| `arrival-accountdeur.e2e.js` | 1 | -- | INVISIBLE ARRIVAL ZONDER SESSIE: DE ACCOUNTDEUR IN HET SCHERM. Eigenaarsbesluit 19 oktober 2026 (AGENTS.md: gebruiken vraagt een account). |
+| `arrival-accountdeur.e2e.js` | 1 | gezakt op `liegpoort /api/` | INVISIBLE ARRIVAL ZONDER SESSIE: DE ACCOUNTDEUR IN HET SCHERM. Eigenaarsbesluit 19 oktober 2026 (AGENTS.md: gebruiken vraagt een account). |
 | `arrival-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | RTG Invisible Arrival op het RTG Design System: het bewijs van batch 4 uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `avond-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET AVONDSCHERM (/apps/avond.html) IN EEN ECHTE BROWSER. test/avond.test.js bewijst dat de avondroutes de klok en het budget als GRENS behandelen en dat een tafel nooit verder komt dan `aangevraagd`. |
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |
-| `bankoverboek-dubbelklik.e2e.js` | 1 | -- | Een dubbelklik op Overboeken boekt een keer (public/apps/geld/bankb.js). De knop maakte zijn herhaalsleutel PER KLIK. |
+| `bankoverboek-dubbelklik.e2e.js` | 1 | gezakt op `liegpoort /api/` | Een dubbelklik op Overboeken boekt een keer (public/apps/geld/bankb.js). De knop maakte zijn herhaalsleutel PER KLIK. |
 | `bankscherm.e2e.js` | 3 | gezakt op `liegpoort /api/` | Scherm-toets op de bank: legt een toets de weg van deze app werkelijk af? WAAROM JUIST DEZE APP EERST scripts/schermen.js telde 105 van de 188 schermen waar geen enkele toets de weg aflegt -- ze worden wel geopend... |
 | `berichten.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de communicatie-app. De unit-toetsen (test/berichten.test.js, test/comm-dm.test.js) bewijzen de server-kant; deze bewijst dat de APP het ook echt doet in een browser: de lijst komt op, een gesprek... |
 | `bestanden.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Bestanden: uploaden via de kiezer, het paneel met voorvertoning, delen op codenaam, de nieuwe versie van de andere kant, en de prullenbak met herstel. Draait alleen waar een browser is. |
@@ -2644,7 +2644,7 @@ toets omvalt.
 | `chauffeur-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | De chauffeurs-PDA op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |
 | `chauffeur-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE CHAUFFEURS-PDA IN EEN ECHTE BROWSER: van ritaanvraag tot afgeronde dienst. WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst de keten aan de API, en test/mobiliteitscherm.e2e.js legt de reiziger en de... |
 | `clipdeler.e2e.js` | 1 | gezakt op `liegpoort /api/` | GAAT ER OOK ECHT BEELD OVER? -- de clipdeler tussen twee browsers. |
-| `clips-deel.e2e.js` | 1 | genoemd | Scherm-test voor het DELEN van een clip, gevonden door de voltooiproef (scripts/lib/voltooi/clips.js). Twee fouten op dezelfde knop: 1. |
+| `clips-deel.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor het DELEN van een clip, gevonden door de voltooiproef (scripts/lib/voltooi/clips.js). Twee fouten op dezelfde knop: 1. |
 | `clips-studio.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de Clips-studio: knippen, geluid en ondertitels, en het toegangsfilter in de kop. test/clips.test.js bewijst de server-kant; deze bewijst dat de studio op het scherm werkt en dat de feed de standen... |
 | `comm-zaak.e2e.js` | 3 | gezakt op `liegpoort /api/` | De zakelijke deur van het communicatieplatform (routes/supplier/comm.js). comm-actor.test.js toetst het MODEL: de sleutels, de naamruimtes, de poort. |
 | `comm.e2e.js` | 5 | gezakt op `liegpoort /api/` | Het communicatieplatform (server/kern/comm + apps/comm.html). WAT HIER BEWAAKT WORDT, en waarom juist dit. |
@@ -2715,8 +2715,8 @@ toets omvalt.
 | `handelscherm.e2e.js` | 0 | gezakt op `liegpoort /api/` | Scherm-test: RTG Handel in een echte browser (Playwright). De endpoints van de handelsketen liggen vast in test/handelsketen.test.js. |
 | `handenvrij.e2e.js` | 1 | gezakt op `liegpoort /api/` | Muisvrij bedienen, in een echte browser. De zinsontleding is los getoetst (test/handenvrij.test.js). |
 | `hangar-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | De Hangar op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom D). |
-| `heelrtg-catalogus-poort.e2e.js` | 1 | -- | HEEL RTG TOONT UIT DE CATALOGUS NIETS WAT DE GIDS VERBERGT (19 oktober 2026). Het zoekmenu "Heel RTG" in de rand bouwt zijn lijst uit de widgetcatalogus (shared/interface/world-widget-catalog.json). |
-| `heelrtg-osapps.e2e.js` | 1 | -- | HEEL RTG VINDT ELKE APP, OOK DE OS-APPS (eigenaarsbesluit 19 oktober 2026). Videobellen, Bellen, Snaps en Werk hebben geen eigen adres: ze wonen in de functiegids (MAPPEN, workspace-world-catalog.js), dezelfde bron... |
+| `heelrtg-catalogus-poort.e2e.js` | 1 | gezakt op `liegpoort /api/` | HEEL RTG TOONT UIT DE CATALOGUS NIETS WAT DE GIDS VERBERGT (19 oktober 2026). Het zoekmenu "Heel RTG" in de rand bouwt zijn lijst uit de widgetcatalogus (shared/interface/world-widget-catalog.json). |
+| `heelrtg-osapps.e2e.js` | 1 | gezakt op `liegpoort /api/` | HEEL RTG VINDT ELKE APP, OOK DE OS-APPS (eigenaarsbesluit 19 oktober 2026). Videobellen, Bellen, Snaps en Werk hebben geen eigen adres: ze wonen in de functiegids (MAPPEN, workspace-world-catalog.js), dezelfde bron... |
 | `helper-veegdoor.e2e.js` | 2 | gezakt op `true->false#0` | DE VEEGHELPER ZELF, en niet een scherm dat hem gebruikt. veegDoor (test/helper.js) heeft twee wegen: de protocolvlucht naar Chromium, en een terugval in de renderer voor als de timer van lang drukken de vlucht heeft... |
 | `heritage-context.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `heritage-intelligence.e2e.js` | 1 | gezakt op `liegpoort /api/` | Een geïsoleerde server en een aangemelde browser controleren behoud van invoer, routecontext en de vaste bediening bij trage of ontbrekende bronnen. |
@@ -2826,7 +2826,7 @@ toets omvalt.
 | `paginas.e2e.js` | 1 | geen bronmutatie mogelijk | DE PAGINASCAN -- elke pagina in public/ wordt echt geopend in een browser. WAAROM DIT ER IS De schermtests hiernaast (test/*.e2e.js) beproeven allemaal EEN scherm dat iemand belangrijk vond. |
 | `partijvoorstel-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE POLITICAL CONNECTOR IN EEN ECHTE BROWSER: het partijenregister op /apps/foundation/kwestiekantoor.html, en de voorstellen bij een kwestie op /apps/foundation/kwesties.html. test/democratie-partij.test.js bewijst... |
 | `pass-startup.e2e.js` | 3 | gezakt op `liegpoort /api/` | Real installation and interrupted startup, rather than a mocked PWA flag alone. API responses must never become part of the offline interface. |
-| `passkeys-weg.e2e.js` | 1 | -- | EEN PASSKEY WEGHALEN VANAF HET SCHERM, IN EEN ECHTE BROWSER. Gevonden door de voltooiproef (scripts/lib/voltooi/passkeys.js): weghalen is een zware handeling (server/routes/auth/webauthn.js), dus wie een passkey... |
+| `passkeys-weg.e2e.js` | 1 | gezakt op `liegpoort /api/` | EEN PASSKEY WEGHALEN VANAF HET SCHERM, IN EEN ECHTE BROWSER. Gevonden door de voltooiproef (scripts/lib/voltooi/passkeys.js): weghalen is een zware handeling (server/routes/auth/webauthn.js), dus wie een passkey... |
 | `payrollkeur.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op het AANMERKEN van een regelpakket (payroll.html, tab "Loonrun (OS)"). WAAROM DIT BESTAND ER IS, en het is een onaangename reden. |
 | `paytegoed.e2e.js` | 2 | gezakt op `liegpoort /api/` | Schermtoets voor het tegoed op RTG Pay (public/apps/pay.html). Waarom dit náást test/paytegoed.test.js staat, dat de routes al afloopt: een scherm dat 200 geeft en netjes rendert kan nog steeds dood zijn. |
 | `pda-ui.e2e.js` | 4 | gezakt op `liegpoort /api/` | Scherm-test: de PDA draait in een echte browser (Playwright). Zo valt de frontend-logica ook onder de suite, en is een refactor van een scherm net zo veilig als de backend. |
@@ -2900,14 +2900,14 @@ toets omvalt.
 | `scan-tafel.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `schermcontext.e2e.js` | 1 | gezakt op `liegpoort /api/` | AGENDA EN NOTITIES ZEGGEN ZELF WAAR JE BENT (EDGE.md besluit 11). Beide schermen wijzen een eigen hoofdactie aan en stonden daarom op CONTEXT_SCHULD in scripts/edgedekking.js. |
-| `schil-taal.e2e.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `schil-taal.e2e.js` | 4 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `schuif.e2e.js` | 1 | gezakt op `liegpoort /api/` | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |
 | `servicebel.e2e.js` | 3 | gezakt op `liegpoort /api/` | BELLEN MET RTG -- de twee schermen. De routes waren al beproefd; deze toetsen gaan over wat een mens ziet en kan. |
 | `servicecockpit.e2e.js` | 8 | gezakt op `liegpoort /api/` | DE SERVICE-COCKPIT. Wat deze toetsen vastleggen is niet dat het scherm laadt, maar wat het WEL en NIET doet: 1. |
 | `servicehulp.e2e.js` | 5 | gezakt op `liegpoort /api/` | DE HULPLAAG IN DE APP-GIDS -- kan een lid er echt bij? WAAROM DIT EEN BROWSERTOETS IS EN GEEN API-TOETS. |
 | `servicewerkplek.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE WERKPLEK VAN EEN ZAAK BIJ RTG SERVICE. De routes bestonden al, maar een zaak kon er alleen langs de API bij -- en dat is geen kanaal maar een belofte. |
 | `sessiestroom.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE SESSIESTROOM IN EEN ECHTE BROWSER: drie schermen openen hun live-stroom met een stroomticket, en GEEN ENKEL verzoek draagt nog een sessie in het adres. De serverkant staat in test/sessiestroom.test.js. |
-| `sfeerbeeld-muis.e2e.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `sfeerbeeld-muis.e2e.js` | 1 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sociaal-edge.e2e.js` | 1 | gezakt op `liegpoort /api/` | SOCIAAL IN DE EDGE: EEN DECLARATIE, EN ELK SCHERM ZEGT ZELF WAAR JE BENT. De technische laag van de sociale schermen (het commandodeck van shared/social-intelligence-runtime.js) stond tot ronde 2 van EDGE.md in het... |
 | `spelpraat.e2e.js` | 1 | gezakt op `liegpoort /api/` | PRATEN IN HET POTJE, IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelpraat.test.js). |
 | `spelscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET GEDEELDE SCHERM IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelprojectie.test.js): een scherm krijgt uitsluitend `zicht.publiek`, en bij 30 Seconden zit de kaart daar niet in. |
@@ -2937,7 +2937,7 @@ toets omvalt.
 | `vertaler.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Vertaler: inloggen, typen, de live-vertaling (met de halve-seconde-rustpauze), een reiszin aantikken en bewaren op het toestel. |
 | `vertegenwoordiging.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET MACHTIGINGSSCHERM (/apps/vertegenwoordiging.html) IN EEN ECHTE BROWSER. test/vertegenwoordiging.test.js bewijst de zeven regels van de laag met een mutatie, en test/vertegenwoordiging.e2e.test.js bewijst dat een... |
 | `verzorging-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor de verzorgingskant van de Zorg-tab: de kapper, de barbier en de nagelstudio staan nu in de leden-app. Wat hier bewezen wordt is precies wat een servertoets NIET kan zien: dat het blok echt op het... |
-| `videobellen-echt.e2e.js` | 3 | -- | ECHT VIDEOBELLEN EN ECHT CLIPS KIJKEN -- twee leden, één headless Chromium. WAAROM DIT BESTAAT. |
+| `videobellen-echt.e2e.js` | 3 | gezakt op `liegpoort /api/` | ECHT VIDEOBELLEN EN ECHT CLIPS KIJKEN -- twee leden, één headless Chromium. WAAROM DIT BESTAAT. |
 | `vluchten-ds.e2e.js` | 4 | gezakt op `api-actie-weg#0` | RTG Vluchten op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server. |
 | `voeding-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor apps/voeding.html. Dit scherm belooft vooral iets NIET, en dat is precies wat op het scherm zelf nagekeken hoort te worden: een motor die niets telt naast een scherm dat er alsnog een cijfer of een... |
 | `voertuig-ds.e2e.js` | 4 | gezakt op `voorwaarde-omkeren#0` | Het voertuigscherm op het RTG Design System: het bewijs uit TRAVELOS-MIGRATIE.md par. 3, in een echte browser tegen een echte server (stroom E, de zaakschermen op de werklaag). |

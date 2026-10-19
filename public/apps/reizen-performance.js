@@ -120,12 +120,16 @@
      ene Edge; de oude rand week daar met een stijlregel op [data-rtg-edge-bar].
      De ds-Edge kent die markering nog niet (TRAVELOS-MIGRATIE.md, open punt
      voor /ds/shell.js), dus wijkt hij hier zolang dit scherm een blad is.
-     Ingebed (?embed=1, bijvoorbeeld in Reizen & Veilig) draagt de ouder de
-     bediening; dan wijken ook de eigen tabs. */
+     Ook in elk ander kader tekent het scherm geen eigen Edge: de oude rand
+     deed dat evenmin (body.rtg-edge-embed), want de buitenste pagina draagt
+     de ene rand. Ingebed (?embed=1, bijvoorbeeld in Reizen & Veilig) draagt
+     de ouder ook de bediening; dan wijken de eigen tabs. */
+  var inKader = false;
+  try { inKader = w.top !== w.self; } catch (e) { inKader = true; }
   function blad() {
     var html = d.documentElement, ingebed = html.classList.contains('tos-ingebed');
     var edge = d.querySelector('.ds-edge'), tabs = d.querySelector('.hoofdtabs');
-    if (edge) edge.hidden = ingebed || html.classList.contains('rtg-command-blad');
+    if (edge) edge.hidden = inKader || ingebed || html.classList.contains('rtg-command-blad');
     if (tabs) tabs.hidden = ingebed;
   }
   new MutationObserver(blad).observe(d.documentElement, { attributes: true, attributeFilter: ['class'] });

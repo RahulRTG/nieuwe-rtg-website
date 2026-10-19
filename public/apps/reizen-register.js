@@ -58,6 +58,7 @@
   /* De kop is sfeer, geen demo-inhoud: een bestemming verschijnt pas als zij
      uit hetzelfde reisdossier komt dat het register tekent. */
   function zetReisdek(reizen, toestand) {
+    if (w.RTGWorldHome) w.RTGWorldHome.travel(reizen, toestand === 'fout' ? (R.token ? 'error' : 'guest') : 'ready');
     var eerste = (reizen || [])[0];
     if (eerste) {
       var bestemming = String(eerste.bestemming || '').trim();
@@ -131,8 +132,7 @@
       }).catch(function (e) { vak.textContent = e.message; knop.disabled = false; });
   }
 
-  /* Een regel oppakken en aan de schil aanbieden, alleen binnen een surface.
-     Pas bij echte beweging een sleep; een tik blijft een tik. */
+  /* Een regel aan de schil aanbieden, alleen in een surface; een tik blijft een tik. */
   (function sleepbaar() {
     var inSchil = false;
     try { inSchil = w.top !== w.self; } catch (e) { inSchil = false; }

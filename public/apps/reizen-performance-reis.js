@@ -71,7 +71,9 @@
       a.appendChild(i); a.appendChild(span); a.appendChild(maak('span', '', '›')); li.appendChild(a); status.appendChild(li);
     });
     if (eerst) { var datum = datumDelen(eerst.van); $('#volgendTijd').textContent = eerst.tijd || (datum.dag + ' ' + datum.maand).trim(); $('#volgendLabel').textContent = eerst.titel || 'Volgend reismoment';
-      $('#volgendVan').textContent = eerst.van === R.vandaagISO(0) ? 'VANDAAG' : (eerst.van || 'DATUM ONBEKEND');
+      var dv = new Date(String(eerst.van || '') + 'T12:00:00');
+      $('#volgendVan').textContent = eerst.van === R.vandaagISO(0) ? 'VANDAAG' : isNaN(dv.getTime()) ? 'DATUM ONBEKEND'
+        : new Intl.DateTimeFormat(R.taal(), { day: 'numeric', month: 'long', year: 'numeric' }).format(dv);
       $('#volgendNaar').textContent = String(eerst.bestemming || 'BESTEMMING ONBEKEND').toUpperCase(); }
     $('#volgendExtra').textContent = eerst && eerst.tijd ? 'VOLGENS UW REISGEGEVENS' : 'TIJD NOG ONBEKEND';
   }

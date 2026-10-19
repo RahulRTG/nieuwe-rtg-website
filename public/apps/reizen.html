@@ -31,7 +31,7 @@
     </header>
     <div><h1 class="ds-cover__wereld" id="coverTitel">TravelOS</h1><p class="ds-cover__ondertitel">Experience the elite class</p></div>
     <div class="ds-cover__onder">
-      <p class="ds-cover__zin">Uw reis begint hier.</p>
+      <p class="ds-cover__zin" id="worldTravelTitle" data-wh-copy="travelTitle">Uw reis begint hier.</p>
       <a class="ds-knop ds-knop--op-beeld" href="#inhoud" data-betreed data-ds-actie="Betreed TravelOS">Betreed TravelOS <svg viewBox="0 0 24 24" aria-hidden="true" class="ds-knop__pijl"><path d="m9 18 6-6-6-6"/></svg></a>
       <nav class="ds-cover__nav" aria-label="TravelOS">
         <a href="#reizen" data-naar-blad="reizen">Reizen</a><a href="#taxi" data-naar-blad="taxi">Taxi</a><a href="#samen" data-naar-blad="samen">Samen</a><a href="#rahul" data-naar-blad="rahul">Rahul</a>
@@ -57,6 +57,9 @@
       <h2 class="ds-titel ds-titel--scherm" id="titelVandaag">Uw reizen</h2>
       <p class="ds-meta" id="dagzin">Uw reisoverzicht wordt opgehaald&hellip;</p>
       <p class="ds-meta" id="travelBelofte">Alles van vertrek tot thuiskomst.</p>
+      <div class="ds-kaart__titel ds-sectie__regel" id="worldTravelDetail" hidden></div>
+      <p class="ds-meta" id="worldTravelMessage" role="status" data-wh-copy="loading">Uw gegevens worden opgehaald.</p>
+      <div><a class="ds-knop ds-knop--stil ds-knop--klein" id="worldTravelAction" href="/apps/reisbureau.html">Bespreek uw reiswens <span aria-hidden="true">↗</span></a></div>
     </div>
     <div class="ds-chips" id="momenten" aria-label="Momenten van deze reis"><span class="ds-meta">Uw reisgegevens worden veilig opgehaald&hellip;</span></div>
     <p class="ds-label"><span id="gereedTeller">WACHT OP BRON</span> · <span id="dagbeeldzin">Uw volgende reis in beeld.</span></p>
@@ -371,6 +374,10 @@
 <!-- De gedeelde overgang (reisboekrij wordt het reisboek). Op een ds-scherm laadt
      de basis hem niet; hij zet geen stijl, alleen een naam bij pageswap. -->
 <script src="/shared/rtg-heritage-transition.js"></script>
+<!-- De ingebouwde wereldtekst (NL/EN, ook zonder vertaalmodel) en de eerlijke
+     toestand van de kop: geen bestemming voordat het reisdossier antwoordt. -->
+<script src="/shared/rtg-world-home-copy.js"></script>
+<script src="/shared/rtg-world-home.js"></script>
 <script src="/apps/reizen-performance.js"></script>
 <script src="/apps/reizen-stand.js"></script>
 <script src="/apps/reizen-register.js"></script>

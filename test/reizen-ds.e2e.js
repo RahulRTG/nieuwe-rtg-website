@@ -125,6 +125,8 @@ test('de Cover: de wereld op de foto, een ingang, en rubrieken die echt van blad
 
 test('het register groepeert per reis, en voorlezen verandert niets tot u bevestigt', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);
+  await page.waitForSelector('#reisVolgende:not([hidden])');
+  await beeld(page, '390-vandaag', { fullPage: true });
   await page.locator('[data-tab="reizen"]').click();
   await page.waitForSelector('#komend [data-reiskop]');
   const koppen = await page.locator('#komend [data-reiskop]').allInnerTexts();

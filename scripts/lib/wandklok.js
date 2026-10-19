@@ -25,10 +25,12 @@
       met een opgeslagen tijdstip werd vergeleken, ook die kant (`datumVan`).
       De rest is per domein werk, want veel van die datums worden VERGELEKEN met
       datums die op dezelfde UTC-manier uit een opgeslagen `at` zijn geknipt: een
-      kant omzetten zonder de andere maakt het erger. Bewust nog niet: de
-      levens- en geldgraaf (een samenhangend stelsel van dagknippers) en de
-      kassadag (een bar sluit na middernacht; dat vraagt een bedrijfsdag, geen
-      kalenderdag). Daarom een ratel en geen grens: het getal mag alleen omlaag.
+      kant omzetten zonder de andere maakt het erger. De levens-, geld- en
+      sociale graaf met de levenslijn zijn als een stelsel omgezet: hun
+      `vandaag` en `dagVan` wonen in levensgraaf/hulp.js en lezen het huis.
+      Bewust nog niet: de kassadag (een bar sluit na middernacht; dat vraagt een
+      bedrijfsdag, geen kalenderdag, en is een besluit van de eigenaar) en de
+      backoffice-dashboards. Daarom een ratel en geen grens: alleen omlaag.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -40,7 +42,7 @@ const UITZONDERING = /tijd-uitzondering:\s*\S.{8,}/;
 // de plek waar de wandklok WOONT
 const THUIS = 'server/kern/tijdzone.js';
 // het plafond van de tweede telling; alleen omlaag
-const UTC_VANDAAG_MAX = 115;
+const UTC_VANDAAG_MAX = 107;
 
 function bestanden(root) {
   const uit = [];

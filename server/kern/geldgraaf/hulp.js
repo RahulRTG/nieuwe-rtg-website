@@ -15,9 +15,7 @@
 
 /* `dagVan` woont sinds de sociale graaf ook daar: drie grafen die ieder hun
    eigen "welke dag was dit" schrijven, lopen stil uiteen. */
-const { isDatum, dagVan } = require('../levensgraaf/hulp');
-
-const vandaag = () => new Date().toISOString().slice(0, 10);
+const { isDatum, dagVan, vandaag } = require('../levensgraaf/hulp');
 
 /* Op het middaguur rekenen, zodat een zomertijdgrens nooit een dag kan
    verschuiven; zelfde truc als de datumkeuring in levensgraaf/hulp.js. */

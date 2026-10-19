@@ -3,14 +3,12 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "bce1c2e8",
+  "commit": "6c88a8f7",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": true,
-   "ongecommitteInvoer": [
-    "public/apps/office/app/app-01b.js"
-   ],
+   "boomVuil": false,
+   "ongecommitteInvoer": [],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -7820,11 +7818,11 @@
   "bekendePaden": 5509
  },
  "gemeten": {
-  "schermenMetPad": 450,
+  "schermenMetPad": 449,
   "nietGelezen": 0,
-  "exactePaden": 1078,
-  "verwijzingen": 1306,
-  "voorvoegsels": 139,
+  "exactePaden": 1043,
+  "verwijzingen": 1269,
+  "voorvoegsels": 141,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8056,15 +8054,6 @@
     "public/apps/backoffice/backoffice-04.js",
     "public/apps/kantoren.html",
     "public/apps/stadsdoos.html"
-   ],
-   "aantal": 3
-  },
-  {
-   "pad": "/api/rtgone/state",
-   "schermen": [
-    "public/apps/decision-room.js",
-    "public/apps/project-room.js",
-    "public/apps/rtgone.html"
    ],
    "aantal": 3
   },
@@ -8509,6 +8498,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/geld/pot/zet",
+   "schermen": [
+    "public/apps/geld/overzichtc.js",
+    "public/apps/geld/voorzijde.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/code/dyn",
    "schermen": [
     "public/apps/geld/rtgcode.js",
@@ -8817,14 +8814,6 @@
    "schermen": [
     "public/apps/rtg-vandaag.js",
     "public/apps/sociaal.html"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/rtgone/project/van-mail",
-   "schermen": [
-    "public/apps/rtgone.html",
-    "public/apps/rtmail-voorzijde-werk.js"
    ],
    "aantal": 2
   },
@@ -9930,20 +9919,6 @@
    "pad": "/api/connect/werk",
    "schermen": [
     "public/apps/connect.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/goedkeuring",
-   "schermen": [
-    "public/apps/decision-room.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/goedkeuring/beslis",
-   "schermen": [
-    "public/apps/decision-room.js"
    ],
    "aantal": 1
   },
@@ -11054,9 +11029,16 @@
    "aantal": 1
   },
   {
-   "pad": "/api/geld/pot/zet",
+   "pad": "/api/geld/pot/reserveer",
    "schermen": [
-    "public/apps/geld/voorzijde.js"
+    "public/apps/geld/overzichtc.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/geld/pot/weg",
+   "schermen": [
+    "public/apps/geld/overzichtc.js"
    ],
    "aantal": 1
   },
@@ -12034,27 +12016,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/member/dossier",
-   "schermen": [
-    "public/apps/loonstrook.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/identiteit/verzoeken",
-   "schermen": [
-    "public/apps/loonstrook.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/loonstroken",
-   "schermen": [
-    "public/apps/loonstrook.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/concern/mijnwerk",
    "schermen": [
     "public/apps/loopbaan.html"
@@ -12951,97 +12912,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/onderneming/aanvraag",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/aanvraag/stand",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/dagbeeld",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/ingeschreven",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/intake",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/kas/saldo",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/mijn",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/nieuw",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/oprichting/zet",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/plan/vastleggen",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/rechtsvorm",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/verkenning",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/onderneming/werkruimte",
-   "schermen": [
-    "public/apps/onderneming.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/supplier/oog/overzicht",
    "schermen": [
     "public/apps/oog.html"
@@ -13493,27 +13363,6 @@
    "pad": "/api/office/platformregister",
    "schermen": [
     "public/apps/platformregister.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/project/bewijs",
-   "schermen": [
-    "public/apps/project-room.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/project/oplever",
-   "schermen": [
-    "public/apps/project-room.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/project/taak",
-   "schermen": [
-    "public/apps/project-room.js"
    ],
    "aantal": 1
   },
@@ -14190,65 +14039,9 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtgone/automatisering/herstel",
+   "pad": "/api/rtgone/project/van-mail",
    "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/automatisering/voer",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/automatisering/voorbereid",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/belofte",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/frictie",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/intentie",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/overdracht",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/rol/geef",
-   "schermen": [
-    "public/apps/rtgone.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtgone/rol/trek",
-   "schermen": [
-    "public/apps/rtgone.html"
+    "public/apps/rtmail-voorzijde-werk.js"
    ],
    "aantal": 1
   },
@@ -14935,48 +14728,6 @@
    "pad": "/api/verify/upload",
    "schermen": [
     "public/apps/verificatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/aanvaard",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/bevoegdheden",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/grens",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/intrek",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/mijn",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/vertegenwoordiging/simulatie",
-   "schermen": [
-    "public/apps/vertegenwoordiging.html"
    ],
    "aantal": 1
   },
@@ -16019,12 +15770,11 @@
   {
    "bestand": "public/apps/decision-room.js",
    "exact": [
-    "/api/account/start",
-    "/api/rtgone/goedkeuring",
-    "/api/rtgone/goedkeuring/beslis",
-    "/api/rtgone/state"
+    "/api/account/start"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/rtgone/"
+   ]
   },
   {
    "bestand": "public/apps/defensie/defensie-01.js",
@@ -16992,11 +16742,12 @@
    "exact": [
     "/api/geld/beleid",
     "/api/geld/beleid/zet",
-    "/api/geld/cockpit"
+    "/api/geld/cockpit",
+    "/api/geld/pot/reserveer",
+    "/api/geld/pot/weg",
+    "/api/geld/pot/zet"
    ],
-   "voorvoegsels": [
-    "/api/geld/pot/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/geld/rtgcode.js",
@@ -17557,15 +17308,6 @@
    ]
   },
   {
-   "bestand": "public/apps/loonstrook.html",
-   "exact": [
-    "/api/member/dossier",
-    "/api/member/identiteit/verzoeken",
-    "/api/member/loonstroken"
-   ],
-   "voorvoegsels": []
-  },
-  {
    "bestand": "public/apps/loopbaan.html",
    "exact": [
     "/api/concern/mijnwerk"
@@ -18022,22 +17764,11 @@
   {
    "bestand": "public/apps/onderneming.html",
    "exact": [
-    "/api/onderneming/aanvraag",
-    "/api/onderneming/aanvraag/stand",
-    "/api/onderneming/dagbeeld",
-    "/api/onderneming/ingeschreven",
-    "/api/onderneming/intake",
-    "/api/onderneming/kas/saldo",
-    "/api/onderneming/mijn",
-    "/api/onderneming/nieuw",
-    "/api/onderneming/oprichting/zet",
-    "/api/onderneming/plan/vastleggen",
-    "/api/onderneming/rechtsvorm",
-    "/api/onderneming/rechtsvormen",
-    "/api/onderneming/verkenning",
-    "/api/onderneming/werkruimte"
+    "/api/onderneming/rechtsvormen"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/onderneming/"
+   ]
   },
   {
    "bestand": "public/apps/oog.html",
@@ -18243,13 +17974,11 @@
   {
    "bestand": "public/apps/project-room.js",
    "exact": [
-    "/api/account/start",
-    "/api/rtgone/project/bewijs",
-    "/api/rtgone/project/oplever",
-    "/api/rtgone/project/taak",
-    "/api/rtgone/state"
+    "/api/account/start"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/rtgone/"
+   ]
   },
   {
    "bestand": "public/apps/pulse.html",
@@ -18631,20 +18360,11 @@
   {
    "bestand": "public/apps/rtgone.html",
    "exact": [
-    "/api/account/start",
-    "/api/rtgone/automatisering/herstel",
-    "/api/rtgone/automatisering/voer",
-    "/api/rtgone/automatisering/voorbereid",
-    "/api/rtgone/belofte",
-    "/api/rtgone/frictie",
-    "/api/rtgone/intentie",
-    "/api/rtgone/overdracht",
-    "/api/rtgone/project/van-mail",
-    "/api/rtgone/rol/geef",
-    "/api/rtgone/rol/trek",
-    "/api/rtgone/state"
+    "/api/account/start"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [
+    "/api/rtgone/"
+   ]
   },
   {
    "bestand": "public/apps/rtgschool/bijles.js",
@@ -19129,15 +18849,10 @@
   },
   {
    "bestand": "public/apps/vertegenwoordiging.html",
-   "exact": [
-    "/api/vertegenwoordiging/aanvaard",
-    "/api/vertegenwoordiging/bevoegdheden",
-    "/api/vertegenwoordiging/grens",
-    "/api/vertegenwoordiging/intrek",
-    "/api/vertegenwoordiging/mijn",
-    "/api/vertegenwoordiging/simulatie"
-   ],
-   "voorvoegsels": []
+   "exact": [],
+   "voorvoegsels": [
+    "/api/vertegenwoordiging"
+   ]
   },
   {
    "bestand": "public/apps/vluchten.html",

@@ -53,16 +53,21 @@
     }).join('');
   }
 
+  /* EEN sleutel per toezegging (shared/id.js): een tweede tik of een nieuwe
+     poging na een weggevallen verbinding legt hem niet nog eens in de pot. */
+  var doneerSleutel = null;
   async function doneer(locId) {
     var inp = $('#lfWrap').querySelector('[data-b="' + locId + '"]');
     var bedrag = Deel().getal(inp && inp.value);
     if (!bedrag) { if (inp) inp.focus(); w.Geld.melding('Vul eerst een bedrag in.'); return; }
+    if (!doneerSleutel || doneerSleutel.voor !== locId + '|' + bedrag) doneerSleutel = { voor: locId + '|' + bedrag, idem: w.RTGId('labfonds') };
     try {
-      await w.Geld.api('/api/labfonds/doneer', { locId: locId, bedrag: bedrag });
+      await w.Geld.api('/api/labfonds/doneer', { locId: locId, bedrag: bedrag, idem: doneerSleutel.idem });
+      doneerSleutel = null;
       if (inp) inp.value = '';
       w.Geld.melding('Dank; het staat in de pot van deze plek.');
       laad();
-    } catch (e) { w.Geld.melding(e.message); }
+    } catch (e) { if (e.status) doneerSleutel = null; w.Geld.melding(e.message); }
   }
 
   async function stem(id, keuze) {

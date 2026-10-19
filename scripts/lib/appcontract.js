@@ -132,6 +132,15 @@ const CONTRACT = {
   'link:wbw': Object.assign({
     belofte: 'twee Salon-vrienden houden een gedeeld lijstje bij: wie betaalde wat en wie staat er hoe voor, tot op de cent; wie rood staat verrekent in een tik via RTG Pay -- wie buiten het lijstje staat leest of raakt niets, en een dubbele tik, een afgebroken verzoek of een crash betaalt nooit twee keer'
   }, voltooi('wbw', 'het scenario loopt /api/wbw/mijn, /maak, /groep, /uitgave en /verreken, de routes die /apps/geld.html#wbw (apps/geld/wbwb.js) zelf aanroept, met twee leden die langs de Salon verbonden zijn, een derde erbuiten en de simulatiebank onder het bijladen')),
+  'link:labfonds': Object.assign({
+    belofte: 'leden zeggen samen geld toe aan de pot van een plek, dienen een voorstel in en beslissen gezamenlijk met de scheidsrechter; alleen de indiener sluit de stemming, en een dubbele tik, een afgebroken verzoek of een crash legt een toezegging nooit twee keer in de pot'
+  }, voltooi('labfonds', 'het scenario loopt /api/labfonds/overzicht, /doneer, /voorstel/maak, /stem en /beslis, de routes die /apps/geld.html#labfonds (apps/geld/labfondsb.js) zelf aanroept, met een tweede lid dat stemt en de stemming niet mag sluiten')),
+  'link:rtgcode': Object.assign({
+    belofte: 'een lid toont een levende, ondertekende code die alleen de RTG-app maakt en leest en die na een halve minuut vervalt; een valse, gewone of verlopen code wordt geweigerd, een ander lid leest er niets van het lid uit, en de code overleeft een herstart en een crash -- en hij is persoonlijk, zoals het scherm belooft'
+  }, voltooi('rtgcode', 'het scenario loopt /api/code/dyn en /api/code/scan, de routes die /apps/geld.html#rtgcode (apps/geld/rtgcode.js en rtgcodeb.js) zelf aanroept, met een tweede lid dat de code scant')),
+  'link:geldcommand': Object.assign({
+    belofte: 'een lid ziet hoe het er financieel voor staat, zet potten en regels binnen de harde grens van GELD.md en leest elke handeling terug in het actielog -- een ander lid ziet of raakt er niets van, en een dubbele tik, een afgebroken verzoek of een crash zet een bedrag nooit twee keer opzij'
+  }, voltooi('geldcommand', 'het scenario loopt /api/geld/cockpit, /beleid, /beleid/zet, /api/geld/pot/zet, /reserveer, /weg en /api/geld/actielog, de routes die de eerste stand van /apps/geld.html (apps/geld/overzichtb.js en overzichtc.js) zelf aanroept, met een tweede lid dat er niet bij mag')),
   /* LivingOS met een tweede actor: de kring, de zaak (18 oktober 2026). */
   'link:veilig': Object.assign({
     belofte: 'als het misgaat krijgen de mensen die het lid zelf koos bericht, met alleen wat hij per persoon toestond, en een lege kring wordt eerlijk geweigerd'

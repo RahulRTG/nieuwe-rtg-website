@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2827 bestanden en 19550 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2834 bestanden en 19562 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2827 |
-| losse beweringen (`test(...)`) | 19550 |
+| toetsbestanden | 2834 |
+| losse beweringen (`test(...)`) | 19562 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 361 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2634 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
-| alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 11 |
+| alleen in de kop *genoemd*, nog niet gemeten | 4 |
+| niets van beide | 15 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2489 bestanden, 18978 beweringen.
+2495 bestanden, 18989 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -235,6 +235,7 @@ toets omvalt.
 | `bedrijfuitgave-mix.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Werk OS: de uitgave met de STRENGSTE VAN TWEE TEKENGRENZEN en de BETAALWIJZE die de werkruimte kiest (AUTHORITY.md par. 5e, vervolg). |
 | `bedrijfuitgave.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werk OS: de UITGAVE, de tekengrens en functiescheiding (AUTHORITY.md fase 5, par. 5j). |
 | `bedrijfwerk.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Werk OS, deel 2: projecten en de kennisbank. De beweringen die ertoe doen, en het zijn er zes: - VOORTGANG WORDT GETELD, NOOIT INGEVULD. |
+| `beeldkeuze-aba.test.js` | 1 | -- | EEN FOTO KIEZEN, HERSTELLEN EN WEER KIEZEN STAAT ER OOK. /api/ik/beelden/zet stond in lib/idemsleutels-beelden.js als `zelfdeVerzoek`: een woordelijk gelijk verzoek binnen vijf seconden telt als herhaling en krijgt... |
 | `beginscherm.test.js` | 4 | geen module gevonden | HET BEGINSCHERM DRAAGT DE WERELDEN EN VERDER GEEN LOSSE APPS. Dat is de afspraak van PLATFORM.md par. |
 | `begroting.test.js` | 14 | gezakt op `voorwaarde-omkeren#0` | DE BEGROTING (server/opzet/begroting.js). WAT HIER OP HET SPEL STAAT. |
 | `begrotingroute.test.js` | 3 | gezakt op `liegpoort /api/` | DE BEGROTING, MAAR DAN VANAF DE BUITENKANT. WAAROM DIT BESTAAT, en het is de eerlijkste regel uit de krimpronde. |
@@ -379,6 +380,7 @@ toets omvalt.
 | `clientafbreking.test.js` | 2 | gezakt op `liegpoort /api/` | EEN CLIENT DIE OPHANGT IS GEEN SERVERFOUT (server/opzet/afsluiters.js) WebKit verbreekt de verbinding als het weg-navigeert terwijl een POST nog loopt. Node geeft dan Error('aborted') aan de bodylezer, en de laatste... |
 | `clipdeler.test.js` | 4 | geen module gevonden | DE CLIPDELER STAAT ÉÉN KEER. Korte video's staan alleen op het toestel van de maker en reizen rechtstreeks (WebRTC-datakanaal). |
 | `clips.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Clips: korte verticale video's die alleen op het toestel van de maker staan (OPFS). De server bewaart enkel de kaart (titel, duur, affiche) en relayeert signalen; de feed is een eindige dagselectie zonder... |
+| `clipsdeel-herhaal.test.js` | 2 | genoemd | Een herhaalde tik op "Deel" is EEN clipkaart, ook na een crash. /api/clips/maak kende geen herhaalsleutel; de algemene idempotentielaag (server/middleware/idempotentie.js) onthoudt alleen in het geheugen. |
 | `clubdorp.test.js` | 4 | gezakt op `liegpoort /api/` | Het clubdorp: bars, clubs en beachclubs krijgen dezelfde afdelingen-motor als het hotel, maar met de eigen afdelingen van de nachtzaak: van de deur en de garderobe tot promo, inkoop en het kantoor. Draai los: node... |
 | `clubs.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Clubs: de golf- en countryclub (Sa Roca) en de sport- en fitnessclub (Fortia). Bewaakt de tee sheet zonder dubbele flights, de lessen van de pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met... |
 | `codearchitect-takken.test.js` | 21 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1271,6 +1273,7 @@ toets omvalt.
 | `media-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `media.test.js` | 11 | gezakt op `liegpoort /api/` | De mediastore: foto's van de Salon en snaps staan als losse bestanden (schijf of S3), niet als base64 in db.data. Zo groeit het werkgeheugen en elke db-snapshot niet mee met de foto's. |
 | `mediadelen.test.js` | 4 | gezakt op `liegpoort /api/` | EEN STUK DELEN IN EEN GESPREK -- en waarom er alleen een ID meegaat. Een gesprek tussen twee leden kon al een Salon-post meedragen. |
+| `medialijst-herhaal.test.js` | 2 | -- | EEN LIJST MAKEN IS EEN KEER MAKEN, OOK NA EEN CRASH. De centrale idempotentielaag (server/middleware/idempotentie.js) onthoudt een eerste antwoord per proces; na een crash is die kas leeg. |
 | `medialijstdelen.test.js` | 4 | gezakt op `liegpoort /api/` | EEN LIJST DELEN -- en de vraag die daar onder ligt. Bij het bouwen van de lijsten stond in TAKEN.md dat delen een antwoord vroeg op EEN vraag, en dat die vraag de kern was en niet de bijzaak: wat gebeurt er met een... |
 | `medialijsten.test.js` | 6 | gezakt op `liegpoort /api/` | AFSPEELLIJSTEN OVER DE VIER VORMEN HEEN -- en wat een lijst NIET bewaart. Een lijst is het tweede ding dat in geen van de vier media-domeinen bestond (het eerste is de bibliotheek). |
 | `mediaos.test.js` | 20 | gezakt op `liegpoort /api/` | De Media OS: één mediawereld over Klankwerk (muziek), Theater (video), Clips (korte video) en Podium (live) heen. Wat hier bewezen moet worden is vooral wat de laag NIET doet: geen tweede administratie naast de vier... |
@@ -1821,6 +1824,7 @@ toets omvalt.
 | `rtg-heritage.test.js` | 15 | geen bronmutatie mogelijk | DE HERITAGE-DOCTRINE IS CODE, GEEN MOODBOARD. Deze toets borgt de vaste wereldpaletten, centrale geometrieën, vier dieptelagen en de componentrollen waarmee routes gefaseerd worden opgebouwd. |
 | `rtg-operation.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-route-memory.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtg-vandaag-lokaal.test.js` | 1 | -- | VANDAAG IS DE DAG VAN HET LID, NIET DIE VAN GREENWICH. Het kompas van het Overzicht (/apps/rtg.html, apps/rtg-vandaag.js) toonde de afspraken van `new Date().toISOString().slice(0, 10)`: de UTC-datum. |
 | `rtg-world-identity.test.js` | 9 | gezakt op `===->!==#0` | DE HERITAGE-ROUTEKAART IS FAIL-CLOSED. Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude redirect mag geen tweede productoppervlak worden. |
 | `rtg.test.js` | 11 | gezakt op `===->!==#0` | HET GEREEDSCHAP -- rtg new, check, dev en sdk. De belofte van dit gereedschap is niet "het draait" maar iets scherpers: het bouwt niets na**. |
 | `rtgai.test.js` | 4 | gezakt op `liegpoort /api/` | De RTG AI van het RTG Kantoor: leest mee, traint zichzelf, meldt zich klaar, en krijgt het roer ALLEEN via de knop; daarna draait het aantoonbare rondes automatisch door en de terug-knop werkt. |
@@ -2009,6 +2013,7 @@ toets omvalt.
 | `sonde-bewaking.test.js` | 8 | gezakt op `liegpoort /api/` | DE SONDE VAN BUITENAF, ONAFHANKELIJK GETOETST (WEERBAARHEID.md par. 9a stap 2 en par. |
 | `sospositie.test.js` | 8 | gezakt op `true->false#0` | EEN SOS-POSITIE HOORT BIJ DE MELDING (NAVIGATIE.md N18). Vijf stromen, een regel (server/kern/sospositie.js): zolang de melding open is blijft de positie, 90 dagen na het sluiten gaat hij eraf, en een proef of een... |
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
+| `spel-dubbeltik.test.js` | 3 | -- | DE DUBBELE TIK OP "NODIG UIT EN START" maakt een potje, niet twee. Gevonden door de voltooiproef van Spelen (scripts/lib/voltooi/spelen.js): twee gelijke verzoeken tegelijk gaven twee potjes en de vriend twee... |
 | `spelaandeel.test.js` | 13 | gezakt op `===->!==#0` | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
 | `spelbank.test.js` | 21 | gezakt op `===->!==#0` | MAGNAAT: DE BANK -- de eerste laag waar geld de wereld verlaat. Alles hiervoor VERPLAATSTE: een contract betaalt de een en verrijkt de ander, een veiling verschuift een zaak, een deelneming splitst een resultaat. |
 | `spelbeleid.test.js` | 11 | gezakt op `return-weg#0` | De beleidslaag: alle toetredingsvragen op een plek, in volgorde. Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er juist niet. |
@@ -2043,6 +2048,7 @@ toets omvalt.
 | `sport-stand-onvolledig.test.js` | 3 | gezakt op `voorwaarde-omkeren#4` | DE STAND VAN SPORT MET EEN ONVOLLEDIG ANTWOORD (public/apps/sport.html). api() maakt van een lijf dat geen JSON is een leeg object: een 502 met HTML, een verbroken verbinding, of -- in WebKit -- een verzoek dat... |
 | `sport-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `sportclub.test.js` | 10 | gezakt op `liegpoort /api/` | Het sportstadion en het clubsysteem: de club tekent zijn EIGEN plattegrond (vakken met capaciteit en prijs, horeca en wc's erop), leden reserveren tickets per vak (afrekenen aan de poort), de scan is eenmalig, de... |
+| `sportticket-herhaal.test.js` | 2 | genoemd | Een herhaalde tik op "Reserveer" is EEN reservering, ook na een crash. /api/member/sport/ticket/koop kende geen eigen herhaalsleutel; de algemene idempotentielaag (server/middleware/idempotentie.js) onthoudt... |
 | `spraaktekst.test.js` | 10 | geen module gevonden | SPRAAK NAAR TEKST -- lokaal, of helemaal niet. Dit is de helft die ontbrak onder de meeleesbaan. |
 | `spreidingsoordeel.test.js` | 8 | gezakt op `&&->||#4` | HET OORDEEL VAN DE SPREIDINGSPROEF (scripts/spreidingsproef.js). Het script meet doorvoer, percentielen en de rekentijd per proces. |
 | `sprong-zonderbody.test.js` | 2 | gezakt op `browser-export-weg#0` | DE SPRONG OP EEN DOCUMENT ZONDER BODY (public/shared/sprong.js). De sprong wordt op elke pagina met `defer` ingevoegd (server/middleware/kopinjectie.js), ook op een omleidingspagina als /apps/logboek.html die in de... |
@@ -2529,7 +2535,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-338 bestanden, 572 beweringen.
+339 bestanden, 573 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2565,6 +2571,7 @@ toets omvalt.
 | `campus-scherm.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE RTF CAMPUS IN EEN ECHTE BROWSER: de werkplek van een leerlingprofiel. test/rtfleerlingtoegang.test.js bewijst dat /api/rtf/toegang de Campus fail-closed houdt. |
 | `chauffeur-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE CHAUFFEURS-PDA IN EEN ECHTE BROWSER: van ritaanvraag tot afgeronde dienst. WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst de keten aan de API, en test/mobiliteitscherm.e2e.js legt de reiziger en de... |
 | `clipdeler.e2e.js` | 1 | gezakt op `liegpoort /api/` | GAAT ER OOK ECHT BEELD OVER? -- de clipdeler tussen twee browsers. |
+| `clips-deel.e2e.js` | 1 | genoemd | Scherm-test voor het DELEN van een clip, gevonden door de voltooiproef (scripts/lib/voltooi/clips.js). Twee fouten op dezelfde knop: 1. |
 | `clips-studio.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de Clips-studio: knippen, geluid en ondertitels, en het toegangsfilter in de kop. test/clips.test.js bewijst de server-kant; deze bewijst dat de studio op het scherm werkt en dat de feed de standen... |
 | `comm-zaak.e2e.js` | 3 | gezakt op `liegpoort /api/` | De zakelijke deur van het communicatieplatform (routes/supplier/comm.js). comm-actor.test.js toetst het MODEL: de sleutels, de naamruimtes, de poort. |
 | `comm.e2e.js` | 5 | gezakt op `liegpoort /api/` | Het communicatieplatform (server/kern/comm + apps/comm.html). WAT HIER BEWAAKT WORDT, en waarom juist dit. |

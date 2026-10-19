@@ -379,18 +379,23 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
       } finally { await page.close(); }
     });
 
-    await t.test('reizen: een wiel omlaag geeft peek en daarna dock', async (st) => {
-      const page = await edge2Pagina(st, '/apps/reizen.html');
-      if (!page) return;
+    /* TravelOS staat op het RTG Design System: daar is de ds-Edge de ene rand,
+       zonder Edge 2 en zonder verkleinstanden. Wat deze proef op reizen bewaakte
+       (een echt wiel scrolt de pagina en de onderste bediening blijft er,
+       vast en bereikbaar), eist hij daarom van de ds-Edge. */
+    await t.test('reizen: een wiel omlaag scrolt, en de ds-Edge blijft vast staan', async () => {
+      const page = await context.newPage();
       try {
+        await page.goto(base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
+        assert.equal(await page.locator('.rtg-adaptive-edge').count(), 0, 'op reizen draait geen tweede, oude Edge');
+        const voor = await page.locator('.ds-edge__balk').boundingBox();
         await page.mouse.move(195, 420);
-        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 1400);
-        assert.equal(m.edge2, true, 'op reizen hoort Edge 2 te draaien');
-        assert.ok(m.y > 50, 'het wiel scrolde de pagina niet (hoogste ' + m.y + '; ' + m.standen.join(' > ') + ')');
-        assert.ok(m.standen.includes('peek'), 'een wiel gaf geen peek: ' + m.standen.join(' > '));
-        assert.equal(m.edge2Stand, 'compact',
-          'Edge 2 staat niet meer op compact; dan kan de dock van Edge 2 komen en niet van de klok van de balk');
-        assert.equal(m.standen[m.standen.length - 1], 'dock', 'na het wiel kwam de balk niet op dock: ' + m.standen.join(' > '));
+        await page.mouse.wheel(0, 700);
+        await page.waitForFunction(() => scrollY > 50);
+        const na = await page.locator('.ds-edge__balk').boundingBox();
+        assert.ok(Math.abs(na.y - voor.y) < 1 && na.height >= 63.5, 'de Edge bewoog of kromp bij het wiel: ' + JSON.stringify([voor, na]));
+        assert.ok(na.y + na.height <= page.viewportSize().height, 'de Edge viel uit beeld');
       } finally { await page.close(); }
     });
 

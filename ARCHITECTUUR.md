@@ -19,13 +19,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5538 |
-| servermodules (`server/**/*.js`) | 4594 |
+| servermodules (`server/**/*.js`) | 4597 |
 | routebestanden (`server/routes/**`) | 671 |
-| kernmodules (`server/kern/**`) | 2878 |
+| kernmodules (`server/kern/**`) | 2881 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 459 |
-| toetsbestanden (`test/*.test.js`) | 2547 |
-| schermtoetsen (`test/*.e2e.js`) | 343 |
+| toetsbestanden (`test/*.test.js`) | 2545 |
+| schermtoetsen (`test/*.e2e.js`) | 344 |
 
 ## 2. De weg van een verzoek
 
@@ -173,7 +173,6 @@ openVacatures(5) overheid(5) sseToCustomer(5)
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
 | 45 | `server/routes/auth/account.js` |
-| 42 | `server/routes/member/voertuigen/huur.js` |
 | 41 | `server/routes/member/voertuigen/charter.js` |
 | 41 | `server/routes/member/voertuigen.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
@@ -181,6 +180,7 @@ openVacatures(5) overheid(5) sseToCustomer(5)
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 35 | `server/routes/auth/herstel.js` |
 | 35 | `server/routes/auth.js` |
+| 35 | `server/routes/member/handel/uitjes.js` |
 
 ## 6. Waar de waarheid staat
 

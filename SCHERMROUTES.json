@@ -3,13 +3,13 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-19",
-  "commit": "dc5dae5b",
+  "commit": "27f29fcf",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
+   "boomVuil": true,
    "ongecommitteInvoer": [
-    "ROUTEBRON.json"
+    "public/apps/arrival.html"
    ],
    "bestanden": [
     "ROUTEBRON.json",
@@ -81,7 +81,6 @@
     "public/apps/app-main/app-main-29.js",
     "public/apps/app-main/app-main-29b.js",
     "public/apps/app-main/app-main-29c.js",
-    "public/apps/app-main/app-main-29d.js",
     "public/apps/app-main/app-main-30.js",
     "public/apps/app-main/app-main-31.js",
     "public/apps/app-main/app-main-31c.js",
@@ -498,7 +497,6 @@
     "public/apps/kantoren-reisuitnodiging.js",
     "public/apps/kantoren-rtgboek.js",
     "public/apps/kantoren-rtgcampagne.js",
-    "public/apps/kantoren-terugbetaling.js",
     "public/apps/kantoren.html",
     "public/apps/kassa.html",
     "public/apps/kassa/wachtrij.js",
@@ -1995,10 +1993,10 @@
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-19T10:49:16.334Z",
-   "commit": "dc5dae5b"
+   "op": "2026-10-19T10:03:21.649Z",
+   "commit": "eb6dde1a"
   },
-  "bekendePaden": 5517
+  "bekendePaden": 5516
  },
  "gemeten": {
   "schermenMetPad": 480,

@@ -136,8 +136,14 @@ function maakPartijen({ kaart, kijk, vastleggen, crypto, nu, koppeling, wie }) {
   }
 
   // het kantoor ziet ook welke codenamen namens een partij handelen (./partijrol.js)
+  /* oudePartijen: actieve partijen van voor 19 oktober 2026 zonder gekoppeld
+     account -- de teller van de migratie (./partijrol.js). Bij nul kunnen de
+     partijpaden uit scripts/lib/publiek.js. */
+  const oud = (p) => p.stand === 'actief' && !p.model && !(p.rolhouders || []).length;
   const lijst = () => ({ ok: true, partijen: Object.values(kijk()).sort((a, b) => a.id.localeCompare(b.id))
-    .map(p => Object.assign(beeld(p), { gekoppeld: (p.rolhouders || []).map(a => ({ codenaam: a.codenaam, sinds: a.sinds })) })),
+    .map(p => Object.assign(beeld(p), { gekoppeld: (p.rolhouders || []).map(a => ({ codenaam: a.codenaam, sinds: a.sinds })),
+      oud: oud(p) })),
+    oudePartijen: Object.values(kijk()).filter(oud).length,
     niveaus: NIVEAUS, categorieen: CATEGORIEEN });
 
   /* De migratie (./partijrol.js): alleen een partij van voor het besluit van

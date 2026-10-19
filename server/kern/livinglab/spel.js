@@ -94,13 +94,17 @@ module.exports = (ctx) => {
      Een paspoort is van de MENS, niet van een studie. Het draagt een naam die de
      drager zelf kiest (een roepnaam, geen echte naam is nodig) en een code die
      alleen hij heeft. */
-  function paspoortMaak(b) {
+  /* Het paspoort hangt aan een account (eigenaarsbesluit 19 oktober 2026): de
+     routelaag geeft de eigenaarssleutel mee, en alleen na de 18+-poort
+     (progressieMag), want niveaus en badges zijn progressie. */
+  function paspoortMaak(b, eigenaar) {
     b = b || {};
+    if (!eigenaar) return { status: 401, error: 'Een labpaspoort hangt aan uw eigen RTG-account.' };
     const lab = ctx.vindLab(b.labId); if (!lab) return { status: 404, error: 'Dit lab bestaat niet.' };
     const naam = schoon(b.naam, 40);
     if (naam.length < 2) return { status: 400, error: 'Onder welke naam wilt u dit paspoort? Een roepnaam volstaat.' };
     if (P().length >= 100000) return { status: 400, error: 'Het paspoortregister zit vol.' };
-    const p = { id: rid(), labId: lab.id, naam, code: code('LABPAS'), punten: 0, niveau: 1, badges: [], at: nu() };
+    const p = { id: rid(), labId: lab.id, naam, code: code('LABPAS'), eigenaar, punten: 0, niveau: 1, badges: [], at: nu() };
     P().unshift(p);
     save();
     return { ok: true, paspoort: { id: p.id, naam: p.naam, code: p.code, punten: 0, niveau: 1, badges: [] } };
@@ -108,9 +112,13 @@ module.exports = (ctx) => {
 
   const opCode = c => P().find(p => p.code === String(c || '').trim().toUpperCase()) || null;
 
-  function paspoort(c) {
+  /* Alleen de eigenaar leest zijn paspoort. Een paspoort van voor het besluit
+     heeft geen eigenaar; het eerste account dat het met de code opent, wordt
+     het (dezelfde vorm als kern/codekoppel.js). */
+  function paspoort(c, eigenaar) {
     const p = opCode(c);
-    if (!p) return { status: 404, error: 'Dit labpaspoort bestaat niet.' };
+    if (!p || !eigenaar || (p.eigenaar && p.eigenaar !== eigenaar)) return { status: 404, error: 'Dit labpaspoort bestaat niet.' };
+    if (!p.eigenaar) { p.eigenaar = eigenaar; save(); }
     const nv = niveauVan(p.punten), volgende = NIVEAUS.find(x => x.vanaf > p.punten) || null;
     return { ok: true, paspoort: { naam: p.naam, punten: p.punten, niveau: nv.niveau, niveauNaam: nv.naam,
       volgende: volgende ? { naam: volgende.naam, vanaf: volgende.vanaf, teGaan: volgende.vanaf - p.punten } : null,

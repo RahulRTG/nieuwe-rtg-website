@@ -91,6 +91,12 @@ Neutraliteit is pas bewezen als deze drie proeven slagen:
 P3 is de ultieme proef. Als het antwoord ooit ja is, is onafhankelijkheid niet
 alleen organisatorisch beloofd maar architectonisch mogelijk gemaakt.
 
+> **Vervallen op 19 oktober 2026 (eigenaarsbesluit).** P3 geldt niet meer: wie
+> namens een partij handelt, heeft een RTG-account met de partijrol
+> (`server/kern/democratie/partijrol.js`), dus DemocratieOS hangt bewust aan
+> RTG-accounts. Zie AUTHORITY.md par. 7a. De rij hierboven blijft staan als
+> geschiedenis van de afweging.
+
 ---
 
 ## 2. De grondwet van DemocratieOS
@@ -358,6 +364,11 @@ Twee besluiten van de eigenaar:
   partij geen ledenaccount nodig om zonder RTG verder te gaan (proef P3), en
   vallen de rollen van woordvoerder en burger nooit in een sessie samen (MN-02).
   De deur staat daarom met reden in `scripts/lib/publiek.js`.
+  *Vervangen op 19 oktober 2026 (eigenaarsbesluit, AUTHORITY.md par. 7a): wie
+  namens een partij handelt, heeft een account met de partijrol, en de sleutel
+  is een eenmalige koppelcode. Partijen van voor het besluit komen met hun oude
+  sleutel binnen tot er een account aan hangt; de werkopdracht om die migratie
+  af te ronden staat in de kop van `server/kern/democratie/partijrol.js`.*
 - **De aannamelijst hoort bij V1.** Zeven velden -- kosten, wie betaalt, wie
   profiteert, wie heeft nadeel, welke regel, wie voert uit, wat is onzeker --
   staan op `onbekend` tot de partij een veld MET een bron invult.

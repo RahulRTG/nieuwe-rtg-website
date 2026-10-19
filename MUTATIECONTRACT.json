@@ -1,31 +1,31 @@
 {
  "stempel": {
-  "op": "2026-10-19T11:15:42.421Z",
-  "commit": "4e617525",
+  "op": "2026-10-19T11:39:02.828Z",
+  "commit": "d7ce2870",
   "boomVuil": true,
-  "boomAnders": 15,
+  "boomAnders": 23,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5407,
-  "geclassificeerd": 5378,
+  "totaal": 5412,
+  "geclassificeerd": 5383,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1299,
    "LEGACY_PENDING_CLASSIFICATION": 29,
    "PROTECTED": 707,
-   "INTENTIONALLY_NON_IDEMPOTENT": 208
+   "INTENTIONALLY_NON_IDEMPOTENT": 213
   },
-  "vastgesteldDoorMens": 2266,
+  "vastgesteldDoorMens": 2271,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4481,
-   "PUBLIC": 101,
+   "AUTHENTICATED": 4486,
+   "PUBLIC": 84,
    "OBJECT_SCOPED": 783,
-   "(niet af te leiden -- vraagt een verklaring)": 26,
+   "(niet af te leiden -- vraagt een verklaring)": 43,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 260
+   "niet gemeten": 265
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -213,12 +213,6 @@
    "route": "POST /api/krant/open",
    "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/lab2/bewoner/studie",
-   "bedoeld": "AUTHENTICATED",
-   "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -494,6 +488,36 @@
   {
    "route": "POST /api/rtf/partner/raad",
    "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfkantoor/club/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfkantoor/stadsraad/partner-code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/gemeente/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/ondernemer/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/partner/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -35959,7 +35983,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -35986,7 +36010,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36067,7 +36091,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36095,7 +36119,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36149,7 +36173,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
@@ -36932,7 +36956,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36960,7 +36984,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -36988,7 +37012,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37016,7 +37040,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37044,7 +37068,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37072,7 +37096,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37100,7 +37124,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37425,7 +37449,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37452,7 +37476,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37479,7 +37503,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37506,7 +37530,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -37533,7 +37557,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -57390,7 +57414,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57417,7 +57441,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57444,7 +57468,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57471,7 +57495,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83514,7 +83538,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83595,7 +83619,7 @@
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83622,7 +83646,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83649,7 +83673,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83676,7 +83700,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83703,7 +83727,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83730,7 +83754,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83757,7 +83781,7 @@
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -94121,6 +94145,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfkantoor.club.code.roteren",
+   "route": "POST /api/rtfkantoor/club/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfkantoor.club.maak",
    "route": "POST /api/rtfkantoor/club/maak",
    "semantiek": {
@@ -94522,6 +94567,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfkantoor.stadsraad.partnercode.roteren",
+   "route": "POST /api/rtfkantoor/stadsraad/partner-code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -96140,6 +96206,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.gemeente.code.roteren",
+   "route": "POST /api/rtfos/gemeente/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.gemeente.maak",
    "route": "POST /api/rtfos/gemeente/maak",
    "semantiek": {
@@ -97311,6 +97398,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.ondernemer.code.roteren",
+   "route": "POST /api/rtfos/ondernemer/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.ondernemer.koppel",
    "route": "POST /api/rtfos/ondernemer/koppel",
    "semantiek": {
@@ -97415,6 +97523,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.partner.code.roteren",
+   "route": "POST /api/rtfos/partner/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

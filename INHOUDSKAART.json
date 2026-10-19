@@ -1493,7 +1493,7 @@
   "GET /api/push/key": {
    "methode": "GET",
    "pad": "/api/push/key",
-   "rol": "publiek",
+   "rol": "member",
    "status": 200,
    "sleutels": [
     "key"
@@ -1501,7 +1501,8 @@
    "dragend": [
     "key"
    ],
-   "op": "2026-08-20T09:03:01.642Z"
+   "op": "2026-10-19T00:00:00.000Z",
+   "reden": "Met de hand bijgesteld: sinds het eigenaarsbesluit van 19 oktober 2026 vraagt de route een sessie die het huis kent (server/kern/elkesessie.js), dus het vormcontract wordt met een ledensessie gemeten. Zonder sessie 401 (test/toegang-ledenroutes.test.js)."
   },
   "GET /api/sso/start": {
    "methode": "GET",

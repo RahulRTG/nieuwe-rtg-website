@@ -59,7 +59,8 @@ const GRENS_LID = 'samengesteld uit IDOR.json en ROLPROEF.json per route die het
   'de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend ' +
   'leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet';
 const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A\'s code met ' +
-  'B\'s eigen token';
+  'B\'s eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; ' +
+  'B\'s toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd';
 
 /* ---- DE LEDENKANT: SAMENSTELLEN --------------------------------------------- */
 
@@ -167,16 +168,23 @@ function paarOordeel({ a, b, anoniem }) {
   if (!ok(a)) return 'eigenaarWeg';
   if (ok(b)) return 'lek';
   if (ok(anoniem)) return 'openbaar';
-  return 'gescheiden';
+  // Een time-out, redirect, validatiefout of serverfout is geen weigering
+  // door autorisatie. Ook 404 vereist een eigen verhullingscontract en
+  // bewijst hier op zichzelf niet dat de bevoegdheidsgrens is geraakt.
+  const geweigerd = (s) => s === 401 || s === 403;
+  return geweigerd(b) && geweigerd(anoniem) ? 'gescheiden' : 'onbeslist';
 }
 
 function gezinOordeel(paren) {
   if (!paren.length) return { status: 'NIET_GETEST', reden: 'het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen' };
   const lek = paren.filter((p) => p.uitslag === 'lek');
   if (lek.length) return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'gezin B kreeg ' + lek[0].verzoek + ' met de code van gezin A (' + lek[0].b + ')', paren: paren.length };
+  const openbaar = paren.find((p) => p.uitslag === 'openbaar');
+  if (openbaar) return { status: 'GEBLOKKEERD_DOOR_DEFECT',
+    reden: 'anoniem kreeg ' + openbaar.verzoek + ' met de code van gezin A (' + openbaar.anoniem + ')', paren: paren.length };
   const gescheiden = paren.filter((p) => p.uitslag === 'gescheiden');
-  if (!gescheiden.length) return { status: 'NIET_GETEST', paren: paren.length,
-    reden: 'geen enkel paar waarin A binnenkwam en de anderen niet (' + paren.map((p) => p.uitslag).join(', ') + ')' };
+  if (gescheiden.length !== paren.length) return { status: 'NIET_GETEST', paren: paren.length,
+    reden: 'niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (' + paren.map((p) => p.uitslag).join(', ') + ')' };
   return { status: 'BEWEZEN', paren: paren.length,
     reden: gescheiden.length + ' van de ' + paren.length + ' kruisparen gescheiden (A binnen, B met A\'s code en anoniem geweigerd), 0 lek: ' + GRENS_GEZIN };
 }
@@ -209,6 +217,7 @@ async function meetGezinnen(rijen, base, browser, maakContext) {
         for (const [k, w] of Object.entries(v.koppen || {})) if (/^(authorization|x-)/i.test(k)) koppen[k] = vervang(w);
         try {
           const res = await fetch(base + vervang(v.url), { method: v.methode, headers: koppen,
+            redirect: 'manual',
             body: v.methode === 'GET' || v.methode === 'HEAD' ? undefined : vervang(v.lijf) });
           return res.status;
         } catch (e) { return 0; }

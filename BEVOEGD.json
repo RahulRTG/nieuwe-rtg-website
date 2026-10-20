@@ -1,20 +1,23 @@
 {
   "stempel": {
-    "op": "2026-10-19T05:08:56.486Z",
-    "commit": "55ed79f9",
-    "boomVuil": false,
+    "op": "2026-10-20T06:56:50.414Z",
+    "commit": "c10c930cb8",
+    "boomVuil": true,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
-    "node": "v22.22.0"
+    "node": "v26.12.0"
   },
   "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.",
-  "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token.",
+  "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, een route die IDOR `publiek` noemt schermt niets af; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd.",
   "bronnen": {
-    "vervallen": []
+    "vervallen": [
+      "IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten)",
+      "ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
+    ]
   },
   "telling": {
-    "NIET_GETEST": 99,
-    "BEWEZEN": 15
+    "NIET_GETEST": 106,
+    "BEWEZEN": 8
   },
   "regels": [
     {
@@ -23,18 +26,15 @@
       "ingang": "/apps/arrival.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 3,
-      "open": 3,
-      "reden": "3 van de 3 routes niet gemeten, o.a. /api/arrival/pass staat niet in IDOR.json; /api/arrival/pulse staat niet in IDOR.json; /api/plaats/venster is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:appdossier",
       "app": "App-dossier",
       "ingang": "/apps/appstore-dossier.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 2,
-      "reden": "alle 2 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:attenties",
@@ -42,9 +42,7 @@
       "ingang": "/apps/attenties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 6,
-      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:balans",
@@ -52,9 +50,7 @@
       "ingang": "/apps/geld.html#balans",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:bank",
@@ -62,9 +58,7 @@
       "ingang": "/apps/geld.html#bank",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:berichten",
@@ -72,9 +66,7 @@
       "ingang": "/apps/comm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 22,
-      "open": 18,
-      "reden": "18 van de 22 routes niet gemeten, o.a. /api/comm/begin is in IDOR.json onbereikbaar; /api/comm/concept is in IDOR.json onbereikbaar; /api/comm/gesprek is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:bescherming",
@@ -82,9 +74,7 @@
       "ingang": "/apps/mijn-isolatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 2,
-      "reden": "2 van de 7 routes niet gemeten, o.a. /api/isolatie/mijn/ontsluiting is in IDOR.json onbereikbaar; /api/isolatie/mijn/zet is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:browser",
@@ -92,7 +82,7 @@
       "ingang": "/apps/browser.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:buurtruil",
@@ -101,7 +91,7 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
@@ -118,9 +108,7 @@
       "ingang": "/apps/camera.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:cellier",
@@ -128,9 +116,7 @@
       "ingang": "/apps/cellier.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:cercle",
@@ -138,9 +124,7 @@
       "ingang": "/apps/cercle.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 6,
-      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:clips",
@@ -148,9 +132,7 @@
       "ingang": "/apps/clips.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/stroom/ticket staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:commerce",
@@ -158,9 +140,7 @@
       "ingang": "/apps/commerce.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 9,
-      "open": 9,
-      "reden": "9 van de 9 routes niet gemeten, o.a. /api/commerce/aanbod is in IDOR.json onbereikbaar; /api/commerce/etalage is in IDOR.json onbereikbaar; /api/commerce/mand is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:connect",
@@ -169,7 +149,7 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 5,
-      "reden": "5 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "5 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
@@ -222,9 +202,7 @@
       "ingang": "/apps/entourage.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 6,
-      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:flits",
@@ -232,7 +210,7 @@
       "ingang": "/apps/flits.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:foodcourt",
@@ -240,21 +218,19 @@
       "ingang": "/apps/foodcourt.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 5,
-      "reden": "5 van de 7 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:foundationzorg",
       "app": "Zorg",
       "ingang": "/apps/foundation/zorg.html",
       "persona": "gezin",
-      "status": "BEWEZEN",
+      "status": "NIET_GETEST",
       "paren": 5,
-      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/HFCZH6/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/ZW9HM4/gezondheid",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -296,9 +272,7 @@
       "ingang": "/apps/garderobe.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:gegevens",
@@ -306,9 +280,7 @@
       "ingang": "/apps/mijn-gegevens.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 14,
-      "open": 6,
-      "reden": "6 van de 14 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:geldcommand",
@@ -316,9 +288,7 @@
       "ingang": "/apps/geld.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:geven",
@@ -327,7 +297,7 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
@@ -344,9 +314,7 @@
       "ingang": "/apps/hangar.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:horeca",
@@ -354,9 +322,7 @@
       "ingang": "/apps/horeca.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 7,
-      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json; /api/supplier/horeca*: de registers kennen geen route onder dit voorvoegsel"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:huis",
@@ -364,7 +330,7 @@
       "ingang": "/apps/thuis.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:ik",
@@ -372,9 +338,7 @@
       "ingang": "/apps/ik.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 3,
-      "reden": "3 van de 12 routes niet gemeten, o.a. /api/veiligheid/kring/mail is in IDOR.json onbereikbaar; /api/veiligheid/kring/toevoegen is in IDOR.json onbereikbaar; /api/veiligheid/plek is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:juridisch",
@@ -382,7 +346,7 @@
       "ingang": "/apps/juridisch.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:klimaat",
@@ -390,9 +354,16 @@
       "ingang": "/apps/foundation/klimaatfonds.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "paren": 2,
+      "reden": "2 van de 2 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
+        {
+          "verzoek": "POST /api/lab2/bewoner/labs",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
@@ -408,7 +379,7 @@
       "ingang": "/apps/krant.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:kwesties",
@@ -417,7 +388,7 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
@@ -434,9 +405,7 @@
       "ingang": "/apps/geld.html#labfonds",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:leven",
@@ -444,9 +413,7 @@
       "ingang": "/apps/leven.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 2,
-      "reden": "2 van de 5 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:library",
@@ -455,7 +422,7 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
@@ -472,9 +439,7 @@
       "ingang": "/apps/geld.html#logboek",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:loonstrook",
@@ -482,7 +447,7 @@
       "ingang": "/apps/loonstrook.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:loopbaan",
@@ -490,9 +455,7 @@
       "ingang": "/apps/loopbaan.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 8,
-      "open": 7,
-      "reden": "7 van de 8 routes niet gemeten, o.a. /api/carriere/ledger/afschrift is in IDOR.json onbereikbaar; /api/carriere/ledger/deel is in IDOR.json onbereikbaar; /api/carriere/ledger/delen is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:magnaat",
@@ -500,9 +463,7 @@
       "ingang": "/apps/magnaat.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 90,
-      "open": 20,
-      "reden": "20 van de 90 routes niet gemeten, o.a. /api/member/magnaat/economie/analyse is in IDOR.json onbereikbaar; /api/member/magnaat/economie/schok is in IDOR.json onbereikbaar; /api/member/magnaat/economie/volgende-dag is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:maison",
@@ -510,9 +471,7 @@
       "ingang": "/apps/maison.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:mall",
@@ -520,9 +479,7 @@
       "ingang": "/apps/mall.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 61,
-      "open": 21,
-      "reden": "21 van de 61 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/bieb/ai is in IDOR.json onbereikbaar; /api/booking/request is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:mecenaat",
@@ -530,9 +487,7 @@
       "ingang": "/apps/geld.html#mecenaat",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:mediaos",
@@ -540,9 +495,7 @@
       "ingang": "/apps/media.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 6,
-      "open": 3,
-      "reden": "3 van de 6 routes niet gemeten, o.a. /api/ondertiteling/fragment is in IDOR.json onbereikbaar; /api/stream staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:mijnmall",
@@ -550,9 +503,7 @@
       "ingang": "/apps/mijnmall.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 18,
-      "open": 2,
-      "reden": "2 van de 18 routes niet gemeten, o.a. /api/mall/aanvraag is in IDOR.json onbereikbaar; /api/supplier/mall/aanvraag/behandel staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:move",
@@ -560,7 +511,7 @@
       "ingang": "/apps/move.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:muziek",
@@ -568,9 +519,7 @@
       "ingang": "/apps/muziek.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar; /api/muziek/bestand is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:nalatenschap",
@@ -578,9 +527,7 @@
       "ingang": "/apps/geld.html#nalatenschap",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:navigatie",
@@ -588,9 +535,7 @@
       "ingang": "/apps/navigatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/nav/gebied/pakket/*: de registers kennen geen route onder dit voorvoegsel"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:neigingen",
@@ -598,18 +543,15 @@
       "ingang": "/apps/mijn-neigingen.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 19,
-      "open": 7,
-      "reden": "7 van de 19 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:nieuws",
       "app": "Nieuws",
       "ingang": "/apps/nieuws.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 3,
-      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:office",
@@ -617,9 +559,7 @@
       "ingang": "/apps/office.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:onderneming",
@@ -627,9 +567,7 @@
       "ingang": "/apps/onderneming.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/onderneming/rechtsvormen staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:ontdek",
@@ -637,9 +575,7 @@
       "ingang": "/apps/rtg.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 2,
-      "reden": "2 van de 7 routes niet gemeten, o.a. /api/sociaal/lijn is in IDOR.json onbereikbaar; /api/sociaal/wereld is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:ov",
@@ -647,27 +583,23 @@
       "ingang": "/apps/ov.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:ovroutes",
       "app": "OV-routes",
       "ingang": "/apps/ovroutes.html",
-      "persona": "lid",
+      "persona": "personeel",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/*: de registers kennen geen route onder dit voorvoegsel"
+      "reden": "deze ronde heeft geen kruisproef voor de persona personeel"
     },
     {
       "functie": "link:partnernetwerk",
       "app": "Partner Network",
       "ingang": "/apps/partner-network.html",
-      "persona": "lid",
+      "persona": "zaak",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "deze ronde heeft geen kruisproef voor de persona zaak"
     },
     {
       "functie": "link:passkeys",
@@ -675,9 +607,7 @@
       "ingang": "/apps/passkeys.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/webauthn/bevestig/opties is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:pay",
@@ -685,9 +615,7 @@
       "ingang": "/apps/pay.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 17,
-      "open": 5,
-      "reden": "5 van de 17 routes niet gemeten, o.a. /api/link/cap/maak is in IDOR.json onbereikbaar; /api/login staat niet in IDOR.json; /api/pay/oplaad is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:podium",
@@ -695,9 +623,7 @@
       "ingang": "/apps/podium.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 3,
-      "open": 3,
-      "reden": "3 van de 3 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/stream staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:post",
@@ -705,9 +631,7 @@
       "ingang": "/apps/mijn-post.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 16,
-      "open": 6,
-      "reden": "6 van de 16 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:projectroom",
@@ -723,9 +647,7 @@
       "ingang": "/apps/pulse.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 15,
-      "open": 1,
-      "reden": "1 van de 15 routes niet gemeten, o.a. /api/member/pulse/volg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:rechterhand",
@@ -733,9 +655,7 @@
       "ingang": "/apps/lifestyle.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 73,
-      "open": 1,
-      "reden": "1 van de 73 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:reisboek",
@@ -743,9 +663,7 @@
       "ingang": "/apps/reisboek.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 3,
-      "reden": "3 van de 12 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:reizen",
@@ -753,9 +671,7 @@
       "ingang": "/apps/reizen-veilig.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 2,
-      "reden": "2 van de 7 routes niet gemeten, o.a. /api/move/volgende is in IDOR.json onbereikbaar; /api/veiligheid/moment/maak is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:relaties",
@@ -763,9 +679,7 @@
       "ingang": "/apps/mijn-relaties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 18,
-      "open": 7,
-      "reden": "7 van de 18 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/inzagekaart is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:rendezvous",
@@ -773,9 +687,7 @@
       "ingang": "/apps/rendezvous.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 38,
-      "open": 9,
-      "reden": "9 van de 38 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:residentie",
@@ -783,9 +695,7 @@
       "ingang": "/apps/residentie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/stroom/ticket staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:routedossier",
@@ -800,9 +710,9 @@
       "app": "Het bord",
       "ingang": "/apps/foundation/bord.html",
       "persona": "gezin",
-      "status": "BEWEZEN",
+      "status": "NIET_GETEST",
       "paren": 5,
-      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -847,9 +757,23 @@
       "ingang": "/apps/foundation/os-publiek.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "paren": 3,
+      "reden": "3 van de 3 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
+        {
+          "verzoek": "POST /api/rtfos/publiek/steden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtfos/publiek/campagnes",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
@@ -866,7 +790,7 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
@@ -882,9 +806,9 @@
       "app": "Het schrift",
       "ingang": "/apps/foundation/schrift.html",
       "persona": "gezin",
-      "status": "BEWEZEN",
+      "status": "NIET_GETEST",
       "paren": 5,
-      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -929,9 +853,7 @@
       "ingang": "/apps/geld.html#rtgcode",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:rtgone",
@@ -947,9 +869,7 @@
       "ingang": "/apps/rtmail.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 63,
-      "open": 35,
-      "reden": "35 van de 63 routes niet gemeten, o.a. /api/account/start is in IDOR.json onbereikbaar; /api/member/rtmail/afwezig is in IDOR.json onbereikbaar; /api/member/rtmail/alias is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:school",
@@ -957,9 +877,7 @@
       "ingang": "/apps/rtgschool.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 4,
-      "reden": "4 van de 5 routes niet gemeten, o.a. /api/bijles/gesprek is in IDOR.json onbereikbaar; /api/bijles/vraag is in IDOR.json onbereikbaar; /api/leerstof/examen is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:sessies",
@@ -967,18 +885,15 @@
       "ingang": "/apps/mijn-sessies.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 17,
-      "open": 8,
-      "reden": "8 van de 17 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/mijn/toestel/bind is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:sitemaker",
       "app": "Website",
       "ingang": "/apps/sitemaker.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 1,
-      "reden": "alle 1 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:sociaal",
@@ -986,9 +901,7 @@
       "ingang": "/apps/sociaal.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 13,
-      "open": 12,
-      "reden": "12 van de 13 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:spelavond",
@@ -996,9 +909,7 @@
       "ingang": "/apps/spelscherm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/projectie/kijk staat niet in IDOR.json; /api/projectie/koppel staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:spelen",
@@ -1006,9 +917,7 @@
       "ingang": "/apps/spelen.html?pas=",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 50,
-      "open": 16,
-      "reden": "16 van de 50 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/member/spel/arcade-bord is in IDOR.json onbereikbaar; /api/member/spel/arcade-score is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:sport",
@@ -1016,9 +925,7 @@
       "ingang": "/apps/sport.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 11,
-      "open": 3,
-      "reden": "3 van de 11 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:stad",
@@ -1026,9 +933,7 @@
       "ingang": "/apps/stad.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/stream staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:table",
@@ -1036,9 +941,7 @@
       "ingang": "/apps/table.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:theater",
@@ -1046,19 +949,15 @@
       "ingang": "/apps/theater.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 5,
-      "reden": "5 van de 5 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/stream staat niet in IDOR.json; /api/stroom/ticket staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:tweedescherm",
       "app": "Tweede scherm",
       "ingang": "/apps/scherm.html",
-      "persona": "lid",
+      "persona": "zaak",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json; /api/supplier/state staat niet in IDOR.json"
+      "reden": "deze ronde heeft geen kruisproef voor de persona zaak"
     },
     {
       "functie": "link:uitgaan",
@@ -1066,9 +965,7 @@
       "ingang": "/apps/uitgaan.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 6,
-      "open": 3,
-      "reden": "3 van de 6 routes niet gemeten, o.a. /api/event/rsvp is in IDOR.json onbereikbaar; /api/event/rsvp/annuleer is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:vandaag",
@@ -1076,9 +973,7 @@
       "ingang": "/apps/life.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 26,
-      "open": 11,
-      "reden": "11 van de 26 routes niet gemeten, o.a. /api/dag is in IDOR.json onbereikbaar; /api/medicatie is in IDOR.json onbereikbaar; /api/metingen is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:veilig",
@@ -1086,9 +981,7 @@
       "ingang": "/apps/veilig.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 21,
-      "open": 6,
-      "reden": "6 van de 21 routes niet gemeten, o.a. /api/veiligheid/alarm is in IDOR.json onbereikbaar; /api/veiligheid/codewoord/zet is in IDOR.json onbereikbaar; /api/veiligheid/kring/mail is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:verificatie",
@@ -1096,9 +989,7 @@
       "ingang": "/apps/verificatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 3,
-      "open": 3,
-      "reden": "3 van de 3 routes niet gemeten, o.a. /api/verify/selfie is in IDOR.json onbereikbaar; /api/verify/status is in IDOR.json onbereikbaar; /api/verify/upload is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:vertegenwoordiging",
@@ -1106,7 +997,7 @@
       "ingang": "/apps/vertegenwoordiging.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:vluchten",
@@ -1114,9 +1005,7 @@
       "ingang": "/apps/vluchten.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 2,
-      "reden": "2 van de 7 routes niet gemeten, o.a. /api/member/vluchten/boek is in IDOR.json onbereikbaar; /api/member/vluchten/charter is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:vonk",
@@ -1124,9 +1013,7 @@
       "ingang": "/apps/vonk.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 9,
-      "open": 9,
-      "reden": "9 van de 9 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar; /api/ondertiteling/stand is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:vooruitzicht",
@@ -1134,18 +1021,16 @@
       "ingang": "/apps/living-os.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 4,
-      "reden": "4 van de 12 routes niet gemeten, o.a. /api/agenda/bereik is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar; /api/geld/cockpit is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:vrienden",
       "app": "Vrienden",
       "ingang": "/apps/foundation/vrienden.html",
       "persona": "gezin",
-      "status": "BEWEZEN",
+      "status": "NIET_GETEST",
       "paren": 12,
-      "reden": "10 van de 12 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -1155,7 +1040,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/HFCZH6/mij",
+          "verzoek": "GET /api/foundation/gezin/ZW9HM4/mij",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -1239,9 +1124,7 @@
       "ingang": "/apps/geld.html#wallet",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:wbw",
@@ -1249,9 +1132,7 @@
       "ingang": "/apps/geld.html#wbw",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 100,
-      "open": 61,
-      "reden": "61 van de 100 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:wereldlaag",
@@ -1259,9 +1140,7 @@
       "ingang": "/apps/wereld.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 2,
-      "reden": "2 van de 5 routes niet gemeten, o.a. /api/krant/artikel staat niet in IDOR.json; /api/mediaos/volg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:werkos",
@@ -1269,9 +1148,7 @@
       "ingang": "/apps/werk.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 8,
-      "open": 8,
-      "reden": "8 van de 8 routes niet gemeten, o.a. /api/bedrijf/mijn is in IDOR.json onbereikbaar; /api/bedrijf/start staat niet in IDOR.json; /api/bedrijf/taak/maak staat niet in IDOR.json"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "link:wonen",
@@ -1279,9 +1156,7 @@
       "ingang": "/apps/wonen.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 1,
-      "reden": "1 van de 7 routes niet gemeten, o.a. /api/home/onderhoud/meld is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "os:bellen",
@@ -1289,7 +1164,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "os:rtf",
@@ -1297,7 +1172,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "os:snaps",
@@ -1305,7 +1180,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "os:videobellen",
@@ -1313,7 +1188,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "os:werk",
@@ -1321,7 +1196,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:assets",
@@ -1329,7 +1204,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:bestellen",
@@ -1337,7 +1212,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:betalen",
@@ -1345,7 +1220,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:gezin",
@@ -1353,7 +1228,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:reizen",
@@ -1361,7 +1236,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:salon",
@@ -1369,7 +1244,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:terplaatse",
@@ -1377,7 +1252,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (118 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (58 andere buiten dit instrument gelaten)"
     },
     {
       "functie": "tab:zorg",

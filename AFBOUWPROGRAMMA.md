@@ -383,3 +383,53 @@ Er is geen alternatief in productcode gezet en geen proef overgeslagen om dit
 groen te maken. De complete Node-suite is nog niet opnieuw op deze nieuwste
 werkstand gekwalificeerd; de oudere rode SUITE.json blijft zichtbaar. De
 overige registerafwijkingen, appbewijzen, UX en releasepoorten blijven open.
+
+### Deep Green — uitvoering vanaf 20 oktober 2026
+
+Het eigenaarsbesluit is uitvoeren: eerst de volledige herhaalmeting, daarna
+gedeelde oorzaken in risicovolgorde herstellen. De bestaande registers blijven
+leidend; er komt geen tweede afbouwadministratie. Veiligheid en transacties,
+appketens, meetbetrouwbaarheid/architectuur en premium UX kunnen onafhankelijk
+voortgaan. Publieke uitrol en merges vallen niet onder deze uitvoering.
+
+De volledige Node 26-ronde draait op de afzonderlijke, vastgelegde werkboom
+`c10c930cb801cd84b7e13ce6d7c0382ffdf509d3`, met de bestaande runner en
+geïsoleerde PostgreSQL-databases. Reparaties tijdens die ronde veranderen zijn
+meetbasis niet. Een lopende ronde is geen groene uitslag.
+
+De eerste onafhankelijke controle vond twee fouten in de gezinsbevoegdheidsmeter:
+een serverfout kon als afscherming tellen en één gescheiden paar kon een
+onbeslist of anoniem toegankelijk paar laten meeliften. De meter eist nu voor
+ieder paar een succesvolle eigenaar en expliciete 401/403 voor beide andere
+actoren; redirects worden niet gevolgd. Anonieme toegang is een defectkandidaat
+voor inhoudelijke beoordeling, niet automatisch bewijs van een privacylek.
+Een verhullende 404 zonder eigen contract blijft onbewezen. B's toegang tot
+zijn eigen object wordt nog niet afzonderlijk gecontroleerd; die beperking
+staat expliciet in de bron en het register.
+
+De browserhermeting op de gewijzigde werkstand levert 8 BEWEZEN en 106
+NIET_GETEST op. Dit is deelbewijs met een vuile-boomstempel, geen
+releasekwalificatie. Vier eerdere gezinsbewijzen vallen terecht terug;
+IDOR.json en ROLPROEF.json zijn bovendien vervallen en moeten op een schone
+codeversie opnieuw worden gemeten. De auditwaarde 12/114, het oude opgeslagen
+register (15/114) en deze werkstandmeting zijn verschillende meetbronnen.
+APPWERKT wordt niet met deze telling handmatig bijgewerkt.
+
+De volledige ronde ontdekte ook een regressie van de vorige herstelset:
+de lokale CI-ontleder herkende Bash-arrayaanvulling (`+=`) niet. De bestaande
+toewijzingsherkenning ondersteunt die syntax nu; volgende testopdrachten en
+onbekende opdrachten blijven afzonderlijk zichtbaar. De gerichte CI-/Bash-proef
+slaagt met 23 tests. De aangescherpte bevoegdheidsproef slaagt met 8 tests.
+
+De 17 eerdere registerfailures betreffen 15 bronfamilies. Herdruk is niet
+automatisch herstel: EDGEKAART mist indirecte fetchpaden en DOORBELASTING toont
+een extra niet-volgbare geldvorm. Eerst de inhoudelijke oorzaak beoordelen,
+dan alleen betrokken afdrukken hernieuwen. Websitebeelden vragen echte nieuwe
+browserbeelden. Documentgetallen volgen als laatste hun bronregisters.
+
+Volgende afhankelijkheden: de volledige suite afmaken en classificeren,
+Directpay met twee echte processen en crashvensters bewijzen, de rol- en
+objectproeven vernieuwen, daarna APPWERKT en kritieke ketens opnieuw meten.
+Premium UX, architectuurreductie en operationele kwalificatie blijven
+afzonderlijke vereisten. Geen totaalscore of groene platformstatus zonder
+volledige, reproduceerbare bewijzen op de releasekandidaat.

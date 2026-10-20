@@ -113,6 +113,12 @@ test('wat de meter niet herkent heet onbekend en niet inrichting', () => {
   assert.equal(W.soortVan('kwispel --hard'), 'onbekend');
 });
 
+test('een Bash-array aanvullen is inrichting en maskeert geen volgende poort', () => {
+  const uit = W.opdrachtenUit('registers+=("$naam")\nnode scripts/check.js\nkwispel --hard');
+  assert.deepEqual(uit.map(x => W.soortVan(x.opdracht)), ['inrichting', 'toets', 'onbekend']);
+  assert.equal(W.soortVan('registers+broken'), 'onbekend');
+});
+
 test('het doel is de eenheid: drie scherven en de hele suite wijzen naar EEN script', () => {
   const s = { test: 'node scripts/test-runner.js', 'test:deel': 'node scripts/test-runner.js',
     'overleving:controle': 'node scripts/overleving.js --controle', secrets: 'node scripts/geheimen.js' };

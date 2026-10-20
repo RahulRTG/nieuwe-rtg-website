@@ -83,7 +83,22 @@ test('3. een gezinspaar bewijst alleen iets als A binnenkwam', () => {
   assert.equal(R.gezinOordeel([]).status, 'NIET_GETEST');
   assert.equal(R.gezinOordeel([{ uitslag: 'eigenaarWeg' }]).status, 'NIET_GETEST', 'zonder A binnen is er niets gekruist');
   assert.equal(R.gezinOordeel([{ uitslag: 'gescheiden' }, { uitslag: 'lek', verzoek: 'POST /api/rtf/x', b: 200 }]).status, 'GEBLOKKEERD_DOOR_DEFECT');
-  assert.equal(R.gezinOordeel([{ uitslag: 'gescheiden' }, { uitslag: 'openbaar' }]).status, 'BEWEZEN');
+  assert.equal(R.gezinOordeel([{ uitslag: 'gescheiden' }, { uitslag: 'openbaar', verzoek: 'GET /api/rtf/x', anoniem: 200 }]).status, 'GEBLOKKEERD_DOOR_DEFECT');
+});
+
+test('3a. uitval en onbesliste antwoorden bewijzen geen gezinsautorisatie', () => {
+  for (const status of [0, undefined, 302, 400, 404, 409, 429, 500, 503]) {
+    assert.equal(R.paarOordeel({ a: 200, b: status, anoniem: 401 }), 'onbeslist', 'B: ' + status);
+    assert.equal(R.paarOordeel({ a: 200, b: 403, anoniem: status }), 'onbeslist', 'anoniem: ' + status);
+  }
+  for (const b of [401, 403]) for (const anoniem of [401, 403]) {
+    assert.equal(R.paarOordeel({ a: 200, b, anoniem }), 'gescheiden');
+  }
+  for (const uitslag of ['onbeslist', 'eigenaarWeg', undefined, 'onbekend']) {
+    assert.equal(R.gezinOordeel([{ uitslag: 'gescheiden' }, { uitslag }]).status, 'NIET_GETEST');
+  }
+  assert.equal(R.gezinOordeel([{ uitslag: 'gescheiden' }, { uitslag: 'gescheiden' }]).status, 'BEWEZEN');
+  assert.equal(R.gezinOordeel([{ uitslag: 'onbeslist' }, { uitslag: 'lek', b: 200 }]).status, 'GEBLOKKEERD_DOOR_DEFECT');
 });
 
 test('4. de bevoegdronde levert bevoegd en niets anders', () => {
@@ -104,7 +119,11 @@ test('5. het echte register spreekt zichzelf niet tegen', () => {
     tel[r.status] = (tel[r.status] || 0) + 1;
     if (r.status === 'BEWEZEN' && r.persona === 'lid') assert.ok(r.routes > 0, r.functie + ': BEWEZEN zonder een route');
     if (r.status === 'BEWEZEN' && r.persona === 'gezin') {
-      assert.ok((r.kruisparen || []).some((p) => p.uitslag === 'gescheiden'), r.functie + ': BEWEZEN zonder een gescheiden kruispaar');
+      assert.ok(r.kruisparen?.length > 0, r.functie + ': BEWEZEN zonder kruisparen');
+      for (const p of r.kruisparen) {
+        assert.equal(R.paarOordeel(p), 'gescheiden', r.functie + ': ruwe antwoorden bewijzen geen scheiding bij ' + p.verzoek);
+        assert.equal(p.uitslag, 'gescheiden', r.functie + ': onbeslist paar mag niet groen meeliften');
+      }
     }
     if (r.status === 'BEWEZEN') assert.ok(['lid', 'gezin'].includes(r.persona), r.functie + ': BEWEZEN voor een persona zonder proef');
   }

@@ -36,6 +36,7 @@
    ========================================================================== */
 'use strict';
 const path = require('path');
+const fs = require('fs');
 const { execFileSync } = require('child_process');
 
 const WORTEL_STANDAARD = path.join(__dirname, '..', '..');
@@ -54,8 +55,12 @@ function blok(uitvoer) {
   /* Wat via require() is geladen, telt als gelezen: dat is de code van de
      generator zelf en alles wat hij meeneemt, ook als de lader buiten de
      omhulde fs-functies om leest. */
+  let wortel;
+  try { wortel = fs.realpathSync(s.wortel); }
+  catch (e) { s.onwaarneembaar.add('invoerwortel niet te bepalen'); }
   for (const f of Object.keys(require.cache)) {
-    const r = path.relative(s.wortel, f).replace(/\\/g, '/');
+    const r = [wortel || s.wortel, s.wortel].map((w) => path.relative(w, f).replace(/\\/g, '/'))
+      .find((p) => p && p !== '..' && !p.startsWith('../') && !path.isAbsolute(p));
     if (r && !r.startsWith('..') && !path.isAbsolute(r)) {
       lees.add(r.startsWith('node_modules/') ? 'package-lock.json' : r);
     }

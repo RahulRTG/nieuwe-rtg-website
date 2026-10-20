@@ -299,3 +299,36 @@ Deze ronde is niet de volledige determinismekwalificatie. Testuitslagen worden
 pas geldig verklaard met hun exacte codeversie en uitvoer; de historische
 9/114 wordt niet handmatig verhoogd. Geen normverlaging, merge naar main of
 productie-uitrol volgt automatisch uit dit besluit.
+
+### Gemeten voortgang en resterende grenzen
+
+De lokale volledige Node-ronde op
+`498c5f8fdc29de7c8af80c170f2da330e3a58402` is voltooid: **19.946 tests,
+19.810 geslaagd, 85 mislukt, 51 overgeslagen**, geen annuleringen.
+`SUITE.json` bewaart de exacte commit en uitslag. Dit is geen CI-equivalente
+kwalificatie: de omgeving gebruikte Node 24.18 op Darwin arm64 terwijl
+`.nvmrc` Node 26 voorschrijft; benodigde Rust-, PostgreSQL-, Redis- en
+loopbackvoorzieningen waren niet volledig aanwezig. Geen skip telt als bewijs.
+
+De vervolgreparatie maakt bevoegdheidsbewijs methodegebonden: een GET kan
+geen POST op hetzelfde pad bewijzen. Iedere bekende niet-GET-methode vraagt
+eigen IDOR- en rolbewijs. Methoden die in beide bronregisters ontbreken blijven
+een expliciete inventarisatiegrens. De suiteplanner laat zijn volledige
+JSON-uitvoer uitlezen voordat hij afsluit; afgebroken uitvoer op 64 KiB was
+een gereproduceerde meetmotorfout. De gecombineerde gerichte contractproeven
+slagen lokaal (27 tests, geen skips); een andere agent heeft deze diff beoordeeld.
+
+De padaliasfout in de versheidsmeter is vervolgens hersteld: dezelfde fysieke
+wortel wordt consequent herkend, ontbrekende paden blijven invoer, en een
+onoplosbaar pad of een externe/directorysymlink kan geen vals actueel bewijs
+geven. De gecombineerde onafhankelijke herhaling van meter-, planner- en
+versheidsproeven slaagt lokaal: **63 tests, geen fouten of skips**. Dit is
+gericht herstelbewijs op de werkstand na bovenstaande volledige ronde,
+geen nieuwe volledige suiteuitslag.
+
+Vervolgvolgorde binnen deze fase: de voorgeschreven testomgeving reproduceren;
+overige failures inhoudelijk
+classificeren en reproduceren; daarna dezelfde volledige kandidaat herhalen.
+Vervallen registers worden niet blind herstempeld. De 102 historische
+bevoegdheidsbewijsgaten, premium UX, complete ketens en operationele
+kwalificatie zijn hiermee nog niet gesloten. Productievrijgave blijft apart.

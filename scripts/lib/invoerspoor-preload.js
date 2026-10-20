@@ -31,8 +31,26 @@
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
+const { fileURLToPath } = require('url');
+// Bewaar de originele native resolver vóór fs wordt omhuld: geen recursie
+// en geen eigen padnormalisatie als extra generatorinvoer.
+const echtPad = fs.realpathSync.native;
+function canoniek(p) {
+  let huidig = path.resolve(p);
+  const rest = [];
+  for (;;) {
+    try { return path.join(echtPad(huidig), ...rest); }
+    catch (e) {
+      if (!['ENOENT', 'ENOTDIR'].includes(e.code)) throw e;
+      const ouder = path.dirname(huidig);
+      if (ouder === huidig) throw e;
+      rest.unshift(path.basename(huidig)); huidig = ouder;
+    }
+  }
+}
 
-const WORTEL = path.resolve(process.env.RTG_INVOER_WORTEL || path.join(__dirname, '..', '..'));
+const ALIAS_WORTEL = path.resolve(process.env.RTG_INVOER_WORTEL || path.join(__dirname, '..', '..'));
+const WORTEL = canoniek(ALIAS_WORTEL);
 
 const spoor = {
   wortel: WORTEL,
@@ -51,12 +69,29 @@ function rel(p) {
   if (p == null) return null;
   if (typeof p === 'number') return null;               // een bestandsdescriptor
   let s;
-  try { s = p instanceof URL ? p.pathname : String(p); } catch (e) { return null; }
+  try { s = p instanceof URL ? fileURLToPath(p) : String(p); } catch (e) { return null; }
   if (Buffer.isBuffer(p)) s = p.toString();
-  const abs = path.resolve(s);
+  const genoemd = [WORTEL, ALIAS_WORTEL].map((w) => path.relative(w, path.resolve(s)).replace(/\\/g, '/'))
+    .find((r) => r && r !== '..' && !r.startsWith('../') && !path.isAbsolute(r));
+  if (genoemd === 'node_modules' || (genoemd && genoemd.startsWith('node_modules/'))) return 'package-lock.json';
+  let abs;
+  try { abs = canoniek(s); }
+  catch (e) { spoor.onwaarneembaar.add('invoerpad niet canoniek te bepalen'); return null; }
   const r = path.relative(WORTEL, abs).replace(/\\/g, '/');
-  if (!r || r.startsWith('..') || path.isAbsolute(r)) return null;
+  if (!r || r === '..' || r.startsWith('../') || path.isAbsolute(r)) {
+    if (r && genoemd) spoor.onwaarneembaar.add('symlink buiten de invoerwortel');
+    return null;
+  }
   if (r === '.git' || r.startsWith('.git/')) return null;
+  if (genoemd && genoemd !== r) {
+    spoor.lees.add(genoemd); // ook de symlinkbinding zelf is invoer
+    // Een mapalias kan een ander bestand gaan aanwijzen terwijl git alleen
+    // de mapbinding wijzigt. Zonder volledige ketenmeting nooit actueel.
+    const ouder = path.join(WORTEL, path.dirname(genoemd));
+    try {
+      if (canoniek(ouder) !== ouder) spoor.onwaarneembaar.add('invoer via een directorysymlink');
+    } catch (e) { spoor.onwaarneembaar.add('invoerpad niet canoniek te bepalen'); }
+  }
   if (r === 'node_modules' || r.startsWith('node_modules/')) return 'package-lock.json';
   return r;
 }

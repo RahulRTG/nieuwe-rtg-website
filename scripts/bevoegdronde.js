@@ -55,7 +55,8 @@ const { stempel, versheid } = require('./lib/stempel');
 const { ingangRoutes } = require('./lib/bewijsbron');
 
 const GRENS_LID = 'samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als ' +
-  'gemeten als elke bekende route eronder gemeten is, een route die IDOR `publiek` noemt schermt niets af, en `afgebakend` ' +
+  'gemeten als elke bekende route eronder gemeten is, een route die IDOR `publiek` noemt schermt niets af; ' +
+  'de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend ' +
   'leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet';
 const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A\'s code met ' +
   'B\'s eigen token';
@@ -101,7 +102,7 @@ const IDOR_GEMETEN = new Set(['gescheiden', 'nagekeken', 'publiek', 'afgebakend'
 const IDOR_GEBROKEN = new Set(['doorbraak', 'lek']);
 
 /* Het oordeel over een pad: gebroken, gemeten of open -- met de reden. Een
-   schrijfroute (ROLPROEF kent hem) moet in BEIDE registers staan: IDOR zegt of
+   niet-GET-methode moet in BEIDE registers staan: IDOR zegt of
    een ander lid erbij kan, ROLPROEF of een andere rol het kan. */
 function padOordeel(pad, reg) {
   const i = reg.idor.get(pad) || [];
@@ -110,8 +111,23 @@ function padOordeel(pad, reg) {
   if (breuk) return { stand: 'gebroken', reden: pad + ' staat in IDOR.json als ' + breuk.staat };
   const open = r.find((x) => x.acl !== 'dicht' || x.privacy !== 'schoon');
   if (open) return { stand: 'gebroken', reden: pad + ' staat in ROLPROEF.json met acl ' + open.acl + ' en privacy ' + open.privacy };
-  const idorGemeten = i.some((x) => IDOR_GEMETEN.has(x.staat));
-  if (!idorGemeten) return { stand: 'open', reden: pad + (i.length ? ' is in IDOR.json ' + i.map((x) => x.staat).join('/') : ' staat niet in IDOR.json') };
+  // De registers zijn alleen bewijs voor hun eigen HTTP-methode. GET mag
+  // een onbekende POST op hetzelfde pad niet laten meeliften. Net als de
+  // rolproef behandelen we iedere niet-GET API-methode als schrijvend.
+  const methoden = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'CONNECT', 'TRACE']);
+  if (!i.length) return { stand: 'open', reden: pad + ' staat niet in IDOR.json' };
+  if ([...i, ...r].some((x) => !methoden.has(x.methode))) {
+    return { stand: 'open', reden: pad + ' heeft bewijs zonder bekende HTTP-methode' };
+  }
+  for (const methode of new Set([...i, ...r].map((x) => x.methode))) {
+    const ids = i.filter((x) => x.methode === methode);
+    if (!ids.length || ids.some((x) => !IDOR_GEMETEN.has(x.staat))) {
+      return { stand: 'open', reden: methode + ' ' + pad + ' is niet volledig gemeten in IDOR.json' };
+    }
+    if (methode !== 'GET' && !r.some((x) => x.methode === methode)) {
+      return { stand: 'open', reden: methode + ' ' + pad + ' staat niet in ROLPROEF.json' };
+    }
+  }
   return { stand: 'gemeten' };
 }
 

@@ -30,30 +30,30 @@ const rij = { functie: 'link:a', ingang: '/apps/a.html' };
 const oordeel = (r) => R.ledenOordeel(rij, r, { schermroutes: SR, lees });
 
 test('1. een ledenscherm is alleen BEWEZEN als elke route gemeten is', () => {
-  const beide = reg({ '/api/a/lijst': [{ staat: 'gescheiden' }], '/api/a/zet': [{ staat: 'nagekeken' }] },
-    { '/api/a/zet': [{ acl: 'dicht', privacy: 'schoon' }] });
+  const beide = reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'nagekeken' }] },
+    { '/api/a/zet': [{ methode: 'POST', acl: 'dicht', privacy: 'schoon' }] });
   const ok = oordeel(beide);
   assert.equal(ok.status, 'BEWEZEN');
   assert.match(ok.reden, /publiek/, 'de grens hoort in elke uitslag te staan');
 
-  const half = reg({ '/api/a/lijst': [{ staat: 'gescheiden' }], '/api/a/zet': [{ staat: 'onbereikbaar' }] }, {});
+  const half = reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {});
   const h = oordeel(half);
   assert.equal(h.status, 'NIET_GETEST');
   assert.match(h.reden, /\/api\/a\/zet/, 'de open route hoort bij naam genoemd te worden');
 
-  const alleenRol = reg({ '/api/a/lijst': [{ staat: 'gescheiden' }] }, { '/api/a/zet': [{ acl: 'dicht', privacy: 'schoon' }] });
+  const alleenRol = reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }] }, { '/api/a/zet': [{ methode: 'POST', acl: 'dicht', privacy: 'schoon' }] });
   assert.equal(oordeel(alleenRol).status, 'NIET_GETEST', 'ROLPROEF alleen zegt niets over een ANDER LID');
 
   const SRv = { perScherm: [{ bestand: 'public/apps/a.html', exact: [], voorvoegsels: ['/api/a/ding/'] }] };
   assert.equal(R.ledenOordeel(rij, reg({}, {}), { schermroutes: SRv, lees }).status, 'NIET_GETEST',
     'een voorvoegsel zonder bekende routes eronder is open, en niet gemeten');
-  assert.equal(R.ledenOordeel(rij, reg({ '/api/a/ding/x': [{ staat: 'gescheiden' }] }, {}), { schermroutes: SRv, lees }).status, 'BEWEZEN');
+  assert.equal(R.ledenOordeel(rij, reg({ '/api/a/ding/x': [{ methode: 'GET', staat: 'gescheiden' }] }, {}), { schermroutes: SRv, lees }).status, 'BEWEZEN');
   assert.equal(R.ledenOordeel({ functie: 'x', ingang: 'stand:x' }, beide, { schermroutes: SR, lees }).status, 'NIET_GETEST');
 
   /* De afbakening (gang 4 van de IDOR-proef) telt als gemeten; haar
      onbereikbaar (A zag niets van zichzelf) blijft open. */
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ staat: 'afgebakend' }], '/api/a/zet': [{ staat: 'gescheiden' }] }, {})).status, 'BEWEZEN');
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ staat: 'afgebakend' }], '/api/a/zet': [{ staat: 'onbereikbaar' }] }, {})).status, 'NIET_GETEST');
+  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'afgebakend' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] }, { '/api/a/zet': [{ methode: 'POST', acl: 'dicht', privacy: 'schoon' }] })).status, 'BEWEZEN');
+  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'afgebakend' }], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {})).status, 'NIET_GETEST');
 });
 
 test('1b. de zaak-gang van IDOR.json telt mee, en een doorbraak daar is een defect', () => {
@@ -67,10 +67,10 @@ test('1b. de zaak-gang van IDOR.json telt mee, en een doorbraak daar is een defe
 });
 
 test('2. een breuk is een defect, en vervallen bewijs is geen bewijs', () => {
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ staat: 'doorbraak' }], '/api/a/zet': [{ staat: 'gescheiden' }] }, {})).status, 'GEBLOKKEERD_DOOR_DEFECT');
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ staat: 'gescheiden' }], '/api/a/zet': [{ staat: 'gescheiden' }] },
-    { '/api/a/zet': [{ acl: 'open', privacy: 'schoon' }] })).status, 'GEBLOKKEERD_DOOR_DEFECT');
-  const v = oordeel(reg({ '/api/a/lijst': [{ staat: 'gescheiden' }], '/api/a/zet': [{ staat: 'gescheiden' }] }, {}, ['IDOR.json: oud']));
+  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'doorbraak' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] }, {})).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] },
+    { '/api/a/zet': [{ methode: 'POST', acl: 'open', privacy: 'schoon' }] })).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  const v = oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] }, {}, ['IDOR.json: oud']));
   assert.equal(v.status, 'NIET_GETEST');
   assert.match(v.reden, /vervallen/);
 });
@@ -109,4 +109,24 @@ test('5. het echte register spreekt zichzelf niet tegen', () => {
     if (r.status === 'BEWEZEN') assert.ok(['lid', 'gezin'].includes(r.persona), r.functie + ': BEWEZEN voor een persona zonder proef');
   }
   assert.deepEqual(reg.telling, tel, 'de telling overstemt de rijen');
+});
+
+// Onafhankelijk bewijs per methode: de adresstring alleen is onvoldoende.
+test('6. schrijfbewijs zonder overeenkomende rolproef blijft open', () => {
+  const id = (methode, staat = 'gescheiden') => ({ methode, staat });
+  const rol = methode => ({ methode, acl: 'dicht', privacy: 'schoon' });
+  const check = (ids, rollen = []) => R.padOordeel('/api/voorbeeld', reg({ '/api/voorbeeld': ids }, { '/api/voorbeeld': rollen }));
+  assert.equal(check([id('POST')]).stand, 'open', 'POST mist een rolproef');
+  assert.equal(check([id('POST')], [rol('PUT')]).stand, 'open', 'PUT bewijst POST niet');
+  assert.equal(check([id('GET'), id('POST')]).stand, 'open', 'GET maskeert geen onbeproefde POST');
+  assert.equal(check([id('GET')], [rol('POST')]).stand, 'open', 'ROLPROEF POST mist eigen IDOR');
+  assert.equal(check([id('GET'), id('POST')], [rol('POST')]).stand, 'gemeten');
+  assert.equal(check([id('POST'), id('PATCH')], [rol('POST')]).stand, 'open', 'alle methodes tellen');
+  assert.equal(check([id('POST'), id('PATCH')], [rol('POST'), rol('PATCH')]).stand, 'gemeten');
+  assert.equal(check([id('GET'), id('GET', 'onbereikbaar')]).stand, 'open', 'een gemeten rij maskeert geen ongemeten rij');
+  for (const methode of [undefined, '', 'BOGUS', 'post']) {
+    assert.equal(check([id(methode)], [rol('POST')]).stand, 'open', 'onbekende methode blijft open');
+    assert.equal(check([id('GET')], [rol(methode)]).stand, 'open', 'onbekende rolmethode blijft open');
+  }
+  assert.equal(check([id('GET')]).stand, 'gemeten', 'GET vereist geen schrijfrolproef');
 });

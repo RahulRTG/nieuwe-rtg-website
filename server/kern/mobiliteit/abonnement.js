@@ -29,7 +29,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, id, schoon, nu, codenaamVan, pay, findSupplier,
     modAan, overeenkomstVoor, magVerkopen, notify, ensureKaartjes, kaartenVan, opslag } = ctx;
 
-  const dagenMs = d => d * 24 * 3600 * 1000;
+  const { dagenMs, aboStand, aboGeldtOp } = require('./geldigheid');
 
   /* Een abonnement kopen. Dezelfde drie poorten als een los kaartje, plus de
      module `subscriptions` -- want een abonnement is een doorlopende afspraak
@@ -123,29 +123,6 @@ module.exports = (ctx) => {
   }
 
   const aboVan = key => kaartenVan(key).filter(k => k.product === 'abonnement');
-
-  /* De stand. Geen ritlimiet, dus alleen het venster en een eventuele volledige
-     terugbetaling tellen. */
-  function aboStand(a) {
-    if (a.terugbetaald && a.terugbetaald.volledig)
-      return { stand: 'terugbetaald', reden: 'het abonnement is beeindigd en terugbetaald' };
-    const nuMs = Date.now();
-    if (nuMs < new Date(a.geldigVan).getTime())
-      return { stand: 'nog-niet-geldig', reden: 'geldig vanaf ' + a.geldigVan.slice(0, 10) };
-    if (nuMs > new Date(a.geldigTot).getTime())
-      return { stand: 'verlopen', reden: 'verlopen op ' + a.geldigTot.slice(0, 10) };
-    const over = Math.ceil((new Date(a.geldigTot).getTime() - nuMs) / dagenMs(1));
-    return { stand: 'geldig', reden: 'nog ' + over + ' dag(en) geldig', dagenOver: over };
-  }
-
-  /* Geldt dit abonnement op DEZE lijn? De overeenkomst bepaalt dat, niet het
-     abonnement zelf -- en de lijnenlijst wordt bij de aankoop gekopieerd, zodat
-     een latere wijziging van het contract een lopend abonnement niet stilletjes
-     uitkleedt. */
-  function aboGeldtOp(a, lijnId) {
-    if (!lijnId) return true;
-    return (a.lijnen || []).includes(lijnId);
-  }
 
   function aboBeeld(a, eigen) {
     const st = aboStand(a);

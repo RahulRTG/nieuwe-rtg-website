@@ -64,44 +64,6 @@ module.exports = ({ db, save, crypto, anthropic, livinglab, bijeen, inBundel }) 
     return { ok: true, locatie: f.locaties[id] };
   }
 
-  function locBeeld(l, lidKey) {
-    const voorstellen = F().voorstellen.filter(v => v.locId === l.id);
-    return {
-      id: l.id, naam: l.naam, land: l.land,
-      pot: eur(l.pot), opgehaald: eur(l.opgehaald), uitgekeerd: eur(l.uitgekeerd),
-      open: voorstellen.filter(v => v.status === 'open').length,
-      mijnBijdrage: eur(F().bijdragen.filter(b => b.lidKey === lidKey && b.locId === l.id).reduce((s, b) => s + b.centen, 0))
-    };
-  }
-  function voorstelBeeld(v, lidKey) {
-    const voor = (v.stemmen.voor || []).length, tegen = (v.stemmen.tegen || []).length;
-    return {
-      id: v.id, locId: v.locId, titel: v.titel, doel: v.doel, bedrag: eur(v.centen),
-      door: v.doorNaam, status: v.status, voor, tegen,
-      mijnStem: (v.stemmen.voor || []).includes(lidKey) ? 'voor' : (v.stemmen.tegen || []).includes(lidKey) ? 'tegen' : null,
-      scheids: v.scheids || null, besluit: v.besluit || null, at: v.at,
-      /* Welk onderzoek dit voorstel financiert. `null` betekent: dit voorstel
-         noemt er geen -- niet dat het er geen kon noemen. */
-      onderzoek: onderzoek.beeld(v)
-    };
-  }
-
-  // het openbare fondsoverzicht voor een lid
-  function fonds(lidKey) {
-    const f = F();
-    const locaties = Object.values(f.locaties).map(l => locBeeld(l, lidKey))
-      .sort((a, b) => b.pot - a.pot);
-    const voorstellen = f.voorstellen.filter(v => v.status === 'open')
-      .slice(0, 100).map(v => voorstelBeeld(v, lidKey));
-    return {
-      ok: true,
-      totaalOpgehaald: eur(Object.values(f.locaties).reduce((s, l) => s + l.opgehaald, 0)),
-      totaalPot: eur(Object.values(f.locaties).reduce((s, l) => s + l.pot, 0)),
-      mijnBijdrage: eur(f.bijdragen.filter(b => b.lidKey === lidKey).reduce((s, b) => s + b.centen, 0)),
-      locaties, voorstellen
-    };
-  }
-
   // een lid zamelt in: de bijdrage gaat naar de pot van EEN locatie (de omgeving)
   /* `idem`: EEN TOEZEGGING PER TIK. Zonder sleutel legde een tweede tik, of
      een herhaling na een afgebroken antwoord, de bijdrage twee keer in de pot
@@ -152,6 +114,7 @@ module.exports = ({ db, save, crypto, anthropic, livinglab, bijeen, inBundel }) 
      kant staat. */
   const onderzoek = require('./labfonds/onderzoek')({ F, livinglab });
   const financiering = (studieId) => onderzoek.financiering(studieId, eur);
+  const { locBeeld, voorstelBeeld, fonds } = require('./labfonds/beeld')({ F, eur, onderzoek });
 
   const { voorstelMaak, stem, scheidsrechter, beslis, boardroom } = require('./labfonds/voorstellen')({
     F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT, onderzoek });

@@ -3,7 +3,6 @@
    de RTG-leden-app (Bearer-token) en de RTFoundation (gezinscode + token),
    zodat alle leden tegen elkaar spelen. */
 const { log } = require('../log');
-const rem = require('../rem');
 
 module.exports = (kern) => {
   /* Alleen wat DIT bestand gebruikt. De acties rondom een potje pakken hun
@@ -12,7 +11,7 @@ module.exports = (kern) => {
      staat een controle op (check.js regel 39). */
   const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten, spelStaat, spelZet,
     spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking,
-    projectieKoppel, projectieStand, spelKlasgenoten, spelOnline, spelUitslagen, spelStand, spelPrestaties,
+    spelKlasgenoten, spelOnline, spelUitslagen, spelStand, spelPrestaties,
     socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
@@ -116,28 +115,8 @@ module.exports = (kern) => {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
     }
   }
-  /* HET GEDEELDE SCHERM blijft zonder ledenaccount, maar niet zonder een
-     begrensde credential (eigenaarsbesluit 19 oktober 2026, uitzondering 6):
-     de tv koppelt met de eenmalige code die een INGELOGD lid aanmaakte
-     (projectie-open vraagt auth), en hangt zo aan dat account. De eenmalige koppeling en de blijvende schermsessie
-     reizen uitsluitend in POST-lijven. Zo belandt geen geheim in een URL,
-     accesslog of Referer. Beide antwoorden zijn no-store. */
-  app.post('/api/projectie/koppel', rem({ windowMs: 60000, limit: 20 }), (req, res) => {
-    res.set('Cache-Control', 'no-store'); res.set('Pragma', 'no-cache');
-    veilig(res, () => projectieKoppel(String((req.body || {}).code || '')),
-      'projectie-koppel', req);
-  });
-  app.post('/api/projectie/kijk', rem({ windowMs: 60000, limit: 90 }), (req, res) => {
-    res.set('Cache-Control', 'no-store'); res.set('Pragma', 'no-cache');
-    veilig(res, () => projectieStand(String((req.body || {}).token || '')),
-      'projectie-kijk', req);
-  });
-  /* Oude 32-bits codes worden nooit gemigreerd naar werkende toegang. Deze
-     route blijft alleen als expliciete, cacheloze eindstatus voor oude tv's. */
-  app.get('/api/projectie/:code', rem({ windowMs: 60000, limit: 20 }), (req, res) => {
-    res.set('Cache-Control', 'no-store'); res.set('Pragma', 'no-cache');
-    res.status(410).json({ error: 'Deze oude schermcode is gesloten. Vraag een speler om een nieuwe code.' });
-  });
+  require('./spelprojectie')({ app, projectieKoppel: kern.projectieKoppel,
+    projectieStand: kern.projectieStand, veilig });
 
   /* "Nodig uit en start" van een lid leest zijn eigen herhaalsleutel
      (kern/spellen/dubbeltik.js), dus hij staat hier letterlijk, voor de lus: de

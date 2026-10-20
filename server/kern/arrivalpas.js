@@ -25,7 +25,6 @@ const HERSTEL_MS = 15 * 60000;
 const MAX_HERSTEL = 3;
 const MAX_PULSEN = 60;
 const BEWAAR_MS = 30 * 86400000;
-const DICHT = Object.freeze(['geweigerd', 'geannuleerd', 'no-show', 'afgerond']);
 const VORM = /^AR\.[0-9A-F]{32}$/i;
 
 module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOString() }) => {
@@ -84,22 +83,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
       if (!r || !(Date.parse(r.tot) >= grens)) delete bron[id];
   }
 
-  // een reservering die niet meer doorgaat maakt de pass nutteloos
-  function oordeel(rij, reserveringVan, { puls } = {}) {
-    if (!rij) return { status: 401, error: 'Deze Arrival Pass is niet geldig.' };
-    const t = rij.toegang, ow = (t && t.onderwerp) || {};
-    if (ow.id !== rij.id || ow.supplierCode !== rij.supplierCode || ow.reserveringId !== rij.reserveringId)
-      return { status: 401, error: 'Deze Arrival Pass is niet geldig.' };
-    const reden = bearer.reden(t, { doel: DOEL, scope: puls ? ['arrival.puls'] : ['arrival.pass.lezen'], negeerGebruik: !puls });
-    if (reden === 'verlopen') return { status: 410, error: 'Deze Arrival Pass is verlopen.' };
-    if (reden === 'ingetrokken') return { status: 410, error: 'Deze Arrival Pass is ingetrokken.' };
-    if (reden === 'opgebruikt') return { status: 429, error: 'Met deze pass is het maximale aantal statusupdates gedeeld.' };
-    if (reden) return { status: 401, error: 'Deze Arrival Pass is niet geldig.' };
-    const r = typeof reserveringVan === 'function' ? reserveringVan(rij.reserveringId) : null;
-    if (!r || r.supplierCode !== rij.supplierCode || DICHT.includes(r.status))
-      return { status: 410, error: 'Deze reservering gaat niet (meer) door; de pass is gesloten.', dicht: true };
-    return null;
-  }
+  const oordeel = require('./arrivalpas-oordeel')({ redenVan: bearer.reden, doel: DOEL });
 
   // de route maakt reserveringId vooraf; bij een herhaling geldt de opgeslagen
   function aanvraag({ lid, requestToken, supplierCode, reserveringId, datum, tijd }) {

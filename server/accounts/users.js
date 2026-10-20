@@ -9,7 +9,6 @@ const kluis = require('./kluis');
 const gebonden = require('./gebonden'); // kluis, gebonden aan (kolom, rij-id)
 const mirror = require('./mirror');
 const { uitgezet } = require('./sessiegrens');
-const tijdzone = require('../kern/tijdzone');
 
 /* createUser is asynchroon (scrypt in de threadpool); createUserSync bestaat
    voor het opstart-seed en tests, waar blokkeren geen kwaad kan. */
@@ -294,22 +293,8 @@ const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 const { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, consumeReset, setPassword } = require('./tokens').maakTokens(getUserById);
 
-/* Openbaar profiel voor de client (nooit de wachtwoord-hash of ruwe kluis). */
-function publicUser(u) {
-  if (!u) return null;
-  const since = new Date(u.created_at);
-  const months = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
-  const full = realNameOf(u);
-  const parts = full.trim().split(/\s+/);
-  const shortName = parts.length > 1 ? parts[0][0] + '. ' + parts.slice(1).join(' ') : parts[0];
-  return {
-    id: u.id, tier: u.tier, name: shortName, full,
-    email: emailOf(u), phone: phoneOf(u), codename: u.codename,
-    number: 'RTG · ' + tijdzone.jaarIn(since) + ' · ' + String(1000 + u.id).slice(-4),
-    since: months[tijdzone.maandIn(since) - 1] + ' ' + tijdzone.jaarIn(since),
-    account: true, verified: u.verified || 'unverified', emailVerified: !!u.email_verified
-  };
-}
+// De clientprojectie kan geen account wijzigen of token uitgeven.
+const { publicUser } = require('./profiel')({ realNameOf, emailOf, phoneOf });
 
 /* Het ledendossier, de verificatie, de kantoorlijsten en de AVG-vergetelheid
    staan in ./dossier.js; ook dat deel krijgt getUserById mee en verhuist mee in

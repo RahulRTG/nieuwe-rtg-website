@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20019 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2941 bestanden en 20021 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2941 |
-| losse beweringen (`test(...)`) | 20019 |
+| losse beweringen (`test(...)`) | 20021 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 364 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2752 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2563 bestanden, 19315 beweringen.
+2563 bestanden, 19317 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -523,7 +523,7 @@ toets omvalt.
 | `dienstdrager.test.js` | 6 | gezakt op `===->!==#0` | ACHTERGRONDWERK: EEN EIGEN FRAME, EEN EIGEN DRAGER, EN DE KETEN VAN RAHUL (Fase 2, PR 7; besluiten B4b en B6a, invariant I11). 1. |
 | `dienstidentiteit.test.js` | 6 | gezakt op `getal+1#0` | DIENSTEN EN TOESTELLEN MET EEN EIGEN IDENTITEIT (AUTHORITY.md fase 7). Vier dingen die niet mogen sneuvelen: 1. |
 | `dienstverband-sleutel.test.js` | 5 | gezakt op `liegpoort /api/` | EEN MENS, TWEE SCHRIJFWIJZEN IN HET DIENSTVERBAND (kern/concern/employment.js, `wie()`; ARBEID.md par. 7a: employment is de waarheid). |
-| `directpay-geweigerd.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | EEN GEWEIGERDE DIRECTE BETALING IS AF, NIET ONDERWEG (19 oktober 2026). De voltooiproef van de stand Betalen (scripts/lib/voltooi-stand/betalen.js) liet de simulatiebank een directe betaling weigeren, en het lid... |
+| `directpay-geweigerd.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | EEN GEWEIGERDE DIRECTE BETALING IS AF, NIET ONDERWEG (19 oktober 2026). De voltooiproef van de stand Betalen (scripts/lib/voltooi-stand/betalen.js) liet de simulatiebank een directe betaling weigeren, en het lid... |
 | `directpay.test.js` | 9 | gezakt op `liegpoort /api/` | Rechtstreeks betalen van klant naar leverancier, met Face ID, via de AI en de Salon. Het lid betaalt zelf of rekent een betaalverzoek van de partner af; het geld gaat rechtstreeks naar de leverancier (ontvangst-teller). |
 | `divergentie.test.js` | 6 | gezakt op `===->!==#0` | DE EERSTE DIVERGENTIE (scripts/lib/divergentie.js, BEWIJSLUS.md par. 4). |
 | `doctrine.test.js` | 8 | gezakt op `===->!==#0` | DE DOCTRINECOMPILER ZELF -- kan hij zakken? scripts/doctrine.js telt harde uitspraken in de doctrine-documenten. |
@@ -1528,7 +1528,7 @@ toets omvalt.
 | `ov-operatie-routes.test.js` | 2 | gezakt op `liegpoort /api/` | BUSINESS PRIVATE-OPERATIES OVER DE ROUTES. test/ov-operatie.test.js toetst de kern van kern/ov/operatie.js in het proces, met de pas als losse parameter. |
 | `ov-operatie.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov-regie.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `ov-verzuim.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `ov-verzuim.test.js` | 2 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov.test.js` | 10 | gezakt op `liegpoort /api/` | RTG OV: al het vervoer in een app. Lijnen met haltes, live voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS-een-tik) en uitchecken met eerlijke km-prijs via RTG Pay. |
 | `ovabonnement-herhaal.test.js` | 1 | gezakt op `voorwaarde-omkeren#0` | Het OV-abonnement en zijn herhaalsleutel na een crash TUSSEN de boeking en het abonnement (kern/mobiliteit/abonnement.js). Draai los: node --test test/ovabonnement-herhaal.test.js De idem-laag van de route is... |
 | `overdracht.test.js` | 11 | gezakt op `liegpoort /api/` | De Integration Fabric: wat gaat er mee bij een overstap, en in welke vorm. De beloftes die hier hard worden gemaakt: - er gaat geen dossier mee maar een pakket per doel, en het pakket zegt ALTIJD wat er niet in zit... |

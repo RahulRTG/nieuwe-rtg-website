@@ -36,6 +36,8 @@ module.exports = [
     reden: 'de gezinsdeur van het genootschap gebruikt dezelfde gezinsPoort (verifieerProfiel, gasten eruit) als Foundation Connect; een kopie zou een tweede definitie van een gezinslid onder een verklaarde poortnaam zijn' },
   { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
     reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
+  { van: 'ingang:spellen', naar: 'ingang:spelprojectie', soort: 'ORKESTRATIE',
+    reden: 'De spelrouter registreert de bestaande tv-ingangen via een beperkt contract: alleen koppelen, schermstand en foutafhandeling. De schermmodule krijgt geen leden- of gezinsauthenticatie en geen spelmutaties; tokencontrole, no-store en rate limits blijven ongewijzigd.' },
   { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
     reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
   /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september

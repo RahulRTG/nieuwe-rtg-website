@@ -8,9 +8,9 @@
       goedgekeurd: T('as.st.goed','goedgekeurd; betaal om uw tickets te krijgen'),
       'betaling-loopt': T('as.st.loopt','de betaling wacht op bevestiging; uw tickets komen pas daarna') };
     if (open.length) el.insertAdjacentHTML('afterbegin', '<div class="live-start h-mt80"><div class="lh">' + T('as.aanvragen','Mijn aanvragen') + '</div>' +
-      open.map(x => '<div class="ld" style="margin-top:0.5rem;">' + esc(x.assetNaam) + ' · ' + x.aantal + ' ' + esc(x.smaak) + ' · ' + eur(x.totaal) + '<br>' + esc(STAND[x.status] || x.status) +
-        '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.4rem;">' +
-        (x.status !== 'aangevraagd' ? '<button class="live-go js-asbetaal" data-id="' + esc(x.id) + '" style="margin-top:0;">' + T('as.betaal','Betaal') + ' ' + eur(x.totaal) + '</button>' : '') +
+      open.map(x => '<div class="ld h-mt50">' + esc(x.assetNaam) + ' · ' + x.aantal + ' ' + esc(x.smaak) + ' · ' + eur(x.totaal) + '<br>' + esc(STAND[x.status] || x.status) +
+        '<div class="h-rij h-wrap h-mt40">' +
+        (x.status !== 'aangevraagd' ? '<button class="live-go js-asbetaal h-mt0" data-id="' + esc(x.id) + '">' + T('as.betaal','Betaal') + ' ' + eur(x.totaal) + '</button>' : '') +
         (x.status !== 'betaling-loopt' ? '<button class="mo-code js-asintrek" data-id="' + esc(x.id) + '">' + T('as.intrek','Trek in') + '</button>' : '') +
         '</div></div>').join('') + '</div>');
     el.querySelectorAll('.js-asbetaal').forEach(b => b.addEventListener('click', async () => {

@@ -106,15 +106,9 @@ kern.berichten = require('../kern/berichten')({ db, save, bijeen, inBundel, soci
    hergebruikt) en voor kern.care. */
 require('./kernlaag4-comm')(kern, hulp);
 
-/* Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
-   dat meereist en een aparte, veilige intake-deling per aanbieder.
-   De metingen-deur gaat LAAT GEBONDEN mee: kern/metingen.js hangt verderop in
-   de bouw, en een kopie op dit moment zou undefined bevriezen -- de stille
-   breuk waar opzet/domeingrens.js over gaat. Bij de samenvoeging van de
-   Life-tak eerst weggevallen; vier zorgtoetsen wezen hem meteen aan. */
-Object.assign(kern, require('../kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee,
+Object.assign(kern, require('./care')({ db, save, crypto, schoon, notify,
+  zorgVoor: kern.zorgVoor, zorgMee: kern.zorgMee,
   metingVanBehandelaar: (...a) => kern.metingVanBehandelaar(...a),
-  // een zorgboeking wordt betaald via RTG Pay (kern/care/leden.js, careBetaal)
   betaalZaak: (...a) => kern.pay.betaalZaak(...a) }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
 /* Geldregie (kern/geldregie.js): RTG bepaalt de geldkant vanuit de boardroom:

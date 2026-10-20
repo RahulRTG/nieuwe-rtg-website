@@ -184,16 +184,8 @@ const { trustPlane, bewijsHospitalityBesluit, markeerHospitalityRequest } =
   maakTrustBewijs({ db, save, betaal,
     vindReservering: id => (db.data.reserveringen || []).find(r => r.id === id) });
 
-/* Eén blijvende waarheid voor inkomende betalingen, vóór routes en webhooks
-   worden bedraad. Ze hangt niet aan Stripe of Mollie: providers leveren alleen
-   gebeurtenissen aan. Daardoor kan een zaak van rail wisselen zonder dat de
-   betekenis van "betaald" mee verhuist. */
-const betaalWaarheid = require('./kern/betaalwaarheid')({
-  d: () => db.data, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log
-});
-const betaalRegie = require('./kern/betaalregie')({
-  d: () => db.data, save, betaal, env: process.env, nu: () => systeemKlok.datum().toISOString(),
-  afhandeling: { terugAfhandelen: b => betaalWaarheid.terugAfhandelen(b), controleAfronden: b => betaalWaarheid.controleAfronden(b) }
+const { betaalWaarheid, betaalRegie } = require('./opzet/betaalketen')({
+  db, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log, env: process.env
 });
 
 /* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde

@@ -24,7 +24,7 @@ test('LivingOS Sport heeft de drie getekende ervaringen in de Heritage-stijl', (
 test('Vandaag, Wedstrijddag en Mijn club blijven op de bestaande Sport-kern', () => {
   const html = lees('public/apps/sport.html');
   for (const route of ['/bord', '/stand', '/plattegrond', '/ticket/koop', '/tickets', '/momenten', '/sponsors', '/sponsor']) {
-    assert.ok(html.includes("api('" + route + "'"), route + ' ontbreekt');
+    assert.ok(html.includes("api('/api/member/sport" + route + "'"), route + ' ontbreekt');
   }
   assert.match(html, /data-koop/);
   assert.match(html, /data-vak/);

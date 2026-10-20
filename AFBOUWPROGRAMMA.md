@@ -332,3 +332,54 @@ classificeren en reproduceren; daarna dezelfde volledige kandidaat herhalen.
 Vervallen registers worden niet blind herstempeld. De 102 historische
 bevoegdheidsbewijsgaten, premium UX, complete ketens en operationele
 kwalificatie zijn hiermee nog niet gesloten. Productievrijgave blijft apart.
+
+### Vervolgmeting met voorgeschreven runtime
+
+De geïsoleerde lokale testomgeving gebruikt nu Node 26.12.0, de bestaande
+gepinde Rust 1.97.1-toolchain, PostgreSQL 16.14 en Redis 7.4.11. Downloads zijn
+tegen de officiële hashes gecontroleerd; de projectdependencies en de
+systeeminstallatie zijn niet gewijzigd. De native motor is uit de bestaande
+bron gebouwd. PostgreSQL en Redis draaien uitsluitend op lokale testpoorten,
+met een afzonderlijke wegwerpdatabase per PostgreSQL-testbestand.
+
+Op de schone kopie van `4961acbcc9618f0385b8c2230875d0333b882736`:
+
+- PostgreSQL: alle 46 bestanden, **119 tests geslaagd, nul skips**; bewijs via
+  de bestaande `scripts/pgtoetsen.js` en zijn `pg-bewijs.json`.
+- Native geld-, Capability Graph-, Sentinel- en Redis-kanarieproeven:
+  **28 tests geslaagd, nul skips**.
+- De bestaande 63 meterregressies slagen ook onder Node 26.
+
+De volgende gerichte reparaties zijn op de integratiewerkstand uitgevoerd:
+
+- De V8-meter vergelijkt fysieke bronpaden; een padalias mag geen echte
+  takken laten verdwijnen. Een lege takkenmeting levert nooit 100% op.
+  Bestaande drempels blijven intact; referentie-uitkomsten 5/6 en 15/18 zijn
+  opnieuw bewezen.
+- Sport-, Media- en Vluchten-tests volgen de bestaande absolute API-paden.
+  Echte helpers bewijzen methode, actor, body, gegevenspoort en hervatten;
+  prefix- en autorisatiemutaties worden afgewezen. Dit is geen browserbewijs.
+- Consent-bronverwijzingen volgen de bestaande modulesplitsing. Arrival
+  vermeldt zichtbaar dat statusdeling én opgegeven reserveringswensen nog
+  buiten centrale intrekking vallen. Stop delen is geen passintrekking;
+  ontbrekende centrale consentintegratie blijft open werk.
+- Het registervoorstel behoudt bestandsvalidatie, draft-PR en menselijke
+  mergecontrole, maar werkt ook met lege arrays op de lokale Bash. De
+  lowercase-tegenproef botst niet meer met een uppercase-bestand op macOS.
+
+Deze reparaties slagen gezamenlijk in **93 Node 26-tests, nul skips**.
+De consent-/Arrival-serverregressie slaagt met 20 tests. Een afzonderlijke
+routeproef slaagt met 37 tests en observeert alle 14 eerder ontbrekende
+routeverwijzingen. Het oude DEKKING-register was achterhaald; het wordt niet
+vervangen door een als volledig gepresenteerde deelmeting. De routeproef bevat
+nu ook succesvolle menselijke terugbetalingsafhandeling, 401/403, gelijktijdige
+herhaling en herstart zonder dubbele financiële verwerking. Die laatste proef
+gebruikt één server en synthetische JSON-opslag, en bewijst dus niet de nog
+vereiste volledige Directpay-providerketen over meerdere workers.
+
+Open omgevingsgrens: de bestaande auditankerproeven vereisen 127.0.0.2; die
+loopbackalias ontbreekt lokaal en toevoegen vereist macOS-beheerdersrechten.
+Er is geen alternatief in productcode gezet en geen proef overgeslagen om dit
+groen te maken. De complete Node-suite is nog niet opnieuw op deze nieuwste
+werkstand gekwalificeerd; de oudere rode SUITE.json blijft zichtbaar. De
+overige registerafwijkingen, appbewijzen, UX en releasepoorten blijven open.

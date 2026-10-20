@@ -72,7 +72,10 @@ test('1. een gewijzigd register wordt een concept-PR naar main, met de CI erbij'
 });
 
 test('2. iets dat geen wortelregister is, laat het hele voorstel zakken', () => {
-  for (const vreemd of ['db.json', 'NOTITIE.md', 'idemproef.json']) {
+  // Geen case-variant van de geldige IDEMPROEF.json: op een niet-
+  // hoofdlettergevoelig volume overschrijft die dezelfde fixture en bestaat
+  // er geen ongeldig bestand om af te wijzen.
+  for (const vreemd of ['db.json', 'NOTITIE.md', 'anderregister.json']) {
     const u = draai(opzet({ 'IDEMPROEF.json': '{"vers":true}\n', [vreemd]: 'x' }));
     assert.equal(u.status, 1, vreemd + ' had moeten zakken: ' + u.uit);
     assert.match(u.uit, new RegExp('hoort niet in een registervoorstel: ' + vreemd.replace('.', '\\.')));

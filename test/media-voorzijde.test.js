@@ -26,12 +26,12 @@ test('de voordeur hergebruikt de echte catalogus, bibliotheek, studio en kamers'
   const speler = lees('public/apps/media/speler.js');
   const blad = lees('public/apps/media/blad.js');
   const voorzijde = lees('public/apps/media/voorzijde.js');
-  assert.match(wereld, /api\('wereld'/);
-  assert.match(wereld, /api\('bewaar'/);
+  assert.match(wereld, /api\('\/api\/mediaos\/wereld'/);
+  assert.match(wereld, /api\('\/api\/mediaos\/bewaar'/);
   assert.match(speler, /RTGOndertitelband\.zet/);
   assert.match(speler, /RTGMediaLijst\.inLijst\(huidig\.id\)/);
   assert.match(speler, /RTGMediaSamen\.start\(huidig\.id\)/);
-  assert.match(blad, /api\('bieb'/);
+  assert.match(blad, /api\('\/api\/mediaos\/bieb'/);
   assert.match(voorzijde, /nieuwKnop/);
   assert.match(voorzijde, /biebKnop/);
   assert.match(voorzijde, /\/apps\/podium\.html/);

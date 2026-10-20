@@ -5,6 +5,11 @@
 /* Wat dit scherm NIET dekt, met reden. Deze regels gaan mee naar het scherm,
    want een lezer hoort te weten waar de lijst ophoudt. */
 const NIET_GEDEKT = [
+  { naam: 'Uw aankomststatus bij Invisible Arrival',
+    reden: 'Deze tijdelijke statusdeling staat nog niet in dit overzicht. U deelt zelf een aankomststatus met de zaak, geen GPS of route. ' +
+      'Bij uw aanvraag ontvangt de zaak ook de reserveringsgegevens en opgegeven wensen, zoals allergie, toegankelijkheid, gelegenheid en voorkeurszone. ' +
+      'Bij Invisible Arrival zet Stop delen de status op delen-gestopt; dat trekt de Arrival Pass niet in en wist de reservering of eerder gedeelde gegevens niet. ' +
+      'De pass heeft een eindtijd. Intrekken van de pass sluit verdere toegang en statuspulsen af; de reservering blijft staan.' },
   { naam: 'Wat u in De Salon of een genootschap plaatst',
     reden: 'Dat is publiceren en geen toestemming: u haalt het weg bij de post zelf.' },
   { naam: 'Uw veiligheidskring (Thuiswacht, Codewoord, Vitaal)',

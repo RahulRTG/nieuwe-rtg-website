@@ -698,7 +698,7 @@ jobs:
           for pad in ronde-registers/*; do
             naam="$(basename "$pad")"
             [[ "$naam" =~ ^[A-Z][A-Z0-9-]*\.json$ ]] || { echo "dit hoort niet in een registervoorstel: $naam"; exit 1; }
-            registers=("${registers[@]}" "$naam")
+            registers+=("$naam")
           done
           [ ${#registers[@]} -gt 0 ] || { echo "het artefact bevat geen enkel register"; exit 1; }
           git checkout -b "$tak"

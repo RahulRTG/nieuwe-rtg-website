@@ -57,7 +57,7 @@ async function vastgelopen() {
   const op = r.terugbetaalOpdrachten[0];
   assert.ok(op.escalatie, 'de veegronde escaleerde');
   const regie = maakBetaalregie({ d: () => data, save: () => {}, betaal, env: AAN, nu });
-  return { bw, r, op, regie };
+  return { bw, r, op, regie, data };
 }
 
 test('een vastgelopen terugbetaling staat als eigen regel op de lijst van de betaalkamer, met wat de knop nodig heeft', async () => {
@@ -121,4 +121,61 @@ test('de route: zonder inlog niets, de gedeelde kantoorcode is geen mens, een ka
     const r = await post(mens, body);
     assert.equal(r.status, 404, JSON.stringify(r.body));
   } finally { await stop(srv); }
+});
+
+
+test('HTTP: een echte vastgelopen synthetische terugbetaling wordt eenmaal op naam afgehandeld en blijft na herstart afgerond', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-terugvast-keten-'));
+  const CODE = 'KANTOOR-TERUG-KETEN';
+  /* De fixture doorloopt hierboven de echte betaalwaarheid, simulatiebank en
+     escalatie. Alleen die bereikte toestand wordt vóór serverstart opgeslagen;
+     geen geschreven statusvlag, vervangen autorisatie of echte geldrail. */
+  const w = await vastgelopen();
+  const bestand = path.join(TMP, 'db.json');
+  fs.writeFileSync(bestand, JSON.stringify({ ...require('../server/seed')(), ...w.data }));
+  const env = { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_STORE: 'json', DATABASE_URL: '', PG_URL: '',
+    REDIS_URL: '', RTG_ENC_KEY: '', RTG_SIMULATIEBANK: '1', OFFICE_CODE: CODE };
+  let srv;
+  const post = (pad, tok, body) => fetch(srv.base + '/api/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+    body: JSON.stringify(body || {})
+  }).then(async r => ({ status: r.status, body: await r.json() }));
+  const route = 'office/betalingen/terug/afhandel';
+  const body = { betalingId: w.r.id, opdrachtId: w.op.id, uitkomst: 'terug',
+    reden: 'gecontroleerd bij de synthetische provider: refund voltooid', door: 'VERVALSTE-ACTOR' };
+  try {
+    srv = await startServer({ env });
+    const gedeeld = (await post('office/login', null, { code: CODE })).body.token;
+    const mens = await kantoorAlsPersoon(srv.base, CODE);
+    assert.ok(gedeeld && mens);
+    const open = (await post('office/betalingen/status', mens)).body.problemen;
+    assert.ok(open.some(p => p.code === 'TERUGBETALING-VASTGELOPEN' && p.opdrachtId === w.op.id));
+    assert.equal((await post(route, null, body)).status, 401);
+    assert.equal((await post(route, gedeeld, body)).status, 403);
+    const naWeigering = JSON.parse(fs.readFileSync(bestand, 'utf8')).betaalWaarheid[w.r.id];
+    assert.equal(naWeigering.terugbetaaldCenten || 0, 0);
+    assert.equal(naWeigering.terugbetaalOpdrachten[0].mens, undefined);
+    const uit = await Promise.all([post(route, mens, body), post(route, mens, body)]);
+    assert.deepEqual(uit.map(x => x.status).sort(), [200, 409]);
+    assert.equal(uit.find(x => x.status === 200).body.stand, 'TERUGBETAALD');
+    assert.equal((await post('office/betalingen/status', mens)).body.problemen
+      .some(p => p.code === 'TERUGBETALING-VASTGELOPEN' && p.opdrachtId === w.op.id), false);
+    await stop(srv); srv = null;
+    const lees = () => JSON.parse(fs.readFileSync(bestand, 'utf8')).betaalWaarheid[w.r.id];
+    const bewaard = lees();
+    assert.equal(bewaard.terugbetaaldCenten, 2500);
+    assert.equal(bewaard.terugbetaalOpdrachten[0].status, 'BEVESTIGD');
+    assert.ok(bewaard.terugbetaalOpdrachten[0].mens.door);
+    assert.notEqual(bewaard.terugbetaalOpdrachten[0].mens.door, body.door, 'actor komt uit de sessie');
+    assert.equal(bewaard.gebeurtenissen.filter(g => g.soort === 'TERUGBETALING_DOOR_MENS').length, 1);
+    srv = await startServer({ env });
+    const opnieuw = await kantoorAlsPersoon(srv.base, CODE);
+    assert.equal((await post(route, opnieuw, body)).status, 409);
+    await stop(srv); srv = null;
+    assert.equal(lees().terugbetaaldCenten, 2500);
+    assert.equal(lees().gebeurtenissen.filter(g => g.soort === 'TERUGBETALING_DOOR_MENS').length, 1);
+  } finally {
+    if (srv) await stop(srv);
+    fs.rmSync(TMP, { recursive: true, force: true });
+  }
 });

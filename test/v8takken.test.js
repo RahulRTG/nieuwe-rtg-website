@@ -168,3 +168,43 @@ test('de V8-regel: de telling van een plek is die van het binnenste bereik dat h
   assert.deepEqual(uitgevoerd([{ startOffset: 0, endOffset: 10, count: 0 }]), [], 'nul is nergens uitgevoerd');
   assert.deepEqual(uitgevoerd([]), []);
 });
+
+test('bronwortel en V8-pad mogen verschillende symlinknamen hebben, maar externe bron blijft buiten', () => {
+  const v8 = require('../scripts/lib/v8takken');
+  const { pathToFileURL } = require('node:url');
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-v8alias-'));
+  try {
+    const echt = path.join(temp, 'echt'), alias = path.join(temp, 'alias'), ruw = path.join(temp, 'ruw');
+    fs.mkdirSync(path.join(echt, 'server'), { recursive: true }); fs.mkdirSync(ruw);
+    fs.writeFileSync(path.join(echt, 'server', 'a.js'), 'module.exports = 1;');
+    fs.symlinkSync(echt, alias, 'dir');
+    const buiten = path.join(temp, 'buiten.js'); fs.writeFileSync(buiten, 'module.exports = 2;');
+    fs.symlinkSync(buiten, path.join(echt, 'server', 'extern.js'));
+    const script = pad => ({ url: pathToFileURL(pad).href, functions: [{ ranges: [
+      { startOffset: 0, endOffset: 19, count: 1 }, { startOffset: 10, endOffset: 18, count: 0 }
+    ] }] });
+    for (const [wortel, bron] of [[alias, fs.realpathSync(echt)], [fs.realpathSync(echt), alias]]) {
+      fs.writeFileSync(path.join(ruw, 'coverage.json'), JSON.stringify({ result: [
+        script(path.join(bron, 'server', 'a.js')), script(path.join(bron, 'server', 'extern.js'))
+      ] }));
+      const gemeten = v8.naarBestand(v8.uitRuw(ruw, wortel));
+      assert.deepEqual(Object.keys(gemeten.bestanden), ['server/a.js']);
+      const telling = v8.tel(v8.voegSamen([gemeten]));
+      assert.equal(telling.totaal, 2); assert.equal(telling.gedekt, 1);
+    }
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('de vloer weigert een lege takkenmeting naast bestaande LCOV-bron, zonder inventaris te publiceren', () => {
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-v8leeg-'));
+  try {
+    fs.writeFileSync(path.join(map, 'deel-1-1.info'), 'TN:\nSF:/rtg/server/a.js\nDA:1,1\nend_of_record\n');
+    fs.writeFileSync(path.join(map, 'deel-1-1.takken.json'), JSON.stringify({ versie: 2, bestanden: {}, onleesbaar: 0 }));
+    const per = path.join(map, 'per.json');
+    const r = spawnSync(process.execPath, [VLOER, '--map', map, '--per-bestand', per], { cwd: WORTEL, encoding: 'utf8' });
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /lege takkenmeting/);
+    assert.equal(fs.existsSync(per), false);
+    assert.doesNotMatch(r.stdout, /takken\s+100%/);
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});

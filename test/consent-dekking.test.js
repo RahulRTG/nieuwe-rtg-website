@@ -31,14 +31,14 @@ const KERN = path.join(__dirname, '..', 'server', 'kern');
    moet zetten, heeft net een nieuwe toestemming gebouwd -- en hoort dan ook te
    bedenken of hij op het toestemmingsscherm hoort. */
 const DEKKING = {
-  'care/leden.js': { laag: 'care-intake' },
+  'care/intakedeling.js': { laag: 'care-intake' },
   'care/vastleggen.js': { laag: 'care-vastlegging' },
   'care/wachtlijst.js': { laag: 'wachtlijst' },
   'toestellen.js': { laag: 'toestel' },
   'gastzorg.js': { laag: 'locatie' },
   'salon-claimcode.js': { reden: 'een tijdelijke aanbiedingsclaim; status bewaakt een bearer en is geen toestemming voor gegevensgebruik' },
   'rtgone-projecten.js': { reden: 'status actief beschrijft de levensloop van een projectintentie; er wordt geen toestemming voor gegevensgebruik vastgelegd' },
-  'assets/winkel.js': { reden: 'een ticket op een object; geen toestemming maar bezit' }
+  'assets/aanvraag-betaal.js': { reden: 'een ticket op een object; geen toestemming maar bezit' }
 };
 
 function jsBestanden(map, prefix = '') {
@@ -108,6 +108,7 @@ test('elke gedekte laag die hier een module heeft, staat ook echt in het registe
 const ROUTES = path.join(__dirname, '..', 'server', 'routes');
 const { NIET_GEDEKT } = require('../server/kern/consent-register');
 const OVERDRACHT = {
+  'supplier/horeca/invisible-arrival.js': { nietGedekt: 'Uw aankomststatus bij Invisible Arrival' },
   'member/werk.js': { nietGedekt: 'Een sollicitatie die u instuurde' },
   'supplier/werving/sollicitaties.js': { nietGedekt: 'Een sollicitatie die u instuurde' },
   'member/werk/talent.js': { nietGedekt: 'Anonieme werkinteresse vanuit de RTFoundation' },

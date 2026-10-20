@@ -469,9 +469,21 @@ De Edge-scanner herkent nu ook eenduidige directe fetch-helpers. De vijf
 nieuwe tegenproeven bewaken onder meer shadowing, generatorbindings,
 scriptgrenzen en inerte scriptblokken. Het is een begrensde statische
 meting, geen algemene callgraph of bewijs van succesvolle netwerkuitvoering.
+Na herijking van uitsluitend EDGEKAART.json op schone code `0c6b2fd787`
+slagen alle 12 Edge-kaarttests. De vijf tegenproeven zijn daarin inbegrepen.
 
 De Directpay-proef met twee processen is nog een niet-gekwalificeerde
 testuitwerking: de aanvraag voor lokale uitvoering is geannuleerd, zodat
 geen PG-run heeft plaatsgevonden. Zij telt niet als gesloten financieel
 bewijs en is nog niet aangesloten op de bestaande PG-testlijst. Geen
 productdefect of geslaagde crashproef claimen op grond van alleen deze code.
+De uitwerking is bewaard buiten de reguliere testselectie in het lokale
+uitvoerbewijs (`output/premium-ready-20261020/drafts/test/`), zodat een
+onuitgevoerde nieuwe PG-proef geen ongemarkeerde suite-afhankelijkheid wordt.
+
+Vier browsertestbestanden hebben een nog ongecommitteerde vervanging van
+vaste wachttijden door observeerbare toestanden. Hun browserkwalificatie is
+niet uitgevoerd: de lokale sandboxrun strandde op EPERM vóór serverstart
+en de aanvraag om buiten de sandbox te draaien is geannuleerd. Syntax en
+bronreview zijn geen vervanging voor deze ontbrekende browserproef. De
+betrokken klokfailures blijven daarom open.

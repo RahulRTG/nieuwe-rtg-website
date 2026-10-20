@@ -52,6 +52,7 @@ const UITSLAG = path.join(WORTEL, 'IDOR.json');
    dus zijn EIGEN object, niet dat van A. Een route die hier NIET op staat en
    toch een doorbraak geeft, is een nieuwe vraag en hoort nagekeken. */
 const NAGEKEKEN = {
+  'POST /api/wallet/munt/koop': 'zorgwallet.js gebruikt req.session.key; wallet.muntKoop leest zaak/aantal/idem, niet id/code. test/zorgwallet.test.js bewijst: B krijgt een eigen muntregel, A blijft ongewijzigd, nepvelden met verse idem werken ook, dezelfde idem met gewijzigde body geeft 409 door de idempotentiepoort; munt/wissel op A\'s id geeft B 404. Een bestaande betaling kan geen tweede zaak financieren (aparte HTTP-tegenproef).',
   'POST /api/boeken/boek': 'de huisbibliotheek is publiek; een boek-id is geen persoonlijk object',
   'POST /api/foodcourt/tijden': 'openingstijden van een restaurant zijn publiek',
   'POST /api/gemeente/afspraak': 'eigenaar uit req.session; het id valt in B\'s eigen namespace',

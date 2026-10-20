@@ -408,7 +408,8 @@ zijn eigen object wordt nog niet afzonderlijk gecontroleerd; die beperking
 staat expliciet in de bron en het register.
 
 De browserhermeting op de gewijzigde werkstand levert 8 BEWEZEN en 106
-NIET_GETEST op. Dit is deelbewijs met een vuile-boomstempel, geen
+NIET_GETEST op. Herhaling op een schone kopie van commit `3452188104` geeft
+dezelfde telling, nu met `boomVuil: false`. Dit is deelbewijs, geen
 releasekwalificatie. Vier eerdere gezinsbewijzen vallen terecht terug;
 IDOR.json en ROLPROEF.json zijn bovendien vervallen en moeten op een schone
 codeversie opnieuw worden gemeten. De auditwaarde 12/114, het oude opgeslagen
@@ -433,3 +434,44 @@ objectproeven vernieuwen, daarna APPWERKT en kritieke ketens opnieuw meten.
 Premium UX, architectuurreductie en operationele kwalificatie blijven
 afzonderlijke vereisten. Geen totaalscore of groene platformstatus zonder
 volledige, reproduceerbare bewijzen op de releasekandidaat.
+
+#### Uitkomst van de volledige herhaalmeting
+
+De ronde op `c10c930cb8` is afgerond: **20.036 tests, 19.987 geslaagd,
+43 mislukt, 6 overgeslagen, 0 geannuleerd**. De 46 PostgreSQL-bestanden
+slagen volledig. SUITE.json bewaart deze rode uitslag met schone bronstempel.
+De eerdere Node 24-ronde had 85 failures en 51 skips; verschillen in omgeving
+en testset maken dit geen bewijs dat precies 42 productfouten zijn opgelost.
+Van de 43 failures betreffen 13 de ontbrekende loopbackalias, twee de inmiddels
+herstelde CI-ontleder en drie vaste wachttijden in browsertests. De overige
+bevindingen omvatten registeractualiteit, broncitaten en schermeigenaarschap;
+hun inhoudelijke beoordeling blijft nodig.
+
+De bestaande rolproef is op schone code `3452188104` opnieuw uitgevoerd:
+4.514 routes, 9.369 pogingen, geen verkeerde rol binnengelaten en geen gevonden
+gegevenslek in de weigeringen. Mechanismen die deze proef niet kan toetsen
+(zoals objecteigenaarschap en lichaamssleutels) blijven expliciet buiten het
+bewijs. De objectproef heeft afzonderlijk 2.630 ledenroutes, 1.273 zaakroutes,
+84 werkplekroutes en 130 werkruimteroutes gemeten, met onbereikbare routes
+zichtbaar in IDOR.json.
+
+Eén walletbevinding uit die objectproef is met twee echte HTTP-testaccounts
+onderzocht. De 409 bij de tegenpoging was een gewijzigde body onder dezelfde
+herhaalsleutel. Met een verse sleutel werken verzonnen objectvelden eveneens:
+B koopt voor zijn eigen wallet, A blijft ongewijzigd, en een echte
+inwisselhandeling op A's munt-id geeft B 404. De bestaande idempotentiepoort
+weigert ook dezelfde betaling voor een andere zaak. Dit specifieke oordeel
+is onafhankelijk gecontroleerd en in de bestaande NAGEKEKEN-lijst gekoppeld
+aan `test/zorgwallet.test.js`. De oorspronkelijke verdachte meting blijft
+bewaard; zij wordt niet handmatig groen geschreven.
+
+De Edge-scanner herkent nu ook eenduidige directe fetch-helpers. De vijf
+nieuwe tegenproeven bewaken onder meer shadowing, generatorbindings,
+scriptgrenzen en inerte scriptblokken. Het is een begrensde statische
+meting, geen algemene callgraph of bewijs van succesvolle netwerkuitvoering.
+
+De Directpay-proef met twee processen is nog een niet-gekwalificeerde
+testuitwerking: de aanvraag voor lokale uitvoering is geannuleerd, zodat
+geen PG-run heeft plaatsgevonden. Zij telt niet als gesloten financieel
+bewijs en is nog niet aangesloten op de bestaande PG-testlijst. Geen
+productdefect of geslaagde crashproef claimen op grond van alleen deze code.

@@ -231,3 +231,65 @@ test('de afgeleide controles vinden wat de kaart moet dragen, en kunnen zakken',
   }
   assert.deepEqual(kaart.afgeleid(wand).fouten, [], 'na elke proef staat de kaart weer zoals hij was');
 });
+
+test('fetch-helper: echte os-publiek-aanroepen blijven zichtbaar na pad-extractie', () => {
+  const p = 'public/apps/foundation/os-publiek.html';
+  const bron = fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
+  const verwacht = ['/api/rtfos/publiek/campagnes', '/api/rtfos/publiek/stad', '/api/rtfos/publiek/steden'];
+  assert.deepEqual(kaart.meet(p, WAND.find(([bestand]) => bestand === p)[1], bron).fetch, verwacht);
+  assert.deepEqual(kaart.bouw().bestanden.find(b => b.pad === p).gemeten.fetch, verwacht);
+  // Tegenproef: dezelfde literal calls zonder fetch-koppeling zijn geen netwerkbewijs.
+  const los = bron.replace('=> fetch(pad,', '=> Promise.resolve(pad,');
+  assert.notEqual(los, bron);
+  assert.deepEqual(kaart.meet(p, '', los).fetch, []);
+});
+
+test('fetch-helper: volgt alleen letterlijke argumenten op de doorgegeven parameterpositie', () => {
+  const bron = `const api = (body, pad) => fetch(pad, {method:'POST', body});
+    api({}, '/api/een?pagina=2'); api({}, '/api/twee'); api({}, gekozen);
+    api({}, '/api/' + gekozen); api({}, '/ergens/anders');`;
+  assert.deepEqual(kaart.meet('voorbeeld.js', bron).fetch, ['/api/een', '/api/twee']);
+  assert.deepEqual(kaart.meet('voorbeeld.js', "fetch('/api/direct/' + id)").fetch, ['/api/direct/']);
+});
+
+test('fetch-helper: geen bewijs uit tekst, commentaar, unrelated, ontsnapte of shadowed helpers', () => {
+  const wrapper = 'const api = (pad, body) => fetch(pad, {body});';
+  const gevallen = [
+    `const api = pad => teken(pad); api('/api/nee');`,
+    `${wrapper} const tekst = "api('/api/nee')";`,
+    `${wrapper} /* api('/api/nee'); */`,
+    `${wrapper} ander.api('/api/nee');`,
+    `${wrapper} const kopie = api; api('/api/nee');`,
+    `${wrapper} function f(api) { api('/api/nee'); }`,
+    `${wrapper} function api(pad) {} api('/api/nee');`,
+    `${wrapper} const fetch = alternatief; api('/api/nee');`,
+    `function f() { ${wrapper} } api('/api/nee');`,
+    `const api = (pad) => fetch(ander); api('/api/nee');`,
+    `const api = (pad) => fetch(pad + '/extra'); api('/api/nee');`
+  ];
+  for (const bron of gevallen) assert.deepEqual(kaart.meet('voorbeeld.js', bron).fetch, [], bron);
+  assert.deepEqual(kaart.meet('voorbeeld.html', `<p>${wrapper} api('/api/nee');</p>`).fetch, []);
+});
+
+
+test('fetch-helper: generatorbindings en bindings over scriptblokken zijn geen fetch-bewijs', () => {
+  const gevallen = [
+    ["const api=(pad)=>fetch(pad); function f(){function* api(pad){} api('/api/no');}", 'voorbeeld.js'],
+    ["function* fetch(pad){} const api=(pad)=>fetch(pad); api('/api/no');", 'voorbeeld.js'],
+    ["<script>const fetch=localFunction;</script><script>const api=(pad)=>fetch(pad);api('/api/no');</script>", 'voorbeeld.html'],
+    ["<script>function* fetch(pad){}</script><script>const api=(pad)=>fetch(pad);api('/api/no');</script>", 'voorbeeld.html'],
+    ["<script>const api=(pad)=>fetch(pad);api('/api/no');</script><script>function* api(pad){}</script>", 'voorbeeld.html']
+  ];
+  for (const [bron, p] of gevallen) assert.deepEqual(kaart.meet(p, '', bron).fetch, [], bron);
+});
+
+
+test('fetch-helper: alleen uitvoerbare inline scripts, geen datablok of src-body', () => {
+  const js = "const api=(pad)=>fetch(pad);api('/api/ja');";
+  for (const attrs of ['', 'type="module"', 'type="text/javascript"', "type='application/javascript'"]) {
+    assert.deepEqual(kaart.meet('voorbeeld.html', '', `<script ${attrs}>${js}</script>`).fetch, ['/api/ja'], attrs);
+  }
+  for (const attrs of ['type="text/plain"', 'type="application/json"', 'src="/extern.js"', 'src=""', 'type="module" src="/extern.js"']) {
+    assert.deepEqual(kaart.meet('voorbeeld.html', '', `<script ${attrs}>${js}</script>`).fetch, [], attrs);
+  }
+});

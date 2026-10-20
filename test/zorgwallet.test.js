@@ -209,3 +209,40 @@ test('7. de poorten: gasten en anoniemen niet, en zonder polis-cap geen zorgtak'
   assert.equal(wb.body.items.length, 0, 'een vers lid begint met een lege wallet');
   assert.ok((await wallet('', {}, lidTok)).body.items.length >= 1, 'terwijl de wallet van het ingeschreven lid gevuld is');
 });
+
+test('dezelfde betaalreferentie mag geen feestmunten voor twee verschillende zaken opleveren', async () => {
+  const invoer = { zaak: 'Idemfeest A', aantal: 2, idem: 'feestmunt-zaakconflict' };
+  const eerste = await wallet('/munt/koop', invoer, lidTok);
+  assert.equal(eerste.status, 200);
+  const voor = await wallet('', {}, lidTok);
+  const geldVoor = await api('/api/pay/overzicht', {}, lidTok);
+  const conflict = await wallet('/munt/koop', { ...invoer, zaak: 'Idemfeest B' }, lidTok);
+  assert.equal(conflict.status, 409, 'een bestaande betaling kan niet een tweede zaak financieren');
+  assert.deepEqual((await wallet('', {}, lidTok)).body.items, voor.body.items, 'geen extra munten of walletregels');
+  assert.equal((await api('/api/pay/overzicht', {}, lidTok)).body.saldo, geldVoor.body.saldo, 'geen tweede afschrijving');
+  const herhaal = await wallet('/munt/koop', invoer, lidTok);
+  assert.equal(herhaal.status, 200);
+  assert.equal(herhaal.body.item.saldo, 2);
+});
+
+test('muntkoop gebruikt de sessie: vreemde objectvelden openen geen wallet van een ander', async () => {
+  const a = await wallet('/munt/koop', { zaak: 'Isolatiefeest', aantal: 1, idem: 'isolatie-a' }, lidTok);
+  assert.equal(a.status, 200);
+  const aVoor = (await wallet('', {}, lidTok)).body.items;
+  const b = await lid();
+  assert.equal((await api('/api/verify/upload', { image: MINI_PNG }, b.token)).status, 200);
+  const invoer = { zaak: 'Isolatiefeest', aantal: 1, idem: 'isolatie-b',
+    id: a.body.item.id, code: a.body.item.code };
+  const koop = await wallet('/munt/koop', invoer, b.token);
+  assert.equal(koop.status, 200);
+  assert.notEqual(koop.body.item.id, a.body.item.id, 'B krijgt een eigen muntregel');
+  const bItems = (await wallet('', {}, b.token)).body.items;
+  assert.ok(bItems.some(x => x.id === koop.body.item.id), 'B leest zijn eigen opgeslagen muntregel');
+  assert.ok(!bItems.some(x => x.id === a.body.item.id), 'B krijgt A\'s muntregel niet');
+  const tegen = { ...invoer, id: 'bestaat-niet', code: 'bestaat-niet' };
+  assert.equal((await wallet('/munt/koop', tegen, b.token)).status, 409, 'zelfde sleutel met andere body is een idempotentieconflict');
+  assert.equal((await wallet('/munt/koop', { ...tegen, idem: 'isolatie-b-nieuw' }, b.token)).status, 200,
+    'een verse sleutel maakt dezelfde aankoop ook zonder A-object: geen IDOR-afhankelijkheid');
+  assert.deepEqual((await wallet('', {}, lidTok)).body.items, aVoor, 'A blijft onaangeraakt');
+  assert.equal((await wallet('/munt/wissel', { id: a.body.item.id, aantal: 1 }, b.token)).status, 404, 'echte objecthandeling sluit voor B');
+});

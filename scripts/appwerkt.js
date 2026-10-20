@@ -680,12 +680,42 @@ async function bedien(ctx, base, pad) {
 /* Staat de zin van een weigering op het scherm, dan heeft de gebruiker gezien
    waarom (gezegd); anders is het een defect: de server weigerde en niemand
    vertelde het hem. */
+/* Een vervolgvraag telt alleen met de bijbehorende netwerkrespons en zichtbare
+   bediening. Een willekeurige (of achtergebleven) dialoog is geen bewijs. */
+const poortVerkeer = new WeakMap();
+async function gegevensVraagGetoond(page, w) {
+  if (w.s !== 428 || !w.poort) return false;
+  const verkeer = poortVerkeer.get(page) || [];
+  const i = verkeer.indexOf(w.poort);
+  const volgende = verkeer[i + 1];
+  if (i < 0 || !volgende || volgende.pad !== '/api/gegevens/start' || volgende.s !== 200 || volgende.methode !== 'POST' || volgende.volgorde <= w.poort.volgorde) return false;
+  const [poort, vraag] = await Promise.all([w.poort.data, volgende.data]);
+  if (!poort || !vraag || !poort.soort || volgende.soort !== poort.soort || !vraag.id || !vraag.tekst ||
+      !Array.isArray(poort.ontbreekt) || !poort.ontbreekt.some(v => v.veld === vraag.veld)) return false;
+  return page.evaluate(({ tekst, veld }) => {
+    const zichtbaar = el => {
+      if (!el || !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      const r = el.getBoundingClientRect();
+      const boven = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return r.width > 0 && r.height > 0 && boven && (boven === el || el.contains(boven));
+    };
+    return [...document.querySelectorAll('.rp-waas .rp-kaart[role="dialog"]')].some(d => {
+      const v = d.querySelector('.rp-vraag'), stop = d.querySelector('.rp-stop');
+      if (!zichtbaar(v) || v.innerText.trim() !== tekst.trim() || !zichtbaar(stop) || stop.disabled) return false;
+      if (veld === 'identiteit') return true; // de bestaande verificatiestap heeft geen invoerveld
+      const invoer = d.querySelector('.rp-in'), door = d.querySelector('.rp-door');
+      return zichtbaar(invoer) && !invoer.disabled && zichtbaar(door) && !door.disabled;
+    });
+  }, { tekst: vraag.tekst, veld: vraag.veld }).catch(() => false);
+}
+
 async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
   while (weigering.length) {
     const w = weigering.shift();
     let tekst = '';
     try { tekst = await page.evaluate(() => document.body ? document.body.innerText : ''); } catch (e) { tekst = ''; }
     if (tekst.includes(w.zin)) gezegd.push(w.s + ' ' + w.pad + ': ' + w.zin);
+    else if (await gegevensVraagGetoond(page, w)) gezegd.push(w.s + ' ' + w.pad + ': bijbehorende gegevensvraag zichtbaar en bedienbaar');
     else serverfout.push(w.s + ' ' + w.pad + ' -- de server weigerde ("' + w.zin.slice(0, 80) + '") maar het scherm toonde de reden niet');
   }
 }
@@ -794,11 +824,22 @@ function weigerZin(lijf) {
 }
 
 function luister(page, base, bak) {
+  const verkeer = [], verzoeken = new WeakMap();
+  let volgorde = 0;
+  page.on('request', q => verzoeken.set(q, ++volgorde));
+  poortVerkeer.set(page, verkeer);
   page.on('pageerror', (e) => bak.crash.push('JS: ' + String(e.message || e).slice(0, 180)));
   page.on('response', async (res) => {
     const s = res.status();
-    if (s < 400) return;
     const pad = res.url().replace(base, '').slice(0, 80);
+    let poort = null;
+    if (s === 428 || pad === '/api/gegevens/start') {
+      let aanvraag = {}; try { aanvraag = JSON.parse(res.request().postData() || '{}'); } catch (e) {}
+      poort = { s, pad, volgorde: verzoeken.get(res.request()) || 0, methode: res.request().method(), soort: aanvraag.soort,
+        data: res.text().then(t => { try { return JSON.parse(t); } catch (e) { return null; } }, () => null) };
+      verkeer.push(poort);
+    }
+    if (s < 400) return;
     if (s === 401 || s === 403 || s === 404) return;   // een deur is geen defect; bewijs 6 gaat daarover
     // de zin eerst uit het HELE antwoord: afgekapt op 200 tekens is het geen JSON meer
     let vol = '';
@@ -811,7 +852,7 @@ function luister(page, base, bak) {
     /* Een weigering MET een zin (400/409/422/428 en {"error": "..."}) is pas een
        defect als de gebruiker niet te zien krijgt waarom. Of hij hem ziet, kijkt
        bedien() na de tik op het scherm na. */
-    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol) });
+    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol), ...(poort ? { poort } : {}) });
     else bak.serverfout.push(s + ' ' + pad + (lijf ? ' -- ' + lijf.slice(0, 100) : ''));
   });
 }
@@ -973,7 +1014,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { onderschepper, klikReden, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

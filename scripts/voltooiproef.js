@@ -258,12 +258,16 @@ function inWoorden(melding) {
 
 function menselijkUit(antwoorden, afgebroken) {
   const n = antwoorden.length;
-  const kaal = antwoorden.filter((a) => a.status === 0 || a.status >= 500);
+  /* BETROUWBAARHEID par. 3: een expliciete configuratieweigering is geen
+     kale serverfout. Dit bewijst alleen de melding; de route blijft 503 en
+     haar functionele/configuratiebewijs wordt hier niet opgewaardeerd. */
+  const configuratie = (a) => a.status === 503 && a.lijf && inWoorden(a.melding) && inWoorden(a.hoe);
+  const kaal = antwoorden.filter((a) => a.status === 0 || (a.status >= 500 && !configuratie(a)));
   const leeg = antwoorden.filter((a) => a.status > 0 && !a.lijf);
-  const weigeringen = antwoorden.filter((a) => a.status >= 400 && a.status < 500);
+  const weigeringen = antwoorden.filter((a) => a.status >= 400);
   const zonder = weigeringen.filter((a) => !inWoorden(a.melding));
   const samenvat = (lijst) => [...new Set(lijst.map((a) => a.status + ' ' + a.pad))].slice(0, 5).join(', ');
-  if (!n || !weigeringen.length) {
+  if (!n || (!weigeringen.length && !kaal.length && !leeg.length)) {
     return { schakels: [], storingen: [], telling: { schakels: 0, gesloten: 0, open: 0, stuk: 0 }, sluit: false,
       antwoorden: n, weigeringen: 0,
       nietBeproefd: n ? 'het scenario lokte geen enkele weigering uit, dus of een melding in woorden de gebruiker bereikt is hier niet gezien'
@@ -276,7 +280,8 @@ function menselijkUit(antwoorden, afgebroken) {
       stand: leeg.length ? 'open' : 'gesloten', ziet: leeg.length ? leeg.length + ' leeg: ' + samenvat(leeg) : 'elk antwoord droeg een lijf' },
     { nr: 3, wat: 'elke weigering (' + weigeringen.length + ') draagt een melding in woorden en geen stacktrace of foutnaam',
       stand: zonder.length ? 'open' : 'gesloten', ziet: zonder.length ? zonder.length + ' zonder melding: ' + samenvat(zonder)
-        : weigeringen.length + ' weigering(en), bijvoorbeeld "' + String(weigeringen[0].melding).slice(0, 90) + '"' }
+        : weigeringen.length ? weigeringen.length + ' weigering(en), bijvoorbeeld "' + String(weigeringen[0].melding).slice(0, 90) + '"'
+          : 'geen ontvangen weigering; verbinding of antwoord ontbreekt' }
   ];
   const t = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
   for (const s of schakels) t[s.stand]++;
@@ -294,7 +299,7 @@ async function meet(opties) {
     testwereld: {
       mail: 'postvanger (server/post-vanger.js): alleen met RTG_POSTVANGER=1, nooit in productie, nooit naast SMTP_URL of MAIL_DIRECT',
       sms: 'sms-sandbox (server/sms-sandbox.js): alleen met SMS_SANDBOX=1, nooit in productie; beide choke points (sendSms en send("sms:...")) lopen erdoor',
-      betalen: 'simulatiebank (server/betaal/synthetisch.js) bestaat; geen van de scenario\'s hieronder betaalt',
+      betalen: 'betaalscenario\'s gebruiken de simulatiebank (server/betaal/synthetisch.js), geen echte betaalrail; de grens staat per scenario',
       opslag: 'eigen RTG_DATA_DIR per scenario, gelezen met node:sqlite readOnly',
       storing: 'SIGTERM (deploy) en SIGKILL (stroomstoring) op dezelfde datamap; een afgebroken verzoek met AbortController'
     },

@@ -98,22 +98,24 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'een kant interesse is nog geen vonk; als ook de ander wil, is er een match met een tafel rond het midden', async () => {
-    /* Welke codenaam in de selectie van A is B? De codenaam in Vonk is een
-       gidsnaam; B leest zijn eigen selectie en kiest A terug, en de match
-       bewijst wie wie was. */
+    /* Herken de zelf aangemaakte deelnemers aan hun openbare profielstad,
+       niet aan de daglot-volgorde. Een proeflike op C verwijdert C uit A's
+       selectie en maakt de latere blokkeerproef onmogelijk vóór de crash. */
     const sA = ((await w.post(SELECTIE, {}, A.token)).data || {}).mensen || [];
-    let match = null, l1 = null;
-    for (const kand of sA.filter((m) => (m.gemeen || []).includes('sushi'))) {
-      l1 = await w.post(LIKE, { codenaam: kand.codenaam }, A.token);
-      const sB = ((await w.post(SELECTIE, {}, B.token)).data || {}).mensen || [];
-      const aInB = sB.find((m) => (m.gemeen || []).includes('sushi') && (m.gemeen || []).length === 1);
-      if (!aInB) continue;
-      const l2 = await w.post(LIKE, { codenaam: aInB.codenaam }, B.token);
-      if (l2.data && l2.data.match) { match = l2; bNaam = kand.codenaam; break; }
-    }
+    const sB = ((await w.post(SELECTIE, {}, B.token)).data || {}).mensen || [];
+    const herken = (lijst, stad) => {
+      const kandidaten = lijst.filter((m) => m.stad === stad && (m.gemeen || []).includes('sushi'));
+      if (kandidaten.length !== 1) throw new Error('Vonk-fixture: verwacht precies één deelnemer uit ' + stad + ', gevonden ' + kandidaten.length);
+      return kandidaten[0].codenaam;
+    };
+    bNaam = herken(sA, 'Cala Jondal');
+    cNaam = herken(sA, 'Santa Eulalia');
+    const aNaam = herken(sB, 'Sant Antoni');
+    const l1 = await w.post(LIKE, { codenaam: bNaam }, A.token);
+    const match = await w.post(LIKE, { codenaam: aNaam }, B.token);
     mid = match && match.data.id;
     const bijA = await mijn(A.token);
-    return { klopt: !!l1 && l1.status === 200 && l1.data.match === false && !!match && !!match.data.tafel && !!match.data.tafel.supplierName &&
+    return { klopt: !!l1 && l1.status === 200 && l1.data.match === false && match.status === 200 && match.data.match === true && !!match.data.tafel && !!match.data.tafel.supplierName &&
       bijA.length === 1 && bijA[0].status === 'wacht-op-betaling',
       ziet: 'eerste like ' + (l1 && l1.status) + ' (match=' + (l1 && l1.data && l1.data.match) + '), wederzijds: ' + (match ? 'match met tafel bij ' + match.data.tafel.supplierName : 'GEEN match') };
   });
@@ -224,7 +226,7 @@ async function loop(w, stap) {
 
   await stap('herstelbaar', 'een crash direct na blokkeren en melden: C blijft uit de selectie en de melding ligt bij het kantoor', async () => {
     const sA = ((await w.post(SELECTIE, {}, A.token)).data || {}).mensen || [];
-    cNaam = (sA.find((m) => m.codenaam !== bNaam && (m.gemeen || []).includes('sushi')) || {}).codenaam;
+    if (!sA.some((m) => m.codenaam === cNaam)) throw new Error('Vonk-fixture: de nog niet gelikete C ontbreekt vóór blokkeren');
     const blok = await w.post(BLOKKEER, { codenaam: cNaam, meld: 'ongepast ' + merk }, A.token);
     await w.crash();
     const na = ((await w.post(SELECTIE, {}, A.token)).data || {}).mensen || [];

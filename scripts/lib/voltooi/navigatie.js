@@ -123,7 +123,8 @@ async function loop(w, stap) {
 
   await stap('voltooibaar', 'een route in Nederland wordt eerlijk geweigerd met de reden, in plaats van verzonnen', async () => {
     const r = await w.post(ROUTE, { van: { lat: 52.37, lng: 4.89 }, naar: { lat: 52.09, lng: 5.12 }, modus: 'auto' }, T);
-    return { klopt: r.status === 503 && /nog niet ingeladen/.test(r.data.error) && !r.data.route,
+    return { klopt: r.status === 503 && /nog niet ingeladen/.test(r.data.error) &&
+      typeof r.data.hoe === 'string' && r.data.hoe.includes('navigatie:nederland') && !r.data.route,
       ziet: r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 

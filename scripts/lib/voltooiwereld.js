@@ -58,9 +58,10 @@ async function maakWereld(naam, eigenEnv) {
      af. Alleen de soort en de melding, nooit de inhoud van het antwoord. */
   const antwoorden = [];
   function noteer(pad, status, data) {
-    const weigering = status >= 400 && status < 500;
+    const weigering = status >= 400;
     const melding = data && typeof data.error === 'string' ? data.error : null;
-    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null });
+    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null,
+      hoe: status === 503 && data && typeof data.hoe === 'string' ? data.hoe : null });
   }
 
   /* `koppen`: extra kopregels, zoals het bezitsbewijs van een gebonden toestel. */

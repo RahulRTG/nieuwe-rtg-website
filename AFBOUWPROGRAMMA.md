@@ -245,3 +245,57 @@ V1 met of zonder geld (B2/B3), SMS of bewust uit (B5), de image-scanner (B6), he
 IBAN van de RTFoundation (B7), het e-mailadres van de eigenaar, de oude
 kaartcodes (cadeaukaart 24 bits, opwaardeerkaart 96 bits), PR #661, en de scope
 van de overlappende productwerk-PR's #672 tot en met #677.
+
+## 11. Premium Ready (eigenaarsbesluit 20 oktober 2026)
+
+De afbouw richt zich op professioneel bruikbare taken, niet op een grotere
+catalogus. De nulmeting op `48623e2020015aa6cfaa93b4b41f365c6decc5aa`
+beoordeelt de integratiewerkstand als **ORANJE, niet vrijgaveklaar**. Binnen de
+onderzochte scenario's hebben 9 van 114 onderdelen acht bewijzen; 12 hebben
+geldig gekoppeld bevoegdheidsbewijs. Dit is een historische meting en geen
+automatische status van latere commits. De auditbestanden blijven behouden.
+
+Zes verplichte poorten, in afhankelijkheidsvolgorde:
+
+| poort | sluitvoorwaarde | bestaande bewijsbron / voorziening |
+|---|---|---|
+| Architectuur | nul verboden koppelingen, geen nieuwe schendingen, aantoonbare reductie van geprioriteerde schuld | architectuurgraaf, normcontrole, CONSOLIDATIE |
+| Functionaliteit | alle onderdelen met realistische complete taakscenario's en acht geldige bewijzen | APPWERKT, voltooiproef, AFBOUWPROGRAMMA |
+| Veiligheid | object-, rol-, organisatie- en accountisolatie, privacy-overdracht, geld onder retries/crashes/meerdere workers bewezen | IDOR, ROLPROEF, BEVOEGD, financiële contract- en herstelproeven |
+| Premium UX | inhoudelijke taakdiepte, Heritage, mobiel/PWA, toegankelijkheid en menselijke taakbeoordeling | bestaande ontwerpcontroles, browser/a11y-proeven en gebruikersbewijs |
+| Betrouwbaarheid | herhaalbare fixtures en tijdgrenzen, volledige groene regressie op dezelfde kandidaat | bestaande testrunner, CI en herstelproeven |
+| Productiekwalificatie | exacte kandidaat, staging/rollback, operationele repetitie en eigenaar-go/no-go | bestaande releaseketen en productie:status |
+
+**Gebouwd, bewezen en vrijgaveklaar zijn verschillende uitspraken.** Aanwezige
+code is geen bewijs. Een scenario met een synthetische provider is geen bewijs
+voor de echte externe rail. Acht appbewijzen vervangen geen premium UX-review
+of platformkwalificatie. Niet-toepasselijk vereist een gemotiveerde scope;
+ontbrekend bewijs is nooit niet-toepasselijk of geslaagd.
+
+Uitvoering: eerst meetfouten en niet-determinisme, daarna kritieke
+veiligheidsgrenzen, architectuurschuld, appkwaliteit, wereldketens en volledige
+kwalificatie. Onafhankelijke werkzaamheden mogen naast elkaar; onveilige
+financiële of autorisatieafhankelijkheden worden niet doorgeschoven.
+
+De permanente kwaliteitsweergave wordt een projectie op de bestaande
+platformregister-/bewijsvoorzieningen. APPWERKT blijft de appbewijsbron;
+er komt geen tweede appinventaris of handmatig groen register. Toon de
+onderzochte commit, versheid, scope, geslaagd/gefaald/ontbrekend/niet-toepasselijk
+en afzonderlijk de lanceerbare kern en het volledige platform. Premium UX en
+operationele proeven zonder bron staan expliciet als ontbrekend bewijs.
+
+### Eerste herstelronde — in uitvoering
+
+- Menselijke foutbeoordeling: verklaarde configuratie-503 onderscheiden van
+  kale serveruitval; netwerkuitval niet verbergen achter ontbrekende weigeringen.
+- Vluchten: zichtbare gegevensdialoog aan de geweigerde handeling koppelen;
+  geen algemene uitzondering voor 428.
+- Vonk: identiteiten in de fixture deterministisch kiezen en bewijzen dat
+  blokkeren werkelijk slaagt vóór het crashherstel wordt beoordeeld.
+- Verblijf: bestaande klokvoorziening en bedrijfstijdzone gebruiken, met
+  middernacht- en zomertijdtegenproeven.
+
+Deze ronde is niet de volledige determinismekwalificatie. Testuitslagen worden
+pas geldig verklaard met hun exacte codeversie en uitvoer; de historische
+9/114 wordt niet handmatig verhoogd. Geen normverlaging, merge naar main of
+productie-uitrol volgt automatisch uit dit besluit.

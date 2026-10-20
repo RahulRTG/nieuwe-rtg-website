@@ -1,9 +1,9 @@
 {
   "uitleg": "Gemeten met scripts/makers.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 3. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist. De envelop is niet hier afgeleid maar overgenomen uit OBJECTMODEL.json.",
-  "vastgelegd": "2026-10-04",
+  "vastgelegd": "2026-10-20",
   "gemeten": {
     "makers": 8,
-    "bestanden": 74,
+    "bestanden": 75,
     "vormen": 17,
     "paren": 28,
     "metGedeeldeKern": 1,
@@ -19,9 +19,11 @@
       "opslag": [
         "ledenSites",
         "reviewStats",
+        "siteTeam",
         "supplierTypes",
         "suppliers",
-        "vacatures"
+        "vacatures",
+        "webMerken"
       ],
       "levensloop": [
         "concept",
@@ -99,7 +101,7 @@
     {
       "id": "clips",
       "naam": "Clips-studio",
-      "bestanden": 3,
+      "bestanden": 4,
       "vormen": 1,
       "talen": 2,
       "opslag": [

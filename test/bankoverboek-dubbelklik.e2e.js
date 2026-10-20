@@ -11,12 +11,31 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser,
+  volgVerzoeken, wachtOpWaarde, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 const post = (base, pad, lijf, tok) => fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
   body: JSON.stringify(lijf || {}) }).then((r) => r.json());
+
+/* Beide opdrachten moeten beantwoord zijn vóór we het saldo of aantal passen
+   lezen. Alleen het eerste antwoord kan een tweede boeking nog verbergen. */
+async function dubbelklikEnWacht(page, selector, pad) {
+  const antwoorden = [];
+  const hoor = (r) => { if (new URL(r.url()).pathname === pad && r.request().method() === 'POST') antwoorden.push(r); };
+  page.on('response', hoor);
+  try {
+    await page.dblclick(selector);
+    await wachtOpWaarde(() => antwoorden.length >= 2, { ms: 15000, wat: 'beide antwoorden van ' + pad });
+    for (const r of antwoorden) {
+      assert.equal(r.status(), 200, pad + ' accepteert beide verzoeken');
+      assert.equal((await r.json()).ok, true, pad + ' bevestigt beide verzoeken');
+    }
+    await wachtOpRust(page, '#bkApp');
+    assert.equal(antwoorden.length, 2, 'precies twee antwoorden van ' + pad);
+  } finally { page.off('response', hoor); }
+}
 
 test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boekt een keer', { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
@@ -39,6 +58,7 @@ test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boek
     const ctx = await browser.newContext();
     await ctx.addInitScript((t) => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, tok);
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     const sleutels = [];
@@ -52,8 +72,7 @@ test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boek
     await page.selectOption('#bkOvan', betaal.iban);
     await page.selectOption('#bkOnaar', spaar.iban);
     await page.fill('#bkObed', '12');
-    await page.dblclick('#bkOdoe');
-    await page.waitForTimeout(1500);
+    await dubbelklikEnWacht(page, '#bkOdoe', '/api/bank/overboek');
 
     assert.equal(sleutels.length, 2, 'beide kliks gingen naar de server');
     assert.equal(sleutels[0], sleutels[1], 'twee kliks, een bedoeling, een sleutel');
@@ -69,8 +88,7 @@ test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boek
       await new Promise((r) => setTimeout(r, 400));
       await route.continue();
     });
-    await page.dblclick('[data-bkpas="' + betaal.iban + '"]');
-    await page.waitForTimeout(1500);
+    await dubbelklikEnWacht(page, '[data-bkpas="' + betaal.iban + '"]', '/api/bank/pas/uitgeven');
     assert.equal(pasSleutels.length, 2);
     assert.equal(pasSleutels[0], pasSleutels[1], 'twee tikken op Pas uitgeven, een sleutel');
     const passen = await post(base, '/api/bank/passen', {}, tok);

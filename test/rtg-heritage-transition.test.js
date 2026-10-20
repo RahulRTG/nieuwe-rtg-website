@@ -56,3 +56,37 @@ test('gedeeld element: een naam buiten [a-z0-9-] wordt nooit een overgangsnaam',
   pageswapProef('/apps/reisboek.html', [vreemd]);
   assert.equal(vreemd.style.viewTransitionName, '');
 });
+
+test('inkomende navigatie verwerkt animatieannulering maar verbergt geen onverwachte fout', () => {
+  const handlers = {}, reported = [], catches = [];
+  const window = { matchMedia: () => ({ matches: false }),
+    addEventListener: (name, fn) => { handlers[name] = fn; },
+    reportError: error => reported.push(error) };
+  const document = { documentElement: { classList: { contains: () => false } } };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../public/shared/rtg-heritage-transition.js'), 'utf8'),
+    { window, document, URL });
+  assert.equal(typeof handlers.pagereveal, 'function');
+  handlers.pagereveal({ viewTransition: null });
+  handlers.pagereveal({ viewTransition: {
+    ready: { catch: fn => catches.push(fn) }, finished: { catch: fn => catches.push(fn) }
+  } });
+  assert.equal(catches.length, 2);
+  for (const catchError of catches) {
+    catchError(Object.assign(new Error('animation skipped'), { name: 'AbortError' }));
+    catchError(Object.assign(new Error('already revealed'), { name: 'InvalidStateError' }));
+  }
+  assert.equal(reported.length, 0);
+  const unexpected = new TypeError('broken application');
+  catches[0](unexpected);
+  assert.deepEqual(reported, [unexpected], 'echte fouten blijven zichtbaar');
+});
+
+test('Berichten en Camera installeren de overgangsbediening voor de eerste weergave', () => {
+  for (const route of ['comm', 'camera']) {
+    const html = fs.readFileSync(path.join(__dirname, '../public/apps/' + route + '.html'), 'utf8');
+    const script = '<script src="/shared/rtg-heritage-transition.js"></script>';
+    assert.ok(html.indexOf(script) > html.indexOf('<head>'));
+    assert.ok(html.indexOf(script) < html.indexOf('<link'), route + ': een deferred controller mist pagereveal');
+    assert.equal(html.split(script).length, 2);
+  }
+});

@@ -15,7 +15,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadScherm, startServer, stop, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { laadScherm, startServer, stop, browserOpties, geenBrowser, letOpFouten, wachtTot } = require('./helper');
 
 const pw = laadScherm();
 const maakPost = (base) => async (pad, lijf, tok) => {
@@ -70,7 +70,17 @@ async function zoekInHeelRtg(browser, base, tok, termen) {
   const uit = {};
   for (const t of termen) {
     await p.locator('.rtg-edge-face-all .rtg-edge-find input').fill(t);
-    await p.waitForTimeout(300);
+    /* Ook een lege uitslag moet bij de nieuwe term horen: wachten op alleen
+       stilte of nul treffers zou de uitslag van de vorige term kunnen lezen. */
+    await wachtTot(p, (term) => {
+      const host = document.querySelector('.rtg-edge-face-all');
+      const invoer = host && host.querySelector('.rtg-edge-find input');
+      const links = host ? [...host.querySelectorAll('.rtg-edge-group a[data-search]')] : [];
+      return invoer && invoer.value === term && links.length > 0 && links.every((a) => {
+        const past = ((a.dataset.search || '') + ' ' + a.textContent.toLowerCase()).includes(term);
+        return a.hidden === !past;
+      });
+    }, t, { wat: 'de gefilterde functielijst voor ' + t });
     uit[t] = await p.locator('.rtg-edge-face-all a[data-catalog-app]:visible').evaluateAll((as) => as.map((a) => a.dataset.catalogApp));
   }
   await ctx.close();

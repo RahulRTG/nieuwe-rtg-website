@@ -23,7 +23,7 @@
    DE OORDELEN, per rij:
      BEWEZEN        ledenscherm: elke route gemeten en niets gebroken;
                     gezinsscherm: minstens een kruispaar, en B en anoniem werden
-                    bij elk paar geweigerd terwijl A binnenkwam.
+                    bij elk paar geweigerd terwijl A en B hun eigen code konden gebruiken.
      DEFECT         een doorbraak of lek in IDOR.json, een open deur in
                     ROLPROEF.json, of een gezinspaar waarin B met A's code 2xx
                     kreeg. Een DEFECT hoort met de hand nagekeken te worden,
@@ -60,7 +60,8 @@ const GRENS_LID = 'samengesteld uit IDOR.json en ROLPROEF.json per route die het
   'leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet';
 const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A\'s code met ' +
   'B\'s eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; ' +
-  'B\'s toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd';
+  'A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, ' +
+  'andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist';
 
 /* ---- DE LEDENKANT: SAMENSTELLEN --------------------------------------------- */
 
@@ -160,10 +161,11 @@ function ledenOordeel(rij, reg, { schermroutes, lees } = {}) {
 
 /* ---- DE GEZINSKANT: KRUISEN --------------------------------------------------
 
-   Een paar is een verzoek van A dat A's code draagt, drie keer nagespeeld: als
-   A (moet binnenkomen, anders zegt het paar niets), als B met A's code, en
-   zonder token. */
-function paarOordeel({ a, b, anoniem }) {
+   Een paar is een verzoek van A dat A's code draagt, vier keer nagespeeld: als
+   A, als B met A's code, zonder token en als B met B's eigen code.
+   Beide eigen controles moeten binnenkomen; anders bewijst een weigering
+   mogelijk alleen dat de tweede sessie of testfixture niet bruikbaar was. */
+function paarOordeel({ a, bEigen, b, anoniem }) {
   const ok = (s) => s >= 200 && s < 300;
   if (!ok(a)) return 'eigenaarWeg';
   if (ok(b)) return 'lek';
@@ -172,7 +174,7 @@ function paarOordeel({ a, b, anoniem }) {
   // door autorisatie. Ook 404 vereist een eigen verhullingscontract en
   // bewijst hier op zichzelf niet dat de bevoegdheidsgrens is geraakt.
   const geweigerd = (s) => s === 401 || s === 403;
-  return geweigerd(b) && geweigerd(anoniem) ? 'gescheiden' : 'onbeslist';
+  return ok(bEigen) && geweigerd(b) && geweigerd(anoniem) ? 'gescheiden' : 'onbeslist';
 }
 
 function gezinOordeel(paren) {
@@ -184,15 +186,17 @@ function gezinOordeel(paren) {
     reden: 'anoniem kreeg ' + openbaar.verzoek + ' met de code van gezin A (' + openbaar.anoniem + ')', paren: paren.length };
   const gescheiden = paren.filter((p) => p.uitslag === 'gescheiden');
   if (gescheiden.length !== paren.length) return { status: 'NIET_GETEST', paren: paren.length,
-    reden: 'niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (' + paren.map((p) => p.uitslag).join(', ') + ')' };
+    reden: 'niet elk paar bewijst A en B op eigen code binnen, B op A\'s code en anoniem geweigerd met 401/403 (' + paren.map((p) => p.uitslag).join(', ') + ')' };
   return { status: 'BEWEZEN', paren: paren.length,
-    reden: gescheiden.length + ' van de ' + paren.length + ' kruisparen gescheiden (A binnen, B met A\'s code en anoniem geweigerd), 0 lek: ' + GRENS_GEZIN };
+    reden: gescheiden.length + ' van de ' + paren.length + ' kruisparen gescheiden (beide eigenaren binnen, B met A\'s code en anoniem geweigerd), 0 lek: ' + GRENS_GEZIN };
 }
 
 async function meetGezinnen(rijen, base, browser, maakContext) {
   const { ROLLEN } = require('./lib/proefsessies');
   const A = await ROLLEN.gezin.haal(base), B = await ROLLEN.gezin.haal(base);
-  if (!A || !B) return new Map(rijen.map((r) => [r.functie, { status: 'NIET_GETEST', reden: 'geen twee gezinssessies' }]));
+  if (!A?.code || !B?.code || !A.token || !B.token || A.code === B.code || A.token === B.token) {
+    return new Map(rijen.map((r) => [r.functie, { status: 'NIET_GETEST', reden: 'geen twee verschillende gezinssessies' }]));
+  }
   const uit = new Map();
   for (const r of rijen) {
     if (!r.pad) { uit.set(r.functie, { status: 'NIET_GETEST', reden: 'geen eigen adres' }); continue; }
@@ -211,8 +215,11 @@ async function meetGezinnen(rijen, base, browser, maakContext) {
     await ctx.close();
     const paren = [];
     for (const v of verzoeken.values()) {
-      const speel = async (van, naar) => {
-        const vervang = (s) => String(s || '').split(van).join(naar);
+      const speel = async (van, naar, eigenCode) => {
+        const vervang = (s) => {
+          const tokenVervangen = String(s || '').split(van).join(naar);
+          return eigenCode ? tokenVervangen.split(A.code).join(eigenCode) : tokenVervangen;
+        };
         const koppen = { 'content-type': 'application/json' };
         for (const [k, w] of Object.entries(v.koppen || {})) if (/^(authorization|x-)/i.test(k)) koppen[k] = vervang(w);
         try {
@@ -223,7 +230,9 @@ async function meetGezinnen(rijen, base, browser, maakContext) {
         } catch (e) { return 0; }
       };
       const a = await speel(A.token, A.token), b = await speel(A.token, B.token), anoniem = await speel(A.token, '');
-      paren.push({ verzoek: v.methode + ' ' + v.url.split('?')[0], a, b, anoniem, uitslag: paarOordeel({ a, b, anoniem }) });
+      const bEigen = await speel(A.token, B.token, B.code);
+      paren.push({ verzoek: v.methode + ' ' + v.url.split('?')[0], a, bEigen, b, anoniem,
+        uitslag: paarOordeel({ a, bEigen, b, anoniem }) });
     }
     uit.set(r.functie, Object.assign(gezinOordeel(paren), { kruisparen: paren }));
   }

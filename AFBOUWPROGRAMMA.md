@@ -487,3 +487,70 @@ niet uitgevoerd: de lokale sandboxrun strandde op EPERM vóór serverstart
 en de aanvraag om buiten de sandbox te draaien is geannuleerd. Syntax en
 bronreview zijn geen vervanging voor deze ontbrekende browserproef. De
 betrokken klokfailures blijven daarom open.
+
+### Deep Green — ronde 2: herstel naar kwalificatie (20 oktober 2026)
+
+Eigenaarsopdracht: werk door op `d14f1ae752cdb7d175569be41ff208e17e988c2d`,
+zonder merge of productie-uitrol. Volledige kwalificatie vereist één vastgelegde
+kandidaat, twee volledige suite-runs en afzonderlijke browser-, financiële,
+autorisatie- en ketenbewijzen. Een hersteld register is geen hersteld product.
+
+De nulmeting gebruikt een schone, detached kopie van die commit, Node 26.12.0,
+PostgreSQL 16.14 op localhost:55439, Redis 7.4.11 op localhost:56389 en de
+bestaande gepinde browser. Er ontstaat geen nieuwe ontwikkeltak. De eerste
+sandboxstart is afgebroken omdat localhost-verzoeken op EPERM strandden;
+die log blijft infrastructuurbewijs en is geen productnulmeting. De vervangende
+run heeft localhost-toegang en eist PostgreSQL en Redis expliciet.
+
+Open punten blijven met verantwoordelijkheid en vervolg zichtbaar:
+
+| Punt | Eigenaar | Vervolg en sluitbewijs |
+|---|---|---|
+| Loopback 127.0.0.2 ontbreekt | Lokale machinebeheerder | Alias met beheerdersrechten activeren; dertien ankerproeven ongewijzigd uitvoeren. De toegestane `sudo -n`-poging vereist een wachtwoord. |
+| Vier browserwijzigingen | Browserwerkstroom en onafhankelijke reviewer | Echte browsers plus negatieve scenario's; pas daarna accepteren. |
+| Directpay met twee processen | Financiële bewijswerkstroom | Geïsoleerde PostgreSQL, synthetische rail, crash/retry/conflict en opslagcontrole. Geen bewijs voor echte provideruitvoering claimen. |
+| Zorgschermen delen betaal- en annuleerbediening | Integrator en architectuurreviewer | Bronvergelijking van app-main-13 en foundation/zorg-hulp; een inhoudelijk eigenaarsbesluit of consolidatie, geen verhoging van de ratel. |
+| Financiële herkomst | Integrator | De verse meting telt 181 niet-volgbare vormen tegenover 180 in het oude register; 39 blijven volgbaar. Verschil onderzoeken, niet als verbetering rapporteren. |
+| APPWERKT en autorisatie | Integrator | Alle apps hermeten; verlopen of onbeslist bewijs blijft ongeldig. Historische 9/114 is geen actuele uitkomst. |
+
+De statische architectuurmeting op de rondebasis telt 63 opwaartse koppelingen,
+105 primitief-naar-domeinkoppelingen en 31 wederkerige paren. De eerste twee
+zijn gelijk aan de aangeleverde nulmeting: nog geen aantoonbare schuldreductie.
+Nul onverklaarde randen betekent alleen dat de randen geclassificeerd zijn,
+niet dat alle koppelingen gewenst zijn.
+
+Ronde-2-tussenstand (geen vrijgavebewijs): de normale Node-batches op de
+rondebasis tellen 19.879 geslaagd, 41 gefaald en 6 overgeslagen. PostgreSQL
+is daarin niet meegeteld: Redis bleek niet beschikbaar na een door de sandbox
+geblokkeerde herstart. De infrastructuurcontrole vóór die run was dus
+onvoldoende. De PostgreSQL-campagne wordt afzonderlijk herhaald met werkende
+Redis; deze nulmeting mag niet als complete groene suite worden opgevoerd.
+Coturn is tijdens deze diagnostische ronde lokaal geïnstalleerd. Een volgende
+integrale kwalificatie moet daarom opnieuw in de vastgelegde omgeving draaien.
+
+Aanvullende proeven sluiten eerdere uitvoeringsblokkades gedeeltelijk:
+
+- Vier browserbestanden: zes echte browsertests geslaagd, nul skips.
+- Coturn: dertien tests geslaagd, nul skips; de zes eerdere skips zijn daar
+  uitgevoerd, niet achteraf uit de nulmeting verwijderd.
+- Directpay: vier subproeven plus hoofdtest geslaagd, nul skips, met twee echte
+  processen en synthetische betalingen. De proef is opgenomen in de bestaande
+  PG-testlijst. Dit bewijst retries, conflicten en lokale opslaginvarianten bij
+  de geteste procescrashes; geen externe charge-count, SQL-crash midden in een
+  commit of isolatie tussen verschillende organisaties.
+- Care-overlap: onafhankelijk beoordeeld als gedeeltelijke presentatie;
+  de ledenapp bezit het gedeelde afspraakbeheer. Foundation behoudt zijn
+  gezinsgezondheid en hulpwijzer. Elf eigenaarschapstests slagen zonder
+  normwijziging.
+- De inkomende paginaovergang van Berichten/Camera veroorzaakte bij expliciete
+  annulering tien onbehandelde fouten in tien bezoeken. De gedeelde afhandeling
+  plus vroeg laden op deze twee routes levert nul fouten in tien tegenproeven.
+  Onverwachte fouten blijven zichtbaar.
+- De bevoegdheidsmeter vereist nu ook een geslaagde eigen aanvraag van actor B.
+  Oude groene gezinsrijen zonder die controle gelden niet als nieuw bewijs.
+
+De schone APPWERKT-nulmeting op d14f1ae752 geeft nul volledig bewezen apps:
+verlopen ketenbewijzen blijven ongeldig en twee browserdefecten zijn gevonden.
+Dat is geen bewijs dat alle apps stuk zijn. Het is wel een kwalificatieblokkade.
+Herstelproeven op de gewijzigde werkboom vervangen de vereiste volledige
+hermeting op een exacte kandidaatcommit niet.

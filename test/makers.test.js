@@ -163,3 +163,46 @@ test('8 - elke maker uit de lijst heeft bestanden gevonden', () => {
   const leeg = r.makers.filter(m => !m.bestanden).map(m => m.id);
   assert.deepEqual(leeg, [], 'makers zonder bestanden: de prefix in MAKERS klopt niet meer');
 });
+
+test('eigencollectie bewaart de bestaande Atelier-opslag in de meting', () => {
+  const fs = require('fs'), path = require('path');
+  const bron = fs.readFileSync(path.join(__dirname, '../server/kern/atelierweb.js'), 'utf8');
+  assert.ok(M.opslagVan(bron).has('atelierSites'));
+  assert.ok(M.meet().makers.find(m => m.id === 'websitestudio').opslag.includes('atelierSites'));
+  for (const [bestand, sleutel] of [['webmaker-team.js', 'siteTeam'], ['webmerk.js', 'webMerken']]) {
+    assert.ok(M.opslagVan(fs.readFileSync(path.join(__dirname, '../server/kern', bestand), 'utf8')).has(sleutel), sleutel);
+  }
+});
+
+test('eigencollectie telt alleen bewezen letterlijke bakaanroepen, geen namen of dynamische sleutels', () => {
+  const binding = "const eigen = require('./eigencollectie')({db, bezit:{voorraad:'kaart'}});";
+  assert.deepEqual([...M.opslagVan(binding + "eigen.bak('voorraad'); eigen.zetBak('voorraad', {});")], ['voorraad']);
+  for (const bron of [binding, binding + 'eigen.bak(gekozen);',
+    binding + "eigen.bak('voor' + suffix);", binding + "/* eigen.bak('niet'); */",
+    binding + 'const uitleg = "eigen.bak(\'niet\')";',
+    "const eigen = require('./andere')({}); eigen.bak('niet');",
+    binding + "function f(eigen) { eigen.bak('niet'); }",
+    binding + "eigen.bak = () => []; eigen.bak('niet');"
+  ]) assert.deepEqual([...M.opslagVan(bron)], [], bron);
+  assert.ok(M.opslagVan('db.data.oud; S().nieuw;').has('oud'));
+  assert.ok(M.opslagVan('db.data.oud; S().nieuw;').has('appstore:nieuw'));
+});
+
+test('eigencollectie weigert propertycalls, afgeleide initializers, vreemde scope en lokale require', () => {
+  const binding = "const eigen = require('./eigencollectie')({});";
+  for (const bron of [
+    binding + "ander.eigen.bak('onterecht');",
+    "const eigen = require('./eigencollectie')({}).ander; eigen.bak('onterecht');",
+    "const eigen = require('./eigencollectie')({}) && ander; eigen.bak('onterecht');",
+    "function maak() { " + binding + " } eigen.bak('onterecht');",
+    "function maak(require) { " + binding + " eigen.bak('onterecht'); }"
+  ]) assert.deepEqual([...M.opslagVan(bron)], [], bron);
+});
+
+test('eigencollectie geeft geen bewijs bij ongelezen template-expressies met alias of require', () => {
+  for (const bron of [
+    "const eigen=require('./eigencollectie')({}); `${eigen.bak = ander}`; eigen.bak('nee');",
+    "let eigen=require('./eigencollectie')({}); `${eigen = ander}`; eigen.bak('nee');",
+    "`${require = ander}`; const eigen=require('./eigencollectie')({}); eigen.bak('nee');"
+  ]) assert.deepEqual([...M.opslagVan(bron)], [], bron);
+});

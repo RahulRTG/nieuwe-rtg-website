@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadScherm, startServer, stop, browserOpties, geenBrowser, nepMediaArgs, installeerNepMicrofoon, letOpFouten } = require('./helper');
+const { laadScherm, startServer, stop, browserOpties, geenBrowser, nepMediaArgs, installeerNepMicrofoon, letOpFouten, wachtOpWaarde, wachtTot } = require('./helper');
 
 const pw = laadScherm();
 
@@ -140,10 +140,13 @@ test('videobellen: twee vrienden zien elkaar echt, in beide richtingen, en ophan
 
     const verbonden = (p) => p.waitForFunction(() => { const c = window.__rtgCall && window.__rtgCall(); return c && c.pc && c.pc.connectionState === 'connected'; }, null, { timeout: 30000 });
     await verbonden(a.p); await verbonden(b.p);
-    await a.p.waitForTimeout(2500);
-    const a1 = await ontvangst(a.p), b1 = await ontvangst(b.p);
-    await a.p.waitForTimeout(2000);
-    const a2 = await ontvangst(a.p), b2 = await ontvangst(b.p);
+    const beeld = (p, wie, vorig) => wachtOpWaarde(async () => {
+      const nu = await ontvangst(p);
+      return nu.stand === 'connected' && nu.frames > (vorig ? vorig.frames : 0) && nu.breed > 0 &&
+        nu.videoBreed > 0 && nu.klok > (vorig ? vorig.klok : 0) ? nu : false;
+    }, { ms: 30000, wat: wie + (vorig ? ': nieuwe frames en een voortlopende videoklok' : ': gedecodeerd beeld op het scherm') });
+    const [a1, b1] = await Promise.all([beeld(a.p, 'A ziet B'), beeld(b.p, 'B ziet A')]);
+    const [a2, b2] = await Promise.all([beeld(a.p, 'A ziet B', a1), beeld(b.p, 'B ziet A', b1)]);
     for (const [wie, een, twee] of [['A ziet B', a1, a2], ['B ziet A', b1, b2]]) {
       assert.ok(een.frames > 0 && een.breed > 0, wie + ': geen gedecodeerd beeld ' + JSON.stringify(een));
       assert.ok(twee.frames > een.frames, wie + ': het beeld staat stil ' + een.frames + ' -> ' + twee.frames);
@@ -161,16 +164,31 @@ test('videobellen: twee vrienden zien elkaar echt, in beide richtingen, en ophan
 test('videobellen: wie niet verbonden is, belt niet, en bij de ander gaat niets over',
   { skip: geenBrowser(pw), timeout: 120000 }, async () => {
   await wereld(async ({ base, post, browser }) => {
-    const A = await lid(post, 'vna'), C = await lid(post, 'vnc');
+    const A = await lid(post, 'vna'), C = await lid(post, 'vnc'), B = await lid(post, 'vnb');
+    await verbind(post, A, B);
     const a = await toestel(browser, base, A.token, '/apps/app.html');
     await a.p.waitForFunction(() => window.RTGSocial && window.RTGSocial.ok(), null, { timeout: 30000 });
     await a.p.waitForFunction(() => window.RTGRealtime && window.RTGRealtime.source && window.RTGRealtime.source.readyState === 1, null, { timeout: 20000 });
+    await a.p.evaluate(() => {
+      window.__belSignalen = [];
+      window.RTGRealtime.source.addEventListener('call', e => window.__belSignalen.push(JSON.parse(e.data)));
+    });
     const r = await post('/api/member/call', { toKey: A.key, kind: 'ring', video: true }, C.token);
     assert.equal(r.status, 403, 'een vreemde mag niet bellen');
     assert.match((r.data && r.data.error) || '', /verbonden/, 'de weigering zegt in woorden waarom');
     const anoniem = await post('/api/member/call', { toKey: A.key, kind: 'ring', video: true });
     assert.equal(anoniem.status, 401);
-    await a.p.waitForTimeout(2000);
+    /* Een toegestaan ICE-signaal van vriend B volgt de geweigerde verzoeken
+       over dezelfde livestroom. Ontvangst daarvan bewijst dat de eerdere
+       signalen verwerkt konden worden; C blijft een vreemde. Zonder gesprek
+       negeert het scherm ICE, dus dit kan geen oproep afsluiten of verbergen. */
+    const merk = 'na-geweigerde-oproepen';
+    const grens = await post('/api/member/call', { toKey: A.key, kind: 'ice', payload: { proef: merk } }, B.token);
+    assert.equal(grens.status, 200, 'het controlesignaal van een vriend wordt toegelaten');
+    await wachtTot(a.p, m => window.__belSignalen.some(s => s.kind === 'ice' && s.payload && s.payload.proef === m),
+      merk, { ms: 10000, wat: 'het controlesignaal na de geweigerde oproepen is ontvangen' });
+    assert.deepEqual(await a.p.evaluate(() => window.__belSignalen.filter(s => s.kind === 'ring')), [],
+      'een geweigerde oproep mag geen belsignaal uitsturen');
     assert.equal(await a.p.locator('.rtg-edge-live__accept').count(), 0, 'bij A ging toch iets over');
     assert.equal(await a.p.evaluate(() => document.querySelector('#callIncoming').classList.contains('open')), false);
   });
@@ -189,8 +207,16 @@ test('clips: een kijker ziet de clip van de maker, rechtstreeks van diens toeste
     await m.p.evaluate(() => document.querySelector('#studioOpen').click());
     await m.p.waitForFunction(() => /Klaar om op te nemen/.test((document.querySelector('#studioStatus') || {}).textContent || ''), null, { timeout: 15000 });
     await m.p.click('#opneem');
-    await m.p.waitForTimeout(2500);
+    const opnameKlok = await m.p.locator('#studioDoek').evaluate(v => v.currentTime);
+    await wachtTot(m.p, van => {
+      const v = document.querySelector('#studioDoek');
+      return v && v.videoWidth > 0 && !v.paused && v.currentTime >= van + 1 &&
+        /Opnemen/.test(document.querySelector('#studioStatus').textContent);
+    }, opnameKlok, { ms: 15000, wat: 'de echte camera levert tijdens de opname een seconde bewegend beeld' });
     await m.p.click('#stopOpname');
+    await wachtTot(m.p, () => !document.querySelector('#deelClip').disabled &&
+      /Opname klaar/.test(document.querySelector('#studioStatus').textContent),
+    null, { ms: 10000, wat: 'de echte MediaRecorder heeft de clip afgerond' });
     await m.p.fill('#clipTitel', 'Mist over de gracht');
     await m.p.click('#deelClip');
     await m.p.waitForFunction(() => /staat in uw archief/.test((document.querySelector('#melding') || {}).textContent || ''), null, { timeout: 15000 });

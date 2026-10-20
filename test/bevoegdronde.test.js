@@ -75,8 +75,8 @@ test('2. een breuk is een defect, en vervallen bewijs is geen bewijs', () => {
   assert.match(v.reden, /vervallen/);
 });
 
-test('3. een gezinspaar bewijst alleen iets als A binnenkwam', () => {
-  assert.equal(R.paarOordeel({ a: 200, b: 403, anoniem: 401 }), 'gescheiden');
+test('3. een gezinspaar bewijst alleen iets als beide eigenaren binnenkwamen', () => {
+  assert.equal(R.paarOordeel({ a: 200, bEigen: 200, b: 403, anoniem: 401 }), 'gescheiden');
   assert.equal(R.paarOordeel({ a: 403, b: 403, anoniem: 403 }), 'eigenaarWeg');
   assert.equal(R.paarOordeel({ a: 200, b: 200, anoniem: 401 }), 'lek');
   assert.equal(R.paarOordeel({ a: 200, b: 403, anoniem: 200 }), 'openbaar');
@@ -88,17 +88,26 @@ test('3. een gezinspaar bewijst alleen iets als A binnenkwam', () => {
 
 test('3a. uitval en onbesliste antwoorden bewijzen geen gezinsautorisatie', () => {
   for (const status of [0, undefined, 302, 400, 404, 409, 429, 500, 503]) {
-    assert.equal(R.paarOordeel({ a: 200, b: status, anoniem: 401 }), 'onbeslist', 'B: ' + status);
-    assert.equal(R.paarOordeel({ a: 200, b: 403, anoniem: status }), 'onbeslist', 'anoniem: ' + status);
+    assert.equal(R.paarOordeel({ a: 200, bEigen: 200, b: status, anoniem: 401 }), 'onbeslist', 'B: ' + status);
+    assert.equal(R.paarOordeel({ a: 200, bEigen: 200, b: 403, anoniem: status }), 'onbeslist', 'anoniem: ' + status);
   }
   for (const b of [401, 403]) for (const anoniem of [401, 403]) {
-    assert.equal(R.paarOordeel({ a: 200, b, anoniem }), 'gescheiden');
+    assert.equal(R.paarOordeel({ a: 200, bEigen: 200, b, anoniem }), 'gescheiden');
   }
   for (const uitslag of ['onbeslist', 'eigenaarWeg', undefined, 'onbekend']) {
     assert.equal(R.gezinOordeel([{ uitslag: 'gescheiden' }, { uitslag }]).status, 'NIET_GETEST');
   }
   assert.equal(R.gezinOordeel([{ uitslag: 'gescheiden' }, { uitslag: 'gescheiden' }]).status, 'BEWEZEN');
   assert.equal(R.gezinOordeel([{ uitslag: 'onbeslist' }, { uitslag: 'lek', b: 200 }]).status, 'GEBLOKKEERD_DOOR_DEFECT');
+});
+
+test('3b. een ongeldige tweede sessie kan geen isolatie bewijzen', () => {
+  for (const bEigen of [undefined, 0, 302, 400, 401, 403, 404, 500, 503]) {
+    assert.equal(R.paarOordeel({ a: 200, bEigen, b: 403, anoniem: 401 }), 'onbeslist');
+  }
+  assert.equal(R.paarOordeel({ a: 200, bEigen: 204, b: 403, anoniem: 401 }), 'gescheiden');
+  assert.equal(R.paarOordeel({ a: 200, bEigen: 403, b: 200, anoniem: 401 }), 'lek',
+    'een open vreemde deur blijft een bevinding, ook als de eigen controle faalt');
 });
 
 test('4. de bevoegdronde levert bevoegd en niets anders', () => {

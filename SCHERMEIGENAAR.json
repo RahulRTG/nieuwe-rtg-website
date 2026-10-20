@@ -390,6 +390,16 @@
     },
     {
       "schermen": [
+        "apps/app.html",
+        "apps/foundation/zorg.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/app.html",
+      "reden": "Het overlappende afspraakbeheer blijft eigendom van RTG Care in de ledenapp (app-main-13.js). Hulp & Zorg presenteert dezelfde afspraken en intakedelingen in de gezinscontext (foundation/zorg-hulp.js) en biedt betalen en annuleren via dezelfde vier ledenroutes: /api/care, /api/care/mijn, /api/care/betaal en /api/care/annuleer. Beide gebruiken de ledensessie; persoonlijk-care.js en kern/care/leden.js blijven de ene implementatie van toegang, opslag, betaling en annulering. Foundation behoudt zijn eigen gezinsgezondheid en hulpwijzer via de Foundation-routes met het gezinsprofiel. Dit is de bestaande gedeeltelijke-presentatieregel zoals bij Salon/wereld: de bron voert de overlappende handeling uit. De gedeelde paden betekenen niet dat een gezinsprofiel toegang krijgt tot de Care-afspraken van andere leden. Vastgelegd op 20 oktober 2026 na vergelijking van beide schermmodules en de routehandlers."
+    },
+    {
+      "schermen": [
         "apps/foundation/gezondheid-welzijn.html",
         "apps/foundation/zorg.html"
       ],

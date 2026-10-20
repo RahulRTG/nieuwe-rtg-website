@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T22:18:27.664Z",
-    "commit": "d86992bbc",
+    "op": "2026-10-20T10:05:24.244Z",
+    "commit": "d14f1ae752",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 13,
     "instrument": "scripts/doorbelasting.js",
-    "node": "v22.22.0"
+    "node": "v26.12.0"
   },
   "graad": "gemeten",
   "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",
@@ -21,8 +21,8 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1598,
-    "geldvormen": 219,
+    "vormenTotaal": 1620,
+    "geldvormen": 220,
     "volgbaar": 39,
     "perHerkomstveld": {
       "bron": 20,
@@ -32,7 +32,7 @@
       "leverancier": 8,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 180,
+    "nietVolgbaar": 181,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -92,7 +92,7 @@
         "volgbaar": 0
       },
       "server/kern/assets": {
-        "geldvormen": 1,
+        "geldvormen": 2,
         "volgbaar": 0
       },
       "server/kern/autoverkoop": {
@@ -212,11 +212,11 @@
         "volgbaar": 2
       },
       "server/kern/labfonds": {
-        "geldvormen": 1,
+        "geldvormen": 2,
         "volgbaar": 0
       },
       "server/kern/labfonds.js": {
-        "geldvormen": 2,
+        "geldvormen": 1,
         "volgbaar": 0
       },
       "server/kern/levensband": {

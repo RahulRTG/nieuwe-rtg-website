@@ -132,14 +132,59 @@ function verdeel() {
   return van;
 }
 
-/* De opslagsleutels die een maker aanraakt. `db.data.x` is in dit huis de enige
-   manier om bij bewaarde staat te komen, dus dit is geen benadering maar een
-   telling. */
+/* Statisch zichtbare opslagsleutels: db.data, App Store-state en letterlijke
+   bak/zetBak-aanroepen op een rechtstreeks gebonden eigencollectie. Dynamische
+   sleutels en doorgegeven opslaghelpers blijven buiten dit lexicale bereik. */
 function opslagVan(bron) {
   const s = wring(bron);
   const uit = new Set();
   for (const m of s.matchAll(/\bdb\s*\.\s*data\s*\.\s*([A-Za-z_$][\w$]*)/g)) uit.add(m[1]);
   for (const m of s.matchAll(/\bS\(\)\s*\.\s*([A-Za-z_$][\w$]*)/g)) uit.add('appstore:' + m[1]);
+  if (bron.includes('eigencollectie')) {
+    const t = require('./ast/lexer').lex(bron), v = i => t[i]?.value;
+    const tekst = i => t[i]?.type === 'string' ? /^(['"])([^\\\n]*)\1$/.exec(v(i))?.[2] : undefined;
+    // De lexer bewaart template-expressies als bron, niet als tokens. Geen
+    // bindingbewijs als zo'n ongelezen expressie de factory/alias kan raken.
+    const templates = t.filter(x => x.type === 'template').flatMap(x => x.value.exprs);
+    const inTemplate = naam => templates.some(expr => new RegExp('(^|[^\\w$])' +
+      naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w$])').test(expr));
+    if (inTemplate('require')) return uit;
+    // Conservatief: iedere niet-aanroep van require maakt de herkomst onzeker.
+    if (t.some((x, n) => x.type === 'naam' && x.value === 'require' &&
+      (v(n + 1) !== '(' || ['.', '?.', 'function', '*', 'new'].includes(v(n - 1))))) return uit;
+    const scopes = [], stapel = [];
+    for (let n = 0; n < t.length; n++) {
+      scopes[n] = stapel.slice();
+      if (t[n].type === 'lees' && v(n) === '{') stapel.push(n);
+      if (t[n].type === 'lees' && v(n) === '}') stapel.pop();
+    }
+    for (let i = 0; i < t.length; i++) {
+      if (!['const', 'let', 'var'].includes(v(i)) || t[i + 1]?.type !== 'naam' || v(i + 2) !== '=' ||
+          v(i + 3) !== 'require' || v(i + 4) !== '(' || t[i + 5]?.type !== 'string' ||
+          !/^\.\.?\/(?:[^/]+\/)*eigencollectie(?:\.js)?$/.test(tekst(i + 5) || '') || v(i + 6) !== ')' || v(i + 7) !== '(') continue;
+      // De initializer moet exact de factory-aanroep zijn, geen .ander, &&,
+      // ternary of andere afleiding. Alleen expliciet afgesloten declaraties.
+      let einde = i + 7, diepte = 0;
+      for (; einde < t.length; einde++) {
+        if (t[einde].type !== 'lees') continue;
+        if (v(einde) === '(') diepte++;
+        if (v(einde) === ')' && --diepte === 0) break;
+      }
+      if (v(einde + 1) !== ';') continue;
+      const alias = v(i + 1);
+      if (inTemplate(alias)) continue;
+      const refs = t.map((x, n) => x.type === 'naam' && x.value === alias ? n : -1).filter(n => n >= 0 && n !== i + 1);
+      // Andere bindingen/overdrachten maken de eigenaar onzeker: niet raden.
+      if (refs.some(n => ['.', '?.'].includes(v(n - 1)) || v(n + 1) !== '.' ||
+        !scopes[i].every((blok, k) => scopes[n][k] === blok) ||
+        (['bak', 'zetBak'].includes(v(n + 2)) && v(n + 3) !== '('))) continue;
+      for (const n of refs) {
+        if (!['bak', 'zetBak'].includes(v(n + 2)) || v(n + 3) !== '(' || t[n + 4]?.type !== 'string' ||
+            ![',', ')'].includes(v(n + 5))) continue;
+        if (tekst(n + 4) !== undefined) uit.add(tekst(n + 4));
+      }
+    }
+  }
   return uit;
 }
 

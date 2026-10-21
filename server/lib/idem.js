@@ -94,14 +94,9 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
     if (sleutel === '_keys' || sleutel === '__proto__') {
       return { status: 400, code: 'IDEMPOTENTIESLEUTEL_ONGELDIG', error: 'Deze idem-sleutel is niet bruikbaar.' };
     }
-    const s = store();
-    const a = afdrukStore();
-    if (Object.hasOwn(s, sleutel)) {
-      if (afdruk && typeof a[sleutel] === 'string' && a[sleutel] !== afdruk) {
-        return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
-      }
-      return Object.assign({}, s[sleutel], { herhaald: true });
-    }
+    // De bundel zet het antwoord al in de werkkopie voordat de opslag het
+    // bevestigt. Een lopende vlucht gaat daarom VOOR het bewaarde antwoord:
+    // bij rollback moeten beide aanroepers de mislukking ontvangen.
     const bezig = inVlucht.get(sleutel);
     if (bezig) {
       if (afdruk && bezig.afdruk && bezig.afdruk !== afdruk) {
@@ -109,6 +104,14 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
       }
       const eerder = await bezig.belofte;
       return (eerder && typeof eerder === 'object') ? Object.assign({}, eerder, { herhaald: true }) : eerder;
+    }
+    const s = store();
+    const a = afdrukStore();
+    if (Object.hasOwn(s, sleutel)) {
+      if (afdruk && typeof a[sleutel] === 'string' && a[sleutel] !== afdruk) {
+        return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
+      }
+      return Object.assign({}, s[sleutel], { herhaald: true });
     }
     /* Geen herhaling en geen lopende vlucht: dit is NIEUW werk. Pas hier de
        vrijgavepoort (zie de kop van maakIdem). */

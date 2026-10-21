@@ -54,6 +54,8 @@
    dezelfde rollen lopen uiteen zodra er een rol bij komt -- LAT.md regel 4, en op
    deze lijst is dat al een keer gebeurd. */
 const { LEGE_SLEUTELS, ROLLEN: BEKENDE_ROLLEN } = require('./proefsleutels');
+const { FIXTURE_ROUTES } = require('./rolproeffixtures');
+const FIXTURE_SLEUTELS = new Set(FIXTURE_ROUTES.map(r => r.methode + ' ' + r.pad));
 const ZONDER_SLEUTEL = new Set(LEGE_SLEUTELS);
 const ROLLEN = ['member', 'supplier', 'office'];
 const EIGEN_CONTROLE = {
@@ -209,7 +211,9 @@ function beoordeelRolrij(rij = {}) {
   const verwacht = ROLLEN.filter(rol => rol !== rij.rol);
   const open = rij.acl === 'OPEN' || antwoorden.some(a => geslaagd(a?.status));
   const lek = rij.privacy === 'LEK' || antwoorden.some(a => typeof a?.lek === 'string' && a.lek.length);
-  const volledig = rij.bewijsVersie === 2 && SCHRIJFMETHODEN.has(rij.methode) &&
+  const eigenRoute = !FIXTURE_SLEUTELS.has(rij.methode + ' ' + rij.pad) ||
+    (rij.eigenRoute?.methode === rij.methode && rij.eigenRoute?.pad === rij.pad && geslaagd(rij.eigenRoute?.status));
+  const volledig = eigenRoute && rij.bewijsVersie === 2 && SCHRIJFMETHODEN.has(rij.methode) &&
     BEKENDE_ROLLEN.includes(rij.rol) && !ZONDER_SLEUTEL.has(rij.rol) &&
     Array.isArray(rij.verwacht) && rij.verwacht.length === verwacht.length &&
     verwacht.every(rol => rij.verwacht.includes(rol)) &&
@@ -231,7 +235,7 @@ function beoordeelRolrij(rij = {}) {
    draaien: `--max=2000` las als "2000 per rol" en leverde 2000 pogingen in
    totaal, dus 1000 routes van de 2937. Een naam die het verkeerde belooft is een
    belofte in tekst (LAT.md, regel 6). */
-async function draaiRolproef({ post, vraag, routes, tokensVoor, maxPogingen, lijfVoor }) {
+async function draaiRolproef({ post, vraag, routes, tokensVoor, maxPogingen, lijfVoor, fixtureVoor }) {
   /* lijfVoor is optioneel: de aanroeper kan lijven verrijken (objectpool),
      zodat ook routes die een BESTAAND object willen de rolvraag echt krijgen.
      Zonder blijft het kale plausibele lijf het gedrag. */
@@ -316,6 +320,8 @@ async function draaiRolproef({ post, vraag, routes, tokensVoor, maxPogingen, lij
     const sleutel = r.methode + ' ' + r.pad;
     const bij = { bewijsVersie: 2, methode: r.methode, pad: r.pad, rol: r.rol,
       verwacht: rollen.filter(rol => rol !== r.rol), geprobeerd: [], antwoorden: [] };
+    const fixture = fixtureVoor && fixtureVoor(r);
+    if (fixture) bij.eigenRoute = fixture.eigenRoute;
     for (const rol of rollen) {
       if (rol === r.rol) continue;                    // alleen de VERKEERDE rollen
       if (maxPogingen && gedaan >= maxPogingen) break;
@@ -325,7 +331,7 @@ async function draaiRolproef({ post, vraag, routes, tokensVoor, maxPogingen, lij
       if (!token) continue;
       if (!vraag && r.methode !== 'POST') continue;
       const eigenVoor = await eigenControle(rol, token);
-      const st = await roep(r.methode, r.pad, lijfVan(r), token);
+      const st = await roep(r.methode, r.pad, fixture ? fixture.lijf : lijfVan(r), token);
       gedaan++;
       const eigenNa = await eigenControle(rol, token);
       const s = statusVan(st);

@@ -177,6 +177,9 @@ async function maakWereld(naam, eigenEnv) {
   }
 
   function klaar() {
+    // Een afgerond scenario houdt geen procesbrede opruimhaak vast.
+    // Actieve werelden blijven bij procesafsluiting wel opgeruimd worden.
+    process.removeListener('exit', klaar);
     try { srv.kind.kill('SIGKILL'); } catch (e) { /* al weg */ }
     try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) { /* al weg */ }
   }

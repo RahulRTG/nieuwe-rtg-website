@@ -235,11 +235,22 @@ wachtOpSchoneBoom();
     : 'NIET -- ' + proeflid.reden));
   const postT = metToestellen(post, { voorLid: { lid: proeflid.klaar, van: () => eigenTokens.member } });
 
+  // Na de destructieve oogst, vóór ijking en momentopname. Alleen de eigen
+  // wegwerpserver krijgt de bestaande eigenaarbesluiten en positieve fixtures.
+  const fixtures = await require('./lib/rolproeffixtures').maakRolfixtures({
+    post, basis, tokens: eigenTokens, proeflid: proeflid.klaar
+  });
+  for (const [route, fixture] of Object.entries(fixtures)) {
+    console.log('  eigen fixturecontrole ' + route + ' : ' + fixture.eigenRoute.status +
+      (fixture.eigenRoute.reden ? ' (' + fixture.eigenRoute.reden + ')' : ''));
+  }
+
   /* tokensVoor leest uit eigenTokens en niet uit de drie constanten van de
      inlog: na de oogstgang kunnen die vervangen zijn. */
   // postT is alleen voor de ijking/vingerafdruk. De kruisgang en zijn eigen
   // sessiecontroles gebruiken vraag met exact dezelfde ongewisselde token.
   const uit = await draaiRolproef({ post: postT, vraag, routes, tokensVoor: () => ({ ...eigenTokens }), maxPogingen: MAX,
+    fixtureVoor: r => fixtures[r.methode + ' ' + r.pad],
     lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf });
 
   if (uit.bevindingen.meterStuk) {

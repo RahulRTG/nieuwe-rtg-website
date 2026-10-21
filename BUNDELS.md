@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**62 bundels, 496 delen, 0 zonder onderwerp.**
+**64 bundels, 500 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -347,6 +347,15 @@ omlaag.
 | `app-01.js` | LibraryOS, het scherm: Studio (werken, knooppunten, publiceren, vrijgeven en feedback) |
 | `app-02.js` | LibraryOS, de private Reader: een editie openen en lezen, feedback sturen, en de mobiele weergave |
 
+## `apps/magnaat-leven.js`
+
+`public/apps/magnaat-leven/` -- 2 delen, 177 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `01-toegang-en-handelingen.js` | Magnaat FROM ZERO (V1) in de Magnaat-app: Vandaag, met de agenda en de Edge |
+| `02-presentatie-en-bediening.js` | Wie een eigen hoofdactie heeft (#vnHoofd, data-hoofdactie), zegt ook zelf waar je bent (EDGE.md par |
+
 ## `apps/meldkamer.js`
 
 `public/apps/meldkamer/` -- 4 delen, 480 regels in de delen
@@ -391,6 +400,15 @@ omlaag.
 |---|---|
 | `blad-01.js` | RTG Office, het rekenblad: het raster en wat je ziet |
 | `blad-02.js` | de actieve cel: invoer, selectie en het blad |
+
+## `apps/ovroutes.js`
+
+`public/apps/ovroutes/` -- 2 delen, 197 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `01-projectie-en-tekenen.js` | De routetekenaar op het RTG Design System (TRAVELOS-MIGRATIE.md par |
+| `02-editor-en-herstel.js` | de editor openen, bewaren, verwijderen |
 
 ## `apps/personeel.js`
 

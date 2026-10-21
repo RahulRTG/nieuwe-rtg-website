@@ -779,7 +779,7 @@ function letOpFouten(page, bak, opties) {
     let origin = '';
     try { origin = new URL(page.url()).origin; } catch (_) { /* nog geen adres */ }
     if (!(opties && opties.eigenZeef) && webkitAfbreking(bericht, origin, motorVan(page))) { afgebrokenTelling.set(bak, afgebrokenIn(bak) + 1); return; }
-    if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
+    if ((opties && opties.eigenZeef) || !BROWSERRUIS.includes(bericht)) bak.push(bericht);
   });
   return bak;
 }

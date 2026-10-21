@@ -58,12 +58,15 @@ module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay, bet
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const lijsten = () => {
+    let gewijzigd = !db.data.assetTickets || !db.data.assetGebruik || !db.data.assetWachtlijst ||
+      !db.data.assetTerugkoop || !db.data.assetKas;
     if (!db.data.assetTickets) db.data.assetTickets = [];       // gekochte tickets, per lid en object
     if (!db.data.assetGebruik) db.data.assetGebruik = [];       // geboekte 24-uursblokken
     if (!db.data.assetWachtlijst) db.data.assetWachtlijst = []; // kopers die op een Asset-ticket wachten
     if (!db.data.assetTerugkoop) db.data.assetTerugkoop = [];   // uitstapverzoeken die op de kantoor-uitbetaling wachten
     if (!db.data.assetKas) db.data.assetKas = {};               // poolkas per object, in centen
     if (!Array.isArray(db.data.sharedAssets) || !db.data.sharedAssets.length) {
+      gewijzigd = true;
       db.data.sharedAssets = [
         { id: 'sa-jet', naam: 'Aria One, Gulfstream G650', soort: 'privejet', icon: 'vluchten', waar: 'Thuisbasis Schiphol Oost',
           entiteit: 'RTG Asset Pool Aria One B.V.',
@@ -80,7 +83,13 @@ module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay, bet
       ];
     }
     // oudere pools: elk object hoort in een eigen entiteit
-    for (const a of db.data.sharedAssets) if (!a.entiteit) a.entiteit = 'RTG Asset Pool ' + a.naam.split(',')[0] + ' B.V.';
+    for (const a of db.data.sharedAssets) if (!a.entiteit) {
+      a.entiteit = 'RTG Asset Pool ' + a.naam.split(',')[0] + ' B.V.';
+      gewijzigd = true;
+    }
+    // Ook initialisatie is een mutatie. PostgreSQL bevestigt die voor het
+    // HTTP-antwoord; bestaande, volledige lijsten veroorzaken geen save.
+    if (gewijzigd) save();
   };
   // Aanvragen en ticketuitgifte blijven onder dezelfde poolopslag als de winkel.
   // De betaalafhandelaar krijgt alleen deze operaties, niet de volledige database.

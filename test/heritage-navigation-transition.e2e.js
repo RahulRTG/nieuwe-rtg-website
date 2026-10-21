@@ -2,7 +2,7 @@
 /* Echt document-navigeren: geen HTML-response-rewrite of foutfilter. De
    observer van de app moet er zijn voordat pagereveal plaatsvindt. */
 const test=require('node:test'),assert=require('node:assert/strict');
-const {startServer,stop,laadPlaywright,browserOpties,geenBrowser}=require('./helper');
+const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,letOpFouten}=require('./helper');
 const {haalSessies,opslagVoor}=require('../scripts/lib/proefsessies');
 const {maakContext}=require('../scripts/appwerkt');
 const pw=laadPlaywright(),skip=geenBrowser(pw);
@@ -34,7 +34,7 @@ for(const mode of ['normaal','annuleren','verminderd'])test('Heritage echte navi
   },mode);
   const page=await ctx.newPage();
   await page.emulateMedia({reducedMotion:mode==='verminderd'?'reduce':'no-preference'});
-  page.on('pageerror',e=>errors.push({name:e.name,message:e.message}));
+  letOpFouten(page,errors,{eigenZeef:true});
   await page.goto(srv.base+'/apps/connect.html',{waitUntil:'load'});
   await page.waitForFunction(()=>window.__rtgNavigatieProef.onthuld&&window.__rtgNavigatieProef.klaar);
   for(let n=0;n<5;n++)for(const route of ['/apps/foundation/buurtruil.html','/apps/connect.html']){

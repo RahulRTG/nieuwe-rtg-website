@@ -90,6 +90,40 @@ test('Directpay: twee workers, conflicterende retries en echte procescrashes', {
       assert.equal((await betaal(a, k, { bedrag: 8.31 })).status, 409);
       preciesEen(await opgeslagen(k));
     });
+    await t.test('andere actor en gast krijgen geen vreemde betalingshistorie of financiële mutatie', async () => {
+      const k = sleutel('deepgreen-race');
+      const eigen = await api(a, 'betaal/mijn', {});
+      assert.equal(eigen.status, 200);
+      const opgeslagenBetaling = (await opgeslagen(k)).betalingen[0];
+      assert.ok(opgeslagenBetaling);
+      const betaling = eigen.body.betalingen.find(x => x.ref === opgeslagenBetaling.ref);
+      assert.ok(betaling, 'positieve controle: eigenaar ziet zijn betaling');
+      const ander = (await api(b, 'login', { tier: 'lifestyle' }, null)).body.token;
+      const gast = (await api(b, 'login', { tier: 'guest' }, null)).body.token;
+      assert.ok(ander && gast);
+      const voor = await opgeslagen(k);
+      for (const token of [ander, gast]) {
+        const vreemd = await api(b, 'betaal/mijn', { key: 'business', codename: 'business', ref: betaling.ref }, token);
+        assert.equal(vreemd.status, 200);
+        assert.ok(Array.isArray(vreemd.body.betalingen));
+        assert.equal(vreemd.body.betalingen.some(x => x.ref === betaling.ref), false);
+      }
+      const verboden = await api(b, 'betaal/direct', body(k, { key: 'business', codename: 'business' }), gast);
+      assert.equal(verboden.status, 403);
+      assert.deepEqual(await opgeslagen(k), voor, 'verboden verzoeken wijzigen geen betalingswaarheid, boeking of ontvangsten');
+    });
+    await t.test('ingetrokken sessie kan op andere worker geen betaling lezen of maken', async () => {
+      const token = (await api(a, 'login', { tier: 'business' }, null)).body.token;
+      assert.ok(token);
+      assert.equal((await api(b, 'betaal/mijn', {}, token)).status, 200, 'sessie werkt vóór intrekking op worker B');
+      assert.equal((await api(a, 'logout', {}, token)).status, 200);
+      const k = sleutel('deepgreen-ingetrokken');
+      const voor = await opgeslagen(k);
+      assert.equal((await api(b, 'betaal/mijn', {}, token)).status, 401, 'intrekking geldt ook in ander proces');
+      assert.equal((await api(b, 'betaal/direct', body(k), token)).status, 401);
+      assert.deepEqual(await opgeslagen(k), voor);
+      assert.equal((await api(b, 'betaal/mijn', {})).status, 200, 'andere geldige sessie blijft werken');
+    });
     await t.test('worker dood na providerantwoord, retry op andere worker', async () => {
       const k = sleutel('deepgreen-provider-crash'), marker = path.join(tmp, 'provider-checkpoint.json');
       const c = await start('crash', marker);

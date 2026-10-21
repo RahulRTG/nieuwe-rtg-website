@@ -107,8 +107,20 @@ module.exports = (ctx) => {
          dat niet vastgelegd kon worden telt als MISLUKT met de reden erbij --
          het geld is dan geind en het merkteken niet, en dat moet een mens
          zien, niet een teller verbergen. */
+      let geboekt = false;
+      const boekFee = () => {
+        // De betaling kan hierboven hebben gewacht terwijl een andere ronde
+        // dit ticketjaar al vastlegde. Herlees binnen de bestaande bundel;
+        // betaal-idempotentie alleen voorkomt geen dubbele poolkasboeking.
+        const actueel = db.data.assetTickets.find(x => x.id === t.id);
+        if (!actueel) throw new Error('Het betaalde assetticket ontbreekt bij de vastlegging.');
+        if (actueel.feeJaar === jaar) return;
+        actueel.feeJaar = jaar;
+        kasAdd(a.id, fee * 100);
+        geboekt = true;
+      };
       if (vastleggen) {
-        const nietVast = await vastleggen(() => { t.feeJaar = jaar; kasAdd(a.id, fee * 100); });
+        const nietVast = await vastleggen(boekFee);
         if (nietVast) {
           mislukt++;
           if (!reden) reden = 'De fee is geind maar niet vastgelegd; de opslag bevestigde het niet. ' +
@@ -116,10 +128,10 @@ module.exports = (ctx) => {
           continue;
         }
       } else {
-        t.feeJaar = jaar;
-        kasAdd(a.id, fee * 100);
+        boekFee();
         save();
       }
+      if (!geboekt) continue;
       geind++; totaal += fee;
     }
     return { ok: true, geind, totaal, mislukt, reden, door: schoon(wie, 40) || 'RTG-kantoor',

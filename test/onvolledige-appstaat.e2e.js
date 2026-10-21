@@ -4,7 +4,7 @@
    testserver. Geen productieprovider, geen registermutaties. */
 'use strict';
 const test=require('node:test'), assert=require('node:assert/strict');
-const {startServer,stop,laadPlaywright,browserOpties,geenBrowser}=require('./helper');
+const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,letOpFouten}=require('./helper');
 const pw=laadPlaywright(), skip=geenBrowser(pw);
 let srv,browser,member,staff;
 async function post(p,b,t){const r=await fetch(srv.base+p,{method:'POST',headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})},body:JSON.stringify(b||{})});const d=await r.json();assert.equal(r.status,200,p+': '+JSON.stringify(d));return d;}
@@ -36,7 +36,7 @@ for(const g of gevallen)test(g.app+': onvolledig is onbekend, retry herstelt zon
   const ctx=await browser.newContext({serviceWorkers:'block',reducedMotion:'reduce'});
   try{
    await ctx.addInitScript(([m,s])=>{localStorage.setItem('rtg_member_token',m);localStorage.setItem('rtg_pda_token',s);localStorage.setItem('rtg_cookieinfo_v1','1');},[member,staff]);
-   const page=await ctx.newPage(), fouten=[],mutaties=[];page.on('pageerror',e=>fouten.push(e.message));
+   const page=await ctx.newPage(), fouten=[],mutaties=[];letOpFouten(page,fouten,{eigenZeef:true});
    page.on('request',r=>{if(/\/api\/(staff\/ov\/lijn\/zet|residentie\/(zeg|stap|meubel\/)|member\/magnaat\/leven\/actie|member\/rendezvous\/(like|pas|profiel\/zet))/.test(r.url()))mutaties.push(r.url());});
    let herstel=false, aanvragen=0;
    if(g.app==='rendezvous')for(const [p,d] of Object.entries({tafels:{tafels:[]},introducties:{introducties:[]},circles:{circles:[]}}))await page.route('**/api/member/rendezvous/'+p,r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(!herstel&&p==='introducties'&&defect.introducties?defect.introducties:d)}));
@@ -80,7 +80,7 @@ test('Residentie: ongeldige en uitgevallen pols blokkeren; geldige pols herstelt
  const ctx=await browser.newContext({serviceWorkers:'block',reducedMotion:'reduce'});
  try{
   await ctx.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_cookieinfo_v1','1');},member);
-  const page=await ctx.newPage(),fouten=[];page.on('pageerror',e=>fouten.push(e.message));
+  const page=await ctx.newPage(),fouten=[];letOpFouten(page,fouten,{eigenZeef:true});
   await page.clock.install();
   let modus='geldig';
   await page.route('**/api/residentie/pols',r=>modus==='netwerk'?r.abort('failed'):modus==='leeg'?

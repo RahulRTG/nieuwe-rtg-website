@@ -689,3 +689,57 @@ geen foutfilter. Een andere agent controleerde alle 300 HTML-diffs en herhaalde
 negen centrale tests. De bestaande e2e-loper ontdekt de nieuwe proef via zijn
 bestaande bestandsselectie. Afgeleide websitebeelden en beide SW-afdrukken zijn
 ververst; de 114-appmeting blijft als historische c7acc-meting herkenbaar.
+
+#### Ronde 2 — gesloten bronoorzaken op 21 oktober 2026
+
+Werkstand vanaf `9d37f223caa110ae377133f3cc85c6c91772f2a4`; onderstaande
+gerichte resultaten zijn geen integrale releasekwalificatie.
+
+- De beheerder heeft de loopbackalias hersteld. Dertien eerder geblokkeerde
+  tests slagen ongewijzigd op 9d37, zonder skips.
+- De scenario-opruiming verwijdert nu haar eigen exit-listener. De tegenproef
+  faalde eerst tweemaal; twaalf gerelateerde tests slagen na herstel. Een andere
+  agent herhaalde de twee lifecycleproeven en controleerde de opruimgrens.
+- De bestaande browserfoutcollector respecteert `eigenZeef` nu ook voor zijn
+  vaste ruislijst. Acht echte overgangs-/UI-herstelproeven en 27 taal-/accounttests
+  slagen zonder skips; paginafouten worden niet weggefilterd. De twee grote
+  browserscripts zijn via de bestaande bundelaar gesplitst; beide uitvoerbestanden
+  zijn byte-identiek. Onafhankelijke review bevestigt beide eigenschappen.
+- Vijf standaard-uit rolroutes hebben echte lokale eigenaarbesluiten en positieve
+  eigen handelingen als fixture. De afzonderlijke HTTP-proef slaagt: vijf eigen
+  200-antwoorden, elf geweigerde kruisverzoeken en 22 levende sessiecontroles.
+  De meter weigert deze vijf groen te noemen zonder de positieve routecontrole.
+  Dit vervangt niet de nog benodigde volledige ROLPROEF-/APPWERKT-hermeting.
+- Een echte assetfee-fout is gereproduceerd: twee rondes met dezelfde betaalidentiteit
+  boekten de poolkas tweemaal. De ticketjaarcontrole gebeurt nu opnieuw binnen de
+  bestaande vastlegging. Een afzonderlijke lege-toestandproef reproduceerde HTTP
+  500 door initialisatie zonder save; ook dat is hersteld via de bestaande opslag.
+  Vier pure proeven, de bestaande assettests en een echte PostgreSQL-proef met
+  twee workers slagen. Die laatste controleert één huisbetaling, één poolbijschrijving,
+  saldi, herhaling en herstart; hij bewijst geen willekeurig crashvenster of externe PSP.
+- Directpay: zeven proeven slagen met twee echte workers en PostgreSQL, inclusief
+  synthetische betaling, conflicterende retry, procescrash, accountafscherming en
+  sessie-intrekking over workers. Dit is geen volledige organisatie-/mandaatmatrix.
+- Een onafhankelijke commitbarriereproef vond vroeg succes in de gedeelde
+  idem-kern: een tweede aanroeper las het geheugenantwoord voordat de eerste
+  commit vaststond en hield succes na rollback. De bestaande in-vluchtcontrole
+  staat nu voor de antwoordcache. Beide tegenproeven slagen na de reparatie,
+  inclusief payloadconflict, beide aanroepers 503 bij rollback en precies een
+  boeking bij een gezonde retry. Een andere agent beoordeelde de fix. Dit is
+  bewijs van de gedeelde kern/bundel, niet van iedere buitenste requestcommit.
+- Drie bestaande browserproeven voor video en clips slagen, waaronder werkelijk
+  beeldtransport in beide richtingen en geweigerde oproepen. De vier ontbrekende
+  APPWERKT-fixtures krijgen daardoor niet automatisch acht groene bewijzen.
+
+De bestaande idem-/bank-/Pay-regressies slagen 536/536 zonder skips in hun
+eigen lokale wegwerpdatabases. De eerste brede run erfde ten onrechte de
+PostgreSQL-configuratie en gaf 53 failures; die ongeldige opstelling is bewaard
+als diagnose, niet als productkwalificatie. PostgreSQL wordt afzonderlijk getoetst.
+De broncontrole is na de laatste reparaties en documentafleiding groen.
+De nieuwe PostgreSQL-proef staat in de bestaande verplichte PG-testlijst;
+de commitbarriereproef is met reden geregistreerd als testaanroeper van de
+bestaande duurzame bundel. Geen productaanroeper of kwaliteitsdrempel is toegevoegd
+of versoepeld. Dit broncheckpoint is nog geen releasekandidaat met eindkwalificatie.
+De 25 onverklaarde mutatiecontracten, onvoldoende objectautorisatiebewijzen en
+ontbrekende integrale kwalificatie blijven releaseblokkades. De historische
+appmeting blijft herkenbaar verlopen. Geen merge, productie-uitrol of echte betaling.

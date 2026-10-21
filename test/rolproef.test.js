@@ -87,6 +87,39 @@ function nepServer(antwoord) {
 const TOKENS = () => ({ member: 'tok-member', supplier: 'tok-supplier', office: 'tok-office' });
 const ROUTES = [{ methode: 'POST', pad: '/api/zaak/prijs', rol: 'supplier' }];
 
+test('een ingeschakelde fixturedeur vraagt een geslaagde eigen route, niet alleen vreemde weigeringen', async () => {
+  const route = { methode: 'POST', pad: '/api/leerhuis/lees', rol: 'member' };
+  for (const status of [undefined, 0, 302, 401, 403, 404, 503]) {
+    const nep = nepServer(() => ({ status: 403, data: { error: 'Verboden' } }));
+    const uit = await draaiRolproef({ post: nep.post, routes: [route], tokensVoor: TOKENS,
+      fixtureVoor: () => ({ lijf: { org: 'PROEF', vraag: 'mijn' },
+        eigenRoute: { methode: 'POST', pad: route.pad, status } }) });
+    const rij = uit.perRoute['POST ' + route.pad];
+    assert.equal(rij.acl, 'onbeslist', 'eigen status ' + status + ' bewijst geen werkende deur');
+    assert.equal(rij.privacy, 'onbeslist');
+  }
+});
+
+test('een positieve fixturecontrole hoort bij dezelfde methode, route en invoer van de kruisproef', async () => {
+  const route = { methode: 'POST', pad: '/api/site/domein', rol: 'member' };
+  const lijf = { id: 'mijn-site', domein: 'rolproef-member.example.test' };
+  const nep = nepServer(() => ({ status: 403, data: { error: 'Verboden' } }));
+  const gezien = [];
+  const post = (pad, invoer, token) => { if (pad === route.pad) gezien.push(invoer); return nep.post(pad, invoer, token); };
+  const uit = await draaiRolproef({ post, routes: [route], tokensVoor: TOKENS,
+    fixtureVoor: () => ({ lijf, eigenRoute: { methode: 'POST', pad: route.pad, status: 200 } }) });
+  const rij = uit.perRoute['POST ' + route.pad];
+  assert.equal(rij.acl, 'dicht');
+  assert.deepEqual(gezien, [lijf, lijf]);
+  assert.deepEqual(rij.eigenRoute, { methode: 'POST', pad: route.pad, status: 200 });
+  for (const eigenRoute of [undefined, { methode: 'GET', pad: route.pad, status: 200 },
+    { methode: 'POST', pad: '/api/site/mijn', status: 200 }]) {
+    assert.equal(beoordeelRolrij({ ...rij, eigenRoute }).acl, 'onbeslist');
+  }
+  assert.equal(beoordeelRolrij({ ...rij, eigenRoute: undefined, acl: 'OPEN' }).acl, 'OPEN');
+  assert.equal(beoordeelRolrij({ ...rij, eigenRoute: undefined, privacy: 'LEK' }).privacy, 'LEK');
+});
+
 test('een route die iedereen binnenlaat, wordt per route aangewezen', async () => {
   const nep = nepServer(() => ({ status: 200, data: { ok: true } }));
   const uit = await draaiRolproef({ post: nep.post, routes: ROUTES, tokensVoor: TOKENS });

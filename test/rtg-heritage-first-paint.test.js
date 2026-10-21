@@ -64,3 +64,42 @@ test('alle 298 echte schermen hebben hun centrale blad (Heritage of het Design S
   assert.equal(redirects, 18);
   assert.ok(ds >= 1, 'minstens een scherm staat op het Design System (TRAVELOS-MIGRATIE.md)');
 });
+
+test('iedere app en de twee overige overgangsschermen observeren na CSS en vóór de eerste weergave', () => {
+  const extras=['public/site/404.html','public/ds/voorbeeld.html'].map(p=>path.join(ROOT,p));
+  for(const bestand of [...htmlBestanden(APPS),...extras]) {
+    if(bestand.startsWith(APPS+path.sep) && identiteit.classify(uitrol.appPad(bestand))==='redirect')continue;
+    const html=fs.readFileSync(bestand,'utf8');
+    const scripts=[...html.matchAll(/<script\b[^>]*src=["']\/shared\/rtg-heritage-transition\.js["'][^>]*><\/script>/gi)];
+    assert.equal(scripts.length,1,bestand+': exact één bestaande controller');
+    assert.doesNotMatch(scripts[0][0],/\b(?:defer|async)\b/);
+    assert.match(scripts[0][0],/blocking="render"/);
+    assert.equal(html.slice(scripts[0].index+scripts[0][0].length,html.indexOf('</head>')).trim(),'',bestand+': observer als laatste in head');
+  }
+});
+
+test('overgangsbootstrap consolideert late scripts brongetrouw en idempotent', () => {
+  const vroeg='<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>';
+  const bron='<html><head>\n<link href="/shared/rtg-uniform.css" rel="stylesheet">\n</head><body>\n'+
+    '<script src="/shared/rtg-heritage-transition.js" defer></script>\n'+
+    '<script src="/shared/rtg-heritage-transition.js?v=oud" async></script>\n'+
+    '<script>const voorbeeld = "<script src=\\"/shared/rtg-heritage-transition.js\\" defer><\\/script>";</script>\n'+
+    '<p>Behouden inhoud</p></body></html>';
+  const uit=uitrol.zetOvergang(bron);
+  assert.ok(uit.indexOf(vroeg)>uit.indexOf('<link') && uit.indexOf(vroeg)<uit.indexOf('</head>'));
+  assert.equal(uit.split(vroeg).length,2);
+  assert.doesNotMatch(uit,/src="\/shared\/rtg-heritage-transition.js\?v=oud"/);
+  assert.ok(uit.includes('const voorbeeld ='));
+  assert.ok(uit.includes('<p>Behouden inhoud</p>'));
+  assert.equal(uitrol.zetOvergang(uit),uit);
+});
+
+test('overgangsbootstrap verandert geen redirect en voegt DS geen Heritage-stijlen toe', () => {
+  const redirect=htmlBestanden(APPS).find(p=>identiteit.classify(uitrol.appPad(p))==='redirect');
+  const bron=fs.readFileSync(redirect,'utf8');
+  assert.equal(uitrol.gewenst(redirect,bron),bron);
+  const ds=htmlBestanden(APPS).find(p=>fs.readFileSync(p,'utf8').includes('href="/ds/rtg-ds.css"'));
+  const uit=uitrol.gewenst(ds,fs.readFileSync(ds,'utf8'));
+  assert.doesNotMatch(uit,/rtg-heritage\.css/);
+  assert.match(uit,/<script src="\/shared\/rtg-heritage-transition.js" blocking="render"><\/script>/);
+});

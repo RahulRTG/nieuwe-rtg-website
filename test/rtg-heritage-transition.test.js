@@ -84,9 +84,9 @@ test('inkomende navigatie verwerkt animatieannulering maar verbergt geen onverwa
 test('Berichten en Camera installeren de overgangsbediening voor de eerste weergave', () => {
   for (const route of ['comm', 'camera']) {
     const html = fs.readFileSync(path.join(__dirname, '../public/apps/' + route + '.html'), 'utf8');
-    const script = '<script src="/shared/rtg-heritage-transition.js"></script>';
+    const script = '<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>';
     assert.ok(html.indexOf(script) > html.indexOf('<head>'));
-    assert.ok(html.indexOf(script) < html.indexOf('<link'), route + ': een deferred controller mist pagereveal');
+    assert.ok(html.indexOf(script) > html.indexOf('<link') && html.indexOf(script) < html.indexOf('</head>'), route + ': classic render-blocking observer na de stijlen');
     assert.equal(html.split(script).length, 2);
   }
 });

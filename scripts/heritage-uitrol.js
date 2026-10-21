@@ -6,6 +6,9 @@
    tekenen. Deze mechanische uitrol zet daarom de vaste wereld op <body> en het
    centrale blad als laatste stylesheet in <head>. De routekaart blijft de ene
    autoriteit; redirects krijgen bewust geen volledige appschil.
+   De bestaande overgangsobserver wacht na de stijlen en blokkeert de eerste
+   weergave expliciet, ook bij DS-schermen.
+   Twee expliciete niet-appschermen krijgen uitsluitend diezelfde observer.
 
    Controle:    node scripts/heritage-uitrol.js
    Vastleggen:  node scripts/heritage-uitrol.js --vastleggen */
@@ -18,6 +21,9 @@ const identiteit = require('../public/shared/rtg-world-identity');
 const WORTEL = path.join(__dirname, '..');
 const APPS = path.join(WORTEL, 'public', 'apps');
 const LINK = '<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">';
+const OVERGANG = '<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>';
+// Buiten de app-routekaart: alleen dezelfde vroege observer, geen appskin.
+const EXTRA_OVERGANG = ['public/site/404.html', 'public/ds/voorbeeld.html'];
 const DESKTOP = '<script src="/shared/rtg-world-desktop.js" defer></script>';
 const VASTLEGGEN = process.argv.includes('--vastleggen');
 
@@ -69,6 +75,13 @@ function verwijderLinkregel(bron, link) {
   return bron.slice(0, positie) + bron.slice(positie + link.length);
 }
 
+function zetOvergang(bron) {
+  if (!/<\/head>/i.test(bron)) throw new Error('Geen </head> voor overgangsbootstrap');
+  const zonder = require('./lib/script-bronnen')(bron,
+    src => src.split(/[?#]/)[0] === '/shared/rtg-heritage-transition.js');
+  return zonder.replace(/<\/head>/i, OVERGANG + '\n</head>');
+}
+
 function gewenst(bestand, bron) {
   const route = appPad(bestand);
   const wereld = identiteit.classify(route);
@@ -84,7 +97,7 @@ function gewenst(bestand, bron) {
   if (/<link\b[^>]*href=["']\/ds\/rtg-ds\.css["']/i.test(bron)) {
     const w = attribuut(body[0], 'data-rtg-world');
     if (w !== wereld) throw new Error(route + ' noemt ' + w + ', routekaart noemt ' + wereld);
-    return bron;
+    return zetOvergang(bron);
   }
   const bestaandeWereld = attribuut(body[0], 'data-rtg-world');
   const bestaandeSkin = attribuut(body[0], 'data-rtg-skin');
@@ -112,7 +125,7 @@ function gewenst(bestand, bron) {
   }
   if (!/<\/head>/i.test(uit)) throw new Error('Geen </head> in ' + route);
   uit = uit.replace(/<\/head>/i, DESKTOP + '\n' + LINK + '\n</head>');
-  return uit;
+  return zetOvergang(uit);
 }
 
 function voerUit() {
@@ -131,9 +144,18 @@ function voerUit() {
     if (VASTLEGGEN) fs.writeFileSync(bestand, nieuw);
   }
 
+  for (const extra of EXTRA_OVERGANG) {
+    const bestand = path.join(WORTEL, extra);
+    const bron = fs.readFileSync(bestand, 'utf8');
+    const nieuw = zetOvergang(bron);
+    if (nieuw === bron) continue;
+    verschillen.push(appPad(bestand));
+    if (VASTLEGGEN) fs.writeFileSync(bestand, nieuw);
+  }
+
   console.log('RTG Heritage-uitrol: ' + echte + ' schermen, ' + redirects + ' redirects.');
   if (!verschillen.length) {
-    console.log('PASS: wereld en stylesheet staan vanaf de eerste paint vast.');
+    console.log('PASS: wereld, stylesheet en vroege overgangsobserver staan vast.');
     return 0;
   }
   console.log((VASTLEGGEN ? 'BIJGEWERKT' : 'ACHTER') + ': ' + verschillen.length + ' schermen.');
@@ -143,4 +165,4 @@ function voerUit() {
 }
 
 if (require.main === module) process.exitCode = voerUit();
-module.exports = { gewenst, appPad, voerUit, LINK, zetAttribuut };
+module.exports = { zetOvergang, OVERGANG, EXTRA_OVERGANG, gewenst, appPad, voerUit, LINK, zetAttribuut };

@@ -635,3 +635,57 @@ De 63 opwaartse en 105 primitief-naar-domeinkoppelingen zijn nog niet
 verminderd. Financiële proeven blijven lokale synthetische scenario's;
 externe providerduurzaamheid en alle SQL-crashvensters zijn niet bewezen.
 Status ORANJE voor voortgang, releasepoort niet groen. Geen merge of uitrol.
+
+#### Ronde 2 — herkwalificatie op c7accbc59b
+
+De bewijsproducenten zijn opnieuw uitgevoerd nadat de offline-shellafdrukken
+vastlagen. Op `c7accbc59bd2729a21a660e7a007c4cd32907ef4` telt APPWERKT
+7 BEWEZEN, 102 NIET_GETEST, 1 GEBLOKKEERD_DOOR_DEFECT en 4 GEEN_FIXTURE.
+Bereikbaar 99, bedienbaar 92, menselijk 106, voltooibaar 110,
+waarheidsgetrouw 98, persistent 110, bevoegd 8 en herstelbaar 110.
+Dit zijn aantallen binnen de scenario's van de meters, geen volledige
+appveiligheids- of Premium Ready-verklaring. De historische 9/114 is niet
+rechtstreeks vergelijkbaar met de aangescherpte autorisatiemeter.
+
+Ontdekken heeft een native paginaovergangsfout. De browser berekent de
+inkomende opt-in vóór de controller een overgangsobject ontvangt. De centrale
+Heritage-uitrol wordt daarom beproefd met de bestaande controller na de
+stijlen, renderblokkerend vóór de eerste weergave. Geen globale foutfilter,
+geen tweede controller en geen uitschakeling van overgangsfunctionaliteit.
+Iedere bronwijziging hierna maakt de betrokken c7acc-bewijzen historisch;
+ze mogen niet als geldige eindkwalificatie van de gewijzigde boom tellen.
+
+Een volledige run in de vaste c7acc-kopie is afgebroken toen bleek dat het
+meegecommitteerde ROLPROEF-register nog van vóór de SW-wijziging stamde.
+De versheidscontrole hield terecht alle ACL-rijen open. Na verse productie
+slagen de 21 betrokken routedossier-/bevoegdheidstests zonder filterwijziging.
+Deze afgebroken run heeft geen volledige suitescore.
+
+Sluitvolgorde voor de resterende kwalificatie:
+
+1. Browserreparatie laten slagen op normale navigatie, echte annuleringen en
+   reduced motion; onafhankelijke review van bron én proef.
+2. Alle afgeleide bronafdrukken verversen vóór de volgende bevriezing.
+3. Bewijsproducenten afronden vóór APPWERKT start; een lopende VOLTOOIPROEF
+   mag niet onderweg worden ingewisseld onder dezelfde samengestelde meting.
+4. Lokale beheerder voltooit de reeds gevraagde loopbackconfiguratie; zonder
+   127.0.0.2 blijven dertien infrastructuurproeven geblokkeerd.
+5. Security/test sluit de positieve rol- en objectfixtures; 106 onbewezen
+   apps en de onbesliste routes blijven zichtbaar, geen generiek groenlabel.
+6. Integrator bevriest bron én bewijsinputs, draait tweemaal dezelfde volledige
+   suite en de verplichte browser/financiële/operationele controles.
+
+De VOLTOOIPROEF meldde bovendien een overschrijding van exit-cleanup-listeners.
+Eigenaar testinfrastructuur: lifecycle onderzoeken en opruimen; waarschuwing
+niet onderdrukken. Niet aangetoond als productfout. De financiële PG-proeven
+bewijzen geen externe PSP/webhookvolgorde, tenantoverstijgende betalingen of
+productiefailover. Die blijven afzonderlijke veiligheidsbewijzen.
+
+De overgangsreparatie is daarna gericht geverifieerd: 27 bron-/afdruktests en
+3 echte browsertests slagen op Node 26.12.0, zonder skips. De browserproef
+bevat tien normale overgangen, tien werkelijk geannuleerde overgangen en tien
+reduced-motion-navigaties zonder overgang. Alle paginafouten worden verzameld;
+geen foutfilter. Een andere agent controleerde alle 300 HTML-diffs en herhaalde
+negen centrale tests. De bestaande e2e-loper ontdekt de nieuwe proef via zijn
+bestaande bestandsselectie. Afgeleide websitebeelden en beide SW-afdrukken zijn
+ververst; de 114-appmeting blijft als historische c7acc-meting herkenbaar.

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-21T06:03:47.266Z",
-  "commit": "87234eeb28",
+  "op": "2026-10-21T10:38:51.360Z",
+  "commit": "c7accbc59b",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 5,
   "instrument": "scripts/idorproef.js",
   "node": "v26.12.0"
  },
@@ -143,8 +143,8 @@
    ]
   },
   "merktekens": {
-   "vanA": 351,
-   "controle": 292
+   "vanA": 355,
+   "controle": 291
   }
  },
  "doorbraken": [],
@@ -1894,7 +1894,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkdb7136b882"
+    "mrk7cef70db08"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -1907,7 +1907,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkdb7136b882"
+    "mrk7cef70db08"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2519,8 +2519,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Saffieren Ooievaar 8681",
-    "mrkdb7136b882"
+    "Zeearend E6BE",
+    "mrk7cef70db08"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2533,8 +2533,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Saffieren Ooievaar 8681",
-    "mrkdb7136b882"
+    "Zeearend E6BE",
+    "mrk7cef70db08"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -4545,7 +4545,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Saffieren Ooievaar 8681"
+    "Zeearend E6BE"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -6559,8 +6559,8 @@
    "staat": "afgebakend",
    "merken": 7,
    "voorbeeld": [
-    "mrkdb7136b882",
-    "agebaa5d3c"
+    "mrk7cef70db08",
+    "age87af53f"
    ],
    "reden": "A kreeg 200 met 7 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -7501,7 +7501,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Saffieren Ooievaar 8681"
+    "Zeearend E6BE"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -9681,7 +9681,7 @@
     "kamerid"
    ],
    "gezien": [
-    "Gouden Panter 1845"
+    "Nachtorchidee 99FA"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een kamercode werkt als een vergaderlink: wie hem heeft mag binnen, en een BESLOTEN kamer weigert alsnog (magErin). B komt binnen als B, met zijn eigen codenaam"
   },
@@ -29769,7 +29769,7 @@
     "postid"
    ],
    "gezien": [
-    "Gouden Panter 1845"
+    "Nachtorchidee 99FA"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin"
   },
@@ -45803,7 +45803,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar 8681"
+    "Zeearend E6BE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C's profiel schreef, met A's codenaam als schrijver"
   },
@@ -45909,7 +45909,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar 8681"
+    "Zeearend E6BE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: kern/metier/zoek.js: \"wie niets invulde, staat niet in de etalage\" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw"
   },
@@ -47379,8 +47379,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "mrkdb7136b882",
-    "Contact-mrkdb7136b882"
+    "mrk7cef70db08",
+    "Contact-mrk7cef70db08"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -51989,7 +51989,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar 8681"
+    "Zeearend E6BE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf"
   },
@@ -52024,7 +52024,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar 8681"
+    "Zeearend E6BE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven"
   },
@@ -55138,7 +55138,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "pw_dh8vTM5I-_fvnsSr"
+    "pw_5h8KzSig2Z4qx7l9"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -62687,7 +62687,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Saffieren Ooievaar 8681"
+    "Zeearend E6BE"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []

@@ -3,10 +3,10 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-10-21T23:04:42.443Z",
-  "commit": "8eb1101897",
+  "op": "2026-10-21T23:10:08.621Z",
+  "commit": "20a1a639fd",
   "boomVuil": true,
-  "boomAnders": 11,
+  "boomAnders": 12,
   "instrument": "scripts/stillezing.js",
   "node": "v26.12.0"
  },
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4848,
+    "regel": 4850,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5352,
+    "regel": 5354,
     "leest": [
      "APPWERKT.json",
      "MUTATIECONTRACT.json"
@@ -230,7 +230,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5623,
+    "regel": 5625,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -238,7 +238,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5799,
+    "regel": 5801,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -246,7 +246,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5812,
+    "regel": 5814,
     "leest": [
      "NORM.json"
     ],
@@ -254,7 +254,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 6027,
+    "regel": 6029,
     "leest": [
      "APPWERKT.json"
     ],

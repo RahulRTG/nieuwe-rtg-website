@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-21T21:56:53.294Z",
-  "commit": "8eb1101897",
-  "boomVuil": true,
-  "boomAnders": 5,
+  "op": "2026-10-21T23:07:47.553Z",
+  "commit": "20a1a639fd",
+  "boomVuil": false,
+  "boomAnders": 3,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v26.12.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -325,13 +325,13 @@
   },
   {
    "sleutel": "POST /api/aanmelding/aanvraag",
-   "bestand": "server/routes/aanmeldingen.js:39",
+   "bestand": "server/routes/aanmeldingen.js:40",
    "staat": "openbaar",
    "reden": "een aanstaande aanvrager is nog geen lid (met rem per ip)"
   },
   {
    "sleutel": "POST /api/aanmelding/bewijs",
-   "bestand": "server/routes/aanmeldingen.js:131",
+   "bestand": "server/routes/aanmeldingen.js:141",
    "staat": "openbaar",
    "reden": "hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor"
   },

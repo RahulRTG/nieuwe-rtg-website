@@ -3524,6 +3524,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
     ['server/lib/verraad-catalogus.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep. Stond op verraad.js tot de catalogus daar op 13 september uit is geknipt (keuringsregel 13); de lijst is daarmee VERPLAATST en niet gegroeid'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
+    ['server/lib/idem-behouden.js', 'migreert een beschermde ontvangst binnen dezelfde in-vluchtpoort en draagt uitsluitend de duurzaam-vlag van de bestaande idem-aanroeper door; kiest zelf geen nieuw duurzaam domein'],
     ['server/lib/idem-zondersleutel.js', 'de tak van lib/idem.js voor werk ZONDER sleutel in een laag die duurzaam verklaarde: dezelfde belofte als met sleutel (schrijfproef 18 oktober 2026: /api/bank/rekening/open en /api/bank/pas/uitgeven gaven 200 over een opslag die niets had)'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
     ['server/opzet/lijfpoort.js', 'bouwt de duurzame vastlegger voor het kritiekspoor: een geldhandeling, privacyexport of machtiging gaat pas door als de regel `toegestaan` aantoonbaar staat (A-P1-05)'],
@@ -3607,7 +3608,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        afgeschreven. Eenmaal betaald, tweemaal geboekt. */
     ['server/kern/assets.js', 'de servicefee: geind geld en het merkteken dat het geind is, horen als EEN duurzame commit te landen -- anders boekt de volgende ronde de kas nog een keer'],
     ['server/opzet/inzagespoor.js', 'het inzagejournaal: wie te horen krijgt dat een kluis is geopend, hoort dat spoor na een herstart terug te vinden -- en waar het spoor niet vaststaat, gaat de inzage niet door'],
-    ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert']
+    ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert'],
+    ['test/idem-beschermd.test.js', 'bewijst met een nagemaakte duurzame bundel dat beschermde ontvangst-migratie commit of rollback deelt; de test voert geen echte commit uit']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

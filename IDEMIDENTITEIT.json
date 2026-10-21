@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-20T09:21:44.555Z",
-    "commit": "d14f1ae752",
+    "op": "2026-10-21T23:08:14.638Z",
+    "commit": "20a1a639fd",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 10,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v26.12.0"
   },
@@ -165,22 +165,18 @@
     },
     {
       "bestand": "server/kern/bank/rekeningen.js",
-      "regel": 68,
+      "regel": 82,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
-        "c",
-        "idem"
+        "sleutel"
       ],
       "afdrukNamen": [
-        "c",
-        "naam",
-        "soort"
+        "afdruk"
       ],
-      "regelTekst": "return metIdem(idem ? 'rekopen:' + c + ':' + idem : null,",
+      "regelTekst": "return metIdem(sleutel, afdruk, () => {",
       "afdrukExtra": [
-        "naam",
-        "soort"
+        "afdruk"
       ],
       "uitspraak": "voegtToe"
     },

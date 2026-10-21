@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-21T22:09:08.834Z",
-  "completedAt": "2026-10-21T22:09:30.912Z",
+  "startedAt": "2026-10-21T23:07:53.751Z",
+  "completedAt": "2026-10-21T23:08:13.663Z",
   "node": "v26.12.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "484bc81b5d863a148a738994754a6cc26dfeada8d6fa59664402723b4960b746",
+  "testOutputSha256": "d14d62a1ab3d4070b31015b868c7596388a216b35def2ec5fbcc6b7bd7c35dbf",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
     "public/apps/access/portal.css": "179b7fd31a231fea52fd7fc30999b115e93cf13001f2f7621275e0abcb40b181",
@@ -24,7 +24,7 @@
     "server/talen.js": "993c59f4fe76ef1110c384d6fc91d2f4e3aeece2fbca12bbda2922ae898a84c2",
     "server/routes/onboarding.js": "08d74042f7846b0cd177e2dfca7d25f9bea7b1103774e85a4616b3f61d09d2dd",
     "server/kern/onboarding/lid.js": "4b27dfdc86b519871c0b7a234eb94347a25991aba0d91e55df5d68f4ae6306f1",
-    "test/helper.js": "6611556182029f0c1bd8212e7fb4a676fd1d2802c4f25b6626f295b29e92633f",
+    "test/helper.js": "c9c51ca24dbe884da294d90b474ad7cb55e7b596b9cb1fa40e3e594ecb4bd0fc",
     "scripts/lib/scherm.js": "9bb3c9eb5390baabb2c69dc798a1e88cfe9d07238f394273221548f53685eb5b",
     "server/translate/batch-model.js": "160464622941708e22843d7e50c6bc92e62512ca2e622f98dd70646543295a6c",
     "server/translate.js": "a9bdd5f0ec8b41494dde3cd2c15aa074087045a162ae65890c52e19fde58cf70",

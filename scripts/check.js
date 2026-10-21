@@ -4843,8 +4843,11 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
   {
     const REG = path.join(ROOT, 'BEDRADING.json');
     let oud = null, onleesbaar = null;
-    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); }
-    catch (e) { if (!e || e.code !== 'ENOENT') onleesbaar = String(e && e.message); }
+    try {
+      oud = JSON.parse(fs.readFileSync(REG, 'utf8'));
+    } catch (e) {
+      if (!e || e.code !== 'ENOENT') onleesbaar = String(e && e.message);
+    }
     if (!oud) {
       fout('BEDRADING.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'ontbreekt') +
         ' -- draai node scripts/check.js met een verse meting');

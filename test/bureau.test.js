@@ -245,11 +245,11 @@ test('de grens bepaalt of een zaak doorloopt of op uw handtekening wacht', async
   const tok = await lidMet('lifestyle');
   await bu('delegatie/zet', { domein: 'vervoer', niveau: 3, grensCenten: 250000 }, tok);
 
-  const binnen = await json(await bu('zaak/open', { titel: 'Beurt', domein: 'vervoer', bedragCenten: 200000 }, tok));
+  const binnen = await json(await bu('zaak/open', { idem: 'zaak-fixture-248', titel: 'Beurt', domein: 'vervoer', bedragCenten: 200000 }, tok));
   assert.equal(binnen.zaak.status, 'in uitvoering');
   assert.equal(binnen.zaak.beslissing.nodig, false);
 
-  const buiten = await json(await bu('zaak/open', { titel: 'Nieuwe wagen', domein: 'vervoer', bedragCenten: 30000000 }, tok));
+  const buiten = await json(await bu('zaak/open', { idem: 'zaak-fixture-252', titel: 'Nieuwe wagen', domein: 'vervoer', bedragCenten: 30000000 }, tok));
   assert.equal(buiten.zaak.status, 'wacht op uw akkoord');
   assert.equal(buiten.zaak.beslissing.nodig, true);
   const regie = await json(await bu('zaken', {}, tok));
@@ -261,7 +261,7 @@ test('de grens bepaalt of een zaak doorloopt of op uw handtekening wacht', async
   assert.ok(!JSON.stringify(beeld).includes('30000000'), 'het regiebeeld draagt geen domeinbedrag');
 
   // een bijzonder verzoek gaat ALTIJD langs het lid, ook binnen de grens
-  const bijz = await json(await bu('zaak/open', { titel: 'Iets onmogelijks', soort: 'bijzonder',
+  const bijz = await json(await bu('zaak/open', { idem: 'zaak-fixture-264', titel: 'Iets onmogelijks', soort: 'bijzonder',
     domein: 'vervoer', bedragCenten: 100 }, tok));
   assert.equal(bijz.zaak.status, 'wacht op uw akkoord');
   assert.ok(bijz.zaak.team.some(t => t.rol === 'Sourcing-specialist'));
@@ -274,8 +274,8 @@ test('de grens bepaalt of een zaak doorloopt of op uw handtekening wacht', async
 test('een besloten zaak bereikt het concierge-bureau niet', async () => {
   const tok = await lidMet('lifestyle');
   const otok = await officeTok();
-  const open = await json(await bu('zaak/open', { titel: 'Gewoon verzoek', domein: 'huishouden' }, tok));
-  const besloten = await json(await bu('zaak/open', { titel: 'Second opinion', domein: 'gezondheid' }, tok));
+  const open = await json(await bu('zaak/open', { idem: 'zaak-fixture-277', titel: 'Gewoon verzoek', domein: 'huishouden' }, tok));
+  const besloten = await json(await bu('zaak/open', { idem: 'zaak-fixture-278', titel: 'Second opinion', domein: 'gezondheid' }, tok));
 
   // ook hier voluit, zodat de meter /api/office/bureau ziet staan
   const desk = await json(await raw('/office/bureau', {}, otok));
@@ -293,7 +293,7 @@ test('een besloten zaak bereikt het concierge-bureau niet', async () => {
 test('alleen een mens achter het bureau kan een zaak op geregeld zetten', async () => {
   const tok = await lidMet('lifestyle');
   const otok = await officeTok();
-  const z = await json(await bu('zaak/open', { titel: 'Tafel voor acht', domein: 'gelegenheden' }, tok));
+  const z = await json(await bu('zaak/open', { idem: 'zaak-fixture-296', titel: 'Tafel voor acht', domein: 'gelegenheden' }, tok));
   assert.equal(z.zaak.status, 'wacht op uw akkoord');
 
   const desk = await json(await oc('bureau', {}, otok));
@@ -461,7 +461,7 @@ test('een verzoek valt uiteen in deelopdrachten, elk met een eigen mandaat', asy
   const tok = await lidMet('lifestyle');
   // twee domeinen, twee verschillende mandaten -> twee verschillende uitkomsten
   await bu('delegatie/zet', { domein: 'huishouden', niveau: 4, grensCenten: 100000 }, tok);
-  const z = await json(await bu('zaak/open', { titel: 'Diner voor dertig', domein: 'gelegenheden' }, tok));
+  const z = await json(await bu('zaak/open', { idem: 'zaak-fixture-464', titel: 'Diner voor dertig', domein: 'gelegenheden' }, tok));
   const per = Object.fromEntries(z.zaak.deelopdrachten.map(d => [d.domein, d.magZelf]));
   assert.equal(per.huishouden, true, 'de woning gereedmaken valt onder het mandaat dat u gaf');
   assert.equal(per.vervoer, false, 'vervoer staat nog op voorbereiden en wordt voorgelegd');
@@ -470,7 +470,7 @@ test('een verzoek valt uiteen in deelopdrachten, elk met een eigen mandaat', asy
     'geen enkel verzoek sleept de twee besloten kamers mee');
 
   // een besloten zaak krijgt er helemaal geen
-  const b = await json(await bu('zaak/open', { titel: 'Iets persoonlijks', domein: 'gezondheid' }, tok));
+  const b = await json(await bu('zaak/open', { idem: 'zaak-fixture-473', titel: 'Iets persoonlijks', domein: 'gezondheid' }, tok));
   assert.deepEqual(b.zaak.deelopdrachten, []);
 });
 
@@ -518,7 +518,7 @@ test('een geregelde inkoop schrijft zichzelf in het Bezittingenregister', async 
   const leeg = await json(await ls('bezit', {}, tok));
   assert.equal(leeg.bezittingen.length, 0);
 
-  const z = await json(await bu('zaak/open', { titel: 'Horloge zoals dat van mijn vader',
+  const z = await json(await bu('zaak/open', { idem: 'zaak-fixture-521', titel: 'Horloge zoals dat van mijn vader',
     soort: 'inkoop', domein: 'collectie', bedragCenten: 2500000,
     registreerNaam: 'Patek 3448', registreerSoort: 'horloge' }, tok));
   assert.equal(z.zaak.registreren.gedaan, false, 'nog niet: er is nog niets geleverd');
@@ -547,7 +547,7 @@ test('de avondbriefing telt wat er echt is gebeurd, niet wat er speelt', async (
   assert.equal(stil.gebeurd.length, 0);
 
   await bu('delegatie/zet', { domein: 'huishouden', niveau: 3, grensCenten: 100000 }, tok);
-  await bu('zaak/open', { titel: 'Ramen laten doen', domein: 'huishouden', bedragCenten: 50000 }, tok);
+  await bu('zaak/open', { idem: 'zaak-fixture-550', titel: 'Ramen laten doen', domein: 'huishouden', bedragCenten: 50000 }, tok);
   const na = await json(await bu('briefing', { moment: 'avond' }, tok));
   assert.equal(na.gebeurd.length, 2, 'genoteerd en in uitvoering: twee stappen');
   assert.equal(na.kop, '2 stappen gezet vandaag');
@@ -563,8 +563,8 @@ test('de avondbriefing telt wat er echt is gebeurd, niet wat er speelt', async (
 
 test('de briefing laat de twee besloten kamers erbuiten', async () => {
   const tok = await lidMet('lifestyle');
-  await bu('zaak/open', { titel: 'Second opinion', domein: 'gezondheid' }, tok);
-  await bu('zaak/open', { titel: 'Ramen', domein: 'huishouden' }, tok);
+  await bu('zaak/open', { idem: 'zaak-fixture-566', titel: 'Second opinion', domein: 'gezondheid' }, tok);
+  await bu('zaak/open', { idem: 'zaak-fixture-567', titel: 'Ramen', domein: 'huishouden' }, tok);
   const av = await json(await bu('briefing', { moment: 'avond' }, tok));
   assert.ok(!av.gebeurd.some(x => x.zaak === 'Second opinion'), 'een dagverslag is de verkeerde plek daarvoor');
   assert.ok(av.gebeurd.some(x => x.zaak === 'Ramen'));

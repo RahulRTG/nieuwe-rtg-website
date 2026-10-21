@@ -30,6 +30,7 @@
    5. ONBOARDING OP KANTOOR. Een aanvraag komt binnen, en de beslissing valt
       door een herleidbaar mens in de backoffice. De AI mag die pas nooit zelf
       verlenen. */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, kantoorAlsPersoon } = require('./helper');
@@ -223,14 +224,18 @@ test('Onboarding op kantoor: een aanvraag wordt door een MENS beslist', async ()
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   try {
     const P = post(base);
-    const aanvraag = await P('/api/aanmelding/aanvraag', {
+    const aanvraag = await P('/api/aanmelding/aanvraag', { idem: randomUUID(),
       naam: 'Cato Vos', email: 'cato' + Date.now() + '@x.nl', telefoon: '0612349999',
       pas: 'lifestyle', motivatie: 'Ik reis veel voor mijn werk en wil het uit handen geven.'
     });
     assert.equal(aanvraag.status, 200, 'de aanvraag komt binnen');
-    const id = aanvraag.body.aanmelding.id;
+    const id = aanvraag.body.ontvangst.aanvraagId;
     assert.ok(id, 'en krijgt een kenmerk');
-    assert.equal(aanvraag.body.aanmelding.status, 'in behandeling', 'hij staat in behandeling, niet meteen toegekend');
+    const mens = await kantoorAlsPersoon(base);
+    assert.ok(mens, 'er is een herleidbaar mens in de backoffice om te beslissen');
+    const dossier = await P('/api/aanmelding/een', { id }, mens);
+    assert.equal(dossier.status, 200, 'het bevoegde kantoor kan de aanvraag lezen');
+    assert.equal(dossier.body.aanmelding.status, 'in behandeling', 'hij staat in behandeling, niet meteen toegekend');
 
     /* ZONDER MENS GEEN BESLUIT. Een aanvrager die zijn eigen aanvraag
        goedkeurt hoort te stuiten, en dat is precies wat er gebeurde toen ik
@@ -241,8 +246,6 @@ test('Onboarding op kantoor: een aanvraag wordt door een MENS beslist', async ()
       'zonder backoffice-sessie valt er geen besluit (kreeg ' + zonder.status + ')');
 
     // met een herleidbaar mens in de backoffice wel
-    const mens = await kantoorAlsPersoon(base);
-    assert.ok(mens, 'er is een herleidbaar mens in de backoffice om te beslissen');
     /* `contractEuro` hoort erbij sinds de ladder: een contractuele pas heeft geen
        lijstprijs, dus accepteren zonder afgesproken maandbedrag wordt geweigerd. */
     const besluit = await P('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, mens);

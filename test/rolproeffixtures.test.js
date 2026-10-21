@@ -13,6 +13,7 @@ function wereld(antwoord) {
     if (pad === '/api/techniek/inloggen') data = { token: 'eigenaar', eigenaar: true };
     if (pad === '/api/techniek/functie') data = { status: 'wacht', verzoekId: lijf.id };
     if (pad === '/api/techniek/functie/besluit') data = { status: 'akkoord' };
+    if (pad === '/api/auth/register') data = { token: 'apart-verificatielid' };
     if (pad === '/api/auth/me') data = { user: { id: 42 } };
     if (pad.endsWith('/bewaar')) data = { design: { id: token + '-site' } };
     return { status: 200, data };
@@ -21,10 +22,10 @@ function wereld(antwoord) {
     proeflid: { token: 'lid-eigen' }, tokens: { supplier: 'zaak-eigen' }, kantoorVoor: async () => 'kantoor-naam' }) };
 }
 
-test('vijf fixturecontroles gebruiken echte eigenaarbesluiten en hun eigen actor/invoer', async () => {
+test('fixturecontroles gebruiken echte eigenaarbesluiten en hun eigen actor/invoer', async () => {
   const w = wereld();
   const fixtures = await w.draai();
-  assert.equal(Object.keys(fixtures).length, 5);
+  assert.equal(Object.keys(fixtures).length, FIXTURE_ROUTES.length);
   assert.deepEqual(w.gezien.filter(x => x.pad === '/api/techniek/functie').map(x => x.lijf),
     [{ id: 'leerhuis', aan: true }, { id: 'dom-eigendomein', aan: true }]);
   assert.deepEqual(w.gezien.filter(x => x.pad === '/api/techniek/functie/besluit').map(x => x.lijf.verzoekId),
@@ -34,7 +35,7 @@ test('vijf fixturecontroles gebruiken echte eigenaarbesluiten en hun eigen actor
     const call = w.gezien.find(x => x.pad === r.pad);
     assert.deepEqual(fixture.lijf, call.lijf);
     assert.deepEqual(fixture.eigenRoute, { methode: r.methode, pad: r.pad, status: 200 });
-    assert.equal(call.token, r.rol === 'supplier' ? 'zaak-eigen' : r.rol === 'member' ? 'lid-eigen' : 'kantoor-naam');
+    assert.equal(call.token, r.functie === 'verificatie' ? 'apart-verificatielid' : r.rol === 'supplier' ? 'zaak-eigen' : r.rol === 'member' ? 'lid-eigen' : 'kantoor-naam');
   }
 });
 

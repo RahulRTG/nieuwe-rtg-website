@@ -149,6 +149,22 @@ test('de Future Engine maakt gededupliceerde RTG/RTF-voorstellen en zet niets li
   assert.equal(w.kantoorStatus().voorstellen.length, aantal, 'dezelfde kans wordt niet dubbel gemaakt');
 });
 
+test('bewuste heranalyse omzeilt dagcache maar dupliceert geen voorstellen of geld', t => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-21T12:00:00Z') });
+  const { db, w } = wereld();
+  const eerste = structuredClone(w.kantoorStatus().voorstellen);
+  const geld = { pay: structuredClone(db.data.pay), bank: structuredClone(db.data.bankBoekingen) };
+  for (let i = 0; i < 2; i++) {
+    t.mock.timers.tick(1000);
+    const r = w.scan('controleur', true);
+    assert.equal(r.ok, true);
+    assert.equal(r.overgeslagen, false, 'bewuste activering rekent opnieuw, ook binnen dezelfde dag');
+    assert.equal(db.data.magnaatWereld.laatsteScan, Date.now());
+    assert.deepEqual(r.voorstellen, eerste, 'bestaande voorstellen en besluiten blijven intact');
+  }
+  assert.deepEqual({ pay: db.data.pay, bank: db.data.bankBoekingen }, geld);
+});
+
 test('alleen expliciete menselijke fasebesluiten brengen een voorstel naar test en pilot', () => {
   const { w } = wereld();
   const v = w.kantoorStatus().voorstellen[0];

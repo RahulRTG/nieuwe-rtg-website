@@ -96,6 +96,7 @@ const VELDEN = {
   nalatenschap:   { eigenaar: 'rechterhand', soort: 'kaart', wat: 'documenten, contacten en wensen' },
 
   /* ---- kern/bureau: het zakelijke bureau om het lid heen -------------------- */
+  caseOntvangsten: { eigenaar: 'bureau', soort: 'kaart', wat: 'opdrachtidentiteit en afdruk; blijft na zaakarchivering' },
   cases:          { eigenaar: 'bureau',      soort: 'lijst', wat: 'lopende zaken' },
   dieren:         { eigenaar: 'bureau',      soort: 'lijst', wat: 'de dieren van het lid' },
   beveiliging:    { eigenaar: 'bureau',      soort: 'kaart', wat: 'de beveiligingsstand' },

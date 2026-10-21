@@ -137,9 +137,8 @@ test('5. een klik op een schakel filtert naar het OPENSTAANDE werk', async () =>
   const alles = (await vraag({ limiet: 1 })).body;
   const open = (await vraag({ schakel: 'ACL', limiet: 1 })).body;
 
-  assert.ok(open.lijst.totaal < alles.lijst.totaal,
-    'filteren op een schakel hoort de lijst korter te maken; nu ' + open.lijst.totaal +
-    ' van ' + alles.lijst.totaal + ' -- staat er weer `!!r.cellen[schakel]`?');
+  // Verouderd bewijs kan alle routes ongemeten maken. Verkorting is dan
+  // onjuist; de gemengde fixture hieronder bewaakt dat bewezen/NVT wegvallen.
   /* En het is niet zomaar korter: het is precies het niet-bewezen, niet-nvt deel. */
   const p = alles.perSchakel.ACL;
   assert.equal(open.lijst.totaal, alles.routes - p.bewezen - p.nvt,
@@ -149,6 +148,26 @@ test('5. een klik op een schakel filtert naar het OPENSTAANDE werk', async () =>
   const ongemeten = (await vraag({ schakel: 'ACL', staat: 'ongemeten', limiet: 1 })).body;
   assert.equal(ongemeten.lijst.totaal, p.ongemeten,
     'ACL+ongemeten hoort precies de ongemeten cellen van die as te geven');
+});
+
+test('5b. filter sluit bewezen en nvt uit, maar behoudt alle onbekende routes', t => {
+  const matrix = require('../scripts/bewijsmatrix');
+  const maak = require('../server/routes/office/dossier');
+  let standen = ['bewezen', 'nvt', 'ongemeten', 'open'];
+  t.mock.method(matrix, 'bouw', () => ({
+    routes: standen.length, rijen: standen.map((staat, i) => ({
+      methode: 'POST', pad: '/api/fixture/' + i, cellen: { ACL: { staat } }
+    }))
+  }));
+  const nieuw = () => maak({ kern: { app: { post() {}, _routes: () => [] }, officeAuth() {} } });
+  const gemengd = nieuw();
+  assert.deepEqual(gemengd.overzicht({ schakel: 'ACL' }).lijst.resultaten.map(r => r.pad),
+    ['/api/fixture/2', '/api/fixture/3']);
+  assert.deepEqual(gemengd.overzicht({ schakel: 'ACL', staat: 'ongemeten' }).lijst.resultaten.map(r => r.pad),
+    ['/api/fixture/2']);
+  standen = ['ongemeten', 'ongemeten'];
+  assert.equal(nieuw().overzicht({ schakel: 'ACL' }).lijst.totaal, 2,
+    'ontbrekend actueel bewijs mag nooit routes uit het openstaande werk verwijderen');
 });
 
 test('6. het dossier van EEN route draagt elf cellen met hun reden', async () => {

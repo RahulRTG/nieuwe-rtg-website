@@ -133,12 +133,12 @@ geblokkeerd item zegt welke voorwaarde aantoonbaar vervuld moet zijn. Valt een
 item op dezelfde regel als een gelezen markering, dan wint het besluitbestand.
 
 **De stand bij lezing** (levende getallen uit `APPWERKT.json`, bijgehouden door
-`npm run getallen`): over <!--getal:toezeg.documenten-->177<!--/getal-->
+`npm run getallen`): over <!--getal:toezeg.documenten-->179<!--/getal-->
 documenten zijn er <!--getal:toezeg.toegezegd-->898<!--/getal--> onderdelen
 `toegezegd`, <!--getal:toezeg.afgewezen-->20<!--/getal-->
 `afgewezen-met-grens`, <!--getal:toezeg.besluit-->89<!--/getal-->
 `vraagt-besluit` en <!--getal:toezeg.extern-->10<!--/getal--> `extern`.
-Daarnaast liggen er <!--getal:toezeg.proza-->220<!--/getal--> markeringen in
+Daarnaast liggen er <!--getal:toezeg.proza-->221<!--/getal--> markeringen in
 lopende tekst die bewust niet zijn gelezen.
 
 **Wat hij niet is.** Geen tweede belofteregister: `BELOFTE.json` zegt of de
@@ -784,3 +784,162 @@ versiegebonden ondertekening met behoud van de eerste ontvangst. Er zijn nog
 geen publieke contracten of bijbehorende clients gewijzigd. De overige
 ontbrekende bevoegdheids-, keten- en operationele bewijzen blijven open.
 Geen merge, publieke uitrol of echte financiële transactie uitgevoerd.
+
+### Deep Green — mutatiecontracten, vervolgmeting 21 oktober 2026
+
+Werkbasis: `8eb1101897`, met nog niet gecommitteerde wijzigingen. Dit vervolg
+vervangt de voorgaande momentopname dat clients en routes nog ongewijzigd zijn;
+het vervangt geen historische testuitslagen en kwalificeert geen release.
+
+- Bankrekeningopening vereist een opdrachtidentiteit en serverbepaalde actor.
+  Zaakhouder wordt gecontroleerd via de bestaande leveranciersbron. Conflicten
+  binden de volledige inhoud; nieuwe opdrachten blijven mogelijk.
+- Bureauzaken en werkplektaken bewaren ontvangstmetadata binnen hun bestaande
+  collectietransactie. Archivering van het werkobject maakt dezelfde opdracht
+  niet opnieuw uitvoerbaar. Oudere clients zonder sleutel worden geweigerd.
+- Ondertekening vereist de gelezen contractversie. Ontvangstgeschiedenis en
+  eerste tijdstip blijven bewaard. Nieuwe hashes binden ook titel, scope en
+  profiel; ontbrekende historische gegevens worden niet achteraf verzonnen.
+- Labfonds-advies en Magnaat-scan rekenen opnieuw. Een Labfonds-advies wacht
+  nu via de bestaande duurzame bundel op opslagbevestiging. Tegenproef eerst
+  rood, daarna groen; geen nieuwe financiële uitvoering.
+- Lezen van onboardingstatus en het lege bankbord initialiseert niet langer
+  stil collecties zonder opslagbevestiging. Beide fouten zijn eerst met rode
+  tegenproeven gereproduceerd.
+
+Gerichte lokale resultaten onder Node 26: 83 bestaande HTTP-regressies groen;
+39 gerichte contract-/client-/leesproeven groen; 35 analyse- en bestaande
+Magnaat/Labfonds-proeven groen. Deze verzamelingen overlappen gedeeltelijk en
+worden niet opgeteld tot een platformtotaal. Echte geïsoleerde PG-workers:
+ondertekening met rollbacktrigger en SIGKILL vóór/na commit, bankreplay en
+herstart, bureauzaak en werkplektaak slagen in hun benoemde scenario's.
+De nieuwe PG-bestanden zijn opgenomen in de bestaande verplichte toetslijst.
+Dit bewijst geen hostuitval, alle autorisatie-intrekkingen of volledige ketens.
+
+Onafhankelijke review vond daarna een clientrace: een laat antwoord kon de
+opdrachtsleutel van een nieuwere opdracht wissen. Tegenproeven reproduceerden
+dit in bureau, werkplek en bank. Wissen vergelijkt nu de verzonden sleutel met
+de actuele sleutel; verlate successen overschrijven geen nieuwere opdracht.
+Bij browseropslagfalen versturen bureau en bank niets. De centrale herhaling
+van deze gerichte client- en contractproeven slaagt: 26/26, nul skips.
+De aanvraagroute blijft open werk: gezamenlijke aanvraag/ontvangstopslag en
+retentie vereisen het besluitvoorstel in MUTATIECONTRACT.md; geen nieuwe
+opslagarchitectuur is goedgekeurd of ingevoerd.
+
+De volledige suite op de schone `8eb1101897`-werkstand is geen kwalificatie:
+bewijsmatrix liep vast en is afzonderlijk gestopt; native proefbinaries
+ontbraken aanvankelijk in die werkstand en zijn daarna uit dezelfde bron
+gebouwd. Beide omstandigheden blijven zichtbaar. De suite vervolgt overige
+bestanden; een integrale herhaling in een complete omgeving blijft verplicht.
+De zeven contracten blijven conservatief ongekwalificeerd in het register.
+Geen productie-uitrol, merge of echte betaling uitgevoerd.
+
+De geïsoleerde bewijsmatrixherhaling op dezelfde `8eb1101897` bron slaagt
+31/31 binnen een externe deadline van 120 seconden. Dit verklaart de eerdere
+hang niet en maakt de gestopte volledige run niet alsnog groen. Gerichte logs
+en bronstatus staan in het bestaande externe evidencepad `round2`, met hashes
+in `mutation-contract-progress.json`; geen tweede kwaliteitsregister.
+
+**Vervolg na het eigenaarsbesluit voor de integrale afbouwronde.** De eigenaar
+heeft de beperkte uitbreiding van de bestaande transactiepoort goedgekeurd en
+de keuze van ontvangstbewaring en antwoordvorm gedelegeerd. De eerdere tekst
+hierboven over een nog ontbrekend architectuurbesluit is daarmee historisch.
+Het actuele productbesluit staat in MUTATIECONTRACT.md §9.3. Aanvraaginhoud
+krijgt geen langere bewaartermijn door dit besluit; minimale ontvangstmetadata
+blijft nodig zolang oude opdrachtkeys geldig blijven. Geen wettelijke
+complianceclaim of onbeperkte bewaring van aanvraaginhoud.
+
+De meervoudige PostgreSQL-poort is gericht beproefd: 8/8 geslaagd zonder skips,
+inclusief gezamenlijk auditspoor en rollback bij de tweede write. De lokale
+opslagregressies slagen 72/72; die telling omvat overlappende gerichte proeven
+en mag niet bij eerdere tellingen worden opgeteld. Een gevonden verlies van
+lokaal voorbereide inhoud bij een nog ontbrekende KV-rij is met een rode
+tegenproef gerepareerd. Verdere bronwijzigingen vereisen nieuwe verificatie.
+
+De historische volledige run op `8eb1101897` is afgerond met exitcode 1.
+Alle 48 PostgreSQL-bestanden slaagden, maar de overige failures en de eerder
+onderbroken bewijsmatrix blijven open bewijs. Na bouwen van de ontbrekende
+motor slagen de 15 betreffende native tests op dezelfde bron. Dit is geen
+retroactieve groenverklaring van de volledige run. De taal-/browserproef
+slaagde 27/27 en vernieuwde uitsluitend haar bestaande, afgebakende rapporten.
+
+De aanvraagmigratie is nog in uitvoering. De eerste integratieproef ontdekte
+een nieuwe grensschending in de privacybedrading waardoor serverstart faalde.
+Deze is hersteld met twee beperkte callbacks, zonder brede toegang tot de
+aanmeldmodule; één echte intakeproef en 30 bestaande HTTP-proeven slagen.
+De PostgreSQL-aanvraagproef heeft nog failures, waaronder accountwissing die
+botst op het onveranderlijke auditspoor. Deze geldt niet als gesloten bewijs.
+De aanvullende bankproef slaagt 3/3, inclusief echte procesuitval vóór en ná
+COMMIT. Opruiming van oude bank-idempotentiesleutels blijft afzonderlijk te
+onderzoeken. Status blijft ORANJE: geen exacte gekwalificeerde kandidaat, geen
+twee groene runs en geen actuele volledige APPWERKT-kwalificatie.
+
+**Vervolgmeting aanvraag en audit.** De hiervoor genoemde aanvraagfailures zijn
+gericht hersteld. De echte PostgreSQL-aanvraagproef slaagt 7/7, inclusief
+accountwissing en herhaling na opruiming. Procesuitval met SIGKILL vóór COMMIT
+en na COMMIT maar vóór antwoord slaagt 3/3: geen tweede aanvraag. Dit zijn
+proeven op de gewijzigde werkboom, geen exacte releasecommitkwalificatie.
+
+De auditpoort accepteert nu een geldige actorwissing gevolgd door normale
+nieuwe auditregels binnen dezelfde transactie. De keten, volledige wissing,
+unieke log-identiteiten en teller blijven gecontroleerd. Een onafhankelijke
+review ontdekte hergebruik van oude log-ID’s; de tegenproef is toegevoegd en
+het probleem hersteld. De gerichte audit/requestregressies slagen 21/21 en de
+onafhankelijke herbeoordeling is akkoord. De gecombineerde transportcontrole
+houdt nog één open specialist-routing-failure; die wordt niet genegeerd.
+
+Ontvangstbewaring en het compacte antwoord volgen MUTATIECONTRACT.md §9.3.
+Na verwijdering van inhoud/vingerafdruk antwoordt een oude intentie met 410,
+niet met een schijnbaar geslaagde herhaling. De broninventaris vindt geen
+ongemigreerde productcaller van de externe aanvraagroute; dit vervangt geen
+volledige gebruikersketenproef. Platformstatus blijft ORANJE.
+
+De onafhankelijke bankreview heeft de crashproef aangescherpt: alle drie
+bankcollecties moeten vóór de COMMIT-barrière geschreven zijn; ontvangst,
+inhoudsafdruk en eerste openingstijdstip worden direct na de crash en na beide
+worker-retries exact gecontroleerd. Na correctie van een verwachte
+kantooridentiteit in de fixture slaagt de herhaling 3/3; review akkoord.
+De aanvullende verificatie-isolatieproeven met echte HTTP-accounts slagen
+2/2. Deze bewijzen sluiten uitsluitend hun benoemde scenario’s, niet alle
+114 apps. De statische controle meldt nog verouderde afgeleide registers en
+taalbewijs. Die worden pas na bronstabilisatie opnieuw gemeten.
+
+### Deep Green — afsluiting gerichte mutatie- en regressiebronnen (22 oktober 2026)
+
+Nog steeds werkbasis `8eb1101897` met niet-gecommitteerde integratiewijzigingen;
+dit is geen releasecommit. De bestaande transactiepoort en idem-kern zijn verder
+afgebakend, zonder tweede opslagvoorziening of nieuwe dependency.
+
+- Kantoor-bankontvangsten blijven in de bestaande `bankIdem`-store maar vallen
+  buiten de gewone 20.000-sleutelring. Migratie van een oude ringvermelding deelt
+  dezelfde duurzame bundel en rollback. Een beschermde ontvangst zonder afdruk,
+  geldig antwoord of IBAN stopt met 503. Onafhankelijke herhaling: 40/40 groen;
+  extra opslagprobes bevestigen gesloten falen en identieke replay.
+- De taakopdracht is nu actor + opdrachtsleutel; bedrijf en taakvelden zitten in
+  de inhoudsafdruk. De eerder groene maar onjuiste verwachting dat dezelfde key
+  in een ander bedrijf een nieuwe taak mocht maken is vervangen door het
+  goedgekeurde conflictcontract. De echte PG-workerproef slaagt 4/4, inclusief
+  twee SIGKILL-vensters en sessie-intrekking.
+- De transportcache herkent de zeven mutatieroutes exact, zodat een generieke
+  cache geen oud succes vóór autorisatie of domeincontrole teruggeeft. De
+  gecombineerde aanvraagtransport-, bank- en ticketcontrole slaagt 33/33.
+- De ticketdag gebruikt nu het einde van de lokale Amsterdamse dag. Wintertijd,
+  zomertijdbegin en zomertijdeinde zijn afzonderlijk bewezen. Een gisteren
+  uitgegeven ticket na lokale middernacht wordt geweigerd.
+- De browserovergangsproef eist in de normale stand 10/10 overgangen, in reduced
+  motion nul, en bij expliciete annulering ten minste één echte overgang plus
+  `skipTransition()` voor iedere aangeboden overgang. Chromium slaagt 3/3; een
+  onafhankelijke agent herhaalde dit tweemaal zonder skip of waargenomen
+  instabiliteit. Browsers mogen na annulering volgende overgangen overslaan.
+- De brede idem-/dubbeltik-/ontvangstselectie gaf 312/313 groen. De enige failure
+  was een verouderd gegenereerd registernummer na bronverschuiving, geen
+  productgedrag. De historische failureset gaf daarna 118/121: twee afgeleide
+  registers en één meetadres. De echte meetvorm in `scripts/check.js` is
+  leesbaar gemaakt en de gerichte stillezingcontrole slaagt 7/7.
+
+De zes gerichte PostgreSQL-contractbestanden gaven vóór de taakcorrectie 22/23;
+na de correctie slaagt de afzonderlijke ontbrekende werkplekset 4/4. Een nieuwe
+gezamenlijke platformrun en registerverversing blijven verplicht. Status blijft
+**ORANJE**: nog geen schone kandidaatcommit, geen actuele 114/114-APPWERKT-meting,
+geen twee integrale groene runs en geen operationele vrijgaveproef. Geen merge,
+publieke uitrol of echte betaling uitgevoerd.

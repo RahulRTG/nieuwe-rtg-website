@@ -114,6 +114,10 @@ function beoordeelIdorRij(rij = {}, { methode = rij.routeMethode || rij.methode,
     return { stand: 'gebroken', reden: rij.lek === true ? 'de IDOR-weigering lekt gegevens' : 'IDOR meldt ' + rij.staat };
   if (!METHODEN.has(methode) || rij.methode !== methode || (rij.routePad && rij.routePad !== pad))
     return { stand: 'open', reden: 'de werkelijk gebruikte IDOR-methode of route is niet aangetoond' };
+  if (rij.gang === 'verificatie-opslag') {
+    if (rij.pad !== pad) return { stand: 'open', reden: 'opslagbewijs hoort bij een andere route' };
+    return require('./lib/verificatie-isolatie').oordeel(rij);
+  }
   const ok = s => Number.isInteger(s) && s >= 200 && s < 300;
   if (rij.staat === 'afgebakend' && rij.gang === 'afbakening' && ok(rij.statusA) && ok(rij.status) &&
       Number.isInteger(rij.merken) && rij.merken > 0 && Array.isArray(rij.voorbeeld) &&

@@ -932,7 +932,7 @@ $('#gDoe').addEventListener('click', async ()=>{
 });
 
 // ---- verplichte onboarding + contract (alleen volwassen gezinsleden) ----
-let onbRtfBezig = false, onbRtfProfiel = null;
+let onbRtfBezig = false, onbRtfProfiel = null, onbRtfVersie = null;
 async function onbApiRtf(path, body){
   const s = Sessie.huidig() || {};
   const r = await fetch('/api/rtf/onboarding' + path, {
@@ -940,7 +940,11 @@ async function onbApiRtf(path, body){
     body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
   });
   const d = await r.json().catch(()=>({}));
-  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  if (!r.ok) {
+    const fout = new Error(d.error || 'Er ging iets mis.');
+    fout.status = r.status; fout.code = d.code;
+    throw fout;
+  }
   return d;
 }
 async function checkOnbRtf(profiel){
@@ -970,7 +974,9 @@ function tekenOnbRtf(st){
   });
   $('#rtfOnbCTitel').textContent = st.contract.titel || '';
   $('#rtfOnbCTekst').textContent = st.contract.tekst || '';
-  const ak = $('#rtfOnbAkk'); ak.checked = ak.checked || !!st.contract.ondertekend;
+  const ak = $('#rtfOnbAkk');
+  ak.checked = onbRtfVersie === st.contract.versie && (ak.checked || !!st.contract.ondertekend);
+  onbRtfVersie = st.contract.versie;
   $('#rtfOnbFout').textContent = '';
 }
 $('#rtfOnbDoe').addEventListener('click', async () => {
@@ -978,16 +984,27 @@ $('#rtfOnbDoe').addEventListener('click', async () => {
   const fout = $('#rtfOnbFout'); fout.textContent = '';
   onbRtfBezig = true;
   try {
+    // De klik geldt voor de tekst die hier stond, ook als opslaan intussen een nieuwere versie ziet.
+    const expectedVersion = onbRtfVersie;
+    const naam = ($('#rtfOnbNaam').value || '').trim();
+    const akkoord = $('#rtfOnbAkk').checked;
     const velden = {};
     document.querySelectorAll('#rtfOnbVelden input[data-veld]').forEach(i => { if (i.value.trim()) velden[i.dataset.veld] = i.value.trim(); });
     if (Object.keys(velden).length) { try { await onbApiRtf('/opslaan', { velden }); } catch(e){} }
-    const naam = ($('#rtfOnbNaam').value || '').trim();
-    const akkoord = $('#rtfOnbAkk').checked;
-    const r = await onbApiRtf('/teken', { naam, akkoord });
+    const r = await onbApiRtf('/teken', { naam, akkoord, expectedVersion });
     if (r.klaar){ $('#rtfOnb').hidden = true; onbRtfBezig = false; return; }
     tekenOnbRtf(r);
     fout.textContent = 'Nog niet compleet: vul de resterende velden in.';
-  } catch(e){ fout.textContent = e.message || 'Er ging iets mis.'; }
+  } catch(e){
+    if (e.status === 409 && e.code === 'version_conflict') {
+      $('#rtfOnbAkk').checked = false;
+      try {
+        tekenOnbRtf(await onbApiRtf('/status'));
+        $('#rtfOnbAkk').checked = false;
+        fout.textContent = 'Lees de getoonde overeenkomst opnieuw en geef opnieuw akkoord.';
+      } catch(herstel){ fout.textContent = herstel.message || 'De overeenkomst kon niet worden vernieuwd. Probeer het opnieuw.'; }
+    } else fout.textContent = e.message || 'Er ging iets mis.';
+  }
   onbRtfBezig = false;
 });
 

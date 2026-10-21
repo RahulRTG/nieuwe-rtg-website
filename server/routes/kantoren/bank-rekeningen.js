@@ -29,8 +29,12 @@ module.exports = (ctx) => {
   const sync = () => sseToOffice('sync', { scope: 'bank' });
 
   app.post('/api/office/bank/rekening/open', kluisAuth, async (req, res) => {
-    try { const r = await bank.rekeningOpen({ codenaam: req.body.codenaam, soort: req.body.soort, naam: req.body.naamRek, wie: 'kantoor' });
-      if (r.ok) { afdelingen.audit(naam(req), 'Bankrekening geopend voor ' + r.rekening.iban); sync(); }
+    const idem = req.body.idem || req.body.idempotentieSleutel;
+    if (typeof idem !== 'string' || !idem.trim() || idem.length > 200)
+      return res.status(400).json({ error: 'Een geldige herhaalsleutel is verplicht om een rekening te openen.' });
+    if (!req.officeKey) return res.status(403).json({ error: 'Een herleidbare kantoormedewerker is vereist.' });
+    try { const r = await bank.rekeningOpen({ codenaam: req.body.codenaam, soort: req.body.soort, naam: req.body.naamRek, wie: 'kantoor', idem, kantoorActor: req.officeKey });
+      if (r.ok && !r.herhaald) { afdelingen.audit(naam(req), 'Bankrekening geopend voor ' + r.rekening.iban); sync(); }
       r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
     } catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });

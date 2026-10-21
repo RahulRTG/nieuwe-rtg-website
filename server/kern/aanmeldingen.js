@@ -61,7 +61,7 @@ const REIS = [
     u: 'Privacy (AVG): u mag uw gegevens altijd inzien, corrigeren en laten wissen.' }
 ];
 
-module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid }) => {
+module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid, bewerkCollectie }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const kap = (t, n) => schoon(String(t == null ? '' : t), n || 200);
@@ -82,8 +82,11 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid 
 
   /* De aanvraagkant staat apart: hoe een aanmelding ONTSTAAT en hoe hij eruit
      ziet. Zie ./aanmeldingen/aanvraag.js. */
-  const { bouwReis, beeld, aanvraag, lijst } = require('./aanmeldingen/aanvraag')({
-    A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save });
+  const aanvraagCtx = { A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save };
+  const { normaliseer, bouwReis, beeld, aanvraag, lijst } = require('./aanmeldingen/aanvraag')(aanvraagCtx);
+  const bedoeling = require('./aanmeldingen/bedoeling')({ db, accounts, bewerkCollectie, normaliseer,
+    maakAanvraag: rij => require('./aanmeldingen/aanvraag')({ ...aanvraagCtx,
+      A: () => rij, rid: () => crypto.randomUUID(), save() {} }).aanvraag });
 
   function een(id) { const a = vind(id); return a ? { ok: true, aanmelding: beeld(a) } : { status: 404, error: 'Deze aanmelding bestaat niet.' }; }
 
@@ -145,5 +148,5 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid 
   };
 
   return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten,
-    termijnVoldaan, magAutomatischToekennen, PASSEN, lidAbonnement, naarGast }, klaarzetten) };
+    termijnVoldaan, magAutomatischToekennen, PASSEN, lidAbonnement, naarGast }, klaarzetten, bedoeling) };
 };

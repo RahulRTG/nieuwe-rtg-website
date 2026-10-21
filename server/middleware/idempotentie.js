@@ -102,6 +102,7 @@ module.exports = () => {
   return function idempotentie(req, res, next) {
     if (req.method !== 'POST' || !req.path.startsWith('/api/')) return next();
     if (isEenmalig(req.method, req.path)) return next();
+    if (require('../lib/ontvangst-operatiepad')(req.path)) return next();
     if (doetHetZelf(req.path)) return next();
     const b = req.body;
     const sleutel = b && (typeof b.idempotentieSleutel === 'string' ? b.idempotentieSleutel

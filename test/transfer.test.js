@@ -13,7 +13,8 @@ const { startServer } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tr-'));
-const VANDAAG = new Date().toISOString().slice(0, 10);
+// Een toekomstig ticket in de huiszone; geen verlopen UTC-dag na lokale middernacht.
+const REISDAG = require('../server/kern/tijdzone').datumIn(new Date(Date.now() + 86400000));
 let child, lidToken, gidsToken, managerToken, ticket;
 
 async function api(pad, body, token) {
@@ -33,9 +34,10 @@ test.before(async () => {
   const gids = roster.staff.find(x => x.role !== 'manager');
   managerToken = (await json(await api('/api/supplier/login', { code: 'ESVEDRA', staffId: man.id, pin: '1234' }))).token;
   gidsToken = (await json(await api('/api/supplier/login', { code: 'ESVEDRA', staffId: gids.id, pin: '5678' }))).token;
-  // een betaald ticket voor vandaag
-  const k = await json(await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a1', datum: VANDAAG, tijd: '17:30', personen: 2 }, lidToken));
-  await api('/api/booking/pay', { ref: k.ticket.ref }, lidToken);
+  // een betaald ticket voor de toekomstige reisdag
+  const k = await json(await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a1', datum: REISDAG, tijd: '17:30', personen: 2 }, lidToken));
+  assert.ok(k.ticket, JSON.stringify(k));
+  assert.equal((await api('/api/booking/pay', { ref: k.ticket.ref }, lidToken)).status, 200);
   ticket = k.ticket;
 });
 test.after(() => {
@@ -60,6 +62,7 @@ test('inclusieve transfer: met ticket aanvragen, prijs 0, meteen definitief', as
   // zonder ticket-ref: niet
   assert.equal((await api('/api/transfer/aanvraag', { ticketRef: 'RTG-T-NEP' }, lidToken)).status, 404);
   const r = await json(await api('/api/transfer/aanvraag', { ticketRef: ticket.ref, van: 'Aguamarina Ibiza, lobby' }, lidToken));
+  assert.ok(r.ride, JSON.stringify(r));
   assert.equal(r.ride.quote, 0);
   assert.equal(r.ride.paid, true);
   assert.equal(r.ride.status, 'aangevraagd');
@@ -89,9 +92,11 @@ test('de chauffeur van de zaak neemt de rit op eigen naam en iedereen ziet elkaa
 
 test('afgesproken prijs: transfer kost het vaste bedrag en loopt via de betaalstroom', async () => {
   await api('/api/supplier/transfer', { prijs: 25 }, managerToken);
-  const k = await json(await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a1', datum: VANDAAG, tijd: '19:30', personen: 1 }, lidToken));
-  await api('/api/booking/pay', { ref: k.ticket.ref }, lidToken);
+  const k = await json(await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a1', datum: REISDAG, tijd: '19:30', personen: 1 }, lidToken));
+  assert.ok(k.ticket, JSON.stringify(k));
+  assert.equal((await api('/api/booking/pay', { ref: k.ticket.ref }, lidToken)).status, 200);
   const r = await json(await api('/api/transfer/aanvraag', { ticketRef: k.ticket.ref, van: 'Dalt Vila' }, lidToken));
+  assert.ok(r.ride, JSON.stringify(r));
   assert.equal(r.ride.quote, 25);
   assert.equal(r.ride.status, 'wacht-op-betaling');
   const pay = await api('/api/ride/pay', { ref: r.ride.ref }, lidToken);

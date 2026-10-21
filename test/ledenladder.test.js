@@ -27,6 +27,7 @@
       zonder een boeking te beloven.
    4. DE PAS IS NIET TE RADEN OF TE VRAGEN. Zonder besluit blijft het lid
       gewoon RTG. */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -112,13 +113,17 @@ test('de pas wordt door een MENS verleend, en dan gaan alle twaalf apps echt ope
      alleen aan een account als hij met een sessie binnenkomt, en zonder die
      koppeling kan het besluit later niemands pas optillen. Een aanvraag die
      anoniem binnenkomt is een briefje zonder afzender. ---- */
-  const aanvraag = await post('/api/aanmelding/aanvraag', {
+  const aanvraag = await post('/api/aanmelding/aanvraag', { idem: randomUUID(),
     naam: 'Kandidaat Vos', email: lid.email, telefoon: '0612340000',
     pas: 'lifestyle', motivatie: 'Ik reis veel en wil het uit handen geven.'
   }, lid.token);
   assert.equal(aanvraag.status, 200, 'de aanvraag komt binnen: ' + JSON.stringify(aanvraag.body).slice(0, 200));
-  const id = aanvraag.body.aanmelding.id;
-  assert.equal(aanvraag.body.aanmelding.status, 'in behandeling', 'en staat in behandeling');
+  const id = aanvraag.body.ontvangst.aanvraagId;
+  const mens = await kantoorAlsPersoon(BASE);
+  assert.ok(mens, 'er is een herleidbaar mens in de backoffice');
+  const dossier = await post('/api/aanmelding/een', { id }, mens);
+  assert.equal(dossier.status, 200, 'het bevoegde kantoor kan de aanvraag lezen');
+  assert.equal(dossier.body.aanmelding.status, 'in behandeling', 'en staat in behandeling');
 
   /* ---- 2. ZONDER MENS GEEN PAS. Dit is de merkregel, en de reden dat drie
      eerdere pogingen terecht op een 403 liepen. ---- */
@@ -127,8 +132,6 @@ test('de pas wordt door een MENS verleend, en dan gaan alle twaalf apps echt ope
     'zonder backoffice-sessie valt er geen besluit (kreeg ' + zonderMens.status + ')');
 
   /* ---- 3. HET BESLUIT, door een herleidbaar mens. ---- */
-  const mens = await kantoorAlsPersoon(BASE);
-  assert.ok(mens, 'er is een herleidbaar mens in de backoffice');
   /* `contractEuro` hoort erbij sinds de ladder: een contractuele pas heeft geen
      lijstprijs, dus accepteren zonder afgesproken maandbedrag wordt geweigerd. */
   const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, mens);
@@ -193,7 +196,7 @@ test('de pas is niet te vragen of te raden: zonder besluit blijft een lid RTG', 
   /* Een aanvraag doen mag; hij levert alleen niets op zolang niemand beslist.
      Zonder deze toets zou de vorige ook slagen als de pas al bij de AANVRAAG
      werd toegekend -- en dan is de menselijke goedkeuring een formaliteit. */
-  const aanvraag = await post('/api/aanmelding/aanvraag', {
+  const aanvraag = await post('/api/aanmelding/aanvraag', { idem: randomUUID(),
     naam: 'Aandringer Vos', email: lid.email, telefoon: '0612340001',
     pas: 'lifestyle', motivatie: 'Graag meteen.'
   });

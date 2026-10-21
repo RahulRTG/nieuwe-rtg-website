@@ -57,7 +57,7 @@ module.exports = (kern) => {
     doneer: vast((wie, nm, b, idem) => labfonds.doneer(wie, nm, String(b.locId || ''), b.bedrag, idem)),
     voorstel: vast((wie, nm, b, idem) => labfonds.voorstelMaak(wie, nm, String(b.locId || ''), b.titel, b.doel, b.bedrag, b.onderzoek, idem)),
     stem: vast((wie, nm, b) => labfonds.stem(wie, String(b.id || ''), String(b.keuze || ''))),
-    scheidsrechter: (wie, nm, b) => labfonds.scheidsrechter(String(b.id || '')),
+    scheidsrechter: vast((wie, nm, b) => labfonds.scheidsrechter(String(b.id || ''))),
     beslis: vast((wie, nm, b) => labfonds.beslis(String(b.id || ''), wie)),
     financiering: (wie, nm, b) => {
       const r = labfonds.zoekOnderzoek(String(b.onderzoek || ''));

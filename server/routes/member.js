@@ -3,7 +3,7 @@
    leden-routes wonen in behapbare submodules onder routes/member/ -- de
    boardroom van het lid sinds vandaag ook (./member/boardroom.js).
    De helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
-module.exports = (kern) => {
+module.exports = (kern, aanvraagPrivacy) => {
   const { app, auth, db, stateFor } = kern;
   const functies = require('../functies');
 
@@ -98,7 +98,7 @@ module.exports = (kern) => {
   // RTG Nieuws: het gepubliceerde werk van RTG Redactie, met Rahul als nieuwslezer
   require('./member/nieuws')(kern);
   // De AVG-rechten: dossier downloaden en definitief verwijderen.
-  require('./member/privacy')(kern);
+  require('./member/privacy')(kern, aanvraagPrivacy);
   require('./member/sessies')(kern);
   require('./member/toestellen')(kern);
   require('./member/herstelkanaal')(kern);

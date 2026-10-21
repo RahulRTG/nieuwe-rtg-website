@@ -34,7 +34,7 @@ const maakCaseOverzicht = require('./cases-overzicht');
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, liveCodename, notify, beoordeel, deelopdrachten } = ctx;
-  const levens = require('../levensdossier')({ db }).voor('bureau');
+  const levens = ctx.levens || require('../levensdossier')({ db }).voor('bureau');
 
   /* C() maakt de lijst aan en is dus alleen voor SCHRIJVERS. lees() raakt niets
      aan en is voor lezers.
@@ -176,7 +176,7 @@ module.exports = (ctx) => {
      ./cases-bureau.js. Hij krijgt de gedeelde staat mee in plaats van hem na te
      bouwen: een tweede `openCase` zou op een dag iets anders "open" noemen dan
      deze. */
-  const bureau = require('./cases-bureau')({ db, save, liveCodename, notify,
+  const bureau = require('./cases-bureau')({ db, levens, save, liveCodename, notify,
     lees, stap, openCase, KANTOOR_STATUSSEN, SOORTEN, bezitZet: ctx.bezitZet });
 
   return { caseOpen, caseBeslis, caseIntrek, cases,

@@ -412,7 +412,7 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   // hierboven al aan zijn rekeningen-plafond)
   const l2 = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
   const cn = (await api('pay/overzicht', {}, l2.token)).body.codenaam;
-  const zak = await kapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk' }, 'RTG');
+  const zak = await kapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk', idem: 'salaris-bronrekening' }, 'RTG');
   const zakIban = zak.body.rekening.iban;
   await api('bank/storten', { iban: zakIban, centen: 100000, idem: 'sal-dek' }, l2.token);
 

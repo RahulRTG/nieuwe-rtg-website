@@ -79,15 +79,7 @@
       '<input id="campusFunctie" maxlength="60" placeholder="Functie" aria-label="Functie"><button type="submit">Plaats in kantoor</button></form>';
   }
 
-  function taken(k) {
-    var r = (MODEL.taken || []).filter(function (t) { return (t.afdeling || 'operations') === k.id; });
-    return '<div class="work-list" id="campusTaken">' + (r.length ? r.map(function (t) {
-      return '<label class="work-row"><input type="checkbox" data-taak="' + esc(t.id) + '"' + (t.af ? ' checked' : '') +
-        '><span' + (t.af ? ' class="taak-afgerond"' : '') + '>' + esc(t.tekst) + '</span></label>';
-    }).join('') : '<p class="office-empty">Geen open werk op deze tafel.</p>') + '</div>' +
-      '<form class="campus-form taakform" id="campusTaakForm"><input id="campusTaak" maxlength="200" placeholder="Nieuw werkpunt" aria-label="Nieuw werkpunt" required>' +
-      '<button type="submit">Zet op tafel</button></form>';
-  }
+  function taken(k) { return RTGWerkplekTaken.teken(MODEL, k, esc); }
 
   function detail(k) {
     $('#campusView').innerHTML = '<section class="office-detail"><header class="office-head"><span class="ico">' + glyf(k.glyf) +
@@ -116,10 +108,7 @@
       e.preventDefault(); var c = $('#campusCodenaam').value.trim(); if (!c) return;
       verander('mens', { bedrijf: MODEL.code, codenaam: c, functie: $('#campusFunctie').value.trim(), afdeling: k.id });
     });
-    $('#campusTaakForm').addEventListener('submit', function (e) {
-      e.preventDefault(); var t = $('#campusTaak').value.trim(); if (!t) return;
-      verander('taak', { bedrijf: MODEL.code, tekst: t, afdeling: k.id });
-    });
+    RTGWerkplekTaken.bind(MODEL, k, verander);
     Array.prototype.forEach.call(document.querySelectorAll('[data-mens-weg]'), function (b) {
       b.addEventListener('click', function () { verander('mens-weg', { bedrijf: MODEL.code, id: b.dataset.mensWeg }); });
     });
@@ -130,12 +119,17 @@
 
   function verander(pad, body) {
     ACT.api(pad, body).then(function (d) {
+      if(pad==='taak') {
+        var opslag='rtg_werkplek_taak_'+body.bedrijf;
+        if(sessionStorage.getItem(opslag)!==body.idem) return;
+        sessionStorage.removeItem(opslag);
+      }
       if (d.mensen) MODEL.mensen = d.mensen;
       if (d.taken) MODEL.taken = d.taken;
       if (d.kantoren) MODEL.kantoren = d.kantoren;
       shell();
       if (ACT.veranderd) ACT.veranderd(MODEL);
-    }).catch(function (e) { alert(e.message); });
+    }).catch(function (e) { alert(e.message+(pad==='taak'?' Uw opdrachtsleutel blijft bewaard. Herhaal dezelfde inhoud.':'')); });
   }
 
   function bindNav() {

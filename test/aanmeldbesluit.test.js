@@ -22,6 +22,7 @@
 
    Draai los: node --test test/aanmeldbesluit.test.js
    ========================================================================== */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -40,7 +41,7 @@ function api(pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 const vraagAan = (pas) => api('/api/aanmelding/aanvraag',
-  { pas, naam: 'Aanvrager ' + pas, email: 'a' + Date.now().toString(36) + pas + '@voorbeeld.test' });
+  { idem: randomUUID(), pas, naam: 'Aanvrager ' + pas, email: 'a' + Date.now().toString(36) + pas + '@voorbeeld.test' });
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
@@ -61,10 +62,10 @@ test.after(() => {
    wijzen, en dan mag er geen Lifestyle Pass ontstaan. */
 test('1. de gedeelde kantoorcode kent geen Lifestyle Pass toe', async () => {
   const a = await vraagAan('lifestyle');
-  assert.ok(a.body.aanmelding && a.body.aanmelding.id, 'de aanvraag is aangenomen: ' + JSON.stringify(a.body).slice(0, 140));
+  assert.ok(a.body.ontvangst && a.body.ontvangst.aanvraagId, 'de aanvraag is aangenomen: ' + JSON.stringify(a.body).slice(0, 140));
 
   const besluit = await api('/api/aanmelding/beslis',
-    { id: a.body.aanmelding.id, besluit: 'geaccepteerd' }, gedeeld);
+    { id: a.body.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, gedeeld);
   assert.equal(besluit.status, 403, 'geweigerd: ' + JSON.stringify(besluit.body).slice(0, 160));
   assert.match(besluit.body.error, /herleidbaar persoon/, 'en het zegt hoe het wel moet');
   assert.doesNotMatch(JSON.stringify(besluit.body), /RTG-personeel/, 'geen verzonnen naam meer');
@@ -73,7 +74,7 @@ test('1. de gedeelde kantoorcode kent geen Lifestyle Pass toe', async () => {
 test('2. een Business Pass net zo min', async () => {
   const a = await vraagAan('business');
   const besluit = await api('/api/aanmelding/beslis',
-    { id: a.body.aanmelding.id, besluit: 'geaccepteerd' }, gedeeld);
+    { id: a.body.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, gedeeld);
   assert.equal(besluit.status, 403, JSON.stringify(besluit.body).slice(0, 160));
 });
 
@@ -86,7 +87,7 @@ test('3. de eigenaar met zijn eigen inlog kan het wel, en komt met naam in het s
      (kern/aanmeldingen/besluit.js). Deze toets gaat over WIE er beslist, niet
      over de prijs -- maar hij loopt wel langs dezelfde poort. */
   const besluit = await api('/api/aanmelding/beslis',
-    { id: a.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'Op uitnodiging', contractEuro: 20000 }, eigenaarKantoor);
+    { id: a.body.ontvangst.aanvraagId, besluit: 'geaccepteerd', notitie: 'Op uitnodiging', contractEuro: 20000 }, eigenaarKantoor);
   assert.equal(besluit.status, 200, JSON.stringify(besluit.body).slice(0, 160));
   const door = besluit.body.aanmelding.besluit.door;
   assert.ok(door && door.length > 1, 'het besluit draagt een herleidbare sleutel: ' + door);
@@ -101,13 +102,13 @@ test('3. de eigenaar met zijn eigen inlog kan het wel, en komt met naam in het s
 test('4. een RTG Pass mag met de gedeelde code, en het spoor zegt dat eerlijk', async () => {
   const a = await vraagAan('rtg');
   const besluit = await api('/api/aanmelding/beslis',
-    { id: a.body.aanmelding.id, besluit: 'geaccepteerd' }, gedeeld);
+    { id: a.body.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, gedeeld);
   assert.equal(besluit.status, 200, JSON.stringify(besluit.body).slice(0, 160));
   assert.equal(besluit.body.aanmelding.besluit.door, 'backoffice (gedeelde code)');
 });
 
 test('5. zonder backoffice-inlog beslist niemand iets', async () => {
   const a = await vraagAan('rtg');
-  const zonder = await api('/api/aanmelding/beslis', { id: a.body.aanmelding.id, besluit: 'geaccepteerd' }, null);
+  const zonder = await api('/api/aanmelding/beslis', { id: a.body.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, null);
   assert.equal(zonder.status, 401, JSON.stringify(zonder.body).slice(0, 140));
 });

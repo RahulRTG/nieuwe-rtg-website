@@ -77,7 +77,7 @@ test('2. een huis van binnen: cijfers, wat loopt er, bezetting en taken', async 
 
 test('3. de twee huizen delen hun bezetting en taken niet', async () => {
   await post('/api/werkplek/mens', { bedrijf: 'rtg', codenaam: 'Gouden Reiger 1A2B', functie: 'Inkoop' }, eigenaar);
-  await post('/api/werkplek/taak', { bedrijf: 'rtg', tekst: 'Partnercontracten nalopen' }, eigenaar);
+  await post('/api/werkplek/taak', { idem: 'taak-fixture-80', bedrijf: 'rtg', tekst: 'Partnercontracten nalopen' }, eigenaar);
   const rtg = (await post('/api/werkplek/overzicht', { bedrijf: 'rtg' }, eigenaar)).body;
   const rtf = (await post('/api/werkplek/overzicht', { bedrijf: 'rtf' }, eigenaar)).body;
   assert.equal(rtg.mensen.length, 1);
@@ -122,7 +122,7 @@ test('6. sleutels uitdelen en intrekken doet alleen de eigenaar', async () => {
 test('6b. bezetting en werkvoorraad blijven bij hun eigen afdelingskantoor', async () => {
   await post('/api/werkplek/mens', { bedrijf: 'rtg', codenaam: 'Koperen Valk 7C8D',
     functie: 'Controller', afdeling: 'finance' }, eigenaar);
-  await post('/api/werkplek/taak', { bedrijf: 'rtg', tekst: 'Liquiditeitsprognose bijwerken', afdeling: 'finance' }, eigenaar);
+  await post('/api/werkplek/taak', { idem: 'taak-fixture-125', bedrijf: 'rtg', tekst: 'Liquiditeitsprognose bijwerken', afdeling: 'finance' }, eigenaar);
   const r = (await post('/api/werkplek/overzicht', { bedrijf: 'rtg' }, eigenaar)).body;
   const finance = r.kantoren.find(k => k.id === 'finance');
   const business = r.kantoren.find(k => k.id === 'business');

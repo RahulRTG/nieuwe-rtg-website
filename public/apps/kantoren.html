@@ -3401,6 +3401,8 @@ function bankRenderSalaris(reks){
   sel.innerHTML = (reks || []).map(m => '<option value="' + m.iban + '">' + esc(m.codenaam) + ' · ' + esc(m.soort) + ' · ' + bkEuro(m.saldoCenten) + '</option>').join('');
   if (keuze) sel.value = keuze;
 }
+let bankOpenBedoeling = null;
+try { bankOpenBedoeling = sessionStorage.getItem('rtg_bank_open_bedoeling'); } catch (e) {}
 function bankRenderRekOpen(){
   $('#bankRekOpen').innerHTML =
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
@@ -3408,7 +3410,15 @@ function bankRenderRekOpen(){
     '<span><label for="bankOpenSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Soort</label><select id="bankOpenSoort"><option value="betaal">Betaalrekening</option><option value="spaar">Spaarrekening</option><option value="zakelijk">Zakelijke rekening</option></select></span>' +
     '<button class="knop stil" id="bankOpenZet" type="button">Open rekening</button></div>';
   $('#bankOpenZet').addEventListener('click', async () => {
-    try { const d = await api('bank/rekening/open', { codenaam: $('#bankOpenCode').value, soort: $('#bankOpenSoort').value }); meld('Geopend: ' + d.rekening.iban); $('#bankOpenCode').value = ''; bankVervers(); } catch (e) { meld(e.message); }
+    // Een verloren antwoord houdt dezelfde sleutel; veranderde invoer wordt
+    // server-side een conflict, nooit ongemerkt een tweede rekening.
+    if (!bankOpenBedoeling) bankOpenBedoeling = crypto.randomUUID();
+    try {
+      sessionStorage.setItem('rtg_bank_open_bedoeling', bankOpenBedoeling);
+      if (sessionStorage.getItem('rtg_bank_open_bedoeling') !== bankOpenBedoeling) throw new Error('Opslagcontrole mislukt.');
+    } catch (e) { meld('Niet verzonden: de opdrachtsleutel kan niet veilig worden bewaard. Herstel de browseropslag en probeer opnieuw.'); return; }
+    const verzonden = bankOpenBedoeling;
+    try { const d = await api('bank/rekening/open', { codenaam: $('#bankOpenCode').value, soort: $('#bankOpenSoort').value, idem: verzonden }); if (bankOpenBedoeling !== verzonden || sessionStorage.getItem('rtg_bank_open_bedoeling') !== verzonden) return; bankOpenBedoeling = null; try { sessionStorage.removeItem('rtg_bank_open_bedoeling'); } catch (e) {} meld('Geopend: ' + d.rekening.iban); $('#bankOpenCode').value = ''; bankVervers(); } catch (e) { meld(e.message); }
   });
 }
 function bankRenderRek(rij){

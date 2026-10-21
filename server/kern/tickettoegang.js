@@ -8,8 +8,8 @@
      de deur verkoopt of vernieuwt een deurticket. Kaal staat de code alleen in
      dat antwoord; op schijf de SHA-256 in `ticketToegang` (per ref), en de
      vorige gaat ingetrokken de historie in.
-   - issuer/doel/scope, verval aan het eind van de ticketdag (UTC, dezelfde dag
-     die de deur vergelijkt), max_gebruik 1.
+   - issuer/doel/scope, verval aan het eind van de ticketdag in de Amsterdamse
+     huiszone (dezelfde kalenderdag die de deur vergelijkt), max_gebruik 1.
    - constant-time zoeken over elke hash, ook historische; een treffer bij een
      ANDERE zaak telt niet.
    - de claim legt de check-in vast in DEZELFDE collectietransactie
@@ -23,6 +23,7 @@
 'use strict';
 
 const klok = require('../lib/klok');
+const tijdzone = require('./tijdzone');
 
 const DOEL = 'activiteit-entree';
 const SCOPE = Object.freeze(['zaak.ticket.checkin']);
@@ -36,8 +37,11 @@ module.exports = ({ db, save, bewerkCollectie, crypto, oudeRijen, nu = () => klo
   const eigen = require('./eigencollectie')({ db, domein: 'kern/tickettoegang', bezit: { ticketToegang: 'kaart' } });
   const afdruk = s => crypto.createHash('sha256').update(String(s)).digest('hex');
   const houder = b => afdruk('rtg-ticket-houder-v1|' + String(b.customerKey || b.customerTier || ('deur:' + b.supplierCode)));
-  const vandaag = () => nu().slice(0, 10);
-  const eindVan = datum => Date.parse(String(datum) + 'T23:59:59.999Z');
+  // Deurverkoop en reisdatum gebruiken de huiszone. Rond 00:00 in Amsterdam
+  // kan de UTC-datum nog gisteren zijn; dezelfde ticketdag moet aan beide
+  // kanten van de deur daarom uit dezelfde klok en zone komen.
+  const vandaag = () => tijdzone.datumIn(new Date(nu()));
+  const eindVan = datum => tijdzone.middernacht(tijdzone.plusDagen(datum, 1)).getTime() - 1;
 
   const transactie = werk => bewerkCollectie('ticketToegang', bron => {
     if (!bron || typeof bron !== 'object' || Array.isArray(bron)) throw new Error('ticketToegang hoort een kaart te zijn');

@@ -55,7 +55,9 @@ const { zonderSleutelPad, nietVastgelegd, vergeetSleutel } = require('./idem-zon
    `poort` (optioneel, een functie): de vrijgavepoort voor NIEUW werk -- na de
    herhaling, voor het werk. Wat dat betekent en waarom juist daar, staat in
    ./idem-nieuwwerk.js. */
-function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
+function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort, behoudSleutel, geldigeOntvangst }) {
+  // Beschermde ontvangsten blijven in dezelfde store, buiten de gewone ring.
+  const behouden = k => typeof behoudSleutel === 'function' && behoudSleutel(k) === true;
   const poortVoorNieuwWerk = require('./idem-nieuwwerk').maakPoortVoorNieuwWerk(poort);
   function store() {
     if (!d()[naam] || typeof d()[naam] !== 'object') d()[naam] = { _keys: [] };
@@ -108,8 +110,18 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
     const s = store();
     const a = afdrukStore();
     if (Object.hasOwn(s, sleutel)) {
-      if (afdruk && typeof a[sleutel] === 'string' && a[sleutel] !== afdruk) {
+      if (afdruk && typeof a[sleutel] === 'string' && (!behouden(sleutel) || a[sleutel]) && a[sleutel] !== afdruk) {
         return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
+      }
+      if (behouden(sleutel)) {
+        if (!Object.hasOwn(a, sleutel) || typeof a[sleutel] !== 'string' || !a[sleutel] ||
+            !afdruk || !s[sleutel] || typeof s[sleutel] !== 'object' ||
+            Array.isArray(s[sleutel]) || s[sleutel].ok !== true ||
+            (typeof geldigeOntvangst === 'function' && !geldigeOntvangst(sleutel, s[sleutel]))) {
+          return { status: 503, code: 'IDEMPOTENTIEBEWIJS_ONGELDIG', error: 'De bewaarde ontvangst vereist herstel.' };
+        }
+        if (s._keys.includes(sleutel)) return require('./idem-behouden')({
+          s, sleutel, afdruk, behouden, save, bijeen, duurzaam, naam, inVlucht });
       }
       return Object.assign({}, s[sleutel], { herhaald: true });
     }
@@ -130,7 +142,8 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
          een derde verzoek ziet altijd of de bewaarde sleutel of de vlucht -- nooit
          het gat ertussen. */
       if (!fout && r && r.ok) {
-        s._keys.push(sleutel);
+        if (behoudSleutel) s._keys = s._keys.filter(k => !behouden(k));
+        if (!behouden(sleutel)) s._keys.push(sleutel);
         if (s._keys.length > MAX) {
           for (const weg of s._keys.splice(0, s._keys.length - MAX)) { delete s[weg]; delete a[weg]; }
         }

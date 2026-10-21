@@ -137,9 +137,19 @@ test('6. een RTF-gezinslid tekent hetzelfde platformcontract, maar zonder paspoo
   const velden = {};
   st.velden.forEach(v => { if (v.type !== 'kyc') velden[v.id] = v.id === 'email' ? 'sam@x.nl' : v.id === 'land' ? 'NL' : 'Sam Ouder'; });
   await api(base, '/api/rtf/onboarding/opslaan', { code: g.code, token: g.token, velden });
-  const t = await api(base, '/api/rtf/onboarding/teken', { code: g.code, token: g.token, naam: 'Sam Ouder', akkoord: true });
+  for (const expectedVersion of [undefined, String(st.contract.versie), st.contract.versie + 1]) {
+    const nee = await api(base, '/api/rtf/onboarding/teken', { code: g.code, token: g.token, naam: 'Sam Ouder', akkoord: true, expectedVersion });
+    assert.equal(nee.status, 409);
+    assert.equal(nee.body.code, 'version_conflict');
+  }
+  const t = await api(base, '/api/rtf/onboarding/teken', { code: g.code, token: g.token, naam: 'Sam Ouder', akkoord: true, expectedVersion: st.contract.versie });
   assert.equal(t.status, 200);
   assert.equal(t.body.klaar, true, 'na invullen + tekenen is de RTF-onboarding rond');
+  const herhaald = await api(base, '/api/rtf/onboarding/teken', { code: g.code, token: g.token, naam: 'Sam Ouder', akkoord: true, expectedVersion: st.contract.versie });
+  assert.equal(herhaald.status, 200);
+  assert.equal(herhaald.body.contract.ondertekendAt, t.body.contract.ondertekendAt);
+  const ander = await api(base, '/api/rtf/onboarding/teken', { code: g.code, token: g.token, naam: 'Andere Naam', akkoord: true, expectedVersion: st.contract.versie });
+  assert.equal(ander.status, 409); assert.equal(ander.body.code, 'name_conflict');
 });
 
 test('5. elke leverancier heeft een eigen scope die los AI-aanpasbaar is', async () => {
@@ -297,12 +307,14 @@ test('de intake schrijft geen nationaliteit naar het ledendossier', () => {
     saveMemberState: (id, md) => { geschreven = true; dossier = md; },
     realNameOf: () => 'Test', emailOf: () => 't@x.nl', phoneOf: () => null
   };
+  const scope = { velden: [{ id: 'nationaliteit', label: 'Nationaliteit', type: 'text', voorWie: ['rtg'], moment: 'later' }],
+    contract: { versie: 1, titel: 't', tekst: 't' } };
+  const profiel = { velden: {}, ondertekend: {} };
   const lid = require('../server/kern/onboarding/lid')({
     accounts, save: () => {}, schoon: (s, n) => String(s).slice(0, n),
     crypto: require('crypto'), nu: () => Date.now(),
-    scopeVan: () => ({ velden: [{ id: 'nationaliteit', label: 'Nationaliteit', type: 'text', voorWie: ['rtg'], moment: 'later' }],
-      contract: { versie: 1, titel: 't', tekst: 't' } }),
-    profielVan: () => ({ velden: {}, ondertekend: {} }), profielId: () => 'p1'
+    scopeVan: () => scope, scopeLezen: () => scope,
+    profielVan: () => profiel, profielLezen: () => profiel, profielId: () => 'p1'
   });
 
   lid.slaOp('rtg', { key: 'k', tier: 'rtg', account: { id: 1 } }, { nationaliteit: 'Nederlandse' });

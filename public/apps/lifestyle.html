@@ -336,6 +336,8 @@ const SOORT_UITLEG = {
   bijzonder:'Het verzoek dat niet in een formulier past. Gaat altijd langs een van onze mensen, en altijd langs u.',
   warroom:'Er is iets misgegaan. Wij zetten er direct mensen op en vragen pas om een besluit als het nodig is.'
 };
+let zaakBedoeling='';
+try { zaakBedoeling=sessionStorage.getItem('rtg_bureau_zaak_bedoeling')||''; } catch(e){}
 async function vZaken(){
   let d, del; try{ [d, del] = await Promise.all([api('/api/member/bureau/zaken'), api('/api/member/bureau/delegatie')]); }catch(e){ return fout(e); }
   const doms = del.domeinen.map(x=>'<option value="'+esc(x.domein)+'">'+esc(x.naam)+'</option>').join('');
@@ -377,12 +379,23 @@ async function vZaken(){
   $('#zK').onclick = async () => {
     const titel = $('#zT').value.trim(); if(!titel) return meld('Waarmee kunnen wij u van dienst zijn?');
     try{
-      const r = await api('/api/member/bureau/zaak/open', { titel, wat:$('#zW').value.trim(), soort:$('#zS').value,
+      if(!zaakBedoeling) zaakBedoeling=crypto.randomUUID();
+      try {
+        sessionStorage.setItem('rtg_bureau_zaak_bedoeling',zaakBedoeling);
+        if(sessionStorage.getItem('rtg_bureau_zaak_bedoeling')!==zaakBedoeling) throw new Error('Opslagcontrole mislukt.');
+      } catch(e) { return meld('Niet verzonden: de opdrachtsleutel kan niet veilig worden bewaard. Herstel de browseropslag en probeer opnieuw.'); }
+      const verzonden=zaakBedoeling;
+      const r = await api('/api/member/bureau/zaak/open', { idem:verzonden, titel, wat:$('#zW').value.trim(), soort:$('#zS').value,
         domein:$('#zD').value, bedragCenten: Math.round((Number($('#zB').value)||0)*100) });
+      if(zaakBedoeling!==verzonden || sessionStorage.getItem('rtg_bureau_zaak_bedoeling')!==verzonden) return;
+      zaakBedoeling=''; sessionStorage.removeItem('rtg_bureau_zaak_bedoeling');
       meld(r.zaak.beslissing.nodig ? 'Aangelegd. Er ligt een besluit voor u klaar.' : 'Aangelegd. Wij pakken het op.');
       vZaken();
-    }catch(e){ meld(e.message); }
+    }catch(e){ meld(e.message+' Uw opdrachtsleutel blijft bewaard: probeer dezelfde inhoud opnieuw.'); }
   };
+  const nieuw=document.createElement('button'); nieuw.className='knop klein stil'; nieuw.textContent='Bewust nieuwe opdracht';
+  nieuw.onclick=()=>{ if(confirm('Een eerdere onzekere opdracht kan al ontvangen zijn. Wilt u bewust een afzonderlijke nieuwe opdracht beginnen?')) { zaakBedoeling=''; sessionStorage.removeItem('rtg_bureau_zaak_bedoeling'); meld('De volgende verzending is een nieuwe opdracht.'); } };
+  $('#zK').insertAdjacentElement('afterend',nieuw);
   $('#paneel').querySelectorAll('.js-ja,.js-nee').forEach(b => b.onclick = async () => {
     try{ await api('/api/member/bureau/zaak/beslis', {id:b.dataset.id, akkoord:b.classList.contains('js-ja')}); vZaken(); }
     catch(e){ meld(e.message); }

@@ -21,10 +21,10 @@ app.post('/api/rtf/onboarding/opslaan', express.json({ limit: '256kb' }), (req, 
   const s = rtfSociaal(req, res); if (!s) return;
   res.json(onboarding.slaOp('rtg', rtfOnbSess(s), req.body.velden || {}));
 });
-app.post('/api/rtf/onboarding/teken', (req, res) => {
+app.post('/api/rtf/onboarding/teken', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = onboarding.teken('rtg', rtfOnbSess(s), req.body.naam, req.body.akkoord === true);
-  if (r.error) return res.status(r.status).json({ error: r.error });
+  const r = await onboarding.tekenVast('rtg', rtfOnbSess(s), req.body.naam, req.body.akkoord === true, req.body.expectedVersion);
+  if (r.error) return res.status(r.status).json({ error: r.error, ...(r.code ? { code: r.code } : {}) });
   res.json(r);
 });
 // Beschermd profiel (15 of jonger): zoeken en zelf verzoeken sturen staat dicht;

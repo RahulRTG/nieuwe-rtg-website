@@ -2,7 +2,7 @@
    Wallet-plafonds en geldnaden blijven bij de eigenaar ná alle domeinen. */
 module.exports = (kern, ctx) => {
   const { db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal,
-    keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten } = ctx;
+    keyVanCodenaam, findSupplier, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten } = ctx;
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
    RTG Bank clearet: via de externe kaart-naad, als eigen emissie, of allebei.
@@ -48,6 +48,6 @@ if (kern.rugdekking && kern.rugdekking.koppelBevoegd) kern.rugdekking.koppelBevo
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('../kern/bank')({ db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten, betaalWaarheid: kern.betaalWaarheid }));
+Object.assign(kern, require('../kern/bank')({ db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, findSupplier, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten, betaalWaarheid: kern.betaalWaarheid }));
   return { bankregie };
 };

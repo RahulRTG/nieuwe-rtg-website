@@ -28,6 +28,7 @@
 
    Draai los: node --test test/zaak-kantoor.test.js
    ========================================================================== */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -66,12 +67,12 @@ test.before(async () => {
      lijst-uitgang -- en bewees dan niets over de index. Dat is precies de vorm
      die ik deze week vaker tegenkwam, dus hier de echte opzet. */
   office = (await api('/api/office/login', { code: OFFICE_CODE })).body.token;
-  const aanvraag = await api('/api/aanmelding/aanvraag', {
+  const aanvraag = await api('/api/aanmelding/aanvraag', { idem: randomUUID(),
     pas: 'rtg', naam: 'Marta Vidal', contact: 'marta' + Date.now().toString(36) + '@voorbeeld.test',
     bedrijf: { naam: 'Cafe Vidal', type: 'restaurant', plaats: 'Ibiza',
       behoeften: ['Een kassasysteem', 'Personeelsplanning', 'Een eigen website'] }
   });
-  const aanmeldId = aanvraag.body && aanvraag.body.aanmelding && aanvraag.body.aanmelding.id;
+  const aanmeldId = aanvraag.body && aanvraag.body.ontvangst && aanvraag.body.ontvangst.aanvraagId;
   if (office && aanmeldId) {
     await api('/api/aanmelding/beslis', { id: aanmeldId, besluit: 'geaccepteerd', notitie: 'Rahul Imran Ismail' }, office);
     const t = await api('/api/aanmelding/termijn-voldaan', { id: aanmeldId, maand: 1 }, office);

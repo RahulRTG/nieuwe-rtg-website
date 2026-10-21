@@ -5,8 +5,10 @@
 const context = require('./verzoekcontext');
 const state = require('./state');
 const verzoekspoor = require('./verzoekspoor');
+const contractVan = require('./collectie-contract');
 
 module.exports = ({ store, db, motor, klaar }) => async function collectieSlotPostgres(sleutel, werk) {
+  const contract = contractVan(sleutel, werk);
   const pg = motor();
   /* PG_ONGEZOND, en die code draagt hier betekenis. Deze fout ontstaat juist
      WANNEER de schrijfpoort al dicht staat, dus hij is een gevolg en geen
@@ -18,9 +20,9 @@ module.exports = ({ store, db, motor, klaar }) => async function collectieSlotPo
       { code: 'PG_ONGEZOND' });
   /* Het auditspoor van het verzoek gaat mee in DEZE transactie (audit P0-1,
      ./verzoekspoor.js): geen vastgelegde mutatie zonder haar spoor. */
-  const spoor = verzoekspoor.voorVroegeCommit([sleutel], state.getRuweData());
+  const spoor = verzoekspoor.voorVroegeCommit(contract.sleutels, state.getRuweData());
   const uit = await pg.bewerkCollectie(sleutel, state.getRuweData(), werk, spoor);
-  context.eigenCommit(sleutel);
+  context.eigenCommit(contract.sleutels);
   verzoekspoor.naVroegeCommit(spoor);
   return uit;
 };

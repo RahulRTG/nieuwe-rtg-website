@@ -76,7 +76,7 @@ const GRENS_PLAFOND = 1000000000;
 
 module.exports = (ctx) => {
   const { db, save, nu } = ctx;
-  const levens = require('../levensdossier')({ db }).voor('bureau');
+  const levens = ctx.levens || require('../levensdossier')({ db }).voor('bureau');
 
   function D(key) {
     const d = levens.veld(key, 'delegatie', (x) => { x.per = {}; x.log = []; });

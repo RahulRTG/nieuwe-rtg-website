@@ -19,7 +19,7 @@
 const CODES = ['rtg', 'rtf'];
 const werkplekKantoren = require('./werkplek-kantoren');
 
-module.exports = ({ db, save, crypto }) => {
+module.exports = ({ db, save, bewerkCollectie, crypto }) => {
   const nu = () => Date.now();
   const d = () => db.data;
   const lijst = x => Array.isArray(x) ? x : (x && typeof x === 'object' ? Object.values(x) : []);
@@ -140,18 +140,7 @@ module.exports = ({ db, save, crypto }) => {
   }
 
   /* ---- de takenlijst van het huis ---- */
-  function taakMaak(code, tekst, afdeling) {
-    code = norm(code);
-    if (!kent(code)) return { status: 404, error: 'Dit bedrijf kennen we niet.' };
-    const t = String(tekst || '').replace(/[<>]/g, '').trim().slice(0, 200);
-    if (!t) return { status: 400, error: 'Wat moet er gebeuren?' };
-    afdeling = kantoorKent(code, afdeling) ? String(afdeling) : 'operations';
-    const rij = takenVan(code);
-    rij.unshift({ id: crypto.randomBytes(4).toString('hex'), tekst: t, afdeling, af: false, at: nu() });
-    if (rij.length > 100) rij.pop();
-    save();
-    return { ok: true, taken: rij.slice(0, 30), kantoren: kantorenVan(code) };
-  }
+  const { taakMaak, taakMaakBedoeling } = require('./werkplek-taken')({ db, save, bewerkCollectie, crypto, nu, kent, norm, takenVan });
   function taakZet(code, id, af) {
     code = norm(code);
     if (!kent(code)) return { status: 404, error: 'Dit bedrijf kennen we niet.' };
@@ -204,6 +193,6 @@ module.exports = ({ db, save, crypto }) => {
     return toegangLijst(code);
   }
 
-  return { werkplek: { bedrijven, overzicht, mensZet, mensWeg, taakMaak, taakZet,
+  return { werkplek: { bedrijven, overzicht, mensZet, mensWeg, taakMaak, taakMaakBedoeling, taakZet,
     magIn, mijnHuizen, toegangLijst, toegangGeef, toegangWeg, kent, CODES } };
 };

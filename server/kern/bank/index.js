@@ -19,7 +19,7 @@
    rente in ./sparen. */
 
 module.exports = (deps) => {
-  const { db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten, betaalWaarheid } = deps;
+  const { db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, findSupplier, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten, betaalWaarheid } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -39,10 +39,11 @@ module.exports = (deps) => {
   function saldi() { if (!d().bankSaldi || typeof d().bankSaldi !== 'object') d().bankSaldi = {}; return d().bankSaldi; }
   function grootboek() { if (!Array.isArray(d().bankBoekingen)) d().bankBoekingen = []; return d().bankBoekingen; }
   function rekeningen() { if (!d().bankRekeningen || typeof d().bankRekeningen !== 'object') d().bankRekeningen = {}; return d().bankRekeningen; }
+  const lezen = require('./lezen')(d);
 
   const isExtern = rek => rek.startsWith('extern:') || rek.startsWith('rtg:');
-  const saldoVan = rek => Math.round(saldi()[rek] || 0);
-  const rekMeta = iban => rekeningen()[iban] || null;
+  const saldoVan = rek => Math.round(lezen.saldi()[rek] || 0);
+  const rekMeta = iban => lezen.rekeningen()[iban] || null;
   const id = p => (p || 'BB') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
   // de bodem van een rekening: extern/rtg mag onbeperkt negatief (dat IS de bank);
@@ -73,7 +74,7 @@ module.exports = (deps) => {
      het serialisatie-slot, de herstart-reconcile, de sluitcontrole en de drift-
      stand voor het statusbord. */
   const { boek, boekAsync, reconcileVanMotor, sluitcontrole, motorStand } = require('./grootboek')({
-    MIN_CENTEN, MAX_CENTEN, saldi, grootboek, saldoVan, rekMeta, isExtern, bodem,
+    MIN_CENTEN, MAX_CENTEN, saldi, saldiLezen: lezen.saldi, grootboek, saldoVan, rekMeta, isExtern, bodem,
     id, schoon, nu, save, d, geldModus, motorklant, bordSeintje });
 
   /* DE BETAALOPDRACHTEN: alles wat het huis verlaat krijgt een eigen rij naast
@@ -89,10 +90,14 @@ module.exports = (deps) => {
   /* EN DUURZAAM, als RTG Pay: zonder die vlag is de bundel atomair en niet
      duurzaam, en gaf /api/bank/akkoord een IBAN die de opslag nooit
      bevestigde (FAALPROEF: `gezakt`). Reikwijdte: GELDLAT.md. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen, duurzaam: true });
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen, duurzaam: true,
+    behoudSleutel: sleutel => sleutel.startsWith('rekopen-kantoor:'),
+    geldigeOntvangst: (sleutel, ontvangst) => !sleutel.startsWith('rekopen-kantoor:') ||
+      !!(ontvangst && ontvangst.rekening && typeof ontvangst.rekening.iban === 'string' &&
+        ontvangst.rekening.iban.trim()) });
 
   // de gedeelde context voor de deelbestanden
-  const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
+  const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, findSupplier, accounts, anthropic,
     nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje, opdrachten, metIdem,
     betaalWaarheid, economischeBoekingEenmaal }; // storten via de waarheid: ./stortwaarheid.js
 
@@ -113,7 +118,7 @@ module.exports = (deps) => {
   /* Het afschrift, de gezondheid en het boardroom-overzicht: alleen lezen,
      en daarom apart in ./bord. */
   const { afschrift, gezondheid, overzicht } = require('./bord')(
-    Object.assign({}, ctx, { sluitcontrole, opdrachten }));
+    Object.assign({}, ctx, lezen, { sluitcontrole, opdrachten }));
 
   /* Zelfde reden als bij pay: de zekering hoort op het bord (LAT.md regel 5).
      motorStand hierboven gaat over DRIFT (loopt de spiegel gelijk met de

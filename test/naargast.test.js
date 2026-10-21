@@ -15,6 +15,7 @@
 
    Draai: node --test test/naargast.test.js */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -38,8 +39,8 @@ async function registreer() {
 }
 async function metContract() {
   const lid = await registreer();
-  const a = (await api('/api/aanmelding/aanvraag', { pas: 'rtg', naam: 'Gast ' + lid.u, contact: lid.u + '@x.nl' }, lid.token)).body;
-  const b = await api('/api/aanmelding/beslis', { id: a.aanmelding.id, besluit: 'geaccepteerd' }, office);
+  const a = (await api('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'rtg', naam: 'Gast ' + lid.u, contact: lid.u + '@x.nl' }, lid.token)).body;
+  const b = await api('/api/aanmelding/beslis', { id: a.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, office);
   assert.equal(b.status, 200);
   return lid;
 }

@@ -21,6 +21,7 @@ const klok = require('../lib/klok');
 const { KANAAL } = require('./schrijflanen');
 const publiceerCollectie = require('../db/collectie-publicatie');
 const { merge3 } = require('../db/merge');
+const contractVan = require('../db/collectie-contract');
 
 module.exports = (ctx, schrijver) => {
   const { pool, uitStore, naarStore, toegepast, laatsteJson,
@@ -40,89 +41,96 @@ module.exports = (ctx, schrijver) => {
      gaat het spoor mee: een bewerker die niets wijzigde, heeft niets
      vastgelegd waar een regel bij hoort. */
   async function bewerkCollectie(sleutel, dataNu, werk, spoor) {
-    if (!sleutel || typeof werk !== 'function') throw new Error('Collectietransactie vereist een sleutel en bewerker.');
+    const contract = contractVan(sleutel, werk), sleutels = contract.sleutels;
     const spoorLijst = spoor && schrijver
-      ? schrijver.sorteer((spoor.wijzigingen || []).filter(w => w.sleutel !== sleutel)) : [];
+      ? schrijver.sorteer((spoor.wijzigingen || []).filter(w => !sleutels.includes(w.sleutel))) : [];
     if (spoor) spoor.geschreven = false;
     const client = await pool.connect();
-    let waarde, resultaat, jsonVoor, publicatieBasisJson, jsonNa, versie = null, spoorPublicaties = [];
+    const waarden = Object.create(null), standen = [];
+    let resultaat, spoorPublicaties = [];
     try {
       await client.query('BEGIN');
-      /* Alle sloten in een vaste volgorde, voor er iets gelezen wordt: dezelfde
-         volgorde als de requestcommit, dus geen kruisdeadlock met een verzoek
-         dat hetzelfde spoor en deze collectie samen commit. */
-      for (const k of [...new Set([sleutel, ...spoorLijst.map(w => w.sleutel)])].sort())
+      // Alle domein- EN auditsloten vóór de eerste lezing, in dezelfde vaste
+      // volgorde als de requestcommit: geen kruisdeadlock of halfverse check.
+      for (const k of [...new Set([...sleutels, ...spoorLijst.map(w => w.sleutel)])].sort())
         await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
-      const huidig = await client.query('SELECT val, ver, weg FROM kv WHERE key = $1 FOR UPDATE', [sleutel]);
-      /* EEN GRAFSTEEN telt hier als "bestaat niet" en niet als data (TAKEN.md
-         4.38). Twee redenen: `val` is dan leeg, dus JSON.parse zou struikelen;
-         en beginnen bij de werkkopie zou de gewiste collectie langs deze weg
-         alsnog laten herrijzen. Opnieuw vullen mag -- daarom vanaf leeg en niet
-         met een weigering. */
-      const bestaat = huidig.rows.length && !huidig.rows[0].weg;
-      jsonVoor = bestaat
-        ? uitStore(huidig.rows[0].val)
-        : JSON.stringify(huidig.rows.length ? {} : (dataNu[sleutel] == null ? {} : dataNu[sleutel]));
-      /* Neem ook lokaal openstaand werk mee dat al VOOR dit DB-slot via
-         S()/save() ontstond. Anders zou juist een ingetrokken zetel die nog op
-         de write-behind flush wacht buiten de autorisatie in `werk` vallen.
-         De extra JSON-ronde voorkomt dat `werk` via een gedeelde objectref al
-         vóór COMMIT aan db.data schrijft. */
-      const dbBasis = JSON.parse(jsonVoor);
-      /* Houd live-voor apart van de verenigde werkkopie. De werkkopie kan
-         verse DB-wijzigingen bevatten die live nog niet kende; publicatie mag
-         die niet aanzien voor een wijziging die tijdens deze tx ontstond. */
-      const liveVoor = dataNu[sleutel] == null ? (Array.isArray(dbBasis) ? [] : {}) : dataNu[sleutel];
-      // Een nooit ingelezen collectie is geen lokale verwijdering van de DB-rij.
-      const cacheBasis = laatsteJson.has(sleutel)
-        ? JSON.parse(laatsteJson.get(sleutel)) : (Array.isArray(liveVoor) ? [] : {});
-      publicatieBasisJson = JSON.stringify(liveVoor);
-      /* Een collectie die deze instance NOOIT zag (geen cache en geen live
-         waarde) heeft geen lokale wijziging: dan telt voor de samenvoeging de
-         database als live. Als `{}` las merge3 dat als "alles verwijderd", en
-         wiste de eerste transactie van instance B wat instance A net in een
-         NIEUWE collectie had gezet (gevonden door test/eten-kortingscode.pg.test.js).
-         De publicatiebasis blijft `{}`: lokaal stond er niets, dus de commit
-         moet daarna in zijn geheel in db.data landen. */
-      const liveMerge = dataNu[sleutel] == null && !laatsteJson.has(sleutel) ? dbBasis : liveVoor;
-      waarde = JSON.parse(JSON.stringify(merge3(cacheBasis, liveMerge, dbBasis)));
-      resultaat = werk(waarde);
+      const rijen = new Map();
+      for (const k of sleutels) {
+        const huidig = await client.query('SELECT val, ver, weg FROM kv WHERE key = $1 FOR UPDATE', [k]);
+        rijen.set(k, huidig.rows[0]);
+      }
+      // Pas na ALLE database-I/O de levende waarden samen kopiëren. Anders
+      // kan één lokale synchrone mutatie tussen twee SELECTs een halfoud paar
+      // in de callback opleveren, ondanks correcte databasevergrendeling.
+      for (const k of sleutels) {
+        const rij = rijen.get(k), grafsteen = !!(rij && rij.weg);
+        if (grafsteen) contract.verwijderd(k);
+        // Stringcallers houden hun bestaande herscheppad. Een typed contract
+        // weigert een grafsteen hierboven, zodat een receipt niet verdwijnt.
+        const jsonVoor = rij && !grafsteen ? uitStore(rij.val)
+          : JSON.stringify(grafsteen ? {} : (contract.getypeerd || dataNu[k] == null ? contract.leeg(k) : dataNu[k]));
+        // Bij een typed contract is lokale beginstand nog GEEN duurzame
+        // DB-basis. Neem die via merge mee en schrijf hem samen met de andere
+        // bakken; anders kan een receipt naar een RAM-only object wijzen.
+        const dbBasis = JSON.parse(jsonVoor);
+        contract.controleer(k, dbBasis);
+        if (contract.getypeerd && Object.hasOwn(dataNu, k)) contract.controleer(k, dataNu[k]);
+        const liveVoor = dataNu[k] == null ? (Array.isArray(dbBasis) ? [] : {}) : dataNu[k];
+        const cacheBasis = laatsteJson.has(k)
+          ? JSON.parse(laatsteJson.get(k)) : (Array.isArray(liveVoor) ? [] : {});
+        contract.controleer(k, cacheBasis);
+        const publicatieBasisJson = JSON.stringify(liveVoor);
+        // Geen cache EN geen lokale waarde is geen lokale verwijdering.
+        // Neem de DB als merge-invoer, maar onthoud de echte live-basis voor
+        // publicatie; anders wist een nieuwe worker de vorige commit.
+        const liveMerge = dataNu[k] == null && !laatsteJson.has(k) ? dbBasis : liveVoor;
+        waarden[k] = JSON.parse(JSON.stringify(merge3(cacheBasis, liveMerge, dbBasis)));
+        contract.controleer(k, waarden[k]);
+        standen.push({ k, rij, grafsteen, jsonVoor, publicatieBasisJson, versie: null });
+      }
+      resultaat = contract.getypeerd
+        ? werk(waarden, contract.context(standen.map(s => [s.k, !!s.rij && !s.grafsteen]))) : werk(waarden[sleutels[0]]);
       if (resultaat && typeof resultaat.then === 'function')
         throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');
-      jsonNa = JSON.stringify(waarde);
-      if (jsonNa !== jsonVoor || (huidig.rows.length && huidig.rows[0].weg)) {
-        const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
-        versie = Number(nv.rows[0].v);
-        await client.query(
-          // `weg = false`: schrijven heft een grafsteen op, net als in de gewone flush
-          `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
-           ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, weg = false, bijgewerkt = now()`,
-          [sleutel, naarStore(jsonNa), versie]
-        );
-        await client.query('SELECT pg_notify($1, $2)', [KANAAL, sleutel]);
-        if (spoorLijst.length) spoorPublicaties = await schrijver.schrijfIn(client, spoorLijst);
-      } else if (huidig.rows.length) versie = Number(huidig.rows[0].ver);
+      contract.controleerMap(waarden);
+      for (const s of standen) {
+        s.jsonNa = JSON.stringify(waarden[s.k]);
+        s.waarde = contract.getypeerd ? JSON.parse(s.jsonNa) : waarden[s.k];
+      }
+      let gewijzigd = false;
+      for (const s of standen) {
+        if (s.jsonNa !== s.jsonVoor || s.grafsteen) {
+          const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
+          s.versie = Number(nv.rows[0].v);
+          await client.query(
+            `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
+             ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, weg = false, bijgewerkt = now()`,
+            [s.k, naarStore(s.jsonNa), s.versie]);
+          await client.query('SELECT pg_notify($1, $2)', [KANAAL, s.k]);
+          gewijzigd = true;
+        } else if (s.rij) s.versie = Number(s.rij.ver);
+      }
+      if (gewijzigd && spoorLijst.length) spoorPublicaties = await schrijver.schrijfIn(client, spoorLijst);
       await client.query('COMMIT');
       if (spoor && spoorPublicaties.length) spoor.geschreven = true;
     } catch (e) {
       try { await client.query('ROLLBACK'); } catch (x) {}
       throw e;
-    } finally {
-      client.release();
-    }
-    /* Tussen de eerste SELECT en COMMIT blijft de event-loop vrij. Een gewone
-       route kan dan dezelfde levende collectie wijzigen en save() plannen.
-       Publiceer daarom niet met een assignment: voeg de commit samen tegen de
-       exacte live-basis van vóór `werk`. laatsteJson blijft afzonderlijk
-       de commit-basis, zodat de gewone flush het live verschil nog ziet. */
+    } finally { client.release(); }
+    // Pas NA de gezamenlijke commit publiceren. Gewone routes kunnen tijdens
+    // I/O lokale wijzigingen maken: behoud die via de exacte live-voorbasis;
+    // de afzonderlijke cachebasis blijft de werkelijk gecommitte JSON.
     if (spoorPublicaties.length) schrijver.publiceer(dataNu, spoorPublicaties);
-    const gepubliceerd = publiceerCollectie({ dataNu, sleutel, basisJson: publicatieBasisJson,
-      commitWaarde: waarde, commitJson: jsonNa, versie, toegepast, laatsteJson });
-    if (gepubliceerd.cacheBijgewerkt) {
-      laatsteGrootte.set(sleutel, jsonNa.length);
-      laatsteLengte.set(sleutel, Array.isArray(waarde) ? waarde.length :
-        (waarde && typeof waarde === 'object' ? Object.keys(waarde).length : 0));
-      laatsteCheck.set(sleutel, klok.nu());
+    for (const s of standen) {
+      const gepubliceerd = publiceerCollectie({ dataNu, sleutel: s.k,
+        basisJson: s.publicatieBasisJson, commitWaarde: s.waarde, commitJson: s.jsonNa,
+        versie: s.versie, toegepast, laatsteJson });
+      if (gepubliceerd.cacheBijgewerkt) {
+        laatsteGrootte.set(s.k, s.jsonNa.length);
+        laatsteLengte.set(s.k, Array.isArray(s.waarde) ? s.waarde.length :
+          (s.waarde && typeof s.waarde === 'object' ? Object.keys(s.waarde).length : 0));
+        laatsteCheck.set(s.k, klok.nu());
+      }
     }
     return resultaat;
   }

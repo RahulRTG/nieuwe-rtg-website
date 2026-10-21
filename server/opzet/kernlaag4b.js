@@ -21,7 +21,7 @@ module.exports = (kern, hulp) => {
   const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, bewerkCollectie, bijeen, rondEuro, crypto, db, economischeBoekingEenmaal, findSupplier, fonds, keyVanCodenaam, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 const { bankregie } = require('./bank')(kern, { db, save, bijeen, economischeBoekingEenmaal,
-  crypto, schoon, betaal, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten });
+  crypto, schoon, betaal, keyVanCodenaam, findSupplier, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten });
 /* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */

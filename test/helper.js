@@ -2,6 +2,7 @@
    poort en wacht robuust tot hij gezond is. Zo botsen parallelle of snel
    opeenvolgende tests niet meer op dezelfde poort (de oude oorzaak van
    sporadische "fetch failed"), en kan de suite weer met concurrency draaien. */
+const { randomUUID } = require('node:crypto');
 const { spawn } = require('node:child_process');
 const net = require('node:net');
 const os = require('node:os');
@@ -674,8 +675,8 @@ async function kantoorKoppelBody(base, lidToken, extra, opties) {
    op een omweg. */
 async function elevateTier(base, memberToken, pas, approverToken) {
   const post = postJson(base);
-  const aanvraag = await post('/api/aanmelding/aanvraag', { pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
-  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+  const aanvraag = await post('/api/aanmelding/aanvraag', { idem: randomUUID(), pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
+  const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   if (!id) throw new Error('elevateTier: aanvraag mislukt (' + JSON.stringify(aanvraag).slice(0, 120) + ')');
   let goedkeurder = approverToken;
   if (pas === 'lifestyle' || pas === 'business') goedkeurder = (await kantoorAlsPersoon(base)) || approverToken;

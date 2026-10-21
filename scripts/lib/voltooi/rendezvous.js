@@ -16,6 +16,7 @@
    worden allebei geweigerd -- dat zijn de schakels van "rol zonder recht".
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const { inloggen, eigenaarSessie, geverifieerdLid, lifestyleLid, KANTOORWERELD } = require('../voltooiwereld');
 
 const PROFIEL = '/api/member/rendezvous/profiel';
@@ -29,9 +30,9 @@ const BLOKKEER = '/api/member/rendezvous/blokkeer';
 /* Geverifieerd paspoort EN Lifestyle Pass, allebei door een mens van RTG. */
 async function signatureLid(w, merk) {
   const lid = await geverifieerdLid(w, merk);
-  const a = await w.post('/api/aanmelding/aanvraag', { pas: 'lifestyle', naam: 'Rendezvouslid ' + merk,
+  const a = await w.post('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'lifestyle', naam: 'Rendezvouslid ' + merk,
     contact: lid.email, viaUitnodiging: true }, lid.token);
-  const id = a.data && a.data.aanmelding && a.data.aanmelding.id;
+  const id = a.data && a.data.ontvangst && a.data.ontvangst.aanvraagId;
   if (a.status !== 200 || !id) throw new Error('de Lifestyle-aanvraag lukte niet (' + a.status + ')');
   const b = await w.post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, await eigenaarSessie(w));
   if (b.status !== 200) throw new Error('het kantoor kon de Lifestyle Pass niet toekennen (' + b.status + ')');

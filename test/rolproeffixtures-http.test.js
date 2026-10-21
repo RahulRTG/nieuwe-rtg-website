@@ -7,7 +7,7 @@ const { maakProeflid, metToestellen } = require('../scripts/lib/proeftoestel');
 const { maakRolfixtures, FIXTURE_ROUTES } = require('../scripts/lib/rolproeffixtures');
 const { draaiRolproef } = require('../scripts/lib/rolproef');
 
-test('vijf standaard-uit deuren zijn pas meetbaar na eigenaarbesluit en echte positieve routecontroles', { timeout: 120000 }, async () => {
+test('standaard-uit deuren en verificatie worden met echte positieve routecontroles gekruist', { timeout: 120000 }, async () => {
   const server = await start({ naam: 'rolfixture-http', env: {
     RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF'
   } });
@@ -20,7 +20,7 @@ test('vijf standaard-uit deuren zijn pas meetbaar na eigenaarbesluit en echte po
       office: (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token
     };
     assert.ok(Object.values(tokens).every(Boolean), 'alle drie rollen moeten bestaan');
-    for (const route of FIXTURE_ROUTES) {
+    for (const route of FIXTURE_ROUTES.filter(r => r.functie !== 'verificatie')) {
       assert.equal((await vraag(route.methode, route.pad, {}, tokens[route.rol] || tokens.office)).status, 503,
         route.pad + ' is zonder eigenaarbesluit standaard uit');
     }
@@ -33,7 +33,7 @@ test('vijf standaard-uit deuren zijn pas meetbaar na eigenaarbesluit en echte po
     const uit = await draaiRolproef({ post: metToestellen(post, { voorLid: { lid: lid.klaar, van: () => tokens.member } }),
       vraag, routes: FIXTURE_ROUTES, tokensVoor: () => tokens, fixtureVoor: r => fixtures[r.methode + ' ' + r.pad] });
     assert.equal(uit.bevindingen.meterStuk, undefined, JSON.stringify(uit.bevindingen));
-    assert.equal(uit.pogingen, 11);
+    assert.equal(uit.pogingen, 17);
     assert.deepEqual(uit.bevindingen.gewijzigd, []);
     assert.deepEqual(uit.bevindingen.onbeslist, []);
     for (const rij of Object.values(uit.perRoute)) {

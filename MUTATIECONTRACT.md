@@ -1653,3 +1653,384 @@ Betrokken routes: `POST /api/aanmelding/aanvraag`,
 `POST /api/werkplek/taak`, `POST /api/labfonds/scheidsrechter`,
 `POST /api/office/magnaat/scan`, `POST /api/rtf/onboarding/teken`.
 Geen productie-uitrol zonder afzonderlijke vrijgave.
+
+### 9.1 Aanmelding: opslagbesluit nog open (21 oktober 2026)
+
+**Historische vergelijking.** Op 22 oktober is optie 2 expliciet toegestaan en
+zijn antwoordvorm en technisch ontvangstbehoud gedelegeerd en ingevuld; zie
+§9.3 voor het actuele besluit. Onderstaande vergelijking verklaart de afweging.
+
+**Voorstel, geen goedkeuring of implementatie.** De eigenaar vroeg een vergelijking
+van drie opslagvormen voor `POST /api/aanmelding/aanvraag`. Het gedragscontract
+hierboven staat vast; een nieuwe opslagarchitectuur is niet goedgekeurd. De
+bestaande aanvraagroute en synchrone kern zijn daarom ongewijzigd. Deze route
+blijft ongekwalificeerd totdat architectuur, retentie en echte tegenproeven rond
+zijn. Geen contractregister of bewijsstatus wordt met dit voorstel opgewaardeerd.
+
+**Wat de huidige bron wel en niet biedt.**
+[`server/kern/aanmeldingen/aanvraag.js`](server/kern/aanmeldingen/aanvraag.js)
+voegt een rij toe aan de array `aanmeldingen` en kapt die af op 5000. Een
+ontvangstbinding op een verdwenen rij voorkomt geen hercreatie. Metadata als
+eigenschap van de array valt bij JSON-serialisatie weg. De begrensde cache en
+proceslokale wachtlijst in [`server/lib/idem.js`](server/lib/idem.js) leveren
+evenmin de blijvende garantie over workers.
+
+RTG **kan al meerdere wijzigingen atomair opslaan**. De huidige
+[`server/pg/collectietransactie.js`](server/pg/collectietransactie.js) neemt naast
+één domeincollectie meerdere auditcollecties mee in dezelfde transactie en
+sorteert alle advisory locks vóór het lezen. De requestcommit gebruikt
+[`server/pg/verzoekschrijf.js`](server/pg/verzoekschrijf.js) voor meerdere KV-rijen,
+row locks, versies en publicatie na commit. Dat maakt een eerdere dedupecheck
+tegen een oude worker-cache nog niet autoritatief. Wat ontbreekt is een generieke
+domeincallback die **meerdere verse collecties samen leest, controleert en
+verandert onder die sloten**. Twee losse `bewerkCollectie`-calls, ook genest,
+vormen die transactie niet.
+
+De bestaande
+[`server/db/collectie-sqlite.js`](server/db/collectie-sqlite.js) gebruikt
+`BEGIN IMMEDIATE`, leest één verse KV-rij, voert een synchrone callback uit en
+publiceert pas na `COMMIT`. SQLite kan binnen datzelfde slot meerdere rijen
+verwerken; die interface is hier nog niet geïmplementeerd. De economische
+PG/SQLite-poorten hebben al meerdere domeincollecties, maar eisen expliciet een
+`bank`/`pay`-identiteit en bijpassende grootboekregels. Die controle voor aanvragen
+omzeilen of een aanvraag als bankboeking voordoen is geen hergebruik.
+
+| Optie | Concrete vorm en voordeel | Verandering, risico en grens |
+|---|---|---|
+| 1. Eén atomair aanvraagregister met ontvangstbewijs | Eén collectie met getypeerde velden `aanvragen` en `ontvangsten`; de huidige enkele collectiepoort kan de volledige dedupecheck en creatie onder één slot doen. Cleanup van het aanvraagvenster laat de ontvangstbinding staan. | `aanmeldingen` is nu een array. Een envelop op dezelfde sleutel vereist een migratie van alle directe readers/writers en de synchrone interne caller. Een tweede register naast de array maakt de oude array een projectie; zonder één eigenaar ontstaat een tweede waarheid. Eén grote blob groeit en serialiseert alle aanvragen. Metadata op een array is uitdrukkelijk geen variant van deze optie. |
+| 2. Bestaande collectiepoort uitbreiden | De bestaande array blijft de aanvraagbron. Een aparte ontvangstcollectie deelt één autoritatieve transactie met die array. Dit behoudt de bestaande domeinopslag en bouwt voort op de huidige slotsortering, auditcommit en publicatie. | Wijziging van gedeelde opslagcode met veel bestaande gebruikers. De stringinterface moet gelijk blijven; versheid, grafstenen, lokale nog niet opgeslagen wijzigingen, audit en publicatie moeten voor elke betrokken collectie kloppen. Technisch aansluitend op de bron, maar pas veilig na PG- én SQLite-proeven. |
+| 3. Duurzaam idempotentieregister met herstelprotocol | Een duurzame statusmachine claimt actor+UUID+afdruk en bewaart een vooraf bepaalde objectidentiteit. Bij uitval herstelt een volgende worker de onvoltooide intentie; geen succes zolang de creatie niet duurzaam bewezen is. | Een claim committen vóór de aanvraag is op zichzelf onvoldoende. Nodig zijn lease/fencing, een uniek effect-ID, herstel na elke tussenstand, bescherming tegen een oude worker na leaseovername en een reconciliatieprocedure. Zonder atomische effectmarkering met de aanvraag blijft er een crashgat; gebruikt men daarvoor optie 2, dan is dit een extra laag boven dezelfde oplossing. Groter dan de huidige aanvraagbehoefte. |
+
+**Aanbeveling ter besluitvorming: optie 2**, mits de onderstaande retentie- en
+compatibiliteitskeuzes worden goedgekeurd en de gedeelde opslagproeven slagen.
+Optie 1 is verdedigbaar als tegelijk expliciet voor een migratie naar één nieuw
+aanvraagmodel wordt gekozen. Drie productiepaths lezen de lijst rechtstreeks:
+`server/opzet/kernlaag4.js` (bedrijfsmaat), `server/opzet/bewaarveger.js`
+(lidmaatschapsduur) en `server/kern/vergeten/anoniem.js` (anonimisering). Daarnaast
+hebben de eigenaar en zijn vier submodules de geïnjecteerde `A()`-lijstinterface.
+Die interface kan behouden blijven, maar de gegevensmigratie en deze directe
+paden moeten samen over. Gemengde oude/nieuwe workers zijn daarbij onveilig:
+`eigencollectie` kan een onherkende containervorm als leeg herstellen. De
+privacy-wisser mag geen nieuwe ontvangstregistratie met bewaarde persoonsgegevens
+overslaan. Optie 3 is pas passend wanneer dezelfde intentie
+onvermijdelijk meerdere afzonderlijke transacties of externe effecten heeft;
+deze aanvraag maakt nu een lokale aanvraagrij en heeft dat niet nodig.
+
+**De voorgestelde interface is getypeerd, niet alleen een lijst namen.**
+Een kale array zoals `['aanmeldingen', 'aanmeldingOntvangsten']` zegt niet dat de
+eerste waarde een lijst en de tweede een kaart moet zijn. Een ontbrekende
+collectie wordt nu standaard `{}`; blind hergebruik zou opnieuw metadata op een
+verkeerde container kunnen laten verdwijnen. Voorkeur als voorstel:
+
+```js
+bewerkCollectie({
+  aanmeldingen: 'lijst',
+  aanmeldingOntvangsten: 'kaart'
+}, ({ aanmeldingen, aanmeldingOntvangsten }) => {
+  // Synchroon: controleer ontvangst, maak hoogstens één aanvraag, noteer ontvangst.
+});
+```
+
+Dit is nog geen bestaande API. Het descriptorcontract moet alleen toegestane
+eigen sleutels en containerklassen accepteren, ongeldige bestaande waarden
+weigeren en een lege container alleen bij echte afwezigheid gebruiken. Een
+grafsteen is geen onbekende sleutel. Die afhandeling mag noch de huidige
+enkele-collectiesemantiek veranderen, noch een verwijderde ontvangstcollectie
+automatisch als een leeg ontvangstboek behandelen. De oude stringinterface
+blijft gelijk; een object mag nooit via `String(object)` een andere KV-sleutel
+worden. Geen nieuwe database of tweede transactie-engine.
+
+De begrensde bronwijziging voor optie 2 raakt
+`server/db/collectie-bewerken.js`, `server/db/collectie-postgres.js`,
+`server/pg/collectietransactie.js` en `server/db/collectie-sqlite.js`. De bestaande
+`verzoekspoor.voorVroegeCommit` en `verzoekcontext.eigenCommit` accepteren al
+meerdere sleutels. Gebruik die bestaande audit- en requestintegratie en
+`server/db/collectie-publicatie.js`: geen cachepublicatie vóór commit, geen
+teruglopende versies, geen verlies van tussentijds lokaal werk. Een
+gemeenschappelijke interne helper is alleen gerechtvaardigd door gedeelde
+logica; geen parallelle meter of opslaglaag.
+
+De domeinwijziging komt in een kleine submodule bij
+`server/kern/aanmeldingen/aanvraag.js`, met een aparte asynchrone externe
+`aanvraagBedoeling`. `server/kern/aanmeldingen.js` blijft de synchrone
+`aanvraag` aanbieden aan onder meer `server/kern/onderneming/aanvraag.js`.
+`server/opzet/kernlaag2.js` geeft de bestaande opslagpoort door;
+`server/routes/aanmeldingen.js` wacht uitsluitend bij de externe aanvraag op de
+nieuwe methode. De huidige synchrone `veilig()`-helper mag geen Promise als
+leeg 200-antwoord versturen. Normalisatie van de inhoud wordt gedeeld met de
+bestaande aanvraag-/bedrijfsbouwer, niet opnieuw los nagemaakt.
+
+**Minimaal ontvangstbewijs en een expliciete retentiekeuze.** Een tweede
+onbegrensd archief met naam, contact, bedrijfsbehoeften of alle aanvraagantwoorden
+is niet het voorstel. De huidige response bevat die invoer én later mutable
+`besluit`/`gezaakt`; een replay mag nooit `beeld(actueleAanmelding)` ophalen.
+Voorstel voor een nieuw compact antwoord is alleen ontvangst-ID, aanvraag-ID,
+eerste ontvangsttijd en de vaste bevestiging `ontvangen`, zonder persoonsinhoud,
+kantoorbesluit, notitie, account-/staff-ID of actuele status. Ook deze indirecte
+verwijzingen zijn niet vanzelf anoniem. De bron met de daadwerkelijke aanvraag
+blijft de enige inhoudelijke aanvraagbron.
+
+Voor de binding zijn tijdens de replayperiode minimaal nodig: schemaversie,
+routegebonden opdrachtsleuteldigest, servergebonden actordigest, inhoudsafdruk en
+het compacte antwoord. Een eenvoudige hash van voorspelbare persoonsgegevens
+is geen privacymaatregel. Het ontwerp moet een sleutelgebonden afdruk met
+versiebeheer gebruiken; de bestaande versleutelde opslag blijft van toepassing.
+Er worden geen oude receipts uit historische aanvragen verzonnen. Voorstel
+voor de UUID is een willekeurige v4, één per bewuste aanvraag; de exacte vorm
+wordt vóór invoering vastgelegd.
+
+Het retentiebesluit kan niet uit de bestaande limiet van 5000 worden afgeleid:
+dat is een aantalgrens, geen vastgestelde bewaartermijn. Er zijn twee
+verschillende eigenschappen: de aanvraaginhoud opruimen en voorkomen dat een
+oude intentie opnieuw effect krijgt. De eigenaar moet de volgende concrete
+keuze nog maken:
+
+- **Een configureerbaar, expliciet vastgesteld replay-/retentievenster vanaf
+  de eerste commit.** Er is nog geen duur goedgekeurd. De onderbouwing moet
+  aansluiten op de benodigde herstelperiode, operationele afhandeling en
+  privacy-/verwijderprocedure; deze inspectie heeft geen gebruiksmeting die een
+  concrete duur rechtvaardigt. Leg duur, reden, beleidsversie en goedkeurder vast
+  vóór uitvoering; geen willekeurige standaardwaarde. Na dat venster kunnen
+  actordigest, inhoudsafdruk, aanvraagverwijzing en ontvangsttijd uit de
+  ontvangstregistratie worden verwijderd; naam/contact/bedrijf staan er nooit in.
+  Een afzonderlijke compacte verbruikstombstone kan daarna uitsluitend een
+  generieke 410 geven, nooit een nieuwe aanvraag. Die tombstone is zelf geen
+  bewijs van anonimiteit en mag niet ongemerkt een permanente persoonsindex
+  worden. De bewaartermijn en verwijdering van de echte aanvraaginhoud moeten
+  afzonderlijk worden vastgesteld; er is hier geen bestaande termijn gemeten.
+- **Een 410 na opruiming is een nog te kiezen contractoptie**, geen reeds
+  toegestane implementatie. Die weigering mag een oud verzoek nooit opnieuw
+  uitvoeren. Een dubbele-opdrachtstatus hoeft geen volledige persoonsgegevens-
+  response te bevatten; ook een compact bewijs kan dezelfde eerdere ontvangst
+  bevestigen. De keuze tussen dat bewijs en een latere generieke 410 wordt
+  expliciet met de eigenaar vastgelegd.
+- **Volledige eindige cleanup van alle bindingsmetadata** is met een vrije
+  willekeurige UUID en onbeperkte acceptatie van onbekende sleutels niet veilig:
+  na verwijdering is een oude UUID niet te onderscheiden van een nieuwe. Daarvoor
+  is aanvullend een serververifieerbare, eindige geldigheid van de intentie nodig
+  (bijvoorbeeld een ondertekende epoch naast de UUID), waarna verlopen intenties
+  ook zonder individuele tombstone worden geweigerd. Dat is extra protocol- en
+  sleutelbeheer en is evenmin goedgekeurd. Zonder zo'n keuze blijven retentie
+  en dus de uitvoering geblokkeerd; er komt geen stilzwijgend permanente opslag.
+
+Bij cleanup gelden dezelfde sloten als bij create/replay. Geen nieuw bedrijfseffect
+na vervaldatum, ook niet door een gelijktijdige replay. Bewaar-/vervalbeleid is
+een expliciete invoer van de proef, geen hardcoded uitzondering op idempotentie.
+
+**Actoren en overgang.** De actor komt uit een servergeverifieerd accounttoken,
+nooit uit `body.accountId`. De openbare aanvrager zonder geverifieerde identiteit
+blijft anoniem; UUID en inhoudsafdruk zijn geen autorisatiebewijs voor later
+lezen, beslissen, uploaden of koppelen. Gewijzigde inhoud geeft een generieke 409
+zonder bestaand antwoord. Een nieuw UUID staat voor een bewuste nieuwe aanvraag.
+De al bestaande publieke `/api/aanmelding/bewijs`-route gebruikt een aanvraag-ID;
+dit voorstel kwalificeert die afzonderlijke toegang niet als veilig.
+
+De volledige callerzoekactie vond HTTP-fixtures en verificatiescripts, geen
+directe publieke aanvraag-UI. Een compacter antwoord is wel een externe
+compatibiliteitswijziging en vereist expliciete migratie; de afwezigheid van een
+gevonden UI bewijst niet dat er geen externe client bestaat. Bij bewuste
+aanvraagbuilders zoals `test/helper.js:elevateTier`, `test/gezelschap.js` en
+`scripts/lib/voltooi/reisboek.js` wordt eenmaal een UUID gemaakt en bij retry
+behouden. Niet automatisch injecteren in generieke `postJson`/`fetch`: dat zou
+ontbrekende-sleuteltests verbergen en retries nieuwe intenties geven. Ontbrekende
+of misvormde sleutel wordt expliciet geweigerd, zonder serverfallback. De
+synchrone interne ondernemingaanvraag en menselijke toelatingsbeslissing blijven
+gelijk en krijgen echte regressieproeven met de aanvraagkern.
+
+**Crash, concurrentie, cleanup en conflict moeten in één proefplan passen.**
+
+| Moment of tegenproef | Vereiste uitkomst bij optie 1 of 2 | Aanvullende eis bij optie 3 |
+|---|---|---|
+| Crash vóór commit, ook na eerste KV-write | Noch aanvraag noch receipt is gecommit; retry kan eenmaal creëren. | Een eerdere claim kan blijven staan; herstel moet veilig vaststellen dat het effect nog niet bestaat. |
+| Crash na commit maar vóór antwoord | Beide bestaan; andere worker/restart geeft hetzelfde compacte bewijs binnen de replayperiode, zonder nieuwe aanvraag. | Herstel moet het al gecommitte effect vinden en dezelfde ontvangst finaliseren zonder duplicaat. |
+| Twee workers, zelfde actor/UUID/inhoud | Beide krijgen hetzelfde bewijs; één aanvraag en één ontvangst. Controleer beide echte DB-rijen, niet alleen HTTP-status. | Claims en overname hebben fencing; een oude worker kan geen tweede effect maken. |
+| Zelfde actor/UUID, andere inhoud, tegelijk of later | Eén oorspronkelijke intentie, andere inhoud 409; geen persoonsgegevens in het foutantwoord. | De claim bewaart de oorspronkelijke afdruk; herstel mag die niet vervangen. |
+| Andere bevoegde actor; body probeert actor te wijzigen | Serverbinding blijft leidend. Positieve controle voor eigen nieuwe intentie; geen toegang tot het bewijs van de ander. | Zelfde actorgrens geldt bij claim, leaseovername en herstel. |
+| Tweede write of audit-trigger faalt | Hele transactie rolt terug, geen vroeg succes of RAM-publicatie; geldige retry slaagt. | Geen claim als voltooid markeren zonder duurzaam effectbewijs. |
+| Aanvraag valt uit 5000-venster, JSON-reload, restart | Replay hercreëert niets; ontvangst/tombstone volgt het expliciet gekozen retentiecontract. | Reconciliatie mag een gearchiveerd effect niet aanzien voor een nooit uitgevoerd effect. |
+| Cleanup tegelijk met replay; verlopen intentie na herstart | Uitkomst volgens dezelfde vaste vervalgrens; geen race tot hercreatie. Test ook verwijderde/grafsteen-ontvangstcollectie en oude worker-cache. | Cleanup mag een claim of effectbewijs niet verwijderen terwijl een oudere worker nog kan schrijven. |
+
+Voer de directe opslagproeven tegen echte PostgreSQL en SQLite uit. Hergebruik
+de controles van `test/collectie-transactie-sqlite.test.js`,
+`test/auditspoor-atomair.pg.test.js` en de cache-/publicatietests. Een procesherstart
+na een succesvolle request bewijst geen crash midden in een transactie: voeg
+expliciete barrières vóór commit en na commit vóór antwoord toe. Test verder
+de ongewijzigde stringinterface, onbekende cache bij worker B, getypeerde lege
+containers, volledige rollback en geen vroeg succes voor een tweede caller.
+Privacytegenproef: anoniem indienen, kantoor voegt een unieke geheime notitie
+toe, replay zonder token via tweede worker en na herstart onthult die niet.
+
+**Terugrollen.** Vóór eerste gebruik kan de nieuwe wiring teruggenomen worden.
+Na een gecommitte receipt mag rollback niet de oude onbeveiligde create-handler
+terugzetten: dezelfde retry zou weer een aanvraag maken. Zet zo nodig alleen
+deze route tijdelijk op expliciete 503 met behoud van de UUID, behoud aanvraag-
+en ontvangstdata, herstel de compatibele opslagcode en bewijs retry opnieuw.
+Een metadata-cleanup of schemawijziging vraagt vooraf een geteste herstelweg;
+geen receipts wissen en vervolgens oude intenties opnieuw toelaten.
+
+**Historisch ontwerpbewijs vóór de goedkeuring (§9.3):** zes voorgestelde pure tests waren rood op de toen ontbrekende
+`aanvraagBedoeling`; dit is acceptatieontwerp, geen productregressie of voltooid
+contract. De proef en het roodlog staan buiten de repository in
+`output/premium-ready-20261020/evidence/round2/aanmelding-proposed.test.js` en
+`aanmelding-proposed-red.log` in de bovenliggende werkruimte. Geen voorgestelde
+workerproef is aan CI toegevoegd; geen HTTP-, PG- of SQLite-run van deze
+opslaguitbreiding is uitgevoerd. Het volgende besluit betreft dus optie,
+retentie en compact antwoord; pas daarna volgen bronwijziging en kwalificatie.
+
+### 9.2 De zeven goedgekeurde contracten en hun bewijs
+
+Dit is de koppeling van het eigenaarsbesluit aan benodigde proeven, geen nieuwe
+kwalificatie. Een groen unitresultaat bewijst niet automatisch het worker-,
+crash-, bevoegdheids- of privacydeel van dezelfde regel. Dezelfde opstelling
+bevat steeds een geldige positieve controle en de negatieve tegenproef; een
+serverfout of ontbrekende fixture telt niet als geslaagde afscherming.
+
+| Route en oorspronkelijke regel | Vereist concreet bewijs |
+|---|---|
+| `POST /api/aanmelding/aanvraag`: één aanvraag per actor/context en intentie | Ontbrekende sleutel weigeren; gelijke inhoud geeft hetzelfde compacte bewijs uit §9.3; gewijzigde inhoud 409; nieuwe intentie maakt een nieuwe aanvraag. Twee workers, commitbarrières en herstart leveren samen één aanvraag/receipt. Het 5000-venster, JSON-reload, cleanup en anonieme replay lekken niets en veroorzaken geen hercreatie. Na redactie weigert iedere oude intentie met 410: er is geen afdruk meer voor een inhoudsvergelijking. |
+| `POST /api/member/bureau/zaak/open`: één zaak per bewuste opdracht | Geldige actor opent eenmaal; dezelfde actor/sleutel/inhoud geeft dezelfde zaakidentiteit; inhoudsconflict 409; nieuwe sleutel maakt een nieuwe zaak. Vreemde of onbevoegde sessie krijgt geen oude response. Twee workers en crash/restart dupliceren geen zaak, beoordeling of persistent gevolg; archivering verwijdert de intentiebinding niet stil. |
+| `POST /api/office/bank/rekening/open`: opdracht, bevoegdheid en rekeninghouder afzonderlijk | Echte bevoegde actor en toegestane houder als positieve controle. Verander onder dezelfde opdracht de houder of inhoud: 409, geen tweede rekening. Herhaal met ontbrekende/ingetrokken bevoegdheid: geen replay van beschermd resultaat. Twee workers, falende commit en herstart houden rekening en ontvangst bij elkaar; controleer de rekeningverzameling rechtstreeks. |
+| `POST /api/werkplek/taak`: één taak per bewuste opdracht | Verplichte sleutel; gelijke genormaliseerde inhoud levert dezelfde taakidentiteit; wijzig titel/instructie/toewijzing onder die sleutel en verwacht 409. Nieuwe sleutel maakt een bewust nieuwe taak. Serveractor en werkplekgrens blijven geldig bij replay; twee workers en crash/restart leveren één taak en één ontvangst. |
+| `POST /api/labfonds/scheidsrechter`: iedere bewuste keer opnieuw rekenen | Verander de relevante broninvoer en voer opnieuw uit: de uitkomst wordt opnieuw uit de nieuwe bron berekend. Geen cache die een bewuste herberekening onderdrukt. Gelijke of gelijktijdige rekenrondes mogen geen financiële/persistente gevolgen verdubbelen; controleer effectidentiteiten en opslag, niet alleen het antwoord. Er volgt geen automatische financiële uitvoering uit dit besluit. |
+| `POST /api/office/magnaat/scan`: iedere bewuste keer opnieuw rekenen | Twee bewuste scans met veranderde bron tonen verse afleiding; ontbrekende kantoorbevoegdheid blijft geweigerd. Concurrentie, retry en herstart verdubbelen geen persistente maatregelen of financiële gevolgen. Een analyseantwoord is geen bewijs dat een voorgestelde maatregel is uitgevoerd. |
+| `POST /api/rtf/onboarding/teken`: exact één onveranderlijke versie per akkoord | Toon en stuur de verwachte versie; ontbrekende/verouderde versie weigeren. Zelfde versie en naam behouden de eerste ontvangsttijd, gewijzigde naam geeft expliciet conflict. Gewijzigde contracttitel of tekst heeft een nieuwe versie en vraagt nieuw akkoord; oude tekst en ontvangst blijven samen aantoonbaar. Twee workers, commitfout en crash/restart maken geen dubbel of half bewijs. Legacydata krijgt geen achteraf verzonnen tekstbewijs. |
+
+Voor alle zeven blijft de overgangsregel gelden: clients houden dezelfde
+intentie bij onzeker antwoord, beginnen alleen bewust een nieuwe en krijgen
+een expliciete herstelbare weigering als de verplichte sleutel/versie ontbreekt.
+Geen hidden fallback, skip, nieuwe productienorm of uitrol volgt uit deze tabel.
+
+### 9.3 Vervolg 22 oktober: beperkte transactie-uitbreiding en minimale ontvangst
+
+De eigenaar heeft de beperkte uitbreiding van de **bestaande** collectiepoort
+(optie 2) expliciet goedgekeurd en de twee productkeuzes aan de uitvoerders
+gedelegeerd. Het gekozen contract hieronder vervangt de open beslispunten uit
+§9.1. Dit is geen integrale kwalificatie of productie-uitrol: de uitvoering
+blijft oranje tot de gezamenlijke HTTP-, opslag-, herstel- en privacyproeven rond
+zijn. Er is geen willekeurige bewaartermijn ingevoerd.
+
+De poort accepteert de bestaande stringinterface of een getypeerde map van
+`lijst`/`kaart`. De synchrone typed callback krijgt ook een onveranderlijke tweede
+context `meta.bestaat`, vastgesteld bij dezelfde autoritatieve lezing. Daarmee
+kan een domein onderscheid maken tussen echt eerste gebruik en een bestaande
+maar ongeldige lege registratie; de levende worker-cache is daarvoor geen
+bewijs. Onbekende typen, niet-JSON-inhoud en grafstenen worden geweigerd. Alle
+domein- en auditsloten zijn gesorteerd, de databasecollecties worden samen
+gelezen, lokaal openstaand werk wordt meegenomen en alle veranderingen delen
+één commit. Geen publicatie vóór commit. De stringcallback houdt één argument.
+
+De externe aanvraag krijgt een expliciet nieuw invoerprotocol: `idem` bevat een
+met `crypto.randomUUID()` gemaakte UUID v4. Er was voor deze route nog geen
+opdrachtsleutelcontract of bestaande caller die vrije idemkeys gebruikte; de
+gevonden HTTP-callers waren fixtures/verificatiescripts zonder key. Ontbrekende
+of misvormde sleutel geeft 400 met hersteladvies, geen serverfallback.
+Dezelfde actor/context en intentie met dezelfde genormaliseerde inhoud geeft
+hetzelfde eerste bewijs; andere inhoud geeft 409. Een bewuste nieuwe aanvraag
+krijgt een nieuwe UUID. De interne synchrone `aanvraag()` blijft bestaan.
+
+Het publieke antwoord is uitsluitend:
+
+```js
+{ ok: true, ontvangst: { id, aanvraagId, at, status: 'ontvangen' } }
+```
+
+`ontvangen` bevestigt het indienen, nooit zakelijke toelating, een betaling of
+een menselijk akkoord. `id` is de ontvangst-ID; vervolgwerk gebruikt
+`aanvraagId`. Naam, contact, bedrijfsbehoeften, reis, accountkoppeling en latere
+kantoorbesluiten staan niet in dit antwoord. De zeven gevonden inhoudelijke
+testcallers en de Reisboek-proef behouden hun dossiercontroles via een bevoegde
+`/api/aanmelding/een`-lezing; de create-response is geen dossierinzage.
+
+De nieuwe `aanmeldingOntvangsten`-collectie bevat alleen een schemaversie,
+sleutelidentificatie en technische ontvangsten met een doelgebonden
+opdrachtsleuteldigest, actordigest, inhoudsafdruk en het compacte bewijs.
+Afdrukken gebruiken HMAC met de bestaande `accounts.sleutelVoor`-afleiding en
+een eigen domeinlabel. Er staat geen volledige aanvraaginhoud in de receipt.
+Hashes zijn niet automatisch anoniem; de registratie blijft beperkt toegankelijke
+operationele data en dit is geen wettelijke complianceclaim. At-rest-versleuteling
+blijft afhankelijk van de bestaande opslagconfiguratie, geen nieuwe garantie.
+
+**Bewaring:** minimale technische ontvangsten blijven bestaan zolang oude keys
+worden geaccepteerd. Er komt geen TTL of ringevictie die een eerder gebruikte key
+weer als nieuw behandelt. Verwijdering van die technische binding kan pas nadat
+verlopen intenties afdwingbaar worden geweigerd. Dit verlengt **niet** de
+bewaring van aanvraaginhoud: die volgt het bestaande privacy-/opruimpad. De
+aanvraaglijst houdt zijn bestaande venster; na verdwijnen van de aanvraag geeft
+replay expliciet HTTP 410 met `{ status: 410, code: 'AANVRAAG_INTENTIE_VERBRUIKT',
+ontvangst: { status: 'alVerwerkt' } }` en worden de
+inhoudsafdruk, actorafdruk, objectlink en oorspronkelijke tijden uit die receipt
+geredigeerd. De verbruikte scoped key blijft staan en veroorzaakt geen nieuw
+effect, ook bij gewijzigde inhoud. Hetzelfde weigeringantwoord geldt na
+accountredactie. Zonder inhoudsafdruk wordt geen inhoudsvergelijking of nieuw
+succes geclaimd: zowel dezelfde als andere inhoud onder deze verbruikte intentie
+wordt geweigerd. Dit is het afgesproken vervallen antwoord na redactie van het
+oorspronkelijke bewijs, geen stil opnieuw uitvoeren of verzonnen resultaat.
+
+De accountbinding komt uitsluitend van de servergeverifieerde actor. De
+route weigert een meegestuurd ongeldig of verlopen token met 401; dat wordt
+geen nieuwe anonieme aanvraag. Alleen een werkelijk headerloos verzoek is
+anoniem. Opgeslagen ontvangsten hebben een strikt veldschema; extra velden
+worden niet als publiek bewijs teruggegeven.
+De anonieme UUID is geen autorisatiebewijs; bezit ervan verleent geen inzagerecht,
+beslisrecht of accountkoppeling. De bestaande vergeetgang krijgt een gerichte
+receipt-redactiehaak, inclusief receipts waarvan de aanvraag al buiten het
+venster viel. Deze twee callbacks worden expliciet vanuit de opzet geïnjecteerd;
+het member-domein krijgt geen toegang tot de aanvraagmotor. Een read-only
+controle van het ontvangstboek gebeurt vóór de eerste vergeetmutatie. Dit
+kwalificeert niet automatisch alle bestaande accountverwijdering
+of gelijktijdige intrekking; die blijven afzonderlijk te beproeven.
+
+Een andere afgeleide sleutel bij rotatie/herstart sluit de ontvangstpoort
+expliciet met 503 totdat herstel is geregeld; er wordt geen tweede keyruimte
+geopend. Normale verwijdering via de opslagpoort laat een grafsteen achter die
+eveneens wordt geweigerd. Fysieke SQL-verwijdering buiten dat contract en
+gedeeltelijk terugzetten van een backup zijn niet door deze poort bewezen
+afgedekt: **backup en herstel moeten aanvragen en ontvangsten samen herstellen**.
+Geen onafhankelijke restore van één helft. Een eerder gevuld register zonder
+grafsteen en zonder andere geschiedenis is na een fysieke DELETE niet van een
+eerste gebruik te onderscheiden; er is hiervoor geen nieuwe markerlaag gebouwd.
+
+De bestaande PG-runner neemt `test/collectie-meervoudig.pg.test.js` en
+`test/aanmelding-workers.pg.test.js` mee. De nieuwe
+proeven onderscheiden directe opslag-/unitchecks, echte SQLite-processen en
+echte PostgreSQL-transacties. Een herstart na commit is nog geen procescrash in
+een open transactie. HTTP-migratie, crashbarrières, sleutelwissel en de
+privacyhaak vereisen hun eigen concrete bewijs voordat deze aanvraag klaar heet.
+
+### 9.4 Beschermde bankontvangsten en taakidentiteit — 22 oktober 2026
+
+De kantoorroute voor rekeningopening gebruikt nog steeds de bestaande
+`bankIdem`-opslag en duurzame bundel. Sleutels met het afgebakende voorvoegsel
+`rekopen-kantoor:` vallen buiten de gewone ring van 20.000 technische
+herhalingen. Daardoor kan ringopruiming een eerder verwerkte kantooropdracht
+niet opnieuw uitvoerbaar maken. Een bestaande beschermde ontvangst die nog in
+de oude ring staat, wordt binnen dezelfde duurzame bundel gemigreerd; bij een
+mislukte commit wordt de oude ringstand hersteld en krijgt de aanroeper geen
+succes.
+
+Een beschermde bankontvangst is alleen bruikbaar wanneer zowel de oorspronkelijke
+inhoudsafdruk als een valide rekeningantwoord met niet-lege IBAN bestaan. Een
+ontbrekende, lege of beschadigde ontvangst stopt gesloten met HTTP 503
+`IDEMPOTENTIEBEWIJS_ONGELDIG`; RTG maakt dan geen tweede rekening en verzint geen
+eerder resultaat. Hergebruik van dezelfde sleutel met andere inhoud blijft 409.
+De kantoorroute controleert actor en toegestane rekeninghouder vóór de replay.
+Het ontvangstantwoord bevat de bestaande publieke rekeningprojectie en is geen
+nieuwe bron van rekening- of klantgegevens. De opslag krijgt geen willekeurige
+TTL: zolang een oude kantooropdrachtsleutel door het contract wordt geaccepteerd,
+blijft de bijbehorende technische ontvangst nodig. Een latere verwijdering vraagt
+eerst een afdwingbare vervalregel en migratie; dit document claimt geen wettelijke
+bewaartermijn.
+
+De werkplektaak bindt een opdracht aan **actor + opdrachtsleutel**. Bedrijf,
+genormaliseerde taaktekst en afdeling horen bij de inhoudsafdruk. Dezelfde actor
+kan dezelfde sleutel dus niet in een ander bedrijf hergebruiken om stil een
+tweede taak te maken: dat is een inhoudsconflict. Een bewust nieuwe taak gebruikt
+een nieuwe sleutel. Verschillende bevoegde actoren blijven geïsoleerd.
+
+Gerichte bewijzen op de gewijzigde werkboom: bank-idempotentie 40/40 in de
+onafhankelijke herhaling; extra echte opslagprobes bevestigen 503 bij beschadigd
+bewijs, identieke replay bij geldig bewijs en ongewijzigd gedrag voor gewone
+bankkeys. De gecombineerde aanvraagtransport-, bank- en ticketcontrole slaagt
+33/33. De PostgreSQL-werkplekproef slaagt 4/4 met twee workers, uitval vóór en na
+commit en ingetrokken sessie. Deze resultaten zijn nog geen platformbrede
+kwalificatie en dragen geen productie- of complianceclaim.

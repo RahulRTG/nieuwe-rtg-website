@@ -7,10 +7,10 @@ const inzagelog = require('../../inzagelog');
 const maakVergeten = require('../../kern/vergeten');
 const { maakOpnieuwBeginnen } = require('../../kern/opnieuwbeginnen');
 
-module.exports = (kern) => {
+module.exports = (kern, aanvraagPrivacy) => {
   const { app, auth, db, stateFor, myApplications, ordersVanKlant, commGast, handelingsspoor } = kern;
   const { lidBoard, lidBoardLog, lidBoardLogKeten } = kern.lidboard;
-  const { wisLid } = maakVergeten(kern);
+  const { wisLid } = maakVergeten(kern, aanvraagPrivacy);
   /* De gegevenskaart wordt later op de kern gezet (opzet/aanbouw4.js); daarom
      bij het verzoek gelezen en niet bij het monteren. */
   /* De stand van het herstel komt van dezelfde voorwaarden als waar

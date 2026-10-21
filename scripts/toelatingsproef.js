@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { randomUUID } = require('node:crypto');
 /* ============================================================================
    DE TOELATINGSPROEF -- de derde gouden keten, en waarom er een derde is.
 
@@ -87,6 +88,7 @@ const schakel = (nr, van, naar, wat, bekend) => ({ nr, van, naar, wat, bekend: b
 /* De aanvraag die deze proef steeds indient. Een naam met een nummer erin,
    zodat twee proeven op dezelfde database elkaar niet in de lijst verwarren. */
 const aanvraagLijf = (genre, merk) => ({
+  idem: randomUUID(),
   pas: 'business', naam: 'Proefaanvrager ' + merk, contact: 'proef+' + merk + '@rtg.test',
   viaUitnodiging: true,
   bedrijf: { naam: 'Proefzaak ' + merk, type: genre, plaats: 'Amsterdam' }
@@ -133,11 +135,12 @@ async function loop(basis, uit) {
      scherpste verschil met de twee andere ketens, waar de klant altijd een
      sessie had. */
   let id = null;
+  const eersteAanvraag = aanvraagLijf(GENRE, merk);
   const r1 = await stap(schakel(1, 'aanvrager', 'kantoor',
     'een aanvraag indienen zonder account, en die komt in de wachtrij van het kantoor'),
-  () => P('/api/aanmelding/aanvraag', aanvraagLijf(GENRE, merk)),
+  () => P('/api/aanmelding/aanvraag', eersteAanvraag),
   async (r) => {
-    id = r.data && r.data.aanmelding && r.data.aanmelding.id;
+    id = r.data && r.data.ontvangst && r.data.ontvangst.aanvraagId;
     const lijst = await P('/api/aanmelding/lijst', { status: 'in behandeling' }, K);
     const staat = ((lijst.data && lijst.data.aanmeldingen) || []).some(a => a.id === id);
     return { klopt: !!id && staat, wat: 'id ' + (id || 'geen') + ', in de wachtrij: ' + staat };
@@ -212,11 +215,12 @@ async function loop(basis, uit) {
      getrokken en niet door een handeling: niemand doet iets, en toch verandert
      de stand. Een aparte aanvraag met een verlopen datum, want de eerste is
      inmiddels doorgezet. */
+  const verlopenAanvraag = aanvraagLijf(GENRE, merk + 'v');
   await stap(schakel(7, 'tijd', 'kantoor',
     'een afgetekend stuk dat is verlopen, verschijnt op de herkeuringslijst'),
   async () => {
-    const a = await P('/api/aanmelding/aanvraag', aanvraagLijf(GENRE, merk + 'v'));
-    const vid = a.data && a.data.aanmelding && a.data.aanmelding.id;
+    const a = await P('/api/aanmelding/aanvraag', verlopenAanvraag);
+    const vid = a.data && a.data.ontvangst && a.data.ontvangst.aanvraagId;
     if (!vid) return { status: 500, data: { error: 'geen tweede aanvraag' } };
     uit.verlopenId = vid;
     await P('/api/aanmelding/bewijs', { id: vid, soort: 'Vergunning apotheek', nummer: 'AP-OUD', geldigTot: '2020-01-01' });
@@ -246,7 +250,7 @@ async function storingen(basis, uit) {
      draait, meet die resten. */
   async function versAanvraag(genre, suffix) {
     const a = await P('/api/aanmelding/aanvraag', aanvraagLijf(genre, merk + suffix));
-    return (a.data && a.data.aanmelding && a.data.aanmelding.id) || null;
+    return (a.data && a.data.ontvangst && a.data.ontvangst.aanvraagId) || null;
   }
 
   const id1 = await versAanvraag(GENRE, '1');

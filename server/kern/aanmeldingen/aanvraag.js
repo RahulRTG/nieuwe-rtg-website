@@ -17,6 +17,11 @@
 
 module.exports = ({ A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save }) => {
 
+  function normaliseer(b = {}) {
+    return { pas: String(b.pas || ''), naam: kap(b.naam, 80), contact: kap(b.contact, 120),
+      viaUitnodiging: !!b.viaUitnodiging, bedrijf: bedrijfMod.normaliseer(b.bedrijf) };
+  }
+
   // De geautomatiseerde reis opbouwen in de toon van de pas. Elke stap is meteen
   // 'gedaan': de AI verzorgt hem automatisch. Alleen het besluit blijft open.
   function bouwReis(stem) {
@@ -39,14 +44,11 @@ module.exports = ({ A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save })
      en Business wordt NOOIT toegang beloofd of gezet -- de reis is voorbereiding,
      geen toelating. */
   function aanvraag(b, aanvragerId) {
-    b = b || {};
-    const pas = String(b.pas || '');
-    const def = PASSEN[pas];
+    b = normaliseer(b || {});
+    const { pas, naam, contact, viaUitnodiging } = b;
+    const def = Object.hasOwn(PASSEN, pas) && PASSEN[pas];
     if (!def) return { status: 400, error: 'Kies een geldige pas (RTG, Lifestyle of Business).' };
-    const naam = kap(b.naam, 80);
     if (naam.length < 2) return { status: 400, error: 'Vul de naam van de aanvrager in.' };
-    const contact = kap(b.contact, 120);
-    const viaUitnodiging = !!b.viaUitnodiging;
     // Was de aanvrager ingelogd, dan koppelen we zijn account (zodat een akkoord
     // dat kan optillen). Het id komt UITSLUITEND uit het geverifieerde token via
     // de route, nooit uit de body -- anders tilde je andermans account op.
@@ -76,5 +78,5 @@ module.exports = ({ A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save })
       aanmeldingen: L.slice(0, 200).map(beeld) };
   }
 
-  return { bouwReis, beeld, aanvraag, lijst };
+  return { normaliseer, bouwReis, beeld, aanvraag, lijst };
 };

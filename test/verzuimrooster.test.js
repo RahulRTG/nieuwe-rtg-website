@@ -85,7 +85,6 @@ function api(base, pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-const vandaag = () => new Date().toISOString().slice(0, 10);
 
 let srv, base;
 test.before(async () => {
@@ -101,11 +100,15 @@ test('3. echte server: een manager zet toch een dienst voor een zieke bewaker, e
   const guards = (login.body.state.staff || []).filter(x => x.role === 'staff');
   const ziek = guards[0];
   const tok = (await api(base, '/api/supplier/login', { code: 'AEGIS', staffId: ziek.id, pin: '5678' })).body.token;
-  assert.equal((await api(base, '/api/staff/leave/request', { soort: 'ziek' }, tok)).status, 200);
-  const rooster = (await api(base, '/api/supplier/beveiliging/rooster', { van: vandaag(), dagen: 1 }, mgr)).body;
+  const melding = await api(base, '/api/staff/leave/request', { soort: 'ziek' }, tok);
+  assert.equal(melding.status, 200);
+  const dag = melding.body.entry.van;
+  assert.match(dag, /^\d{4}-\d{2}-\d{2}$/);
+  // De dienst hoort bij deze ziekmelding, ook rond de UTC/huis-middernacht.
+  const rooster = (await api(base, '/api/supplier/beveiliging/rooster', { van: dag, dagen: 1 }, mgr)).body;
   const post = rooster.dagen[0].posten[0];
   const r = await api(base, '/api/supplier/beveiliging/dienst',
-    { postId: post.postId, shiftId: post.shifts[post.shifts.length - 1].shiftId, datum: vandaag(), guardId: ziek.id }, mgr);
+    { postId: post.postId, shiftId: post.shifts[post.shifts.length - 1].shiftId, datum: dag, guardId: ziek.id }, mgr);
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
   assert.match(r.body.verzuimWaarschuwing || '', /staat op \d{4}-\d{2}-\d{2} als afwezig .*in de verzuimlaag/, JSON.stringify(r.body).slice(0, 400));
   assert.equal(r.body.verzuimNagekeken, true);

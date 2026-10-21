@@ -105,37 +105,7 @@ function commandToevoegingen(basis, variant, naam) {
 
 const API_VELDEN = ['commandJournaal', 'commandJournaalTotaal'];
 
-function valideerWissing(b, v, naam) {
-  const bl = Array.isArray(b.commandJournaal) ? b.commandJournaal : [];
-  const vl = Array.isArray(v.commandJournaal) ? v.commandJournaal : [];
-  const laatste = vl[vl.length - 1];
-  const afkap = bl.length === API_MAX && vl.length === API_MAX ? 1 : 0;
-  const oud = bl.slice(afkap), herschreven = vl.slice(0, -1);
-  if (!laatste || laatste.actor !== 'systeem' || laatste.actie !== 'wissing in het spoor' ||
-      laatste.uitslag !== 'gedaan' || herschreven.length !== oud.length)
-    conflict(naam + ' is geen aantoonbare AVG-wissing.');
-  let actor = null, geraakt = 0;
-  for (let i = 0; i < oud.length; i++) {
-    const voor = oud[i], na = herschreven[i];
-    if (!voor || !na || voor.id !== na.id ||
-        json(zonder(voor, ['actor', 'vorig', 'zegel'])) !==
-        json(zonder(na, ['actor', 'vorig', 'zegel'])))
-      conflict(naam + ' herschrijft meer dan de actorbinding.');
-    if (voor.actor === na.actor) continue;
-    if (na.actor !== 'gewist' || (actor && actor !== voor.actor))
-      conflict(naam + ' wist niet precies één actorbinding.');
-    actor = voor.actor; geraakt++;
-  }
-  const kop = bl.length ? bl[bl.length - 1].zegel : null;
-  const gemeld = Number(laatste.na && laatste.na.regelsGewist);
-  /* Een vol venster kapt bij het wissingbewijs precies de oudste basisregel. */
-  if (afkap && gemeld === geraakt + 1 && bl[0] && (!actor || actor === bl[0].actor)) {
-    actor = actor || bl[0].actor; geraakt++;
-  }
-  if (!geraakt || gemeld !== geraakt ||
-      !laatste.voor || laatste.voor.kopVoorWissing !== kop)
-    conflict(naam + ' verantwoordt de AVG-wissing niet volledig.');
-}
+const valideerWissing = require('./verzoekspoor-wissing');
 
 function valideerApiVariant(b, v, naam) {
   const bl = Array.isArray(b.commandJournaal) ? b.commandJournaal : [];
@@ -143,9 +113,19 @@ function valideerApiVariant(b, v, naam) {
   const bt = Number(b.commandJournaalTotaal || 0), vt = Number(v.commandJournaalTotaal || 0);
   if (!commandHeel(vl) || json(zonder(b, API_VELDEN)) !== json(zonder(v, API_VELDEN)))
     conflict(naam + ' is niet geldig.');
-  const laatste = vl[vl.length - 1];
-  if (vt === bt + 1 && laatste && laatste.actie === 'wissing in het spoor') {
-    valideerWissing(b, v, naam); return;
+  const oudeIds = new Set(bl.map(r => r && r.id));
+  const wisIndex = vl.findIndex(r => r && !oudeIds.has(r.id) && r.actie === 'wissing in het spoor');
+  if (wisIndex >= 0) {
+    const prefix = vl.slice(0, wisIndex + 1), extra = vl.length - prefix.length;
+    const ids = vl.map(r => r && r.id);
+    if (vl.length > API_MAX || vt !== bt + 1 + extra ||
+        ids.some(id => typeof id !== 'string' || !id) || new Set(ids).size !== ids.length ||
+        vl.slice(wisIndex + 1).some(r => oudeIds.has(r.id)) ||
+        vl.slice(wisIndex + 1).some(r => r.actie === 'wissing in het spoor'))
+      conflict(naam + ' heeft geen eenduidige wissing met toevoegingen.');
+    valideerWissing(b, { ...v, commandJournaal: prefix }, naam, extra, conflict);
+    commandToevoegingen(prefix, vl, naam);
+    return;
   }
   const nieuw = commandToevoegingen(bl, vl, naam);
   if (vt !== bt + nieuw.length) conflict('De teller van ' + naam + ' loopt niet met zijn regels mee.');

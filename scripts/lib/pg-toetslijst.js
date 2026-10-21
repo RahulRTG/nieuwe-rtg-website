@@ -27,6 +27,10 @@ const TOETSEN = Object.freeze([
   'test/foundation-lescredential.pg.test.js',
   'test/payout-terugboeking.pg.test.js',
   'test/directpay-workers.pg.test.js',
+  'test/office-bank-open-workers.pg.test.js',
+  'test/onboarding-workers.pg.test.js',
+  'test/bureau-case-workers.pg.test.js',
+  'test/werkplek-taak-workers.pg.test.js',
   'test/assets-fee-workers.pg.test.js',
   'test/postgres-requestcommit.pg.test.js',
   'test/accounts-requestcommit.pg.test.js',
@@ -49,7 +53,10 @@ const TOETSEN = Object.freeze([
   'test/auditboek.pg.test.js',
   'test/auditboek-cli.pg.test.js',
   'test/kritiekspoor-auditboek.pg.test.js',
-  'test/auditspoor-atomair.pg.test.js'
+  'test/auditspoor-atomair.pg.test.js',
+  'test/collectie-meervoudig.pg.test.js',
+  'test/aanmelding-workers.pg.test.js',
+  'test/aanmelding-crash.pg.test.js'
 ]);
 
 const toetslijstSha256 = crypto.createHash('sha256').update(TOETSEN.join('\n') + '\n').digest('hex');

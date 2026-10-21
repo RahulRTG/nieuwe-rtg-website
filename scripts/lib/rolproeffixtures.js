@@ -2,10 +2,12 @@
 
 /* Alleen de bestaande wegwerpserver van rolproef-route gebruikt deze opbouw.
    De twee standaard-uit functies gaan langs hun gewone eigenaarbesluit; er
-   verandert geen servervlag of productiestandaard. De vijf positieve controles
+   verandert geen servervlag of productiestandaard. De positieve controles
    gebeuren VOOR de vingerafdruk, met hetzelfde lijf als de latere kruisproef.
    Een mislukte opbouw blijft ruwe ontbrekende/negatieve bewijsinformatie. */
+const { ROUTES: VERIFICATIE_ROUTES, PNG } = require('./verificatie-isolatie');
 const FIXTURE_ROUTES = [
+  ...VERIFICATIE_ROUTES.map(pad => ({ methode: 'POST', pad, rol: 'member', functie: 'verificatie' })),
   { methode: 'POST', pad: '/api/leerhuis/doe', rol: 'member', functie: 'leerhuis' },
   { methode: 'POST', pad: '/api/leerhuis/lees', rol: 'member', functie: 'leerhuis' },
   { methode: 'POST', pad: '/api/office/leerhuis/open', rol: 'kantoor-op-naam', functie: 'leerhuis' },
@@ -51,6 +53,16 @@ async function maakRolfixtures({ post, basis, tokens, proeflid, kantoorVoor }) {
         if (!geslaagd(rij.eigenRoute)) rij.eigenRoute.reden = String(e.message || e);
       }
     }
+  }
+  // Upload zet verified terug naar pending: gebruik nooit het gekeurde
+  // proeflid waarop de financiële ijking van de rolronde berust.
+  try {
+    const { nieuwLid } = require('./voltooiwereld');
+    const verificatielid = await nieuwLid({ post }, 'rol-verificatie');
+    for (const pad of VERIFICATIE_ROUTES)
+      await positief(pad, pad.endsWith('/status') ? {} : { image: PNG }, verificatielid.token);
+  } catch (e) {
+    for (const pad of VERIFICATIE_ROUTES) fixtures['POST ' + pad].eigenRoute.reden = String(e.message || e);
   }
   await groep('leerhuis', async () => {
     if (!proeflid?.token) throw new Error('geen eigen proeflid voor Academy');

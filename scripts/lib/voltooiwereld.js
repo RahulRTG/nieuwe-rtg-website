@@ -26,6 +26,7 @@
    echte post verstuurt, is een ongeluk en geen meting.
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -241,9 +242,9 @@ async function eigenaarSessie(w) {
    RTG-lid verder. */
 async function lifestyleLid(w, merk) {
   const lid = await nieuwLid(w, merk);
-  const a = await w.post('/api/aanmelding/aanvraag', { pas: 'lifestyle', naam: 'Voltooilid ' + merk,
+  const a = await w.post('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'lifestyle', naam: 'Voltooilid ' + merk,
     contact: lid.email, viaUitnodiging: true }, lid.token);
-  const id = a.data && a.data.aanmelding && a.data.aanmelding.id;
+  const id = a.data && a.data.ontvangst && a.data.ontvangst.aanvraagId;
   if (a.status !== 200 || !id) throw new Error('de Lifestyle-aanvraag lukte niet (' + a.status + ')');
   const K = await eigenaarSessie(w);
   const b = await w.post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, K);

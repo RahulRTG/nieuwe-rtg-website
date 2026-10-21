@@ -31,7 +31,7 @@ const VELD_TYPES = ['text', 'email', 'tel', 'date', 'land', 'nummer', 'kyc'];
 
 const DEFAULT_CONTRACT = require('./onboarding/contract');
 
-function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
+function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon, bewerkCollectie }) {
   function nu() { return new Date().toISOString(); }
 
   /* Elk veld draagt zijn MOMENT: wanneer we het vragen.
@@ -80,7 +80,8 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
   function standaardScope() {
     return { velden: standaardVelden(), contract: { versie: 1, titel: 'RTG-lidmaatschaps- en reisovereenkomst', tekst: DEFAULT_CONTRACT, bijgewerkt: nu() } };
   }
-  // Zorg dat de opslag (en de platform-scope) bestaan; migratie-vrij.
+  const lezen = require('./onboarding/lezen')({ db, standaardScope, standaardMoment });
+  // Alleen schrijvers initialiseren en migreren de opgeslagen scopes.
   function store() {
     if (!db.data.onboarding) db.data.onboarding = { scopes: {}, profielen: {} };
     if (!db.data.onboarding.scopes) db.data.onboarding.scopes = {};
@@ -98,12 +99,7 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
           lengte van dagen in de poort na het inloggen blijven vragen. Een veld
           dat de eigenaar zelf een moment gaf blijft staan, en een veld dat de
           eigenaar zelf toevoegde kennen we niet en blijft dus bij de intake. */
-    for (const sc of Object.values(db.data.onboarding.scopes)) {
-      for (const v of (sc && sc.velden) || []) {
-        if (v.id === 'paspoort' && v.label === 'Paspoort of ID-kaart') v.label = 'Voorkant van je paspoort';
-        if (!v.moment && standaardMoment(v.id)) v.moment = standaardMoment(v.id);
-      }
-    }
+    for (const sc of Object.values(db.data.onboarding.scopes)) lezen.normaliseerScope(sc);
     return db.data.onboarding;
   }
   // Een scope ophalen; onbekende leverancier-scope krijgt een eigen standaardset
@@ -130,18 +126,20 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
 
   /* De beheer/AI-laag draait als submodule op een gedeelde context, een
      keer opgebouwd bij het opstarten. */
-  const ctx = { db, save, crypto, accounts, anthropic, schoon,
+  const ctx = { db, save, crypto, accounts, anthropic, schoon, ...lezen,
     ALLE_WIE, PAS_WIE, VELD_TYPES, DEFAULT_CONTRACT,
     nu, standaardVelden, standaardMoment, standaardScope, store, scopeVan, profielVan, profielId };
   const { publiekeConfig, config, normaliseerVelden, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars } = require('./onboarding/beheer')(ctx);
   // de lid-acties (status, intake, paspoort, RTG Pay-poort, tekenen)
   const { status, klaar, payGate, slaOp, bewaarPaspoort, teken } = require('./onboarding/lid')(ctx);
+  const tekenVast = require('./onboarding/tekenvast')({ bewerkCollectie,
+    maakLokaal: data => maakOnboarding({ db: { data }, save: () => {}, crypto, accounts, anthropic, schoon }) });
   // het inrichten: in één keer invullen wat de gegevenspoort anders per keer vraagt
   const { inrichtStatus, inrichtOp } = require('./onboarding/inrichten')(ctx);
   // meebouwen: het eerste Salon-bericht en het eigen bedrijf, met toestemming
   const { meebouwStatus, meebouwSalon, meebouwBedrijf, zetHaken } = require('./onboarding/meebouwen')(ctx);
 
-  return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
+  return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, tekenVast, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
     inrichtStatus, inrichtOp, meebouwStatus, meebouwSalon, meebouwBedrijf, zetHaken,
     ALLE_WIE, PAS_WIE, VELD_TYPES };
 }

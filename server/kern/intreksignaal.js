@@ -122,6 +122,18 @@ async function bereid(rij) {
   return true;
 }
 
+/* Zonder Redis is de bestaande PG-outbox de duurzame intrekkingsbron.
+   Lees alleen deze credential, vóór de route op zijn lokale sessie vertrouwt.
+   Een mislukte lezing is geen toestemming; de aanroeper moet dan stoppen. */
+async function controleerGedeeld(token, sid) {
+  if (!outbox || typeof outbox.gedeeld !== 'function')
+    throw Object.assign(new Error('De gedeelde intrekkingsbron ontbreekt.'), { code: 'INTREKOPSLAG_ONZEKER' });
+  const sleutels = ['token:' + vingerVanToken(token)];
+  if (goedeSid(sid)) sleutels.push('sessie:' + sid);
+  for (const rij of await outbox.gedeeld(sleutels))
+    lever({ versie: 1, soort: rij.soort, waarde: rij.waarde, verloopt: rij.verloopt });
+}
+
 async function herhaalOutbox() {
   if (!outbox) return;
   const samen = new Map();
@@ -224,5 +236,5 @@ function _wis() {
 }
 
 module.exports = { KANAAL, PREFIX, vingerVanToken, meldToken, meldVinger, meldSessie,
-  tokenIngetrokken, sessieIngetrokken, bereid, wachtDuurzaam,
+  tokenIngetrokken, sessieIngetrokken, bereid, wachtDuurzaam, controleerGedeeld,
   koppelBus, koppelOutbox, abonneer, bewaakStand, stand, _wis };

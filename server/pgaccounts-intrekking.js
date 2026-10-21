@@ -20,7 +20,15 @@ module.exports = function maakIntrekkingen(pool) {
     [rij.sleutel, rij.soort, rij.waarde, Number(rij.verloopt)]);
     return true;
   }
-  async function lijst(nu) {
+  async function lijst(nu, sleutels) {
+    if (Array.isArray(sleutels)) {
+      if (!sleutels.length) return [];
+      const posities = sleutels.map((_, i) => '$' + (i + 1)).join(',');
+      const { rows } = await pool.query(
+        `SELECT sleutel, soort, waarde, verloopt FROM intrekking_outbox WHERE sleutel IN (${posities}) AND verloopt >= $${sleutels.length + 1}`,
+        [...sleutels, Number(nu)]);
+      return rows.map(r => Object.assign({}, r, { verloopt: Number(r.verloopt) }));
+    }
     await pool.query('DELETE FROM intrekking_outbox WHERE verloopt < $1', [Number(nu)]);
     const { rows } = await pool.query(
       'SELECT sleutel, soort, waarde, verloopt FROM intrekking_outbox WHERE verloopt >= $1 ORDER BY sleutel',

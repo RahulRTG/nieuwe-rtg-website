@@ -23,9 +23,9 @@ module.exports = ({ PGMODE, laag }) => {
     const l = eisIntrekkingen();
     return l ? l.bewaar(rij) : true;
   }
-  async function gedeeldeIntrekkingen() {
+  async function gedeeldeIntrekkingen(sleutels) {
     const l = eisIntrekkingen();
-    return l ? l.lijst(Date.now()) : [];
+    return l ? l.lijst(Date.now(), sleutels) : [];
   }
   async function voltooiIntrekkingen(sleutels) {
     const l = eisIntrekkingen();

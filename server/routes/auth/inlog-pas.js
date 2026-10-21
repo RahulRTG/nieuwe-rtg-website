@@ -10,10 +10,11 @@
    /api/auth/login. In dit huis is de volgorde van registreren ook de volgorde
    van afhandelen. */
 'use strict';
+const { tokenHash } = require('../../kern/sessies');
 
 module.exports = (ctx) => {
   const { PERSONAS, accounts, app, auth, checkCred, crypto, forgetSessionDuurzaam, hasCred, loginFails,
-    noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog, DEMO, pasAppOk , PAS_FOUT } = ctx;
+    noteFailedTry, rememberSession, stateFor, tooManyTries, logInlog, DEMO, pasAppOk , PAS_FOUT } = ctx;
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
@@ -54,11 +55,12 @@ app.post('/api/login', (req, res) => {
    waarop iemand denkt veilig te zijn. Gevonden in aanvalsronde 2, punt 14. */
 app.post('/api/logout', auth, async (req, res, next) => {
   try {
-    for (const [token, sess] of sessions)
-      if (sess === req.session) await forgetSessionDuurzaam(token);
-    // en de staatloze kant: het aangeboden token op de intreklijst
+    // De Map kan sinds auth door een externe update herbouwd zijn. De
+    // aangeboden credential blijft dezelfde; objectidentiteit is geen sleutel.
     const kop = req.get('authorization') || '';
     const tok = kop.startsWith('Bearer ') ? kop.slice(7) : null;
+    if (tok) await forgetSessionDuurzaam(tokenHash(tok));
+    // De bestaande staatloze accountintrekking blijft daarnaast vereist.
     if (tok && accounts && typeof accounts.trekIn === 'function') await accounts.trekIn(tok);
     if (accounts && typeof accounts.wachtIntrekkingen === 'function') await accounts.wachtIntrekkingen();
     res.json({ ok: true });

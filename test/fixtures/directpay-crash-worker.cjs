@@ -4,6 +4,16 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const ROOT = process.env.RTG_DP_PROEF_ROOT || path.resolve(__dirname, '../..');
+// Hold only automatic session-cache invalidation, never the authoritative
+// revocation read. The parent arms this after proving the token works on B.
+const sessiePad = require.resolve(path.join(ROOT, 'server/kern/sessies'));
+const sessies = require(sessiePad);
+require.cache[sessiePad].exports = { ...sessies, maakSessies(ctx) {
+  const s = sessies.maakSessies(ctx), herbouw = s.herbouwSessions;
+  s.herbouwSessions = () => process.env.RTG_DP_PROEF_SESSIEBARRIER &&
+    fs.existsSync(process.env.RTG_DP_PROEF_SESSIEBARRIER) ? s.sessions.size : herbouw();
+  return s;
+} };
 const pad = require.resolve(path.join(ROOT, 'server/betaal/ontvangst')); 
 const origineel = require(pad);
 require.cache[pad].exports = function (ctx) {

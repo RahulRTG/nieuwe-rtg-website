@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-21T10:38:31.062Z",
-  "commit": "c7accbc59b",
+  "op": "2026-10-21T17:27:38.240Z",
+  "commit": "521fdbdac2",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 0,
   "instrument": "scripts/rolproef-route.js",
   "node": "v26.12.0"
  },
@@ -1475,10 +1475,10 @@
   "nietTeKruisen": 92,
   "aclOpen": 0,
   "privacyLek": 0,
-  "onbeslist": 5,
+  "onbeslist": 0,
   "zijeffecten": 0,
   "blindeRondes": 0,
-  "begrenzing": 100000
+  "begrenzing": 20000
  },
  "perRoute": [
   {
@@ -33188,7 +33188,7 @@
     {
      "rol": "supplier",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
@@ -33196,15 +33196,20 @@
     {
      "rol": "office",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
     }
    ],
-   "acl": "onbeslist",
-   "privacy": "onbeslist",
-   "reden": "geen volledige ruwe rolproef met expliciete weigeringen en levende eigen sessies"
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/leerhuis/doe",
+    "status": 200
+   },
+   "acl": "dicht",
+   "privacy": "schoon",
+   "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"
   },
   {
    "bewijsVersie": 2,
@@ -33223,7 +33228,7 @@
     {
      "rol": "supplier",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
@@ -33231,15 +33236,20 @@
     {
      "rol": "office",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
     }
    ],
-   "acl": "onbeslist",
-   "privacy": "onbeslist",
-   "reden": "geen volledige ruwe rolproef met expliciete weigeringen en levende eigen sessies"
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/leerhuis/lees",
+    "status": 200
+   },
+   "acl": "dicht",
+   "privacy": "schoon",
+   "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"
   },
   {
    "bewijsVersie": 2,
@@ -72395,7 +72405,7 @@
     {
      "rol": "member",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
@@ -72403,7 +72413,7 @@
     {
      "rol": "supplier",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
@@ -72411,15 +72421,20 @@
     {
      "rol": "office",
      "methode": "POST",
-     "status": 503,
+     "status": 403,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
     }
    ],
-   "acl": "onbeslist",
-   "privacy": "onbeslist",
-   "reden": "geen volledige ruwe rolproef met expliciete weigeringen en levende eigen sessies"
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/office/leerhuis/open",
+    "status": 200
+   },
+   "acl": "dicht",
+   "privacy": "schoon",
+   "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"
   },
   {
    "bewijsVersie": 2,
@@ -111858,7 +111873,7 @@
     {
      "rol": "supplier",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
@@ -111866,15 +111881,20 @@
     {
      "rol": "office",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
     }
    ],
-   "acl": "onbeslist",
-   "privacy": "onbeslist",
-   "reden": "geen volledige ruwe rolproef met expliciete weigeringen en levende eigen sessies"
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/site/domein",
+    "status": 200
+   },
+   "acl": "dicht",
+   "privacy": "schoon",
+   "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"
   },
   {
    "bewijsVersie": 2,
@@ -146018,7 +146038,7 @@
     {
      "rol": "member",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
@@ -146026,15 +146046,20 @@
     {
      "rol": "office",
      "methode": "POST",
-     "status": 503,
+     "status": 401,
      "eigenVoor": 200,
      "eigenNa": 200,
      "lek": null
     }
    ],
-   "acl": "onbeslist",
-   "privacy": "onbeslist",
-   "reden": "geen volledige ruwe rolproef met expliciete weigeringen en levende eigen sessies"
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/supplier/site/domein",
+    "status": 200
+   },
+   "acl": "dicht",
+   "privacy": "schoon",
+   "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"
   },
   {
    "bewijsVersie": 2,

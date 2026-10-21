@@ -46,9 +46,10 @@ test('Directpay: twee workers, conflicterende retries en echte procescrashes', {
       body: JSON.stringify(body || {}), signal: AbortSignal.timeout(20000) });
     return { status: res.status, body: await res.json() };
   };
-  async function start(naam, marker) {
+  async function start(naam, marker, sessieBarrier) {
     const w = await startServer({ script: path.join(__dirname, 'fixtures/directpay-crash-worker.cjs'),
-      env: { ...env, RTG_DATA_DIR: path.join(tmp, naam), RTG_DP_PROEF_MARKER: marker || '' } });
+      env: { ...env, RTG_DATA_DIR: path.join(tmp, naam), RTG_DP_PROEF_MARKER: marker || '',
+        RTG_DP_PROEF_SESSIEBARRIER: sessieBarrier || '' } });
     workers.push(w);
     w.token = (await api(w, 'login', { tier: 'business' }, null)).body.token;
     assert.ok(w.token, 'testaccount op worker ' + naam);
@@ -70,7 +71,8 @@ test('Directpay: twee workers, conflicterende retries en echte procescrashes', {
     assert.equal(s.d.directOntvangsten.MAISON.som, alle.reduce((n, b) => n + b.bedrag, 0), 'teller en boekingen blijven gelijk');
   }
   try {
-    const a = await start('a'), b = await start('b');
+    const sessieBarrier = path.join(tmp, 'houd-sessiecache');
+    const a = await start('a'), b = await start('b', null, sessieBarrier);
     assert.notEqual(a.child.pid, b.child.pid);
     await t.test('geen sessie mag geen financiële toestand wijzigen', async () => {
       const k = sleutel('deepgreen-onbevoegd');
@@ -116,6 +118,8 @@ test('Directpay: twee workers, conflicterende retries en echte procescrashes', {
       const token = (await api(a, 'login', { tier: 'business' }, null)).body.token;
       assert.ok(token);
       assert.equal((await api(b, 'betaal/mijn', {}, token)).status, 200, 'sessie werkt vóór intrekking op worker B');
+      fs.writeFileSync(sessieBarrier, 'houd automatische invalidatie vast');
+      try {
       assert.equal((await api(a, 'logout', {}, token)).status, 200);
       const k = sleutel('deepgreen-ingetrokken');
       const voor = await opgeslagen(k);
@@ -123,6 +127,7 @@ test('Directpay: twee workers, conflicterende retries en echte procescrashes', {
       assert.equal((await api(b, 'betaal/direct', body(k), token)).status, 401);
       assert.deepEqual(await opgeslagen(k), voor);
       assert.equal((await api(b, 'betaal/mijn', {})).status, 200, 'andere geldige sessie blijft werken');
+      } finally { fs.unlinkSync(sessieBarrier); }
     });
     await t.test('worker dood na providerantwoord, retry op andere worker', async () => {
       const k = sleutel('deepgreen-provider-crash'), marker = path.join(tmp, 'provider-checkpoint.json');

@@ -743,3 +743,44 @@ of versoepeld. Dit broncheckpoint is nog geen releasekandidaat met eindkwalifica
 De 25 onverklaarde mutatiecontracten, onvoldoende objectautorisatiebewijzen en
 ontbrekende integrale kwalificatie blijven releaseblokkades. De historische
 appmeting blijft herkenbaar verlopen. Geen merge, productie-uitrol of echte betaling.
+
+### Deep Green: hermeting en gedeelde intrekking (21 oktober 2026)
+
+De zeven meters zijn opnieuw uitgevoerd op broncommit `521fdbdac2`, Node
+26.12.0. APPWERKT meet 114 apps, nul browserdefecten en acht volledig bewezen
+apps binnen de bestaande scenario's; 102 blijven niet volledig getest en vier
+missen fixtures. Er zijn 718 van 945 gevonden knoppen aangetikt; zes schermen
+blijven grotendeels ongemeten. ROLPROEF heeft nul onbesliste kruisproeven na de
+vijf positieve eigenaarfixtures. ROLRONDE blijft 577 bewezen tegenover norm
+1444. LIEGRONDE blijft 98/114. Geen van deze cijfers kwalificeert het platform.
+
+De volledige PG-run op die commit vond alsnog een intrekkingsfout: een tweede
+worker las na logout tijdelijk zijn oude sessiecache (200 in plaats van 401).
+Dit vervangt de eerdere losse groene intrekkingsclaim hierboven. Zonder Redis
+wordt nu voor bearer-verzoeken de bestaande gedeelde intrekkingsoutbox gericht
+op tokenhash en geverifieerde sid gelezen. Bij opslagonzekerheid stopt het
+verzoek met 503. Logout gebruikt de bestaande tokenhash in plaats van
+objectidentiteit, zodat externe sessieherbouw de intrekking niet overslaat.
+
+Bewijs op de gewijzigde werkboom: 16 gerichte unitproeven, 32 bestaande
+sessie-/documentproeven en de volledige 48 PG-bestanden (128 tests) slagen,
+zonder skips. De twee-workerproef houdt automatische sessiecache-invalidatie
+expliciet tegen en eist direct 401. Een onafhankelijke agent beoordeelde de
+reparatie. Een eerste nieuwe query bleek niet compatibel met de eigen
+pgwire-arraycodering; de query gebruikt nu gewone gebonden scalairen. De
+mislukte tussenmeting blijft als diagnose bewaard. Geen driverwijziging.
+
+Reikwijdte: homogene PG-installatie zonder Redis, bearer-verzoeken die na
+bevestigde intrekking beginnen. Dit bewijst geen intrekking tijdens een al
+lopende mutatie, bestaande SSE-stroom, andere credentialdragers of gemengd
+geconfigureerde clusters. Het bestaande Redis-pad is ongewijzigd en zijn
+verplichte PG-proeven zijn opnieuw geslaagd. Een schone integrale herhaling
+op een exacte nieuwe commit blijft nodig; de 521f-appbewijzen zijn historisch
+en mogen niet automatisch naar de gewijzigde code worden overgenomen.
+
+Zeven semantische productbesluiten zijn door de eigenaar goedgekeurd en vastgelegd in MUTATIECONTRACT.md:
+vier creaties met een opdrachtidentiteit, twee telkens actuele analyses en
+versiegebonden ondertekening met behoud van de eerste ontvangst. Er zijn nog
+geen publieke contracten of bijbehorende clients gewijzigd. De overige
+ontbrekende bevoegdheids-, keten- en operationele bewijzen blijven open.
+Geen merge, publieke uitrol of echte financiële transactie uitgevoerd.

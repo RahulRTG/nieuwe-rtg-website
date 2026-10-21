@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-21T10:39:26.395Z",
-    "commit": "c7accbc59b",
+    "op": "2026-10-21T19:54:16.417Z",
+    "commit": "521fdbdac2",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 5,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.0"
   },
@@ -14,24 +14,24 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "cd7935eac1a568fac9a0f622a0eba44427ac00b45b3fa98d308beb38448e8a43",
+        "sha256": "0c9545fde37f50b57c126acc01ff361d80ce02d6ef906ed58b7cfc86d4b61b63",
         "stempel": {
-          "op": "2026-10-21T10:38:51.360Z",
-          "commit": "c7accbc59b",
+          "op": "2026-10-21T19:32:13.777Z",
+          "commit": "521fdbdac2",
           "boomVuil": false,
-          "boomAnders": 5,
+          "boomAnders": 1,
           "instrument": "scripts/idorproef.js",
           "node": "v26.12.0"
         }
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "92a40bd49f3c9cf1f1bc008b37a011a2f47513d0220bf029cf80258e8688f5ff",
+        "sha256": "f2078faec38cc0fc550e4a681a6cd6460e7286654fc6c860880e6725c86ca37f",
         "stempel": {
-          "op": "2026-10-21T10:38:31.062Z",
-          "commit": "c7accbc59b",
+          "op": "2026-10-21T17:27:38.240Z",
+          "commit": "521fdbdac2",
           "boomVuil": false,
-          "boomAnders": 4,
+          "boomAnders": 0,
           "instrument": "scripts/rolproef-route.js",
           "node": "v26.12.0"
         }
@@ -291,7 +291,7 @@
       "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/M63N2J/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/7ZKB9P/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1246,7 +1246,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/M63N2J/mij",
+          "verzoek": "GET /api/foundation/gezin/7ZKB9P/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1267,14 +1267,6 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "bEigen": 200,
-          "b": 401,
-          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1307,6 +1299,14 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "bEigen": 200,
+          "b": 401,
+          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {

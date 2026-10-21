@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-21T10:38:51.360Z",
-  "commit": "c7accbc59b",
+  "op": "2026-10-21T19:32:13.777Z",
+  "commit": "521fdbdac2",
   "boomVuil": false,
-  "boomAnders": 5,
+  "boomAnders": 1,
   "instrument": "scripts/idorproef.js",
   "node": "v26.12.0"
  },
@@ -15,9 +15,9 @@
   "doorbraak": 0,
   "nagekeken": 59,
   "publiek": 536,
-  "onbereikbaar": 900,
+  "onbereikbaar": 901,
   "lek": 0,
-  "afgebakend": 11,
+  "afgebakend": 10,
   "poolDomeinen": 158,
   "poolVelden": 922,
   "werkplek": {
@@ -128,11 +128,11 @@
   },
   "afbakening": {
    "routes": 733,
-   "afgebakend": 11,
+   "afgebakend": 10,
    "gescheiden": 0,
    "doorbraak": 0,
    "nagekeken": 1,
-   "onbereikbaar": 721
+   "onbereikbaar": 722
   },
   "opbouw": {
    "stappen": 76,
@@ -143,7 +143,7 @@
    ]
   },
   "merktekens": {
-   "vanA": 355,
+   "vanA": 354,
    "controle": 291
   }
  },
@@ -1894,7 +1894,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrk7cef70db08"
+    "mrke167668457"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -1907,7 +1907,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrk7cef70db08"
+    "mrke167668457"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2519,8 +2519,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Zeearend E6BE",
-    "mrk7cef70db08"
+    "Saffieren Ooievaar D0FB",
+    "mrke167668457"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2533,8 +2533,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Zeearend E6BE",
-    "mrk7cef70db08"
+    "Saffieren Ooievaar D0FB",
+    "mrke167668457"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -4545,7 +4545,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zeearend E6BE"
+    "Saffieren Ooievaar D0FB"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -6559,8 +6559,8 @@
    "staat": "afgebakend",
    "merken": 7,
    "voorbeeld": [
-    "mrk7cef70db08",
-    "age87af53f"
+    "mrke167668457",
+    "agfdd3013c"
    ],
    "reden": "A kreeg 200 met 7 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -7501,7 +7501,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zeearend E6BE"
+    "Saffieren Ooievaar D0FB"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -9681,7 +9681,7 @@
     "kamerid"
    ],
    "gezien": [
-    "Nachtorchidee 99FA"
+    "Marmeren Valk 2819"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een kamercode werkt als een vergaderlink: wie hem heeft mag binnen, en een BESLOTEN kamer weigert alsnog (magErin). B komt binnen als B, met zijn eigen codenaam"
   },
@@ -29769,7 +29769,7 @@
     "postid"
    ],
    "gezien": [
-    "Nachtorchidee 99FA"
+    "Marmeren Valk 2819"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin"
   },
@@ -45803,7 +45803,7 @@
     "id"
    ],
    "gezien": [
-    "Zeearend E6BE"
+    "Saffieren Ooievaar D0FB"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C's profiel schreef, met A's codenaam als schrijver"
   },
@@ -45909,7 +45909,7 @@
     "id"
    ],
    "gezien": [
-    "Zeearend E6BE"
+    "Saffieren Ooievaar D0FB"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: kern/metier/zoek.js: \"wie niets invulde, staat niet in de etalage\" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw"
   },
@@ -47379,8 +47379,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "mrk7cef70db08",
-    "Contact-mrk7cef70db08"
+    "mrke167668457",
+    "Contact-mrke167668457"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -51989,7 +51989,7 @@
     "id"
    ],
    "gezien": [
-    "Zeearend E6BE"
+    "Saffieren Ooievaar D0FB"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf"
   },
@@ -52024,7 +52024,7 @@
     "id"
    ],
    "gezien": [
-    "Zeearend E6BE"
+    "Saffieren Ooievaar D0FB"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven"
   },
@@ -55131,17 +55131,9 @@
    "afbakening": "A kreeg zelf 403: er is geen open deur om tegen te ijken"
   },
   "POST /api/zegel/maak": {
-   "methode": "POST",
-   "status": 200,
-   "statusA": 200,
-   "gang": "afbakening",
-   "staat": "afgebakend",
-   "merken": 1,
-   "voorbeeld": [
-    "pw_5h8KzSig2Z4qx7l9"
-   ],
-   "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
-   "velden": []
+   "staat": "onbereikbaar",
+   "reden": "geen id van A in dit domein",
+   "afbakening": "A's eigen antwoord draagt niets dat alleen van A is: B's antwoord kan hier niets over A zeggen"
   },
   "POST /api/zorgprofiel": {
    "staat": "onbereikbaar",
@@ -62687,7 +62679,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zeearend E6BE"
+    "Saffieren Ooievaar D0FB"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []

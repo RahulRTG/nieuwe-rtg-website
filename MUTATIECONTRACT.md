@@ -1621,3 +1621,35 @@ Dat beproeft in één gang de idempotentie **en** de objectgrens (IDOR) **en** d
 intrekking van een bevoegdheid. `scripts/lib/idemwereld.js` zet vandaag de eerste
 drie stappen (een gezin, een werkruimte met een toegelaten lid, een school via de
 volledige registratieketen); de laatste vier bestaan nog niet.
+
+## 9. Eigenaarsbesluit van 21 oktober 2026: zeven gedragscontracten
+
+Goedgekeurd door de eigenaar in de Deep Green-opdracht. Dit is een productbesluit,
+geen implementatie- of bewijsverklaring; de zeven contracten blijven ongekwalificeerd
+tot hun echte positieve, negatieve, concurrency- en herstelproeven slagen.
+
+- Aanmelding aanvragen, een bureauzaak openen, een kantoorbankrekening openen en
+  een werkplektaak maken: een unieke sleutel per bewuste opdracht. Dezelfde
+  sleutel met dezelfde inhoud geeft hetzelfde resultaat; andere inhoud geeft
+  expliciet 409; een nieuwe sleutel laat een bewust nieuwe opdracht toe.
+- De sleutel wordt aan de bevoegde actor/context gebonden. Bankrekeninghouder,
+  bevoegdheid en rekeningidentiteit worden afzonderlijk gecontroleerd. Een andere
+  houder onder dezelfde opdrachtidentiteit mag geen tweede opening veroorzaken.
+- Labfonds-scheidsrechter en kantoor-Magnaat-scan rekenen iedere bewuste keer
+  opnieuw. Afgeleide financiële of persistente effecten mogen niet ongewenst
+  worden verdubbeld. Dit is geen toestemming voor automatische uitvoering.
+- RTF-onboarding-ondertekening hoort bij één exacte onveranderlijke contractversie.
+  De eerste geldige ontvangsttijd blijft behouden. Gewijzigde inhoud vraagt een
+  nieuwe versie en een nieuw akkoord; de oude ontvangst blijft bij de oude tekst.
+- De garanties gelden ook over workers, retries, uitval en herstart. Een
+  geheugencache of alleen sequentiële proef is onvoldoende bewijs.
+- Clients en routes krijgen een gecontroleerd overgangscontract. Bij kritieke
+  mutaties mag een ontbrekende sleutel niet stil tot onbeveiligde creatie leiden.
+  Oudere clients krijgen een expliciete herstelbare weigering wanneer zij niet
+  aan het nieuwe contract voldoen; geen ongedocumenteerde uitzondering.
+
+Betrokken routes: `POST /api/aanmelding/aanvraag`,
+`POST /api/member/bureau/zaak/open`, `POST /api/office/bank/rekening/open`,
+`POST /api/werkplek/taak`, `POST /api/labfonds/scheidsrechter`,
+`POST /api/office/magnaat/scan`, `POST /api/rtf/onboarding/teken`.
+Geen productie-uitrol zonder afzonderlijke vrijgave.

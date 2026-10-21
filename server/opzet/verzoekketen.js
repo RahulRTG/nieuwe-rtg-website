@@ -118,6 +118,24 @@ module.exports = function verzoekketen(deps) {
 
   require('./koppen')({ app });
 
+  /* PG zonder Redis: NOTIFY is een versnelling, geen autorisatiebewijs.
+     Intrekking moet al gelden vóór de eerste route-/isolatiebeslissing. */
+  if ((process.env.DATABASE_URL || process.env.PG_URL) && !process.env.REDIS_URL) {
+    app.use(async (req, res, next) => {
+      const dragers = require('../kern/isolatie/sessiedragers');
+      const token = dragers.bearerVan(req);
+      if (!token) return next();
+      try {
+        const sess = dragers.losSessie(token);
+        await require('../kern/intreksignaal').controleerGedeeld(token, sess && sess.sid);
+        next();
+      } catch (e) {
+        log.warn('Gedeelde sessietoegang niet controleerbaar', { code: e.code || 'INTREKOPSLAG_ONZEKER' });
+        res.status(503).json({ error: 'De sessietoegang kan nu niet veilig worden gecontroleerd.' });
+      }
+    });
+  }
+
   /* De meelees-laag van de RTG AI (kern/rtgai.js): telt alleen mee met het
      verkeer en doet verder niets; de kern wordt verderop aangesloten. */
   const zetRtgaiMeelezer = require('./rtgai-meelezer')(app);

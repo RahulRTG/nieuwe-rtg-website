@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2959 bestanden en 20120 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2961 bestanden en 20126 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2959 |
-| losse beweringen (`test(...)`) | 20120 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 379 |
+| toetsbestanden | 2961 |
+| losse beweringen (`test(...)`) | 20126 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 381 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2752 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 6 |
-| niets van beide | 21 |
+| niets van beide | 23 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2578 bestanden, 19412 beweringen.
+2580 bestanden, 19418 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -965,6 +965,7 @@ toets omvalt.
 | `intentie-model.test.js` | 11 | gezakt op `liegpoort /api/` | INTENTIE EN CONTEXT OP EEN ECHTE SERVER -- de tien gevallen van de eigenaar (12 oktober 2026), met een nep-modelserver die bewaart wat het model krijgt. Het uitgangspunt: een lid heeft een Ibiza-aanvraag open en... |
 | `intentie.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | INTENTIE EN CONTEXT UIT ELKAAR -- de relatieregel en de reiswens (EDGE.md par. 14.4, de correctie op de eerste doorsnede). |
 | `intrekking-multi-instance.pg.test.js` | 1 | slaat zichzelf over | Echte twee-instanceproef voor intrekking. De stream hangt op instance B; instance A trekt de credential in. |
+| `intrekking-pg-controle.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `intrekkingbus-realtime.test.js` | 6 | gezakt op `===->!==#0` | Een geconfigureerde clusterleiding is onderdeel van de machtiging van een persoonlijke SSE-verbinding: valt zij weg, dan blijft geen mogelijk stale stream open. |
 | `intreklijst-failclosed.test.js` | 5 | gezakt op `&&->||#0` | De generieke tokenintreklijst: opslagonzekerheid is nooit hetzelfde als "niet ingetrokken", en een geslaagde intrekking seint levende verbindingen. |
 | `intreksignaal-takken.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | HET INTREKSIGNAAL ONDER WEDLOOP (kern/intreksignaal.js), aanvulling op test/intreksignaal-weerbaar.test.js. Daar staat het signaal onder vergiftigde berichten en een omvallende bus. |
@@ -2333,6 +2334,7 @@ toets omvalt.
 | `uitbetaalgrendel.test.js` | 9 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `uitgeven-inwisselen.test.js` | 6 | gezakt op `liegpoort /api/` | WAT EEN ZAAK UITGEEFT EN EEN LID INWISSELT -- 6 endpoints. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: giftcard/sell, giftcard/redeem, salon/deal, salon/deal/redeem, salon/poll en salon/stats. |
 | `uitgifte.test.js` | 6 | gezakt op `liegpoort /api/` | De documentenuitgifte (kern/uitgifte.js): met een druk op de knop de officiele documentatie naar oude apparatuur of een harde schijf, altijd achter het 4- of 6-ogenprincipe. Getest voor de drie huizen: de zaak... |
+| `uitloggen-sessie-identiteit.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `uitloggen.test.js` | 4 | gezakt op `liegpoort /api/` | UITLOGGEN MOET ECHT UITLOGGEN. Gevonden in aanvalsronde 2 (scripts/aanval.js, punt 14), en het is het soort gat dat je alleen vindt door het te DOEN in plaats van te lezen: POST /api/logout -> { ok: true } POST... |
 | `uitrol.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `uitrolregie-echt.test.js` | 6 | gezakt op `liegpoort /api/` | DE UITROLREGIE OP EEN ECHTE SERVER. test/uitrolregie.test.js toetst de regels; dit toetst dat hij ook werkelijk aan de schakelkast hangt. |

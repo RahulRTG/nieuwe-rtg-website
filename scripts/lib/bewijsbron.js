@@ -240,7 +240,7 @@ function rondeUitslag(register, functie, { lees = leesStandaard, versheid } = {}
   let reg;
   try { reg = JSON.parse(tekst); } catch (e) { return { status: 'NIET_GETEST', reden: register + ' is geen geldige JSON', bewijs: null }; }
   const st = reg.stempel;
-  const v = (st && typeof st === 'object') ? versheid(st) : { vers: false, reden: 'het register draagt geen stempel met commit' };
+  const v = (st && typeof st === 'object') ? versheid({ ...st, bronnen: reg.bronnen?.registers }) : { vers: false, reden: 'het register draagt geen stempel met commit' };
   const bewijs = { register, op: st && st.op ? st.op : null, commit: st && st.commit ? st.commit : null };
   if (!v.vers) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + v.reden, bewijs };
   const rij = (reg.regels || []).find((r) => r.functie === functie);

@@ -25,52 +25,147 @@ const { BRONSOORTEN, ALGEMEEN } = require('../scripts/lib/appcontract');
 
 const SR = { perScherm: [{ bestand: 'public/apps/a.html', exact: ['/api/a/lijst', '/api/a/zet'], voorvoegsels: [] }] };
 const lees = (f) => (f === 'public/apps/a.html' ? '<html></html>' : null);
-const reg = (idor, rol, vervallen = []) => ({ idor: new Map(Object.entries(idor)), rol: new Map(Object.entries(rol)), vervallen });
+const reg = (idor, rol, vervallen = []) => ({ idor: new Map(Object.entries(idor)), rol: new Map(Object.entries(rol)), vervallen,
+  rolMeting: { zijeffecten: 0, blindeRondes: 0 } });
 const rij = { functie: 'link:a', ingang: '/apps/a.html' };
 const oordeel = (r) => R.ledenOordeel(rij, r, { schermroutes: SR, lees });
+const rolbewijs = (methode = 'POST', pad = '/api/a/zet') => ({
+  bewijsVersie: 2, methode, pad, rol: 'member', verwacht: ['supplier', 'office'],
+  geprobeerd: ['supplier', 'office'], acl: 'dicht', privacy: 'schoon',
+  antwoorden: ['supplier', 'office'].map(rol => ({ rol, methode, status: 403,
+    eigenVoor: 200, eigenNa: 200, lek: null }))
+});
+const idormeting = (methode = 'GET', staat = 'afgebakend') => ({
+  methode, staat, status: 200, statusA: 200, gang: 'afbakening', merken: 1,
+  voorbeeld: ['een-blijvend-merkteken-van-A'], velden: []
+});
+
+test('idorbewijs: een groene samenvatting zonder eigen controles is geen scheiding', () => {
+  const check = raw => R.padOordeel('/api/idor', reg({ '/api/idor': [raw] }, {}));
+  for (const raw of [
+    { methode: 'GET', staat: 'gescheiden', status: 403 },
+    { methode: 'GET', staat: 'gescheiden', status: 403, statusA: 200 },
+    { methode: 'GET', staat: 'nagekeken', status: 200, reden: 'met de hand nagekeken en GEEN lek' },
+    { methode: 'GET', staat: 'publiek', status: 200, reden: 'ook met een VERZONNEN id een 200' },
+    { methode: 'GET', staat: 'afgebakend' }
+  ]) assert.equal(check(raw).stand, 'open', raw.staat);
+  assert.equal(check(idormeting()).stand, 'gemeten', 'bestaand smal antwoordbewijs blijft herkenbaar');
+  for (const status of [undefined, 0, '200', 302, 400, 401, 403, 404, 500, 503]) {
+    assert.equal(check({ ...idormeting(), status }).stand, 'open', 'B: ' + status);
+    assert.equal(check({ ...idormeting(), statusA: status }).stand, 'open', 'A: ' + status);
+  }
+  for (const wijzig of [{ merken: 0 }, { voorbeeld: [] }, { gang: undefined }, { methode: undefined }])
+    assert.equal(check({ ...idormeting(), ...wijzig }).stand, 'open');
+});
+
+test('idorbewijs: registerlezer bewaart lekken, ruwe methode en overlappende gangen', () => {
+  const raw = { ...idormeting('GET'), lek: true };
+  const laad = (eerste, tweede = {}) => R.laadRegisters({
+    lees: f => JSON.stringify(f === 'IDOR.json'
+      ? { stempel: {}, zaakPerRoute: eerste, perRoute: tweede }
+      : { stempel: {}, gemeten: { zijeffecten: 0, blindeRondes: 0 }, perRoute: [] }),
+    vers: () => ({ vers: true })
+  });
+  for (const staat of ['gescheiden', 'afgebakend', 'nagekeken', 'publiek']) {
+    const r = laad({ 'GET /api/idor': { ...raw, staat } });
+    assert.equal(R.padOordeel('/api/idor', r).stand, 'gebroken', staat + ' wist lek:true niet uit');
+    assert.equal(r.idor.get('/api/idor')[0].lek, true);
+  }
+  assert.equal(R.padOordeel('/api/idor', laad({ 'GET /api/idor': raw }, { 'GET /api/idor': idormeting() })).stand, 'gebroken');
+  assert.equal(R.padOordeel('/api/idor', laad({ 'GET /api/idor': idormeting('POST') })).stand, 'open', 'de sleutel mag een verkeerde werkelijk gebruikte methode niet overschrijven');
+});
+
+test('rolbewijs: ruwe tegenproeven beslissen, niet een groene samenvatting', () => {
+  const check = row => oordeel(reg({
+    '/api/a/lijst': [idormeting('GET')],
+    '/api/a/zet': [idormeting('POST')]
+  }, { '/api/a/zet': [row] }));
+  assert.equal(check(rolbewijs()).status, 'BEWEZEN');
+  for (const status of [0, 302, 400, 404, 429, 500, 503]) {
+    const r = rolbewijs(); r.antwoorden[1].status = status;
+    assert.equal(check(r).status, 'NIET_GETEST', 'status ' + status);
+  }
+  for (const verander of [
+    r => { r.antwoorden.pop(); },
+    r => { r.antwoorden[0].eigenNa = 401; },
+    r => { delete r.bewijsVersie; }
+  ]) {
+    const r = rolbewijs(); verander(r);
+    assert.equal(check(r).status, 'NIET_GETEST');
+  }
+  const open = rolbewijs(); open.antwoorden[0].status = 200;
+  assert.equal(check(open).status, 'GEBLOKKEERD_DOOR_DEFECT');
+});
+
+test('rolbewijs: registerlezer bewaart de ruwe invoer en weigert een mislukte hele meting', () => {
+  const laad = (gemeten = { zijeffecten: 0, blindeRondes: 0 }) => R.laadRegisters({
+    lees: f => JSON.stringify(f === 'IDOR.json'
+      ? { stempel: {}, perRoute: { 'POST /api/a/zet': idormeting('POST') } }
+      : { stempel: {}, gemeten, perRoute: [rolbewijs()] }),
+    vers: () => ({ vers: true })
+  });
+  assert.deepEqual(laad().rol.get('/api/a/zet')[0].antwoorden, rolbewijs().antwoorden);
+  assert.equal(R.padOordeel('/api/a/zet', laad()).stand, 'gemeten');
+  assert.equal(R.padOordeel('/api/a/zet', laad({ zijeffecten: 1, blindeRondes: 0 })).stand, 'gebroken');
+  for (const gemeten of [{ zijeffecten: 0, blindeRondes: 1 }, {}, { zijeffecten: -1, blindeRondes: 0 }])
+    assert.equal(R.padOordeel('/api/a/zet', laad(gemeten)).stand, 'open');
+});
+
+test('rolbewijs: een onbesliste bron blijft via BEVOEGD onbeslist in APPWERKT', () => {
+  const raw = rolbewijs(); raw.antwoorden[0].status = 500;
+  const uit = oordeel(reg({
+    '/api/a/lijst': [idormeting('GET')],
+    '/api/a/zet': [idormeting('POST')]
+  }, { '/api/a/zet': [raw] }));
+  const app = { ...rij, bewijzen: {} };
+  B.stelSamen(app, { contract: {}, algemeen: { bevoegd: ALGEMEEN.bevoegd },
+    lees: () => JSON.stringify({ stempel: {}, regels: [{ functie: rij.functie, ...uit }] }),
+    versheid: () => ({ vers: true }) });
+  assert.equal(app.bewijzen.bevoegd.status, 'NIET_GETEST');
+});
 
 test('1. een ledenscherm is alleen BEWEZEN als elke route gemeten is', () => {
-  const beide = reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'nagekeken' }] },
-    { '/api/a/zet': [{ methode: 'POST', acl: 'dicht', privacy: 'schoon' }] });
+  const beide = reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [idormeting('POST')] },
+    { '/api/a/zet': [rolbewijs()] });
   const ok = oordeel(beide);
   assert.equal(ok.status, 'BEWEZEN');
   assert.match(ok.reden, /publiek/, 'de grens hoort in elke uitslag te staan');
 
-  const half = reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {});
+  const half = reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {});
   const h = oordeel(half);
   assert.equal(h.status, 'NIET_GETEST');
   assert.match(h.reden, /\/api\/a\/zet/, 'de open route hoort bij naam genoemd te worden');
 
-  const alleenRol = reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }] }, { '/api/a/zet': [{ methode: 'POST', acl: 'dicht', privacy: 'schoon' }] });
+  const alleenRol = reg({ '/api/a/lijst': [idormeting('GET')] }, { '/api/a/zet': [rolbewijs()] });
   assert.equal(oordeel(alleenRol).status, 'NIET_GETEST', 'ROLPROEF alleen zegt niets over een ANDER LID');
 
   const SRv = { perScherm: [{ bestand: 'public/apps/a.html', exact: [], voorvoegsels: ['/api/a/ding/'] }] };
   assert.equal(R.ledenOordeel(rij, reg({}, {}), { schermroutes: SRv, lees }).status, 'NIET_GETEST',
     'een voorvoegsel zonder bekende routes eronder is open, en niet gemeten');
-  assert.equal(R.ledenOordeel(rij, reg({ '/api/a/ding/x': [{ methode: 'GET', staat: 'gescheiden' }] }, {}), { schermroutes: SRv, lees }).status, 'BEWEZEN');
+  assert.equal(R.ledenOordeel(rij, reg({ '/api/a/ding/x': [idormeting('GET')] }, {}), { schermroutes: SRv, lees }).status, 'BEWEZEN');
   assert.equal(R.ledenOordeel({ functie: 'x', ingang: 'stand:x' }, beide, { schermroutes: SR, lees }).status, 'NIET_GETEST');
 
   /* De afbakening (gang 4 van de IDOR-proef) telt als gemeten; haar
      onbereikbaar (A zag niets van zichzelf) blijft open. */
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'afgebakend' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] }, { '/api/a/zet': [{ methode: 'POST', acl: 'dicht', privacy: 'schoon' }] })).status, 'BEWEZEN');
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'afgebakend' }], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {})).status, 'NIET_GETEST');
+  assert.equal(oordeel(reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [idormeting('POST')] }, { '/api/a/zet': [rolbewijs()] })).status, 'BEWEZEN');
+  assert.equal(oordeel(reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {})).status, 'NIET_GETEST');
 });
 
 test('1b. de zaak-gang van IDOR.json telt mee, en een doorbraak daar is een defect', () => {
   const lees = (perRoute, zaakPerRoute) => (f) => (f === 'IDOR.json' ? JSON.stringify({ stempel: {}, perRoute, zaakPerRoute })
     : f === 'ROLPROEF.json' ? JSON.stringify({ stempel: {}, perRoute: [] }) : null);
   const vers = () => ({ vers: true });
-  const r1 = R.laadRegisters({ lees: lees({}, { 'POST /api/supplier/x': { staat: 'gescheiden' } }), vers });
-  assert.deepEqual(r1.idor.get('/api/supplier/x'), [{ methode: 'POST', staat: 'gescheiden' }]);
+  const r1 = R.laadRegisters({ lees: lees({}, { 'POST /api/supplier/x': idormeting('POST') }), vers });
+  assert.deepEqual(r1.idor.get('/api/supplier/x'), [{ ...idormeting('POST'), routeMethode: 'POST', routePad: '/api/supplier/x' }]);
   const r2 = R.laadRegisters({ lees: lees({}, { 'POST /api/supplier/x': { staat: 'doorbraak' } }), vers });
   assert.equal(R.padOordeel('/api/supplier/x', r2).stand, 'gebroken');
 });
 
 test('2. een breuk is een defect, en vervallen bewijs is geen bewijs', () => {
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'doorbraak' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] }, {})).status, 'GEBLOKKEERD_DOOR_DEFECT');
-  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] },
-    { '/api/a/zet': [{ methode: 'POST', acl: 'open', privacy: 'schoon' }] })).status, 'GEBLOKKEERD_DOOR_DEFECT');
-  const v = oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'gescheiden' }], '/api/a/zet': [{ methode: 'POST', staat: 'gescheiden' }] }, {}, ['IDOR.json: oud']));
+  assert.equal(oordeel(reg({ '/api/a/lijst': [{ methode: 'GET', staat: 'doorbraak' }], '/api/a/zet': [idormeting('POST')] }, {})).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  assert.equal(oordeel(reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [idormeting('POST')] },
+    { '/api/a/zet': [{ methode: 'POST', acl: 'OPEN', privacy: 'schoon' }] })).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  const v = oordeel(reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [idormeting('POST')] }, {}, ['IDOR.json: oud']));
   assert.equal(v.status, 'NIET_GETEST');
   assert.match(v.reden, /vervallen/);
 });
@@ -141,8 +236,8 @@ test('5. het echte register spreekt zichzelf niet tegen', () => {
 
 // Onafhankelijk bewijs per methode: de adresstring alleen is onvoldoende.
 test('6. schrijfbewijs zonder overeenkomende rolproef blijft open', () => {
-  const id = (methode, staat = 'gescheiden') => ({ methode, staat });
-  const rol = methode => ({ methode, acl: 'dicht', privacy: 'schoon' });
+  const id = (methode, staat = 'afgebakend') => idormeting(methode, staat);
+  const rol = methode => rolbewijs(methode, '/api/voorbeeld');
   const check = (ids, rollen = []) => R.padOordeel('/api/voorbeeld', reg({ '/api/voorbeeld': ids }, { '/api/voorbeeld': rollen }));
   assert.equal(check([id('POST')]).stand, 'open', 'POST mist een rolproef');
   assert.equal(check([id('POST')], [rol('PUT')]).stand, 'open', 'PUT bewijst POST niet');

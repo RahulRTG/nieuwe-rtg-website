@@ -53,8 +53,16 @@
    tekort maar de JUISTE invoer"), en daar wordt hij ook gemunt. Twee lijsten van
    dezelfde rollen lopen uiteen zodra er een rol bij komt -- LAT.md regel 4, en op
    deze lijst is dat al een keer gebeurd. */
-const { LEGE_SLEUTELS } = require('./proefsleutels');
+const { LEGE_SLEUTELS, ROLLEN: BEKENDE_ROLLEN } = require('./proefsleutels');
 const ZONDER_SLEUTEL = new Set(LEGE_SLEUTELS);
+const ROLLEN = ['member', 'supplier', 'office'];
+const EIGEN_CONTROLE = {
+  member: '/api/auth/me', supplier: '/api/supplier/backoffice', office: '/api/office/state'
+};
+const SCHRIJFMETHODEN = new Set(['POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']);
+const geslaagd = status => Number.isInteger(status) && status >= 200 && status < 300;
+const geweigerd = status => status === 401 || status === 403;
+const statusVan = antwoord => Number.isInteger(antwoord && antwoord.status) ? antwoord.status : 0;
 
 /* Wat er NOOIT in een antwoord aan een verkeerde rol hoort te staan. Bewust
    ruim: liever een vals alarm dat je met de hand wegstreept dan een lek dat je
@@ -117,20 +125,33 @@ function plausibelLijf(pad) {
    Dat is ijkVingerafdruk() hieronder. */
 async function vingerafdruk(post, tok) {
   const lengte = (v) => (Array.isArray(v) ? v.length : (typeof v === 'number' ? v : null));
-  const uit = {};
-  try {
-    const r = await post('/api/pay/overzicht', {}, tok.member);
+  const uit = { meetfouten: [] };
+  async function lees(pad, token) {
+    try {
+      const r = await post(pad, {}, token);
+      if (!geslaagd(r && r.status) || !r.data || typeof r.data !== 'object') {
+        uit.meetfouten.push(pad + ' -> ' + statusVan(r));
+        return {};
+      }
+      return r;
+    } catch (e) {
+      uit.meetfouten.push(pad + ' -> geen antwoord');
+      return {};
+    }
+  }
+  {
+    const r = await lees('/api/pay/overzicht', tok.member);
     uit.saldo = lengte(r.data && r.data.saldo);
     uit.geschiedenis = lengte(r.data && r.data.geschiedenis);
     uit.aanMij = lengte(r.data && r.data.aanMij);
     uit.vanMij = lengte(r.data && r.data.vanMij);
-  } catch (e) {}
-  try { const r = await post('/api/verkoop/mijn', {}, tok.member); uit.deals = lengte(r.data && r.data.deals); } catch (e) {}
-  try {
-    const r = await post('/api/supplier/backoffice', {}, tok.supplier);
+  }
+  { const r = await lees('/api/verkoop/mijn', tok.member); uit.deals = lengte(r.data && r.data.deals); }
+  {
+    const r = await lees('/api/supplier/backoffice', tok.supplier);
     uit.toppers = lengte(r.data && r.data.toppers);
     uit.alerts = lengte(r.data && r.data.alerts);
-  } catch (e) {}
+  }
   return uit;
 }
 
@@ -152,11 +173,12 @@ async function ijkVingerafdruk(post, tok) {
   let gelukt = false;
   try {
     const r = await post('/api/pay/oplaad', { centen: 137, idem: 'ijk-' + Math.random().toString(36).slice(2, 10) }, tok.member);
-    gelukt = r.status >= 200 && r.status < 300;
+    gelukt = geslaagd(r.status);
   } catch (e) {}
   const na = await vingerafdruk(post, tok);
-  const bewogen = Object.keys(na).filter(k => voor[k] !== na[k]);
-  return { gelukt, bewogen, voor, na, gevoelig: bewogen.length > 0 };
+  const bewogen = Object.keys(na).filter(k => k !== 'meetfouten' && voor[k] !== na[k]);
+  return { gelukt, bewogen, voor, na,
+    gevoelig: !voor.meetfouten.length && !na.meetfouten.length && bewogen.length > 0 };
 }
 
 /* De proef zelf. `routes` zijn de schrijfroutes uit de routekaart; `rolVan` geeft
@@ -172,9 +194,36 @@ async function ijkVingerafdruk(post, tok) {
    Los toetsbaar (test/rolproef.test.js), want in een proef die een echte server
    nodig heeft komt niemand hier ooit met een mutatie bij. */
 function weegAntwoord(status, lijf) {
-  if (status >= 200 && status < 300) return { tweexx: true, lek: null };
-  for (const m of LEKMERKERS) if (m.re.test(String(lijf || ''))) return { tweexx: false, lek: m.naam };
-  return { tweexx: false, lek: null };
+  if (geslaagd(status)) return { tweexx: true, lek: null, acl: 'OPEN' };
+  const acl = geweigerd(status) ? 'dicht' : 'onbeslist';
+  for (const m of LEKMERKERS) if (m.re.test(String(lijf || ''))) return { tweexx: false, lek: m.naam, acl };
+  return { tweexx: false, lek: null, acl };
+}
+
+/* Hetzelfde oordeel voor de producent, BEVOEGD en de bewijsmatrix. Labels uit
+   oude registers zijn geen ruwe controles. Bekende bevindingen blijven wel
+   bevindingen: een onvolledige ronde kan een open deur hebben aangetoond. */
+function beoordeelRolrij(rij = {}) {
+  if (!rij || typeof rij !== 'object') rij = {};
+  const antwoorden = Array.isArray(rij.antwoorden) ? rij.antwoorden : [];
+  const verwacht = ROLLEN.filter(rol => rol !== rij.rol);
+  const open = rij.acl === 'OPEN' || antwoorden.some(a => geslaagd(a?.status));
+  const lek = rij.privacy === 'LEK' || antwoorden.some(a => typeof a?.lek === 'string' && a.lek.length);
+  const volledig = rij.bewijsVersie === 2 && SCHRIJFMETHODEN.has(rij.methode) &&
+    BEKENDE_ROLLEN.includes(rij.rol) && !ZONDER_SLEUTEL.has(rij.rol) &&
+    Array.isArray(rij.verwacht) && rij.verwacht.length === verwacht.length &&
+    verwacht.every(rol => rij.verwacht.includes(rol)) &&
+    antwoorden.length === verwacht.length && verwacht.every(rol => {
+      const perRol = antwoorden.filter(a => a?.rol === rol);
+      return perRol.length === 1 && perRol[0].methode === rij.methode &&
+        geweigerd(perRol[0].status) && geslaagd(perRol[0].eigenVoor) && geslaagd(perRol[0].eigenNa);
+    });
+  return {
+    acl: open ? 'OPEN' : volledig ? 'dicht' : 'onbeslist',
+    privacy: lek ? 'LEK' : volledig && antwoorden.every(a => a.lek === null) ? 'schoon' : 'onbeslist',
+    reden: volledig && antwoorden.every(a => a.lek === null) ? 'alle verkeerde rollen expliciet geweigerd met levende eigen sessies'
+      : 'geen volledige ruwe rolproef met expliciete weigeringen en levende eigen sessies'
+  };
 }
 
 /* `maxPogingen` is een budget voor de HELE ronde en niet per rol, en zo heette
@@ -182,22 +231,21 @@ function weegAntwoord(status, lijf) {
    draaien: `--max=2000` las als "2000 per rol" en leverde 2000 pogingen in
    totaal, dus 1000 routes van de 2937. Een naam die het verkeerde belooft is een
    belofte in tekst (LAT.md, regel 6). */
-async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }) {
+async function draaiRolproef({ post, vraag, routes, tokensVoor, maxPogingen, lijfVoor }) {
   /* lijfVoor is optioneel: de aanroeper kan lijven verrijken (objectpool),
      zodat ook routes die een BESTAAND object willen de rolvraag echt krijgen.
      Zonder blijft het kale plausibele lijf het gedrag. */
   const lijfVan = lijfVoor || ((r) => plausibelLijf(r.pad));
-  const bevindingen = { tweexx: [], lekken: [], gewijzigd: [] };
-  /* Per route wat er met hem is gebeurd -- de bewijsmatrix vult hier ACL en
-     PRIVACY mee. Een route die NIET is geprobeerd staat er niet in, en dat is
-     het hele punt: ongemeten is geen groen. */
+  const bevindingen = { tweexx: [], lekken: [], gewijzigd: [], onbeslist: [] };
+  /* Per route ruwe pogingen en ontbrekend bewijs. Aanwezigheid in deze lijst
+     betekent niet dat een poging is uitgevoerd of dat ACL/PRIVACY bewezen is. */
   const perRoute = {};
   /* Routes die met een REDEN niet gekruist zijn. Apart van perRoute, want die
      lijst betekent "beproefd" en telt als dekking; deze betekent "hier valt niet
      te kruisen". Ze bij elkaar optellen zou de dekking laten groeien zonder dat
      er iets extra's is gemeten. */
   const nietTeKruisen = [];
-  const rollen = ['member', 'supplier', 'office'];
+  const rollen = ROLLEN;
 
   /* ---- EEN VAST TOKEN PER ROL, VOOR DE HELE PROEF ----
      Dit ging mis en het kostte een run. De aanroeper levert tokensVoor() met een
@@ -222,10 +270,10 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
      is er gekomen omdat deze proef een uur lang op PASS stond terwijl hij vijf
      keer null met vijf keer null vergeleek. */
   const ijk = await ijkVingerafdruk(post, vastVoor());
-  if (!ijk.gevoelig) {
+  if (!ijk.gelukt || !ijk.gevoelig) {
     return {
       perRoute: {},
-      bevindingen: { tweexx: [], lekken: [], gewijzigd: [],
+      bevindingen: { tweexx: [], lekken: [], gewijzigd: [], onbeslist: [],
         meterStuk: 'de vingerafdruk zag een LEGITIEME wijziging niet' +
           (ijk.gelukt ? '' : ' (en de ijk-oplading zelf lukte ook niet)') +
           '; hij kan dus ook een ongeoorloofde wijziging niet zien. Gemeten: ' + JSON.stringify(ijk.voor) },
@@ -234,6 +282,20 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
   }
 
   const voor = await vingerafdruk(post, vastVoor());
+  const roep = async (methode, pad, lijf, token) => {
+    try {
+      if (vraag) return await vraag(methode, pad, lijf, token);
+      if (methode === 'POST') return await post(pad, lijf, token);
+    } catch (e) { return { status: 0, data: {} }; }
+    return { status: 0, data: {} };
+  };
+  const eigenControle = async (rol, token) => {
+    // Dezelfde token als in de kruispoging; geen herlogin of rolwisseling
+    // tussen controle en poging. Bij uitval blijft de uitkomst onbeslist.
+    if (vraag) return statusVan(await roep('POST', EIGEN_CONTROLE[rol], {}, token));
+    try { return statusVan(await post(EIGEN_CONTROLE[rol], {}, token)); }
+    catch (e) { return 0; }
+  };
   let gedaan = 0;
   for (const r of routes) {
     if (r.methode === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
@@ -251,17 +313,25 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
       continue;
     }
     if (r.schakel) continue;                          // de schakelkast zou de hele proef vergiftigen
+    const sleutel = r.methode + ' ' + r.pad;
+    const bij = { bewijsVersie: 2, methode: r.methode, pad: r.pad, rol: r.rol,
+      verwacht: rollen.filter(rol => rol !== r.rol), geprobeerd: [], antwoorden: [] };
     for (const rol of rollen) {
       if (rol === r.rol) continue;                    // alleen de VERKEERDE rollen
       if (maxPogingen && gedaan >= maxPogingen) break;
       const tk = vastVoor()[rol];
       if (!tk) continue;
-      const st = await post(r.pad, lijfVan(r), Array.isArray(tk) ? tk[0] : tk);
+      const token = Array.isArray(tk) ? tk[0] : tk;
+      if (!token) continue;
+      if (!vraag && r.methode !== 'POST') continue;
+      const eigenVoor = await eigenControle(rol, token);
+      const st = await roep(r.methode, r.pad, lijfVan(r), token);
       gedaan++;
-      const s = st.status;
+      const eigenNa = await eigenControle(rol, token);
+      const s = statusVan(st);
       /* Het LIJF van de weigering. Hier hoort een foutmelding te staan en verder
          niets: geen adres, geen echte naam, geen rekeningnummer. */
-      const lijf = typeof st.data === 'string' ? st.data : JSON.stringify(st.data || {});
+      const lijf = typeof st?.data === 'string' ? st.data : JSON.stringify(st?.data || {});
       const oordeel = weegAntwoord(s, lijf);
 
       /* HET OORDEEL VALT OP EEN PLEK, en daarna pas tellen EN opschrijven.
@@ -269,26 +339,34 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }
          tweede uitvoer naast zet -- en dat is precies wat de bewijsmatrix wil --
          bouwt dan onvermijdelijk een tweede waarheid die er langzaam naast gaat
          lopen. Dezelfde les als bij de poortwacht. */
-      const sleutel = r.methode + ' ' + r.pad;
-      const bij = perRoute[sleutel] || (perRoute[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, geprobeerd: [], acl: 'dicht', privacy: 'schoon' });
       bij.geprobeerd.push(rol);
+      bij.antwoorden.push({ rol, methode: r.methode, status: s, eigenVoor, eigenNa, lek: oordeel.lek });
       if (oordeel.tweexx) {
-        bij.acl = 'OPEN';
         bevindingen.tweexx.push(sleutel + ' [' + rol + ' -> ' + s + ']');
         continue;
       }
       if (oordeel.lek) {
-        bij.privacy = 'LEK';
         bevindingen.lekken.push(sleutel + ' [' + rol + ' -> ' + s + '] ' + oordeel.lek +
           ': ' + lijf.slice(0, 120).replace(/\s+/g, ' '));
       }
     }
+    Object.assign(bij, beoordeelRolrij(bij));
+    // Ook een onvolledige route blijft zichtbaar. Alleen `geprobeerd` telt
+    // als uitgevoerd; aanwezigheid in perRoute betekent geen bewezen ACL.
+    perRoute[sleutel] = bij;
+    if (bij.acl === 'onbeslist' || bij.privacy === 'onbeslist') bevindingen.onbeslist.push(sleutel);
   }
 
   const na = await vingerafdruk(post, vastVoor());
-  for (const k of new Set([...Object.keys(voor), ...Object.keys(na)])) {
-    if (voor[k] == null && na[k] == null) continue;
-    if (voor[k] !== na[k]) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);
+  if (voor.meetfouten.length || na.meetfouten.length) {
+    bevindingen.meterStuk = 'de toestandscontrole gaf geen geldig antwoord: ' +
+      [...voor.meetfouten, ...na.meetfouten].join('; ');
+  } else {
+    for (const k of new Set([...Object.keys(voor), ...Object.keys(na)])) {
+      if (k === 'meetfouten') continue;
+      if (voor[k] == null && na[k] == null) continue;
+      if (voor[k] !== na[k]) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);
+    }
   }
   return { bevindingen, perRoute, nietTeKruisen, pogingen: gedaan, voor, na, ijk };
 }
@@ -309,4 +387,4 @@ const CONTROL = {
 };
 
 module.exports = { draaiRolproef, vingerafdruk, ijkVingerafdruk, plausibelLijf,
-  weegAntwoord, LEKMERKERS, CONTROL };
+  weegAntwoord, beoordeelRolrij, LEKMERKERS, CONTROL };

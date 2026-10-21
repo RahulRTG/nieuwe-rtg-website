@@ -160,14 +160,19 @@ function verzoek(method, pad, token, body, timeoutMs) {
   });
 }
 // volledige variant voor geld/misbruik: de body wordt geparsed teruggegeven
-function haal(method, pad, token, body, koppen) {
+function haal(method, pad, token, body, koppen, vraagHttp = http.request) {
   return new Promise(resolve => {
     const data = method === 'GET' ? null : JSON.stringify(body === undefined ? {} : body);
     const headers = Object.assign({ 'Content-Type': 'application/json' }, koppen || {});
     if (token) headers['Authorization'] = 'Bearer ' + token;
     if (data) headers['Content-Length'] = Buffer.byteLength(data);
-    const req = http.request({ host: '127.0.0.1', port: PORT, path: pad, method, headers, agent }, res => {
-      let buf = ''; res.on('data', c => buf += c); res.on('end', () => { let d = {}; try { d = JSON.parse(buf); } catch (e) {} resolve({ status: res.statusCode, data: d }); });
+    const req = vraagHttp({ host: '127.0.0.1', port: PORT, path: pad, method, headers, agent }, res => {
+      let buf = ''; res.on('data', c => buf += c); res.on('end', () => {
+        // Ook een tekstweigering kan gegevens lekken; een parsefout wist het
+        // werkelijk ontvangen antwoord nooit voordat de lekscan het ziet.
+        let d = buf; try { d = JSON.parse(buf); } catch (e) {}
+        resolve({ status: res.statusCode, data: d });
+      });
     });
     req.on('error', () => resolve({ status: 0, data: {} }));
     req.setTimeout(15000, () => { req.destroy(); resolve({ status: 0, data: {} }); });
@@ -570,7 +575,7 @@ async function misbruikBeproeving(tok) {
    er anders uitzag. Een instrument hoort te meten als je erom vraagt, niet als
    je ernaar kijkt (scripts/meetkeuring.js, regel `wacht`).
    ============================================================================ */
-if (require.main !== module) { module.exports = { alleRoutes }; return; }
+if (require.main !== module) { module.exports = { alleRoutes, haal }; return; }
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
@@ -976,6 +981,9 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
        Op een ZWAAR pad klopt de ledenrol aan als het rol-lid en tekent; op elk
        ander pad blijft het token zoals het was (scripts/lib/proeftoestel.js). */
     post: lidRol.toestel ? metToestellen(post, { voorLid: { lid: lidRol.toestel, van: () => tokVoor.member } }) : post,
+    // Kruispogingen en eigen sessiecontroles delen de echte methode/token;
+    // de getekende post hierboven blijft uitsluitend de toestandsijking.
+    vraag: (methode, pad, lijf, token) => haal(methode, pad, token, lijf),
     routes: routes.map(r => ({ ...r, rol: r.rol === 'open' ? 'openbaar' : r.rol })), tokensVoor: () => ({
       member: rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
       supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
@@ -989,6 +997,7 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
   rij('  weigeringen die gegevens meegaven', rp.bevindingen.lekken.length ? '\x1b[31m' + rp.bevindingen.lekken.length + '\x1b[0m' : '\x1b[32m0\x1b[0m');
   for (const l of rp.bevindingen.lekken.slice(0, 6)) rij('    ' + l.slice(0, 100), '');
   rij('  blijvende wijzigingen na afloop', rp.bevindingen.gewijzigd.length ? '\x1b[31m' + rp.bevindingen.gewijzigd.join(', ') + '\x1b[0m' : '\x1b[32mgeen\x1b[0m');
+  rij('  onbesliste rolbewijzen', rp.bevindingen.onbeslist.length);
   rij('  gemeten toestand', JSON.stringify(rp.voor));
   if (rp.ijk) rij('  ijking van de vingerafdruk', rp.ijk.gevoelig
     ? '\x1b[32mhij ziet een legitieme wijziging\x1b[0m (' + rp.ijk.bewogen.join(', ') + ')'
@@ -1198,10 +1207,10 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
   v('SCHAKELKAST', kastOpen, kastOpen ? 'elke functie stond aan tijdens de hele run'
     : 'de hendel ging niet over (status ' + aan + '): de run draaide tegen de standaardstand');
   v('ROBUUSTHEID', buckets.s5xx === 0, buckets.s5xx + ' onverwachte serverfouten');
-  v('ROL-LEK', !rp.bevindingen.meterStuk && rp.bevindingen.lekken.length === 0 && rp.bevindingen.gewijzigd.length === 0 && rp.bevindingen.tweexx.length === 0,
+  v('ROL-LEK', !rp.bevindingen.meterStuk && rp.bevindingen.onbeslist.length === 0 && rp.bevindingen.lekken.length === 0 && rp.bevindingen.gewijzigd.length === 0 && rp.bevindingen.tweexx.length === 0,
     rp.bevindingen.meterStuk ? 'DE METER ZELF IS STUK: ' + rp.bevindingen.meterStuk
-    : rp.bevindingen.lekken.length || rp.bevindingen.gewijzigd.length || rp.bevindingen.tweexx.length
-      ? rp.bevindingen.tweexx.length + ' x 2xx, ' + rp.bevindingen.lekken.length + ' lekkende weigering(en), ' + rp.bevindingen.gewijzigd.length + ' blijvende wijziging(en)'
+    : rp.bevindingen.lekken.length || rp.bevindingen.gewijzigd.length || rp.bevindingen.tweexx.length || rp.bevindingen.onbeslist.length
+      ? rp.bevindingen.tweexx.length + ' x 2xx, ' + rp.bevindingen.lekken.length + ' lekkende weigering(en), ' + rp.bevindingen.gewijzigd.length + ' blijvende wijziging(en), ' + rp.bevindingen.onbeslist.length + ' onbesliste routes'
       : nl(rp.pogingen) + ' schrijfpogingen met een verkeerde rol: geen 2xx, geen gegevens in de weigering, geen blijvende wijziging');
   v('ROL-SCHEIDING', rolLek.length === 0, rolLek.length ? rolLek.slice(0, 8).join(', ') : 'geen verkeerd-rol token kreeg 2xx');
   v('DEKKING', onbereikt.length === 0, onbereikt.length + ' endpoints te weinig geraakt' + (onbereikt.length ? ': ' + onbereikt.slice(0, 6).map(e => e[0]).join(', ') : ''));

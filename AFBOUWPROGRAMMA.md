@@ -554,3 +554,35 @@ verlopen ketenbewijzen blijven ongeldig en twee browserdefecten zijn gevonden.
 Dat is geen bewijs dat alle apps stuk zijn. Het is wel een kwalificatieblokkade.
 Herstelproeven op de gewijzigde werkboom vervangen de vereiste volledige
 hermeting op een exacte kandidaatcommit niet.
+
+Herhaling en aangescherpte bewijsgrenzen:
+
+- De PostgreSQL-herhaling op d14f1ae752 met herstelde Redis slaagt:
+  46 bestanden, 119 tests, nul failures/skips. De nieuwe Directpay-proef
+  staat afzonderlijk en is nog niet in deze oude toetslijst inbegrepen.
+- Tussencommit 350743bfae bevat de geteste eerste reparaties. Dit is geen
+  releasecommit. Op die bron sluiten de 110 aanwezige voltooiingsscenario's;
+  de afgeleide menselijkheid is 107 gesloten en 3 niet beproefd.
+- LIEGRONDE op dezelfde bron: 94 bewezen, 20 niet getest. Vier daarvan tonen
+  fouten bij lege antwoorden (Magnaat, OV-routes, Rendez-vous, Verblijven),
+  drie zitten achter een gesloten toegangsscherm en dertien hebben geen eigen
+  adres in deze browsermeter. Eigenaar Experience/Test: echte bereikbare
+  scenario's en foutafhandeling toevoegen, vervolgens opnieuw meten.
+- DEKKING is opnieuw getoetst aan de actuele router: 5545 routes aangeraakt.
+  Dit bewijst bereik van de route, niet succesvolle of bevoegde uitvoering.
+- Zes aanvullende klokwachttests: 39 serverproeven geslaagd; de klokratel
+  blijft ongewijzigd. Tijdafhankelijke Flits-semantiek blijft apart beproefd.
+
+De onafhankelijke veiligheidsreview vond meetfouten, geen bewezen nieuwe
+productdoorbraken. ROLPROEF telde onbesliste antwoorden en onvolledige
+rolpogingen als gesloten; een afnemer kon oude of onvolledige bewijzen groen
+houden. ROLRONDE miste positieve sessiecontroles van de vreemde rollen.
+IDOR verstuurde ook niet-POST-routes als POST en mist bij veel routes positieve
+eigenaar- en B-eigen-objectcontroles. Daarom geldt 1124 geobserveerde weigeringen
+nadrukkelijk niet als 1124 bewezen objectgrenzen.
+
+Eigenaar Security/Test: meters en afnemers eerst fail-closed corrigeren,
+HTTP-methoden en ruwe controles behouden, fouten/lekken niet wegwerpen,
+en vervolgens hermeten op een vaste bron. Ontbrekende positieve fixtures
+blijven ontbrekend bewijs. Geen norm verlagen om de verwachte daling van
+gekwalificeerde dekking te compenseren.

@@ -26,14 +26,11 @@
    DEZE RONDE VRAAGT HET AAN DE SERVER IN PLAATS VAN AAN DE BRON. Voor elke
    route uit scripts/lib/routes.js:
 
-     1. klopt een ANONIEME beller aan. Krijgt hij geen 401, dan is het geen
-        leden-endpoint (publiek, of het valideert voor de deur) -- de dwaler-trede
-        van de ladder gaat over die groep.
-     2. klopt een ECHT LID aan (geregistreerd en geverifieerd, geen demo-persona).
-        Komt hij er ook niet door, dan is het een route van een andere rol.
-     3. blijft over: anoniem eruit, lid erdoor. Dat IS een leden-endpoint, hoe zijn
-        grendel er ook uitziet. Daar moeten een leverancier- en een kantoortoken
-        401 krijgen -- nooit 2xx (ongewenste toegang) en nooit 5xx (crash).
+     1. vereist een expliciete 401/403 voor de anonieme beller.
+     2. vereist 2xx voor het lid en een succesvolle sessiekanarie.
+     3. vereist expliciete 401/403 voor leverancier EN kantoor.
+        Andere antwoorden zijn onbekend, behalve ongewenste2xx (een gat).
+        Bekende gedeelde loketten blijven apart en bewijzen geen rolscheiding.
 
    DE SESSIE STERFT ONDERWEG, en dat mag geen classificatie worden. Deze ronde
    stuurt {} naar ruim drieduizend routes met het ledentoken, en daar zit
@@ -75,9 +72,9 @@ const VASTLEGGEN = process.argv.includes('--vastleggen');
 
 /* ---- DE METERS ----
    `rolscheidingGaten` telt de leden-endpoints die een niet-leden-token
-   binnenlieten of crashten. Nul, en dat mag zo blijven.
+   met2xx binnenlieten. Storingen en validatie zijn onbekend bewijs.
 
-   `rolscheidingGemeten` telt hoeveel leden-endpoints er ZIJN beproefd, en die
+   `rolscheidingGemeten` telt hoeveel leden-endpoints expliciete scheiding bewezen, en die
    mag alleen omhoog. Dat tweede getal is de belangrijkste van de twee en de
    minst vanzelfsprekende: nul gaten is triviaal te halen door minder te
    onderzoeken. Precies dat gebeurde hier -- de regexvorm vond er 1374 en zweeg
@@ -197,6 +194,43 @@ function gedeeldAntwoordGeldig(route, lid, ander) {
     require('node:util').isDeepStrictEqual(lid.data, ander.data);
 }
 
+/* Bewijs is smaller dan geen waargenomen lek. Validatie, een uitgeschakelde
+   functie, een storing of een timeout bewijst geen rolgrens. */
+const succesvol = antwoord => !!antwoord && antwoord.status >= 200 && antwoord.status < 300;
+const geweigerd = antwoord => !!antwoord && [401, 403].includes(antwoord.status);
+// Dezelfde token moet op zijn eigen loket vóór én na de tegenproef leven.
+async function meetRol(vraag, rol, token, methode, pad) {
+  const eigenPad = { leverancier: '/api/supplier/state', kantoor: '/api/office/state' }[rol];
+  if (!eigenPad) throw new Error('Onbekende proefrol');
+  const voor = await vraag('POST', eigenPad, token);
+  const antwoord = await vraag(methode, pad, token);
+  const na = await vraag('POST', eigenPad, token);
+  return { voor, antwoord, na };
+}
+function beoordeelRoute(route, anon, lid, antwoorden = {}, controles = {}) {
+  const uit = { bewezen: false, gaten: [], onbekend: [], gedeeld: [] };
+  const onbekend = (rol, a) => uit.onbekend.push({ route, rol, status: a ? a.status : 0 });
+  if (!geweigerd(anon)) { onbekend('anoniem', anon); return uit; }
+  if (!succesvol(lid)) { onbekend('lid', lid); return uit; }
+  for (const rol of ['leverancier', 'kantoor']) {
+    const a = antwoorden[rol];
+    const controle = controles[rol];
+    if (!controle || !succesvol(controle.voor) || !succesvol(controle.na)) {
+      uit.onbekend.push({ route, rol, status: a ? a.status : 0, reden: 'eigen-sessie-niet-bewezen',
+        voor: controle && controle.voor ? controle.voor.status : 0,
+        na: controle && controle.na ? controle.na.status : 0 });
+      continue;
+    }
+    if (geweigerd(a)) continue;
+    if (succesvol(a)) {
+      if (gedeeldAntwoordGeldig(route, lid, a)) uit.gedeeld.push({ route, rol });
+      else uit.gaten.push({ route, rol, status: a.status });
+    } else onbekend(rol, a);
+  }
+  uit.bewezen = !uit.gaten.length && !uit.onbekend.length && !uit.gedeeld.length;
+  return uit;
+}
+
 async function main() {
   let srv = null, basis = BASIS_EXTERN;
   if (!basis) {
@@ -231,51 +265,65 @@ async function main() {
 
   const ledenEndpoints = [], publiekOfVroeg = [], andereRol = [], stil = [];
   const gaten = [];
+  const onbekend = [];
   const gedeeld = [];
+  const rolproeven = [];
   let hersteld = 0;
-  const lidLeeft = async () => (await vraag('POST', '/api/state', lid)).status !== 401;
+  const lidLeeft = async () => succesvol(await vraag('POST', '/api/state', lid));
 
   for (const r of routes) {
     const pad = r.pad.replace(/:[A-Za-z_]+/g, 'x1');       // een padparam met iets onschuldigs
     const anon = await vraag(r.methode, pad, null);
-    if (anon.status === 0) { stil.push(r.methode + ' ' + r.pad); continue; }
-    if (anon.status !== 401) { publiekOfVroeg.push(r.methode + ' ' + r.pad + ' -> ' + anon.status); continue; }
+    if (!geweigerd(anon)) {
+      publiekOfVroeg.push(r.methode + ' ' + r.pad + ' -> ' + anon.status);
+      onbekend.push(...beoordeelRoute(r.methode + ' ' + r.pad, anon).onbekend);
+      if (anon.status === 0) stil.push(r.methode + ' ' + r.pad);
+      continue;
+    }
 
     let l = await vraag(r.methode, pad, lid);
     if (l.status === 401 && !(await lidLeeft())) {
       lid = await nieuwLid(vraag); hersteld++;
-      if (!lid) { stil.push(r.methode + ' ' + r.pad + ' (geen lid meer te maken)'); continue; }
+      if (!lid) {
+        stil.push(r.methode + ' ' + r.pad + ' (geen lid meer te maken)');
+        onbekend.push({ route: r.methode + ' ' + r.pad, rol: 'lid-herstel', status: 0 });
+        continue;
+      }
       l = await vraag(r.methode, pad, lid);
     }
-    if (l.status === 401) { andereRol.push(r.methode + ' ' + r.pad); continue; }
-
-    ledenEndpoints.push(r.methode + ' ' + pad);
-    for (const [rol, tok] of [['leverancier', supTok], ['kantoor', offTok]]) {
-      const a = await vraag(r.methode, pad, tok);
-      /* 401 is de eis. 404 mag (de padparam-dummy bestaat niet), en een 503 van
-         een functie die BEWUST uitstaat mag ook: dat laat niemand binnen, ook
-         geen lid, en dat is meer dan hier gevraagd wordt. We eisen wel dat zo'n
-         antwoord de functie noemt, zodat een echte 503-crash blijft opvallen --
-         zelfde afspraak als in test/auth-rol.test.js. */
-      const bewustDicht = a.status === 503 && a.data && a.data.functie;
-      /* Een loket dat met opzet voor meer dan een rol opengaat telt hier niet
-         als gat -- maar wel als REGEL, want het staat bij naam in ROLGEDEELD
-         hierboven met zijn reden en zijn toets. */
-      const bewustGedeeld = gedeeldAntwoordGeldig(r.methode + ' ' + pad, l, a);
-      if (bewustGedeeld) { gedeeld.push(r.methode + ' ' + pad + ' [' + rol + ']'); continue; }
-      if (!bewustDicht && (a.status < 400 || a.status >= 500))
-        gaten.push({ route: r.methode + ' ' + pad, rol, status: a.status, bestand: r.bestand + ':' + r.regel });
+    if (!succesvol(l)) {
+      andereRol.push(r.methode + ' ' + r.pad);
+      onbekend.push(...beoordeelRoute(r.methode + ' ' + r.pad, anon, l).onbekend);
+      continue;
     }
+    if (!(await lidLeeft())) {
+      onbekend.push({ route: r.methode + ' ' + r.pad, rol: 'lid-kanarie', status: 0 });
+      continue;
+    }
+    const antwoorden = {}, controles = {};
+    for (const [rol, tok] of [['leverancier', supTok], ['kantoor', offTok]]) {
+      const proef = await meetRol(vraag, rol, tok, r.methode, pad);
+      antwoorden[rol] = proef.antwoord;
+      controles[rol] = { voor: proef.voor, na: proef.na };
+      // Uitsluitend statusbewijs; geen tokens of ontvangen inhoud bewaren.
+      rolproeven.push({ route: r.methode + ' ' + r.pad, rol,
+        voor: proef.voor.status, antwoord: proef.antwoord.status, na: proef.na.status });
+    }
+    const uit = beoordeelRoute(r.methode + ' ' + r.pad, anon, l, antwoorden, controles);
+    if (uit.bewezen) ledenEndpoints.push(r.methode + ' ' + r.pad);
+    gaten.push(...uit.gaten.map(g => ({ ...g, bestand: r.bestand + ':' + r.regel })));
+    onbekend.push(...uit.onbekend);
+    gedeeld.push(...uit.gedeeld);
   }
 
   console.log('  ' + K.grijs + 'sessie onderweg hersteld: ' + hersteld + ' keer' + K.reset + '\n');
-  console.log('  ' + K.vet + ledenEndpoints.length + K.reset + ' leden-endpoints beproefd ' +
-    K.grijs + '(anoniem eruit, lid erdoor)' + K.reset);
-  console.log('  ' + K.grijs + publiekOfVroeg.length + ' routes gaven een anonieme beller geen 401 (publiek, of ze valideren voor de deur)' + K.reset);
-  console.log('  ' + K.grijs + andereRol.length + ' routes lieten ook een lid niet binnen (leverancier, kantoor, foundation)' + K.reset);
+  console.log('  ' + K.vet + ledenEndpoints.length + K.reset + ' leden-endpoints met bewezen rolscheiding ' +
+    K.grijs + '(anoniem401/403, lid2xx, andere rollen401/403 met eigen2xx vóór/na)' + K.reset);
+  console.log('  ' + K.grijs + publiekOfVroeg.length + ' routes zonder expliciete anonieme401/403 (scheiding niet bewezen)' + K.reset);
+  console.log('  ' + K.grijs + andereRol.length + ' routes zonder succesvolle ledencontrole (rol niet bewezen)' + K.reset);
   if (gedeeld.length) {
     console.log('  ' + K.grijs + gedeeld.length + ' antwoord(en) van een loket dat MET OPZET voor meer dan een rol opengaat:' + K.reset);
-    for (const [route, uitleg] of ROLGEDEELD) console.log('    ' + K.grijs + route + ' -- ' + uitleg.reden.slice(0, 90) + K.reset);
+    for (const g of gedeeld) console.log('    ' + K.grijs + g.route + ' [' + g.rol + '] -- ' + ROLGEDEELD.get(g.route).reden.slice(0, 90) + K.reset);
   }
   if (stil.length) console.log('  ' + K.geel + stil.length + ' routes gaven geen antwoord' + K.reset);
 
@@ -290,6 +338,8 @@ async function main() {
       routesOnderzocht: routes.length, sessieHersteld: hersteld,
       publiekOfVroegGevalideerd: publiekOfVroeg.length, andereRol: andereRol.length, zonderAntwoord: stil,
       bewustGedeeld: [...ROLGEDEELD].map(([route, u]) => ({ route, reden: u.reden, toets: u.toets })),
+      waargenomenGedeeld: gedeeld, rolproeven,
+      onbekend, bewezen: ledenEndpoints,
       gaten
     }, null, 2) + '\n');
   } catch (e) { console.error('  kon ROLRONDE.json niet schrijven: ' + e.message); }
@@ -304,30 +354,30 @@ async function main() {
     console.log('');
     return 1;
   }
-  console.log('\n  ' + K.groen + 'Geen enkel leden-endpoint liet een leverancier- of kantoortoken binnen.' + K.reset + '\n');
+  console.log('\n  ' + (onbekend.length ? K.geel : K.groen) +
+    (onbekend.length ? onbekend.length + ' antwoorden zonder voldoende bewijs; geen waargenomen lek is geen bewezen scheiding.'
+      : 'De onderzochte rolgrenzen zijn expliciet beproefd.') + K.reset + '\n');
 
   /* ---------- de ratel ---------- */
   let norm = null;
   try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   if (norm && norm.meters && !BASIS_EXTERN) {
     const uitslag = { gaten: gaten.length, gemeten: ledenEndpoints.length };
-    if (VASTLEGGEN) {
+    const oordeel = beoordeel(uitslag, norm.meters);
+    if (oordeel.zakt) {
+      for (const reden of oordeel.redenen) console.error(reden);
+      return 1;
+    }
+    if (VASTLEGGEN && !onbekend.length) {
       const p = norm.meters[METER], v = norm.meters[METER_N];
       if (p === undefined || uitslag.gaten <= p) norm.meters[METER] = uitslag.gaten;
       if (v === undefined || uitslag.gemeten >= v) norm.meters[METER_N] = uitslag.gemeten;
       fs.writeFileSync(path.join(WORTEL, 'NORM.json'), JSON.stringify(norm, null, 2) + '\n');
       console.log('  ' + K.groen + METER + ' vastgelegd op ' + norm.meters[METER] + ', ' + METER_N + ' op ' + norm.meters[METER_N] + '.' + K.reset + '\n');
-    } else {
-      const oordeel = beoordeel(uitslag, norm.meters);
-      if (oordeel.zakt) {
-        for (const r of oordeel.redenen) console.error('  ' + K.rood + r + K.reset);
-        console.error('');
-        return 1;
-      }
     }
   }
-  return 0;
+  return onbekend.length ? 2 : 0;
 }
 
 if (require.main === module) main().then(c => { process.exitCode = c; }).catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { beoordeel, gedeeldAntwoordGeldig, METER, METER_N };
+module.exports = { meetRol, beoordeelRoute, beoordeel, gedeeldAntwoordGeldig, METER, METER_N };

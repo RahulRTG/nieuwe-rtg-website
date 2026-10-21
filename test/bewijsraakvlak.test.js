@@ -18,6 +18,8 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const R = require('../scripts/lib/bewijsraakvlak');
 const { beoordeel } = require('../scripts/appwerkt-vers');
+const crypto = require('crypto');
+const B = require('../scripts/lib/bewijsbron');
 
 const BESTANDEN = {
   'server/server.js': "require('./middleware/auth');\nrequire('./opzet/routes')(require('./kern/db'));\n",
@@ -90,6 +92,81 @@ function metRepo(doe) {
     return doe({ map, sha, recs, H, nu, st });
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
 }
+
+function metBevoegd(doe) {
+  return metRepo(({ map }) => {
+    for (const [rel, inhoud] of Object.entries({
+      'scripts/bevoegdronde.js': 'module.exports = {};\n',
+      'scripts/idorproef.js': "require('./lib/idor');\n",
+      'scripts/lib/idor.js': 'module.exports = 1;\n',
+      'scripts/rolproef-route.js': "require('./lib/rolproef');\n",
+      'scripts/lib/rolproef.js': 'module.exports = 1;\n'
+    })) schrijf(map, rel, inhoud);
+    const sha = commit(map, 'instrumenten');
+    const bronnen = ['IDOR.json', 'ROLPROEF.json'].map((register, i) => {
+      const stempel = { op: 'nu', commit: sha, boomVuil: false,
+        instrument: i ? 'scripts/rolproef-route.js' : 'scripts/idorproef.js' };
+      const inhoud = JSON.stringify({ stempel, perRoute: i ? [] : {} });
+      schrijf(map, register, inhoud);
+      return { register, stempel, sha256: crypto.createHash('sha256').update(inhoud).digest('hex') };
+    });
+    // De bronregisters zijn vers geschreven na de commit; hun code is wel exact.
+    const st = { op: 'nu', commit: sha, boomVuil: false, instrument: 'scripts/bevoegdronde.js' };
+    const w = wereld(map);
+    const v = R.versheidVoor(w, { ingang: '/apps/a.html' }, grofSpion())(st, { bronnen });
+    const H = R.hashes(w);
+    const nu = () => R.controleer(wereld(map), v.raakvlak, H, '/apps/a.html', grofSpion());
+    return doe({ map, st, bronnen, v, H, nu });
+  });
+}
+
+test('rolbewijs: bevoegd bewaart en controleert de gelezen bronregisters transitief', () => metBevoegd(({ map, v, bronnen, nu }) => {
+  assert.equal(v.vers, true, v.reden);
+  assert.deepEqual(v.raakvlak.bronnen, bronnen);
+  assert.equal(nu().stand, 'VERS');
+  for (const register of ['IDOR.json', 'ROLPROEF.json']) {
+    const oud = fs.readFileSync(path.join(map, register), 'utf8');
+    schrijf(map, register, oud + '\n');
+    assert.equal(nu().stand, 'VERVALLEN', register + ': een nieuwe bronmeting vereist opnieuw samenstellen');
+    schrijf(map, register, oud);
+  }
+  for (const instrument of ['scripts/lib/rolproef.js', 'scripts/lib/idor.js']) {
+    schrijf(map, instrument, 'module.exports = 2;\n');
+    assert.equal(nu().stand, 'VERVALLEN', instrument + ': de classifier van een bron blijft deel van het bewijs');
+    schrijf(map, instrument, 'module.exports = 1;\n');
+  }
+  assert.equal(nu().stand, 'VERS');
+}));
+
+test('rolbewijs: ontbrekende bronbinding is nooit vers, ook bij een groen grof oordeel', () => metBevoegd(({ map, st, bronnen }) => {
+  const vers = extra => R.versheidVoor(wereld(map), { ingang: '/apps/a.html' }, () => ({ vers: true }))(st, extra);
+  assert.equal(vers().vers, false);
+  assert.equal(vers({ bronnen: bronnen.slice(0, 1) }).vers, false);
+  const verkeerd = bronnen.map(x => ({ ...x })); verkeerd[0].sha256 = 'a'.repeat(64);
+  assert.equal(vers({ bronnen: verkeerd }).vers, false);
+  assert.equal(vers({ bronnen: [bronnen[0], bronnen[0]] }).vers, false);
+  const anderStempel = bronnen.map(x => ({ ...x, stempel: { ...x.stempel } }));
+  anderStempel[0].stempel.commit = 'deadbeef';
+  assert.equal(vers({ bronnen: anderStempel }).vers, false);
+  const reg = { stempel: st, bronnen: { registers: bronnen }, regels: [{ functie: 'link:a', status: 'BEWEZEN' }] };
+  const uit = B.rondeUitslag('BEVOEGD.json', 'link:a', {
+    lees: () => JSON.stringify(reg),
+    versheid: R.versheidVoor(wereld(map), { ingang: '/apps/a.html' }, grofSpion())
+  });
+  assert.equal(uit.status, 'BEWEZEN', uit.reden);
+  assert.deepEqual(uit.raakvlak[0].bronnen, bronnen, 'de binding reist via bewijsbron mee naar APPWERKT');
+}));
+
+test('rolbewijs: bronbinding blijft verplicht bij een onbepaald raakvlak', () => metBevoegd(({ map, st, bronnen }) => {
+  const grof = () => ({ vers: true, reden: 'zelfde code' });
+  const v = R.versheidVoor(wereld(map), { ingang: '/apps/c.html' }, grof)(st, { bronnen });
+  assert.equal(v.vers, true);
+  assert.ok(v.raakvlak.onbepaald);
+  schrijf(map, 'ROLPROEF.json', '{}');
+  const c = R.controleer(wereld(map), v.raakvlak, {}, '/apps/c.html', grof);
+  assert.equal(c.vers, false);
+  assert.match(c.reden, /ROLPROEF/);
+}));
 
 test('vers op de eigen commit, met het raakvlak erbij', () => metRepo(({ recs, nu }) => {
   assert.ok(recs.a && !recs.a.onbepaald && /^[0-9a-f]{64}$/.test(recs.a.samen));

@@ -21,8 +21,10 @@
 
    WAT EEN ROUTE HIER VERDIENT, en wat niet:
 
-     bewezen    er is met minstens één verkeerde rol op geklopt, met plausibele
-                invoer, en er is naar het antwoord gekeken.
+     bewezen    iedere verwachte verkeerde rol is expliciet geweigerd, met
+                dezelfde levende sessie vóór en na elke poging.
+     onbeslist  ontbrekende pogingen, ongeldige sessies, uitval of andere
+                antwoorden. Een serverfout bewijst geen afscherming.
      ongemeten  er is niet op geklopt. Een leesroute, een publieke route, of hij
                 viel buiten de begrenzing van deze ronde.
 
@@ -63,6 +65,23 @@ const UITSLAG = path.join(WORTEL, 'ROLPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 600;
 
+/* De werkelijke methode gaat tot aan HTTP mee. Redirects worden niet gevolgd:
+   een 401 op de bestemmingspagina bewijst niets over de oorspronkelijke deur. */
+function maakVraag({ basis, fetcher = fetch, leer = () => {} }) {
+  return async (methode, pad, lijf, tok, extraKoppen) => {
+    try {
+      const r = await fetcher(basis + pad, { method: methode, redirect: 'manual',
+        signal: AbortSignal.timeout(15000),
+        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(extraKoppen || {}) },
+        ...(['GET', 'HEAD'].includes(methode) ? {} : { body: JSON.stringify(lijf || {}) }) });
+      const tekst = await r.text();
+      let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
+      if (r.status >= 200 && r.status < 300 && data && typeof data === 'object') leer(data, pad);
+      return { status: r.status, data };
+    } catch (e) { return { status: 0, data: String(e.message) }; }
+  };
+}
+
 /* rolVan() stond hier woordelijk, en in de drie andere proef-scripts nog eens.
    Hij woont nu in ./lib/routes.js, samen met de REDEN waarom een rol soms niet te
    bepalen valt -- want die redenen horen geteld te worden en niet stil te
@@ -79,7 +98,7 @@ const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 6
    scripts/bewijsmatrix.js heeft deze wacht al sinds hij ooit de hele testrunner
    meenam. Dezelfde wacht hoort op elk instrument dat bij het draaien een register
    OVERSCHRIJFT. */
-if (require.main !== module) { module.exports = {}; return; }
+if (require.main !== module) { module.exports = { maakVraag }; return; }
 wachtOpSchoneBoom();
 
 (async () => {
@@ -114,17 +133,8 @@ wachtOpSchoneBoom();
      rol met een ECHT object-id bereikt de eigenaarschapsvraag zelf -- precies
      de laag waar de kale lijven op 404 strandden. */
   const pool = maakPool();
-  const post = async (pad, lijf, tok, extraKoppen) => {
-    try {
-      const r = await fetch(basis + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(extraKoppen || {}) },
-        body: JSON.stringify(lijf || {}) });
-      const tekst = await r.text();
-      let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
-      if (r.status >= 200 && r.status < 300 && data && typeof data === 'object') pool.leer(data, pad);
-      return { status: r.status, data };
-    } catch (e) { return { status: 0, data: String(e.message) }; }
-  };
+  const vraag = maakVraag({ basis, leer: (data, pad) => pool.leer(data, pad) });
+  const post = (pad, lijf, tok, extraKoppen) => vraag('POST', pad, lijf, tok, extraKoppen);
 
   /* De drie rollen. Lukt er een niet, dan zeggen we dat en gaan we NIET door met
      twee: een proef die de derde rol mist, meldt "geen bevindingen" over routes
@@ -184,7 +194,11 @@ wachtOpSchoneBoom();
   for (const r of routes) {
     const tk = eigenTokens[r.rol];
     if (!tk) continue;
-    await wacht.roep(r.pad, plausibelLijf(r.pad), r.rol, Array.isArray(tk) ? tk[0] : tk);
+    if (r.methode === 'POST') {
+      await wacht.roep(r.pad, plausibelLijf(r.pad), r.rol, Array.isArray(tk) ? tk[0] : tk);
+    } else {
+      await vraag(r.methode, r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
+    }
   }
   if (wacht.hernieuwd()) console.log('  sessie hernieuwd tijdens de oogstgang : ' + wacht.hernieuwd() +
     '  (deze gang raakt ook de uitlogroutes aan)');
@@ -223,19 +237,22 @@ wachtOpSchoneBoom();
 
   /* tokensVoor leest uit eigenTokens en niet uit de drie constanten van de
      inlog: na de oogstgang kunnen die vervangen zijn. */
-  const uit = await draaiRolproef({ post: postT, routes, tokensVoor: () => ({ ...eigenTokens }), maxPogingen: MAX,
+  // postT is alleen voor de ijking/vingerafdruk. De kruisgang en zijn eigen
+  // sessiecontroles gebruiken vraag met exact dezelfde ongewisselde token.
+  const uit = await draaiRolproef({ post: postT, vraag, routes, tokensVoor: () => ({ ...eigenTokens }), maxPogingen: MAX,
     lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf });
 
   if (uit.bevindingen.meterStuk) {
     console.error('\n  DE METER IS BLIND: ' + uit.bevindingen.meterStuk);
-    klaar(); process.exit(2);
   }
 
   const perRoute = Object.values(uit.perRoute);
   const open = perRoute.filter(r => r.acl === 'OPEN');
   const lek = perRoute.filter(r => r.privacy === 'LEK');
+  const onbeslist = perRoute.filter(r => r.acl === 'onbeslist' || r.privacy === 'onbeslist');
+  const beproefd = perRoute.filter(r => r.geprobeerd.length);
 
-  console.log('  routes werkelijk beproefd            : ' + perRoute.length);
+  console.log('  routes werkelijk beproefd            : ' + beproefd.length);
   console.log('  pogingen                             : ' + uit.pogingen);
   console.log('  verkeerde rol kwam BINNEN            : ' + open.length);
   for (const r of open.slice(0, 10)) console.log('      ' + r.methode + ' ' + r.pad);
@@ -243,6 +260,7 @@ wachtOpSchoneBoom();
   for (const r of lek.slice(0, 10)) console.log('      ' + r.methode + ' ' + r.pad);
   console.log('  blijvende wijziging na afloop        : ' +
     (uit.bevindingen.gewijzigd.length ? uit.bevindingen.gewijzigd.join(', ') : 'geen'));
+  console.log('  routes met onbeslist bewijs          : ' + onbeslist.length);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
@@ -278,9 +296,9 @@ wachtOpSchoneBoom();
        hier vandaan kwamen. */
     nietTeKruisen: (uit.nietTeKruisen || []).slice()
       .sort((a, b) => (a.pad + a.methode).localeCompare(b.pad + b.methode)),
-    gemeten: { routesMetRol: routes.length, beproefd: perRoute.length, pogingen: uit.pogingen,
+    gemeten: { routesMetRol: routes.length, beproefd: beproefd.length, pogingen: uit.pogingen,
       nietTeKruisen: (uit.nietTeKruisen || []).length,
-      aclOpen: open.length, privacyLek: lek.length,
+      aclOpen: open.length, privacyLek: lek.length, onbeslist: onbeslist.length,
       /* Blijvende wijziging na afloop: een handler die eerst schrijft en daarna
          pas de rechten controleert, geeft keurig 403 terug terwijl de mutatie al
          is gebeurd. De statuscode klopt dan en de database niet. */
@@ -294,5 +312,6 @@ wachtOpSchoneBoom();
   console.log('\n  weggeschreven in ROLPROEF.json');
 
   klaar();
-  process.exit(open.length || lek.length ? 1 : 0);
+  process.exit(open.length || lek.length || uit.bevindingen.gewijzigd.length ? 1
+    : uit.bevindingen.meterStuk || onbeslist.length ? 2 : 0);
 })().catch(e => { console.error('de rolproef viel om: ' + (e && e.message)); process.exit(2); });

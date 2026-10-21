@@ -1,18 +1,18 @@
 {
   "stempel": {
-    "op": "2026-10-19T05:08:12.013Z",
-    "commit": "72492000",
+    "op": "2026-10-20T19:16:11.959Z",
+    "commit": "350743bfae",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 5,
     "instrument": "scripts/liegronde.js",
-    "node": "v22.22.0"
+    "node": "v26.12.0"
   },
   "uitleg": "Bewijs 4 (waarheidsgetrouw) per onderdeel uit MAPPEN: het scherm met de persona van de rij, terwijl de backend buiten de deuren leeg antwoordt (RTG_LIEG). Zie de kop van scripts/liegronde.js.",
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 96,
-    "NIET_GETEST": 18
+    "BEWEZEN": 94,
+    "NIET_GETEST": 20
   },
   "regels": [
     {
@@ -21,8 +21,8 @@
       "ingang": "/apps/arrival.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
       "klachten": []
     },
     {
@@ -161,8 +161,8 @@
       "ingang": "/apps/connect.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 1,
+      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 2,
       "klachten": []
     },
     {
@@ -191,8 +191,8 @@
       "ingang": "/apps/flits.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
       "klachten": []
     },
     {
@@ -261,8 +261,8 @@
       "ingang": "/apps/hangar.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 10,
+      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 2,
       "klachten": []
     },
     {
@@ -291,8 +291,8 @@
       "ingang": "/apps/ik.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "8 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 8,
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {
@@ -351,8 +351,8 @@
       "ingang": "/apps/leven.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 2,
+      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 9,
       "klachten": []
     },
     {
@@ -402,7 +402,7 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 11,
+      "gelogen": 13,
       "klachten": [
         "rommel in beeld: undefined"
       ]
@@ -463,8 +463,8 @@
       "ingang": "/apps/move.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 11,
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
       "klachten": []
     },
     {
@@ -493,8 +493,8 @@
       "ingang": "/apps/navigatie.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
       "klachten": []
     },
     {
@@ -553,28 +553,30 @@
       "ingang": "/apps/ov.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 14,
+      "reden": "6 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 6,
       "klachten": []
     },
     {
       "functie": "link:ovroutes",
       "app": "OV-routes",
       "ingang": "/apps/ovroutes.html",
-      "persona": "lid",
-      "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
-      "klachten": []
+      "persona": "personeel",
+      "status": "NIET_GETEST",
+      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'forEach')); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "gelogen": 2,
+      "klachten": [
+        "JS-fout: Cannot read properties of undefined (reading 'forEach')"
+      ]
     },
     {
       "functie": "link:partnernetwerk",
       "app": "Partner Network",
       "ingang": "/apps/partner-network.html",
-      "persona": "lid",
+      "persona": "zaak",
       "status": "BEWEZEN",
-      "reden": "8 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 8,
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
       "klachten": []
     },
     {
@@ -613,8 +615,8 @@
       "ingang": "/apps/mijn-post.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {
@@ -653,8 +655,8 @@
       "ingang": "/apps/reisboek.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 11,
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 4,
       "klachten": []
     },
     {
@@ -663,8 +665,8 @@
       "ingang": "/apps/reizen-veilig.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "12 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 12,
+      "reden": "4 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 4,
       "klachten": []
     },
     {
@@ -694,10 +696,12 @@
       "app": "Verblijven",
       "ingang": "/apps/residentie.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 11,
-      "klachten": []
+      "status": "NIET_GETEST",
+      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "gelogen": 3,
+      "klachten": [
+        "rommel in beeld: undefined"
+      ]
     },
     {
       "functie": "link:routedossier",
@@ -785,8 +789,8 @@
       "ingang": "/apps/rtgschool.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "8 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 8,
+      "reden": "13 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 13,
       "klachten": []
     },
     {
@@ -805,8 +809,8 @@
       "ingang": "/apps/sitemaker.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {
@@ -815,8 +819,8 @@
       "ingang": "/apps/sociaal.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 11,
+      "reden": "12 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 12,
       "klachten": []
     },
     {
@@ -855,8 +859,8 @@
       "ingang": "/apps/stad.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 11,
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 3,
       "klachten": []
     },
     {
@@ -883,10 +887,10 @@
       "functie": "link:tweedescherm",
       "app": "Tweede scherm",
       "ingang": "/apps/scherm.html",
-      "persona": "lid",
+      "persona": "zaak",
       "status": "BEWEZEN",
-      "reden": "8 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 8,
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
       "klachten": []
     },
     {
@@ -905,8 +909,8 @@
       "ingang": "/apps/life.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "7 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 7,
+      "reden": "16 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 16,
       "klachten": []
     },
     {
@@ -915,8 +919,8 @@
       "ingang": "/apps/veilig.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "8 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 8,
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {
@@ -935,8 +939,8 @@
       "ingang": "/apps/vertegenwoordiging.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {
@@ -945,8 +949,8 @@
       "ingang": "/apps/vluchten.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 10,
+      "reden": "2 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 2,
       "klachten": []
     },
     {
@@ -965,8 +969,8 @@
       "ingang": "/apps/living-os.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "15 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 15,
+      "reden": "16 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 16,
       "klachten": []
     },
     {

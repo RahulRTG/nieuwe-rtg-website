@@ -189,7 +189,8 @@ test('de herhaalsleutel staat bij het meubel: dezelfde tik is hetzelfde meubel, 
   const voor = (await api(base, '/api/residentie/suite', {}, a.token)).body.suite.meubels.length;
   const lijf = { soort: 'kruk', x: 8, y: 6, idem: 'meubel-sleutel-1' };
   await api(base, '/api/residentie/meubel/zet', lijf, a.token);
-  await new Promise(r => setTimeout(r, 5200)); // voorbij het dubbeltikvenster van de idem-poort
+  // Deze route bewaart haar eigen sleutel; de tijdelijke antwoordkas doet niet mee.
+  assert.equal(require('../server/middleware/idempotentie-eigen').doetHetZelf('/api/residentie/meubel/zet'), true);
   const weer = await api(base, '/api/residentie/meubel/zet', lijf, a.token);
   assert.equal(weer.status, 200);
   assert.equal((await api(base, '/api/residentie/suite', {}, a.token)).body.suite.meubels.length, voor + 1, 'een kruk, niet twee');

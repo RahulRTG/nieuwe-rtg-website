@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, wachtOpWaarde } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-flits-'));
@@ -205,10 +205,36 @@ test('10. dezelfde melder vlakbij opnieuw is een herhaling, geen bevestiging -- 
   const ander = await api('/api/flits/meld', { soort: 'file', ...plek, idem: 'tik-1' }, melder);
   assert.equal(ander.status, 409);
   /* En een nieuwe tik van dezelfde melder vlakbij, na de rustpauze. */
-  await new Promise(r => setTimeout(r, 20500));
-  const nog = await api('/api/flits/meld', { soort: 'ongeval', lat: plek.lat + 0.001, lng: plek.lng, land: 'ES', idem: 'tik-2' }, melder);
+  const volgende = { soort: 'ongeval', lat: plek.lat + 0.001, lng: plek.lng, land: 'ES', idem: 'tik-2' };
+  const pauze = await api('/api/flits/meld', volgende, melder);
+  assert.equal(pauze.status, 429, 'de domeinrustpauze is nog actief');
+  assert.match(pauze.body.error, /vorige melding/);
+  const nog = await wachtOpWaarde(async () => {
+    const antwoord = await api('/api/flits/meld', volgende, melder);
+    // Alleen de verwachte domeinrustpauze rechtvaardigt opnieuw wachten.
+    return antwoord.status === 429 && /vorige melding/.test(antwoord.body.error || '') ? false : antwoord;
+  }, { ms: 25000, stap: 1000, wat: 'dezelfde melder kan na de domeinrustpauze opnieuw melden' });
   assert.equal(nog.status, 200);
   assert.notEqual(nog.body.bevestigd, true, 'een melder bevestigt zichzelf niet');
   const rond = await api('/api/flits/rond', plek, melder);
   assert.equal(rond.body.meldingen.find(x => x.id === eerst.body.melding.id).bevestigingen, 0);
+});
+
+
+test('de rustpauze duurt exact twintig seconden en zelfherhaling blijft geen bevestiging', (t) => {
+  const start = Date.parse('2026-10-20T12:00:00Z');
+  t.mock.timers.enable({ apis: ['Date'], now: start });
+  const db = { data: {} };
+  const flits = require('../server/kern/flits').maakFlits({ db, save() {}, crypto: require('node:crypto'), haversine: () => 100 });
+  const plek = { soort: 'ongeval', lat: IBIZA.lat, lng: IBIZA.lng, land: 'ES' };
+  const eerste = flits.flitsMeld('A', 'MELDER A', { ...plek, idem: 'een' });
+  assert.equal(eerste.status, 200);
+  t.mock.timers.setTime(start + 19999);
+  assert.equal(flits.flitsMeld('A', 'MELDER A', { ...plek, idem: 'twee' }).status, 429);
+  t.mock.timers.setTime(start + 20000);
+  const opnieuw = flits.flitsMeld('A', 'MELDER A', { ...plek, idem: 'twee' });
+  assert.equal(opnieuw.status, 200);
+  assert.equal(opnieuw.melding.id, eerste.melding.id);
+  assert.notEqual(opnieuw.bevestigd, true);
+  assert.equal(db.data.flitsMeldingen[0].bevestigingen, 0);
 });

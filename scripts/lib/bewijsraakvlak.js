@@ -92,6 +92,14 @@ const DYNAMISCH = {
 /* De voltooiproef laadt elk scenario letterlijk; voor een bewijs telt alleen
    het eigen scenario (zie de kop). */
 const SCENARIOMAP = 'scripts/lib/voltooi/';
+/* Deze ronde stelt bestaande metingen samen. Hun inhoud is invoer, en hun
+   instrumenten blijven dus ook meetcode van het afgeleide bewijs. */
+const BRONREGISTERS = {
+  'scripts/bevoegdronde.js': {
+    'IDOR.json': 'scripts/idorproef.js',
+    'ROLPROEF.json': 'scripts/rolproef-route.js'
+  }
+};
 
 const sha256 = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 const blobId = (buf) => crypto.createHash('sha1').update('blob ' + buf.length + '\0').update(buf).digest('hex');
@@ -591,7 +599,8 @@ function instrumentDeel(w, instrument, scenario) {
   if (!instrument) return { bepaald: false, reden: 'het stempel noemt geen instrument' };
   const lijst = w.lijst() || new Set();
   if (!lijst.has(instrument)) return { bepaald: false, reden: 'het instrument ' + instrument + ' bestaat niet' };
-  const starts = [instrument].concat(scenario ? [scenario] : []);
+  const starts = [instrument].concat(scenario ? [scenario] : [],
+    Object.values(BRONREGISTERS[instrument] || {}));
   const s = sluitingVan(w, starts, {
     volg: (van, naar) => !(scenario && naar.startsWith(SCENARIOMAP) && naar !== scenario && van === instrument)
   });
@@ -675,21 +684,63 @@ function stempelGebrek(st) {
   return null;
 }
 
+/* Registerinhoud wordt na de codecommit geschreven. Daarom binden we de exact
+   gelezen bytes met dezelfde sha256 als elders in dit raakvlak, en vergelijken
+   we de broninstrumenten afzonderlijk met hun eigen meetcommit. Een nieuwe
+   bronmeting vereist opnieuw samenstellen, ook als de code gelijk bleef. */
+function bronGebrek(w, instrument, bronnen, grof) {
+  const nodig = BRONREGISTERS[instrument];
+  if (!nodig) return null;
+  if (!Array.isArray(bronnen) || bronnen.length !== Object.keys(nodig).length)
+    return { reden: 'de gelezen bronregisters zijn niet volledig vastgelegd', oorzaak: Object.keys(nodig) };
+  for (const [register, bronInstrument] of Object.entries(nodig)) {
+    const matches = bronnen.filter(b => b?.register === register);
+    if (matches.length !== 1) return { reden: register + ': geen eenduidige bronbinding', oorzaak: [register] };
+    const b = matches[0], inhoud = w.inhoud(register);
+    if (inhoud === null || !/^[0-9a-f]{64}$/.test(b.sha256 || '') || sha256(inhoud) !== b.sha256)
+      return { reden: register + ': de inhoud verschilt van de gelezen bronmeting', oorzaak: [register] };
+    let j;
+    try { j = JSON.parse(inhoud.toString('utf8')); } catch (e) {
+      return { reden: register + ': geen geldige JSON', oorzaak: [register] };
+    }
+    const st = j.stempel;
+    if (stempelGebrek(st) || st?.instrument !== bronInstrument ||
+      !b.stempel || ['op', 'commit', 'instrument', 'boomVuil'].some(k => b.stempel[k] !== st[k]))
+      return { reden: register + ': geen geldig overeenkomend bronstempel', oorzaak: [register] };
+    const ins = instrumentDeel(w, bronInstrument);
+    if (!ins.bepaald) {
+      const v = grof(st);
+      if (!v.vers) return { reden: register + ': ' + v.reden, oorzaak: [register] };
+    } else {
+      const d = verschil(w, ins.bestanden, st.commit);
+      if (!d.bekend || d.oorzaak.length)
+        return { reden: register + ': broninstrument gewijzigd sinds de meting',
+          oorzaak: d.oorzaak?.length ? d.oorzaak : [register] };
+    }
+  }
+  return null;
+}
+
 /* ---- VERSHEID OP HET RAAKVLAK ----------------------------------------------
    Geeft een versheid()-functie (zelfde vorm: { vers, reden }) die per bewijs
    naar zijn raakvlak kijkt, met het vast te leggen raakvlak erbij. `grof` is de
    oude regel, voor als het raakvlak onbepaald is. */
 function versheidVoor(w, invoer, grof) {
-  return function versheidOpRaakvlak(st) {
+  return function versheidOpRaakvlak(st, { bronnen = st?.bronnen } = {}) {
     const gebrek = stempelGebrek(st);
     if (gebrek) return { vers: false, reden: gebrek };
     const ins = Object.assign({ instrument: st.instrument }, invoer);
+    const gebrekBron = bronGebrek(w, ins.instrument, bronnen, grof);
+    if (gebrekBron) return { vers: false, ...gebrekBron };
+    const bronVeld = BRONREGISTERS[ins.instrument] ? { bronnen } : {};
     const r = raakvlak(w, ins);
     if (!r.bepaald) {
-      const v = grof(st);
+      let v = grof(st);
+      // Ook bij de grove terugval blijven de broninstrumenten meetcode.
+      for (const b of bronnen || []) if (v.vers) v = grof(b.stempel);
       return Object.assign({}, v, { reden: 'raakvlak onbepaald (' + r.reden + '), dus de grove regel: ' + v.reden,
         raakvlak: { commit: st.commit, instrument: ins.instrument, scenario: ins.scenario || null,
-          routeInstrument: ins.routeInstrument || null, soort: ins.soort || 'browser', onbepaald: r.reden } });
+          routeInstrument: ins.routeInstrument || null, soort: ins.soort || 'browser', onbepaald: r.reden, ...bronVeld } });
     }
     const d = verschil(w, r.alle, st.commit);
     if (!d.bekend) return { vers: false, reden: 'gemeten op commit ' + st.commit + ', die hier niet meer bestaat' };
@@ -702,7 +753,7 @@ function versheidVoor(w, invoer, grof) {
         r.eigen.length + ' eigen, ' + r.instrumentBestanden.length + ' van het instrument, ' + r.gedeeld + ' gedeeld)',
       raakvlak: { commit: st.commit, instrument: ins.instrument, scenario: ins.scenario || null,
         routeInstrument: ins.routeInstrument || null, soort: ins.soort || 'browser', telt: r.alle.size, eigen: r.eigen.length,
-        samen: samen(r.alle, w.sha) } };
+        samen: samen(r.alle, w.sha), ...bronVeld } };
   };
 }
 
@@ -725,8 +776,11 @@ function hashes(w) {
 function controleer(w, rec, opgeslagen, ingang, grof) {
   if (!rec || typeof rec !== 'object') return { stand: 'GROF', vers: false, reden: 'geen raakvlak vastgelegd' };
   const st = { op: 'vastgelegd', commit: rec.commit, instrument: rec.instrument, boomVuil: false };
+  const gebrekBron = bronGebrek(w, rec.instrument, rec.bronnen, grof);
+  if (gebrekBron) return { stand: 'VERVALLEN', vers: false, ...gebrekBron };
   const grofUit = (waarom) => {
-    const v = grof(st);
+    let v = grof(st);
+    for (const b of rec.bronnen || []) if (v.vers) v = grof(b.stempel);
     return { stand: 'GROF', vers: !!v.vers, reden: waarom + '; de grove regel: ' + v.reden };
   };
   if (rec.onbepaald) return grofUit('raakvlak onbepaald bij de meting (' + rec.onbepaald + ')');

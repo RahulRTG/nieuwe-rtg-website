@@ -48,14 +48,17 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'BEVOEGD.json');
 const { stempel, versheid } = require('./lib/stempel');
 const { ingangRoutes } = require('./lib/bewijsbron');
+const { beoordeelRolrij } = require('./lib/rolproef');
 
 const GRENS_LID = 'samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als ' +
-  'gemeten als elke bekende route eronder gemeten is, een route die IDOR `publiek` noemt schermt niets af; ' +
+  'gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los ' +
+  'gescheiden-label mist de eigen positieve controles; ' +
   'de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend ' +
   'leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet';
 const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A\'s code met ' +
@@ -71,24 +74,27 @@ const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en di
 function laadRegisters({ lees, vers } = {}) {
   const l = lees || ((f) => { try { return fs.readFileSync(path.join(WORTEL, f), 'utf8'); } catch (e) { return null; } });
   const v = vers || versheid;
-  const uit = { idor: new Map(), rol: new Map(), vervallen: [] };
+  const uit = { idor: new Map(), rol: new Map(), vervallen: [], bronnen: [] };
   for (const [naam, zet] of [['IDOR.json', 'idor'], ['ROLPROEF.json', 'rol']]) {
     const t = l(naam);
     if (t === null) { uit.vervallen.push(naam + ' bestaat niet'); continue; }
     let reg; try { reg = JSON.parse(t); } catch (e) { uit.vervallen.push(naam + ' is geen geldige JSON'); continue; }
+    uit.bronnen.push({ register: naam, sha256: crypto.createHash('sha256').update(t).digest('hex'), stempel: reg.stempel });
     const s = reg.stempel && typeof reg.stempel === 'object' ? v(reg.stempel) : { vers: false, reden: 'geen stempel met commit' };
     if (!s.vers) uit.vervallen.push(naam + ': ' + s.reden);
     if (zet === 'idor') {
       /* De zaak-gang (gang 5) meet leveranciersroutes met twee ZAKEN: daar is
          "een ander bedrijf" de vraag, en ledenschermen als Horeca roepen ze aan.
          De paden overlappen niet met de ledengang. */
-      for (const [k, w] of Object.entries(Object.assign({}, reg.zaakPerRoute || {}, reg.perRoute || {}))) {
+      for (const [k, w] of [...Object.entries(reg.zaakPerRoute || {}), ...Object.entries(reg.perRoute || {})]) {
         const [methode, pad] = k.split(' ');
-        const lijst = uit.idor.get(pad) || []; lijst.push({ methode, staat: w.staat }); uit.idor.set(pad, lijst);
+        const lijst = uit.idor.get(pad) || [];
+        lijst.push({ ...w, routeMethode: methode, routePad: pad }); uit.idor.set(pad, lijst);
       }
     } else {
+      uit.rolMeting = reg.gemeten;
       for (const w of reg.perRoute || []) {
-        const lijst = uit.rol.get(w.pad) || []; lijst.push({ methode: w.methode, acl: w.acl, privacy: w.privacy }); uit.rol.set(w.pad, lijst);
+        const lijst = uit.rol.get(w.pad) || []; lijst.push(w); uit.rol.set(w.pad, lijst);
       }
     }
   }
@@ -100,8 +106,27 @@ function laadRegisters({ lees, vers } = {}) {
    hetzelfde verzoek geen enkel daarvan. Dat is een uitgevoerd experiment met een
    open deur als ijking. Een route waar A NIETS van zichzelf zag, heet daar
    onbereikbaar en telt hier dus niet. */
-const IDOR_GEMETEN = new Set(['gescheiden', 'nagekeken', 'publiek', 'afgebakend']);
 const IDOR_GEBROKEN = new Set(['doorbraak', 'lek']);
+const METHODEN = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'CONNECT', 'TRACE']);
+
+function beoordeelIdorRij(rij = {}, { methode = rij.routeMethode || rij.methode, pad = rij.routePad } = {}) {
+  if (rij.lek === true || IDOR_GEBROKEN.has(rij.staat))
+    return { stand: 'gebroken', reden: rij.lek === true ? 'de IDOR-weigering lekt gegevens' : 'IDOR meldt ' + rij.staat };
+  if (!METHODEN.has(methode) || rij.methode !== methode || (rij.routePad && rij.routePad !== pad))
+    return { stand: 'open', reden: 'de werkelijk gebruikte IDOR-methode of route is niet aangetoond' };
+  const ok = s => Number.isInteger(s) && s >= 200 && s < 300;
+  if (rij.staat === 'afgebakend' && rij.gang === 'afbakening' && ok(rij.statusA) && ok(rij.status) &&
+      Number.isInteger(rij.merken) && rij.merken > 0 && Array.isArray(rij.voorbeeld) &&
+      rij.voorbeeld.length > 0 && rij.voorbeeld.length <= rij.merken && rij.voorbeeld.every(x => typeof x === 'string' && x.length > 0) &&
+      Array.isArray(rij.velden) && rij.velden.length === 0 && !(rij.gezien?.length)) {
+    return { stand: 'gemeten', reden: 'alleen antwoordafbakening: A zag eigen merktekens, B kreeg op hetzelfde verzoek 2xx zonder die merktekens' };
+  }
+  if (rij.staat === 'gescheiden') return { stand: 'open',
+    reden: 'IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding' };
+  if (rij.staat === 'publiek' || rij.staat === 'nagekeken') return { stand: 'open',
+    reden: 'IDOR noemt de route ' + rij.staat + ': ' + (rij.reden || 'geen toelichting') + '; deze smalle duiding is geen ruwe proef van afscherming' };
+  return { stand: 'open', reden: 'IDOR draagt geen volledige ruwe antwoordafbakening' };
+}
 
 /* Het oordeel over een pad: gebroken, gemeten of open -- met de reden. Een
    niet-GET-methode moet in BEIDE registers staan: IDOR zegt of
@@ -109,21 +134,33 @@ const IDOR_GEBROKEN = new Set(['doorbraak', 'lek']);
 function padOordeel(pad, reg) {
   const i = reg.idor.get(pad) || [];
   const r = reg.rol.get(pad) || [];
-  const breuk = i.find((x) => IDOR_GEBROKEN.has(x.staat));
-  if (breuk) return { stand: 'gebroken', reden: pad + ' staat in IDOR.json als ' + breuk.staat };
-  const open = r.find((x) => x.acl !== 'dicht' || x.privacy !== 'schoon');
-  if (open) return { stand: 'gebroken', reden: pad + ' staat in ROLPROEF.json met acl ' + open.acl + ' en privacy ' + open.privacy };
+  const ids = i.map(x => beoordeelIdorRij(x, { methode: x.routeMethode || x.methode, pad }));
+  const breuk = ids.find(x => x.stand === 'gebroken');
+  if (breuk) return { stand: 'gebroken', reden: pad + ': ' + breuk.reden };
+  const rollen = r.map(beoordeelRolrij);
+  const breukRol = rollen.find((x) => x.acl === 'OPEN' || x.privacy === 'LEK');
+  if (breukRol) return { stand: 'gebroken', reden: pad + ' staat in ROLPROEF.json met acl ' + breukRol.acl + ' en privacy ' + breukRol.privacy };
   // De registers zijn alleen bewijs voor hun eigen HTTP-methode. GET mag
   // een onbekende POST op hetzelfde pad niet laten meeliften. Net als de
   // rolproef behandelen we iedere niet-GET API-methode als schrijvend.
-  const methoden = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'CONNECT', 'TRACE']);
   if (!i.length) return { stand: 'open', reden: pad + ' staat niet in IDOR.json' };
-  if ([...i, ...r].some((x) => !methoden.has(x.methode))) {
+  if ([...i, ...r].some((x) => !METHODEN.has(x.methode))) {
     return { stand: 'open', reden: pad + ' heeft bewijs zonder bekende HTTP-methode' };
   }
+  if (r.length || Object.hasOwn(reg, 'rolMeting')) {
+    const g = reg.rolMeting;
+    if (Number.isInteger(g?.zijeffecten) && g.zijeffecten > 0)
+      return { stand: 'gebroken', reden: 'ROLPROEF.json mat blijvende ongeoorloofde wijzigingen' };
+    if (!g || !['zijeffecten', 'blindeRondes'].every(k => Number.isInteger(g[k]) && g[k] === 0))
+      return { stand: 'open', reden: 'ROLPROEF.json heeft geen aantoonbaar geslaagde hele meting' };
+  }
+  const onbeslist = rollen.find(x => x.acl !== 'dicht' || x.privacy !== 'schoon');
+  if (onbeslist) return { stand: 'open', reden: pad + ': ' + onbeslist.reden };
+  const idorOpen = ids.find(x => x.stand !== 'gemeten');
+  if (idorOpen) return { stand: 'open', reden: pad + ': ' + idorOpen.reden };
   for (const methode of new Set([...i, ...r].map((x) => x.methode))) {
     const ids = i.filter((x) => x.methode === methode);
-    if (!ids.length || ids.some((x) => !IDOR_GEMETEN.has(x.staat))) {
+    if (!ids.length) {
       return { stand: 'open', reden: methode + ' ' + pad + ' is niet volledig gemeten in IDOR.json' };
     }
     if (methode !== 'GET' && !r.some((x) => x.methode === methode)) {
@@ -274,13 +311,13 @@ async function meet() {
     stempel: stempel(),
     uitleg: 'Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.',
     grens: 'leden: ' + GRENS_LID + '. gezinnen: ' + GRENS_GEZIN + '.',
-    bronnen: { vervallen: reg.vervallen },
+    bronnen: { vervallen: reg.vervallen, registers: reg.bronnen },
     telling,
     regels
   };
 }
 
-module.exports = { padOordeel, ledenOordeel, paarOordeel, gezinOordeel, laadRegisters, DOEL };
+module.exports = { beoordeelIdorRij, padOordeel, ledenOordeel, paarOordeel, gezinOordeel, laadRegisters, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

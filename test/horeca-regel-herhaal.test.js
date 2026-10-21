@@ -17,6 +17,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const { once } = require('node:events');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-regel-'));
 let srv = null;
@@ -45,9 +46,13 @@ test('een herhaalde tik is na een crash dezelfde regel; een andere tik met dezel
   assert.equal(eerste.status, 200);
   /* Twee biertjes zijn geen dubbeltik: een tweede tik heeft een eigen sleutel. */
   assert.equal((await api('/api/supplier/horeca/rekening/regel', Object.assign({}, tik, { idem: 'tik-2' }), tok)).status, 200);
-  await new Promise(r => setTimeout(r, 300));
-  srv.child.kill('SIGKILL');
-  await new Promise(r => srv.child.once('exit', r));
+  // Een bevestigde handeling moet direct duurzaam zijn, zonder extra spaartijd.
+  // Luister vóór SIGKILL; een gemist exit-event mag de proef niet laten hangen.
+  const exited = once(srv.child, 'exit', { signal: AbortSignal.timeout(5000) });
+  const killed = srv.child.kill('SIGKILL');
+  const [, signal] = await exited;
+  assert.equal(killed, true);
+  assert.equal(signal, 'SIGKILL');
   srv = await startServer({ env });
   tok = await zaak();
   const herhaling = await api('/api/supplier/horeca/rekening/regel', tik, tok);

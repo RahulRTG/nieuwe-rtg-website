@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-20T08:48:41.921Z",
-  "commit": "3452188104",
+  "op": "2026-10-20T17:37:07.206Z",
+  "commit": "350743bfae",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 0,
   "instrument": "scripts/idorproef.js",
   "node": "v26.12.0"
  },
@@ -12,8 +12,8 @@
  "gemeten": {
   "routes": 2630,
   "gescheiden": 1124,
-  "doorbraak": 1,
-  "nagekeken": 58,
+  "doorbraak": 0,
+  "nagekeken": 59,
   "publiek": 536,
   "onbereikbaar": 900,
   "lek": 0,
@@ -41,8 +41,8 @@
   "zwarePaden": {
    "routes": 81,
    "gescheiden": 38,
-   "doorbraak": 1,
-   "nagekeken": 1,
+   "doorbraak": 0,
+   "nagekeken": 2,
    "publiek": 31,
    "onbereikbaar": 10,
    "aanDeDeur": 0
@@ -143,20 +143,11 @@
    ]
   },
   "merktekens": {
-   "vanA": 353,
+   "vanA": 355,
    "controle": 291
   }
  },
- "doorbraken": [
-  {
-   "route": "POST /api/wallet/munt/koop",
-   "status": 200,
-   "velden": [
-    "id",
-    "code"
-   ]
-  }
- ],
+ "doorbraken": [],
  "perRoute": {
   "POST /api/aandacht": {
    "staat": "onbereikbaar",
@@ -1791,7 +1782,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkd88d8dc5e3"
+    "mrk3ed67bc8d5"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -1803,7 +1794,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkd88d8dc5e3"
+    "mrk3ed67bc8d5"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2375,8 +2366,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Zilveren Valk 10D5",
-    "mrkd88d8dc5e3"
+    "Witte Reiger 5873",
+    "mrk3ed67bc8d5"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2388,8 +2379,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Zilveren Valk 10D5",
-    "mrkd88d8dc5e3"
+    "Witte Reiger 5873",
+    "mrk3ed67bc8d5"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -4292,7 +4283,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zilveren Valk 10D5"
+    "Witte Reiger 5873"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -6166,8 +6157,8 @@
    "staat": "afgebakend",
    "merken": 7,
    "voorbeeld": [
-    "mrkd88d8dc5e3",
-    "ag1ad0ce41"
+    "mrk3ed67bc8d5",
+    "ag48cb2067"
    ],
    "reden": "A kreeg 200 met 7 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -7062,7 +7053,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zilveren Valk 10D5"
+    "Witte Reiger 5873"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -9161,7 +9152,7 @@
     "kamerid"
    ],
    "gezien": [
-    "Stille Havik F599"
+    "Blauwe Fenix 6615"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een kamercode werkt als een vergaderlink: wie hem heeft mag binnen, en een BESLOTEN kamer weigert alsnog (magErin). B komt binnen als B, met zijn eigen codenaam"
   },
@@ -29020,7 +29011,7 @@
     "postid"
    ],
    "gezien": [
-    "Stille Havik F599"
+    "Blauwe Fenix 6615"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin"
   },
@@ -44798,7 +44789,7 @@
     "id"
    ],
    "gezien": [
-    "Zilveren Valk 10D5"
+    "Witte Reiger 5873"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C's profiel schreef, met A's codenaam als schrijver"
   },
@@ -44894,7 +44885,7 @@
     "id"
    ],
    "gezien": [
-    "Zilveren Valk 10D5"
+    "Witte Reiger 5873"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: kern/metier/zoek.js: \"wie niets invulde, staat niet in de etalage\" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw"
   },
@@ -46274,8 +46265,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "mrkd88d8dc5e3",
-    "Contact-mrkd88d8dc5e3"
+    "mrk3ed67bc8d5",
+    "Contact-mrk3ed67bc8d5"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -50598,7 +50589,7 @@
     "id"
    ],
    "gezien": [
-    "Zilveren Valk 10D5"
+    "Witte Reiger 5873"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf"
   },
@@ -50630,7 +50621,7 @@
     "id"
    ],
    "gezien": [
-    "Zilveren Valk 10D5"
+    "Witte Reiger 5873"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven"
   },
@@ -53019,13 +53010,12 @@
   },
   "POST /api/wallet/munt/koop": {
    "status": 200,
-   "tegenpoging": 409,
-   "staat": "doorbraak",
+   "staat": "nagekeken",
    "velden": [
     "id",
     "code"
    ],
-   "reden": "B kreeg 200 met A's id maar 409 met een verzonnen id: A's ECHTE object opende de deur voor B -- dit is een objectreferentie die B niet hoort te hebben"
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: zorgwallet.js gebruikt req.session.key; wallet.muntKoop leest zaak/aantal/idem, niet id/code. test/zorgwallet.test.js bewijst: B krijgt een eigen muntregel, A blijft ongewijzigd, nepvelden met verse idem werken ook, dezelfde idem met gewijzigde body geeft 409 door de idempotentiepoort; munt/wissel op A's id geeft B 404. Een bestaande betaling kan geen tweede zaak financieren (aparte HTTP-tegenproef)."
   },
   "POST /api/wallet/munt/wissel": {
    "status": 404,
@@ -53568,7 +53558,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "pw__J5KWQzaoeaIa1w_"
+    "pw_Q-lwuV4qMzxxjALO"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -60671,7 +60661,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zilveren Valk 10D5"
+    "Witte Reiger 5873"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []

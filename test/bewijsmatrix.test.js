@@ -35,6 +35,74 @@ const leeg = () => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null,
   poort: null, rol: null, keten: null, invoer: null, idem: null });
 const rij = (m, pad) => leeg().rijen.find(r => r.methode === m && r.pad === pad);
 
+test('rolbewijs: alleen volledige ruwe weigeringen bewijzen ACL en PRIVACY', () => {
+  const goed = () => ({
+    bewijsVersie: 2, methode: 'POST', pad: '/api/proef/schrijf', rol: 'member',
+    verwacht: ['supplier', 'office'], geprobeerd: ['supplier', 'office'],
+    acl: 'dicht', privacy: 'schoon',
+    antwoorden: ['supplier', 'office'].map(rol => ({ rol, methode: 'POST', status: 403,
+      eigenVoor: 200, eigenNa: 200, lek: null }))
+  });
+  const cellen = (r, gemeten = { zijeffecten: 0, blindeRondes: 0 }) => {
+    const rol = new Map([['POST /api/proef/schrijf', r]]); rol.gemeten = gemeten;
+    rol.versheid = { vers: true, reden: 'verse synthetische meting' };
+    return bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null, rol })
+      .rijen.find(r => r.pad === '/api/proef/schrijf').cellen;
+  };
+  assert.equal(cellen(goed()).ACL.staat, 'bewezen');
+  for (const verander of [
+    r => { r.antwoorden[1].status = 503; },
+    r => { r.antwoorden[0].eigenVoor = 401; },
+    r => { r.antwoorden.pop(); },
+    r => { delete r.bewijsVersie; }
+  ]) {
+    const r = goed(); verander(r);
+    for (const naam of ['ACL', 'PRIVACY']) assert.equal(cellen(r)[naam].staat, 'ongemeten', naam);
+  }
+  for (const gemeten of [undefined, {}, { zijeffecten: 0, blindeRondes: 1 }]) {
+    const c = cellen(goed(), gemeten === undefined ? null : gemeten);
+    for (const naam of ['ACL', 'PRIVACY']) assert.notEqual(c[naam].staat, 'bewezen');
+  }
+  for (const naam of ['ACL', 'PRIVACY'])
+    assert.notEqual(cellen(goed(), { zijeffecten: 1, blindeRondes: 0 })[naam].staat, 'bewezen');
+  const open = goed(); open.antwoorden[0].status = 200;
+  assert.equal(cellen(open).ACL.staat, 'gezakt');
+  assert.equal(cellen({ acl: 'OPEN', privacy: 'LEK' }).ACL.staat, 'gezakt', 'oude bevindingen blijven bevindingen');
+  assert.equal(cellen({ acl: 'OPEN', privacy: 'LEK' }).PRIVACY.staat, 'gezakt');
+});
+
+test('rolbewijs: oude of ontbrekende bronstempels kunnen geen ruwe groene rij verversen', () => {
+  const { rolproefUitslag } = require('../scripts/bewijsmatrix');
+  const r = { bewijsVersie: 2, methode: 'POST', pad: '/api/proef/schrijf', rol: 'member',
+    verwacht: ['supplier', 'office'], geprobeerd: ['supplier', 'office'],
+    antwoorden: ['supplier', 'office'].map(rol => ({ rol, methode: 'POST', status: 403,
+      eigenVoor: 200, eigenNa: 200, lek: null })) };
+  const stempel = { op: '2026-10-20T12:00:00Z', commit: 'oude-code', boomVuil: false, instrument: 'scripts/rolproef-route.js' };
+  const reg = { stempel, gemeten: { zijeffecten: 0, blindeRondes: 0 }, perRoute: [r],
+    nietTeKruisen: [{ methode: 'POST', pad: '/api/proef/kaal', rol: 'openbaar', reden: 'publieke deur' }] };
+  let gezien = null;
+  const lees = () => JSON.stringify(reg);
+  const vers = st => { gezien = st; return { vers: false, reden: 'beveiligingscode gewijzigd sinds meting' }; };
+  const rol = rolproefUitslag({ lees, vers });
+  assert.deepEqual(gezien, stempel, 'de oorspronkelijke meetcommit moet worden gecontroleerd');
+  const cellen = kaart => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null, rol: kaart })
+    .rijen.find(x => x.pad === '/api/proef/schrijf').cellen;
+  for (const naam of ['ACL', 'PRIVACY']) assert.equal(cellen(rol)[naam].staat, 'ongemeten');
+  const versRol = rolproefUitslag({ lees, vers: () => ({ vers: true, reden: 'dezelfde code' }) });
+  assert.equal(cellen(versRol).ACL.staat, 'bewezen');
+  const openbaar = kaart => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null, rol: kaart })
+    .rijen.find(x => x.pad === '/api/proef/kaal').cellen.ACL.staat;
+  assert.equal(openbaar(rol), 'ongemeten', 'een oude publieke rol kan een gewijzigde deur niet vrijstellen');
+  assert.equal(openbaar(versRol), 'nvt');
+  reg.stempel = { ...stempel, instrument: 'scripts/ander.js' };
+  assert.equal(cellen(rolproefUitslag({ lees, vers: () => ({ vers: true }) })).ACL.staat, 'ongemeten');
+  delete reg.stempel;
+  const zonder = rolproefUitslag({ lees, vers: () => { throw new Error('zonder stempel niet controleren'); } });
+  assert.equal(cellen(zonder).ACL.staat, 'ongemeten');
+  delete versRol.versheid;
+  assert.equal(cellen(versRol).ACL.staat, 'ongemeten', 'een losse kaart zonder broncontrole is geen vers bewijs');
+});
+
 test('elke route krijgt elke schakel: geen cel valt stilletjes weg', () => {
   const m = leeg();
   assert.equal(m.routes, 3);

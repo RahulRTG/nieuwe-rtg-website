@@ -157,7 +157,8 @@ test('6. een dubbeltik op het charterloket is een aanvraag, geen twee', async ()
 test('7. de herhaalsleutel staat bij de charteraanvraag: dezelfde tik is dezelfde aanvraag, een andere een 409', async () => {
   const lijf = { soort: 'helikopter', bestemming: 'Formentera sleutel', tijd: '10:15', idem: 'charter-sleutel-1' };
   const een = await api(base, '/api/member/vluchten/charter', lijf, lid);
-  await new Promise(r => setTimeout(r, 5200)); // voorbij het dubbeltikvenster van de idem-poort
+  // Deze route bewaart haar eigen sleutel; de tijdelijke antwoordkas doet niet mee.
+  assert.equal(require('../server/middleware/idempotentie-eigen').doetHetZelf('/api/member/vluchten/charter'), true);
   const twee = await api(base, '/api/member/vluchten/charter', lijf, lid);
   assert.equal(twee.status, 200);
   assert.equal(twee.body.charter.code, een.body.charter.code);

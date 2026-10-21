@@ -232,7 +232,8 @@ test('10. de herhaalsleutel staat bij de lijn: dezelfde tik is dezelfde lijn, ee
   const lijf = { naam: 'Lijn 14 Sleutel', soort: 'bus', idem: 'lijn-sleutel-1',
     haltes: [{ naam: 'A', lat: 38.912, lng: 1.428 }, { naam: 'B', lat: 38.902, lng: 1.42 }] };
   const een = await api('/api/staff/ov/lijn/zet', lijf, baas);
-  await new Promise(r => setTimeout(r, 5200)); // voorbij het dubbeltikvenster van de idem-poort
+  // Deze route bewaart haar eigen sleutel; de tijdelijke antwoordkas doet niet mee.
+  assert.equal(require('../server/middleware/idempotentie-eigen').doetHetZelf('/api/staff/ov/lijn/zet'), true);
   const twee = await api('/api/staff/ov/lijn/zet', lijf, baas);
   assert.equal(twee.status, 200);
   assert.equal(twee.body.lijn.id, een.body.lijn.id, 'dezelfde lijn');

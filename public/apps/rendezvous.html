@@ -301,6 +301,13 @@
 
   async function ontdek() {
     const [data,tableData,introData,circleData] = await Promise.all([api('/api/member/rendezvous/kandidaten'),api('/api/member/rendezvous/tafels'),api('/api/member/rendezvous/introducties'),api('/api/member/rendezvous/circles')]);
+    if (!data || typeof data.profielAan !== 'boolean' || !Array.isArray(data.kandidaten) ||
+        !data.kandidaten.every(k => k && typeof k.id === 'string' && typeof k.codenaam === 'string' && Array.isArray(k.gedeeldeLocaties)) ||
+        !tableData || !Array.isArray(tableData.tafels) || !tableData.tafels.every(x=>x && typeof x==='object') ||
+        !introData || !Array.isArray(introData.introducties) || !introData.introducties.every(x=>x && typeof x==='object') ||
+        !circleData || !Array.isArray(circleData.circles) || !circleData.circles.every(c=>c && typeof c==='object' &&
+          (c.gatherings == null || (Array.isArray(c.gatherings) && c.gatherings.every(g=>g && typeof g==='object')))))
+      throw new Error('De ontmoetingsgegevens zijn niet beschikbaar. Probeer opnieuw.');
     uitvoer = {naam:'kandidaten',kolommen:['codenaam','status','zoekt','locaties','gedeelde locaties','tegelijk ergens'],rijen:(data.kandidaten||[]).map(k=>[k.codenaam||'',k.status||'',k.zoekt||'',(k.locaties||[]).join(', '),(k.gedeeldeLocaties||[]).join(', '),(k.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', ')])};
     let lijst = '';
     if (!data.profielAan) lijst += '<div class="dating-date"><strong>Uw profiel is verborgen.</strong> Open uw profiel om zichtbaar te worden.<div class="dating-actions strak"><button class="dating-button" type="button" id="rvOpenProfiel">Profiel openen</button></div></div>';
@@ -454,9 +461,11 @@
   async function laad() {
     communicationClients.forEach(c=>c.unmount());communicationClients=[];
     tekenTabs(); uitvoer=null;
-    if(!token){toonGate(new Error('Log eerst in via de leden-app.'));return;}
+    $('#main').inert=true;
+    if(!token){toonGate(new Error('Log eerst in via de leden-app.'));$('#main').inert=false;return;}
     try { if(tab==='profiel')await profiel(); else if(tab==='ontdek')await ontdek(); else if(tab==='kring')await kring(); else if(tab==='concierge')await concierge(); else await matches(); if(connectionEdge)connectionEdge.refresh(true); }
-    catch(e){ if(e.status===403||e.status===401)toonGate(e); else { $('#main').innerHTML='<div class="dating-empty"><strong>Rendez-vous kon niet laden</strong><p>'+esc(e.message)+'</p></div>'; meld(e.message); } }
+    catch(e){ if(e.status===403||e.status===401)toonGate(e); else { $('#main').innerHTML='<div class="dating-empty" role="status"><strong>Rendez-vous kon niet laden</strong><p>De ontmoetingsgegevens zijn niet beschikbaar.</p><button class="dating-button" id="rvHerstel" type="button">Opnieuw proberen</button></div>'; $('#rvHerstel').onclick=laad; } }
+    finally { $('#main').inert=false; }
   }
   startConnectionEdge(); laad();
 })();

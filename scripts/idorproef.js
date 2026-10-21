@@ -190,7 +190,20 @@ const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
 const VASTLEGGEN = argv.includes('--vastleggen');
 
-if (require.main !== module) { module.exports = {}; return; }
+function maakIdorVraag(basis, vraag = fetch) {
+  return async (pad, lijf, tok, koppen, methode = 'POST') => {
+    try {
+      const r = await vraag(basis + pad, { method: methode, redirect: 'manual',
+        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(koppen || {}) },
+        body: JSON.stringify(lijf || {}) });
+      const tekst = await r.text();
+      let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
+      return { methode, status: r.status, data, tekst };
+    } catch (e) { return { methode, status: 0, data: null, tekst: String(e.message) }; }
+  };
+}
+
+if (require.main !== module) { module.exports = { maakIdorVraag }; return; }
 
 (async () => {
   /* Het kaatsmodel (./lib/kaatsmodel.js) is de lokale modelserver van deze
@@ -202,16 +215,7 @@ if (require.main !== module) { module.exports = {}; return; }
   const { basis } = server;
   const klaar = () => { kaats.stop(); server.klaar(); };
 
-  const kaal = async (pad, lijf, tok, koppen) => {
-    try {
-      const r = await fetch(basis + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(koppen || {}) },
-        body: JSON.stringify(lijf || {}) });
-      const tekst = await r.text();
-      let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
-      return { status: r.status, data, tekst };
-    } catch (e) { return { status: 0, data: null, tekst: String(e.message) }; }
-  };
+  const kaal = maakIdorVraag(basis);
 
   /* A EN B MET EEN GEBONDEN TOESTEL -- ./lib/proeftoestel.js, dezelfde weg als
      De Beproeving, de rolproef en de tredeproef (18 oktober 2026).
@@ -349,7 +353,7 @@ if (require.main !== module) { module.exports = {}; return; }
     2: { vers: () => versLid(2), leeft: levend, zet: (t) => { B = t; } },
     3: { vers: () => versLid(3), leeft: levend, zet: (t) => { C = t; } }
   } });
-  const roep = (pad, lijf, n, tok) => wacht.roep(pad, lijf, n, tok);
+  const roep = (pad, lijf, n, tok, methode) => wacht.roep(pad, lijf, n, tok, methode);
 
   /* Alleen member-schrijfroutes: IDOR gaat over het bedienen van een object,
      niet over lezen of over een publieke deur. */
@@ -376,7 +380,7 @@ if (require.main !== module) { module.exports = {}; return; }
      kan dus nooit een object van A zijn. */
   const controle = new Set();
   for (const r of routes) {
-    const u = await roep(r.pad, basisLijf(r.pad), 3, C);
+    const u = await roep(r.pad, basisLijf(r.pad), 3, C, r.methode);
     if (u.data && typeof u.data === 'object') waarden(u.data, controle);
   }
   for (const w of identiteit[3] || []) controle.add(w);
@@ -387,7 +391,7 @@ if (require.main !== module) { module.exports = {}; return; }
   const pool = maakPool();
   const vanA = new Set();
   for (const r of routes) {
-    const u = await roep(r.pad, basisLijf(r.pad), 1, A);
+    const u = await roep(r.pad, basisLijf(r.pad), 1, A, r.methode);
     if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { pool.leer(u.data, r.pad); waarden(u.data, vanA); }
   }
 
@@ -480,7 +484,7 @@ if (require.main !== module) { module.exports = {}; return; }
       const lijf = Object.assign(verrijkt.lijf, eigen);
       const velden = [...new Set([...verrijkt.velden, ...Object.keys(eigen)])];
       if (!velden.length) { telling.onbereikbaar++; perRoute[sleutel] = { staat: 'onbereikbaar', reden: 'geen id van A in dit domein' }; continue; }
-      const u = await roepB(r.pad, lijf);
+      const u = await roepB(r.pad, lijf, r.methode);
       if (spoor(r.pad)) console.error('SPOOR2B', r.pad, u.status, String(u.tekst).slice(0, 200));
       const o = oordeelIdor(u.status, u.tekst);
       /* WIE A IS, IN B'S ANTWOORD. Een 2xx voor B die ook met een verzonnen id
@@ -494,11 +498,11 @@ if (require.main !== module) { module.exports = {}; return; }
       if (o.staat === 'doorbraak' && zagA.length) {
         if (NAGEKEKEN[sleutel]) {
           telling.nagekeken++;
-          perRoute[sleutel] = { status: u.status, staat: 'nagekeken', velden, gezien: zagA.slice(0, 3),
+          perRoute[sleutel] = { methode: u.methode, status: u.status, staat: 'nagekeken', velden, gezien: zagA.slice(0, 3),
             reden: 'B zag wie A is; met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
           continue;
         }
-        perRoute[sleutel] = { status: u.status, staat: 'doorbraak', velden, gezien: zagA.slice(0, 3),
+        perRoute[sleutel] = { methode: u.methode, status: u.status, staat: 'doorbraak', velden, gezien: zagA.slice(0, 3),
           reden: 'B kreeg ' + u.status + ' en zijn antwoord draagt wie A is (' + zagA.length + ' merkteken(s)): NAKIJKEN' };
         telling.doorbraak++;
         continue;
@@ -506,21 +510,21 @@ if (require.main !== module) { module.exports = {}; return; }
       if (o.staat === 'doorbraak') {
         const nep = { ...lijf };
         for (const v of velden) nep[v] = verzonnen();
-        const tegenpoging = await tegenB(r.pad, nep);
+        const tegenpoging = await tegenB(r.pad, nep, r.methode);
         if (tegenpoging.status >= 200 && tegenpoging.status < 300) {
           telling.publiek++;
-          perRoute[sleutel] = { status: u.status, staat: 'publiek', velden,
+          perRoute[sleutel] = { methode: u.methode, status: u.status, staat: 'publiek', velden,
             reden: 'ook met een VERZONNEN id een ' + tegenpoging.status + ': de route is publiek/rol-open, ' +
               'A\'s id maakt geen verschil -- geen objectreferentie om te schenden' };
           continue;
         }
         if (NAGEKEKEN[sleutel]) {
           telling.nagekeken++;
-          perRoute[sleutel] = { status: u.status, staat: 'nagekeken', velden,
+          perRoute[sleutel] = { methode: u.methode, status: u.status, staat: 'nagekeken', velden,
             reden: 'doorbraak-kandidaat, met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
           continue;
         }
-        perRoute[sleutel] = { status: u.status, tegenpoging: tegenpoging.status, staat: 'doorbraak', velden,
+        perRoute[sleutel] = { methode: u.methode, status: u.status, tegenpoging: tegenpoging.status, staat: 'doorbraak', velden,
           reden: 'B kreeg ' + u.status + ' met A\'s id maar ' + tegenpoging.status + ' met een verzonnen id: ' +
             'A\'s ECHTE object opende de deur voor B -- dit is een objectreferentie die B niet hoort te hebben' };
         telling.doorbraak++;
@@ -532,14 +536,14 @@ if (require.main !== module) { module.exports = {}; return; }
          enige verschil wie het stuurt. Dan is B's weigering een scheiding. Een
          antwoord voor B dat een merkteken van A draagt telt nooit als scheiding. */
       if (o.staat === 'onbereikbaar' && (u.status === 400 || u.status === 422)) {
-        const ijk = await roepA(r.pad, lijf);
+        const ijk = await roepA(r.pad, lijf, r.methode);
         if (spoor(r.pad)) console.error('SPOOR2', r.pad, 'B', u.status, String(u.tekst).slice(0, 100), 'A', ijk.status, String(ijk.tekst).slice(0, 200));
         if (ijk.status >= 200 && ijk.status < 300) {
           const merken = merktekens({ antwoordA: ijk.data, vanA, controle, lijf, wie: wie() });
           const gezien = merken.filter((m) => String(u.tekst || '').includes(JSON.stringify(m).slice(1, -1)));
           if (!gezien.length) {
             telling.gescheiden++;
-            perRoute[sleutel] = { status: u.status, statusA: ijk.status, staat: 'gescheiden', velden,
+            perRoute[sleutel] = { methode: u.methode, status: u.status, statusA: ijk.status, staat: 'gescheiden', velden,
               reden: 'geijkt: A kwam met letterlijk hetzelfde lijf binnen (' + ijk.status + '), B kreeg ' + u.status +
                 ' -- het lijf was geldig, het enige verschil is wie het stuurt' };
             continue;
@@ -559,17 +563,17 @@ if (require.main !== module) { module.exports = {}; return; }
          de werkruimtes, is dat geen formaliteit: een lid zonder recht krijgt
          dezelfde 403 als een vreemde. */
       if (ijkAltijd && o.staat === 'gescheiden') {
-        const ijk = await roepA(r.pad, lijf);
+        const ijk = await roepA(r.pad, lijf, r.methode);
         if (spoor(r.pad)) console.error('SPOORIJK', r.pad, 'B', u.status, String(u.tekst).slice(0, 120), 'A', ijk.status, String(ijk.tekst).slice(0, 160));
         if (!(ijk.status >= 200 && ijk.status < 300)) {
           telling.onbereikbaar++;
-          perRoute[sleutel] = { status: u.status, statusA: ijk.status, staat: 'onbereikbaar', velden,
+          perRoute[sleutel] = { methode: u.methode, status: u.status, statusA: ijk.status, staat: 'onbereikbaar', velden,
             reden: 'B kreeg ' + u.status + ', maar ook A kwam er met zijn eigen sleutel niet in (' + ijk.status + '): een muur, geen scheiding' };
           continue;
         }
         o.reden += ' (geijkt: A kwam erin, ' + ijk.status + ')';
       }
-      perRoute[sleutel] = { status: u.status, ...o, velden };
+      perRoute[sleutel] = { methode: u.methode, status: u.status, ...o, velden };
       telling[o.staat]++;
       if (o.lek) telling.lek++;
     }
@@ -588,7 +592,7 @@ if (require.main !== module) { module.exports = {}; return; }
       if (!v || v.staat !== 'onbereikbaar' || (v.velden && v.velden.length)) continue;
       afbakening.routes++;
       const lijf = basis(r.pad);
-      const a = await roepA(r.pad, lijf);
+      const a = await roepA(r.pad, lijf, r.methode);
       /* EEN MERKTEKEN IS IETS WAT A AL HAD, en niet wat deze ene aanroep net
          verzon. Hier stond eerst waarden(a.data, vanA) VOOR de merktekens, en
          dan was het verse ticket van /api/stroom/ticket een "merkteken van A":
@@ -601,7 +605,7 @@ if (require.main !== module) { module.exports = {}; return; }
       /* IDOR_SPOOR=<patroon> toont voor die routes wat A kreeg: om een open route te
          begrijpen zonder het register te lezen. Verandert niets aan de meting. */
       if (spoor(r.pad)) console.error('SPOOR4', r.pad, a.status, JSON.stringify(merken), String(a.tekst).slice(0, 400));
-      const b = merken.length && a.status >= 200 && a.status < 300 ? await roepB(r.pad, lijf) : { status: 0, tekst: '' };
+      const b = merken.length && a.status >= 200 && a.status < 300 ? await roepB(r.pad, lijf, r.methode) : { status: 0, tekst: '' };
       let o = oordeelAfbakening({ a, b, merken });
       if (o.staat === 'doorbraak' && NAGEKEKEN[sleutel]) {
         o = { staat: 'nagekeken', reden: 'afbakening-kandidaat, met de hand nagekeken en GEEN lek: ' + NAGEKEKEN[sleutel] };
@@ -611,7 +615,7 @@ if (require.main !== module) { module.exports = {}; return; }
       telling.onbereikbaar--;
       telling[o.staat]++;
       if (o.lek) telling.lek++;
-      perRoute[sleutel] = { status: b.status, statusA: a.status, gang: 'afbakening', ...o, velden: [] };
+      perRoute[sleutel] = { methode: b.methode, status: b.status, statusA: a.status, gang: 'afbakening', ...o, velden: [] };
     }
     return { perRoute, telling, afbakening };
   }
@@ -622,8 +626,8 @@ if (require.main !== module) { module.exports = {}; return; }
        wat A zelf maakte; een antwoord voor B dat het draagt, ergens in een lange
        tekst (een AI-prompt, een chatgeschiedenis), toont iets van A. */
     eigenVan: (pad) => opbouwLib.vanA(pad, ctx), vanA, controle, wie: () => [...(identiteit[1] || []), ctx.merk],
-    roepA: (pad, lijf) => roep(pad, lijf, 1, A), roepB: (pad, lijf) => roep(pad, lijf, 2, B),
-    tegenB: (pad, lijf) => post(pad, lijf, B) });
+    roepA: (pad, lijf, methode) => roep(pad, lijf, 1, A, methode), roepB: (pad, lijf, methode) => roep(pad, lijf, 2, B, methode),
+    tegenB: (pad, lijf, methode) => post(pad, lijf, B, undefined, methode) });
 
   if (!(await levend(B))) {
     const vers = await versLid(2);
@@ -724,7 +728,7 @@ if (require.main !== module) { module.exports = {}; return; }
       continue;
     }
     if (gang.verrijkt) herwonnen++;
-    const aanval = await roep(r.pad, gang.lijf, 2, B);
+    const aanval = await roep(r.pad, gang.lijf, 2, B, r.methode);
     const o = oordeelIdor(aanval.status, aanval.tekst);
     /* EEN 2xx OP EEN GEFILTERDE LIJST IS GEEN DOORBRAAK, en dit huis heeft er
        een: /api/werkplek/mijn antwoordt elk ingelogd lid met 200 en geeft
@@ -782,7 +786,7 @@ if (require.main !== module) { module.exports = {}; return; }
   const zaakLeeft = async (tok) => (await post('/api/supplier/state', {}, tok)).status === 200;
   const zaakWacht = maakSessiewacht({ post, rollen: Object.fromEntries(Object.entries(ZAKEN).map(([n, code]) =>
     [n, { vers: () => zaakLogin(code), leeft: zaakLeeft, zet: (t) => { zaakTok[n] = t; } }])) });
-  const zroep = (pad, lijf, n) => zaakWacht.roep(pad, lijf, n, zaakTok[n]);
+  const zroep = (pad, lijf, n, methode) => zaakWacht.roep(pad, lijf, n, zaakTok[n], methode);
   const zaakRoutes = verdeelOpRol(kandidaten, ['supplier']).metRol.filter((r) => r.rol === 'supplier');
   const zLijf = (pad) => opbouwLib.lijfVoor(pad, plausibelLijf(pad), {});
   let zaak = { routes: zaakRoutes.length, reden: null };
@@ -792,13 +796,13 @@ if (require.main !== module) { module.exports = {}; return; }
   } else {
     const zControle = new Set();
     for (const r of zaakRoutes) {
-      const u = await zroep(r.pad, zLijf(r.pad), 13);
+      const u = await zroep(r.pad, zLijf(r.pad), 13, r.methode);
       if (u.data && typeof u.data === 'object') waarden(u.data, zControle);
     }
     const zPool = maakPool();
     const vanZaakA = new Set();
     for (const r of zaakRoutes) {
-      const u = await zroep(r.pad, zLijf(r.pad), 11);
+      const u = await zroep(r.pad, zLijf(r.pad), 11, r.methode);
       if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { zPool.leer(u.data, r.pad); waarden(u.data, vanZaakA); }
     }
     /* De zaak-opbouw (./lib/idoropbouw.js zaakStappen): zaak A maakt een band, en
@@ -812,8 +816,8 @@ if (require.main !== module) { module.exports = {}; return; }
     }
     const z = await kruis({ routes: zaakRoutes, pool: zPool, basis: zLijf, eigenVan: (pad) => opbouwLib.zaakVanA(pad, zctx),
       vanA: vanZaakA, controle: zControle, wie: () => [],
-      roepA: (pad, lijf) => zroep(pad, lijf, 11), roepB: (pad, lijf) => zroep(pad, lijf, 12),
-      tegenB: (pad, lijf) => post(pad, lijf, zaakTok[12]) });
+      roepA: (pad, lijf, methode) => zroep(pad, lijf, 11, methode), roepB: (pad, lijf, methode) => zroep(pad, lijf, 12, methode),
+      tegenB: (pad, lijf, methode) => post(pad, lijf, zaakTok[12], undefined, methode) });
     zaakPerRoute = z.perRoute;
     zaak = { routes: zaakRoutes.length, ...z.telling, afbakening: z.afbakening, pool: zPool.grootte(),
       sessieHernieuwd: zaakWacht.hernieuwd(), zaken: ZAKEN };
@@ -927,13 +931,13 @@ if (require.main !== module) { module.exports = {}; return; }
       const met = (W, w) => (lijf) => Object.assign({}, lijf, { werkruimte: W.code, lidToken: w.lidToken, beheerToken: w.beheer });
       const wControle = new Set();
       for (const r of wRoutes) {
-        const u = await roep(r.pad, met(WC, WC)(basisLijf(r.pad)), 3, C);
+        const u = await roep(r.pad, met(WC, WC)(basisLijf(r.pad)), 3, C, r.methode);
         if (u.data && typeof u.data === 'object') waarden(u.data, wControle);
       }
       const wPool = maakPool();
       const vanWA = new Set();
       for (const r of wRoutes) {
-        const u = await roep(r.pad, met(WA, WA)(basisLijf(r.pad)), 1, A);
+        const u = await roep(r.pad, met(WA, WA)(basisLijf(r.pad)), 1, A, r.methode);
         if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') { wPool.leer(u.data, r.pad); waarden(u.data, vanWA); }
       }
       /* B noemt A's werkruimte met B's EIGEN tokens; A ijkt met zijn eigen. De
@@ -942,9 +946,9 @@ if (require.main !== module) { module.exports = {}; return; }
          heen kunnen leggen. */
       const z = await kruis({ routes: wRoutes, pool: wPool, basis: basisLijf, eigenVan: () => ({ werkruimte: WA.code }),
         vanA: vanWA, controle: wControle, wie: () => [ctx.merk],
-        roepA: (pad, lijf) => roep(pad, met(WA, WA)(lijf), 1, A),
-        roepB: (pad, lijf) => roep(pad, met(WA, WB)(lijf), 2, B),
-        tegenB: (pad, lijf) => post(pad, met(WA, WB)(lijf), B), ijkAltijd: true });
+        roepA: (pad, lijf, methode) => roep(pad, met(WA, WA)(lijf), 1, A, methode),
+        roepB: (pad, lijf, methode) => roep(pad, met(WA, WB)(lijf), 2, B, methode),
+        tegenB: (pad, lijf, methode) => post(pad, met(WA, WB)(lijf), B, undefined, methode), ijkAltijd: true });
       Object.assign(werkruimte, z.telling, { afbakening: z.afbakening, pool: wPool.grootte() });
       for (const [k, v] of Object.entries(z.perRoute)) {
         const eerder = perRoute[k];

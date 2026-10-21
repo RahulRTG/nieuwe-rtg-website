@@ -586,3 +586,52 @@ HTTP-methoden en ruwe controles behouden, fouten/lekken niet wegwerpen,
 en vervolgens hermeten op een vaste bron. Ontbrekende positieve fixtures
 blijven ontbrekend bewijs. Geen norm verlagen om de verwachte daling van
 gekwalificeerde dekking te compenseren.
+
+
+#### Ronde 2 — tweede meetstand op 21 oktober 2026
+
+Broncommit: `87234eeb2871c725c572c23eab21b9369a5d1e65`, Node 26.12.0.
+De volledige diagnostische Node-run telt 19.970 tests: 19.954 geslaagd,
+16 gefaald, nul skips en nul annuleringen. Alle 47 PostgreSQL-testbestanden
+slagen afzonderlijk binnen dezelfde campagne, inclusief de synthetische
+Directpay-proef met twee processen. Deze run is geen schone eindkwalificatie:
+de afgeleide bewijsregisters werden tijdens de campagne opnieuw gemeten.
+
+Dertien failures horen bij de ontbrekende loopbackalias. De overige drie zijn
+achterhaalde afgeleide verwijzingen na onze bronwijzigingen: BUNDELS-regeltelling,
+STILLEZING-catchlocatie en de offline shell-inhoudsafdruk. Bestaande generators
+herstellen deze; achttien betrokken tests slagen, zonder normverlaging.
+Dat sluit die drie gerichte regressies, niet de nog te herhalen volledige suite.
+
+Verse autorisatiemeting en onafhankelijke tegenlezing:
+
+- ROLPROEF: 4.514 routes beproefd, vijf onbeslist; 92 niet te kruisen en
+  836 zonder geclassificeerde rol blijven afzonderlijke dekkingsgrenzen.
+- De vijf onbeslisten zijn Leerhuis doen/lezen/openen en de twee eigen-domeinroutes.
+  Elf kruisverzoeken geven 503 met 22 levende voor/na-sessiecontroles.
+  Uitgeschakelde functies zijn een bronverklaring, geen bewezen antwoordreden:
+  de ruwe rolproef bewaart die antwoordtekst niet.
+- ROLRONDE: 577 bewezen tegenover norm 1.444; 4.583 onbekende antwoorden en
+  zes expliciet gedeelde routes. De norm blijft ongewijzigd rood.
+- BEVOEGD: acht BEWEZEN en 106 NIET_GETEST. De acht zijn beperkte
+  gezinslaadscenario's: vijftien kruisparen over acht unieke routes, met
+  A/B-eigen 200 en vreemde/anonieme 401 of 403. Geen volledige appautorisatie,
+  foutinhoudprivacy of afwezigheid van servermutaties bewezen. De registertests
+  slagen alle veertien. Oude ruimere claims worden niet overgenomen.
+- LIEGRONDE: 98 BEWEZEN, zestien NIET_GETEST, tegenover 94/20 vóór de vier
+  UI-herstelstappen. De meting bewijst uitsluitend de beschreven browserstoringen.
+
+Open vervolg blijft van eigenaar voorzien:
+
+| Blokkade | Eigenaar | Vereist sluitbewijs |
+|---|---|---|
+| Loopbackalias | Lokale machinebeheerder | 127.0.0.2 activeren met beheerdersrechten; dertien ongewijzigde tests herhalen. |
+| Academy en eigen domeinen | Security/test | Bestaande lokaal ingeschakelde fixtures, positieve eigen handelingen en negatieve rollen; geen productieschakelaars wijzigen. |
+| Positieve object- en rolfixtures | Security/test | Geldige invoer en A/B-eigen objecten voor de ontbrekende routes; logout/delete in eigen geïsoleerde sessies. |
+| Volledige appkwalificatie | Integrator | APPWERKT opnieuw op actuele bewijsbronnen; geen oude groene velden hergebruiken. |
+| Integrale eindkwalificatie | Integrator | Definitieve bron en registers bevriezen; tweemaal volledige suite plus verplichte browser-, financiële en operationele controles. |
+
+De 63 opwaartse en 105 primitief-naar-domeinkoppelingen zijn nog niet
+verminderd. Financiële proeven blijven lokale synthetische scenario's;
+externe providerduurzaamheid en alle SQL-crashvensters zijn niet bewezen.
+Status ORANJE voor voortgang, releasepoort niet groen. Geen merge of uitrol.

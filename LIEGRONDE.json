@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-20T19:16:11.959Z",
-    "commit": "350743bfae",
+    "op": "2026-10-21T07:25:46.577Z",
+    "commit": "87234eeb28",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 4,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.0"
   },
@@ -11,8 +11,8 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 94,
-    "NIET_GETEST": 20
+    "BEWEZEN": 98,
+    "NIET_GETEST": 16
   },
   "regels": [
     {
@@ -400,12 +400,10 @@
       "app": "Magnaat",
       "ingang": "/apps/magnaat.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "13 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 13,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:maison",
@@ -562,12 +560,10 @@
       "app": "OV-routes",
       "ingang": "/apps/ovroutes.html",
       "persona": "personeel",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (JS-fout: Cannot read properties of undefined (reading 'forEach')); of het een toestand zou verzinnen, is zo niet vast te stellen",
-      "gelogen": 2,
-      "klachten": [
-        "JS-fout: Cannot read properties of undefined (reading 'forEach')"
-      ]
+      "status": "BEWEZEN",
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
+      "klachten": []
     },
     {
       "functie": "link:partnernetwerk",
@@ -684,24 +680,20 @@
       "app": "Rendez-vous",
       "ingang": "/apps/rendezvous.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "13 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 13,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:residentie",
       "app": "Verblijven",
       "ingang": "/apps/residentie.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "het scherm viel om of toonde rommel bij een leeg antwoord (rommel in beeld: undefined); of het een toestand zou verzinnen, is zo niet vast te stellen",
+      "status": "BEWEZEN",
+      "reden": "3 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 3,
-      "klachten": [
-        "rommel in beeld: undefined"
-      ]
+      "klachten": []
     },
     {
       "functie": "link:routedossier",

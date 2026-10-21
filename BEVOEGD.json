@@ -1,18 +1,41 @@
 {
   "stempel": {
-    "op": "2026-10-20T07:16:56.945Z",
-    "commit": "3452188104",
+    "op": "2026-10-21T06:41:06.922Z",
+    "commit": "87234eeb28",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.0"
   },
   "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.",
-  "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, een route die IDOR `publiek` noemt schermt niets af; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd.",
+  "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist.",
   "bronnen": {
-    "vervallen": [
-      "IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten)",
-      "ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+    "vervallen": [],
+    "registers": [
+      {
+        "register": "IDOR.json",
+        "sha256": "2c10bbb75ff76757abc56cd83e1f97e21662ac3639826a7808365f36294b72b8",
+        "stempel": {
+          "op": "2026-10-21T06:03:47.266Z",
+          "commit": "87234eeb28",
+          "boomVuil": false,
+          "boomAnders": 0,
+          "instrument": "scripts/idorproef.js",
+          "node": "v26.12.0"
+        }
+      },
+      {
+        "register": "ROLPROEF.json",
+        "sha256": "50fce9b6792627912a68ef6e2c8f31036fe3d7143e7442112784b7f31a6efd13",
+        "stempel": {
+          "op": "2026-10-21T06:03:57.532Z",
+          "commit": "87234eeb28",
+          "boomVuil": false,
+          "boomAnders": 2,
+          "instrument": "scripts/rolproef-route.js",
+          "node": "v26.12.0"
+        }
+      }
     ]
   },
   "telling": {
@@ -26,7 +49,9 @@
       "ingang": "/apps/arrival.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 9,
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/arrival/interpret heeft bewijs zonder bekende HTTP-methode; /api/arrival/pass heeft bewijs zonder bekende HTTP-methode; /api/arrival/pulse heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:appdossier",
@@ -34,7 +59,9 @@
       "ingang": "/apps/appstore-dossier.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/appstore/dossier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/appstore/kanaal: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:attenties",
@@ -42,7 +69,9 @@
       "ingang": "/apps/attenties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 75,
+      "open": 75,
+      "reden": "75 van de 75 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:balans",
@@ -50,7 +79,9 @@
       "ingang": "/apps/geld.html#balans",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:bank",
@@ -58,7 +89,9 @@
       "ingang": "/apps/geld.html#bank",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:berichten",
@@ -66,7 +99,9 @@
       "ingang": "/apps/comm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 22,
+      "open": 22,
+      "reden": "22 van de 22 routes niet gemeten, o.a. /api/comm/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/begin: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/concept: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:bescherming",
@@ -74,7 +109,9 @@
       "ingang": "/apps/mijn-isolatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/isolatie/mijn: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/isolatie/mijn/ontsluiting: IDOR draagt geen volledige ruwe antwoordafbakening; /api/isolatie/mijn/ontsluiting/afbreken: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:browser",
@@ -82,7 +119,9 @@
       "ingang": "/apps/browser.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 4,
+      "open": 4,
+      "reden": "4 van de 4 routes niet gemeten, o.a. /api/browser/bericht heeft bewijs zonder bekende HTTP-methode; /api/browser/gids: IDOR noemt de route nagekeken: afbakening-kandidaat, met de hand nagekeken en GEEN lek: webmaker-blader gids() geeft alleen sites die hun maker zelf online zette (d.online && d.adres): een openbare gids, en het adres is de codenaam die de maker publiceerde; deze smalle duiding is geen ruwe proef van afscherming; /api/browser/open heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:buurtruil",
@@ -91,11 +130,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "1 van de 1 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -108,7 +148,9 @@
       "ingang": "/apps/camera.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/drm/key heeft bewijs zonder bekende HTTP-methode; /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:cellier",
@@ -116,7 +158,9 @@
       "ingang": "/apps/cellier.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 70,
+      "open": 70,
+      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:cercle",
@@ -124,7 +168,9 @@
       "ingang": "/apps/cercle.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 75,
+      "open": 75,
+      "reden": "75 van de 75 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:clips",
@@ -132,7 +178,9 @@
       "ingang": "/apps/clips.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 12,
+      "open": 12,
+      "reden": "12 van de 12 routes niet gemeten, o.a. /api/clips/feed heeft bewijs zonder bekende HTTP-methode; /api/clips/geluid heeft bewijs zonder bekende HTTP-methode; /api/clips/knip heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:commerce",
@@ -140,7 +188,9 @@
       "ingang": "/apps/commerce.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 9,
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/commerce/aanbod: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/commerce/etalage: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/commerce/mand: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:connect",
@@ -149,11 +199,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 5,
-      "reden": "5 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "5 van de 5 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -161,6 +212,7 @@
         {
           "verzoek": "POST /api/rtf/connect/ontdek",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -168,6 +220,7 @@
         {
           "verzoek": "POST /api/rtf/connect/horizon",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -175,6 +228,7 @@
         {
           "verzoek": "POST /api/rtf/connect/dossier",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -182,6 +236,7 @@
         {
           "verzoek": "POST /api/rtf/connect/portfolio",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -202,7 +257,9 @@
       "ingang": "/apps/entourage.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 75,
+      "open": 75,
+      "reden": "75 van de 75 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:flits",
@@ -210,7 +267,9 @@
       "ingang": "/apps/flits.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 4,
+      "open": 4,
+      "reden": "4 van de 4 routes niet gemeten, o.a. /api/flits/meld heeft bewijs zonder bekende HTTP-methode; /api/flits/rond heeft bewijs zonder bekende HTTP-methode; /api/flits/stem heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:foodcourt",
@@ -218,7 +277,9 @@
       "ingang": "/apps/foodcourt.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/adres/zoek heeft bewijs zonder bekende HTTP-methode; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: openingstijden van een restaurant zijn publiek; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:foundationzorg",
@@ -227,11 +288,12 @@
       "persona": "gezin",
       "status": "NIET_GETEST",
       "paren": 5,
-      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
+      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/TZ7Y2D/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/S36E89/gezondheid",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -239,6 +301,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -246,6 +309,7 @@
         {
           "verzoek": "POST /api/rtf/social/connections",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -253,6 +317,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -260,6 +325,7 @@
         {
           "verzoek": "POST /api/rtf/leerling/dag",
           "a": 403,
+          "bEigen": 403,
           "b": 403,
           "anoniem": 403,
           "uitslag": "eigenaarWeg"
@@ -272,7 +338,9 @@
       "ingang": "/apps/garderobe.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 70,
+      "open": 70,
+      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:gegevens",
@@ -280,7 +348,9 @@
       "ingang": "/apps/mijn-gegevens.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 15,
+      "open": 15,
+      "reden": "15 van de 15 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:geldcommand",
@@ -288,7 +358,9 @@
       "ingang": "/apps/geld.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:geven",
@@ -297,11 +369,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "1 van de 1 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -314,7 +387,9 @@
       "ingang": "/apps/hangar.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 69,
+      "open": 69,
+      "reden": "69 van de 69 routes niet gemeten, o.a. /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties/gift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:horeca",
@@ -322,7 +397,9 @@
       "ingang": "/apps/horeca.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 138,
+      "open": 136,
+      "reden": "136 van de 138 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/stroom/ticket heeft bewijs zonder bekende HTTP-methode; /api/supplier/horeca/arrival/promise: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:huis",
@@ -330,7 +407,9 @@
       "ingang": "/apps/thuis.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 22,
+      "open": 22,
+      "reden": "22 van de 22 routes niet gemeten, o.a. /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/thuis/annuleer heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:ik",
@@ -338,7 +417,9 @@
       "ingang": "/apps/ik.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 12,
+      "open": 12,
+      "reden": "12 van de 12 routes niet gemeten, o.a. /api/ik: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/geloof: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/toegankelijk/zet: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:juridisch",
@@ -346,7 +427,7 @@
       "ingang": "/apps/juridisch.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
     },
     {
       "functie": "link:klimaat",
@@ -355,11 +436,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 2,
-      "reden": "2 van de 2 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "2 van de 2 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/lab2/bewoner/labs",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -367,6 +449,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -379,7 +462,9 @@
       "ingang": "/apps/krant.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/auth/login staat niet in IDOR.json; /api/auth/register staat niet in IDOR.json; /api/krant/artikel heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:kwesties",
@@ -388,11 +473,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "1 van de 1 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -405,7 +491,9 @@
       "ingang": "/apps/geld.html#labfonds",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:leven",
@@ -413,7 +501,9 @@
       "ingang": "/apps/leven.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 5,
+      "open": 5,
+      "reden": "5 van de 5 routes niet gemeten, o.a. /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:library",
@@ -422,11 +512,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "1 van de 1 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -439,7 +530,9 @@
       "ingang": "/apps/geld.html#logboek",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:loonstrook",
@@ -447,7 +540,9 @@
       "ingang": "/apps/loonstrook.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 3,
+      "open": 3,
+      "reden": "3 van de 3 routes niet gemeten, o.a. /api/member/dossier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/identiteit/verzoeken: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/loonstroken: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:loopbaan",
@@ -455,7 +550,9 @@
       "ingang": "/apps/loopbaan.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 8,
+      "open": 8,
+      "reden": "8 van de 8 routes niet gemeten, o.a. /api/carriere/ledger/afschrift: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/carriere/ledger/deel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/carriere/ledger/delen: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:magnaat",
@@ -463,7 +560,9 @@
       "ingang": "/apps/magnaat.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 90,
+      "open": 84,
+      "reden": "84 van de 90 routes niet gemeten, o.a. /api/member/magnaat/controle/overzicht: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/magnaat/controle/taak/maak: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/magnaat/controle/taak/zet: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:maison",
@@ -471,7 +570,9 @@
       "ingang": "/apps/maison.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 70,
+      "open": 70,
+      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:mall",
@@ -479,7 +580,9 @@
       "ingang": "/apps/mall.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 61,
+      "open": 61,
+      "reden": "61 van de 61 routes niet gemeten, o.a. /api/adres/zoek heeft bewijs zonder bekende HTTP-methode; /api/appstore/bon: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/appstore/catalogus: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:mecenaat",
@@ -487,7 +590,9 @@
       "ingang": "/apps/geld.html#mecenaat",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:mediaos",
@@ -495,7 +600,9 @@
       "ingang": "/apps/media.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 27,
+      "open": 27,
+      "reden": "27 van de 27 routes niet gemeten, o.a. /api/mediaos/bewaar: IDOR draagt geen volledige ruwe antwoordafbakening; /api/mediaos/bieb: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mediaos/bord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:mijnmall",
@@ -503,7 +610,9 @@
       "ingang": "/apps/mijnmall.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 18,
+      "open": 17,
+      "reden": "17 van de 18 routes niet gemeten, o.a. /api/mall/aanvraag: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: mallAanvragen.plaats(req.session.key, ...) maakt een nieuwe aanvraag voor B; de pool vulde openbare categorie- en etage-id's in, en met verzonnen waarden faalt de validatie (400). Er wordt geen aanvraag van A aangeraakt; deze smalle duiding is geen ruwe proef van afscherming; /api/mall/aanvraag/heropen: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mall/aanvraag/kies: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:move",
@@ -511,7 +620,9 @@
       "ingang": "/apps/move.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 5,
+      "open": 5,
+      "reden": "5 van de 5 routes niet gemeten, o.a. /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/move/gevolg heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:muziek",
@@ -519,7 +630,9 @@
       "ingang": "/apps/muziek.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 12,
+      "open": 12,
+      "reden": "12 van de 12 routes niet gemeten, o.a. /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/muziek/bestand: IDOR draagt geen volledige ruwe antwoordafbakening; /api/muziek/bestand-ticket: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:nalatenschap",
@@ -527,7 +640,9 @@
       "ingang": "/apps/geld.html#nalatenschap",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:navigatie",
@@ -535,7 +650,9 @@
       "ingang": "/apps/navigatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 11,
+      "open": 11,
+      "reden": "11 van de 11 routes niet gemeten, o.a. /api/nav/bestemmingen: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/nav/gebied/kies: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/nav/gebied/pakket: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:neigingen",
@@ -543,7 +660,9 @@
       "ingang": "/apps/mijn-neigingen.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 20,
+      "open": 20,
+      "reden": "20 van de 20 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:nieuws",
@@ -551,7 +670,9 @@
       "ingang": "/apps/nieuws.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 3,
+      "open": 3,
+      "reden": "3 van de 3 routes niet gemeten, o.a. /api/member/nieuws: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/nieuws/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/nieuws/artikel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:office",
@@ -559,7 +680,9 @@
       "ingang": "/apps/office.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 41,
+      "open": 41,
+      "reden": "41 van de 41 routes niet gemeten, o.a. /api/office/kantoorpakket/aanwezig staat niet in IDOR.json; /api/office/kantoorpakket/ai staat niet in IDOR.json; /api/office/kantoorpakket/beheer staat niet in IDOR.json"
     },
     {
       "functie": "link:onderneming",
@@ -567,7 +690,9 @@
       "ingang": "/apps/onderneming.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 14,
+      "open": 14,
+      "reden": "14 van de 14 routes niet gemeten, o.a. /api/onderneming/aanvraag: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/onderneming/aanvraag/stand: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/onderneming/dagbeeld: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:ontdek",
@@ -575,7 +700,9 @@
       "ingang": "/apps/rtg.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/agenda/mijn-lijst: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/auth/me: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/huis/dossier: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:ov",
@@ -583,7 +710,9 @@
       "ingang": "/apps/ov.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 32,
+      "open": 32,
+      "reden": "32 van de 32 routes niet gemeten, o.a. /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mob/aanbod: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:ovroutes",
@@ -607,7 +736,9 @@
       "ingang": "/apps/passkeys.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/webauthn/bevestig/opties heeft bewijs zonder bekende HTTP-methode; /api/webauthn/lijst heeft bewijs zonder bekende HTTP-methode; /api/webauthn/login staat niet in IDOR.json"
     },
     {
       "functie": "link:pay",
@@ -615,7 +746,9 @@
       "ingang": "/apps/pay.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 17,
+      "open": 16,
+      "reden": "16 van de 17 routes niet gemeten, o.a. /api/login staat niet in IDOR.json; /api/member/connections: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/pay/oplaad: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:podium",
@@ -623,7 +756,9 @@
       "ingang": "/apps/podium.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 19,
+      "open": 19,
+      "reden": "19 van de 19 routes niet gemeten, o.a. /api/drm/key heeft bewijs zonder bekende HTTP-methode; /api/ice staat niet in IDOR.json; /api/podium/abonneer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:post",
@@ -631,7 +766,9 @@
       "ingang": "/apps/mijn-post.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 17,
+      "open": 17,
+      "reden": "17 van de 17 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:projectroom",
@@ -647,7 +784,9 @@
       "ingang": "/apps/pulse.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 15,
+      "open": 15,
+      "reden": "15 van de 15 routes niet gemeten, o.a. /api/member/pulse/bewaar: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: een bladwijzer op andermans bericht, in B's EIGEN plank; het bericht moet door zichtbaar() heen; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewaard: IDOR noemt de route nagekeken: B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewerk: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:rechterhand",
@@ -655,7 +794,9 @@
       "ingang": "/apps/lifestyle.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 48,
+      "open": 48,
+      "reden": "48 van de 48 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/bureau/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/bureau/beveiliging: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:reisboek",
@@ -663,7 +804,9 @@
       "ingang": "/apps/reisboek.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 11,
+      "open": 11,
+      "reden": "11 van de 11 routes niet gemeten, o.a. /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/reis/item: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:reizen",
@@ -671,7 +814,9 @@
       "ingang": "/apps/reizen-veilig.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 9,
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/move/volgende heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:relaties",
@@ -679,7 +824,9 @@
       "ingang": "/apps/mijn-relaties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 19,
+      "open": 19,
+      "reden": "19 van de 19 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:rendezvous",
@@ -687,7 +834,9 @@
       "ingang": "/apps/rendezvous.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 37,
+      "open": 37,
+      "reden": "37 van de 37 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/ice staat niet in IDOR.json; /api/member/rendezvous/aanwezig/wis: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:residentie",
@@ -695,7 +844,9 @@
       "ingang": "/apps/residentie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 27,
+      "open": 27,
+      "reden": "27 van de 27 routes niet gemeten, o.a. /api/member/connect: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/find: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/spel/antwoord: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:routedossier",
@@ -712,11 +863,12 @@
       "persona": "gezin",
       "status": "NIET_GETEST",
       "paren": 5,
-      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
+      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -724,6 +876,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -731,6 +884,7 @@
         {
           "verzoek": "POST /api/rtf/social/connections",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -738,6 +892,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -745,6 +900,7 @@
         {
           "verzoek": "POST /api/rtf/leerling/dag",
           "a": 403,
+          "bEigen": 403,
           "b": 403,
           "anoniem": 403,
           "uitslag": "eigenaarWeg"
@@ -758,11 +914,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 3,
-      "reden": "3 van de 3 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "3 van de 3 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtfos/publiek/steden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -770,6 +927,7 @@
         {
           "verzoek": "POST /api/rtfos/publiek/campagnes",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -777,6 +935,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -790,11 +949,12 @@
       "persona": "gezin",
       "status": "BEWEZEN",
       "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; B's toegang tot zijn eigen object wordt niet afzonderlijk geverifieerd",
+      "reden": "1 van de 1 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -808,11 +968,12 @@
       "persona": "gezin",
       "status": "NIET_GETEST",
       "paren": 5,
-      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
+      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -820,6 +981,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
@@ -827,6 +989,7 @@
         {
           "verzoek": "POST /api/rtf/social/connections",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -834,6 +997,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -841,6 +1005,7 @@
         {
           "verzoek": "POST /api/rtf/leerling/dag",
           "a": 403,
+          "bEigen": 403,
           "b": 403,
           "anoniem": 403,
           "uitslag": "eigenaarWeg"
@@ -853,7 +1018,9 @@
       "ingang": "/apps/geld.html#rtgcode",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:rtgone",
@@ -869,7 +1036,9 @@
       "ingang": "/apps/rtmail.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 63,
+      "open": 63,
+      "reden": "63 van de 63 routes niet gemeten, o.a. /api/account/start heeft bewijs zonder bekende HTTP-methode; /api/member/rtmail/adres: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/rtmail/afwezig: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:school",
@@ -877,7 +1046,9 @@
       "ingang": "/apps/rtgschool.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 17,
+      "open": 15,
+      "reden": "15 van de 17 routes niet gemeten, o.a. /api/leerstof/antwoord heeft bewijs zonder bekende HTTP-methode; /api/leerstof/dag heeft bewijs zonder bekende HTTP-methode; /api/leerstof/examen heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:sessies",
@@ -885,7 +1056,9 @@
       "ingang": "/apps/mijn-sessies.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 18,
+      "open": 18,
+      "reden": "18 van de 18 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:sitemaker",
@@ -893,7 +1066,9 @@
       "ingang": "/apps/sitemaker.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 15,
+      "open": 15,
+      "reden": "15 van de 15 routes niet gemeten, o.a. /api/salon/promo: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/site/ai: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/site/bewaar: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:sociaal",
@@ -901,7 +1076,9 @@
       "ingang": "/apps/sociaal.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 13,
+      "open": 13,
+      "reden": "13 van de 13 routes niet gemeten, o.a. /api/comm/inbox: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/actielog: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/beleid: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:spelavond",
@@ -909,7 +1086,9 @@
       "ingang": "/apps/spelscherm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/projectie/kijk staat niet in IDOR.json; /api/projectie/koppel staat niet in IDOR.json"
     },
     {
       "functie": "link:spelen",
@@ -917,7 +1096,9 @@
       "ingang": "/apps/spelen.html?pas=",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 202,
+      "open": 167,
+      "reden": "167 van de 202 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/foundation/gezin/agenda: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/foundation/gezin/agenda/bereik: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:sport",
@@ -925,7 +1106,9 @@
       "ingang": "/apps/sport.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 11,
+      "open": 11,
+      "reden": "11 van de 11 routes niet gemeten, o.a. /api/adres/zoek heeft bewijs zonder bekende HTTP-methode; /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:stad",
@@ -933,7 +1116,9 @@
       "ingang": "/apps/stad.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 4,
+      "open": 4,
+      "reden": "4 van de 4 routes niet gemeten, o.a. /api/stad/bewoner: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/stad/melding: IDOR draagt geen volledige ruwe antwoordafbakening; /api/stream heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:table",
@@ -941,7 +1126,9 @@
       "ingang": "/apps/table.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 70,
+      "open": 70,
+      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app heeft bewijs zonder bekende HTTP-methode; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:theater",
@@ -949,7 +1136,9 @@
       "ingang": "/apps/theater.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 23,
+      "open": 23,
+      "reden": "23 van de 23 routes niet gemeten, o.a. /api/drm/key heeft bewijs zonder bekende HTTP-methode; /api/ice staat niet in IDOR.json; /api/stream heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:tweedescherm",
@@ -965,7 +1154,9 @@
       "ingang": "/apps/uitgaan.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 6,
+      "open": 6,
+      "reden": "6 van de 6 routes niet gemeten, o.a. /api/event/rsvp heeft bewijs zonder bekende HTTP-methode; /api/event/rsvp/annuleer heeft bewijs zonder bekende HTTP-methode; /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:vandaag",
@@ -973,7 +1164,9 @@
       "ingang": "/apps/life.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 26,
+      "open": 25,
+      "reden": "25 van de 26 routes niet gemeten, o.a. /api/dag heeft bewijs zonder bekende HTTP-methode; /api/gemoed: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gemoed/weg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:veilig",
@@ -981,7 +1174,9 @@
       "ingang": "/apps/veilig.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 21,
+      "open": 21,
+      "reden": "21 van de 21 routes niet gemeten, o.a. /api/veiligheid: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/veiligheid/alarm: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/veiligheid/codewoord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:verificatie",
@@ -989,7 +1184,9 @@
       "ingang": "/apps/verificatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 3,
+      "open": 3,
+      "reden": "3 van de 3 routes niet gemeten, o.a. /api/verify/selfie heeft bewijs zonder bekende HTTP-methode; /api/verify/status heeft bewijs zonder bekende HTTP-methode; /api/verify/upload heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:vertegenwoordiging",
@@ -997,7 +1194,9 @@
       "ingang": "/apps/vertegenwoordiging.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 6,
+      "open": 6,
+      "reden": "6 van de 6 routes niet gemeten, o.a. /api/vertegenwoordiging/aanvaard: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/vertegenwoordiging/bevoegdheden: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/vertegenwoordiging/grens: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:vluchten",
@@ -1005,7 +1204,9 @@
       "ingang": "/apps/vluchten.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 9,
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/gegevens/start: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gegevens/zeg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/vluchten/boek: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "link:vonk",
@@ -1013,7 +1214,9 @@
       "ingang": "/apps/vonk.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 22,
+      "open": 22,
+      "reden": "22 van de 22 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment heeft bewijs zonder bekende HTTP-methode; /api/ondertiteling/stand heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:vooruitzicht",
@@ -1021,7 +1224,9 @@
       "ingang": "/apps/living-os.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 12,
+      "open": 12,
+      "reden": "12 van de 12 routes niet gemeten, o.a. /api/agenda/bereik: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/geld/cockpit: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:vrienden",
@@ -1030,18 +1235,20 @@
       "persona": "gezin",
       "status": "NIET_GETEST",
       "paren": 12,
-      "reden": "niet elk paar bewijst A binnen en B plus anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, eigenaarWeg)",
+      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/TZ7Y2D/mij",
+          "verzoek": "GET /api/foundation/gezin/S36E89/mij",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -1049,6 +1256,7 @@
         {
           "verzoek": "POST /api/rtf/social/connections",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -1056,34 +1264,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/stroom/ticket",
           "a": 200,
-          "b": 403,
-          "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/rtf/social/pin",
-          "a": 200,
-          "b": 403,
-          "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/rtf/social/stories",
-          "a": 200,
-          "b": 403,
-          "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/rtf/social/snaps",
-          "a": 200,
-          "b": 403,
-          "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/rtf/social/opdracht",
-          "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -1091,13 +1272,47 @@
         {
           "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
+          "bEigen": 200,
           "b": 401,
           "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
+          "verzoek": "POST /api/rtf/social/pin",
+          "a": 200,
+          "bEigen": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/stories",
+          "a": 200,
+          "bEigen": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/snaps",
+          "a": 200,
+          "bEigen": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/opdracht",
+          "a": 200,
+          "bEigen": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
           "verzoek": "GET /api/rtf/social/stream",
           "a": 401,
+          "bEigen": 401,
           "b": 401,
           "anoniem": 401,
           "uitslag": "eigenaarWeg"
@@ -1105,6 +1320,7 @@
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",
           "a": 200,
+          "bEigen": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
@@ -1112,6 +1328,7 @@
         {
           "verzoek": "POST /api/rtf/leerling/dag",
           "a": 403,
+          "bEigen": 403,
           "b": 403,
           "anoniem": 403,
           "uitslag": "eigenaarWeg"
@@ -1124,7 +1341,9 @@
       "ingang": "/apps/geld.html#wallet",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:wbw",
@@ -1132,7 +1351,9 @@
       "ingang": "/apps/geld.html#wbw",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 99,
+      "open": 97,
+      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:wereldlaag",
@@ -1140,7 +1361,9 @@
       "ingang": "/apps/wereld.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 5,
+      "open": 5,
+      "reden": "5 van de 5 routes niet gemeten, o.a. /api/krant/artikel heeft bewijs zonder bekende HTTP-methode; /api/mediaos/volg: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/salon/plaats: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:werkos",
@@ -1148,7 +1371,9 @@
       "ingang": "/apps/werk.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 18,
+      "open": 18,
+      "reden": "18 van de 18 routes niet gemeten, o.a. /api/auth/login staat niet in IDOR.json; /api/auth/register staat niet in IDOR.json; /api/bedrijf/mijn heeft bewijs zonder bekende HTTP-methode"
     },
     {
       "functie": "link:wonen",
@@ -1156,7 +1381,9 @@
       "ingang": "/apps/wonen.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/bestanden/map: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bestanden/mijn: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bestanden/upload: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "os:bellen",
@@ -1164,7 +1391,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:rtf",
@@ -1172,7 +1399,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:snaps",
@@ -1180,7 +1407,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:videobellen",
@@ -1188,7 +1415,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:werk",
@@ -1196,7 +1423,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:assets",
@@ -1204,7 +1431,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:bestellen",
@@ -1212,7 +1439,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:betalen",
@@ -1220,7 +1447,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:gezin",
@@ -1228,7 +1455,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:reizen",
@@ -1236,7 +1463,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:salon",
@@ -1244,7 +1471,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:terplaatse",
@@ -1252,7 +1479,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "bewijs vervallen: IDOR.json: gemeten op 34b3fc25, sindsdien zijn 737 codebestand(en) gewijzigd (119 andere buiten dit instrument gelaten); ROLPROEF.json: gemeten op 1284f13a, sindsdien zijn 449 codebestand(en) gewijzigd (59 andere buiten dit instrument gelaten)"
+      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:zorg",

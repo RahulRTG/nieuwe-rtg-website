@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-20T07:49:51.661Z",
-  "commit": "c10c930cb801cd84b7e13ce6d7c0382ffdf509d3",
+  "op": "2026-10-21T08:27:04.969Z",
+  "commit": "87234eeb2871c725c572c23eab21b9369a5d1e65",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 5,
   "instrument": "scripts/test-runner.js",
   "node": "v26.12.0"
  },
@@ -12,22 +12,22 @@
  "hoe": "npm test",
  "gemeten": {
   "volledig": true,
-  "bestanden": 2569,
-  "bestandenSha256": "cfa60b872b1a9180d6616f76be73551c52e079ec8a6caa8564cba3f9d9f195a6",
+  "bestanden": 2572,
+  "bestandenSha256": "d98907548621c95def4d8c0be50df0f5c87502bfc7f670d52972b30e108eb077",
   "afsluitcode": 1,
   "groen": false,
   "tapVolledig": true,
-  "tests": 20036,
-  "geslaagdeTests": 19987,
-  "mislukt": 43,
+  "tests": 20094,
+  "geslaagdeTests": 20078,
+  "mislukt": 16,
   "geannuleerd": 0,
-  "overgeslagen": 6,
+  "overgeslagen": 0,
   "todo": 0
  },
  "postgres": {
   "pad": ".release/pg-bewijs.json",
-  "sha256": "50a6c785d1dac4a4027d642435a915ad821cae5433ba777ab3954daa78d9d1b0",
-  "bestanden": 46,
-  "toetslijstSha256": "210070668742ade0a952a65ef8289bddf485dc0defe853b694b399feb9334678"
+  "sha256": "c2eec52227e19ea483e805ec1a0f2dd83eb2dbad68818861e6fb8a32592c9ae1",
+  "bestanden": 47,
+  "toetslijstSha256": "3818b832fecd1b44a25dafcfa619f2d404e64609b0552aa89cf658b14433a79a"
  }
 }

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-10-22T18:13:28.698Z",
-  "commit": "cebe17ca76",
-  "boomVuil": false,
+  "op": "2026-10-22T23:40:59.417Z",
+  "commit": "f79f081b56",
+  "boomVuil": true,
   "boomAnders": 7,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v26.12.0"
@@ -13,7 +13,7 @@
   "posten": 18,
   "meetwerk": 339,
   "instrument": 466,
-  "grens": 725
+  "grens": 722
  },
  "aflossing": {
   "doel": 0,
@@ -29,9 +29,9 @@
  "gemeten": {
   "postenTotaal": 18,
   "achterstand": 805,
-  "randVanDeMethode": 725,
+  "randVanDeMethode": 722,
   "auth-onbeslist": 1,
-  "capability-in-handler": 590,
+  "capability-in-handler": 587,
   "objectpoort": 55,
   "output-deuren": 21,
   "lichaamssleutel": 110,
@@ -62,7 +62,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 590,
+   "aantal": 587,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -221,7 +221,7 @@
    },
    {
     "op": "2026-10-22",
-    "aantal": 590
+    "aantal": 587
    }
   ],
   "objectpoort": [

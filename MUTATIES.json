@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-19T23:25:05.656Z",
-    "commit": "638e5a995d",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-10-22T23:41:29.064Z",
+    "commit": "f79f081b56",
+    "boomVuil": true,
+    "boomAnders": 10,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v26.12.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -1063,6 +1063,13 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "arrival-accountdeur.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "arrival-ds.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1420,6 +1427,13 @@
       "operator": "!==->===#0",
       "gezakt": 3,
       "geprobeerd": 2
+    },
+    "bankoverboek-dubbelklik.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bankpositie.test.js": {
       "soort": "server",
@@ -2902,6 +2916,13 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "clips-deel.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "clips-studio.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3001,6 +3022,14 @@
     "codewereld.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "collectie-media-festival.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/eigencollectie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 18
     },
     "collectie-transactie-sqlite.test.js": {
       "soort": "puur",
@@ -6402,6 +6431,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "gezinspin.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinspin.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "gezinsregistratie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6771,6 +6808,20 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "heelrtg-catalogus-poort.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "heelrtg-osapps.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "helikopter.test.js": {
       "soort": "server",
@@ -13033,6 +13084,13 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "passkeys-weg.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
+    },
     "pay-grootboek.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -16373,6 +16431,21 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "schil-taal.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/shared/interface/world-desktop-copy.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-browser-gericht-bewijs/schil-taal.e2e.js.evidence.json",
+        "sha256": "61b874e81211ada8989f4a36089690728b5c57b5a59686d9c6beca137ece1ced",
+        "commit": "df73e872b860dae2be7f27cd40b8315578ea28b0",
+        "sourceSha256": "eda68ef8a2f185994d501d9fcc51312f8e3bb25327e21ea1bde4665da6c5807c",
+        "testSha256": "0bf61f9d7ce86cbe7700df7a06b64b720342c3e9a9a5c6c79eef1de48e91ba5f"
+      }
+    },
     "schil-taal.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -16990,6 +17063,21 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "sfeerbeeld-muis.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-personal-images.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-browser-gericht-bewijs/sfeerbeeld-muis.e2e.js.evidence.json",
+        "sha256": "68002059d4123c654fc903cf36e010733546e750ced2d8c4be567047d9d38e34",
+        "commit": "df73e872b860dae2be7f27cd40b8315578ea28b0",
+        "sourceSha256": "06b627a6af0f5aa31804dfe541ee137227ceb5abcf8fb248ff9b467a51ee6230",
+        "testSha256": "58d8114db8d42382edbed7e50080c37bfcc07884d8a57edc6ba1461f7a6ea1a0"
+      }
+    },
     "signatureroutes.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -17087,6 +17175,14 @@
       "module": "server/smtp.js",
       "operator": "===->!==#0",
       "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "snapisolatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/snapisolatie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "snaps-herhaal.test.js": {
@@ -20087,6 +20183,13 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "videobellen-echt.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "vijandigerand.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -21948,85 +22051,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "arrival-accountdeur.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "bankoverboek-dubbelklik.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "clips-deel.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "heelrtg-catalogus-poort.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "heelrtg-osapps.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "passkeys-weg.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "overleefd"
-    },
-    "videobellen-echt.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
-    },
-    "schil-taal.e2e.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "public/shared/interface/world-desktop-copy.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/private/tmp/rtg-browser-gericht-bewijs/schil-taal.e2e.js.evidence.json",
-        "sha256": "61b874e81211ada8989f4a36089690728b5c57b5a59686d9c6beca137ece1ced",
-        "commit": "df73e872b860dae2be7f27cd40b8315578ea28b0",
-        "sourceSha256": "eda68ef8a2f185994d501d9fcc51312f8e3bb25327e21ea1bde4665da6c5807c",
-        "testSha256": "0bf61f9d7ce86cbe7700df7a06b64b720342c3e9a9a5c6c79eef1de48e91ba5f"
-      }
-    },
-    "sfeerbeeld-muis.e2e.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "public/shared/rtg-personal-images.css",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/private/tmp/rtg-browser-gericht-bewijs/sfeerbeeld-muis.e2e.js.evidence.json",
-        "sha256": "68002059d4123c654fc903cf36e010733546e750ced2d8c4be567047d9d38e34",
-        "commit": "df73e872b860dae2be7f27cd40b8315578ea28b0",
-        "sourceSha256": "06b627a6af0f5aa31804dfe541ee137227ceb5abcf8fb248ff9b467a51ee6230",
-        "testSha256": "58d8114db8d42382edbed7e50080c37bfcc07884d8a57edc6ba1461f7a6ea1a0"
-      }
     }
   }
 }

@@ -964,6 +964,7 @@ if (require.main !== module) { module.exports = { maakIdorVraag }; return; }
   // Een eigen wegwerpwereld voorkomt dat destructieve eerdere oogstgangen
   // de drie identiteitsfixtures onbruikbaar maken. Geen ontwikkeldata.
   Object.assign(perRoute, await require('./lib/verificatie-isolatie').meet());
+  require('./lib/snapisolatie').voegToe(perRoute, await require('./lib/snapisolatie').meet());
   klaar();
 
   const doorbraken = Object.entries(perRoute).concat(Object.entries(zaakPerRoute)).filter(([, v]) => v.staat === 'doorbraak');

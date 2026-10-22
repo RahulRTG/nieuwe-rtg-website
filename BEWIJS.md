@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2990 bestanden en 20240 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2999 bestanden en 20286 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2990 |
-| losse beweringen (`test(...)`) | 20240 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 405 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2752 |
+| toetsbestanden | 2999 |
+| losse beweringen (`test(...)`) | 20286 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 411 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2755 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 9 |
-| niets van beide | 49 |
+| niets van beide | 55 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2609 bestanden, 19532 beweringen.
+2618 bestanden, 19578 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -317,7 +317,7 @@ toets omvalt.
 | `bewijsladder.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | DE BEWIJSLADDER -- levert dit huis nog elk soort bewijs, en waar? Twee beweringen worden hier hard gemaakt, en ze zijn allebei een ANDERE dan die van test/ci-lokaal.test.js (dat gaat over pariteit per poort): 1. |
 | `bewijsmatrix-audit.test.js` | 4 | gezakt op `!==->===#6` | DE AUDIT-KOLOM HEEFT TWEE BRONNEN, EN ALLEBEI MOETEN ZE AAN BOD KOMEN. DIT IS TWEE KEER MISGEGAAN, en beide keren op dezelfde manier: een tak die de cel ook claimde als hij NIETS wist, met een `continue` erachter. |
 | `bewijsmatrix.test.js` | 31 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
-| `bewijsraakvlak.test.js` | 24 | gezakt op `voorwaarde-omkeren#0` | HET RAAKVLAK -- een bewijs vervalt alleen door een bestand dat het kan raken. scripts/lib/bewijsraakvlak.js vervangt voor APPWERKT de grove regel "er veranderde iets in server/ of public/, dus alles is oud" door een... |
+| `bewijsraakvlak.test.js` | 25 | gezakt op `voorwaarde-omkeren#0` | HET RAAKVLAK -- een bewijs vervalt alleen door een bestand dat het kan raken. scripts/lib/bewijsraakvlak.js vervangt voor APPWERKT de grove regel "er veranderde iets in server/ of public/, dus alles is oud" door een... |
 | `bewijsregister.test.js` | 5 | gezakt op `===->!==#9` | ROOD BEWIJS MOET BLIJVEN STAAN. Tot 9 september 2026 was BEPROEVING.json tegelijk het VERSLAG van de laatste ronde en de INVOER van de prestatieratel. |
 | `bewijsschuld.test.js` | 9 | gezakt op `!==->===#0` | DE BEWIJSSCHULD MAG ALLEEN KRIMPEN. WAAROM DIT BESTAAT. |
 | `bewijstoken.test.js` | 13 | gezakt op `&&->||#0` | HET BEWIJSTOKEN -- een bevoegdheid die je kunt meedragen. WAT ER OP HET SPEL STAAT. |
@@ -416,6 +416,8 @@ toets omvalt.
 | `codeql-verdict.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codevergelijking.test.js` | 4 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codewereld.test.js` | 7 | geen module gevonden | DE CODEWERELD TELT INDEXEN NIET ALS GEDRAG. Twee keer op rij sprong hier een dekkingsgetal omhoog zonder dat er iets bij was gekomen: eerst bij SYMBOLEN.json (bronbereik 33% -> 100%) en daarna bij AANROEPGRAAF.json... |
+| `collectie-eigen-aanwezig.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `collectie-media-festival.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `collectie-meervoudig-sqlite.test.js` | 6 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `collectie-meervoudig.pg.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `collectie-meervoudig.test.js` | 9 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -819,6 +821,7 @@ toets omvalt.
 | `gezinsdeur.test.js` | 6 | gezakt op `liegpoort /api/` | De gezinsdeur op een ECHTE server (B18 en B19, CODECREDENTIALS.json foundation.family_profile_access): de 128-bit gezinscode die alleen in het antwoord op maken en roteren staat, het zes-tekenadres dat niets meer... |
 | `gezinseigenaar.test.js` | 9 | gezakt op `liegpoort /api/` | HET GEZIN AAN EEN OUDERACCOUNT, op een ECHTE server (foundation/gezinseigenaar.js, besluit van de eigenaar van 5 oktober 2026). De server draait met RTF_GEZIN_ACCOUNTPLICHT=1: dezelfde plicht die in productie vanzelf... |
 | `gezinskeuken.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de Gezinskeuken (RTFoundation-gezin): het weekmenu (wat eten we, wie kookt), de "verras me"-ideeen, en de gedeelde boodschappenlijst waar iedereen op afvinkt. Gedeeld per gezin, dicht voor gasten... |
+| `gezinspin.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `gezinsregistratie.test.js` | 5 | gezakt op `liegpoort /api/` | De snelle gezinsdeur: code + eigen PIN zonder namenlek, kinderen onder de beheerder en volwassenen alleen via een persoonlijke eenmalige sleutel. |
 | `gezinssessie.test.js` | 4 | gezakt op `liegpoort /api/` | Het gezinsprofieltoken op een ECHTE server (foundation.family_profile_token_ buiten_harde_poort, B17): elke uitgifte een nieuwe 128-bit sessie, roteren en afmelden door de houder, de beheerder die een profiel of het... |
 | `gezinstoken.test.js` | 11 | gezakt op `true->false#0` | Het gezinsprofieltoken (foundation.family_profile_token_buiten_harde_poort, B17), control voor control: 128 bits en eenmaal kaal, hash-only, issuer/doel/ scope/onderwerp zonder persoonsgegevens, vervaltijd, het... |
@@ -968,6 +971,8 @@ toets omvalt.
 | `inhoudswacht.test.js` | 2 | gezakt op `liegpoort /api/` | DE INHOUDSWACHT -- elke blinde route krijgt zijn vormcontract terug. INHOUDSKAART.json draagt per (voorheen) blinde route het ware antwoordprofiel: status, sleutels, en welke velden dragend zijn. |
 | `inkoopketen.test.js` | 5 | gezakt op `liegpoort /api/` | DE KETEN VAN BESTELLEN NAAR KEUKEN -- 5 endpoints uit de supplier-groep. groothandel/product, groothandel/voorraad, inkoop/annuleer, inkoop/ai-bevestig en mep/daily/done stonden als nooit aangeroepen in de... |
 | `inlinestijl.test.js` | 9 | gezakt op `&&->||#0` | DE OMZETTING VAN INLINE STIJLEN NAAR KLASSEN (TAKEN.md 4.51). WAT HIER OP HET SPEL STAAT. |
+| `inlog-appendmerge.pg.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `inlog-appendmerge.test.js` | 9 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `inlogherkomst-weerbaar.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | DE HERKOMST VAN EEN INLOG EN HET INLOGSPOOR (server/kern/identiteit/inlogherkomst.js). Wat deze module beschermt: twee dingen die op het moment van inloggen moeten gebeuren en niet achteraf kunnen. |
 | `inlogpauze-spelling.test.js` | 2 | gezakt op `liegpoort /api/` | DE INLOGPAUZE KENT ELKE SPELLING DIE DE ROUTER KENT (N18 van de V1-audit). De inlogpauze (server/middleware/remmen.js) sluit tijdens een brede brute force de paden waarlangs iemand een sessie krijgt. |
 | `inlogrem.test.js` | 2 | gezakt op `liegpoort /api/` | DE INLOGREM MOET OOK EEN VERSPREIDE AANVAL ZIEN, EN DE EIGENAAR NOOIT BUITEN ZETTEN. WAT ER MIS WAS. |
@@ -1245,7 +1250,7 @@ toets omvalt.
 | `magnaat-capabilities.test.js` | 8 | geen bruikbare mutatie | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-controle.test.js` | 9 | gezakt op `!==->===#0` | Het RTG Controleregister: ieder gevonden codepunt heeft dezelfde veilige schakelaar, taakmotor en bestuursaudit, terwijl ontbrekend bronbewijs en ontbrekende echte gameplay zichtbaar rood blijven. |
 | `magnaat-economenlab.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `magnaat-economie-routes.test.js` | 4 | gezakt op `liegpoort /api/` | De twee schrijvende economieroutes tegen de echte HTTP- en SQLite-keten. De losse economische toetsen gebruiken bewust gewone geheugenobjecten. |
+| `magnaat-economie-routes.test.js` | 5 | gezakt op `liegpoort /api/` | De twee schrijvende economieroutes tegen de echte HTTP- en SQLite-keten. De losse economische toetsen gebruiken bewust gewone geheugenobjecten. |
 | `magnaat-economie.test.js` | 11 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-economische-motor.test.js` | 9 | gezakt op `===->!==#0` | De economische motor van Magnaat, losgemaakt uit het Oefenkantoor (ronde A1, MAGNAAT.md par. 7). |
 | `magnaat-grootboek.test.js` | 5 | gezakt op `===->!==#0` | Het Magnaat-grootboek (ronde A2.0, MAGNAAT.md): de boekhoudautoriteit als eigen laag onder de economische motor. Wat hier vastligt, en wat test/magnaat-economische-motor.test.js niet al doet: 1. |
@@ -1455,6 +1460,7 @@ toets omvalt.
 | `objectoogst.test.js` | 14 | gezakt op `!==->===#0` | HET OBJECT MAKEN VOOR JE ERAAN KOMT. 1635 mutatieroutes strandden op 404: het ding waar ze over gaan bestaat niet. |
 | `objectpagina.test.js` | 9 | gezakt op `===->!==#0` | DE OBJECTPAGINASTRUCTUUR (server/kern/objectlaag/pagina.js) -- MAATSTAF.md U28. Elke objectpagina draagt dezelfde tien secties. |
 | `objectpool.test.js` | 6 | gezakt op `!==->===#0` | DE OBJECTPOOL, NAGETROKKEN. Oogsten is geen raden: de pool mag alleen leren uit wat een proef echt zag, en alleen verrijken binnen hetzelfde domein. |
+| `objectveld-afleiding.test.js` | 5 | -- | Handgelezen objectpoorten mogen niet verdwijnen tussen generator en toets. Een veld mag evenmin worden geleend van een andere HTTP-methode of route. |
 | `objectveld.test.js` | 4 | geen module gevonden | IS AUTORISATIE TOEWIJSBAAR? -- van voornemen naar machine. |
 | `objectverwijzing.test.js` | 4 | gezakt op `===->!==#0` | DE OBJECTPOORT: een object is een verwijzing, en er is een plek die dat beslist. shared/objectverwijzing.js kapt af wat een scherm als object meegeeft: soort, id, label en hooguit acht velden. |
 | `ochtend.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor het Ochtendritme (RTFoundation-gezin): een persoonlijk ochtendlijstje dat elke dag reset, de zachte weektelling bij een afgeronde ochtend (bewust geen reeks en geen record -- een ketting die je... |
@@ -1484,7 +1490,7 @@ toets omvalt.
 | `onboarding-config-zet.test.js` | 1 | gezakt op `liegpoort /api/` | DE EIGENAAR ZET HET PLATFORMCONTRACT MET DE HAND -- /api/onboarding/config/zet. test/onboarding.test.js toetst het aanpassen MET AI (/config/ai); de deur waarmee de eigenaar de eisen en het contract rechtstreeks zet,... |
 | `onboarding-inrichten.test.js` | 3 | gezakt op `liegpoort /api/` | HET INRICHTEN: in één keer invullen wat het huis anders per keer komt vragen. De voordeur vraagt vier dingen en zet de rest op 'later': telefoon en adres worden pas gevraagd op het moment dat een handeling ze nodig... |
 | `onboarding-meebouwen.test.js` | 4 | gezakt op `liegpoort /api/` | MEEBOUWEN: de twee dingen die een nieuw lid aan het platform zelf bijdraagt, elk met een toestemming die ergens op slaat. Sinds de demo-inhoud eruit is begint een installatie leeg -- De Salon zonder berichten, de... |
-| `onboarding-ontvangst.test.js` | 11 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `onboarding-ontvangst.test.js` | 12 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `onboarding-workers.pg.test.js` | 1 | -- | Echte HTTP-workers delen alleen PostgreSQL. Alle data leeft in een verse testdatabase. |
 | `onboarding.test.js` | 11 | gezakt op `liegpoort /api/` | De verplichte onboarding + het contract: elk account vult de standaardgegevens in (paspoort, e-mail, telefoon, adres, ...) en tekent het contract. De eigenaar past de eisen en het contract aan (met AI in gewone taal,... |
 | `onderhoud.test.js` | 9 | gezakt op `===->!==#0` | DE VEGER MAG DE REM NIET LOSSEN. WAT ER MIS WAS, EN TWEE KEER. |
@@ -1555,7 +1561,7 @@ toets omvalt.
 | `outputbinding.test.js` | 5 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `outputshards.test.js` | 11 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `outputworker.test.js` | 3 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `ov-operatie-routes.test.js` | 2 | gezakt op `liegpoort /api/` | BUSINESS PRIVATE-OPERATIES OVER DE ROUTES. test/ov-operatie.test.js toetst de kern van kern/ov/operatie.js in het proces, met de pas als losse parameter. |
+| `ov-operatie-routes.test.js` | 4 | gezakt op `liegpoort /api/` | BUSINESS PRIVATE-OPERATIES OVER DE ROUTES. test/ov-operatie.test.js toetst de kern van kern/ov/operatie.js in het proces, met de pas als losse parameter. |
 | `ov-operatie.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov-regie.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov-verzuim.test.js` | 2 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1823,6 +1829,7 @@ toets omvalt.
 | `rolproef.test.js` | 28 | gezakt op `===->!==#0` | DE ROL-SCHEIDING (scripts/lib/rolproef.js) -- de proef die vraagt of een INGELOGDE met de verkeerde rol binnenkomt, en of de weigering iets lekt. WAAROM DEZE TOETS ER IS. |
 | `rolproeffixtures-http.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rolproeffixtures.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rolronde-fixtures.test.js` | 8 | -- | Lifestyle blijft een werkelijk toegekende pas, geen bredere statuscode-regel. Deze tegenproeven bewaken dezelfde input, twee geldige accounts en fail-closed herstel. |
 | `rolronde.test.js` | 9 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `romeproef.test.js` | 8 | gezakt op `&&->||#0` | DE ROMEPROEF -- het instrument en zijn register. scripts/romeproef.js loopt de Rome-keten over LivingOS, WorkOS, TravelOS, het geld en de universele bodem van FoundationOS, tegen een wegwerpserver. |
 | `ronde.test.js` | 11 | gezakt op `===->!==#0` | DE COMMERCIELE RONDE: het werk dat wel gebouwd was en nooit werd gedaan. Vier dingen stonden klaar en werden door niemand aangeroepen. |
@@ -2068,6 +2075,7 @@ toets omvalt.
 | `sloophamer.pg.test.js` | 1 | slaat zichzelf over | De "sloophamer": de chaos-intentie van een aangeleverde test, maar dan tegen de ECHTE architectuur van dit platform (twee kind-processen op een gedeelde Postgres + Redis, echte HTTP-endpoints), niet tegen een... |
 | `smtp-in.test.js` | 16 | gezakt op `liegpoort /api/` | De SMTP-ONTVANGER: post van buiten aannemen. Wat hier bewezen wordt, en waarom juist dit: geen relay een RCPT TO naar een adres dat hier geen postvak is, krijgt 550 -- en wel VOOR de inhoud. |
 | `smtp.test.js` | 9 | gezakt op `===->!==#0` | Eigen SMTP-verzendclient (server/smtp.js), die nodemailer verving. We draaien tegen een nep-SMTP-server (net/tls) en controleren de protocolstappen en de MIME-opmaak: EHLO -> MAIL/RCPT/DATA, base64-body die terug... |
+| `snapisolatie.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `snaps-herhaal.test.js` | 1 | gezakt op `liegpoort /api/` | Een snap met een herhaalsleutel gaat een keer weg, ook bij twee gelijktijdige tikken en na een crash (19 oktober 2026). De voltooiproef van os:snaps zag dezelfde tik na een crash twee snaps bij de vriend leggen. |
 | `snaps-routes.test.js` | 2 | gezakt op `liegpoort /api/` | SNAPS EN VERHALEN AAN DE RTG-LEDENKANT: /api/member/snaps, /api/member/snap/view, /api/member/story/view en /api/member/snap/opdracht. test/foundation.test.js loopt dezelfde kern af via de gezinskant... |
 | `sni.test.js` | 5 | geen bruikbare mutatie | SNI ALLEEN BIJ EEN NAAM. WAAROM DEZE TOETS BESTAAT, en dat is de les. |
@@ -2196,6 +2204,7 @@ toets omvalt.
 | `stripe-eigen.test.js` | 4 | gezakt op `===->!==#0` | De eigen Stripe-client (server/stripe.js) i.p.v. het pakket 'stripe'. |
 | `stroom-client.test.js` | 4 | geen module gevonden | RTGStroom (public/shared/stroom.js) zonder browser: de ruil, het herverbinden met een VERS ticket, en het stoppen als de sessie zelf weg is. Een EventSource verbindt na een storing vanzelf opnieuw met HETZELFDE adres. |
 | `stroom-rolscheiding.test.js` | 3 | gezakt op `liegpoort /api/` | DE ROLSCHEIDING VAN HET STROOMLOKET (server/opzet/stroomtoegang.js). POST /api/stroom/ticket is EEN loket voor drie soorten stromen (lid, zaak, kantoor), en elke soort toetst zelf of de sessie de hare is. |
+| `stroomisolatie.test.js` | 8 | -- | Stroomisolatie accepteert alleen beide positieve eigen eventreeksen en expliciete weigering; een groen label, 500 of verkeerde methode bewijst niets. |
 | `stroomticket-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | HET STROOMTICKET TAK VOOR TAK (server/kern/stroomticket.js). Aanvulling op test/stroomticket.test.js. |
 | `stroomticket.test.js` | 8 | gezakt op `===->!==#0` | Het gedeelde stroomticket (server/kern/stroomticket.js), regel voor regel: 128 bits en alleen de hash, kort en eenmalig, binding aan het onderwerp, het plafond (weigeren of de oudste verdringen), de hercontrole bij... |
 | `studio.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau van de kantoren (automotive, jachten, luchtvaart, helikopters). Een AI tekent het concept uit (silhouet, aandrijving, materialen, gedempt palet, uitrusting,... |

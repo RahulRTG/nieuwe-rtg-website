@@ -73,19 +73,7 @@ function schoonGroep(v) { return GROEPEN.includes(v) ? v : null; }
 // privezaken van het gezin (geld, mentale steun, dromen, cv, reisaanvraag).
 const isGast = p => p && p.rol === 'gast';
 const KLEUREN = ['#C9A24B', '#5FA56A', '#6AA6C9', '#B4574E', '#B07AC0', '#D08A3E'];
-const scryptAsync = (pin, salt, len) => new Promise((resolve, reject) =>
-  crypto.scrypt(String(pin), salt, len, (err, key) => err ? reject(err) : resolve(key)));
-async function hashPin(pin) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  return { salt, hash: (await scryptAsync(pin, salt, 32)).toString('hex') };
-}
-async function checkPin(rec, pin) {
-  if (!rec || !rec.hash) return false;
-  let h; try { h = await scryptAsync(pin, rec.salt, 32); } catch (e) { return false; }
-  const b = Buffer.from(rec.hash, 'hex');
-  return h.length === b.length && crypto.timingSafeEqual(h, b);
-}
-const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
+const { hashPin, checkPin, geldigePin } = require('./gezinspin')({ crypto });
 function schoonAvatar(v) {
   const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim();
   if (!s) return 'ster';

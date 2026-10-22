@@ -16,18 +16,18 @@
    is precies wat hij in de feed zou zien -- inclusief wat er NIET in staat. */
 'use strict';
 
-module.exports = ({ db, lijsten, beeld }) => {
+module.exports = ({ eigen, lijsten, beeld }) => {
   const opDatum = (a, b) => String(b.at).localeCompare(String(a.at));
 
   const clipsVan = (makerKey, kijkerKey) => {
     lijsten();
-    return db.data.clips.filter(c => c.key === makerKey).sort(opDatum).map(c => beeld(c, kijkerKey));
+    return eigen.kijk('clips').filter(c => c.key === makerKey).sort(opDatum).map(c => beeld(c, kijkerKey));
   };
   const clipsMetTrack = (trackId, kijkerKey) => {
     lijsten();
     const t = String(trackId || '');
     if (!t) return [];
-    return db.data.clips.filter(c => c.muziek && c.muziek.id === t).sort(opDatum).map(c => beeld(c, kijkerKey));
+    return eigen.kijk('clips').filter(c => c.muziek && c.muziek.id === t).sort(opDatum).map(c => beeld(c, kijkerKey));
   };
   /* De SLEUTELS van wie deze maker volgt, niet een getal. Het makersbord wil
      tellen en de meldingslaag wil ze een voor een wekken; als dit een getal
@@ -35,8 +35,8 @@ module.exports = ({ db, lijsten, beeld }) => {
      elkaar gaan lopen (LAT.md regel 4). Tellen doet de beller maar. */
   const clipsVolgersVan = (makerKey) => {
     lijsten();
-    return Object.keys(db.data.clipsVolg)
-      .filter(k => (db.data.clipsVolg[k] || []).includes(makerKey));
+    return Object.keys(eigen.kijk('clipsVolg'))
+      .filter(k => (eigen.kijk('clipsVolg')[k] || []).includes(makerKey));
   };
 
   return { clipsVan, clipsMetTrack, clipsVolgersVan };

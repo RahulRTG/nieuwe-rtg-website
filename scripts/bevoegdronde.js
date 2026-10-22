@@ -126,6 +126,10 @@ function beoordeelIdorRij(rij = {}, { methode = rij.routeMethode || rij.methode,
     if (rij.pad !== pad) return { stand: 'open', reden: 'stroomproef hoort bij een andere route' };
     return require('./lib/stroomisolatie').oordeel(rij);
   }
+  if (rij.gang === 'snapisolatie') {
+    if (rij.pad !== pad) return { stand: 'open', reden: 'snapbewijs hoort bij een andere route' };
+    return require('./lib/snapisolatie-oordeel').oordeel(rij);
+  }
   if (rij.gang === 'verificatie-opslag') {
     if (rij.pad !== pad) return { stand: 'open', reden: 'opslagbewijs hoort bij een andere route' };
     return require('./lib/verificatie-isolatie').oordeel(rij);

@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-10-21T23:07:47.553Z",
-  "commit": "20a1a639fd",
-  "boomVuil": false,
-  "boomAnders": 3,
+  "op": "2026-10-22T23:41:02.916Z",
+  "commit": "f79f081b56",
+  "boomVuil": true,
+  "boomAnders": 7,
   "instrument": "scripts/handlerwacht.js",
   "node": "v26.12.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 654,
-  "bewaakt": 568,
+  "zonderBewakerslaag": 651,
+  "bewaakt": 565,
   "openbaarMetReden": 43,
   "eigenControle": 26,
   "sleutelDoorgegeven": 10,
@@ -71,11 +71,11 @@
    "aantal": 37
   },
   {
-   "naam": "rtfSociaal",
-   "aantal": 28
+   "naam": "profiel",
+   "aantal": 25
   },
   {
-   "naam": "profiel",
+   "naam": "rtfSociaal",
    "aantal": 25
   },
   {
@@ -1532,7 +1532,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/sollicitaties",
-   "bestand": "server/foundation/sollicitaties.js:34",
+   "bestand": "server/foundation/sollicitaties.js:36",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -3453,24 +3453,6 @@
    "wacht": "rtf.verifieerProfiel"
   },
   {
-   "sleutel": "POST /api/rtf/onboarding/opslaan",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:20",
-   "staat": "bewaakt",
-   "wacht": "rtfSociaal"
-  },
-  {
-   "sleutel": "POST /api/rtf/onboarding/status",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:16",
-   "staat": "bewaakt",
-   "wacht": "rtfSociaal"
-  },
-  {
-   "sleutel": "POST /api/rtf/onboarding/teken",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:24",
-   "staat": "bewaakt",
-   "wacht": "rtfSociaal"
-  },
-  {
    "sleutel": "POST /api/rtf/rahul",
    "bestand": "server/routes/rtfschool.js:140",
    "staat": "bewaakt",
@@ -3568,37 +3550,37 @@
   },
   {
    "sleutel": "POST /api/rtf/social/connect",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:37",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:46",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/connections",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:70",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:79",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/dm",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:93",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:102",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/dm/send",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:99",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:108",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/find",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:32",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:41",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/goedkeuren",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:105",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:114",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
@@ -3640,13 +3622,13 @@
   },
   {
    "sleutel": "POST /api/rtf/social/opdracht",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:131",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:140",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/oudervoeg",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:46",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:55",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
@@ -3658,43 +3640,43 @@
   },
   {
    "sleutel": "POST /api/rtf/social/respond",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:64",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:73",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/snap/send",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:112",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:121",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/snap/view",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:119",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:128",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/snaps",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:118",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:127",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/stories",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:132",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:141",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/story/post",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:125",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:134",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/story/view",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:133",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:142",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
@@ -4196,7 +4178,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1317",
+   "bestand": "server/server.js:1318",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

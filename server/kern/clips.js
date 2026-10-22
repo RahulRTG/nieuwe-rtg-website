@@ -144,7 +144,7 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
      eigen muziekstuk als geluid dragen, hoeveel volgers een maker heeft)
      staan in ./clips-lezers.js -- een eigen onderwerp, en dit bestand blijft
      er onder de omvangregel van de keuring mee. */
-  const lezers = require('./clips-lezers')({ db, lijsten, beeld });
+  const lezers = require('./clips-lezers')({ eigen, lijsten, beeld });
 
   /* ---- reacties en melden (op codenaam, begrensd) ---- */
   function reactie(key, cid, tekst) {

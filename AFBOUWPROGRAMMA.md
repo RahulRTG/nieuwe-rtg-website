@@ -1342,3 +1342,39 @@ Log /tmp/rtg-r3-norm-e1544ee-local.log. De eerste sandboxpoging kon geen
 routekaart meten en telt niet als normuitkomst. De extra serveromvang zit
 in foundation/gezinshulp.js (10360 bytes); geen commentaarstrip of normverlaging
 om deze bevinding weg te rekenen. Platformstatus blijft ORANJE.
+
+### Deep Green — eigenaarsgrenzen en Snaps-bewijs (23 oktober)
+
+Drie directe opslagtoegangen in Clips/festival lopen via de bestaande
+collectie-eigenaar: deurenmeting 467 naar 464, norm 464. Bestaande
+collectietransacties blijven intact. De nieuwe interne festivallezer wordt
+expliciet buiten de publieke kern-API gehouden. Media/festivalregressies
+88/88; extra publieke-grenscontrole en festivalreeks 59/59. Corruptieweigering
+van de losse Clips-lezer is geen nieuwe claim over de initialiserende fabriek.
+PIN-hulpfuncties zijn inhoudelijk ongewijzigd uit gezinshulp naar gezinspin
+verplaatst (10360 naar 9782 bytes), met dezelfde publieke exports en bestaande
+hashcompatibiliteit. Pure compatibiliteitsproeven 23/23; gezins- en
+bevoegdheidsregressies 25/25. Onafhankelijke review vond na API-correctie geen
+blocker. Logs: /tmp/rtg-r3-owner-regression-local.log,
+/tmp/rtg-r3-festival-boundary.log, /tmp/rtg-gezinspin-extract.log,
+/tmp/rtg-r3-family-snaps-regression.log.
+
+Snaps heeft een echte geïsoleerde HTTP/SQLite-proef met twee bevriende
+accounts, een derde account en anonieme verzoeken. Positieve eigen controles,
+verschillende foto-inhoud, volledige antwoordvorm, persistent snap/media-
+verloop, sessie-identiteit en eenmalig openen worden gecontroleerd. Bestaand
+negatief IDOR-bewijs wordt niet overschreven. Review vond aanvankelijk gaten
+in payloadcontrole, verschillende fotofixtures en samenvoegen; die zijn
+hersteld met tegenproeven. Herbeoordeling akkoord binnen deze beperkte scope;
+18/18 gerichte proeven slagen (/tmp/rtg-r3-snaps-reviewed.log). Dit is geen
+PostgreSQL-, crash- of productievrijgavebewijs. Appstatus volgt pas uit een
+actuele geïntegreerde hermeting; geen handmatige groenverklaring.
+
+De drie nieuwe tests zijn via de bestaande mutatiemotor op ingebouwde fouten
+gezakt en dus aantoonbaar gevoelig. Bron is daarna hersteld, motor exit 0.
+Log /tmp/rtg-r3-new-mutations.log. Dit bewijst niet dat iedere mogelijke fout
+wordt ontdekt. Taalhermeting 27/27 geslaagd, expliciete beperkingen voor 114
+talen behouden. CI op f79f081b56 faalde in preflight op verouderde afgeleide
+artefacten; de betreffende generators zijn opnieuw uitgevoerd, niet de
+kwaliteitsdrempels aangepast. Logs /tmp/rtg-r3-ci-f79-failed.log,
+/tmp/rtg-r3-refresh-local.log en /tmp/rtg-r3-language-refresh.log.

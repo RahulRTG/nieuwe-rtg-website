@@ -74,6 +74,9 @@ module.exports = (ctx) => {
 
   const eigen = require('../eigencollectie')({ db, domein: 'kern/festival/model', bezit: { festivals: 'kaart' } });
   const bak = () => eigen.bak('festivals');
+  // Lezers en transactiefallbacks delen de vormcontrole van deze eigenaar.
+  // Een ontbrekende collectie blijft afwezig; een corrupte kaart wordt geweigerd.
+  const festivalCollectieLezen = () => eigen.kijk('festivals');
 
   const festivalVind = (fid) => bak()[String(fid || '')] || null;
 
@@ -179,7 +182,7 @@ module.exports = (ctx) => {
      eigenaar iets betekent (routes/festival.js, mijn()). */
   const festivalAlle = () => Object.values(bak());
 
-  return { festivalNieuw, festivalVind, festivalAlle, editieNieuw, editieVind, dagZet, dagVind,
+  return { festivalCollectieLezen, festivalNieuw, festivalVind, festivalAlle, editieNieuw, editieVind, dagZet, dagVind,
     dagOpMoment, offset, momentOffset, duurVan, publiekFestival: publiek, HHMM };
 };
 

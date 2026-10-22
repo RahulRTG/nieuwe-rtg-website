@@ -1287,7 +1287,7 @@
       },
       "bewijs": {
         "beschikbaarheid": "ticketsVoorSlot",
-        "bevestig": "bewaarLogboek",
+        "bevestig": "logboekVoor",
         "lever": "bezorgtNu"
       },
       "telt": 3

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-21T19:32:13.777Z",
-  "commit": "521fdbdac2",
+  "op": "2026-10-22T06:46:20.294Z",
+  "commit": "cf23dacd2e",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/idorproef.js",
   "node": "v26.12.0"
  },
@@ -15,20 +15,20 @@
   "doorbraak": 0,
   "nagekeken": 59,
   "publiek": 536,
-  "onbereikbaar": 901,
+  "onbereikbaar": 900,
   "lek": 0,
-  "afgebakend": 10,
+  "afgebakend": 11,
   "poolDomeinen": 158,
   "poolVelden": 922,
   "werkplek": {
    "routes": 84,
-   "gescheiden": 56,
+   "gescheiden": 55,
    "doorbraak": 0,
-   "onbereikbaar": 28,
+   "onbereikbaar": 29,
    "herwonnen": 24,
    "pool": {
     "domeinen": 9,
-    "velden": 59
+    "velden": 57
    }
   },
   "sessieHernieuwd": 6,
@@ -128,11 +128,11 @@
   },
   "afbakening": {
    "routes": 733,
-   "afgebakend": 10,
+   "afgebakend": 11,
    "gescheiden": 0,
    "doorbraak": 0,
    "nagekeken": 1,
-   "onbereikbaar": 722
+   "onbereikbaar": 721
   },
   "opbouw": {
    "stappen": 76,
@@ -143,8 +143,8 @@
    ]
   },
   "merktekens": {
-   "vanA": 354,
-   "controle": 291
+   "vanA": 356,
+   "controle": 292
   }
  },
  "doorbraken": [],
@@ -1894,7 +1894,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrke167668457"
+    "mrk867ca33a2b"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -1907,7 +1907,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrke167668457"
+    "mrk867ca33a2b"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2519,8 +2519,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Saffieren Ooievaar D0FB",
-    "mrke167668457"
+    "Zilveren Valk 02EE",
+    "mrk867ca33a2b"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2533,8 +2533,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Saffieren Ooievaar D0FB",
-    "mrke167668457"
+    "Zilveren Valk 02EE",
+    "mrk867ca33a2b"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -4545,7 +4545,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Saffieren Ooievaar D0FB"
+    "Zilveren Valk 02EE"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -6559,8 +6559,8 @@
    "staat": "afgebakend",
    "merken": 7,
    "voorbeeld": [
-    "mrke167668457",
-    "agfdd3013c"
+    "mrk867ca33a2b",
+    "ag8cfc1429"
    ],
    "reden": "A kreeg 200 met 7 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -7501,7 +7501,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Saffieren Ooievaar D0FB"
+    "Zilveren Valk 02EE"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -9681,7 +9681,7 @@
     "kamerid"
    ],
    "gezien": [
-    "Marmeren Valk 2819"
+    "Marmeren Valk 1E17"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een kamercode werkt als een vergaderlink: wie hem heeft mag binnen, en een BESLOTEN kamer weigert alsnog (magErin). B komt binnen als B, met zijn eigen codenaam"
   },
@@ -29769,7 +29769,7 @@
     "postid"
    ],
    "gezien": [
-    "Marmeren Valk 2819"
+    "Marmeren Valk 1E17"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin"
   },
@@ -45803,7 +45803,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar D0FB"
+    "Zilveren Valk 02EE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C's profiel schreef, met A's codenaam als schrijver"
   },
@@ -45909,7 +45909,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar D0FB"
+    "Zilveren Valk 02EE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: kern/metier/zoek.js: \"wie niets invulde, staat niet in de etalage\" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw"
   },
@@ -47379,8 +47379,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "mrke167668457",
-    "Contact-mrke167668457"
+    "mrk867ca33a2b",
+    "Contact-mrk867ca33a2b"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -51989,7 +51989,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar D0FB"
+    "Zilveren Valk 02EE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf"
   },
@@ -52024,7 +52024,7 @@
     "id"
    ],
    "gezien": [
-    "Saffieren Ooievaar D0FB"
+    "Zilveren Valk 02EE"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven"
   },
@@ -54134,19 +54134,410 @@
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/verify/selfie": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein",
-   "afbakening": "A's eigen antwoord draagt niets dat alleen van A is: B's antwoord kan hier niets over A zeggen"
+   "gang": "verificatie-opslag",
+   "bewijsVersie": 1,
+   "methode": "POST",
+   "pad": "/api/verify/selfie",
+   "proef": {
+    "actorA": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+    "actorB": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+    "eigen": [
+     {
+      "actor": "a",
+      "methode": "POST",
+      "pad": "/api/verify/selfie",
+      "status": 200,
+      "voor": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      }
+     },
+     {
+      "actor": "b",
+      "methode": "POST",
+      "pad": "/api/verify/selfie",
+      "status": 200,
+      "voor": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "63089579eb0e084e9da9079cf6e77156634a6a5928f930343125632487110865",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      }
+     }
+    ],
+    "rollen": [
+     {
+      "rol": "supplier",
+      "methode": "POST",
+      "pad": "/api/verify/selfie",
+      "status": 401,
+      "voor": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "4a4d34b3b80e8557ac1a3b961e180e2bbf5bac67756ef22f678cda1d7774b086",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "4a4d34b3b80e8557ac1a3b961e180e2bbf5bac67756ef22f678cda1d7774b086",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": 200,
+      "eigenNa": 200,
+      "lek": null
+     },
+     {
+      "rol": "office",
+      "methode": "POST",
+      "pad": "/api/verify/selfie",
+      "status": 401,
+      "voor": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "4a4d34b3b80e8557ac1a3b961e180e2bbf5bac67756ef22f678cda1d7774b086",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "4a4d34b3b80e8557ac1a3b961e180e2bbf5bac67756ef22f678cda1d7774b086",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": 200,
+      "eigenNa": 200,
+      "lek": null
+     },
+     {
+      "rol": "anoniem",
+      "methode": "POST",
+      "pad": "/api/verify/selfie",
+      "status": 401,
+      "voor": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "4a4d34b3b80e8557ac1a3b961e180e2bbf5bac67756ef22f678cda1d7774b086",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+       "b": "4a4d34b3b80e8557ac1a3b961e180e2bbf5bac67756ef22f678cda1d7774b086",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": null,
+      "eigenNa": null,
+      "lek": null
+     }
+    ],
+    "sessies": [
+     {
+      "actor": "a",
+      "voor": 200,
+      "na": 200
+     },
+     {
+      "actor": "b",
+      "voor": 200,
+      "na": 200
+     }
+    ],
+    "kruis": {
+     "methode": "POST",
+     "pad": "/api/verify/selfie",
+     "status": 200,
+     "voor": {
+      "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+      "b": "63089579eb0e084e9da9079cf6e77156634a6a5928f930343125632487110865",
+      "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+     },
+     "na": {
+      "a": "eacd3fb4b58f7e5e8285b3b3195b14363f4b4fa9bbaf45c62ebed4aefa15e610",
+      "b": "4a4d34b3b80e8557ac1a3b961e180e2bbf5bac67756ef22f678cda1d7774b086",
+      "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+     },
+     "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+     "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25"
+    }
+   },
+   "staat": "opslaggescheiden",
+   "reden": "drie expliciete verificatieroutes: eigen handelingen, sessiegebonden opslagisolatie en geweigerde rollen; geen inhoudelijke documentkeuring"
   },
   "POST /api/verify/status": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein",
-   "afbakening": "A's eigen antwoord draagt niets dat alleen van A is: B's antwoord kan hier niets over A zeggen"
+   "gang": "verificatie-opslag",
+   "bewijsVersie": 1,
+   "methode": "POST",
+   "pad": "/api/verify/status",
+   "proef": {
+    "actorA": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+    "actorB": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+    "eigen": [
+     {
+      "actor": "a",
+      "methode": "POST",
+      "pad": "/api/verify/status",
+      "status": 200,
+      "voor": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      }
+     },
+     {
+      "actor": "b",
+      "methode": "POST",
+      "pad": "/api/verify/status",
+      "status": 200,
+      "voor": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      }
+     }
+    ],
+    "rollen": [
+     {
+      "rol": "supplier",
+      "methode": "POST",
+      "pad": "/api/verify/status",
+      "status": 401,
+      "voor": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": 200,
+      "eigenNa": 200,
+      "lek": null
+     },
+     {
+      "rol": "office",
+      "methode": "POST",
+      "pad": "/api/verify/status",
+      "status": 401,
+      "voor": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": 200,
+      "eigenNa": 200,
+      "lek": null
+     },
+     {
+      "rol": "anoniem",
+      "methode": "POST",
+      "pad": "/api/verify/status",
+      "status": 401,
+      "voor": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": null,
+      "eigenNa": null,
+      "lek": null
+     }
+    ],
+    "sessies": [
+     {
+      "actor": "a",
+      "voor": 200,
+      "na": 200
+     },
+     {
+      "actor": "b",
+      "voor": 200,
+      "na": 200
+     }
+    ],
+    "statusA": "pending",
+    "statusB": "unverified",
+    "kruis": {
+     "methode": "POST",
+     "pad": "/api/verify/status",
+     "status": 200,
+     "voor": {
+      "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+      "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+      "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+     },
+     "na": {
+      "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+      "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+      "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+     },
+     "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+     "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+     "antwoordStatus": "unverified"
+    }
+   },
+   "staat": "opslaggescheiden",
+   "reden": "drie expliciete verificatieroutes: eigen handelingen, sessiegebonden opslagisolatie en geweigerde rollen; geen inhoudelijke documentkeuring"
   },
   "POST /api/verify/upload": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein",
-   "afbakening": "A's eigen antwoord draagt niets dat alleen van A is: B's antwoord kan hier niets over A zeggen"
+   "gang": "verificatie-opslag",
+   "bewijsVersie": 1,
+   "methode": "POST",
+   "pad": "/api/verify/upload",
+   "proef": {
+    "actorA": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+    "actorB": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+    "eigen": [
+     {
+      "actor": "a",
+      "methode": "POST",
+      "pad": "/api/verify/upload",
+      "status": 200,
+      "voor": {
+       "a": "69c2c3b89b0965316b88c2c64538ad799f244043d6242e1d42b7d0149b752f02",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      }
+     },
+     {
+      "actor": "b",
+      "methode": "POST",
+      "pad": "/api/verify/upload",
+      "status": 200,
+      "voor": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "cf0b8c96c731070d9bb83403bae354fb2f6b80faaedea2e4a5ff89772507b4d7",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "92c210aef7f82c2772ea95dd6f50df3f3f7cfec49f7e149d18e6912706fa614c",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      }
+     }
+    ],
+    "rollen": [
+     {
+      "rol": "supplier",
+      "methode": "POST",
+      "pad": "/api/verify/upload",
+      "status": 401,
+      "voor": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": 200,
+      "eigenNa": 200,
+      "lek": null
+     },
+     {
+      "rol": "office",
+      "methode": "POST",
+      "pad": "/api/verify/upload",
+      "status": 401,
+      "voor": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": 200,
+      "eigenNa": 200,
+      "lek": null
+     },
+     {
+      "rol": "anoniem",
+      "methode": "POST",
+      "pad": "/api/verify/upload",
+      "status": 401,
+      "voor": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "na": {
+       "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+       "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+       "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+      },
+      "eigenVoor": null,
+      "eigenNa": null,
+      "lek": null
+     }
+    ],
+    "sessies": [
+     {
+      "actor": "a",
+      "voor": 200,
+      "na": 200
+     },
+     {
+      "actor": "b",
+      "voor": 200,
+      "na": 200
+     }
+    ],
+    "kruis": {
+     "methode": "POST",
+     "pad": "/api/verify/upload",
+     "status": 200,
+     "voor": {
+      "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+      "b": "92c210aef7f82c2772ea95dd6f50df3f3f7cfec49f7e149d18e6912706fa614c",
+      "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+     },
+     "na": {
+      "a": "328a41f62cc081150b4a7752abe0f497d1c1e0d339d1fb8687a04c155ce2921f",
+      "b": "8adb20b1d26af495a5206080a6c74933a901f0c6693f994d1f1fffb80135a4b1",
+      "overig": "b4ef9361b22a2fcc7d80a708d620346f978f19af44a444254dccd07f1ac667e1"
+     },
+     "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+     "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+     "antwoordStatus": "pending"
+    }
+   },
+   "staat": "opslaggescheiden",
+   "reden": "drie expliciete verificatieroutes: eigen handelingen, sessiegebonden opslagisolatie en geweigerde rollen; geen inhoudelijke documentkeuring"
   },
   "POST /api/verkoop/inruil": {
    "methode": "POST",
@@ -55131,9 +55522,17 @@
    "afbakening": "A kreeg zelf 403: er is geen open deur om tegen te ijken"
   },
   "POST /api/zegel/maak": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein",
-   "afbakening": "A's eigen antwoord draagt niets dat alleen van A is: B's antwoord kan hier niets over A zeggen"
+   "methode": "POST",
+   "status": 200,
+   "statusA": 200,
+   "gang": "afbakening",
+   "staat": "afgebakend",
+   "merken": 1,
+   "voorbeeld": [
+    "pw_Mujb36r-wCb5St7P"
+   ],
+   "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
+   "velden": []
   },
   "POST /api/zorgprofiel": {
    "staat": "onbereikbaar",
@@ -62679,7 +63078,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Saffieren Ooievaar D0FB"
+    "Zilveren Valk 02EE"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -64025,10 +64424,9 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/taak": {
-   "status": 403,
-   "staat": "gescheiden",
-   "bedrijf": "rtg",
-   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
+   "staat": "onbereikbaar",
+   "status": 400,
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (400), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/taak-zet": {
    "staat": "onbereikbaar",

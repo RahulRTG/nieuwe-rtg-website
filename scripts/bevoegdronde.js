@@ -53,7 +53,8 @@ const crypto = require('crypto');
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'BEVOEGD.json');
 const { stempel, versheid } = require('./lib/stempel');
-const { ingangRoutes } = require('./lib/bewijsbron');
+const { ingangVan } = require('./lib/bewijsbron');
+const { CONTRACT } = require('./lib/appcontract');
 const { beoordeelRolrij } = require('./lib/rolproef');
 
 const GRENS_LID = 'samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als ' +
@@ -181,9 +182,16 @@ function padOordeel(pad, reg) {
   return { stand: 'gemeten' };
 }
 
-function ledenOordeel(rij, reg, { schermroutes, lees } = {}) {
+function ledenOordeel(rij, reg, { schermroutes, lees, contract = CONTRACT } = {}) {
   if (reg.vervallen.length) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + reg.vervallen.join('; ') };
-  const ing = ingangRoutes(rij.ingang, { schermroutes, lees });
+  /* Gebruik hetzelfde expliciete appcontract als APPWERKT. Interne tabs en
+     OS-standen hebben geen eigen URL, maar wel een echte ingang, navigatiestap
+     en afgebakende bronbestanden. De brede paginaresolver verloor die context
+     en schreef daardoor alle routes van /apps/app.html aan iedere stand toe --
+     of verklaarde de stand helemaal onmeetbaar. `ingangVan` valideert voor een
+     gewoon scherm bovendien dat een contractdeel werkelijk door dat scherm
+     geladen wordt; de bevoegdheidsnorm per gevonden route blijft gelijk. */
+  const ing = ingangVan(rij.ingang, contract && contract[rij.functie], { schermroutes, lees });
   if (!ing) return { status: 'NIET_GETEST', reden: 'geen eigen adres: een stand of kiezer binnen de ledenapp' };
   const paden = [...ing.exact];
   /* Een voorvoegsel is een pad dat het scherm zelf aan elkaar plakt. Het telt

@@ -156,6 +156,25 @@ test('1. een ledenscherm is alleen BEWEZEN als elke route gemeten is', () => {
   assert.equal(oordeel(reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {})).status, 'NIET_GETEST');
 });
 
+test('1a. een interne tab gebruikt alleen de bronbestanden uit zijn bestaande appcontract', () => {
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/app-main/tab-a.js', exact: ['/api/a/lijst'], voorvoegsels: [] },
+    { bestand: 'public/apps/app-main/tab-b.js', exact: ['/api/b/geheim'], voorvoegsels: [] }
+  ] };
+  const tab = { functie: 'tab:a', ingang: '(tab in de app, geen eigen adres)' };
+  const contract = { 'tab:a': {
+    ingang: '/apps/app.html', via: '#tab=a', bestanden: ['public/apps/app-main/tab-a.js']
+  } };
+  const uit = R.ledenOordeel(tab, reg({ '/api/a/lijst': [idormeting('GET')] }, {}),
+    { schermroutes, lees: () => null, contract });
+  assert.equal(uit.status, 'BEWEZEN');
+  assert.equal(uit.routes, 1, 'een buurstand uit dezelfde schil telt niet mee');
+
+  const zonderContract = R.ledenOordeel(tab, reg({ '/api/a/lijst': [idormeting('GET')] }, {}),
+    { schermroutes, lees: () => null, contract: {} });
+  assert.equal(zonderContract.status, 'NIET_GETEST', 'geen verzonnen ingang zonder expliciet contract');
+});
+
 test('1b. de zaak-gang van IDOR.json telt mee, en een doorbraak daar is een defect', () => {
   const lees = (perRoute, zaakPerRoute) => (f) => (f === 'IDOR.json' ? JSON.stringify({ stempel: {}, perRoute, zaakPerRoute })
     : f === 'ROLPROEF.json' ? JSON.stringify({ stempel: {}, perRoute: [] }) : null);

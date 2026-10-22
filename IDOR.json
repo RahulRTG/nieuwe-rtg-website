@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-22T22:59:53.032Z",
-  "commit": "f3e630f421",
+  "op": "2026-10-22T23:42:58.878Z",
+  "commit": "b0733baac0",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/idorproef.js",
@@ -175,7 +175,7 @@
   },
   "merktekens": {
    "vanA": 355,
-   "controle": 291
+   "controle": 290
   }
  },
  "doorbraken": [],
@@ -1925,7 +1925,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkc3a912a626"
+    "mrkc1f0200fec"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -1938,7 +1938,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkc3a912a626"
+    "mrkc1f0200fec"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2550,8 +2550,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Nachtorchidee 1799",
-    "mrkc3a912a626"
+    "Witte Reiger 00BA",
+    "mrkc1f0200fec"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2564,8 +2564,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Nachtorchidee 1799",
-    "mrkc3a912a626"
+    "Witte Reiger 00BA",
+    "mrkc1f0200fec"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -4576,7 +4576,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Nachtorchidee 1799"
+    "Witte Reiger 00BA"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -6590,8 +6590,8 @@
    "staat": "afgebakend",
    "merken": 7,
    "voorbeeld": [
-    "mrkc3a912a626",
-    "aga2cdc052"
+    "mrkc1f0200fec",
+    "ag96bec185"
    ],
    "reden": "A kreeg 200 met 7 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -7532,7 +7532,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Nachtorchidee 1799"
+    "Witte Reiger 00BA"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -9712,7 +9712,7 @@
     "kamerid"
    ],
    "gezien": [
-    "Noordelijke Ster 631A"
+    "Nachtorchidee 3132"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een kamercode werkt als een vergaderlink: wie hem heeft mag binnen, en een BESLOTEN kamer weigert alsnog (magErin). B komt binnen als B, met zijn eigen codenaam"
   },
@@ -29800,7 +29800,7 @@
     "postid"
    ],
    "gezien": [
-    "Noordelijke Ster 631A"
+    "Nachtorchidee 3132"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin"
   },
@@ -42417,351 +42417,2788 @@
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/member/snap/send": {
+   "gang": "snapisolatie",
+   "bewijsVersie": 1,
    "methode": "POST",
-   "status": 403,
-   "staat": "gescheiden",
-   "reden": "B kreeg 403: het object is niet van B",
-   "lek": false,
-   "velden": [
-    "id",
-    "bundel",
-    "bundelid",
-    "kanal",
-    "kanalid",
-    "categorie",
-    "categorieid",
-    "project",
-    "projectid",
-    "schrijfsel",
-    "schrijfselid",
-    "dimensie",
-    "dimensieid",
-    "kantor",
-    "kantorid",
-    "schok",
-    "schokid",
-    "bedrijv",
-    "bedrijvid",
-    "laatste",
-    "laatsteid",
-    "indicator",
-    "indicatorid",
-    "analyse",
-    "analyseid",
-    "rubric",
-    "rubricid",
-    "komend",
-    "komendid",
-    "recent",
-    "recentid",
-    "startpositie",
-    "startpositieid",
-    "niveau",
-    "niveauid",
-    "wijk",
-    "wijkid",
-    "aanbod",
-    "aanbodid",
-    "rtg",
-    "rtgid",
-    "stap",
-    "stapid",
-    "stadid",
-    "functieid",
-    "dossier",
-    "dossierid",
-    "catalogu",
-    "cataloguid",
-    "sleutel",
-    "domein",
-    "domeinid",
-    "werkproces",
-    "werkprocesid",
-    "volledigewerkproces",
-    "volledigewerkprocesid",
-    "sted",
-    "stedid",
-    "futurelab",
-    "futurelabid",
-    "code",
-    "artikel",
-    "artikelid",
-    "gebeurtenis",
-    "gebeurtenisid",
-    "post",
-    "postid",
-    "concept",
-    "conceptid",
-    "bericht",
-    "berichtid",
-    "gesprek",
-    "gesprekid",
-    "sleutelid",
-    "regel",
-    "regelid",
-    "team",
-    "teamid",
-    "key",
-    "led",
-    "ledid",
-    "clubcode",
-    "wedstrijd",
-    "wedstrijdid",
-    "club",
-    "clubid",
-    "moment",
-    "momentid",
-    "vak",
-    "vakid",
-    "voorziening",
-    "voorzieningid",
-    "sponsor",
-    "sponsorid",
-    "tal",
-    "talid",
-    "vlucht",
-    "vluchtid",
-    "nummer",
-    "security",
-    "securityid",
-    "charter",
-    "charterid",
-    "venster",
-    "vensterid",
-    "item",
-    "itemid"
-   ]
+   "pad": "/api/member/snap/send",
+   "proef": {
+    "omgeving": "geisoleerde-http-sqlite",
+    "actors": [
+     "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+     "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+     "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36"
+    ],
+    "objecten": {
+     "a": {
+      "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+      "foto": "22be4728e478b75f7c44dc0b05fe8d0c5367b720dfca855e8acc22bd9997f234",
+      "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+      "media": "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+      "opslag": {
+       "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+       "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+       "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+       "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+       "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+      }
+     },
+     "b": {
+      "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+      "foto": "ab6aaff746c0746ec42757adef2546784a77fd9ef5a0d3383a6d124e07abdd38",
+      "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+      "media": "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa",
+      "opslag": {
+       "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+       "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+       "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+       "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+       "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+      }
+     }
+    },
+    "stappen": [
+     {
+      "id": "send:a",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+      "status": 200,
+      "antwoord": {
+       "ok": true
+      },
+      "voor": {
+       "snaps": [],
+       "media": []
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "send:b",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+      "status": 200,
+      "antwoord": {
+       "ok": true
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:a",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "a",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741"
+        }
+       ]
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:b",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "b",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc"
+        }
+       ]
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:c",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "c",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": []
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:send:c",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "c",
+      "doel": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+      "status": 403,
+      "antwoord": {
+       "error": "bb1a8f87f214016920cbe8ab8cf47856b707c6324972d3a70ca2e5fe4f7f3167"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:view:c",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "c",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:view:afzender",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:0",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:1",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": null,
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:2",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "view:a",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "status": 200,
+      "antwoord": {
+       "foto": "ab6aaff746c0746ec42757adef2546784a77fd9ef5a0d3383a6d124e07abdd38",
+       "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+       "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:herhaal:a",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "view:b",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 200,
+      "antwoord": {
+       "foto": "22be4728e478b75f7c44dc0b05fe8d0c5367b720dfca855e8acc22bd9997f234",
+       "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+       "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [],
+       "media": []
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:herhaal:b",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [],
+       "media": []
+      },
+      "na": {
+       "snaps": [],
+       "media": []
+      },
+      "lek": false
+     }
+    ],
+    "sessies": [
+     {
+      "actor": "a",
+      "voor": {
+       "status": 200,
+       "me": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "codenaam": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      },
+      "na": {
+       "status": 200,
+       "me": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "codenaam": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      }
+     },
+     {
+      "actor": "b",
+      "voor": {
+       "status": 200,
+       "me": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "codenaam": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      },
+      "na": {
+       "status": 200,
+       "me": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "codenaam": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      }
+     },
+     {
+      "actor": "c",
+      "voor": {
+       "status": 200,
+       "me": "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36",
+       "codenaam": "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+      },
+      "na": {
+       "status": 200,
+       "me": "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36",
+       "codenaam": "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+      }
+     }
+    ],
+    "codenamen": [
+     "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+     "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+     "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+    ]
+   },
+   "staat": "snapgescheiden",
+   "reden": "drie HTTP-snaproutes met echte vriendschap, eigen ontvangers, derde actor, anoniem, inhoud en opslag; geïsoleerde SQLite-proef, geen productie/concurrencykwalificatie"
   },
   "POST /api/member/snap/view": {
+   "gang": "snapisolatie",
+   "bewijsVersie": 1,
    "methode": "POST",
-   "status": 404,
-   "staat": "gescheiden",
-   "reden": "B kreeg 404: het object is niet van B",
-   "lek": false,
-   "velden": [
-    "id",
-    "bundel",
-    "bundelid",
-    "kanal",
-    "kanalid",
-    "categorie",
-    "categorieid",
-    "project",
-    "projectid",
-    "schrijfsel",
-    "schrijfselid",
-    "dimensie",
-    "dimensieid",
-    "kantor",
-    "kantorid",
-    "schok",
-    "schokid",
-    "bedrijv",
-    "bedrijvid",
-    "laatste",
-    "laatsteid",
-    "indicator",
-    "indicatorid",
-    "analyse",
-    "analyseid",
-    "rubric",
-    "rubricid",
-    "komend",
-    "komendid",
-    "recent",
-    "recentid",
-    "startpositie",
-    "startpositieid",
-    "niveau",
-    "niveauid",
-    "wijk",
-    "wijkid",
-    "aanbod",
-    "aanbodid",
-    "rtg",
-    "rtgid",
-    "stap",
-    "stapid",
-    "stadid",
-    "functieid",
-    "dossier",
-    "dossierid",
-    "catalogu",
-    "cataloguid",
-    "sleutel",
-    "domein",
-    "domeinid",
-    "werkproces",
-    "werkprocesid",
-    "volledigewerkproces",
-    "volledigewerkprocesid",
-    "sted",
-    "stedid",
-    "futurelab",
-    "futurelabid",
-    "code",
-    "artikel",
-    "artikelid",
-    "gebeurtenis",
-    "gebeurtenisid",
-    "post",
-    "postid",
-    "concept",
-    "conceptid",
-    "bericht",
-    "berichtid",
-    "gesprek",
-    "gesprekid",
-    "sleutelid",
-    "regel",
-    "regelid",
-    "team",
-    "teamid",
-    "key",
-    "led",
-    "ledid",
-    "clubcode",
-    "wedstrijd",
-    "wedstrijdid",
-    "club",
-    "clubid",
-    "moment",
-    "momentid",
-    "vak",
-    "vakid",
-    "voorziening",
-    "voorzieningid",
-    "sponsor",
-    "sponsorid",
-    "tal",
-    "talid",
-    "vlucht",
-    "vluchtid",
-    "nummer",
-    "security",
-    "securityid",
-    "charter",
-    "charterid",
-    "venster",
-    "vensterid",
-    "item",
-    "itemid"
-   ]
+   "pad": "/api/member/snap/view",
+   "proef": {
+    "omgeving": "geisoleerde-http-sqlite",
+    "actors": [
+     "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+     "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+     "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36"
+    ],
+    "objecten": {
+     "a": {
+      "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+      "foto": "22be4728e478b75f7c44dc0b05fe8d0c5367b720dfca855e8acc22bd9997f234",
+      "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+      "media": "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+      "opslag": {
+       "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+       "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+       "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+       "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+       "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+      }
+     },
+     "b": {
+      "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+      "foto": "ab6aaff746c0746ec42757adef2546784a77fd9ef5a0d3383a6d124e07abdd38",
+      "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+      "media": "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa",
+      "opslag": {
+       "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+       "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+       "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+       "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+       "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+      }
+     }
+    },
+    "stappen": [
+     {
+      "id": "send:a",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+      "status": 200,
+      "antwoord": {
+       "ok": true
+      },
+      "voor": {
+       "snaps": [],
+       "media": []
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "send:b",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+      "status": 200,
+      "antwoord": {
+       "ok": true
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:a",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "a",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741"
+        }
+       ]
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:b",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "b",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc"
+        }
+       ]
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:c",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "c",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": []
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:send:c",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "c",
+      "doel": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+      "status": 403,
+      "antwoord": {
+       "error": "bb1a8f87f214016920cbe8ab8cf47856b707c6324972d3a70ca2e5fe4f7f3167"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:view:c",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "c",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:view:afzender",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:0",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:1",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": null,
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:2",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "view:a",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "status": 200,
+      "antwoord": {
+       "foto": "ab6aaff746c0746ec42757adef2546784a77fd9ef5a0d3383a6d124e07abdd38",
+       "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+       "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:herhaal:a",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "view:b",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 200,
+      "antwoord": {
+       "foto": "22be4728e478b75f7c44dc0b05fe8d0c5367b720dfca855e8acc22bd9997f234",
+       "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+       "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [],
+       "media": []
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:herhaal:b",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [],
+       "media": []
+      },
+      "na": {
+       "snaps": [],
+       "media": []
+      },
+      "lek": false
+     }
+    ],
+    "sessies": [
+     {
+      "actor": "a",
+      "voor": {
+       "status": 200,
+       "me": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "codenaam": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      },
+      "na": {
+       "status": 200,
+       "me": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "codenaam": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      }
+     },
+     {
+      "actor": "b",
+      "voor": {
+       "status": 200,
+       "me": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "codenaam": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      },
+      "na": {
+       "status": 200,
+       "me": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "codenaam": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      }
+     },
+     {
+      "actor": "c",
+      "voor": {
+       "status": 200,
+       "me": "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36",
+       "codenaam": "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+      },
+      "na": {
+       "status": 200,
+       "me": "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36",
+       "codenaam": "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+      }
+     }
+    ],
+    "codenamen": [
+     "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+     "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+     "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+    ]
+   },
+   "staat": "snapgescheiden",
+   "reden": "drie HTTP-snaproutes met echte vriendschap, eigen ontvangers, derde actor, anoniem, inhoud en opslag; geïsoleerde SQLite-proef, geen productie/concurrencykwalificatie"
   },
   "POST /api/member/snaps": {
+   "gang": "snapisolatie",
+   "bewijsVersie": 1,
    "methode": "POST",
-   "status": 200,
-   "staat": "publiek",
-   "velden": [
-    "id",
-    "bundel",
-    "bundelid",
-    "kanal",
-    "kanalid",
-    "categorie",
-    "categorieid",
-    "project",
-    "projectid",
-    "schrijfsel",
-    "schrijfselid",
-    "dimensie",
-    "dimensieid",
-    "kantor",
-    "kantorid",
-    "schok",
-    "schokid",
-    "bedrijv",
-    "bedrijvid",
-    "laatste",
-    "laatsteid",
-    "indicator",
-    "indicatorid",
-    "analyse",
-    "analyseid",
-    "rubric",
-    "rubricid",
-    "komend",
-    "komendid",
-    "recent",
-    "recentid",
-    "startpositie",
-    "startpositieid",
-    "niveau",
-    "niveauid",
-    "wijk",
-    "wijkid",
-    "aanbod",
-    "aanbodid",
-    "rtg",
-    "rtgid",
-    "stap",
-    "stapid",
-    "stadid",
-    "functieid",
-    "dossier",
-    "dossierid",
-    "catalogu",
-    "cataloguid",
-    "sleutel",
-    "domein",
-    "domeinid",
-    "werkproces",
-    "werkprocesid",
-    "volledigewerkproces",
-    "volledigewerkprocesid",
-    "sted",
-    "stedid",
-    "futurelab",
-    "futurelabid",
-    "code",
-    "artikel",
-    "artikelid",
-    "gebeurtenis",
-    "gebeurtenisid",
-    "post",
-    "postid",
-    "concept",
-    "conceptid",
-    "bericht",
-    "berichtid",
-    "gesprek",
-    "gesprekid",
-    "sleutelid",
-    "regel",
-    "regelid",
-    "team",
-    "teamid",
-    "key",
-    "led",
-    "ledid",
-    "clubcode",
-    "wedstrijd",
-    "wedstrijdid",
-    "club",
-    "clubid",
-    "moment",
-    "momentid",
-    "vak",
-    "vakid",
-    "voorziening",
-    "voorzieningid",
-    "sponsor",
-    "sponsorid",
-    "tal",
-    "talid",
-    "vlucht",
-    "vluchtid",
-    "nummer",
-    "security",
-    "securityid",
-    "charter",
-    "charterid",
-    "venster",
-    "vensterid",
-    "item",
-    "itemid"
-   ],
-   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
+   "pad": "/api/member/snaps",
+   "proef": {
+    "omgeving": "geisoleerde-http-sqlite",
+    "actors": [
+     "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+     "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+     "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36"
+    ],
+    "objecten": {
+     "a": {
+      "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+      "foto": "22be4728e478b75f7c44dc0b05fe8d0c5367b720dfca855e8acc22bd9997f234",
+      "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+      "media": "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+      "opslag": {
+       "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+       "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+       "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+       "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+       "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+      }
+     },
+     "b": {
+      "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+      "foto": "ab6aaff746c0746ec42757adef2546784a77fd9ef5a0d3383a6d124e07abdd38",
+      "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+      "media": "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa",
+      "opslag": {
+       "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+       "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+       "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+       "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+       "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+      }
+     }
+    },
+    "stappen": [
+     {
+      "id": "send:a",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+      "status": 200,
+      "antwoord": {
+       "ok": true
+      },
+      "voor": {
+       "snaps": [],
+       "media": []
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "send:b",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+      "status": 200,
+      "antwoord": {
+       "ok": true
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:a",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "a",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741"
+        }
+       ]
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:b",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "b",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc"
+        }
+       ]
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "lijst:c",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "c",
+      "doel": null,
+      "status": 200,
+      "antwoord": {
+       "snaps": []
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:send:c",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "c",
+      "doel": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+      "status": 403,
+      "antwoord": {
+       "error": "bb1a8f87f214016920cbe8ab8cf47856b707c6324972d3a70ca2e5fe4f7f3167"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:view:c",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "c",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:view:afzender",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:0",
+      "pad": "/api/member/snap/send",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:1",
+      "pad": "/api/member/snaps",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": null,
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:anoniem:2",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "anoniem",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 401,
+      "antwoord": {
+       "error": "69ea74906dadc92b425460ef79818d30f3f03ef326e9ae27cabe07d3a7957846"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "view:a",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "status": 200,
+      "antwoord": {
+       "foto": "ab6aaff746c0746ec42757adef2546784a77fd9ef5a0d3383a6d124e07abdd38",
+       "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+       "van": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+         "inhoud": "06fbc7f24d0c19d10a7b934c946d54fc31df0b3e215bd6c0c60279d9c0699136",
+         "van": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "naar": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "tekst": "e5d26ace8de650788ceb53747fad623b2906f6aac3c34a734902298428727741",
+         "foto": "67dfed9e6c938943c486f9d9b36efa013b5d22857680be190d16a90deec36527",
+         "at": "9127263716b8bfea292af9dec61f14ed2c4ac426f990f475624a93f7fa2828f7"
+        },
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4",
+        "5ebca9cc525108a2aee0223010dd425a90d264528490446a7b359d8e397aeffa"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:herhaal:a",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "a",
+      "doel": "2b8e0faa5ff51cd7075271e3baa47017c48bc8ac449662c1e0e7f18cce58e6ee",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "lek": false
+     },
+     {
+      "id": "view:b",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 200,
+      "antwoord": {
+       "foto": "22be4728e478b75f7c44dc0b05fe8d0c5367b720dfca855e8acc22bd9997f234",
+       "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+       "van": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      },
+      "voor": {
+       "snaps": [
+        {
+         "id": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+         "inhoud": "03861ef9bc17962eb98af6b54776da3c50258ae44b4348a65835f1d7e19d80d1",
+         "van": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+         "naar": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+         "tekst": "51cb20410ca3407f429937e7bddd3bf600b18d7eeea1f6761d3869ac80ddc4bc",
+         "foto": "3198099ad75ec171a51a77ac3556195547b47f08ab33e6ea894c3cacbdd4db42",
+         "at": "54f5e97a19b1d28482c62c7d52f62a50ef36aa380a2a90f482d24807c7fb6601"
+        }
+       ],
+       "media": [
+        "3ef670db6fe8a7aafd44e6a7c814b7abcd789d10e4808671507c4f565d44ede4"
+       ]
+      },
+      "na": {
+       "snaps": [],
+       "media": []
+      },
+      "lek": false
+     },
+     {
+      "id": "weigering:herhaal:b",
+      "pad": "/api/member/snap/view",
+      "methode": "POST",
+      "actor": "b",
+      "doel": "9c7bca06c9ac92e05a2a5d5be78346f0017a586de7f1e1b09d99a08092ef38e7",
+      "status": 404,
+      "antwoord": {
+       "error": "617d9d3b4353ded7f4610f196a09c80b39c69057380f11f89076d7d628d8ae6f"
+      },
+      "voor": {
+       "snaps": [],
+       "media": []
+      },
+      "na": {
+       "snaps": [],
+       "media": []
+      },
+      "lek": false
+     }
+    ],
+    "sessies": [
+     {
+      "actor": "a",
+      "voor": {
+       "status": 200,
+       "me": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "codenaam": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      },
+      "na": {
+       "status": 200,
+       "me": "5d08e7295b38b57c9e0f0e6419fce3b76289467d2304922603dcfb566f11be21",
+       "codenaam": "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1"
+      }
+     },
+     {
+      "actor": "b",
+      "voor": {
+       "status": 200,
+       "me": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "codenaam": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      },
+      "na": {
+       "status": 200,
+       "me": "1a90e1d2917b968c9ac77cae19b32a67cfecff3c06f54f108f3787e457859095",
+       "codenaam": "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2"
+      }
+     },
+     {
+      "actor": "c",
+      "voor": {
+       "status": 200,
+       "me": "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36",
+       "codenaam": "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+      },
+      "na": {
+       "status": 200,
+       "me": "9a0717f1de83fba143a8d463fc5e35118ff2e79e35b899db4c3170f3b26b0b36",
+       "codenaam": "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+      }
+     }
+    ],
+    "codenamen": [
+     "73b0482ded7b5cf28509cb4c4b7efda627cce849ac51268ae3f91b6ba2340ba1",
+     "de38625bec8b800e4204432ab62083bda58bf575c5e9a2650cd6a32f21c10af2",
+     "6ff69aebda555f97bed45a7315ad6a794a5958eb59e4572a75c7d46b1805ee00"
+    ]
+   },
+   "staat": "snapgescheiden",
+   "reden": "drie HTTP-snaproutes met echte vriendschap, eigen ontvangers, derde actor, anoniem, inhoud en opslag; geïsoleerde SQLite-proef, geen productie/concurrencykwalificatie"
   },
   "POST /api/member/spel/antwoord": {
    "methode": "POST",
@@ -45834,7 +48271,7 @@
     "id"
    ],
    "gezien": [
-    "Nachtorchidee 1799"
+    "Witte Reiger 00BA"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C's profiel schreef, met A's codenaam als schrijver"
   },
@@ -45940,7 +48377,7 @@
     "id"
    ],
    "gezien": [
-    "Nachtorchidee 1799"
+    "Witte Reiger 00BA"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: kern/metier/zoek.js: \"wie niets invulde, staat niet in de etalage\" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw"
   },
@@ -47410,8 +49847,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "mrkc3a912a626",
-    "Contact-mrkc3a912a626"
+    "mrkc1f0200fec",
+    "Contact-mrkc1f0200fec"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -52020,7 +54457,7 @@
     "id"
    ],
    "gezien": [
-    "Nachtorchidee 1799"
+    "Witte Reiger 00BA"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf"
   },
@@ -52055,7 +54492,7 @@
     "id"
    ],
    "gezien": [
-    "Nachtorchidee 1799"
+    "Witte Reiger 00BA"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven"
   },
@@ -54179,14 +56616,14 @@
       "pad": "/api/verify/selfie",
       "status": 200,
       "voor": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       }
      },
      {
@@ -54195,14 +56632,14 @@
       "pad": "/api/verify/selfie",
       "status": 200,
       "voor": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "1b103d7b58c025e5863947643c7e5cb0814cfbded5a8a6f10ebac7d513b83ace",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "d03be0cfe59c8d8a8da14f973cca09a8e233a5efa56c8c21510e9472b3f3930e",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       }
      }
     ],
@@ -54213,14 +56650,14 @@
       "pad": "/api/verify/selfie",
       "status": 401,
       "voor": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "329b09b9d799563e6c4d88748da6df9948a4d0e0af8e2b7edf7a31c86e770bc7",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "329b09b9d799563e6c4d88748da6df9948a4d0e0af8e2b7edf7a31c86e770bc7",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54232,14 +56669,14 @@
       "pad": "/api/verify/selfie",
       "status": 401,
       "voor": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "329b09b9d799563e6c4d88748da6df9948a4d0e0af8e2b7edf7a31c86e770bc7",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "329b09b9d799563e6c4d88748da6df9948a4d0e0af8e2b7edf7a31c86e770bc7",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54251,14 +56688,14 @@
       "pad": "/api/verify/selfie",
       "status": 401,
       "voor": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "329b09b9d799563e6c4d88748da6df9948a4d0e0af8e2b7edf7a31c86e770bc7",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+       "b": "329b09b9d799563e6c4d88748da6df9948a4d0e0af8e2b7edf7a31c86e770bc7",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": null,
       "eigenNa": null,
@@ -54282,14 +56719,14 @@
      "pad": "/api/verify/selfie",
      "status": 200,
      "voor": {
-      "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-      "b": "1b103d7b58c025e5863947643c7e5cb0814cfbded5a8a6f10ebac7d513b83ace",
-      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+      "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+      "b": "d03be0cfe59c8d8a8da14f973cca09a8e233a5efa56c8c21510e9472b3f3930e",
+      "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
      },
      "na": {
-      "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
-      "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
-      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+      "a": "deb951ff979af423ed8588a56e11aec272c626631b1981b4964c264844afaa1f",
+      "b": "329b09b9d799563e6c4d88748da6df9948a4d0e0af8e2b7edf7a31c86e770bc7",
+      "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
      },
      "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
      "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25"
@@ -54313,14 +56750,14 @@
       "pad": "/api/verify/status",
       "status": 200,
       "voor": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       }
      },
      {
@@ -54329,14 +56766,14 @@
       "pad": "/api/verify/status",
       "status": 200,
       "voor": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       }
      }
     ],
@@ -54347,14 +56784,14 @@
       "pad": "/api/verify/status",
       "status": 401,
       "voor": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54366,14 +56803,14 @@
       "pad": "/api/verify/status",
       "status": 401,
       "voor": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54385,14 +56822,14 @@
       "pad": "/api/verify/status",
       "status": 401,
       "voor": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": null,
       "eigenNa": null,
@@ -54418,14 +56855,14 @@
      "pad": "/api/verify/status",
      "status": 200,
      "voor": {
-      "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-      "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+      "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+      "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+      "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
      },
      "na": {
-      "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-      "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+      "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+      "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+      "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
      },
      "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
      "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
@@ -54450,14 +56887,14 @@
       "pad": "/api/verify/upload",
       "status": 200,
       "voor": {
-       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "bbb3d532db76125c6be13d2a70dd7e88293276753e22a602b62646bd0f8a4a0e",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       }
      },
      {
@@ -54466,14 +56903,14 @@
       "pad": "/api/verify/upload",
       "status": 200,
       "voor": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "7badfeae9aa5b5f670232c50ed07b59d5cf97343bf6adf7b6d2e553e87ec2d57",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "c5b39add27ed52f09885efff3e8194cd05c3bf559c63fda0d49c61ba5e94c348",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bb097012bbe81d7fe2913e87a5933dc9dd6c93a5653477f1f69a167bef65810c",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       }
      }
     ],
@@ -54484,14 +56921,14 @@
       "pad": "/api/verify/upload",
       "status": 401,
       "voor": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54503,14 +56940,14 @@
       "pad": "/api/verify/upload",
       "status": 401,
       "voor": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54522,14 +56959,14 @@
       "pad": "/api/verify/upload",
       "status": 401,
       "voor": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "na": {
-       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+       "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+       "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+       "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
       },
       "eigenVoor": null,
       "eigenNa": null,
@@ -54553,14 +56990,14 @@
      "pad": "/api/verify/upload",
      "status": 200,
      "voor": {
-      "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-      "b": "c5b39add27ed52f09885efff3e8194cd05c3bf559c63fda0d49c61ba5e94c348",
-      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+      "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+      "b": "bb097012bbe81d7fe2913e87a5933dc9dd6c93a5653477f1f69a167bef65810c",
+      "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
      },
      "na": {
-      "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
-      "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
-      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
+      "a": "223622f53cde7c4f7f37fc962ecf5592bb3266b01716ab63833aabf49e49516d",
+      "b": "bf12e067579bfd662a1cfab28e3e2059758a57b1b060f2494570594553135b77",
+      "overig": "6ae81dda01a6c437480151f5262f6247a9e071b1ebe8d27d066411ac82fee487"
      },
      "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
      "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
@@ -55560,7 +57997,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "pw_oahak_DOQgDU3XZZ"
+    "pw_gtyv4Epn_kmMVGPK"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -63109,7 +65546,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Nachtorchidee 1799"
+    "Witte Reiger 00BA"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []

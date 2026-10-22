@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-22T23:04:11.344Z",
-    "commit": "f3e630f421",
+    "op": "2026-10-22T23:44:58.819Z",
+    "commit": "b0733baac0",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/bevoegdronde.js",
@@ -14,10 +14,10 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "944a3ff1f0ff38eb70c885ba1c85bfe06818a96765c4918b23084706a267b6de",
+        "sha256": "e9c84dfd849b47ca86c1d3a2d137733d93f0444dd227245a911e1855ffa99728",
         "stempel": {
-          "op": "2026-10-22T22:59:53.032Z",
-          "commit": "f3e630f421",
+          "op": "2026-10-22T23:42:58.878Z",
+          "commit": "b0733baac0",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/idorproef.js",
@@ -26,12 +26,12 @@
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "064d4fc89cefdcc7a262d5a3ea1f6ec1c512b71cc058e2c4f6d6d9bdcdec0348",
+        "sha256": "b2aaaf3add5dd7db23eb341d770f7d689f4353ba87714711d3261d8f5a8aa5db",
         "stempel": {
-          "op": "2026-10-22T23:02:13.105Z",
-          "commit": "f3e630f421",
+          "op": "2026-10-22T23:43:37.825Z",
+          "commit": "b0733baac0",
           "boomVuil": false,
-          "boomAnders": 2,
+          "boomAnders": 1,
           "instrument": "scripts/rolproef-route.js",
           "node": "v26.12.0"
         }
@@ -39,8 +39,8 @@
     ]
   },
   "telling": {
-    "NIET_GETEST": 104,
-    "BEWEZEN": 10
+    "NIET_GETEST": 103,
+    "BEWEZEN": 11
   },
   "regels": [
     {
@@ -290,7 +290,7 @@
       "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/YRHD8N/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/3DTJEW/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1244,7 +1244,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/YRHD8N/mij",
+          "verzoek": "GET /api/foundation/gezin/3DTJEW/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1406,10 +1406,9 @@
       "app": "Snaps",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
+      "status": "BEWEZEN",
       "routes": 3,
-      "open": 3,
-      "reden": "3 van de 3 routes niet gemeten, o.a. /api/member/snap/send: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/snap/view: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/snaps: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet"
     },
     {
       "functie": "os:videobellen",

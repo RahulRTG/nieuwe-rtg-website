@@ -1378,3 +1378,21 @@ talen behouden. CI op f79f081b56 faalde in preflight op verouderde afgeleide
 artefacten; de betreffende generators zijn opnieuw uitgevoerd, niet de
 kwaliteitsdrempels aangepast. Logs /tmp/rtg-r3-ci-f79-failed.log,
 /tmp/rtg-r3-refresh-local.log en /tmp/rtg-r3-language-refresh.log.
+
+Hermeting op b0733baac0: IDOR bevat nu voor alle drie Snaps-routes de
+gekwalificeerde HTTP/SQLite-proef. De volledige rollenronde herhaalt
+4514 routes / 9369 pogingen, nul verkeerde-roltoegang, lekken, persistente
+onbevoegde wijzigingen of onbeslist bewijs. De bevoegdronde stijgt aantoonbaar
+van 10 naar 11 BEWEZEN; 103 blijven NIET_GETEST. Dit is uitsluitend de dimensie
+bevoegd, niet 11 apps met alle acht actuele bewijzen. Logs:
+/tmp/rtg-r3-idor-b073.log, /tmp/rtg-r3-role-b073.log en
+/tmp/rtg-r3-authority-b073.log. De bestaande harde preflight is lokaal groen
+(/tmp/rtg-r3-check-b073.log); hij meldt tegelijk 900 verlopen APPWERKT-bewijzen.
+Die melding is niet opgelost of genegeerd. Geen integrale vrijgaveclaim.
+
+Volgende gedeelde oorzaken: de Foundation-desktop vraagt voor ouderprofielen
+standaard een uitsluitend voor kinderen bevoegde leerlingwidget op (correcte
+server-403). Bord/Schrift vereisen bovendien hun eigen schoolpersona's; een
+widgetcorrectie kwalificeert die niet. Gegevens-start/zeg ontbreekt als
+sessiegebonden isolatiebewijs bij 13 apps; die apps hebben ook andere open
+routes. Beide pakketten worden binnen bestaande infrastructuur voorbereid.

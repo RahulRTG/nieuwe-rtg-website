@@ -79,6 +79,16 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     const factor = (plan ? Math.max(0.6, Math.min(2, plan.covers / (stoelen * 2))) : 1) * ctx.factor;
     const regels = basis.regels.map(r => ({ ...r, aantal: Math.max(1, Math.round(r.aantal * factor)) }));
     const totaal = Math.round(regels.reduce((n, r) => n + r.aantal * r.prijs, 0) * 100) / 100;
+    /* Een verse MEP-berekening mag een nieuw voorstel opleveren, maar nooit
+       twee gelijktijdig goed te keuren automatische bestellingen voor dezelfde
+       operationele stap. Bewaar het oude voorstel voor de audit en maak het
+       onuitvoerbaar voordat het nieuwe wordt toegevoegd. Handmatig gevraagde
+       voorstellen blijven afzonderlijke bewuste opdrachten. */
+    if (wie === 'AI-agent (na de MEP-voorspelling)') {
+      for (const oud of a.voorstellen) {
+        if (oud.door === wie && oud.status === 'wacht-op-goedkeuring') oud.status = 'vervallen';
+      }
+    }
     const v = {
       id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString(), soort: 'inkoop',
       groothandelCode: basisCode, groothandelNaam: basis.groothandelNaam,

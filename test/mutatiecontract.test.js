@@ -328,12 +328,6 @@ const BEKEND_OPEN = Object.freeze([
   'POST /api/office/balie/zoek',
   'POST /api/office/techniek/integraties/noodstop',
   'POST /api/ov/regie/zet',
-  'POST /api/supplier/mep/daily',
-  'POST /api/supplier/onboarding/zet',
-  'POST /api/supplier/poort/online',
-  'POST /api/supplier/rooster/voorstel',
-  'POST /api/supplier/rtmail/export',
-  'POST /api/supplier/werkbeleid/zet'
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {

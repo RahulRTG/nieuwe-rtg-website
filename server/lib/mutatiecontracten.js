@@ -171,7 +171,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-ovronde'),
   require('./mutatiecontracten-objectronde'),
   require('./mutatiecontracten-effect'),
-  require('./mutatiecontracten-premium-opdrachten').CONTRACTEN);
+  require('./mutatiecontracten-premium-opdrachten').CONTRACTEN,
+  require('./mutatiecontracten-deepgreen-r3').CONTRACTEN);
 
 
 require('./mutatiecontracten-effectguard');

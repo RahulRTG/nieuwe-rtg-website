@@ -177,9 +177,13 @@ test('5. het intakeformulier zet de eigenaar, en het blijft van de eigen zaak', 
   assert.equal((await api('/api/supplier/onboarding/zet', { voorstel: { titel: 'Aanmelden' } }, werker)).status, 403,
     'het intakeformulier is geen knop voor de bediening');
 
-  const z = await api('/api/supplier/onboarding/zet',
-    { voorstel: { titel: 'Welkom bij Sal de Mar', velden: [{ id: 'allergie', label: 'Allergieën', soort: 'tekst' }] } }, baas);
+  const voorstel = { titel: 'Welkom bij Sal de Mar', velden: [{ id: 'allergie', label: 'Allergieën', soort: 'tekst' }] };
+  const z = await api('/api/supplier/onboarding/zet', { voorstel }, baas);
   assert.equal(z.status, 200, JSON.stringify(z.body).slice(0, 200));
+  const herhaald = await api('/api/supplier/onboarding/zet', { voorstel }, baas);
+  assert.equal(herhaald.status, 200);
+  assert.equal(herhaald.body.config.contract.bijgewerkt, z.body.config.contract.bijgewerkt,
+    'dezelfde gewenste configuratie krijgt geen nieuw wijzigingstijdstip');
 
   const mijn = await api('/api/supplier/onboarding/config', {}, baas);
   assert.equal(mijn.status, 200);

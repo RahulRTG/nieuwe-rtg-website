@@ -94,6 +94,13 @@ function maakWerkbeleid({ db, save }) {
       if (c.vast) return { status: 409, error: '"' + c.naam + '" hoort bij de basis van het toestel en kan niet door een werkgever dicht.' };
       if (schoon.indexOf(id) < 0) schoon.push(id);
     }
+    /* De lijst beschrijft de volledige gewenste stand. Dezelfde set opnieuw
+       ontvangen is een retry, geen nieuwe beleidswijziging; bewaar daarom ook
+       het oorspronkelijke tijdstip en de oorspronkelijke actor. */
+    const huidig = beleid(code).uit;
+    if (huidig.length === schoon.length && huidig.every(id => schoon.includes(id))) {
+      return { status: 200, ok: true, beleid: overzicht(code) };
+    }
     const s = store();
     s[code] = { uit: schoon, at: new Date().toISOString(), door: String(door || '').slice(0, 60) || null };
     save();

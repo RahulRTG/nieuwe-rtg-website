@@ -72,7 +72,13 @@ test('1. een manager van een ANDERE zaak krijgt via een delegatie de wervingspos
   // en het bewaarbeleid toont hem de leidingsplek niet
   assert.equal((await api('/api/supplier/rtmail/bewaarbeleid', { postvak: 'kikunoi@partner.rtg' }, luz.m.tok)).body.leiding, undefined);
   // tegenproef: de manager van KIKUNOI zelf krijgt hem wel mee
+  const voor = (await api('/api/supplier/rtmail/journaal', {}, k.m.tok)).body.regels
+    .filter(r => /^geexporteerd:/.test(r.wat)).length;
   assert.ok(heeft(await api('/api/supplier/rtmail/export', { reden: 'proef', metInhoud: true }, k.m.tok)), 'de eigen manager mist hem');
+  assert.ok(heeft(await api('/api/supplier/rtmail/export', { reden: 'proef', metInhoud: true }, k.m.tok)), 'de tweede bewuste export blijft beschikbaar');
+  const na = (await api('/api/supplier/rtmail/journaal', {}, k.m.tok)).body.regels
+    .filter(r => /^geexporteerd:/.test(r.wat)).length;
+  assert.equal(na, voor + 2, 'iedere bewuste export krijgt een afzonderlijke auditregel');
 });
 
 test('2. een postvaktermijn raakt de leidingsplek nooit; het bewijs noemt de inlog', async () => {

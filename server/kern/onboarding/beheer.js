@@ -45,7 +45,11 @@ module.exports = (ctx) => {
   // De getoonde titel en tekst horen samen bij één onveranderlijke versie.
   function zetConfig(scope, voorstel) {
     const sc = scopeVan(scope);
-    if (voorstel && voorstel.velden) { const v = normaliseerVelden(voorstel.velden, sc); if (v) sc.velden = v; }
+    let gewijzigd = false;
+    if (voorstel && voorstel.velden) {
+      const v = normaliseerVelden(voorstel.velden, sc);
+      if (v && JSON.stringify(v) !== JSON.stringify(sc.velden)) { sc.velden = v; gewijzigd = true; }
+    }
     if (voorstel && voorstel.contract) {
       const c = voorstel.contract;
       const titel = c.titel != null ? schoon(String(c.titel), 100) || sc.contract.titel : sc.contract.titel;
@@ -57,8 +61,13 @@ module.exports = (ctx) => {
       if (titel !== sc.contract.titel || tekst !== sc.contract.tekst) {
         require('./ontvangst').bewaarContract(sc);
         sc.contract = { ...sc.contract, titel, tekst, versie: sc.contract.versie + 1 };
+        gewijzigd = true;
       }
     }
+    /* Een transportretry van exact dezelfde gewenste configuratie is geen
+       tweede beheerhandeling. Laat ook `bijgewerkt` staan: anders ziet een
+       herhaling eruit als een nieuwe contract- of intakewijziging. */
+    if (!gewijzigd) return config(scope);
     sc.contract.bijgewerkt = nu();
     save();
     return config(scope);

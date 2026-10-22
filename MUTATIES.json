@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-22T23:41:29.064Z",
-    "commit": "f79f081b56",
+    "op": "2026-10-22T23:50:43.341Z",
+    "commit": "def35be2ef",
     "boomVuil": true,
-    "boomAnders": 10,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v26.12.0"
   },
@@ -21692,6 +21692,14 @@
       "module": "scripts/world-widgets.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "world-widget-family.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/interface/world-widget-data.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "writehealth-lus.test.js": {

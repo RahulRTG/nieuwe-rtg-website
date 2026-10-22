@@ -1396,3 +1396,23 @@ server-403). Bord/Schrift vereisen bovendien hun eigen schoolpersona's; een
 widgetcorrectie kwalificeert die niet. Gegevens-start/zeg ontbreekt als
 sessiegebonden isolatiebewijs bij 13 apps; die apps hebben ook andere open
 routes. Beide pakketten worden binnen bestaande infrastructuur voorbereid.
+
+23 oktober 2026 — Gedeelde widgetoorzaak hersteld: automatische leerlingpreview
+alleen voor het passende bevestigde kindprofiel. Catalogus en handmatig gekozen
+apps blijven bestaan; de serverpoort blijft ongewijzigd. De bestaande runtime-
+sessiecontrole beschermt nu ook member-cacheantwoorden. Profielwissel en destroy
+maken oude callbacks ongeldig; een oude finally kan geen nieuw verzoek wissen.
+Gerichte Node 26-kwalificatie: 21/21, nul skips, inclusief echte browserwissel
+ouder → kind → ouder, ouder-HTTP403, kind-HTTP200 en oorspronkelijke identity/
+state-regressies. Log /tmp/rtg-r3-widget-complete.log. Onafhankelijke review van
+het familiepad vond geen blocker; root beoordeelde de aanvullende memberguard.
+Mutatieproef detecteert verwijderd browserexport (1/1); dit is beperkte
+gevoeligheidsmeting, geen bewijs voor iedere mogelijke race. Log
+/tmp/rtg-r3-widget-mutation.log. Geen APPWERKT-herkwalificatie geclaimd.
+
+Diagnostische normmeting tijdens deze ongecommitteerde werkstand:
+/tmp/rtg-r3-norm-current.log. Directe opslagdeuren vallen weer binnen 464 en
+de te-grote-bestandengrens is hersteld. Nog rood: omvang 358/350, dubbeling
+186/184, gedeelde kern 262/260, ongemeten mutatietoetsen 198/142 en drie
+registers uit een vuile bronboom. Dit is geen kandidaatkwalificatie; registers
+moeten na bronbevriezing opnieuw worden gemeten, niet handmatig groen gezet.

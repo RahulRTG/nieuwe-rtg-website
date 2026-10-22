@@ -66,7 +66,7 @@
       var defaults = { living: ['agenda', 'notities'], travel: ['reizen', 'agenda', 'notities'],
         work: ['agenda', 'notities'], foundation: ['foundation-agenda', 'foundation-leren'] };
       var cards = w.RTGDesktopCards({ world: world, apps: apps, favorites: favorites, library: library, runtime: runtime,
-        defaults: defaults[world].filter(function (id) { return apps.some(function (a) { return a.id === id; }); }),
+        defaults: defaults[world].filter(function (id) { return w.RTGWidgetData.previewAvailable(id) && apps.some(function (a) { return a.id === id; }); }),
         open: function (app, trigger, action) { runtime.navigation.open(app.url, app.name, 'desktop-catalog'); if (action) frame.prepare(action); } });
       d.body.dataset.rtgDesktopState = 'ready';
       function edge() {

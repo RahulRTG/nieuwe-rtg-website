@@ -8,7 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 
-const maak = () => require('../server/kern/labfonds')({ db: { data: {} }, save: () => {}, crypto, anthropic: null }).labfonds;
+const maak = (livinglab) => require('../server/kern/labfonds')({ db: { data: {} }, save: () => {}, crypto, anthropic: null, livinglab }).labfonds;
 
 test('dezelfde sleutel legt de toezegging een keer in de pot', () => {
   const lf = maak();
@@ -62,4 +62,21 @@ test('dezelfde sleutel voor een ander voorstel is een conflict', () => {
   lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL, 20, '', 'v1');
   assert.equal(lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bankjes', DOEL, 20, '', 'v1').status, 409);
   assert.equal(lf.fonds('lid1').voorstellen.length, 1);
+});
+
+test('dezelfde voorstelsleutel vergelijkt ook doel en het canonieke onderzoek', () => {
+  const studies = [
+    { id: 'studie-a', nummer: 'RTF-AMS-2026-0001', titel: 'A', soort: 'proef', stap: 'open', labId: 'lab' },
+    { id: 'studie-b', nummer: 'RTF-AMS-2026-0002', titel: 'B', soort: 'proef', stap: 'open', labId: 'lab' }
+  ];
+  const lf = maak({ S: () => ({ studies }) });
+  assert.equal(lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL, 20,
+    'RTF-AMS-2026-0001', 'volledig').ok, true);
+  assert.equal(lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL + ' Ander doel.', 20,
+    'RTF-AMS-2026-0001', 'volledig').status, 409, 'een ander doel is andere inhoud');
+  assert.equal(lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL, 20,
+    'studie-b', 'volledig').status, 409, 'een ander onderzoek is andere inhoud');
+  const zelfde = lf.voorstelMaak('lid1', 'Amber', 'ibiza', 'Bomen', DOEL, 20,
+    'studie-a', 'volledig');
+  assert.equal(zelfde.herhaald, true, 'nummer en id van dezelfde studie zijn dezelfde opdracht');
 });

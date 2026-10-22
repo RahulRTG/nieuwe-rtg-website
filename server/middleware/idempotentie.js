@@ -81,6 +81,7 @@ const { bewaarBijEind } = require('../lib/eindstatus');
 const { isEenmalig } = require('../lib/eenmalig-geheim-routes');
 const { EIGEN, doetHetZelf } = require('./idempotentie-eigen');
 const { wieVan } = require('../lib/idem-sleutelbepaling');
+const { sleutelVoor } = require('../lib/idemsleutels');
 
 const TTL_MS = 24 * 60 * 60 * 1000;
 const MAX = 50000;
@@ -104,6 +105,11 @@ module.exports = () => {
     if (isEenmalig(req.method, req.path)) return next();
     if (require('../lib/ontvangst-operatiepad')(req.path)) return next();
     if (doetHetZelf(req.path)) return next();
+    /* Een verklaarde tweede handeling of toestandspoort mag nooit het eerste
+       antwoord uit deze proceskas terugkrijgen. Het domein moet de actuele
+       stand zien en zelf bijvoorbeeld 409 "al beslist" kunnen geven. */
+    const contract = sleutelVoor(req.method, req.path);
+    if (contract && contract.nietIdempotent) return next();
     const b = req.body;
     const sleutel = b && (typeof b.idempotentieSleutel === 'string' ? b.idempotentieSleutel
       : (typeof b.idem === 'string' ? b.idem : null));

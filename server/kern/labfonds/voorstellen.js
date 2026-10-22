@@ -16,21 +16,25 @@ module.exports = (ctx) => {
     if (d.length < 10) return { status: 400, error: 'Leg kort uit wat het voor de omgeving oplevert.' };
     const c = naarCenten(euro);
     if (c < 100) return { status: 400, error: 'Noem een bedrag van minimaal EUR 1.' };
-    const sleutel = schoon(idem, 80) || null;
-    const al = sleutel && F().voorstellen.find(x => x.doorKey === lidKey && x.idem === sleutel);
-    if (al) return al.locId === l.id && al.titel === t && al.centen === c
-      ? { ok: true, herhaald: true, voorstel: voorstelBeeld(al, lidKey) }
-      : { status: 409, error: 'Deze sleutel hoort al bij een ander voorstel.' };
-    /* Het onderzoek is OPTIONEEL -- niet elk voorstel financiert een studie (een
-       buurtmoestuin is geen onderzoek). Maar wie er een noemt, noemt een
-       BESTAAND onderzoek: een voorstel met een dood verwijzingsveld belooft een
-       verantwoording die niemand meer kan naslaan. */
+    /* De volledige zakelijke inhoud hoort bij de sleutel. Onderzoek wordt
+       eerst naar zijn stabiele studie-id vertaald: nummer en id van dezelfde
+       studie zijn daarmee dezelfde opdracht, een ander onderzoek niet. */
     let studieId = null, studieNummer = null;
     if (String(onderzoekRef == null ? '' : onderzoekRef).trim()) {
       const r = onderzoek.zoek(onderzoekRef);
       if (!r.gevonden) return { status: 400, error: r.reden };
       studieId = r.studie.id; studieNummer = r.studie.nummer;
     }
+    const sleutel = schoon(idem, 80) || null;
+    const al = sleutel && F().voorstellen.find(x => x.doorKey === lidKey && x.idem === sleutel);
+    if (al) return al.locId === l.id && al.titel === t && al.doel === d && al.centen === c &&
+      (al.studieId || null) === studieId
+      ? { ok: true, herhaald: true, voorstel: voorstelBeeld(al, lidKey) }
+      : { status: 409, error: 'Deze sleutel hoort al bij een ander voorstel.' };
+    /* Het onderzoek is OPTIONEEL -- niet elk voorstel financiert een studie (een
+       buurtmoestuin is geen onderzoek). Maar wie er een noemt, noemt een
+       BESTAAND onderzoek: een voorstel met een dood verwijzingsveld belooft een
+       verantwoording die niemand meer kan naslaan. */
     const v = { id: rid(), locId: l.id, doorKey: lidKey, doorNaam: schoon(lidNaam, 40) || 'Lid',
       titel: t, doel: d, centen: c, status: 'open', studieId, studieNummer,
       stemmen: { voor: [lidKey], tegen: [] }, scheids: null, besluit: null, at: nu(), idem: sleutel };

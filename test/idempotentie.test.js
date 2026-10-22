@@ -21,6 +21,7 @@ async function metApp(doe) {
   app.use(maakIdempotentie());
   let teller = 0, status = 200;
   app.post('/api/tel', (req, res) => { teller++; res.status(status).json({ teller, echo: req.body.w || null }); });
+  app.post('/api/labfonds/beslis', (req, res) => { teller++; res.status(200).json({ teller }); });
   app.post('/api/plat', (req, res) => { teller++; res.send('geen json'); });
   const server = await new Promise(z => { const s = app.listen(0, () => z(s)); });
   const basis = 'http://127.0.0.1:' + server.address().port;
@@ -127,6 +128,15 @@ test('zonder sleutel bemoeit de laag zich nergens mee', () => metApp(async ({ po
   await post('/api/tel', { w: 'x' });
   await post('/api/tel', { w: 'x' });
   assert.equal(telling(), 2, 'geen sleutel, geen herhaalbescherming: het oude gedrag');
+}));
+
+test('een verklaarde toestandscontrole krijgt bij herhaling de actuele domeintoestand', () => metApp(async ({ post, telling }) => {
+  const een = await post('/api/labfonds/beslis', { id: 'voorstel', idem: 'besluit-1' });
+  const twee = await post('/api/labfonds/beslis', { id: 'voorstel', idem: 'besluit-1' });
+  assert.equal(een.status, 200);
+  assert.equal(twee.status, 200);
+  assert.equal(telling(), 2, 'de algemene antwoordkas mag een verklaarde toestandscontrole niet onderscheppen');
+  assert.equal(twee.data.teller, 2, 'het antwoord komt uit de actuele handler en niet uit de kas');
 }));
 
 test('een andere sleutel, of dezelfde sleutel van een andere afzender, draait echt', () => metApp(async ({ post, telling }) => {

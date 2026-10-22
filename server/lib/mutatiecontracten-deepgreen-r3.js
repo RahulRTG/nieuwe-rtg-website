@@ -40,7 +40,17 @@ const CONTRACTEN = {
     'Iedere datasetexport is een afzonderlijke gegevensuitgifte. Deduplicatie zou een echte export uit het verplichte auditspoor verwijderen.'),
   'POST /api/ov/regie/zet': contract('ov.regie.zet', 'idempotent', 'PROTECTED',
     'test/ov-regie.test.js: een identieke toegestane voorkeur veroorzaakt na de eerste opslag geen tweede save',
-    'De automaten, comfort- en privacyvelden beschrijven de volledige gewenste regiestand; een gelijke retry is geen nieuwe keuze.')
+    'De automaten, comfort- en privacyvelden beschrijven de volledige gewenste regiestand; een gelijke retry is geen nieuwe keuze.'),
+
+  'POST /api/labfonds/doneer': contract('labfonds.doneer', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
+    'test/labfonds-idem.test.js en test/rtf-labfonds-deur.test.js: zonder sleutel tellen twee toezeggingen op; met sleutel is replay veilig en afwijkende inhoud 409',
+    'Een bewuste tweede toezegging is een nieuwe toezegging. De expliciete sleutel onderscheidt een technische retry van die zakelijke handeling.'),
+  'POST /api/labfonds/voorstel/maak': contract('labfonds.voorstel.maak', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
+    'test/labfonds-idem.test.js: de sleutel vergelijkt locatie, titel, doel, bedrag en canoniek onderzoek; test/rtf-labfonds-deur.test.js bewijst twee bewuste voorstellen',
+    'Twee bewuste indieningen mogen twee voorstellen zijn; een expliciete sleutel beschermt de dubbeltik en weigert hergebruik voor afwijkende inhoud.'),
+  'POST /api/labfonds/beslis': contract('labfonds.beslis', 'hooguitEens', 'PROTECTED',
+    'test/appstore-lab-toestemming-routes.test.js en test/rtf-labfonds-deur.test.js: alleen de indiener beslist en een tweede besluit wordt 409',
+    'Een besluit mag hooguit eenmaal de pot bewegen. De domeinkern bewaakt de actuele toestand en de generieke antwoordcache is voor deze route uitgeschakeld.')
 };
 
 module.exports = { CONTRACTEN };

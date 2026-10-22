@@ -43,15 +43,15 @@
    het duurste soort fout zijn: een route met een poort als publiek boeken, of
    andersom. Vandaar twee lijsten en niet een.
    ------------------------------------------------------------------------- */
-const ROUTEPOORTEN = Object.assign({},
-  require('./buiten-routes').ROUTEPOORTEN,
-  require('./buiten-routes-b').ROUTEPOORTEN);
-{
-  /* Dezelfde regel als bij de sleutellijst: een route in twee bestanden zou er
-     stil een overschrijven. Zie ../../lib/idemsleutels-eenmaal.js. */
-  const a = require('./buiten-routes').ROUTEPOORTEN, b = require('./buiten-routes-b').ROUTEPOORTEN;
-  const dubbel = Object.keys(a).filter(k => k in b);
-  if (dubbel.length) throw new Error('handlerpoorten: route in beide routelijsten: ' + dubbel.join(', '));
+const ROUTEPOORTEN = {};
+for (const lijst of [require('./buiten-routes').ROUTEPOORTEN,
+  require('./buiten-routes-b').ROUTEPOORTEN,
+  require('./buiten-routes-lab').ROUTEPOORTEN]) {
+  for (const [route, poort] of Object.entries(lijst)) {
+    if (Object.hasOwn(ROUTEPOORTEN, route))
+      throw new Error('handlerpoorten: route in meerdere routelijsten: ' + route);
+    ROUTEPOORTEN[route] = poort;
+  }
 }
 
 /* De handgelezen poort van een route, of null. */

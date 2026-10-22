@@ -1088,3 +1088,32 @@ De bestaande Evidence DAG (`plan.js`) en `bewijsraakvlak.js` bieden al gerichte
 selectie en bewijsverval met conservatieve terugval. Eerst hun dekking toetsen;
 geen nieuwe bewijsengine. APPWERKT is voor deze CI-aansluiting niet opnieuw
 gemeten en geen appstatus is verhoogd. Status blijft ORANJE. Geen merge of uitrol.
+
+### Deep Green — preflightpakket gesloten (22 oktober 2026)
+
+De negen oorspronkelijke preflightbevindingen van CI-run 39798849793 zijn
+hersteld. De Lab-routepoortgegevens zijn binnen hetzelfde register gesplitst;
+alle 49 waarden uit de oorspronkelijke tweede routelijst zijn exact behouden.
+Samenvoegen weigert dubbele routes in alle delen. Werkbeleidgedrag bleef gelijk;
+alleen de herhalende historische toelichting is ingekort. Gerichte poort- en
+werkbeleidproeven: 15/15. Taalbewijs opnieuw werkelijk gemeten: 27/27.
+De bestaande bewijsraakvlak-proeven: 24/24. Geen skips in deze drie selecties.
+
+ARCHITECTUUR, BEWIJS, BEWIJSSCHULD, FUNCTIES en de door het nieuwe bronbestand
+getroffen OBJECTMODEL- en COMMERCE-tellingen zijn opnieuw afgeleid. De echte
+websitebeelden en hun websitewaarheid zijn vernieuwd. De volledige
+`node scripts/check.js` eindigt met "Alles in orde" (lokale log:
+`/tmp/rtg-r3-check-final.log`). De sandboxrun kon de routekaart niet openen;
+alleen de vervolgens toegestane loopbackrun telt als geldige preflight.
+
+Aanvullend gevonden: `test/objectveld.test.js` mist bij acht Lab-routes de
+handgelezen objectvelden. De waarden zijn aantoonbaar gelijk gebleven; dit is
+een bestaande onvolledige bewijsafleiding, nog geen gesloten werkpakket.
+De huidige routekoppelingen prioriteren stroomticket (20 appverwijzingen),
+ledenstream (18) en Rechterhand-routes (17 per route). Dit zijn overlappende
+verwijzingen en geen optelbare, reeds gekwalificeerde apps.
+
+Het preflightpakket sluit geen APPWERKT- of autorisatiebewijs. Door de
+bronwijzigingen moet bewijsverval volgens de bestaande regels blijven gelden.
+Volgende stap: volledige Node-suite en de objectveldafleiding. Geen merge,
+productie-uitrol of Deep Green-verklaring.

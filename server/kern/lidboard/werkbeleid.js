@@ -17,11 +17,9 @@
 
        ALLEEN TIJDENS JE DIENST, EN NIET IN JE PAUZE.
 
-   Het beleid gold hiervoor VIERENTWINTIG UUR PER DAG: dichtVoor() keek alleen
-   of je een werkkoppeling met die zaak had, niet of je aan het werk was. Dat
-   betekende dat je baas je pas ook op zondag dichthield. Nu geldt het beleid
-   alleen zolang je INGEKLOKT staat, en daarbinnen heb je 45 minuten pauze
-   waarin het even niet geldt -- de rookpauze, de grote pauze.
+   Het beleid geldt uitsluitend tijdens een open dienst, met 45 minuten
+   pauze waarin het tijdelijk niet geldt. Buiten de dienst bepaalt de
+   medewerker zelf welke functies beschikbaar zijn.
 
    Wat we daarvoor NIET doen: meten wanneer je kijkt. Zou het budget aftellen
    op je gebruik van De Salon, dan zou dit systeem precies bijhouden hoeveel

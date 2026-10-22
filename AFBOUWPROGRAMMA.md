@@ -1015,3 +1015,35 @@ blijft **ORANJE**: 104 autorisatiegaten, zeven waarheidsgetrouwheidsgaten, vier
 voltooiingsfixtures, de architectuurclassificatie, twee integrale groene runs en
 de operationele kwalificatie staan nog open. Geen merge, productie-uitrol of
 echte betaling uitgevoerd.
+
+### Deep Green — Foundation-klaslokalen eerlijk gemeten (22 oktober 2026)
+
+De twee resterende Foundation-deuren voor Bord en Schrift zijn niet omzeild.
+De liegronde maakt nu via de bestaande profiel- en lesroutes een echt gekozen
+kinderprofiel, een echte les en een echte leerlingdeelname. De docent- en
+leerlingensleutel zijn verschillend, blijven uitsluitend in `sessionStorage`,
+verlopen volgens het bestaande Schoolpas-contract en worden bij elk verzoek
+servermatig gecontroleerd. Een gerichte tegenproef bewijst dit 9/9.
+
+De fixture staat bewust in `scripts/lib/schoolproefsessies.js` en niet in de
+algemene sessiehelper. Daarmee verandert een waarheidsfixture niet langer het
+raakvlak van de bevoegdheidsproef. De volledige `LIEGRONDE.json` op commit
+`4ea4825c71` bewijst nu 109/114 ingangen: Bord kreeg negen lege functionele
+antwoorden en Schrift tien, zonder verzonnen zekerheid, rommel, JS-fout of
+toegangsdeur. De vijf resterende gaten zijn uitsluitend de interne OS-kiezers
+Bellen, RTFoundation, Snaps, Videobellen en Werk; voor hen bestaat nog geen
+uitvoerbaar functiecontract en er is geen URL geraden.
+
+De daaropvolgende volledige APPWERKT-meting op commit `54cb83d8ce` bezocht
+114/114 onderdelen met nul browserdefecten. De actuele dimensies zijn:
+bereikbaar 107, bedienbaar 96, voltooibaar 110, persistent 110, herstelbaar
+110, menselijk 110, waarheidsgetrouw 109 en bevoegd 10. De samengestelde stand
+blijft 10 `BEWEZEN`, 100 `NIET_GETEST` en 4 `GEEN_FIXTURE`; de nieuwe
+waarheidsbewijzen maskeren de nog ontbrekende bereikbaarheid, bediening en
+bevoegdheid van Bord en Schrift niet.
+
+De platformstatus blijft **ORANJE**. Open blijven: 104 volledige
+autorisatiebewijzen, vijf uitvoerbare OS-contracten, vier voltooifixtures, de
+architectuurclassificatie, twee integrale groene kwalificatieruns en staging-,
+back-up-, rollback- en incidentbewijs. Geen merge, productie-uitrol of echte
+financiële transactie uitgevoerd.

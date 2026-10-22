@@ -316,31 +316,24 @@ const BEKEND_OPEN = Object.freeze([
      door een meter verzonnen betekenis: elke route staat bij NAAM, zodat een
      nieuwe onbekende nog steeds onmiddellijk faalt en deze lijst alleen gericht
      kan krimpen zodra de handler werkelijk is nagelezen. */
-  'POST /api/aanmelding/aanvraag',
   'POST /api/bank/akkoord',
   'POST /api/command/uitrol/pauze',
   'POST /api/foundation/school/overdracht/pakket',
   'POST /api/labfonds/beslis',
   'POST /api/labfonds/doneer',
-  'POST /api/labfonds/scheidsrechter',
   'POST /api/labfonds/voorstel/maak',
-  'POST /api/member/bureau/zaak/open',
   'POST /api/member/magnaat/economie/beslis',
   'POST /api/office/aidata/export',
   'POST /api/office/asset/fees',
   'POST /api/office/balie/zoek',
-  'POST /api/office/bank/rekening/open',
-  'POST /api/office/magnaat/scan',
   'POST /api/office/techniek/integraties/noodstop',
   'POST /api/ov/regie/zet',
-  'POST /api/rtf/onboarding/teken',
   'POST /api/supplier/mep/daily',
   'POST /api/supplier/onboarding/zet',
   'POST /api/supplier/poort/online',
   'POST /api/supplier/rooster/voorstel',
   'POST /api/supplier/rtmail/export',
-  'POST /api/supplier/werkbeleid/zet',
-  'POST /api/werkplek/taak'
+  'POST /api/supplier/werkbeleid/zet'
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {

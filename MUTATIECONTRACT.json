@@ -1,25 +1,25 @@
 {
  "stempel": {
-  "op": "2026-10-19T12:06:14.646Z",
-  "commit": "e04b77ec",
+  "op": "2026-10-22T07:11:42.623Z",
+  "commit": "0497b429fe",
   "boomVuil": false,
-  "boomAnders": 7,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.0"
+  "node": "v26.12.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5412,
-  "geclassificeerd": 5387,
+  "geclassificeerd": 5394,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1300,
-   "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 710,
-   "INTENTIONALLY_NON_IDEMPOTENT": 213
+   "PROTECTED": 715,
+   "INTENTIONALLY_NON_IDEMPOTENT": 215,
+   "LEGACY_PENDING_CLASSIFICATION": 18
   },
-  "vastgesteldDoorMens": 2275,
+  "vastgesteldDoorMens": 2282,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4486,
@@ -498,6 +498,12 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
+   "route": "POST /api/rtf/onboarding/teken",
+   "bedoeld": "AUTHENTICATED",
+   "waargenomen": "OBJECT_SCOPED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
    "route": "POST /api/rtf/partner/raad",
    "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
@@ -885,12 +891,14 @@
   {
    "mutatieId": "aanmelding.aanvraag",
    "route": "POST /api/aanmelding/aanvraag",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -900,10 +908,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "aanmelding.beslis",
@@ -38482,12 +38490,14 @@
   {
    "mutatieId": "labfonds.scheidsrechter",
    "route": "POST /api/labfonds/scheidsrechter",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38499,10 +38509,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "labfonds.stem",
@@ -46292,14 +46302,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "member.bureau.zaak.open",
+   "mutatieId": "bureau.zaak.open",
    "route": "POST /api/member/bureau/zaak/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -46311,10 +46323,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.zaken",
@@ -62485,12 +62497,14 @@
   {
    "mutatieId": "office.bank.rekening.open",
    "route": "POST /api/office/bank/rekening/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "kluisAuth"
     ]
@@ -62502,10 +62516,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.rood.aanvragen",
@@ -67572,12 +67586,14 @@
   {
    "mutatieId": "office.magnaat.scan",
    "route": "POST /api/office/magnaat/scan",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -67589,10 +67605,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.magnaat.status",
@@ -91067,12 +91083,14 @@
   {
    "mutatieId": "rtf.onboarding.teken",
    "route": "POST /api/rtf/onboarding/teken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -91082,10 +91100,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.ontkoppel",
@@ -143252,12 +143270,14 @@
   {
    "mutatieId": "werkplek.taak",
    "route": "POST /api/werkplek/taak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -143269,10 +143289,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.taak-zet",

@@ -8,7 +8,8 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startServer, stop } = require('./helper');
-const { haalSessies, haalSchoolsessies } = require('../scripts/lib/proefsessies');
+const { haalSessies } = require('../scripts/lib/proefsessies');
+const { haalSchoolsessies } = require('../scripts/lib/schoolproefsessies');
 
 test('de liegronde krijgt een echte tijdelijke Schoolpas voor bord en schrift', async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schoolproef-'));

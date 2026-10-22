@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-22T11:55:01.007Z",
-    "commit": "e7110cf6da",
+    "op": "2026-10-22T12:48:45.759Z",
+    "commit": "330b7921e7",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
@@ -11,8 +11,8 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 106,
-    "NIET_GETEST": 8
+    "BEWEZEN": 107,
+    "NIET_GETEST": 7
   },
   "regels": [
     {
@@ -711,8 +711,8 @@
       "ingang": "/apps/foundation/bord.html",
       "persona": "gezin",
       "status": "NIET_GETEST",
-      "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
-      "gelogen": 6,
+      "reden": "achter een deur (html.rtf-school-dicht); het scherm zelf is niet beproefd",
+      "gelogen": 5,
       "klachten": []
     },
     {
@@ -741,8 +741,8 @@
       "ingang": "/apps/foundation/schrift.html",
       "persona": "gezin",
       "status": "NIET_GETEST",
-      "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
-      "gelogen": 6,
+      "reden": "achter een deur (html.rtf-school-dicht); het scherm zelf is niet beproefd",
+      "gelogen": 5,
       "klachten": []
     },
     {
@@ -970,9 +970,9 @@
       "app": "Vrienden",
       "ingang": "/apps/foundation/vrienden.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "achter een deur (html.rtf-toegang-dicht); het scherm zelf is niet beproefd",
-      "gelogen": 12,
+      "status": "BEWEZEN",
+      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 11,
       "klachten": []
     },
     {

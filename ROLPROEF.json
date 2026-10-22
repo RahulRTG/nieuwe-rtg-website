@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-21T17:27:38.240Z",
-  "commit": "521fdbdac2",
+  "op": "2026-10-22T06:54:27.077Z",
+  "commit": "79711441bc",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/rolproef-route.js",
@@ -158707,6 +158707,11 @@
      "lek": null
     }
    ],
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/verify/selfie",
+    "status": 200
+   },
    "acl": "dicht",
    "privacy": "schoon",
    "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"
@@ -158742,6 +158747,11 @@
      "lek": null
     }
    ],
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/verify/status",
+    "status": 200
+   },
    "acl": "dicht",
    "privacy": "schoon",
    "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"
@@ -158777,6 +158787,11 @@
      "lek": null
     }
    ],
+   "eigenRoute": {
+    "methode": "POST",
+    "pad": "/api/verify/upload",
+    "status": 200
+   },
    "acl": "dicht",
    "privacy": "schoon",
    "reden": "alle verkeerde rollen expliciet geweigerd met levende eigen sessies"

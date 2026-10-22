@@ -306,7 +306,7 @@ async function meet() {
   return { regels: uit, sessiesOvergeslagen: overgeslagen, belasting };
 }
 
-async function maakContext(browser, opslag) {
+async function maakContext(browser, opslag, tijdelijkeOpslag) {
   const ctx = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 1280, height: 900 } });
   /* De intake is niet wat hier gemeten wordt: een vers lid staat voor de
      ledenovereenkomst, en die tekent een mens een keer in zijn leven. Zelfde
@@ -318,6 +318,18 @@ async function maakContext(browser, opslag) {
      een Nederlands huis -- gezien op 24 september 2026. */
   await ctx.addInitScript((o) => { try { for (const k of Object.keys(o)) localStorage.setItem(k, o[k]); } catch (e) {} },
     Object.assign({ rtg_lang: 'nl' }, opslag));
+  /* Tijdelijke werk- en schoolsleutels horen niet in localStorage. De waarde
+     krijgt hetzelfde omhulsel en dezelfde vervaltijd als RTGSchoolSession.zet;
+     de server controleert de sleutel daarna bij ieder verzoek opnieuw. */
+  if (tijdelijkeOpslag && Object.keys(tijdelijkeOpslag).length) {
+    await ctx.addInitScript((o) => {
+      try {
+        for (const k of Object.keys(o)) sessionStorage.setItem(k, JSON.stringify({
+          merk: 'rtg-school-sessie-v1', waarde: o[k], verloopt: Date.now() + 30 * 60 * 1000
+        }));
+      } catch (e) {}
+    }, tijdelijkeOpslag);
+  }
   return ctx;
 }
 

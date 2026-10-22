@@ -41,7 +41,7 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'LIEGRONDE.json');
 const { rijen, meetIngang, maakContext, POORTEN } = require('./appwerkt');
-const { haalSessies, opslagVoor } = require('./lib/proefsessies');
+const { haalSessies, haalSchoolsessies, opslagVoor } = require('./lib/proefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
 const { magLiegen } = require('../server/opzet/liegpoort');
 const { stempel } = require('./lib/stempel');
@@ -53,7 +53,13 @@ const LIEG = '/api/';
    die elk scherm nodig heeft om op te bouwen (dezelfde lijst als
    test/liegend-scherm.e2e.js). */
 const SPAAR = ['/api/auth/', '/api/login', '/api/office/login', '/api/supplier/login',
-  '/api/supplier/roster', '/api/foundation/gezin/maak', '/api/account/', '/api/onboarding/status',
+  '/api/supplier/roster', '/api/foundation/gezin/maak',
+  /* Proefopbouw, niet de gegevens die Bord en Schrift tonen: een echt gekozen
+     kinderprofiel en een echte les leveren de tijdelijke Schoolpas. De schermen
+     lezen daarna andere routes; die blijven dus gewoon leeggelogen. */
+  '/api/foundation/gezin/profiel/maak', '/api/foundation/gezin/profiel/kies',
+  '/api/foundation/les/maak', '/api/foundation/les/join',
+  '/api/account/', '/api/onboarding/status',
   /* Dit is de serverdeur van beschermde Foundation-schermen. Hem leeg laten
      antwoorden houdt het echte scherm kunstmatig dicht en meet vervolgens de
      deur in plaats van wat het scherm over zijn gegevens beweert. Net als de
@@ -101,7 +107,7 @@ async function meetRij(rij, base, contexten) {
   const uit = { functie: rij.functie, app: rij.app, ingang: rij.ingang, persona: rij.persona };
   const adres = meetAdres(rij);
   if (!adres) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen meetbare contractingang: een stand of kiezer binnen de ledenapp' });
-  const ctx = contexten[rij.persona];
+  const ctx = contexten[rij.functie] || contexten[rij.persona];
   if (!ctx) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen sessie voor de persona ' + rij.persona });
   const statisch = await fetch(base + adres.pad).then((r) => (r.ok ? r.text() : '')).catch(() => '');
   const m = { pad: adres.pad, klachten: [], gelogen: [], landing: null, deur: null };
@@ -142,12 +148,18 @@ async function meet() {
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   try {
     const { sessies, overgeslagen } = await haalSessies(base);
+    const school = await haalSchoolsessies(base, sessies);
+    if (!school) overgeslagen.push({ rol: 'schoolproef', reden: 'de echte les- en leerlingensessies konden niet worden gemaakt' });
     const lijst = rijen();
     const uit = [];
     let n = 0;
     await Promise.all(Array.from({ length: PAR }, async () => {
       const contexten = {};
       for (const rol of Object.keys(sessies)) contexten[rol] = await maakContext(browser, opslagVoor({ [rol]: sessies[rol] }));
+      if (school) {
+        contexten['link:rtfbord'] = await maakContext(browser, school.bord.lokaal, school.bord.tijdelijk);
+        contexten['link:rtfschrift'] = await maakContext(browser, school.schrift.lokaal, school.schrift.tijdelijk);
+      }
       while (true) {
         const i = n++; if (i >= lijst.length) break;
         uit.push(await meetRij(lijst[i], base, contexten));

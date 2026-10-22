@@ -86,6 +86,10 @@ test('de liegronde gebruikt ook een expliciete contractingang voor interne tabs'
 test('de Foundation-toegangspoort blijft echt zodat het scherm zelf wordt gemeten', () => {
   assert.ok(SPAAR.split(',').includes('/api/rtf/toegang'),
     'zonder de echte toegangspoort meet de liegronde alleen de dichte Foundation-deur');
+  for (const pad of ['/api/foundation/gezin/profiel/maak', '/api/foundation/gezin/profiel/kies',
+    '/api/foundation/les/maak', '/api/foundation/les/join']) {
+    assert.ok(SPAAR.split(',').includes(pad), pad + ' moet echt blijven om een tijdelijke Schoolpas te kunnen maken');
+  }
 });
 
 test('5. het echte register spreekt zichzelf niet tegen', () => {

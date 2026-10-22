@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-22T08:04:59.184Z",
-  "commit": "750554a9cb",
+  "op": "2026-10-22T08:16:52.655Z",
+  "commit": "43f7ddb048",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -11,15 +11,14 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5412,
-  "geclassificeerd": 5409,
+  "geclassificeerd": 5412,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1300,
-   "PROTECTED": 720,
-   "INTENTIONALLY_NON_IDEMPOTENT": 225,
-   "LEGACY_PENDING_CLASSIFICATION": 3
+   "PROTECTED": 723,
+   "INTENTIONALLY_NON_IDEMPOTENT": 225
   },
-  "vastgesteldDoorMens": 2297,
+  "vastgesteldDoorMens": 2300,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4499,
@@ -35,9 +34,7 @@
    "kale ronde: geen uitspraak": 4881,
    "niet gemeten": 265
   },
-  "voorstellen": {
-   "NOT_APPLICABLE": 1
-  },
+  "voorstellen": {},
   "metingVan": "2026-09-29T18:39:11.935Z"
  },
  "tegenspraken": [
@@ -4082,12 +4079,14 @@
   {
    "mutatieId": "bank.akkoord",
    "route": "POST /api/bank/akkoord",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -4099,10 +4098,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "deze route draagt een duplicaatregel in lib/idemsleutels.js; dat zegt dat een herhaling WEL iets zou doen, en dus is NOT_APPLICABLE hier uitgesloten -- de meters zagen niets omdat de stand al op de doelwaarde stond"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.bevries",
@@ -48336,12 +48335,14 @@
   {
    "mutatieId": "member.magnaat.economie.beslis",
    "route": "POST /api/member/magnaat/economie/beslis",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -48353,10 +48354,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.magnaat.economie.schok",
@@ -60502,12 +60503,14 @@
   {
    "mutatieId": "office.asset.fees",
    "route": "POST /api/office/asset/fees",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -60519,10 +60522,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.asset.overzicht",

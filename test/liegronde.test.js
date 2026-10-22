@@ -17,7 +17,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { oordeel } = require('../scripts/liegronde');
+const { oordeel, meetAdres } = require('../scripts/liegronde');
 const B = require('../scripts/lib/bewijsbron');
 const { BRONSOORTEN, ALGEMEEN } = require('../scripts/lib/appcontract');
 
@@ -72,6 +72,15 @@ test('4. een liegronde levert waarheidsgetrouw en niets anders', () => {
   B.stelSamen(r, { contract: {}, algemeen: { waarheidsgetrouw: ALGEMEEN.waarheidsgetrouw }, lees: () => REG(regels), versheid: vers });
   assert.equal(r.bewijzen.waarheidsgetrouw.status, 'BEWEZEN');
   assert.deepEqual(Object.keys(r.bewijzen), ['waarheidsgetrouw'], 'de ronde raakt geen ander bewijs');
+});
+
+test('de liegronde gebruikt ook een expliciete contractingang voor interne tabs', () => {
+  assert.deepEqual(meetAdres({ functie: 'link:x', pad: '/apps/x.html' }),
+    { ingang: '/apps/x.html', pad: '/apps/x.html' });
+  assert.deepEqual(meetAdres({ functie: 'tab:assets', pad: null }),
+    { ingang: '/apps/app.html#tab=assets', pad: '/apps/app.html' });
+  assert.equal(meetAdres({ functie: 'os:werk', pad: null }), null,
+    'een natuurlijke-taalkeuze zonder declaratieve route wordt niet geraden');
 });
 
 test('5. het echte register spreekt zichzelf niet tegen', () => {

@@ -40,11 +40,12 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'LIEGRONDE.json');
-const { rijen, maakContext, POORTEN } = require('./appwerkt');
+const { rijen, meetIngang, maakContext, POORTEN } = require('./appwerkt');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
 const { magLiegen } = require('../server/opzet/liegpoort');
 const { stempel } = require('./lib/stempel');
+const { isBrowserruis } = require('./lib/browserruis');
 
 const LIEG = '/api/';
 /* De deuren liegen niet: anders meet je de inlog en niet het scherm. Dat zijn de
@@ -83,25 +84,32 @@ function oordeel(m) {
   return { status: 'BEWEZEN', reden: m.gelogen.length + ' antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; ' + GRENS };
 }
 
+function meetAdres(rij) {
+  const meetbaar = meetIngang(rij);
+  if (!meetbaar) return null;
+  return { ingang: meetbaar.pad, pad: meetbaar.bestemming };
+}
+
 async function meetRij(rij, base, contexten) {
   const uit = { functie: rij.functie, app: rij.app, ingang: rij.ingang, persona: rij.persona };
-  if (!rij.pad) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen eigen adres: een stand of kiezer binnen de ledenapp' });
+  const adres = meetAdres(rij);
+  if (!adres) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen meetbare contractingang: een stand of kiezer binnen de ledenapp' });
   const ctx = contexten[rij.persona];
   if (!ctx) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen sessie voor de persona ' + rij.persona });
-  const statisch = await fetch(base + rij.pad).then((r) => (r.ok ? r.text() : '')).catch(() => '');
-  const m = { pad: rij.pad, klachten: [], gelogen: [], landing: null, deur: null };
+  const statisch = await fetch(base + adres.pad).then((r) => (r.ok ? r.text() : '')).catch(() => '');
+  const m = { pad: adres.pad, klachten: [], gelogen: [], landing: null, deur: null };
   if (!statisch) m.klachten.push('scherm niet op te halen');
   const page = await ctx.newPage();
   const fouten = [];
   const gelogen = new Set();
-  page.on('pageerror', (e) => fouten.push(String((e && e.message) || e)));
+  page.on('pageerror', (e) => { if (!isBrowserruis(e)) fouten.push(String((e && e.message) || e)); });
   page.on('request', (req) => {
     const p = new URL(req.url()).pathname;
     if (p.startsWith('/api/') && magLiegen(p, LIEG, SPAAR)) gelogen.add(req.method() + ' ' + p);
   });
   try {
     if (statisch) {
-      await page.goto(base + rij.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await page.goto(base + adres.ingang, { waitUntil: 'domcontentloaded', timeout: 20000 });
       await page.waitForTimeout(2500);
       m.landing = new URL(page.url()).pathname;
       m.deur = await page.evaluate((sel) => sel.find((s) => document.querySelector(s)) || null, POORTEN);
@@ -157,7 +165,7 @@ async function meet() {
   }
 }
 
-module.exports = { oordeel, isZekerheid, SPAAR, DOEL };
+module.exports = { oordeel, isZekerheid, meetAdres, SPAAR, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

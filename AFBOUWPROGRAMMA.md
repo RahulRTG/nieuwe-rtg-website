@@ -1196,3 +1196,12 @@ Bewijslogs: `/tmp/rtg-r3-pg-full.log`, `/tmp/rtg-r3-onboarding-repro.log`,
 `/tmp/rtg-r3-raakvlak-integrity.log`. De nieuwe bronwijzigingen zijn nog geen
 bevroren releasekandidaat. Normgrenzen blijven ongewijzigd; twee integrale groene
 runs, actuele appbewijzen en operationele kwalificatie ontbreken nog.
+
+Onafhankelijke read-only review vond één beperking in de streammeter:
+de kruismarkerstand werd vóór de laatste replay/anon-controles vastgezet.
+De meter sluit nu eerst beide readers af en beoordeelt daarna alle ontvangen
+events. Een tegenproef injecteert tijdens het afsluiten een kruismarker en
+vereist `gebroken`. Gerichte herhaling inclusief echte HTTP/SSE: 8/8 groen,
+nul skips (`/tmp/rtg-r3-stream-close.log`). De correctie is onafhankelijk
+herbeoordeeld; de reviewer heeft geen eigen testrun uitgevoerd. Het eerder
+vastgelegde IDOR-register is nog geen hermeting met deze strengere afsluitcontrole.

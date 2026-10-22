@@ -66,6 +66,16 @@ test('timeout beëindigt wachten en sluit de SSE-reader zonder vaste sleeps', as
   await assert.rejects(s.wacht(es=>es.length>0),/aborted/); await s.sluit();
 });
 
+test('een kruismarker tijdens afsluiten wordt vóór het definitieve oordeel meegenomen', async () => {
+  const raw = bewijs(), markers = ['eigen-a', 'eigen-b'], barrieres = ['klaar-a', 'klaar-b'];
+  const streams = markers.map((marker, i) => ({ events: [marker, barrieres[i]],
+    async sluit() { if (i === 0) { await Promise.resolve(); this.events.push(markers[1]); } } }));
+  await require('../scripts/lib/stroomisolatie').sluitEnLees(streams, raw.proef, markers, barrieres);
+  assert.equal(raw.proef.eigen[0].kruis, true);
+  assert.equal(raw.proef.eigen[1].kruis, false);
+  assert.equal(oordeel(raw).stand, 'gebroken');
+});
+
 test('echte HTTP-streams bewijzen eigen ontvangst, kruisgrens en eenmalige tickets', {timeout:90000}, async t => {
   const w = await require('../scripts/lib/voltooiwereld').maakWereld('stroomisolatie');
   t.after(() => w.klaar());

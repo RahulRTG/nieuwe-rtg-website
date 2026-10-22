@@ -67,10 +67,24 @@ async function openStroom(url, { vraag = fetch, timeout = 15000 } = {}) {
   } catch (e) { clearTimeout(timer); throw e; }
 }
 
+async function sluitEnLees(open, proef, markers, barrieres) {
+  await Promise.all(open.map(s => s.sluit()));
+  if (markers.length !== 2 || barrieres.length !== 2) return;
+  for (let i = 0; i < open.length; i++) {
+    const events = open[i].events;
+    const markerIndex = events.findIndex(e => e.includes(markers[i]));
+    const barriereIndex = events.findIndex(e => e.includes(barrieres[i]));
+    Object.assign(proef.eigen[i], { markerIndex, barriereIndex,
+      kruis: events.some(e => e.includes(markers[1 - i]) || e.includes(barrieres[1 - i])),
+      volgorde: markerIndex >= 0 && barriereIndex > markerIndex });
+  }
+}
+
 async function meet({ basis, post, vraag = fetch, timeout = 15000 }) {
   const proef = { eigen: [], barrieresNaVerzending: false };
   const uit = { gang: 'stroom', bewijsVersie: 1, staat: 'onbereikbaar', proef };
   const open = [];
+  let markers = [], barrieres = [];
   const getStatus = async ticket => {
     const ac = new AbortController(), t = setTimeout(() => ac.abort(), timeout);
     try { const r = await vraag(basis + '/api/stream?ticket=' + encodeURIComponent(ticket || ''),
@@ -97,7 +111,8 @@ async function meet({ basis, post, vraag = fetch, timeout = 15000 }) {
     }
     await Promise.all(open.map(s => s.wacht(events => events.some(e => /^event: hello$/m.test(e)))));
     for (const e of proef.eigen) e.hello = true;
-    const markers = ['stroom-a-' + merk, 'stroom-b-' + merk], barrieres = ['barriere-a-' + merk, 'barriere-b-' + merk];
+    markers = ['stroom-a-' + merk, 'stroom-b-' + merk];
+    barrieres = ['barriere-a-' + merk, 'barriere-b-' + merk];
     const stuur = async (i, tekst) => (await post('/api/comm/stuur', { id: gesprekken[i], tekst, idem: crypto.randomUUID() }, C.token)).status;
     for (let i = 0; i < 2; i++) proef.eigen[i].stuur = await stuur(i, markers[i]);
     if (!proef.eigen.every(e => ok(e.stuur))) throw new Error('marker niet serverbevestigd');
@@ -105,19 +120,16 @@ async function meet({ basis, post, vraag = fetch, timeout = 15000 }) {
     proef.barrieresNaVerzending = true;
     for (let i = 0; i < 2; i++) proef.eigen[i].barriereStuur = await stuur(i, barrieres[i]);
     await Promise.all(open.map((s, i) => s.wacht(es => es.some(e => e.includes(barrieres[i])))));
-    for (let i = 0; i < 2; i++) Object.assign(proef.eigen[i], {
-      markerIndex: open[i].events.findIndex(e => e.includes(markers[i])),
-      barriereIndex: open[i].events.findIndex(e => e.includes(barrieres[i])),
-      kruis: open[i].events.some(e => e.includes(markers[1 - i]) || e.includes(barrieres[1 - i])),
-      volgorde: true, herhaal: await getStatus(tickets[i])
-    });
+    for (let i = 0; i < 2; i++) proef.eigen[i].herhaal = await getStatus(tickets[i]);
     proef.anoniemTicket = (await post('/api/stroom/ticket', { stroom: 'lid' }, null)).status;
     proef.anoniemStream = await getStatus('');
   } catch (e) { uit.reden = e.message; }
-  finally { await Promise.all(open.map(s => s.sluit())); }
+  // Ook een kruismarker tijdens replay/anon-controles telt mee: lees pas
+  // definitief nadat beide readers gestopt zijn en hun eventlijsten vaststaan.
+  finally { await sluitEnLees(open, proef, markers, barrieres); }
   const o = oordeel({ ...uit, pad: '/api/stream', methode: 'GET' });
   uit.staat = o.stand === 'gemeten' ? 'afgebakend' : o.stand === 'gebroken' ? 'doorbraak' : 'onbereikbaar';
   uit.reden = uit.reden || o.reden;
   return uit;
 }
-module.exports = { oordeel, meet, openStroom };
+module.exports = { oordeel, meet, openStroom, sluitEnLees };

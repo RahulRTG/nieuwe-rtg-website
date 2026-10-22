@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-22T12:48:45.759Z",
-    "commit": "330b7921e7",
+    "op": "2026-10-22T13:27:26.165Z",
+    "commit": "5b88e7e03f",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.0"
   },
@@ -11,8 +11,8 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 107,
-    "NIET_GETEST": 7
+    "BEWEZEN": 109,
+    "NIET_GETEST": 5
   },
   "regels": [
     {
@@ -710,9 +710,9 @@
       "app": "Het bord",
       "ingang": "/apps/foundation/bord.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "achter een deur (html.rtf-school-dicht); het scherm zelf is niet beproefd",
-      "gelogen": 5,
+      "status": "BEWEZEN",
+      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 9,
       "klachten": []
     },
     {
@@ -740,9 +740,9 @@
       "app": "Het schrift",
       "ingang": "/apps/foundation/schrift.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "achter een deur (html.rtf-school-dicht); het scherm zelf is niet beproefd",
-      "gelogen": 5,
+      "status": "BEWEZEN",
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {

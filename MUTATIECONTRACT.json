@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-22T07:22:19.775Z",
-  "commit": "de9a2c6431",
+  "op": "2026-10-22T07:25:23.929Z",
+  "commit": "3a4698cf0f",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -11,15 +11,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5412,
-  "geclassificeerd": 5402,
+  "geclassificeerd": 5405,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1300,
-   "PROTECTED": 719,
-   "INTENTIONALLY_NON_IDEMPOTENT": 219,
-   "LEGACY_PENDING_CLASSIFICATION": 10
+   "PROTECTED": 720,
+   "INTENTIONALLY_NON_IDEMPOTENT": 221,
+   "LEGACY_PENDING_CLASSIFICATION": 7
   },
-  "vastgesteldDoorMens": 2290,
+  "vastgesteldDoorMens": 2293,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4499,
@@ -38200,12 +38200,14 @@
   {
    "mutatieId": "labfonds.beslis",
    "route": "POST /api/labfonds/beslis",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38217,10 +38219,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "labfonds.boardroom",
@@ -38252,12 +38254,14 @@
   {
    "mutatieId": "labfonds.doneer",
    "route": "POST /api/labfonds/doneer",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38269,10 +38273,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "labfonds.financiering",
@@ -38412,12 +38416,14 @@
   {
    "mutatieId": "labfonds.voorstel.maak",
    "route": "POST /api/labfonds/voorstel/maak",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38429,10 +38435,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "leerhuis.doe",

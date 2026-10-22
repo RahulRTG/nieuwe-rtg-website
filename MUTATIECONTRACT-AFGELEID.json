@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-10-22T07:12:26.329Z",
-  "commit": "abc7285729",
+  "op": "2026-10-22T07:15:49.701Z",
+  "commit": "f6bbb98161",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v26.12.0"
  },
  "uitleg": "Afgeleide mutatiecontracten -- GEEN MENS HEEFT HIER OVER NAGEDACHT. Geschreven door node scripts/mutatiecontract.js --afleiden, en overschreven bij elke volgende gang.",
  "grens": "Alleen BLOCKED_BY_TEST_FIXTURE. Vijf van de zes standen doen een uitspraak over GEDRAG en die mag geen script zetten -- geen meting leest de bedoeling van een handeling af. Deze stand doet de omgekeerde uitspraak: wij weten het niet, en dit is waarom de proef er niet bij kwam. De grond is hard: de route gaf zijn eigen hindernis terug. Wie een regel wil verbeteren, verhuist hem naar server/lib/mutatiecontracten.js -- een mens wint van een script.",
  "waardeloosVoor": "Een regel hier zegt NIETS over veiligheid en niets over idempotentie. Alleen: deze route bestaat, hij is niet gemeten, en dit moet er in scripts/lib/idemwereld.js komen voordat hij iets kan zeggen. Het is de wachtrij met per regel de reden -- beter dan diezelfde routes ongeteld op een hoop onder LEGACY.",
- "aantal": 3091,
+ "aantal": 3112,
  "contracten": {
   "POST /api/aandacht": {
    "mutatieId": "aandacht",
@@ -11483,6 +11483,22 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze gewoonte staat niet op uw naam.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/gids/app": {
+   "mutatieId": "gids.app",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Voor deze pagina is geen gids.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/giftcard/buy": {
    "mutatieId": "giftcard.buy",
    "herkomst": "afgeleid",
@@ -12620,6 +12636,119 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Kies: tegenviel, misging, onverwacht, herzien.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/lab2/bewoner/klacht": {
+   "mutatieId": "lab2.bewoner.klacht",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Beschrijf waar de klacht over gaat.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/bewoner/overzicht": {
+   "mutatieId": "lab2.bewoner.overzicht",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit lab bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/bewoner/paspoort": {
+   "mutatieId": "lab2.bewoner.paspoort",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "code"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit labpaspoort bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/bewoner/paspoort-maak": {
+   "mutatieId": "lab2.bewoner.paspoort-maak",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit lab bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/bewoner/stem": {
+   "mutatieId": "lab2.bewoner.stem",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit thema bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/bewoner/thema": {
+   "mutatieId": "lab2.bewoner.thema",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/bewoner/themas": {
+   "mutatieId": "lab2.bewoner.themas",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit lab bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/lab2/coach": {
    "mutatieId": "lab2.coach",
    "herkomst": "afgeleid",
@@ -12940,6 +13069,125 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze deelnemer staat niet op dit onderzoek.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/lab2/mijn": {
+   "mutatieId": "lab2.mijn",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "pas"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze labpas kennen we niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/mijn/meting": {
+   "mutatieId": "lab2.mijn.meting",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "pas"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze labpas kennen we niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/mijn/observatie": {
+   "mutatieId": "lab2.mijn.observatie",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "pas"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze labpas kennen we niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/mijn/reflectie": {
+   "mutatieId": "lab2.mijn.reflectie",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "pas"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze labpas kennen we niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/mijn/terugtrekken": {
+   "mutatieId": "lab2.mijn.terugtrekken",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "pas"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/mijn/terugtrekken/gevolg": {
+   "mutatieId": "lab2.mijn.terugtrekken.gevolg",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "pas"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/mijn/venster": {
+   "mutatieId": "lab2.mijn.venster",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "pas"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/lab2/observatorium": {
    "mutatieId": "lab2.observatorium",
    "herkomst": "afgeleid",
@@ -13099,6 +13347,86 @@
     "op": "2026-10-22"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Er is nog geen besluit over dit onderzoek. Publiceren kan pas als het lab heeft vastgesteld wat het ermee doet -- ook als de uitkomst is dat het gestopt is.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/publiek/apparatuur": {
+   "mutatieId": "lab2.publiek.apparatuur",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit lab bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/publiek/onderzoek": {
+   "mutatieId": "lab2.publiek.onderzoek",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit onderzoek is (nog) niet openbaar.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/publiek/onderzoeken": {
+   "mutatieId": "lab2.publiek.onderzoeken",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit lab bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/publiek/uitleen-aanvraag": {
+   "mutatieId": "lab2.publiek.uitleen-aanvraag",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/lab2/publiek/vragen": {
+   "mutatieId": "lab2.publiek.vragen",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit lab bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/lab2/studie/besluit": {
    "mutatieId": "lab2.studie.besluit",
@@ -32261,6 +32589,22 @@
     "op": "2026-10-22"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze stadsafdeling bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/rtfos/publiek/stad": {
+   "mutatieId": "rtfos.publiek.stad",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-10-22"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"RTF Proefstad is nog niet open. Zodra de afdeling van start gaat, staat hier wat er te doen is.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/rtfos/rapport": {
    "mutatieId": "rtfos.rapport",

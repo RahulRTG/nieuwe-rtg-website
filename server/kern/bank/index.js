@@ -91,10 +91,17 @@ module.exports = (deps) => {
      duurzaam, en gaf /api/bank/akkoord een IBAN die de opslag nooit
      bevestigde (FAALPROEF: `gezakt`). Reikwijdte: GELDLAT.md. */
   const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen, duurzaam: true,
-    behoudSleutel: sleutel => sleutel.startsWith('rekopen-kantoor:'),
-    geldigeOntvangst: (sleutel, ontvangst) => !sleutel.startsWith('rekopen-kantoor:') ||
-      !!(ontvangst && ontvangst.rekening && typeof ontvangst.rekening.iban === 'string' &&
-        ontvangst.rekening.iban.trim()) });
+    behoudSleutel: sleutel => sleutel.startsWith('rekopen-kantoor:') || sleutel.startsWith('bankakkoord:'),
+    geldigeOntvangst: (sleutel, ontvangst) => {
+      if (sleutel.startsWith('rekopen-kantoor:')) return !!(ontvangst && ontvangst.rekening &&
+        typeof ontvangst.rekening.iban === 'string' && ontvangst.rekening.iban.trim());
+      /* Oude ontvangsten bevatten alleen {ok:true}; die blijven veilig
+         herkenbaar maar openen bij replay geen rekening. Nieuwe ontvangsten
+         dragen de volledige atomair vastgelegde akkoorduitkomst. */
+      if (sleutel.startsWith('bankakkoord:')) return !!(ontvangst && ontvangst.ok === true &&
+        (ontvangst.akkoord === undefined || ontvangst.akkoord === true));
+      return true;
+    } });
 
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, findSupplier, accounts, anthropic,

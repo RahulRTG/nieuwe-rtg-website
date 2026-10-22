@@ -36,7 +36,6 @@ module.exports = (ctx, { open, vanLid }) => {
     if (!bankregie.bankLedenAan()) return { status: 403, error: 'De RTG Bank is nog niet live voor leden.' };
     const c = String(codenaam || '').trim();
     if (!c) return { status: 400, error: 'Onbekend lid.' };
-    const alHad = Object.values(rekeningen()).some(m => m.codenaam === c);
     /* HET AKKOORD ZELF WAS NIET DUURZAAM, de rekening eronder wel.
 
        Hier stond `store[c] = ...; save();` -- write-behind, buiten elke bundel.
@@ -51,23 +50,35 @@ module.exports = (ctx, { open, vanLid }) => {
        Twee commits, in de juiste volgorde -- eerst de instemming, dan de
        rekening; andersom krijgt een lid een rekening waar hij nooit ja tegen
        zei. */
-    const vast = await metIdem('bankakkoord:' + c, idemContract.identiteitVan('bank.akkoord', { codenaam: c }), () => {
+    const vast = await metIdem('bankakkoord:' + c,
+      idemContract.identiteitVan('bank.akkoord', { codenaam: c, tier: tier || 'rtg' }), async () => {
       const store = akkoordStore();
       store[c] = store[c] || nu();
       save();
-      return { ok: true };
+      /* Akkoord en de daaruit volgende standaardrekeningen vallen onder
+         dezelfde bestaande databasebundel. Een kill kan daardoor niet langer
+         een juridisch akkoord zonder rekening, of een rekening zonder akkoord,
+         als half geslaagde handeling achterlaten. */
+      const alHad = Object.values(rekeningen()).some(m => m.codenaam === c);
+      let rekening = null;
+      if (!alHad) {
+        const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid', idem: 'akkoord-betaal' });
+        if (r.error) return r;
+        rekening = r.rekening;
+      }
+      let zakelijk = null;
+      if (tier === 'business' && !Object.values(rekeningen()).some(m => m.codenaam === c && m.soort === 'zakelijk')) {
+        const z = await open({ codenaam: c, soort: 'zakelijk', naam: 'RTG Zakelijke rekening', wie: 'lid', idem: 'akkoord-zakelijk' });
+        if (z.error) return z;
+        zakelijk = z.rekening;
+      }
+      return { ok: true, akkoord: true, rekening, zakelijk };
     });
     if (vast && vast.error) return vast;
-    /* MET SLEUTEL: zonder loopt het werk buiten de duurzame commit (idem.js 94). */
-    let rekening = null;
-    if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid', idem: 'akkoord-betaal' }); if (r.error) return r; rekening = r.rekening; }
-    // de Business Pass krijgt er AUTOMATISCH een zakelijke rekening bij (gratis)
-    let zakelijk = null;
-    if (tier === 'business' && !Object.values(rekeningen()).some(m => m.codenaam === c && m.soort === 'zakelijk')) {
-      const z = await open({ codenaam: c, soort: 'zakelijk', naam: 'RTG Zakelijke rekening', wie: 'lid', idem: 'akkoord-zakelijk' });
-      if (!z.error) zakelijk = z.rekening;
-    }
-    return { ok: true, akkoord: true, rekening, zakelijk };
+    /* Een herhaling bevestigt de zakelijke status, maar heronthult geen oud
+       rekeningobject en opent na een latere sluiting nooit stil een nieuwe. */
+    if (vast.herhaald) return { ok: true, akkoord: true, herhaald: true, rekening: null, zakelijk: null };
+    return vast;
   }
 
   return { bankLedenOverzicht: ledenOverzicht, bankLedenAkkoord: ledenAkkoord };

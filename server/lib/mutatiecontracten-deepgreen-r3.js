@@ -64,7 +64,11 @@ const CONTRACTEN = {
     'Iedere ledenzoekopdracht is afzonderlijke inzage in persoonsgegevens en moet als zelfstandig auditmoment worden vastgelegd.'),
   'POST /api/office/techniek/integraties/noodstop': contract('office.integraties.noodstop', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
     'test/remduurzaam.test.js: iedere bewuste noodstop zet alle runtime-rails opnieuw uit, schrijft een eigen logregel en bevestigt uitsluitend na duurzame opslag',
-    'Een herhaalde bewuste noodstop is een nieuwe veiligheidsactie: hij handhaaft de actuele runtime opnieuw en blijft afzonderlijk auditeerbaar.')
+    'Een herhaalde bewuste noodstop is een nieuwe veiligheidsactie: hij handhaaft de actuele runtime opnieuw en blijft afzonderlijk auditeerbaar.'),
+
+  'POST /api/bank/akkoord': contract('bank.akkoord', 'hooguitEens', 'PROTECTED',
+    'test/bankhart.test.js: retry geeft compact herhaald antwoord en opent geen nieuwe rekening; test/bankduurzaam.test.js: opslagverlies geeft geen akkoord of IBAN',
+    'Akkoord en standaardrekeningen worden in één bestaande transactionele idem-bundel vastgelegd. De duurzame akkoordontvangst blijft buiten de gewone sleutelring.')
 };
 
 module.exports = { CONTRACTEN };

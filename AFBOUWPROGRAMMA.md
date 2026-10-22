@@ -1223,3 +1223,19 @@ De gerichte SQLite/HTTP-regressie haalt 49/49 zonder skips
 die onjuiste proefopzet is geen productkwalificatie. De volledige geïsoleerde
 PostgreSQL-selectie moet opnieuw worden uitgevoerd op de vastgelegde bronstand.
 Status blijft ORANJE; geen merge of uitrol.
+
+Hermeting op `4c0948c98a`: PostgreSQL opnieuw 55/56 bestanden. Onboarding
+is nu groen; GRAND faalt bij leverancierslogin met 409. Dit is een nieuwe
+waarneming, geen afgesloten volledige PG-kwalificatie
+(`/tmp/rtg-r3-pg-repeat.log`). De rolronde bewijst 581 endpoints bij de
+ongewijzigde vloer 1444. Alle 23 Lifestyle-fixtures slagen; 19 eerder getelde
+routes missen nu toestelbewijs in de strengere testomgeving. De rolmeter
+bindt daarom via de bestaande toestelprocedure een eigen sleutel aan ieder
+nieuw testlid en tekent ieder verzoek afzonderlijk. Beveiliging blijft
+verplicht. Gerichte HTTP- en tegenproeven: 21/21, nul skips
+(`/tmp/rtg-r3-role-device.log`); brede hermeting volgt.
+
+De afzonderlijke gluurronde (`/tmp/rtg-r3-idor-repeat.log`, instrument
+`scripts/gluurronde.js`) ziet geen toegang van A tot B's herkenbare stukken:
+5853 controles, 15582 verzoeken, 31 aangelegde stukken en 26 terugvindbaar.
+Dit beperkte GLUURRONDE-bewijs is geen volledige IDOR- of streamkwalificatie.

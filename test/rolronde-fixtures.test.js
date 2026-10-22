@@ -58,3 +58,20 @@ test('echte eigenaar kent Lifestyle toe; 23 leesingangen behouden RTG- en rolgre
   assert.equal(beoordeelRoute('POST '+pad,anon,e.eigen,antwoorden,controles).bewezen,true,pad);
  }
 });
+
+test('rolmeter bindt een echt toestel per sessie zonder de bezitsbewijsgrens te verlagen', {timeout:120000}, async t=>{
+ const {maakWereld,nieuwLid}=require('../scripts/lib/voltooiwereld');
+ const {maakVraag}=require('../scripts/rolronde');
+ const w=await maakWereld('rolronde-toestel',{RTG_BEZITSBEWIJS:'verplicht'});t.after(()=>w.klaar());
+ const a=await nieuwLid(w,'toestel-a'),b=await nieuwLid(w,'toestel-b');
+ const vraag=maakVraag(w.basis);
+ const pad='/api/privacy/inzage';
+ assert.equal((await vraag('POST',pad,a.token,{})).status,403);
+ await vraag.bindToestel(a.token);
+ for(let i=0;i<2;i++)assert.equal((await vraag('POST',pad,a.token,{})).status,200,'ieder verzoek heeft nieuw geldig bewijs');
+ assert.equal((await vraag('POST',pad,b.token,{})).status,403,'geen toestelbewijs van A naar B');
+ assert.equal((await w.post(pad,{},a.token)).status,401,'token zonder handtekening blijft geweigerd');
+ await vraag.bindToestel(b.token);
+ assert.equal((await vraag('POST',pad,b.token,{})).status,200);
+ assert.equal((await vraag('POST',pad,null,{})).status,401,'anoniem blijft anoniem');
+});

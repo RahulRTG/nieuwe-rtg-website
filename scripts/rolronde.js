@@ -95,10 +95,13 @@ const NIET_KLOPPEN = /\/api\/(sse|stream|live-)|\/sse|\/stream|\/api\/test\/|\/a
 const agent = new http.Agent({ keepAlive: true, maxSockets: 32 });
 function maakVraag(basis) {
   const u = new URL(basis);
-  return function vraag(methode, pad, token, lijf, opt) {
+  const toestellen = new Map();
+  const vraag = async function vraag(methode, pad, token, lijf, opt) {
+    const toestel = toestellen.get(token);
+    const bewijs = toestel ? await toestel.bewijs(methode, pad) : {};
     return new Promise(resolve => {
       const data = methode === 'GET' ? null : JSON.stringify(lijf === undefined ? {} : lijf);
-      const headers = { 'Content-Type': 'application/json' };
+      const headers = { 'Content-Type': 'application/json', ...bewijs };
       if (data) headers['Content-Length'] = Buffer.byteLength(data);
       if (token) headers.Authorization = 'Bearer ' + token;
       const req = http.request({ hostname: u.hostname, port: u.port, path: pad, method: methode, headers, agent,
@@ -118,6 +121,14 @@ function maakVraag(basis) {
       req.end();
     });
   };
+  vraag.bindToestel = async token => {
+    if (!token) throw new Error('Geen accountsessie voor toestelbinding');
+    const toestel = await require('./lib/voltooiwereld').gebondenToestel({
+      post: (pad, lijf, tok) => vraag('POST', pad, tok, lijf)
+    }, token);
+    toestellen.set(token, toestel);
+  };
+  return vraag;
 }
 
 /* ------------------------------------------------------------- de drie rollen */
@@ -133,6 +144,7 @@ async function nieuwLid(vraag) {
     name: 'Rolronde ' + u, email: 'rolronde' + u + '@voorbeeld.test', phone: '0612345678',
     password: 'Geheim' + u + '!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   const tok = reg.data && reg.data.token;
+  if (tok) await vraag.bindToestel(tok);
   if (tok) await vraag('POST', '/api/verify/upload', tok, { image: KYC });
   return tok || null;
 }
@@ -395,4 +407,4 @@ async function main() {
 }
 
 if (require.main === module) main().then(c => { process.exitCode = c; }).catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { meetRol, beoordeelRoute, beoordeel, gedeeldAntwoordGeldig, METER, METER_N };
+module.exports = { maakVraag, meetRol, beoordeelRoute, beoordeel, gedeeldAntwoordGeldig, METER, METER_N };

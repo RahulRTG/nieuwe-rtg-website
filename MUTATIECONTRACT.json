@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-22T07:15:58.267Z",
-  "commit": "f919b93494",
+  "op": "2026-10-22T07:20:17.686Z",
+  "commit": "c6c448c627",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v26.12.0"
  },
@@ -11,15 +11,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5412,
-  "geclassificeerd": 5394,
+  "geclassificeerd": 5400,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1300,
-   "PROTECTED": 715,
-   "INTENTIONALLY_NON_IDEMPOTENT": 215,
-   "LEGACY_PENDING_CLASSIFICATION": 18
+   "PROTECTED": 718,
+   "INTENTIONALLY_NON_IDEMPOTENT": 218,
+   "LEGACY_PENDING_CLASSIFICATION": 12
   },
-  "vastgesteldDoorMens": 2282,
+  "vastgesteldDoorMens": 2288,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4499,
@@ -121614,12 +121614,14 @@
   {
    "mutatieId": "supplier.mep.daily",
    "route": "POST /api/supplier/mep/daily",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -121631,10 +121633,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.mep.daily.done",
@@ -123035,12 +123037,14 @@
   {
    "mutatieId": "supplier.onboarding.zet",
    "route": "POST /api/supplier/onboarding/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -123052,10 +123056,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "onderneming.zaakkant.lezen",
@@ -125031,12 +125035,14 @@
   {
    "mutatieId": "supplier.poort.online",
    "route": "POST /api/supplier/poort/online",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -125048,10 +125054,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.poort.rondleiding",
@@ -126880,12 +126886,14 @@
   {
    "mutatieId": "supplier.rooster.voorstel",
    "route": "POST /api/supplier/rooster/voorstel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -126897,10 +126905,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.roster",
@@ -127470,12 +127478,14 @@
   {
    "mutatieId": "supplier.rtmail.export",
    "route": "POST /api/supplier/rtmail/export",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -127487,10 +127497,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.rtmail.gesprekken",
@@ -132740,12 +132750,14 @@
   {
    "mutatieId": "supplier.werkbeleid.zet",
    "route": "POST /api/supplier/werkbeleid/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -132757,10 +132769,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.werkmail.adressen",

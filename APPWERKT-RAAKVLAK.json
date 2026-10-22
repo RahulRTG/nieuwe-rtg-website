@@ -2,15 +2,15 @@
  "soort": "meting",
  "uitleg": "Per bestand dat in het raakvlak van een bewijs in APPWERKT.json zit, de sha256 van zijn inhoud op het moment van de meting (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i). Wordt alleen samen met APPWERKT.json geschreven, door scripts/appwerkt.js.",
  "stempel": {
-  "op": "2026-10-22T12:40:29.446Z",
-  "commit": "b0a84886bc",
+  "op": "2026-10-22T12:59:53.167Z",
+  "commit": "5de83ea781",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
   "node": "v26.12.0"
  },
  "bestanden": 6032,
- "samen": "c4271b9e6cb6c2f389971e6896c9066029cdf3132f6f64702513ee9c5b871f93",
+ "samen": "e87863c5c2f3ba7c21a3a36bcbad5f4e24539681e2f7443763dd7d62db6d5a5c",
  "hashes": {
   "IDEMPROEF.json": "a252ece47b856742ee77e8f4368e057d50c237296adfb7f4670c9131ff0df745",
   "package.json": "558de98416a46c5e3d0000fbac4c536611cf221b21057e16c34f091685165af8",
@@ -1391,7 +1391,7 @@
   "scripts/lib/wereldregister.js": "8a4538a7282894c6648fd0ecf9697463fe5d2d85139a99a562de8809a09f76e3",
   "scripts/lib/werkelijkheid.js": "defa3d83416b7737748cc7b0200f702abd1a7c34ae99d61a517c9457bd33e7d6",
   "scripts/lib/zaakinlog.js": "3bf4923ca8b22b886614d971ea7a9a4aa165211b0e9c5e0952a0b5fb1801b16e",
-  "scripts/liegronde.js": "ede390a6cf1b15155e7d3b0add46495e22a08fa64107572780df8985a34de1fd",
+  "scripts/liegronde.js": "665b74f8f9c9e83d47c7ea3ec8284d05e7bbbd57f9067aa3cc313d066e277ccc",
   "scripts/release-bewijs.js": "05381f23d7360695eeab1a814bc3a516d8159871b5936baed2e0f6dc5f104148",
   "scripts/rolproef-route.js": "3abf20c6eb5399a693ff4730d31d41857ead76097fbd74a51873772272669cf3",
   "scripts/routeversheid.js": "2e518d4cffd2c880229a00d9933a3ade6a247ebe647757bcd6bd9ead62d3f4bc",

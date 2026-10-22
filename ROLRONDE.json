@@ -1,22 +1,22 @@
 {
   "stempel": {
-    "op": "2026-10-22T21:10:18.274Z",
-    "commit": "4c0948c98a",
+    "op": "2026-10-22T22:08:32.377Z",
+    "commit": "8b4e5c1429",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/rolronde.js",
     "node": "v26.12.0"
   },
   "uitleg": "De rolronde: welke rol komt waar binnen, gevraagd aan een echte server in plaats van aan de brontekst. gaten MAG ALLEEN DALEN en gemeten mag ALLEEN STIJGEN -- zie scripts/rolronde.js. Dit is de VERTICALE scheiding; de horizontale (lid A tegen lid B) is de gluurder-trede van de ladder.",
-  "gedraaid": "2026-10-22T21:10:18.275Z",
+  "gedraaid": "2026-10-22T22:08:32.377Z",
   "meters": {
     "rolscheidingGaten": 0,
-    "rolscheidingGemeten": 581
+    "rolscheidingGemeten": 600
   },
   "routesOnderzocht": 5166,
-  "sessieHersteld": 1,
+  "sessieHersteld": 2,
   "publiekOfVroegGevalideerd": 180,
-  "andereRol": 4398,
+  "andereRol": 4378,
   "zonderAntwoord": [],
   "bewustGedeeld": [
     {
@@ -536,6 +536,20 @@
       "na": 200
     },
     {
+      "route": "POST /api/bank/overzicht",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/bank/overzicht",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
       "route": "POST /api/bedrijf/mijn",
       "rol": "leverancier",
       "voor": 200,
@@ -600,6 +614,34 @@
     },
     {
       "route": "POST /api/bestanden/upstart",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/betaal/mijn",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/betaal/mijn",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/betaal/verzoeken",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/betaal/verzoeken",
       "rol": "kantoor",
       "voor": 200,
       "antwoord": 401,
@@ -1594,6 +1636,20 @@
     },
     {
       "route": "POST /api/gegevens/nodig",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/gegevens/start",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/gegevens/start",
       "rol": "kantoor",
       "voor": 200,
       "antwoord": 401,
@@ -5858,6 +5914,20 @@
       "na": 200
     },
     {
+      "route": "POST /api/mijn/sessies/sluit-overige",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/sessies/sluit-overige",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
       "route": "POST /api/mijn/toestel/uitdaging",
       "rol": "leverancier",
       "voor": 200,
@@ -6356,6 +6426,34 @@
     },
     {
       "route": "POST /api/notities/mijn",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/onboarding/inricht",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/onboarding/inricht",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/onboarding/inrichten",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/onboarding/inrichten",
       "rol": "kantoor",
       "voor": 200,
       "antwoord": 401,
@@ -6950,6 +7048,146 @@
       "na": 200
     },
     {
+      "route": "POST /api/pay/graaf",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/graaf",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/kascode",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/kascode",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/kascode/intrek",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/kascode/intrek",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/overzicht",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/overzicht",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/portefeuille",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/portefeuille",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tegoed",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tegoed",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/terugstand",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/terugstand",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tikcode",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tikcode",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tikcode/intrek",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tikcode/intrek",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tiks",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/pay/tiks",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
       "route": "POST /api/pin/check",
       "rol": "leverancier",
       "voor": 200,
@@ -7056,6 +7294,34 @@
     },
     {
       "route": "POST /api/podium/weg",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/privacy/export",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/privacy/export",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/privacy/inzage",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/privacy/inzage",
       "rol": "kantoor",
       "voor": 200,
       "antwoord": 401,
@@ -9680,11 +9946,6 @@
       "status": 403
     },
     {
-      "route": "POST /api/bank/overzicht",
-      "rol": "lid",
-      "status": 403
-    },
-    {
       "route": "POST /api/bank/pas/betaal",
       "rol": "lid",
       "status": 403
@@ -10592,22 +10853,12 @@
     {
       "route": "POST /api/betaal/direct",
       "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/betaal/mijn",
-      "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/betaal/verzoek/pay",
       "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/betaal/verzoeken",
-      "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/betaal/webhook",
@@ -12750,14 +13001,9 @@
       "status": 400
     },
     {
-      "route": "POST /api/gegevens/start",
-      "rol": "lid",
-      "status": 403
-    },
-    {
       "route": "POST /api/gegevens/zeg",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/geld/beleid/weg",
@@ -16597,22 +16843,17 @@
     {
       "route": "POST /api/mijn/sessies/sluit",
       "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/mijn/sessies/sluit-overige",
-      "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/mijn/toestel/bind",
       "rol": "lid",
-      "status": 400
+      "status": 409
     },
     {
       "route": "POST /api/mijn/toestel/introk",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/mijn/toestel/noem",
@@ -20390,16 +20631,6 @@
       "status": 403
     },
     {
-      "route": "POST /api/onboarding/inricht",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/onboarding/inrichten",
-      "rol": "lid",
-      "status": 403
-    },
-    {
       "route": "POST /api/onboarding/salonpost",
       "rol": "lid",
       "status": 400
@@ -21190,119 +21421,69 @@
       "status": 200
     },
     {
-      "route": "POST /api/pay/graaf",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/kascode",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/kascode/intrek",
-      "rol": "lid",
-      "status": 403
-    },
-    {
       "route": "POST /api/pay/oplaad",
       "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/overzicht",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/portefeuille",
-      "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/rekening",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/saldo",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/pay/stuur",
       "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/tegoed",
-      "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/tegoed/koop",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/tegoed/roteer",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/tegoed/terug",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/pay/tegoed/verzilver",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/terug",
       "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/terugstand",
-      "rol": "lid",
-      "status": 403
+      "status": 409
     },
     {
       "route": "POST /api/pay/tik",
       "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/tikcode",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/tikcode/intrek",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/pay/tiks",
-      "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/verzoek",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/pay/verzoek/betaal",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/pay/verzoek/intrek",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/pin/herstel",
@@ -21406,18 +21587,8 @@
     },
     {
       "route": "POST /api/privacy/delete",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/privacy/export",
-      "rol": "lid",
-      "status": 403
-    },
-    {
-      "route": "POST /api/privacy/inzage",
-      "rol": "lid",
-      "status": 403
+      "rol": "lid-kanarie",
+      "status": 0
     },
     {
       "route": "GET /api/projectie/:code",
@@ -24182,12 +24353,12 @@
     {
       "route": "POST /api/rtgid/machtig",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/rtgid/machtig/intrek",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/rtgid/roteer",
@@ -31292,22 +31463,22 @@
     {
       "route": "POST /api/wallet/munt/koop",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/wallet/munt/wissel",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/wallet/voeg",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/wallet/weg",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/wbw/groep",
@@ -31327,7 +31498,7 @@
     {
       "route": "POST /api/wbw/verreken",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/wbw/verzoek",
@@ -31347,7 +31518,7 @@
     {
       "route": "POST /api/webauthn/registreer",
       "rol": "lid",
-      "status": 403
+      "status": 400
     },
     {
       "route": "POST /api/webauthn/registreer/opties",
@@ -31357,7 +31528,7 @@
     {
       "route": "POST /api/webauthn/weg",
       "rol": "lid",
-      "status": 403
+      "status": 404
     },
     {
       "route": "POST /api/webhooks/storingen",
@@ -32077,11 +32248,14 @@
     "POST /api/avond/voorkeuren",
     "POST /api/avond/voorkeuren/proef",
     "POST /api/balans",
+    "POST /api/bank/overzicht",
     "POST /api/bedrijf/mijn",
     "POST /api/beraad/mijn",
     "POST /api/bestanden/leeg",
     "POST /api/bestanden/mijn",
     "POST /api/bestanden/upstart",
+    "POST /api/betaal/mijn",
+    "POST /api/betaal/verzoeken",
     "POST /api/bezorg/partners",
     "POST /api/bijles/gesprek",
     "POST /api/boeken/bieb",
@@ -32153,6 +32327,7 @@
     "POST /api/gast/foodcourt/mijn",
     "POST /api/gedachten",
     "POST /api/gegevens/nodig",
+    "POST /api/gegevens/start",
     "POST /api/geld/actielog",
     "POST /api/geld/beleid",
     "POST /api/geld/cockpit",
@@ -32395,6 +32570,7 @@
     "POST /api/mijn/post/alles-uit",
     "POST /api/mijn/post/geschiedenis",
     "POST /api/mijn/sessies",
+    "POST /api/mijn/sessies/sluit-overige",
     "POST /api/mijn/toestel/uitdaging",
     "POST /api/mijn/tweefactor",
     "POST /api/mob/aanbod",
@@ -32431,6 +32607,8 @@
     "POST /api/notifications/read",
     "POST /api/notities/bewaar",
     "POST /api/notities/mijn",
+    "POST /api/onboarding/inricht",
+    "POST /api/onboarding/inrichten",
     "POST /api/onboarding/meebouwen",
     "POST /api/onboarding/opslaan",
     "POST /api/onboarding/paspoort",
@@ -32473,6 +32651,16 @@
     "POST /api/overheid/zaken/mijn",
     "POST /api/pakket/typen",
     "POST /api/pakketten",
+    "POST /api/pay/graaf",
+    "POST /api/pay/kascode",
+    "POST /api/pay/kascode/intrek",
+    "POST /api/pay/overzicht",
+    "POST /api/pay/portefeuille",
+    "POST /api/pay/tegoed",
+    "POST /api/pay/terugstand",
+    "POST /api/pay/tikcode",
+    "POST /api/pay/tikcode/intrek",
+    "POST /api/pay/tiks",
     "POST /api/pin/check",
     "POST /api/pin/status",
     "POST /api/pin/vergeten",
@@ -32481,6 +32669,8 @@
     "POST /api/podium/kanalen",
     "POST /api/podium/mijn",
     "POST /api/podium/weg",
+    "POST /api/privacy/export",
+    "POST /api/privacy/inzage",
     "POST /api/privacy/opnieuw",
     "POST /api/punten",
     "POST /api/rahul/plekken",

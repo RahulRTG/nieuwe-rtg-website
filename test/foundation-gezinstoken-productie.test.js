@@ -98,8 +98,10 @@ test('er is precies een plek die een gezinstoken vergelijkt, en niemand maakt no
   }
   assert.deepEqual(fout, [], 'een tweede vergelijking of een kaal token naast foundation/gezinstoken.js');
   const hulp = fs.readFileSync(path.join(ROOT, 'server/foundation/gezinshulp.js'), 'utf8');
-  assert.match(hulp, /function profielVan\(g, token\) \{[\s\S]{0,200}gezinstoken\.vind\(g, token\)/,
-    'profielVan vraagt het aan gezinstoken.vind');
+  const profiel = hulp.match(/function profielVan\(g, token, gezinnen\) \{([\s\S]*?)\n\}/);
+  assert.ok(profiel, 'één profielcontrole met optionele transactionele gezinsstand');
+  assert.match(profiel[1], /const p = gezinstoken\.vind\(g, token\)/, 'dezelfde tokenmotor');
+  assert.match(profiel[1], /return p && plicht\.magDoor\(g, p\) \? p : undefined/, 'accountplicht blijft onderdeel van dezelfde controle');
 });
 
 test('met een PASS-dossier: het gezinstoken, de gezinsdeur en de lesfamilie open', async t => {

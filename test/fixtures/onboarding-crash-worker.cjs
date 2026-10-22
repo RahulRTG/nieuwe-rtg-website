@@ -11,15 +11,20 @@ require.cache[pad].exports = { ...origineel, maakOnboarding(ctx) {
   const fase = process.env.RTG_ONB_PROEF_FASE;
   if (!marker) return origineel.maakOnboarding(ctx);
   return origineel.maakOnboarding({ ...ctx, bewerkCollectie: async (sleutel, werk) => {
+    const ondertekening = sleutel === 'onboarding' || (sleutel && sleutel.onboarding === 'kaart' && sleutel.foundation === 'kaart');
+    if (ondertekening && fase === 'voor-slot') {
+      fs.writeFileSync(marker, JSON.stringify({ fase }));
+      while (!fs.existsSync(marker + '.verder')) await new Promise(r => setTimeout(r, 10));
+    }
     const r = await ctx.bewerkCollectie(sleutel, bron => {
       const uit = werk(bron);
-      if (sleutel === 'onboarding' && uit.ok && fase === 'voor-commit') {
+      if (ondertekening && uit.ok && fase === 'voor-commit') {
         fs.writeFileSync(marker, JSON.stringify({ fase, at: uit.contract.ondertekendAt }));
         process.kill(process.pid, 'SIGKILL');
       }
       return uit;
     });
-    if (sleutel === 'onboarding' && r.ok && fase === 'na-commit') {
+    if (ondertekening && r.ok && fase === 'na-commit') {
       fs.writeFileSync(marker, JSON.stringify({ fase, at: r.contract.ondertekendAt }));
       await new Promise(() => {});
     }

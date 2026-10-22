@@ -171,3 +171,30 @@ test('collectieslot leest de actuele versie, niet de verouderde worker-cache', a
   assert.equal(r.status, 200); assert.equal(r.contract.versie, 2);
   assert.equal(p.db.data.onboarding.profielen[sess.key], undefined, 'de bewerker gebruikt geen losse RAM-schrijver');
 });
+
+test('gezinstransactie publiceert geen profielmigratie bij weigering en leidt actor uitsluitend binnen het slot af', async () => {
+  const p = motor(), bron = { foundation: { gezinnen: { GEZIN: { legacy: true } } }, onboarding: {} };
+  let binnen = false, geldig = false;
+  const onb = maakOnboarding({ ...p.opties,
+    bewerkCollectie: async (contract, werk) => {
+      assert.deepEqual(contract, { foundation: 'kaart', onboarding: 'kaart' });
+      binnen = true; try { return werk(bron); } finally { binnen = false; }
+    },
+    verifieerGezin: (code, token, foundation) => {
+      assert.equal(binnen, true); assert.equal(code, 'GEZIN'); assert.equal(token, 'test-token');
+      assert.notEqual(foundation, bron.foundation);
+      delete foundation.gezinnen.GEZIN.legacy;
+      return geldig ? { handle: sess.key, gast: false } : null;
+    }
+  });
+  const voor = structuredClone(bron);
+  assert.equal((await onb.tekenGezinVast('GEZIN', 'test-token', 'Sam Ouder', true, 1)).status, 403);
+  assert.deepEqual(bron, voor);
+  geldig = true;
+  assert.equal((await onb.tekenGezinVast('GEZIN', 'test-token', 'Sam Ouder', false, 1)).status, 400);
+  assert.deepEqual(bron, voor, 'ook geweigerd akkoord publiceert geen migratie');
+  assert.equal((await onb.tekenGezinVast('GEZIN', 'test-token', 'Sam Ouder', true, 1)).status, 200);
+  assert.equal(bron.foundation.gezinnen.GEZIN.legacy, undefined);
+  assert.ok(bron.onboarding.profielen[sess.key].ondertekeningen.rtg[1]);
+  assert.deepEqual(p.db.data, {}, 'geen globale snapshotverwisseling');
+});

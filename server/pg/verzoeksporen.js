@@ -183,4 +183,4 @@ function voegSpoorSamen(sleutel, basis, ons, hun) {
   return null;
 }
 
-module.exports = { voegSpoorSamen, mergeHandeling, mergeApiSpoor, commandHeel };
+module.exports = { voegSpoorSamen, mergeHandeling, mergeApiSpoor, commandHeel, handelingToevoegingen };

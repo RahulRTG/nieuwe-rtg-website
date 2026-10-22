@@ -31,7 +31,7 @@ const VELD_TYPES = ['text', 'email', 'tel', 'date', 'land', 'nummer', 'kyc'];
 
 const DEFAULT_CONTRACT = require('./onboarding/contract');
 
-function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon, bewerkCollectie }) {
+function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon, bewerkCollectie, verifieerGezin }) {
   function nu() { return new Date().toISOString(); }
 
   /* Elk veld draagt zijn MOMENT: wanneer we het vragen.
@@ -132,14 +132,14 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon, bewerkC
   const { publiekeConfig, config, normaliseerVelden, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars } = require('./onboarding/beheer')(ctx);
   // de lid-acties (status, intake, paspoort, RTG Pay-poort, tekenen)
   const { status, klaar, payGate, slaOp, bewaarPaspoort, teken } = require('./onboarding/lid')(ctx);
-  const tekenVast = require('./onboarding/tekenvast')({ bewerkCollectie,
+  const tekenVast = require('./onboarding/tekenvast')({ bewerkCollectie, verifieerGezin,
     maakLokaal: data => maakOnboarding({ db: { data }, save: () => {}, crypto, accounts, anthropic, schoon }) });
   // het inrichten: in één keer invullen wat de gegevenspoort anders per keer vraagt
   const { inrichtStatus, inrichtOp } = require('./onboarding/inrichten')(ctx);
   // meebouwen: het eerste Salon-bericht en het eigen bedrijf, met toestemming
   const { meebouwStatus, meebouwSalon, meebouwBedrijf, zetHaken } = require('./onboarding/meebouwen')(ctx);
 
-  return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, tekenVast, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
+  return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, tekenVast, tekenGezinVast: tekenVast.gezin, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
     inrichtStatus, inrichtOp, meebouwStatus, meebouwSalon, meebouwBedrijf, zetHaken,
     ALLE_WIE, PAS_WIE, VELD_TYPES };
 }

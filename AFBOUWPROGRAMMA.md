@@ -1239,3 +1239,48 @@ De afzonderlijke gluurronde (`/tmp/rtg-r3-idor-repeat.log`, instrument
 `scripts/gluurronde.js`) ziet geen toegang van A tot B's herkenbare stukken:
 5853 controles, 15582 verzoeken, 31 aangelegde stukken en 26 terugvindbaar.
 Dit beperkte GLUURRONDE-bewijs is geen volledige IDOR- of streamkwalificatie.
+
+Vervolg 23 oktober, vanaf `8b4e5c1429`: de rolmeter met echte toestelbinding
+meet 600 endpoints (vloer ongewijzigd 1444), 4560 onbekend en geen waargenomen
+gaten. Dit is een beperkte rolmeting, geen volledige autorisatiekwalificatie
+(`/tmp/rtg-r3-role-device-full.log`, ROLRONDE.json).
+
+RTF-ondertekening verifieert de gezinssessie opnieuw binnen dezelfde bestaande
+transactie als Foundation en onboarding. De bronkopie publiceert alleen bij
+geslaagde ondertekening; geweigerde invoer publiceert ook geen profielmigratie.
+Gerichte HTTP/client-regressies 45/45 en ontvangstproeven 12/12; echte PG-proef
+7/7 met identieke retries, inhoudsconflict, rollback, SIGKILL vóór/na commit en
+intrekking na routecontrole maar vóór slotverkrijging. Een positieve tegenproef
+gebruikt hetzelfde onderbrekingscheckpoint. Logs:
+`/tmp/rtg-r3-signature-regression.log`, `/tmp/rtg-r3-signature-snapshot.log`,
+`/tmp/rtg-r3-onboarding-race-qualified.log`. De twee voorafgaande mislukte
+PG-runs blijven geregistreerd: de demo-bootstrap reset bewust het
+eigenaarswachtwoord en verhoogt sessies_vanaf bij nieuwe workers. De fixture
+vernieuwt de beheercredential nu uitsluitend na aantoonbare gedeelde
+intrekking en eist dat de oude credential 401 geeft. De geteste gezinssessie
+wordt niet vervangen. Externe volwassenaccount-intrekking en de omgekeerde
+slotvolgorde zijn hiermee niet nieuw bewezen.
+
+De bestaande requestcommit kan afzonderlijke toevoegingen aan securityLog en
+supplierActivity nu conflictveilig samenvoegen. Sessie en beide logs blijven
+één transactie. Ambigue gelijke inhoud, gewijzigde historie en gelijktijdige
+cleanup/toevoegingen blijven conflicten; geen stille deduplicatie. Bestaand
+retentiebeleid is één gedeelde policy met compatibele domeinexports, zonder
+PG-naar-domeinimport. Gerichte pure regressies en echte PG-proeven bewijzen
+disjuncte stale snapshots, ketenbehoud, medewerkersprivacy en rollback na de
+sessieschrijfactie. PG 4/4, nul skips (`/tmp/rtg-r3-loginmerge-pg.log`). De
+nieuwe proef staat in de bestaande verplichte PG-selectie. Dit bewijst het
+onderliggende conflictpatroon, niet de oorspronkelijke collectieoorzaak van
+de incidentele GRAND-409. Beide bronpatches zijn onafhankelijk read-only
+beoordeeld; reviewers voerden geen eigen runtimeproeven uit.
+
+Aanvullende regressie: 43/43 pure proeven en 21/21 HTTP-login/logboekproeven
+(`/tmp/rtg-r3-atomic-regression.log`, `/tmp/rtg-r3-login-regression-fixed.log`).
+De eerste HTTP-run had 20/21: de roosterfixture koos de UTC-datum terwijl de
+PDA de zaakdatum gebruikt. De test gebruikt nu de serverbevestigde plandatum
+en vereist exact die dienst; de terugval naar een willekeurige dienst is
+verwijderd. Geen productrecht of retentiegrens veranderd.
+
+Status blijft ORANJE. De volledige PG-selectie, actuele IDOR- en APPWERKT-
+bewijzen, twee integrale groene runs en operationele kwalificatie blijven
+verplicht. Geen merge of uitrol.

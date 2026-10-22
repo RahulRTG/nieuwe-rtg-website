@@ -32,7 +32,7 @@ app.post('/api/rtf/onboarding/opslaan', express.json({ limit: '256kb' }), actuel
 });
 app.post('/api/rtf/onboarding/teken', actueleOnboarding, async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = await onboarding.tekenVast('rtg', rtfOnbSess(s), req.body.naam, req.body.akkoord === true, req.body.expectedVersion);
+  const r = await onboarding.tekenGezinVast(req.body.code, req.body.token, req.body.naam, req.body.akkoord === true, req.body.expectedVersion);
   if (r.error) return res.status(r.status).json({ error: r.error, ...(r.code ? { code: r.code } : {}) });
   res.json(r);
 });

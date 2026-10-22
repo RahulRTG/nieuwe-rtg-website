@@ -74,9 +74,24 @@ test('RTF ondertekening: twee workers, onveranderlijke versies en procescrashher
       assert.ok([401, 403, 404].includes(anoniem.status), JSON.stringify(anoniem));
       assert.deepEqual(historie(await lees())[v1], eerste);
     });
-    const owner = (await api(a, 'auth/login', { login: ownerEmail, password: 'Imran', pasApp: 'business' })).body.token;
+    const ownerLogin = async () => {
+      const r = await api(a, 'auth/login', { login: ownerEmail, password: 'Imran', pasApp: 'business' });
+      assert.equal(r.status, 200, JSON.stringify(r)); return r.body.token;
+    };
+    let owner = await ownerLogin();
     assert.ok(owner, 'bestaande eigenaarsdeur');
     async function vernieuw(n) {
+      // Een nieuwe demo-worker zet bewust het demo-wachtwoord opnieuw en
+      // daarmee sessies_vanaf. Alleen die aantoonbare intrekking vernieuwt
+      // de beheerfixture; een onverklaarde 401 blijft een fout. De geteste
+      // gezinssessie blijft gedurende alle crashes exact dezelfde.
+      const [id, , uitgegeven] = Buffer.from(owner.split('.')[0], 'base64url').toString().split('.');
+      const { rows } = await pool.query('SELECT sessies_vanaf FROM users WHERE id=$1', [Number(id)]);
+      assert.equal(rows.length, 1);
+      if (Number(rows[0].sessies_vanaf || 0) > Number(uitgegeven)) {
+        assert.equal((await api(a, 'auth/me', {}, owner)).status, 401, 'demo-wachtwoordreset trekt oude beheersessie werkelijk in');
+        owner = await ownerLogin();
+      }
       const r = await api(a, 'onboarding/config/zet', { voorstel: { contract: {
         tekst: 'Overeenkomst ' + n + ': nieuwe afspraken vragen opnieuw expliciet akkoord.' } } }, owner);
       assert.equal(r.status, 200, JSON.stringify(r)); return r.body.config.contract.versie;
@@ -116,12 +131,26 @@ test('RTF ondertekening: twee workers, onveranderlijke versies en procescrashher
       assert.deepEqual(Object.keys(historie(await lees())), [v1, v2, v3].map(String));
       assert.deepEqual(historie(await lees())[v1], eerste);
     });
-    await t.test('intrekken bij worker A weigert alle onboarding-ingangen bij worker B', async () => {
+    const onderbreek = await start('intrek', 'voor-slot');
+    const marker = path.join(tmp, 'intrek.json');
+    await t.test('onderbroken geldige ondertekening hervat via dezelfde transactieweg', async () => {
+      const request = sign(onderbreek, v3);
+      assert.equal((await checkpoint(marker)).fase, 'voor-slot');
+      fs.writeFileSync(marker + '.verder', 'ja');
+      assert.equal((await request).status, 200);
+      fs.unlinkSync(marker); fs.unlinkSync(marker + '.verder');
+    });
+    const v4 = await vernieuw(4);
+    await t.test('intrekken na routecontrole maar vóór collectieslot weigert ondertekening', async () => {
       assert.equal((await api(b, 'rtf/onboarding/status', auth)).status, 200);
       const voor = await lees();
+      const onderweg = sign(onderbreek, v4);
+      assert.equal((await checkpoint(marker)).fase, 'voor-slot');
       const ingetrokken = await api(a, 'foundation/gezin/sessie/intrek', auth);
       assert.equal(ingetrokken.status, 200, JSON.stringify(ingetrokken));
       assert.equal(ingetrokken.body.gesloten, 1);
+      fs.writeFileSync(marker + '.verder', 'ja');
+      assert.equal((await onderweg).status, 403, 'eerder gecontroleerde sessie verleent geen tekenrecht na intrekking');
       for (const pad of ['rtf/onboarding/status', 'rtf/onboarding/opslaan', 'rtf/onboarding/teken']) {
         const r = await api(b, pad, { ...auth, velden: { naam: 'Onbevoegd' },
           naam: 'Sam Ouder', akkoord: true, expectedVersion: v3 });

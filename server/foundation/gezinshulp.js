@@ -159,8 +159,10 @@ const gezinscode = require('./gezinscode').maak({ db, crypto, bewerkCollectie: b
 const gezinsstroom = require('./gezinsstroom').maak({ db, crypto, bewerkCollectie: bc, gezinstoken, G, nu, rtfHandle });
 let oudGeruimd = false;
 const plicht = require('./accountplicht').maak({ ctx, isBeschermd });
-function profielVan(g, token) {
-  if (!oudGeruimd && Object.keys(G()).length) { oudGeruimd = true; if (gezinstoken.ruimOud(G())) save(); }
+function profielVan(g, token, gezinnen) {
+  // Een transactie geeft haar eigen kopie mee; geen globale save of vlag wijzigen.
+  if (gezinnen !== undefined) gezinstoken.ruimOud(gezinnen);
+  else if (!oudGeruimd && Object.keys(G()).length) { oudGeruimd = true; if (gezinstoken.ruimOud(G())) save(); }
   const p = gezinstoken.vind(g, token);
   if (p) actualiseerGroep(p);
   return p && plicht.magDoor(g, p) ? p : undefined;

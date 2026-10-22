@@ -1053,7 +1053,8 @@ const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto
   dyncodeGeef: () => kern && kern.dyncode });
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
-const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon, bewerkCollectie });
+const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon, bewerkCollectie,
+  verifieerGezin: (code, token, foundation) => rtf.verifieerProfiel(code, token, foundation) });
 // De slimme boerderij-laag (kern/boerderij.js): boerderijtypes, percelen+gewassen,
 // dieren, takenbord, seizoensbriefing en een AI-adviseur die ook dingen doet.
 const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon });

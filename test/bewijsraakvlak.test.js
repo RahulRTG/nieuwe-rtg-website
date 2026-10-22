@@ -355,3 +355,21 @@ test('het register van de hashes hoort aantoonbaar bij APPWERKT.json, anders tel
   assert.equal(R.hashesVoor(appwerkt, geknoeid).hashes, null);
   assert.equal(R.hashesVoor(appwerkt, null).hashes, null);
 });
+
+test('vastgelegd raakvlakregister hoort bij dezelfde APPWERKT-meting; gewijzigde inhoud sluit', () => {
+  const appwerkt = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'APPWERKT.json'), 'utf8'));
+  const raakvlak = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'APPWERKT-RAAKVLAK.json'), 'utf8'));
+  assert.equal(appwerkt.raakvlak.register, R.REGISTER);
+  assert.ok(Object.keys(raakvlak.hashes).length > 0, 'geen leeg bewijsregister');
+  assert.equal(raakvlak.bestanden, Object.keys(raakvlak.hashes).length);
+  assert.equal(appwerkt.raakvlak.bestanden, raakvlak.bestanden);
+  const echt = R.hashesVoor(appwerkt, raakvlak);
+  assert.equal(echt.reden, null, echt.reden);
+  assert.deepEqual(echt.hashes, raakvlak.hashes);
+  const gewijzigd = structuredClone(raakvlak);
+  delete gewijzigd.hashes[Object.keys(gewijzigd.hashes)[0]];
+  assert.equal(R.hashesVoor(appwerkt, gewijzigd).hashes, null);
+  const andereMeting = structuredClone(raakvlak);
+  andereMeting.stempel.commit = 'andere-meting';
+  assert.equal(R.hashesVoor(appwerkt, andereMeting).hashes, null);
+});

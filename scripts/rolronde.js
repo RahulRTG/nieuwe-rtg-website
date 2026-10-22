@@ -199,11 +199,11 @@ function gedeeldAntwoordGeldig(route, lid, ander) {
 const succesvol = antwoord => !!antwoord && antwoord.status >= 200 && antwoord.status < 300;
 const geweigerd = antwoord => !!antwoord && [401, 403].includes(antwoord.status);
 // Dezelfde token moet op zijn eigen loket vóór én na de tegenproef leven.
-async function meetRol(vraag, rol, token, methode, pad) {
+async function meetRol(vraag, rol, token, methode, pad, lijf) {
   const eigenPad = { leverancier: '/api/supplier/state', kantoor: '/api/office/state' }[rol];
   if (!eigenPad) throw new Error('Onbekende proefrol');
   const voor = await vraag('POST', eigenPad, token);
-  const antwoord = await vraag(methode, pad, token);
+  const antwoord = await vraag(methode, pad, token, ...(lijf === undefined ? [] : [lijf]));
   const na = await vraag('POST', eigenPad, token);
   return { voor, antwoord, na };
 }
@@ -234,17 +234,20 @@ function beoordeelRoute(route, anon, lid, antwoorden = {}, controles = {}) {
 async function main() {
   let srv = null, basis = BASIS_EXTERN;
   if (!basis) {
-    srv = proefserver.start({ poort: PORT, merk: 'rolronde' });
-    basis = srv.base;
+    srv = await require('./lib/wegwerpserver').start({ naam: 'rolronde', poort: PORT, gereed: 'ready',
+      env: { NODE_ENV: 'test', ...require('./lib/voltooiwereld').KANTOORWERELD, OFFICE_CODE: 'RTG-OFFICE' } });
+    basis = srv.basis;
   }
   const vraag = maakVraag(basis);
+  const sluit = () => { if (srv) srv.klaar(); };
+  const fixtures = require('./lib/rolronde-fixtures').maakFixtures({ vraag });
   console.log('\n' + K.vet + 'DE ROLRONDE' + K.reset + K.grijs + ' -- welke rol komt waar binnen, gevraagd aan de server' + K.reset);
   console.log('  ' + K.grijs + 'tegen ' + basis + (srv ? ' (eigen boot)' : ' (meegegeven)') + K.reset + '\n');
 
   if (!await proefserver.wachtGezond(vraag)) {
     console.error('  ' + K.rood + 'De server kwam niet op; er is niets gemeten.' + K.reset);
     console.error('  ' + K.grijs + 'Dat is geen schone uitslag maar een ontbrekende meting (LAT.md regel 3).' + K.reset + '\n');
-    proefserver.stop(srv);
+    sluit();
     return 2;
   }
 
@@ -256,7 +259,7 @@ async function main() {
     console.error('  ' + K.rood + 'Niet alle drie de rollen kwamen rond' + K.reset +
       ' (lid: ' + !!lid + ', leverancier: ' + !!supTok + ', kantoor: ' + !!offTok + ').');
     console.error('  ' + K.grijs + 'Zonder alle drie is er geen scheiding te beproeven.' + K.reset + '\n');
-    proefserver.stop(srv);
+    sluit();
     return 2;
   }
 
@@ -273,7 +276,8 @@ async function main() {
 
   for (const r of routes) {
     const pad = r.pad.replace(/:[A-Za-z_]+/g, 'x1');       // een padparam met iets onschuldigs
-    const anon = await vraag(r.methode, pad, null);
+    const lijf = {};
+    const anon = await vraag(r.methode, pad, null, lijf);
     if (!geweigerd(anon)) {
       publiekOfVroeg.push(r.methode + ' ' + r.pad + ' -> ' + anon.status);
       onbekend.push(...beoordeelRoute(r.methode + ' ' + r.pad, anon).onbekend);
@@ -281,7 +285,7 @@ async function main() {
       continue;
     }
 
-    let l = await vraag(r.methode, pad, lid);
+    let l = await vraag(r.methode, pad, lid, lijf);
     if (l.status === 401 && !(await lidLeeft())) {
       lid = await nieuwLid(vraag); hersteld++;
       if (!lid) {
@@ -289,7 +293,18 @@ async function main() {
         onbekend.push({ route: r.methode + ' ' + r.pad, rol: 'lid-herstel', status: 0 });
         continue;
       }
-      l = await vraag(r.methode, pad, lid);
+      l = await vraag(r.methode, pad, lid, lijf);
+    }
+    if (fixtures.past(r.methode, pad)) {
+      const f = await fixtures.meet(r.methode, pad, lid, lijf);
+      rolproeven.push({ route: r.methode + ' ' + r.pad, rol: 'rtg-pas', ...f.proef, oordeel: f.oordeel });
+      if (f.oordeel.stand !== 'bewezen') {
+        const rij = { route: r.methode + ' ' + r.pad, rol: 'rtg-pas', reden: f.oordeel.reden };
+        if (f.oordeel.stand === 'gat') gaten.push(rij);
+        else onbekend.push(rij);
+        continue;
+      }
+      l = f.eigen;
     }
     if (!succesvol(l)) {
       andereRol.push(r.methode + ' ' + r.pad);
@@ -302,7 +317,7 @@ async function main() {
     }
     const antwoorden = {}, controles = {};
     for (const [rol, tok] of [['leverancier', supTok], ['kantoor', offTok]]) {
-      const proef = await meetRol(vraag, rol, tok, r.methode, pad);
+      const proef = await meetRol(vraag, rol, tok, r.methode, pad, lijf);
       antwoorden[rol] = proef.antwoord;
       controles[rol] = { voor: proef.voor, na: proef.na };
       // Uitsluitend statusbewijs; geen tokens of ontvangen inhoud bewaren.
@@ -344,7 +359,7 @@ async function main() {
     }, null, 2) + '\n');
   } catch (e) { console.error('  kon ROLRONDE.json niet schrijven: ' + e.message); }
 
-  proefserver.stop(srv);
+  sluit();
 
   if (gaten.length) {
     console.log('\n  ' + K.rood + K.vet + gaten.length + ' GAT(EN) IN DE ROLSCHEIDING' + K.reset + '\n');

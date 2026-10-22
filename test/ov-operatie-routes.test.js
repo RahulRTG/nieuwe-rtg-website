@@ -69,6 +69,41 @@ test('een RTG-lid ontsluit geen private operaties via de route', async () => {
   assert.equal((await api('/api/ov/operaties', {}, null)).status, 401);
 });
 
+test('Move-regie gebruikt de sessiepas, niet een opgegeven premiumrol', async () => {
+  for (const pad of ['/api/ov/regie', '/api/ov/regie/zet']) {
+    assert.equal((await api(pad, { tier: 'business', automaat: 'entourage', aan: true })).status, 401);
+  }
+  const voor = await api('/api/ov/regie', { tier: 'business' }, rtgLid);
+  assert.equal(voor.status, 200);
+  assert.equal(voor.body.tier, 'rtg');
+  assert.equal(voor.body.automaten.entourage, undefined);
+  const geweigerd = await api('/api/ov/regie/zet', { tier: 'business', automaat: 'entourage', aan: true }, rtgLid);
+  assert.equal(geweigerd.status, 403);
+  assert.deepEqual((await api('/api/ov/regie', {}, rtgLid)).body, voor.body);
+});
+
+test('Move-regie bewaart alleen eigen voorkeuren en behoudt de locatieprivacygrens', async () => {
+  const eigen = await api('/api/state', {}, zakelijk);
+  assert.equal(eigen.status, 200);
+  const key = eigen.body.state.user.codename;
+  assert.ok(key, 'echte codenaam van de eigenaar voor de vervalsingsproef');
+  const anderVoor = await api('/api/ov/regie', {}, ander);
+  assert.equal(anderVoor.status, 200);
+  const wijzig = { automaat: 'entourage', aan: true,
+    privacy: { discreteMeldingen: false, locatieNaRitWissen: false } };
+  const r = await api('/api/ov/regie/zet', wijzig, zakelijk);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.automaten.entourage.aan, true);
+  assert.equal(r.body.privacy.locatieNaRitWissen, true);
+  assert.equal(r.body.privacy.discreteMeldingen, false);
+  assert.deepEqual((await api('/api/ov/regie', {}, zakelijk)).body, r.body);
+  assert.deepEqual((await api('/api/ov/regie', {}, ander)).body, anderVoor.body);
+  const vals = await api('/api/ov/regie/zet', { key, codenaam: key, automaat: 'entourage', aan: false }, ander);
+  assert.equal(vals.status, 200, 'het andere lid mag uitsluitend de eigen voorkeur wijzigen');
+  assert.deepEqual((await api('/api/ov/regie', {}, zakelijk)).body, r.body);
+  assert.deepEqual((await api('/api/ov/regie/zet', wijzig, zakelijk)).body, r.body, 'herhaling behoudt dezelfde voorkeur');
+});
+
 test('concept, activeren en per segment akkoord: de keten over de route, en alleen voor de eigenaar', async () => {
   const leeg = await api('/api/ov/operaties', {}, zakelijk);
   assert.equal(leeg.status, 200);

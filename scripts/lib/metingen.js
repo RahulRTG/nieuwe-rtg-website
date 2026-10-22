@@ -106,6 +106,9 @@ const REGISTER = {
   'DEKKING.json': { meter: ['dekkingWaargenomenPct', 'endpointsNooitAangeraakt'] },
   'AANROEPGRAAF.json': { eigenRatel: 'test/codewereld.test.js' },
   'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },
+  // Bewaakt de koppeling en integriteit, niet de actuele geldigheid van appbewijs.
+  // Die laatste grens blijft bij appwerkt-vers.js --controle.
+  'APPWERKT-RAAKVLAK.json': { eigenRatel: 'test/bewijsraakvlak.test.js' },
   'CODEWERELD.json': { eigenRatel: 'test/codewereld.test.js' },
   /* TOEZEGKLASSEN.json is het besluitbestand van de inventaris (AFBOUWPROGRAMMA.md).
      Zijn getal dat slechter kan worden is het aantal ROTTE citaten, en dat staat op

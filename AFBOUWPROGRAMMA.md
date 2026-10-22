@@ -1168,3 +1168,31 @@ De rolronde bewijst 577 endpoints tegenover de bestaande vloer 1444; 4583
 antwoorden missen voldoende bewijs. Deze drempel blijft intact. Vuile
 registermetingen worden na broncommit opnieuw uitgevoerd, niet omgestempeld.
 Status blijft ORANJE. Geen merge of productie-uitrol.
+
+Vervolgmeting 22 oktober op bronstand `cebe17ca76`:
+
+- De volledige bestaande PostgreSQL-selectie haalt 55/56 bestanden. De
+  ondertekenproef faalt: de tweede worker weigert een bij de eerste worker
+  aangemaakte gezinssessie. Herhaling reproduceert dit. Het ontbrekende
+  integrale PG-bewijs blijft open; de volgende subtestfouten zijn cascades.
+- De volledige IDOR-ronde levert voor de twee streamroutes beide eigen
+  markers en barrières, zonder kruismarkers in het geteste eventvenster.
+  Anoniem en ticketreplay geven 401. Dit is geen volledige objectkwalificatie:
+  de overige onbereikbare routes blijven als zodanig in IDOR.json staan.
+- Een bestaande Lifestyle-aanvraag met werkelijk eigenaarsakkoord ontsluit
+  23 Bureau/Rechterhand-leesroutes. Een afzonderlijk geldig RTG-account,
+  anoniem, leverancier en kantoor blijven geweigerd. Het gerichte pakket
+  haalt 16/16; de volledige rolronde moet dit nog integraal herhalen.
+- De twee ontbrekende Move-regieroutes hebben nu HTTP-proeven voor vervalste
+  pasrechten, eigen voorkeuren, herhaling en een tweede lid. Samen met de
+  bestaande kern- en operatieproeven 7/7 groen, nul skips.
+- APPWERKT-RAAKVLAK is gekoppeld aan de bestaande integriteitscontrole.
+  Die vergelijkt ook de werkelijk vastgelegde registers en weigert een
+  verwijderde hash of een andere meetcommit. 25/25 groen. Deze controle
+  bewijst registerbinding; zij verklaart geen verlopen appbewijs opnieuw geldig.
+
+Bewijslogs: `/tmp/rtg-r3-pg-full.log`, `/tmp/rtg-r3-onboarding-repro.log`,
+`/tmp/rtg-r3-idor.log`, `/tmp/rtg-r3-ov-regie.log`,
+`/tmp/rtg-r3-raakvlak-integrity.log`. De nieuwe bronwijzigingen zijn nog geen
+bevroren releasekandidaat. Normgrenzen blijven ongewijzigd; twee integrale groene
+runs, actuele appbewijzen en operationele kwalificatie ontbreken nog.

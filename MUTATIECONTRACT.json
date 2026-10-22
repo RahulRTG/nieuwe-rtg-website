@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-22T07:11:42.623Z",
-  "commit": "0497b429fe",
+  "op": "2026-10-22T07:15:58.267Z",
+  "commit": "f919b93494",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v26.12.0"
  },
@@ -22,10 +22,10 @@
   "vastgesteldDoorMens": 2282,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4486,
+   "AUTHENTICATED": 4499,
    "PUBLIC": 84,
-   "OBJECT_SCOPED": 783,
-   "(niet af te leiden -- vraagt een verklaring)": 43,
+   "OBJECT_SCOPED": 791,
+   "(niet af te leiden -- vraagt een verklaring)": 22,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -48,12 +48,6 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
-   "route": "POST /api/arrival/pass",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
    "route": "POST /api/arrival/pass/intrek",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
@@ -62,18 +56,6 @@
   {
    "route": "POST /api/arrival/pass/roteer",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/arrival/pulse",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/arrival/request",
-   "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -93,12 +75,6 @@
    "route": "POST /api/betaal/webhook/connect",
    "bedoeld": "SERVICE_TO_SERVICE",
    "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/book",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -150,18 +126,6 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
-   "route": "POST /api/gast/aanschuiven",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/gast/tafel",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
    "route": "POST /api/isolatie/mijn",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
@@ -204,19 +168,7 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
-   "route": "POST /api/krant/artikel",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
    "route": "POST /api/krant/gids",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/krant/open",
    "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -486,27 +438,9 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
-   "route": "POST /api/rtf/club/bericht",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtf/club/portaal",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
    "route": "POST /api/rtf/onboarding/teken",
    "bedoeld": "AUTHENTICATED",
    "waargenomen": "OBJECT_SCOPED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtf/partner/raad",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -540,48 +474,6 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
-   "route": "POST /api/rtfos/portaal/deelnemer",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/deelnemer/intrekken",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/donateur",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/donateur/bewijs",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/gemeente",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/ondernemer",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/partner",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
    "route": "POST /api/rtfos/portaal/partner/genootschap",
    "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
@@ -589,24 +481,6 @@
   },
   {
    "route": "POST /api/rtfos/portaal/partner/genootschap/erken",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/vrijwilliger",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/vrijwilliger/uren",
-   "bedoeld": "PUBLIC",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/rtfos/portaal/vrijwilliger/zet",
    "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -656,12 +530,6 @@
   {
    "route": "POST /api/sociaal/object/pagina",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/supplier/apply",
-   "bedoeld": "PUBLIC",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -3217,7 +3085,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "arrivalPassAuth"
@@ -3299,7 +3167,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "arrivalPassAuth"
@@ -3327,7 +3195,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -10067,7 +9935,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -29546,7 +29414,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -30329,7 +30197,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -32618,9 +32486,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -35280,7 +35148,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -35334,7 +35202,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -36034,9 +35902,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -36088,9 +35956,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -36115,9 +35983,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -36143,9 +36011,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -36170,9 +36038,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -36224,9 +36092,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -36251,9 +36119,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -36980,9 +36848,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37008,9 +36876,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37036,9 +36904,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37064,9 +36932,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37092,9 +36960,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37120,9 +36988,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37148,9 +37016,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37473,9 +37341,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37500,9 +37368,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37527,9 +37395,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37554,9 +37422,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37581,9 +37449,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -87841,7 +87709,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -87870,7 +87738,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -91227,7 +91095,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97730,7 +97598,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97759,7 +97627,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97788,7 +97656,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97817,7 +97685,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97846,7 +97714,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97875,7 +97743,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97904,7 +97772,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -97979,7 +97847,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -98064,7 +97932,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -98093,7 +97961,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw",
@@ -98417,9 +98285,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -107383,7 +107251,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]

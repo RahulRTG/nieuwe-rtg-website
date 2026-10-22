@@ -1117,3 +1117,54 @@ Het preflightpakket sluit geen APPWERKT- of autorisatiebewijs. Door de
 bronwijzigingen moet bewijsverval volgens de bestaande regels blijven gelden.
 Volgende stap: volledige Node-suite en de objectveldafleiding. Geen merge,
 productie-uitrol of Deep Green-verklaring.
+
+### Deep Green R3 — gedeelde meetoorzaken en actuele rode nulmeting (22 oktober 2026)
+
+Volledige lokale Node-run op `816906a89bfe024e638e1b6f8f4c28f86924e982`,
+Node v26.12.0, schone bron: 20.187 tests, 20.111 geslaagd, 21 mislukt,
+55 overgeslagen. `SUITE.json` bewaart deze rode uitkomst. De run eindigde
+zelfstandig; het latere stopverzoek vond geen actieve runner. PostgreSQL en
+Redis waren niet meegegeven: de PG-proeven zijn daarom niet gekwalificeerd.
+De Redis-geheimkanarie miste bovendien redis-server in PATH. Dit is geen
+vergelijkbare verbetering/verslechtering tegenover een run mét infrastructuur.
+Ruwe uitvoer: `/tmp/rtg-r3-full-suite.log`; foutselectie via de bestaande
+`.release/unit-test-fouten.json`.
+
+Gesloten gerichte oorzaken, nog geen integrale vrijgave:
+
+- Objectveldafleiding: de generator en controle lezen nu dezelfde bestaande
+  handpoorten op exacte HTTP-methode+route. Acht Lab-velden werden gemist;
+  ook alle 17 historische veldloze uitzonderingen hadden al expliciete
+  handvelden. 18/18 gerichte proeven en een negatieve handpoorttegenproef.
+  Dit bewijst de veldafleiding, niet de runtime-isolatie van al die routes.
+- Workercheckpoints: bureauzaak, office-bank en werkplektaak gebruiken de
+  bestaande voorwaardewachter. 11/11 echte PostgreSQL-workerproeven groen,
+  inclusief SIGKILL vóór/na commit en ingetrokken sessies; nul skips.
+  De aparte klokwachtcontrole slaagt 6/6, zonder hogere schuldgrens.
+- Magnaat: idem/idempotentieSleutel is in CODECREDENTIALS onderbouwd als
+  opdrachtidentiteit, geen toegangscredential. Een werkelijk HTTP-verzoek
+  bewijst dat dezelfde bekende sleutel zonder sessie 401 en als gast 403 geeft,
+  terwijl de bevoegde herhaling geen extra lening oplevert. Samen met de
+  credentialregister- en geheimkanarieproeven: 30/30 groen, nul skips, met de
+  bestaande Redis-binary in PATH. Geen productiegeheimen of echte betalingen.
+- Streambewijs: twee verse leden ontvangen elk hun eigen marker en barrière.
+  De adapter wacht op events, controleert kruisinhoud en weigert anonieme en
+  herhaalde tickets uitsluitend met 401/403. Raw bewijs bevat exacte methoden;
+  500, ontbrekende positieve controle of alleen een groen label blijven open.
+  Gerichte echte HTTP/SSE-proef plus tegenproeven: 7/7 groen. De aanvullende
+  rolproef voor ticketuitgifte blijft vereist. APPWERKT is nog niet hergemeten.
+
+Onafhankelijke architectuurlezing: 63 omhoog en 105 lekmarkeringen zijn
+reproduceerbaar, maar 105 betekent niet 105 verboden primitief-domeinkoppelingen.
+63 lekmarkeringen zijn bestaande EIGEN_DATA-familieknippen; de overige 42 hebben
+verklaringen die nog inhoudelijk moeten worden beoordeeld. Opwaartse paren:
+36 motor→domein, 16 ingang→opzet, 6 domein→opzet, 5 motor→opzet. Geen categorie
+is stilzwijgend vrijgesteld; nul onbekend is niet hetzelfde als nul verboden.
+
+De preflight op 816906 meldde 867 vervallen bewijzen, ook bij alle tien eerder
+8/8-apps. 10/114 is dus historische stand. CI op dezelfde commit bevestigde
+preflight, CodeQL en WebKit, maar norm, deltapoort en rolronde zijn rood.
+De rolronde bewijst 577 endpoints tegenover de bestaande vloer 1444; 4583
+antwoorden missen voldoende bewijs. Deze drempel blijft intact. Vuile
+registermetingen worden na broncommit opnieuw uitgevoerd, niet omgestempeld.
+Status blijft ORANJE. Geen merge of productie-uitrol.

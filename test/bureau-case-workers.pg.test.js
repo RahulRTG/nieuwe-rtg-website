@@ -3,7 +3,7 @@
    Geen host-, stroomuitval- of volledige platformclaim. */
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
-const {startServer,stop,stopHard}=require('./helper');
+const {startServer,stop,stopHard,wachtOpWaarde}=require('./helper');
 const URL=process.env.DATABASE_URL||process.env.PG_URL;
 const skip=require('./infra').vereist('pg',!!URL,'bureauzaak vereist PG');
 test('bureauzaak: twee workers, conflict, bewust nieuw en herstart', {skip,timeout:240000},async t=>{
@@ -15,7 +15,11 @@ test('bureauzaak: twee workers, conflict, bewust nieuw en herstart', {skip,timeo
  RTG_OWNER_EMAIL:'bureau-owner@fixture.test',DEMO_PASS:'BureauFixtureOnly123!',SMTP_URL:'',STRIPE_SECRET_KEY:'',MOLLIE_API_KEY:'',ADYEN_API_KEY:''};
  async function api(w,p,b={},token=w.token){const r=await fetch(w.base+'/api/'+p,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(b),signal:AbortSignal.timeout(30000)});return{status:r.status,body:await r.json()};}
  async function start(n,fase){const w=await startServer({script:path.join(__dirname,'fixtures/bedoeling-crash-worker.cjs'),env:{...env,RTG_DATA_DIR:path.join(tmp,n),RTG_BEDOELING_MODULE:'bureau',RTG_BEDOELING_FASE:fase||'',RTG_BEDOELING_MARKER:fase?path.join(tmp,n+'.json'):''}});workers.push(w);return w;}
- async function checkpoint(n){for(let i=0;i<200;i++){const p=path.join(tmp,n+'.json');if(fs.existsSync(p))return JSON.parse(fs.readFileSync(p));await new Promise(r=>setTimeout(r,50));}throw Error('Crashcheckpoint ontbreekt: '+n);}
+ async function checkpoint(n){
+  const p=path.join(tmp,n+'.json');
+  return wachtOpWaarde(()=>fs.existsSync(p)&&JSON.parse(fs.readFileSync(p,'utf8')),
+   {ms:10000,wat:'duurzaam crashcheckpoint '+n});
+ }
  async function login(w){const r=await api(w,'auth/login',{login:env.RTG_OWNER_EMAIL,password:env.DEMO_PASS},null);assert.equal(r.status,200,JSON.stringify(r));w.token=r.body.token;const me=await api(w,'auth/me');assert.equal(me.status,200);w.key='user-'+me.body.user.id;}
  async function close(w){if(w.child.exitCode!==null||w.child.signalCode!==null)return;const p=new Promise(r=>w.child.once('exit',r));stop(w);await p;}
  async function dossier(k){const {rows}=await pool.query("SELECT val FROM kv WHERE key='lifestyle' AND NOT weg");return JSON.parse(require('../server/kluis').ontsleutel(rows[0].val))[k];}

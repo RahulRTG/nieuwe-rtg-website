@@ -11,9 +11,9 @@ const { startServer, stop } = require('./helper');
 let server;
 let token;
 
-async function post(pad, body) {
+async function post(pad, body, sessie = token) {
   const headers = { 'Content-Type': 'application/json' };
-  if (token) headers.Authorization = 'Bearer ' + token;
+  if (sessie) headers.Authorization = 'Bearer ' + sessie;
   const response = await fetch(server.base + pad, {
     method: 'POST', headers, body: JSON.stringify(body || {})
   });
@@ -85,4 +85,20 @@ test('economenanalyse loopt via HTTP en de duurzame economie-opslag zonder 500',
   assert.equal(antwoord.body.ok, true);
   assert.equal(antwoord.body.ingediend.status, 'wacht-op-realisatie');
   assert.equal(antwoord.body.ingediend.hypothese, 'productiviteit');
+});
+
+
+test('een bekende idempotentiesleutel verleent anoniem of als gast geen bevoegdheid', async () => {
+  const pad = '/api/member/magnaat/economie/beslis';
+  const body = {lening: 500, idempotentieSleutel: 'credential-grens-1'};
+  const geldig = await post(pad, body);
+  assert.equal(geldig.status, 200, JSON.stringify(geldig.body));
+  assert.equal((await post(pad, body, null)).status, 401);
+  const gast = await post('/api/login', {tier: 'guest'}, null);
+  assert.equal(gast.status, 200); assert.ok(gast.body.token);
+  assert.equal((await post(pad, body, gast.body.token)).status, 403);
+  const herhaal = await post(pad, body);
+  assert.equal(herhaal.status, 200);
+  assert.equal(herhaal.body.herhaald, true);
+  assert.equal(herhaal.body.strategie.schuld, geldig.body.strategie.schuld);
 });

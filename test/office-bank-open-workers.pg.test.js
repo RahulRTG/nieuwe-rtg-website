@@ -3,7 +3,7 @@
    Bewijst PG-account/sleutelcommit, herstart en procesuitval rond COMMIT. */
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
-const {startServer,stop,stopHard}=require('./helper');
+const {startServer,stop,stopHard,wachtOpWaarde}=require('./helper');
 const URL=process.env.DATABASE_URL||process.env.PG_URL;
 const skip=require('./infra').vereist('pg',!!URL,'office bank vraagt echte PG');
 async function sluit(w){if(!w||w.child.exitCode!==null||w.child.signalCode!==null)return;const p=new Promise(r=>w.child.once('exit',r));stop(w);await p;}
@@ -25,7 +25,11 @@ test('office bank: dezelfde bedoeling over twee workers en na procesverlies', {s
   const me=await api(w,'auth/me');assert.equal(me.status,200,JSON.stringify(me));return me.body.user;
  }
  async function start(n,fase){const w=await startServer({script:path.join(__dirname,'fixtures/bank-open-crash-worker.cjs'),env:{...env,RTG_DATA_DIR:path.join(tmp,n),RTG_BANK_CRASH_FASE:fase||'',RTG_BANK_CRASH_MARKER:path.join(tmp,n+'.json')}});workers.push(w);return w;}
- async function checkpoint(n){for(let i=0;i<200;i++){const p=path.join(tmp,n+'.json');if(fs.existsSync(p))return JSON.parse(fs.readFileSync(p));await new Promise(r=>setTimeout(r,50));}throw Error('Bank-COMMIT-checkpoint ontbreekt: '+n);}
+ async function checkpoint(n){
+  const p=path.join(tmp,n+'.json');
+  return wachtOpWaarde(()=>fs.existsSync(p)&&JSON.parse(fs.readFileSync(p,'utf8')),
+   {ms:10000,wat:'duurzaam crashcheckpoint '+n});
+ }
  async function opgeslagen(){const {rows}=await pool.query("SELECT key,val FROM kv WHERE key IN ('bankRekeningen','bankIdem','bankIdemAfdruk') AND NOT weg");return Object.fromEntries(rows.map(r=>[r.key,JSON.parse(kluis.ontsleutel(r.val))]));}
  try{
   const a=await start('a'),b=await start('b');assert.notEqual(a.child.pid,b.child.pid);

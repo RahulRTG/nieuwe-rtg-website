@@ -114,6 +114,10 @@ async function loop(w, stap) {
       ziet: 'bevestigd ' + r.status + ', na SIGKILL herhaald=' + (opnieuw.data && opnieuw.data.herhaald) +
         ', aantal ' + telTitel(l, 'Werk na stroomstoring') };
   });
+
+  /* Een verkeerd werkruimtetoken is de relevante gesloten deur voor deze
+     persona. De afgeleide menselijk-proef eist een begrijpelijke weigering. */
+  await w.post(START, { werkruimte: sessie.werkruimte, lidToken: 'ongeldig-voltooi-token' });
 }
 
 module.exports = {

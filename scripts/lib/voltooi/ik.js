@@ -111,6 +111,11 @@ async function loop(w, stap) {
     const t = (await beeld()).toegankelijk || {};
     return { klopt: r.status === 200 && t.tekst === 'normaal' && t.beweging === 'normaal', ziet: 'na SIGKILL tekst ' + t.tekst + ', beweging ' + t.beweging };
   });
+
+  /* De succesvolle profiellus bevatte geen weigering. Laat de bestaande
+     profielroute daarom ook zonder sessie antwoorden; menselijkUit controleert
+     dat de weigering leesbare woorden en geen stacktrace draagt. */
+  await w.post(IK, {});
 }
 
 module.exports = {

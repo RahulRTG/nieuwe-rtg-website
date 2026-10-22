@@ -126,6 +126,12 @@ async function loop(w, stap) {
     return { klopt: r.status === 200 && !!s && s.aan && s.kanalen.join(',') === 'push', ziet: 'geven ' + r.status + ', na SIGKILL: aan=' + (s && s.aan) + ' via ' + (s && s.kanalen.join('+')) };
   });
 
+  /* Bewijs 8 wordt door de voltooiproef uit ALLE antwoorden afgeleid. De
+     normale toestemmingslus weigerde niets en kon dus niet aantonen dat een
+     mens bij een gesloten deur woorden krijgt in plaats van een kale status.
+     Deze anonieme leesproef muteert niets en loopt exact de schermroute. */
+  await w.post(STAND, {});
+
 }
 
 module.exports = {

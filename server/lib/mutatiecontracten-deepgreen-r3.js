@@ -50,7 +50,20 @@ const CONTRACTEN = {
     'Twee bewuste indieningen mogen twee voorstellen zijn; een expliciete sleutel beschermt de dubbeltik en weigert hergebruik voor afwijkende inhoud.'),
   'POST /api/labfonds/beslis': contract('labfonds.beslis', 'hooguitEens', 'PROTECTED',
     'test/appstore-lab-toestemming-routes.test.js en test/rtf-labfonds-deur.test.js: alleen de indiener beslist en een tweede besluit wordt 409',
-    'Een besluit mag hooguit eenmaal de pot bewegen. De domeinkern bewaakt de actuele toestand en de generieke antwoordcache is voor deze route uitgeschakeld.')
+    'Een besluit mag hooguit eenmaal de pot bewegen. De domeinkern bewaakt de actuele toestand en de generieke antwoordcache is voor deze route uitgeschakeld.'),
+
+  'POST /api/command/uitrol/pauze': contract('command.uitrol.pauze', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
+    'test/uitrolregie.test.js: twee bewuste pauzes leggen precies twee afzonderlijke geschiedenisregels vast; test/remduurzaam.test.js bewijst fail-closed opslag',
+    'Iedere bewuste remactie is een zelfstandig operationeel auditmoment, ook wanneer de uitrol al stil staat.'),
+  'POST /api/foundation/school/overdracht/pakket': contract('foundation.school.overdracht.pakket', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
+    'test/overdracht.test.js: twee bewuste pakketinzages leveren precies twee journaalregels en versturen niets',
+    'Het pakket is een gevoelige dossierinzage. Iedere bewuste blik moet afzonderlijk herleidbaar blijven.'),
+  'POST /api/office/balie/zoek': contract('office.balie.zoek', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
+    'test/ledenbaliespoor.test.js: twee bewuste zoekopdrachten vragen exact twee duurzame inzagesporen; opslagverlies sluit de resultaten',
+    'Iedere ledenzoekopdracht is afzonderlijke inzage in persoonsgegevens en moet als zelfstandig auditmoment worden vastgelegd.'),
+  'POST /api/office/techniek/integraties/noodstop': contract('office.integraties.noodstop', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
+    'test/remduurzaam.test.js: iedere bewuste noodstop zet alle runtime-rails opnieuw uit, schrijft een eigen logregel en bevestigt uitsluitend na duurzame opslag',
+    'Een herhaalde bewuste noodstop is een nieuwe veiligheidsactie: hij handhaaft de actuele runtime opnieuw en blijft afzonderlijk auditeerbaar.')
 };
 
 module.exports = { CONTRACTEN };

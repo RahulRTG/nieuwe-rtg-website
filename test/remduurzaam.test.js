@@ -73,6 +73,13 @@ test('1. zonder verraad zet de noodstop alles uit en bevestigt dat', async () =>
      status kijkt, ziet dat verschil niet. */
   assert.ok(Array.isArray(r.body.tegels) && r.body.tegels.length,
     'een 200 zonder inhoud is een niet-afgewachte belofte');
+  const voor = r.body.log.filter(x => x.soort === 'noodstop').length;
+  const opnieuw = await post(eerlijk.base, '/api/office/techniek/integraties/noodstop',
+    { reden: 'tweede bewuste veiligheidscontrole' }, tokEerlijk);
+  assert.equal(opnieuw.status, 200);
+  assert.ok(opnieuw.body.tegels.every(t => t.aan === false), 'de tweede noodstop handhaaft alle runtime-rails opnieuw');
+  assert.equal(opnieuw.body.log.filter(x => x.soort === 'noodstop').length, voor + 1,
+    'iedere bewuste noodstop blijft als eigen veiligheidsactie zichtbaar');
 });
 
 test('2. zonder verraad pauzeert de uitrol en geeft de stand terug', async () => {

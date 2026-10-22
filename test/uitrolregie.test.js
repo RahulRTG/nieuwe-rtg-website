@@ -195,16 +195,20 @@ test('een herstart wist de nulmeting, en dan klimt hij NIET', () => {
   assert.equal(s.oordeel.zakbaar, false, 'en ook geen reden om te zakken');
 });
 
-test('pauzeren houdt hem stil, ook op groen', () => {
+test('iedere bewuste pauze houdt hem stil en krijgt een eigen geschiedenisregel', async () => {
   const o = maak();
   o.regie.zet('start', 'proef');
   o.regie.klim('proef');
-  o.regie.pauze('roel', 'even niet');
+  const voor = o.regie.stand().geschiedenis.length;
+  await o.regie.pauze('roel', 'eerste rem');
+  await o.regie.pauze('roel', 'tweede rem');
   o.verkeer(1000, 0); o.verzet(RUST);
   const s = o.regie.stand();
   assert.equal(s.trede, 'start');
   assert.equal(s.stand, 'stil');
-  assert.equal(s.reden, 'even niet');
+  assert.equal(s.reden, 'tweede rem');
+  assert.equal(s.geschiedenis.length, voor + 2, 'twee bewuste remacties zijn twee auditmomenten');
+  assert.deepEqual(s.geschiedenis.slice(0, 2).map(r => r.reden), ['tweede rem', 'eerste rem']);
 });
 
 test('de trap is uit: boven aangekomen stopt hij vanzelf', () => {

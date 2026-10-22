@@ -317,12 +317,8 @@ const BEKEND_OPEN = Object.freeze([
      nieuwe onbekende nog steeds onmiddellijk faalt en deze lijst alleen gericht
      kan krimpen zodra de handler werkelijk is nagelezen. */
   'POST /api/bank/akkoord',
-  'POST /api/command/uitrol/pauze',
-  'POST /api/foundation/school/overdracht/pakket',
   'POST /api/member/magnaat/economie/beslis',
   'POST /api/office/asset/fees',
-  'POST /api/office/balie/zoek',
-  'POST /api/office/techniek/integraties/noodstop',
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {

@@ -35,6 +35,8 @@ const SLEUTELS = Object.assign({},
   /* Pulse, De Salon en RTMail: een dubbeltik gaf de ander alles twee keer. */
   require('./idemsleutels-tweedelid').SLEUTELS,
   /* WorkOS-zaakregie projecteert een bestaande eigen zaak en schrijft niet. */
-  require('./idemsleutels-zaakregie').SLEUTELS);
+  require('./idemsleutels-zaakregie').SLEUTELS,
+  /* De expliciet bewuste tweede handelingen uit Deep Green ronde 3. */
+  require('./idemsleutels-deepgreen-r3').SLEUTELS);
 
 module.exports = { SLEUTELS };

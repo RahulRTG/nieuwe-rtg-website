@@ -985,3 +985,33 @@ geen geclassificeerde afbouw van de 63 opwaartse en 105
 primitief-naar-domeinkoppelingen en geen afgeronde staging-, back-up-, rollback-
 of incidentproef. Geen merge, productie-uitrol of echte financiële transactie
 uitgevoerd.
+
+### Deep Green — eerste afgesloten gedeelde oorzaak in Ronde 3 (22 oktober 2026)
+
+De waarheidsgetrouwheidsproef verving ook de centrale Foundation-toegangspoort
+door een leeg antwoord. Daardoor bleef de juiste gezinssessie kunstmatig voor
+drie beschermde schermen staan en werd de deur gemeten in plaats van het
+scherm. `/api/rtf/toegang` blijft nu, net als de andere sessiepoorten, echt;
+alle functionele Foundation-antwoorden achter die deur blijven door de
+liegpoort vervangen. De gerichte regressies slagen 10/10.
+
+De volledige `LIEGRONDE.json` op commit `330b7921e7` ging hierdoor van 106 naar
+107 bewezen ingangen, zonder nieuw defect. `Vrienden` opent nu en verzint bij
+lege functionele antwoorden geen zekerheid. Bord en Schrift bereiken de
+algemene deur maar blijven terecht achter hun afzonderlijke tijdelijke
+Schoolpas; vijf interne OS-kiezers hebben nog geen functie-specifieke
+meetadapter. Geen van deze zeven gaten is administratief groen gemaakt.
+
+Omdat de bron wijzigde, zijn de bevoegdheidsronde en APPWERKT opnieuw uitgevoerd
+in plaats van de oude bewijsstempels geldig te verklaren. `BEVOEGD.json` op
+commit `bdbfa07329` blijft conservatief 10 `BEWEZEN` en 104 `NIET_GETEST`.
+`APPWERKT.json` is daarna op dezelfde schone bronstand volledig samengesteld:
+114/114 onderdelen bezocht, nul browserdefecten, 10 volledig bewezen apps,
+waarheidsgetrouw 107/114 en bevoegd 10/114. `appwerkt-vers --controle` meldt 900
+verse bewijzen en nul vervallen bewijs onder de tien 8/8-rijen.
+
+Dit sluit één gedeelde meetfout en één aanvullend appbewijs. De platformstatus
+blijft **ORANJE**: 104 autorisatiegaten, zeven waarheidsgetrouwheidsgaten, vier
+voltooiingsfixtures, de architectuurclassificatie, twee integrale groene runs en
+de operationele kwalificatie staan nog open. Geen merge, productie-uitrol of
+echte betaling uitgevoerd.

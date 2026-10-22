@@ -943,3 +943,45 @@ gezamenlijke platformrun en registerverversing blijven verplicht. Status blijft
 **ORANJE**: nog geen schone kandidaatcommit, geen actuele 114/114-APPWERKT-meting,
 geen twee integrale groene runs en geen operationele vrijgaveproef. Geen merge,
 publieke uitrol of echte betaling uitgevoerd.
+
+### Deep Green — Ronde 3 actuele integrale nulmeting (22 oktober 2026)
+
+De hiervoor openstaande registerverversing is uitgevoerd op opeenvolgende,
+schone bronstanden. Dit is een nieuwe nulmeting voor Ronde 3 en geen
+vrijgavekwalificatie.
+
+- `VOLTOOIPROEF.json` is op commit `877e0459b6` volledig opnieuw gemeten met
+  Node `v26.12.0`: 110 apps, 330/330 bewijsgroepen gesloten, 110/110 afgeleide
+  menselijke bewijzen gesloten, nul open en nul niet beproefd. De proef gebruikt
+  per scenario wegwerpopslag, een read-only opslaglezer, nette herstart en
+  SIGKILL-crash; de vier niet gemodelleerde APPWERKT-ingangen vallen buiten dit
+  register.
+- `IDOR.json` en `ROLPROEF.json` zijn op de actuele bron opnieuw gemeten. IDOR
+  vond over 2.630 schrijfroutevermeldingen 1.124 aantoonbaar gescheiden routes,
+  nul nieuwe doorbraken en nul persoonslekken. De volledige rolproef vond 5.442
+  schrijfroutes, voerde 4.514 routes uit in 9.369 pogingen en vond nul
+  verkeerde-roltoegang, privacylek of blijvend ongeoorloofd zijeffect.
+- `BEVOEGD.json` combineert die registers conservatief: 10/114 apps zijn
+  volledig bewezen en 104/114 blijven `NIET_GETEST`. Een enkele geweigerde
+  route, een publiek pad of een handmatig nagekeken niet-lek telt uitdrukkelijk
+  niet als volledig autorisatiebewijs.
+- `LIEGRONDE.json` bewijst 106/114 ingangen waarheidsgetrouw; drie
+  RTFoundation-deuren en vijf interne OS-kiezers hebben nog geen uitvoerbaar
+  declaratief contract.
+- `APPWERKT.json` is op commit `b0a84886bc` volledig opnieuw gemeten: 114/114
+  onderdelen bezocht en nul browserdefecten. De samengestelde stand is 10
+  `BEWEZEN`, 100 `NIET_GETEST` en 4 `GEEN_FIXTURE`. Per dimensie: bereikbaar
+  107, bedienbaar 96, menselijk 110, voltooibaar/persistent/herstelbaar elk 110,
+  waarheidsgetrouw 106 en bevoegd 10. De vier fixturegaten zijn Juridisch,
+  Camera, RTFoundation en Videobellen.
+- `appwerkt-vers --controle` meldt 900 verse bewijzen, 10 rijen die als 8/8
+  gelden en nul daarvan met vervallen bewijs.
+
+De actuele status blijft **ORANJE**. De grootste blokkade is aantoonbaar
+autorisatiebewijs voor 104 apps, gevolgd door 18 bedienbaarheidsgaten, acht
+waarheidsgetrouwheidsgaten, zeven bereikbaarheidsgaten en vier toepasselijke
+voltooiingsfixtures. Er zijn nog geen twee volledige groene kwalificatieruns,
+geen geclassificeerde afbouw van de 63 opwaartse en 105
+primitief-naar-domeinkoppelingen en geen afgeronde staging-, back-up-, rollback-
+of incidentproef. Geen merge, productie-uitrol of echte financiële transactie
+uitgevoerd.

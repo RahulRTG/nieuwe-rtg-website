@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-22T12:00:54.940Z",
-  "commit": "5f136a7055",
+  "op": "2026-10-22T23:02:13.105Z",
+  "commit": "f3e630f421",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/rolproef-route.js",
   "node": "v26.12.0"
  },
@@ -12,7 +12,7 @@
  "redenenNietBeproefbaar": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
-   "aantal": 590,
+   "aantal": 587,
    "routes": [
     "POST /api/auth/tweede",
     "POST /api/bedrijf/apparaat/innemen",
@@ -498,9 +498,6 @@
     "POST /api/rtf/geloof/mijn",
     "POST /api/rtf/geloof/weg",
     "POST /api/rtf/knelpunt",
-    "POST /api/rtf/onboarding/opslaan",
-    "POST /api/rtf/onboarding/status",
-    "POST /api/rtf/onboarding/teken",
     "POST /api/rtf/rahul",
     "POST /api/rtf/samen/chat",
     "POST /api/rtf/samen/code",
@@ -895,6 +892,15 @@
     "POST /api/lab2/mijn/terugtrekken",
     "POST /api/lab2/mijn/terugtrekken/gevolg",
     "POST /api/lab2/mijn/venster"
+   ]
+  },
+  {
+   "reden": "bewaker van onbekende soort: actueleOnboarding -- deel hem in in scripts/lib/bewakers.js",
+   "aantal": 3,
+   "routes": [
+    "POST /api/rtf/onboarding/opslaan",
+    "POST /api/rtf/onboarding/status",
+    "POST /api/rtf/onboarding/teken"
    ]
   },
   {
@@ -1478,7 +1484,7 @@
   "onbeslist": 0,
   "zijeffecten": 0,
   "blindeRondes": 0,
-  "begrenzing": 10000
+  "begrenzing": 20000
  },
  "perRoute": [
   {

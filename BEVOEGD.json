@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-22T14:31:24.035Z",
-    "commit": "db7391d693",
+    "op": "2026-10-22T23:04:11.344Z",
+    "commit": "f3e630f421",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 2,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.0"
   },
@@ -14,10 +14,10 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "cc7797ce4580d8d9536d97beff2b8bd60567e6e4ed1dc9401b662cf802dd0b7b",
+        "sha256": "944a3ff1f0ff38eb70c885ba1c85bfe06818a96765c4918b23084706a267b6de",
         "stempel": {
-          "op": "2026-10-22T11:55:53.922Z",
-          "commit": "ac5e92dab9",
+          "op": "2026-10-22T22:59:53.032Z",
+          "commit": "f3e630f421",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/idorproef.js",
@@ -26,12 +26,12 @@
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "109d1a170692a6ae583441f028f6ff3723142d0a161275d7a2c1ddf0faa60c6d",
+        "sha256": "064d4fc89cefdcc7a262d5a3ea1f6ec1c512b71cc058e2c4f6d6d9bdcdec0348",
         "stempel": {
-          "op": "2026-10-22T12:00:54.940Z",
-          "commit": "5f136a7055",
+          "op": "2026-10-22T23:02:13.105Z",
+          "commit": "f3e630f421",
           "boomVuil": false,
-          "boomAnders": 0,
+          "boomAnders": 2,
           "instrument": "scripts/rolproef-route.js",
           "node": "v26.12.0"
         }
@@ -89,8 +89,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:berichten",
@@ -99,8 +99,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 22,
-      "open": 22,
-      "reden": "22 van de 22 routes niet gemeten, o.a. /api/comm/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/begin: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/concept: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 21,
+      "reden": "21 van de 22 routes niet gemeten, o.a. /api/comm/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/begin: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/concept: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:bescherming",
@@ -278,7 +278,7 @@
       "status": "NIET_GETEST",
       "routes": 7,
       "open": 7,
-      "reden": "7 van de 7 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: openingstijden van een restaurant zijn publiek; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "link:foundationzorg",
@@ -290,7 +290,7 @@
       "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/GXTB3A/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/YRHD8N/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -358,8 +358,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:geven",
@@ -398,7 +398,7 @@
       "status": "NIET_GETEST",
       "routes": 138,
       "open": 136,
-      "reden": "136 van de 138 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/stroom/ticket: IDOR draagt geen volledige ruwe antwoordafbakening; /api/supplier/horeca/arrival/promise: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "136 van de 138 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; POST /api/stroom/ticket staat niet in ROLPROEF.json; /api/supplier/horeca/arrival/promise: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:huis",
@@ -491,8 +491,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:leven",
@@ -530,8 +530,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:loonstrook",
@@ -560,8 +560,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 90,
-      "open": 84,
-      "reden": "84 van de 90 routes niet gemeten, o.a. /api/member/magnaat/controle/overzicht: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/magnaat/controle/taak/maak: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/magnaat/controle/taak/zet: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 83,
+      "reden": "83 van de 90 routes niet gemeten, o.a. /api/member/magnaat/controle/overzicht: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/magnaat/controle/taak/maak: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/magnaat/controle/taak/zet: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:maison",
@@ -590,8 +590,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:mediaos",
@@ -600,8 +600,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 27,
-      "open": 27,
-      "reden": "27 van de 27 routes niet gemeten, o.a. /api/mediaos/bewaar: IDOR draagt geen volledige ruwe antwoordafbakening; /api/mediaos/bieb: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mediaos/bord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "open": 26,
+      "reden": "26 van de 27 routes niet gemeten, o.a. /api/mediaos/bewaar: IDOR draagt geen volledige ruwe antwoordafbakening; /api/mediaos/bieb: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mediaos/bord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:mijnmall",
@@ -640,8 +640,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:navigatie",
@@ -756,8 +756,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 19,
-      "open": 19,
-      "reden": "19 van de 19 routes niet gemeten, o.a. /api/drm/key: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ice staat niet in IDOR.json; /api/podium/abonneer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 18,
+      "reden": "18 van de 19 routes niet gemeten, o.a. /api/drm/key: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ice staat niet in IDOR.json; /api/podium/abonneer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:post",
@@ -844,8 +844,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 27,
-      "open": 27,
-      "reden": "27 van de 27 routes niet gemeten, o.a. /api/member/connect: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/find: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/spel/antwoord: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 26,
+      "reden": "26 van de 27 routes niet gemeten, o.a. /api/member/connect: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/find: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/spel/antwoord: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:routedossier",
@@ -1018,8 +1018,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:rtgone",
@@ -1076,8 +1076,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 13,
-      "open": 13,
-      "reden": "13 van de 13 routes niet gemeten, o.a. /api/comm/inbox: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/actielog: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/beleid: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "open": 12,
+      "reden": "12 van de 13 routes niet gemeten, o.a. /api/comm/inbox: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/actielog: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/beleid: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:spelavond",
@@ -1096,8 +1096,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 202,
-      "open": 167,
-      "reden": "167 van de 202 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/foundation/gezin/agenda: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/foundation/gezin/agenda/bereik: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 166,
+      "reden": "166 van de 202 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/foundation/gezin/agenda: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/foundation/gezin/agenda/bereik: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:sport",
@@ -1116,8 +1116,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 4,
-      "open": 4,
-      "reden": "4 van de 4 routes niet gemeten, o.a. /api/stad/bewoner: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/stad/melding: IDOR draagt geen volledige ruwe antwoordafbakening; /api/stream: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "open": 3,
+      "reden": "3 van de 4 routes niet gemeten, o.a. /api/stad/bewoner: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/stad/melding: IDOR draagt geen volledige ruwe antwoordafbakening; POST /api/stroom/ticket staat niet in ROLPROEF.json"
     },
     {
       "functie": "link:table",
@@ -1136,8 +1136,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 23,
-      "open": 23,
-      "reden": "23 van de 23 routes niet gemeten, o.a. /api/drm/key: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ice staat niet in IDOR.json; /api/stream: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "open": 22,
+      "reden": "22 van de 23 routes niet gemeten, o.a. /api/drm/key: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ice staat niet in IDOR.json; POST /api/stroom/ticket staat niet in ROLPROEF.json"
     },
     {
       "functie": "link:tweedescherm",
@@ -1244,7 +1244,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/GXTB3A/mij",
+          "verzoek": "GET /api/foundation/gezin/YRHD8N/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1340,8 +1340,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:wbw",
@@ -1350,8 +1350,8 @@
       "persona": "lid",
       "status": "NIET_GETEST",
       "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "open": 96,
+      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:wereldlaag",

@@ -1,19 +1,19 @@
 {
  "stempel": {
-  "op": "2026-10-22T18:25:58.072Z",
-  "commit": "cebe17ca76",
+  "op": "2026-10-22T22:59:53.032Z",
+  "commit": "f3e630f421",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 0,
   "instrument": "scripts/idorproef.js",
   "node": "v26.12.0"
  },
  "uitleg": "Twee echte leden met dezelfde rol: A oogst objecten (objectpool), B probeert ze te bedienen. gescheiden = B geweigerd (bewijs); doorbraak = B kreeg 2xx op een object uit A's antwoord (BEVINDING, met de hand nakijken -- kan publiek zijn); onbereikbaar = geen id of validatie strandde eerder. Zie scripts/lib/idor.js voor het oordeel.",
  "grens": "een doorbraak is een VRAAG en geen vonnis: het object kan publiek zijn. En de proef ziet alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.",
  "gemeten": {
-  "routes": 2630,
+  "routes": 2627,
   "gescheiden": 1124,
   "doorbraak": 0,
-  "nagekeken": 59,
+  "nagekeken": 56,
   "publiek": 535,
   "onbereikbaar": 901,
   "lek": 0,
@@ -88,11 +88,11 @@
       "hello": true,
       "stuur": 200,
       "barriereStuur": 200,
+      "herhaal": 401,
       "markerIndex": 1,
       "barriereIndex": 2,
       "kruis": false,
-      "volgorde": true,
-      "herhaal": 401
+      "volgorde": true
      },
      {
       "actor": "24cb9a8772235a2a6403c997db3ae8d02098951a0c400354e7979a9045ea2897",
@@ -101,11 +101,11 @@
       "hello": true,
       "stuur": 200,
       "barriereStuur": 200,
+      "herhaal": 401,
       "markerIndex": 1,
       "barriereIndex": 2,
       "kruis": false,
-      "volgorde": true,
-      "herhaal": 401
+      "volgorde": true
      }
     ],
     "barrieresNaVerzending": true,
@@ -158,12 +158,12 @@
    "verzoeken": 50
   },
   "afbakening": {
-   "routes": 733,
+   "routes": 730,
    "afgebakend": 11,
    "gescheiden": 0,
    "doorbraak": 0,
    "nagekeken": 1,
-   "onbereikbaar": 721
+   "onbereikbaar": 718
   },
   "opbouw": {
    "stappen": 76,
@@ -174,8 +174,8 @@
    ]
   },
   "merktekens": {
-   "vanA": 356,
-   "controle": 292
+   "vanA": 355,
+   "controle": 291
   }
  },
  "doorbraken": [],
@@ -1192,7 +1192,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "[0,2,0,3,1,0,0]"
+    "[2,0,3,1,0,0,0]"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -1925,7 +1925,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkbdb0e93384"
+    "mrkc3a912a626"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -1938,7 +1938,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "mrkbdb0e93384"
+    "mrkc3a912a626"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2550,8 +2550,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Zwarte Zwaan 0E01",
-    "mrkbdb0e93384"
+    "Nachtorchidee 1799",
+    "mrkc3a912a626"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -2564,8 +2564,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "Zwarte Zwaan 0E01",
-    "mrkbdb0e93384"
+    "Nachtorchidee 1799",
+    "mrkc3a912a626"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -4576,7 +4576,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zwarte Zwaan 0E01"
+    "Nachtorchidee 1799"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -4758,14 +4758,14 @@
   },
   "POST /api/foodcourt/tijden": {
    "methode": "POST",
-   "status": 200,
-   "staat": "nagekeken",
+   "status": 400,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
     "code",
     "restaurant",
     "restaurantid"
-   ],
-   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: openingstijden van een restaurant zijn publiek"
+   ]
   },
   "POST /api/galerij/album": {
    "staat": "onbereikbaar",
@@ -5281,8 +5281,9 @@
   },
   "POST /api/gemeente/afspraak": {
    "methode": "POST",
-   "status": 200,
-   "staat": "nagekeken",
+   "status": 400,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
     "id",
     "bekendmaking",
@@ -5294,8 +5295,7 @@
     "ref",
     "melding",
     "meldingid"
-   ],
-   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: eigenaar uit req.session; het id valt in B's eigen namespace"
+   ]
   },
   "POST /api/gemeente/afspraak/annuleer": {
    "methode": "POST",
@@ -5413,8 +5413,9 @@
   },
   "POST /api/gemeente/burgerzaken/slots": {
    "methode": "POST",
-   "status": 200,
-   "staat": "nagekeken",
+   "status": 400,
+   "staat": "onbereikbaar",
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
    "velden": [
     "id",
     "bekendmaking",
@@ -5426,8 +5427,7 @@
     "ref",
     "melding",
     "meldingid"
-   ],
-   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: publieke slots op soort+datum, geen persoonlijk object"
+   ]
   },
   "POST /api/gemeente/grofvuil": {
    "methode": "POST",
@@ -6590,8 +6590,8 @@
    "staat": "afgebakend",
    "merken": 7,
    "voorbeeld": [
-    "mrkbdb0e93384",
-    "ag3a5e059b"
+    "mrkc3a912a626",
+    "aga2cdc052"
    ],
    "reden": "A kreeg 200 met 7 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -7532,7 +7532,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zwarte Zwaan 0E01"
+    "Nachtorchidee 1799"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -9712,7 +9712,7 @@
     "kamerid"
    ],
    "gezien": [
-    "Blauwe Fenix B4D3"
+    "Noordelijke Ster 631A"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een kamercode werkt als een vergaderlink: wie hem heeft mag binnen, en een BESLOTEN kamer weigert alsnog (magErin). B komt binnen als B, met zijn eigen codenaam"
   },
@@ -29800,7 +29800,7 @@
     "postid"
    ],
    "gezien": [
-    "Blauwe Fenix B4D3"
+    "Noordelijke Ster 631A"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin"
   },
@@ -45834,7 +45834,7 @@
     "id"
    ],
    "gezien": [
-    "Zwarte Zwaan 0E01"
+    "Nachtorchidee 1799"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: Metier is een openbaar beroepsregister: metier.publiek() geeft het profiel op codenaam, en aanbevelingenVan() laat verborgen aanbevelingen weg; B zag de aanbeveling die A op C's profiel schreef, met A's codenaam als schrijver"
   },
@@ -45940,7 +45940,7 @@
     "id"
    ],
    "gezien": [
-    "Zwarte Zwaan 0E01"
+    "Nachtorchidee 1799"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: kern/metier/zoek.js: \"wie niets invulde, staat niet in de etalage\" -- een ingevuld profiel is vindbaar op codenaam, zonder sleutel; A vulde zijn kaart in de opbouw"
   },
@@ -47410,8 +47410,8 @@
    "staat": "afgebakend",
    "merken": 2,
    "voorbeeld": [
-    "mrkbdb0e93384",
-    "Contact-mrkbdb0e93384"
+    "mrkc3a912a626",
+    "Contact-mrkc3a912a626"
    ],
    "reden": "A kreeg 200 met 2 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -52020,7 +52020,7 @@
     "id"
    ],
    "gezien": [
-    "Zwarte Zwaan 0E01"
+    "Nachtorchidee 1799"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf"
   },
@@ -52055,7 +52055,7 @@
     "id"
    ],
    "gezien": [
-    "Zwarte Zwaan 0E01"
+    "Nachtorchidee 1799"
    ],
    "reden": "B zag wie A is; met de hand nagekeken en GEEN lek: de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven"
   },
@@ -54179,14 +54179,14 @@
       "pad": "/api/verify/selfie",
       "status": 200,
       "voor": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       }
      },
      {
@@ -54195,14 +54195,14 @@
       "pad": "/api/verify/selfie",
       "status": 200,
       "voor": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "9432892f3a1cb4f3b9bf4ed4443b7bb2bb778c756b7f854030595a83f0ed4c36",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "1b103d7b58c025e5863947643c7e5cb0814cfbded5a8a6f10ebac7d513b83ace",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       }
      }
     ],
@@ -54213,14 +54213,14 @@
       "pad": "/api/verify/selfie",
       "status": 401,
       "voor": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c60e3513f2d41007886ae29e4e3e69b2cdf9277ce085336b2fce3c89fc93ee34",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c60e3513f2d41007886ae29e4e3e69b2cdf9277ce085336b2fce3c89fc93ee34",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54232,14 +54232,14 @@
       "pad": "/api/verify/selfie",
       "status": 401,
       "voor": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c60e3513f2d41007886ae29e4e3e69b2cdf9277ce085336b2fce3c89fc93ee34",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c60e3513f2d41007886ae29e4e3e69b2cdf9277ce085336b2fce3c89fc93ee34",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54251,14 +54251,14 @@
       "pad": "/api/verify/selfie",
       "status": 401,
       "voor": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c60e3513f2d41007886ae29e4e3e69b2cdf9277ce085336b2fce3c89fc93ee34",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-       "b": "c60e3513f2d41007886ae29e4e3e69b2cdf9277ce085336b2fce3c89fc93ee34",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+       "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": null,
       "eigenNa": null,
@@ -54282,14 +54282,14 @@
      "pad": "/api/verify/selfie",
      "status": 200,
      "voor": {
-      "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-      "b": "9432892f3a1cb4f3b9bf4ed4443b7bb2bb778c756b7f854030595a83f0ed4c36",
-      "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+      "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+      "b": "1b103d7b58c025e5863947643c7e5cb0814cfbded5a8a6f10ebac7d513b83ace",
+      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
      },
      "na": {
-      "a": "870ea68412910cb14f6219ff64be76a6b245f48bb35d912d668429220ebcdd65",
-      "b": "c60e3513f2d41007886ae29e4e3e69b2cdf9277ce085336b2fce3c89fc93ee34",
-      "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+      "a": "ae06a7445cac51a2e60d25b158358d7a515c705f4acf22cf546ee13d789ccb7e",
+      "b": "5d8b9b7c0638d40ee2cee5f7c721f00484b473d214eb5b62c1daff19f52a0df4",
+      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
      },
      "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
      "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25"
@@ -54313,14 +54313,14 @@
       "pad": "/api/verify/status",
       "status": 200,
       "voor": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       }
      },
      {
@@ -54329,14 +54329,14 @@
       "pad": "/api/verify/status",
       "status": 200,
       "voor": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       }
      }
     ],
@@ -54347,14 +54347,14 @@
       "pad": "/api/verify/status",
       "status": 401,
       "voor": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54366,14 +54366,14 @@
       "pad": "/api/verify/status",
       "status": 401,
       "voor": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54385,14 +54385,14 @@
       "pad": "/api/verify/status",
       "status": 401,
       "voor": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": null,
       "eigenNa": null,
@@ -54418,14 +54418,14 @@
      "pad": "/api/verify/status",
      "status": 200,
      "voor": {
-      "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-      "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-      "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+      "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+      "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
      },
      "na": {
-      "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-      "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-      "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+      "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+      "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
      },
      "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
      "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
@@ -54450,14 +54450,14 @@
       "pad": "/api/verify/upload",
       "status": 200,
       "voor": {
-       "a": "30cbdb36e21bf01c27adb9f3f0c9dc28211b96603716da46cd823f19d27ac0b1",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "0cc411ca630ddf7a53e9ceaa84f373307455a29449ac9fc3d2d0b41bc5d37571",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       }
      },
      {
@@ -54466,14 +54466,14 @@
       "pad": "/api/verify/upload",
       "status": 200,
       "voor": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "2ad457304793395e4383de949d1727ac30e4e392f400df23be3985a8f1adad69",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "e1abbebd7a21e2509d13a04eb68cce40a98677a77ecc8950fb1c7e957b9a922e",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "5c337533347e7b7a5ecae67dc670ce1715d463eabb89bbb58cd2fd060b070c6f",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "c5b39add27ed52f09885efff3e8194cd05c3bf559c63fda0d49c61ba5e94c348",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       }
      }
     ],
@@ -54484,14 +54484,14 @@
       "pad": "/api/verify/upload",
       "status": 401,
       "voor": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54503,14 +54503,14 @@
       "pad": "/api/verify/upload",
       "status": 401,
       "voor": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": 200,
       "eigenNa": 200,
@@ -54522,14 +54522,14 @@
       "pad": "/api/verify/upload",
       "status": 401,
       "voor": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "na": {
-       "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-       "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-       "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+       "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+       "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+       "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
       },
       "eigenVoor": null,
       "eigenNa": null,
@@ -54553,14 +54553,14 @@
      "pad": "/api/verify/upload",
      "status": 200,
      "voor": {
-      "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-      "b": "5c337533347e7b7a5ecae67dc670ce1715d463eabb89bbb58cd2fd060b070c6f",
-      "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+      "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+      "b": "c5b39add27ed52f09885efff3e8194cd05c3bf559c63fda0d49c61ba5e94c348",
+      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
      },
      "na": {
-      "a": "1eefdfe6adf4799232787623f8c90770ed43f3131087e9addfbfeaa1d57c7907",
-      "b": "c86d746cf9acd151995fad110d89fcc93c42d30cc86016379efcd1cf572b167c",
-      "overig": "fe7d9e4a52899abf00365d0b7c6e76c1b06a1acbacae20c9356424cbf0f602df"
+      "a": "b83a2bcc930c4cd87719c6371c6282b14df61f4d513f9f9c7a011ecfd8e3f154",
+      "b": "001f11933d8a26e89bce622175c7c13816ecc8a48c532132ac79929dcd56d9a1",
+      "overig": "208c9191b899404d451e7df5240a327c20ad1e23884ef35fa9c8ffb7e0a6b5e8"
      },
      "actor": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
      "doel": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
@@ -55560,7 +55560,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "pw_SyJEwddhbjsY8lj9"
+    "pw_oahak_DOQgDU3XZZ"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -63109,7 +63109,7 @@
    "staat": "afgebakend",
    "merken": 1,
    "voorbeeld": [
-    "Zwarte Zwaan 0E01"
+    "Nachtorchidee 1799"
    ],
    "reden": "A kreeg 200 met 1 merkteken(s) van zichzelf; B kreeg met hetzelfde verzoek 200 en geen enkel daarvan: de route bakent af op de sessie",
    "velden": []
@@ -63235,21 +63235,6 @@
    "afbakening": "A kreeg zelf 403: er is geen open deur om tegen te ijken"
   },
   "POST /api/rtf/knelpunt": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein",
-   "afbakening": "A kreeg zelf 403: er is geen open deur om tegen te ijken"
-  },
-  "POST /api/rtf/onboarding/opslaan": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein",
-   "afbakening": "A kreeg zelf 403: er is geen open deur om tegen te ijken"
-  },
-  "POST /api/rtf/onboarding/status": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein",
-   "afbakening": "A kreeg zelf 403: er is geen open deur om tegen te ijken"
-  },
-  "POST /api/rtf/onboarding/teken": {
    "staat": "onbereikbaar",
    "reden": "geen id van A in dit domein",
    "afbakening": "A kreeg zelf 403: er is geen open deur om tegen te ijken"
@@ -63697,11 +63682,11 @@
       "hello": true,
       "stuur": 200,
       "barriereStuur": 200,
+      "herhaal": 401,
       "markerIndex": 1,
       "barriereIndex": 2,
       "kruis": false,
-      "volgorde": true,
-      "herhaal": 401
+      "volgorde": true
      },
      {
       "actor": "24cb9a8772235a2a6403c997db3ae8d02098951a0c400354e7979a9045ea2897",
@@ -63710,11 +63695,11 @@
       "hello": true,
       "stuur": 200,
       "barriereStuur": 200,
+      "herhaal": 401,
       "markerIndex": 1,
       "barriereIndex": 2,
       "kruis": false,
-      "volgorde": true,
-      "herhaal": 401
+      "volgorde": true
      }
     ],
     "barrieresNaVerzending": true,
@@ -64039,11 +64024,11 @@
       "hello": true,
       "stuur": 200,
       "barriereStuur": 200,
+      "herhaal": 401,
       "markerIndex": 1,
       "barriereIndex": 2,
       "kruis": false,
-      "volgorde": true,
-      "herhaal": 401
+      "volgorde": true
      },
      {
       "actor": "24cb9a8772235a2a6403c997db3ae8d02098951a0c400354e7979a9045ea2897",
@@ -64052,11 +64037,11 @@
       "hello": true,
       "stuur": 200,
       "barriereStuur": 200,
+      "herhaal": 401,
       "markerIndex": 1,
       "barriereIndex": 2,
       "kruis": false,
-      "volgorde": true,
-      "herhaal": 401
+      "volgorde": true
      }
     ],
     "barrieresNaVerzending": true,

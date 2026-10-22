@@ -3810,7 +3810,6 @@
       "server/kern/levensgraaf/bronnen-leven.js",
       "server/kern/levenslijn/index.js",
       "server/kern/leverancier.js",
-      "server/kern/leverancier/beschermdesoorten.js",
       "server/kern/leverancier/logboekzicht.js",
       "server/kern/library/feedback.js",
       "server/kern/library/loop-source.js",
@@ -4533,7 +4532,6 @@
       "server/kern/leren.js",
       "server/kern/leren/schrijven.js",
       "server/kern/levensdossier/velden.js",
-      "server/kern/leverancier/beschermdesoorten.js",
       "server/kern/library/feedback.js",
       "server/kern/library/index.js",
       "server/kern/library/journal.js",
@@ -11797,7 +11795,6 @@
         "screensOmitted": 0,
         "signals": [
           "decision",
-          "feedback",
           "booking",
           "transaction",
           "failure",
@@ -11819,9 +11816,7 @@
         "decisions": [
           "SOURCE_EVENT_CANDIDATE"
         ],
-        "claimsContests": [
-          "SOURCE_EVENT_CANDIDATE"
-        ],
+        "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
         ],
@@ -31335,7 +31330,6 @@
         "screensOmitted": 0,
         "signals": [
           "decision",
-          "feedback",
           "booking",
           "transaction",
           "failure",
@@ -31359,9 +31353,7 @@
         "decisions": [
           "SOURCE_EVENT_CANDIDATE"
         ],
-        "claimsContests": [
-          "SOURCE_EVENT_CANDIDATE"
-        ],
+        "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
         ],
@@ -31468,6 +31460,7 @@
         ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "feedback",
           "transaction",
           "failure",
@@ -31485,8 +31478,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [
           "SOURCE_EVENT_CANDIDATE"
         ],

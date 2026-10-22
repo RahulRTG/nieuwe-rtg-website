@@ -1284,3 +1284,46 @@ verwijderd. Geen productrecht of retentiegrens veranderd.
 Status blijft ORANJE. De volledige PG-selectie, actuele IDOR- en APPWERKT-
 bewijzen, twee integrale groene runs en operationele kwalificatie blijven
 verplicht. Geen merge of uitrol.
+
+### Deep Green ronde 3 — gerichte afsluiting na meetstand f3e630f421
+
+Op de vaste bronstand f3e630f421 is de volledige PG-selectie uitgevoerd:
+56/57 bestanden geslaagd, ticketcodes.pg.test.js faalde (409 in plaats van
+200). Geen volledig PG-bewijs afgegeven. Log: /tmp/rtg-r3-pg-qualified.log.
+De eerder falende onboarding- en GRAND-proeven slagen in deze run (7 en 11).
+
+De rollenhermeting is expliciet volledig uitgevoerd met --max=20000:
+4514 routes, 9369 pogingen, nul verkeerde-roltoegang, privacylekken,
+onbevoegde persistente wijzigingen of onbesliste uitkomsten. De eerdere
+standaardrun met budget 600 is geen volledige kwalificatie. Bewijs:
+ROLPROEF.json en /tmp/rtg-r3-roleproof-qualified.log. IDOR.json bevat de
+actuele objectproeven, inclusief onbereikbare en publieke routes; geen
+waargenomen lek is geen bewijs voor de onbereikbare routes. BEVOEGD.json
+blijft 10 BEWEZEN / 104 NIET_GETEST. Dit zijn bevoegdheidsbewijzen, niet
+114 volledig gekwalificeerde apps. Logs: /tmp/rtg-r3-idor-qualified.log en
+/tmp/rtg-r3-authority-qualified.log. De geheimcanary slaagde met de juiste
+Redis-binary in PATH: 5/5, /tmp/rtg-r3-secret-canary.log.
+
+De ticketfixture gebruikte de UTC-dag terwijl de productcode de huiszone
+Amsterdam controleert. Hersteld met één vaste geïnjecteerde klok voor beide
+instances, expliciete lokale ticketdag en een negatieve gisterenproef.
+De PG-proef krijgt via de bestaande helper een eigen wegwerpdatabase.
+Geen productcode of toegangsgrens gewijzigd. Gerichte ticketproeven: 11/11,
+nul skips, /tmp/rtg-r3-ticket-clock.log. Dit vervangt geen volledige PG-run.
+
+Een gerichte selectie van elf eerder falende testbestanden leverde met
+lokale servertoegang 90/94 op. De sandboxrun had daarnaast vijftien
+listen-EPERM-hookfailures: infrastructuurfouten, geen productbevindingen.
+Vier resterende fouten kwamen uit twee verouderde afgeleide registers en
+één ontbrekende credentialclassificatie met twee bewakingstests. De bestaande
+onboarding/teken-consumer is na broninspectie gekoppeld aan de bestaande
+gezinstoken-deur, met verwijzing naar de PG-intrekkingsproef. Geen control
+versoepeld en geen nieuwe credentialfamilie gemaakt. CAPABILITEIT en
+LOOP-FABRIC-COVERAGE zijn opnieuw uit hun bestaande generators afgeleid;
+de laatste blijft statische vindbaarheid, geen operationeel ketenbewijs.
+Herhaling van dezelfde selectie: 94/94, nul skips of failures, log
+/tmp/rtg-r3-remaining-regressions-fixed.log (Node 26.12.0).
+
+Status ORANJE. Open blijven onder meer 104 ontbrekende bevoegdheidsbewijzen,
+architectuurnormen, actuele integrale APPWERKT-kwalificatie, twee volledige
+kwalificatieruns en operationeel herstel/staging. Geen merge of uitrol.

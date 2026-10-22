@@ -26,7 +26,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 
-const { POORTEN, poortVan, NIET_IN } = require('../server/kern/handlerpoorten');
+const { POORTEN, poortVan, poortVanRouteHand, NIET_IN } = require('../server/kern/handlerpoorten');
 const { TOEGANGNAMEN } = require('../server/kern/mutatiecontract');
 
 const WORTEL = path.join(__dirname, '..');
@@ -48,6 +48,25 @@ test('elke OBJECT_SCOPED poort noemt het VELD dat het object aanwijst', () => {
   for (const [naam, p] of Object.entries(POORTEN)) {
     if (p.toegang !== 'OBJECT_SCOPED') continue;
     assert.ok(p.veld && p.veld.length > 1, naam + ' is OBJECT_SCOPED zonder veld');
+  }
+});
+
+test('inline sessie- en labpaspoorten blijven zichtbaar voor de contractmeter', () => {
+  const account = [
+    'POST /api/gids/app',
+    'POST /api/lab2/bewoner/klacht',
+    'POST /api/lab2/publiek/onderzoek',
+    'POST /api/rtfos/publiek/stad'
+  ];
+  for (const route of account) {
+    assert.strictEqual(poortVanRouteHand(route).toegang, 'AUTHENTICATED', route);
+  }
+
+  for (const route of ['POST /api/lab2/mijn', 'POST /api/lab2/mijn/meting',
+    'POST /api/lab2/mijn/terugtrekken', 'POST /api/lab2/bewoner/paspoort']) {
+    const poort = poortVanRouteHand(route);
+    assert.strictEqual(poort.toegang, 'OBJECT_SCOPED', route);
+    assert.ok(poort.veld, route + ' noemt het objectveld');
   }
 });
 

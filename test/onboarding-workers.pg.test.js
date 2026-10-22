@@ -50,7 +50,7 @@ test('RTF ondertekening: twee workers, onveranderlijke versies en procescrashher
     assert.equal(gezin.status, 200, JSON.stringify(gezin));
     const auth = { code: gezin.body.code, token: gezin.body.token };
     assert.ok(auth.code && auth.token);
-    const st = await api(a, 'rtf/onboarding/status', auth);
+    const st = await api(b, 'rtf/onboarding/status', auth);
     assert.equal(st.status, 200);
     const v1 = st.body.contract.versie, tekst1 = st.body.contract.tekst;
     const sign = (w, versie, naam = 'Sam Ouder', meer = {}) => api(w, 'rtf/onboarding/teken',
@@ -115,6 +115,19 @@ test('RTF ondertekening: twee workers, onveranderlijke versies en procescrashher
       assert.equal(retry.body.contract.ondertekendAt, punt.at);
       assert.deepEqual(Object.keys(historie(await lees())), [v1, v2, v3].map(String));
       assert.deepEqual(historie(await lees())[v1], eerste);
+    });
+    await t.test('intrekken bij worker A weigert alle onboarding-ingangen bij worker B', async () => {
+      assert.equal((await api(b, 'rtf/onboarding/status', auth)).status, 200);
+      const voor = await lees();
+      const ingetrokken = await api(a, 'foundation/gezin/sessie/intrek', auth);
+      assert.equal(ingetrokken.status, 200, JSON.stringify(ingetrokken));
+      assert.equal(ingetrokken.body.gesloten, 1);
+      for (const pad of ['rtf/onboarding/status', 'rtf/onboarding/opslaan', 'rtf/onboarding/teken']) {
+        const r = await api(b, pad, { ...auth, velden: { naam: 'Onbevoegd' },
+          naam: 'Sam Ouder', akkoord: true, expectedVersion: v3 });
+        assert.equal(r.status, 403, pad + JSON.stringify(r));
+      }
+      assert.deepEqual(await lees(), voor, 'geen gewijzigde of herhaalde ontvangst na intrekking');
     });
   } finally {
     for (const w of workers) await dood(w);

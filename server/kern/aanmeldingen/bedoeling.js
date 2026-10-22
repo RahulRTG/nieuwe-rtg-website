@@ -12,7 +12,7 @@ const verwerkt = () => ({ status: 410, code: 'AANVRAAG_INTENTIE_VERBRUIKT',
   ontvangst: { status: 'alVerwerkt' } });
 const kopie = x => JSON.parse(JSON.stringify(x));
 
-module.exports = ({ db, accounts, bewerkCollectie, normaliseer, maakAanvraag }) => {
+module.exports = ({ eigen, accounts, bewerkCollectie, normaliseer, maakAanvraag }) => {
   function zegel() {
     const key = accounts && accounts.sleutelVoor && accounts.sleutelVoor('aanmelding-ontvangst-v1');
     if (!Buffer.isBuffer(key) || key.length < 32) return null;
@@ -78,16 +78,16 @@ module.exports = ({ db, accounts, bewerkCollectie, normaliseer, maakAanvraag }) 
      Verwijder ook actor/inhoudsafdruk en objectlink. De verbruikte sleutel blijft
      staan; een later herhaald oud verzoek krijgt uitsluitend alVerwerkt. */
   function controleerOntvangstRedactie() {
-    if (!Object.hasOwn(db.data, 'aanmeldingOntvangsten')) return;
-    const boek = db.data.aanmeldingOntvangsten, z = zegel();
+    if (!eigen.bestaat('aanmeldingOntvangsten')) return;
+    const boek = eigen.kijk('aanmeldingOntvangsten'), z = zegel();
     if (!z || !geldigBoek(boek, z) || Object.entries(boek.ontvangsten)
       .some(([k, r]) => !HEX.test(k) || !(geredigeerd(r) || geldigBewijs(r))))
       throw Error('Aanmeldingontvangsten vereisen herstel vóór redactie.');
   }
   function redigeerOntvangsten({ accountId, aanvraagIds = [] } = {}) {
     controleerOntvangstRedactie();
-    if (!Object.hasOwn(db.data, 'aanmeldingOntvangsten')) return;
-    const boek = db.data.aanmeldingOntvangsten, z = zegel();
+    if (!eigen.bestaat('aanmeldingOntvangsten')) return;
+    const boek = eigen.kijk('aanmeldingOntvangsten'), z = zegel();
     const actor = accountId == null ? null : z.hash('actor', 'account:' + Number(accountId));
     const ids = new Set(aanvraagIds);
     for (const [k, r] of Object.entries(boek.ontvangsten)) {

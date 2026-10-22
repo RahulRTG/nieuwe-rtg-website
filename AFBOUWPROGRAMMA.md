@@ -1205,3 +1205,21 @@ vereist `gebroken`. Gerichte herhaling inclusief echte HTTP/SSE: 8/8 groen,
 nul skips (`/tmp/rtg-r3-stream-close.log`). De correctie is onafhankelijk
 herbeoordeeld; de reviewer heeft geen eigen testrun uitgevoerd. Het eerder
 vastgelegde IDOR-register is nog geen hermeting met deze strengere afsluitcontrole.
+
+Vervolgafsluiting: de drie RTF-onboardingroutes verversen vóór de bestaande
+sessiecontrole de gedeelde Foundation-stand. De echte PostgreSQL-proef haalt
+6/6, inclusief twee workers, commitfouten, procesuitval en sessie-intrekking
+vóór het volgende verzoek (`/tmp/rtg-r3-onboarding-current.log`). Gelijktijdige
+intrekking tijdens de ondertekentransactie blijft een afzonderlijke open
+bewijsgrens; dit pakket claimt daarvoor geen atomair autorisatiebewijs.
+De bestaande verversvoorziening ververst de volledige projectie.
+
+Aanvraagontvangsten en werkplekbezetting gebruiken nu hun bestaande
+eigencollectiecontract. Aanwezigheid lezen maakt geen collectie aan; alleen
+expliciet eigen namen worden toegelaten, ook bij JavaScript-prototypenamen.
+De gerichte SQLite/HTTP-regressie haalt 49/49 zonder skips
+(`/tmp/rtg-r3-ownership-sqlite.log`). Een voorafgaande gemengde run gaf
+41/60 doordat gewone SQLite-fixtures een PostgreSQL-omgeving erfden;
+die onjuiste proefopzet is geen productkwalificatie. De volledige geïsoleerde
+PostgreSQL-selectie moet opnieuw worden uitgevoerd op de vastgelegde bronstand.
+Status blijft ORANJE; geen merge of uitrol.

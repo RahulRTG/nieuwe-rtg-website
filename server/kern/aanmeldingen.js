@@ -67,7 +67,7 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid,
   const kap = (t, n) => schoon(String(t == null ? '' : t), n || 200);
   const eur = c => Math.round(c) / 100;
 
-  const eigen = require('./eigencollectie')({ db, domein: 'kern/aanmeldingen', bezit: { aanmeldingen: 'lijst', lidmaatschapBetalingen: 'lijst' } });
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/aanmeldingen', bezit: { aanmeldingen: 'lijst', lidmaatschapBetalingen: 'lijst', aanmeldingOntvangsten: 'kaart' } });
   function A() { return eigen.bak('aanmeldingen'); }
   function B() { return eigen.bak('lidmaatschapBetalingen'); }
 
@@ -84,7 +84,7 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid,
      ziet. Zie ./aanmeldingen/aanvraag.js. */
   const aanvraagCtx = { A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save };
   const { normaliseer, bouwReis, beeld, aanvraag, lijst } = require('./aanmeldingen/aanvraag')(aanvraagCtx);
-  const bedoeling = require('./aanmeldingen/bedoeling')({ db, accounts, bewerkCollectie, normaliseer,
+  const bedoeling = require('./aanmeldingen/bedoeling')({ eigen, accounts, bewerkCollectie, normaliseer,
     maakAanvraag: rij => require('./aanmeldingen/aanvraag')({ ...aanvraagCtx,
       A: () => rij, rid: () => crypto.randomUUID(), save() {} }).aanvraag });
 

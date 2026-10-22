@@ -1,10 +1,8 @@
 /* Eén taakbouwer voor de synchrone interne ingang en de duurzame API-opdracht. */
 'use strict';
 const {createHash}=require('node:crypto');
-const kantoren=require('./werkplek-kantoren');
-module.exports=({db,save,bewerkCollectie,crypto,nu,kent,norm,takenVan})=>{
+module.exports=({kamers,save,bewerkCollectie,crypto,nu,kent,norm,takenVan})=>{
  const tekstVan=t=>String(t||'').replace(/[<>]/g,'').trim().slice(0,200);
- const kamers=(code,rij)=>kantoren(code,(db.data.werkplekMensen||{})[code]||[],rij);
  const afdelingVan=(code,a,rij)=>kamers(code,rij).some(k=>k.id===String(a||''))?String(a):'operations';
  const voeg=(rij,tekst,afdeling)=>{const taak={id:crypto.randomBytes(4).toString('hex'),tekst,afdeling,af:false,at:nu()};rij.unshift(taak);if(rij.length>100)rij.pop();return taak;};
  const beeld=(code,rij)=>({ok:true,taken:rij.slice(0,30),kantoren:kamers(code,rij)});

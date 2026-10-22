@@ -20,6 +20,7 @@ const CODES = ['rtg', 'rtf'];
 const werkplekKantoren = require('./werkplek-kantoren');
 
 module.exports = ({ db, save, bewerkCollectie, crypto }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/werkplek', bezit: { werkplekMensen: 'kaart', werkplekTaken: 'kaart', werkplekToegang: 'kaart' } });
   const nu = () => Date.now();
   const d = () => db.data;
   const lijst = x => Array.isArray(x) ? x : (x && typeof x === 'object' ? Object.values(x) : []);
@@ -74,9 +75,9 @@ module.exports = ({ db, save, bewerkCollectie, crypto }) => {
   const norm = code => String(code || '').toLowerCase();
 
   function bak(sleutel, code) {
-    if (!d()[sleutel] || typeof d()[sleutel] !== 'object') d()[sleutel] = {};
-    if (!Array.isArray(d()[sleutel][code])) d()[sleutel][code] = [];
-    return d()[sleutel][code];
+    const bron = eigen.bak(sleutel);
+    if (!Array.isArray(bron[code])) bron[code] = [];
+    return bron[code];
   }
   const mensenVan = code => bak('werkplekMensen', code);
   const takenVan = code => bak('werkplekTaken', code);
@@ -140,7 +141,7 @@ module.exports = ({ db, save, bewerkCollectie, crypto }) => {
   }
 
   /* ---- de takenlijst van het huis ---- */
-  const { taakMaak, taakMaakBedoeling } = require('./werkplek-taken')({ db, save, bewerkCollectie, crypto, nu, kent, norm, takenVan });
+  const { taakMaak, taakMaakBedoeling } = require('./werkplek-taken')({ kamers: (code, rij) => werkplekKantoren(code, eigen.kijk('werkplekMensen')[code] || [], rij), save, bewerkCollectie, crypto, nu, kent, norm, takenVan });
   function taakZet(code, id, af) {
     code = norm(code);
     if (!kent(code)) return { status: 404, error: 'Dit bedrijf kennen we niet.' };

@@ -7,7 +7,18 @@ const { beoordeelIdorRij } = require('../scripts/bevoegdronde');
 // Eén echte HTTP-uitvoering levert de uitgangsdata voor meter-tegenproeven.
 // Zonder geslaagde positieve controle wordt geen synthetisch groen verzonnen.
 test('snapmeter: echte eigen ontvangers en negatieve controles; ruwe tegenproeven', async () => {
-  const uit = await meet();
+  // Opzettelijk onbereikbare loopbackdiensten. Een geërfde opslagconfig
+  // zou de echte positieve controles doen falen, nooit een externe dienst raken.
+  const vervuild = { DATABASE_URL: 'postgresql://fixture@127.0.0.1:1/verboden',
+    PG_URL: 'postgresql://fixture@127.0.0.1:1/verboden', REDIS_URL: 'redis://127.0.0.1:1',
+    RTG_STORE: 'postgres', RTG_AUDIT_DATABASE_URL: 'postgresql://fixture@127.0.0.1:1/verboden',
+    RTG_MEDIA_BACKEND: 's3', RTG_MEDIA_S3_BUCKET: 'fixture-bucket',
+    RTG_MEDIA_S3_ENDPOINT: 'http://127.0.0.1:1', RTG_MEDIA_S3_KEY: 'fixture', RTG_MEDIA_S3_SECRET: 'fixture' };
+  const vorige = Object.fromEntries(Object.keys(vervuild).map(k => [k, process.env[k]]));
+  let uit;
+  try { Object.assign(process.env, vervuild); uit = await meet(); }
+  finally { for (const [k, v] of Object.entries(vorige)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } }
+
   for (const pad of ROUTES) {
     const r = uit['POST ' + pad];
     assert.equal(oordeel(r).stand, 'gemeten', JSON.stringify(r));

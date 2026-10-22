@@ -965,6 +965,7 @@ if (require.main !== module) { module.exports = { maakIdorVraag }; return; }
   // de drie identiteitsfixtures onbruikbaar maken. Geen ontwikkeldata.
   Object.assign(perRoute, await require('./lib/verificatie-isolatie').meet());
   require('./lib/snapisolatie').voegToe(perRoute, await require('./lib/snapisolatie').meet());
+  require('./lib/gegevensisolatie').voegToe(perRoute, await require('./lib/gegevensisolatie').meet());
   klaar();
 
   const doorbraken = Object.entries(perRoute).concat(Object.entries(zaakPerRoute)).filter(([, v]) => v.staat === 'doorbraak');

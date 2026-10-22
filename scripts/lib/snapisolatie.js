@@ -8,7 +8,13 @@ const ok = s => Number.isInteger(s) && s >= 200 && s < 300;
 const FOTOS = {"a": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==", "b": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPj/HwADAgH/5ncLrgAAAABJRU5ErkJggg=="};
 async function meet() {
   const { maakWereld, nieuwLid, verbind } = require('./voltooiwereld');
-  const w = await maakWereld('snapisolatie');
+  // Deze proef leest lokale SQLite en media: geërfde PG/Redis/S3-config
+  // mag nooit een tweede, gedeelde opslag buiten de wegwerpmap aanspreken.
+  const w = await maakWereld('snapisolatie', {
+    RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '', REDIS_URL: '', RTG_AUDIT_DATABASE_URL: '',
+    RTG_MEDIA_BACKEND: 'disk', RTG_MEDIA_S3_BUCKET: '', RTG_MEDIA_S3_ENDPOINT: '',
+    RTG_MEDIA_S3_KEY: '', RTG_MEDIA_S3_SECRET: '', AWS_ACCESS_KEY_ID: '', AWS_SECRET_ACCESS_KEY: ''
+  });
   const p = { omgeving: 'geisoleerde-http-sqlite', actors: [], objecten: {}, stappen: [], sessies: [] };
   const uit = Object.fromEntries(ROUTES.map(pad => ['POST ' + pad, { gang: 'snapisolatie', bewijsVersie: 1, methode: 'POST', pad, proef: p }]));
   try {

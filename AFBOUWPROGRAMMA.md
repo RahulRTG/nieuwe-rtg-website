@@ -1416,3 +1416,29 @@ de te-grote-bestandengrens is hersteld. Nog rood: omvang 358/350, dubbeling
 186/184, gedeelde kern 262/260, ongemeten mutatietoetsen 198/142 en drie
 registers uit een vuile bronboom. Dit is geen kandidaatkwalificatie; registers
 moeten na bronbevriezing opnieuw worden gemeten, niet handmatig groen gezet.
+
+23 oktober — Gegevens-start/zeg krijgt een concrete telefoonflow-proef via de
+bestaande IDOR- en bevoegdronde. Twee echt geregistreerde toestelgebonden
+accounts: eigen gesprek, vervalste body-identiteit, wederzijdse overname vóór
+afronding geweigerd, anoniem geweigerd, uitsluitend eigen kluisrij veranderd,
+eigen identiteit en telefoon na herstart bevestigd. Alle users-kolommen worden
+gehasht gecontroleerd; afwijkende antwoordstructuren en bestaande negatieve
+bevindingen blijven blokkerend. Geen algemene adres/document/concurrencyclaim.
+De eerste fixture miste het verplichte toestelbewijs; gecorrigeerd via de
+bestaande binding en ondertekening, zonder serveruitzondering.
+
+Onafhankelijke review vond geërfde opslagconfiguratie in de wegwerpwereld.
+Gegevens- en Snaps-proeven kiezen nu expliciet lokale SQLite/disk en wissen
+externe opslagconfiguratie. Tegenproeven erven opzettelijk onbereikbare
+PG/Redis/S3-loopbackadressen en moeten nog steeds alle controles voltooien.
+Gerichte eindrun: 24/24, nul skips, inclusief bestaande gegevenspoort en
+bevoegd-consument. Log /tmp/rtg-r3-isolation-final.log. Geen echte betalingen,
+productiegebruik, merge of uitrol. Nieuwe appaantallen vereisen hermeting.
+
+Bounded normreview: de twee extra gedeelde namen projectieKoppel/projectieStand
+komen uit expliciete doorgifte van spellen.js naar child-router spelprojectie.js;
+de meter ziet aparte bestandsdomeinen. De extra namen grootboek (read-only
+banklezer) en bereidVoor (contractvoorbereiding) hebben andere semantiek dan
+hun naamgenoten. Geen veilige consolidatie aangetoond. Niet hernoemd of
+verplaatst om aantallen te verlagen; deze normblokkades blijven open voor een
+inhoudelijk onderbouwde oplossing, met ongewijzigde drempels.

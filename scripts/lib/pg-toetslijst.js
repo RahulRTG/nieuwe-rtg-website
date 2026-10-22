@@ -32,6 +32,7 @@ const TOETSEN = Object.freeze([
   'test/bureau-case-workers.pg.test.js',
   'test/werkplek-taak-workers.pg.test.js',
   'test/assets-fee-workers.pg.test.js',
+  'test/magnaat-besluit-workers.pg.test.js',
   'test/postgres-requestcommit.pg.test.js',
   'test/accounts-requestcommit.pg.test.js',
   'test/duurzaamheid-pg.test.js',

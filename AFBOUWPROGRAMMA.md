@@ -1049,3 +1049,42 @@ autorisatiebewijzen, vijf uitvoerbare OS-contracten, vier voltooifixtures, de
 architectuurclassificatie, twee integrale groene kwalificatieruns en staging-,
 back-up-, rollback- en incidentbewijs. Geen merge, productie-uitrol of echte
 financiële transactie uitgevoerd.
+
+### Deep Green — afsluiten op bronoorzaak (22 oktober 2026)
+
+PR #697 blijft afbouwbasis. CI-run `39798849793` op `e54ef1cce1`
+stopt bij negen preflightbevindingen; de overgeslagen afhankelijke jobs zijn
+geen afzonderlijk bewezen productdefect. De negen bevindingen zijn twee
+modulegroottegrenzen (`handlerpoorten/buiten-routes-b.js`,
+`lidboard/werkbeleid.js`), een ontbrekende PostgreSQL-testregistratie en zes
+verouderde afleidingen/bewijzen (ARCHITECTUUR, BEWIJS, BEWIJSSCHULD, FUNCTIES,
+taalbewijs en websitebeelden). Eigenaar van deze afbouw: de integratiewerkstroom.
+Afgeleide bestanden worden pas na hun bronreparaties in samenhang vernieuwd.
+
+De vergeten `test/magnaat-besluit-workers.pg.test.js` is aangesloten op de
+bestaande `scripts/lib/pg-toetslijst.js`. Daarmee nemen de suiteplanner,
+geïsoleerde PostgreSQL-runner en releasecontrole dezelfde test mee. De echte
+twee-workerproef plus `test/suite-pg.test.js` slagen met Node v26.12.0:
+8/8, nul skips, exitcode 0. Command:
+`DATABASE_URL=<lokale-testdatabase> node --test test/magnaat-besluit-workers.pg.test.js test/suite-pg.test.js`.
+De proef maakt zelf een wegwerpdatabase en toetst herhaling, herstart,
+inhoudsconflict en actorisolatie. De eerste sandboxpoging faalde op EPERM;
+de toegestane loopbackrun is de geldige uitvoering. De nieuwe volledige
+PostgreSQL-kwalificatie blijft vereist: een oudere telling kan deze uitbreiding
+van de testlijst niet bewijzen.
+
+De bestaande BEVOEGD-rijen groeperen de 104 open apps voorlopig als volgt:
+
+| Bewijsgat | Apps | Volgende afsluitactie |
+|---|---:|---|
+| Routebewijs onvolledig | 89 | Gedeelde routes en werkelijke beveiligingspatronen bepalen; eigen positieve en negatieve controles behouden |
+| Persona-adapter ontbreekt | 7 | Bestaande zaak-/kantoorsessies koppelen aan object- en rolproeven |
+| Gezinskruisproef onvolledig | 5 | Eigen toegang van beide gezinnen aantonen vóór afscherming wordt beoordeeld |
+| Interne ingang ontbreekt | 2 | Bestaande UI werkelijk openen; geen fictieve URL als bewijs |
+| Statisch juridisch scherm | 1 | Toepasselijkheid onderbouwen; niet automatisch bevoegd verklaren |
+
+Dit zijn groepen van ontbrekend bewijs, geen reeds bewezen beveiligingsfamilies.
+De bestaande Evidence DAG (`plan.js`) en `bewijsraakvlak.js` bieden al gerichte
+selectie en bewijsverval met conservatieve terugval. Eerst hun dekking toetsen;
+geen nieuwe bewijsengine. APPWERKT is voor deze CI-aansluiting niet opnieuw
+gemeten en geen appstatus is verhoogd. Status blijft ORANJE. Geen merge of uitrol.

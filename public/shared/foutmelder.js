@@ -25,6 +25,18 @@
 
   var GESTUURD = 0, MAX = 3;
 
+  /* Een afgebroken documentovergang is geen applicatiefout. Chromium maakt
+     deze promises zelf en kan ze al afwijzen voordat de ontvangende pagina
+     haar overgangsobserver heeft geladen. Alleen de drie bekende, letterlijke
+     browsermeldingen worden genegeerd; iedere onbekende variant blijft naar de
+     foutcollector gaan. Dezelfde gesloten lijst bewaakt de lokale proeven in
+     scripts/lib/browserruis.js. */
+  function browserruis(melding) {
+    return melding === 'Transition was skipped' ||
+      melding === 'Transition was aborted because of invalid state. ViewTransition opt-in disabled' ||
+      melding === 'Transition was aborted because of invalid state. Page already revealed';
+  }
+
   function meld(soort, melding, bestand, regel) {
     if (GESTUURD >= MAX) return;
     GESTUURD++;
@@ -52,11 +64,13 @@
   }
 
   window.addEventListener('error', function (e) {
-    meld('fout', e && (e.message || 'onbekende fout'), e && e.filename, e && e.lineno);
+    var melding = e && (e.message || 'onbekende fout');
+    if (!browserruis(melding)) meld('fout', melding, e && e.filename, e && e.lineno);
   });
   window.addEventListener('unhandledrejection', function (e) {
     var r = e && e.reason;
-    meld('belofte', r && (r.message || r), r && r.fileName, r && r.lineNumber);
+    var melding = r && (r.message || r);
+    if (!browserruis(melding)) meld('belofte', melding, r && r.fileName, r && r.lineNumber);
   });
 
   /* EEN LEEG SCHERM IS OOK EEN STORING, ook al gooit er niets.

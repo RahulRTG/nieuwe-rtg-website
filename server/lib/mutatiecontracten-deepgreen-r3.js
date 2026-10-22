@@ -68,7 +68,16 @@ const CONTRACTEN = {
 
   'POST /api/bank/akkoord': contract('bank.akkoord', 'hooguitEens', 'PROTECTED',
     'test/bankhart.test.js: retry geeft compact herhaald antwoord en opent geen nieuwe rekening; test/bankduurzaam.test.js: opslagverlies geeft geen akkoord of IBAN',
-    'Akkoord en standaardrekeningen worden in één bestaande transactionele idem-bundel vastgelegd. De duurzame akkoordontvangst blijft buiten de gewone sleutelring.')
+    'Akkoord en standaardrekeningen worden in één bestaande transactionele idem-bundel vastgelegd. De duurzame akkoordontvangst blijft buiten de gewone sleutelring.'),
+
+  'POST /api/member/magnaat/economie/beslis': contract('member.magnaat.economie.beslis', 'hooguitEens', 'PROTECTED',
+    'test/magnaat-economie-routes.test.js: replay en inhoudsconflict; test/magnaat-besluit-workers.pg.test.js: twee workers, herstart en actorisolatie',
+    'De HTTP-deur eist een clientsleutel. Een minimale actor- en inhoudsgebonden ontvangsthash staat atomair met het besluit in de bestaande economische wereldstaat.'),
+
+  'POST /api/office/asset/fees': contract('office.asset.fees', 'idempotent', 'PROTECTED',
+    'test/assets-fee-concurrency.test.js: gelijktijdigheid en opslagweigering; test/assets-fee-workers.pg.test.js: twee workers, retries en herstart',
+    'De natuurlijke sleutel ticket plus kalenderjaar bindt de duurzame Pay-boeking. feeJaar en de poolkas worden daarna samen in de bestaande duurzame bundel vastgelegd; een retry kan geen tweede afschrijving of kasboeking maken.',
+    { klasse: 'AUTHENTICATED', deur: 'officeAuth' })
 };
 
 module.exports = { CONTRACTEN };

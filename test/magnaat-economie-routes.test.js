@@ -38,12 +38,35 @@ test.after(() => stop(server));
 test('bedrijfsbesluit loopt via HTTP en de duurzame economie-opslag zonder 500', async () => {
   const antwoord = await post('/api/member/magnaat/economie/beslis', {
     prijs: 117, personeelDoel: 21, loonMaand: 3650,
-    trainingDag: 1800, bestelling: 340, impactPct: 1.4
+    trainingDag: 1800, bestelling: 340, impactPct: 1.4,
+    idem: 'route-besluit-1'
   });
   assert.equal(antwoord.status, 200, JSON.stringify(antwoord.body));
   assert.equal(antwoord.body.ok, true);
   assert.equal(antwoord.body.strategie.prijs, 11700);
   assert.equal(antwoord.body.strategie.personeelDoel, 21);
+});
+
+test('bedrijfsbesluit bindt de sleutel aan actor en inhoud en boekt een lening een keer', async () => {
+  const eerste = await post('/api/member/magnaat/economie/beslis', { lening: 1000, idem: 'route-lening-1' });
+  assert.equal(eerste.status, 200, JSON.stringify(eerste.body));
+  assert.equal(eerste.body.herhaald, false);
+  const schuld = eerste.body.strategie.schuld;
+
+  const herhaald = await post('/api/member/magnaat/economie/beslis', { idem: 'route-lening-1', lening: '1000' });
+  assert.equal(herhaald.status, 200, JSON.stringify(herhaald.body));
+  assert.equal(herhaald.body.herhaald, true);
+  assert.equal(herhaald.body.strategie.schuld, schuld);
+
+  const conflict = await post('/api/member/magnaat/economie/beslis', { lening: 1001, idem: 'route-lening-1' });
+  assert.equal(conflict.status, 409, JSON.stringify(conflict.body));
+  assert.equal(conflict.body.error.includes('ander bedrijfsbesluit'), true);
+});
+
+test('bedrijfsbesluit weigert een onbeschermde client', async () => {
+  const antwoord = await post('/api/member/magnaat/economie/beslis', { prijs: 118 });
+  assert.equal(antwoord.status, 400, JSON.stringify(antwoord.body));
+  assert.equal(antwoord.body.error.includes('idempotentiesleutel'), true);
 });
 
 test('economenanalyse loopt via HTTP en de duurzame economie-opslag zonder 500', async () => {

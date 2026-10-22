@@ -27,7 +27,10 @@ module.exports = (kern) => {
   app.post('/api/member/magnaat/taak/actie', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.taakActie(key, b.taakId, b.invoer)));
   app.post('/api/member/magnaat/kantoor/kies', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.kiesKantoor(key, b.kantoorId, b.rol)));
   app.post('/api/member/magnaat/werkproces/start', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.werkprocesStart(key, b.workflowId, b.apparaat)));
-  app.post('/api/member/magnaat/economie/beslis', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieBeslis(key, b)));
+  app.post('/api/member/magnaat/economie/beslis', auth, (req, res) => alsLid(req, res,
+    (key, b) => (b.idem || b.idempotentieSleutel)
+      ? magnaatWereld.economieBeslis(key, b, b.idem || b.idempotentieSleutel)
+      : { status: 400, error: 'Een unieke idempotentiesleutel is nodig om een bedrijfsbesluit veilig te verwerken.' }));
   app.post('/api/member/magnaat/economie/analyse', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieAnalyse(key, b)));
   app.post('/api/member/magnaat/economie/volgende-dag', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieVolgendeDag(key, b.commandoId)));
   app.post('/api/member/magnaat/economie/schok', auth, (req, res) => alsLid(req, res, (key, b) => magnaatWereld.economieSchok(key, b.schokId)));

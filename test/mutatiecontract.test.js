@@ -316,8 +316,6 @@ const BEKEND_OPEN = Object.freeze([
      door een meter verzonnen betekenis: elke route staat bij NAAM, zodat een
      nieuwe onbekende nog steeds onmiddellijk faalt en deze lijst alleen gericht
      kan krimpen zodra de handler werkelijk is nagelezen. */
-  'POST /api/member/magnaat/economie/beslis',
-  'POST /api/office/asset/fees',
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {

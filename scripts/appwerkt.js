@@ -214,6 +214,19 @@ function rijen() {
   return filter ? uit.filter((r) => (r.ingang || '').includes(filter) || r.app.toLowerCase().includes(filter.toLowerCase())) : uit;
 }
 
+/* Een interne tab heeft geen los publiek adres, maar kan WEL een meetbare
+   ingang hebben. Het bestaande appcontract benoemt dan het echte scherm en de
+   echte hash-navigatie. Alleen een declaratieve hash mag hier rechtstreeks
+   worden geopend; natuurlijke-taalstappen voor OS-kiezers moeten door een
+   eigen bedieningsadapter worden uitgevoerd en blijven dus eerlijk ongemeten. */
+function meetIngang(rij, contract = CONTRACT) {
+  if (rij && rij.pad) return { pad: rij.pad, bestemming: rij.pad, via: null };
+  const c = rij && contract && contract[rij.functie];
+  if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') ||
+      typeof c.via !== 'string' || !c.via.startsWith('#')) return null;
+  return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via };
+}
+
 /* ---- de vijf bewijzen die een testwereld nodig hebben ---- */
 const GEEN_FIXTURE = (wat) => ({ status: 'GEEN_FIXTURE', reden: wat, bewijs: null });
 /* Bewijs 3, 5 en 7 hebben sinds 11 oktober 2026 een testwereld
@@ -311,9 +324,11 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   const r = { ...rij, bewijzen: {}, gevonden: 0, geklikt: 0, overgeslagen: [], nietKlikbaar: [], waarnemingen: [] };
   delete r.soort; delete r.pad;
 
-  /* tab: en os: hebben geen eigen adres -- ze zijn een stand of een kiezer
-     binnen de app. Meten kan dus niet vanaf een URL, en dat is geen defect. */
-  if (!rij.pad) {
+  const meet = meetIngang(rij);
+  /* Een OS-kiezer met alleen een menselijke bedieningsbeschrijving heeft nog
+     geen uitvoerbare adapter. Hash-tabs hebben die inmiddels wel via hun
+     bestaande appcontract en worden hieronder als echte appstand geopend. */
+  if (!meet) {
     const reden = rij.soort === 'tab'
       ? 'een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen'
       : 'een kiezer in de app: het adres ontstaat pas na een keuze';
@@ -321,11 +336,12 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     vulOngemeten(r);
     return r;
   }
+  if (meet.via) r.via = meet.via;
 
-  const bestand = path.join(WORTEL, 'public', rij.pad.replace(/^\//, ''));
+  const bestand = path.join(WORTEL, 'public', meet.bestemming.replace(/^\//, ''));
   if (!fs.existsSync(bestand)) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
-      reden: 'de wereld wijst naar ' + rij.pad + ' en dat bestand bestaat niet', bewijs: null };
+      reden: 'de wereld wijst naar ' + meet.bestemming + ' en dat bestand bestaat niet', bewijs: null };
     for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST', reden: 'er is geen scherm om te bedienen', bewijs: null };
     vulOngemeten(r);
     return r;
@@ -333,7 +349,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 
   /* Een BEVINDING en geen oordeel: meet de proef met een andere persona dan het
      register als doelgroep noemt? Beide bronnen staan erbij (./lib/bestemming.js). */
-  r.personaAfwijking = personaAfwijking(rij.persona, rij.pad, SCHERMREGISTER());
+  r.personaAfwijking = personaAfwijking(rij.persona, meet.bestemming, SCHERMREGISTER());
 
   // ---- bewijs 1: bereikbaar voor de persona van deze wereld ----
   const eigen = persoonlijk[rij.persona];
@@ -344,7 +360,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     vulOngemeten(r);
     return r;
   }
-  const eersteBezoek = await bezoek(eigen, base, rij.pad);
+  const eersteBezoek = await bezoek(eigen, base, meet.pad);
   r.waarnemingen.push('als ' + rij.persona + ': ' + eersteBezoek.samenvatting);
   if (eersteBezoek.rem.length) r.waarnemingen.push('proef: bij het laden ' + eersteBezoek.rem.length + 'x de rem (429) geraakt, door het gedeelde adres van de meting');
 
@@ -355,7 +371,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     let opener = null;
     for (const rol of rollen) {
       if (rol === rij.persona) continue;
-      const proef = await bezoek(persoonlijk[rol], base, rij.pad);
+      const proef = await bezoek(persoonlijk[rol], base, meet.pad);
       if (!proef.poort && !proef.crash.length) { opener = rol; break; }
     }
     /* TWEE HEEL VERSCHILLENDE UITKOMSTEN, en ze door elkaar halen maakt dit
@@ -376,20 +392,20 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     r.bewijzen.bereikbaar = opener
       ? { status: 'GEBLOKKEERD_DOOR_DEFECT',
         reden: 'de wereld toont deze ingang aan een ' + rij.persona + ', maar de deur gaat alleen open voor een ' + opener + ': ' + eersteBezoek.poortTekst,
-        bewijs: rij.pad }
+        bewijs: meet.pad }
       : { status: 'NIET_GETEST',
         reden: 'er staat een deur die geen van de vier bekende sessies (lid, zaak, kantoor, gezin) opent; welke rol er wel doorheen komt, weet deze proef niet: ' + eersteBezoek.poortTekst,
-        bewijs: rij.pad };
+        bewijs: meet.pad };
     for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST', reden: 'achter een dichte deur valt de bediening niet te meten', bewijs: null };
     vulOngemeten(r);
     return r;
   }
   if (eersteBezoek.crash.length) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
-      reden: 'het scherm gooit bij het laden: ' + eersteBezoek.crash[0], bewijs: rij.pad };
+      reden: 'het scherm gooit bij het laden: ' + eersteBezoek.crash[0], bewijs: meet.pad };
   } else if (eersteBezoek.config.length) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG',
-      reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: rij.pad };
+      reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: meet.pad };
   } else {
     /* OPENDE ZONDER POORT EN ZONDER FOUT -- maar OP DE BEDOELDE BESTEMMING?
        Een deur kan ook een doorverwijzing zijn: vier kantoorschermen stuurden
@@ -398,19 +414,19 @@ async function meetRij(rij, base, persoonlijk, rollen) {
        op url-gelijkheid. De andere sessies worden alleen bezocht als de
        bestemming niet klopte: dan is de vraag of de ingang verkeerd geadresseerd
        is (de bestaande uitkomst) of gewoon niet bereikt. */
-    const landing = eersteBezoek.eind || rij.pad;
-    let o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen: [] });
+    const landing = eersteBezoek.eind || meet.bestemming;
+    let o = beoordeelBestemming({ ingang: meet.bestemming, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen: [] });
     if (o.status !== 'BEWEZEN' && o.bestemming.uitkomst === 'andere-capability') {
       const anderen = [];
       for (const rol of rollen) {
         if (rol === rij.persona || !persoonlijk[rol]) continue;
-        const b = await bezoek(persoonlijk[rol], base, rij.pad);
-        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || rij.pad });
+        const b = await bezoek(persoonlijk[rol], base, meet.pad);
+        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || meet.bestemming });
       }
-      o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
+      o = beoordeelBestemming({ ingang: meet.bestemming, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
     }
     r.bestemming = o.bestemming;
-    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: rij.pad };
+    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: meet.pad };
     if (o.status !== 'BEWEZEN') {
       for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST',
         reden: 'de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app', bewijs: null };
@@ -420,7 +436,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   }
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
-  const bediening = await bedien(eigen, base, rij.pad);
+  const bediening = await bedien(eigen, base, meet.pad);
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
   r.schil = bediening.schil;
@@ -1014,7 +1030,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, weigerZin, rijen, meetIngang, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

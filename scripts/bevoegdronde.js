@@ -247,7 +247,7 @@ function gezinOordeel(paren) {
     reden: gescheiden.length + ' van de ' + paren.length + ' kruisparen gescheiden (beide eigenaren binnen, B met A\'s code en anoniem geweigerd), 0 lek: ' + GRENS_GEZIN };
 }
 
-async function meetGezinnen(rijen, base, browser, maakContext) {
+async function meetGezinnen(rijen, base, browser, maakContext, meetIngang) {
   const { ROLLEN } = require('./lib/proefsessies');
   const A = await ROLLEN.gezin.haal(base), B = await ROLLEN.gezin.haal(base);
   if (!A?.code || !B?.code || !A.token || !B.token || A.code === B.code || A.token === B.token) {
@@ -255,7 +255,8 @@ async function meetGezinnen(rijen, base, browser, maakContext) {
   }
   const uit = new Map();
   for (const r of rijen) {
-    if (!r.pad) { uit.set(r.functie, { status: 'NIET_GETEST', reden: 'geen eigen adres' }); continue; }
+    const meet = meetIngang(r);
+    if (!meet) { uit.set(r.functie, { status: 'NIET_GETEST', reden: 'geen uitvoerbare ingang' }); continue; }
     const ctx = await maakContext(browser, { rtf_sessie: JSON.stringify(A), rtg_cookieinfo_v1: '1' });
     const page = await ctx.newPage();
     const verzoeken = new Map();
@@ -267,7 +268,7 @@ async function meetGezinnen(rijen, base, browser, maakContext) {
       const k = q.method() + ' ' + u.pathname + u.search + ' ' + lijf;
       if (!verzoeken.has(k)) verzoeken.set(k, { methode: q.method(), url: u.pathname + u.search, lijf, koppen: q.headers() });
     });
-    try { await page.goto(base + r.pad, { waitUntil: 'domcontentloaded', timeout: 20000 }); await page.waitForTimeout(2500); } catch (e) {}
+    try { await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 }); await page.waitForTimeout(2500); } catch (e) {}
     await ctx.close();
     const paren = [];
     for (const v of verzoeken.values()) {
@@ -296,7 +297,7 @@ async function meetGezinnen(rijen, base, browser, maakContext) {
 }
 
 async function meet() {
-  const { rijen, maakContext } = require('./appwerkt');
+  const { rijen, maakContext, meetIngang } = require('./appwerkt');
   const lijst = rijen();
   const reg = laadRegisters();
   const regels = [];
@@ -310,7 +311,7 @@ async function meet() {
     const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bevoegdronde-'));
     const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
     const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    try { gezinUit = await meetGezinnen(gezin, base, browser, maakContext); }
+    try { gezinUit = await meetGezinnen(gezin, base, browser, maakContext, meetIngang); }
     finally {
       await browser.close();
       try { child.kill(); } catch (e) {}

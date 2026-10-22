@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-22T12:02:11.049Z",
-    "commit": "a712b3f80e",
+    "op": "2026-10-22T13:02:17.698Z",
+    "commit": "c8e5f00072",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -290,7 +290,7 @@
       "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/NAAUKE/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/R4UU87/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1233,7 +1233,7 @@
       "persona": "gezin",
       "status": "NIET_GETEST",
       "paren": 12,
-      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, eigenaarWeg)",
+      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -1244,7 +1244,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/NAAUKE/mij",
+          "verzoek": "GET /api/foundation/gezin/R4UU87/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1265,14 +1265,6 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "bEigen": 200,
-          "b": 401,
-          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1314,6 +1306,14 @@
           "b": 401,
           "anoniem": 401,
           "uitslag": "eigenaarWeg"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "bEigen": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
         },
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",

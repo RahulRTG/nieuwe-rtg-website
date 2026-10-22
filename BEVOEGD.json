@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-22T10:36:51.349Z",
-    "commit": "ca28be08d3",
+    "op": "2026-10-22T10:57:35.736Z",
+    "commit": "bded5af315",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.0"
   },
@@ -290,7 +290,7 @@
       "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/7MT2DT/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/SRKHEX/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1244,7 +1244,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/7MT2DT/mij",
+          "verzoek": "GET /api/foundation/gezin/SRKHEX/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1265,6 +1265,14 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "bEigen": 200,
+          "b": 401,
+          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1297,14 +1305,6 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "bEigen": 200,
-          "b": 401,
-          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1505,7 +1505,8 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "gezin",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres"
+      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
+      "kruisparen": []
     }
   ]
 }

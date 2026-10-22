@@ -323,11 +323,9 @@ const BEKEND_OPEN = Object.freeze([
   'POST /api/labfonds/doneer',
   'POST /api/labfonds/voorstel/maak',
   'POST /api/member/magnaat/economie/beslis',
-  'POST /api/office/aidata/export',
   'POST /api/office/asset/fees',
   'POST /api/office/balie/zoek',
   'POST /api/office/techniek/integraties/noodstop',
-  'POST /api/ov/regie/zet',
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {

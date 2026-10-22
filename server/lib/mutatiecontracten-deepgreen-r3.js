@@ -33,7 +33,14 @@ const CONTRACTEN = {
     'Iedere bewuste activering maakt een nieuw voorstel uit de actuele medewerkers, afwezigheid en weekcontext; vaststellen blijft een aparte manageractie.'),
   'POST /api/supplier/rtmail/export': contract('supplier.rtmail.export', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
     'test/rtmail-leiding-bestuur.test.js: twee bewuste exports geven exact twee afzonderlijke auditregels',
-    'Iedere export is een afzonderlijke gegevensuitvoer die voor privacy en toezicht afzonderlijk in het journaal moet blijven staan.')
+    'Iedere export is een afzonderlijke gegevensuitvoer die voor privacy en toezicht afzonderlijk in het journaal moet blijven staan.'),
+
+  'POST /api/office/aidata/export': contract('office.aidata.export', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
+    'test/aidata.test.js: twee bewuste datasetexports leveren exact twee duurzame boardroom-auditregels; opslagverlies sluit de uitvoer',
+    'Iedere datasetexport is een afzonderlijke gegevensuitgifte. Deduplicatie zou een echte export uit het verplichte auditspoor verwijderen.'),
+  'POST /api/ov/regie/zet': contract('ov.regie.zet', 'idempotent', 'PROTECTED',
+    'test/ov-regie.test.js: een identieke toegestane voorkeur veroorzaakt na de eerste opslag geen tweede save',
+    'De automaten, comfort- en privacyvelden beschrijven de volledige gewenste regiestand; een gelijke retry is geen nieuwe keuze.')
 };
 
 module.exports = { CONTRACTEN };

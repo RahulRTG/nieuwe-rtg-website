@@ -9,6 +9,7 @@ const os = require('node:os');
 const path = require('node:path');
 const fs = require('node:fs');
 const dekkingsvang = require('./lib/dekkingsvang');
+const { isBrowserruis } = require('../scripts/lib/browserruis');
 
 /* DE BROWSER VOOR EEN SCHERMTOETS, en waarom dit hier staat en niet 32 keer.
 
@@ -739,8 +740,6 @@ async function elevateTier(base, memberToken, pas, approverToken) {
 
    Zet hier dus alleen een melding bij die de browser over zijn eigen animatie
    doet. Alles wat de APP zegt hoort door te komen. */
-const BROWSERRUIS = ['Transition was skipped',
-  'Transition was aborted because of invalid state. ViewTransition opt-in disabled'];
 /* WEBKIT MELDT EEN VERZOEK DAT AFBREEKT OMDAT ZIJN DOCUMENT WORDT VERLATEN --
    een pagina die dichtgaat of weg-navigeert -- als onafgevangen fout, met de
    misleidende tekst "<adres> due to access control checks.". Voor een adres op
@@ -780,7 +779,7 @@ function letOpFouten(page, bak, opties) {
     let origin = '';
     try { origin = new URL(page.url()).origin; } catch (_) { /* nog geen adres */ }
     if (!(opties && opties.eigenZeef) && webkitAfbreking(bericht, origin, motorVan(page))) { afgebrokenTelling.set(bak, afgebrokenIn(bak) + 1); return; }
-    if ((opties && opties.eigenZeef) || !BROWSERRUIS.includes(bericht)) bak.push(bericht);
+    if ((opties && opties.eigenZeef) || !isBrowserruis(bericht)) bak.push(bericht);
   });
   return bak;
 }

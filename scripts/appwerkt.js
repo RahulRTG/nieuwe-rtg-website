@@ -137,6 +137,7 @@ let raakvlakWereld = null;
 const RAAKVLAKWERELD = () => (raakvlakWereld = raakvlakWereld || raakvlakken.maakWereld());
 const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+const { isBrowserruis } = require('./lib/browserruis');
 /* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
    geen eigen register. */
 const toezegklassen = require('./lib/toezegklassen');
@@ -844,7 +845,9 @@ function luister(page, base, bak) {
   let volgorde = 0;
   page.on('request', q => verzoeken.set(q, ++volgorde));
   poortVerkeer.set(page, verkeer);
-  page.on('pageerror', (e) => bak.crash.push('JS: ' + String(e.message || e).slice(0, 180)));
+  page.on('pageerror', (e) => {
+    if (!isBrowserruis(e)) bak.crash.push('JS: ' + String(e.message || e).slice(0, 180));
+  });
   page.on('response', async (res) => {
     const s = res.status();
     const pad = res.url().replace(base, '').slice(0, 80);

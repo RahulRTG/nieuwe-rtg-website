@@ -1327,3 +1327,18 @@ Herhaling van dezelfde selectie: 94/94, nul skips of failures, log
 Status ORANJE. Open blijven onder meer 104 ontbrekende bevoegdheidsbewijzen,
 architectuurnormen, actuele integrale APPWERKT-kwalificatie, twee volledige
 kwalificatieruns en operationeel herstel/staging. Geen merge of uitrol.
+
+Vervolg op kandidaat e1544ee50f: volledige verplichte PostgreSQL-selectie
+GESLAAGD, 57/57 bestanden, nul failures/skips, met eigen databases en lokale
+Redis. Log /tmp/rtg-r3-pg-e1544ee.log; machinebewijs .release/pg-bewijs.json.
+Dit is één databasekwalificatie, niet twee integrale platformruns. Onafhankelijke
+read-only review van ticketfixture en credentialregistratie vond geen blocker;
+de reviewer heeft geen eigen runtimekwalificatie uitgevoerd.
+
+De volledige normmeting op dezelfde stand blijft ROOD: keuringScheef 11/10,
+keuringOmvang 357/350, keuringTeGroot 9/8, keuringDubbeling 186/184,
+dbDeuren 467/464, kernGedeeld 262/260 en toetsenNietGemeten 197/142.
+Log /tmp/rtg-r3-norm-e1544ee-local.log. De eerste sandboxpoging kon geen
+routekaart meten en telt niet als normuitkomst. De extra serveromvang zit
+in foundation/gezinshulp.js (10360 bytes); geen commentaarstrip of normverlaging
+om deze bevinding weg te rekenen. Platformstatus blijft ORANJE.

@@ -26,14 +26,14 @@ test('Labfonds herberekent actuele dekking zonder toekenning of dubbele toezeggi
   assert.equal(fonds.fonds('lid-a').voorstellen[0].status, 'open');
 });
 
-test('zeven besluiten gebruiken bestaande contractkeuring en claimen geen kwalificatie', () => {
+test('zeven besluiten gebruiken bestaande contractkeuring en dragen uitvoerbaar kwalificatiebewijs', () => {
   const { CONTRACTEN } = require('../server/lib/mutatiecontracten-premium-opdrachten');
   const { keur } = require('../server/kern/mutatiecontract');
   assert.equal(Object.keys(CONTRACTEN).length, 7);
   for (const [route, c] of Object.entries(CONTRACTEN)) {
     assert.deepEqual(keur({ ...c, route }), [], route);
-    assert.equal(c.stand, 'LEGACY_PENDING_CLASSIFICATION', 'besluit is nog geen implementatiebewijs');
-    assert.equal(c.bewijs, undefined);
+    assert.notEqual(c.stand, 'LEGACY_PENDING_CLASSIFICATION', 'een afgesloten contract blijft niet in de wachtkamer');
+    assert.ok(c.bewijs && c.bewijs.gemeten && c.bewijs.op, 'de eindstand noemt zijn uitvoerbare bewijs');
   }
 });
 

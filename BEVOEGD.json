@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-22T09:53:19.706Z",
-    "commit": "2d8f1d6f2d",
+    "op": "2026-10-22T10:36:51.349Z",
+    "commit": "ca28be08d3",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.0"
   },
@@ -39,8 +39,8 @@
     ]
   },
   "telling": {
-    "NIET_GETEST": 105,
-    "BEWEZEN": 9
+    "NIET_GETEST": 104,
+    "BEWEZEN": 10
   },
   "regels": [
     {
@@ -78,10 +78,9 @@
       "app": "Balans",
       "ingang": "/apps/geld.html#balans",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 99,
-      "open": 97,
-      "reden": "97 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "status": "BEWEZEN",
+      "routes": 1,
+      "reden": "alle 1 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet"
     },
     {
       "functie": "link:bank",
@@ -291,7 +290,7 @@
       "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg)",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/44HNXC/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/7MT2DT/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1245,7 +1244,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/44HNXC/mij",
+          "verzoek": "GET /api/foundation/gezin/7MT2DT/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1266,14 +1265,6 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "bEigen": 200,
-          "b": 401,
-          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1306,6 +1297,14 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "bEigen": 200,
+          "b": 401,
+          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1390,7 +1389,9 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 11,
+      "open": 11,
+      "reden": "11 van de 11 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/klets: IDOR draagt geen volledige ruwe antwoordafbakening; /api/klets/gesprek: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "os:rtf",
@@ -1406,7 +1407,9 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 3,
+      "open": 3,
+      "reden": "3 van de 3 routes niet gemeten, o.a. /api/member/snap/send: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/snap/view: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/snaps: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "os:videobellen",
@@ -1422,7 +1425,9 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/account/rollen: IDOR draagt geen volledige ruwe antwoordafbakening; /api/account/start: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "tab:assets",
@@ -1430,7 +1435,9 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 20,
+      "open": 20,
+      "reden": "20 van de 20 routes niet gemeten, o.a. /api/asset/aanvraag/betaal: IDOR draagt geen volledige ruwe antwoordafbakening; /api/asset/aanvragen: IDOR draagt geen volledige ruwe antwoordafbakening; /api/asset/document: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "tab:bestellen",
@@ -1438,7 +1445,9 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 6,
+      "open": 6,
+      "reden": "6 van de 6 routes niet gemeten, o.a. /api/groothandel/annuleer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/groothandel/bestel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/groothandel/markt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "tab:betalen",
@@ -1446,7 +1455,9 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 5,
+      "open": 5,
+      "reden": "5 van de 5 routes niet gemeten, o.a. /api/betaal/direct: IDOR draagt geen volledige ruwe antwoordafbakening; /api/betaal/mijn: IDOR draagt geen volledige ruwe antwoordafbakening; /api/betaal/verzoek/pay: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "tab:gezin",
@@ -1454,7 +1465,9 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 9,
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/order/pay: IDOR draagt geen volledige ruwe antwoordafbakening; /api/orders/mine: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "tab:reizen",
@@ -1462,7 +1475,9 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 21,
+      "open": 21,
+      "reden": "21 van de 21 routes niet gemeten, o.a. /api/agenda/mijn: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bezorg/partners: IDOR draagt geen volledige ruwe antwoordafbakening; /api/contract/teken: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "tab:salon",
@@ -1470,7 +1485,9 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 2,
+      "open": 2,
+      "reden": "2 van de 2 routes niet gemeten, o.a. /api/comment: IDOR draagt geen volledige ruwe antwoordafbakening; /api/like: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "tab:terplaatse",
@@ -1478,7 +1495,9 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "routes": 25,
+      "open": 25,
+      "reden": "25 van de 25 routes niet gemeten, o.a. /api/bezorg/partners: IDOR draagt geen volledige ruwe antwoordafbakening; /api/booking/pay: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/care/pakket/betaal: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "tab:zorg",

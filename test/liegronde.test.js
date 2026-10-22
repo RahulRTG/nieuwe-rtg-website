@@ -17,7 +17,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { oordeel, meetAdres } = require('../scripts/liegronde');
+const { oordeel, meetAdres, SPAAR } = require('../scripts/liegronde');
 const B = require('../scripts/lib/bewijsbron');
 const { BRONSOORTEN, ALGEMEEN } = require('../scripts/lib/appcontract');
 
@@ -81,6 +81,11 @@ test('de liegronde gebruikt ook een expliciete contractingang voor interne tabs'
     { ingang: '/apps/app.html#tab=assets', pad: '/apps/app.html' });
   assert.equal(meetAdres({ functie: 'os:werk', pad: null }), null,
     'een natuurlijke-taalkeuze zonder declaratieve route wordt niet geraden');
+});
+
+test('de Foundation-toegangspoort blijft echt zodat het scherm zelf wordt gemeten', () => {
+  assert.ok(SPAAR.split(',').includes('/api/rtf/toegang'),
+    'zonder de echte toegangspoort meet de liegronde alleen de dichte Foundation-deur');
 });
 
 test('5. het echte register spreekt zichzelf niet tegen', () => {

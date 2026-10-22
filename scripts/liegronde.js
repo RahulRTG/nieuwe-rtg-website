@@ -54,6 +54,13 @@ const LIEG = '/api/';
    test/liegend-scherm.e2e.js). */
 const SPAAR = ['/api/auth/', '/api/login', '/api/office/login', '/api/supplier/login',
   '/api/supplier/roster', '/api/foundation/gezin/maak', '/api/account/', '/api/onboarding/status',
+  /* Dit is de serverdeur van beschermde Foundation-schermen. Hem leeg laten
+     antwoorden houdt het echte scherm kunstmatig dicht en meet vervolgens de
+     deur in plaats van wat het scherm over zijn gegevens beweert. Net als de
+     sessiemunters hierboven blijft alleen deze toegangspoort echt; de
+     functionele Foundation-antwoorden achter de deur worden nog steeds door de
+     liegpoort vervangen. */
+  '/api/rtf/toegang',
   '/api/config', '/api/i18n', '/api/talen', '/api/vertaal/', '/api/gids/app', '/api/push/key'].join(',');
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 4);
 const GRENS = 'alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt';

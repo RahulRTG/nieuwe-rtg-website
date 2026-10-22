@@ -138,6 +138,21 @@ async function meetRij(rij, base, contexten) {
   return Object.assign(uit, oordeel(m), { gelogen: m.gelogen.length, klachten: m.klachten });
 }
 
+async function maakSchoolContext(browser, school) {
+  const ctx = await maakContext(browser, school.lokaal);
+  /* De Schoolpas is tabgebonden. Houd deze proefopbouw daarom lokaal bij de
+     enige ronde die hem nodig heeft; de gedeelde contextbouwer blijft gelijk en
+     andere bewijsregisters vervallen niet door een Foundation-fixture. */
+  await ctx.addInitScript((o) => {
+    try {
+      for (const k of Object.keys(o)) sessionStorage.setItem(k, JSON.stringify({
+        merk: 'rtg-school-sessie-v1', waarde: o[k], verloopt: Date.now() + 30 * 60 * 1000
+      }));
+    } catch (e) {}
+  }, school.tijdelijk);
+  return ctx;
+}
+
 async function meet() {
   const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
   const pw = laadBrowser({ eigenDriver: false });
@@ -157,8 +172,8 @@ async function meet() {
       const contexten = {};
       for (const rol of Object.keys(sessies)) contexten[rol] = await maakContext(browser, opslagVoor({ [rol]: sessies[rol] }));
       if (school) {
-        contexten['link:rtfbord'] = await maakContext(browser, school.bord.lokaal, school.bord.tijdelijk);
-        contexten['link:rtfschrift'] = await maakContext(browser, school.schrift.lokaal, school.schrift.tijdelijk);
+        contexten['link:rtfbord'] = await maakSchoolContext(browser, school.bord);
+        contexten['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift);
       }
       while (true) {
         const i = n++; if (i >= lijst.length) break;

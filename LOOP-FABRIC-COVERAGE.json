@@ -4823,6 +4823,7 @@
       "server/kern/lidacties/afrekenen.js",
       "server/kern/lidboard/index.js",
       "server/kern/lidboard/schakel.js",
+      "server/kern/lidboard/werkbeleid.js",
       "server/kern/living-world/loop-delivery.js",
       "server/kern/loop-fabric/delivery.js",
       "server/kern/magnaat-capabilities.js",
@@ -6556,6 +6557,7 @@
       "server/kern/magnaat-capabilities-routes.js",
       "server/kern/magnaat-capabilities.js",
       "server/kern/magnaat-controle.js",
+      "server/kern/magnaat-economische-motor/besluiten.js",
       "server/kern/magnaat-kantoorregels/tabel-breed.js",
       "server/kern/magnaat-kantoorregels/tabel-hdi.js",
       "server/kern/magnaat-kantoorregels/tabel-lid.js",
@@ -8040,7 +8042,7 @@
       "behaviourEvidence": {
         "routeCount": 472,
         "mutationRoutes": 471,
-        "declaredMutationSemantics": 171,
+        "declaredMutationSemantics": 173,
         "sourceFileCount": 42,
         "kernelDependencyCount": 154,
         "screenCount": 26,
@@ -9368,7 +9370,7 @@
       "behaviourEvidence": {
         "routeCount": 84,
         "mutationRoutes": 84,
-        "declaredMutationSemantics": 34,
+        "declaredMutationSemantics": 35,
         "sourceFileCount": 3,
         "kernelDependencyCount": 0,
         "screenCount": 2,
@@ -9814,7 +9816,7 @@
       "behaviourEvidence": {
         "routeCount": 264,
         "mutationRoutes": 263,
-        "declaredMutationSemantics": 107,
+        "declaredMutationSemantics": 108,
         "sourceFileCount": 26,
         "kernelDependencyCount": 80,
         "screenCount": 28,
@@ -11661,7 +11663,7 @@
       "behaviourEvidence": {
         "routeCount": 20,
         "mutationRoutes": 20,
-        "declaredMutationSemantics": 9,
+        "declaredMutationSemantics": 10,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
         "screenCount": 4,
@@ -15787,7 +15789,7 @@
       "behaviourEvidence": {
         "routeCount": 1028,
         "mutationRoutes": 1027,
-        "declaredMutationSemantics": 320,
+        "declaredMutationSemantics": 326,
         "sourceFileCount": 205,
         "kernelDependencyCount": 2732,
         "screenCount": 41,
@@ -16253,7 +16255,7 @@
       "behaviourEvidence": {
         "routeCount": 11,
         "mutationRoutes": 11,
-        "declaredMutationSemantics": 0,
+        "declaredMutationSemantics": 1,
         "sourceFileCount": 3,
         "kernelDependencyCount": 1,
         "screenCount": 0,
@@ -16781,7 +16783,7 @@
       "behaviourEvidence": {
         "routeCount": 692,
         "mutationRoutes": 672,
-        "declaredMutationSemantics": 397,
+        "declaredMutationSemantics": 403,
         "sourceFileCount": 114,
         "kernelDependencyCount": 157,
         "screenCount": 21,
@@ -17041,7 +17043,7 @@
       "behaviourEvidence": {
         "routeCount": 370,
         "mutationRoutes": 342,
-        "declaredMutationSemantics": 141,
+        "declaredMutationSemantics": 142,
         "sourceFileCount": 84,
         "kernelDependencyCount": 102,
         "screenCount": 26,
@@ -17187,7 +17189,7 @@
       "behaviourEvidence": {
         "routeCount": 217,
         "mutationRoutes": 216,
-        "declaredMutationSemantics": 91,
+        "declaredMutationSemantics": 92,
         "sourceFileCount": 57,
         "kernelDependencyCount": 88,
         "screenCount": 0,
@@ -18826,7 +18828,7 @@
       "behaviourEvidence": {
         "routeCount": 54,
         "mutationRoutes": 54,
-        "declaredMutationSemantics": 18,
+        "declaredMutationSemantics": 19,
         "sourceFileCount": 4,
         "kernelDependencyCount": 4,
         "screenCount": 0,
@@ -21530,7 +21532,7 @@
       "behaviourEvidence": {
         "routeCount": 84,
         "mutationRoutes": 84,
-        "declaredMutationSemantics": 30,
+        "declaredMutationSemantics": 31,
         "sourceFileCount": 6,
         "kernelDependencyCount": 15,
         "screenCount": 2,
@@ -24500,7 +24502,7 @@
       "behaviourEvidence": {
         "routeCount": 33,
         "mutationRoutes": 33,
-        "declaredMutationSemantics": 24,
+        "declaredMutationSemantics": 25,
         "sourceFileCount": 2,
         "kernelDependencyCount": 1,
         "screenCount": 3,
@@ -27037,7 +27039,7 @@
       "behaviourEvidence": {
         "routeCount": 15,
         "mutationRoutes": 15,
-        "declaredMutationSemantics": 5,
+        "declaredMutationSemantics": 6,
         "sourceFileCount": 2,
         "kernelDependencyCount": 3,
         "screenCount": 0,
@@ -31554,7 +31556,7 @@
       "behaviourEvidence": {
         "routeCount": 17,
         "mutationRoutes": 17,
-        "declaredMutationSemantics": 11,
+        "declaredMutationSemantics": 15,
         "sourceFileCount": 1,
         "kernelDependencyCount": 15,
         "screenCount": 2,

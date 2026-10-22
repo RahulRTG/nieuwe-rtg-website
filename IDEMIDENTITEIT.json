@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-21T23:08:14.638Z",
-    "commit": "20a1a639fd",
+    "op": "2026-10-22T18:13:07.731Z",
+    "commit": "cebe17ca76",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v26.12.0"
   },
@@ -48,7 +48,7 @@
     },
     {
       "bestand": "server/kern/bank/ledenbank.js",
-      "regel": 54,
+      "regel": 53,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -58,9 +58,10 @@
         "c",
         "codenaam",
         "idemContract",
-        "identiteitVan"
+        "identiteitVan",
+        "tier"
       ],
-      "regelTekst": "const vast = await metIdem('bankakkoord:' + c, idemContract.identiteitVan('bank.akkoord', { codenaam: c }), () => {",
+      "regelTekst": "const vast = await metIdem('bankakkoord:' + c,",
       "uitspraak": "verklaard"
     },
     {

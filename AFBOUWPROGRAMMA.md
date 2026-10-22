@@ -1034,7 +1034,9 @@ toegangsdeur. De vijf resterende gaten zijn uitsluitend de interne OS-kiezers
 Bellen, RTFoundation, Snaps, Videobellen en Werk; voor hen bestaat nog geen
 uitvoerbaar functiecontract en er is geen URL geraden.
 
-De daaropvolgende volledige APPWERKT-meting op commit `54cb83d8ce` bezocht
+Na de verplichte herhaling van `BEVOEGD.json` op commit `db7391d693` bleef de
+autorisatiestand 10 `BEWEZEN` en 104 `NIET_GETEST`. De daaropvolgende volledige
+APPWERKT-meting op commit `6779d098f3` bezocht
 114/114 onderdelen met nul browserdefecten. De actuele dimensies zijn:
 bereikbaar 107, bedienbaar 96, voltooibaar 110, persistent 110, herstelbaar
 110, menselijk 110, waarheidsgetrouw 109 en bevoegd 10. De samengestelde stand

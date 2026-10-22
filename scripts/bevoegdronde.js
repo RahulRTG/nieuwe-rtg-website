@@ -89,7 +89,14 @@ function laadRegisters({ lees, vers } = {}) {
       for (const [k, w] of [...Object.entries(reg.zaakPerRoute || {}), ...Object.entries(reg.perRoute || {})]) {
         const [methode, pad] = k.split(' ');
         const lijst = uit.idor.get(pad) || [];
-        lijst.push({ ...w, routeMethode: methode, routePad: pad }); uit.idor.set(pad, lijst);
+        /* Oudere IDOR-rijen bewaren de methode alleen in de sleutel van
+           `perRoute` (`POST /api/...`). De bevoegdronde controleert methoden
+           later bewust afzonderlijk; zonder normalisatie werd zo'n geldige
+           rij daar ten onrechte "bewijs zonder bekende HTTP-methode". Een
+           methode die WEL in de rij staat blijft leidend, zodat een verschil
+           tussen sleutel en inhoud juist open blijft en niet wordt gladgestreken. */
+        lijst.push({ ...w, methode: w.methode || methode,
+          routeMethode: methode, routePad: pad }); uit.idor.set(pad, lijst);
       }
     } else {
       uit.rolMeting = reg.gemeten;

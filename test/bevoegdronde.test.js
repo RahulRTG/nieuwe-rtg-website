@@ -73,6 +73,11 @@ test('idorbewijs: registerlezer bewaart lekken, ruwe methode en overlappende gan
   }
   assert.equal(R.padOordeel('/api/idor', laad({ 'GET /api/idor': raw }, { 'GET /api/idor': idormeting() })).stand, 'gebroken');
   assert.equal(R.padOordeel('/api/idor', laad({ 'GET /api/idor': idormeting('POST') })).stand, 'open', 'de sleutel mag een verkeerde werkelijk gebruikte methode niet overschrijven');
+  const zonderMethode = laad({ 'GET /api/idor': { ...idormeting(), methode: undefined } });
+  assert.equal(zonderMethode.idor.get('/api/idor')[0].methode, 'GET',
+    'de routesleutel vult een ontbrekende historische methode aan');
+  assert.equal(R.padOordeel('/api/idor', zonderMethode).stand, 'gemeten',
+    'een ontbrekend dubbel opgeslagen methodeveld maakt geldig routesleutelbewijs niet open');
 });
 
 test('rolbewijs: ruwe tegenproeven beslissen, niet een groene samenvatting', () => {

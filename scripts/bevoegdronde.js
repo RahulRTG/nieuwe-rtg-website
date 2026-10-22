@@ -245,13 +245,19 @@ function paarOordeel({ a, bEigen, b, anoniem }) {
   return ok(bEigen) && geweigerd(b) && geweigerd(anoniem) ? 'gescheiden' : 'onbeslist';
 }
 
-function gezinOordeel(paren) {
+function gezinOordeel(paren, { rij, contract = CONTRACT } = {}) {
   if (!paren.length) return { status: 'NIET_GETEST', reden: 'het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen' };
   const lek = paren.filter((p) => p.uitslag === 'lek');
   if (lek.length) return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'gezin B kreeg ' + lek[0].verzoek + ' met de code van gezin A (' + lek[0].b + ')', paren: paren.length };
   const openbaar = paren.find((p) => p.uitslag === 'openbaar');
   if (openbaar) return { status: 'GEBLOKKEERD_DOOR_DEFECT',
     reden: 'anoniem kreeg ' + openbaar.verzoek + ' met de code van gezin A (' + openbaar.anoniem + ')', paren: paren.length };
+  // Gezinsparen uit de gedeelde schil kwalificeren geen aanvullende
+  // appcontext. Het bestaande appcontract benoemt die context, niet een
+  // uitzonderingslijst in de meter. Een echte lekbevinding hierboven gaat voor.
+  const context = rij && contract?.[rij.functie]?.bevoegdContext;
+  if (context && context !== 'gezin') return { status: 'NIET_GETEST', paren: paren.length,
+    reden: 'vereiste bevoegdheidscontext ' + context + ' niet gemeten: gezinsparen bewijzen alleen de gedeelde schil; eigen appobjecten, rollen en kruiscontroles ontbreken' };
   const gescheiden = paren.filter((p) => p.uitslag === 'gescheiden');
   if (gescheiden.length !== paren.length) return { status: 'NIET_GETEST', paren: paren.length,
     reden: 'niet elk paar bewijst A en B op eigen code binnen, B op A\'s code en anoniem geweigerd met 401/403 (' + paren.map((p) => p.uitslag).join(', ') + ')' };
@@ -303,7 +309,7 @@ async function meetGezinnen(rijen, base, browser, maakContext, meetIngang) {
       paren.push({ verzoek: v.methode + ' ' + v.url.split('?')[0], a, bEigen, b, anoniem,
         uitslag: paarOordeel({ a, bEigen, b, anoniem }) });
     }
-    uit.set(r.functie, Object.assign(gezinOordeel(paren), { kruisparen: paren }));
+    uit.set(r.functie, Object.assign(gezinOordeel(paren, { rij: r }), { kruisparen: paren }));
   }
   return uit;
 }

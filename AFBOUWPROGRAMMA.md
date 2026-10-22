@@ -1442,3 +1442,24 @@ banklezer) en bereidVoor (contractvoorbereiding) hebben andere semantiek dan
 hun naamgenoten. Geen veilige consolidatie aangetoond. Niet hernoemd of
 verplaatst om aantallen te verlagen; deze normblokkades blijven open voor een
 inhoudelijk onderbouwde oplossing, met ongewijzigde drempels.
+
+Hermeting d8e1a45c21: de volledige rolproef herhaalt 4514 routes/9369 pogingen
+zonder waargenomen verkeerde-roltoegang, lek, persistente onbevoegde wijziging
+of onbesliste uitkomst. Gegevensroutes en Snaps staan nu in IDOR met hun ruwe
+beperkte bewijs. Preflight groen na genereren van FUNCTIES.md; taalproeven
+27/27. De drie vuile registerstempels zijn met echte hermetingen op de schone
+bronstand hersteld. Norm blijft rood op vier grenzen: omvang 358/350,
+dubbeling 186/184, gedeelde kern 262/260, ongemeten mutatietoetsen 197/142.
+Logs /tmp/rtg-r3-role-d8e1.log, /tmp/rtg-r3-idor-d8e1.log,
+/tmp/rtg-r3-check-d8e1-final.log, /tmp/rtg-r3-language-d8e1.log en
+/tmp/rtg-r3-norm-d8e1.log. Nieuwe gegevensmutatie gedetecteerd; ongewijzigde
+eerdere mutatieresultaten door bestaande motor hergebruikt.
+
+De bevoegdronde meldde aanvankelijk 14 BEWEZEN. Deze uitkomst is inhoudelijk
+afgekeurd: Bord/Schrift hadden alleen vier Foundation-schilroutes geraakt,
+geen schoolobjecten of lessleutels. De bestaande appcontracten benoemen nu
+expliciet de aanvullende docent-/leerlingcontext; gezinsbewijs kan die niet
+meer als volledig kwalificeren. Concrete lekken blijven vóór dit ontbrekende
+bewijs defect. 16/16 gerichte metertests slagen. Nieuwe runtimehermeting vereist;
+de 14 mag niet als voortgang worden gebruikt. Zorg heeft wel vier geldige
+gezinskruisparen; ook dat is uitsluitend bevoegdheid binnen de meetgrens.

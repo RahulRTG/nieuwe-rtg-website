@@ -277,3 +277,22 @@ test('6. schrijfbewijs zonder overeenkomende rolproef blijft open', () => {
   }
   assert.equal(check([id('GET')]).stand, 'gemeten', 'GET vereist geen schrijfrolproef');
 });
+
+
+test('gezinsparen kwalificeren geen aanvullende bevoegdheidscontext uit het appcontract', () => {
+  const paren = Array.from({ length: 4 }, () => ({ uitslag: 'gescheiden' }));
+  for (const functie of ['link:rtfbord', 'link:rtfschrift']) {
+    const o = R.gezinOordeel(paren, { rij: { functie } });
+    assert.equal(o.status, 'NIET_GETEST', functie + ': vier schilroutes zijn geen lesbewijs');
+    assert.match(o.reden, /school:(docent|leerling)/);
+  }
+  const rij = { functie: 'onbekende-app' };
+  assert.equal(R.gezinOordeel(paren, { rij, contract: { 'onbekende-app': { bevoegdContext: 'andere-context' } } }).status, 'NIET_GETEST', 'geen app-ID-uitzonderingslijst');
+  assert.equal(R.gezinOordeel(paren, { rij, contract: { 'onbekende-app': { bevoegdContext: 'gezin' } } }).status, 'BEWEZEN');
+  assert.equal(R.gezinOordeel(paren, { rij, contract: {} }).status, 'BEWEZEN', 'bestaande gezinsmeting blijft behouden');
+  for (const uitslag of ['lek', 'openbaar']) {
+    assert.equal(R.gezinOordeel([...paren, { uitslag, b: 200, anoniem: 200 }], {
+      rij: { functie: 'link:rtfbord' }
+    }).status, 'GEBLOKKEERD_DOOR_DEFECT', 'concreet tegenbewijs gaat voor ontbrekende context');
+  }
+});

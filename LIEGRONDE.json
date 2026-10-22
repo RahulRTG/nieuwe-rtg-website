@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-22T11:39:18.345Z",
-    "commit": "33e53421d7",
+    "op": "2026-10-22T11:55:01.007Z",
+    "commit": "e7110cf6da",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
@@ -11,8 +11,8 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 98,
-    "NIET_GETEST": 16
+    "BEWEZEN": 106,
+    "NIET_GETEST": 8
   },
   "regels": [
     {
@@ -1031,7 +1031,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:rtf",
@@ -1039,7 +1039,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:snaps",
@@ -1047,7 +1047,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:videobellen",
@@ -1055,7 +1055,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "os:werk",
@@ -1063,71 +1063,87 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
     },
     {
       "functie": "tab:assets",
       "app": "assets",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
+      "klachten": []
     },
     {
       "functie": "tab:bestellen",
       "app": "bestellen",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
+      "klachten": []
     },
     {
       "functie": "tab:betalen",
       "app": "betalen",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
+      "klachten": []
     },
     {
       "functie": "tab:gezin",
       "app": "gezin",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
+      "klachten": []
     },
     {
       "functie": "tab:reizen",
       "app": "reizen",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
+      "klachten": []
     },
     {
       "functie": "tab:salon",
       "app": "salon",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
+      "klachten": []
     },
     {
       "functie": "tab:terplaatse",
       "app": "terplaatse",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
+      "klachten": []
     },
     {
       "functie": "tab:zorg",
       "app": "zorg",
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
+      "klachten": []
     }
   ]
 }

@@ -9,8 +9,9 @@
 
 const AFGETEKEND = { door: 'RTG-eigenaar, Deep Green ronde 3 uitvoeringsbesluit', op: '2026-10-22' };
 const AUTH = { klasse: 'AUTHENTICATED' };
-const contract = (mutatieId, klasse, stand, gemeten, waarom) => ({
-  mutatieId, herkomst: 'mens', semantiek: { klasse }, toegang: AUTH, stand,
+const SCHOOL = { klasse: 'OBJECT_SCOPED', objectVeld: 'schoolCode' };
+const contract = (mutatieId, klasse, stand, gemeten, waarom, toegang = AUTH) => ({
+  mutatieId, herkomst: 'mens', semantiek: { klasse }, toegang, stand,
   bewijs: { gemeten, op: '2026-10-22' }, waarom, afgetekend: AFGETEKEND
 });
 
@@ -57,7 +58,7 @@ const CONTRACTEN = {
     'Iedere bewuste remactie is een zelfstandig operationeel auditmoment, ook wanneer de uitrol al stil staat.'),
   'POST /api/foundation/school/overdracht/pakket': contract('foundation.school.overdracht.pakket', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
     'test/overdracht.test.js: twee bewuste pakketinzages leveren precies twee journaalregels en versturen niets',
-    'Het pakket is een gevoelige dossierinzage. Iedere bewuste blik moet afzonderlijk herleidbaar blijven.'),
+    'Het pakket is een gevoelige dossierinzage. Iedere bewuste blik moet afzonderlijk herleidbaar blijven.', SCHOOL),
   'POST /api/office/balie/zoek': contract('office.balie.zoek', 'nietHerhaalbaar', 'INTENTIONALLY_NON_IDEMPOTENT',
     'test/ledenbaliespoor.test.js: twee bewuste zoekopdrachten vragen exact twee duurzame inzagesporen; opslagverlies sluit de resultaten',
     'Iedere ledenzoekopdracht is afzonderlijke inzage in persoonsgegevens en moet als zelfstandig auditmoment worden vastgelegd.'),

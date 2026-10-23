@@ -1492,3 +1492,15 @@ Dockerkwalificatie moet CI nog bevestigen (lokaal geen Docker). Geen merge of
 uitrol. De lopende voltooiproef leest dit kwalificatiescript niet; productbron
 blijft ongewijzigd. LIEGRONDE wordt na deze scriptcommit opnieuw vernieuwd,
 omdat haar afhankelijkheidssluiting niet volledig kan worden vastgesteld.
+
+Hermeting na overdrachtsfix f17f3bc530: de echte GitHub Dockerkwalificatie
+(bouw en byte-voorcontrole) slaagt, run 39877119961. Lokale preflight slaagt
+na de bestaande FUNCTIES-/ARCHITECTUUR-generatie. De oorspronkelijke
+shelloverdrachtsfout is als expliciete bronmutatie teruggebracht en door de
+nieuwe regressieproef gedetecteerd; baseline en herstel groen, bewijs in
+/tmp/rtg-r3-image-mutant-proof. Geen vrijstelling in de bytecontrole.
+LIEGRONDE blijft 109 BEWEZEN/5 NIET_GETEST en BEVOEGD blijft 12/102, beide
+op f17f3bc530 herhaald; geen stijging geclaimd door alleen registervernieuwing.
+Logs /tmp/rtg-r3-check-f17-final.log, /tmp/rtg-r3-truth-f17.log en
+/tmp/rtg-r3-authority-f17.log. De integrale apphermeting volgt nog na afloop
+van VOLTOOIPROEF. Platform blijft ORANJE.

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-22T14:16:35.561Z",
-    "commit": "4ea4825c71",
+    "op": "2026-10-23T00:17:47.560Z",
+    "commit": "f17f3bc530",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 2,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.0"
   },
@@ -211,8 +211,8 @@
       "ingang": "/apps/foundation/zorg.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "reden": "6 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 6,
+      "reden": "5 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 5,
       "klachten": []
     },
     {
@@ -711,8 +711,8 @@
       "ingang": "/apps/foundation/bord.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "reden": "9 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 9,
+      "reden": "8 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 8,
       "klachten": []
     },
     {
@@ -971,8 +971,8 @@
       "ingang": "/apps/foundation/vrienden.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "reden": "11 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 11,
+      "reden": "10 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 10,
       "klachten": []
     },
     {

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-23T00:00:24.044Z",
-    "commit": "0c4b12e4d7",
+    "op": "2026-10-23T00:18:15.065Z",
+    "commit": "f17f3bc530",
     "boomVuil": false,
-    "boomAnders": 12,
+    "boomAnders": 2,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.0"
   },
@@ -290,7 +290,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/K87ZSD/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/2FWGTC/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1220,7 +1220,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/K87ZSD/mij",
+          "verzoek": "GET /api/foundation/gezin/2FWGTC/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1241,6 +1241,14 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "bEigen": 200,
+          "b": 401,
+          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1273,14 +1281,6 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "bEigen": 200,
-          "b": 401,
-          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-22T23:54:25.352Z",
-    "commit": "d8e1a45c21",
+    "op": "2026-10-23T00:20:37.998Z",
+    "commit": "f17f3bc530",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
     "node": "v26.12.0"
   },
@@ -8745,6 +8745,21 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "kwalificatie-overdracht.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/kwalificatie.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-r3-image-mutant-proof/kwalificatie-overdracht.test.js.evidence.json",
+        "sha256": "56a63aea4a49f8217c46ce711286932e510b2b4d0e540b8857fb9e33f52aba03",
+        "commit": "f17f3bc530cc91e62f4d27da757c25dea737320a",
+        "sourceSha256": "ea1a9a14a4012d2dd7ae6aadc206a4b526d79470ffada255fc1d4211c159e066",
+        "testSha256": "8abda9869264a5df0e9f123023d3d3edfc199582253cf9581bff833c10eaf143"
+      }
     },
     "kwalificatie-takken.test.js": {
       "soort": "puur",

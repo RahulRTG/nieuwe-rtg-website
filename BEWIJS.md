@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3002 bestanden en 20304 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3002 bestanden en 20309 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3002 |
-| losse beweringen (`test(...)`) | 20304 |
+| losse beweringen (`test(...)`) | 20309 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 414 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2758 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2621 bestanden, 19595 beweringen.
+2621 bestanden, 19600 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -312,7 +312,7 @@ toets omvalt.
 | `bewakersketen.test.js` | 2 | gezakt op `===->!==#0` | DE BEWAKERSKETEN: elke deur van een domein draagt het slot van dat domein. WAT DIT BEWAAKT, EN WAAROM HET PAS SINDS VANDAAG KAN Een route is in deze router een LAAG PER MIDDLEWARE (server/web/routing.js); de laatste... |
 | `bewijs.test.js` | 3 | gezakt op `liegpoort /api/` | Proof of Learning: bewijs onder elke beheersing. De belofte die hier hard wordt gemaakt: "behaald" is geen bewering meer maar een conclusie uit bewijs, en een leerling kan altijd navragen waarop die conclusie berust. |
 | `bewijsboek.test.js` | 12 | gezakt op `===->!==#0` | HET REGRESSIECORPUS VAN HET BEWIJSBOEK. Dit is de laag die mag zeggen "die toets hoeft niet opnieuw". |
-| `bewijsbron-takken.test.js` | 22 | gezakt op `voorwaarde-omkeren#0` | DE BEWIJSBRON, TAK VOOR TAK (scripts/lib/bewijsbron.js). test/appcontract.test.js beproeft de drie vragen (koppeling, vers, uitkomst) met het echte contract. |
+| `bewijsbron-takken.test.js` | 27 | gezakt op `voorwaarde-omkeren#0` | DE BEWIJSBRON, TAK VOOR TAK (scripts/lib/bewijsbron.js). test/appcontract.test.js beproeft de drie vragen (koppeling, vers, uitkomst) met het echte contract. |
 | `bewijskosten.test.js` | 11 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `bewijsladder.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | DE BEWIJSLADDER -- levert dit huis nog elk soort bewijs, en waar? Twee beweringen worden hier hard gemaakt, en ze zijn allebei een ANDERE dan die van test/ci-lokaal.test.js (dat gaat over pariteit per poort): 1. |
 | `bewijsmatrix-audit.test.js` | 4 | gezakt op `!==->===#6` | DE AUDIT-KOLOM HEEFT TWEE BRONNEN, EN ALLEBEI MOETEN ZE AAN BOD KOMEN. DIT IS TWEE KEER MISGEGAAN, en beide keren op dezelfde manier: een tak die de cel ook claimde als hij NIETS wist, met een `continue` erachter. |

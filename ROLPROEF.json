@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-22T23:55:50.076Z",
-  "commit": "d8e1a45c21",
+  "op": "2026-10-23T18:37:21.995Z",
+  "commit": "1e2dc56f0a",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 0,
   "instrument": "scripts/rolproef-route.js",
-  "node": "v26.12.0"
+  "node": "v26.12.1"
  },
  "uitleg": "Per SCHRIJFroute welke verkeerde rollen zijn geprobeerd, met plausibele invoer. Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.",
  "nietBeproefbaar": 836,
@@ -895,7 +895,7 @@
    ]
   },
   {
-   "reden": "bewaker van onbekende soort: actueleOnboarding -- deel hem in in scripts/lib/bewakers.js",
+   "reden": "geenBewaker: actueleOnboarding -- geen autorisatielaag -- alleen een rem of cache",
    "aantal": 3,
    "routes": [
     "POST /api/rtf/onboarding/opslaan",

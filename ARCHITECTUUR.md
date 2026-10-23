@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5545 |
-| servermodules (`server/**/*.js`) | 4644 |
-| routebestanden (`server/routes/**`) | 674 |
-| kernmodules (`server/kern/**`) | 2905 |
+| servermodules (`server/**/*.js`) | 4652 |
+| routebestanden (`server/routes/**`) | 676 |
+| kernmodules (`server/kern/**`) | 2911 |
 | schermen (`public/**/*.html`) | 328 |
 | gedeelde browsermodules (`public/shared/*.js`) | 459 |
 | toetsbestanden (`test/*.test.js`) | 2621 |
@@ -113,13 +113,13 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 262 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 260 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 55 |
 | `member` | 772 | 79 | 15 | 455 |
-| `supplier` | 641 | 142 | 5 | 350 |
+| `supplier` | 641 | 143 | 5 | 350 |
 | `office` | 100 | 22 | 3 | 95 |
 | `staff` | 27 | 10 | 0 | 44 |
 | `social` | 79 | 11 | 30 | 74 |
@@ -144,8 +144,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1695 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 262 |
-| daarvan door precies één domein | 1433 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 260 |
+| daarvan door precies één domein | 1435 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -157,7 +157,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(217) auth(135) supplierAuth(67) officeAuth(50) db(41) liveCodename(36) status(32)
+app(216) auth(135) supplierAuth(67) officeAuth(50) db(41) liveCodename(36) status(32)
 accounts(30) schoon(23) rtf(23) boardroomWie(22) codenaamVan(21) managerOnly(20)
 save(20) tooManyTries(14) geenGast(14) express(14) boardroomAuth(14) findSupplier(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)

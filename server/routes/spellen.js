@@ -115,7 +115,7 @@ module.exports = (kern) => {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
     }
   }
-  require('./spelprojectie')({ app, projectieKoppel: kern.projectieKoppel,
+  require('./spellen/projectie')({ app, projectieKoppel: kern.projectieKoppel,
     projectieStand: kern.projectieStand, veilig });
 
   /* "Nodig uit en start" van een lid leest zijn eigen herhaalsleutel

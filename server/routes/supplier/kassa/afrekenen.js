@@ -9,8 +9,8 @@
 /* `herhaling` komt sinds main's idempotentieronde als tweede argument mee:
    het uitchecken staat binnen eenmalig() (zie kern/kassa/herhaling.js). */
 module.exports = (kern, herhaling) => {
-  const { app, crypto, db, facturatie, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
-          sseToSupplier, supplierAuth, pay, tafelticket } = kern;
+  const { app, crypto, db, facturatie, logActivity, pickupCode, save,
+          sseToSupplier, supplierAuth, pay } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
@@ -85,69 +85,6 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
  res.json(antwoord);
 });
 
-/* Tafelticket: alle openstaande bonnen van dezelfde tafel op EEN ticket. De AI
-   (Rahul) en de kassa lopen over deze route, dus met de inlog en de controles
-   van de zaak zelf. De beveiliging zit in de kern (HMAC-zegel + verse controle). */
-app.post('/api/supplier/tafelticket', supplierAuth, (req, res) => {
-  const r = tafelticket.bouwTicket(req.supplier, req.body.table);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-
-// het tafelticket in EEN keer afrekenen. Het meegestuurde zegel (uit /tafelticket)
-// wordt vers gecontroleerd: is de rekening intussen gewijzigd of gemanipuleerd,
-// dan weigert de kern en moet het ticket opnieuw worden opgehaald. Zo nooit
-// afrekenen op een oud of aangepast totaal, en nooit dubbel.
-app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
-  const chk = tafelticket.afrekenCheck(req.supplier, req.body.table, req.body.zegel, req.body.at);
-  if (chk.error) return res.status(chk.status).json({ error: chk.error });
-  const method = ['rtgpay', 'contant', 'rtg'].includes(req.body.method) ? req.body.method : 'contant';
-  const codenames = [];
-  for (const o of chk.bonnen) {
-    o.paid = true;
-    o.paidAt = require('../../../lib/klok').datum().toISOString();
-    o.betaaldMet = method; // waarmee de tafel werkelijk afrekende (TAKEN.md 4.59)
-    if (o.status === 'wacht-op-betaling' || o.status === 'nieuw') o.status = 'geserveerd';
-    o.rekeningVoldaan = true;
-    if (!codenames.includes(o.customerCodename)) codenames.push(o.customerCodename);
-    /* EEN FACTUUR PER BON, ook al gaat er EEN kassabon overheen. De gebundelde
-       bon hieronder is het kassastuk van de zaak; de boekhouding en de
-       btw-aangifte tellen per bestelling, dus daar hoort de factuur op te
-       staan. Zonder deze regel viel een tafel die in EEN keer afrekent buiten
-       het factuurregister -- zie kern/lidacties/factuur.js. */
-    factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
-      codenaam: o.customerCodename, ref: o.ref, methode: method, regels: regelsVanItems(o.items) });
-    sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
-    notify(o.customerKey, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
-  }
-  /* EEN GEBUNDELDE KASSABON VOOR HET HELE TAFELTICKET -- en die draagt een merk.
-
-     `omzetElders` zegt: dit is het KASSASTUK, de omzet staat al bij de
-     bestellingen hierboven. Zonder dat merk telde de maandboekhouding een tafel
-     die contant of met RTG Pay afrekende twee keer: een keer via de bonnen (die
-     nu op `paid` staan) en een keer via deze bundelbon. `financeVoor` sloeg
-     alleen `rtg` en `kamer` over, en dit is geen van beide -- de gast betaalde
-     werkelijk contant, dus de betaalwijze liegen om de optelling te redden zou
-     een tweede fout zijn. Vandaar een merk naast de betaalwijze in plaats van
-     eroverheen (TAKEN.md 4.28). */
-  const sale = {
-    id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
-    desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
-    room: chk.table, items: null, total: chk.subtotaal, method, omzetElders: 'bestellingen',
-    at: require('../../../lib/klok').datum().toISOString()
-  };
-  const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
-  list.unshift(sale);
-  db.data.posSales[req.supplier.code] = list.slice(0, 300);
-  // de tafel staat na afrekenen weer vrij voor de volgende gasten
-  const tf = (req.supplier.tables || []).find(t => t.name === chk.table);
-  if (tf) tf.status = 'vrij';
-  save();
-  logActivity(req.supplier.code, req.actor, 'rekende tafelticket ' + chk.table + ' af: € ' + chk.subtotaal + ' (' + chk.bonnen.length + ' bon(nen), ' + method + ')');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'orders' });
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, sale, table: chk.table, aantalBonnen: chk.bonnen.length, subtotaal: chk.subtotaal, gasten: codenames.length });
-});
+require('./tafelticket-afrekenen')(kern, { factuurVoorLid, regelsVanItems });
 
 };

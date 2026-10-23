@@ -30,7 +30,7 @@ module.exports = ({ db, crypto }) => {
   const lijst = naam => Array.isArray(d()[naam]) ? d()[naam] : [];
 
   function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
-  function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
+  function payGrootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
   function klompjes() { if (!Array.isArray(d().payVerzoeken)) d().payVerzoeken = []; return d().payVerzoeken; }
   /* De kas- en tikcodes staan hier niet meer: ze wonen hash-only in hun eigen
      collectie (./kasbak.js), en een lege payCodes-lijst aanmaken zou alleen de
@@ -44,6 +44,6 @@ module.exports = ({ db, crypto }) => {
   const saldoVan = rek => Math.round(saldiKijk()[rek] || 0);
   const id = p => (p || 'P') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
-  return { d, saldi, grootboek, klompjes,
+  return { d, saldi, grootboek: payGrootboek, klompjes,
     saldiKijk, grootboekKijk, klompjesKijk, rekLid, rekPartner, saldoVan, id };
 };

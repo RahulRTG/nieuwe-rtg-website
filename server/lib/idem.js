@@ -26,6 +26,7 @@ const MAX = 20000; // ring: zoveel sleutels houden we vast
 /* De handeling waarin een boeking valt: ./idem-handeling.js. */
 const { handeling, volgendeStap } = require('./idem-handeling');
 const { zonderSleutelPad, nietVastgelegd, vergeetSleutel } = require('./idem-zondersleutel');
+const idemBehouden = require('./idem-behouden');
 
 /* `naam` is de sleutel in de database, bijv. 'payIdem' of 'bankIdem'; de
    afdrukken staan naast in '<naam>Afdruk'. `d` geeft het datablok, `save`
@@ -113,16 +114,8 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort, behou
       if (afdruk && typeof a[sleutel] === 'string' && (!behouden(sleutel) || a[sleutel]) && a[sleutel] !== afdruk) {
         return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
       }
-      if (behouden(sleutel)) {
-        if (!Object.hasOwn(a, sleutel) || typeof a[sleutel] !== 'string' || !a[sleutel] ||
-            !afdruk || !s[sleutel] || typeof s[sleutel] !== 'object' ||
-            Array.isArray(s[sleutel]) || s[sleutel].ok !== true ||
-            (typeof geldigeOntvangst === 'function' && !geldigeOntvangst(sleutel, s[sleutel]))) {
-          return { status: 503, code: 'IDEMPOTENTIEBEWIJS_ONGELDIG', error: 'De bewaarde ontvangst vereist herstel.' };
-        }
-        if (s._keys.includes(sleutel)) return require('./idem-behouden')({
-          s, sleutel, afdruk, behouden, save, bijeen, duurzaam, naam, inVlucht });
-      }
+      if (behouden(sleutel)) return idemBehouden.herhaal({ s, a, sleutel, afdruk, geldigeOntvangst,
+        behouden, save, bijeen, duurzaam, naam, inVlucht });
       return Object.assign({}, s[sleutel], { herhaald: true });
     }
     /* Geen herhaling en geen lopende vlucht: dit is NIEUW werk. Pas hier de

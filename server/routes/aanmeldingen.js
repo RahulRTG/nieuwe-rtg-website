@@ -23,33 +23,7 @@ module.exports = (kern) => {
      null het eerlijke antwoord -- de kern beslist wat daarmee mag, want die
      kent de pas waar het over gaat. Zelfde patroon als bij RTG Bank. */
   const wie = req => boardroomWie(req) || null;
-  // Is er een geldig leden-token meegestuurd? Dan koppelen we dat account aan de
-  // aanvraag (server-side, nooit uit de body), zodat een menselijk akkoord op een
-  // Lifestyle/Business-aanvraag dat account kan optillen.
-  const aanvragerContext = req => {
-    try {
-      const h = req.get('authorization');
-      const tok = typeof h === 'string' && h.startsWith('Bearer ') ? h.slice(7) : null;
-      const u = tok && accounts && accounts.verifyToken(tok);
-      return { aanwezig: h != null, id: u ? u.id : null };
-    } catch (e) { return { aanwezig: true, id: null }; }
-  };
-  const aanvragerVan = req => aanvragerContext(req).id;
-
-  // een aanvraag indienen (publiek, met een lichte rem tegen misbruik)
-  app.post('/api/aanmelding/aanvraag', async (req, res) => {
-    if (tooManyTries && tooManyTries(res, 'aanmelding:' + req.ip)) return;
-    try {
-      const actor = aanvragerContext(req);
-      if (actor.aanwezig && actor.id == null)
-        return res.status(401).json({ error: 'Log opnieuw in voor deze aanvraag.' });
-      const r = await aanmeldingen.aanvraagBedoeling(req.body || {}, actor.id);
-      res.status(r.status || 200).json(r);
-    } catch (e) {
-      console.error('[aanmeldingen] ontvangst niet bevestigd:', e.code || 'opslagfout');
-      res.status(503).json({ error: 'De ontvangst is niet bevestigd. Herhaal met dezelfde opdrachtsleutel en inhoud.' });
-    }
-  });
+  const aanvragerVan = require('./aanmeldingen/aanvraag')({ app, accounts, tooManyTries, aanmeldingen });
 
   // de wachtrij en het besluit: alleen RTG-personeel
   app.post('/api/aanmelding/lijst', officeAuth, (req, res) => veilig(res, () => aanmeldingen.lijst((req.body || {}).status)));

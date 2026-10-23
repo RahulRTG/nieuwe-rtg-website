@@ -7,6 +7,7 @@ module.exports = (ctx) => {
   const { momentopname, versieConflict, bereidVoor, ontvangstVan, afdruk, geldig } = require('./ontvangst');
   // De paspoortcontrole staat apart.
   const { bewaarPaspoort } = require('./paspoort')(ctx);
+  const payGate = require('./paypoort')({ profielVan, profielId, save });
 
   // wat we al van een echt account weten (naam, e-mail, paspoortstatus ...)
   function bekend(veldId, sess) {
@@ -85,28 +86,6 @@ module.exports = (ctx) => {
   }
   // Snelle ja/nee: is de onboarding van deze sessie (platform-scope) rond?
   function klaar(sess, scope) { return status(scope || 'rtg', sess).klaar; }
-
-  /* RTG Pay-gebruik door een gratis lid. Vanaf het eerste gebruik is het
-     paspoort eenmalig vereist; de betaalde passen hebben dat al bij de
-     onboarding gedaan. Geeft {ok:true} als het door mag; anders een nette
-     403 met kyc:true, zodat de app het lid naar de paspoort-stap stuurt.
-     (Demo-/gastsessies zonder echt account laten we door: die kunnen geen
-     identiteitsbewijs uploaden.) */
-  function payGate(sess) {
-    const tier = (sess && sess.tier) || 'guest';
-    if (tier === 'lifestyle' || tier === 'business') return { ok: true };
-    /* Elk account, ook een gratis account (tier 'guest'): eigenaarsbesluit van
-       19 oktober 2026. Hier stond `if (tier !== 'rtg') return { ok: true }`, en
-       een ongekeurd gratis account laadde zonder paspoort op tot het
-       walletplafond (test/paspoort-gratisaccount.test.js). */
-    const profiel = profielVan(profielId(sess));
-    if (!profiel.payGebruikt) { profiel.payGebruikt = true; save(); }
-    const acc = sess && sess.account;
-    const geverifieerd = acc && ['pending', 'approved', 'geverifieerd', 'verified'].includes(acc.verified);
-    if (!acc || geverifieerd) return { ok: true };
-    return { ok: false, status: 403, kyc: true,
-      error: 'RTG Pay vraagt eenmalig je paspoort. Open de app; Rahul helpt je het te bevestigen.' };
-  }
 
   // De intake-velden opslaan (paspoort loopt via de KYC-upload, niet hier).
   function slaOp(scope, sess, velden) {

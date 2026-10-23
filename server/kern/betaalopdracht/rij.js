@@ -9,12 +9,10 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { rij, rijLezen, save, nu, STATUS, AF, OPEN, publiek, zet, klacht, ramMax } = ctx;
+  const { d, save, nu, STATUS, AF, OPEN, publiek, zet, klacht, ramMax } = ctx;
   const { maakOpenstaandOverzicht } = require('./status');
-  // dienIn wordt door ./index pas NA dit bestand op de ctx gezet (de twee delen
-  // kennen elkaar over en weer), dus lezen we hem per aanroep en niet hier
-  const dienIn = (o) => ctx.dienIn(o);
-
+  const opslag = require('./opslag')(d);
+  const rij = opslag.schrijfRij, rijLezen = opslag.leesRij;
   /* Een nieuwe opdracht in de rij zetten, en de rij op maat houden. Opruimen mag
      ALLEEN wat af is: de staart afknippen zonder te kijken is precies hoe boeking
      50.001 verdween (LAT.md regel 1), en hier zou het een openstaande betaling
@@ -118,7 +116,7 @@ module.exports = (ctx) => {
     try {
       for (const o of rijLezen().filter(x => !AF.has(x.status) && x.status !== STATUS.MISLUKT && x.status !== STATUS.ONBEKEND && (x.volgendeAt || 0) <= grens)) {
         const voor = o.status;
-        await dienIn(o);
+        await ctx.dienIn(o);
         gedaan++;
         if ((o.status === STATUS.INGEDIEND || o.status === STATUS.AFGEWIKKELD) && voor === STATUS.GEBOEKT) gelukt++;
         if (o.status === STATUS.MISLUKT || o.status === STATUS.TERUGGEBOEKT) opgegeven++;

@@ -9,6 +9,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const { goedeVinger, goedeSid, geldig } = require('./intreksignaal-vorm');
 
 const KANAAL = 'rtg:intrekking:v1';
 const PREFIX = KANAAL + ':';
@@ -24,17 +25,6 @@ const wachtend = new Set();
 let outbox = null, herstelTimer = null;
 
 const vingerVanToken = token => crypto.createHash('sha256').update(String(token || '')).digest('hex');
-const goedeVinger = waarde => /^[a-f0-9]{64}$/.test(String(waarde || ''));
-const goedeSid = waarde => /^[A-Za-z0-9_-]{12}$/.test(String(waarde || ''));
-
-function geldig(bericht) {
-  if (!bericht || bericht.versie !== 1) return false;
-  if (!Number.isFinite(Number(bericht.verloopt)) || Number(bericht.verloopt) <= Date.now()) return false;
-  if (bericht.soort === 'token') return goedeVinger(bericht.waarde);
-  if (bericht.soort === 'sessie') return goedeSid(bericht.waarde);
-  return false;
-}
-
 function lever(bericht) {
   if (!geldig(bericht)) return false;
   const doel = bericht.soort === 'token' ? ingetrokkenTokens : ingetrokkenSessies;
@@ -122,16 +112,8 @@ async function bereid(rij) {
   return true;
 }
 
-/* Zonder Redis is de bestaande PG-outbox de duurzame intrekkingsbron.
-   Lees alleen deze credential, vóór de route op zijn lokale sessie vertrouwt.
-   Een mislukte lezing is geen toestemming; de aanroeper moet dan stoppen. */
 async function controleerGedeeld(token, sid) {
-  if (!outbox || typeof outbox.gedeeld !== 'function')
-    throw Object.assign(new Error('De gedeelde intrekkingsbron ontbreekt.'), { code: 'INTREKOPSLAG_ONZEKER' });
-  const sleutels = ['token:' + vingerVanToken(token)];
-  if (goedeSid(sid)) sleutels.push('sessie:' + sid);
-  for (const rij of await outbox.gedeeld(sleutels))
-    lever({ versie: 1, soort: rij.soort, waarde: rij.waarde, verloopt: rij.verloopt });
+  return require('./intreksignaal-gedeeld')({ outbox, token, sid, vingerVanToken, goedeSid, lever });
 }
 
 async function herhaalOutbox() {

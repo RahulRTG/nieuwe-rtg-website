@@ -29,7 +29,7 @@ function bewaarContract(sc) {
   sc.contractVersies[sc.contract.versie] = momentopname(sc.contract);
   return true;
 }
-function bereidVoor(sc, p, scope, naam, hash) {
+function ondertekeningVoorbereiden(sc, p, scope, naam, hash) {
   const huidig = (p.ondertekend || {})[scope];
   const geschiedenis = (p.ondertekeningen || {})[scope] || {};
   const bestaand = ontvangstVan(p, scope, sc.contract.versie);
@@ -55,4 +55,5 @@ function bereidVoor(sc, p, scope, naam, hash) {
   }
   return { herhaald: false };
 }
-module.exports = { momentopname, zelfdeContract, bewaarContract, versieConflict, bereidVoor, ontvangstVan, afdruk, geldig };
+module.exports = { momentopname, zelfdeContract, bewaarContract, versieConflict,
+  bereidVoor: ondertekeningVoorbereiden, ontvangstVan, afdruk, geldig };

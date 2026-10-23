@@ -45,13 +45,6 @@ module.exports = function maakBetaalopdrachten(opties) {
   const maxPogingen = Number.isFinite(opties && opties.maxPogingen) ? opties.maxPogingen : MAX_POGINGEN;
   const backoffMs = (opties && Array.isArray(opties.backoffMs) && opties.backoffMs.length) ? opties.backoffMs : BACKOFF_MS;
 
-  function rij() { if (!Array.isArray(d().betaalOpdrachten)) d().betaalOpdrachten = []; return d().betaalOpdrachten; }
-  function rijLezen() {
-    const r = d().betaalOpdrachten;
-    if (r === undefined) return [];
-    if (!Array.isArray(r)) throw new Error('betaalOpdrachten heeft geen geldige lijstvorm.');
-    return r;
-  }
   const wacht = n => backoffMs[Math.min(Math.max(0, n - 1), backoffMs.length - 1)];
   const klacht = (bericht, gegevens) => { if (log && log.warn) log.warn(bericht, gegevens); else console.warn('[betaalopdracht] ' + bericht, gegevens || ''); };
 
@@ -153,7 +146,7 @@ module.exports = function maakBetaalopdrachten(opties) {
     return true;
   }
 
-  const ctx = { rij, rijLezen, save, nu, klacht, publiek, zet, wacht, maxPogingen,
+  const ctx = { d, save, nu, klacht, publiek, zet, wacht, maxPogingen,
     STATUS, AF, OPEN, DEFINITIEF, MISLUKT_RAIL, ramMax: RAM_MAX, railInzenden, terugboeken, verwerkAfwikkeling };
   const derij = require('./rij')(ctx);
   ctx.plaats = derij.plaats;

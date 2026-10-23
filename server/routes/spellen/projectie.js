@@ -1,6 +1,6 @@
 /* De beperkte schermcredential heeft eigen ingangen. Dit contract bevat
    geen spelmutaties of toegang tot leden-/gezinsaccounts. */
-const rem = require('../rem');
+const rem = require('../../rem');
 module.exports = (ctx) => {
   const { app, projectieKoppel, projectieStand, veilig } = ctx;
   /* HET GEDEELDE SCHERM blijft zonder ledenaccount, maar niet zonder een

@@ -2,7 +2,13 @@
    Dezelfde inVlucht-poort beschermt replay tegen een nog onbevestigde migratie. */
 'use strict';
 const { nietVastgelegd } = require('./idem-zondersleutel');
-module.exports = async ({ s, sleutel, afdruk, behouden, save, bijeen, duurzaam, naam, inVlucht }) => {
+function ontvangstGeldig({ s, a, sleutel, afdruk, geldigeOntvangst }) {
+  return Object.hasOwn(a, sleutel) && typeof a[sleutel] === 'string' && !!a[sleutel] && !!afdruk &&
+    !!s[sleutel] && typeof s[sleutel] === 'object' && !Array.isArray(s[sleutel]) && s[sleutel].ok === true &&
+    (typeof geldigeOntvangst !== 'function' || geldigeOntvangst(sleutel, s[sleutel]));
+}
+
+async function migreer({ s, sleutel, afdruk, behouden, save, bijeen, duurzaam, naam, inVlucht }) {
   let klaar;
   inVlucht.set(sleutel, { afdruk, belofte: new Promise(r => { klaar = r; }) });
   const voor = s._keys, na = voor.filter(k => !behouden(k));
@@ -19,4 +25,15 @@ module.exports = async ({ s, sleutel, afdruk, behouden, save, bijeen, duurzaam, 
   } finally { inVlucht.delete(sleutel); }
   klaar(uit);
   return uit;
-};
+}
+
+async function herhaal(opties) {
+  const { s, a, sleutel, afdruk, geldigeOntvangst } = opties;
+  if (!ontvangstGeldig({ s, a, sleutel, afdruk, geldigeOntvangst }))
+    return { status: 503, code: 'IDEMPOTENTIEBEWIJS_ONGELDIG', error: 'De bewaarde ontvangst vereist herstel.' };
+  return s._keys.includes(sleutel) ? migreer(opties) : Object.assign({}, s[sleutel], { herhaald: true });
+}
+
+module.exports = migreer;
+module.exports.ontvangstGeldig = ontvangstGeldig;
+module.exports.herhaal = herhaal;

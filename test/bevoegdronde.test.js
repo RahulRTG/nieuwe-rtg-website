@@ -129,6 +129,39 @@ test('rolbewijs: een onbesliste bron blijft via BEVOEGD onbeslist in APPWERKT', 
   assert.equal(app.bewijzen.bevoegd.status, 'NIET_GETEST');
 });
 
+test('appkruisproef: volledige bevoegde workflow plus vreemde actor telt, samenvatting alleen niet', () => {
+  const rij = { functie: 'link:a' };
+  const basis = () => ({ voltooiVervallen: [], voltooi: new Map() });
+  const niet = basis();
+  assert.equal(R.scenarioOordeel(rij, niet).status, 'NIET_GETEST');
+
+  const bewijs = { sluit: true, telling: { schakels: 2, gesloten: 2, open: 0, stuk: 0 }, schakels: [
+    { soort: 'bevoegde-workflow', stand: 'gesloten', wat: 'A voltooit' },
+    { soort: 'tegenproef', stand: 'gesloten', wat: 'B blijft buiten' }
+  ] };
+  const goed = basis(); goed.voltooi.set(rij.functie, bewijs);
+  assert.equal(R.scenarioOordeel(rij, goed).status, 'BEWEZEN');
+
+  const gelogen = basis(); gelogen.voltooi.set(rij.functie, { ...bewijs,
+    telling: { schakels: 2, gesloten: 2, open: 0, stuk: 0 },
+    schakels: [bewijs.schakels[0], { ...bewijs.schakels[1], stand: 'open' }] });
+  assert.equal(R.scenarioOordeel(rij, gelogen).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  const oud = basis(); oud.voltooiVervallen.push('oud'); oud.voltooi.set(rij.functie, bewijs);
+  assert.equal(R.scenarioOordeel(rij, oud).status, 'NIET_GETEST');
+});
+
+test('appkruisproef: concreet routelek wint, scenario vult alleen ontbrekend bewijs aan', () => {
+  const dicht = { status: 'BEWEZEN', reden: 'alle routes dicht' };
+  const open = { status: 'NIET_GETEST', reden: 'route ontbreekt' };
+  const lek = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'lek' };
+  const scenario = { status: 'BEWEZEN', reden: 'workflow gekruist' };
+  assert.equal(R.combineerOordelen(dicht, scenario).reden, dicht.reden);
+  assert.equal(R.combineerOordelen(open, scenario).status, 'BEWEZEN');
+  assert.match(R.combineerOordelen(open, scenario).reden, /routeprojectie bleef open/);
+  assert.equal(R.combineerOordelen(lek, scenario).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  assert.equal(R.combineerOordelen(open, lek).status, 'GEBLOKKEERD_DOOR_DEFECT');
+});
+
 test('1. een ledenscherm is alleen BEWEZEN als elke route gemeten is', () => {
   const beide = reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [idormeting('POST')] },
     { '/api/a/zet': [rolbewijs()] });
@@ -253,7 +286,8 @@ test('5. het echte register spreekt zichzelf niet tegen', () => {
         assert.equal(p.uitslag, 'gescheiden', r.functie + ': onbeslist paar mag niet groen meeliften');
       }
     }
-    if (r.status === 'BEWEZEN') assert.ok(['lid', 'gezin'].includes(r.persona), r.functie + ': BEWEZEN voor een persona zonder proef');
+    if (r.status === 'BEWEZEN' && !r.scenario) assert.ok(['lid', 'gezin'].includes(r.persona), r.functie + ': BEWEZEN voor een persona zonder proef');
+    if (r.status === 'BEWEZEN' && r.scenario) assert.ok(r.tegenproeven > 0, r.functie + ': scenariobewijs zonder vreemde-actorproef');
   }
   assert.deepEqual(reg.telling, tel, 'de telling overstemt de rijen');
 });

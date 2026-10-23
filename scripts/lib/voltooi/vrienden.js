@@ -73,14 +73,14 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder gezinssessie geen kring, geen bericht en geen toevoeging', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder gezinssessie geen kring, geen bericht en geen toevoeging', async () => {
     const c = await w.post(CONNECTIONS, {});
     const d = await w.post(DM_SEND, { toKey: kb.me, text: 'anoniem' });
     const o = await w.post(OUDERVOEG, { kindHandle: ka.me, codenaam: kc.codename });
     return { klopt: [c.status, d.status, o.status].every((x) => x === 401 || x === 403), ziet: 'kring ' + c.status + ', bericht ' + d.status + ', toevoegen ' + o.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een vreemde ouder voegt niemand toe voor andermans kind, keurt niets goed en leest de chat niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een vreemde ouder voegt niemand toe voor andermans kind, keurt niets goed en leest de chat niet', async () => {
     const o = await soc(C.gezin, OUDERVOEG, { kindHandle: ka.me, codenaam: kc.codename });
     const g = await soc(C.gezin, GOEDKEUREN, { kindHandle: kb.me, anderKey: ka.me, akkoord: false });
     const d = await soc(C.kind, DM, { withKey: ka.me });
@@ -89,7 +89,7 @@ async function loop(w, stap) {
       ziet: 'vreemde ouder: toevoegen ' + o.status + ', keuren ' + g.status + '; vreemd kind: lezen ' + d.status + ', sturen ' + s.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind keurt zelf niets goed en voegt niemand toe, ook niet voor zichzelf', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind keurt zelf niets goed en voegt niemand toe, ook niet voor zichzelf', async () => {
     const v = await soc(A.gezin, OUDERVOEG, { kindHandle: ka.me, codenaam: kc.codename });
     const g = await soc(C.kind, GOEDKEUREN, { kindHandle: kc.me, anderKey: ka.me, akkoord: true });
     const o = await soc(A.kind, OUDERVOEG, { kindHandle: ka.me, codenaam: kc.codename });

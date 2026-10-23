@@ -98,21 +98,21 @@ async function loop(w, stap) {
     return { klopt: m.status === 200 && JSON.stringify(l).includes('Proefmelding ' + merk), ziet: 'meld ' + m.status + ', bij kantoor: ' + JSON.stringify(l).includes('Proefmelding ' + merk) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen zaal, niet meekijken en niet chatten (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen zaal, niet meekijken en niet chatten (401)', async () => {
     const a = await w.post(KANALEN, {});
     const b = await w.post(KIJK, { id: kanaal.id });
     const c = await w.post(CHAT, { id: kanaal.id, tekst: 'anoniem' });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'zaal ' + a.status + ', kijk ' + b.status + ', chat ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid blokkeert niemand in het kanaal van de maker, en chat niet zonder mee te kijken', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid blokkeert niemand in het kanaal van de maker, en chat niet zonder mee te kijken', async () => {
     const b = await w.post(BLOKKEER, { id: kanaal.id, key: 'iemand' }, D.token);
     const c = await w.post(CHAT, { id: kanaal.id, tekst: 'Zonder kijken ' + merk }, D.token);
     return { klopt: b.status === 403 && c.status === 403 && telChat(await mijnChat(), 'Zonder kijken ' + merk) === 0,
       ziet: 'blokkeer ' + b.status + ' (' + (b.data && b.data.error) + '), chat ' + c.status + ' (' + (c.data && c.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: de maker blokkeert een kijker -- die kijkt en chat dan niet meer; een gratis account heeft geen Podium', async () => {
+  await stap('bevoegd', 'bevoegdheid: de maker blokkeert een kijker -- die kijkt en chat dan niet meer; een gratis account heeft geen Podium', async () => {
     await w.post(KIJK, { id: kanaal.id }, D.token);
     const dKey = ((await w.post('/api/member/connections', {}, D.token)).data || {}).me;
     const b = await w.post(BLOKKEER, { id: kanaal.id, key: dKey }, M.token);

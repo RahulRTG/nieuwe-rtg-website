@@ -128,13 +128,13 @@ async function loop(w, stap) {
         ', afgetekend door ' + (x.watDePoortVond && x.watDePoortVond.afgetekendDoor) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen dossier en geen kanaaldossier (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen dossier en geen kanaaldossier (401)', async () => {
     const a = await w.post(DOSSIER, { sleutel: SLEUTEL });
     const b = await w.post(KANAAL, {});
     return { klopt: a.status === 401 && b.status === 401, ziet: 'dossier ' + a.status + ', kanaal ' + b.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een lid kan het dossier lezen maar geen app publiceren of intrekken', async () => {
+  await stap('bevoegd', 'bevoegdheid: een lid kan het dossier lezen maar geen app publiceren of intrekken', async () => {
     const b = await w.post('/api/appstore/kantoor/besluit', { versieId: versie.id, besluit: 'afgewezen', reden: 'proef' }, T);
     const x = await w.post('/api/appstore/kantoor/intrekken', { sleutel: SLEUTEL, reden: 'proef' }, T);
     const d = await lees();
@@ -142,7 +142,7 @@ async function loop(w, stap) {
       ziet: 'besluit ' + b.status + ', intrekken ' + x.status + ', dossier ' + d.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: de gedeelde kantoorcode is geen mens en kan geen app aftekenen', async () => {
+  await stap('bevoegd', 'bevoegdheid: de gedeelde kantoorcode is geen mens en kan geen app aftekenen', async () => {
     const tweede = await w.post('/api/appstore/uitgever/inzenden', { manifest: Object.assign({}, MANIFEST, { versie: '1.0.1' }), bestanden: BUNDEL.concat([{ pad: 'leeg.txt', inhoud: 'v101' }]) }, Z);
     keurloper(w);
     const v2 = tweede.data && tweede.data.versie;

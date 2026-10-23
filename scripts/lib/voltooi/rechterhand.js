@@ -77,14 +77,14 @@ async function loop(w, stap) {
     return { klopt: b.status === 400 && !!(b.data && b.data.error), ziet: b.status + ' (' + (b.data && b.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'bevoegd: zonder inlog geeft de intake, de case en het besluit 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geeft de intake, de case en het besluit 401', async () => {
     const a = await w.post(INTAKE, { zin: zin('anoniem'), sleutel: 'voltooi-rechterhand-anoniem-' + merk });
     const b = await w.post(ZAAK, { id });
     const c = await w.post(BESLIS, { id, akkoord: false });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'intake ' + a.status + ', case ' + b.status + ', besluit ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegd: een ander Lifestyle-lid opent deze case niet en beslist er niet over, ook niet met het juiste id', async () => {
+  await stap('bevoegd', 'bevoegd: een ander Lifestyle-lid opent deze case niet en beslist er niet over, ook niet met het juiste id', async () => {
     const z = await zaak(ander.token);
     const b = await w.post(BESLIS, { id, akkoord: false }, ander.token);
     const t = await w.post(TOELICHTING, { id, tekst: 'Ik ben iemand anders' }, ander.token);
@@ -93,7 +93,7 @@ async function loop(w, stap) {
       ziet: 'case ' + z.status + ', besluit ' + b.status + ', toelichting ' + t.status + ', ' + eigen + ' cases bij het andere lid' };
   });
 
-  await stap('voltooibaar', 'bevoegd: een RTG-lid zonder Lifestyle Pass komt niet bij De Rechterhand, en hoort waarom', async () => {
+  await stap('bevoegd', 'bevoegd: een RTG-lid zonder Lifestyle Pass komt niet bij De Rechterhand, en hoort waarom', async () => {
     const a = await w.post(INTAKE, { zin: zin('rtg'), sleutel: 'voltooi-rechterhand-rtg-' + merk }, rtg.token);
     const z = await zaak(rtg.token);
     return { klopt: a.status === 403 && z.status === 403 && /Lifestyle/.test((a.data && a.data.error) || ''),

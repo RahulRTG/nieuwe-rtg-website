@@ -79,7 +79,7 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid: wie zonder account, als ander lid of als kind komt. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen lijst, geen plaatsing en geen belangstelling (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen lijst, geen plaatsing en geen belangstelling (401)', async () => {
     const l = await w.post(LIJST, { stad: stad.id });
     const p = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: 'Anoniem ' + merk });
     const i = await w.post(INTERESSE, { id: stoel && stoel.id });
@@ -87,7 +87,7 @@ async function loop(w, stap) {
       ziet: 'lijst ' + l.status + ', plaatsen ' + p.status + ', interesse ' + i.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: de buur kan het aanbod van de ouder niet intrekken, en ziet de belangstellenden niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: de buur kan het aanbod van de ouder niet intrekken, en ziet de belangstellenden niet', async () => {
     const s = await w.post(SLUIT, { id: stoel && stoel.id, status: 'ingetrokken' }, buur.token);
     const st = metTitel(await mijn(), STOEL)[0] || {};
     const l = metTitel(await lijst(buur.token), STOEL)[0] || {};
@@ -95,7 +95,7 @@ async function loop(w, stap) {
       ziet: 'intrekken door de buur ' + s.status + ' (' + (s.data && s.data.error) + '), stand ' + st.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind van het gezin heeft geen eigen account; met zijn gezinssessie komt het er niet in', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind van het gezin heeft geen eigen account; met zijn gezinssessie komt het er niet in', async () => {
     const p = await w.post(PLAATS, { stad: stad.id, soort: 'geef', titel: 'Kind ' + merk }, ouder.kind.token);
     const l = await w.post(LIJST, { stad: stad.id, code: ouder.kind.code, token: ouder.kind.token });
     return { klopt: p.status === 401 && l.status === 401 && w.vindInOpslag('Kind ' + merk).length === 0,

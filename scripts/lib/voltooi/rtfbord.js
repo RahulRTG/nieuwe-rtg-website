@@ -99,12 +99,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: een les maken zonder RTG-account wordt geweigerd (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: een les maken zonder RTG-account wordt geweigerd (401)', async () => {
     const r = await w.post(MAAK, { vak: 'Anoniem', naam: 'Niemand', idem: 'anoniem-' + merk });
     return { klopt: r.status === 401, ziet: 'les maken zonder account: ' + r.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder lessleutel geen streek, geen opgave en geen bord om te lezen', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder lessleutel geen streek, geen opgave en geen bord om te lezen', async () => {
     const s = await w.post(STROKE, { code: les.lesId, stroke: streek(90) });
     const o = await w.post(OPGAVE, { code: les.lesId, tekst: 'Zonder sleutel' });
     const b = await haal(w, BORD + les.lesId, null);
@@ -113,7 +113,7 @@ async function loop(w, stap) {
       ziet: 'streek ' + s.status + ', opgave ' + o.status + ', bord lezen ' + b.status + ', bord ' + n + ' streken' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: de begeleider van een andere les tekent hier niet, wist niet en leest geen opgaven of schrift', async () => {
+  await stap('bevoegd', 'bevoegdheid: de begeleider van een andere les tekent hier niet, wist niet en leest geen opgaven of schrift', async () => {
     const V = { code: les.lesId, token: vreemd.token };
     const s = await w.post(STROKE, Object.assign({ stroke: streek(70) }, V));
     const x = await w.post(WIS, V);
@@ -124,7 +124,7 @@ async function loop(w, stap) {
       ziet: 'andere les: streek ' + s.status + ', wissen ' + x.status + ', opgaven ' + o.status + ', schrift ' + sc.status + '; bord ' + n + ' streken' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind is leerling en geen begeleider: het tekent niet, wist niet en zet geen opgave', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind is leerling en geen begeleider: het tekent niet, wist niet en zet geen opgave', async () => {
     const K = { code: les.lesId, token: kind.token };
     const s = await w.post(STROKE, Object.assign({ stroke: streek(80) }, K));
     const x = await w.post(WIS, K);

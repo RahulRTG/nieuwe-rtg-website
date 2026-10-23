@@ -82,12 +82,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen projectenlijst om aan te geven (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen projectenlijst om aan te geven (401)', async () => {
     const r = await w.post(PROJECTEN, { soort: SOORT });
     return { klopt: r.status === 401, ziet: 'projecten zonder account: ' + r.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen vraag stellen en niet stemmen (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen vraag stellen en niet stemmen (401)', async () => {
     const v = await w.post(THEMA, { labId: lab.id, vraag: 'Anonieme vraag over windmolens in de wijk ' + merk, soort: SOORT });
     const t = await mijnVraag();
     const s = await w.post(STEM, { id: t && t.id, alias: 'Iemand anders ' + merk });
@@ -95,14 +95,14 @@ async function loop(w, stap) {
       ziet: 'vraag zonder account ' + v.status + ', stem zonder account ' + s.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: dezelfde buur onder een andere alias stemt niet nog eens (de stem hangt aan het account)', async () => {
+  await stap('bevoegd', 'bevoegdheid: dezelfde buur onder een andere alias stemt niet nog eens (de stem hangt aan het account)', async () => {
     const t = await mijnVraag();
     const s = await w.post(STEM, { id: t && t.id, alias: 'Heel iemand anders ' + merk }, buur1);
     const na = await mijnVraag();
     return { klopt: s.status === 409 && Number(na && na.stemmen) === 1, ziet: 'andere alias ' + s.status + ', ' + (na && na.stemmen) + ' stem' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind van het gezin opent de projectenlijst niet met zijn gezinssessie', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind van het gezin opent de projectenlijst niet met zijn gezinssessie', async () => {
     const r = await w.post(PROJECTEN, { soort: SOORT }, ouder.kind.token);
     const c = await w.post(PROJECTEN, { soort: SOORT, code: ouder.kind.code, token: ouder.kind.token });
     return { klopt: r.status === 401 && c.status === 401, ziet: 'kindertoken ' + r.status + ', code+token ' + c.status };

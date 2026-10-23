@@ -94,14 +94,14 @@ async function loop(w, stap) {
       ziet: 'checkin ' + i.status + ', checkuit ' + u.status + ', review ' + r.status + ', zichtbaar voor een ander lid: ' + lijst.includes('Rustig en schoon ' + merk) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie niet zoeken, niet boeken en geen huis zetten (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie niet zoeken, niet boeken en geen huis zetten (401)', async () => {
     const a = await w.post(ZOEK, { plaats: 'Sant Josep' });
     const b = await w.post(BOEK, { id: huis.id, van: dag(50), tot: dag(52) });
     const c = await w.post(HUIS, { huis: { titel: 'Anoniem', plaats: 'Ibiza' } });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'zoek ' + a.status + ', boek ' + b.status + ', huis ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet de boeking niet, leest de berichten niet en beslist of wijzigt niets van de host', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet de boeking niet, leest de berichten niet en beslist of wijzigt niets van de host', async () => {
     const m = await reizen(X.token);
     const br = await w.post(BERICHTEN, { ref }, X.token);
     const a = await w.post('/api/thuis/annuleer', { ref }, X.token);
@@ -111,7 +111,7 @@ async function loop(w, stap) {
       ziet: 'reizen ' + m.length + ', berichten ' + br.status + ', annuleer ' + a.status + ', huis wijzigen ' + z.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een gratis account mag kijken maar niet boeken of hosten', async () => {
+  await stap('bevoegd', 'bevoegdheid: een gratis account mag kijken maar niet boeken of hosten', async () => {
     const g = await nieuwLid(w, 'hsg', 'guest');
     const s = await w.post(ZOEK, { plaats: 'Sant Josep' }, g.token);
     const b = await w.post(BOEK, { id: huis.id, van: dag(60), tot: dag(63), gasten: 1 }, g.token);

@@ -85,7 +85,7 @@ async function loop(w, stap) {
       ziet: 'zelfde code nog eens ' + tweede.status + ', nieuwe code ' + o.status + ' (geroteerd=' + (o.data && o.data.geroteerd) + '), oud scherm ' + oud.status + ', nieuw scherm ' + r.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen schermcode en geen zet (401), en een verzonnen schermsessie toont niets', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen schermcode en geen zet (401), en een verzonnen schermsessie toont niets', async () => {
     const o = await w.post(OPEN, { id, idem: idem(merk) });
     const z = await w.post(ZET, { id, zet: { van: 51, naar: 35 } });
     const r = await kijk('SCREEN.' + 'A'.repeat(32));
@@ -93,7 +93,7 @@ async function loop(w, stap) {
       ziet: 'code ' + o.status + ', zet ' + z.status + ', verzonnen scherm ' + r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: wie niet meespeelt geeft geen schermcode uit, ziet de staat niet en zet niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: wie niet meespeelt geeft geen schermcode uit, ziet de staat niet en zet niet', async () => {
     const o = await w.post(OPEN, { id, idem: idem(merk) }, C.token);
     const s = await w.post(STAAT, { id }, C.token);
     const z = await zet(C.token, 51, 35);
@@ -102,7 +102,7 @@ async function loop(w, stap) {
       ziet: 'code door C ' + o.status + ', staat ' + s.status + ', zet ' + z.status + ', scherm nog ' + r.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: de schermsessie is geen ledensessie en een ledensessie geen schermsessie', async () => {
+  await stap('bevoegd', 'bevoegdheid: de schermsessie is geen ledensessie en een ledensessie geen schermsessie', async () => {
     const alsLid = await w.post(STAAT, { id }, scherm);
     const alsScherm = await kijk(A.token);
     const r = (await kijk()).data || {};

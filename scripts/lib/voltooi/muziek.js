@@ -110,20 +110,20 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid: wie niet ingelogd is, wie het niet maakte, wie geen lid is. */
-  await stap('voltooibaar', 'bevoegd: zonder inlog geeft de feed, het publiceren en de luisterkaart 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geeft de feed, het publiceren en de luisterkaart 401', async () => {
     const f = await w.post(FEED, {});
     const p = await publiceer(null, 'Anoniem ' + merk, 'voltooi-muziek-anoniem-' + merk);
     const t = await w.post(TICKET, { id: nummer.id });
     return { klopt: f.status === 401 && p.status === 401 && t.status === 401, ziet: 'feed ' + f.status + ', publiceren ' + p.status + ', kaart ' + t.status };
   });
 
-  await stap('voltooibaar', 'bevoegd: het andere lid kan het nummer niet weghalen; het staat er daarna nog', async () => {
+  await stap('bevoegd', 'bevoegd: het andere lid kan het nummer niet weghalen; het staat er daarna nog', async () => {
     const x = await w.post(WEG, { id: nummer.id }, B.token);
     const l = metNaam(await feed(A.token), 'Avondlicht ' + merk);
     return { klopt: x.status === 404 && l.length === 1, ziet: 'weghalen door B ' + x.status + ', nog ' + l.length + ' in de feed' };
   });
 
-  await stap('voltooibaar', 'bevoegd: een gratis account zonder pas mag RTG Studio niet in, en hoort waarom', async () => {
+  await stap('bevoegd', 'bevoegd: een gratis account zonder pas mag RTG Studio niet in, en hoort waarom', async () => {
     const f = await w.post(FEED, {}, gast.token);
     const p = await publiceer(gast.token, 'Gast ' + merk, 'voltooi-muziek-gast-' + merk);
     return { klopt: f.status === 403 && p.status === 403 && /voor leden/.test((f.data && f.data.error) || '') && metNaam(await feed(A.token), 'Gast ' + merk).length === 0,

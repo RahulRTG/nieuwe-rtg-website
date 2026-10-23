@@ -148,14 +148,14 @@ async function loop(w, stap) {
       ziet: 'opgeladen ' + opgeladen.join('/') + ', betaal ' + b1.status + '/' + b2.status + ' (' + ((b1.data && b1.data.error) || (b2.data && b2.data.error) || 'ok') + '), na betalen ' + na.status + ', zaak ' + besluit.status + ', bij B ' + eind.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen selectie, geen match en geen bericht (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen selectie, geen match en geen bericht (401)', async () => {
     const a = await w.post(SELECTIE, {});
     const b = await w.post(MIJN, {});
     const c = await w.post(BERICHT, { id: mid, tekst: 'anoniem' });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'selectie ' + a.status + ', mijn ' + b.status + ', bericht ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een derde gekeurd lid komt de chat van A en B niet in en ziet hun match niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een derde gekeurd lid komt de chat van A en B niet in en ziet hun match niet', async () => {
     const r = await w.post(BERICHT, { id: mid, tekst: 'Indringer ' + merk }, C.token);
     const e = await w.post(EDGE, { id: mid }, C.token);
     const bijC = await mijn(C.token);
@@ -165,7 +165,7 @@ async function loop(w, stap) {
       ziet: 'bericht door C ' + r.status + ' (' + (r.data && r.data.error) + '), C ziet ' + bijC.length + ' matches' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een gratis account heeft geen Vonk, ook niet met een geldige sessie', async () => {
+  await stap('bevoegd', 'bevoegdheid: een gratis account heeft geen Vonk, ook niet met een geldige sessie', async () => {
     const g = await nieuwLid(w, 'vkg', 'guest');
     const s = await w.post(SELECTIE, {}, g.token);
     const p = await w.post(PROFIEL, PROFIEL_LIJF('Ibiza', 38.9, 1.4, 'sushi'), g.token);

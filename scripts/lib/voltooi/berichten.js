@@ -94,7 +94,7 @@ async function loop(w, stap) {
       ziet: 'wis ' + x.status + ', B ziet tekst ' + JSON.stringify(bij.tekst) + ', weg=' + !!bij.weg };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen inbox, geen gesprek en niets versturen (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen inbox, geen gesprek en niets versturen (401)', async () => {
     const a = await w.post(INBOX, {});
     const b = await w.post(GESPREK, { id: gid });
     const c = await w.post(STUUR, { id: gid, tekst: 'anoniem ' + merk });
@@ -103,7 +103,7 @@ async function loop(w, stap) {
       ziet: 'inbox ' + a.status + ', gesprek ' + b.status + ', stuur ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een derde lid leest het gesprek niet, schrijft er niet in en ziet het niet in zijn inbox', async () => {
+  await stap('bevoegd', 'bevoegdheid: een derde lid leest het gesprek niet, schrijft er niet in en ziet het niet in zijn inbox', async () => {
     const g = await w.post(GESPREK, { id: gid }, C.token);
     const s = await w.post(STUUR, { id: gid, tekst: 'Indringer ' + merk }, C.token);
     const x = await w.post(WIJZIG, { id: gid, berichtId: eerste.id, tekst: 'overgenomen' }, C.token);
@@ -114,7 +114,7 @@ async function loop(w, stap) {
       ziet: 'gesprek ' + g.status + ' (' + (g.data && g.data.error) + '), stuur ' + s.status + ', wijzig ' + x.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: wie A niet kent, begint geen gesprek met hem, en B wijzigt of wist het bericht van A niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: wie A niet kent, begint geen gesprek met hem, en B wijzigt of wist het bericht van A niet', async () => {
     const b = await w.post(BEGIN, { met: v.a.key }, C.token);
     const x = await w.post(WIJZIG, { id: gid, berichtId: eerste.id, tekst: 'door B' }, B.token);
     const y = await w.post(WIS, { id: gid, berichtId: eerste.id }, B.token);

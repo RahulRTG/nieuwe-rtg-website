@@ -32,6 +32,7 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    lid kreeg, ook onder de storingen. Een scenario schrijft het niet; zonder
    uitgelokte weigering draagt het geen schakels en `nietBeproefd`. */
 const AFGELEID = 'menselijk';
+const BEVOEGD = 'bevoegd';
 /* DE RATEL: zoveel bewijzen staan op 11 oktober 2026 gesloten (twee
    onderdelen, drie bewijzen). Alleen omhoog; wie hem verlaagt, schrijft erbij
    waarom. */
@@ -51,6 +52,24 @@ test('1. het instrument draait in de testwereld en vraagt een schone boom om vas
   assert.match(wereld, /kill\('SIGKILL'\)/, 'een crash (stroomstoring)');
   assert.match(wereld, /readOnly: true/, 'de opslag wordt gelezen zonder erin te kunnen schrijven');
   assert.doesNotMatch(proef + wereld, /localhost:3000|127\.0\.0\.1:3000/, 'de ontwikkelserver is van iemand anders');
+});
+
+test('1a. bevoegdheid vraagt een gesloten kernworkflow en een expliciete tegenproef', () => {
+  const { bevoegdUit } = require('../scripts/voltooiproef');
+  const kern = { sluit: true, telling: { gesloten: 4, schakels: 4 } };
+  const niets = bevoegdUit(kern, [], null);
+  assert.equal(niets.sluit, false);
+  assert.match(niets.nietBeproefd, /geen uitgevoerde kruisproef/);
+
+  const dicht = bevoegdUit(kern, [{ nr: 2, soort: 'tegenproef', wat: 'B blijft buiten', stand: 'gesloten' }], null);
+  assert.equal(dicht.sluit, true);
+  assert.deepEqual(dicht.schakels.map((s) => s.soort), ['bevoegde-workflow', 'tegenproef']);
+
+  const open = bevoegdUit(kern, [{ nr: 2, soort: 'tegenproef', wat: 'B kwam binnen', stand: 'open' }], null);
+  assert.equal(open.sluit, false);
+  assert.equal(open.telling.open, 1);
+  assert.equal(bevoegdUit({ sluit: false, telling: { gesloten: 3, schakels: 4 } }, dicht.schakels.slice(1), null).sluit, false);
+  assert.equal(bevoegdUit(kern, dicht.schakels.slice(1), 'afgebroken').sluit, false);
 });
 
 test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de scenario\'s dekken elkaar', () => {
@@ -123,6 +142,19 @@ test('3. het echte register is bruikbaar als bewijs en spreekt zichzelf niet teg
       assert.equal(d.telling.gesloten, g, f + '/' + b + ': de telling overstemt de schakels');
       assert.equal(d.sluit, g === d.schakels.length && !a.afgebroken, f + '/' + b + ': `sluit` zegt iets anders dan de rijen');
       (d.sluit ? gesloten++ : open++);
+    }
+  }
+  for (const [f, a] of Object.entries(reg.apps)) {
+    const b = a[BEVOEGD];
+    assert.ok(b && Array.isArray(b.schakels), f + '/' + BEVOEGD + ' ontbreekt');
+    if (b.nietBeproefd) {
+      assert.equal(b.schakels.length, 0, f + '/' + BEVOEGD + ': niet beproefd en toch schakels');
+      assert.equal(b.sluit, false, f + '/' + BEVOEGD + ': niet beproefd en toch gesloten');
+    } else {
+      assert.equal(b.schakels.filter((s) => s.soort === 'bevoegde-workflow').length, 1, f + ': precies één positieve kernworkflow');
+      assert.ok(b.schakels.some((s) => s.soort === 'tegenproef'), f + ': geen vreemde-actorproef');
+      const g = b.schakels.filter((s) => s.stand === 'gesloten').length;
+      assert.equal(b.sluit, g === b.schakels.length && !a.afgebroken, f + '/' + BEVOEGD + ': `sluit` spreekt de rijen tegen');
     }
   }
   assert.equal(reg.telling.bewijzenGesloten, gesloten);

@@ -68,14 +68,14 @@ async function loop(w, stap) {
       ziet: 'plaats ' + p.status + ', vriend ziet ' + !!bijB + ' en reageert ' + r.status + ', vreemde ziet ' + !!bijC };
   });
 
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven de stand, de waardering en de reactie 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven de stand, de waardering en de reactie 401', async () => {
     const s = await w.post(STAAT, {});
     const l = await w.post(LIKE, { postId: open.id, liked: true });
     const r = await w.post(REACTIE, { postId: open.id, text: 'anoniem ' + merk });
     return { klopt: s.status === 401 && l.status === 401 && r.status === 401, ziet: 'stand ' + s.status + ', like ' + l.status + ', reactie ' + r.status };
   });
 
-  await stap('voltooibaar', 'bevoegd: een vreemde kan op de besloten post niet waarderen of reageren, en de reactie van een ander niet terugdraaien', async () => {
+  await stap('bevoegd', 'bevoegd: een vreemde kan op de besloten post niet waarderen of reageren, en de reactie van een ander niet terugdraaien', async () => {
     const l = await w.post(LIKE, { postId: besloten, liked: true }, C.token);
     const r = await w.post(REACTIE, { postId: besloten, text: 'Ik kijk mee ' + merk }, C.token);
     const terug = await w.post(LIKE, { postId: open.id, liked: false }, C.token);
@@ -85,7 +85,7 @@ async function loop(w, stap) {
       ziet: 'like ' + l.status + ', reactie ' + r.status + '; ontliken door C ' + terug.status + ' laat A liked=' + bijA.liked };
   });
 
-  await stap('voltooibaar', 'bevoegd: een gratis account zonder pas leest mee maar waardeert en reageert niet bij leden', async () => {
+  await stap('bevoegd', 'bevoegd: een gratis account zonder pas leest mee maar waardeert en reageert niet bij leden', async () => {
     const zie = await posts(gast.token);
     const l = await w.post(LIKE, { postId: open.id, liked: true }, gast.token);
     const r = await w.post(REACTIE, { postId: open.id, text: 'gast ' + merk }, gast.token);

@@ -84,19 +84,19 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account geeft de buurtpagina niets (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geeft de buurtpagina niets (401)', async () => {
     const s = await w.post(STEDEN, {}), z = await w.post(STAD, { id: zwolle.id }), c = await w.post(CAMPAGNES, {});
     return { klopt: [s.status, z.status, c.status].every((x) => x === 401),
       ziet: 'steden ' + s.status + ', stad ' + z.status + ', campagnes ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: de buurt ziet geen budget, geen projectleider, geen begeleiders en geen inschrijvingen', async () => {
+  await stap('bevoegd', 'bevoegdheid: de buurt ziet geen budget, geen projectleider, geen begeleiders en geen inschrijvingen', async () => {
     const z = JSON.stringify((await w.post(STAD, { id: zwolle.id }, ouder.token)).data || {});
     return { klopt: !/budget|leider|begeleider|inschrijving|deelnemers|kosten|user-\d/i.test(z),
       ziet: 'stadsantwoord van ' + z.length + ' tekens zonder interne velden' + (/budget|leider|begeleider|inschrijving|deelnemers|kosten|user-\d/i.test(z) ? ' -- NIET: ' + z.match(/budget|leider|begeleider|inschrijving|deelnemers|kosten|user-\d/i)[0] : '') };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: wat het kantoor stopt, verdwijnt meteen uit de buurt -- de buurt ziet nooit meer dan de stand van het kantoor', async () => {
+  await stap('bevoegd', 'bevoegdheid: wat het kantoor stopt, verdwijnt meteen uit de buurt -- de buurt ziet nooit meer dan de stand van het kantoor', async () => {
     const tweede = await actiefProject(w, zwolle, 'Moestuin ' + merk, 'taal');
     const voor = (((await w.post(STAD, { id: zwolle.id }, ouder.token)).data || {}).projecten || []).some((x) => x.naam === tweede.naam);
     const st = await w.post('/api/rtfos/project/status', { id: tweede.id, status: 'gestopt' }, K);

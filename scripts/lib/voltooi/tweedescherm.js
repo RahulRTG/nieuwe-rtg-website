@@ -68,17 +68,17 @@ async function loop(w, stap) {
       ziet: (s && s.supplier.code) + ', verkoop van KIKUNOI zichtbaar: ' + tekst.includes('Proef ' + merk) };
   });
 
-  await stap('voltooibaar', 'bevoegd: zonder inlog geeft het tweede scherm 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geeft het tweede scherm 401', async () => {
     const r = await w.post(STAAT, {});
     return { klopt: r.status === 401 && !!(r.data && r.data.error), ziet: r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'bevoegd: een lid met zijn ledensessie komt niet bij de staat van een zaak', async () => {
+  await stap('bevoegd', 'bevoegd: een lid met zijn ledensessie komt niet bij de staat van een zaak', async () => {
     const r = await w.post(STAAT, {}, lid.token);
     return { klopt: r.status === 401 || r.status === 403, ziet: r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'bevoegd: met de sessie van een andere zaak verkoopt niemand op de kassa van deze zaak', async () => {
+  await stap('bevoegd', 'bevoegd: met de sessie van een andere zaak verkoopt niemand op de kassa van deze zaak', async () => {
     const voor = kassa(await staat(Z));
     const v = await verkoop(ander, 99, 'voltooi-ts-ander-' + merk);
     const na = kassa(await staat(Z));

@@ -73,7 +73,10 @@ const BRONSOORTEN = {
      uitkomst daarna in een nieuwe sessie EN in de opslag buiten de server om
      (persistent), en laat het proces sterven direct na een bevestiging, herhaalt
      en breekt verzoeken af (herstelbaar). Hij leest geen scherm en kruist geen
-     vreemde rol, dus waarheidsgetrouw en bevoegd levert hij niet.
+     vreemde rol, dus waarheidsgetrouw en bevoegd levert hij niet RECHTSTREEKS
+     als appcontractbron. Expliciet gemarkeerde vreemde-actorstappen worden wel
+     door scripts/bevoegdronde.js gelezen en daar met IDOR/ROLPROEF samengevoegd;
+     BEVOEGD.json blijft zo de enige APPWERKT-bron voor bewijs 6.
      MENSELIJK (18 oktober 2026) levert hij als vierde, en alleen de helft die
      scripts/appwerkt.js niet kon: dat scherm ziet of een kale fout de
      gebruiker bereikt bij de bediening, en zei zelf dat de bruikbaarheid van

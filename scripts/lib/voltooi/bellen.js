@@ -90,13 +90,13 @@ async function loop(w, stap) {
     return { klopt: van(lb, 'hangup').length === 1 && van(la, 'decline').length === 1, ziet: 'ophangen bij B ' + van(lb, 'hangup').length + ', weigering bij A ' + van(la, 'decline').length };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen oproep en geen live-verbinding (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen oproep en geen live-verbinding (401)', async () => {
     const r = await w.post(BEL, { toKey: ab.b.key, kind: 'ring' });
     const t = await w.post(TICKET, { stroom: 'lid' });
     return { klopt: r.status === 401 && t.status === 401, ziet: 'bellen ' + r.status + ', stroomticket ' + t.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een onverbonden lid belt B niet, en een derde hoort niets van het gesprek van A en B', async () => {
+  await stap('bevoegd', 'bevoegdheid: een onverbonden lid belt B niet, en een derde hoort niets van het gesprek van A en B', async () => {
     const voor = lb.oproepen().length;
     const r = await w.post(BEL, { toKey: ab.b.key, kind: 'ring' }, C.token);
     await wacht(400);
@@ -104,7 +104,7 @@ async function loop(w, stap) {
       ziet: 'C belt B: ' + r.status + ' "' + (r.data && r.data.error) + '", bij B ' + (lb.oproepen().length - voor) + ' nieuw, C hoorde ' + lc.oproepen().length + ' signalen' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: wie A blokkeerde wordt niet meer door A gebeld, en een gratis account belt niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: wie A blokkeerde wordt niet meer door A gebeld, en een gratis account belt niet', async () => {
     const b = await w.post(BLOK, { key: ae.a.key }, E.token);
     const r = await w.post(BEL, { toKey: ae.b.key, kind: 'ring' }, A.token);
     const g = await w.post(BEL, { toKey: ab.b.key, kind: 'ring' }, G.token);

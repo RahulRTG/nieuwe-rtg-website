@@ -114,12 +114,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven een nieuw potje, de staat, een zet en de uitslagen 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven een nieuw potje, de staat, een zet en de uitslagen 401', async () => {
     const r = await Promise.all([w.post(NIEUW, { soort: 'schaak', grootte: 2 }), w.post(STAAT, { id: potje }), w.post(ZET, { id: potje, zet: NARRENMAT[0] }), w.post(UITSLAGEN, {})]);
     return { klopt: r.every((x) => x.status === 401), ziet: r.map((x) => x.status).join('/') };
   });
 
-  await stap('voltooibaar', 'bevoegd: een lid buiten het potje ziet het bord niet, zet niet mee en kan geen uitnodiging van een ander aannemen', async () => {
+  await stap('bevoegd', 'bevoegd: een lid buiten het potje ziet het bord niet, zet niet mee en kan geen uitnodiging van een ander aannemen', async () => {
     const id = await potjeTussen(A, B, ab.b.key);
     const s = await w.post(STAAT, { id }, C.token);
     const z = await w.post(ZET, { id, zet: NARRENMAT[0] }, C.token);
@@ -130,7 +130,7 @@ async function loop(w, stap) {
       ziet: 'staat ' + s.status + ', zet ' + z.status + ', andermans uitnodiging ' + a.status + ', bord heeft ' + zetten(nog) + ' zetten' };
   });
 
-  await stap('voltooibaar', 'bevoegd: wie niet bevriend is, kan niet via de vriendenlijst uitgenodigd worden', async () => {
+  await stap('bevoegd', 'bevoegd: wie niet bevriend is, kan niet via de vriendenlijst uitgenodigd worden', async () => {
     const n = await w.post(NIEUW, { soort: 'schaak', grootte: 2, vrienden: [cd.a.key] }, A.token);
     const mc = await w.post(MIJN, {}, C.token);
     return { klopt: n.status === 400 && !!n.data.error && !n.data.id && ((mc.data && mc.data.uitnodigingen) || []).length === 0,

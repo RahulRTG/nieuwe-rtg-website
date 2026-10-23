@@ -46,6 +46,14 @@
    leest dat als NIET_GETEST en nooit als bewezen. Een scenario kan dit bewijs
    niet zelf schrijven: `stap()` kent alleen de drie hierboven.
 
+   BEWIJS 6 (BEVOEGD) KAN EXPLICIET WORDEN AANGELEVERD AAN DE BEVOEGDRONDE.
+   Een scenario markeert daarvoor een daadwerkelijk uitgevoerde vreemde-actor-
+   stap met `stap('bevoegd', ...)`. De stap blijft tevens onderdeel van de
+   kernworkflow. Alleen een volledig gesloten kernworkflow plus minstens één
+   gesloten gemarkeerde tegenproef vormt appbewijs; tekst of een losse 401
+   wordt nooit automatisch opgewaardeerd. BEVOEGD.json blijft de enige bron die
+   APPWERKT voor bewijs 6 leest en laat concrete IDOR/rollekken altijd winnen.
+
    WAT DEZE PROEF NIET IS, en dat staat per onderdeel onder `grens`:
      - geen browser: de routes van het scherm, niet het scherm (dat is bewijs 2);
      - geen Redis en geen PostgreSQL: herstelbaar is hier een proces dat sterft
@@ -69,6 +77,13 @@ const MAP = path.join(__dirname, 'lib', 'voltooi');
 const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
 /* Afgeleid uit de antwoorden, niet door een scenario geschreven (zie de kop). */
 const AFGELEID = 'menselijk';
+/* Een scenario mag een stap die een vreemde actor werkelijk uitvoert expliciet
+   als `bevoegd` aanmerken. Die stap blijft onderdeel van `voltooibaar`; voor
+   bevoegdheid vormt hij samen met de volledig gesloten kernworkflow een
+   afzonderlijke positieve + negatieve kruisproef. Losse 401-antwoorden of
+   woorden in een stapnaam worden nooit automatisch als bevoegdheidsbewijs
+   geïnterpreteerd. */
+const BEVOEGD = 'bevoegd';
 
 /* DE SCENARIO'S STAAN HIER LETTERLIJK, en niet als een require over een
    mapinhoud. De versheid van VOLTOOIPROEF.json rekent alleen wijzigingen mee in
@@ -201,20 +216,42 @@ function scenarios(alleen) {
     .map((n) => Object.assign({ bestand: 'scripts/lib/voltooi/' + n }, SCENARIOS[n]));
 }
 
+function bevoegdUit(kern, tegenproeven, afgebroken) {
+  if (!tegenproeven.length) {
+    return { schakels: [], storingen: [], telling: { schakels: 0, gesloten: 0, open: 0, stuk: 0 },
+      sluit: false, nietBeproefd: 'het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor' };
+  }
+  const eigen = { nr: 1, soort: 'bevoegde-workflow',
+    wat: 'de bevoegde actor voltooit de volledige kernworkflow',
+    stand: kern.sluit ? 'gesloten' : 'open',
+    ziet: kern.telling.gesloten + ' van de ' + kern.telling.schakels + ' kernschakels gesloten' };
+  const schakels = [eigen, ...tegenproeven];
+  const telling = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
+  for (const s of schakels) telling[s.stand]++;
+  return { schakels, storingen: [], telling,
+    sluit: telling.gesloten === telling.schakels && !afgebroken };
+}
+
 async function meetScenario(sc) {
   const boek = Object.fromEntries(BEWIJZEN.map((b) => [b, []]));
+  const tegenproeven = [];
   /* Een stap faalt nooit stil: een uitzondering wordt `stuk` met de fout erbij,
      en de volgende stap loopt gewoon -- een keten die na de eerste fout stopt,
      verbergt hoeveel er verder nog kapot is. */
   const stap = async (bewijs, wat, fn) => {
-    if (!boek[bewijs]) throw new Error('onbekend bewijs ' + bewijs + ' in ' + sc.bestand);
+    const doel = bewijs === BEVOEGD ? 'voltooibaar' : bewijs;
+    if (!boek[doel]) throw new Error('onbekend bewijs ' + bewijs + ' in ' + sc.bestand);
     const t0 = Date.now();
-    const nr = boek[bewijs].length + 1;
+    const nr = boek[doel].length + 1;
     try {
       const r = await fn();
-      boek[bewijs].push({ nr, wat, stand: r && r.klopt ? 'gesloten' : 'open', ziet: r && r.ziet || null, ms: Date.now() - t0 });
+      const regel = { nr, wat, stand: r && r.klopt ? 'gesloten' : 'open', ziet: r && r.ziet || null, ms: Date.now() - t0 };
+      boek[doel].push(regel);
+      if (bewijs === BEVOEGD) tegenproeven.push({ ...regel, nr: tegenproeven.length + 2, soort: 'tegenproef' });
     } catch (e) {
-      boek[bewijs].push({ nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 });
+      const regel = { nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 };
+      boek[doel].push(regel);
+      if (bewijs === BEVOEGD) tegenproeven.push({ ...regel, nr: tegenproeven.length + 2, soort: 'tegenproef' });
     }
   };
   /* `omgeving`: een scenario dat een herleidbaar mens van het kantoor nodig
@@ -244,6 +281,7 @@ async function meetScenario(sc) {
     uit[b] = { schakels, storingen: [], telling: t,
       sluit: schakels.length > 0 && t.open === 0 && t.stuk === 0 && !afgebroken };
   }
+  uit[BEVOEGD] = bevoegdUit(uit.voltooibaar, tegenproeven, afgebroken);
   return uit;
 }
 
@@ -309,12 +347,15 @@ async function meet(opties) {
   /* De telling en `sluit` gaan over de drie geschreven bewijzen. Menselijk
      telt apart (`menselijkGesloten`, `menselijkNietBeproefd`): een scenario dat
      geen weigering uitlokte is niet gezakt, het heeft dat stuk niet gemeten. */
-  const t = { apps: 0, bewijzenGesloten: 0, bewijzenOpen: 0, menselijkGesloten: 0, menselijkOpen: 0, menselijkNietBeproefd: 0 };
+  const t = { apps: 0, bewijzenGesloten: 0, bewijzenOpen: 0, menselijkGesloten: 0, menselijkOpen: 0,
+    menselijkNietBeproefd: 0, bevoegdGesloten: 0, bevoegdOpen: 0, bevoegdNietBeproefd: 0 };
   for (const a of Object.values(reg.apps)) {
     t.apps++;
     for (const b of BEWIJZEN) (a[b].sluit ? t.bewijzenGesloten++ : t.bewijzenOpen++);
     const m = a[AFGELEID];
     if (m.nietBeproefd) t.menselijkNietBeproefd++; else if (m.sluit) t.menselijkGesloten++; else t.menselijkOpen++;
+    const b = a[BEVOEGD];
+    if (b.nietBeproefd) t.bevoegdNietBeproefd++; else if (b.sluit) t.bevoegdGesloten++; else t.bevoegdOpen++;
   }
   reg.telling = t;
   reg.sluit = t.apps > 0 && t.bewijzenOpen === 0;
@@ -332,13 +373,17 @@ function druk(reg) {
     const m = a[AFGELEID];
     console.log('  ' + AFGELEID + ' (afgeleid): ' + (m.nietBeproefd ? 'NIET BEPROEFD -- ' + m.nietBeproefd : (m.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + m.telling.gesloten + '/' + m.telling.schakels + ')'));
     for (const s of m.schakels) console.log('    ' + String(s.nr).padStart(2) + ' ' + s.stand.padEnd(9) + s.wat + (s.ziet ? '\n         ziet: ' + s.ziet : ''));
+    const q = a[BEVOEGD];
+    console.log('  ' + BEVOEGD + ' (expliciet): ' + (q.nietBeproefd ? 'NIET BEPROEFD -- ' + q.nietBeproefd : (q.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + q.telling.gesloten + '/' + q.telling.schakels + ')'));
+    for (const s of q.schakels) console.log('    ' + String(s.nr).padStart(2) + ' ' + s.stand.padEnd(9) + s.wat + (s.ziet ? '\n         ziet: ' + s.ziet : ''));
     console.log('  post: ' + a.post.gevangen + ' gevangen, ' + a.post.naarBuiten + ' naar buiten');
   }
   console.log(reg.sluit ? '\nAlle bewijzen sluiten.' : '\nNIET ALLE BEWIJZEN SLUITEN (' + reg.telling.bewijzenOpen + ' open).');
   console.log('menselijk (afgeleid): ' + reg.telling.menselijkGesloten + ' gesloten, ' + reg.telling.menselijkOpen + ' open, ' + reg.telling.menselijkNietBeproefd + ' niet beproefd.');
+  console.log('bevoegd (expliciet): ' + reg.telling.bevoegdGesloten + ' gesloten, ' + reg.telling.bevoegdOpen + ' open, ' + reg.telling.bevoegdNietBeproefd + ' niet beproefd.');
 }
 
-module.exports = { meet, scenarios, DOEL, BEWIJZEN, AFGELEID, menselijkUit, inWoorden };
+module.exports = { meet, scenarios, DOEL, BEWIJZEN, AFGELEID, BEVOEGD, bevoegdUit, menselijkUit, inWoorden };
 
 if (require.main === module) {
   const vast = process.argv.includes('--vastleggen');

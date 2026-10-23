@@ -103,12 +103,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven de wereld, Life Command, de lijn en bevestigen 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven de wereld, Life Command, de lijn en bevestigen 401', async () => {
     const r = await Promise.all([w.post(WERELD, {}), w.post(COMMAND, {}), w.post(LIJN, {}), w.post(BEVESTIG, { id: voorstelId, keuze: 'nee' })]);
     return { klopt: r.every((x) => x.status === 401), ziet: r.map((x) => x.status).join('/') };
   });
 
-  await stap('voltooibaar', 'bevoegd: een lid buiten het genootschap ziet het voorstel niet, kan het niet bevestigen en hoort niet of de groep bestaat', async () => {
+  await stap('bevoegd', 'bevoegd: een lid buiten het genootschap ziet het voorstel niet, kan het niet bevestigen en hoort niet of de groep bestaat', async () => {
     const tweede = await bijeenkomst('Lunch ' + merk, 6);
     const idB = (await voorstellenVan(B.token, 'Lunch ' + merk))[0];
     const vC = await voorstellenVan(C.token, 'Lunch ' + merk);
@@ -124,7 +124,7 @@ async function loop(w, stap) {
   /* Een gratis account met eigen account mag hier in (server.js, geenGast
      weert alleen een gast ZONDER account), dus een pas-eis speelt op dit scherm
      niet. Wat wel speelt: een bevestiging handelt alleen voor wie bevestigt. */
-  await stap('voltooibaar', 'bevoegd: de bevestiging van B handelt alleen voor B: het voorstel van gastheer A voor dezelfde avond blijft open', async () => {
+  await stap('bevoegd', 'bevoegd: de bevestiging van B handelt alleen voor B: het voorstel van gastheer A voor dezelfde avond blijft open', async () => {
     const vA = await voorstellenVan(A.token, 'Avond ' + merk);
     const a = await antwoordBij(A.token, 'Avond ' + merk);
     return { klopt: vA.length === 1 && vA[0].id === voorstelId && !!a.b && a.b.mijnAntwoord === null && a.b.ja === 1,

@@ -118,12 +118,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen aanbod met eigen stand, geen boeking en geen betaling (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen aanbod met eigen stand, geen boeking en geen betaling (401)', async () => {
     const o = await w.post(CARE, {}), b = await w.post(BOEK, slot(2)), p = await w.post(BETAAL, { ref: eerste });
     return { klopt: o.status === 401 && b.status === 401 && p.status === 401, ziet: 'aanbod ' + o.status + ', boeken ' + b.status + ', betalen ' + p.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet de afspraak niet, annuleert hem niet en stopt geen deling van het lid', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet de afspraak niet, annuleert hem niet en stopt geen deling van het lid', async () => {
     const z = (await mijn(vreemd.token)).some((x) => x.ref === eerste);
     const x = await w.post(ANNULEER, { ref: eerste }, vreemd.token);
     const d = await w.post(INTAKE_DEEL, { aanbiederId: a.id, medisch: 'Nieuwe deling ' + merk }, tok);
@@ -133,7 +133,7 @@ async function loop(w, stap) {
       ziet: 'ander lid ziet hem ' + z + ', annuleren ' + x.status + ', deling stoppen ' + s.status + ', deling staat nog: ' + nog };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind van het gezin boekt geen zorg met zijn gezinssessie', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind van het gezin boekt geen zorg met zijn gezinssessie', async () => {
     const b = await w.post(BOEK, slot(2), ouder.kind.token);
     const o = await w.post(MIJN, { code: ouder.kind.code, token: ouder.kind.token });
     return { klopt: b.status === 401 && o.status === 401, ziet: 'boeken met het kindertoken ' + b.status + ', afspraken met code+token ' + o.status };

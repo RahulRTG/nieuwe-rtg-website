@@ -131,7 +131,7 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen afspraken en geen betaling (401), en zonder gezinssessie geen kaart of hulpwijzer', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen afspraken en geen betaling (401), en zonder gezinssessie geen kaart of hulpwijzer', async () => {
     const m = await w.post(CARE_MIJN, {});
     const p = await w.post(CARE_BETAAL, { ref: boeking && boeking.ref });
     const k = await haal(w, GEZONDHEID(ouder.gezin.code), null);
@@ -144,7 +144,7 @@ async function loop(w, stap) {
       ziet: 'afspraken ' + m.status + ', betalen ' + p.status + ', kaart ' + k.status + ', hulpwijzer ' + h.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid annuleert de afspraak van de ouder niet, en een ander gezin leest zijn kaart niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid annuleert de afspraak van de ouder niet, en een ander gezin leest zijn kaart niet', async () => {
     const x = await w.post(CARE_ANNULEER, { ref: boeking && boeking.ref }, vreemd.token);
     const nog = (await mijn()).some((y) => boeking && y.ref === boeking.ref);
     const k = await haal(w, GEZONDHEID(ouder.gezin.code), ander.gezin.token);
@@ -153,7 +153,7 @@ async function loop(w, stap) {
       ziet: 'annuleren door een ander lid ' + x.status + ', kaart met het token van een ander gezin ' + k.status + ', schrijven ' + z.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind boekt geen zorg en zet niets op de kaart van zijn ouder', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind boekt geen zorg en zet niets op de kaart van zijn ouder', async () => {
     const b = await w.post(CARE_BOEK, slot(2), ouder.kind.token);
     const z = await w.post(AFSPRAAK, { code: ouder.kind.code, token: ouder.kind.token, voor: ouder.gezin.profielId, wat: 'Door het kind', datum: dag });
     return { klopt: b.status === 401 && z.status === 403, ziet: 'boeken met het kindertoken ' + b.status + ', afspraak op de kaart van de ouder ' + z.status };

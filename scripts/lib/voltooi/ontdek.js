@@ -74,12 +74,12 @@ async function loop(w, stap) {
       ziet: 'herstel ' + weg.status + ' (' + JSON.stringify(leeg) + '), opnieuw ' + terug.status + ', daarna ' + JSON.stringify(b && b[SLOT] && b[SLOT].file) };
   });
 
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven het dossier, de beelden, het zetten en de agenda 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven het dossier, de beelden, het zetten en de agenda 401', async () => {
     const r = await Promise.all([w.post(DOSSIER, {}), w.post(BEELDEN, {}), w.post(ZET, { slot: SLOT, image: null }), w.post(AGENDA, {})]);
     return { klopt: r.every((x) => x.status === 401), ziet: r.map((x) => x.status).join('/') };
   });
 
-  await stap('voltooibaar', 'bevoegd: een ander lid kan A\'s foto niet als zijn beeld zetten of ophalen, en ziet A\'s keuze en afspraak niet', async () => {
+  await stap('bevoegd', 'bevoegd: een ander lid kan A\'s foto niet als zijn beeld zetten of ophalen, en ziet A\'s keuze en afspraak niet', async () => {
     const z = await zet(B.token, 10, foto);
     const h = await w.post(HAAL, { id: foto }, B.token);
     const b = await beelden(B.token);
@@ -94,7 +94,7 @@ async function loop(w, stap) {
      heeft iedereen een account, en een gratis account mag zijn eigen Overzicht
      en zijn eigen foto (server.js geenGast). De derde stap is daarom de
      schrijfkant van "een ander lid": een nieuwe versie over A's bestand. */
-  await stap('voltooibaar', 'bevoegd: een ander lid kan geen nieuwe versie over A\'s foto zetten; A houdt zijn eigen bytes', async () => {
+  await stap('bevoegd', 'bevoegd: een ander lid kan geen nieuwe versie over A\'s foto zetten; A houdt zijn eigen bytes', async () => {
     const v = await w.post(UPLOAD, { id: foto, dataUrl: PIXEL.replace('AAAADUlEQVR42mNk', 'AAAADUlEQVR42mNz') }, B.token);
     const h = await w.post(HAAL, { id: foto }, A.token);
     return { klopt: v.status >= 400 && v.status < 500 && h.status === 200 && h.data.dataUrl === PIXEL,

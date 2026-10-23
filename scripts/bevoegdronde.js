@@ -23,7 +23,12 @@
    DE OORDELEN, per rij:
      BEWEZEN        ledenscherm: elke route gemeten en niets gebroken;
                     gezinsscherm: minstens een kruispaar, en B en anoniem werden
-                    bij elk paar geweigerd terwijl A en B hun eigen code konden gebruiken.
+       bij elk paar geweigerd terwijl A en B hun eigen code konden gebruiken.
+     VOLLEDIGE APPSCENARIO'S mogen een ontbrekende generieke routeprojectie
+       aanvullen als de bevoegde actor de hele kernworkflow voltooit EN het
+       scenario minstens één vreemde-actorstap expliciet als kruisproef heeft
+       uitgevoerd. Een concrete lekbevinding uit IDOR, ROLPROEF of het scenario
+       blokkeert altijd; een losse weigering of groene samenvatting telt niet.
      DEFECT         een doorbraak of lek in IDOR.json, een open deur in
                     ROLPROEF.json, of een gezinspaar waarin B met A's code 2xx
                     kreeg. Een DEFECT hoort met de hand nagekeken te worden,
@@ -32,7 +37,8 @@
                     registers staat (met naam), een scherm zonder routes of
                     zonder eigen adres, een register dat niet vers is, een
                     gezinsscherm dat zijn code niet noemt, en elke rij van een
-                    persona waarvoor deze ronde geen proef heeft (zaak, kantoor).
+                    persona waarvoor deze ronde geen generieke proef heeft en
+                    waarvoor ook geen expliciete appkruisproef bestaat.
 
    WAT DIT NIET BEWIJST, en dat staat in elke uitslag: dynamische paden die het
    scherm aan elkaar plakt ('/api/x/' + id) zijn per voorvoegsel niet volledig te
@@ -75,7 +81,8 @@ const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en di
 function laadRegisters({ lees, vers } = {}) {
   const l = lees || ((f) => { try { return fs.readFileSync(path.join(WORTEL, f), 'utf8'); } catch (e) { return null; } });
   const v = vers || versheid;
-  const uit = { idor: new Map(), rol: new Map(), vervallen: [], bronnen: [] };
+  const uit = { idor: new Map(), rol: new Map(), vervallen: [], bronnen: [],
+    voltooi: new Map(), voltooiVervallen: [] };
   for (const [naam, zet] of [['IDOR.json', 'idor'], ['ROLPROEF.json', 'rol']]) {
     const t = l(naam);
     if (t === null) { uit.vervallen.push(naam + ' bestaat niet'); continue; }
@@ -106,7 +113,64 @@ function laadRegisters({ lees, vers } = {}) {
       }
     }
   }
+  /* De volledige appscenario's mogen een tweede, smallere weg naar bewijs 6
+     leveren: alleen als zij hun vreemde-actorproeven expliciet als zodanig
+     hebben uitgevoerd. Dit blijft hetzelfde VOLTOOIPROEF-register; er ontstaat
+     geen tweede bewijsadministratie. Een ontbrekende of oude voltooiproef maakt
+     de routeproeven niet oud en omgekeerd. */
+  const naam = 'VOLTOOIPROEF.json';
+  const tekst = l(naam);
+  if (tekst === null) uit.voltooiVervallen.push(naam + ' bestaat niet');
+  else {
+    let bron;
+    try { bron = JSON.parse(tekst); } catch (e) { uit.voltooiVervallen.push(naam + ' is geen geldige JSON'); }
+    if (bron) {
+      uit.bronnen.push({ register: naam, sha256: crypto.createHash('sha256').update(tekst).digest('hex'), stempel: bron.stempel });
+      const s = bron.stempel && typeof bron.stempel === 'object' ? v(bron.stempel) : { vers: false, reden: 'geen stempel met commit' };
+      if (!s.vers) uit.voltooiVervallen.push(naam + ': ' + s.reden);
+      for (const [functie, app] of Object.entries(bron.apps || {})) uit.voltooi.set(functie, app.bevoegd);
+    }
+  }
   return uit;
+}
+
+/* Een expliciete appkruisproef bestaat uit twee kanten: de bevoegde actor moet
+   de hele kernworkflow voltooien en minstens één gemarkeerde vreemde actor
+   moet aantoonbaar buiten blijven. De schakels zelf zijn leidend; een groene
+   samenvatting kan een open of ontbrekende schakel niet overstemmen. */
+function scenarioOordeel(rij, reg) {
+  if (reg.voltooiVervallen.length) return { status: 'NIET_GETEST',
+    reden: 'appkruisproef vervallen: ' + reg.voltooiVervallen.join('; ') };
+  const bewijs = reg.voltooi.get(rij.functie);
+  if (!bewijs || bewijs.nietBeproefd) return { status: 'NIET_GETEST',
+    reden: bewijs?.nietBeproefd || 'geen expliciete appkruisproef in VOLTOOIPROEF.json' };
+  const schakels = Array.isArray(bewijs.schakels) ? bewijs.schakels : [];
+  const eigen = schakels.filter((s) => s.soort === 'bevoegde-workflow');
+  const vreemd = schakels.filter((s) => s.soort === 'tegenproef');
+  if (eigen.length !== 1 || !vreemd.length) return { status: 'NIET_GETEST',
+    reden: 'appkruisproef mist de bevoegde kernworkflow of een expliciete vreemde-actorproef' };
+  const stuk = schakels.find((s) => !['gesloten', 'open', 'stuk'].includes(s.stand));
+  if (stuk) return { status: 'NIET_GETEST', reden: 'appkruisproef draagt een onbekende schakelstand' };
+  const open = schakels.find((s) => s.stand !== 'gesloten');
+  if (open || bewijs.sluit !== true) return { status: 'GEBLOKKEERD_DOOR_DEFECT',
+    reden: 'appkruisproef sluit niet: ' + (open ? open.wat + ' staat ' + open.stand : 'de proef zegt zelf niet gesloten') };
+  const t = bewijs.telling || {};
+  if (t.schakels !== schakels.length || t.gesloten !== schakels.length || t.open !== 0 || t.stuk !== 0)
+    return { status: 'NIET_GETEST', reden: 'de samenvatting van de appkruisproef spreekt de schakels tegen' };
+  return { status: 'BEWEZEN', scenario: true, tegenproeven: vreemd.length,
+    reden: 'volledige bevoegde kernworkflow en ' + vreemd.length + ' expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json' };
+}
+
+function combineerOordelen(route, scenario) {
+  /* Een concreet gevonden lek blijft altijd een blokkade, ongeacht een andere
+     geslaagde route. Bij ontbrekend bewijs mag een volledige appkruisproef wel
+     de kernworkflow kwalificeren; beide bronnen blijven in de reden zichtbaar. */
+  if (route.status === 'GEBLOKKEERD_DOOR_DEFECT') return route;
+  if (scenario.status === 'GEBLOKKEERD_DOOR_DEFECT') return scenario;
+  if (route.status === 'BEWEZEN') return route;
+  if (scenario.status === 'BEWEZEN') return { ...scenario,
+    reden: scenario.reden + '; de generieke routeprojectie bleef open: ' + route.reden };
+  return { ...route, reden: route.reden + '; appkruisproef: ' + scenario.reden };
 }
 
 /* `afgebakend` is de vierde gang van de IDOR-proef (scripts/lib/afbakening.js):
@@ -338,16 +402,18 @@ async function meet() {
   }
   for (const r of lijst) {
     const basis = { functie: r.functie, app: r.app, ingang: r.ingang, persona: r.persona };
-    if (r.persona === 'lid') regels.push(Object.assign(basis, ledenOordeel(r, reg)));
-    else if (r.persona === 'gezin') regels.push(Object.assign(basis, gezinUit.get(r.functie)));
-    else regels.push(Object.assign(basis, { status: 'NIET_GETEST', reden: 'deze ronde heeft geen kruisproef voor de persona ' + r.persona }));
+    let route;
+    if (r.persona === 'lid') route = ledenOordeel(r, reg);
+    else if (r.persona === 'gezin') route = gezinUit.get(r.functie);
+    else route = { status: 'NIET_GETEST', reden: 'de generieke ronde heeft geen kruisproef voor de persona ' + r.persona };
+    regels.push(Object.assign(basis, combineerOordelen(route, scenarioOordeel(r, reg))));
   }
   regels.sort((a, b) => a.functie.localeCompare(b.functie));
   const telling = {};
   for (const r of regels) telling[r.status] = (telling[r.status] || 0) + 1;
   return {
     stempel: stempel(),
-    uitleg: 'Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.',
+    uitleg: 'Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode, en expliciet gemarkeerde vreemde-actorproeven uit de volledige appscenario\'s. Een concreet lek uit een bron blokkeert altijd. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.',
     grens: 'leden: ' + GRENS_LID + '. gezinnen: ' + GRENS_GEZIN + '.',
     bronnen: { vervallen: reg.vervallen, registers: reg.bronnen },
     telling,
@@ -355,7 +421,8 @@ async function meet() {
   };
 }
 
-module.exports = { beoordeelIdorRij, padOordeel, ledenOordeel, paarOordeel, gezinOordeel, laadRegisters, DOEL };
+module.exports = { beoordeelIdorRij, padOordeel, ledenOordeel, paarOordeel, gezinOordeel,
+  scenarioOordeel, combineerOordelen, laadRegisters, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

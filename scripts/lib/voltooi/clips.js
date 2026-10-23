@@ -95,11 +95,11 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven de feed, delen en reageren 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven de feed, delen en reageren 401', async () => {
     const a = await w.post(FEED, {}); const b = await w.post(MAAK, { titel: 'x', duurS: 3 }); const c = await w.post(REACTIE, { id: clip, tekst: 'x' });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: a.status + '/' + b.status + '/' + c.status };
   });
-  await stap('voltooibaar', 'bevoegd: een ander lid kan de clip niet weghalen, knippen of ondertitelen; hij blijft zoals de maker hem liet', async () => {
+  await stap('bevoegd', 'bevoegd: een ander lid kan de clip niet weghalen, knippen of ondertitelen; hij blijft zoals de maker hem liet', async () => {
     const x = await w.post(WEG, { id: clip }, B.token);
     const k = await w.post(KNIP, { id: clip, weg: true }, B.token);
     const o = await w.post(ONDERTITELS, { id: clip, regels: [] }, B.token);
@@ -107,7 +107,7 @@ async function loop(w, stap) {
     return { klopt: x.status === 404 && k.status === 403 && o.status === 403 && c.speelduurS === 12 && c.ondertiteld === true,
       ziet: 'weg ' + x.status + ', knip ' + k.status + ', ondertitels ' + o.status + ', clip nog ' + c.speelduurS + 's ondertiteld' };
   });
-  await stap('voltooibaar', 'bevoegd: een gratis account komt RTG Clips niet in, en een lid niet in de kantoorlijst', async () => {
+  await stap('bevoegd', 'bevoegd: een gratis account komt RTG Clips niet in, en een lid niet in de kantoorlijst', async () => {
     const g = await w.post(FEED, {}, gast.token);
     const l = await w.post(KANTOOR, {}, B.token);
     return { klopt: g.status === 403 && /voor leden/.test((g.data && g.data.error) || '') && [401, 403].includes(l.status),

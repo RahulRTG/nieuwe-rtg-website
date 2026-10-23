@@ -67,13 +67,13 @@ async function loop(w, stap) {
       ziet: 'foodcourt ' + f.status + ' (' + ((f.data && f.data.restaurants) || []).length + ' restaurants), uitgaan ' + u.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen levensbeeld (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen levensbeeld (401)', async () => {
     const a = await w.post(COCKPIT, {});
     const b = await w.post(AGENDA, { titel: 'Anoniem', datum: dag(2) });
     return { klopt: a.status === 401 && b.status === 401, ziet: 'cockpit ' + a.status + ', agenda ' + b.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet de afspraak van het eerste niet op zijn lijn en kan hem niet weghalen', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet de afspraak van het eerste niet op zijn lijn en kan hem niet weghalen', async () => {
     const c = await cockpit(B.token);
     const x = await w.post(WEG, { id: item.id }, B.token);
     const bijL = await cockpit();
@@ -81,7 +81,7 @@ async function loop(w, stap) {
       ziet: 'bij B: ' + (JSON.stringify(c).includes(merk) ? 'ZICHTBAAR' : 'niets') + ', weghalen door B ' + x.status + ', bij het lid nog ' + regels(bijL, 'Tandarts ' + merk).length };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een gratis account krijgt geen levensbeeld', async () => {
+  await stap('bevoegd', 'bevoegdheid: een gratis account krijgt geen levensbeeld', async () => {
     const g = await nieuwLid(w, 'lvg', 'guest');
     const r = await w.post(COCKPIT, {}, g.token);
     return { klopt: r.status === 403 && /leden/.test((r.data && r.data.error) || ''), ziet: r.status + ' -- ' + (r.data && r.data.error) };

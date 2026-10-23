@@ -94,13 +94,13 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen lijst en geen nieuwe passkey (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen lijst en geen nieuwe passkey (401)', async () => {
     const l = await w.post(LIJST, {});
     const o = await w.post(REG_OPTIES, { huidig: lid.wachtwoord });
     return { klopt: l.status === 401 && o.status === 401, ziet: 'lijst ' + l.status + ', opties ' + o.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet de passkeys van het lid niet en haalt ze niet weg', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet de passkeys van het lid niet en haalt ze niet weg', async () => {
     const id = ((await sleutels())[0] || {}).id;
     const zijn = (((await w.post(LIJST, {}, vreemd.token)).data) || {}).sleutels || [];
     const weg = await w.post(WEG, { id }, vreemd.token);
@@ -108,7 +108,7 @@ async function loop(w, stap) {
       ziet: 'vreemde ziet ' + zijn.length + ', weghalen ' + weg.status + ', het lid heeft er nog ' + (await sleutels()).length };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een vreemde sleutel logt niet in, en een weggehaalde laptop ook niet meer', async () => {
+  await stap('bevoegd', 'bevoegdheid: een vreemde sleutel logt niet in, en een weggehaalde laptop ook niet meer', async () => {
     const n = await inlog(nep);
     const l = await inlog(laptop);
     return { klopt: n.r.status >= 400 && n.r.status < 500 && !(n.r.data && n.r.data.token) && l.r.status >= 400 && l.r.status < 500 && !(l.r.data && l.r.data.token),

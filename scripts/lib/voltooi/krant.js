@@ -94,7 +94,7 @@ async function loop(w, stap) {
       ziet: 'eerst ' + zichtbaar + ' in de krant, terughalen ' + x.status + ', daarna ' + na + ', openen ' + l.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen krant -- gebruiken vraagt een account (open tot de accountplicht deze deur sluit)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen krant -- gebruiken vraagt een account (open tot de accountplicht deze deur sluit)', async () => {
     const g = await w.post(GIDS, {});
     const o = await w.post(OPEN, { code: ZAAK });
     const a = await w.post(ARTIKEL, { code: ZAAK, id: art.id });
@@ -102,7 +102,7 @@ async function loop(w, stap) {
       ziet: 'gids ' + g.status + ', krant ' + o.status + ', artikel ' + a.status + (a.status === 200 ? ' -- de krant is nog openbaar' : '') };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een lid publiceert niets en haalt niets terug in een krant', async () => {
+  await stap('bevoegd', 'bevoegdheid: een lid publiceert niets en haalt niets terug in een krant', async () => {
     const b = await w.post(BEWAAR, { titel: 'Nep ' + merk, inhoud: 'nep' }, L.token);
     const x = await w.post(CONCEPT, { id: art.id, toelichting: 'weg' }, L.token);
     const k = await krant();
@@ -110,7 +110,7 @@ async function loop(w, stap) {
       ziet: 'schrijven ' + b.status + ', terughalen ' + x.status + ', artikel staat er nog' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een zaak zonder redactie geeft geen krant uit, en raakt het artikel van een andere krant niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een zaak zonder redactie geeft geen krant uit, en raakt het artikel van een andere krant niet', async () => {
     const Z = await zaakSessie(w, 'KIKUNOI');
     const b = await w.post(BEWAAR, { titel: 'Restaurantnieuws ' + merk, inhoud: 'x' }, Z);
     const x = await w.post(CONCEPT, { id: art.id, toelichting: 'weg' }, Z);

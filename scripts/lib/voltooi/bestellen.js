@@ -81,14 +81,14 @@ async function loop(w, stap) {
       ziet: 'bestellen ' + b.status + ', annuleren ' + a.status + ', ' + (o && o.status) + ', voorraad ' + v + ' -> ' + (await voorraad(product.id)) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen markt, geen bestelling en geen annulering (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen markt, geen bestelling en geen annulering (401)', async () => {
     const a = await w.post(MARKT, {});
     const b = await w.post(BESTEL, { groothandelCode: GH, regels: [{ productId: product.id, aantal: 2 }] });
     const c = await w.post(MIJN, {});
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'markt ' + a.status + ', bestel ' + b.status + ', mijn ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet de bestelling niet en annuleert haar niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet de bestelling niet en annuleert haar niet', async () => {
     const b = await bestel(product.minBestel || 2);
     const r = b.data && b.data.order && b.data.order.ref;
     const zicht = (await mijn(X.token)).some((o) => o.ref === r);
@@ -98,7 +98,7 @@ async function loop(w, stap) {
     return { klopt: !zicht && a.status === 404 && o && o.status === 'aangevraagd', ziet: 'X ziet: ' + zicht + ', annuleren door X ' + a.status + ', bij L nog ' + (o && o.status) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een zaak die geen groothandel is, zet de bestelling van een ander niet verder', async () => {
+  await stap('bevoegd', 'bevoegdheid: een zaak die geen groothandel is, zet de bestelling van een ander niet verder', async () => {
     const K = await zaakSessie(w, 'KIKUNOI');
     const b = await bestel(product.minBestel || 2);
     const r = b.data && b.data.order && b.data.order.ref;

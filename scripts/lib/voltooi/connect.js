@@ -92,7 +92,7 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account weigert de ledendeur (401) en zonder gezinssessie de gezinsdeur', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account weigert de ledendeur (401) en zonder gezinssessie de gezinsdeur', async () => {
     const l = await w.post(LID_ONTDEK, {});
     const g = await w.post(DOSSIER, {});
     const s = await w.post(SIGNAAL, { onderwerp: ONDERWERP, signaal: 'meer' });
@@ -100,7 +100,7 @@ async function loop(w, stap) {
       ziet: 'ledendeur ' + l.status + ', gezinsdeur dossier ' + g.status + ' en signaal ' + s.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander gezin leest het dossier van de ouder niet, ook niet met de gezinscode van de ouder', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander gezin leest het dossier van de ouder niet, ook niet met de gezinscode van de ouder', async () => {
     const eigen = regels(await post(DOSSIER, {}, ander.gezin));
     const kruis = await w.post(DOSSIER, { code: ouder.gezin.code, token: ander.gezin.token });
     const omgekeerd = await w.post(NOTEER, { code: ander.gezin.code, token: ouder.gezin.token, trede: 'begrepen', onderwerp: 'kruis' + merk });
@@ -109,7 +109,7 @@ async function loop(w, stap) {
       ziet: 'ander gezin ziet ' + eigen.length + ' regels, met de code van de ouder ' + kruis.status + ', omgekeerd schrijven ' + omgekeerd.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind heeft een eigen dossier, ziet niets van de ouder, en "onderwezen" zegt niemand over zichzelf', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind heeft een eigen dossier, ziet niets van de ouder, en "onderwezen" zegt niemand over zichzelf', async () => {
     const k = regels(await post(DOSSIER, {}, ouder.kind));
     const zelf = await post(NOTEER, { trede: 'onderwezen', onderwerp: ONDERWERP }, ouder.kind);
     const kn = await post(NOTEER, { trede: 'begrepen', onderwerp: 'breuken' + merk }, ouder.kind);

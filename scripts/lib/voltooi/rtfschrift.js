@@ -82,12 +82,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: meedoen met een les zonder RTG-account wordt geweigerd (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: meedoen met een les zonder RTG-account wordt geweigerd (401)', async () => {
     const r = await w.post(JOIN, { lescode: les.lescode, naam: 'Anoniem ' + merk });
     return { klopt: r.status === 401, ziet: 'meedoen zonder account: ' + r.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder lessleutel geen schrift lezen of schrijven, en geen inzending', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder lessleutel geen schrift lezen of schrijven, en geen inzending', async () => {
     const o = await w.post(OPSLAAN, { code: les.lesId, pages: [{ type: 'tekst', inhoud: 'zonder sleutel' }] });
     const l = await haal(w, SCHRIFT + les.lesId, null);
     const i = await w.post(INLEVEREN, { code: les.lesId, opgaveId: opg && opg.id, antwoord: 'x' });
@@ -95,7 +95,7 @@ async function loop(w, stap) {
       ziet: 'opslaan ' + o.status + ', lezen ' + l.status + ', inleveren ' + i.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een klasgenoot leest zijn eigen schrift en niet dat van het kind; een leerling van een andere les komt er niet in', async () => {
+  await stap('bevoegd', 'bevoegdheid: een klasgenoot leest zijn eigen schrift en niet dat van het kind; een leerling van een andere les komt er niet in', async () => {
     klasgenoot = await doeMee(w, les.lescode, 'Klasgenoot', g2.token);
     buiten = await doeMee(w, elders.lescode, 'Van elders', g3.token);
     const eigen = await mijnSchrift(klasgenoot.token);
@@ -106,7 +106,7 @@ async function loop(w, stap) {
       ziet: 'klasgenoot ziet ' + eigen.length + ' bladzijden, andere les leest ' + vreemd.status + ' en schrijft ' + vreemdOp.status + ', klasgenoot via de begeleidersroute ' + docentSchrift.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: haalt de begeleider de klasgenoot uit de les, dan schrijft die niet meer', async () => {
+  await stap('bevoegd', 'bevoegdheid: haalt de begeleider de klasgenoot uit de les, dan schrijft die niet meer', async () => {
     const x = await w.post('/api/foundation/les/leerling/intrekken', D({ studentId: klasgenoot.studentId }));
     const o = await w.post(OPSLAAN, { code: les.lesId, token: klasgenoot.token, pages: [{ type: 'tekst', inhoud: 'na het intrekken' }] });
     return { klopt: x.status === 200 && o.status === 403, ziet: 'intrekken ' + x.status + ', daarna opslaan ' + o.status };

@@ -79,14 +79,14 @@ async function loop(w, stap) {
     return { klopt: b.status === 200 && !!m && m.vanNaam === 'Oppas Mila', ziet: 'bericht ' + b.status + ', bij de ouder: ' + (m ? 'van ' + m.vanNaam : 'NIETS') };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen overzicht, geen bericht en geen koppeling (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen overzicht, geen bericht en geen koppeling (401)', async () => {
     const a = await w.post(OVERZICHT, {});
     const b = await w.post(BERICHT, { code: gezin.code, tekst: 'anoniem' });
     const c = await w.post(ACCEPTEER, { uitnodiging });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'overzicht ' + a.status + ', bericht ' + b.status + ', accepteren ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet het gezin niet, schrijft het niet en kan dezelfde uitnodiging niet nog eens gebruiken', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet het gezin niet, schrijft het niet en kan dezelfde uitnodiging niet nog eens gebruiken', async () => {
     const o = await overzicht(X.token);
     const b = await w.post(BERICHT, { code: gezin.code, tekst: 'Indringer ' + merk }, X.token);
     const a = await w.post(ACCEPTEER, { uitnodiging }, X.token);
@@ -95,7 +95,7 @@ async function loop(w, stap) {
       ziet: 'overzicht ' + o.length + ' gezinnen, bericht ' + b.status + ', uitnodiging opnieuw ' + a.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een oppas heeft geen ouderrechten -- met zijn kanaal wijzigt hij de gezinsinfo niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een oppas heeft geen ouderrechten -- met zijn kanaal wijzigt hij de gezinsinfo niet', async () => {
     const k = await w.post(KANAAL, { code: gezin.code }, O.token);
     const tok = k.data && (k.data.token || (k.data.sessie && k.data.sessie.token));
     const z = await w.post('/api/foundation/gezin/oppasinfo', { code: gezin.code, token: tok, huisregels: 'Alles mag ' + merk }, tok);

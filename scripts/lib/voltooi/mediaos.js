@@ -83,14 +83,14 @@ async function loop(w, stap) {
       ziet: 'delen ' + d.status + ', B leest ' + l.status + ' (eigenaar=' + (l.data && l.data.ikEigenaar) + ', van ' + (l.data && l.data.van) + ')' };
   });
 
-  await stap('voltooibaar', 'bevoegd: zonder inlog geeft de wereld, de bibliotheek en het maken van een lijst 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geeft de wereld, de bibliotheek en het maken van een lijst 401', async () => {
     const a = await w.post(WERELD, {});
     const b = await w.post(BIEB, {});
     const c = await w.post(MAAK, { naam: 'Anoniem ' + merk });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'wereld ' + a.status + ', bieb ' + b.status + ', maak ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegd: de lezer kan de gedeelde lijst niet wijzigen of weggooien en hoort waarom; een vreemde leest hem niet en ziet A\'s bibliotheek niet', async () => {
+  await stap('bevoegd', 'bevoegd: de lezer kan de gedeelde lijst niet wijzigen of weggooien en hoort waarom; een vreemde leest hem niet en ziet A\'s bibliotheek niet', async () => {
     const weg = await w.post(ZET, { id: lijst.id, weg: true }, B.token);
     const erin = await w.post(STUK, { id: lijst.id, stukId: stukken[0].id, aan: false }, B.token);
     const vreemd = await w.post(LIJST, { id: lijst.id }, C.token);
@@ -102,7 +102,7 @@ async function loop(w, stap) {
       ziet: 'B weggooien ' + weg.status + ', B eruit ' + erin.status + ', C leest ' + vreemd.status + ', C deelt ' + cDeelt.status + ', C-bieb ' + JSON.stringify(cBieb) };
   });
 
-  await stap('voltooibaar', 'bevoegd: delen met iemand met wie het lid niet verbonden is wordt geweigerd; een gratis account komt de Media OS niet in', async () => {
+  await stap('bevoegd', 'bevoegd: delen met iemand met wie het lid niet verbonden is wordt geweigerd; een gratis account komt de Media OS niet in', async () => {
     const cc = ((await w.post('/api/member/connections', {}, C.token)).data || {}).codename;
     const d = await w.post(DEEL, { id: lijst.id, codenaam: cc }, A.token);
     const g = await w.post(WERELD, {}, gast.token);

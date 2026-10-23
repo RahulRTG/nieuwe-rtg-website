@@ -92,14 +92,14 @@ async function loop(w, stap) {
       ziet: 'direct ' + d.status + ' (' + ((d.data && d.data.error) || 'ok') + '), ' + b.length + ' betaling bij het lid' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen verzoeken en niet betalen (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen verzoeken en niet betalen (401)', async () => {
     const a = await w.post(VERZOEKEN, {});
     const b = await w.post(BETAAL, { ref });
     const c = await w.post(DIRECT, { supplierCode: ZAAK, bedrag: 1 });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: 'verzoeken ' + a.status + ', betalen ' + b.status + ', direct ' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander gekeurd lid ziet het verzoek van het eerste niet en rekent het niet af', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander gekeurd lid ziet het verzoek van het eerste niet en rekent het niet af', async () => {
     const r3 = await stuurVerzoek(300, 'Alleen voor L ' + merk);
     const bijX = await verzoeken(X);
     const p = await post(BETAAL, { ref: r3, idem: 'bv-x-' + r3 }, X);
@@ -108,7 +108,7 @@ async function loop(w, stap) {
       ziet: 'bij X: ' + bijX.length + ' verzoeken, afrekenen door X ' + p.status + ' (' + (p.data && p.data.error) + '), bij L nog open: ' + nogOpen };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een betaling zonder bewezen toestel gaat niet door, en een gratis account betaalt niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een betaling zonder bewezen toestel gaat niet door, en een gratis account betaalt niet', async () => {
     const zonder = await w.post(DIRECT, { supplierCode: ZAAK, bedrag: 1, idem: 'zonder-' + merk }, L.token);
     const g = await nieuwLid(w, 'btg', 'guest');
     const gast = await w.post(DIRECT, { supplierCode: ZAAK, bedrag: 1 }, g.token);

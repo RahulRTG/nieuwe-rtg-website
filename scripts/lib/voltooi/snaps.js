@@ -71,14 +71,14 @@ async function loop(w, stap) {
     return { klopt: plek.filter((p) => p.sleutel !== 'audit').length === 0, ziet: JSON.stringify(plek) };
   });
 
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven sturen, de strip en openen 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven sturen, de strip en openen 401', async () => {
     const s = await w.post(STUUR, { toKey: band.b.key, foto: png('anoniem'), tekst: 'anoniem' });
     const l = await w.post(LIJST, {});
     const o = await w.post(OPEN, { id: 'x' });
     return { klopt: s.status === 401 && l.status === 401 && o.status === 401, ziet: 'sturen ' + s.status + ', strip ' + l.status + ', openen ' + o.status };
   });
 
-  await stap('voltooibaar', 'bevoegd: een ander lid ziet of opent de snap van een ander niet, en snapt niet naar een vreemde', async () => {
+  await stap('bevoegd', 'bevoegd: een ander lid ziet of opent de snap van een ander niet, en snapt niet naar een vreemde', async () => {
     const r = await w.post(STUUR, { toKey: band.b.key, foto: png('privé-' + merk), tekst: 'Prive ' + merk, idem: 'voltooi-snap-prive-' + merk }, A.token);
     const id = ((await inbox(B.token, 'Prive ' + merk))[0] || {}).id;
     const cZiet = await inbox(C.token, 'Prive ' + merk);
@@ -91,7 +91,7 @@ async function loop(w, stap) {
 
   /* Een gratis account mag snappen naar een vriend (routes/social: "ook de
      gratis laag, met paspoort"); de rol zonder recht is hier wie geblokkeerd is. */
-  await stap('voltooibaar', 'bevoegd: wie door de ontvanger geblokkeerd is, snapt niet meer, ook al waren ze bevriend', async () => {
+  await stap('bevoegd', 'bevoegd: wie door de ontvanger geblokkeerd is, snapt niet meer, ook al waren ze bevriend', async () => {
     const b = await w.post('/api/member/block', { key: cKey }, A.token);
     const s = await w.post(STUUR, { toKey: band.a.key, foto: png('geblokt'), tekst: 'Geblokt ' + merk }, C.token);
     const l = await inbox(A.token, 'Geblokt ' + merk);

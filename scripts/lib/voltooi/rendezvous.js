@@ -130,12 +130,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven het profiel, de kandidaten, de matches en een like 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven het profiel, de kandidaten, de matches en een like 401', async () => {
     const r = await Promise.all([w.post(PROFIEL, {}), w.post(KANDIDATEN, {}), w.post(MATCHES, {}), w.post(LIKE, { id: keyB })]);
     return { klopt: r.every((x) => x.status === 401), ziet: r.map((x) => x.status).join('/') };
   });
 
-  await stap('voltooibaar', 'bevoegd: een derde lid ziet de match van A en B niet, en zijn like maakt geen match uit hun likes', async () => {
+  await stap('bevoegd', 'bevoegd: een derde lid ziet de match van A en B niet, en zijn like maakt geen match uit hun likes', async () => {
     const mC = await matches(C.token);
     const l = await w.post(LIKE, { id: keyA }, C.token);
     const mA = await matches(A.token);
@@ -143,7 +143,7 @@ async function loop(w, stap) {
       ziet: 'C heeft ' + (mC || []).length + ' matches, like van C match=' + (l.data && l.data.match) + ', A heeft ' + (mA || []).length + ' match' };
   });
 
-  await stap('voltooibaar', 'bevoegd: een geverifieerd RTG-lid zonder Signature-pas en een Lifestyle-lid zonder geverifieerd paspoort komen er niet in', async () => {
+  await stap('bevoegd', 'bevoegd: een geverifieerd RTG-lid zonder Signature-pas en een Lifestyle-lid zonder geverifieerd paspoort komen er niet in', async () => {
     const rtg = await geverifieerdLid(w, 'rvr');
     const ongeverifieerd = await lifestyleLid(w, 'rvl');
     const a = await w.post(KANDIDATEN, {}, rtg.token), b = await w.post(KANDIDATEN, {}, ongeverifieerd.token);

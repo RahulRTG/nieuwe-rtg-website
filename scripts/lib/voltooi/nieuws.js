@@ -86,12 +86,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven de lijst, het artikel en de nieuwslezer 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven de lijst, het artikel en de nieuwslezer 401', async () => {
     const a = await w.post(LIJST, {}); const b = await w.post(ARTIKEL, { id: art.id }); const c = await w.post(AI, { id: art.id });
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: a.status + '/' + b.status + '/' + c.status };
   });
 
-  await stap('voltooibaar', 'bevoegd: een lid kan zelf niets publiceren of terugtrekken -- dat beslist een mens van de redactie', async () => {
+  await stap('bevoegd', 'bevoegd: een lid kan zelf niets publiceren of terugtrekken -- dat beslist een mens van de redactie', async () => {
     const m = await w.post(MAAK, { kop: 'Lid ' + merk, tekst: 'x' }, A.token);
     const s = await w.post(STATUS, { id: art.id, status: 'concept' }, A.token);
     const nog = metKop(await lijst(B.token), 'Nachttrein ' + merk).length;
@@ -100,7 +100,7 @@ async function loop(w, stap) {
       ziet: 'maken ' + m.status + ', terugtrekken ' + s.status + ', artikel nog ' + nog + ' bij een ander lid' };
   });
 
-  await stap('voltooibaar', 'bevoegd: een concept-id raden levert een ander lid niets op, ook niet via de nieuwslezer', async () => {
+  await stap('bevoegd', 'bevoegd: een concept-id raden levert een ander lid niets op, ook niet via de nieuwslezer', async () => {
     const a = await w.post(ARTIKEL, { id: concept }, B.token);
     const b = await w.post(AI, { id: concept, vraag: 'Wat staat erin?' }, B.token);
     return { klopt: a.status === 404 && b.status === 404 && !JSON.stringify(b.data || {}).includes('Nog niet af'), ziet: 'artikel ' + a.status + ', nieuwslezer ' + b.status };

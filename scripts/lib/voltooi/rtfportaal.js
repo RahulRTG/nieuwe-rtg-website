@@ -75,12 +75,12 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account opent het portaal niets (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account opent het portaal niets (401)', async () => {
     const r = await w.post(PARTNER, { code: p.code });
     return { klopt: r.status === 401, ziet: 'met de code maar zonder account: ' + r.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander gratis account met dezelfde codes opent niets -- de code hoort bij het account dat hem eerst opende', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander gratis account met dezelfde codes opent niets -- de code hoort bij het account dat hem eerst opende', async () => {
     const vreemd = await registreerGratis(w.basis);
     if (!vreemd) return { klopt: false, ziet: 'een gratis account registreren lukte niet' };
     const r = [await w.post(PARTNER, { code: p.code }, vreemd.token), await w.post(GEMEENTE, { code: g.code }, vreemd.token), await w.post(ONDERNEMER, { code: o.code }, vreemd.token)];
@@ -89,7 +89,7 @@ async function loop(w, stap) {
       ziet: 'ander account: partner ' + r[0].status + ', gemeente ' + r[1].status + ', ondernemer ' + r[2].status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: elke code opent alleen zijn eigen dossier -- de tweede stichting ziet de eerste niet, en een gemeentecode is geen partnercode', async () => {
+  await stap('bevoegd', 'bevoegdheid: elke code opent alleen zijn eigen dossier -- de tweede stichting ziet de eerste niet, en een gemeentecode is geen partnercode', async () => {
     const b = await lees(PARTNER, q.code);
     const t = JSON.stringify(b.data || {});
     const fout = await lees(PARTNER, g.code);
@@ -98,7 +98,7 @@ async function loop(w, stap) {
       ziet: 'tweede stichting ' + b.status + ' (ziet de eerste ' + t.includes('De Wilg') + '), gemeentecode bij partner ' + fout.status + ', partnercode bij gemeente ' + omgekeerd.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het gemeenteportaal draagt geen naam, geen codenaam en geen dossier, en het partnerportaal geen IBAN of KvK', async () => {
+  await stap('bevoegd', 'bevoegdheid: het gemeenteportaal draagt geen naam, geen codenaam en geen dossier, en het partnerportaal geen IBAN of KvK', async () => {
     const gm = JSON.stringify((await lees(GEMEENTE, g.code)).data || {});
     const pa = JSON.stringify((await lees(PARTNER, p.code)).data || {});
     return { klopt: !/codenaam|dossier"|"naam":"[A-Z][a-z]+ [A-Z][a-z]+ [0-9A-F]{4}"/.test(gm) && !/iban|kvk|rsin|bestuurders/i.test(pa),

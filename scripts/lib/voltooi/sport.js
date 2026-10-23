@@ -97,17 +97,17 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegd: zonder inlog geven het bord, reserveren en Mijn tickets 401', async () => {
+  await stap('bevoegd', 'bevoegd: zonder inlog geven het bord, reserveren en Mijn tickets 401', async () => {
     const a = await w.post(BORD, {}); const b = await w.post(KOOP, { wedstrijdId: wedstrijd, vak, aantal: 1 }); const c = await w.post(MIJN, {});
     return { klopt: a.status === 401 && b.status === 401 && c.status === 401, ziet: a.status + '/' + b.status + '/' + c.status };
   });
-  await stap('voltooibaar', 'bevoegd: een ander lid ziet de toegangscode van het eerste lid niet, en een lid kan zelf niet scannen', async () => {
+  await stap('bevoegd', 'bevoegd: een ander lid ziet de toegangscode van het eerste lid niet, en een lid kan zelf niet scannen', async () => {
     const lB = await mijn(B.token);
     const zelf = await w.post(SCAN, { code: eerste.code }, A.token);
     return { klopt: !lB.some((t) => t.code === eerste.code) && [401, 403].includes(zelf.status),
       ziet: 'B ziet ' + lB.length + ' eigen ticket(s), geen van A; scannen door het lid ' + zelf.status };
   });
-  await stap('voltooibaar', 'bevoegd: een gratis account zonder pas reserveert niet, en hoort waarom', async () => {
+  await stap('bevoegd', 'bevoegd: een gratis account zonder pas reserveert niet, en hoort waarom', async () => {
     const r = await koop(gast.token, 1, 'voltooi-sport-gast-' + merk);
     return { klopt: r.status === 403 && /voor leden/i.test((r.data && r.data.error) || '') && (await mijn(gast.token)).length === 0,
       ziet: r.status + ' (' + (r.data && r.data.error) + ')' };

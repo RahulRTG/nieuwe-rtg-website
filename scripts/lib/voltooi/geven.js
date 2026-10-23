@@ -122,7 +122,7 @@ async function loop(w, stap) {
       ziet: 'tekenen ' + t.status + ', actief ' + actief.length + ', intrekken ' + i.status + ', daarna actief ' + na.length + ', plan ' + p.stand };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen voornemen, geen gift en geen plan (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen voornemen, geen gift en geen plan (401)', async () => {
     const v = await w.post(VOORBEREID, { euro: 5, vorm: 'eenmalig' });
     const b = await w.post(BEVESTIG, { euro: 5, vorm: 'eenmalig', idem: 'anoniem-' + merk });
     const p = await w.post(PLAN_MIJN, {});
@@ -130,7 +130,7 @@ async function loop(w, stap) {
       ziet: 'voornemen ' + v.status + ', bevestigen ' + b.status + ', plannen ' + p.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet het plan van de ouder niet en kan het niet stoppen of er een machtiging onder zetten', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet het plan van de ouder niet en kan het niet stoppen of er een machtiging onder zetten', async () => {
     const m = ((await w.post(PLAN_MIJN, {}, vreemde.token)).data || {}).plannen || [];
     const s = await w.post(PLAN_STOP, { id: plan && plan.id }, vreemde.token);
     const t = await w.post(M_TEKEN, { planId: plan && plan.id, houder: 'Vreemde', ibanEinde: '9999', max: 500 }, vreemde.token);
@@ -139,7 +139,7 @@ async function loop(w, stap) {
       ziet: 'vreemde ziet ' + m.length + ' plannen, stoppen ' + s.status + ', machtiging ' + t.status + ', plan ' + p.stand };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind van het gezin geeft niet: zijn gezinssessie opent de giftroutes niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind van het gezin geeft niet: zijn gezinssessie opent de giftroutes niet', async () => {
     const b = await w.post(BEVESTIG, { euro: 5, vorm: 'eenmalig', idem: 'kind-' + merk }, ouder.kind.token);
     const s = await w.post(STAND, { code: ouder.kind.code, token: ouder.kind.token });
     return { klopt: b.status === 401 && s.status === 401 && bronnen().length === 2,

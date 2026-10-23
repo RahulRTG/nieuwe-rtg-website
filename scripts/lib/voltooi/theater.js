@@ -106,7 +106,7 @@ async function loop(w, stap) {
       ziet: 'meld ' + m.status + ', bij kantoor: ' + JSON.stringify(l).includes('Proefmelding ' + merk) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen zaal, geen kijkticket en geen upload; een sessie in het adres krijgt 401', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen zaal, geen kijkticket en geen upload; een sessie in het adres krijgt 401', async () => {
     const z = await w.post(ZAAL, {});
     const t = await w.post(TICKET, { stroom: 'theater-kijk', id: vid });
     const u = await upload(vid, webm('anoniem'));
@@ -115,7 +115,7 @@ async function loop(w, stap) {
       ziet: 'zaal ' + z.status + ', ticket ' + t.status + ', upload ' + u.status + ', ?token= ' + adres.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid overschrijft de film van de maker niet, verwijdert hem niet en schrijft zijn ondertitels niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid overschrijft de film van de maker niet, verwijdert hem niet en schrijft zijn ondertitels niet', async () => {
     const u = await upload(vid, webm('kaping'), K.token);
     const x = await w.post('/api/theater/verwijder', { id: vid }, K.token);
     const o = await w.post('/api/theater/ondertitels', { id: vid, regels: [{ van: 0, tot: 2, tekst: 'gekaapt' }] }, K.token);
@@ -124,7 +124,7 @@ async function loop(w, stap) {
       ziet: 'upload ' + u.status + ', verwijder ' + x.status + ', ondertitels ' + o.status + ', film nog ' + (sha(heel.buf) === sha(bytes) ? 'gelijk' : 'ANDERS') };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een gratis account heeft geen Theater, en een kijkticket van het ene lid opent niet voor een andere video', async () => {
+  await stap('bevoegd', 'bevoegdheid: een gratis account heeft geen Theater, en een kijkticket van het ene lid opent niet voor een andere video', async () => {
     const g = await nieuwLid(w, 'thg', 'guest');
     const z = await w.post(ZAAL, {}, g.token);
     const t = await w.post(TICKET, { stroom: 'theater-kijk', id: vid }, K.token);

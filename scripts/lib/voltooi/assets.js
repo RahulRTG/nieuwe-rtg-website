@@ -113,19 +113,19 @@ async function loop(w, stap) {
       ziet: uit.map((x) => x.r).join('; ') + '; daarna tickets ' + (pos.tickets || 0) + ', terugbetaling loopt ' + (pos.herroepLoopt || 0) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen aanvraag, geen lijst en geen betaling (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen aanvraag, geen lijst en geen betaling (401)', async () => {
     const r = [await w.post(KOOP, { assetId: object.id, smaak: 'access', aantal: 1 }), await w.post(AANVRAGEN, {}), await w.post(BETAAL, { id: B.id })];
     return { klopt: r.every((x) => x.status === 401), ziet: r.map((x) => x.status).join('/') };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid ziet de aanvraag niet en betaalt of sluit hem niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid ziet de aanvraag niet en betaalt of sluit hem niet', async () => {
     const l = ((await w.post(AANVRAGEN, {}, X.token)).data || {}).aanvragen || [];
     const b = await w.post(BETAAL, { id: B.id, idem: 'x-' + merk }, X.token);
     const h = await w.post(HERROEP, { id: B.id }, X.token);
     return { klopt: !l.some((x) => x.id === B.id) && b.status === 404 && h.status === 404, ziet: 'ziet ' + l.length + ', betaal ' + b.status + ', sluit ' + h.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het lid keurt zichzelf niet, de gedeelde kantoorcode keurt niet, en een gratis account vraagt niet aan', async () => {
+  await stap('bevoegd', 'bevoegdheid: het lid keurt zichzelf niet, de gedeelde kantoorcode keurt niet, en een gratis account vraagt niet aan', async () => {
     const C = ((await w.post(KOOP, { assetId: object.id, smaak: 'access', aantal: 1, idem: 'zelf-' + merk }, L.token)).data || {}).aanvraag;
     const zelf = await w.post(BESLIS, { id: C.id, besluit: 'goedgekeurd' }, L.token);
     const gedeeld = await w.post(BESLIS, { id: C.id, besluit: 'goedgekeurd' }, code);

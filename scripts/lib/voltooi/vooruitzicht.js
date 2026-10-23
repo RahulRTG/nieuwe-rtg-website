@@ -93,13 +93,13 @@ async function loop(w, stap) {
     return { klopt: nette && ok >= 4, ziet: ok + ' van ' + uit.length + ' bronnen gaven gegevens; de rest: ' + uit.filter((r) => r.status !== 200).map((r) => r.status + ' ' + (r.data && r.data.error || '').slice(0, 40)).join('; ') };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: zonder sessie geen vooruitzicht en geen gebeurtenis (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder sessie geen vooruitzicht en geen gebeurtenis (401)', async () => {
     const a = await w.post(WERELD, {});
     const b = await w.post(EVENT, { type: 'intent.delta', value: 'anoniem', version: 1 });
     return { klopt: a.status === 401 && b.status === 401, ziet: 'lezen ' + a.status + ', schrijven ' + b.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een ander lid heeft een eigen vooruitzicht, ziet de intentie van A niet en wijzigt die niet', async () => {
+  await stap('bevoegd', 'bevoegdheid: een ander lid heeft een eigen vooruitzicht, ziet de intentie van A niet en wijzigt die niet', async () => {
     const vanB = await lees(B.token);
     const r = await w.post(EVENT, { type: 'intent.delta', value: 'Van B ' + merk, version: vanB.version, key: 'b-' + merk }, B.token);
     const bijA = await lees();
@@ -108,7 +108,7 @@ async function loop(w, stap) {
       ziet: 'B heeft ' + vanB.id + ' (intentie "' + vanB.intent + '"), A houdt "' + bijA.intent + '"' };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: de partnerweergave draagt geen intentie, geen toestemmingen en geen verzonnen samenvatting', async () => {
+  await stap('bevoegd', 'bevoegdheid: de partnerweergave draagt geen intentie, geen toestemmingen en geen verzonnen samenvatting', async () => {
     const p = (await w.post(PARTNER, {}, A.token)).data || {};
     return { klopt: p.intent === undefined && p.permissions === undefined && !JSON.stringify(p).includes('Kyoto') && !/gasten|oktober/.test(p.intentSummary || '') && p.paymentGuarantee === false,
       ziet: 'samenvatting "' + p.intentSummary + '", betaalgarantie ' + p.paymentGuarantee };

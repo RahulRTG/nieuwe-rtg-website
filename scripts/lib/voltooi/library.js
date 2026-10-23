@@ -127,14 +127,14 @@ async function loop(w, stap) {
   });
 
   /* Bevoegdheid. */
-  await stap('voltooibaar', 'bevoegdheid: zonder account geen werken, geen nieuw werk en geen studio (401)', async () => {
+  await stap('bevoegd', 'bevoegdheid: zonder account geen werken, geen nieuw werk en geen studio (401)', async () => {
     const l = await w.post(WORK_LIST, {});
     const c = await w.post(WORK_CREATE, { operationId: op('anon'), data: { title: 'Anoniem', type: 'book', language: 'nl' } });
     const s = await w.post(WORKSPACE, { workId });
     return { klopt: l.status === 401 && c.status === 401 && s.status === 401, ziet: 'lijst ' + l.status + ', maken ' + c.status + ', studio ' + s.status };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: een maker uit een ander gezin ziet het werk niet en schrijft er niets in', async () => {
+  await stap('bevoegd', 'bevoegdheid: een maker uit een ander gezin ziet het werk niet en schrijft er niets in', async () => {
     const g = await w.post(WORK_GET, { workId }, ander.token);
     const s = await w.post(WORKSPACE, { workId }, ander.token);
     const r = await w.post(REVISION_ADD, { operationId: op('vreemd'), workId, expectedRevision: ((await work()).work || {}).revision,
@@ -144,7 +144,7 @@ async function loop(w, stap) {
       ziet: 'ander: lezen ' + g.status + ', studio ' + s.status + ', schrijven ' + r.status + ', in zijn lijst ' + l.some((x) => x.id === workId) };
   });
 
-  await stap('voltooibaar', 'bevoegdheid: het kind van het gezin heeft geen eigen account en opent de Library niet met zijn gezinssessie', async () => {
+  await stap('bevoegd', 'bevoegdheid: het kind van het gezin heeft geen eigen account en opent de Library niet met zijn gezinssessie', async () => {
     const l = await w.post(WORK_LIST, {}, maker.kind.token);
     const g = await w.post(WORK_GET, { workId, code: maker.kind.code, token: maker.kind.token });
     return { klopt: l.status === 401 && g.status === 401, ziet: 'kindertoken ' + l.status + ', code+token ' + g.status };

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-23T12:56:56.098Z",
-    "commit": "f15dc803fc",
+    "op": "2026-10-23T13:01:41.258Z",
+    "commit": "8596e42142",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1027,9 +1027,12 @@
       "geprobeerd": 1
     },
     "appwerkt-gegevenspoort.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/poortgesprek.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "appwerkt-glad.e2e.js": {
       "soort": "puur",
@@ -3869,9 +3872,12 @@
       "geprobeerd": 5
     },
     "contrastfoto.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/a11ykeuring.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "control-uniqueness.e2e.js": {
       "soort": "server",

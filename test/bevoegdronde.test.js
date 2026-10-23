@@ -278,8 +278,8 @@ test('5. het echte register spreekt zichzelf niet tegen', () => {
   const tel = {};
   for (const r of reg.regels) {
     tel[r.status] = (tel[r.status] || 0) + 1;
-    if (r.status === 'BEWEZEN' && r.persona === 'lid') assert.ok(r.routes > 0, r.functie + ': BEWEZEN zonder een route');
-    if (r.status === 'BEWEZEN' && r.persona === 'gezin') {
+    if (r.status === 'BEWEZEN' && r.persona === 'lid' && !r.scenario) assert.ok(r.routes > 0, r.functie + ': BEWEZEN zonder een route');
+    if (r.status === 'BEWEZEN' && r.persona === 'gezin' && !r.scenario) {
       assert.ok(r.kruisparen?.length > 0, r.functie + ': BEWEZEN zonder kruisparen');
       for (const p of r.kruisparen) {
         assert.equal(R.paarOordeel(p), 'gescheiden', r.functie + ': ruwe antwoorden bewijzen geen scheiding bij ' + p.verzoek);

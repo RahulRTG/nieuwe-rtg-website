@@ -23,6 +23,10 @@ const kw = require('./lib/kwalificatie');
 
 const ROOT = path.join(__dirname, '..');
 const ID = /^sha256:[a-f0-9]{64}$/;
+/* Alleen de expliciete, door stempelBouw herschreven shelloutputs. Andere
+   bronverschillen blijven door de ongewijzigde bytecontrole geweigerd. */
+const BOUWSHELL = ['public/apps/app-main.js', 'public/apps/app-main/app-main-01.js',
+  'public/apps/app.html', 'public/apps/werkruimte.html'];
 const VLAGGEN = new Set(['uit-image', 'controle', 'gepubliceerd', 'image', 'backup', 'fase', 'lokaal']);
 
 function arg(naam) {
@@ -91,6 +95,10 @@ function uitImage() {
       ['/app/rtg-motor', 'rtg-motor'], ['/app/rtg-sentinel', 'rtg-sentinel'], ['/app/public/dist', 'dist'],
       ['/app/public/sw.js', 'sw.js'], ['/app/public/apps/foundation/sw.js', 'foundation-sw.js']])
       docker(['cp', container + ':' + binnen, path.join(tmp, buiten)]);
+    for (const rel of BOUWSHELL) {
+      fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true });
+      docker(['cp', container + ':/app/' + rel, path.join(tmp, rel)]);
+    }
   } finally { cp.spawnSync('docker', ['rm', '-f', container]); }
   const bewijsBytes = fs.readFileSync(path.join(tmp, 'release-bewijs.json'));
   const bewijs = JSON.parse(bewijsBytes.toString('utf8'));
@@ -99,6 +107,15 @@ function uitImage() {
   if (!bewijs.bron || String(bewijs.bron.commit || '').toLowerCase() !== commit.toLowerCase())
     throw new Error('Het image is niet uit de commit van deze werkboom gebouwd (' +
       (bewijs.bron && bewijs.bron.commit) + ' tegen ' + commit + ').');
+  /* Geen lokaal werk wegschrijven: alleen HEAD of reeds uitgepakte imagebytes.
+     Controleer alle doelen vóór de eerste vervanging. */
+  for (const rel of BOUWSHELL) {
+    const werk = fs.readFileSync(path.join(ROOT, rel));
+    const gebouwd = fs.readFileSync(path.join(tmp, rel));
+    const bron = cp.spawnSync('git', ['-C', ROOT, 'show', 'HEAD:' + rel]);
+    if (!werk.equals(gebouwd) && (bron.status !== 0 || !Buffer.isBuffer(bron.stdout) || !werk.equals(bron.stdout)))
+      throw new Error('Kwalificatie weigert lokale wijziging in ' + rel + '.');
+  }
   fs.mkdirSync(path.join(ROOT, '.release'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, kw.REL.imageBewijs), bewijsBytes);
   /* De geteste binaries ZIJN de geleverde: op de imagepaden (die het
@@ -115,6 +132,7 @@ function uitImage() {
      dist terughalen liet de voor-controle na iedere shellwijziging zakken. */
   vervang(path.join(ROOT, 'public/sw.js'), path.join(tmp, 'sw.js'));
   vervang(path.join(ROOT, 'public/apps/foundation/sw.js'), path.join(tmp, 'foundation-sw.js'));
+  for (const rel of BOUWSHELL) vervang(path.join(ROOT, rel), path.join(tmp, rel));
   fs.rmSync(tmp, { recursive: true, force: true });
   kw.schrijfJson(ROOT, kw.REL.image, { formaat: kw.FORMAAT + '-image', image: ref, imageId: id,
     commit, bewijsSha256: kw.sha256(bewijsBytes), inhoudSha256: bewijs.inhoudSha256,
@@ -318,7 +336,7 @@ function hoofd() {
   throw new Error('Gebruik --uit-image, --controle --fase=voor|na, --gepubliceerd of --lokaal.');
 }
 
-module.exports = { lokaalPlan, lokaalGrens, woorden, eisen };
+module.exports = { lokaalPlan, lokaalGrens, woorden, eisen, uitImage };
 
 if (require.main === module) {
   try { hoofd(); } catch (e) { console.error('[kwalificatie] ' + e.message); process.exitCode = 1; }

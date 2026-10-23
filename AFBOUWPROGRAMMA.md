@@ -1478,3 +1478,17 @@ die bestaande volledige bronmetingen vernieuwen, daarna APPWERKT samenstellen.
 De onderbroken ronde /tmp/rtg-r3-appwerkt-0c4b.log is GEEN kwalificatieresultaat.
 Lopende bronmetingen: /tmp/rtg-r3-completion-0c4b.log en
 /tmp/rtg-r3-truth-0c4b.log; resultaat blijft open totdat deze werkelijk eindigen.
+
+23 oktober — CI op 1053f97f3f blokkeerde op de achtergelopen BEWIJS-generator
+(schoolguard kreeg een extra test) en vier gebouwde shellbestanden die
+kwalificatie --uit-image niet terughaalde. De bestaande overdracht neemt nu
+uitsluitend die vier expliciete buildoutputs mee; vóór vervanging moet lokale
+inhoud HEAD of exact het image zijn. Serverdrift, ontbrekende imagebytes,
+afwijzende commitcontrole en wijzigingen na de voorcontrole blijven rood.
+29/29 gerichte kwalificatie-/ketentests, nul skips; onafhankelijke codereview
+zonder blocker. Log /tmp/rtg-r3-image-transfer-final.log. Docker/Git zijn in de
+nieuwe overdrachtfixture gesimuleerd, files en bytekwalificatie echt. Echte
+Dockerkwalificatie moet CI nog bevestigen (lokaal geen Docker). Geen merge of
+uitrol. De lopende voltooiproef leest dit kwalificatiescript niet; productbron
+blijft ongewijzigd. LIEGRONDE wordt na deze scriptcommit opnieuw vernieuwd,
+omdat haar afhankelijkheidssluiting niet volledig kan worden vastgesteld.

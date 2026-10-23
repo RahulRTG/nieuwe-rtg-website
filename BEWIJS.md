@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3002 bestanden en 20309 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3002 bestanden en 20312 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3002 |
-| losse beweringen (`test(...)`) | 20309 |
+| losse beweringen (`test(...)`) | 20312 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 414 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2814 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2621 bestanden, 19600 beweringen.
+2621 bestanden, 19603 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1832,7 +1832,7 @@ toets omvalt.
 | `rolproeffixtures-http.test.js` | 1 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rolproeffixtures.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rolronde-fixtures.test.js` | 8 | gezakt op `voorwaarde-omkeren#0` | Lifestyle blijft een werkelijk toegekende pas, geen bredere statuscode-regel. Deze tegenproeven bewaken dezelfde input, twee geldige accounts en fail-closed herstel. |
-| `rolronde.test.js` | 9 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rolronde.test.js` | 12 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `romeproef.test.js` | 8 | gezakt op `&&->||#0` | DE ROMEPROEF -- het instrument en zijn register. scripts/romeproef.js loopt de Rome-keten over LivingOS, WorkOS, TravelOS, het geld en de universele bodem van FoundationOS, tegen een wegwerpserver. |
 | `ronde.test.js` | 11 | gezakt op `===->!==#0` | DE COMMERCIELE RONDE: het werk dat wel gebouwd was en nooit werd gedaan. Vier dingen stonden klaar en werden door niemand aangeroepen. |
 | `rondepr.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE RONDE LEVERT EEN VOORSTEL EN GEEN VASTLEGGING (.github/workflows/ronde.yml, job `registers-pr`). De toets draait de ECHTE stap uit de werkstroom -- gelezen met dezelfde lezer als scripts/ci-keten.js, niet... |

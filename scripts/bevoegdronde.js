@@ -389,14 +389,17 @@ async function meet() {
     const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
     const pw = laadBrowser({ eigenDriver: false });
     if (!pw) { console.error('Geen browser beschikbaar; de gezinskant meet in een echte browser.'); process.exit(2); }
-    const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
+    const { startServer, stopNet } = require(path.join(WORTEL, 'test', 'helper.js'));
     const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bevoegdronde-'));
     const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
     const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     try { gezinUit = await meetGezinnen(gezin, base, browser, maakContext, meetIngang); }
     finally {
       await browser.close();
-      try { child.kill(); } catch (e) {}
+      /* Eerst de server zijn write-behind en journaal laten sluiten, pas daarna
+         de datamap verwijderen. kill()+rmSync liet incidenteel een laatste
+         journaalschrijving tegen een al verwijderde map lopen. */
+      await stopNet(child, 5000);
       try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
     }
   }

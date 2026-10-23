@@ -271,6 +271,13 @@ test('4. de bevoegdronde levert bevoegd en niets anders', () => {
   /mag geen herstelbaar/);
 });
 
+test('4a. de browserwereld stopt volledig voordat haar tijdelijke opslag verdwijnt', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'bevoegdronde.js'), 'utf8');
+  assert.match(bron, /const \{ startServer, stopNet \}/);
+  assert.match(bron, /await stopNet\(child, 5000\);[\s\S]{0,180}fs\.rmSync\(TMP/,
+    'cleanup mag de opslag niet verwijderen terwijl de server nog journaalregels schrijft');
+});
+
 test('5. het echte register spreekt zichzelf niet tegen', () => {
   const reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'BEVOEGD.json'), 'utf8'));
   assert.ok(reg.stempel && reg.stempel.commit, 'BEVOEGD.json draagt geen stempel met commit');

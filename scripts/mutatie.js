@@ -590,6 +590,8 @@ const EIGEN_MODULE = new Map([
   // beweringen niet (uit #446).
   // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.
   ['a11y-hermeet.e2e.js', ['scripts/a11y-hermeet.js']],
+  ['appwerkt-gegevenspoort.e2e.js', ['public/shared/poortgesprek.js']],
+  ['contrastfoto.e2e.js', ['scripts/a11ykeuring.js']],
   ['csp.e2e.js', ['server/middleware/voordeur.js']],
   // Deze browserproeven laden clientgedrag of toetsen een keuringsmodule;
   // een gewijzigde serverrespons raakt hun beweringen niet.

@@ -157,7 +157,7 @@ const LEZERS = {
   'server/routes/supplier/kassa/innen.js': { collectie: 'orders', soort: 'grendel', stand: 'geen-werk',
     wat: 'innen aan de kassa: alleen wat nog niet betaald is',
     gedaan: 'de tak hangt aan `!o.paid`, en die staat bij een teruggestorte bon op true -- er wordt dus niet nogmaals geind' },
-  'server/routes/supplier/kassa/afrekenen.js': { collectie: 'orders', soort: 'grendel', stand: 'geen-werk',
+  'server/routes/supplier/kassa/tafelticket-afrekenen.js': { collectie: 'orders', soort: 'grendel', stand: 'geen-werk',
     wat: 'afrekenen aan de kassa',
     gedaan: 'schrijft `paid` en leest hem niet als betaalstand' },
   'server/db/tx/rij.js': { collectie: 'orders', soort: 'toont', stand: 'geen-werk',

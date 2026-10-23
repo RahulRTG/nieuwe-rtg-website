@@ -85,6 +85,14 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
  res.json(antwoord);
 });
 
-require('./tafelticket-afrekenen')(kern, { factuurVoorLid, regelsVanItems });
+/* Houd de opslagdeur in deze bestaande kassamodule. De tafelticketworkflow
+   krijgt alleen de twee operaties die zij nodig heeft en wordt daarmee geen
+   tweede rechtstreekse schrijver in db.data. */
+require('./tafelticket-afrekenen')(kern, { factuurVoorLid, regelsVanItems }, {
+  posSalesVan(code) {
+    return db.data.posSales[code] = (db.data.posSales[code] || []);
+  },
+  bewaarPosSales(code, lijst) { db.data.posSales[code] = lijst; }
+});
 
 };

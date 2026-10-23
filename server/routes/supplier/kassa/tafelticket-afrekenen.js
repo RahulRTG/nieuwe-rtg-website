@@ -3,8 +3,8 @@
    zegelcontrole, facturatie en kassabon van deze tweede workflow. */
 'use strict';
 
-module.exports = (kern, factuur) => {
-  const { app, crypto, db, logActivity, notify, pickupCode, save, sseToCustomer,
+module.exports = (kern, factuur, opslag) => {
+  const { app, crypto, logActivity, notify, pickupCode, save, sseToCustomer,
     sseToOffice, sseToSupplier, supplierAuth, tafelticket } = kern;
   const factuurVoorLid = factuur.factuurVoorLid, regelsVanItems = factuur.regelsVanItems;
   const nu = () => require('../../../lib/klok').datum().toISOString();
@@ -42,9 +42,9 @@ module.exports = (kern, factuur) => {
       desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
       room: chk.table, items: null, total: chk.subtotaal, method, omzetElders: 'bestellingen', at: nu()
     };
-    const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
+    const list = opslag.posSalesVan(req.supplier.code);
     list.unshift(sale);
-    db.data.posSales[req.supplier.code] = list.slice(0, 300);
+    opslag.bewaarPosSales(req.supplier.code, list.slice(0, 300));
     const tf = (req.supplier.tables || []).find(t => t.name === chk.table);
     if (tf) tf.status = 'vrij';
     save();

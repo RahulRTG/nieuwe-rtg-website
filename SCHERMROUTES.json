@@ -2,15 +2,13 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-10-19",
-  "commit": "e04b77ec",
+  "op": "2026-10-23",
+  "commit": "94493e9497",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
    "boomVuil": false,
-   "ongecommitteInvoer": [
-    "ROUTEBRON.json"
-   ],
+   "ongecommitteInvoer": [],
    "bestanden": [
     "ROUTEBRON.json",
     "public/apps/access/meaning.js",
@@ -129,6 +127,7 @@
     "public/apps/appstore-kantoor.html",
     "public/apps/appstore-uitgever.html",
     "public/apps/architect-pda.html",
+    "public/apps/arrival-voorzijde.js",
     "public/apps/arrival.html",
     "public/apps/attenties.html",
     "public/apps/avond.html",
@@ -208,6 +207,7 @@
     "public/apps/defensie.html",
     "public/apps/defensie/defensie-01.js",
     "public/apps/defensie/defensie-02.js",
+    "public/apps/dispatch-voorzijde.js",
     "public/apps/dispatch.html",
     "public/apps/doelen.html",
     "public/apps/doos.html",
@@ -228,6 +228,7 @@
     "public/apps/festival/programma.js",
     "public/apps/festival/schil.js",
     "public/apps/festival/vooruit.js",
+    "public/apps/flits-voorzijde.js",
     "public/apps/flits.html",
     "public/apps/foodcourt-intent.js",
     "public/apps/foodcourt.html",
@@ -420,10 +421,13 @@
     "public/apps/gereedschap/klok.js",
     "public/apps/gereedschap/reken.js",
     "public/apps/gereedschap/tijd.js",
+    "public/apps/ghost-voorzijde.js",
     "public/apps/ghost.html",
     "public/apps/handel-aanvraag.js",
     "public/apps/handel.html",
     "public/apps/handel.js",
+    "public/apps/hangar-toestel.js",
+    "public/apps/hangar-voorzijde.js",
     "public/apps/hangar.html",
     "public/apps/hardware-pda.html",
     "public/apps/home.html",
@@ -716,7 +720,10 @@
     "public/apps/loonstrook.html",
     "public/apps/loopbaan.html",
     "public/apps/loopbaanbewijs.html",
+    "public/apps/luchthaven-bord.js",
+    "public/apps/luchthaven-loket.js",
     "public/apps/luchthaven.html",
+    "public/apps/luchthaven.js",
     "public/apps/magnaat-data.js",
     "public/apps/magnaat-kantoor.html",
     "public/apps/magnaat-leven-bedrijf.js",
@@ -724,7 +731,8 @@
     "public/apps/magnaat-leven-schermen.js",
     "public/apps/magnaat-leven-stad.js",
     "public/apps/magnaat-leven-verhaal.js",
-    "public/apps/magnaat-leven.js",
+    "public/apps/magnaat-leven/01-toegang-en-handelingen.js",
+    "public/apps/magnaat-leven/02-presentatie-en-bediening.js",
     "public/apps/magnaat-partnerstudio.html",
     "public/apps/magnaat-sandbox.js",
     "public/apps/magnaat-voorzijde-scenarios.js",
@@ -737,6 +745,7 @@
     "public/apps/mall-experience.js",
     "public/apps/mall.html",
     "public/apps/marechaussee.html",
+    "public/apps/marechaussee.js",
     "public/apps/mecenaat.html",
     "public/apps/media.html",
     "public/apps/media/blad.js",
@@ -782,6 +791,12 @@
     "public/apps/muziek-feed.js",
     "public/apps/muziek.html",
     "public/apps/nalatenschap.html",
+    "public/apps/navigatie-bediening.js",
+    "public/apps/navigatie-drie.js",
+    "public/apps/navigatie-kaarten.js",
+    "public/apps/navigatie-kern.js",
+    "public/apps/navigatie-start.js",
+    "public/apps/navigatie-zoek.js",
     "public/apps/navigatie.html",
     "public/apps/nieuws.html",
     "public/apps/notities.html",
@@ -829,10 +844,15 @@
     "public/apps/oog.html",
     "public/apps/ov.html",
     "public/apps/ovcontrol.html",
+    "public/apps/ovcontrol.js",
+    "public/apps/ovdienst-scan.js",
     "public/apps/ovdienst.html",
+    "public/apps/ovdienst.js",
     "public/apps/overheid.html",
     "public/apps/overheidspda.html",
     "public/apps/ovroutes.html",
+    "public/apps/ovroutes/01-projectie-en-tekenen.js",
+    "public/apps/ovroutes/02-editor-en-herstel.js",
     "public/apps/pakketten.html",
     "public/apps/partner-network.html",
     "public/apps/partner-network.js",
@@ -898,27 +918,37 @@
     "public/apps/reisboek-momenten.js",
     "public/apps/reisboek.html",
     "public/apps/reisboek.js",
+    "public/apps/reisbureau-aanvragen.js",
     "public/apps/reisbureau-experience.js",
+    "public/apps/reisbureau-voorzijde.js",
     "public/apps/reisbureau.html",
     "public/apps/reisprogramma-editor.js",
     "public/apps/reisprogramma-velden.js",
     "public/apps/reisprogramma-weergave.js",
     "public/apps/reisuitnodiging-client.js",
     "public/apps/reisuitnodiging.html",
+    "public/apps/reizen-beeld-editor.js",
+    "public/apps/reizen-beeld.js",
     "public/apps/reizen-context.js",
+    "public/apps/reizen-invoer.js",
     "public/apps/reizen-performance-boeken.js",
     "public/apps/reizen-performance-rahul.js",
     "public/apps/reizen-performance-reis.js",
     "public/apps/reizen-performance-taxi.js",
     "public/apps/reizen-performance.js",
+    "public/apps/reizen-regel.js",
+    "public/apps/reizen-register.js",
     "public/apps/reizen-samen-besluit.js",
     "public/apps/reizen-samen-delen.js",
     "public/apps/reizen-samen-mensen.js",
     "public/apps/reizen-samen-voorstel.js",
     "public/apps/reizen-samen.js",
+    "public/apps/reizen-stand.js",
     "public/apps/reizen-veilig-reis.js",
     "public/apps/reizen-veilig.html",
     "public/apps/reizen-veilig.js",
+    "public/apps/reizen-wacht.js",
+    "public/apps/reizen-wereld.js",
     "public/apps/reizen.html",
     "public/apps/rendezvous.html",
     "public/apps/residentie.html",
@@ -943,7 +973,9 @@
     "public/apps/rit-ontvangst.js",
     "public/apps/rit.html",
     "public/apps/rit.js",
+    "public/apps/routedekking-voorzijde.js",
     "public/apps/routedekking.html",
+    "public/apps/routedossier-voorzijde.js",
     "public/apps/routedossier.html",
     "public/apps/rtg-context.js",
     "public/apps/rtg-dossier.js",
@@ -1037,6 +1069,7 @@
     "public/apps/sport.html",
     "public/apps/sportclub.html",
     "public/apps/stad.html",
+    "public/apps/stad.js",
     "public/apps/stadsdoos.html",
     "public/apps/studio-pda.html",
     "public/apps/table.html",
@@ -1075,6 +1108,8 @@
     "public/apps/vertaler/app.js",
     "public/apps/vertegenwoordiging.html",
     "public/apps/vitaal.html",
+    "public/apps/vluchten-momenten.js",
+    "public/apps/vluchten-voorzijde.js",
     "public/apps/vluchten.html",
     "public/apps/voeding.html",
     "public/apps/voertuig.html",
@@ -1111,9 +1146,11 @@
     "public/apps/werkplek-bureaus/werkplek-bureaus-02.js",
     "public/apps/werkplek-campus.js",
     "public/apps/werkplek-landing.js",
+    "public/apps/werkplek-taken.js",
     "public/apps/werkplek.html",
     "public/apps/werkplek.js",
     "public/apps/werkruimte.html",
+    "public/apps/werkvloer.js",
     "public/apps/winkel-voorzijde.js",
     "public/apps/wonen.html",
     "public/apps/wonen.js",
@@ -1124,8 +1161,15 @@
     "public/apps/zaakpay.html",
     "public/apps/zaakweb.html",
     "public/apps/zaal.html",
+    "public/apps/zakelijk-overzicht.js",
+    "public/apps/zakelijk-voorzijde.js",
     "public/apps/zakelijk.html",
     "public/apps/zorgbalie.html",
+    "public/ds/edge-modi.js",
+    "public/ds/edge.js",
+    "public/ds/register.js",
+    "public/ds/shell.js",
+    "public/ds/voorbeeld.html",
     "public/shared/accountdeur.js",
     "public/shared/accounts-brug.js",
     "public/shared/accounts-os.js",
@@ -1591,6 +1635,7 @@
     "public/sw.js",
     "scripts/ast/lexer.js",
     "scripts/bundel.js",
+    "scripts/lib/schermroutepaden.js",
     "scripts/schermroutes.js"
    ],
    "bestaat": [
@@ -1682,6 +1727,9 @@
      "pad": "public/apps/living-world"
     },
     {
+     "pad": "public/apps/magnaat-leven"
+    },
+    {
      "pad": "public/apps/media"
     },
     {
@@ -1707,6 +1755,9 @@
     },
     {
      "pad": "public/apps/office/blad"
+    },
+    {
+     "pad": "public/apps/ovroutes"
     },
     {
      "pad": "public/apps/personeel"
@@ -1779,6 +1830,18 @@
     },
     {
      "pad": "public/campagne"
+    },
+    {
+     "pad": "public/ds"
+    },
+    {
+     "pad": "public/ds/componenten"
+    },
+    {
+     "pad": "public/ds/schermen"
+    },
+    {
+     "pad": "public/ds/thema"
     },
     {
      "pad": "public/fonts"
@@ -1988,7 +2051,7 @@
    "omgevingGekopieerd": false,
    "omgeving": [],
    "onwaarneembaar": [],
-   "nodeHoofdversie": 22
+   "nodeHoofdversie": 26
   }
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
@@ -2001,11 +2064,11 @@
   "bekendePaden": 5523
  },
  "gemeten": {
-  "schermenMetPad": 480,
+  "schermenMetPad": 495,
   "nietGelezen": 0,
-  "exactePaden": 1566,
-  "verwijzingen": 1849,
-  "voorvoegsels": 115,
+  "exactePaden": 1882,
+  "verwijzingen": 2200,
+  "voorvoegsels": 89,
   "basisPaden": 1,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -2030,7 +2093,7 @@
     "public/apps/service.html",
     "public/apps/sociaal.html",
     "public/apps/spelen.html",
-    "public/apps/stad.html",
+    "public/apps/stad.js",
     "public/apps/theater.html",
     "public/shared/clipdeler/clipdeler-02.js",
     "public/shared/metgezel/metgezel-02.js",
@@ -2050,11 +2113,28 @@
     "public/apps/overheid.html",
     "public/apps/reizen-performance-rahul.js",
     "public/apps/uitgaan.html",
+    "public/ds/edge-modi.js",
     "public/shared/handenvrij-balk/handenvrij-balk-01.js",
     "public/shared/metgezel/metgezel-01b2.js",
     "public/shared/rahul-tab.js"
    ],
-   "aantal": 11
+   "aantal": 12
+  },
+  {
+   "pad": "/api/member/rechterhand/ai",
+   "schermen": [
+    "public/apps/attenties.html",
+    "public/apps/cellier.html",
+    "public/apps/cercle.html",
+    "public/apps/entourage.html",
+    "public/apps/garderobe.html",
+    "public/apps/geld/logboekb.js",
+    "public/apps/geld/mecenaatb.js",
+    "public/apps/geld/nalatenschapb.js",
+    "public/apps/maison.html",
+    "public/apps/table.html"
+   ],
+   "aantal": 10
   },
   {
    "pad": "/api/supplier/login",
@@ -2062,14 +2142,13 @@
     "public/apps/belastingkantoor.html",
     "public/apps/gemeenteloket.html",
     "public/apps/gemeentepda.html",
-    "public/apps/luchthaven.html",
-    "public/apps/marechaussee.html",
     "public/apps/overheidspda.html",
     "public/apps/rechtbank.html",
     "public/apps/rijksloket.html",
-    "public/apps/sportclub.html"
+    "public/apps/sportclub.html",
+    "public/apps/werkvloer.js"
    ],
-   "aantal": 9
+   "aantal": 8
   },
   {
    "pad": "/api/supplier/roster",
@@ -2077,14 +2156,27 @@
     "public/apps/belastingkantoor.html",
     "public/apps/gemeenteloket.html",
     "public/apps/gemeentepda.html",
-    "public/apps/luchthaven.html",
-    "public/apps/marechaussee.html",
     "public/apps/overheidspda.html",
     "public/apps/rechtbank.html",
     "public/apps/rijksloket.html",
-    "public/apps/sportclub.html"
+    "public/apps/sportclub.html",
+    "public/apps/werkvloer.js"
    ],
-   "aantal": 9
+   "aantal": 8
+  },
+  {
+   "pad": "/api/bestanden/mijn",
+   "schermen": [
+    "public/apps/boeken/app.js",
+    "public/apps/memo/app.js",
+    "public/apps/reizen-beeld-editor.js",
+    "public/apps/reizen-samen-delen.js",
+    "public/apps/wonen.js",
+    "public/shared/interface/personal-image-editor.js",
+    "public/shared/interface/world-widget-data.js",
+    "public/shared/kluismap.js"
+   ],
+   "aantal": 8
   },
   {
    "pad": "/api/rtf/social/connections",
@@ -2114,15 +2206,15 @@
    "aantal": 7
   },
   {
-   "pad": "/api/bestanden/mijn",
+   "pad": "/api/account/start",
    "schermen": [
-    "public/apps/boeken/app.js",
-    "public/apps/memo/app.js",
-    "public/apps/reizen-samen-delen.js",
-    "public/apps/wonen.js",
-    "public/shared/interface/personal-image-editor.js",
-    "public/shared/interface/world-widget-data.js",
-    "public/shared/kluismap.js"
+    "public/apps/app-main/app-main-25.js",
+    "public/apps/decision-room.js",
+    "public/apps/leverancier/leverancier-07.js",
+    "public/apps/project-room.js",
+    "public/apps/rtgone.html",
+    "public/apps/rtmail-voorzijde-werk.js",
+    "public/shared/kantoordeur.js"
    ],
    "aantal": 7
   },
@@ -2140,16 +2232,15 @@
    "aantal": 7
   },
   {
-   "pad": "/api/account/start",
+   "pad": "/api/bestanden/haal",
    "schermen": [
-    "public/apps/app-main/app-main-25.js",
-    "public/apps/decision-room.js",
-    "public/apps/project-room.js",
-    "public/apps/rtgone.html",
-    "public/apps/rtmail-voorzijde-werk.js",
-    "public/shared/kantoordeur.js"
+    "public/apps/boeken/app.js",
+    "public/apps/memo/app.js",
+    "public/apps/reizen-beeld.js",
+    "public/apps/reizen-samen-delen.js",
+    "public/shared/interface/personal-images.js"
    ],
-   "aantal": 6
+   "aantal": 5
   },
   {
    "pad": "/api/comm/inbox",
@@ -2174,22 +2265,33 @@
    "aantal": 5
   },
   {
+   "pad": "/api/gids/app",
+   "schermen": [
+    "public/apps/hangar-voorzijde.js",
+    "public/apps/reisboek-momenten.js",
+    "public/apps/werkvloer.js",
+    "public/shared/basis/basis-02.js",
+    "public/shared/deur.js"
+   ],
+   "aantal": 5
+  },
+  {
+   "pad": "/api/account/rollen",
+   "schermen": [
+    "public/apps/app-main/app-main-24a3.js",
+    "public/apps/app-main/app-main-25.js",
+    "public/apps/leverancier/leverancier-07.js",
+    "public/apps/personeel/personeel-04a.js"
+   ],
+   "aantal": 4
+  },
+  {
    "pad": "/api/foundation",
    "schermen": [
     "public/apps/app-main/app-main-43.js",
     "public/apps/foundation/contact.html",
     "public/apps/foundation/gezin-rt/gezin-rt-01.js",
     "public/shared/gezinsstroom.js"
-   ],
-   "aantal": 4
-  },
-  {
-   "pad": "/api/bestanden/haal",
-   "schermen": [
-    "public/apps/boeken/app.js",
-    "public/apps/memo/app.js",
-    "public/apps/reizen-samen-delen.js",
-    "public/shared/interface/personal-images.js"
    ],
    "aantal": 4
   },
@@ -2227,8 +2329,8 @@
    "pad": "/api/reis/reizen",
    "schermen": [
     "public/apps/reisboek.js",
+    "public/apps/reizen-register.js",
     "public/apps/reizen-samen.js",
-    "public/apps/reizen.html",
     "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 4
@@ -2289,15 +2391,6 @@
    "aantal": 3
   },
   {
-   "pad": "/api/account/rollen",
-   "schermen": [
-    "public/apps/app-main/app-main-24a3.js",
-    "public/apps/app-main/app-main-25.js",
-    "public/apps/personeel/personeel-04a.js"
-   ],
-   "aantal": 3
-  },
-  {
    "pad": "/api/office/stream",
    "schermen": [
     "public/apps/backoffice/backoffice-04.js",
@@ -2343,11 +2436,20 @@
    "aantal": 3
   },
   {
-   "pad": "/api/member/rechterhand/ai",
+   "pad": "/api/rtf/tiener/toets-stap",
    "schermen": [
-    "public/apps/geld/logboekb.js",
-    "public/apps/geld/mecenaatb.js",
-    "public/apps/geld/nalatenschapb.js"
+    "public/apps/foundation/school.html",
+    "public/apps/foundation/toetsen.html",
+    "public/shared/verbinding/verbinding-01.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/rtf/leren/schrijfsels",
+   "schermen": [
+    "public/apps/foundation/schrijven.html",
+    "public/shared/interface/world-desktop-home.js",
+    "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 3
   },
@@ -2451,20 +2553,29 @@
    "aantal": 3
   },
   {
-   "pad": "/api/reisbureau",
+   "pad": "/api/webauthn/registreer",
    "schermen": [
-    "public/apps/reisbureau.html",
-    "public/apps/reizen-veilig-reis.js",
-    "public/shared/interface/modules/travel.js"
+    "public/apps/passkeys.html",
+    "public/apps/rtgid.html",
+    "public/shared/toestelsleutel.js"
    ],
    "aantal": 3
   },
   {
    "pad": "/api/reisbureau/mijn",
    "schermen": [
-    "public/apps/reisbureau.html",
+    "public/apps/reisbureau-aanvragen.js",
     "public/shared/interface/modules/travel-actions.js",
     "public/shared/travel-request-controller.js"
+   ],
+   "aantal": 3
+  },
+  {
+   "pad": "/api/reisbureau",
+   "schermen": [
+    "public/apps/reisbureau-voorzijde.js",
+    "public/apps/reizen-veilig-reis.js",
+    "public/shared/interface/modules/travel.js"
    ],
    "aantal": 3
   },
@@ -2617,7 +2728,7 @@
   {
    "pad": "/api/arrival/pass",
    "schermen": [
-    "public/apps/arrival.html",
+    "public/apps/arrival-voorzijde.js",
     "public/shared/plaatsnadering.js"
    ],
    "aantal": 2
@@ -2625,8 +2736,16 @@
   {
    "pad": "/api/arrival/pulse",
    "schermen": [
-    "public/apps/arrival.html",
+    "public/apps/arrival-voorzijde.js",
     "public/shared/plaatsnadering.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/member/rechterhand/attenties",
+   "schermen": [
+    "public/apps/attenties.html",
+    "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 2
   },
@@ -2643,6 +2762,14 @@
    "schermen": [
     "public/apps/boardroom.html",
     "public/apps/kantoren.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/supplier/mob/toewijzen",
+   "schermen": [
+    "public/apps/chauffeur.js",
+    "public/apps/dispatch-voorzijde.js"
    ],
    "aantal": 2
   },
@@ -2675,6 +2802,30 @@
    "schermen": [
     "public/apps/festival/podium.js",
     "public/apps/festival/programma.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/rtf/baby/entry-maak",
+   "schermen": [
+    "public/apps/foundation/babyboek.html",
+    "public/shared/verbinding/verbinding-01.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/rtf/baby/gezin-zet",
+   "schermen": [
+    "public/apps/foundation/babyboek.html",
+    "public/shared/verbinding/verbinding-01.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/rtf/bieb/catalogus",
+   "schermen": [
+    "public/apps/foundation/bieb.html",
+    "public/apps/foundation/campus.html"
    ],
    "aantal": 2
   },
@@ -2839,9 +2990,17 @@
    "aantal": 2
   },
   {
-   "pad": "/api/rtf/tiener/toets-stap",
+   "pad": "/api/rtf/leren/notitie",
    "schermen": [
-    "public/apps/foundation/school.html",
+    "public/apps/foundation/projecten.html",
+    "public/shared/verbinding/verbinding-01.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/rtf/leren/schrijf-bewaar",
+   "schermen": [
+    "public/apps/foundation/schrijven.html",
     "public/shared/verbinding/verbinding-01.js"
    ],
    "aantal": 2
@@ -3015,6 +3174,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/account/koppel",
+   "schermen": [
+    "public/apps/leverancier/leverancier-07.js",
+    "public/apps/personeel/personeel-04a.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/supplier/mall/aanvraag/reageer",
    "schermen": [
     "public/apps/leverancier-aanvragen.js",
@@ -3083,6 +3250,14 @@
    "schermen": [
     "public/apps/living-os-data.js",
     "public/apps/reizen-veilig.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/lucht/bord",
+   "schermen": [
+    "public/apps/luchthaven-bord.js",
+    "public/apps/luchthaven.js"
    ],
    "aantal": 2
   },
@@ -3167,6 +3342,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/nav/bestemmingen",
+   "schermen": [
+    "public/apps/navigatie-bediening.js",
+    "public/apps/navigatie-zoek.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/mob/volg",
    "schermen": [
     "public/apps/ov.html",
@@ -3177,8 +3360,8 @@
   {
    "pad": "/api/supplier/ov/overzicht",
    "schermen": [
-    "public/apps/ovcontrol.html",
-    "public/apps/ovdienst.html"
+    "public/apps/ovcontrol.js",
+    "public/apps/ovdienst.js"
    ],
    "aantal": 2
   },
@@ -3215,10 +3398,10 @@
    "aantal": 2
   },
   {
-   "pad": "/api/webauthn/registreer",
+   "pad": "/api/webauthn/registreer/opties",
    "schermen": [
     "public/apps/passkeys.html",
-    "public/shared/toestelsleutel.js"
+    "public/apps/rtgid.html"
    ],
    "aantal": 2
   },
@@ -3258,7 +3441,7 @@
    "pad": "/api/reis/los",
    "schermen": [
     "public/apps/reisboek.js",
-    "public/apps/reizen.html"
+    "public/apps/reizen-wacht.js"
    ],
    "aantal": 2
   },
@@ -3266,7 +3449,7 @@
    "pad": "/api/reis/los/doe",
    "schermen": [
     "public/apps/reisboek.js",
-    "public/apps/reizen.html"
+    "public/apps/reizen-wacht.js"
    ],
    "aantal": 2
   },
@@ -3274,7 +3457,31 @@
    "pad": "/api/reis/wacht",
    "schermen": [
     "public/apps/reisboek.js",
-    "public/apps/reizen.html"
+    "public/apps/reizen-wacht.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/auth/register",
+   "schermen": [
+    "public/apps/reisuitnodiging-client.js",
+    "public/shared/accountdeur.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/ik/beelden",
+   "schermen": [
+    "public/apps/reizen-beeld.js",
+    "public/shared/interface/personal-images.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/ik/beelden/zet",
+   "schermen": [
+    "public/apps/reizen-beeld.js",
+    "public/shared/interface/personal-images.js"
    ],
    "aantal": 2
   },
@@ -3283,6 +3490,22 @@
    "schermen": [
     "public/apps/reizen-performance-boeken.js",
     "public/apps/rit.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/residentie/betreed",
+   "schermen": [
+    "public/apps/residentie/residentie-01.js",
+    "public/apps/residentie/residentie-03.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/residentie/pols",
+   "schermen": [
+    "public/apps/residentie/residentie-01.js",
+    "public/apps/residentie/residentie-03.js"
    ],
    "aantal": 2
   },
@@ -3335,6 +3558,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/rtgid/machtig",
+   "schermen": [
+    "public/apps/rtgid.html",
+    "public/shared/toestelsleutel.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/rtgone/project/van-mail",
    "schermen": [
     "public/apps/rtgone.html",
@@ -3355,6 +3586,22 @@
    "schermen": [
     "public/apps/salon.html",
     "public/apps/saloon/acties.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/service/bel/mijn",
+   "schermen": [
+    "public/apps/service-bel.js",
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/member/rechterhand/table",
+   "schermen": [
+    "public/apps/table.html",
+    "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 2
   },
@@ -3431,14 +3678,6 @@
    "aantal": 2
   },
   {
-   "pad": "/api/gids/app",
-   "schermen": [
-    "public/shared/basis/basis-02.js",
-    "public/shared/deur.js"
-   ],
-   "aantal": 2
-  },
-  {
    "pad": "/api/service/mens",
    "schermen": [
     "public/shared/basis/basis-02b.js",
@@ -3483,14 +3722,6 @@
    "schermen": [
     "public/shared/interface/workspace-continuity.js",
     "public/shared/interface/world-desktop-people.js"
-   ],
-   "aantal": 2
-  },
-  {
-   "pad": "/api/rtf/leren/schrijfsels",
-   "schermen": [
-    "public/shared/interface/world-desktop-home.js",
-    "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 2
   },
@@ -4220,14 +4451,42 @@
   {
    "pad": "/api/arrival/interpret",
    "schermen": [
-    "public/apps/arrival.html"
+    "public/apps/arrival-voorzijde.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/arrival/request",
    "schermen": [
-    "public/apps/arrival.html"
+    "public/apps/arrival-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/attenties/gift",
+   "schermen": [
+    "public/apps/attenties.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/attenties/gift/weg",
+   "schermen": [
+    "public/apps/attenties.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/attenties/relatie",
+   "schermen": [
+    "public/apps/attenties.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/attenties/relatie/weg",
+   "schermen": [
+    "public/apps/attenties.html"
    ],
    "aantal": 1
   },
@@ -4848,6 +5107,76 @@
    "aantal": 1
   },
   {
+   "pad": "/api/member/rechterhand/cellier",
+   "schermen": [
+    "public/apps/cellier.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cellier/schenk",
+   "schermen": [
+    "public/apps/cellier.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cellier/weg",
+   "schermen": [
+    "public/apps/cellier.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cellier/zet",
+   "schermen": [
+    "public/apps/cellier.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cercle",
+   "schermen": [
+    "public/apps/cercle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cercle/club",
+   "schermen": [
+    "public/apps/cercle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cercle/club/weg",
+   "schermen": [
+    "public/apps/cercle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cercle/gast",
+   "schermen": [
+    "public/apps/cercle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cercle/gast/terug",
+   "schermen": [
+    "public/apps/cercle.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/cercle/waarheen",
+   "schermen": [
+    "public/apps/cercle.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/staff/mob/mijn",
    "schermen": [
     "public/apps/chauffeur.js"
@@ -4863,13 +5192,6 @@
   },
   {
    "pad": "/api/staff/mob/status",
-   "schermen": [
-    "public/apps/chauffeur.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/supplier/mob/toewijzen",
    "schermen": [
     "public/apps/chauffeur.js"
    ],
@@ -5100,6 +5422,83 @@
    "aantal": 1
   },
   {
+   "pad": "/api/office/bureau",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/concierge",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/concierge/voortgang",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/arrangement/step",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/arrangements",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/circle/create",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/circle/gathering",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/circle/invite",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/circles",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/concierge",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rendezvous/concierge/step",
+   "schermen": [
+    "public/apps/concierge.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/connect/dossier",
    "schermen": [
     "public/apps/connect.html"
@@ -5226,6 +5625,34 @@
    "aantal": 1
   },
   {
+   "pad": "/api/supplier/mob/dispatch",
+   "schermen": [
+    "public/apps/dispatch-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/mob/plekken",
+   "schermen": [
+    "public/apps/dispatch-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/mob/telefoon",
+   "schermen": [
+    "public/apps/dispatch-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/mob/voorstel",
+   "schermen": [
+    "public/apps/dispatch-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/doelen",
    "schermen": [
     "public/apps/doelen.html"
@@ -5264,6 +5691,48 @@
    "pad": "/api/doos/rapport",
    "schermen": [
     "public/apps/doos.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/doc",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/doc/weg",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/gezelschap",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/persoon",
+   "schermen": [
+    "public/apps/entourage.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/entourage/persoon/weg",
+   "schermen": [
+    "public/apps/entourage.html"
    ],
    "aantal": 1
   },
@@ -5578,28 +6047,28 @@
   {
    "pad": "/api/flits/meld",
    "schermen": [
-    "public/apps/flits.html"
+    "public/apps/flits-voorzijde.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/flits/rond",
    "schermen": [
-    "public/apps/flits.html"
+    "public/apps/flits-voorzijde.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/flits/stem",
    "schermen": [
-    "public/apps/flits.html"
+    "public/apps/flits-voorzijde.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/flits/vooruit",
    "schermen": [
-    "public/apps/flits.html"
+    "public/apps/flits-voorzijde.js"
    ],
    "aantal": 1
   },
@@ -5621,6 +6090,118 @@
    "pad": "/api/reserveringen/mijn",
    "schermen": [
     "public/apps/foodcourt.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/baby/boek",
+   "schermen": [
+    "public/apps/foundation/babyboek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/baby/entry-weg",
+   "schermen": [
+    "public/apps/foundation/babyboek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/baby/favoriet",
+   "schermen": [
+    "public/apps/foundation/babyboek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/baby/instellen",
+   "schermen": [
+    "public/apps/foundation/babyboek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/baby/moment-ai",
+   "schermen": [
+    "public/apps/foundation/babyboek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/baby/tijdlijn",
+   "schermen": [
+    "public/apps/foundation/babyboek.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/beroepen",
+   "schermen": [
+    "public/apps/foundation/beroepen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/beroepen/catalogus",
+   "schermen": [
+    "public/apps/foundation/beroepen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/beroepen/installeer",
+   "schermen": [
+    "public/apps/foundation/beroepen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/beroepen/mijn",
+   "schermen": [
+    "public/apps/foundation/beroepen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/beroepen/weg",
+   "schermen": [
+    "public/apps/foundation/beroepen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/bieb",
+   "schermen": [
+    "public/apps/foundation/bieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/bieb/ai",
+   "schermen": [
+    "public/apps/foundation/bieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/bieb/installeer",
+   "schermen": [
+    "public/apps/foundation/bieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/bieb/mijn",
+   "schermen": [
+    "public/apps/foundation/bieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/bieb/weg",
+   "schermen": [
+    "public/apps/foundation/bieb.html"
    ],
    "aantal": 1
   },
@@ -5716,9 +6297,79 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtf/bieb/catalogus",
+   "pad": "/api/rtf/club/bericht",
    "schermen": [
-    "public/apps/foundation/campus.html"
+    "public/apps/foundation/club.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/club/portaal",
+   "schermen": [
+    "public/apps/foundation/club.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/afspraak",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/afspraak-zet",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/bericht",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/maak",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/programma",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/programma-zet",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/team",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/club/zet",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/clubs",
+   "schermen": [
+    "public/apps/foundation/clubswerk.html"
    ],
    "aantal": 1
   },
@@ -5733,6 +6384,55 @@
    "pad": "/api/foundation/bespaartip",
    "schermen": [
     "public/apps/foundation/geld.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/geloof",
+   "schermen": [
+    "public/apps/foundation/geloofbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/geloof/ai",
+   "schermen": [
+    "public/apps/foundation/geloofbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/geloof/catalogus",
+   "schermen": [
+    "public/apps/foundation/geloofbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/geloof/installeer",
+   "schermen": [
+    "public/apps/foundation/geloofbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/geloof/lees",
+   "schermen": [
+    "public/apps/foundation/geloofbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/geloof/mijn",
+   "schermen": [
+    "public/apps/foundation/geloofbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/geloof/weg",
+   "schermen": [
+    "public/apps/foundation/geloofbieb.html"
    ],
    "aantal": 1
   },
@@ -5800,6 +6500,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/rtf/welzijn/dagboek",
+   "schermen": [
+    "public/apps/foundation/gevoel.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/welzijn/stemming",
+   "schermen": [
+    "public/apps/foundation/gevoel.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/welzijn/toestemming",
+   "schermen": [
+    "public/apps/foundation/gevoel.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/foundation/impact",
    "schermen": [
     "public/apps/foundation/index.html"
@@ -5815,6 +6536,104 @@
   },
   {
    "pad": "/api/office/rtfwallet/maak",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/kamer",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/kamer/advies",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/kamer/taak",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/kamer/taak-zet",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/kamers",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/overzicht",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/stadsraad",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/stadsraad/besluit-sluit",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/stadsraad/besluit-start",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/stadsraad/partner-maak",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/stadsraad/partner-stop",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfkantoor/stadsraad/stem",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/stand/kantoor",
+   "schermen": [
+    "public/apps/foundation/kantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/gift/stand/zet",
    "schermen": [
     "public/apps/foundation/kantoor.html"
    ],
@@ -5873,6 +6692,34 @@
    "pad": "/api/lab2/bewoner/themas",
    "schermen": [
     "public/apps/foundation/klimaatfonds.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/democratie/kwestie/gezien",
+   "schermen": [
+    "public/apps/foundation/kwesties.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/democratie/kwestie/inbreng",
+   "schermen": [
+    "public/apps/foundation/kwesties.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/democratie/kwestie/intrek",
+   "schermen": [
+    "public/apps/foundation/kwesties.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/democratie/kwestie/mijn",
+   "schermen": [
+    "public/apps/foundation/kwesties.html"
    ],
    "aantal": 1
   },
@@ -5947,6 +6794,34 @@
    "aantal": 1
   },
   {
+   "pad": "/api/rtfos/portaal/deelnemer",
+   "schermen": [
+    "public/apps/foundation/os-deelnemer.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/deelnemer/intrekken",
+   "schermen": [
+    "public/apps/foundation/os-deelnemer.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/donateur",
+   "schermen": [
+    "public/apps/foundation/os-donateur.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/donateur/bewijs",
+   "schermen": [
+    "public/apps/foundation/os-donateur.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/rtfos/portaal/gemeente",
    "schermen": [
     "public/apps/foundation/os-portaal.html"
@@ -5982,9 +6857,261 @@
    "aantal": 1
   },
   {
+   "pad": "/api/rtfos/portaal/vrijwilliger",
+   "schermen": [
+    "public/apps/foundation/os-vrijwilliger.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/vrijwilliger/uren",
+   "schermen": [
+    "public/apps/foundation/os-vrijwilliger.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/portaal/vrijwilliger/zet",
+   "schermen": [
+    "public/apps/foundation/os-vrijwilliger.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/herhaal",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/herhaal-antwoord",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/herhaal-stand",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/lijst-ai",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/lijst-haal",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/lijst-maak",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/lijst-weg",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/lijsten",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/overhoor-klaar",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/sessie-antwoord",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/sessie-staat",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/sessie-start",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/sessie-zet",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/sessies",
+   "schermen": [
+    "public/apps/foundation/overhoren.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/partner/besluit-sluit",
+   "schermen": [
+    "public/apps/foundation/partner.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/partner/besluit-start",
+   "schermen": [
+    "public/apps/foundation/partner.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/partner/raad",
+   "schermen": [
+    "public/apps/foundation/partner.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/partner/stem",
+   "schermen": [
+    "public/apps/foundation/partner.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/project-ai",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/project-antwoord",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/project-maak",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/project-staat",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/project-uitnodig",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/project-weg",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/projecten",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/taak-maak",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/taak-zet",
+   "schermen": [
+    "public/apps/foundation/projecten.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/foundation/les/stroomticket",
    "schermen": [
     "public/apps/foundation/realtime.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/gezin/maak",
+   "schermen": [
+    "public/apps/foundation/registreren.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/gezin/uitnodiging/accepteer",
+   "schermen": [
+    "public/apps/foundation/registreren.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/gezin/uitnodiging/bekijk",
+   "schermen": [
+    "public/apps/foundation/registreren.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/registratie/aanvragen",
+   "schermen": [
+    "public/apps/foundation/registreren.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/registratie/catalogus",
+   "schermen": [
+    "public/apps/foundation/registreren.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/registratie/status",
+   "schermen": [
+    "public/apps/foundation/registreren.js"
    ],
    "aantal": 1
   },
@@ -6006,6 +7133,41 @@
    "pad": "/api/member/democratie/kwestie/voorstellen",
    "schermen": [
     "public/apps/foundation/samendoen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/school",
+   "schermen": [
+    "public/apps/foundation/schoolbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/school/catalogus",
+   "schermen": [
+    "public/apps/foundation/schoolbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/school/installeer",
+   "schermen": [
+    "public/apps/foundation/schoolbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/school/mijn",
+   "schermen": [
+    "public/apps/foundation/schoolbieb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/school/weg",
+   "schermen": [
+    "public/apps/foundation/schoolbieb.html"
    ],
    "aantal": 1
   },
@@ -6038,6 +7200,20 @@
    "aantal": 1
   },
   {
+   "pad": "/api/rtf/leren/schrijf-feedback",
+   "schermen": [
+    "public/apps/foundation/schrijven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/leren/schrijf-opdracht",
+   "schermen": [
+    "public/apps/foundation/schrijven.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/foundation/gezin/sessie/intrek",
    "schermen": [
     "public/apps/foundation/sessie/sessie-00.js"
@@ -6048,6 +7224,27 @@
    "pad": "/api/rtf/toegang",
    "schermen": [
     "public/apps/foundation/sessie/sessie-00.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/toets-maak",
+   "schermen": [
+    "public/apps/foundation/toetsen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/toets-weg",
+   "schermen": [
+    "public/apps/foundation/toetsen.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/toetsen",
+   "schermen": [
+    "public/apps/foundation/toetsen.html"
    ],
    "aantal": 1
   },
@@ -6276,9 +7473,100 @@
    "aantal": 1
   },
   {
+   "pad": "/api/rtfos/winkel",
+   "schermen": [
+    "public/apps/foundation/winkel.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/winkel/koop",
+   "schermen": [
+    "public/apps/foundation/winkel.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtfos/winkel/mijn",
+   "schermen": [
+    "public/apps/foundation/winkel.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/boek",
+   "schermen": [
+    "public/apps/foundation/zakgeld.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/doel-inleg",
+   "schermen": [
+    "public/apps/foundation/zakgeld.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/doel-maak",
+   "schermen": [
+    "public/apps/foundation/zakgeld.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/doel-weg",
+   "schermen": [
+    "public/apps/foundation/zakgeld.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtf/tiener/potje",
+   "schermen": [
+    "public/apps/foundation/zakgeld.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/foundation/hulp/ai",
    "schermen": [
     "public/apps/foundation/zorg-hulp.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/garderobe",
+   "schermen": [
+    "public/apps/garderobe.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/garderobe/stuk",
+   "schermen": [
+    "public/apps/garderobe.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/garderobe/stuk/weg",
+   "schermen": [
+    "public/apps/garderobe.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/garderobe/vakman",
+   "schermen": [
+    "public/apps/garderobe.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/garderobe/vakman/weg",
+   "schermen": [
+    "public/apps/garderobe.html"
    ],
    "aantal": 1
   },
@@ -7034,7 +8322,7 @@
   {
    "pad": "/api/supplier/ghost",
    "schermen": [
-    "public/apps/ghost.html"
+    "public/apps/ghost-voorzijde.js"
    ],
    "aantal": 1
   },
@@ -7270,6 +8558,69 @@
    "aantal": 1
   },
   {
+   "pad": "/api/supplier/kassa/artikel",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/dagrapport",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/derving",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/instel",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/kasopmaak",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/parkeer",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/retour",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/scherm",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/kassa/wachtbon",
+   "schermen": [
+    "public/apps/kassa.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/office/economie/relatie/zet",
    "schermen": [
     "public/apps/kosten.html"
@@ -7403,6 +8754,62 @@
    "aantal": 1
   },
   {
+   "pad": "/api/lab/ai",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lab/kennisbank",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lab/overzicht",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lab/project/bevinding",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lab/project/fase",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lab/project/log",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lab/project/maak",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lab/project/veiligheid",
+   "schermen": [
+    "public/apps/lab.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/leerhuis/doe",
    "schermen": [
     "public/apps/leerhuis-deur.js"
@@ -7518,6 +8925,76 @@
    "pad": "/api/supplier/verkoopweg/zet",
    "schermen": [
     "public/apps/leverancier-commerce.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/bericht",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/bevestig",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/bevestigingen",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/keuzes",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/mens",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/mijn",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/open",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/stand",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/weiger",
+   "schermen": [
+    "public/apps/leverancier-service.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/service/zaak",
+   "schermen": [
+    "public/apps/leverancier-service.js"
    ],
    "aantal": 1
   },
@@ -8180,6 +9657,55 @@
    "aantal": 1
   },
   {
+   "pad": "/api/carriere/ledger/afschrift",
+   "schermen": [
+    "public/apps/loopbaan.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/carriere/ledger/deel",
+   "schermen": [
+    "public/apps/loopbaan.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/carriere/ledger/delen",
+   "schermen": [
+    "public/apps/loopbaan.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/carriere/ledger/intrek",
+   "schermen": [
+    "public/apps/loopbaan.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/carriere/ledger/mijn",
+   "schermen": [
+    "public/apps/loopbaan.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/carriere/ledger/stopdelen",
+   "schermen": [
+    "public/apps/loopbaan.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/carriere/ledger/zet",
+   "schermen": [
+    "public/apps/loopbaan.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/concern/mijnwerk",
    "schermen": [
     "public/apps/loopbaan.html"
@@ -8194,142 +9720,191 @@
    "aantal": 1
   },
   {
-   "pad": "/api/lucht/ai",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/bagage",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/bagage/zet",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/bord",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/charter/beslis",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/charters",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/cockpit",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/lucht/draai/taak",
    "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/lounge",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/lounge/in",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/lounge/uit",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/security/zet",
-   "schermen": [
-    "public/apps/luchthaven.html"
+    "public/apps/luchthaven-bord.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/lucht/toren/klaring",
    "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/vip/lijst",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/vip/maak",
-   "schermen": [
-    "public/apps/luchthaven.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/lucht/vip/taak",
-   "schermen": [
-    "public/apps/luchthaven.html"
+    "public/apps/luchthaven-bord.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/lucht/vlucht/gate",
    "schermen": [
-    "public/apps/luchthaven.html"
+    "public/apps/luchthaven-bord.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/lucht/vlucht/maak",
    "schermen": [
-    "public/apps/luchthaven.html"
+    "public/apps/luchthaven-bord.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/lucht/vlucht/status",
    "schermen": [
-    "public/apps/luchthaven.html"
+    "public/apps/luchthaven-bord.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/lucht/vlucht/vertraag",
    "schermen": [
-    "public/apps/luchthaven.html"
+    "public/apps/luchthaven-bord.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/bagage",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/bagage/zet",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/charter/beslis",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/charters",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/lounge",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/lounge/in",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/lounge/uit",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/vip/lijst",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/vip/maak",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/vip/taak",
+   "schermen": [
+    "public/apps/luchthaven-loket.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/ai",
+   "schermen": [
+    "public/apps/luchthaven.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/cockpit",
+   "schermen": [
+    "public/apps/luchthaven.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/lucht/security/zet",
+   "schermen": [
+    "public/apps/luchthaven.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison",
+   "schermen": [
+    "public/apps/maison.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison/log",
+   "schermen": [
+    "public/apps/maison.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison/log/weg",
+   "schermen": [
+    "public/apps/maison.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison/staf",
+   "schermen": [
+    "public/apps/maison.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison/staf/weg",
+   "schermen": [
+    "public/apps/maison.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison/taak",
+   "schermen": [
+    "public/apps/maison.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison/taak/klaar",
+   "schermen": [
+    "public/apps/maison.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/maison/taak/weg",
+   "schermen": [
+    "public/apps/maison.html"
    ],
    "aantal": 1
   },
@@ -8693,56 +10268,56 @@
   {
    "pad": "/api/kmar/ai",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/kmar/cockpit",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/kmar/controle/lijst",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/kmar/controle/zet",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/kmar/incident",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/kmar/incident/sluit",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/kmar/incidenten",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/kmar/patrouille",
    "schermen": [
-    "public/apps/marechaussee.html"
+    "public/apps/marechaussee.js"
    ],
    "aantal": 1
   },
@@ -8932,6 +10507,48 @@
    "pad": "/api/memo/samenvat",
    "schermen": [
     "public/apps/memo/app.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/merk/haal",
+   "schermen": [
+    "public/apps/merken.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/merk/lijst",
+   "schermen": [
+    "public/apps/merken.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/merk/maak",
+   "schermen": [
+    "public/apps/merken.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/merk/sjabloon",
+   "schermen": [
+    "public/apps/merken.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/merk/uitrol",
+   "schermen": [
+    "public/apps/merken.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/merk/vestiging",
+   "schermen": [
+    "public/apps/merken.html"
    ],
    "aantal": 1
   },
@@ -9293,72 +10910,65 @@
    "aantal": 1
   },
   {
-   "pad": "/api/nav/bestemmingen",
-   "schermen": [
-    "public/apps/navigatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/nav/gebied/kies",
-   "schermen": [
-    "public/apps/navigatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/nav/gebied/pakket",
-   "schermen": [
-    "public/apps/navigatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/nav/gebied/weg",
-   "schermen": [
-    "public/apps/navigatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/nav/gebieden",
-   "schermen": [
-    "public/apps/navigatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/nav/kaart",
-   "schermen": [
-    "public/apps/navigatie.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/nav/meld",
    "schermen": [
-    "public/apps/navigatie.html"
+    "public/apps/navigatie-bediening.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/nav/poi",
    "schermen": [
-    "public/apps/navigatie.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/nav/route",
-   "schermen": [
-    "public/apps/navigatie.html"
+    "public/apps/navigatie-bediening.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/nav/status",
    "schermen": [
-    "public/apps/navigatie.html"
+    "public/apps/navigatie-bediening.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebied/kies",
+   "schermen": [
+    "public/apps/navigatie-kaarten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebied/pakket",
+   "schermen": [
+    "public/apps/navigatie-kaarten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebied/weg",
+   "schermen": [
+    "public/apps/navigatie-kaarten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/gebieden",
+   "schermen": [
+    "public/apps/navigatie-kaarten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/kaart",
+   "schermen": [
+    "public/apps/navigatie-start.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/nav/route",
+   "schermen": [
+    "public/apps/navigatie-zoek.js"
    ],
    "aantal": 1
   },
@@ -9471,6 +11081,55 @@
    "pad": "/api/onderneming/werkruimte",
    "schermen": [
     "public/apps/onderneming.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/oog",
+   "schermen": [
+    "public/apps/oog.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/oog/leer",
+   "schermen": [
+    "public/apps/oog.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/oog/nulmeting",
+   "schermen": [
+    "public/apps/oog.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/oog/nulmeting/van",
+   "schermen": [
+    "public/apps/oog.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/oog/schouw",
+   "schermen": [
+    "public/apps/oog.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/oog/schouwen",
+   "schermen": [
+    "public/apps/oog.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/staff/oog/uitgifte",
+   "schermen": [
+    "public/apps/oog.html"
    ],
    "aantal": 1
   },
@@ -9666,7 +11325,7 @@
   {
    "pad": "/api/staff/mob/kaart/controle",
    "schermen": [
-    "public/apps/ovdienst.html"
+    "public/apps/ovdienst.js"
    ],
    "aantal": 1
   },
@@ -9874,6 +11533,27 @@
    "aantal": 1
   },
   {
+   "pad": "/api/rtgid/start",
+   "schermen": [
+    "public/apps/overheid.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/status",
+   "schermen": [
+    "public/apps/overheid.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/wie",
+   "schermen": [
+    "public/apps/overheid.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/overheid/pda/ai",
    "schermen": [
     "public/apps/overheidspda.html"
@@ -9972,20 +11652,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/staff/ov/lijn/zet",
-   "schermen": [
-    "public/apps/ovroutes.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/staff/ov/lijnen",
-   "schermen": [
-    "public/apps/ovroutes.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/pakket/advies",
    "schermen": [
     "public/apps/pakketten.html"
@@ -10003,13 +11669,6 @@
    "pad": "/api/supplier/netwerk/overzicht",
    "schermen": [
     "public/apps/partner-network.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/webauthn/registreer/opties",
-   "schermen": [
-    "public/apps/passkeys.html"
    ],
    "aantal": 1
   },
@@ -10112,9 +11771,177 @@
    "aantal": 1
   },
   {
-   "pad": "/api/account/koppel",
+   "pad": "/api/office/payroll/aangifte",
    "schermen": [
-    "public/apps/personeel/personeel-04a.js"
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/aangifte/aansluiting",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/aangifte/indienen",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/bron",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/component",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/componenten",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/contract",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/dekking",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/dossier",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/herbouw",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/journaal",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/loonrun",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/match",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/overzicht",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/personeel",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/regels",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/regels/haal",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/regels/keur",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/run/definitief",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/run/een",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/run/keur",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/run/open",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/run/verklaar",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/verklaar",
+   "schermen": [
+    "public/apps/payroll.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/payroll/verval",
+   "schermen": [
+    "public/apps/payroll.html"
    ],
    "aantal": 1
   },
@@ -10315,6 +12142,76 @@
    "aantal": 1
   },
   {
+   "pad": "/api/office/redactie",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/ai/redactie",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/ai/schrijf",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/artikel/maak",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/artikel/status",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/artikel/verwijder",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/drukproef",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/editie/maak",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/editie/status",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/redactie/nieuwstips",
+   "schermen": [
+    "public/apps/redactiekantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/member/rechterhand/reis/item",
    "schermen": [
     "public/apps/reisboek-beheer.js"
@@ -10343,37 +12240,79 @@
    "aantal": 1
   },
   {
-   "pad": "/api/reis/wijzer",
-   "schermen": [
-    "public/apps/reisbureau.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/reisbureau/advies",
-   "schermen": [
-    "public/apps/reisbureau.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/reisbureau/afzeggen",
    "schermen": [
-    "public/apps/reisbureau.html"
+    "public/apps/reisbureau-aanvragen.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/reisbureau/annuleer",
    "schermen": [
-    "public/apps/reisbureau.html"
+    "public/apps/reisbureau-aanvragen.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/reisbureau/wijzig",
    "schermen": [
-    "public/apps/reisbureau.html"
+    "public/apps/reisbureau-aanvragen.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reis/wijzer",
+   "schermen": [
+    "public/apps/reisbureau-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reisbureau/advies",
+   "schermen": [
+    "public/apps/reisbureau-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reis/uitnodiging/eisop",
+   "schermen": [
+    "public/apps/reisuitnodiging-client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reis/uitnodiging/mijn",
+   "schermen": [
+    "public/apps/reisuitnodiging-client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reis/uitnodiging/open",
+   "schermen": [
+    "public/apps/reisuitnodiging-client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reis/uitnodiging/roteer",
+   "schermen": [
+    "public/apps/reisuitnodiging-client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reis/uitnodiging/weg",
+   "schermen": [
+    "public/apps/reisuitnodiging-client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reis/uitnodiging/nodig-uit",
+   "schermen": [
+    "public/apps/reizen-register.js"
    ],
    "aantal": 1
   },
@@ -10756,21 +12695,7 @@
    "aantal": 1
   },
   {
-   "pad": "/api/residentie/betreed",
-   "schermen": [
-    "public/apps/residentie/residentie-03.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/residentie/emote",
-   "schermen": [
-    "public/apps/residentie/residentie-03.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/residentie/pols",
    "schermen": [
     "public/apps/residentie/residentie-03.js"
    ],
@@ -11059,14 +12984,14 @@
   {
    "pad": "/api/office/routedekking",
    "schermen": [
-    "public/apps/routedekking.html"
+    "public/apps/routedekking-voorzijde.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/office/routedossier",
    "schermen": [
-    "public/apps/routedossier.html"
+    "public/apps/routedossier-voorzijde.js"
    ],
    "aantal": 1
   },
@@ -11095,6 +13020,97 @@
    "pad": "/api/agenda/mijn-lijst",
    "schermen": [
     "public/apps/rtg-vandaag.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/bevestig",
+   "schermen": [
+    "public/apps/rtgid.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/inzage",
+   "schermen": [
+    "public/apps/rtgid.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/koppel",
+   "schermen": [
+    "public/apps/rtgid.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/stapop/opties",
+   "schermen": [
+    "public/apps/rtgid.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/rtgid/weiger",
+   "schermen": [
+    "public/apps/rtgid.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/onderzoeker",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/onderzoeker/onderzoek",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/onderzoeker/ontwikkel",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/onderzoeker/rapport",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rtgai",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rtgai/roer/geef",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rtgai/roer/terug",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/rtgai/train",
+   "schermen": [
+    "public/apps/rtgkantoor.html"
    ],
    "aantal": 1
   },
@@ -11270,6 +13286,160 @@
    "pad": "/api/salon/weg",
    "schermen": [
     "public/apps/salon.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/bel",
+   "schermen": [
+    "public/apps/service-bel.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/bel/eind",
+   "schermen": [
+    "public/apps/service-bel.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/bel/signaal",
+   "schermen": [
+    "public/apps/service-bel.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/ai/vraag",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/bericht",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/bevestiging/code",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/bevestiging/vraag",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/bundel",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/eigenaar",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/foutsignalen",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/gesprek/eind",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/gesprek/neem",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/gesprek/signaal",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/gesprekken",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/incident/hersteld",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/kanalen",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/kwaliteit",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/patronen",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/stand",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/wachtrij",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/weeg",
+   "schermen": [
+    "public/apps/service.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/service/zaak",
+   "schermen": [
+    "public/apps/service.html"
    ],
    "aantal": 1
   },
@@ -11843,14 +14013,42 @@
   {
    "pad": "/api/stad/bewoner",
    "schermen": [
-    "public/apps/stad.html"
+    "public/apps/stad.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/stad/melding",
    "schermen": [
-    "public/apps/stad.html"
+    "public/apps/stad.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/stad",
+   "schermen": [
+    "public/apps/stadsdoos.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/stad/node/aanmeld",
+   "schermen": [
+    "public/apps/stadsdoos.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/stad/werk",
+   "schermen": [
+    "public/apps/stadsdoos.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/stad/werk/klaar",
+   "schermen": [
+    "public/apps/stadsdoos.html"
    ],
    "aantal": 1
   },
@@ -11858,6 +14056,48 @@
    "pad": "/api/stad/doos/hartslag",
    "schermen": [
     "public/apps/stadsdoos.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/table/gast",
+   "schermen": [
+    "public/apps/table.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/table/gast/weg",
+   "schermen": [
+    "public/apps/table.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/table/menu",
+   "schermen": [
+    "public/apps/table.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/table/menu/weg",
+   "schermen": [
+    "public/apps/table.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/table/weg",
+   "schermen": [
+    "public/apps/table.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/rechterhand/table/zet",
+   "schermen": [
+    "public/apps/table.html"
    ],
    "aantal": 1
   },
@@ -12513,51 +14753,51 @@
    "aantal": 1
   },
   {
-   "pad": "/api/member/vluchten/boek",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/vluchten/bord",
-   "schermen": [
-    "public/apps/vluchten.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/member/vluchten/charter",
    "schermen": [
-    "public/apps/vluchten.html"
+    "public/apps/vluchten-momenten.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/member/vluchten/incheck",
    "schermen": [
-    "public/apps/vluchten.html"
+    "public/apps/vluchten-momenten.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/member/vluchten/mijn",
    "schermen": [
-    "public/apps/vluchten.html"
+    "public/apps/vluchten-momenten.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/member/vluchten/pass/intrek",
    "schermen": [
-    "public/apps/vluchten.html"
+    "public/apps/vluchten-momenten.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/member/vluchten/pass/roteer",
    "schermen": [
-    "public/apps/vluchten.html"
+    "public/apps/vluchten-momenten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/boek",
+   "schermen": [
+    "public/apps/vluchten-voorzijde.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/member/vluchten/bord",
+   "schermen": [
+    "public/apps/vluchten-voorzijde.js"
    ],
    "aantal": 1
   },
@@ -12579,6 +14819,20 @@
    "pad": "/api/voeding/zet",
    "schermen": [
     "public/apps/voeding.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/mob/vloot",
+   "schermen": [
+    "public/apps/voertuig.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/mob/voertuig",
+   "schermen": [
+    "public/apps/voertuig.js"
    ],
    "aantal": 1
   },
@@ -12681,6 +14935,55 @@
    "aantal": 1
   },
   {
+   "pad": "/api/office/atelierweb/bewaar",
+   "schermen": [
+    "public/apps/websitestudio.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/atelierweb/etalage",
+   "schermen": [
+    "public/apps/websitestudio.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/atelierweb/foto",
+   "schermen": [
+    "public/apps/websitestudio.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/atelierweb/fotos",
+   "schermen": [
+    "public/apps/websitestudio.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/atelierweb/haal",
+   "schermen": [
+    "public/apps/websitestudio.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/atelierweb/lijst",
+   "schermen": [
+    "public/apps/websitestudio.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/atelierweb/salon",
+   "schermen": [
+    "public/apps/websitestudio.html"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/bedrijf/taak/maak",
    "schermen": [
     "public/apps/werk/acties.js"
@@ -12772,9 +15075,86 @@
    "aantal": 1
   },
   {
-   "pad": "/api/auth/register",
+   "pad": "/api/supplier/site/cijfers",
    "schermen": [
-    "public/shared/accountdeur.js"
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/genereer",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/herstel",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/live",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/mijn",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/offline",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/plan",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/publiceer",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/spoor",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/team",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/team/zet",
+   "schermen": [
+    "public/apps/zaakweb.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/site/versies",
+   "schermen": [
+    "public/apps/zaakweb.html"
    ],
    "aantal": 1
   },
@@ -12782,13 +15162,6 @@
    "pad": "/api/adres/zoek",
    "schermen": [
     "public/shared/adresvoorstel.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/service/bel/mijn",
-   "schermen": [
-    "public/shared/basis/basis-02b.js"
    ],
    "aantal": 1
   },
@@ -12933,20 +15306,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/ik/beelden",
-   "schermen": [
-    "public/shared/interface/personal-images.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/ik/beelden/zet",
-   "schermen": [
-    "public/shared/interface/personal-images.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/ik/workspace/audit/noteer",
    "schermen": [
     "public/shared/interface/workspace-runtime.js"
@@ -12962,20 +15321,6 @@
   },
   {
    "pad": "/api/foundation/gezin/agenda/bereik",
-   "schermen": [
-    "public/shared/interface/world-widget-data.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/rechterhand/attenties",
-   "schermen": [
-    "public/shared/interface/world-widget-data.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/member/rechterhand/table",
    "schermen": [
     "public/shared/interface/world-widget-data.js"
    ],
@@ -13171,13 +15516,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtgid/machtig",
-   "schermen": [
-    "public/shared/toestelsleutel.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/reisbureau/boek",
    "schermen": [
     "public/shared/travel-request-controller.js"
@@ -13223,34 +15561,6 @@
    "pad": "/api/veiligheid/plek",
    "schermen": [
     "public/shared/veiligheid.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtf/baby/entry-maak",
-   "schermen": [
-    "public/shared/verbinding/verbinding-01.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtf/baby/gezin-zet",
-   "schermen": [
-    "public/shared/verbinding/verbinding-01.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtf/leren/notitie",
-   "schermen": [
-    "public/shared/verbinding/verbinding-01.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/rtf/leren/schrijf-bewaar",
-   "schermen": [
-    "public/shared/verbinding/verbinding-01.js"
    ],
    "aantal": 1
   },
@@ -13608,7 +15918,7 @@
    ]
   },
   {
-   "bestand": "public/apps/arrival.html",
+   "bestand": "public/apps/arrival-voorzijde.js",
    "exact": [
     "/api/arrival/interpret",
     "/api/arrival/pass",
@@ -13619,9 +15929,29 @@
   },
   {
    "bestand": "public/apps/attenties.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/attenties",
+    "/api/member/rechterhand/attenties/gift",
+    "/api/member/rechterhand/attenties/gift/weg",
+    "/api/member/rechterhand/attenties/relatie",
+    "/api/member/rechterhand/attenties/relatie/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/rechterhand/",
+     "exactePaden": [
+      "/api/member/rechterhand/ai",
+      "/api/member/rechterhand/attenties",
+      "/api/member/rechterhand/attenties/gift",
+      "/api/member/rechterhand/attenties/gift/weg",
+      "/api/member/rechterhand/attenties/relatie",
+      "/api/member/rechterhand/attenties/relatie",
+      "/api/member/rechterhand/attenties/relatie/weg"
+     ]
+    }
    ]
   },
   {
@@ -13816,16 +16146,54 @@
   },
   {
    "bestand": "public/apps/cellier.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/cellier",
+    "/api/member/rechterhand/cellier/schenk",
+    "/api/member/rechterhand/cellier/weg",
+    "/api/member/rechterhand/cellier/zet"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/rechterhand/",
+     "exactePaden": [
+      "/api/member/rechterhand/ai",
+      "/api/member/rechterhand/cellier",
+      "/api/member/rechterhand/cellier/schenk",
+      "/api/member/rechterhand/cellier/weg",
+      "/api/member/rechterhand/cellier/zet"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/cercle.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/cercle",
+    "/api/member/rechterhand/cercle/club",
+    "/api/member/rechterhand/cercle/club/weg",
+    "/api/member/rechterhand/cercle/gast",
+    "/api/member/rechterhand/cercle/gast/terug",
+    "/api/member/rechterhand/cercle/waarheen"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/rechterhand/",
+     "exactePaden": [
+      "/api/member/rechterhand/ai",
+      "/api/member/rechterhand/cercle",
+      "/api/member/rechterhand/cercle/club",
+      "/api/member/rechterhand/cercle/club/weg",
+      "/api/member/rechterhand/cercle/gast",
+      "/api/member/rechterhand/cercle/gast/terug",
+      "/api/member/rechterhand/cercle/waarheen"
+     ]
+    }
    ]
   },
   {
@@ -13909,9 +16277,38 @@
   },
   {
    "bestand": "public/apps/concierge.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/office/"
+   "exact": [
+    "/api/office/bureau",
+    "/api/office/concierge",
+    "/api/office/concierge/voortgang",
+    "/api/office/rendezvous/arrangement/step",
+    "/api/office/rendezvous/arrangements",
+    "/api/office/rendezvous/circle/create",
+    "/api/office/rendezvous/circle/gathering",
+    "/api/office/rendezvous/circle/invite",
+    "/api/office/rendezvous/circles",
+    "/api/office/rendezvous/concierge",
+    "/api/office/rendezvous/concierge/step"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/",
+     "exactePaden": [
+      "/api/office/bureau",
+      "/api/office/concierge",
+      "/api/office/concierge/voortgang",
+      "/api/office/rendezvous/arrangement/step",
+      "/api/office/rendezvous/arrangements",
+      "/api/office/rendezvous/circle/create",
+      "/api/office/rendezvous/circle/gathering",
+      "/api/office/rendezvous/circle/invite",
+      "/api/office/rendezvous/circles",
+      "/api/office/rendezvous/concierge",
+      "/api/office/rendezvous/concierge/step"
+     ]
+    }
    ]
   },
   {
@@ -13954,10 +16351,28 @@
    ]
   },
   {
-   "bestand": "public/apps/dispatch.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/supplier/mob/"
+   "bestand": "public/apps/dispatch-voorzijde.js",
+   "exact": [
+    "/api/supplier/mob/dispatch",
+    "/api/supplier/mob/plekken",
+    "/api/supplier/mob/telefoon",
+    "/api/supplier/mob/toewijzen",
+    "/api/supplier/mob/voorstel"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/supplier/mob/",
+     "exactePaden": [
+      "/api/supplier/mob/dispatch",
+      "/api/supplier/mob/plekken",
+      "/api/supplier/mob/telefoon",
+      "/api/supplier/mob/toewijzen",
+      "/api/supplier/mob/toewijzen",
+      "/api/supplier/mob/voorstel"
+     ]
+    }
    ]
   },
   {
@@ -13981,9 +16396,30 @@
   },
   {
    "bestand": "public/apps/entourage.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/entourage",
+    "/api/member/rechterhand/entourage/doc",
+    "/api/member/rechterhand/entourage/doc/weg",
+    "/api/member/rechterhand/entourage/gezelschap",
+    "/api/member/rechterhand/entourage/persoon",
+    "/api/member/rechterhand/entourage/persoon/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/rechterhand/",
+     "exactePaden": [
+      "/api/member/rechterhand/ai",
+      "/api/member/rechterhand/entourage",
+      "/api/member/rechterhand/entourage/doc",
+      "/api/member/rechterhand/entourage/doc/weg",
+      "/api/member/rechterhand/entourage/gezelschap",
+      "/api/member/rechterhand/entourage/persoon",
+      "/api/member/rechterhand/entourage/persoon/weg"
+     ]
+    }
    ]
   },
   {
@@ -14109,7 +16545,7 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/flits.html",
+   "bestand": "public/apps/flits-voorzijde.js",
    "exact": [
     "/api/flits/meld",
     "/api/flits/rond",
@@ -14139,10 +16575,36 @@
   },
   {
    "bestand": "public/apps/foundation/babyboek.html",
-   "exact": [],
+   "exact": [
+    "/api/rtf/baby/boek",
+    "/api/rtf/baby/entry-maak",
+    "/api/rtf/baby/entry-weg",
+    "/api/rtf/baby/favoriet",
+    "/api/rtf/baby/gezin-zet",
+    "/api/rtf/baby/instellen",
+    "/api/rtf/baby/moment-ai",
+    "/api/rtf/baby/tijdlijn"
+   ],
    "voorvoegsels": [
-    "/api/foundation/gezin/",
-    "/api/rtf/baby/"
+    "/api/foundation/gezin/"
+   ],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/baby/",
+     "exactePaden": [
+      "/api/rtf/baby/boek",
+      "/api/rtf/baby/entry-maak",
+      "/api/rtf/baby/entry-weg",
+      "/api/rtf/baby/favoriet",
+      "/api/rtf/baby/favoriet",
+      "/api/rtf/baby/gezin-zet",
+      "/api/rtf/baby/gezin-zet",
+      "/api/rtf/baby/instellen",
+      "/api/rtf/baby/moment-ai",
+      "/api/rtf/baby/tijdlijn"
+     ]
+    }
    ]
   },
   {
@@ -14162,16 +16624,53 @@
   },
   {
    "bestand": "public/apps/foundation/beroepen.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/beroepen"
+   "exact": [
+    "/api/rtf/beroepen",
+    "/api/rtf/beroepen/catalogus",
+    "/api/rtf/beroepen/installeer",
+    "/api/rtf/beroepen/mijn",
+    "/api/rtf/beroepen/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/beroepen",
+     "exactePaden": [
+      "/api/rtf/beroepen",
+      "/api/rtf/beroepen/catalogus",
+      "/api/rtf/beroepen/installeer",
+      "/api/rtf/beroepen/mijn",
+      "/api/rtf/beroepen/mijn",
+      "/api/rtf/beroepen/weg"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/foundation/bieb.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/bieb"
+   "exact": [
+    "/api/rtf/bieb",
+    "/api/rtf/bieb/ai",
+    "/api/rtf/bieb/catalogus",
+    "/api/rtf/bieb/installeer",
+    "/api/rtf/bieb/mijn",
+    "/api/rtf/bieb/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/bieb",
+     "exactePaden": [
+      "/api/rtf/bieb",
+      "/api/rtf/bieb/ai",
+      "/api/rtf/bieb/catalogus",
+      "/api/rtf/bieb/installeer",
+      "/api/rtf/bieb/mijn",
+      "/api/rtf/bieb/weg"
+     ]
+    }
    ]
   },
   {
@@ -14214,16 +16713,52 @@
   },
   {
    "bestand": "public/apps/foundation/club.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/club/"
+   "exact": [
+    "/api/rtf/club/bericht",
+    "/api/rtf/club/portaal"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/club/",
+     "exactePaden": [
+      "/api/rtf/club/bericht",
+      "/api/rtf/club/portaal"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/foundation/clubswerk.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfkantoor/"
+   "exact": [
+    "/api/rtfkantoor/club/afspraak",
+    "/api/rtfkantoor/club/afspraak-zet",
+    "/api/rtfkantoor/club/bericht",
+    "/api/rtfkantoor/club/maak",
+    "/api/rtfkantoor/club/programma",
+    "/api/rtfkantoor/club/programma-zet",
+    "/api/rtfkantoor/club/team",
+    "/api/rtfkantoor/club/zet",
+    "/api/rtfkantoor/clubs"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtfkantoor/",
+     "exactePaden": [
+      "/api/rtfkantoor/club/afspraak",
+      "/api/rtfkantoor/club/afspraak-zet",
+      "/api/rtfkantoor/club/bericht",
+      "/api/rtfkantoor/club/maak",
+      "/api/rtfkantoor/club/programma",
+      "/api/rtfkantoor/club/programma-zet",
+      "/api/rtfkantoor/club/team",
+      "/api/rtfkantoor/club/zet",
+      "/api/rtfkantoor/clubs"
+     ]
+    }
    ]
   },
   {
@@ -14269,9 +16804,30 @@
   },
   {
    "bestand": "public/apps/foundation/geloofbieb.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/geloof"
+   "exact": [
+    "/api/rtf/geloof",
+    "/api/rtf/geloof/ai",
+    "/api/rtf/geloof/catalogus",
+    "/api/rtf/geloof/installeer",
+    "/api/rtf/geloof/lees",
+    "/api/rtf/geloof/mijn",
+    "/api/rtf/geloof/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/geloof",
+     "exactePaden": [
+      "/api/rtf/geloof",
+      "/api/rtf/geloof/ai",
+      "/api/rtf/geloof/catalogus",
+      "/api/rtf/geloof/installeer",
+      "/api/rtf/geloof/lees",
+      "/api/rtf/geloof/mijn",
+      "/api/rtf/geloof/weg"
+     ]
+    }
    ]
   },
   {
@@ -14292,9 +16848,23 @@
   },
   {
    "bestand": "public/apps/foundation/gevoel.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/welzijn/"
+   "exact": [
+    "/api/rtf/welzijn/dagboek",
+    "/api/rtf/welzijn/stemming",
+    "/api/rtf/welzijn/toestemming"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/welzijn/",
+     "exactePaden": [
+      "/api/rtf/welzijn/dagboek",
+      "/api/rtf/welzijn/stemming",
+      "/api/rtf/welzijn/toestemming",
+      "/api/rtf/welzijn/toestemming"
+     ]
+    }
    ]
   },
   {
@@ -14333,11 +16903,50 @@
    "bestand": "public/apps/foundation/kantoor.html",
    "exact": [
     "/api/office/rtfwallet",
-    "/api/office/rtfwallet/maak"
+    "/api/office/rtfwallet/maak",
+    "/api/rtfkantoor/kamer",
+    "/api/rtfkantoor/kamer/advies",
+    "/api/rtfkantoor/kamer/taak",
+    "/api/rtfkantoor/kamer/taak-zet",
+    "/api/rtfkantoor/kamers",
+    "/api/rtfkantoor/overzicht",
+    "/api/rtfkantoor/stadsraad",
+    "/api/rtfkantoor/stadsraad/besluit-sluit",
+    "/api/rtfkantoor/stadsraad/besluit-start",
+    "/api/rtfkantoor/stadsraad/partner-maak",
+    "/api/rtfkantoor/stadsraad/partner-stop",
+    "/api/rtfkantoor/stadsraad/stem",
+    "/api/rtfos/gift/stand/kantoor",
+    "/api/rtfos/gift/stand/zet"
    ],
-   "voorvoegsels": [
-    "/api/rtfkantoor/",
-    "/api/rtfos/gift/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtfkantoor/",
+     "exactePaden": [
+      "/api/rtfkantoor/kamer",
+      "/api/rtfkantoor/kamer/advies",
+      "/api/rtfkantoor/kamer/taak",
+      "/api/rtfkantoor/kamer/taak-zet",
+      "/api/rtfkantoor/kamers",
+      "/api/rtfkantoor/overzicht",
+      "/api/rtfkantoor/stadsraad",
+      "/api/rtfkantoor/stadsraad/besluit-sluit",
+      "/api/rtfkantoor/stadsraad/besluit-start",
+      "/api/rtfkantoor/stadsraad/partner-maak",
+      "/api/rtfkantoor/stadsraad/partner-stop",
+      "/api/rtfkantoor/stadsraad/stem"
+     ]
+    },
+    {
+     "naam": "giftApi",
+     "prefix": "/api/rtfos/gift/",
+     "exactePaden": [
+      "/api/rtfos/gift/stand/kantoor",
+      "/api/rtfos/gift/stand/zet"
+     ]
+    }
    ]
   },
   {
@@ -14384,9 +16993,24 @@
   },
   {
    "bestand": "public/apps/foundation/kwesties.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/democratie/kwestie/"
+   "exact": [
+    "/api/member/democratie/kwestie/gezien",
+    "/api/member/democratie/kwestie/inbreng",
+    "/api/member/democratie/kwestie/intrek",
+    "/api/member/democratie/kwestie/mijn"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/democratie/kwestie/",
+     "exactePaden": [
+      "/api/member/democratie/kwestie/gezien",
+      "/api/member/democratie/kwestie/inbreng",
+      "/api/member/democratie/kwestie/intrek",
+      "/api/member/democratie/kwestie/mijn"
+     ]
+    }
    ]
   },
   {
@@ -14469,16 +17093,38 @@
   },
   {
    "bestand": "public/apps/foundation/os-deelnemer.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfos/portaal/"
+   "exact": [
+    "/api/rtfos/portaal/deelnemer",
+    "/api/rtfos/portaal/deelnemer/intrekken"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtfos/portaal/",
+     "exactePaden": [
+      "/api/rtfos/portaal/deelnemer",
+      "/api/rtfos/portaal/deelnemer/intrekken"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/foundation/os-donateur.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfos/portaal/"
+   "exact": [
+    "/api/rtfos/portaal/donateur",
+    "/api/rtfos/portaal/donateur/bewijs"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtfos/portaal/",
+     "exactePaden": [
+      "/api/rtfos/portaal/donateur",
+      "/api/rtfos/portaal/donateur/bewijs"
+     ]
+    }
    ]
   },
   {
@@ -14508,9 +17154,22 @@
   },
   {
    "bestand": "public/apps/foundation/os-vrijwilliger.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfos/portaal/"
+   "exact": [
+    "/api/rtfos/portaal/vrijwilliger",
+    "/api/rtfos/portaal/vrijwilliger/uren",
+    "/api/rtfos/portaal/vrijwilliger/zet"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtfos/portaal/",
+     "exactePaden": [
+      "/api/rtfos/portaal/vrijwilliger",
+      "/api/rtfos/portaal/vrijwilliger/uren",
+      "/api/rtfos/portaal/vrijwilliger/zet"
+     ]
+    }
    ]
   },
   {
@@ -14523,26 +17182,104 @@
   {
    "bestand": "public/apps/foundation/overhoren.html",
    "exact": [
+    "/api/rtf/leren/herhaal",
+    "/api/rtf/leren/herhaal-antwoord",
+    "/api/rtf/leren/herhaal-stand",
+    "/api/rtf/leren/lijst-ai",
+    "/api/rtf/leren/lijst-haal",
+    "/api/rtf/leren/lijst-maak",
+    "/api/rtf/leren/lijst-weg",
+    "/api/rtf/leren/lijsten",
+    "/api/rtf/leren/overhoor-klaar",
+    "/api/rtf/leren/sessie-antwoord",
+    "/api/rtf/leren/sessie-staat",
+    "/api/rtf/leren/sessie-start",
+    "/api/rtf/leren/sessie-zet",
+    "/api/rtf/leren/sessies",
     "/api/rtf/social/connections"
    ],
-   "voorvoegsels": [
-    "/api/rtf/leren/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/leren/",
+     "exactePaden": [
+      "/api/rtf/leren/herhaal",
+      "/api/rtf/leren/herhaal-antwoord",
+      "/api/rtf/leren/herhaal-stand",
+      "/api/rtf/leren/lijst-ai",
+      "/api/rtf/leren/lijst-haal",
+      "/api/rtf/leren/lijst-maak",
+      "/api/rtf/leren/lijst-weg",
+      "/api/rtf/leren/lijsten",
+      "/api/rtf/leren/overhoor-klaar",
+      "/api/rtf/leren/sessie-antwoord",
+      "/api/rtf/leren/sessie-antwoord",
+      "/api/rtf/leren/sessie-staat",
+      "/api/rtf/leren/sessie-start",
+      "/api/rtf/leren/sessie-zet",
+      "/api/rtf/leren/sessies"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/foundation/partner.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/partner/"
+   "exact": [
+    "/api/rtf/partner/besluit-sluit",
+    "/api/rtf/partner/besluit-start",
+    "/api/rtf/partner/raad",
+    "/api/rtf/partner/stem"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/partner/",
+     "exactePaden": [
+      "/api/rtf/partner/besluit-sluit",
+      "/api/rtf/partner/besluit-start",
+      "/api/rtf/partner/raad",
+      "/api/rtf/partner/stem"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/foundation/projecten.html",
    "exact": [
+    "/api/rtf/leren/notitie",
+    "/api/rtf/leren/project-ai",
+    "/api/rtf/leren/project-antwoord",
+    "/api/rtf/leren/project-maak",
+    "/api/rtf/leren/project-staat",
+    "/api/rtf/leren/project-uitnodig",
+    "/api/rtf/leren/project-weg",
+    "/api/rtf/leren/projecten",
+    "/api/rtf/leren/taak-maak",
+    "/api/rtf/leren/taak-zet",
     "/api/rtf/social/connections"
    ],
-   "voorvoegsels": [
-    "/api/rtf/leren/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/leren/",
+     "exactePaden": [
+      "/api/rtf/leren/notitie",
+      "/api/rtf/leren/project-ai",
+      "/api/rtf/leren/project-antwoord",
+      "/api/rtf/leren/project-antwoord",
+      "/api/rtf/leren/project-maak",
+      "/api/rtf/leren/project-staat",
+      "/api/rtf/leren/project-uitnodig",
+      "/api/rtf/leren/project-weg",
+      "/api/rtf/leren/projecten",
+      "/api/rtf/leren/taak-maak",
+      "/api/rtf/leren/taak-zet",
+      "/api/rtf/leren/taak-zet"
+     ]
+    }
    ]
   },
   {
@@ -14556,10 +17293,34 @@
   },
   {
    "bestand": "public/apps/foundation/registreren.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/foundation/gezin/",
-    "/api/foundation/registratie/"
+   "exact": [
+    "/api/foundation/gezin/maak",
+    "/api/foundation/gezin/uitnodiging/accepteer",
+    "/api/foundation/gezin/uitnodiging/bekijk",
+    "/api/foundation/registratie/aanvragen",
+    "/api/foundation/registratie/catalogus",
+    "/api/foundation/registratie/status"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/foundation/registratie/",
+     "exactePaden": [
+      "/api/foundation/registratie/aanvragen",
+      "/api/foundation/registratie/catalogus",
+      "/api/foundation/registratie/status"
+     ]
+    },
+    {
+     "naam": "gezinApi",
+     "prefix": "/api/foundation/gezin/",
+     "exactePaden": [
+      "/api/foundation/gezin/maak",
+      "/api/foundation/gezin/uitnodiging/accepteer",
+      "/api/foundation/gezin/uitnodiging/bekijk"
+     ]
+    }
    ]
   },
   {
@@ -14611,9 +17372,26 @@
   },
   {
    "bestand": "public/apps/foundation/schoolbieb.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/school"
+   "exact": [
+    "/api/rtf/school",
+    "/api/rtf/school/catalogus",
+    "/api/rtf/school/installeer",
+    "/api/rtf/school/mijn",
+    "/api/rtf/school/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/school",
+     "exactePaden": [
+      "/api/rtf/school",
+      "/api/rtf/school/catalogus",
+      "/api/rtf/school/installeer",
+      "/api/rtf/school/mijn",
+      "/api/rtf/school/weg"
+     ]
+    }
    ]
   },
   {
@@ -14632,9 +17410,24 @@
   },
   {
    "bestand": "public/apps/foundation/schrijven.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/leren/"
+   "exact": [
+    "/api/rtf/leren/schrijf-bewaar",
+    "/api/rtf/leren/schrijf-feedback",
+    "/api/rtf/leren/schrijf-opdracht",
+    "/api/rtf/leren/schrijfsels"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/leren/",
+     "exactePaden": [
+      "/api/rtf/leren/schrijf-bewaar",
+      "/api/rtf/leren/schrijf-feedback",
+      "/api/rtf/leren/schrijf-opdracht",
+      "/api/rtf/leren/schrijfsels"
+     ]
+    }
    ]
   },
   {
@@ -14679,9 +17472,24 @@
   },
   {
    "bestand": "public/apps/foundation/toetsen.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/tiener/"
+   "exact": [
+    "/api/rtf/tiener/toets-maak",
+    "/api/rtf/tiener/toets-stap",
+    "/api/rtf/tiener/toets-weg",
+    "/api/rtf/tiener/toetsen"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/tiener/",
+     "exactePaden": [
+      "/api/rtf/tiener/toets-maak",
+      "/api/rtf/tiener/toets-stap",
+      "/api/rtf/tiener/toets-weg",
+      "/api/rtf/tiener/toetsen"
+     ]
+    }
    ]
   },
   {
@@ -14774,16 +17582,47 @@
   },
   {
    "bestand": "public/apps/foundation/winkel.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtfos/winkel"
+   "exact": [
+    "/api/rtfos/winkel",
+    "/api/rtfos/winkel/koop",
+    "/api/rtfos/winkel/mijn"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtfos/winkel",
+     "exactePaden": [
+      "/api/rtfos/winkel",
+      "/api/rtfos/winkel/koop",
+      "/api/rtfos/winkel/mijn"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/foundation/zakgeld.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtf/tiener/"
+   "exact": [
+    "/api/rtf/tiener/boek",
+    "/api/rtf/tiener/doel-inleg",
+    "/api/rtf/tiener/doel-maak",
+    "/api/rtf/tiener/doel-weg",
+    "/api/rtf/tiener/potje"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtf/tiener/",
+     "exactePaden": [
+      "/api/rtf/tiener/boek",
+      "/api/rtf/tiener/doel-inleg",
+      "/api/rtf/tiener/doel-maak",
+      "/api/rtf/tiener/doel-weg",
+      "/api/rtf/tiener/potje",
+      "/api/rtf/tiener/potje"
+     ]
+    }
    ]
   },
   {
@@ -14808,9 +17647,28 @@
   },
   {
    "bestand": "public/apps/garderobe.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/garderobe",
+    "/api/member/rechterhand/garderobe/stuk",
+    "/api/member/rechterhand/garderobe/stuk/weg",
+    "/api/member/rechterhand/garderobe/vakman",
+    "/api/member/rechterhand/garderobe/vakman/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/rechterhand/",
+     "exactePaden": [
+      "/api/member/rechterhand/ai",
+      "/api/member/rechterhand/garderobe",
+      "/api/member/rechterhand/garderobe/stuk",
+      "/api/member/rechterhand/garderobe/stuk/weg",
+      "/api/member/rechterhand/garderobe/vakman",
+      "/api/member/rechterhand/garderobe/vakman/weg"
+     ]
+    }
    ]
   },
   {
@@ -15122,7 +17980,7 @@
    ]
   },
   {
-   "bestand": "public/apps/ghost.html",
+   "bestand": "public/apps/ghost-voorzijde.js",
    "exact": [
     "/api/supplier/ghost"
    ],
@@ -15136,8 +17994,10 @@
    ]
   },
   {
-   "bestand": "public/apps/hangar.html",
-   "exact": [],
+   "bestand": "public/apps/hangar-voorzijde.js",
+   "exact": [
+    "/api/gids/app"
+   ],
    "voorvoegsels": [
     "/api/member/rechterhand/"
    ]
@@ -15289,9 +18149,36 @@
   },
   {
    "bestand": "public/apps/kassa.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/supplier/"
+   "exact": [
+    "/api/supplier/kassa/artikel",
+    "/api/supplier/kassa/dagrapport",
+    "/api/supplier/kassa/derving",
+    "/api/supplier/kassa/instel",
+    "/api/supplier/kassa/kasopmaak",
+    "/api/supplier/kassa/parkeer",
+    "/api/supplier/kassa/retour",
+    "/api/supplier/kassa/scherm",
+    "/api/supplier/kassa/wachtbon"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/supplier/",
+     "exactePaden": [
+      "/api/supplier/kassa/artikel",
+      "/api/supplier/kassa/dagrapport",
+      "/api/supplier/kassa/derving",
+      "/api/supplier/kassa/derving",
+      "/api/supplier/kassa/instel",
+      "/api/supplier/kassa/kasopmaak",
+      "/api/supplier/kassa/parkeer",
+      "/api/supplier/kassa/retour",
+      "/api/supplier/kassa/scherm",
+      "/api/supplier/kassa/wachtbon",
+      "/api/supplier/kassa/wachtbon"
+     ]
+    }
    ]
   },
   {
@@ -15349,9 +18236,32 @@
   },
   {
    "bestand": "public/apps/lab.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/lab/"
+   "exact": [
+    "/api/lab/ai",
+    "/api/lab/kennisbank",
+    "/api/lab/overzicht",
+    "/api/lab/project/bevinding",
+    "/api/lab/project/fase",
+    "/api/lab/project/log",
+    "/api/lab/project/maak",
+    "/api/lab/project/veiligheid"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/lab/",
+     "exactePaden": [
+      "/api/lab/ai",
+      "/api/lab/kennisbank",
+      "/api/lab/overzicht",
+      "/api/lab/project/bevinding",
+      "/api/lab/project/fase",
+      "/api/lab/project/log",
+      "/api/lab/project/maak",
+      "/api/lab/project/veiligheid"
+     ]
+    }
    ]
   },
   {
@@ -15413,10 +18323,22 @@
   {
    "bestand": "public/apps/leverancier/leverancier-07.js",
    "exact": [
+    "/api/account/koppel",
+    "/api/account/rollen",
+    "/api/account/start",
     "/api/doos/status"
    ],
-   "voorvoegsels": [
-    "/api/account/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "accApi",
+     "prefix": "/api/account/",
+     "exactePaden": [
+      "/api/account/koppel",
+      "/api/account/rollen",
+      "/api/account/start"
+     ]
+    }
    ]
   },
   {
@@ -15458,9 +18380,36 @@
   },
   {
    "bestand": "public/apps/leverancier-service.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/supplier/service/"
+   "exact": [
+    "/api/supplier/service/bericht",
+    "/api/supplier/service/bevestig",
+    "/api/supplier/service/bevestigingen",
+    "/api/supplier/service/keuzes",
+    "/api/supplier/service/mens",
+    "/api/supplier/service/mijn",
+    "/api/supplier/service/open",
+    "/api/supplier/service/stand",
+    "/api/supplier/service/weiger",
+    "/api/supplier/service/zaak"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/supplier/service/",
+     "exactePaden": [
+      "/api/supplier/service/bericht",
+      "/api/supplier/service/bevestig",
+      "/api/supplier/service/bevestigingen",
+      "/api/supplier/service/keuzes",
+      "/api/supplier/service/mens",
+      "/api/supplier/service/mijn",
+      "/api/supplier/service/open",
+      "/api/supplier/service/stand",
+      "/api/supplier/service/weiger",
+      "/api/supplier/service/zaak"
+     ]
+    }
    ]
   },
   {
@@ -15644,10 +18593,30 @@
   {
    "bestand": "public/apps/loopbaan.html",
    "exact": [
+    "/api/carriere/ledger/afschrift",
+    "/api/carriere/ledger/deel",
+    "/api/carriere/ledger/delen",
+    "/api/carriere/ledger/intrek",
+    "/api/carriere/ledger/mijn",
+    "/api/carriere/ledger/stopdelen",
+    "/api/carriere/ledger/zet",
     "/api/concern/mijnwerk"
    ],
-   "voorvoegsels": [
-    "/api/carriere/ledger"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/carriere/ledger",
+     "exactePaden": [
+      "/api/carriere/ledger/afschrift",
+      "/api/carriere/ledger/deel",
+      "/api/carriere/ledger/delen",
+      "/api/carriere/ledger/intrek",
+      "/api/carriere/ledger/mijn",
+      "/api/carriere/ledger/stopdelen",
+      "/api/carriere/ledger/zet"
+     ]
+    }
    ]
   },
   {
@@ -15658,30 +18627,41 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/luchthaven.html",
+   "bestand": "public/apps/luchthaven-bord.js",
    "exact": [
-    "/api/lucht/ai",
-    "/api/lucht/bagage",
-    "/api/lucht/bagage/zet",
     "/api/lucht/bord",
-    "/api/lucht/charter/beslis",
-    "/api/lucht/charters",
-    "/api/lucht/cockpit",
     "/api/lucht/draai/taak",
-    "/api/lucht/lounge",
-    "/api/lucht/lounge/in",
-    "/api/lucht/lounge/uit",
-    "/api/lucht/security/zet",
     "/api/lucht/toren/klaring",
-    "/api/lucht/vip/lijst",
-    "/api/lucht/vip/maak",
-    "/api/lucht/vip/taak",
     "/api/lucht/vlucht/gate",
     "/api/lucht/vlucht/maak",
     "/api/lucht/vlucht/status",
-    "/api/lucht/vlucht/vertraag",
-    "/api/supplier/login",
-    "/api/supplier/roster"
+    "/api/lucht/vlucht/vertraag"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/luchthaven-loket.js",
+   "exact": [
+    "/api/lucht/bagage",
+    "/api/lucht/bagage/zet",
+    "/api/lucht/charter/beslis",
+    "/api/lucht/charters",
+    "/api/lucht/lounge",
+    "/api/lucht/lounge/in",
+    "/api/lucht/lounge/uit",
+    "/api/lucht/vip/lijst",
+    "/api/lucht/vip/maak",
+    "/api/lucht/vip/taak"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/luchthaven.js",
+   "exact": [
+    "/api/lucht/ai",
+    "/api/lucht/bord",
+    "/api/lucht/cockpit",
+    "/api/lucht/security/zet"
    ],
    "voorvoegsels": []
   },
@@ -15693,17 +18673,17 @@
    ]
   },
   {
+   "bestand": "public/apps/magnaat-leven/01-toegang-en-handelingen.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/member/magnaat/"
+   ]
+  },
+  {
    "bestand": "public/apps/magnaat-leven-stad.js",
    "exact": [],
    "voorvoegsels": [
     "/api/member/magnaat/stad/"
-   ]
-  },
-  {
-   "bestand": "public/apps/magnaat-leven.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/magnaat/"
    ]
   },
   {
@@ -15730,9 +18710,34 @@
   },
   {
    "bestand": "public/apps/maison.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/maison",
+    "/api/member/rechterhand/maison/log",
+    "/api/member/rechterhand/maison/log/weg",
+    "/api/member/rechterhand/maison/staf",
+    "/api/member/rechterhand/maison/staf/weg",
+    "/api/member/rechterhand/maison/taak",
+    "/api/member/rechterhand/maison/taak/klaar",
+    "/api/member/rechterhand/maison/taak/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/rechterhand/",
+     "exactePaden": [
+      "/api/member/rechterhand/ai",
+      "/api/member/rechterhand/maison",
+      "/api/member/rechterhand/maison/log",
+      "/api/member/rechterhand/maison/log/weg",
+      "/api/member/rechterhand/maison/staf",
+      "/api/member/rechterhand/maison/staf/weg",
+      "/api/member/rechterhand/maison/taak",
+      "/api/member/rechterhand/maison/taak/klaar",
+      "/api/member/rechterhand/maison/taak/weg"
+     ]
+    }
    ]
   },
   {
@@ -15822,7 +18827,7 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/marechaussee.html",
+   "bestand": "public/apps/marechaussee.js",
    "exact": [
     "/api/kmar/ai",
     "/api/kmar/cockpit",
@@ -15831,9 +18836,7 @@
     "/api/kmar/incident",
     "/api/kmar/incident/sluit",
     "/api/kmar/incidenten",
-    "/api/kmar/patrouille",
-    "/api/supplier/login",
-    "/api/supplier/roster"
+    "/api/kmar/patrouille"
    ],
    "voorvoegsels": []
   },
@@ -15948,9 +18951,29 @@
   },
   {
    "bestand": "public/apps/merken.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/office/"
+   "exact": [
+    "/api/office/merk/haal",
+    "/api/office/merk/lijst",
+    "/api/office/merk/maak",
+    "/api/office/merk/sjabloon",
+    "/api/office/merk/uitrol",
+    "/api/office/merk/vestiging"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/",
+     "exactePaden": [
+      "/api/office/merk/haal",
+      "/api/office/merk/lijst",
+      "/api/office/merk/maak",
+      "/api/office/merk/sjabloon",
+      "/api/office/merk/uitrol",
+      "/api/office/merk/vestiging",
+      "/api/office/merk/vestiging"
+     ]
+    }
    ]
   },
   {
@@ -16097,18 +19120,37 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/navigatie.html",
+   "bestand": "public/apps/navigatie-bediening.js",
    "exact": [
     "/api/nav/bestemmingen",
+    "/api/nav/meld",
+    "/api/nav/poi",
+    "/api/nav/status"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/navigatie-kaarten.js",
+   "exact": [
     "/api/nav/gebied/kies",
     "/api/nav/gebied/pakket",
     "/api/nav/gebied/weg",
-    "/api/nav/gebieden",
-    "/api/nav/kaart",
-    "/api/nav/meld",
-    "/api/nav/poi",
-    "/api/nav/route",
-    "/api/nav/status"
+    "/api/nav/gebieden"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/navigatie-start.js",
+   "exact": [
+    "/api/nav/kaart"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/navigatie-zoek.js",
+   "exact": [
+    "/api/nav/bestemmingen",
+    "/api/nav/route"
    ],
    "voorvoegsels": []
   },
@@ -16162,10 +19204,30 @@
   {
    "bestand": "public/apps/oog.html",
    "exact": [
+    "/api/staff/oog",
+    "/api/staff/oog/leer",
+    "/api/staff/oog/nulmeting",
+    "/api/staff/oog/nulmeting/van",
+    "/api/staff/oog/schouw",
+    "/api/staff/oog/schouwen",
+    "/api/staff/oog/uitgifte",
     "/api/supplier/oog/overzicht"
    ],
-   "voorvoegsels": [
-    "/api/staff/oog"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/staff/oog",
+     "exactePaden": [
+      "/api/staff/oog",
+      "/api/staff/oog/leer",
+      "/api/staff/oog/nulmeting",
+      "/api/staff/oog/nulmeting/van",
+      "/api/staff/oog/schouw",
+      "/api/staff/oog/schouwen",
+      "/api/staff/oog/uitgifte"
+     ]
+    }
    ]
   },
   {
@@ -16205,14 +19267,14 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/ovcontrol.html",
+   "bestand": "public/apps/ovcontrol.js",
    "exact": [
     "/api/supplier/ov/overzicht"
    ],
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/ovdienst.html",
+   "bestand": "public/apps/ovdienst.js",
    "exact": [
     "/api/staff/mob/kaart/controle",
     "/api/supplier/ov/overzicht"
@@ -16254,10 +19316,22 @@
     "/api/overheid/water/meld",
     "/api/overheid/water/meldingen/mijn",
     "/api/overheid/waterschap/betaal",
-    "/api/overheid/waterschap/mijn"
+    "/api/overheid/waterschap/mijn",
+    "/api/rtgid/start",
+    "/api/rtgid/status",
+    "/api/rtgid/wie"
    ],
-   "voorvoegsels": [
-    "/api/rtgid/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "idApi",
+     "prefix": "/api/rtgid/",
+     "exactePaden": [
+      "/api/rtgid/start",
+      "/api/rtgid/status",
+      "/api/rtgid/wie"
+     ]
+    }
    ]
   },
   {
@@ -16283,12 +19357,11 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/ovroutes.html",
-   "exact": [
-    "/api/staff/ov/lijn/zet",
-    "/api/staff/ov/lijnen"
-   ],
-   "voorvoegsels": []
+   "bestand": "public/apps/ovroutes/01-projectie-en-tekenen.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/staff/ov/"
+   ]
   },
   {
    "bestand": "public/apps/pakketten.html",
@@ -16344,9 +19417,70 @@
   },
   {
    "bestand": "public/apps/payroll.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/office/payroll/"
+   "exact": [
+    "/api/office/payroll/aangifte",
+    "/api/office/payroll/aangifte/aansluiting",
+    "/api/office/payroll/aangifte/indienen",
+    "/api/office/payroll/bron",
+    "/api/office/payroll/component",
+    "/api/office/payroll/componenten",
+    "/api/office/payroll/contract",
+    "/api/office/payroll/dekking",
+    "/api/office/payroll/dossier",
+    "/api/office/payroll/herbouw",
+    "/api/office/payroll/journaal",
+    "/api/office/payroll/loonrun",
+    "/api/office/payroll/match",
+    "/api/office/payroll/overzicht",
+    "/api/office/payroll/personeel",
+    "/api/office/payroll/regels",
+    "/api/office/payroll/regels/haal",
+    "/api/office/payroll/regels/keur",
+    "/api/office/payroll/run/definitief",
+    "/api/office/payroll/run/een",
+    "/api/office/payroll/run/keur",
+    "/api/office/payroll/run/open",
+    "/api/office/payroll/run/verklaar",
+    "/api/office/payroll/verklaar",
+    "/api/office/payroll/verval"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/payroll/",
+     "exactePaden": [
+      "/api/office/payroll/aangifte",
+      "/api/office/payroll/aangifte/aansluiting",
+      "/api/office/payroll/aangifte/indienen",
+      "/api/office/payroll/bron",
+      "/api/office/payroll/component",
+      "/api/office/payroll/componenten",
+      "/api/office/payroll/contract",
+      "/api/office/payroll/dekking",
+      "/api/office/payroll/dossier",
+      "/api/office/payroll/dossier",
+      "/api/office/payroll/herbouw",
+      "/api/office/payroll/journaal",
+      "/api/office/payroll/loonrun",
+      "/api/office/payroll/match",
+      "/api/office/payroll/overzicht",
+      "/api/office/payroll/personeel",
+      "/api/office/payroll/regels",
+      "/api/office/payroll/regels/haal",
+      "/api/office/payroll/regels/haal",
+      "/api/office/payroll/regels/keur",
+      "/api/office/payroll/run/definitief",
+      "/api/office/payroll/run/een",
+      "/api/office/payroll/run/een",
+      "/api/office/payroll/run/een",
+      "/api/office/payroll/run/keur",
+      "/api/office/payroll/run/open",
+      "/api/office/payroll/run/verklaar",
+      "/api/office/payroll/verklaar",
+      "/api/office/payroll/verval"
+     ]
+    }
    ]
   },
   {
@@ -16468,9 +19602,37 @@
   },
   {
    "bestand": "public/apps/redactiekantoor.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/office/"
+   "exact": [
+    "/api/office/redactie",
+    "/api/office/redactie/ai/redactie",
+    "/api/office/redactie/ai/schrijf",
+    "/api/office/redactie/artikel/maak",
+    "/api/office/redactie/artikel/status",
+    "/api/office/redactie/artikel/verwijder",
+    "/api/office/redactie/drukproef",
+    "/api/office/redactie/editie/maak",
+    "/api/office/redactie/editie/status",
+    "/api/office/redactie/nieuwstips"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/",
+     "exactePaden": [
+      "/api/office/redactie",
+      "/api/office/redactie/ai/redactie",
+      "/api/office/redactie/ai/schrijf",
+      "/api/office/redactie/artikel/maak",
+      "/api/office/redactie/artikel/maak",
+      "/api/office/redactie/artikel/status",
+      "/api/office/redactie/artikel/verwijder",
+      "/api/office/redactie/drukproef",
+      "/api/office/redactie/editie/maak",
+      "/api/office/redactie/editie/status",
+      "/api/office/redactie/nieuwstips"
+     ]
+    }
    ]
   },
   {
@@ -16480,6 +19642,13 @@
     "/api/member/rechterhand/reis/item/weg",
     "/api/member/rechterhand/reis/weg",
     "/api/member/rechterhand/reis/zet"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/reisboek-momenten.js",
+   "exact": [
+    "/api/gids/app"
    ],
    "voorvoegsels": []
   },
@@ -16495,11 +19664,8 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/reisbureau.html",
+   "bestand": "public/apps/reisbureau-aanvragen.js",
    "exact": [
-    "/api/reis/wijzer",
-    "/api/reisbureau",
-    "/api/reisbureau/advies",
     "/api/reisbureau/afzeggen",
     "/api/reisbureau/annuleer",
     "/api/reisbureau/mijn",
@@ -16508,10 +19674,65 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/reisbureau-voorzijde.js",
+   "exact": [
+    "/api/reis/wijzer",
+    "/api/reisbureau",
+    "/api/reisbureau/advies"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/reisuitnodiging-client.js",
+   "exact": [
+    "/api/auth/register",
+    "/api/reis/uitnodiging/eisop",
+    "/api/reis/uitnodiging/mijn",
+    "/api/reis/uitnodiging/open",
+    "/api/reis/uitnodiging/roteer",
+    "/api/reis/uitnodiging/weg"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/",
+     "exactePaden": [
+      "/api/auth/register",
+      "/api/reis/uitnodiging/eisop",
+      "/api/reis/uitnodiging/eisop",
+      "/api/reis/uitnodiging/mijn",
+      "/api/reis/uitnodiging/open",
+      "/api/reis/uitnodiging/open",
+      "/api/reis/uitnodiging/roteer",
+      "/api/reis/uitnodiging/weg"
+     ]
+    }
+   ]
+  },
+  {
+   "bestand": "public/apps/reizen-beeld-editor.js",
+   "exact": [
+    "/api/bestanden/mijn"
+   ],
+   "voorvoegsels": [
+    "/api/bestanden/"
+   ]
+  },
+  {
+   "bestand": "public/apps/reizen-beeld.js",
+   "exact": [
+    "/api/bestanden/haal",
+    "/api/ik/beelden",
+    "/api/ik/beelden/zet"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/reizen-invoer.js",
    "exact": [],
    "voorvoegsels": [
-    "/api/"
+    "/api/reis/"
    ]
   },
   {
@@ -16541,6 +19762,14 @@
     "/api/mob/aanbod",
     "/api/mob/mijn",
     "/api/mob/plekken"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/reizen-register.js",
+   "exact": [
+    "/api/reis/reizen",
+    "/api/reis/uitnodiging/nodig-uit"
    ],
    "voorvoegsels": []
   },
@@ -16619,16 +19848,13 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/reizen.html",
+   "bestand": "public/apps/reizen-wacht.js",
    "exact": [
     "/api/reis/los",
     "/api/reis/los/doe",
-    "/api/reis/reizen",
     "/api/reis/wacht"
    ],
-   "voorvoegsels": [
-    "/api/reis/"
-   ]
+   "voorvoegsels": []
   },
   {
    "bestand": "public/apps/rendezvous.html",
@@ -16663,6 +19889,16 @@
     "/api/member/rendezvous/tafels"
    ],
    "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/residentie/residentie-01.js",
+   "exact": [
+    "/api/residentie/betreed",
+    "/api/residentie/pols"
+   ],
+   "voorvoegsels": [
+    "/api/residentie/"
+   ]
   },
   {
    "bestand": "public/apps/residentie/residentie-03.js",
@@ -16778,14 +20014,14 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/routedekking.html",
+   "bestand": "public/apps/routedekking-voorzijde.js",
    "exact": [
     "/api/office/routedekking"
    ],
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/routedossier.html",
+   "bestand": "public/apps/routedossier-voorzijde.js",
    "exact": [
     "/api/office/routedossier"
    ],
@@ -16818,17 +20054,69 @@
   },
   {
    "bestand": "public/apps/rtgid.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/rtgid/",
-    "/api/webauthn/"
+   "exact": [
+    "/api/rtgid/bevestig",
+    "/api/rtgid/inzage",
+    "/api/rtgid/koppel",
+    "/api/rtgid/machtig",
+    "/api/rtgid/stapop/opties",
+    "/api/rtgid/weiger",
+    "/api/webauthn/registreer",
+    "/api/webauthn/registreer/opties"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/rtgid/",
+     "exactePaden": [
+      "/api/rtgid/bevestig",
+      "/api/rtgid/inzage",
+      "/api/rtgid/koppel",
+      "/api/rtgid/machtig",
+      "/api/rtgid/stapop/opties",
+      "/api/rtgid/weiger"
+     ]
+    },
+    {
+     "naam": "wapi",
+     "prefix": "/api/webauthn/",
+     "exactePaden": [
+      "/api/webauthn/registreer",
+      "/api/webauthn/registreer/opties",
+      "/api/webauthn/registreer/opties"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/rtgkantoor.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/office/"
+   "exact": [
+    "/api/office/onderzoeker",
+    "/api/office/onderzoeker/onderzoek",
+    "/api/office/onderzoeker/ontwikkel",
+    "/api/office/onderzoeker/rapport",
+    "/api/office/rtgai",
+    "/api/office/rtgai/roer/geef",
+    "/api/office/rtgai/roer/terug",
+    "/api/office/rtgai/train"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/",
+     "exactePaden": [
+      "/api/office/onderzoeker",
+      "/api/office/onderzoeker/onderzoek",
+      "/api/office/onderzoeker/ontwikkel",
+      "/api/office/onderzoeker/rapport",
+      "/api/office/rtgai",
+      "/api/office/rtgai/roer/geef",
+      "/api/office/rtgai/roer/terug",
+      "/api/office/rtgai/train"
+     ]
+    }
    ]
   },
   {
@@ -16986,19 +20274,79 @@
   {
    "bestand": "public/apps/service-bel.js",
    "exact": [
+    "/api/service/bel",
+    "/api/service/bel/eind",
+    "/api/service/bel/mijn",
+    "/api/service/bel/signaal",
     "/api/stream"
    ],
-   "voorvoegsels": [
-    "/api/service/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/service/",
+     "exactePaden": [
+      "/api/service/bel",
+      "/api/service/bel/eind",
+      "/api/service/bel/mijn",
+      "/api/service/bel/signaal",
+      "/api/service/bel/signaal"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/service.html",
    "exact": [
+    "/api/office/service/ai/vraag",
+    "/api/office/service/bericht",
+    "/api/office/service/bevestiging/code",
+    "/api/office/service/bevestiging/vraag",
+    "/api/office/service/bundel",
+    "/api/office/service/eigenaar",
+    "/api/office/service/foutsignalen",
+    "/api/office/service/gesprek/eind",
+    "/api/office/service/gesprek/neem",
+    "/api/office/service/gesprek/signaal",
+    "/api/office/service/gesprekken",
+    "/api/office/service/incident/hersteld",
+    "/api/office/service/kanalen",
+    "/api/office/service/kwaliteit",
+    "/api/office/service/patronen",
+    "/api/office/service/stand",
+    "/api/office/service/wachtrij",
+    "/api/office/service/weeg",
+    "/api/office/service/zaak",
     "/api/stream"
    ],
-   "voorvoegsels": [
-    "/api/office/service/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/service/",
+     "exactePaden": [
+      "/api/office/service/ai/vraag",
+      "/api/office/service/bericht",
+      "/api/office/service/bevestiging/code",
+      "/api/office/service/bevestiging/vraag",
+      "/api/office/service/bundel",
+      "/api/office/service/eigenaar",
+      "/api/office/service/foutsignalen",
+      "/api/office/service/gesprek/eind",
+      "/api/office/service/gesprek/neem",
+      "/api/office/service/gesprek/signaal",
+      "/api/office/service/gesprek/signaal",
+      "/api/office/service/gesprekken",
+      "/api/office/service/incident/hersteld",
+      "/api/office/service/kanalen",
+      "/api/office/service/kwaliteit",
+      "/api/office/service/patronen",
+      "/api/office/service/stand",
+      "/api/office/service/wachtrij",
+      "/api/office/service/weeg",
+      "/api/office/service/zaak"
+     ]
+    }
    ]
   },
   {
@@ -17135,29 +20483,76 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/stad.html",
+   "bestand": "public/apps/stad.js",
    "exact": [
     "/api/stad/bewoner",
     "/api/stad/melding",
     "/api/stream"
    ],
-   "voorvoegsels": []
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/",
+     "exactePaden": [
+      "/api/stad/bewoner",
+      "/api/stad/melding"
+     ]
+    }
+   ]
   },
   {
    "bestand": "public/apps/stadsdoos.html",
    "exact": [
+    "/api/office/stad",
+    "/api/office/stad/node/aanmeld",
+    "/api/office/stad/werk",
+    "/api/office/stad/werk/klaar",
     "/api/office/stream",
     "/api/stad/doos/hartslag"
    ],
-   "voorvoegsels": [
-    "/api/office/"
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/",
+     "exactePaden": [
+      "/api/office/stad",
+      "/api/office/stad/node/aanmeld",
+      "/api/office/stad/werk",
+      "/api/office/stad/werk/klaar"
+     ]
+    }
    ]
   },
   {
    "bestand": "public/apps/table.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/member/rechterhand/"
+   "exact": [
+    "/api/member/rechterhand/ai",
+    "/api/member/rechterhand/table",
+    "/api/member/rechterhand/table/gast",
+    "/api/member/rechterhand/table/gast/weg",
+    "/api/member/rechterhand/table/menu",
+    "/api/member/rechterhand/table/menu/weg",
+    "/api/member/rechterhand/table/weg",
+    "/api/member/rechterhand/table/zet"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/member/rechterhand/",
+     "exactePaden": [
+      "/api/member/rechterhand/ai",
+      "/api/member/rechterhand/table",
+      "/api/member/rechterhand/table/gast",
+      "/api/member/rechterhand/table/gast/weg",
+      "/api/member/rechterhand/table/menu",
+      "/api/member/rechterhand/table/menu/weg",
+      "/api/member/rechterhand/table/weg",
+      "/api/member/rechterhand/table/zet"
+     ]
+    }
    ]
   },
   {
@@ -17431,15 +20826,21 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/vluchten.html",
+   "bestand": "public/apps/vluchten-momenten.js",
    "exact": [
-    "/api/member/vluchten/boek",
-    "/api/member/vluchten/bord",
     "/api/member/vluchten/charter",
     "/api/member/vluchten/incheck",
     "/api/member/vluchten/mijn",
     "/api/member/vluchten/pass/intrek",
     "/api/member/vluchten/pass/roteer"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/vluchten-voorzijde.js",
+   "exact": [
+    "/api/member/vluchten/boek",
+    "/api/member/vluchten/bord"
    ],
    "voorvoegsels": []
   },
@@ -17454,9 +20855,20 @@
   },
   {
    "bestand": "public/apps/voertuig.js",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/supplier/mob/"
+   "exact": [
+    "/api/supplier/mob/vloot",
+    "/api/supplier/mob/voertuig"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/supplier/mob/",
+     "exactePaden": [
+      "/api/supplier/mob/vloot",
+      "/api/supplier/mob/voertuig"
+     ]
+    }
    ]
   },
   {
@@ -17481,9 +20893,30 @@
   },
   {
    "bestand": "public/apps/websitestudio.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/office/atelierweb/"
+   "exact": [
+    "/api/office/atelierweb/bewaar",
+    "/api/office/atelierweb/etalage",
+    "/api/office/atelierweb/foto",
+    "/api/office/atelierweb/fotos",
+    "/api/office/atelierweb/haal",
+    "/api/office/atelierweb/lijst",
+    "/api/office/atelierweb/salon"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/office/atelierweb/",
+     "exactePaden": [
+      "/api/office/atelierweb/bewaar",
+      "/api/office/atelierweb/etalage",
+      "/api/office/atelierweb/foto",
+      "/api/office/atelierweb/fotos",
+      "/api/office/atelierweb/haal",
+      "/api/office/atelierweb/lijst",
+      "/api/office/atelierweb/salon"
+     ]
+    }
    ]
   },
   {
@@ -17584,6 +21017,15 @@
    ]
   },
   {
+   "bestand": "public/apps/werkvloer.js",
+   "exact": [
+    "/api/gids/app",
+    "/api/supplier/login",
+    "/api/supplier/roster"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/wonen.js",
    "exact": [
     "/api/bestanden/map",
@@ -17614,17 +21056,56 @@
   },
   {
    "bestand": "public/apps/zaakweb.html",
-   "exact": [],
-   "voorvoegsels": [
-    "/api/supplier/site/"
+   "exact": [
+    "/api/supplier/site/cijfers",
+    "/api/supplier/site/genereer",
+    "/api/supplier/site/herstel",
+    "/api/supplier/site/live",
+    "/api/supplier/site/mijn",
+    "/api/supplier/site/offline",
+    "/api/supplier/site/plan",
+    "/api/supplier/site/publiceer",
+    "/api/supplier/site/spoor",
+    "/api/supplier/site/team",
+    "/api/supplier/site/team/zet",
+    "/api/supplier/site/versies"
+   ],
+   "voorvoegsels": [],
+   "verfijndeHelpers": [
+    {
+     "naam": "api",
+     "prefix": "/api/supplier/site/",
+     "exactePaden": [
+      "/api/supplier/site/cijfers",
+      "/api/supplier/site/genereer",
+      "/api/supplier/site/genereer",
+      "/api/supplier/site/herstel",
+      "/api/supplier/site/live",
+      "/api/supplier/site/mijn",
+      "/api/supplier/site/offline",
+      "/api/supplier/site/plan",
+      "/api/supplier/site/publiceer",
+      "/api/supplier/site/spoor",
+      "/api/supplier/site/team",
+      "/api/supplier/site/team/zet",
+      "/api/supplier/site/versies"
+     ]
+    }
    ]
   },
   {
-   "bestand": "public/apps/zakelijk.html",
+   "bestand": "public/apps/zakelijk-voorzijde.js",
    "exact": [],
    "voorvoegsels": [
     "/api/supplier/mob/"
    ]
+  },
+  {
+   "bestand": "public/ds/edge-modi.js",
+   "exact": [
+    "/api/fluister"
+   ],
+   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/accountdeur.js",

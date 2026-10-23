@@ -47,7 +47,14 @@ test('SSE-wachten volgt complete events over willekeurige chunks en bewaart volg
   const s=await openStroom('http://test.invalid', {vraag:async()=>({status:200,body}),timeout:1000});
   let gezien=false; const wacht=s.wacht(es=>es.some(e=>e.includes('marker'))).then(()=>{gezien=true;});
   for(const text of ['event: hello\r','\ndata: {}\r\n\r\n','event: msg\ndata: mar','ker\n\n','event: msg\ndata: barriere\n\n']) controller.enqueue(enc.encode(text));
-  await wacht; assert.equal(gezien,true); assert.equal(s.events.length,3);
+  await wacht;
+  /* `wacht` belooft alleen dat zijn eigen waarneembare voorwaarde is bereikt.
+     De barriere staat al in de ReadableStream, maar de reader hoeft die volgende
+     chunk dan nog niet verwerkt te hebben. Wacht daarom ook op het gedrag dat
+     deze bewering werkelijk beoordeelt; anders maakt scheduling de nulmeting
+     soms rood voordat er ook maar een mutatie is uitgevoerd. */
+  await s.wacht(es=>es.some(e=>e.includes('barriere')));
+  assert.equal(gezien,true); assert.equal(s.events.length,3);
   assert.match(s.events[0],/event: hello/); assert.match(s.events[1],/marker/); assert.match(s.events[2],/barriere/);
   controller.close(); await s.sluit();
 });

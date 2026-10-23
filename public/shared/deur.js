@@ -81,6 +81,23 @@
     doel.innerHTML = h;
   }
 
+  /* De app-gids is sinds het eigenaarsbesluit van 19 oktober alleen met een
+     geldige RTG-sessie beschikbaar. De deur wordt juist vroeg en zelfstandig
+     geladen, vaak voordat basis.js klaar is. Neem daarom uitsluitend een al
+     bestaande sessie mee; de server blijft beslissen of die sessie deze gids
+     mag lezen. Zonder sessie blijft de eerlijke lokale deur zichtbaar. */
+  function gidsSessie() {
+    var t = '', g = {};
+    try {
+      t = localStorage.getItem('rtg_member_token') || localStorage.getItem('rtg_sup_token') ||
+        localStorage.getItem('rtg_office_token') || localStorage.getItem('rtg_pda_token') || '';
+      g = JSON.parse(localStorage.getItem('rtf_sessie') || 'null') || {};
+    } catch (e) { /* privévenster: zonder sessie */ }
+    var kop = { 'Content-Type': 'application/json' };
+    if (t) kop.Authorization = 'Bearer ' + t;
+    return { kop: kop, code: g.code, token: g.token };
+  }
+
   function toon(doel, opties) {
     if (!doel) return;
     var o = opties || {};
@@ -93,8 +110,9 @@
     // mag niet op een netwerkverzoek wachten
     teken(doel, o, null);
     try {
-      fetch('/api/gids/app', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pad: location.pathname }) })
+      var gs = gidsSessie();
+      fetch('/api/gids/app', { method: 'POST', headers: gs.kop,
+        body: JSON.stringify({ pad: location.pathname, code: gs.code, token: gs.token }) })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) { if (d && d.gids) teken(doel, o, d.gids); })
         .catch(function () { /* zonder gids blijft de poort staan zoals hij is */ });

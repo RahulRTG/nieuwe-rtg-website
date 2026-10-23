@@ -361,3 +361,24 @@ test('een route achter de meetpoort krijgt de rol omgeving, niet openbaar', () =
   assert.notEqual(u.rol, 'openbaar', 'van buiten geeft deze deur 404; dat is niet openbaar');
   assert.equal(u.reden, null);
 });
+
+
+test('actueleOnboarding ververst opslag maar bewijst geen identiteit of autorisatie', () => {
+  assert.equal(bk.soortVan('actueleOnboarding'), 'geenBewaker');
+  assert.equal(bk.rolBij('actueleOnboarding'), null);
+  assert.match(bk.waaromBij('actueleOnboarding'), /503.*geen identiteit.*rtfSociaal/);
+  const alleen = bk.beoordeel({ bewakersBekend: true, bewakers: ['actueleOnboarding'],
+    pad: '/api/niet-openbaar-verversing', methode: 'POST' });
+  assert.equal(alleen.rol, null, 'verse opslag of 503 is geen bewijs van een geautoriseerde rol');
+  assert.match(alleen.reden, /geen autorisatielaag/);
+  for (const bewakers of [['actueleOnboarding', 'gezinsPoort'], ['gezinsPoort', 'actueleOnboarding']]) {
+    const u = bk.beoordeel({ bewakersBekend: true, bewakers });
+    assert.equal(u.rol, null);
+    assert.match(u.reden, /^lichaamssleutel:/, 'de opslagverversing overschrijft de echte gezinsdeur niet');
+  }
+  for (const actie of ['status', 'opslaan', 'teken']) {
+    const route = alleRoutes().find(r => r.methode === 'POST' && r.pad === '/api/rtf/onboarding/' + actie);
+    assert.ok(route && route.bewakers.includes('actueleOnboarding'), actie + ': echte route blijft in de inventaris');
+    assert.equal(bk.beoordeel(route).rol, null, actie + ': handlerautorisatie is geen bearerrol');
+  }
+});

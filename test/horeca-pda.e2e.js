@@ -33,6 +33,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, klikEnWacht, tekstVan } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pda-'));
 
@@ -128,10 +129,15 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     // en een gast die om hulp vraagt: grens 3 minuten
     const qr = (await H('/api/supplier/horeca/gast/qr', { tafel: 'PDA-DRAAG' })).body;
-    const aan = (await post(base, '/api/gast/aanschuiven', { token: qr.token, naam: 'Sam' })).body;
+    /* Een tafel-QR vult de accountdeur aan en vervangt haar niet. Gebruik hier
+       dezelfde gratis-accountweg als het gastscherm en de toegangsproef; anders
+       toetst deze browserproef een sinds 19 oktober verboden anonieme route. */
+    const gast = await registreerGratis(base);
+    assert.ok(gast && gast.token, 'de gast heeft een gratis account');
+    const aan = (await post(base, '/api/gast/aanschuiven', { token: qr.token, naam: 'Sam' }, gast.token)).body;
     assert.ok(aan.sleutel, 'de gast zit aan tafel');
     const vz = (await post(base, '/api/gast/verzoek', { sleutel: aan.sleutel, soort: 'hulp',
-      tekst: 'Het glas is gebarsten' })).body;
+      tekst: 'Het glas is gebarsten' }, gast.token)).body;
     assert.ok(vz.verzoek, 'het verzoek staat: ' + JSON.stringify(vz).slice(0, 120));
 
     /* ---- ingelogd: de lijst ---- */

@@ -177,7 +177,9 @@ test('unavailable and forbidden widget data are never rendered as an empty confi
       const state = await page.locator('.wd-favorites [data-widget="notities"] .wd-widget-content').evaluate(el => ({
         minHeight: getComputedStyle(el).minHeight, content: el.dataset.contentState,
         timestamp: el.querySelectorAll('.wd-widget-updated').length,
-        retry: [...el.querySelectorAll('button')].some(b => b.dataset.i18n === 'widget.retry')
+        /* In de Nederlandse standaardtaal draagt kopie bewust geen i18n-data;
+           vergelijk daarom met dezelfde locale-copybron als de knop zelf. */
+        retry: [...el.querySelectorAll('button')].some(b => b.textContent.trim() === window.RTGWidgetCopy('retry'))
       }));
       assert.equal(state.minHeight, '0px'); assert.equal(state.content, undefined);
       assert.equal(state.timestamp, 0, 'failed or forbidden reads cannot masquerade as retrieved records');

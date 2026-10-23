@@ -24,7 +24,7 @@ const { decodeer, PAD } = require('../server/middleware/stijlbundel-rij');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const BEELDEN = process.env.RTG_DS_BEELDEN || '';
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-let srv, browser, reiziger, leeg;
+let srv, browser, reiziger, leeg, vlieger, afspraak;
 
 async function post(url, data, auth) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -44,7 +44,10 @@ async function open(token, breedte, hoogte, taal = 'nl') {
   const fouten = letOpFouten(page, []);
   await page.goto(srv.base + '/apps/move.html', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
-  await page.waitForSelector('[data-naad], #naden .ds-status__titel');
+  /* Een enkele komende vlucht heeft wel een Continue Key, maar nog geen
+     overgang en dus terecht geen naadkaart. Wacht op een van de drie echte
+     schermuitkomsten in plaats van alleen op de twee uitersten. */
+  await page.waitForSelector('[data-naad], #naden .ds-status__titel, #verderVak:not([hidden])');
   return { ctx, page, fouten };
 }
 async function beeld(page, naam) {
@@ -63,13 +66,15 @@ test.before(async () => {
   if (skip) return;
   srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', NODE_ENV: 'test', RTG_DEMO: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
-  reiziger = await lid('Move Lid'); leeg = await lid('Move Leeg');
+  reiziger = await lid('Move Lid'); leeg = await lid('Move Leeg'); vlieger = await lid('Move Vlieger');
   /* Een afspraak om 08:00 en een charter om 09:30: twee plekken, en de tweede
-     is een vlucht, dus de volgende plek is een luchthaven. */
+     is een vlucht. De afspraak komt eerst; een losse charter start bij de luchthaven. */
   const d = morgen();
   const bk = await post('/api/booking/request', { supplierCode: 'KAITO', serviceId: 's1', date: d, time: '08:00' }, reiziger);
+  afspraak = bk.boeking.ref;
   await post('/api/booking/pay', { ref: bk.boeking.ref }, reiziger);
   await post('/api/member/vluchten/charter', { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, reiziger);
+  await post('/api/member/vluchten/charter', { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, vlieger);
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
 
@@ -95,7 +100,9 @@ test('de echte weging wordt een oordeel, en de Edge brengt het lid naar de volge
   assert.match(await page.locator('[data-naad] [data-cijfers]').first().innerText(), /min/);
   await page.waitForFunction(() => !document.querySelector('#verderVak').hidden);
   const label = (await page.locator('#verder').innerText()).trim();
-  assert.match(label, /airport|luchthaven/i, 'de verderknop noemt de luchthaven: ' + label);
+  const eerste = (await post('/api/move/volgende', {}, reiziger)).volgende;
+  assert.equal(eerste.kenmerk, afspraak, 'de afspraak van 08:00 komt eerst');
+  assert.equal(label, 'Naar ' + eerste.plek.label);
   await beeld(page, '390');
   await page.locator('[data-naad]').first().evaluate(e => e.scrollIntoView());
   await beeld(page, '390-overgang');
@@ -104,6 +111,21 @@ test('de echte weging wordt een oordeel, en de Edge brengt het lid naar de volge
   await page.waitForURL(/navigatie\.html/);
   const naar = String(new URL(page.url()).searchParams.get('naar') || '').split(',').map(Number);
   assert.ok(naar.length === 2 && naar.every(Number.isFinite), 'Navigatie krijgt een opgeloste plek mee: ' + page.url());
+  assert.deepEqual(fouten, []);
+  await ctx.close();
+});
+
+test('een charter begint bij de luchthaven en de Edge draagt precies die plek over', { skip }, async () => {
+  const { ctx, page, fouten } = await open(vlieger, 390, 844);
+  await page.waitForFunction(() => !document.querySelector('#verderVak').hidden);
+  const label = (await page.locator('#verder').innerText()).trim();
+  assert.match(label, /airport|luchthaven/i, 'de verderknop noemt de luchthaven');
+  assert.doesNotMatch(label, /parijs|bourget/i, 'niet de bestemming');
+  const plek = (await post('/api/move/volgende', {}, vlieger)).volgende.plek;
+  await page.locator('[data-ds-edge="acties"]').click();
+  await page.locator('#dsEdgeBlad button', { hasText: label }).click();
+  await page.waitForURL(/navigatie\.html/);
+  assert.equal(new URL(page.url()).searchParams.get('naar'), plek.lat + ',' + plek.lng);
   assert.deepEqual(fouten, []);
   await ctx.close();
 });

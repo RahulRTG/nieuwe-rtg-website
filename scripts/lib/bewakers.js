@@ -211,6 +211,8 @@ const KAART = new Map([
      niemand. De echte weigering zit in de handtekeningcontrole erna. */
   ['formulier', ['geenBewaker', null, 'leest het formulierlichaam van een SAML-antwoord (server/routes/sso-saml.js)']],
   ['leesMelding', ['geenBewaker', null, 'begrensde raw-body lezer voor de storingenwebhook; storingenAuth controleert daarna de HMAC']],
+  ['actueleOnboarding', ['geenBewaker', null,
+    'ververst de gedeelde Foundation-stand en weigert bij opslaguitval met 503; stelt geen identiteit vast, rtfSociaal controleert daarna code en token in de handler']],
 
   // ---- omgeving: de opstelling beslist, niet de bezoeker ----
   ['meetpoort', ['omgeving', null, 'RTG_METRICS_TOKEN en het interne net beslissen; zie scripts/poortwacht.js']]

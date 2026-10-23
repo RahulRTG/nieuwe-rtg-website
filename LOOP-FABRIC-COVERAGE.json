@@ -3455,7 +3455,6 @@
       "server/foundation/accountplicht.js",
       "server/foundation/gezinscode.js",
       "server/foundation/gezinseigenaar.js",
-      "server/foundation/gezinshulp.js",
       "server/foundation/gezinsstroom.js",
       "server/foundation/gezinstoken.js",
       "server/foundation/gezondheidstoestemming.js",
@@ -5239,7 +5238,6 @@
       "server/kern/factuur.js",
       "server/kern/festival/artiest.js",
       "server/kern/festival/dienst.js",
-      "server/kern/festival/groep.js",
       "server/kern/festival/index.js",
       "server/kern/festival/model.js",
       "server/kern/festival/norm.js",
@@ -8043,7 +8041,7 @@
         "declaredMutationSemantics": 173,
         "sourceFileCount": 42,
         "kernelDependencyCount": 154,
-        "screenCount": 26,
+        "screenCount": 27,
         "sourceFiles": [
           "server/routes/borden.js",
           "server/routes/democratie/index.js",
@@ -8104,7 +8102,7 @@
           "public/apps/lifestyle.html",
           "public/apps/living-os.html"
         ],
-        "screensOmitted": 14,
+        "screensOmitted": 15,
         "signals": [
           "decision",
           "feedback",
@@ -8201,7 +8199,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 1,
         "kernelDependencyCount": 3,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/social/leden.js"
         ],
@@ -8213,6 +8211,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/media.html"
         ],
         "screensOmitted": 0,
@@ -8286,14 +8285,16 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/social/snaps.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "ai"
@@ -9817,7 +9818,7 @@
         "declaredMutationSemantics": 108,
         "sourceFileCount": 26,
         "kernelDependencyCount": 80,
-        "screenCount": 28,
+        "screenCount": 29,
         "sourceFiles": [
           "server/routes/baby.js",
           "server/routes/connect.js",
@@ -9865,6 +9866,7 @@
         ],
         "kernelDependenciesOmitted": 56,
         "screens": [
+          "public/apps/app.html",
           "public/apps/connect.html",
           "public/apps/foundation/arena.html",
           "public/apps/foundation/babyboek.html",
@@ -9875,10 +9877,9 @@
           "public/apps/foundation/geld-later.html",
           "public/apps/foundation/geloofbieb.html",
           "public/apps/foundation/gevoel.html",
-          "public/apps/foundation/index.html",
-          "public/apps/foundation/leerpaspoort.html"
+          "public/apps/foundation/index.html"
         ],
-        "screensOmitted": 16,
+        "screensOmitted": 17,
         "signals": [
           "decision",
           "feedback",
@@ -10177,7 +10178,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
         "kernelDependencyCount": 3,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/afhaalcode.js",
           "server/routes/member/boeken.js",
@@ -10190,7 +10191,9 @@
           "server/kern/util.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10284,7 +10287,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/kopen/tickets.js"
         ],
@@ -10293,7 +10296,9 @@
           "server/kern/lidacties/ritreferentie.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10383,7 +10388,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/voertuigen/huur.js"
         ],
@@ -10392,7 +10397,9 @@
           "server/kern/util.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10485,7 +10492,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/voertuigen/charter.js"
         ],
@@ -10494,7 +10501,9 @@
           "server/kern/util.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10587,7 +10596,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/handel/vastgoed.js"
         ],
@@ -10596,7 +10605,9 @@
           "server/kern/vastgoed-keyless-toegang.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "feedback",
@@ -10927,14 +10938,16 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/handel/winkel.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "transaction",
@@ -11022,7 +11035,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 2,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/handel/winkel.js",
           "server/routes/supplier/groothandel.js"
@@ -11030,7 +11043,9 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "transaction",
@@ -15787,7 +15802,7 @@
         "declaredMutationSemantics": 326,
         "sourceFileCount": 205,
         "kernelDependencyCount": 2732,
-        "screenCount": 41,
+        "screenCount": 42,
         "sourceFiles": [
           "server/routes/agenda.js",
           "server/routes/alpine.js",
@@ -15848,7 +15863,7 @@
           "public/apps/horeca-pda.html",
           "public/apps/horeca.html"
         ],
-        "screensOmitted": 29,
+        "screensOmitted": 30,
         "signals": [
           "decision",
           "feedback",
@@ -16674,7 +16689,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
         "kernelDependencyCount": 2,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/supplier/werving/sollchat.js",
           "server/routes/supplier/werving/sollicitaties.js"
@@ -16685,7 +16700,9 @@
           "server/kern/werk-opslag.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/leverancier.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -17574,7 +17591,7 @@
         "declaredMutationSemantics": 23,
         "sourceFileCount": 8,
         "kernelDependencyCount": 41,
-        "screenCount": 2,
+        "screenCount": 4,
         "sourceFiles": [
           "server/opzet/connectwebhook.js",
           "server/opzet/kaartwebhooks.js",
@@ -17614,8 +17631,10 @@
         ],
         "kernelDependenciesOmitted": 17,
         "screens": [
+          "public/apps/app.html",
           "public/apps/geld.html",
-          "public/apps/isolatie.html"
+          "public/apps/isolatie.html",
+          "public/apps/pay.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -20026,7 +20045,7 @@
         "declaredMutationSemantics": 6,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/persoonlijk-care.js"
         ],
@@ -20036,6 +20055,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/foundation/gezondheid-welzijn.html",
           "public/apps/foundation/zorg.html"
         ],
@@ -20119,7 +20139,7 @@
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
         "kernelDependencyCount": 13,
-        "screenCount": 4,
+        "screenCount": 5,
         "sourceFiles": [
           "server/routes/agenda.js",
           "server/routes/member/handel/uitjes.js"
@@ -20143,6 +20163,7 @@
         "kernelDependenciesOmitted": 0,
         "screens": [
           "public/apps/agenda.html",
+          "public/apps/app.html",
           "public/apps/isolatie.html",
           "public/apps/living-os.html",
           "public/apps/rtg.html"
@@ -21287,7 +21308,7 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
         "kernelDependencyCount": 25,
-        "screenCount": 9,
+        "screenCount": 10,
         "sourceFiles": [
           "server/routes/member/persoonlijk-concept.js",
           "server/routes/member/persoonlijk-rahul.js",
@@ -21322,6 +21343,7 @@
         ],
         "kernelDependenciesOmitted": 1,
         "screens": [
+          "public/apps/app.html",
           "public/apps/camera.html",
           "public/apps/gemeente.html",
           "public/apps/living-os.html",
@@ -21857,14 +21879,16 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/voertuigen/verkoop.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking"
@@ -23866,14 +23890,16 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk-assets.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -25658,7 +25684,7 @@
         "declaredMutationSemantics": 12,
         "sourceFileCount": 2,
         "kernelDependencyCount": 1,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/pay-tegoed.js",
           "server/routes/pay.js"
@@ -25669,7 +25695,8 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
-          "public/apps/isolatie.html"
+          "public/apps/isolatie.html",
+          "public/apps/pay.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -25758,14 +25785,16 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/pay-tegoed.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/pay.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -26282,7 +26311,7 @@
         "declaredMutationSemantics": 6,
         "sourceFileCount": 6,
         "kernelDependencyCount": 10,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/auth/account.js",
           "server/routes/auth/herstel.js",
@@ -26306,6 +26335,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/passkeys.html",
           "public/apps/personeel.html",
           "public/apps/rtg.html"
         ],
@@ -26834,7 +26864,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/link.js"
         ],
@@ -26843,7 +26873,9 @@
           "server/kern/link/wie.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/pay.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -27136,7 +27168,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
         "kernelDependencyCount": 142,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/ik-workspace-rechten.js",
           "server/routes/ik.js",
@@ -27172,6 +27204,7 @@
         ],
         "kernelDependenciesOmitted": 118,
         "screens": [
+          "public/apps/app.html",
           "public/apps/geld.html",
           "public/apps/ik.html"
         ],
@@ -27505,7 +27538,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 3,
         "kernelDependencyCount": 16,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/assistent.js",
           "server/routes/member/salon.js",
@@ -27532,6 +27565,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/geld.html",
           "public/apps/salon.html"
         ],
@@ -27840,7 +27874,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 25,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk.js"
         ],
@@ -27872,7 +27906,9 @@
           "server/kern/stuur/taakbeeld.js"
         ],
         "kernelDependenciesOmitted": 1,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -28356,7 +28392,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
         "kernelDependencyCount": 2,
-        "screenCount": 3,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/member/handel/uitjes.js",
           "server/routes/member/salon.js"
@@ -28368,6 +28404,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/bestellen.html",
           "public/apps/mall.html",
           "public/apps/salon.html"
@@ -28468,7 +28505,7 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
         "kernelDependencyCount": 9,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/boeken.js",
           "server/routes/member/partnerkanaal.js",
@@ -28488,6 +28525,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/hotels.html",
           "public/apps/mall.html"
         ],
@@ -28800,7 +28838,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
         "kernelDependencyCount": 17,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/kopen/tickets.js",
           "server/routes/member/onderweg.js"
@@ -28826,7 +28864,9 @@
           "server/kern/werkvormen.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -28933,7 +28973,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
         "kernelDependencyCount": 3,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/handel/uitjes.js",
           "server/routes/member/kopen/tickets.js",
@@ -28948,6 +28988,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/leven.html",
           "public/apps/uitgaan.html"
         ],
@@ -29052,7 +29093,7 @@
         "declaredMutationSemantics": 5,
         "sourceFileCount": 4,
         "kernelDependencyCount": 2,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/handel/winkel.js",
           "server/routes/member/pakket.js",
@@ -29066,6 +29107,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/pakketten.html"
         ],
         "screensOmitted": 0,
@@ -29270,7 +29312,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
         "kernelDependencyCount": 47,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/opzet/webhooks.js",
           "server/routes/member/betalen-munt.js"
@@ -29303,7 +29345,9 @@
           "server/kern/kosten/soorten.js"
         ],
         "kernelDependenciesOmitted": 23,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -30229,7 +30273,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 2,
         "kernelDependencyCount": 16,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/kantoren/stad.js",
           "server/routes/stad.js"
@@ -30255,6 +30299,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/stad.html",
           "public/apps/stadsdoos.html"
         ],
         "screensOmitted": 0,
@@ -30356,14 +30401,16 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/boeken.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -30456,14 +30503,16 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk-assets.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -30705,7 +30754,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 25,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk.js"
         ],
@@ -30737,7 +30786,9 @@
           "server/kern/stuur/taakbeeld.js"
         ],
         "kernelDependenciesOmitted": 1,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -30824,7 +30875,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/terplaatse.js",
           "server/routes/voorspel.js"
@@ -30832,7 +30883,9 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "transaction",
@@ -30921,14 +30974,16 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk-spar.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "ai"

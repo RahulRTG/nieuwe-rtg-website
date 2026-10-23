@@ -78,7 +78,7 @@ body[data-rtg-skin="heritage"][data-world-home] :is(.wh-paper-card,.onthaal-kies
 body[data-rtg-skin="heritage"][data-world-home] .onthaal-kies .buurtstad{
   background:var(--rtg-world-card-strong)!important;color:var(--rtg-world-ink)!important;
 }
-body[data-rtg-skin="heritage"][data-world-home] .onthaal-kies :is(.buurtsec,.leeg){color:#625d52!important}
+body[data-rtg-skin="heritage"][data-world-home] .onthaal-kies :is(.buurtsec,.leeg,.melder){color:#625d52!important}
 /* The public Foundation story stays readable even against a bright photo.
    The gradient belongs to the photo, never to the city data or its controls. */
 body[data-rtg-skin="heritage"][data-world-home="foundation"] .wh-foundation-public::after{

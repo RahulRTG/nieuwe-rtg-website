@@ -1504,3 +1504,68 @@ op f17f3bc530 herhaald; geen stijging geclaimd door alleen registervernieuwing.
 Logs /tmp/rtg-r3-check-f17-final.log, /tmp/rtg-r3-truth-f17.log en
 /tmp/rtg-r3-authority-f17.log. De integrale apphermeting volgt nog na afloop
 van VOLTOOIPROEF. Platform blijft ORANJE.
+
+### Deep Green — actuele appmeting en gerichte CI-afsluiting (23 oktober)
+
+De volledige VOLTOOIPROEF is zonder open scenario's afgerond: 110 apps met
+330 gesloten bewijsschakels en nul open of onbewezen schakels. De vier
+overige catalogusregels hebben geen voltooifixture en blijven daarom zichtbaar
+als `GEEN_FIXTURE`; ze worden niet administratief groen gemaakt. De volledige
+PostgreSQL-runner slaagt op dezelfde afbouwstand met **57/57 bestanden en 169
+proeven**, zonder failures of skips. Logbestanden:
+`/tmp/rtg-r3-completion-0c4b.log` en `/tmp/rtg-r3-pg-28bc.log`.
+
+APPWERKT is daarna volledig herbouwd op `28bc8ef749`: **11/114 BEWEZEN,
+99 NIET_GETEST en 4 GEEN_FIXTURE**, met nul gemeten browserdefecten. Zorg is de
+nieuwe volledig bewezen app. Per bewijsdimensie: bereikbaar 107/114,
+bedienbaar 95/114, menselijk 110/114, voltooibaar 110/114,
+waarheidsgetrouw 109/114, persistent 110/114, bevoegd 12/114 en herstelbaar
+110/114. Dit is een bronmeting, geen releaseoordeel. De vijf open
+waarheidsgetrouwheidsregels zijn ingebedde OS-standen zonder zelfstandige
+meetbare contractingang; de grootste kwalificatieachterstand blijft bevoegd
+met 102 open apps. Log: `/tmp/rtg-r3-appwerkt-28bc.log`.
+
+CI op `28bc8ef749` bevestigde preflight, lokale imagekwalificatie, CodeQL,
+WebKit en de brede schermweergave, maar bracht ook concrete downstream-
+regressies aan het licht. Die zijn bij de contractbron hersteld:
+
+- `bevoegdContext` is begrensde appcontractmetadata en kan geen negende bewijs
+  of uitslag worden; onbekende waarden sluiten.
+- `actueleOnboarding` ververst alleen Foundation-opslag en geldt niet als
+  identiteits- of autorisatiebewaker; de echte handlerpoort blijft leidend.
+- Move houdt de chronologische eerstvolgende bestemming vast en beproeft een
+  charter-luchthaven in een afzonderlijke reis, zonder een eerdere afspraak
+  over te slaan.
+- De horeca-PDA-proef schuift aan via het bestaande verplichte gratis account;
+  anoniem aanschuiven blijft 401. De desktop-widgetproef herkent de retry via
+  dezelfde locale-copybron die de knop tekent.
+- De Foundation-melder op het lichte redactionele vlak gebruikt de bestaande
+  leesbare Heritage-inktkleur; service-workerafdrukken zijn opnieuw opgebouwd.
+
+Gerichte verificatie op Node 26.12.0: **95/95** contract-, register- en
+generatorproeven, **15/15** gecombineerde horeca-PDA/wereld-desktop-
+browserproeven, en **7/7** Move Design System-browserproeven. De volledige
+statische preflight is groen; zij meldt terecht dat APPWERKT-bewijs door de
+latere bronwijzigingen opnieuw vervalt en dus vóór kandidaatkwalificatie moet
+worden herhaald. Geen kwaliteitsdrempel of autorisatiepoort is verlaagd.
+
+De laatste drie schermscherfoorzaken zijn daarna bij hun contract gesloten.
+De zelfstandige appdeur neemt een reeds aanwezige RTG- of gezinssessie mee
+naar de beveiligde app-gids; zonder sessie blijft alleen de lokale titel en
+toegangsweg zichtbaar. Acht kantoorapps lekken daardoor geen gidsinhoud en
+houden hun terugkeerroute. De Foundation-livelesproef maakt een les via het
+verplichte gratis account en houdt de gezins- en accountsleutels gescheiden.
+Het handlerpoortregister benoemt `/api/foundation/les/maak` weer waarheidsgetrouw
+als `AUTHENTICATED`. De gerichte deur-/lesstroomrun slaagt 4/4 en de relevante
+contract- en autorisatieproeven slagen 53/53. Toegankelijkheidsmeting deel 3
+meet 79 schermen met nul structurele en nul kwalificerende contrastfouten; de
+afzonderlijke blinde-assenronde meldt vier notch-contrastsituaties als
+werkvoorraad en telt die niet stilzwijgend als gekwalificeerd bewijs.
+De volledige gewijzigde browserset is aansluitend samen herhaald: **28/28**
+geslaagd, zonder skips (deur, kantoor, lesstroom, horeca-PDA, wereld-desktop en
+beide Move-ronden).
+
+Status blijft **ORANJE**. Open blijven de 102 appbevoegdheidsbewijzen, vier
+voltooifixtures, vijf zelfstandige waarheidsgetrouwheidsingangen, vier rode
+architectuurnormen, de adversarial rolvloer, twee volledige kandidaat-runs en
+operationele staging-, herstel- en vrijgavekwalificatie. Geen merge of uitrol.

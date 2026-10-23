@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-23T00:18:15.065Z",
-    "commit": "f17f3bc530",
+    "op": "2026-10-23T18:38:12.216Z",
+    "commit": "b655f0160c",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
-    "node": "v26.12.0"
+    "node": "v26.12.1"
   },
   "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.",
   "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist.",
@@ -14,26 +14,26 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "939ed668a31d1bf9a2b9085c59727463d96ec360d074eba7eba9cf8befcd4277",
+        "sha256": "740d9df1807ed04256a62f46a25e19e54f884213ed8f22ba994bb650450de4f4",
         "stempel": {
-          "op": "2026-10-22T23:55:07.932Z",
-          "commit": "d8e1a45c21",
+          "op": "2026-10-23T18:36:20.569Z",
+          "commit": "3028017ae5",
           "boomVuil": false,
-          "boomAnders": 5,
+          "boomAnders": 0,
           "instrument": "scripts/idorproef.js",
-          "node": "v26.12.0"
+          "node": "v26.12.1"
         }
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "ea4b581a5394ecde703b4b590c6e47c277e347165d7529179482947ca2fea11c",
+        "sha256": "c978df6a48b62567da7b215fc44f1c578f6712a1efced569f955dc730eb86655",
         "stempel": {
-          "op": "2026-10-22T23:55:50.076Z",
-          "commit": "d8e1a45c21",
+          "op": "2026-10-23T18:37:21.995Z",
+          "commit": "1e2dc56f0a",
           "boomVuil": false,
-          "boomAnders": 6,
+          "boomAnders": 0,
           "instrument": "scripts/rolproef-route.js",
-          "node": "v26.12.0"
+          "node": "v26.12.1"
         }
       }
     ]
@@ -69,9 +69,9 @@
       "ingang": "/apps/attenties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 75,
-      "reden": "75 van de 75 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 12,
+      "open": 12,
+      "reden": "12 van de 12 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:balans",
@@ -157,9 +157,9 @@
       "ingang": "/apps/cellier.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 70,
-      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 6,
+      "open": 6,
+      "reden": "6 van de 6 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cellier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:cercle",
@@ -167,9 +167,9 @@
       "ingang": "/apps/cercle.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 75,
-      "reden": "75 van de 75 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 13,
+      "open": 13,
+      "reden": "13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cercle: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:clips",
@@ -256,9 +256,9 @@
       "ingang": "/apps/entourage.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 75,
-      "reden": "75 van de 75 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 13,
+      "open": 13,
+      "reden": "13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/entourage: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:flits",
@@ -278,7 +278,7 @@
       "status": "NIET_GETEST",
       "routes": 7,
       "open": 5,
-      "reden": "5 van de 7 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "5 van de 7 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: openingstijden van een restaurant zijn publiek; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:foundationzorg",
@@ -290,7 +290,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/2FWGTC/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/PH3QJZ/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -329,9 +329,9 @@
       "ingang": "/apps/garderobe.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 70,
-      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 7,
+      "open": 7,
+      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/garderobe: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:gegevens",
@@ -378,9 +378,9 @@
       "ingang": "/apps/hangar.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 69,
-      "open": 69,
-      "reden": "69 van de 69 routes niet gemeten, o.a. /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties/gift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 70,
+      "open": 70,
+      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:horeca",
@@ -561,9 +561,9 @@
       "ingang": "/apps/maison.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 70,
-      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 10,
+      "open": 10,
+      "reden": "10 van de 10 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/maison: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:mall",
@@ -795,9 +795,9 @@
       "ingang": "/apps/reisboek.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 11,
-      "open": 9,
-      "reden": "9 van de 11 routes niet gemeten, o.a. /api/member/rechterhand/reis/item: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/reis/item/weg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/reis/weg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 12,
+      "open": 10,
+      "reden": "10 van de 12 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/reis/item: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/reis/item/weg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:reizen",
@@ -1101,9 +1101,9 @@
       "ingang": "/apps/table.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 70,
-      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "routes": 9,
+      "open": 9,
+      "reden": "9 van de 9 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/table: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:theater",
@@ -1209,7 +1209,7 @@
       "persona": "gezin",
       "status": "NIET_GETEST",
       "paren": 11,
-      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden)",
+      "reden": "niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, gescheiden)",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -1220,7 +1220,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/2FWGTC/mij",
+          "verzoek": "GET /api/foundation/gezin/PH3QJZ/mij",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1241,14 +1241,6 @@
           "bEigen": 200,
           "b": 403,
           "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "bEigen": 200,
-          "b": 401,
-          "anoniem": 401,
           "uitslag": "gescheiden"
         },
         {
@@ -1290,6 +1282,14 @@
           "b": 401,
           "anoniem": 401,
           "uitslag": "eigenaarWeg"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "bEigen": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
         },
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2999 bestanden en 20286 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3001 bestanden en 20296 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2999 |
-| losse beweringen (`test(...)`) | 20286 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 411 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2755 |
+| toetsbestanden | 3001 |
+| losse beweringen (`test(...)`) | 20296 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 413 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2757 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 180 |
 | alleen in de kop *genoemd*, nog niet gemeten | 9 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2618 bestanden, 19578 beweringen.
+2620 bestanden, 19588 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -749,6 +749,7 @@ toets omvalt.
 | `gedachten.test.js` | 7 | gezakt op `liegpoort /api/` | Het gedachtenboek (kern/gedachten.js). De belofte is dat dit GEEN materiaal is, en die wordt hier op drie manieren vastgezet: er is geen deur die de tekst ergens anders heen stuurt, niemand anders kan erbij, en... |
 | `geen-demo.test.js` | 2 | gezakt op `liegpoort /api/` | ZONDER RTG_DEMO STAAT ER NIETS VERZONNENS. De demo-INLOG stond al op "uit tenzij je hem aanzet" (server.js, `const DEMO`), met de conclusie erbij: een slot dat opengaat als iemand iets vergeet is geen slot. |
 | `geenlek.test.js` | 9 | gezakt op `getal+1#0` | HET REGRESSIECORPUS VAN DE ZEEF. scripts/lib/geenlek.js bepaalt wat er WEL en NIET in klaartekst in een log belandt. |
+| `gegevensisolatie.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `gegevenskaart.test.js` | 14 | gezakt op `===->!==#0` | DE GEGEVENSKAART -- wat weet RTG van mij. DE TOETS DIE HET REGISTER EERLIJK HOUDT staat in 1: elke regel noemt een `bron`, en dat bestand moet bestaan. |
 | `gegevenspoort.test.js` | 4 | gezakt op `liegpoort /api/` | Een gratis account vraagt vier dingen. Pas als er een DERDE PARTIJ bij komt -- een zaak, een koerier -- vraagt Rahul de rest, in een gesprek. |
 | `geheimkanarie.test.js` | 5 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -2611,6 +2612,7 @@ toets omvalt.
 | `workspace-voorkeur.test.js` | 5 | gezakt op `liegpoort /api/` | De Adaptive Workspace bewaart compositie en niets anders. Dit toetst zowel de pure grens als de twee accountwegen die Continuity gebruikt. |
 | `workspace-work.test.js` | 8 | gezakt op `browser-export-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-widget-catalog.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `world-widget-family.test.js` | 8 | gezakt op `browser-export-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `writehealth-lus.test.js` | 5 | gezakt op `===->!==#0` | DE SCHRIJFPOORT MAG ZIJN EIGEN GESLOTEN TOESTAND NIET ALS NIEUWE STORING LEZEN. Gemeten in de 100M-ronde van 9 september 2026: de poort sloot 89 keer, en 45 van die sluitingen droegen als reden "collectietransactie:... |
 | `zaaihash.test.js` | 5 | gezakt op `liegpoort /api/` | DE ZAAI-HASH, EN DE GRENS ERONDER. De demo-seed maakte bij elke serverstart 220 scrypt-hashes voor 4 verschillende wachtwoorden. |
 | `zaak-balie.test.js` | 7 | gezakt op `liegpoort /api/` | DE BALIE VAN EEN ZAAK -- 7 endpoints uit de supplier-groep. agenda/toevoegen, agenda/wijzig, agenda/verwijder, ticket/add, ticket/status, lost/add en lost/done stonden als nooit aangeroepen in de waargenomen... |

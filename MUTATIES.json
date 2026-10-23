@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-22T23:50:43.341Z",
-    "commit": "def35be2ef",
-    "boomVuil": true,
+    "op": "2026-10-22T23:54:25.352Z",
+    "commit": "d8e1a45c21",
+    "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v26.12.0"
@@ -5843,6 +5843,14 @@
       "module": "scripts/lib/geenlek.js",
       "operator": "getal+1#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "gegevensisolatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/gegevensisolatie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "gegevenskaart-scherm.e2e.js": {

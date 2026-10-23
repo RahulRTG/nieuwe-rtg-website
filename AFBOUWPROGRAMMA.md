@@ -1463,3 +1463,18 @@ meer als volledig kwalificeren. Concrete lekken blijven vóór dit ontbrekende
 bewijs defect. 16/16 gerichte metertests slagen. Nieuwe runtimehermeting vereist;
 de 14 mag niet als voortgang worden gebruikt. Zorg heeft wel vier geldige
 gezinskruisparen; ook dat is uitsluitend bevoegdheid binnen de meetgrens.
+
+De echte gecorrigeerde bevoegdronde op 0c4b12e4d7 levert 12 BEWEZEN en 102
+NIET_GETEST. Bord/Schrift blijven open wegens de aanvullende schoolcontext;
+Zorg is nieuw bevoegd binnen vier bestaande laad-kruisparen. IDOR/ROLPROEF
+blijven volgens de bestaande bronafhankelijkheidscontrole geldig; geen nieuw
+stempel zonder meting. Log /tmp/rtg-r3-authority-0c4b.log. De schoolguard is
+onafhankelijk gelezen en zonder nieuwe blocker beoordeeld.
+
+Volledige APPWERKT-browserhermeting gestart maar onderbroken vóór vastlegging:
+een controle van de afhankelijkheden toont dat VOLTOOIPROEF (877e0459b6) en
+LIEGRONDE (4ea4825c71) door gedeelde serverwijzigingen vervallen zijn. Eerst
+die bestaande volledige bronmetingen vernieuwen, daarna APPWERKT samenstellen.
+De onderbroken ronde /tmp/rtg-r3-appwerkt-0c4b.log is GEEN kwalificatieresultaat.
+Lopende bronmetingen: /tmp/rtg-r3-completion-0c4b.log en
+/tmp/rtg-r3-truth-0c4b.log; resultaat blijft open totdat deze werkelijk eindigen.

@@ -76,7 +76,7 @@ async function loop(w, stap) {
       ziet: 'overdracht ' + o.status + ', briefje ' + (briefje ? 'gemaakt' : 'GEEN') + ', lezen op het domeinscherm ' + l.status };
   });
 
-  await stap('voltooibaar', 'een ander lid met het briefje-id kan het niet lezen', async () => {
+  await stap('bevoegd', 'een ander lid met het briefje-id kan het niet lezen', async () => {
     const l = await w.post(LEES, { id: briefje }, ander.token);
     return { klopt: l.status >= 400 && l.status < 500 && !JSON.stringify(l.data || {}).includes(artikel.id), ziet: 'ander lid: ' + l.status + ' (' + (l.data && l.data.error) + ')' };
   });

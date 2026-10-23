@@ -63,7 +63,7 @@ async function loop(w, stap) {
       ziet: k ? k.werkorder + ': ' + k.omschrijving.slice(0, 80) : 'NIET OP DE WERKLIJST' };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet de melding niet bij zich, en kan hem niet klaarmelden', async () => {
+  await stap('bevoegd', 'een ander lid ziet de melding niet bij zich, en kan hem niet klaarmelden', async () => {
     const b = metTekst(await mijn(B.token), tekst);
     const k = await w.post(KLAAR, { sleutel: 'melding:' + melding.id }, B.token);
     const nog = metTekst(await mijn(), tekst);

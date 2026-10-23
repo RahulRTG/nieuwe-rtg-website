@@ -44,7 +44,7 @@ async function loop(w, stap) {
       ziet: 'start ' + s.status + ', aanvraag ' + r.status + ', stand ' + (g && g.status) + ', vereist ' + (g && g.vereist) + ' stemmen' };
   });
 
-  await stap('voltooibaar', 'de aanvrager kan zijn eigen voorstel niet goedkeuren, en B zonder rol mag het niet beoordelen', async () => {
+  await stap('bevoegd', 'de aanvrager kan zijn eigen voorstel niet goedkeuren, en B zonder rol mag het niet beoordelen', async () => {
     const zelf = await w.post(BESLIS, { id, besluit: 'goedkeuren', reden: 'Ik vind het goed.' }, A.kantoor);
     const zonderRol = await w.post(BESLIS, { id, besluit: 'goedkeuren', reden: 'Akkoord.' }, B.kantoor);
     const g = metTitel(await state(), hoofd)[0];

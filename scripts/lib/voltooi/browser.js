@@ -75,7 +75,7 @@ async function loop(w, stap) {
     return { klopt: r.status === 200 && r.data.via === 'chat' && n === 1, ziet: 'bericht ' + r.status + ' via ' + (r.data && r.data.via) + ', A ziet het ' + n + ' keer' };
   });
 
-  await stap('voltooibaar', 'een vreemde die het adres kent, bereikt de maker niet via het formulier', async () => {
+  await stap('bevoegd', 'een vreemde die het adres kent, bereikt de maker niet via het formulier', async () => {
     const C = await nieuwLid(w, 'brwc');
     const o = await w.post(OPEN, { adres }, C.token);
     const r = await w.post(BERICHT, { adres, tekst: 'Ongevraagd ' + merk }, C.token);

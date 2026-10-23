@@ -91,7 +91,7 @@ async function loop(w, stap) {
     return { klopt: g.status === 400 && /aantal minuten/.test(g.data.error), ziet: g.status + ' (' + (g.data && g.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet een lege reis en kan geen gevolg vragen over een afspraak van dit lid', async () => {
+  await stap('bevoegd', 'een ander lid ziet een lege reis en kan geen gevolg vragen over een afspraak van dit lid', async () => {
     const r = await reis(B.token);
     const g = await w.post(GEVOLG, { kenmerk: vroeg, minuten: 30 }, B.token);
     return { klopt: r.status === 200 && r.data.onderdelen === 0 && g.status === 404 && !JSON.stringify(g.data).includes(dienst(zaken[0]).name),

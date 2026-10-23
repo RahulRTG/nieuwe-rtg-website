@@ -86,7 +86,7 @@ async function loop(w, stap) {
     return { klopt: r.status === 200 && r.data.gevonden === false && r.data.gevraagd === 'POST /api/bestaat/niet', ziet: JSON.stringify(r.data) };
   });
 
-  await stap('voltooibaar', 'een lid, een zaak en een vreemde komen er niet in, en horen dat het de kantoordeur is', async () => {
+  await stap('bevoegd', 'een lid, een zaak en een vreemde komen er niet in, en horen dat het de kantoordeur is', async () => {
     const lid = await nieuwLid(w, 'rdl');
     const rooster = await w.post('/api/supplier/roster', { code: 'BRISA' });
     const man = ((rooster.data && rooster.data.staff) || []).find((x) => x.role === 'manager');

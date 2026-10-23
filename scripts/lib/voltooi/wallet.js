@@ -104,7 +104,7 @@ async function loop(w, stap) {
       ziet: 'inwisselen ' + r.status + ', saldo ' + m.saldo + '; te veel ' + te.status + ' (' + (te.data && te.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'een ANDER lid ziet niets van deze wallet en kan de munten en de kaart niet inwisselen of weghalen', async () => {
+  await stap('bevoegd', 'een ANDER lid ziet niets van deze wallet en kan de munten en de kaart niet inwisselen of weghalen', async () => {
     const ander = await nieuwLid(w, 'walander');
     const zijnToestel = await gebondenToestel(w, ander.token);
     const zijn = await lijst(ander.token);

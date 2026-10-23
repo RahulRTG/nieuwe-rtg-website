@@ -60,7 +60,7 @@ async function loop(w, stap) {
       ziet: 'koppel ' + k.status + ', rollen ' + lijst.map((r) => r.rol).join('+') + ', kantoorsessie ' + s.status + ', RTG One ' + one.status };
   });
 
-  await stap('voltooibaar', 'een rol die niet aan het account hangt opent niets: een ander lid krijgt geen kantoor en geen werkplek bij deze zaak', async () => {
+  await stap('bevoegd', 'een rol die niet aan het account hangt opent niets: een ander lid krijgt geen kantoor en geen werkplek bij deze zaak', async () => {
     const B = await nieuwLid(w, 'werkb');
     const k = await w.post(START, { rol: 'kantoor' }, B.token);
     const p = await w.post(START, { rol: 'personeel', code: personeel.code, staffId: personeel.staffId }, B.token);

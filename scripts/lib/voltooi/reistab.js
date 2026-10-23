@@ -117,7 +117,7 @@ async function loop(w, stap) {
       ziet: 'boeken ' + b.status + ', programma ' + g.status + ' met ' + items.length + ' item(s)' + (it ? ': ' + it.titel : ', ZONDER de vlucht') };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet de deals en het programma van dit lid niet, en tekent zijn contract niet', async () => {
+  await stap('bevoegd', 'een ander lid ziet de deals en het programma van dit lid niet, en tekent zijn contract niet', async () => {
     const zijn = await deals(B.token);
     const g = await w.post(AGENDA, {}, B.token);
     const items = ((g.data && g.data.dagen) || []).flatMap((d) => d.items);

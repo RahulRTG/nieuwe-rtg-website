@@ -83,7 +83,7 @@ async function loop(w, stap) {
       ziet: 'inchecken ' + r.status + (r.data && r.data.error ? ' (' + r.data.error + ')' : '') + ', boeking ' + (b && b.status) + ', code alleen in dit antwoord: ' + (b && !JSON.stringify(b).includes(pass && pass.code)) };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet de boeking niet en kan er niet mee inchecken, roteren of intrekken', async () => {
+  await stap('bevoegd', 'een ander lid ziet de boeking niet en kan er niet mee inchecken, roteren of intrekken', async () => {
     const zicht = await boeking(boekId, B.token);
     const r = await w.post(ROTEER, { id: boekId, rotatie: 1 }, B.token);
     const x = await w.post(INTREK, { id: boekId, rotatie: 1 }, B.token);

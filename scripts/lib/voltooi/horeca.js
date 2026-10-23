@@ -91,7 +91,7 @@ async function loop(w, stap) {
       ziet: 'openstaand ' + te + ', betaal ' + b.status + ', stand ' + (na.data && na.data.rekening.status) };
   });
 
-  await stap('voltooibaar', 'een andere zaak leest of wijzigt deze rekening niet, en een lid zonder zaak komt er niet in', async () => {
+  await stap('bevoegd', 'een andere zaak leest of wijzigt deze rekening niet, en een lid zonder zaak komt er niet in', async () => {
     const P = await zaakSessie(w, 'PONTO');
     const lezen = await w.post(REKENING, { rekeningId: rekId }, P);
     const regel = await w.post(REGEL, { rekeningId: rekId, naam: 'Ingeschoven', centen: 100 }, P);

@@ -119,7 +119,7 @@ async function loop(w, stap) {
       ziet: c.status + ' (' + (c.data && c.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet het kaartje niet en kan het niet tonen', async () => {
+  await stap('bevoegd', 'een ander lid ziet het kaartje niet en kan het niet tonen', async () => {
     const k = await kaartjes(B.token);
     const t = await w.post(TOON, { id: kaartje.id }, B.token);
     return { klopt: k.length === 0 && t.status >= 400 && t.status < 500 && !t.data.code,

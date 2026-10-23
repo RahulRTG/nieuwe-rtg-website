@@ -104,7 +104,7 @@ async function loop(w, stap) {
       ziet: r.status + ' (' + (r.data && r.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'een ANDER lid buiten het lijstje leest het niet, schrijft er niets in en verrekent er niets', async () => {
+  await stap('bevoegd', 'een ANDER lid buiten het lijstje leest het niet, schrijft er niets in en verrekent er niets', async () => {
     const C = await geverifieerdLid(w, 'wbwd');
     const toestelC = await gebondenToestel(w, C.token);
     const lees = await groep(C, gid);

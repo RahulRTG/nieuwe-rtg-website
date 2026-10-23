@@ -83,7 +83,7 @@ async function loop(w, stap) {
       ziet: 'opleveren ' + r.status + ', stand ' + p.status + ', ' + p.voortgang + '%' };
   });
 
-  await stap('voltooibaar', 'een andere medewerker wijzigt niets aan dit project, en een lid zonder kantoorrol komt er niet bij', async () => {
+  await stap('bevoegd', 'een andere medewerker wijzigt niets aan dit project, en een lid zonder kantoorrol komt er niet bij', async () => {
     const Q = await nieuwProject('Tweede vraag ' + merk);
     const taak = await w.post(TAAK, { id: Q.id, taakId: Q.taken[0].id, af: true }, N.kantoor);
     const bewijs = await w.post(BEWIJS, { projectId: Q.id, titel: 'Vals', uitleg: 'Niet van mij' }, N.kantoor);

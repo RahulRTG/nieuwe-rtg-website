@@ -113,7 +113,7 @@ async function loop(w, stap) {
       ziet: 'overboeken ' + r.status + ', betaal ' + saldo(o, betaal.iban) + ', spaar ' + saldo(o, spaar.iban) };
   });
 
-  await stap('voltooibaar', 'een ANDER lid ziet deze rekeningen niet, leest het afschrift niet en kan er niet van afboeken', async () => {
+  await stap('bevoegd', 'een ANDER lid ziet deze rekeningen niet, leest het afschrift niet en kan er niet van afboeken', async () => {
     const ander = await nieuwLid(w, 'bankander');
     const t2 = await gebondenToestel(w, ander.token);
     await post(AKKOORD, {}, ander.token, t2);

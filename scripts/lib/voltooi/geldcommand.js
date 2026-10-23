@@ -83,7 +83,7 @@ async function loop(w, stap) {
       ziet: 'pot met regel ' + vast.status + ', losse pot ' + weg.status };
   });
 
-  await stap('voltooibaar', 'een ANDER lid ziet geen regels, potten of log van dit lid en kan zijn pot niet raken', async () => {
+  await stap('bevoegd', 'een ANDER lid ziet geen regels, potten of log van dit lid en kan zijn pot niet raken', async () => {
     const B = await nieuwLid(w, 'gcb');
     const zijn = await beleid(B.token);
     const log = ((await w.post(LOG, {}, B.token)).data || {}).log || [];

@@ -123,7 +123,7 @@ async function loop(w, stap) {
       ziet: 'weigeren ' + wg.status + ', status ' + c.status + ', tekenen ' + t.status + ' (' + (t.data && t.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet de huur en de contracten niet, tekent niet en zet de locatie van deze huur niet aan', async () => {
+  await stap('bevoegd', 'een ander lid ziet de huur en de contracten niet, tekent niet en zet de locatie van deze huur niet aan', async () => {
     const zijnH = await huren(B.token), zijnC = await contracten(B.token);
     const t = await w.post(TEKEN, { ref: cRef, naam: 'Vreemde', akkoord: true }, B.token);
     const l = await w.post(LOCATIE, { ref: huur.ref, aan: true }, B.token);

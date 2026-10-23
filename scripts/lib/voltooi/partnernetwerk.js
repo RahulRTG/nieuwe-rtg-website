@@ -67,7 +67,7 @@ async function loop(w, stap) {
       ziet: 'reactie ' + r.status + ', lid leest ' + !!reactie + ', beantwoord ' + getal(o, 'intentiesBeantwoord').waarde + ', responstijd ' + getal(o, 'responstijdMin').waarde + ' min' };
   });
 
-  await stap('voltooibaar', 'een andere zaak ziet het antwoord van deze zaak niet in haar netwerk, en een lid komt niet in het netwerkoverzicht', async () => {
+  await stap('bevoegd', 'een andere zaak ziet het antwoord van deze zaak niet in haar netwerk, en een lid komt niet in het netwerkoverzicht', async () => {
     const P = await zaakSessie(w, 'PONTO');
     const op = await overzicht(P);
     const item = (op.aandacht || []).find((x) => x.id === a.id);

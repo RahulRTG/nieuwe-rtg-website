@@ -85,7 +85,7 @@ async function loop(w, stap) {
       ziet: 'spoor ' + v.status + ', ' + (v.data && v.data.verzoeken && v.data.verzoeken.length) + ' opvragingen' };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet deze strook niet en krijgt het dossier niet, ook niet met de juiste runId', async () => {
+  await stap('bevoegd', 'een ander lid ziet deze strook niet en krijgt het dossier niet, ook niet met de juiste runId', async () => {
     const B = await nieuwLid(w, 'loonb');
     const s = await w.post(STROKEN, {}, B.token);
     const d = await w.post(DOSSIER, { runId }, B.token);

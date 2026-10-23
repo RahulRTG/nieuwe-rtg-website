@@ -49,7 +49,7 @@ async function loop(w, stap) {
       ziet: r.status + ', ' + (s && s.naam) + ', ' + startAantal + ' meubels, catalogus ' + cat.length + ' stuks' };
   });
 
-  await stap('voltooibaar', 'een net ingerichte suite begint dicht: niet in de gids van een ander lid, en die komt er niet in', async () => {
+  await stap('bevoegd', 'een net ingerichte suite begint dicht: niet in de gids van een ander lid, en die komt er niet in', async () => {
     const s = await suite();
     const g = await w.post(GIDS, {}, B.token);
     const inGids = ((g.data && g.data.suites) || []).some((x) => x.adres === adres);
@@ -85,7 +85,7 @@ async function loop(w, stap) {
       ziet: 'gids ' + g.status + (inGids ? ' met ' + inGids.naam : ' ZONDER de suite') + ', binnenlopen ' + b.status };
   });
 
-  await stap('voltooibaar', 'het lid zet de suite dicht: hij verdwijnt uit de gids en het andere lid komt er niet meer in', async () => {
+  await stap('bevoegd', 'het lid zet de suite dicht: hij verdwijnt uit de gids en het andere lid komt er niet meer in', async () => {
     const z = await w.post(SUITE_ZET, { open: false }, T);
     const g = await w.post(GIDS, {}, B.token);
     const inGids = ((g.data && g.data.suites) || []).some((x) => x.adres === adres);
@@ -96,7 +96,7 @@ async function loop(w, stap) {
       ziet: 'dicht ' + z.status + ', in de gids ' + (inGids ? 'NOG' : 'niet') + ', B ' + b.status + ' (' + (b.data && b.data.error) + '), eigenaar ' + eigen.status };
   });
 
-  await stap('voltooibaar', 'wat het andere lid neerzet, landt in zijn eigen suite en nooit in die van dit lid', async () => {
+  await stap('bevoegd', 'wat het andere lid neerzet, landt in zijn eigen suite en nooit in die van dit lid', async () => {
     const voor = JSON.stringify((await suite()).meubels);
     const m = await w.post(MEUBEL_ZET, { soort: 'kruk', x: 9, y: 7 }, B.token);
     const na = JSON.stringify((await suite()).meubels);

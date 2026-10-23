@@ -83,7 +83,7 @@ async function loop(w, stap) {
       ziet: 'na 2,2 s: ' + s.status + ' (' + (s.data && s.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'zonder inlog geen code en geen scan; een lid mag geen tafel- of deurcode van een zaak maken', async () => {
+  await stap('bevoegd', 'zonder inlog geen code en geen scan; een lid mag geen tafel- of deurcode van een zaak maken', async () => {
     const zonder = await w.post(DYN, PAS, null);
     const scanZonder = await w.post(SCAN, { token: 'RTG1.x.y' }, null);
     const tafel = await w.post(DYN, { soort: 'tafel', code: 'ZAAK:1' }, A.token);
@@ -91,7 +91,7 @@ async function loop(w, stap) {
       ziet: 'zonder inlog ' + zonder.status + '/' + scanZonder.status + ', tafelcode als lid ' + tafel.status };
   });
 
-  await stap('voltooibaar', 'een ANDER lid dat de code scant, leest er niets van het lid uit: geen codenaam, geen account', async () => {
+  await stap('bevoegd', 'een ANDER lid dat de code scant, leest er niets van het lid uit: geen codenaam, geen account', async () => {
     const r = await maak();
     const s = await scan(r.data.token, B.token);
     const lijf = JSON.stringify(s.data || {});

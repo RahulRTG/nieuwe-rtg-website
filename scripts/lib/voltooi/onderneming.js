@@ -77,7 +77,7 @@ async function loop(w, stap) {
       ziet: 'kvk ' + k.status + ', saldo ' + (s.data && s.data.saldo && s.data.saldo.bedrag) + ', fase ' + (d.data && d.data.fase) };
   });
 
-  await stap('voltooibaar', 'een ander lid ziet deze onderneming niet en wijzigt er niets aan', async () => {
+  await stap('bevoegd', 'een ander lid ziet deze onderneming niet en wijzigt er niets aan', async () => {
     const B = await nieuwLid(w, 'ondb');
     const r = await w.post(RECHTSVORM, { id, rechtsvorm: 'bv' }, B.token);
     const d = await w.post(DAGBEELD, { id }, B.token);

@@ -94,7 +94,7 @@ async function loop(w, stap) {
       ziet: r.status + ', ' + (r.data && r.data.pass && r.data.pass.status) };
   });
 
-  await stap('voltooibaar', 'zonder inlog komt niemand binnen: wens, aanvraag en pass geven een 401', async () => {
+  await stap('bevoegd', 'zonder inlog komt niemand binnen: wens, aanvraag en pass geven een 401', async () => {
     const i = await w.post(INTERPRET, { tekst: 'morgen om 20:00 met 2' });
     const a = await w.post(AANVRAAG, { requestToken: aanvraagcode(), supplierCode: zaak, datum: dag(4), tijd: '21:00', personen: 2 });
     const p = await w.post(PAS, { pass: pas.accessToken });
@@ -102,7 +102,7 @@ async function loop(w, stap) {
       ziet: 'wens ' + i.status + ', aanvraag ' + a.status + ', pass ' + p.status + ' (' + (p.data && p.data.error) + ')' };
   });
 
-  await stap('voltooibaar', 'een ander lid met de pass van dit lid komt er niet in: lezen, een status delen en roteren geven een 404', async () => {
+  await stap('bevoegd', 'een ander lid met de pass van dit lid komt er niet in: lezen, een status delen en roteren geven een 404', async () => {
     const l = await w.post(PAS, { pass: pas.accessToken }, B.token);
     const p = await w.post(PULS, { pass: pas.accessToken, pulse: 'onderweg' }, B.token);
     const r = await w.post('/api/arrival/pass/roteer', { pass: pas.accessToken }, B.token);
@@ -118,7 +118,7 @@ async function loop(w, stap) {
       ziet: a ? 'bij ' + zaak + ': ' + a.status + ', allergie ' + a.wensen.allergie : 'NIET BIJ DE ZAAK' };
   });
 
-  await stap('voltooibaar', 'een andere zaak ziet deze aankomst niet en kan er geen belofte van bevestigen', async () => {
+  await stap('bevoegd', 'een andere zaak ziet deze aankomst niet en kan er geen belofte van bevestigen', async () => {
     const zichtbaar = (await lijstBij(Z2)).some((x) => x.id === pas.id);
     const p = await w.post(ZAAK_BELOFTE, { arrivalId: pas.id, id: 'allergie', akkoord: true }, Z2);
     const nog = await w.post(PAS, { pass: pas.accessToken }, T);

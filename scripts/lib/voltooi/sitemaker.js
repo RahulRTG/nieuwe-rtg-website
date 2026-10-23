@@ -82,7 +82,7 @@ async function loop(w, stap) {
       ziet: 'versies ' + (v.data && v.data.lijst && v.data.lijst.length) + ', herstel ' + h.status + ', concept "' + kop + '"' };
   });
 
-  await stap('voltooibaar', 'een ander lid haalt, overschrijft, publiceert of haalt deze site niet uit de lucht', async () => {
+  await stap('bevoegd', 'een ander lid haalt, overschrijft, publiceert of haalt deze site niet uit de lucht', async () => {
     const h = await w.post(HAAL, { id }, B.token);
     const o = await w.post(OFFLINE, { id }, B.token);
     const p = await w.post(PUBLICEER, { id, adres: 'gekaapt-' + merk }, B.token);

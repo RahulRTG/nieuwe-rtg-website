@@ -59,7 +59,7 @@ async function loop(w, stap) {
       ziet: a.status + ', kantoor ' + (dossier && dossier.status) + ', ' + (aanvraag && aanvraag.status) };
   });
 
-  await stap('voltooibaar', 'de gedeelde kantoorcode kan de pas niet toekennen: dat is geen herleidbaar mens', async () => {
+  await stap('bevoegd', 'de gedeelde kantoorcode kan de pas niet toekennen: dat is geen herleidbaar mens', async () => {
     const o = await w.post('/api/office/login', { code: KANTOORWERELD.OFFICE_CODE });
     const tok = o.data && o.data.token;
     const b = tok ? await w.post(BESLIS, { id: aanvraag.id, besluit: 'geaccepteerd', contractEuro: 20000 }, tok) : o;

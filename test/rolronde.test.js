@@ -1,7 +1,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { meetRol, beoordeelRoute, beoordeel, METER_N } = require('../scripts/rolronde');
+const { meetRol, beoordeelRoute, beoordeel, lidPasseertLedenpoort,
+  redenNietMeetbaarLid, redenNietMeetbareRoute, METER_N } = require('../scripts/rolronde');
 const r = status => ({ status, data: {} });
 const levend = () => ({ leverancier:{voor:r(200),na:r(200)}, kantoor:{voor:r(200),na:r(200)} });
 const oordeel = (anon=401, lid=200, leverancier=401, kantoor=403) =>
@@ -27,6 +28,41 @@ test('zonder2xx eigenaar bestaat geen positieve controle', () => {
     assert.ok(uit.onbekend.length);
   }
   assert.equal(oordeel(404).bewezen, false);
+});
+test('een expliciete ledenbewaker mag gecontroleerde domeinantwoorden als passage bewijzen', () => {
+  const contract = { explicieteLedenbewaker: true };
+  for (const status of [400, 403, 404, 409, 422, 428]) {
+    assert.equal(lidPasseertLedenpoort(r(status), contract), true, String(status));
+    const uit = beoordeelRoute('POST /api/prive', r(401), r(status),
+      { leverancier:r(401), kantoor:r(403) }, levend(), contract);
+    assert.equal(uit.bewezen, true, String(status));
+  }
+});
+test('ledenpassage faalt dicht zonder expliciete bronbewaker of bij auth-, limiet- en serverfouten', () => {
+  for (const status of [0, 301, 401, 429, 500, 503]) {
+    assert.equal(lidPasseertLedenpoort(r(status), { explicieteLedenbewaker:true }), false, String(status));
+  }
+  for (const status of [400, 404, 409, 422, 428]) {
+    assert.equal(lidPasseertLedenpoort(r(status)), false, String(status));
+  }
+});
+test('alleen verklaarde aanvullende ledenvoorwaarden en aantoonbaar uitgeschakelde functies zijn niet meetbaar', () => {
+  const contract = { explicieteLedenbewaker:true, aanvullendeLedenvoorwaarde:true };
+  assert.match(redenNietMeetbaarLid(r(401), contract), /aanvullende ledenvoorwaarde/);
+  assert.match(redenNietMeetbaarLid(r(403), contract), /aanvullende ledenvoorwaarde/);
+  assert.match(redenNietMeetbaarLid({status:503,data:{functie:'bank'}}, contract), /bank/);
+  assert.equal(redenNietMeetbaarLid(r(500), contract), null);
+  assert.equal(redenNietMeetbaarLid(r(503), contract), null);
+  assert.equal(redenNietMeetbaarLid(r(401)), null);
+  assert.equal(redenNietMeetbaarLid(r(401), { explicieteLedenbewaker:true }), null);
+  for (const route of ['POST /api/leerhuis/doe', 'POST /api/leerhuis/lees', 'POST /api/site/domein',
+    'POST /api/munt/direct', 'POST /api/munt/verzoek', 'POST /api/ondertiteling/fragment'])
+    assert.ok(redenNietMeetbareRoute(route, r(503)), route);
+  assert.equal(redenNietMeetbareRoute('POST /api/anders', r(503)), null);
+  assert.equal(redenNietMeetbareRoute('POST /api/munt/direct', r(500)), null);
+  assert.match(redenNietMeetbareRoute('POST /api/arrival/pass', r(401)), /Arrival Pass/);
+  assert.match(redenNietMeetbareRoute('POST /api/democratie/partij/koppel', r(401)), /koppelcode/);
+  assert.equal(redenNietMeetbareRoute('POST /api/arrival/pass', r(403)), null);
 });
 test('ongewenste2xx is een gat, ook als de andere rol onbekend blijft', () => {
   const uit = oordeel(401, 200, 200, 503);

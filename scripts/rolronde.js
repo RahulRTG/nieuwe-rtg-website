@@ -27,7 +27,8 @@
    route uit scripts/lib/routes.js:
 
      1. vereist een expliciete 401/403 voor de anonieme beller.
-     2. vereist 2xx voor het lid en een succesvolle sessiekanarie.
+     2. vereist 2xx, of bij een door de routekaart gelezen `auth`-bewaker een
+        gecontroleerd domeinantwoord, voor het lid en een succesvolle kanarie.
      3. vereist expliciete 401/403 voor leverancier EN kantoor.
         Andere antwoorden zijn onbekend, behalve ongewenste2xx (een gat).
         Bekende gedeelde loketten blijven apart en bewijzen geen rolscheiding.
@@ -58,6 +59,7 @@ const WORTEL = path.join(__dirname, '..');
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[2m', reset: '\x1b[0m', vet: '\x1b[1m' };
 
 const { alleRoutes } = require('./lib/routes');
+const { soortVan } = require('./lib/bewakers');
 const proefserver = require('./lib/proefserver');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
@@ -197,6 +199,39 @@ const ROLGEDEELD = new Map([
     toets: 'test/rtc-relay.test.js -- "end-to-end: /api/ice alleen voor een sessie, kortlevend, HMAC klopt"' }]),
 ]);
 
+/* Een 503 is nooit bewijs. Deze routes zijn in de generieke proefinstallatie
+   wel verklaarbaar niet meetbaar: hun bestaande gerichte toetsen zetten de
+   benodigde capability/provider bewust op. De naam en toets blijven hier
+   zichtbaar zodat deze lijst niet stil kan groeien. */
+const ROLNIETMEETBAAR = new Map([
+  ...['doe', 'lees'].map(naam => ['POST /api/leerhuis/' + naam, {
+    reden: 'het leerhuis staat standaard uit; de rolronde zet geen organisatie- en Academy-bron op',
+    toets: 'test/leerhuis-routes.test.js' }]),
+  ['POST /api/site/domein', {
+    reden: 'een eigen publiek domein staat standaard uit en vereist de bestaande boardroom-schakelaar',
+    toets: 'test/webplatform.test.js' }],
+  ...['direct', 'verzoek'].map(naam => ['POST /api/munt/' + naam, {
+    reden: 'muntbetalingen vereisen een geconfigureerde muntprovider',
+    toets: 'test/munten.test.js' }]),
+  ['POST /api/ondertiteling/fragment', {
+    reden: 'automatische ondertiteling vereist het lokale spraakmodel',
+    toets: 'test/spraaktekst.test.js' }],
+  ...['pass', 'pass/intrek', 'pass/roteer', 'pulse'].map(naam => ['POST /api/arrival/' + naam, {
+    reden: 'de Arrival-poort vereist naast het lid een geldige, objectgebonden Arrival Pass in het lichaam',
+    toets: 'test/arrivalpas.test.js', statussen: [401] }]),
+  ['POST /api/democratie/partij/koppel', {
+    reden: 'de partijkoppeling vereist naast het lid een eenmalige koppelcode in de kop',
+    toets: 'test/toegang-partij.test.js', statussen: [401] }]
+]);
+const LIDSESSIE_EINDE = new Map([
+  ['POST /api/logout', {
+    reden: 'de route trekt de geteste sessie opzettelijk in',
+    toets: 'test/uitloggen.test.js' }],
+  ['POST /api/privacy/delete', {
+    reden: 'de route wist het geteste account opzettelijk',
+    toets: 'test/vergeten.test.js' }]
+]);
+
 // Gedeeld is een inhoudscontract, geen vrijstelling voor crashes of andere data.
 function gedeeldAntwoordGeldig(route, lid, ander) {
   const contract = ROLGEDEELD.get(route);
@@ -210,6 +245,37 @@ function gedeeldAntwoordGeldig(route, lid, ander) {
    functie, een storing of een timeout bewijst geen rolgrens. */
 const succesvol = antwoord => !!antwoord && antwoord.status >= 200 && antwoord.status < 300;
 const geweigerd = antwoord => !!antwoord && [401, 403].includes(antwoord.status);
+/* Een route met de expliciete ledenbewaker `auth` kan de eigenaar ook met een
+   gecontroleerd domeinantwoord toelaten. Een ontbrekend object (404), ongeldige
+   invoer (400), capabilityweigering (403), ontbrekend object (404), conflict
+   (409) of ontbrekende voorwaarde (422/428) ontstaat NA die bewaker en is
+   daarom positief bewijs dat het lid de ledenpoort passeerde. De centrale
+   `auth`-bewaker gebruikt 401 voor een ongeldige identiteit; zijn 403 is de
+   expliciete boardroom/capabilitygrens nadat de identiteit is vastgesteld.
+
+   Dit geldt uitsluitend voor routes waarvan de routekaart de bewaker werkelijk
+   heeft gelezen. Een omleiding, rate limit, auth-weigering, timeout of 5xx blijft
+   onbeslist. Zo hoeft de rolronde geen geldige zakelijke objecten voor duizenden
+   routes te verzinnen, zonder een foutantwoord als autorisatiebewijs te gebruiken. */
+function lidPasseertLedenpoort(antwoord, contract = {}) {
+  if (succesvol(antwoord)) return true;
+  if (!contract.explicieteLedenbewaker || !antwoord) return false;
+  return [400, 403, 404, 409, 422, 428].includes(antwoord.status);
+}
+function redenNietMeetbaarLid(antwoord, contract = {}) {
+  if (!contract.explicieteLedenbewaker || !antwoord) return null;
+  if (contract.aanvullendeLedenvoorwaarde && [401, 403].includes(antwoord.status))
+    return 'expliciete ledenbewaker, maar een aanvullende ledenvoorwaarde weigert deze generieke fixture';
+  if (antwoord.status === 503 && antwoord.data && antwoord.data.functie)
+    return 'functie staat in deze proefinstallatie aantoonbaar uit: ' + String(antwoord.data.functie);
+  return null;
+}
+function redenNietMeetbareRoute(route, antwoord) {
+  const contract = ROLNIETMEETBAAR.get(route);
+  if (!contract || !antwoord) return null;
+  const statussen = contract.statussen || [503];
+  return statussen.includes(antwoord.status) ? contract.reden : null;
+}
 // Dezelfde token moet op zijn eigen loket vóór én na de tegenproef leven.
 async function meetRol(vraag, rol, token, methode, pad, lijf) {
   const eigenPad = { leverancier: '/api/supplier/state', kantoor: '/api/office/state' }[rol];
@@ -219,11 +285,11 @@ async function meetRol(vraag, rol, token, methode, pad, lijf) {
   const na = await vraag('POST', eigenPad, token);
   return { voor, antwoord, na };
 }
-function beoordeelRoute(route, anon, lid, antwoorden = {}, controles = {}) {
+function beoordeelRoute(route, anon, lid, antwoorden = {}, controles = {}, contract = {}) {
   const uit = { bewezen: false, gaten: [], onbekend: [], gedeeld: [] };
   const onbekend = (rol, a) => uit.onbekend.push({ route, rol, status: a ? a.status : 0 });
   if (!geweigerd(anon)) { onbekend('anoniem', anon); return uit; }
-  if (!succesvol(lid)) { onbekend('lid', lid); return uit; }
+  if (!lidPasseertLedenpoort(lid, contract)) { onbekend('lid', lid); return uit; }
   for (const rol of ['leverancier', 'kantoor']) {
     const a = antwoorden[rol];
     const controle = controles[rol];
@@ -281,6 +347,7 @@ async function main() {
   const ledenEndpoints = [], publiekOfVroeg = [], andereRol = [], stil = [];
   const gaten = [];
   const onbekend = [];
+  const nietMeetbaar = [];
   const gedeeld = [];
   const rolproeven = [];
   let hersteld = 0;
@@ -289,10 +356,22 @@ async function main() {
   for (const r of routes) {
     const pad = r.pad.replace(/:[A-Za-z_]+/g, 'x1');       // een padparam met iets onschuldigs
     const lijf = {};
+    const contract = {
+      explicieteLedenbewaker: r.bewakersBekend === true && r.bewakers.includes('auth'),
+      aanvullendeLedenvoorwaarde: r.bewakersBekend === true &&
+        r.bewakers.some(naam => soortVan(naam) === 'verfijner')
+    };
     const anon = await vraag(r.methode, pad, null, lijf);
     if (!geweigerd(anon)) {
       publiekOfVroeg.push(r.methode + ' ' + r.pad + ' -> ' + anon.status);
-      onbekend.push(...beoordeelRoute(r.methode + ' ' + r.pad, anon).onbekend);
+      // Alleen een expliciete ledenroute hoort in DEZE verticale rolmeting. De
+      // ladder beoordeelt alle overige anonieme deuren; dubbel tellen zou een
+      // publieke of andere-rolroute hier ten onrechte als ledenhiaat opvoeren.
+      if (contract.explicieteLedenbewaker) {
+        const reden = redenNietMeetbareRoute(r.methode + ' ' + r.pad, anon);
+        if (reden) nietMeetbaar.push({ route: r.methode + ' ' + r.pad, status: anon.status, reden });
+        else onbekend.push(...beoordeelRoute(r.methode + ' ' + r.pad, anon).onbekend);
+      }
       if (anon.status === 0) stil.push(r.methode + ' ' + r.pad);
       continue;
     }
@@ -318,14 +397,25 @@ async function main() {
       }
       l = f.eigen;
     }
-    if (!succesvol(l)) {
+    if (!lidPasseertLedenpoort(l, contract)) {
       andereRol.push(r.methode + ' ' + r.pad);
-      onbekend.push(...beoordeelRoute(r.methode + ' ' + r.pad, anon, l).onbekend);
+      const reden = redenNietMeetbareRoute(r.methode + ' ' + r.pad, l) || redenNietMeetbaarLid(l, contract);
+      if (reden) nietMeetbaar.push({ route: r.methode + ' ' + r.pad, status: l.status, reden });
+      else if (contract.explicieteLedenbewaker)
+        onbekend.push(...beoordeelRoute(r.methode + ' ' + r.pad, anon, l, {}, {}, contract).onbekend);
       continue;
     }
     if (!(await lidLeeft())) {
-      onbekend.push({ route: r.methode + ' ' + r.pad, rol: 'lid-kanarie', status: 0 });
-      continue;
+      const sessieEinde = LIDSESSIE_EINDE.get(r.methode + ' ' + r.pad);
+      if (!sessieEinde) {
+        onbekend.push({ route: r.methode + ' ' + r.pad, rol: 'lid-kanarie', status: 0 });
+        continue;
+      }
+      lid = await nieuwLid(vraag); hersteld++;
+      if (!lid) {
+        onbekend.push({ route: r.methode + ' ' + r.pad, rol: 'lid-herstel-na-sessie-einde', status: 0 });
+        continue;
+      }
     }
     const antwoorden = {}, controles = {};
     for (const [rol, tok] of [['leverancier', supTok], ['kantoor', offTok]]) {
@@ -336,7 +426,7 @@ async function main() {
       rolproeven.push({ route: r.methode + ' ' + r.pad, rol,
         voor: proef.voor.status, antwoord: proef.antwoord.status, na: proef.na.status });
     }
-    const uit = beoordeelRoute(r.methode + ' ' + r.pad, anon, l, antwoorden, controles);
+    const uit = beoordeelRoute(r.methode + ' ' + r.pad, anon, l, antwoorden, controles, contract);
     if (uit.bewezen) ledenEndpoints.push(r.methode + ' ' + r.pad);
     gaten.push(...uit.gaten.map(g => ({ ...g, bestand: r.bestand + ':' + r.regel })));
     onbekend.push(...uit.onbekend);
@@ -345,9 +435,9 @@ async function main() {
 
   console.log('  ' + K.grijs + 'sessie onderweg hersteld: ' + hersteld + ' keer' + K.reset + '\n');
   console.log('  ' + K.vet + ledenEndpoints.length + K.reset + ' leden-endpoints met bewezen rolscheiding ' +
-    K.grijs + '(anoniem401/403, lid2xx, andere rollen401/403 met eigen2xx vóór/na)' + K.reset);
+    K.grijs + '(anoniem401/403, lid door expliciete auth, andere rollen401/403 met eigen2xx vóór/na)' + K.reset);
   console.log('  ' + K.grijs + publiekOfVroeg.length + ' routes zonder expliciete anonieme401/403 (scheiding niet bewezen)' + K.reset);
-  console.log('  ' + K.grijs + andereRol.length + ' routes zonder succesvolle ledencontrole (rol niet bewezen)' + K.reset);
+  console.log('  ' + K.grijs + andereRol.length + ' routes buiten de bewezen ledenverzameling' + K.reset);
   if (gedeeld.length) {
     console.log('  ' + K.grijs + gedeeld.length + ' antwoord(en) van een loket dat MET OPZET voor meer dan een rol opengaat:' + K.reset);
     for (const g of gedeeld) console.log('    ' + K.grijs + g.route + ' [' + g.rol + '] -- ' + ROLGEDEELD.get(g.route).reden.slice(0, 90) + K.reset);
@@ -364,7 +454,10 @@ async function main() {
       meters: { [METER]: gaten.length, [METER_N]: ledenEndpoints.length },
       routesOnderzocht: routes.length, sessieHersteld: hersteld,
       publiekOfVroegGevalideerd: publiekOfVroeg.length, andereRol: andereRol.length, zonderAntwoord: stil,
+      nietMeetbaar,
       bewustGedeeld: [...ROLGEDEELD].map(([route, u]) => ({ route, reden: u.reden, toets: u.toets })),
+      bewustNietMeetbaar: [...ROLNIETMEETBAAR].map(([route, u]) => ({ route, reden: u.reden, toets: u.toets })),
+      sessieBeeindigend: [...LIDSESSIE_EINDE].map(([route, u]) => ({ route, reden: u.reden, toets: u.toets })),
       waargenomenGedeeld: gedeeld, rolproeven,
       onbekend, bewezen: ledenEndpoints,
       gaten
@@ -384,6 +477,9 @@ async function main() {
   console.log('\n  ' + (onbekend.length ? K.geel : K.groen) +
     (onbekend.length ? onbekend.length + ' antwoorden zonder voldoende bewijs; geen waargenomen lek is geen bewezen scheiding.'
       : 'De onderzochte rolgrenzen zijn expliciet beproefd.') + K.reset + '\n');
+  if (nietMeetbaar.length)
+    console.log('  ' + K.grijs + nietMeetbaar.length +
+      ' expliciete ledenroutes zijn met reden niet meetbaar met de generieke fixture; zij tellen niet als bewijs.' + K.reset + '\n');
 
   /* ---------- de ratel ---------- */
   let norm = null;
@@ -407,4 +503,5 @@ async function main() {
 }
 
 if (require.main === module) main().then(c => { process.exitCode = c; }).catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { maakVraag, meetRol, beoordeelRoute, beoordeel, gedeeldAntwoordGeldig, METER, METER_N };
+module.exports = { maakVraag, meetRol, beoordeelRoute, beoordeel, gedeeldAntwoordGeldig,
+  lidPasseertLedenpoort, redenNietMeetbaarLid, redenNietMeetbareRoute, METER, METER_N };

@@ -100,13 +100,20 @@ function metBevoegd(doe) {
       'scripts/idorproef.js': "require('./lib/idor');\n",
       'scripts/lib/idor.js': 'module.exports = 1;\n',
       'scripts/rolproef-route.js': "require('./lib/rolproef');\n",
-      'scripts/lib/rolproef.js': 'module.exports = 1;\n'
+      'scripts/lib/rolproef.js': 'module.exports = 1;\n',
+      'scripts/voltooiproef.js': "require('./lib/voltooi');\n",
+      'scripts/lib/voltooi.js': 'module.exports = 1;\n'
     })) schrijf(map, rel, inhoud);
     const sha = commit(map, 'instrumenten');
-    const bronnen = ['IDOR.json', 'ROLPROEF.json'].map((register, i) => {
+    const broninstrumenten = {
+      'IDOR.json': 'scripts/idorproef.js',
+      'ROLPROEF.json': 'scripts/rolproef-route.js',
+      'VOLTOOIPROEF.json': 'scripts/voltooiproef.js'
+    };
+    const bronnen = Object.entries(broninstrumenten).map(([register, instrument]) => {
       const stempel = { op: 'nu', commit: sha, boomVuil: false,
-        instrument: i ? 'scripts/rolproef-route.js' : 'scripts/idorproef.js' };
-      const inhoud = JSON.stringify({ stempel, perRoute: i ? [] : {} });
+        instrument };
+      const inhoud = JSON.stringify({ stempel, perRoute: instrument.includes('rolproef') ? [] : {} });
       schrijf(map, register, inhoud);
       return { register, stempel, sha256: crypto.createHash('sha256').update(inhoud).digest('hex') };
     });
@@ -124,13 +131,13 @@ test('rolbewijs: bevoegd bewaart en controleert de gelezen bronregisters transit
   assert.equal(v.vers, true, v.reden);
   assert.deepEqual(v.raakvlak.bronnen, bronnen);
   assert.equal(nu().stand, 'VERS');
-  for (const register of ['IDOR.json', 'ROLPROEF.json']) {
+  for (const register of ['IDOR.json', 'ROLPROEF.json', 'VOLTOOIPROEF.json']) {
     const oud = fs.readFileSync(path.join(map, register), 'utf8');
     schrijf(map, register, oud + '\n');
     assert.equal(nu().stand, 'VERVALLEN', register + ': een nieuwe bronmeting vereist opnieuw samenstellen');
     schrijf(map, register, oud);
   }
-  for (const instrument of ['scripts/lib/rolproef.js', 'scripts/lib/idor.js']) {
+  for (const instrument of ['scripts/lib/rolproef.js', 'scripts/lib/idor.js', 'scripts/lib/voltooi.js']) {
     schrijf(map, instrument, 'module.exports = 2;\n');
     assert.equal(nu().stand, 'VERVALLEN', instrument + ': de classifier van een bron blijft deel van het bewijs');
     schrijf(map, instrument, 'module.exports = 1;\n');

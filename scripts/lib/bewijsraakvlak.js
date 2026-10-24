@@ -97,7 +97,13 @@ const SCENARIOMAP = 'scripts/lib/voltooi/';
 const BRONREGISTERS = {
   'scripts/bevoegdronde.js': {
     'IDOR.json': 'scripts/idorproef.js',
-    'ROLPROEF.json': 'scripts/rolproef-route.js'
+    'ROLPROEF.json': 'scripts/rolproef-route.js',
+    /* De appkruisproef komt uit dezelfde echte workflow die voltooibaarheid,
+       opslag en herstel meet. Sinds bevoegdronde die expliciet gemarkeerde
+       tegenactor-stappen meeneemt, is VOLTOOIPROEF net zo goed broninvoer als
+       de twee routeproeven. Zonder deze binding werd geldig bewijs bij de
+       APPWERKT-samenstelling terecht geweigerd als "niet volledig vastgelegd". */
+    'VOLTOOIPROEF.json': 'scripts/voltooiproef.js'
   }
 };
 

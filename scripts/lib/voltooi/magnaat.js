@@ -78,7 +78,7 @@ async function loop(w, stap) {
       ziet: 'dossier ' + t.status + ', xp ' + voor.xp + ' -> ' + na.xp + ', voltooid ' + na.voltooid };
   });
 
-  await stap('voltooibaar', 'een tweede speler beantwoordt, opent of ziet de dossiers van de eerste niet', async () => {
+  await stap('bevoegd', 'een tweede speler beantwoordt, opent of ziet de dossiers van de eerste niet', async () => {
     const B = await nieuwLid(w, 'magb');
     const t = await begin();
     const a = await post(ANTWOORD, { taakId: t.id, keuze: 0, stap: t.stap }, B.token);

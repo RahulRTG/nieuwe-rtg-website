@@ -80,7 +80,7 @@ async function loop(w, stap) {
       ziet: 'overdracht ' + r.status + ', ' + (o ? o.beloften.length : 0) + ' open belofte(n) mee' };
   });
 
-  await stap('voltooibaar', 'een lid zonder kantoorrol krijgt geen kantoorsessie en leest of schrijft niets in RTG One', async () => {
+  await stap('bevoegd', 'een lid zonder kantoorrol krijgt geen kantoorsessie en leest of schrijft niets in RTG One', async () => {
     const V = await nieuwLid(w, 'vreemd');
     const s = await w.post(START, { rol: 'kantoor' }, V.token);
     const l = await w.post(STATE, { huis: 'rtg' }, V.token);

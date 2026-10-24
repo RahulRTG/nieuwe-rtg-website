@@ -75,7 +75,7 @@ async function loop(w, stap) {
       ziet: 'aanvaard ' + a.status + ', binnen ' + binnen.status + ', buiten ' + buiten.status + ', spoor ' + log.length + ' handelingen' };
   });
 
-  await stap('voltooibaar', 'een derde lid simuleert, aanvaardt of trekt deze machtiging niet in, en ziet haar niet', async () => {
+  await stap('bevoegd', 'een derde lid simuleert, aanvaardt of trekt deze machtiging niet in, en ziet haar niet', async () => {
     const D = await nieuwLid(w, 'vtgd');
     const s = await w.post(SIMULATIE, { id }, D.token);
     const i = await w.post(INTREK, { id }, D.token);

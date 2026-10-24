@@ -44,7 +44,7 @@ async function loop(w, stap) {
 
   /* Het scherm vraagt "Codenaam of sleutel" en stuurt wat het lid intypt als
      `handle` (public/shared/veiligheid.js). De proef typt dus de CODENAAM. */
-  await stap('voltooibaar', 'iemand met wie A niet verbonden is, kan niet in de kring -- ook niet bij codenaam', async () => {
+  await stap('bevoegd', 'iemand met wie A niet verbonden is, kan niet in de kring -- ook niet bij codenaam', async () => {
     const cb = (await w.post('/api/member/connections', {}, B.token)).data;
     handleB = cb.me; codenaamB = cb.codename;
     const r = await w.post(TOEVOEGEN, { handle: codenaamB }, A.token);

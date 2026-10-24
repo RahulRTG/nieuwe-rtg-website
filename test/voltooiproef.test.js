@@ -33,6 +33,10 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    uitgelokte weigering draagt het geen schakels en `nietBeproefd`. */
 const AFGELEID = 'menselijk';
 const BEVOEGD = 'bevoegd';
+/* De autorisatieratel hoort naast de functionele ratel. Op 24 oktober 2026
+   waren 76 scenario's voorzien van een daadwerkelijk uitgevoerde tegenproef;
+   een volgende meting mag die niet stil terugbrengen naar alleen kernwerk. */
+const BEVOEGD_MINIMUM = 76;
 /* DE RATEL: zoveel bewijzen staan op 11 oktober 2026 gesloten (twee
    onderdelen, drie bewijzen). Alleen omhoog; wie hem verlaagt, schrijft erbij
    waarom. */
@@ -157,6 +161,10 @@ test('3. het echte register is bruikbaar als bewijs en spreekt zichzelf niet teg
       assert.equal(b.sluit, g === b.schakels.length && !a.afgebroken, f + '/' + BEVOEGD + ': `sluit` spreekt de rijen tegen');
     }
   }
+  const bevoegdGesloten = Object.values(reg.apps).filter((a) => a[BEVOEGD].sluit).length;
+  assert.equal(reg.telling.bevoegdGesloten, bevoegdGesloten, 'de bevoegd-telling overstemt de rijen');
+  assert.ok(bevoegdGesloten >= BEVOEGD_MINIMUM,
+    'de bevoegd-ratel: ' + bevoegdGesloten + ' gesloten workflows, het minimum is ' + BEVOEGD_MINIMUM);
   assert.equal(reg.telling.bewijzenGesloten, gesloten);
   assert.equal(reg.telling.bewijzenOpen, open);
   assert.equal(reg.sluit, open === 0);

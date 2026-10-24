@@ -77,7 +77,7 @@ async function loop(w, stap) {
       ziet: 'stemmen ' + a.status + '/' + b.status + (b.data && b.data.al ? ' (al gestemd)' : '') + ', ' + (m && m.bevestigingen) + ' bevestigingen' };
   });
 
-  await stap('voltooibaar', 'een melder bevestigt zijn eigen melding niet: "klopt" geeft een 403 met een zin, en opnieuw melden vlakbij is een herhaling', async () => {
+  await stap('bevoegd', 'een melder bevestigt zijn eigen melding niet: "klopt" geeft een 403 met een zin, en opnieuw melden vlakbij is een herhaling', async () => {
     const s0 = (await metId(flitser.id, plek(0))).bevestigingen;
     const k = await w.post(STEM, { id: flitser.id, klopt: true }, T);
     await pauze();

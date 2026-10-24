@@ -209,7 +209,7 @@ async function loop(w, stap) {
     return { klopt: r.status === 200 && b.length >= 1 && b[0].extra === 'Amsterdam', ziet: r.status + ', ' + b.map((x) => x.naam).join(', ') };
   });
 
-  await stap('voltooibaar', 'de kaartcatalogus kent nu de gebieden van de index; het lid kiest er een, en een ander lid ziet die keuze niet', async () => {
+  await stap('bevoegd', 'de kaartcatalogus kent nu de gebieden van de index; het lid kiest er een, en een ander lid ziet die keuze niet', async () => {
     const g = await w.post(GEBIEDEN, {}, T);
     gebied = (g.data.gebieden || []).find((x) => x.code === 'europe-netherlands');
     const k = await w.post(KIES, { code: gebied && gebied.code }, T);

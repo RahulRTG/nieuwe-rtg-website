@@ -74,7 +74,7 @@ async function loop(w, stap) {
       ziet: 'versies ' + v.status + ' (' + lijst.length + '), terug ' + t.status + ', tekst "' + tekst(stand) + '"' };
   });
 
-  await stap('voltooibaar', 'een zaak en een lid zonder kantoorrol openen of wijzigen dit kantoordocument niet', async () => {
+  await stap('bevoegd', 'een zaak en een lid zonder kantoorrol openen of wijzigen dit kantoordocument niet', async () => {
     const Z = await zaakSessie(w, 'KIKUNOI');
     const zo = await w.post('/api/supplier/kantoorpakket/open', { id }, Z);
     const zb = await w.post('/api/supplier/kantoorpakket/bewaar', { id, inhoud: { tekst: 'Zaak' } }, Z);

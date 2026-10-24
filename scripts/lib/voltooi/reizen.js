@@ -57,6 +57,17 @@ async function loop(w, stap) {
     return { klopt: !!b && b.eigenaar === v.a.codenaam && b.status === 'gepland' && b.niveau === 'voortgang' && !('plek' in b), ziet: b ? 'van ' + b.eigenaar + ', ' + b.status + ', niveau ' + b.niveau : 'NIETS' };
   });
 
+  await stap('bevoegd', 'C kan het Moment van A niet wijzigen, pauzeren of stoppen; A en B houden de oorspronkelijke stand', async () => {
+    const wijzigen = await w.post(STATUS, { id: m.id, status: 'vertraagd', eta: '23:59' }, C.token);
+    const pauzeren = await w.post(PAUZE, { id: m.id, aan: true }, C.token);
+    const stoppen = await w.post(STOP, { id: m.id }, C.token);
+    const a = (await eigen()).find((x) => x.id === m.id);
+    const b = (await voorB()).find((x) => x.id === m.id);
+    const geweigerd = [wijzigen, pauzeren, stoppen].every((r) => [403, 404].includes(r.status));
+    return { klopt: geweigerd && !!a && !!b && a.status === 'gepland' && b.status === 'gepland',
+      ziet: 'C krijgt ' + [wijzigen.status, pauzeren.status, stoppen.status].join('/') + '; A en B zien ' + (a && a.status) + '/' + (b && b.status) };
+  });
+
   await stap('voltooibaar', 'A meldt dat hij is aangekomen; B ziet het', async () => {
     const r = await w.post(STATUS, { id: m.id, status: 'aangekomen' }, A.token);
     const b = (await voorB()).find((x) => x.id === m.id);

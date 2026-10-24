@@ -28,7 +28,7 @@ async function loop(w, stap) {
   const kaart = async (tok) => { const r = await w.post(GEHEUGEN, {}, tok); return r.status === 200 ? r.data : null; };
   const onderwerpen = (k) => (k ? k.neigingen : []).map((n) => n.onderwerp).sort().join(',');
 
-  await stap('voltooibaar', 'een gratis account waarvan RTG het paspoort nog niet zag, staat voor de deur en hoort hoe het wel kan', async () => {
+  await stap('bevoegd', 'een gratis account waarvan RTG het paspoort nog niet zag, staat voor de deur en hoort hoe het wel kan', async () => {
     const vers = await nieuwLid(w, 'nge', 'guest');
     const r = await w.post(INTAKE, {}, vers.token);
     return { klopt: r.status === 403 && /paspoort/.test((r.data && r.data.error) || '') && /Identiteitsverificatie/.test((r.data && r.data.hoe) || ''),

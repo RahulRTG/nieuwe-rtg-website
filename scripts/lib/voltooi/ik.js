@@ -26,6 +26,8 @@ async function loop(w, stap) {
   const merk = 'ik' + Date.now().toString(36);
   const lid = await nieuwLid(w, 'ikk');
   const T = lid.token;
+  const ander = await nieuwLid(w, 'ikb');
+  const B = ander.token;
   const beeld = async (tok) => { const r = await w.post(IK, {}, tok || T); return r.status === 200 ? r.data : null; };
   const rijen = () => Object.fromEntries(w.opslag('rtg.db', 'SELECT id, member_state FROM users').map((r) => [r.id, r.member_state]));
 
@@ -36,13 +38,27 @@ async function loop(w, stap) {
       ziet: b ? 'omgang ' + b.omgang + ', fase ' + b.fase + ', te kiezen: ' + fases.join('/') : '-' };
   });
 
-  const voorRijen = rijen();
+  let voorRijen = null;
   await stap('voltooibaar', 'het lid kiest een zakelijke Rahul, een aanhef en een voornaamwoord; het beeld zegt het terug', async () => {
     const r = await w.post(ZET, { omgang: 'zakelijk', aanhef: 'Mr. ' + merk, voornaamwoord: 'hij/hem' }, T);
     const b = await beeld();
     return { klopt: r.status === 200 && b.omgang === 'zakelijk' && b.aanhef === 'Mr. ' + merk && b.voornaamwoord === 'hij/hem',
       ziet: 'omgang ' + b.omgang + ', aanhef "' + b.aanhef.split(' ')[0] + ' ...", ' + b.voornaamwoord };
   });
+
+  await stap('bevoegd', 'B ziet en wijzigt uitsluitend zijn eigen profiel; het profiel van A blijft afgeschermd', async () => {
+    const bVoor = await beeld(B);
+    const zetB = await w.post(ZET, { omgang: 'rustig', aanhef: 'Dr. Ander ' + merk }, B);
+    const bNa = await beeld(B);
+    const aNa = await beeld(T);
+    return { klopt: !!bVoor && bVoor.aanhef !== 'Mr. ' + merk && zetB.status === 200 && !!bNa && bNa.aanhef === 'Dr. Ander ' + merk &&
+      !!aNa && aNa.aanhef === 'Mr. ' + merk && aNa.omgang === 'zakelijk',
+      ziet: 'B zag A niet, B heeft "' + (bNa && bNa.aanhef) + '", A houdt "' + (aNa && aNa.aanhef) + '"' };
+  });
+  /* Vanaf hier verandert alleen A nog. Zo bewijst de opslagproef hieronder
+     precies A's latere dossiermutaties, zonder B's bewuste isolatieproef mee
+     te tellen als een onverwachte tweede accountrij. */
+  voorRijen = rijen();
 
   await stap('voltooibaar', 'een volwassene kan zichzelf geen kind verklaren: die fase wordt niet opgeslagen, een volwassen fase wel', async () => {
     const a = await w.post(ZET, { fase: 'kind' }, T);

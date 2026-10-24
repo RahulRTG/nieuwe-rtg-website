@@ -30,6 +30,8 @@ const geen5xx = (r) => r && r.status > 0 && r.status < 500;
 async function loop(w, stap) {
   const lid = await nieuwLid(w, 'pst');
   const A = lid.token;
+  const ander = await nieuwLid(w, 'psb');
+  const B = ander.token;
   let geschiedenisVoor = null;
 
   /* ---------------- voltooibaar ---------------- */
@@ -45,6 +47,20 @@ async function loop(w, stap) {
     const s = soort(await w.post(STAND, {}, A), 'aanbiedingen');
     return { klopt: r.status === 200 && !!s && s.aan && s.kanalen.join(',') === 'email,sms' && s.gegevenVia === 'scherm:' + BRON && !!s.sinds,
       ziet: 'aan=' + (s && s.aan) + ', kanalen ' + (s && s.kanalen.join('+')) + ', via ' + (s && s.gegevenVia) };
+  });
+
+  await stap('bevoegd', 'de toestemming en geschiedenis van A lekken niet naar B, en B kan alleen zijn eigen stand wijzigen', async () => {
+    const bVoor = await w.post(STAND, {}, B);
+    const bGeschiedenisVoor = await w.post(GESCHIEDENIS, {}, B);
+    const zetB = await w.post(ZET, { soort: 'productnieuws', kanalen: ['push'], bron: BRON + '-b' }, B);
+    const aNa = soort(await w.post(STAND, {}, A), 'aanbiedingen');
+    const bAanbiedingen = soort(await w.post(STAND, {}, B), 'aanbiedingen');
+    const bProductnieuws = soort(await w.post(STAND, {}, B), 'productnieuws');
+    const bAanVoor = (bVoor.data && bVoor.data.soorten || []).filter((s) => s.aan).length;
+    const bHistorieVoor = (bGeschiedenisVoor.data && bGeschiedenisVoor.data.geschiedenis || []).length;
+    return { klopt: bVoor.status === 200 && bAanVoor === 0 && bHistorieVoor === 0 && zetB.status === 200 &&
+      !!aNa && aNa.aan && aNa.kanalen.join(',') === 'email,sms' && !!bAanbiedingen && !bAanbiedingen.aan && !!bProductnieuws && bProductnieuws.aan,
+      ziet: 'B begon met ' + bAanVoor + ' aan en ' + bHistorieVoor + ' regels; A aanbiedingen=' + (aNa && aNa.aan) + ', B aanbiedingen=' + (bAanbiedingen && bAanbiedingen.aan) + ', B productnieuws=' + (bProductnieuws && bProductnieuws.aan) };
   });
 
   await stap('voltooibaar', 'het lid beperkt het tot e-mail; de geschiedenis zegt gegeven en daarna gewijzigd', async () => {

@@ -64,6 +64,22 @@ async function loop(w, stap) {
       ziet: 'maken ' + r.status + ', lijst bevat ' + telTitel(l, hoofdTitel) };
   });
 
+  await stap('bevoegd', 'een geldig lid-token uit een andere werkruimte opent of leest deze werkruimte niet', async () => {
+    const tweede = await w.post(MAAK, { naam: 'Andere WorkOS-werkruimte', idem: idem('andere-ruimte') });
+    const andereWerkruimte = tweede.data && tweede.data.werkruimte;
+    const anderBeheer = tweede.data && tweede.data.beheerToken;
+    const aanmelden = await w.post(AANMELD, { werkruimte: andereWerkruimte, naam: 'Andere medewerker', functie: 'projectleider' });
+    const anderToken = aanmelden.data && aanmelden.data.lidToken;
+    const anderId = aanmelden.data && aanmelden.data.lidId;
+    const toelaten = await w.post(BESLUIT, { werkruimte: andereWerkruimte, beheerToken: anderBeheer, lidId: anderId, akkoord: true });
+    const vreemdeStart = await w.post(START, { werkruimte: sessie.werkruimte, lidToken: anderToken });
+    const vreemdeTaken = await w.post(TAKEN, { werkruimte: sessie.werkruimte, lidToken: anderToken });
+    const eigenTaken = await w.post(TAKEN, lijf(sessie));
+    return { klopt: tweede.status === 200 && aanmelden.status === 200 && toelaten.status === 200 &&
+      [403, 404].includes(vreemdeStart.status) && [403, 404].includes(vreemdeTaken.status) && telTitel(eigenTaken, hoofdTitel) === 1,
+      ziet: 'vreemde start/taken ' + vreemdeStart.status + '/' + vreemdeTaken.status + '; eigen werkruimte houdt ' + telTitel(eigenTaken, hoofdTitel) + ' taak' };
+  });
+
   await w.herstart();
   await stap('persistent', 'na een nette herstart blijft het lid-token bij exact dezelfde werkruimte horen', async () => {
     const r = await w.post(START, lijf(sessie));

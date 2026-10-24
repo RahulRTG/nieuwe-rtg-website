@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-24T14:59:11.031Z",
-    "commit": "aaa23d6b92",
+    "op": "2026-10-24T15:41:36.458Z",
+    "commit": "60ac6464b2",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -38,10 +38,10 @@
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "bd712221933a1a0188f0c0c88aaaae28f8b258b31c1c229dd68a9b782b8c9fb3",
+        "sha256": "f7174231cad10d4c7a8e0ef8373cf588258638f2f54a6ccc40bd18e30378addd",
         "stempel": {
-          "op": "2026-10-24T14:31:56.579Z",
-          "commit": "d003044732",
+          "op": "2026-10-24T15:23:00.455Z",
+          "commit": "d46a624b10",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -51,8 +51,8 @@
     ]
   },
   "telling": {
-    "BEWEZEN": 82,
-    "NIET_GETEST": 32
+    "BEWEZEN": 85,
+    "NIET_GETEST": 29
   },
   "regels": [
     {
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/E25TFJ/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/8ZVCAF/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -495,10 +495,10 @@
       "app": "Fonds",
       "ingang": "/apps/geld.html#labfonds",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 99,
-      "open": 96,
-      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:leven",
@@ -554,10 +554,10 @@
       "app": "Mijn loopbaan",
       "ingang": "/apps/loopbaan.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 8,
-      "open": 8,
-      "reden": "8 van de 8 routes niet gemeten, o.a. /api/carriere/ledger/afschrift: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/carriere/ledger/deel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/carriere/ledger/delen: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 8 van de 8 routes niet gemeten, o.a. /api/carriere/ledger/afschrift: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/carriere/ledger/deel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/carriere/ledger/delen: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:magnaat",
@@ -724,8 +724,10 @@
       "app": "OV-routes",
       "ingang": "/apps/ovroutes.html",
       "persona": "personeel",
-      "status": "NIET_GETEST",
-      "reden": "de generieke ronde heeft geen kruisproef voor de persona personeel; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona personeel"
     },
     {
       "functie": "link:partnernetwerk",

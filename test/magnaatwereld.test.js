@@ -8,10 +8,12 @@ const path = require('path');
 const functies = require('../server/functies');
 const maak = require('../server/kern/magnaatwereld');
 
-function wereld() {
+/* De spelers in deze toetsen zijn gekeurde volwassenen (progressieMag); wat
+   er onder de 18+-grens gebeurt, staat in een eigen toets hieronder. */
+function wereld(progressieMag = () => true) {
   const db = { data: {} };
   let saves = 0;
-  const { magnaatWereld } = maak({ db, save: () => { saves += 1; }, crypto, functies });
+  const { magnaatWereld } = maak({ db, save: () => { saves += 1; }, crypto, functies, progressieMag });
   return { db, saves: () => saves, w: magnaatWereld };
 }
 
@@ -90,6 +92,41 @@ test('een missie controleert dat de speler het juiste echte RTG-scherm opent', (
   assert.ok(goed.taak.punten >= 75);
 });
 
+test('onder de 18+-grens is elke dienst speelbaar maar worden xp, niveau en reputatie niet bewaard', () => {
+  /* CLAUDE.md: niveaus en prestaties buiten het potje bestaan alleen voor wie
+     volwassen() haalt, via progressieMag (server/kern/spellen/grens.js). */
+  const mag = (key) => key === 'user-volwassen';
+  const { w } = wereld(mag);
+  const c = w.catalogus.find(x => x.id === 'betalen');
+  const jong = voltooi(w, 'user-jong', c.id);
+  assert.equal(jong.taak.status, 'klaar', 'het dossier is gewoon af te maken');
+  const sJong = w.overzicht('user-jong').speler;
+  assert.equal(sJong.xp, 0, 'er wordt geen xp bewaard');
+  assert.equal(sJong.niveau, 1);
+  assert.equal(sJong.reputatie, 50, 'en geen reputatie');
+  const oud = voltooi(w, 'user-volwassen', c.id);
+  assert.ok(w.overzicht('user-volwassen').speler.xp >= oud.taak.punten, 'een gekeurde volwassene bouwt wel op');
+  /* Zonder bedrading geen progressie: de grens faalt dicht. */
+  const { magnaatWereld: kaal } = maak({ db: { data: {} }, save: () => {}, crypto, functies });
+  voltooi(kaal, 'user-x', c.id);
+  assert.equal(kaal.overzicht('user-x').speler.xp, 0);
+});
+
+test('een herhaald antwoord beantwoordt niet stil de volgende vraag', () => {
+  const { w } = wereld();
+  const c = w.catalogus.find(x => x.id === 'betalen');
+  const t = w.taakStart('user-herhaal', c.id, 'computer').taak;
+  const open = w.taakHandeling('user-herhaal', t.id, t.huidig.doel).taak;
+  const eerste = w.taakAntwoord('user-herhaal', t.id, 0, open.stap);
+  assert.equal(eerste.ok, true);
+  /* Het antwoord kwam nooit bij het scherm aan, dus het stuurt hetzelfde
+     antwoord voor dezelfde vraag opnieuw. */
+  const herhaling = w.taakAntwoord('user-herhaal', t.id, 0, open.stap);
+  assert.equal(herhaling.status, 409, 'de herhaling hoort bij de vorige vraag');
+  assert.equal(herhaling.taak.stap, open.stap + 1, 'de opdracht gaat een stap verder en niet twee');
+  assert.equal(herhaling.taak.punten, eerste.taak.punten, 'en de herhaling levert geen punten op');
+});
+
 test('spelers zien elkaars opdrachten niet, maar delen wel dezelfde wereldtotalen', () => {
   const { w } = wereld();
   const c = w.catalogus[0];
@@ -110,6 +147,22 @@ test('de Future Engine maakt gededupliceerde RTG/RTF-voorstellen en zet niets li
   const aantal = eerste.voorstellen.length;
   w.scan('test', true);
   assert.equal(w.kantoorStatus().voorstellen.length, aantal, 'dezelfde kans wordt niet dubbel gemaakt');
+});
+
+test('bewuste heranalyse omzeilt dagcache maar dupliceert geen voorstellen of geld', t => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-21T12:00:00Z') });
+  const { db, w } = wereld();
+  const eerste = structuredClone(w.kantoorStatus().voorstellen);
+  const geld = { pay: structuredClone(db.data.pay), bank: structuredClone(db.data.bankBoekingen) };
+  for (let i = 0; i < 2; i++) {
+    t.mock.timers.tick(1000);
+    const r = w.scan('controleur', true);
+    assert.equal(r.ok, true);
+    assert.equal(r.overgeslagen, false, 'bewuste activering rekent opnieuw, ook binnen dezelfde dag');
+    assert.equal(db.data.magnaatWereld.laatsteScan, Date.now());
+    assert.deepEqual(r.voorstellen, eerste, 'bestaande voorstellen en besluiten blijven intact');
+  }
+  assert.deepEqual({ pay: db.data.pay, bank: db.data.bankBoekingen }, geld);
 });
 
 test('alleen expliciete menselijke fasebesluiten brengen een voorstel naar test en pilot', () => {

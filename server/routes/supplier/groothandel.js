@@ -47,7 +47,7 @@ module.exports = (kern) => {
   });
   app.post('/api/supplier/groothandel/order/status', supplierAuth, (req, res) => {
     if (!eisGroothandel(req, res)) return;
-    const r = ghOrderVerder(req.supplier.code, String(req.body.ref || ''), String(req.body.actie || ''), req.actor);
+    const r = ghOrderVerder(req.supplier.code, String(req.body.ref || ''), String(req.body.actie || ''), req.actor, req.body.van ? String(req.body.van) : null);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true, status: r.status2, inkomend: ghInkomend(req.supplier.code) });
   });

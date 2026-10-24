@@ -19,6 +19,18 @@
    aanroepregel in kernlaag3.js zat op EEN BYTE van keuringsregel 13, en acht
    namen overtypen zou hem eroverheen duwen. Wat hij eruit haalt staat hier, op
    een plek waar het te lezen is. */
-module.exports = (hulp, kern) => require('../kern/assets')({
+module.exports = (hulp, kern) => {
+  const eigenaar = require('../kern/assets')({
   db: hulp.db, save: hulp.save, bijeen: hulp.bijeen, inBundel: hulp.inBundel,
-  crypto: hulp.crypto, schoon: hulp.schoon, notify: hulp.notify, pay: kern.pay });
+  crypto: hulp.crypto, schoon: hulp.schoon, notify: hulp.notify, pay: kern.pay, betaalWaarheid: kern.betaalWaarheid });
+
+  // Routes krijgen uitsluitend de handelingen voor hun rol. De fabriek en
+  // financiële logica blijven één eigenaar; geen losse globals in de kern.
+  const kies = namen => Object.freeze(Object.fromEntries(namen.map(n => [n, eigenaar[n]])));
+  return {
+    assetsLid: kies(['assetsOverzicht', 'assetDocument', 'assetKoop', 'assetHerroep', 'assetWachtlijstZet',
+      'assetMijn', 'assetGebruik', 'assetUitstap', 'assetAanvragenMijn', 'assetAanvraagBetaal']),
+    assetsKantoor: kies(['assetHertaxeer', 'assetKantoor', 'assetTerugkoopUit', 'assetFeesInnen',
+      'assetAanvragenKantoor', 'assetAanvraagBeslis'])
+  };
+};

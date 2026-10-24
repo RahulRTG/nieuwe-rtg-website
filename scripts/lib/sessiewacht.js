@@ -59,9 +59,9 @@
    uitlogroute komt, dan doet deze wacht niets en hoort dat op te vallen. */
 function maakSessiewacht({ post, rollen }) {
   let teller = 0;
-  async function roep(pad, lijf, rol, tok) {
+  async function roep(pad, lijf, rol, tok, methode = 'POST') {
     const r = rollen[rol];
-    const eerste = await post(pad, lijf, tok);
+    const eerste = await post(pad, lijf, tok, undefined, methode);
     if (eerste.status !== 401 || !r || typeof r.vers !== 'function') return eerste;
     /* Met een probe: leeft de sessie, dan is de 401 een echte weigering en
        blijven we er met onze handen vanaf. */
@@ -72,7 +72,7 @@ function maakSessiewacht({ post, rollen }) {
     /* Zonder probe weten we het pas na de herhaling. Alleen als die ANDERS
        uitvalt was de sessie het probleem; blijft het 401, dan telde de eerste
        al goed en tellen we deze niet als herstel. */
-    const tweede = await post(pad, lijf, vers);
+    const tweede = await post(pad, lijf, vers, undefined, methode);
     if (typeof r.leeft === 'function' || tweede.status !== 401) teller++;
     return tweede;
   }

@@ -48,6 +48,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
+// de codeportalen vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per server
+require('./portaalaccount').zetPortaalAccount();
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfos3-'));
 const OFFICE_CODE = 'RTFOS3-KEURING';

@@ -43,7 +43,7 @@
   N.initialiseerKaart = initialiseerKaart;
   async function initialiseerKaart() {
     if (S.kaartBegonnen || !S.hier) return;
-    const r = await api('kaart', { lat: S.hier.lat, lng: S.hier.lng });
+    const r = await api('/api/nav/kaart', { lat: S.hier.lat, lng: S.hier.lng });
     if (r.status !== 200) {
       await haalStatus();                       // de badge hoort hetzelfde te zeggen als de poort
       $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.';

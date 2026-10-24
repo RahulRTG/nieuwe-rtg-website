@@ -4,6 +4,7 @@
    zaak er (met dorp van het genre en de wensen uit de intake), en de
    eigenaar kan met de eenmalige PIN op de zaak inloggen.
    Draai los: node --test test/bedrijfsintake.test.js */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -36,10 +37,13 @@ test.after(() => {
 
 test('ondernemersintake: behoeften mee, mens beslist, zaak na eerste voldane termijn', async () => {
   // 1. de aanvraag met bedrijfsintake (de AI vraagt wat er nodig is)
-  let r = await json(await raw('/aanmelding/aanvraag', { pas: 'business', naam: 'Imre Dekker', contact: 'imre@zaak.test',
+  let r = await json(await raw('/aanmelding/aanvraag', { idem: randomUUID(), pas: 'business', naam: 'Imre Dekker', contact: 'imre@zaak.test',
     bedrijf: { naam: 'Dekker Interieur', type: 'vakwerk', plaats: 'Ibiza', behoeften: ['Offertes en facturen', 'Team van drie op de PDA'] } }));
   assert.equal(r.ok, true);
-  const id = r.aanmelding.id;
+  const id = r.ontvangst.aanvraagId;
+  const dossier = await raw('/aanmelding/een', { id }, baas);
+  assert.equal(dossier.status, 200, 'het bevoegde kantoor kan de intake lezen');
+  r = await json(dossier);
   assert.equal(r.aanmelding.bedrijf.type, 'vakwerk');
   assert.equal(r.aanmelding.bedrijf.behoeften.length, 2);
 

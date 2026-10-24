@@ -77,7 +77,7 @@
   }
 
   async function kaartenLaad() {
-    const r = await api('gebieden');
+    const r = await api('/api/nav/gebieden');
     if (r.status !== 200) { zeg(r.body.error || 'De kaarten zijn niet op te halen.'); return; }
     kaartenStand = r.body;
     await toestelMeten();
@@ -148,7 +148,7 @@
       return;
     }
     tk.textContent = 'Manifest...';
-    const mf = await api('gebied/pakket', { code });
+    const mf = await api('/api/nav/gebied/pakket', { code });
     if (mf.status !== 200) { tk.disabled = false; tk.textContent = 'Naar toestel'; zeg(mf.body.error || 'Deze kaart is niet op te halen.'); return; }
     const uit = await P.haal(code, { manifest: mf.body, token, opVoortgang: (v) => { tk.textContent = v.klaar + '/' + v.totaal; } });
     tk.disabled = false;
@@ -166,7 +166,7 @@
     if (!knop || knop.disabled) return;
     const code = knop.dataset.code, gekozen = knop.getAttribute('aria-pressed') === 'true';
     knop.disabled = true;
-    const r = await api(gekozen ? 'gebied/weg' : 'gebied/kies', { code });
+    const r = await api(gekozen ? '/api/nav/gebied/weg' : '/api/nav/gebied/kies', { code });
     knop.disabled = false;
     if (r.status !== 200) { zeg(r.body.error || 'Dat lukte niet.'); return; }
     /* De hele stand opnieuw ophalen: de server weet of het pakket er ligt. */

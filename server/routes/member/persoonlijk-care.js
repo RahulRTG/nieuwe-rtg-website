@@ -22,8 +22,8 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
-  app.post('/api/care/betaal', auth, (req, res) => {
-    const r = careBetaal(req.session, req.body.ref, verdienPunten);
+  app.post('/api/care/betaal', auth, async (req, res) => {
+    const r = await careBetaal(req.session, req.body.ref, verdienPunten);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
@@ -86,8 +86,8 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
-  app.post('/api/care/pakket/betaal', auth, (req, res) => {
-    const r = carePakketBetaal(req.session, req.body.ref, verdienPunten);
+  app.post('/api/care/pakket/betaal', auth, async (req, res) => {
+    const r = await carePakketBetaal(req.session, req.body.ref, verdienPunten);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

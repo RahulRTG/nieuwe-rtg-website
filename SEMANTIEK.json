@@ -1,10 +1,10 @@
 {
   "grens": "Telt alleen benoemde catalogi (een hoofdletterconstante met een gesloten verzameling ids) onder server/; een begrip dat anders wordt vastgelegd ziet hij niet. Een naam in twee domeinen met weinig gedeelde leden is een KANDIDAAT-botsing, geen bewezen misverstand: of het hetzelfde ding hoort te zijn, beslist een mens.",
-  "catalogi": 1231,
-  "verschillendeNamen": 752,
-  "namenInMeerDomeinen": 133,
-  "woordenMetMeerBetekenissen": 115,
-  "betekenissenTotaal": 432,
+  "catalogi": 1235,
+  "verschillendeNamen": 754,
+  "namenInMeerDomeinen": 134,
+  "woordenMetMeerBetekenissen": 116,
+  "betekenissenTotaal": 434,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -3757,5 +3757,5 @@
       ]
     }
   ],
-  "bestanden": 4517
+  "bestanden": 4618
 }

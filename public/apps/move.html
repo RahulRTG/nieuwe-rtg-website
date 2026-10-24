@@ -15,6 +15,7 @@
 <link href="/ds/rtg-ds.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
 <script src="/ds/shell.js"></script>
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 4): Status
      (het oordeel over uw reis, met de dekking ernaast) en een Collectie van
@@ -66,7 +67,7 @@
   'use strict';
   const $ = s => document.querySelector(s);
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/move/' + pad, { method: 'POST',
+  const api = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -173,7 +174,7 @@
       knop.disabled = true;
       uit.textContent = 'Move rekent de rest van uw reis door\u2026';
       try {
-        const r = await api('gevolg', { kenmerk: van.kenmerk, minuten: Number(kies.value) });
+        const r = await api('/api/move/gevolg', { kenmerk: van.kenmerk, minuten: Number(kies.value) });
         toonGevolg(uit, r, kies.value);
       } catch (e) {
         uit.textContent = 'Doorrekenen is niet gelukt. Probeer het opnieuw.';
@@ -245,7 +246,7 @@
   }
 
   async function haal() {
-    const r = await api('reis');
+    const r = await api('/api/move/reis');
     if (r.status === 401) return zegStand(null, 'Meld u aan om uw reis te laten wegen.');
     if (r.status === 403) return zegStand(null, (r.body && r.body.error) || 'RTG Move is voor leden.');
     if (r.status !== 200) return zegStand(null, (r.body && r.body.error) || 'De weging is niet gelukt.');
@@ -280,7 +281,7 @@
   }
 
   async function volgende() {
-    const r = await api('volgende');
+    const r = await api('/api/move/volgende');
     if (r.status !== 200 || !r.body || !r.body.volgende) return;   // geen knop zonder bestemming
     const v = r.body.volgende;
     const p = v.plek || {};

@@ -12,15 +12,18 @@
    zonder aanduiding). De categorie zegt waar de toelating vandaan komt, niet
    hoeveel een partij mag: nergens in deze laag wordt erop vertakt.
 
-   DE PARTIJ HANGT NIET AAN EEN RTG-ACCOUNT (besluit van de eigenaar, 29
-   september 2026). Bij het inschrijven krijgt de partij EEN KEER een sleutel te
-   zien. Die is een bearer uit kern/bearercode.js (namespace democratie.partij,
-   128 bits): op schijf alleen de hash, zoeken in constante tijd over ALLE
-   partijen, een vervaltijd van een jaar, en intrekken aan de serverkant. Een
-   partij die morgen geen RTG meer wil, of een DemocratieOS zonder RTG (proef
-   P3), heeft geen ledenaccount nodig om verder te gaan. Het kantoor kan de
-   sleutel vervangen of de partij uitschrijven; de oude sleutel werkt dan niet
-   meer.
+   WIE NAMENS EEN PARTIJ HANDELT, HEEFT EEN ACCOUNT MET DIE ROL (eigenaarsbesluit
+   19 oktober 2026). Dit vervangt het besluit van 29 september 2026 dat de
+   partij NIET aan een RTG-account hing, en daarmee vervalt proef P3 (een
+   DemocratieOS zonder RTG). Bij het inschrijven krijgt de partij EEN KEER een
+   code te zien. Die is een bearer uit kern/bearercode.js (namespace
+   democratie.partij, 128 bits): op schijf alleen de hash, zoeken in constante
+   tijd over ALLE partijen, een vervaltijd van een jaar, en intrekken aan de
+   serverkant. Hij is geen geloofsbrief meer maar een EENMALIGE KOPPELCODE: een
+   mens van de partij koppelt er zijn account mee en daarna is hij ingetrokken
+   (./partijrol.js, ook voor de migratie van partijen van voor dit besluit).
+   Het kantoor kan een nieuwe code uitgeven, een account losmaken of de partij
+   uitschrijven.
 
    HET GEBRUIK WORDT NIET GETELD. Een partijsleutel opent een koppeling die bij
    elk verzoek wordt gebruikt; tellen zou van elke leesvraag een schrijfactie
@@ -41,7 +44,7 @@ const JAAR = 365 * 86400000;
 const DOEL = 'partijdeur';
 const SCOPE = 'democratie.partij.voorstel';
 
-function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
+function maakPartijen({ kaart, kijk, vastleggen, crypto, nu, koppeling, wie }) {
   const bearer = require('../bearercode')({ crypto, namespace: 'democratie.partij', nu });
   const vind = (id) => kijk()[String(id || '').toUpperCase()] || null;
 
@@ -83,13 +86,14 @@ function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
       const register = kaart();
       let id;
       do { id = 'PP-' + crypto.randomBytes(3).toString('hex').toUpperCase(); } while (register[id]);
-      p = Object.assign({ id, stand: 'actief', ingeschreven: { door, at: nu() }, historie: [] }, g);
+      p = Object.assign({ id, stand: 'actief', model: 'account', ingeschreven: { door, at: nu() }, historie: [] }, g);
       geheim = nieuwGeheim(p, door);
       p.historie.push({ wat: 'ingeschreven', door, at: nu() });
       register[id] = p;
     });
     return mis || { ok: true, partij: beeld(p), sleutel: geheim,
-      let_op: 'Deze sleutel ziet u een keer. Geef hem aan de partij; wij bewaren alleen een hash.' };
+      let_op: 'Deze koppelcode ziet u een keer. Geef hem aan de partij: een mens van de partij koppelt er zijn ' +
+        'RTG-account mee, en daarna werkt hij niet meer. Wij bewaren alleen een hash.' };
   }
 
   async function vervangSleutel(door, id) {
@@ -97,9 +101,11 @@ function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
     if (!p) return { status: 404, error: 'Onbekende partij.' };
     if (p.stand !== 'actief') return { status: 409, error: 'Deze partij is uitgeschreven.' };
     let geheim = null;
-    const mis = await vastleggen(() => { geheim = nieuwGeheim(p, door); p.historie.push({ wat: 'sleutel-vervangen', door, at: nu() }); });
+    const mis = await vastleggen(() => {
+      geheim = nieuwGeheim(p, door); p.model = 'account'; p.historie.push({ wat: 'sleutel-vervangen', door, at: nu() });
+    });
     return mis || { ok: true, partij: beeld(p), sleutel: geheim,
-      let_op: 'De vorige sleutel werkt niet meer. Deze ziet u een keer.' };
+      let_op: 'De vorige code werkt niet meer. Deze koppelcode ziet u een keer: er koppelt een account mee.' };
   }
 
   async function uitschrijf(door, id, b) {
@@ -129,10 +135,29 @@ function maakPartijen({ kaart, kijk, vastleggen, crypto, nu }) {
     return p && p.stand === 'actief' && p.sleutel && p.sleutel.code_hash === toegang.code_hash ? p : null;
   }
 
-  const lijst = () => ({ ok: true, partijen: Object.values(kijk()).sort((a, b) => a.id.localeCompare(b.id)).map(beeld),
+  // het kantoor ziet ook welke codenamen namens een partij handelen (./partijrol.js)
+  /* oudePartijen: actieve partijen van voor 19 oktober 2026 zonder gekoppeld
+     account -- de teller van de migratie (./partijrol.js). Bij nul kunnen de
+     partijpaden uit scripts/lib/publiek.js. */
+  const oud = (p) => p.stand === 'actief' && !p.model && !(p.rolhouders || []).length;
+  const lijst = () => ({ ok: true, partijen: Object.values(kijk()).sort((a, b) => a.id.localeCompare(b.id))
+    .map(p => Object.assign(beeld(p), { gekoppeld: (p.rolhouders || []).map(a => ({ codenaam: a.codenaam, sinds: a.sinds })),
+      oud: oud(p) })),
+    oudePartijen: Object.values(kijk()).filter(oud).length,
     niveaus: NIVEAUS, categorieen: CATEGORIEEN });
 
-  return { registreer, vervangSleutel, uitschrijf, vanSleutel, lijst, beeld, vind };
+  /* De migratie (./partijrol.js): alleen een partij van voor het besluit van
+     19 oktober 2026, zonder model en zonder gekoppeld account, komt met haar
+     sleutel nog door de deur. */
+  const vanOudeSleutel = (geheim) => {
+    const p = vanSleutel(geheim);
+    return p && !p.model && !(p.rolhouders || []).length ? p : null;
+  };
+  const rol = require('./partijrol').maakPartijrol({ kijk, vind, vastleggen, nu, vanCode: vanSleutel, koppeling, wie,
+    trekIn: (p, door, reden) => { if (p.sleutel) bearer.intrekken(p.sleutel, door, reden); } });
+
+  return { registreer, vervangSleutel, uitschrijf, vanSleutel, vanOudeSleutel, lijst, beeld, vind,
+    koppel: rol.koppel, ontkoppel: rol.ontkoppel, vanAccount: rol.vanAccount };
 }
 
 module.exports = { maakPartijen, NIVEAUS, CATEGORIEEN };

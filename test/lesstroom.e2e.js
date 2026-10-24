@@ -19,6 +19,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtTot, wachtOpTekst } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const pw = laadPlaywright();
 const OVERSLAAN = geenBrowser(pw);
@@ -38,10 +39,12 @@ test.before(async () => {
   if (OVERSLAAN) return;
   TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lesstroom-'));
   ({ child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }));
+  const account = await registreerGratis(base);
   const gezin = (await post('/api/foundation/gezin/maak', { gezinsnaam: 'Stroomgezin', naam: 'Papa',
     pin: '1234', geboortedatum: '1985-01-01', bevoegdGezin: true, privacyAkkoord: true })).body;
   assert.ok(gezin.token, 'het gezin bestaat: ' + JSON.stringify(gezin).slice(0, 160));
-  BEHEERDER = { code: gezin.code, token: gezin.token, profiel: { naam: 'Papa', beheerder: true } };
+  BEHEERDER = { code: gezin.code, token: gezin.token, profiel: { naam: 'Papa', beheerder: true },
+    memberToken: account.token };
   const p = (await post('/api/foundation/gezin/profiel/maak', { code: gezin.code, token: gezin.token,
     naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' })).body;
   const kies = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: p.profiel.id, pin: '5678' })).body;
@@ -61,11 +64,13 @@ test.after(async () => {
    adresbalk noteert, in sessionStorage zodat het spoor de overstap overleeft. */
 async function openAls(sessie) {
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
-  await ctx.addInitScript((s) => {
-    localStorage.setItem('rtf_sessie', JSON.stringify(s));
+  await ctx.addInitScript((ingang) => {
+    localStorage.setItem('rtf_sessie', JSON.stringify(ingang.sessie));
+    if (ingang.memberToken) localStorage.setItem('rtg_member_token', ingang.memberToken);
     localStorage.setItem('rtg_lang', 'nl');
     localStorage.setItem('rtg_cookieinfo_v1', '1');
-  }, sessie);
+  }, { sessie: { code: sessie.code, token: sessie.token, profiel: sessie.profiel },
+    memberToken: sessie.memberToken || '' });
   await ctx.addInitScript(() => {
     const noteer = (wat) => {
       const log = JSON.parse(sessionStorage.getItem('__adresBijVerzoek') || '[]');

@@ -31,12 +31,24 @@
     }
     return transition;
   }
+  function observeNavigation(event) {
+    var navigation = event.viewTransition;
+    if (!navigation) return;
+    // De ontvangende pagina heeft eigen promises. Alleen op pageswap luisteren
+    // laat een annulering bij pagereveal als onbehandelde paginafout ontsnappen.
+    function onError(error) {
+      if (error && (error.name === 'AbortError' || error.name === 'InvalidStateError')) return;
+      if (w.reportError) w.reportError(error);
+      else w.setTimeout(function () { throw error; }, 0);
+    }
+    navigation.ready.catch(onError);
+    navigation.finished.catch(onError);
+  }
+  w.addEventListener('pagereveal', observeNavigation);
   w.addEventListener('pageswap', function (event) {
     var navigation = event.viewTransition;
     if (!navigation) return;
-    // Een overgeslagen cross-document animatie mag geen afgewezen promise lekken.
-    navigation.ready.catch(function () {});
-    navigation.finished.catch(function () {});
+    observeNavigation(event);
     if (!allowed()) { navigation.skipTransition(); return; }
     if (!event.activation) return;
     var to = new URL(event.activation.entry.url).pathname;

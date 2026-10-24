@@ -10,10 +10,11 @@
    /api/auth/login. In dit huis is de volgorde van registreren ook de volgorde
    van afhandelen. */
 'use strict';
+const { tokenHash } = require('../../kern/sessies');
 
 module.exports = (ctx) => {
   const { PERSONAS, accounts, app, auth, checkCred, crypto, forgetSessionDuurzaam, hasCred, loginFails,
-    noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog, DEMO, pasAppOk , PAS_FOUT } = ctx;
+    noteFailedTry, rememberSession, stateFor, tooManyTries, logInlog, DEMO, pasAppOk , PAS_FOUT } = ctx;
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
@@ -29,9 +30,12 @@ app.post('/api/login', (req, res) => {
     loginFails.delete(bucket);
     logInlog('lid', true, req.body.username, req);
     tier = 'business'; // het demo-account is een volledig lidmaatschap
-  } else if (tier !== 'guest' && !DEMO) {
-    // een pas-tier zonder wachtwoord is alleen voor de demo; gast blijft publiek
-    return res.status(403).json({ error: 'Log in met je account.' });
+  } else if (!DEMO) {
+    /* Een pas-tier zonder wachtwoord is alleen voor de demo, en sinds het
+       eigenaarsbesluit van 19 oktober 2026 (AGENTS.md: gebruiken vraagt een
+       account) geldt dat ook voor de gast: buiten de demo is de kleinste vorm
+       een gratis account, geen sessie zonder account. */
+    return res.status(403).json({ error: 'Log in met je account, of maak gratis een account aan.', accountNodig: true });
   }
   if (!PERSONAS[tier]) return res.status(400).json({ error: 'Onbekende pas.' });
   if (!pasAppOk(String(req.body.pasApp || ''), tier)) return res.status(403).json({ error: PAS_FOUT });
@@ -51,11 +55,12 @@ app.post('/api/login', (req, res) => {
    waarop iemand denkt veilig te zijn. Gevonden in aanvalsronde 2, punt 14. */
 app.post('/api/logout', auth, async (req, res, next) => {
   try {
-    for (const [token, sess] of sessions)
-      if (sess === req.session) await forgetSessionDuurzaam(token);
-    // en de staatloze kant: het aangeboden token op de intreklijst
+    // De Map kan sinds auth door een externe update herbouwd zijn. De
+    // aangeboden credential blijft dezelfde; objectidentiteit is geen sleutel.
     const kop = req.get('authorization') || '';
     const tok = kop.startsWith('Bearer ') ? kop.slice(7) : null;
+    if (tok) await forgetSessionDuurzaam(tokenHash(tok));
+    // De bestaande staatloze accountintrekking blijft daarnaast vereist.
     if (tok && accounts && typeof accounts.trekIn === 'function') await accounts.trekIn(tok);
     if (accounts && typeof accounts.wachtIntrekkingen === 'function') await accounts.wachtIntrekkingen();
     res.json({ ok: true });

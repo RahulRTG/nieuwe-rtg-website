@@ -129,8 +129,15 @@ const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
+/* Het raakvlak per bewijs (scripts/lib/bewijsraakvlak.js): EEN wereld per ronde, zodat
+   elk bestand een keer wordt gelezen en gehasht, en de hashes in het register
+   dezelfde inhoud dragen als waartegen elk bewijs vers werd verklaard. */
+const raakvlakken = require('./lib/bewijsraakvlak');
+let raakvlakWereld = null;
+const RAAKVLAKWERELD = () => (raakvlakWereld = raakvlakWereld || raakvlakken.maakWereld());
 const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+const { isBrowserruis } = require('./lib/browserruis');
 /* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
    geen eigen register. */
 const toezegklassen = require('./lib/toezegklassen');
@@ -206,6 +213,19 @@ function rijen() {
     }
   }
   return filter ? uit.filter((r) => (r.ingang || '').includes(filter) || r.app.toLowerCase().includes(filter.toLowerCase())) : uit;
+}
+
+/* Een interne tab heeft geen los publiek adres, maar kan WEL een meetbare
+   ingang hebben. Het bestaande appcontract benoemt dan het echte scherm en de
+   echte hash-navigatie. Alleen een declaratieve hash mag hier rechtstreeks
+   worden geopend; natuurlijke-taalstappen voor OS-kiezers moeten door een
+   eigen bedieningsadapter worden uitgevoerd en blijven dus eerlijk ongemeten. */
+function meetIngang(rij, contract = CONTRACT) {
+  if (rij && rij.pad) return { pad: rij.pad, bestemming: rij.pad, via: null };
+  const c = rij && contract && contract[rij.functie];
+  if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') ||
+      typeof c.via !== 'string' || !c.via.startsWith('#')) return null;
+  return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via };
 }
 
 /* ---- de vijf bewijzen die een testwereld nodig hebben ---- */
@@ -305,9 +325,11 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   const r = { ...rij, bewijzen: {}, gevonden: 0, geklikt: 0, overgeslagen: [], nietKlikbaar: [], waarnemingen: [] };
   delete r.soort; delete r.pad;
 
-  /* tab: en os: hebben geen eigen adres -- ze zijn een stand of een kiezer
-     binnen de app. Meten kan dus niet vanaf een URL, en dat is geen defect. */
-  if (!rij.pad) {
+  const meet = meetIngang(rij);
+  /* Een OS-kiezer met alleen een menselijke bedieningsbeschrijving heeft nog
+     geen uitvoerbare adapter. Hash-tabs hebben die inmiddels wel via hun
+     bestaande appcontract en worden hieronder als echte appstand geopend. */
+  if (!meet) {
     const reden = rij.soort === 'tab'
       ? 'een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen'
       : 'een kiezer in de app: het adres ontstaat pas na een keuze';
@@ -315,11 +337,12 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     vulOngemeten(r);
     return r;
   }
+  if (meet.via) r.via = meet.via;
 
-  const bestand = path.join(WORTEL, 'public', rij.pad.replace(/^\//, ''));
+  const bestand = path.join(WORTEL, 'public', meet.bestemming.replace(/^\//, ''));
   if (!fs.existsSync(bestand)) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
-      reden: 'de wereld wijst naar ' + rij.pad + ' en dat bestand bestaat niet', bewijs: null };
+      reden: 'de wereld wijst naar ' + meet.bestemming + ' en dat bestand bestaat niet', bewijs: null };
     for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST', reden: 'er is geen scherm om te bedienen', bewijs: null };
     vulOngemeten(r);
     return r;
@@ -327,7 +350,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 
   /* Een BEVINDING en geen oordeel: meet de proef met een andere persona dan het
      register als doelgroep noemt? Beide bronnen staan erbij (./lib/bestemming.js). */
-  r.personaAfwijking = personaAfwijking(rij.persona, rij.pad, SCHERMREGISTER());
+  r.personaAfwijking = personaAfwijking(rij.persona, meet.bestemming, SCHERMREGISTER());
 
   // ---- bewijs 1: bereikbaar voor de persona van deze wereld ----
   const eigen = persoonlijk[rij.persona];
@@ -338,7 +361,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     vulOngemeten(r);
     return r;
   }
-  const eersteBezoek = await bezoek(eigen, base, rij.pad);
+  const eersteBezoek = await bezoek(eigen, base, meet.pad);
   r.waarnemingen.push('als ' + rij.persona + ': ' + eersteBezoek.samenvatting);
   if (eersteBezoek.rem.length) r.waarnemingen.push('proef: bij het laden ' + eersteBezoek.rem.length + 'x de rem (429) geraakt, door het gedeelde adres van de meting');
 
@@ -349,7 +372,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     let opener = null;
     for (const rol of rollen) {
       if (rol === rij.persona) continue;
-      const proef = await bezoek(persoonlijk[rol], base, rij.pad);
+      const proef = await bezoek(persoonlijk[rol], base, meet.pad);
       if (!proef.poort && !proef.crash.length) { opener = rol; break; }
     }
     /* TWEE HEEL VERSCHILLENDE UITKOMSTEN, en ze door elkaar halen maakt dit
@@ -370,20 +393,20 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     r.bewijzen.bereikbaar = opener
       ? { status: 'GEBLOKKEERD_DOOR_DEFECT',
         reden: 'de wereld toont deze ingang aan een ' + rij.persona + ', maar de deur gaat alleen open voor een ' + opener + ': ' + eersteBezoek.poortTekst,
-        bewijs: rij.pad }
+        bewijs: meet.pad }
       : { status: 'NIET_GETEST',
         reden: 'er staat een deur die geen van de vier bekende sessies (lid, zaak, kantoor, gezin) opent; welke rol er wel doorheen komt, weet deze proef niet: ' + eersteBezoek.poortTekst,
-        bewijs: rij.pad };
+        bewijs: meet.pad };
     for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST', reden: 'achter een dichte deur valt de bediening niet te meten', bewijs: null };
     vulOngemeten(r);
     return r;
   }
   if (eersteBezoek.crash.length) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
-      reden: 'het scherm gooit bij het laden: ' + eersteBezoek.crash[0], bewijs: rij.pad };
+      reden: 'het scherm gooit bij het laden: ' + eersteBezoek.crash[0], bewijs: meet.pad };
   } else if (eersteBezoek.config.length) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG',
-      reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: rij.pad };
+      reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: meet.pad };
   } else {
     /* OPENDE ZONDER POORT EN ZONDER FOUT -- maar OP DE BEDOELDE BESTEMMING?
        Een deur kan ook een doorverwijzing zijn: vier kantoorschermen stuurden
@@ -392,19 +415,19 @@ async function meetRij(rij, base, persoonlijk, rollen) {
        op url-gelijkheid. De andere sessies worden alleen bezocht als de
        bestemming niet klopte: dan is de vraag of de ingang verkeerd geadresseerd
        is (de bestaande uitkomst) of gewoon niet bereikt. */
-    const landing = eersteBezoek.eind || rij.pad;
-    let o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen: [] });
+    const landing = eersteBezoek.eind || meet.bestemming;
+    let o = beoordeelBestemming({ ingang: meet.bestemming, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen: [] });
     if (o.status !== 'BEWEZEN' && o.bestemming.uitkomst === 'andere-capability') {
       const anderen = [];
       for (const rol of rollen) {
         if (rol === rij.persona || !persoonlijk[rol]) continue;
-        const b = await bezoek(persoonlijk[rol], base, rij.pad);
-        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || rij.pad });
+        const b = await bezoek(persoonlijk[rol], base, meet.pad);
+        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || meet.bestemming });
       }
-      o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
+      o = beoordeelBestemming({ ingang: meet.bestemming, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
     }
     r.bestemming = o.bestemming;
-    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: rij.pad };
+    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: meet.pad };
     if (o.status !== 'BEWEZEN') {
       for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST',
         reden: 'de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app', bewijs: null };
@@ -414,7 +437,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   }
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
-  const bediening = await bedien(eigen, base, rij.pad);
+  const bediening = await bedien(eigen, base, meet.pad);
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
   r.schil = bediening.schil;
@@ -474,7 +497,7 @@ function vulOngemeten(r) {
   for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak(r);
   /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
      door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
-  r.samengesteld = stelSamen(r);
+  r.samengesteld = stelSamen(r, { wereld: RAAKVLAKWERELD() });
   /* De vier randvoorwaarden uit de opdracht die hier niet gemeten worden, maar
      die wel een plek in de rij verdienen -- weglaten leest als "in orde". */
   r.mobiel = { status: 'NIET_GETEST', reden: 'deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md' };
@@ -674,12 +697,42 @@ async function bedien(ctx, base, pad) {
 /* Staat de zin van een weigering op het scherm, dan heeft de gebruiker gezien
    waarom (gezegd); anders is het een defect: de server weigerde en niemand
    vertelde het hem. */
+/* Een vervolgvraag telt alleen met de bijbehorende netwerkrespons en zichtbare
+   bediening. Een willekeurige (of achtergebleven) dialoog is geen bewijs. */
+const poortVerkeer = new WeakMap();
+async function gegevensVraagGetoond(page, w) {
+  if (w.s !== 428 || !w.poort) return false;
+  const verkeer = poortVerkeer.get(page) || [];
+  const i = verkeer.indexOf(w.poort);
+  const volgende = verkeer[i + 1];
+  if (i < 0 || !volgende || volgende.pad !== '/api/gegevens/start' || volgende.s !== 200 || volgende.methode !== 'POST' || volgende.volgorde <= w.poort.volgorde) return false;
+  const [poort, vraag] = await Promise.all([w.poort.data, volgende.data]);
+  if (!poort || !vraag || !poort.soort || volgende.soort !== poort.soort || !vraag.id || !vraag.tekst ||
+      !Array.isArray(poort.ontbreekt) || !poort.ontbreekt.some(v => v.veld === vraag.veld)) return false;
+  return page.evaluate(({ tekst, veld }) => {
+    const zichtbaar = el => {
+      if (!el || !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      const r = el.getBoundingClientRect();
+      const boven = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return r.width > 0 && r.height > 0 && boven && (boven === el || el.contains(boven));
+    };
+    return [...document.querySelectorAll('.rp-waas .rp-kaart[role="dialog"]')].some(d => {
+      const v = d.querySelector('.rp-vraag'), stop = d.querySelector('.rp-stop');
+      if (!zichtbaar(v) || v.innerText.trim() !== tekst.trim() || !zichtbaar(stop) || stop.disabled) return false;
+      if (veld === 'identiteit') return true; // de bestaande verificatiestap heeft geen invoerveld
+      const invoer = d.querySelector('.rp-in'), door = d.querySelector('.rp-door');
+      return zichtbaar(invoer) && !invoer.disabled && zichtbaar(door) && !door.disabled;
+    });
+  }, { tekst: vraag.tekst, veld: vraag.veld }).catch(() => false);
+}
+
 async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
   while (weigering.length) {
     const w = weigering.shift();
     let tekst = '';
     try { tekst = await page.evaluate(() => document.body ? document.body.innerText : ''); } catch (e) { tekst = ''; }
     if (tekst.includes(w.zin)) gezegd.push(w.s + ' ' + w.pad + ': ' + w.zin);
+    else if (await gegevensVraagGetoond(page, w)) gezegd.push(w.s + ' ' + w.pad + ': bijbehorende gegevensvraag zichtbaar en bedienbaar');
     else serverfout.push(w.s + ' ' + w.pad + ' -- de server weigerde ("' + w.zin.slice(0, 80) + '") maar het scherm toonde de reden niet');
   }
 }
@@ -788,11 +841,24 @@ function weigerZin(lijf) {
 }
 
 function luister(page, base, bak) {
-  page.on('pageerror', (e) => bak.crash.push('JS: ' + String(e.message || e).slice(0, 180)));
+  const verkeer = [], verzoeken = new WeakMap();
+  let volgorde = 0;
+  page.on('request', q => verzoeken.set(q, ++volgorde));
+  poortVerkeer.set(page, verkeer);
+  page.on('pageerror', (e) => {
+    if (!isBrowserruis(e)) bak.crash.push('JS: ' + String(e.message || e).slice(0, 180));
+  });
   page.on('response', async (res) => {
     const s = res.status();
-    if (s < 400) return;
     const pad = res.url().replace(base, '').slice(0, 80);
+    let poort = null;
+    if (s === 428 || pad === '/api/gegevens/start') {
+      let aanvraag = {}; try { aanvraag = JSON.parse(res.request().postData() || '{}'); } catch (e) {}
+      poort = { s, pad, volgorde: verzoeken.get(res.request()) || 0, methode: res.request().method(), soort: aanvraag.soort,
+        data: res.text().then(t => { try { return JSON.parse(t); } catch (e) { return null; } }, () => null) };
+      verkeer.push(poort);
+    }
+    if (s < 400) return;
     if (s === 401 || s === 403 || s === 404) return;   // een deur is geen defect; bewijs 6 gaat daarover
     // de zin eerst uit het HELE antwoord: afgekapt op 200 tekens is het geen JSON meer
     let vol = '';
@@ -805,13 +871,36 @@ function luister(page, base, bak) {
     /* Een weigering MET een zin (400/409/422/428 en {"error": "..."}) is pas een
        defect als de gebruiker niet te zien krijgt waarom. Of hij hem ziet, kijkt
        bedien() na de tik op het scherm na. */
-    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol) });
+    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol), ...(poort ? { poort } : {}) });
     else bak.serverfout.push(s + ' ' + pad + (lijf ? ' -- ' + lijf.slice(0, 100) : ''));
   });
 }
 
 /* ---- schrijven ---- */
+/* De bewijzen die deze browserronde ZELF meet, krijgen hun raakvlak hier, op
+   het stempel van de ronde. Een samengesteld bewijs kreeg het al bij de bron;
+   menselijk heeft dan twee helften, en beide moeten vers blijven. */
+const EIGEN_BEWIJZEN = ['bereikbaar', 'bedienbaar', 'menselijk'];
+function legRaakvlakken(regels, st) {
+  const w = RAAKVLAKWERELD();
+  const grof = require('./lib/stempel').versheid;
+  for (const r of regels) {
+    for (const naam of EIGEN_BEWIJZEN) {
+      const b = r.bewijzen[naam];
+      if (!b || b.status === 'GEEN_FIXTURE') continue;
+      if ((r.samengesteld || []).includes(naam) && naam !== 'menselijk') continue;
+      const v = raakvlakken.versheidVoor(w, { ingang: r.ingang, soort: 'browser' }, grof)(st);
+      if (!v.raakvlak) continue;   // niet vers op de eigen commit: dan is er geen raakvlak om te bewaren
+      b.raakvlak = ((r.samengesteld || []).includes(naam) ? (b.raakvlak || []) : []).concat([v.raakvlak]);
+    }
+  }
+  return raakvlakken.hashes(w);
+}
+
+let laatsteHashes = null;
 function bouw(meting) {
+  const st = stempel();
+  const hashes = laatsteHashes = legRaakvlakken(meting.regels, st);
   const telling = {};
   for (const r of meting.regels) telling[r.status] = (telling[r.status] || 0) + 1;
   const perBewijs = {};
@@ -834,7 +923,13 @@ function bouw(meting) {
       GEEN_FIXTURE: 'niet te meten zonder testwereld, met de reden erbij',
       NIET_GETEST: 'deze ronde niet aangeraakt, met de reden erbij'
     },
-    stempel: stempel(),
+    stempel: st,
+    /* Het raakvlak (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i):
+       de sha256 per bestand staat in APPWERKT-RAAKVLAK.json, met hetzelfde
+       stempel, zodat dit register leesbaar blijft. Hier staat de verwijzing met
+       de samengestelde hash over die hashes; elk bewijs draagt zijn eigen
+       samengestelde hash in `raakvlak`. */
+    raakvlak: raakvlakken.verwijzing(st, hashes),
     sessiesOvergeslagen: meting.sessiesOvergeslagen,
     /* DE MACHINE STAAT ERBIJ. Deze proef tikt met een tijdslimiet, en op een
        machine die drie keer meer werk heeft dan kernen loopt een gezonde tik
@@ -938,7 +1033,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { onderschepper, klikReden, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, weigerZin, rijen, meetIngang, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {
@@ -984,7 +1079,10 @@ if (require.main === module) (async () => {
     process.exit(0);
   }
   const uit = bouw(await meet());
-  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) {
+    fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+    fs.writeFileSync(raakvlakken.REGISTER_PAD, JSON.stringify(raakvlakken.register(uit.stempel, laatsteHashes), null, 1) + '\n');
+  }
   log('\nAPPWERKT: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
   for (const d of uit.defecten) log('  ✗ ' + d.wereld + ' / ' + d.app + ': ' + d.reden);
   process.exit(0);

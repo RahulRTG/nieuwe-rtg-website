@@ -31,8 +31,12 @@ test('premiumfuncties zijn niet via een vervalst verzoek te activeren', () => {
 });
 
 test('privacygrens locatie wissen kan niet worden uitgezet', () => {
-  const { api } = regie();
-  const r = api.ovRegieZet('a', 'business', { privacy: { discreteMeldingen: true, locatieNaRitWissen: false } });
-  assert.equal(r.privacy.discreteMeldingen, true);
+  const { api, saves } = regie();
+  const r = api.ovRegieZet('a', 'business', { privacy: { discreteMeldingen: false, locatieNaRitWissen: false } });
+  assert.equal(r.privacy.discreteMeldingen, false);
   assert.equal(r.privacy.locatieNaRitWissen, true);
+  assert.equal(saves(), 1);
+  const opnieuw = api.ovRegieZet('a', 'business', { privacy: { discreteMeldingen: false, locatieNaRitWissen: false } });
+  assert.equal(opnieuw.privacy.discreteMeldingen, false);
+  assert.equal(saves(), 1, 'dezelfde gewenste voorkeur wordt niet opnieuw opgeslagen');
 });

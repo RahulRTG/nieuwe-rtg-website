@@ -40,9 +40,9 @@ function geboorteInfo(v, vandaag = klokDatum()) {
   const jaar = Number(m[1]), maand = Number(m[2]), dag = Number(m[3]);
   const datum = new Date(Date.UTC(jaar, maand - 1, dag));
   if (datum.getUTCFullYear() !== jaar || datum.getUTCMonth() !== maand - 1 || datum.getUTCDate() !== dag) return null;
-  const nuJaar = vandaag.getFullYear(), nuMaand = vandaag.getMonth() + 1, nuDag = vandaag.getDate();
-  let leeftijd = nuJaar - jaar;
-  if (nuMaand < maand || (nuMaand === maand && nuDag < dag)) leeftijd -= 1;
+  const n = require('../kern/tijdzone').huis(vandaag);
+  let leeftijd = n.jaar - jaar;
+  if (n.maand < maand || (n.maand === maand && n.dagVanMaand < dag)) leeftijd -= 1;
   if (leeftijd < 0 || leeftijd > 120) return null;
   return { datum: tekst, leeftijd };
 }
@@ -73,19 +73,7 @@ function schoonGroep(v) { return GROEPEN.includes(v) ? v : null; }
 // privezaken van het gezin (geld, mentale steun, dromen, cv, reisaanvraag).
 const isGast = p => p && p.rol === 'gast';
 const KLEUREN = ['#C9A24B', '#5FA56A', '#6AA6C9', '#B4574E', '#B07AC0', '#D08A3E'];
-const scryptAsync = (pin, salt, len) => new Promise((resolve, reject) =>
-  crypto.scrypt(String(pin), salt, len, (err, key) => err ? reject(err) : resolve(key)));
-async function hashPin(pin) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  return { salt, hash: (await scryptAsync(pin, salt, 32)).toString('hex') };
-}
-async function checkPin(rec, pin) {
-  if (!rec || !rec.hash) return false;
-  let h; try { h = await scryptAsync(pin, rec.salt, 32); } catch (e) { return false; }
-  const b = Buffer.from(rec.hash, 'hex');
-  return h.length === b.length && crypto.timingSafeEqual(h, b);
-}
-const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
+const { hashPin, checkPin, geldigePin } = require('./gezinspin')({ crypto });
 function schoonAvatar(v) {
   const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim();
   if (!s) return 'ster';
@@ -159,8 +147,10 @@ const gezinscode = require('./gezinscode').maak({ db, crypto, bewerkCollectie: b
 const gezinsstroom = require('./gezinsstroom').maak({ db, crypto, bewerkCollectie: bc, gezinstoken, G, nu, rtfHandle });
 let oudGeruimd = false;
 const plicht = require('./accountplicht').maak({ ctx, isBeschermd });
-function profielVan(g, token) {
-  if (!oudGeruimd && Object.keys(G()).length) { oudGeruimd = true; if (gezinstoken.ruimOud(G())) save(); }
+function profielVan(g, token, gezinnen) {
+  // Een transactie geeft haar eigen kopie mee; geen globale save of vlag wijzigen.
+  if (gezinnen !== undefined) gezinstoken.ruimOud(gezinnen);
+  else if (!oudGeruimd && Object.keys(G()).length) { oudGeruimd = true; if (gezinstoken.ruimOud(G())) save(); }
   const p = gezinstoken.vind(g, token);
   if (p) actualiseerGroep(p);
   return p && plicht.magDoor(g, p) ? p : undefined;

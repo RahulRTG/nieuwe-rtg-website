@@ -61,7 +61,7 @@ module.exports = (kern) => {
   });
   app.post('/api/theater/reactie', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, theaterReactie(req.session.key, String(req.body.id || ''), req.body.tekst));
+    stuur(res, theaterReactie(req.session.key, String(req.body.id || ''), req.body.tekst, req.body.idem));
   });
   app.post('/api/theater/reacties', auth, (req, res) => {
     if (geenGast(req, res)) return;

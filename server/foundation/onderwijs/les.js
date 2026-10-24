@@ -4,7 +4,10 @@
    foundation/onderwijs.js. */
 module.exports = (octx) => {
   const { router, F, save, nu, rid, schoon, teVaak, misluktePoging, goedePoging, ipVan,
-    toegang, ruimOudeLessen, rolVanVerzoek, sse, stuur, presentie, lesVan, sleutelInAdres, docentCheck, lesPubliek } = octx;
+    toegang, ruimOudeLessen, rolVanVerzoek, sse, stuur, presentie, lesVan, sleutelInAdres, docentCheck, lesPubliek, gezinsCtx } = octx;
+
+  // een account voor de les (eigenaarsbesluit 19 oktober 2026): zie ./lesaccount.js
+  const { metAccount, alsGezinslid, GEEN_ACCOUNT } = require('./lesaccount')(gezinsCtx);
 
   /* ---------- les maken / meedoen ---------- */
   /* EEN REM OP HET MAKEN, en niet alleen op het raden. `lesVan()` begrenst wie
@@ -30,6 +33,7 @@ module.exports = (octx) => {
      `lescode` voor de klas en `token` voor de begeleider. Een herhaling met
      dezelfde `idem` maakt geen tweede les en toont niets opnieuw (409). */
   router.post('/les/maak', async (req, res) => {
+    if (!metAccount(req)) return res.status(401).json(GEEN_ACCOUNT);
     const bak = 'lesmaak:' + ipVan(req);
     if (teVaak(res, bak)) return;
     misluktePoging(bak, 20, 60);
@@ -47,6 +51,7 @@ module.exports = (octx) => {
      begeleider; de sleutel draagt hem niet. Een naam die al meedoet krijgt 409 en
      nooit de sleutel van die ander -- zo kon je vroeger iemands schrift openen. */
   router.post('/les/join', async (req, res) => {
+    if (!metAccount(req) && !alsGezinslid(req)) return res.status(401).json(GEEN_ACCOUNT);
     const bak = 'lescode:' + ipVan(req);
     if (teVaak(res, bak)) return;
     const naam = schoon(req.body.naam, 40);

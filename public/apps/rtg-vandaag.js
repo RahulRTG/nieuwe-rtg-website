@@ -133,7 +133,10 @@
   /* --------------------------------------------------------------- kompas */
   api('/api/agenda/mijn-lijst').then(function (d) {
     var items = (d && d.items) || [];
-    var vandaag = new Date().toISOString().slice(0, 10);
+    /* De dag op de klok van het lid, zoals hij de datum invoerde; de UTC-dag
+       liep na middernacht een dag achter (test/rtg-vandaag-lokaal.test.js). */
+    var nu = new Date();
+    var vandaag = nu.getFullYear() + '-' + String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
     var vanVandaag = items.filter(function (i) { return String(i.datum || '').slice(0, 10) === vandaag; })
       .sort(function (a, b) { return String(a.tijd || '').localeCompare(String(b.tijd || '')); });
 

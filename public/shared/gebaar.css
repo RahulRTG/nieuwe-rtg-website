@@ -75,18 +75,17 @@
 /* De lade is precies zo breed als er plank is weggeschoven. Daardoor overlappen
    plank en lade elkaar nooit en is er geen z-index-vraag: de een gaat weg waar
    de ander komt. */
-.gb-lade{
+.gb-rij>.gb-lade{box-sizing:content-box;
   /* content-box, en dat is geen detail: de snedelijn hieronder is een border van
      1px, en met border-box zou die pixel van de INHOUD afgaan. De knoppenrij is
      precies --gb-vol breed, dus dan puilt hij er een pixel uit en ziet de laatste
      letter er geschaafd uit. Zo staat de lijn ernaast in plaats van erin. */
-  box-sizing:content-box;
   position:absolute;top:0;bottom:0;width:var(--gb-lade,0px);
   overflow:hidden;background:var(--onyx-glans,#0C0C0B);
   transition:width var(--gb-duur,0ms) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
 }
 /* Alleen de BUITENhoeken: aan de snede sluit de lade recht op de plank aan,
-   want daar raken ze elkaar. */
+   daar raken ze elkaar. */
 .gb-lade[data-kant="rechts"]{right:0;border-left:1px solid var(--gold-rand,rgba(192,165,68,.52));
   border-radius:0;}
 .gb-lade[data-kant="links"]{left:var(--gb-inzet,0px);border-right:1px solid var(--gold-rand,rgba(192,165,68,.52));

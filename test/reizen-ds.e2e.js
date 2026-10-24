@@ -124,6 +124,12 @@ test('de Cover: de wereld op de foto, een ingang, en rubrieken die echt van blad
   await page.locator('[data-tab="taxi"]').click();
   assert.equal(await page.locator('[data-blad="taxi"]').isVisible(), true);
   assert.equal(await page.locator('[data-blad="reizen"]').isHidden(), true);
+  /* Nadruk (ONTWERPSYSTEEM.md par. 7): de Cover is beleving, het overzicht
+     balans, en zelf iets toevoegen is gereedschap: minder lucht en een kortere beweging. */
+  const lucht = sel => page.locator(sel).evaluate(e => getComputedStyle(e).marginBlockStart);
+  assert.equal(await lucht('section[aria-labelledby="wachtTitel"]'), '48px');
+  assert.equal(await lucht('#worldTravelImport'), '32px');
+  assert.equal(await page.locator('[data-blad="taxi"]').evaluate(e => { const c = getComputedStyle(e); return c.getPropertyValue('--ds-duur') === c.getPropertyValue('--ds-duur-kort'); }), true);
   assert.deepEqual(fouten, []);
   await ctx.close();
 });

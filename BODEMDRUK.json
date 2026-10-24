@@ -1,17 +1,17 @@
 {
   "stempel": {
-    "op": "2026-10-18T21:33:31.699Z",
-    "commit": "d1a9a85f9",
+    "op": "2026-10-24T14:50:00.551Z",
+    "commit": "897d49afc0",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bodemdruk.js",
-    "node": "v22.22.0"
+    "node": "v26.12.1"
   },
   "graad": "vermoed",
   "uitleg": "Per scherm dat een pad van de universele bodem aanroept (afgeleid uit de verklaring, het functieregister en SCHERMROUTES.json): staat er een uitnodiging om te betalen op? SAMENLEVING.md par. 6, eis 5.",
   "grens": "Lexicaal en zonder commentaar gelezen, dus een ONDERGRENS: druk zonder deze woorden (een slotje, een kleur, een badge) ziet deze meter niet. Een deur die zegt dat iets bij een pas hoort is een weigering en geen druk; of die weigering op de bodem mag, meet npm run onvervreemdbaar. Gebruikstijd wordt niet gemeten (SAM-05).",
   "gemeten": {
-    "schermen": 50,
+    "schermen": 59,
     "metDruk": 0,
     "treffers": 0
   },
@@ -25,6 +25,42 @@
       ],
       "functies": [
         "member-connect"
+      ]
+    },
+    {
+      "bestand": "public/apps/app-main/app-main-11.js",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "kern-berichten"
+      ]
+    },
+    {
+      "bestand": "public/apps/app-main/app-main-13.js",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-care"
+      ]
+    },
+    {
+      "bestand": "public/apps/app-main/app-main-14.js",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-care"
+      ]
+    },
+    {
+      "bestand": "public/apps/app-main/app-main-15.js",
+      "werkwoorden": [
+        "hulp-vinden"
+      ],
+      "functies": [
+        "dom-care"
       ]
     },
     {
@@ -62,6 +98,15 @@
       ],
       "functies": [
         "doelen"
+      ]
+    },
+    {
+      "bestand": "public/apps/foundation/buurtruil.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "dom-rtfos"
       ]
     },
     {
@@ -166,6 +211,15 @@
       ]
     },
     {
+      "bestand": "public/apps/hangar-voorzijde.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
+      ]
+    },
+    {
       "bestand": "public/apps/isolatie.js",
       "werkwoorden": [
         "verbinden"
@@ -251,12 +305,30 @@
       ]
     },
     {
+      "bestand": "public/apps/pay.html",
+      "werkwoorden": [
+        "verbinden"
+      ],
+      "functies": [
+        "member-connect"
+      ]
+    },
+    {
       "bestand": "public/apps/rechtbank.html",
       "werkwoorden": [
         "hulp-vinden"
       ],
       "functies": [
         "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/reisboek-momenten.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
       ]
     },
     {
@@ -404,6 +476,15 @@
       ],
       "functies": [
         "rust"
+      ]
+    },
+    {
+      "bestand": "public/apps/werkvloer.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
       ]
     },
     {

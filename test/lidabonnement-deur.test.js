@@ -19,6 +19,7 @@
    Draai los: node --test test/lidabonnement-deur.test.js
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -43,8 +44,8 @@ async function lidMetAbonnement(office) {
     phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
   const aanvraag = (await api('/api/aanmelding/aanvraag',
-    { pas: 'rtg', naam: 'Abo ' + u, contact: u + '@x.nl' }, reg.token)).body;
-  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+    { idem: randomUUID(), pas: 'rtg', naam: 'Abo ' + u, contact: u + '@x.nl' }, reg.token)).body;
+  const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   assert.ok(id, 'de aanvraag is binnengekomen: ' + JSON.stringify(aanvraag).slice(0, 160));
   const besluit = await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, office);
   assert.equal(besluit.status, 200, 'het kantoor keurt goed: ' + JSON.stringify(besluit.body).slice(0, 160));

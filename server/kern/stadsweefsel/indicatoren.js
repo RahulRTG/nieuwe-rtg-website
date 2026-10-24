@@ -33,12 +33,7 @@ module.exports = (ctx) => {
   const { nu, geo, obj, zkn, werk, tr } = ctx;
 
   const uren = (ms) => Math.round(ms / 3600000 * 10) / 10;
-  function mediaan(rij) {
-    if (!rij.length) return null;
-    const s = rij.slice().sort((a, b) => a - b);
-    const m = Math.floor(s.length / 2);
-    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
-  }
+  const { mediaan } = require('../util');
   const gem = (rij) => (rij.length ? rij.reduce((a, b) => a + b, 0) / rij.length : null);
 
   /* Het venster. Alles hieronder rekent over EEN periode, en de vorige periode

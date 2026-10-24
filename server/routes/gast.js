@@ -8,12 +8,13 @@
    tweede horecasysteem. De rekening waar een gast op bestelt is dezelfde rij in
    dezelfde opslag die de bediening op haar scherm ziet.
 
-   DE POORT IS DE TAFELSLEUTEL EN NIET EEN INLOG. Een gast aan tafel 12 is vaak
-   geen lid, en van een lid willen we hier niet meer weten dan nodig. Wie de QR
-   scant en aanschuift krijgt een sleutel die bij DEZE open rekening hoort; gaat
-   de rekening dicht, dan is de sleutel niets meer waard. Er staat dus geen
-   account achter een tafelsessie, en op de rekening staat een handle -- nooit
-   een echte naam, nooit een ledensleutel (CLAUDE.md, privacy by design).
+   DE POORT IS EEN ACCOUNT PLUS DE TAFELSLEUTEL (eigenaarsbesluit 19 oktober
+   2026: gebruiken vraagt een account). Wie de QR scant, maakt in het scherm een
+   gratis account en schuift dan aan; hij krijgt een sleutel die bij DEZE open
+   rekening EN bij zijn account hoort. Gaat de rekening dicht, dan is de sleutel
+   niets meer waard; zonder de sessie die aanschoof is hij dat ook niet. Op de
+   rekening staat de codenaam van het account -- nooit een echte naam, nooit een
+   ledensleutel (CLAUDE.md, privacy by design).
 
    DE HORECA-KERN WORDT HIER OPNIEUW OPGEBOUWD en dat is geen tweede waarheid:
    kern/horeca.js is een fabriek zonder eigen geheugen die alles uit db.data
@@ -40,10 +41,14 @@ module.exports = (kern) => {
      die zelf de sleutel moet opzoeken, is een handler die het een keer vergeet.
      Wat hier langskomt heeft altijd een zaak, een open rekening en een
      deelnemer -- of het komt er niet langs. */
-  function gastAuth(req, res, next) {
+  function gastAuth(req, res, next) { kern.auth(req, res, () => tafelSleutel(req, res, next)); }
+  function tafelSleutel(req, res, next) {
     const gevonden = sessie.herken((req.body || {}).sleutel);
     if (!gevonden) return res.status(401).json({
       error: 'Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.', code: 'sessie-weg' });
+    // de sleutel hoort bij het account dat aanschoof, en bij geen ander
+    if (!gevonden.deelnemer.account || gevonden.deelnemer.account !== naad.handleVan(req.session))
+      return res.status(403).json({ error: 'Deze tafelsessie hoort bij een ander account. Scan de QR en schuif zelf aan.', code: 'ander-account' });
     req.gast = gevonden;
     /* De actor is hier een TAFEL en geen persoon, en dat is juist -- een gast
        hoeft zich niet te identificeren om te bestellen. De envelop zegt dat

@@ -2,6 +2,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { startServer, stop, stopNet } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const bewijs = require('./operationeel-journaal');
 
 test('aanvraag gaat via twee bevoegde werkplekken terug naar Saloon, ook zonder optionele diensten', async () => {
@@ -69,7 +70,8 @@ test('aanvraag gaat via twee bevoegde werkplekken terug naar Saloon, ook zonder 
     assert.equal((await feed()).items[0].titel, a.wat);
     a = (await api('/api/mall/aanvraag/sluit', { id: a.id, versie: a.versie })).aanvraag;
     assert.equal(a.status, 'gesloten');
-    assert.equal((await fetch(srv.base + '/api/push/key').then(r => r.json())).key, null);
+    assert.equal((await fetch(srv.base + '/api/push/key').then(r => r.status)), 401, 'de pushsleutel hoort bij een ingelogd scherm');
+    assert.equal((await fetch(srv.base + '/api/push/key', { headers: { Authorization: 'Bearer ' + (await registreerGratis(srv.base)).token } }).then(r => r.json())).key, null);
     assert.equal((await api('/api/pay/stuur', { centen: 100 })).code, 'betalingen-uit');
     bewijs('mall-api', ['ENTRY', 'AUTHORITY', 'HANDOFF', 'DECISION', 'STATE', 'RESULT', 'RETURN', 'RECALL', 'CHANGE', 'REVOKE', 'REPLAY', 'DEGRADED', 'PROOF'],
       { modi: ['PAYMENTS OFF', 'AI OFF', 'PUSH OFF'], grens: 'API + nette herstart; geen bewijs van harde opslaguitval, ingetrokken personeelsrol of alle schermacties.' });

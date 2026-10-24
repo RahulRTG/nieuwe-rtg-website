@@ -34,6 +34,27 @@ function wereld() {
   return { db, kern, ticket, claim, schuif: ms => { klok += ms; } };
 }
 
+test('0. de ticketdag volgt Amsterdam rond lokale middernacht', () => {
+  let klok = Date.parse('2026-09-27T22:30:00.000Z'); // 28 september in Amsterdam
+  const db = { data: { boekingen: [], posSales: {} }, writable: true };
+  const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} });
+  const kern = require('../server/kern/tickettoegang')({ db, save() {}, bewerkCollectie, crypto,
+    oudeRijen: () => db.data, nu: () => new Date(klok).toISOString() });
+  const boeking = { ref: 'MIDDERNACHT', kind: 'ticket', supplierCode: 'ZAAK',
+    customerKey: 'lid:middernacht', datum: '2026-09-28', tijd: '00:30', paid: true,
+    status: 'bevestigd', personen: 1 };
+  db.data.boekingen.push(boeking);
+  const uitgegeven = kern.uitgeven({ boeking, key: boeking.customerKey });
+  assert.equal(uitgegeven.status, 200);
+  const binnen = kern.claim({ code: uitgegeven.code, supplierCode: 'ZAAK',
+    actor: { name: 'Deur' }, boekingVan: ref => db.data.boekingen.find(b => b.ref === ref) });
+  assert.equal(binnen.status, 200, JSON.stringify(binnen));
+  const gisteren = { ...boeking, ref: 'GISTEREN', customerKey: 'lid:gisteren', datum: '2026-09-27' };
+  db.data.boekingen.push(gisteren);
+  assert.equal(kern.uitgeven({ boeking: gisteren, key: gisteren.customerKey }).status, 409,
+    'na lokale middernacht krijgt gisteren geen ogenschijnlijk actieve code meer');
+});
+
 test('1. 128 bits, kaal eenmaal, op schijf alleen de hash, en tonen roteert', () => {
   const w = wereld();
   const b = w.ticket('T1');
@@ -57,12 +78,33 @@ test('2. issuer, doel, scope en verval aan het eind van de ticketdag', () => {
   assert.equal(r.toegang.doel, 'activiteit-entree');
   assert.deepEqual(r.toegang.scope, ['zaak.ticket.checkin']);
   assert.equal(r.toegang.issued_at, new Date(T0).toISOString());
-  assert.equal(r.toegang.expires_at, DAG + 'T23:59:59.999Z');
+  assert.equal(r.toegang.expires_at, '2026-09-27T21:59:59.999Z');
   assert.equal(r.toegang.max_gebruik, 1);
   assert.equal(w.claim(r.code, 'ANDER').status, 404, 'de scope is de zaak');
   w.schuif(12 * 3600000);
   assert.equal(w.claim(r.code).status, 409, 'na de ticketdag verlopen');
   assert.match(w.claim(r.code).error, /verlopen/);
+});
+
+test('2b. einde ticketdag volgt wintertijd en beide DST-grenzen', () => {
+  const gevallen = [
+    ['2026-01-15T10:00:00.000Z', '2026-01-15', '2026-01-15T22:59:59.999Z'],
+    ['2026-03-29T08:00:00.000Z', '2026-03-29', '2026-03-29T21:59:59.999Z'],
+    ['2026-10-25T08:00:00.000Z', '2026-10-25', '2026-10-25T22:59:59.999Z']
+  ];
+  for (const [nu, datum, verwacht] of gevallen) {
+    const db = { data: { boekingen: [], posSales: {} }, writable: true };
+    const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save() {} });
+    const kern = require('../server/kern/tickettoegang')({ db, save() {}, bewerkCollectie, crypto,
+      oudeRijen: () => db.data, nu: () => nu });
+    const boeking = { ref: 'DST-' + datum, kind: 'ticket', supplierCode: 'ZAAK',
+      customerKey: 'lid:' + datum, datum, tijd: '12:00', paid: true,
+      status: 'bevestigd', personen: 1 };
+    db.data.boekingen.push(boeking);
+    const r = kern.uitgeven({ boeking, key: boeking.customerKey });
+    assert.equal(r.status, 200, datum);
+    assert.equal(r.toegang.expires_at, verwacht, datum);
+  }
 });
 
 test('3. max_gebruik 1: de tweede scan laat niemand binnen', () => {
@@ -135,7 +177,7 @@ test('7. echte server: koop zonder code, tonen roteert, de deur laat een keer bi
     const lid = (await reg('5501')).body.token, ander = (await reg('5502')).body.token;
     const roster = (await api('/api/supplier/roster', { code: 'ESVEDRA' })).body.staff;
     const deur = (await api('/api/supplier/login', { code: 'ESVEDRA', staffId: roster.find(x => x.role !== 'manager').id, pin: '5678' })).body.token;
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = require('../server/kern/tijdzone').datumIn();
     const k = await api('/api/ticket/koop', { supplierCode: 'ESVEDRA', activiteitId: 'a2', datum: vandaag, tijd: '14:00', personen: 1 }, lid);
     assert.equal(k.status, 200, k.tekst);
     assert.doesNotMatch(k.tekst, /TK\./, 'de koop draagt geen code');

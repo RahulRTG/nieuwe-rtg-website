@@ -90,7 +90,7 @@ module.exports = function maakEigen({ db, domein, bezit }) {
   }
 
   function eis(naam) {
-    const soort = bezit[naam];
+    const soort = Object.hasOwn(bezit, naam) ? bezit[naam] : undefined;
     if (!soort) {
       throw new Error('eigencollectie (' + domein + '): "' + naam + '" staat niet in wat dit domein ' +
         'bezit. Een collectie die nergens is opgeschreven, kan niemand verhuizen -- zet hem erbij, ' +
@@ -152,7 +152,9 @@ module.exports = function maakEigen({ db, domein, bezit }) {
     return waarde;
   }
 
-  return { bak, kijk, zetBak, bezit, domein };
+  // Aanwezigheid is geen vormgoedkeuring; kijk() blijft die controleren.
+  function bestaat(naam) { eis(naam); return Object.prototype.hasOwnProperty.call(db.data, naam); }
+  return { bak, kijk, bestaat, zetBak, bezit, domein };
 };
 
 module.exports.LEEG = LEEG;

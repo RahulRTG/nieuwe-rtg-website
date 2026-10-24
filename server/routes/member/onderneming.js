@@ -48,7 +48,8 @@ module.exports = (kern) => {
      Met ?land=DE komt alleen dat land -- en voor een land dat wij niet kennen
      komt er geen halve Nederlandse lijst maar een eerlijk "wij weten het niet";
      zie kern/onderneming/rechtsvorm-landen.js. */
-  app.get('/api/onderneming/rechtsvormen', (req, res) => {
+  // met een account (eigenaarsbesluit 19 oktober 2026): onderneming.html en concern.html sturen hun Bearer mee
+  app.get('/api/onderneming/rechtsvormen', auth, (req, res) => {
     const kort = (id, r) => ({ id, label: r.label, kort: r.kort, land: r.land,
       rechtspersoon: r.rechtspersoon, notarieel: r.notarieel,
       aansprakelijk: r.aansprakelijk, stappen: r.oprichting.length });
@@ -67,7 +68,8 @@ module.exports = (kern) => {
   });
 
   app.post('/api/onderneming/nieuw', auth, (req, res) => {
-    stuur(res, ondernemingNieuw(req.session.key, req.body || {}));
+    // de herhaalsleutel leest de route zelf (middleware/idempotentie-eigen.js)
+    stuur(res, ondernemingNieuw(req.session.key, req.body || {}, req.body.idem));
   });
 
   app.post('/api/onderneming/beeld', auth, (req, res) => {

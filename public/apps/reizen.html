@@ -14,6 +14,7 @@
 <link href="/images/worlds/heritage/travel-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <script src="/shared/poortgesprek.js"></script>
 <script src="/ds/shell.js"></script>
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom A): de
      wereldingang is een Cover (volle foto, de wereldnaam, een zin, een ingang
@@ -43,7 +44,7 @@
   </section>
 </div>
 
-<main class="ds-collectie" id="inhoud">
+<main class="ds-collectie" id="inhoud" data-ds-nadruk="balans">
   <div class="hoofdtabs"><div class="ds-chips" role="tablist" aria-label="RTG Reizen">
     <button class="ds-chip" role="tab" type="button" data-tab="vandaag" aria-selected="true">Vandaag</button>
     <button class="ds-chip" role="tab" type="button" data-tab="reizen" aria-selected="false">Reizen</button>
@@ -133,7 +134,7 @@
   </section>
 
   <!-- TAXI: een rit aanvragen (Taak). Het aanbod komt uit Mobility OS. -->
-  <section data-blad="taxi" role="tabpanel" aria-labelledby="titelTaxi" hidden>
+  <section data-blad="taxi" role="tabpanel" aria-labelledby="titelTaxi" data-ds-nadruk="gereedschap" hidden>
     <div class="ds-taak">
       <div class="ds-taak__kop">
         <p class="ds-label">RTG Executive Mobility</p>
@@ -298,7 +299,7 @@
 
   <!-- DE INVOERBALIE (REIZEN.md fase 2): RTG leest en zet klaar, de mens
        bevestigt. Pas daarna staat het bij de reizen. -->
-  <section class="ds-sectie" id="worldTravelImport" aria-labelledby="invoerTitel">
+  <section class="ds-sectie" id="worldTravelImport" aria-labelledby="invoerTitel" data-ds-nadruk="gereedschap">
     <h2 class="ds-titel ds-titel--scherm" id="invoerTitel">Zelf iets toevoegen <span class="ds-meta" id="invTel"></span></h2>
     <div class="ds-taak__kop" id="invoer">
       <p class="ds-meta">Ergens anders geboekt? Plak de bevestiging of kies het bestand. RTG leest eruit
@@ -410,7 +411,6 @@
 <script src="/shared/rtg-route-memory.js"></script>
 <!-- De gedeelde overgang (reisboekrij wordt het reisboek). Op een ds-scherm laadt
      de basis hem niet; hij zet geen stijl, alleen een naam bij pageswap. -->
-<script src="/shared/rtg-heritage-transition.js"></script>
 <!-- De ingebouwde wereldtekst (NL/EN, ook zonder vertaalmodel) en de eerlijke
      toestand van de kop: geen bestemming voordat het reisdossier antwoordt. -->
 <script src="/shared/rtg-world-home-copy.js"></script>

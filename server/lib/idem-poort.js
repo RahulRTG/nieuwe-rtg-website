@@ -114,12 +114,12 @@ function maakIdemPoort(opties) {
       .digest('hex');
   }
 
-  let documentOperatiepad = null; // lui geladen en daarna onthouden: zie de toelichting in opzet/handeling.js
+  let ontvangstOperatiepad = null; // behoud opstartvolgorde
   function middleware(req, res, next) {
     if (req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'PATCH') return next();
     if (isEenmalig(req.method, req.path)) return next();
-    // Domain-owned durable receipts must recheck current auth and ownership on every retry.
-    if ((documentOperatiepad || (documentOperatiepad = require('./document-operatiepad')))(req.path)) return next();
+    // De duurzame ontvangst hercontroleert toegang en redactie bij elke retry.
+    if ((ontvangstOperatiepad || (ontvangstOperatiepad = require('./ontvangst-operatiepad')))(req.path)) return next();
     /* Twee bronnen, en de header wint. Stuurt een client een eigen sleutel, dan
        is dat een bewuste opdracht met een lang venster; de verklaring is de
        vangnet-vorm met het korte dubbeltikvenster. */

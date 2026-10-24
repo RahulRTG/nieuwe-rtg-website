@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { randomUUID } = require('node:crypto');
 /* ============================================================================
    DE VOORRAADPROEF -- de eerste keten TUSSEN twee zaken.
 
@@ -112,9 +113,9 @@ async function wereld(basis, merk) {
     const reg = await P('/api/auth/register', { name: naam, email: mail, password: pw, geboortedatum: '1980-06-01' });
     const tok = reg.data && reg.data.token;
     if (!tok) throw new Error('geen ondernemerssessie voor ' + naam + ' (status ' + reg.status + ')');
-    const aan = await P('/api/aanmelding/aanvraag', { pas: 'business', naam, contact: mail,
+    const aan = await P('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'business', naam, contact: mail,
       viaUitnodiging: true, bedrijf: { naam: naam + ' ' + merk, type: GENRE, plaats: 'Amsterdam' } }, tok);
-    const id = aan.data && aan.data.aanmelding && aan.data.aanmelding.id;
+    const id = aan.data && aan.data.ontvangst && aan.data.ontvangst.aanvraagId;
     if (!id) throw new Error('geen aanmelding voor ' + naam + ' (status ' + aan.status + ')');
     await P('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 5000 }, K);
     const t = await P('/api/aanmelding/termijn-voldaan', { id, maand: 1 }, K);

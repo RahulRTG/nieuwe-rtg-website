@@ -19,6 +19,7 @@
    het scherm, maar hun belofte is een andere en wordt hier niet gelopen.
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const { nieuwLid, inloggen, eigenaarSessie, KANTOORWERELD } = require('../voltooiwereld');
 
 const BOEK = '/api/member/rechterhand/reisboek';
@@ -37,6 +38,8 @@ const metNaam = (lijst, naam) => (lijst || []).filter((r) => r.naam === naam);
 async function loop(w, stap) {
   const merk = 'rb' + Date.now().toString(36);
   const lid = await nieuwLid(w, 'rbk');
+  const aanvraagLijf = { idem: randomUUID(), pas: 'lifestyle', naam: 'Reisboeklid ' + merk,
+    contact: lid.email, viaUitnodiging: true };
   let T = lid.token, aanvraag = null, reis = null, K = null;
 
   /* ---------------- voltooibaar ---------------- */
@@ -47,13 +50,16 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'het lid vraagt de Lifestyle Pass aan; de aanvraag landt in behandeling bij het kantoor', async () => {
-    const a = await w.post(AANVRAAG, { pas: 'lifestyle', naam: 'Reisboeklid ' + merk, contact: lid.email, viaUitnodiging: true }, T);
-    aanvraag = a.data && a.data.aanmelding;
-    return { klopt: a.status === 200 && !!aanvraag && aanvraag.status === 'in behandeling',
-      ziet: a.status + ', ' + (aanvraag && aanvraag.status) };
+    const a = await w.post(AANVRAAG, aanvraagLijf, T);
+    const id = a.data && a.data.ontvangst && a.data.ontvangst.aanvraagId;
+    K = await eigenaarSessie(w);
+    const dossier = id ? await w.post('/api/aanmelding/een', { id }, K) : null;
+    aanvraag = dossier && dossier.data && dossier.data.aanmelding;
+    return { klopt: a.status === 200 && !!dossier && dossier.status === 200 && !!aanvraag && aanvraag.status === 'in behandeling',
+      ziet: a.status + ', kantoor ' + (dossier && dossier.status) + ', ' + (aanvraag && aanvraag.status) };
   });
 
-  await stap('voltooibaar', 'de gedeelde kantoorcode kan de pas niet toekennen: dat is geen herleidbaar mens', async () => {
+  await stap('bevoegd', 'de gedeelde kantoorcode kan de pas niet toekennen: dat is geen herleidbaar mens', async () => {
     const o = await w.post('/api/office/login', { code: KANTOORWERELD.OFFICE_CODE });
     const tok = o.data && o.data.token;
     const b = tok ? await w.post(BESLIS, { id: aanvraag.id, besluit: 'geaccepteerd', contractEuro: 20000 }, tok) : o;
@@ -63,7 +69,6 @@ async function loop(w, stap) {
   });
 
   await stap('voltooibaar', 'een herleidbaar mens van het kantoor accepteert met een contractbedrag; het lid ziet de pas na opnieuw inloggen', async () => {
-    K = await eigenaarSessie(w);
     const b = await w.post(BESLIS, { id: aanvraag.id, besluit: 'geaccepteerd', contractEuro: 20000 }, K);
     T = await inloggen(w, lid);
     const r = await w.post(BOEK, {}, T);

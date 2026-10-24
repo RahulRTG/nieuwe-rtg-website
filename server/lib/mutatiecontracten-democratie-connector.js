@@ -15,11 +15,12 @@ const KANTOOR = { klasse: 'AUTHENTICATED', deur: 'officeAuth' };
    alleen als hash bewaard, te vervangen via /partij/sleutel en te doven via /partij/uitschrijf. */
 const PC_OP = '2026-09-29';
 const PC_GETEKEND = { door: 'Claude, op grond van test/democratie-partij.test.js toets 8 en 9; niet door een mens nagelezen', op: PC_OP };
-const PARTIJ = { klasse: 'PUBLIC', deur: 'geen bewakerslaag; de kop x-partij-sleutel is het geheim, 128 bits uit kern/bearercode, alleen als ' +
-  'hash bewaard, een jaar geldig en door een kantoormens op naam te vervangen of te doven; rem 120/minuut per bron',
-  waarom: 'een partij hangt met opzet niet aan een RTG-account (POLITIEK.md par. 7.3, proef P3): de sleutel uit ' +
-    'het register is de geloofsbrief, en zonder geldige sleutel geeft de deur 401. De rem die deze klasse eist ' +
-    'hangt ervoor: 120 verzoeken per ip per minuut (routes/democratie/partij.js).' };
+const PARTIJ = { klasse: 'PUBLIC', deur: 'geen bewakerslaag; de handler vraagt een RTG-account met de partijrol ' +
+  '(kern/democratie/partijrol.js, eigenaarsbesluit 19 oktober 2026) en geeft zonder sessie 401 en zonder rol 403. ' +
+  'Tijdens de migratie opent ook de oude sleutel in de kop x-partij-sleutel van een partij zonder gekoppeld account; rem 120/minuut per bron',
+  waarom: 'PUBLIC alleen om de migratie: een partij van voor het besluit van 19 oktober 2026 komt met haar oude ' +
+    'sleutel binnen tot er een account aan hangt, en koppelen trekt die sleutel in. Proef P3 is vervallen. De rem ' +
+    'die deze klasse eist hangt ervoor: 120 verzoeken per ip per minuut (routes/democratie/partij.js).' };
 const pc = (route, mutatieId, toegang, klasse, stand, bewijs, nagekeken) => [route, Object.assign({
   mutatieId, herkomst: 'mens', semantiek: { klasse }, toegang, stand,
   bewijs: { gemeten: 'test/democratie-partij.test.js (' + PC_OP + '): ' + bewijs, op: PC_OP },
@@ -42,6 +43,10 @@ const CONNECTOR = [
     'toets 9: nog eens uitschrijven gaf 200 met herhaling en geen tweede regel in de historie.'),
   pc('POST /api/office/democratie/partij/registreer', 'democratie.partij.registreer', KANTOOR, 'idempotent', 'PROTECTED',
     'toets 9: de tweede gaf 409 en er bleef een partij. Een toestandscontrole: dezelfde aanduiding staat een keer per niveau.'),
+  pc('POST /api/democratie/partij/koppel', 'democratie.partij.koppel', LID, 'nietHerhaalbaar', 'PROTECTED',
+    'test/toegang-partij.test.js: de koppelcode koppelt een keer; een tweede koppeling met dezelfde code geeft 401.'),
+  pc('POST /api/office/democratie/partij/ontkoppel', 'democratie.partij.ontkoppel', KANTOOR, 'nietHerhaalbaar', 'PROTECTED',
+    'test/toegang-partij.test.js: na ontkoppelen geeft de partijdeur dat account 403; nog eens ontkoppelen geeft 404.'),
   pc('POST /api/office/democratie/partij/sleutel', 'democratie.partij.sleutel', KANTOOR, 'nietHerhaalbaar', 'PROTECTED',
     'toets 8: elke oproep geeft een nieuwe sleutel en de vorige werkt daarna niet meer; toets 9: bij een uitgeschreven partij 409.'),
   pc('POST /api/democratie/partij/voorstel/plaats', 'democratie.partij.voorstel.plaats', PARTIJ, 'nietHerhaalbaar', 'PROTECTED',

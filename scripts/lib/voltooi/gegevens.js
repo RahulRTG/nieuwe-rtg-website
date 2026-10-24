@@ -38,7 +38,7 @@ async function loop(w, stap) {
   let S = await sessie(lid.token);
   let codenaam = null;
 
-  await stap('voltooibaar', 'de gegevenskaart laadt voor het lid; een bezoeker zonder sessie krijgt hem niet', async () => {
+  await stap('bevoegd', 'de gegevenskaart laadt voor het lid; een bezoeker zonder sessie krijgt hem niet', async () => {
     const r = await w.post(KAART, {}, S.token);
     const anoniem = await w.post(KAART, {}, null);
     return { klopt: r.status === 200 && !!r.data && typeof r.data === 'object' && anoniem.status === 401,

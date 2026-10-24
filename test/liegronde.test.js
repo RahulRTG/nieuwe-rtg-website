@@ -17,7 +17,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { oordeel } = require('../scripts/liegronde');
+const { oordeel, meetAdres, SPAAR } = require('../scripts/liegronde');
 const B = require('../scripts/lib/bewijsbron');
 const { BRONSOORTEN, ALGEMEEN } = require('../scripts/lib/appcontract');
 
@@ -72,6 +72,24 @@ test('4. een liegronde levert waarheidsgetrouw en niets anders', () => {
   B.stelSamen(r, { contract: {}, algemeen: { waarheidsgetrouw: ALGEMEEN.waarheidsgetrouw }, lees: () => REG(regels), versheid: vers });
   assert.equal(r.bewijzen.waarheidsgetrouw.status, 'BEWEZEN');
   assert.deepEqual(Object.keys(r.bewijzen), ['waarheidsgetrouw'], 'de ronde raakt geen ander bewijs');
+});
+
+test('de liegronde gebruikt ook een expliciete contractingang voor interne tabs', () => {
+  assert.deepEqual(meetAdres({ functie: 'link:x', pad: '/apps/x.html' }),
+    { ingang: '/apps/x.html', pad: '/apps/x.html' });
+  assert.deepEqual(meetAdres({ functie: 'tab:assets', pad: null }),
+    { ingang: '/apps/app.html#tab=assets', pad: '/apps/app.html' });
+  assert.equal(meetAdres({ functie: 'os:werk', pad: null }), null,
+    'een natuurlijke-taalkeuze zonder declaratieve route wordt niet geraden');
+});
+
+test('de Foundation-toegangspoort blijft echt zodat het scherm zelf wordt gemeten', () => {
+  assert.ok(SPAAR.split(',').includes('/api/rtf/toegang'),
+    'zonder de echte toegangspoort meet de liegronde alleen de dichte Foundation-deur');
+  for (const pad of ['/api/foundation/gezin/profiel/maak', '/api/foundation/gezin/profiel/kies',
+    '/api/foundation/les/maak', '/api/foundation/les/join']) {
+    assert.ok(SPAAR.split(',').includes(pad), pad + ' moet echt blijven om een tijdelijke Schoolpas te kunnen maken');
+  }
 });
 
 test('5. het echte register spreekt zichzelf niet tegen', () => {

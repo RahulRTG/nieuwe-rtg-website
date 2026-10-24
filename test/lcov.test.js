@@ -147,14 +147,16 @@ const { spawnSync } = require('node:child_process');
 
 const VLOER = path.join(__dirname, '..', 'scripts', 'dekkingsvloer.js');
 const DEKKING = ['TN:', 'SF:/rtg/server/z.js', 'DA:1,1', 'LF:1', 'LH:1',
-  'BRF:0', 'BRH:0', 'FNF:0', 'FNH:0', 'end_of_record'].join('\n');
+  'BRDA:1,0,0,1', 'BRF:1', 'BRH:1', 'FN:1,module', 'FNDA:1,module', 'FNF:1', 'FNH:1', 'end_of_record'].join('\n');
 
 function draaiVloer(namen) {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scherven-'));
   /* Elk lcov-bestand krijgt zijn takkenbestand erbij: zonder dat telt de vloer
      de takken niet (scripts/lib/v8takken.js) en zakt hij om een andere reden
      dan de scherven waar deze toetsen over gaan. */
-  const takken = JSON.stringify({ versie: 2, bestanden: {}, onleesbaar: 0 });
+  const takken = JSON.stringify({ versie: 2, bestanden: { 'server/z.js': {
+    functies: ['0-10'], gedekteFuncties: ['0-10'], blokken: [], uitgevoerd: [[0, 10]]
+  } }, onleesbaar: 0 });
   for (const n of namen) {
     fs.writeFileSync(path.join(map, n), DEKKING + '\n');
     fs.writeFileSync(path.join(map, n.replace(/\.info$/, '.takken.json')), takken + '\n');

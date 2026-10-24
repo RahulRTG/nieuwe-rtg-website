@@ -42,6 +42,7 @@
    ../commercie/contract.js (de winkel) en ../commercie/contract/vorm.js (de
    vorm). */
 'use strict';
+const tijdzone = require('../tijdzone');
 
 module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
 
@@ -140,7 +141,8 @@ module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
     if (isNaN(d.getTime())) return null;
     const M = ['januari', 'februari', 'maart', 'april', 'mei', 'juni',
       'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
-    return d.getDate() + ' ' + M[d.getMonth()] + ' ' + d.getFullYear();
+    const h = tijdzone.huis(d);
+    return h.dagVanMaand + ' ' + M[h.maand - 1] + ' ' + h.jaar;
   }
 
   function standTekst(c, u) {

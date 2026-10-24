@@ -136,3 +136,7 @@ module.exports = function maakLevensdossier({ db }) {
 module.exports.VELDEN = VELDEN;
 module.exports.DOMEINEN = DOMEINEN;
 module.exports.NIET_GEBOUWD = NIET_GEBOUWD;
+
+/* Een collectietransactie levert een geïsoleerde dossierkast. Alleen deze
+   eigenaar bindt die kast aan dezelfde veldrechten; geen globale db-wissel. */
+module.exports.opCollectie = collectie => module.exports({ db: { data: { [COLLECTIE]: collectie } } });

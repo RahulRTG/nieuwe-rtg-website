@@ -2,7 +2,7 @@
    Salon-vrienden: uitgaven, balans en verrekenen via RTG Pay. Alles achter
    de gewone leden-inlog; geld beweegt alleen door een tik van de eigenaar. */
 module.exports = (kern) => {
-  const { app, auth, wbwMaak, wbwMijn, wbwGroep, wbwUitgave, wbwVerreken, wbwVerzoek } = kern;
+  const { app, auth, wbwMaak, wbwMijn, wbwGroep, wbwUitgave, wbwVerreken, wbwVerzoek, onboarding } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Wie betaalt wat is voor leden.' }); return true; }
@@ -25,9 +25,19 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, wbwUitgave(req.session.key, String(req.body.id || ''), req.body || {}));
   });
+  /* VERREKENEN VERPLAATST GELD (pay.stuur), en kwam daarom langs geen enkele
+     poort die RTG Pay van buitenaf heeft: geen paspoortpoort en geen
+     bezitsbewijs. Nu dezelfde eenmalige paspoortpoort als routes/pay.js en
+     zorgwallet.js; het bezitsbewijs staat in kern/identiteit/bezitspaden.js. */
+  const kyc = (req, res) => {
+    if (!onboarding || !onboarding.payGate) return false;
+    const g = onboarding.payGate(req.session);
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; }
+    return false;
+  };
   // de eigen schuld in een tik betalen (RTG Pay, idempotent)
   app.post('/api/wbw/verreken', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
+    if (geenGast(req, res) || kyc(req, res)) return;
     stuur(res, await wbwVerreken(req.session.key, String(req.body.id || ''), req.body.idem));
   });
   // als tegoedhouder: nette Klompjes (betaalverzoeken) naar wie rood staat

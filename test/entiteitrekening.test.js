@@ -90,7 +90,7 @@ test('1-2. KYC-minimum, RTG zet het product open, een per entiteit', async () =>
   assert.equal((await api('/api/concern/rekening', { entiteit: E }, ANDER.token)).status, 404, 'een ander ziet hem niet');
   const eigen = await api('/api/concern/rekening', { entiteit: E }, OWN.rtg.token);
   assert.equal(eigen.body.rekening.iban, ok.body.rekening.iban);
-  const kantoor = await api('/api/office/bank/rekening/open', { codenaam: 'entiteit:' + E, soort: 'zakelijk' }, BAAS);
+  const kantoor = await api('/api/office/bank/rekening/open', { codenaam: 'entiteit:' + E, soort: 'zakelijk', idem: 'entiteit-verkeerde-kantoordeur' }, BAAS);
   assert.notEqual(kantoor.status, 200, 'de kantoorroute opent geen rekening op naam van een entiteit: ' + JSON.stringify(kantoor.body));
 });
 

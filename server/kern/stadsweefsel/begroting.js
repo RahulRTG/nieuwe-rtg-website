@@ -22,6 +22,7 @@
    omdat een potje leeg is, is een besluit van een mens), en een project sluit
    zichzelf niet af. Krijgt de gedeelde ctx van kern/stadsweefsel/index.js. */
 const { schoon } = require('../util');
+const tijdzone = require('../tijdzone');
 
 module.exports = (ctx) => {
   const { d, save, crypto, nu, geo, werk, ind } = ctx;
@@ -44,7 +45,7 @@ module.exports = (ctx) => {
     const j = Number(jaar);
     const x = { id: 'D-' + crypto.randomBytes(3).toString('hex').toUpperCase(), naam: n,
       omschrijving: schoon(omschrijving, 300) || null,
-      jaar: Number.isFinite(j) && j >= 2000 ? Math.round(j) : new Date(nu()).getFullYear(),
+      jaar: Number.isFinite(j) && j >= 2000 ? Math.round(j) : tijdzone.jaarIn(nu()),
       indicator: schoon(indicator, 40) || null, door: schoon(wie, 60) || 'kantoor', at: nu() };
     doelen().push(x);
     save();

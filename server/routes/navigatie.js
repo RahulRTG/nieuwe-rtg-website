@@ -8,7 +8,9 @@ module.exports = (kern) => {
   const { app, auth, supplierAuth, liveCodename, navBestemmingen, navRoute, navPoi, navKaart, navMeld,
     navStatus, navPartnerEvent, navPartnerEvents,
     navKaartenBeeld, navKaartKies, navKaartWeg, navKaartPakket, navKaartDeel } = kern;
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  // Alleen de publieke uitleg doorgeven, nooit het volledige interne foutobject.
+  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error,
+    ...(typeof r.hoe === 'string' && r.hoe.trim() ? { hoe: r.hoe } : {}) }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Navigatie is voor leden.' }); return true; }
     return false;

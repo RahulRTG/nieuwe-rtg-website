@@ -28,6 +28,7 @@
    Krijgt de gedeelde ctx van kern/stadsweefsel/index.js. */
 const { schoon } = require('../util');
 const { magAutomatisch, niveauVoorObject } = require('./ainiveau');
+const tijdzone = require('../tijdzone');
 
 const DAG = 86400000, MAAND = 30 * DAG;
 /* Het inspectie-interval per soort, in maanden. De getallen komen uit wat een
@@ -41,7 +42,7 @@ const REGIME = {
 module.exports = (ctx) => {
   const { nu, geo, obj, werk } = ctx;
 
-  const jaarNu = () => new Date(nu()).getFullYear();
+  const jaarNu = () => tijdzone.jaarIn(nu());
   const intervalMs = (soort) => (REGIME[soort] || 24) * MAAND;
 
   // sinds wanneer is dit object niet nagekeken? Zonder inspectie telt de

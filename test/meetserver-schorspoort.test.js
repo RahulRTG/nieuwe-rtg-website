@@ -28,9 +28,12 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const wegwerp = require('../scripts/lib/wegwerpserver');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
-/* Een route zonder inlog die echt iets DOET, zodat een 200 ook betekent dat hij
-   is uitgevoerd. Schrijvend, want alleen daar kijkt de schorspoort naar. */
+/* Een route die echt iets DOET, zodat een 200 ook betekent dat hij is
+   uitgevoerd. Schrijvend, want alleen daar kijkt de schorspoort naar. Sinds het
+   eigenaarsbesluit van 19 oktober 2026 vraagt hij een account; de toets die
+   een 200 verwacht, draagt daarom een gratis account. */
 const PAD = '/api/foundation/les/maak';
 const LIJF = { vak: 'Meetproef', naam: 'Begeleider' };
 
@@ -48,8 +51,8 @@ test.before(() => {
 });
 test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
-const roep = (basis) => fetch(basis + PAD, { method: 'POST',
-  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(LIJF) });
+const roep = (basis, token) => fetch(basis + PAD, { method: 'POST',
+  headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}), body: JSON.stringify(LIJF) });
 
 test('DE TEGENPROEF EERST: met de poort AAN weigert deze route wel degelijk', async () => {
   /* Zonder deze bewijst de toets hieronder niets: een route die toch al 200 geeft
@@ -72,7 +75,7 @@ test('een meetserver bereikt een GESCHORSTE route, zodat hermeting mogelijk blij
      deze toets zakken op 503 -- en dan is de lus terug. */
   const srv = await wegwerp.start({ naam: 'schorslus-uit', env: { RTG_VERTROUWEN: REGISTER } });
   try {
-    const r = await roep(srv.basis);
+    const r = await roep(srv.basis, (await registreerGratis(srv.basis)).token);
     assert.equal(r.status, 200,
       'een instrument moet een geschorste route kunnen uitvoeren, anders kan hij nooit meer worden vrijgemeten');
     const d = await r.json();

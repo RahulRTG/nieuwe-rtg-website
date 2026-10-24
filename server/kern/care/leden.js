@@ -5,33 +5,11 @@ module.exports = (ctx) => {
   const { save, crypto, schoon, notify, zorgVoor, zorgMee,
     nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief } = ctx;
   const C = ctx.opslag || require('./opslag')(ctx); // ./opslag.js, gebouwd in ../care.js
-  function careIntakeDeel(key, aanbiederIdIn, medischIn) {
-    lijsten();
-    const a = aanbiederVan(aanbiederIdIn);
-    if (!a) return { status: 404, error: 'Zorgaanbieder niet gevonden.' };
-    const medisch = schoon(medischIn, 600);
-    if (!medisch) return { status: 400, error: 'Vul in wat de behandelaar moet weten.' };
-    // een lopende intake bijwerken in plaats van stapelen
-    let i = intakeActief(key, a.id);
-    if (!i) {
-      i = { id: crypto.randomBytes(4).toString('hex'), key, aanbiederId: a.id, aanbiederNaam: a.naam, status: 'actief', at: nu() };
-      C.bak('careIntake').push(i);
-    }
-    i.medisch = medisch;
-    i.vervaltOp = new Date(Date.now() + INTAKE_DAGEN * 86400000).toISOString().slice(0, 10);
-    save();
-    notify(key, { icon: 'zorg', title: 'Intake gedeeld met ' + a.naam, body: 'Uw medische context is beschikbaar voor ' + a.naam + ' tot ' + i.vervaltOp + '. U kunt dit altijd stoppen.', scope: 'care' });
-    return { ok: true, intake: { id: i.id, aanbiederNaam: a.naam, vervaltOp: i.vervaltOp } };
-  }
-  function careIntakeStop(key, idIn) {
-    lijsten();
-    const i = C.bak('careIntake').find(x => x.id === String(idIn || '') && x.key === key && x.status === 'actief');
-    if (!i) return { status: 404, error: 'Deze deling is er niet (meer).' };
-    i.status = 'gestopt';
-    i.gestoptOp = nu();
-    save();
-    return { ok: true, gestopt: i.aanbiederNaam };
-  }
+  const kluisje = ctx.intakesleutel || require('./intakesleutel')(); // art. 9: per veld, gebonden aan de rij
+  const { careIntakeDeel, careIntakeStop } = require('./intakedeling')({
+    intakes: () => C.bak('careIntake'), save, crypto, schoon, notify, nu,
+    INTAKE_DAGEN, lijsten, aanbiederVan, intakeActief, kluisje
+  });
 
   /* ---- het overzicht voor het lid: aanbieders, behandelingen en de eigen
      lopende intakes ---- */
@@ -82,24 +60,39 @@ module.exports = (ctx) => {
       // het algemene zorgprofiel reist mee (met toestemming); een aparte,
       // uitdrukkelijk gedeelde intake voor deze aanbieder gaat er bovenop
       zorg: zorgMee(sess.key, { zaak: 'care:' + a.id, reden: 'zorgprofiel meegegeven bij een zorgboeking' }),
-      intake: (intakeActief(sess.key, a.id) || {}).medisch || null,
+      intake: null,   // hieronder, versleuteld en aan deze boeking gebonden
       status: 'wacht-op-betaling', paid: false, at: nu()
     };
+    const ik = intakeActief(sess.key, a.id);
+    const tekst = ik ? kluisje.open(ik.medisch, 'intake|' + ik.id + '|' + sess.key) : null;
+    if (tekst) { try { boeking.intake = kluisje.sluit(tekst, 'boeking|' + boeking.id); } catch (e) { /* dicht: dan reist hij niet mee */ } }
     C.bak('careBoekingen').unshift(boeking);
     C.zetBak('careBoekingen', C.bak('careBoekingen').slice(0, 200000));
     save();
-    return { ok: true, boeking };
+    // het lid ziet zijn eigen intake terug; in de opslag staat hij alleen versleuteld
+    return { ok: true, boeking: Object.assign({}, boeking, { intake: tekst || null }) };
   }
 
-  function careBetaal(sess, refIn, verdien) {
+  /* Betaald is: er bewoog geld. Het lid betaalt de zorgaanbieder via RTG Pay
+     (pay.betaalZaak); de sleutel hangt aan de boeking (test/carebetaal.test.js). */
+  async function careBetaal(sess, refIn, verdien) {
     lijsten();
     const bk = C.bak('careBoekingen').find(x => x.ref === String(refIn || '') && x.key === sess.key);
     if (!bk) return { status: 404, error: 'Boeking niet gevonden.' };
     if (bk.paid) return { status: 409, error: 'Al betaald.' };
     if (Date.now() - Date.parse(bk.at) > 30 * 60000) return { status: 410, error: 'Deze boeking is verlopen. Boek opnieuw.' };
+    const a = aanbiederVan(bk.aanbiederId);
+    if (!a || !a.supplierCode) return { status: 409, error: 'Deze aanbieder kan nog geen betaling ontvangen. Er is niets afgeschreven.' };
+    if (typeof ctx.betaalZaak !== 'function') return { status: 503, error: 'RTG Pay is niet aangesloten; er is niets afgeschreven.' };
+    const r = await ctx.betaalZaak({ codenaam: bk.codenaam, supplierCode: a.supplierCode,
+      centen: Math.round(Number(bk.prijs) * 100), soort: 'zorg',
+      oms: 'Zorg bij ' + bk.aanbiederNaam + ': ' + bk.behandelingNaam, ref: bk.ref, idem: 'care:' + bk.ref });
+    if (r.error) return r;
+    if (bk.paid) return { ok: true, herhaald: true, boeking: bk }; // een gelijktijdige tik was eerst
     bk.paid = true;
     bk.paidAt = nu();
     bk.status = 'geboekt';
+    bk.betaling = { boeking: r.boeking || null, centen: r.betaaldCenten };
     save();
     if (typeof verdien === 'function') { try { verdien(sess.key, bk.prijs, bk.aanbiederNaam); } catch (e) {} }
     notify(sess.key, { icon: 'agenda', title: bk.aanbiederNaam + ': ' + bk.behandelingNaam, body: bk.datum + ' om ' + bk.tijd + ' bij ' + (bk.behandelaarNaam || 'de behandelaar') + '. Tot dan.', scope: 'care' });
@@ -136,12 +129,9 @@ module.exports = (ctx) => {
   }
 
   /* ---- de aanbieder-kant: de agenda van de behandelaar ----
-     Een zorgaanbieder (spa/kliniek) is gekoppeld aan een leveranciersaccount
-     via supplierCode. De behandelaar ziet zijn dag: wie komt, wanneer, welke
-     behandeling, en de zorgcontext die met toestemming meereist (allergenen
-     en, alleen voor een kliniek met een gedeelde intake, de medische notitie).
-     Zo staat een notenallergie of bloedverdunner vóór de behandeling op het
-     scherm. Afronden zet de afspraak op 'afgerond'. */
+     Gekoppeld via supplierCode: wie komt, welke behandeling, en de zorgcontext
+     die met toestemming meereist, zodat een allergie vóór de behandeling op het
+     scherm staat. Afronden zet de afspraak op 'afgerond'. */
   const aanbiedersVanSupplier = code => C.kijk('careAanbieders')
     .filter(a => String(a.supplierCode || '').toUpperCase() === String(code || '').toUpperCase());
 

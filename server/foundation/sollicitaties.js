@@ -6,10 +6,12 @@
 module.exports = (ctx) => {
   const { router, db, save, nu, G, profielVan, familieVan, isGast, ensureCodenaam, rtfHandle, isBeschermd } = ctx;
 
-  function verifieerProfiel(code, token) {
-    const g = G()[String(code || '').toUpperCase()];
+  function verifieerProfiel(code, token, foundation) {
+    const gezinnen = foundation === undefined ? undefined : foundation.gezinnen;
+    if (foundation !== undefined && (!gezinnen || typeof gezinnen !== 'object' || Array.isArray(gezinnen))) return null;
+    const g = (gezinnen || G())[String(code || '').toUpperCase()];
     if (!g) return null;
-    const p = profielVan(g, token);
+    const p = profielVan(g, token, gezinnen);
     if (!p) return null;
     if (!isGast(p)) ensureCodenaam(p);
     return { g, p, gast: isGast(p), handle: rtfHandle(g.code, p.id), codenaam: p.codenaam, kind: p.rol === 'kind', beschermd: isBeschermd(p), beheerder: p.rol === 'beheerder' };

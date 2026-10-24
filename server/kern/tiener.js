@@ -3,6 +3,7 @@
    profiel zelf (p.tiener), blijft binnen het gezin en is dicht voor gasten.
    De planner is bewust een vaste, uitlegbare verdeler (geen AI nodig): per
    vaktype een andere leerroute, met een knipoog naar de Overhoren-tool. */
+const tijdzone = require('./tijdzone');
 
 module.exports = ({ save, crypto }) => {
 
@@ -14,14 +15,8 @@ module.exports = ({ save, crypto }) => {
     if (!p.tiener) p.tiener = { toetsen: [], transacties: [], doelen: [] };
     return p.tiener;
   }
-  function vandaag() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
-  const dagStr = ms => {
-    const d = new Date(ms);
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  };
+  const vandaag = () => tijdzone.datumIn();
+  const dagStr = ms => tijdzone.datumIn(new Date(ms));
   const dagenTot = datum => Math.round((new Date(datum + 'T12:00:00') - new Date(vandaag() + 'T12:00:00')) / DAG);
 
   /* ---------- de toetsplanner ---------- */

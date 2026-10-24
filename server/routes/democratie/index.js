@@ -52,5 +52,5 @@ module.exports = (app, auth, officeAuth, boardroomWie, democratie) => {
     alsLid(req, res, (k, b) => democratie.voorstellenBij(k, b.id)));
 
   require('./kantoor')({ app, officeAuth, boardroomWie, democratie, stuur });
-  require('./partij')({ app, democratie, stuur });
+  require('./partij')({ app, auth, democratie, stuur });
 };

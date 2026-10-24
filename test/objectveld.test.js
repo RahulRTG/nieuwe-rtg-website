@@ -37,64 +37,14 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const register = require(path.join(WORTEL, 'MUTATIECONTRACT.json'));
-const handlerpoorten = require(path.join(WORTEL, 'server/kern/handlerpoorten'));
+const { objectVeldVan } = require('../scripts/lib/objectveld');
 const { CONTRACTEN } = require(path.join(WORTEL, 'server/lib/mutatiecontracten'));
 
-/* De zeventien die vandaag geen objectveld hebben. Geen van alle is een bewezen
-   lek -- ze zijn ONBEPAALD, en dat is het punt: van deze routes kan niemand
-   zeggen waarop het verschil tussen twee eigenaren hangt. Ze clusteren in drie
-   families (de uitnodigingen van gezin en school, de sollicitatiekant van de
-   RTFoundation) plus twee losse.
+/* De voormalige zeventien uitzonderingen hadden al een exact handgelezen
+   objectveld in handlerpoorten. De gedeelde afleiding leest die bron nu ook.
+   Geen uitzondering blijft nodig; nieuwe gaten blijven de ratel laten falen. */
+const NOG_ZONDER = [];
 
-   GEKROMPEN OP 13 SEPTEMBER 2026: /api/foundation/kosten eraf. Die route kreeg
-   een mutatiecontract met `toegang.objectVeld: 'code'` in
-   server/lib/mutatiecontracten-afleidrest.js, en objectVeldVan() hieronder leest
-   het CONTRACT voor hij naar de bewakerskaart kijkt.
-
-   Het veld was overigens niet nieuw: handlerpoorten/buiten-routes-b.js:53
-   beschrijft deze deur al als "gezinVan(code) plus beheerderVan()". Wat ontbrak
-   was dat het REGISTER het zei -- en dat is precies wat toets 3 bedoelt met
-   "wie er een oplost, haalt hem eraf".
-
-   GEKROMPEN OP 6 OKTOBER 2026: /api/foundation/les/join,
-   /api/foundation/gezin/inloggen en /profiel/kies eraf. Hun menselijke
-   credentialcontracten noemen nu respectievelijk `lescode` en `gezinscode` als
-   objectveld; de afgeleide BLOCKED_BY_TEST_FIXTURE-regels waren geen blijvende
-   uitspraak over hun bedoeling. */
-const NOG_ZONDER = [
-  'POST /api/aanmeld/zeg',
-  'POST /api/auth/reset',
-  'POST /api/foundation/gezin/uitnodiging/accepteer',
-  'POST /api/foundation/gezin/uitnodiging/bekijk',
-  'POST /api/foundation/gezin/uitnodiging/intrek',
-  'POST /api/foundation/gezin/uitnodiging/maak',
-  'POST /api/foundation/mail/lees',
-  'POST /api/foundation/mail/stuur',
-  'POST /api/foundation/school/personeel/inlog/accepteer',
-  'POST /api/foundation/school/personeel/uitnodiging/accepteer',
-  'POST /api/foundation/school/personeel/uitnodiging/bekijk',
-  'POST /api/foundation/school/school/activeren',
-  'POST /api/rtf/apply/chat',
-  'POST /api/rtf/apply/chat/send',
-  'POST /api/rtf/solliciteer',
-  'POST /api/rtf/talent/interesse',
-  'POST /api/sso/wissel'
-];
-
-/* De vier bronnen waaruit een objectveld mag komen, in dezelfde volgorde als
-   scripts/effectcontracten.js ze leest. Twee lezers van dezelfde waarheid lopen
-   uiteen (LAT.md regel 4), dus dit hoort op termijn EEN functie te zijn; zolang
-   dat niet zo is, staat hier letterlijk dezelfde ketting. */
-function objectVeldVan(rij) {
-  const t = rij.toegang || {};
-  const uh = String(t.uitHandler || '');
-  if (uh.startsWith('object: ')) return uh.slice(8);
-  const c = CONTRACTEN[rij.route];
-  if (c && c.toegang && c.toegang.objectVeld) return c.toegang.objectVeld;
-  const viaBewaker = (t.bewakers || []).map(n => handlerpoorten.veldVanBewaker(n)).find(Boolean);
-  if (viaBewaker) return viaBewaker;
-  return handlerpoorten.veldVanPad(rij.route.replace(/^[A-Z]+ /, ''));
-}
 
 function objectRoutes() {
   return (register.rijen || []).filter(r => {
@@ -111,7 +61,7 @@ test('1. er zijn genoeg OBJECT_SCOPED-routes om iets te bewijzen', () => {
 });
 
 test('2. geen NIEUWE objectgebonden route zonder objectveld', () => {
-  const zonder = objectRoutes().filter(r => !objectVeldVan(r)).map(r => r.route).sort();
+  const zonder = objectRoutes().filter(r => !objectVeldVan(r, CONTRACTEN)).map(r => r.route).sort();
   const nieuw = zonder.filter(r => !NOG_ZONDER.includes(r));
   assert.deepEqual(nieuw, [],
     'deze objectgebonden route(s) zeggen niet welk veld het object aanwijst. Zonder dat is niet na ' +
@@ -122,7 +72,7 @@ test('2. geen NIEUWE objectgebonden route zonder objectveld', () => {
 });
 
 test('3. de lijst slijt niet: wie er een oplost, haalt hem eraf', () => {
-  const zonder = objectRoutes().filter(r => !objectVeldVan(r)).map(r => r.route);
+  const zonder = objectRoutes().filter(r => !objectVeldVan(r, CONTRACTEN)).map(r => r.route);
   const opgelost = NOG_ZONDER.filter(r => !zonder.includes(r));
   assert.deepEqual(opgelost, [],
     'deze route(s) staan nog op NOG_ZONDER maar dragen inmiddels wel een objectveld. Haal ze van ' +

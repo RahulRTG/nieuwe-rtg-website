@@ -57,6 +57,22 @@ function api(base, pad, body, token) {
    het journaal. */
 const REDEN = 'Controle van het abonnement na een vraag van het lid zelf';
 
+test('iedere bewuste zoekopdracht krijgt een eigen duurzaam inzagespoor', async () => {
+  let sporen = 0;
+  const maakInzage = require('../server/kern/ledenbalie-inzage');
+  const balie = maakInzage({
+    inzagelog: { noteerVeelVast: async () => { sporen += 1; return { ok: true }; } },
+    kort: (v, n) => String(v || '').slice(0, n), redenOf: String,
+    lidOf: () => null, geenReden: {}, geenLid: {},
+    accounts: { ledenRegisterRijen: () => [{ id: 1, key: 'user-1', codename: 'Amber', tier: 'rtg' }] },
+    steuncodeVan: () => 'STEUN', stadVan: () => 'Utrecht', aboVan: () => null,
+    klachtenVan: () => [], pasVan: () => 'RTG'
+  });
+  assert.equal((await balie.balieZoek({ codenaam: 'am', door: 'medewerker' })).ok, true);
+  assert.equal((await balie.balieZoek({ codenaam: 'am', door: 'medewerker' })).ok, true);
+  assert.equal(sporen, 2, 'een tweede bewuste lookup mag niet door een oud antwoord worden verborgen');
+});
+
 /* Twee servers: een eerlijke en een liegende, elk met een eigen datamap -- een
    opslag die schrijfacties weggooit hoort niet in de map van een andere toets
    te wroeten. */

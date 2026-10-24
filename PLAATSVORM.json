@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-12T14:05:51.520Z",
-    "commit": "6a39961d9",
+    "op": "2026-10-20T10:05:23.867Z",
+    "commit": "d14f1ae752",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 12,
     "instrument": "scripts/plaatsvorm.js",
-    "node": "v26.10.0"
+    "node": "v26.12.0"
   },
   "uitleg": "Wat verstaat RTG onder een plaats? Elke objectvorm die een plaats draagt, per domein, over drie assen: de vorm (gedeelde velden), de woordenschat (hoeveel manieren om een punt te schrijven) en de aspecten (etiket, zichtbaarheid, toestand, bewijs, termijn naast de plek). Gemeten met de lezer van scripts/objectmodel.js.",
   "graad": "vermoed",
@@ -18,7 +18,7 @@
   "eensgezind": true,
   "rondes": {
     "ruim": {
-      "vormen": 58,
+      "vormen": 59,
       "domeinen": [
         "kern/afdelingen",
         "kern/agenda-pro",
@@ -41,6 +41,7 @@
         "kern/ontmoeting",
         "kern/ov",
         "kern/overheid",
+        "kern/partnernetwerk",
         "kern/pay",
         "kern/rtfos",
         "kern/stadsweefsel",
@@ -52,7 +53,7 @@
         "school"
       ],
       "vorm": {
-        "velden": 175,
+        "velden": 176,
         "inAlleDomeinen": [],
         "inMinstensHelft": 0,
         "inEenDomeinPct": 90.3
@@ -102,7 +103,7 @@
           },
           {
             "variant": "plek",
-            "vormen": 18,
+            "vormen": 19,
             "domeinen": [
               "kern/afdelingen",
               "kern/agenda-pro",
@@ -110,6 +111,7 @@
               "kern/festival",
               "kern/hulpdienst",
               "kern/mall",
+              "kern/partnernetwerk",
               "kern/rtfos",
               "kern/veiligheid",
               "kern/vonk",
@@ -137,8 +139,8 @@
       "aspecten": [
         {
           "aspect": "etiket",
-          "vormen": 22,
-          "domeinen": 14
+          "vormen": 23,
+          "domeinen": 15
         },
         {
           "aspect": "zichtbaarheid",
@@ -152,8 +154,8 @@
         },
         {
           "aspect": "bewijs",
-          "vormen": 15,
-          "domeinen": 10
+          "vormen": 16,
+          "domeinen": 11
         },
         {
           "aspect": "termijn",
@@ -163,7 +165,7 @@
       ],
       "kaal": {
         "vormen": 24,
-        "pct": 41.4,
+        "pct": 40.7,
         "voorbeelden": [
           "server/kern/agenda-pro.js",
           "server/kern/connection-profile-media.js",
@@ -487,7 +489,15 @@
           "aspecten": []
         },
         {
-          "module": "server/kern/ov/dienst.js",
+          "module": "server/kern/ov/index.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/ov/overzicht.js",
           "domein": "kern/ov",
           "punt": [
             "lat+lng"
@@ -496,14 +506,6 @@
             "etiket",
             "bewijs"
           ]
-        },
-        {
-          "module": "server/kern/ov/index.js",
-          "domein": "kern/ov",
-          "punt": [
-            "lat+lng"
-          ],
-          "aspecten": []
         },
         {
           "module": "server/kern/ov/reizen.js",
@@ -578,6 +580,17 @@
             "locatie"
           ],
           "aspecten": []
+        },
+        {
+          "module": "server/kern/partnernetwerk.js",
+          "domein": "kern/partnernetwerk",
+          "punt": [
+            "plek"
+          ],
+          "aspecten": [
+            "etiket",
+            "bewijs"
+          ]
         },
         {
           "module": "server/kern/pay/budget.js",
@@ -931,7 +944,15 @@
           "aspecten": []
         },
         {
-          "module": "server/kern/ov/dienst.js",
+          "module": "server/kern/ov/index.js",
+          "domein": "kern/ov",
+          "punt": [
+            "lat+lng"
+          ],
+          "aspecten": []
+        },
+        {
+          "module": "server/kern/ov/overzicht.js",
           "domein": "kern/ov",
           "punt": [
             "lat+lng"
@@ -940,14 +961,6 @@
             "etiket",
             "bewijs"
           ]
-        },
-        {
-          "module": "server/kern/ov/index.js",
-          "domein": "kern/ov",
-          "punt": [
-            "lat+lng"
-          ],
-          "aspecten": []
         },
         {
           "module": "server/kern/ov/reizen.js",

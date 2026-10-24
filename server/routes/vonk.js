@@ -54,7 +54,7 @@ module.exports = (kern) => {
     stuur(res, vonkCommConsent(req.session.key, req.body || {}, req.body && req.body.capability,
       !(req.body && req.body.active === false)))));
   app.post('/api/connection/vonk/text', auth, lid('connection.message', (req, res) =>
-    stuur(res, vonkCommText(req.session.key, req.body || {}, req.body && req.body.text))));
+    stuur(res, vonkCommText(req.session.key, req.body || {}, req.body && req.body.text, req.body && req.body.idem))));
   app.post('/api/connection/vonk/message/remove', auth, lid('connection.message', (req,res) =>
     stuur(res,vonkCommRemove(req.session.key,req.body||{},req.body&&req.body.messageId))));
   app.post('/api/connection/vonk/message/report', auth, lid('connection.safety.block', (req,res) =>
@@ -92,7 +92,7 @@ module.exports = (kern) => {
   app.post('/api/vonk/betaal', auth, overgang('connection.payment.confirm', State.EVENTS.CONFIRM_PAYMENT,
     b => ({ id: String(b.id || '') }), async (req, res) => stuur(res, await vonkBetaal(req.session.key, String(req.body.id || '')))));
   app.post('/api/vonk/bericht', auth, overgang('connection.message', State.EVENTS.SEND_MESSAGE,
-    b => ({ id: String(b.id || '') }), (req, res) => stuur(res, vonkBericht(req.session.key, String(req.body.id || ''), req.body.tekst))));
+    b => ({ id: String(b.id || '') }), (req, res) => stuur(res, vonkBericht(req.session.key, String(req.body.id || ''), req.body.tekst, req.body.idem))));
   app.post('/api/vonk/mijn', auth, lid('connection.match.read', (req, res) => stuur(res, vonkMijn(req.session.key))));
   app.post('/api/vonk/halfweg', auth, overgang('connection.meet.plan', State.EVENTS.PLAN_MEET,
     b => ({ id: String(b.id || '') }), (req, res) => stuur(res, vonkHalfweg(req.session.key, String(req.body.id || '')))));

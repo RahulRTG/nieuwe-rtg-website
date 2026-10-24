@@ -139,5 +139,8 @@ module.exports = (ctx) => {
       gemeten: u.gemeten, ongemeten: u.ongemeten, rust: u.rust };
   }
 
-  return { ...k, festivalStand };
+  const publiek = { ...k, festivalStand };
+  // De collectiepoort is uitsluitend voor de samengestelde interne modules.
+  delete publiek.festivalCollectieLezen;
+  return publiek;
 };

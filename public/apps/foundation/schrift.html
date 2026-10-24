@@ -89,6 +89,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <div class="kop">
@@ -160,8 +161,8 @@ if(!CODE||!TOKEN){
 }
 RTGSchoolSession.bewaak(['rtf_leerling'],()=>{ CODE=''; TOKEN=''; RTGSchoolSession.deur({rol:'leerling'}); });
 
-async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
-async function get(p){ const r=await fetch('/api/foundation'+p,{headers:{Authorization:'Bearer '+TOKEN}}); return r.json(); }
+async function api(p,b){ const r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
+async function get(p){ const r=await fetch(p,{headers:{Authorization:'Bearer '+TOKEN}}); return r.json(); }
 
 document.querySelectorAll('.tabbar button').forEach(b=> b.addEventListener('click', ()=>{
   document.querySelectorAll('.tabbar button').forEach(x=>x.classList.remove('aan')); b.classList.add('aan');
@@ -172,7 +173,7 @@ document.querySelectorAll('.tabbar button').forEach(b=> b.addEventListener('clic
 
 const liveBord = new TekenBord($('#liveBord'), { readOnly:true, background:'#12110F' });
 function bordNietLeeg(){ $('#wacht').style.display = liveBord.leeg() ? 'flex' : 'none'; }
-get('/bord/'+CODE).then(d=>{ liveBord.setStrokes(d.strokes||[]); bordNietLeeg(); });
+get('/api/foundation/bord/'+CODE).then(d=>{ liveBord.setStrokes(d.strokes||[]); bordNietLeeg(); });
 
 $('#bewaarFoto').addEventListener('click', ()=>{
   const data = liveBord.fotoDataURL();
@@ -184,7 +185,7 @@ $('#bewaarFoto').addEventListener('click', ()=>{
 let pages = [], huidig = 0, tekenbord = null, bewaarTimer = null;
 function markDirty(){ $('#bewaard').textContent='bewaren…'; clearTimeout(bewaarTimer); bewaarTimer=setTimeout(bewaar, 900); }
 function vangHuidigeTekening(){ if(tekenbord && pages[huidig] && pages[huidig].type==='tekening') pages[huidig].strokes = tekenbord.getStrokes(); }
-async function bewaar(){ vangHuidigeTekening(); try{ await api('/schrift/opslaan',{ pages }); $('#bewaard').textContent='opgeslagen'; }catch(e){ $('#bewaard').textContent='niet opgeslagen'; } }
+async function bewaar(){ vangHuidigeTekening(); try{ await api('/api/foundation/schrift/opslaan',{ pages }); $('#bewaard').textContent='opgeslagen'; }catch(e){ $('#bewaard').textContent='niet opgeslagen'; } }
 function tekenStrip(){
   const strip=$('#pgStrip');
   strip.innerHTML = pages.map((p,i)=> '<div class="pg '+(i===huidig?'aan':'')+'" data-i="'+i+'">'+(p.type==='tekening'?'✎':p.type==='foto'?'◨':(i+1))+'</div>').join('')
@@ -218,7 +219,7 @@ function toonOpgaven(){
   box.querySelectorAll('[data-open]').forEach(b=> b.addEventListener('click', ()=>{ $('#op-'+b.dataset.open).style.display='block'; b.style.display='none'; }));
   box.querySelectorAll('[data-lever]').forEach(b=> b.addEventListener('click', async ()=>{
     const wrap=$('#op-'+b.dataset.lever); const ant=wrap.querySelector('textarea').value.trim(); if(!ant) return;
-    try{ await api('/opgave/inleveren',{ opgaveId:b.dataset.lever, antwoord:ant }); const o=opgaven.find(x=>x.id===b.dataset.lever); if(o)o.klaar=true; toonOpgaven(); pages.push({type:'tekst',titel:'Opgave',inhoud:ant}); bewaar(); }
+    try{ await api('/api/foundation/opgave/inleveren',{ opgaveId:b.dataset.lever, antwoord:ant }); const o=opgaven.find(x=>x.id===b.dataset.lever); if(o)o.klaar=true; toonOpgaven(); pages.push({type:'tekst',titel:'Opgave',inhoud:ant}); bewaar(); }
     catch(e){ alert(e.message); }
   }));
 }
@@ -236,7 +237,7 @@ async function vraagBram(){
   const t=$('#vraag').value.trim(); if(!t) return;
   gesprek.push({role:'user',content:t}); $('#vraag').value=''; toonChat();
   gesprek.push({role:'assistant',content:'…'}); toonChat();
-  try{ const d=await api('/ai',{ messages: gesprek.filter(m=>m.content!=='…'), buddy: buddyKeuze(), groep: groepVan() }); gesprek[gesprek.length-1]={role:'assistant',content:d.text}; }
+  try{ const d=await api('/api/foundation/ai',{ messages: gesprek.filter(m=>m.content!=='…'), buddy: buddyKeuze(), groep: groepVan() }); gesprek[gesprek.length-1]={role:'assistant',content:d.text}; }
   catch(e){ gesprek[gesprek.length-1]={role:'assistant',content:'Sorry, ik ben er even niet. Probeer het zo nog eens.'}; }
   toonChat();
 }
@@ -244,7 +245,7 @@ $('#stuur').addEventListener('click', vraagBram);
 $('#vraag').addEventListener('keydown', e=>{ if(e.key==='Enter') vraagBram(); });
 fetch('/api/foundation/tip').then(r=>r.json()).then(d=>{ $('#tipTxt').textContent=d.tip; }).catch(()=>{});
 
-get('/schrift/'+CODE).then(d=>{ pages=(d.schrift&&d.schrift.pages)||[]; tekenStrip(); huidigePagina(); }).catch(()=>{ tekenStrip(); });
+get('/api/foundation/schrift/'+CODE).then(d=>{ pages=(d.schrift&&d.schrift.pages)||[]; tekenStrip(); huidigePagina(); }).catch(()=>{ tekenStrip(); });
 
 /* Meenemen: het schrift is van de leerling, dus geeft de app zijn eigen
    model door -- bladzijde voor bladzijde, met de soort, de titel en de
@@ -260,7 +261,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function(){
       p.type==='tekst' ? (p.inhoud || '') : ''])
   };
 });
-get('/les/'+CODE).then(d=>{ const l=d.les||{}; $('#mVak').textContent=l.vak||'Les'; $('#mNaam').textContent=NAAM?('Schrift van '+NAAM):''; opgaven=(l.opgaven||[]).map(o=>({...o})); toonOpgaven(); toonAgenda(l.agenda||[]); });
+get('/api/foundation/les/'+CODE).then(d=>{ const l=d.les||{}; $('#mVak').textContent=l.vak||'Les'; $('#mNaam').textContent=NAAM?('Schrift van '+NAAM):''; opgaven=(l.opgaven||[]).map(o=>({...o})); toonOpgaven(); toonAgenda(l.agenda||[]); });
 toonChat();
 
 KlasLive.verbind(CODE,'leerling',TOKEN,{

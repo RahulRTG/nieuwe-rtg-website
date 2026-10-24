@@ -111,6 +111,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -264,7 +265,7 @@ const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<'
 const euro = c => (c/100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const idem = () => RTGIdem('pay');
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
-const api = (pad, body) => fetch('/api/' + pad, {
+const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) toon('vGate'); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
@@ -306,7 +307,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
 });
 
 async function ververs(){
-  const d = await api('pay/overzicht');
+  const d = await api('/api/pay/overzicht');
   STAND = d;
   toon('vPay');
   $('#pNaam').textContent = d.codenaam;
@@ -319,7 +320,7 @@ async function ververs(){
   $('#pAanMij').querySelectorAll('[data-betaal]').forEach(b => b.addEventListener('click', async () => {
     b.disabled = true;
     try {
-      const r = await api('pay/verzoek/betaal', { id: b.dataset.betaal, idem: idem() });
+      const r = await api('/api/pay/verzoek/betaal', { id: b.dataset.betaal, idem: idem() });
       meld(r.bijgeladen ? 'Betaald. Er is ' + euro(r.bijgeladen) + ' eur bijgeladen via Apple Pay.' : 'Betaald.');
       ververs();
     } catch (e) { meld(e.message); b.disabled = false; }
@@ -331,7 +332,7 @@ async function ververs(){
     (v.status==='open' ? '<button class="knop stil" data-intrek="'+v.id+'" style="padding:.3rem .8rem;font-size:.75rem;">Trek in</button>' : '')+'</div>').join('')
     : '<div class="leeg">Geen uitstaande Klompjes.</div>';
   $('#pVanMij').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
-    try { await api('pay/verzoek/intrek', { id: b.dataset.intrek }); ververs(); } catch (e) { meld(e.message); }
+    try { await api('/api/pay/verzoek/intrek', { id: b.dataset.intrek }); ververs(); } catch (e) { meld(e.message); }
   }));
   // geschiedenis
   $('#pHist').innerHTML = d.geschiedenis.length ? d.geschiedenis.map(h =>
@@ -350,7 +351,7 @@ $('#pLaad').addEventListener('click', async () => {
   const vrij = Number(String($('#pLaadVrij').value).replace(',', '.'));
   const centen = vrij > 0 ? Math.round(vrij * 100) : LAADCENTEN;
   try {
-    const r = await api('pay/oplaad', { centen, idem: idem() });
+    const r = await api('/api/pay/oplaad', { centen, idem: idem() });
     meld(euro(r.geladen) + ' eur geladen. Nieuw saldo: ' + euro(r.saldo) + ' eur.');
     ververs();
   } catch (e) { meld(e.message); }
@@ -360,7 +361,7 @@ $('#pLaad').addEventListener('click', async () => {
 const gekozen = new Set();
 async function laadVrienden(){
   try {
-    const d = await api('member/connections');
+    const d = await api('/api/member/connections');
     const namen = [...new Set((d.connections || []).map(c => c.codename || c.codenaam || c.naam).filter(Boolean))].slice(0, 12);
     $('#tVrienden').innerHTML = namen.map(n => '<button class="chip" data-vriend="'+esc(n)+'" aria-pressed="false">'+esc(n)+'</button>').join('');
     $('#tVrienden').querySelectorAll('[data-vriend]').forEach(c => c.addEventListener('click', () => {
@@ -375,7 +376,7 @@ $('#tStuur').addEventListener('click', async () => {
   const los = $('#tAan').value.split(',').map(x => x.trim()).filter(Boolean);
   const aan = [...new Set([...gekozen, ...los])];
   try {
-    const r = await api('pay/verzoek', { aan, totaalCenten: totaal, oms: $('#tOms').value, splitsMetMij: $('#tSplits').checked, idem: idem() });
+    const r = await api('/api/pay/verzoek', { aan, totaalCenten: totaal, oms: $('#tOms').value, splitsMetMij: $('#tSplits').checked, idem: idem() });
     meld('Klompje staat uit: ' + euro(r.perPersoon) + ' eur per persoon.');
     $('#tBedrag').value = ''; $('#tOms').value = ''; $('#tAan').value = '';
     gekozen.clear();
@@ -388,7 +389,7 @@ $('#tStuur').addEventListener('click', async () => {
 $('#sStuur').addEventListener('click', async () => {
   const centen = Math.round(Number(String($('#sBedrag').value).replace(',', '.')) * 100);
   try {
-    const r = await api('pay/stuur', { aan: $('#sAan').value.trim(), centen, oms: 'Gestuurd via RTG Pay', idem: idem() });
+    const r = await api('/api/pay/stuur', { aan: $('#sAan').value.trim(), centen, oms: 'Gestuurd via RTG Pay', idem: idem() });
     meld('Gestuurd.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
     $('#sAan').value = ''; $('#sBedrag').value = '';
     ververs();
@@ -400,7 +401,7 @@ let tikTimer = null;
 // het kleine sociale logboek: wie tikte wie
 async function laadTiks(){
   try {
-    const r = await api('pay/tiks', {});
+    const r = await api('/api/pay/tiks', {});
     const el = $('#pTiks');
     if (!r.tiks.length){ el.hidden = true; return; }
     el.hidden = false;
@@ -417,7 +418,7 @@ async function laadTiks(){
 }
 $('#xOntvang').addEventListener('click', async () => {
   try {
-    const r = await api('pay/tikcode', {});
+    const r = await api('/api/pay/tikcode', {});
     $('#xOntvangAan').hidden = false;
     $('#xCode').textContent = r.code;
     $('#xTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
@@ -437,7 +438,7 @@ async function tikBetaalMet(ruweCode, centen){
   const code = String(ruweCode || '').trim().toUpperCase();
   if (!code) return;
   try {
-    const r = await api('pay/tik', { code, centen, oms: $('#xOms').value.trim(), idem: idem() });
+    const r = await api('/api/pay/tik', { code, centen, oms: $('#xOms').value.trim(), idem: idem() });
     meld(euro(centen) + ' eur getikt naar ' + r.aan + '.' + (r.bijgeladen ? ' Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : ''));
     $('#xBedrag').value = ''; $('#xOms').value = '';
     ververs();
@@ -469,7 +470,7 @@ $('#xBetaal').addEventListener('click', () => {
    tonen maakt van een overzicht een archief. */
 async function verversTegoed(){
   let d;
-  try { d = await api('pay/tegoed'); } catch (e) { return; }
+  try { d = await api('/api/pay/tegoed'); } catch (e) { return; }
 
   const voor = d.voorMij || [];
   const el = $('#gVoorMij');
@@ -509,9 +510,9 @@ async function verversTegoed(){
         klaar(r); ververs(); verversTegoed();
       } catch (e) { meld(e.message); b.disabled = false; }
     }));
-    doe('[data-terug]', 'pay/tegoed/terug', {}, r => meld(euro(r.centen) + ' eur is terug op je saldo.'));
-    doe('[data-intrek]', 'pay/tegoed/terug', { intrekken: true }, r => meld('Ingetrokken: ' + euro(r.centen) + ' eur is terug op je saldo.'));
-    doe('[data-roteer]', 'pay/tegoed/roteer', {}, r => {
+    doe('[data-terug]', '/api/pay/tegoed/terug', {}, r => meld(euro(r.centen) + ' eur is terug op je saldo.'));
+    doe('[data-intrek]', '/api/pay/tegoed/terug', { intrekken: true }, r => meld('Ingetrokken: ' + euro(r.centen) + ' eur is terug op je saldo.'));
+    doe('[data-roteer]', '/api/pay/tegoed/roteer', {}, r => {
       $('#gNieuw').hidden = false;
       $('#gCode').textContent = r.tegoed.code;
       meld('Nieuwe code. De oude werkt niet meer.');
@@ -522,7 +523,7 @@ async function verversTegoed(){
 async function verzilverCode(wat, knop){
   if (knop) knop.disabled = true;
   try {
-    const r = await api('pay/tegoed/verzilver', Object.assign({ idem: idem() }, wat));
+    const r = await api('/api/pay/tegoed/verzilver', Object.assign({ idem: idem() }, wat));
     meld(euro(r.centen) + ' eur staat op je saldo.');
     $('#gIn').value = '';
     ververs(); verversTegoed();
@@ -533,7 +534,7 @@ $('#gZet').addEventListener('click', async () => {
   const centen = Math.round(Number(String($('#gBedrag').value).replace(',', '.')) * 100);
   if (!(centen > 0)) { meld('Vul een bedrag in.'); return; }
   try {
-    const r = await api('pay/tegoed/koop', {
+    const r = await api('/api/pay/tegoed/koop', {
       centen, aan: $('#gAan').value.trim(), oms: $('#gOms').value.trim(), idem: idem()
     });
     $('#gNieuw').hidden = false;
@@ -562,7 +563,7 @@ let kasTimer = null;
 $('#kMaak').addEventListener('click', async () => {
   const max = Math.round(Number(String($('#kMax').value).replace(',', '.')) * 100);
   try {
-    const r = await api('link/cap/maak', { handeling: 'geld.kassa', maxCenten: max > 0 ? max : undefined });
+    const r = await api('/api/link/cap/maak', { handeling: 'geld.kassa', maxCenten: max > 0 ? max : undefined });
     const eigen = r.eigen || {};        // de code + het maximum, alleen voor mij
     $('#kasUit').hidden = true;
     $('#kasAan').hidden = false;

@@ -37,9 +37,22 @@
   };
   w.I18N = w.I18N || {}; w.I18N.en = w.I18N.en || {};
   Object.keys(words).forEach(function (k) { w.I18N.en['desktop.' + k] = words[k][1]; });
-  function value(k) { return w.RTGi18n ? w.RTGi18n.t('desktop.' + k, words[k][0]) : words[k][0]; }
+  /* De schil spreekt de taal van de pagina. Zonder keuze van het lid zet i18n
+     de toesteltaal alleen op tekst met een sleutel; tekst zonder sleutel blijft
+     Nederlands tot het lid kiest. Een pagina zonder eigen sleutels bleef dus
+     Nederlands onder een Engelse schil (arrival.html, 19 oktober 2026). De
+     regel zelf woont in i18n.js (inhoudVolgt), naast <html lang>. */
+  function volgt() {
+    var i = w.RTGi18n;
+    return !!i && i.lang !== 'nl' && typeof i.inhoudVolgt === 'function' && i.inhoudVolgt();
+  }
+  function taal() { return volgt() ? w.RTGi18n.lang : 'nl'; }
+  function value(k) { return volgt() ? w.RTGi18n.t('desktop.' + k, words[k][0]) : words[k][0]; }
   function el(tag, cls, text) { var n = d.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function copy(n, k) { n.dataset.i18n = 'desktop.' + k; n.dataset.i18nSource = words[k][0]; n.textContent = value(k); return n; }
+  /* Een sleutel alleen waar de schil de i18n-laag volgt; anders zet i18n.apply
+     de schiltekst later alsnog in de toesteltaal. */
+  function key(n, k, source) { if (volgt()) { n.dataset.i18n = k; if (source != null) n.dataset.i18nSource = source; } return n; }
+  function copy(n, k) { key(n, 'desktop.' + k, words[k][0]); n.textContent = value(k); return n; }
   function button(k, run, cls) { var b = copy(el('button', cls), k); b.type = 'button'; b.onclick = run; return b; }
   function label(n, k) { n.setAttribute('aria-label', value(k)); return n; }
   function icon(name) {
@@ -53,5 +66,5 @@
     name = aliases[name] || name;
     n.innerHTML = '<svg viewBox="0 0 24 24">' + (icons[name] || icons.grid || '') + '</svg>'; return n;
   }
-  w.RTGDesktopUI = { el: el, copy: copy, value: value, button: button, label: label, icon: icon };
+  w.RTGDesktopUI = { el: el, copy: copy, value: value, volgt: volgt, taal: taal, key: key, button: button, label: label, icon: icon };
 })(window, document);

@@ -5,9 +5,9 @@
      gaat over tickets. */
   async function laadTickets(){
     if (!API.live) return;
-    try { tkPartners = (await API.call('/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
+    try { tkPartners = (await API.call('/api/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/tickets/mijn')).tickets || []; } catch(e){}
+    try { mijn = (await API.call('/api/tickets/mijn')).tickets || []; } catch(e){}
     const mijnEl = $('#tkMijn');
     if (mijnEl) mijnEl.innerHTML = mijn.filter(t => !t.gebruikt || t.datum >= new Date().toISOString().slice(0, 10)).map(t =>
       '<div class="card s-j84k16">'+
@@ -34,7 +34,7 @@
       '</div>').join('');
     document.querySelectorAll('[data-tktoon]').forEach(b => b.addEventListener('click', async () => {
       try {
-        const r = await API.call('/ticket/toon', { ref: b.dataset.tktoon });
+        const r = await API.call('/api/ticket/toon', { ref: b.dataset.tktoon });
         const el = document.getElementById('tkCode-' + b.dataset.tktoon);
         if (el) el.textContent = r.code;
       } catch(e){ toast(e.message); }
@@ -42,8 +42,8 @@
     document.querySelectorAll('[data-trvraag]').forEach(b => b.addEventListener('click', async () => {
       const veld = document.getElementById('trVan-' + b.dataset.trvraag);
       try {
-        const r = await API.call('/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
-        if (Number(b.dataset.trprijs) > 0) await API.call('/ride/pay', { ref: r.ride.ref });
+        const r = await API.call('/api/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
+        if (Number(b.dataset.trprijs) > 0) await API.call('/api/ride/pay', { ref: r.ride.ref });
         toast(T('tk.tr.ok','Transfer aangevraagd. U ziet hier wie u komt halen.'));
         laadTickets();
       } catch(e){ toast(e.message); }

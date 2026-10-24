@@ -106,4 +106,12 @@ function veiligeFout(e, standaard) {
   return schoongemaakt || standaard || 'Er ging iets mis.';
 }
 
-module.exports = { schoon, veiligeFout, coord, coordPaar, ledenPrijs, rondEuro, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };
+// Sorteert een kopie; afronding blijft bij de presentatie van de domeinmeting.
+function mediaan(reeks) {
+  const r = reeks.slice().sort((a, b) => a - b);
+  if (!r.length) return null;
+  const m = Math.floor(r.length / 2);
+  return r.length % 2 ? r[m] : (r[m - 1] + r[m]) / 2;
+}
+
+module.exports = { mediaan, schoon, veiligeFout, coord, coordPaar, ledenPrijs, rondEuro, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };

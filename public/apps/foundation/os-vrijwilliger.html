@@ -49,6 +49,7 @@
 <link rel="stylesheet" href="premium.css">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="foundation.os-vrijwilliger" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -56,6 +57,7 @@
   <h1>Mijn vrijwilligerswerk</h1>
 </header>
 <main id="main">
+  <div id="accountDeur"></div>
   <div class="kaart" id="deur">
     <div class="sec">Uw code</div>
     <div class="rij">
@@ -72,6 +74,7 @@
   <div id="uit"></div>
 </main>
 
+<script src="/shared/accountdeur.js"></script>
 <script>
 /* Het scherm van de vrijwilliger zelf.
 
@@ -97,11 +100,15 @@ function melding(tekst, goed) {
   const el = document.getElementById('meldingIn') || $('#melding');
   el.innerHTML = '<div class="melder ' + (goed ? 'goed' : 'fout') + '">' + esc(tekst) + '</div>';
 }
+/* Een account en de code (eigenaarsbesluit 19 oktober 2026): de code koppelt
+   het account de eerste keer aan het dossier, de deur staat in dit scherm. */
+const metAccount = () => RTGAccountDeur.eis($('#accountDeur'), { waarom: 'Uw planning bekijkt u met een RTG-account; een gratis account is genoeg. Uw code koppelt dat account aan uw dossier.' });
 const api = (pad, body) => fetch('/api/rtfos/portaal/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  method: 'POST', headers: RTGAccountDeur.kop({ 'Content-Type': 'application/json' }),
   body: JSON.stringify(Object.assign({ code: CODE }, body || {}))
 }).then(async r => {
   const d = await r.json().catch(() => ({}));
+  if (r.status === 401) RTGAccountDeur.vergeet();
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
   return d;
 });
@@ -113,6 +120,7 @@ async function open() {
     melding('Een vrijwilligerscode begint met RTFV. Vraag uw coördinator om de juiste code.', false);
     return;
   }
+  await metAccount();
   try {
     const r = await api('vrijwilliger');
     MIJ = r.vrijwilliger;

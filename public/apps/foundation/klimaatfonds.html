@@ -76,6 +76,7 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <main id="main">
@@ -145,6 +146,7 @@
 
 </main>
 
+<script src="/shared/accountdeur.js"></script>
 <script>
 /* Het Klimaatfonds: een VENSTER op het Living Lab, geen tweede lab.
 
@@ -203,15 +205,21 @@ async function werkTeken() {
   }
 }
 
-const api = (pad, body) => fetch('/api/lab2/bewoner/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+/* De buurtdeuren van het lab vragen een account of het gezinsprofiel onder het account van een ouder (eigenaarsbesluit 19 oktober 2026). */
+const lidToken = () => RTGAccountDeur.token();
+const gezin = () => { try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null') || {}; } catch (e) { return {}; } };
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: RTGAccountDeur.kop({ 'Content-Type': 'application/json' }),
+  body: JSON.stringify(Object.assign({ gezinCode: gezin().code, gezinToken: gezin().token }, body || {}))
 }).then(async r => {
   const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && lidToken()) RTGAccountDeur.vergeet();
   if (!r.ok || d.error) throw new Error(d.error || 'Er ging iets mis.');
   return d;
 });
 
 let LAB = null;
+let VRAAGSLEUTEL = null;
 
 /* De alias staat in deze browser en nergens anders: hij hoort bij het stemmen
    en niet bij een account. Kan localStorage niet (privémodus, geblokkeerd),
@@ -222,7 +230,9 @@ const STAPPEN = ['vraagstuk', 'hypothese', 'plan', 'deelnemers', 'experiment', '
 
 async function start() {
   try {
-    const r = await api('labs');
+    if (!lidToken() && !gezin().token)
+      await RTGAccountDeur.eis($('#labs'), { waarom: 'Het lab doe je met een RTG-account. Een gratis account is genoeg.' });
+    const r = await api('/api/lab2/bewoner/labs');
     /* Zonder lijst geen "Er is nog geen lab open" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
     if (!(r && Array.isArray(r.labs))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     $('#labs').innerHTML = r.labs.length
@@ -244,7 +254,7 @@ async function kiesLab(id) {
 
 async function tekenThemas() {
   try {
-    const r = await api('themas', { labId: LAB });
+    const r = await api('/api/lab2/bewoner/themas', { labId: LAB });
     const mijn = (r.themas || []).filter(t => t.soort === SOORT);
     $('#themas').innerHTML = mijn.length ? mijn.map(t =>
       '<div class="idee"><div class="vraag">' + esc(t.vraag) +
@@ -260,7 +270,7 @@ async function tekenThemas() {
         $('#alias').focus();
         return;
       }
-      try { await api('stem', { id: b.dataset.stem, alias: wie }); $('#melding').innerHTML = ''; await tekenThemas(); }
+      try { await api('/api/lab2/bewoner/stem', { id: b.dataset.stem, alias: wie }); $('#melding').innerHTML = ''; await tekenThemas(); }
       catch (e) { $('#melding').innerHTML = '<div class="melder ruimte">' + esc(e.message) + '</div>'; }
     }));
   } catch (e) { $('#themas').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
@@ -268,7 +278,7 @@ async function tekenThemas() {
 
 async function tekenStudies() {
   try {
-    const r = await api('overzicht', { labId: LAB });
+    const r = await api('/api/lab2/bewoner/overzicht', { labId: LAB });
     const mijn = (r.studies || []).filter(s => s.soort === SOORT);
     $('#studies').innerHTML = mijn.length ? mijn.map(s => {
       const i = STAPPEN.indexOf(s.stap);
@@ -294,7 +304,11 @@ $('#stuur').addEventListener('click', async () => {
   const vraag = $('#nieuwIdee').value.trim();
   if (!LAB || !vraag) return;
   try {
-    await api('thema', { labId: LAB, vraag, soort: SOORT, door: 'bewoner' });
+    /* Een herhaalsleutel per opgestelde vraag: een dubbele tik of een nieuwe
+       poging na een fout is dezelfde vraag, een aangepaste vraag een nieuwe. */
+    if (!VRAAGSLEUTEL || VRAAGSLEUTEL.inhoud !== LAB + '|' + vraag) VRAAGSLEUTEL = { inhoud: LAB + '|' + vraag, idem: RTGId('thema') };
+    await api('/api/lab2/bewoner/thema', { labId: LAB, vraag, soort: SOORT, door: 'bewoner', idem: VRAAGSLEUTEL.idem });
+    VRAAGSLEUTEL = null;
     $('#nieuwIdee').value = '';
     $('#melding').innerHTML = '';
     await tekenThemas();

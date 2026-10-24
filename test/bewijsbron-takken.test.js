@@ -13,6 +13,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const B = require('../scripts/lib/bewijsbron');
+const { paden: schermpaden } = require('../scripts/lib/schermroutepaden');
 
 const lezer = (bestanden) => (rel) => (Object.hasOwn(bestanden, rel) ? bestanden[rel] : null);
 const vers = () => ({ vers: true, reden: 'vers op abc' });
@@ -60,6 +61,23 @@ test('ingangRoutes leest SCHERMROUTES.json via de lezer, en een ontbrekende inga
   assert.deepEqual([...r.exact], ['/api/z']);
   const zonder = B.ingangRoutes('/apps/weg.html', { lees: lezer({}) });
   assert.equal(zonder.exact.size, 0);
+});
+
+test('ingangRoutes volgt een gegenereerde bundel naar zijn delen, waar SCHERMROUTES de paden toeschrijft', () => {
+  const html = '<script src="/apps/bundel.js" defer></script>';
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/bundel/deel-01.js', exact: ['/api/huis/zet'] },
+    { bestand: 'public/apps/bundel/deel-02.js', exact: ['/api/huis'] },
+    { bestand: 'public/apps/ander/deel-01.js', exact: ['/api/vreemd'] }
+  ] };
+  const bundels = new Map([['public/apps/bundel.js', 'public/apps/bundel/']]);
+  const r = B.ingangRoutes('/apps/b.html', { lees: lezer({ 'public/apps/b.html': html }), schermroutes, bundels });
+  assert.deepEqual([...r.exact].sort(), ['/api/huis', '/api/huis/zet'], 'de delen van de bundel tellen, een andere map niet');
+  /* En het echte register kent de residentie als bundel. */
+  assert.ok(B.ingangRoutes('/apps/residentie.html').exact.has('/api/residentie/suite/zet'));
+  /* Maar een schilbundel (shared/metgezel.js) brengt zijn routes niet mee: die
+     zijn van de schil, niet van het scherm. */
+  assert.ok(!B.ingangRoutes('/apps/routedossier.html').exact.has('/api/service/mens'));
 });
 
 test('gedeeld: exact of via voorvoegsel, gesorteerd', () => {
@@ -249,4 +267,96 @@ test('zonder opgegeven lezer en versheid gebruikt bewijsVoor de echte, en dat bl
   const r = B.bewijsVoor('bestaat-niet', 'waarheidsgetrouw', '/apps/app.html');
   assert.ok(['BEWEZEN', 'GEBLOKKEERD_DOOR_DEFECT', 'GEBLOKKEERD_DOOR_CONFIG', 'NIET_GETEST'].includes(r.status), r.status);
   assert.equal(r.bron.soort, 'liegronde');
+});
+
+test('een tab zonder eigen adres koppelt alleen via ingang, via en zijn eigen delen', () => {
+  /* Een tab koppelt op de routes van ZIJN delen, niet op die van de hele schil:
+     anders "bewijst" elk scenario dat iets in /apps/app.html aanroept alle tabs.
+     Ontbreekt de navigatiestap of de delen, dan is er geen ingang. */
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/app.html', exact: ['/api/schil/a', '/api/schil/b'] },
+    { bestand: 'public/apps/app-main/tab-x.js', exact: ['/api/tabx/lees', '/api/tabx/zet'] }] };
+  const vol = { ingang: '/apps/app.html', via: '#tab=x', bestanden: ['public/apps/app-main/tab-x.js'] };
+  const ing = B.ingangVan('(tab in de app, geen eigen adres)', vol, { schermroutes });
+  assert.deepEqual([...ing.exact].sort(), ['/api/tabx/lees', '/api/tabx/zet']);
+  assert.ok(!ing.exact.has('/api/schil/a'), 'de schil telt niet mee voor een tab');
+  for (const zonder of ['via', 'ingang', 'bestanden']) {
+    const c = Object.assign({}, vol); delete c[zonder];
+    assert.equal(B.ingangVan('(tab in de app, geen eigen adres)', c, { schermroutes }), null, 'zonder ' + zonder + ' geen ingang');
+  }
+  assert.equal(B.ingangVan('(tab in de app, geen eigen adres)', null, { schermroutes }), null);
+});
+
+test('een stand op een scherm koppelt op zijn eigen delen, en alleen als het scherm die laadt', () => {
+  /* /apps/geld.html laadt de delen van elke stand; zonder versmalling telt
+     Balans alle routes van het geldscherm en kan hij met zijn ene route nooit
+     koppelen. Een deel dat het scherm niet laadt, mag het contract niet noemen. */
+  const lees = (f) => f === 'public/apps/geld.html'
+    ? '<script src="/apps/geld/balans.js"></script><script src="/apps/geld/bank.js"></script>' : null;
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/geld/balans.js', exact: ['/api/balans'] },
+    { bestand: 'public/apps/geld/bank.js', exact: ['/api/bank/overzicht', '/api/bank/storten'] },
+    { bestand: 'public/apps/ander.js', exact: ['/api/ander'] }] };
+  const opt = { lees, schermroutes, bundels: new Map() };
+  const heel = B.ingangVan('/apps/geld.html#balans', null, opt);
+  assert.equal(heel.exact.size, 3, 'zonder contract telt het hele scherm');
+  const stand = B.ingangVan('/apps/geld.html#balans', { bestanden: ['public/apps/geld/balans.js'] }, opt);
+  assert.deepEqual([...stand.exact], ['/api/balans']);
+  assert.equal(B.ingangVan('/apps/geld.html#balans', { bestanden: ['public/apps/ander.js'] }, opt), null,
+    'een deel dat het scherm niet laadt geeft geen ingang');
+  const zonderContract = B.ingangVan('/apps/geld.html', {}, opt);
+  assert.equal(zonderContract.exact.size, 3, 'zonder aangewezen delen wordt er niet versmald');
+  const eigenScherm = B.ingangVan('/apps/geld.html', { bestanden: ['public/apps/geld/bank.js'] }, opt);
+  assert.equal(eigenScherm.exact.size, 2, 'ook zonder stand mag een scherm zijn eigen delen aanwijzen (niet de schil)');
+});
+
+test('schermroutes verfijnt een lokale API-helper met uitsluitend letterlijke aanroepen', () => {
+  const r = schermpaden(`
+    const api = (pad, body) => fetch('/api/member/rechterhand/' + pad, { body });
+    api('cellier');
+    await api('cellier/zet', { naam: 'Een' });
+  `);
+  assert.deepEqual(r.exact, ['/api/member/rechterhand/cellier', '/api/member/rechterhand/cellier/zet']);
+  assert.deepEqual(r.voorvoegsels, []);
+  assert.deepEqual(r.verfijndeHelpers, [{
+    naam: 'api', prefix: '/api/member/rechterhand/',
+    exactePaden: ['/api/member/rechterhand/cellier', '/api/member/rechterhand/cellier/zet']
+  }]);
+});
+
+test('schermroutes houdt het brede voorvoegsel bij een variabel argument', () => {
+  const r = schermpaden(`
+    const api = (pad, body) => fetch('/api/member/rechterhand/' + pad, { body });
+    api(gekozenPad, {});
+    api('cellier');
+  `);
+  assert.deepEqual(r.exact, []);
+  assert.deepEqual(r.voorvoegsels, ['/api/member/rechterhand/']);
+  assert.deepEqual(r.verfijndeHelpers, []);
+});
+
+test('schermroutes houdt het brede voorvoegsel wanneer de helper wordt doorgegeven', () => {
+  const r = schermpaden(`
+    const api = (pad) => fetch('/api/office/' + pad);
+    const later = api;
+    api('agenda');
+  `);
+  assert.deepEqual(r.exact, []);
+  assert.deepEqual(r.voorvoegsels, ['/api/office/']);
+});
+
+test('schermroutes vernauwt niet wanneer dezelfde prefix elders dynamisch voorkomt', () => {
+  const r = schermpaden(`
+    const api = (pad) => fetch('/api/office/' + pad);
+    api('agenda');
+    fetch('/api/office/' + willekeurig);
+  `);
+  assert.deepEqual(r.exact, ['/api/office/agenda']);
+  assert.deepEqual(r.voorvoegsels, ['/api/office/']);
+});
+
+test('schermroutes behoudt bestaande exacte, template- en queryclassificatie', () => {
+  const r = schermpaden("fetch('/api/exact'); fetch(`/api/ding/${id}`); fetch('/api/doc?file=' + naam)");
+  assert.deepEqual(r.exact, ['/api/exact']);
+  assert.deepEqual(r.voorvoegsels, ['/api/ding/', '/api/doc?file=']);
 });

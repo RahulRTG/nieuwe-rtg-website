@@ -89,7 +89,7 @@ module.exports = ({ db, crypto, rid, nu, log, rechtenVan }) => {
       annuleringsreden: a.annuleringsreden || null,
       magAntwoorden: d.gebruik === 0 && d.versie === a.versie && ['aangevraagd', 'annulering-gevraagd'].includes(a.stand) };
   }
-  function besluit(g, b) {
+  function besluit(g, b, account) {
     const { w, d, x, t } = g, a = t.externeAfspraak;
     if (!beeld(g).magAntwoorden || b.versie !== a.versie) return V.fout('Deze opdracht is gewijzigd of al beantwoord.', 409);
     if (!['bevestigen', 'weigeren'].includes(b.keuze) || !V.tekst(b.naam, 80) || !V.tekst(b.referentie, 200))
@@ -97,7 +97,7 @@ module.exports = ({ db, crypto, rid, nu, log, rechtenVan }) => {
     const annulering = a.stand === 'annulering-gevraagd';
     a.stand = b.keuze === 'bevestigen' ? (annulering ? 'geannuleerd' : 'bevestigd') : (annulering ? 'bevestigd' : 'afgewezen');
     a.antwoord = { naam: V.tekst(b.naam, 80), referentie: V.tekst(b.referentie, 200), at: nu(),
-      bron: 'leverancierslink', keuze: b.keuze, annulering, linkId: d.id };
+      bron: 'leverancierslink', keuze: b.keuze, annulering, linkId: d.id, account: account || null };
     t.geannuleerd = ['geannuleerd', 'afgewezen'].includes(a.stand);
     a.versie++; x.versie++; d.gebruik++;
     log(w, { id: 'leverancierslink:' + d.id, naam: a.antwoord.naam }, 'leveranciersopdracht-' + a.stand, t.id);

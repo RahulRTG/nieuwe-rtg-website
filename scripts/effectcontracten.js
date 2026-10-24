@@ -55,7 +55,7 @@ const { PUBLIEK } = require('./lib/publiekeroutes');
 const verklaard = new Set(Object.entries(
   require(path.join(__dirname, '..', 'server/lib/idemsleutels')).SLEUTELS)
   .filter(([, v]) => v && !v.leest).map(([k]) => k));
-const handlerpoorten = require(path.join(__dirname, '..', 'server/kern/handlerpoorten'));
+const { objectVeldVan } = require('./lib/objectveld');
 const DOEL = path.join(WORTEL, 'MUTATIECONTRACT-VOORSTEL.json');
 
 /* De routes die al een verklaring van een mens hebben, blijven onaangeroerd:
@@ -239,17 +239,7 @@ for (const r of rijen) {
     rij.waarom = waarom;
   }
   if (klasse === 'OBJECT_SCOPED') {
-    const uh = String((x.toegang && x.toegang.uitHandler) || '');
-    /* Uit de handler, of -- als de objectpoort op de ROUTER hangt -- uit
-       ROUTERPOORTEN. Dertien werkplek-routes haalden alle vier de bewijseisen en
-       strandden hier op een ontbrekend veld. */
-    /* Drie bronnen, en de derde is er sinds 4 september bij: een route uit een
-       LUS heeft geen bewaker in de routetabel, want zijn poort zit in de handler
-       van die lus. Zonder die derde stonden 31 spelroutes als "zonder
-       objectveld" terwijl ze allemaal achter rtfSpeler() hangen. */
-    const veld = uh.startsWith('object: ') ? uh.slice(8)
-      : (((x.toegang && x.toegang.bewakers) || []).map(n => handlerpoorten.veldVanBewaker(n)).find(Boolean)
-        || handlerpoorten.veldVanPad(r.pad));
+    const veld = objectVeldVan(x);
     if (!veld) { zonderDeur++; continue; }   // OBJECT_SCOPED zonder veld is geen contract
     rij.objectVeld = veld;
   }

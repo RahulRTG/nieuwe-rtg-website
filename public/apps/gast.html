@@ -13,6 +13,7 @@
      en een terugval op Date.now() zou twee snelle tikken hetzelfde (of juist een
      ander) sleutelnummer geven. -->
 <script src="/shared/id.js"></script>
+<script src="/shared/accountdeur.js"></script>
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
@@ -100,6 +101,7 @@
 <link href="/shared/rtg-eten-uitgaan-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <!-- data-ios-uit: deze pagina wil bewust GEEN OS-chroom. Ze staat wel onder
      /apps/, maar wie hem opent is meestal geen lid: je komt hier via de QR op
@@ -122,13 +124,14 @@
 <main id="main" role="main">
   <div id="melding" hidden></div>
 
+  <!-- 0. een account: de QR is een extra sleutel, geen vervanging (eigenaarsbesluit 19 oktober 2026) -->
+  <section id="vAccount"></section>
+
   <!-- 1. aanschuiven -->
   <section class="kaart" id="vAanschuif" hidden>
     <h2 id="aanschuifKop">Schuif aan</h2>
     <p class="sub" id="lopend"></p>
-    <label class="lbl" for="naam">Hoe mogen we je noemen?</label>
-    <input id="naam" maxlength="40" placeholder="Sam" autocomplete="given-name">
-    <p class="sub mt5" id="naamUitleg">Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.</p>
+    <p class="sub mt5" id="naamUitleg">Op de rekening sta je met je codenaam, zodat je tafelgenoten zien wie wat bestelde. Je echte naam blijft in je account.</p>
     <div class="rij mt8"><button class="prim" id="bAanschuif">Aanschuiven</button></div>
   </section>
 
@@ -263,10 +266,18 @@
     if (goed) setTimeout(function () { el.hidden = true; }, 4000);
   }
 
+  /* De tafel vraagt een account (eigenaarsbesluit 19 oktober 2026). Zonder
+     account maakt de gast er hier in het scherm een, gratis, en komt hij terug
+     aan dezelfde tafel. Een 401 zonder `sessie-weg` is een verlopen account:
+     dan opnieuw de deur. De tafelsleutel van een ander account weg, en opnieuw
+     aanschuiven. */
+  var DEUR = window.RTGAccountDeur;
   function api(pad, body) {
-    return fetch('/api/gast/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    return fetch('/api/gast/' + pad, { method: 'POST', headers: DEUR.kop({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body || {}) }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.status === 401 && j.code !== 'sessie-weg') { DEUR.vergeet(); start(); j._stil = true; }
+        if (j.code === 'ander-account') { SLEUTEL = null; try { localStorage.removeItem('rtg_gast_' + TOKEN); } catch (e) {} }
         /* Een fout van de server is hier ECHTE inhoud en geen technisch
            ongelukje: hij draagt de reden die de gast hoort te lezen. Daarom
            wordt hij getoond zoals hij is, en niet vervangen door "er ging iets
@@ -288,7 +299,9 @@
 
   function start() {
     if (!TOKEN) { meld('Scan de QR-code op je tafel of op je kamer om te beginnen.'); return; }
-    api('tafel', { token: TOKEN }).then(function (j) {
+    DEUR.eis($('#vAccount'), { waarom: 'Om aan te schuiven en te bestellen heb je een RTG-account nodig. Een gratis account is genoeg.' })
+      .then(function () { return api('tafel', { token: TOKEN }); }).then(function (j) {
+      if (j._stil) return;
       if (j._code === 'geen-verblijf') {
         $('#zaakSub').textContent = 'Kamer ' + (j.kamer || '');
         return meld(j._fout);
@@ -304,8 +317,8 @@
       $('#aanschuifKop').textContent = opKamer ? 'Roomservice' : 'Schuif aan';
       $('#bAanschuif').textContent = opKamer ? 'Beginnen' : 'Aanschuiven';
       $('#naamUitleg').textContent = opKamer
-        ? 'Deze naam staat op je bestelling, zodat de bediening weet wie er opendoet. Verder slaan we niets van je op.'
-        : 'Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.';
+        ? 'Op je bestelling sta je met je codenaam. De bediening weet zo van wie hij is; je echte naam blijft in je account.'
+        : 'Op de rekening sta je met je codenaam, zodat je tafelgenoten zien wie wat bestelde. Je echte naam blijft in je account.';
       $('#lopend').textContent = opKamer
         ? (j.lopendeRekening
           ? 'Er loopt al een bestelling op deze kamer met ' + j.lopendeRekening.regels + ' regel(s).'
@@ -322,7 +335,7 @@
   }
 
   $('#bAanschuif').addEventListener('click', function () {
-    api('aanschuiven', { token: TOKEN, naam: $('#naam').value }).then(function (j) {
+    api('aanschuiven', { token: TOKEN }).then(function (j) {
       if (j._fout) return meld(j._fout);
       SLEUTEL = j.sleutel;
       try { localStorage.setItem('rtg_gast_' + TOKEN, SLEUTEL); } catch (e) {}
@@ -333,6 +346,8 @@
 
   function laadRekening(eersteKeer) {
     api('rekening', { sleutel: SLEUTEL }).then(function (j) {
+      if (j._stil) return;
+      if (j._code === 'ander-account') { $('#vApp').hidden = true; $('#vAanschuif').hidden = false; return; }
       if (j._code === 'sessie-weg') {
         /* De rekening is voldaan of de zaak heeft hem gesloten. De sleutel
            weggooien en opnieuw laten aanschuiven is eerlijker dan een scherm

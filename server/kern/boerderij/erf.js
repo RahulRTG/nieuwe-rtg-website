@@ -1,5 +1,6 @@
 /* Boerderij (deelmodule): gewasfasen, publieke weergaven, de dagbriefing en het overzicht.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/boerderij.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, anthropic, schoon,
     BTYPES, GEWASSEN, DIEREN,
@@ -63,7 +64,7 @@ module.exports = (ctx) => {
     if (teLaat.length) punten.push({ soort: 'taak', urgentie: 'hoog', tekst: teLaat.length + ' taak/taken over de einddatum.' });
     else if (open.length) punten.push({ soort: 'taak', urgentie: 'laag', tekst: open.length + ' open taak/taken op het bord.' });
     // seizoensadvies: wat kun je nu zaaien?
-    const m = new Date().getMonth() + 1;
+    const m = tijdzone.maandIn();
     const nuZaaien = Object.keys(GEWASSEN).filter(k => (GEWASSEN[k].zaaiMnd || []).includes(m)).map(k => GEWASSEN[k].label);
     if (nuZaaien.length) punten.push({ soort: 'seizoen', urgentie: 'laag', tekst: 'Goede maand om te zaaien/planten: ' + nuZaaien.slice(0, 6).join(', ') + '.' });
     return { seizoen: seiz, seizoenLabel: SEIZOEN_LABEL[seiz], punten };

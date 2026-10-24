@@ -184,7 +184,7 @@ test('de lus is dicht voor een RTG Pass en voor wie geen kantoor is', async () =
   assert.equal((await roep('/office/bureau/lus/aanbod', { key: 'x', id: 'y', wat: 'x' }, r.d.token)).status, 401);
   // een gewone zaak kan zich niet via /zaak/open in de lus zetten
   const lid = await lifestyleLid();
-  const o = await roep('/member/bureau/zaak/open', { titel: 'Test', werkwijze: 'voorstel' }, lid);
+  const o = await roep('/member/bureau/zaak/open', { idem: 'zaak-fixture-187', titel: 'Test', werkwijze: 'voorstel' }, lid);
   assert.notEqual(o.d.zaak.status, 'in voorbereiding');
   assert.equal(o.d.zaak.werkwijze, undefined);
 });

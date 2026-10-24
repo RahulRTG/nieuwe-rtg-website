@@ -14,6 +14,8 @@
 const VERSIE = 5;
 const DAG = 24 * 60 * 60 * 1000;
 const DIENST_BONUS = { xp: 300, virtueelBudget: 25000, reputatie: 3 };
+/* De melding van de 18+-grens, in de woorden van Magnaat: wat er niet gebeurt en wat eraan te doen is. */
+const GEEN_OPBOUW = 'Xp, niveau en reputatie bouw je pas op als RTG je identiteitsbewijs heeft gezien en je 18 of ouder bent; het dossier zelf telt gewoon.';
 const { nu: klokNu } = require('../lib/klok');
 
 /* De eerste volledige verticale werkroute. Dit is bewust geen quiz: de speler
@@ -105,62 +107,7 @@ const WERELDGEBEURTENISSEN = [
   }
 ];
 
-const SCENARIOS = {
-  planning: {
-    titel: 'Live operatie',
-    briefing: 'Een lid heeft een wijziging in een lopende reis. Houd de keten rustig, controleer afhankelijkheden en communiceer op codenaam.',
-    stappen: [
-      { vraag: 'Waar begin je?', opties: ['Meteen alles wijzigen', 'Eerst beschikbaarheid en gevolgen controleren', 'Het dossier doorsturen zonder controle'], juist: 1, uitleg: 'Eerst controleren voorkomt dubbele boekingen en onnodige kosten.' },
-      { vraag: 'Welke gegevens gebruik je in de werkruimte?', opties: ['Alleen de codenaam en noodzakelijke reisgegevens', 'Een export met alle paspoortgegevens', 'De volledige betaalhistorie'], juist: 0, uitleg: 'Dataminimalisatie geldt ook in een spoedsituatie.' },
-      { vraag: 'Wanneer is de operatie klaar?', opties: ['Na de eerste klik', 'Als alleen de partner akkoord is', 'Na bevestiging, controle van de keten en een duidelijke terugkoppeling'], juist: 2, uitleg: 'Een sluitende keten eindigt met controle én communicatie.' }
-    ]
-  },
-  controle: {
-    titel: 'Controlekamer',
-    briefing: 'Een synthetisch dossier wijkt af van het normale patroon. Onderzoek het signaal zonder een echte betaling of identiteit te raken.',
-    stappen: [
-      { vraag: 'Wat betekent een afwijkend signaal?', opties: ['Automatisch fraude', 'Een reden om gecontroleerd te onderzoeken', 'Direct blokkeren voor iedereen'], juist: 1, uitleg: 'Een signaal is een onderzoekspunt, geen oordeel.' },
-      { vraag: 'Welke actie is in Magnaat toegestaan?', opties: ['Een echte transactie terugboeken', 'Een echte accountkluis openen', 'De trainingskopie markeren en onderbouwen'], juist: 2, uitleg: 'Magnaat blijft altijd buiten productie.' },
-      { vraag: 'Wie beslist over een echte vervolgstap?', opties: ['Een bevoegd mens via de bestaande RTG-controle', 'De speler met de hoogste score', 'De Future Engine zelfstandig'], juist: 0, uitleg: 'Geld, identiteit en productie blijven onder menselijke regie.' }
-    ]
-  },
-  gesprek: {
-    titel: 'Servicegesprek',
-    briefing: 'Een reiziger vraagt hulp via een beveiligd oefengesprek. Los de vraag menselijk op en deel niet meer gegevens dan nodig.',
-    stappen: [
-      { vraag: 'Wat is de beste eerste reactie?', opties: ['Een korte ontvangstbevestiging en één gerichte vraag', 'Een standaardtekst zonder de vraag te lezen', 'Om alle persoonsgegevens vragen'], juist: 0, uitleg: 'Een gerichte vraag geeft snelheid zonder onnodige gegevens.' },
-      { vraag: 'Waar hoort het gesprek?', opties: ['In het beveiligde RTG-kanaal', 'In een openbaar spelersprofiel', 'In de wereldranglijst'], juist: 0, uitleg: 'Service-inhoud hoort niet in publieke speldata.' },
-      { vraag: 'Hoe sluit je af?', opties: ['Zonder bevestiging', 'Met oplossing, volgende stap en duidelijk eigenaarschap', 'Door het dossier stil te verwijderen'], juist: 1, uitleg: 'De reiziger moet weten wat geregeld is en wie verder gaat.' }
-    ]
-  },
-  impact: {
-    titel: 'Impactmissie',
-    briefing: 'De RTFoundation ziet een kans om een groep beter te bereiken. Bouw een kleine proef die meetbaar, eerlijk en lokaal bruikbaar is.',
-    stappen: [
-      { vraag: 'Wat kies je eerst?', opties: ['Een concreet probleem met een bereikbare doelgroep', 'Een logo', 'Een zo groot mogelijk budget'], juist: 0, uitleg: 'Impact begint bij een duidelijk probleem en de mensen om wie het gaat.' },
-      { vraag: 'Welke meting telt het meest?', opties: ['Alleen het aantal kliks', 'Een vooraf gekozen uitkomst voor de doelgroep', 'Hoe vaak het team vergadert'], juist: 1, uitleg: 'Meet het effect dat de doelgroep daadwerkelijk merkt.' },
-      { vraag: 'Wat gebeurt na de proef?', opties: ['Altijd wereldwijd uitrollen', 'Resultaten en risico’s laten beoordelen', 'De uitkomst geheimhouden'], juist: 1, uitleg: 'De proef levert bewijs; een mens beslist over het vervolg.' }
-    ]
-  },
-  operatie: {
-    titel: 'Werkvloer onder druk',
-    briefing: 'Een RTG-partner krijgt tegelijk meer vraag, een roosterprobleem en een kwaliteitsmelding. Breng rust in de operatie.',
-    stappen: [
-      { vraag: 'Wat pak je eerst vast?', opties: ['De grootste veiligheids- of klantimpact', 'De makkelijkste taak', 'Een willekeurige melding'], juist: 0, uitleg: 'Prioriteren gebeurt op risico en impact.' },
-      { vraag: 'Hoe test je de oplossing?', opties: ['Direct bij alle zaken', 'In een afgebakende trainingssituatie met succescriteria', 'Zonder meetpunt'], juist: 1, uitleg: 'Klein en meetbaar testen beperkt schade en levert beter bewijs.' },
-      { vraag: 'Wat leg je vast?', opties: ['Besluit, reden, resultaat en eigenaar', 'Alleen de eindscore', 'Niets; het was maar een oefening'], juist: 0, uitleg: 'Een goed logboek maakt leren en verantwoorden mogelijk.' }
-    ]
-  },
-  puzzel: {
-    titel: 'Productpuzzel',
-    briefing: 'Een gebruiker loopt vast in een RTG-proces. Leg de juiste functie op het juiste moment in de keten.',
-    stappen: [
-      { vraag: 'Wat is een sterke eerste stap?', opties: ['Het gebruikersdoel vaststellen', 'Meer knoppen toevoegen', 'De fout verbergen'], juist: 0, uitleg: 'Het doel bepaalt welke functie werkelijk nodig is.' },
-      { vraag: 'Welke oplossing heeft de voorkeur?', opties: ['De kleinste veilige stap die het probleem oplost', 'De grootste mogelijke verbouwing', 'Een los proces buiten RTG'], juist: 0, uitleg: 'Klein, veilig en geïntegreerd maakt een functie beheersbaar.' },
-      { vraag: 'Wanneer is de puzzel geslaagd?', opties: ['Als de knop werkt', 'Als de taak aantoonbaar lukt en de grensgevallen zijn getest', 'Als het scherm mooi is'], juist: 1, uitleg: 'Functionaliteit omvat ook bewijs en grensgevallen.' }
-    ]
-  }
-};
+const SCENARIOS = require('./magnaatwereld/scenarios');
 
 const KANSEN = [
   {
@@ -203,8 +150,18 @@ const KANSEN = [
 
 module.exports = ({
   db, save, bewerkCollectie = null, crypto, functies,
-  partnerstudio = null, codenaamVan = null, sseToCustomer = null
+  partnerstudio = null, codenaamVan = null, sseToCustomer = null, progressieMag = null
 }) => {
+  /* DE 18+-GRENS (CLAUDE.md, server/kern/spellen/grens.js). Xp, niveau en
+     reputatie bewaren een prestatie buiten het potje, en die bestaan alleen
+     voor wie volwassen() haalt. Onder de grens is elk dossier gewoon speelbaar;
+     er wordt alleen niets van opgebouwd. Zonder bedrading faalt hij dicht. */
+  const magOpbouwen = (key) => typeof progressieMag === 'function' && progressieMag(key) === true;
+  const bouwOp = (key, p, xp, reputatie) => {
+    if (!magOpbouwen(key)) return false;
+    p.xp += xp; p.reputatie = Math.min(100, p.reputatie + reputatie);
+    return true;
+  };
   const nu = klokNu;
   const id = voor => voor + '-' + crypto.randomBytes(6).toString('hex');
   const tekst = (v, max = 300) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);
@@ -565,9 +522,8 @@ module.exports = ({
     if (!klaar || dienst.bonusOntvangen) return false;
     dienst.bonusOntvangen = true;
     dienst.afgerond = nu();
-    p.xp += DIENST_BONUS.xp;
+    bouwOp(key, p, DIENST_BONUS.xp, DIENST_BONUS.reputatie);
     p.virtueelBudget += DIENST_BONUS.virtueelBudget;
-    p.reputatie = Math.min(100, p.reputatie + DIENST_BONUS.reputatie);
     p.dienstenVoltooid = (p.dienstenVoltooid || 0) + 1;
     log('dienst-voltooid', key, dienst.datum + ' · bonus ' + DIENST_BONUS.xp + ' XP');
     return true;
@@ -692,8 +648,7 @@ module.exports = ({
   function rondTaakAf(key, p, taak) {
     taak.status = 'klaar';
     taak.voltooid = nu();
-    p.xp += taak.punten;
-    p.reputatie = Math.min(100, p.reputatie + (taak.punten >= 250 ? 2 : 1));
+    if (!bouwOp(key, p, taak.punten, taak.punten >= 250 ? 2 : 1)) taak.feedback += ' ' + GEEN_OPBOUW;
     p.virtueelBudget += taak.punten * 25;
     taak.economischEffect = economie.registreerWerk(key, taak);
     taak.feedback += ' ' + taak.economischEffect.uitleg;
@@ -738,11 +693,19 @@ module.exports = ({
     return { ok: true, goed: true, feedback: taak.feedback, taak: publiekeTaak(taak), speler: publiekeSpeler(p) };
   }
 
-  function taakAntwoord(key, taakId, keuze) {
+  function taakAntwoord(key, taakId, keuze, stapNr) {
     const p = speler(key);
     const taak = p.taken.find(t => t.id === tekst(taakId, 100));
     if (!taak) return { status: 404, error: 'Deze opdracht bestaat niet.' };
     if (taak.status !== 'bezig') return { status: 409, error: 'Deze opdracht is al afgerond.', taak: publiekeTaak(taak) };
+    /* EEN ANTWOORD HOORT BIJ EEN VRAAG. Het scherm stuurt de stap mee die het
+       toonde; komt hetzelfde antwoord terug nadat het al telde (een herhaling
+       na een afgebroken verbinding), dan was het voor de vorige vraag en niet
+       voor de volgende. Zonder deze controle beantwoordde de herhaling stil de
+       volgende vraag met dezelfde keuze (scripts/lib/voltooi/magnaat.js). */
+    if (stapNr !== undefined && stapNr !== null && Number(stapNr) !== taak.stap) {
+      return { status: 409, error: 'Dit antwoord is al verwerkt; de opdracht staat op de volgende vraag.', taak: publiekeTaak(taak) };
+    }
     const stap = taak.stappen[taak.stap];
     if (stap.soort === 'software') {
       return { status: 409, error: 'Open eerst ' + stap.schermNaam + ' in het RTG OS.', taak: publiekeTaak(taak) };
@@ -968,8 +931,9 @@ module.exports = ({
     const claim = partnerstudio.trainingClaim(key, trainingId);
     if (!claim.nieuw) return r;
     const p = speler(key), xp = claim.score * 3, virtueelBudget = claim.score * 250;
-    p.xp += xp; p.virtueelBudget += virtueelBudget; p.reputatie = Math.min(100, p.reputatie + (claim.score >= 75 ? 2 : 0));
-    r.beloning = { xp, virtueelBudget, reputatie: claim.score >= 75 ? 2 : 0 };
+    const opgebouwd = bouwOp(key, p, xp, claim.score >= 75 ? 2 : 0);
+    p.virtueelBudget += virtueelBudget;
+    r.beloning = opgebouwd ? { xp, virtueelBudget, reputatie: claim.score >= 75 ? 2 : 0 } : { xp: 0, virtueelBudget, reputatie: 0, reden: GEEN_OPBOUW };
     r.speler = publiekeSpeler(p);
     log('partnertraining-voltooid', key, claim.bedrijf.naam + ' · ' + claim.score + '%');
     save();
@@ -1019,7 +983,7 @@ module.exports = ({
     werkprocesStart, kiesKantoor, scan, beslis, kantoorStatus, wereld, catalogus,
     partnerTrainingStart, partnerTrainingAntwoord,
     teamkamerMijn: (key, id) => trainingslobbies.mijn(key, id),
-    teamkamerMaak: (key, invoer) => trainingslobbies.maak(key, invoer),
+    teamkamerMaak: (key, invoer, idem) => trainingslobbies.maak(key, invoer, idem),
     teamkamerDeelnemen: (key, code) => trainingslobbies.deelnemen(key, code),
     teamkamerCode: (key, id) => trainingslobbies.roteerCode(key, id),
     teamkamerCodeIntrek: (key, id) => trainingslobbies.intrekCode(key, id),
@@ -1027,7 +991,7 @@ module.exports = ({
     teamkamerStart: (key, id, revisie, commandoId) => trainingslobbies.start(key, id, revisie, commandoId),
     teamkamerActie: (key, id, invoer) => trainingslobbies.actie(key, id, invoer),
     teamkamerBedien: (key, id, actie, revisie, commandoId) => trainingslobbies.bedien(key, id, actie, revisie, commandoId),
-    economieBeslis: (key, invoer) => economie.beslis(key, invoer),
+    economieBeslis: (key, invoer, idem) => economie.beslis(key, invoer, idem),
     economieAnalyse: (key, invoer) => economie.analyse(key, invoer),
     economieVolgendeDag: (key, commandoId) => economie.volgendeDagAsync(key, commandoId),
     economieSchok: (key, schokId) => economie.kiesSchok(key, schokId),

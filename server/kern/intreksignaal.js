@@ -9,6 +9,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const { goedeVinger, goedeSid, geldig } = require('./intreksignaal-vorm');
 
 const KANAAL = 'rtg:intrekking:v1';
 const PREFIX = KANAAL + ':';
@@ -24,17 +25,6 @@ const wachtend = new Set();
 let outbox = null, herstelTimer = null;
 
 const vingerVanToken = token => crypto.createHash('sha256').update(String(token || '')).digest('hex');
-const goedeVinger = waarde => /^[a-f0-9]{64}$/.test(String(waarde || ''));
-const goedeSid = waarde => /^[A-Za-z0-9_-]{12}$/.test(String(waarde || ''));
-
-function geldig(bericht) {
-  if (!bericht || bericht.versie !== 1) return false;
-  if (!Number.isFinite(Number(bericht.verloopt)) || Number(bericht.verloopt) <= Date.now()) return false;
-  if (bericht.soort === 'token') return goedeVinger(bericht.waarde);
-  if (bericht.soort === 'sessie') return goedeSid(bericht.waarde);
-  return false;
-}
-
 function lever(bericht) {
   if (!geldig(bericht)) return false;
   const doel = bericht.soort === 'token' ? ingetrokkenTokens : ingetrokkenSessies;
@@ -120,6 +110,10 @@ async function bereid(rij) {
   if (!geldig(bericht)) throw new Error('ongeldige intrekking voor de outbox');
   if (outbox && typeof outbox.deel === 'function') await outbox.deel(rij);
   return true;
+}
+
+async function controleerGedeeld(token, sid) {
+  return require('./intreksignaal-gedeeld')({ outbox, token, sid, vingerVanToken, goedeSid, lever });
 }
 
 async function herhaalOutbox() {
@@ -224,5 +218,5 @@ function _wis() {
 }
 
 module.exports = { KANAAL, PREFIX, vingerVanToken, meldToken, meldVinger, meldSessie,
-  tokenIngetrokken, sessieIngetrokken, bereid, wachtDuurzaam,
+  tokenIngetrokken, sessieIngetrokken, bereid, wachtDuurzaam, controleerGedeeld,
   koppelBus, koppelOutbox, abonneer, bewaakStand, stand, _wis };

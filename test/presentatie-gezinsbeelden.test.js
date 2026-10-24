@@ -8,7 +8,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const DEUREN = ['/api/foundation/gezin/beelden', '/api/foundation/gezin/beelden/zet',
@@ -17,18 +18,27 @@ const DEUREN = ['/api/foundation/gezin/beelden', '/api/foundation/gezin/beelden/
   '/api/foundation/gezin/beelden/upklaar', '/api/foundation/gezin/beelden/upload'];
 
 let srv;
-test.before(async () => { srv = await startServer({ env: { RTG_DEMO: '0', RTG_AI_UIT: '1', SMTP_URL: '' } }); });
+/* De accountplicht staat AAN: buiten de demo bestaat een anoniem gezin niet meer
+   (eigenaarsbesluit 19 oktober 2026). Het gezin hangt hier dus aan een gratis
+   account van een ouder; de demo is er alleen om die ouder door een kantoormens
+   op naam te laten keuren, wat een kind in het gezin vraagt. */
+test.before(async () => { srv = await startServer({ env: { RTG_MAGNAAT_TEST: '1', RTF_GEZIN_ACCOUNTPLICHT: '1', RTG_AI_UIT: '1', SMTP_URL: '' } }); });
 test.after(async () => { if (srv) await stop(srv.child); });
 
-async function post(pad, body) {
-  const r = await fetch(srv.base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+async function post(pad, body, tok) {
+  const r = await fetch(srv.base + pad, { method: 'POST', body: JSON.stringify(body || {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}) });
   let j = null; try { j = await r.json(); } catch (_) { /* geen json */ }
   return { status: r.status, body: j };
 }
 async function profiel(naam) {
-  const f = (await post('/api/foundation/gezin/maak', { gezinsnaam: naam, naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true })).body;
-  const c = (await post('/api/foundation/gezin/profiel/maak', { code: f.code, token: f.token, naam: 'Kind', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' })).body;
-  const k = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: f.gezinscode, profielId: c.profiel.id, pin: '5678' })).body;
+  const ouder = await registreerGratis(srv.base);
+  assert.ok(ouder, 'een gratis account van de ouder');
+  await keurLidGoed(srv.base, ouder.token, ouder.codenaam);
+  const f = (await post('/api/rtf/eigen-gezin/maak', { gezinsnaam: naam, naam: 'Ouder', bevoegdGezin: true, privacyAkkoord: true }, ouder.token)).body;
+  const c = (await post('/api/rtf/eigen-gezin/kind', { naam: 'Kind', geboortedatum: '2015-04-04' }, ouder.token)).body;
+  const k = (await post('/api/rtf/eigen-gezin/sessie', { profielId: c.profiel.id }, ouder.token)).body;
+  assert.ok(k.token, 'het kind komt binnen via het account van de ouder');
   return { code: f.code, token: k.token };
 }
 

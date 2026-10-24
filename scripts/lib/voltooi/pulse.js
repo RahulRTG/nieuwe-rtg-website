@@ -64,7 +64,7 @@ async function loop(w, stap) {
       ziet: 'reactie ' + r.status + ', plank ' + plank.length + ', bij A: ' + (bijA ? bijA.reacties.length + ' reactie(s), ' + bijA.likes + ' waardering' : 'WEG') };
   });
 
-  await stap('voltooibaar', 'een bericht dat niet bestaat is niet te waarderen; en B kan het bericht van A niet weghalen', async () => {
+  await stap('bevoegd', 'een bericht dat niet bestaat is niet te waarderen; en B kan het bericht van A niet weghalen', async () => {
     const spook = await w.post(LIKE, { id: 'bestaat-niet-' + merk }, B.token);
     const vreemd = await w.post(WEG, { id: post.id }, B.token);
     const nog = await vind(A.token, 'volgend', post.id);

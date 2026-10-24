@@ -7,24 +7,33 @@ module.exports = (sctx) => {
      een gezinsvriend die hem mag zien, ziet hem; anders nietBeschikbaar. */
   const metPosts = (s, berichten) => (berichten || []).map(m => m.post
     ? Object.assign({}, m, { post: dmPost().voorLezer(rtfOnbSess(s), m.post) }) : m);
-  const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
+  const { app, express, db, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
           socialDm, socialDmSend, socialGoedkeur, socialIntrek, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
           verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;
 /* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
    maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
    contract (geen paspoort; dat is voor de reispas). */
-app.post('/api/rtf/onboarding/status', (req, res) => {
+async function actueleOnboarding(req, res, next) {
+  try {
+    if (typeof db.verversVerzoekCollectie === 'function') await db.verversVerzoekCollectie('foundation');
+    else if (process.env.DATABASE_URL || process.env.PG_URL) throw new Error('Geen actuele gedeelde gezinsstand');
+    next();
+  } catch (_) {
+    res.status(503).json({ error: 'De gezinssessie kan nu niet veilig worden gecontroleerd. Probeer het opnieuw.' });
+  }
+}
+app.post('/api/rtf/onboarding/status', actueleOnboarding, (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   res.json(onboarding.status('rtg', rtfOnbSess(s)));
 });
-app.post('/api/rtf/onboarding/opslaan', express.json({ limit: '256kb' }), (req, res) => {
+app.post('/api/rtf/onboarding/opslaan', express.json({ limit: '256kb' }), actueleOnboarding, (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   res.json(onboarding.slaOp('rtg', rtfOnbSess(s), req.body.velden || {}));
 });
-app.post('/api/rtf/onboarding/teken', (req, res) => {
+app.post('/api/rtf/onboarding/teken', actueleOnboarding, async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = onboarding.teken('rtg', rtfOnbSess(s), req.body.naam, req.body.akkoord === true);
-  if (r.error) return res.status(r.status).json({ error: r.error });
+  const r = await onboarding.tekenGezinVast(req.body.code, req.body.token, req.body.naam, req.body.akkoord === true, req.body.expectedVersion);
+  if (r.error) return res.status(r.status).json({ error: r.error, ...(r.code ? { code: r.code } : {}) });
   res.json(r);
 });
 // Beschermd profiel (15 of jonger): zoeken en zelf verzoeken sturen staat dicht;
@@ -98,7 +107,7 @@ app.post('/api/rtf/social/dm', (req, res) => {
 });
 app.post('/api/rtf/social/dm/send', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
-  const r = socialDmSend(s.handle, String(req.body.toKey || ''), req.body.text);
+  const r = socialDmSend(s.handle, String(req.body.toKey || ''), req.body.text, req.body.idem);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, messages: metPosts(s, r.messages) });
 });

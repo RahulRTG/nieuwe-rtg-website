@@ -77,7 +77,8 @@ test('Klimaatfonds: een te korte vraag weigert met reden, een vraag komt in het 
       const LAB = lab.body.lab.id;
       /* Een vraag van een ANDERE soort in hetzelfde lab: die hoort hier niet in
          beeld, en wel in het antwoord van de server. */
-      const fiets = await post('/api/lab2/bewoner/thema', { labId: LAB, vraag: FIETSVRAAG, soort: 'mobiliteit' });
+      const fietser = await lid('Buurman Fietser');
+      const fiets = await post('/api/lab2/bewoner/thema', { labId: LAB, vraag: FIETSVRAAG, soort: 'mobiliteit' }, fietser.token);
       assert.equal(fiets.status, 200, JSON.stringify(fiets.body).slice(0, 160));
       assert.equal(fiets.body.thema.soort, 'mobiliteit');
 
@@ -109,13 +110,15 @@ test('Klimaatfonds: een te korte vraag weigert met reden, een vraag komt in het 
 
       browser = await pw.chromium.launch(browserOpties(pw));
 
-      /* 5a. Zonder ledensessie: het venster werkt, de werklijst vraagt om inloggen. */
+      /* 5a. Zonder ledensessie: het lab vraagt een account (eigenaarsbesluit 19
+         oktober 2026), de deur staat in het scherm zelf en er komt geen lab en
+         geen project in beeld. */
       const gast = await browser.newContext({ viewport: { width: 900, height: 1000 } });
       await gast.addInitScript(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_lang', 'nl'); });
       const zonder = await gast.newPage();
       await zonder.goto(base + SCHERM, { waitUntil: 'domcontentloaded' });
-      await zonder.waitForSelector('#labs [data-lab]', { state: 'visible', timeout: 20000 });
-      await zonder.locator('#labs [data-lab="' + LAB + '"]').click();
+      await wachtOpTekst(zonder, /Het lab doe je met een RTG-account/, { in: '#labs' });
+      assert.equal(await zonder.locator('#labs [data-lab]').count(), 0, 'zonder account stond er toch een lab in beeld');
       await wachtOpTekst(zonder, /Log in met je eigen RTG-account/, { in: '#werklijst' });
       assert.ok(!(await tekstVan(zonder, '#werklijst')).includes('Groene daken'), 'zonder sessie stond het project toch in de werklijst');
       await gast.close();
@@ -143,7 +146,7 @@ test('Klimaatfonds: een te korte vraag weigert met reden, een vraag komt in het 
 
       /* 3. Het filter is een beeld: de fietsvraag staat er niet, en wel op de server. */
       assert.ok(!(await tekstVan(page, '#themas')).includes('fiets'), 'een vraag over mobiliteit stond in het klimaatvenster');
-      const opServer = await post('/api/lab2/bewoner/themas', { labId: LAB });
+      const opServer = await post('/api/lab2/bewoner/themas', { labId: LAB }, bewoner.token);
       assert.ok((opServer.body.themas || []).some((t) => t.vraag === FIETSVRAAG), 'de fietsvraag staat niet op de server; dan zegt het filter hierboven niets');
 
       /* 1. Een te korte vraag: geweigerd met de zin van de server. */
@@ -165,7 +168,7 @@ test('Klimaatfonds: een te korte vraag weigert met reden, een vraag komt in het 
       assert.equal(await page.locator('#themas [data-stem]').count(), 1, 'het venster toont niet precies de ene duurzaamheidsvraag');
       assert.equal(await tekstVan(page, '#themas [data-stem] b'), '0');
       assert.match(await tekstVan(page, '#themas'), /nog geen onderzoek/);
-      const naAandragen = await post('/api/lab2/bewoner/themas', { labId: LAB });
+      const naAandragen = await post('/api/lab2/bewoner/themas', { labId: LAB }, bewoner.token);
       const thema = (naAandragen.body.themas || []).find((t) => t.vraag === VRAAG);
       assert.ok(thema, 'de vraag staat niet in het lab op de server');
       assert.equal(thema.soort, 'duurzaam', 'het venster droeg zijn soort niet mee');
@@ -195,7 +198,7 @@ test('Klimaatfonds: een te korte vraag weigert met reden, een vraag komt in het 
       assert.equal((await stem2).status(), 409, 'een tweede stem van dezelfde alias kwam erdoor');
       await wachtOpTekst(page, /al op dit thema gestemd/, { in: '#melding' });
       assert.equal(await tekstVan(page, '#themas [data-stem] b'), '1', 'de tweede stem van dezelfde alias telde mee');
-      const geteld = (await post('/api/lab2/bewoner/themas', { labId: LAB })).body.themas.find((t) => t.id === thema.id);
+      const geteld = (await post('/api/lab2/bewoner/themas', { labId: LAB }, bewoner.token)).body.themas.find((t) => t.id === thema.id);
       assert.equal(geteld.stemmen, 1, 'de server telde de tweede stem wel');
 
       /* 5b. Het werk dat eruit voortkomt, met sessie. */

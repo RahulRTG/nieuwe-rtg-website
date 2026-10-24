@@ -16,7 +16,14 @@
 const WEG = '(verwijderd)';
 const OP_VERZOEK = '(op verzoek verwijderd)';
 
-module.exports = function maakAnoniem({ db, accounts, spelVergeet }) {
+module.exports = function maakAnoniem({ db, accounts, spelVergeet,
+  controleerAanmeldingOntvangsten, redigeerAanmeldingOntvangsten }) {
+  function controleerRedactie() {
+    if (!Object.hasOwn(db.data, 'aanmeldingOntvangsten')) return;
+    if (typeof controleerAanmeldingOntvangsten !== 'function' || typeof redigeerAanmeldingOntvangsten !== 'function')
+      throw Error('Aanmeldingontvangsten hebben geen redactiepoort.');
+    controleerAanmeldingOntvangsten();
+  }
   /* De reacties van dit lid onder posts van ANDEREN: dat is de draad van iemand
      anders. Daar gaat alleen de persoon uit, niet het gesprek. `cn` vangt de
      oudere vorm op, waarin een reactie alleen een codenaam droeg en geen
@@ -56,12 +63,21 @@ module.exports = function maakAnoniem({ db, accounts, spelVergeet }) {
      en wanneer), want dat is haar eigen administratie van een menselijke
      beslissing. De AANVRAGER gaat eruit, net als bij sollicitaties. */
   function aanmeldingen(key, cn, sessie) {
+    const aanvraagIds = [];
     for (const a of db.data.aanmeldingen || []) {
       const raakt = (a.userId != null && key === 'user-' + a.userId) ||
+        (a.accountId != null && key === 'user-' + a.accountId) ||
         (cn && a.codenaam === cn) || (a.contact && sessie.account &&
           String(a.contact).toLowerCase() === String(accounts.emailOf(sessie.account) || '').toLowerCase());
-      if (raakt) { a.naam = OP_VERZOEK; a.contact = ''; a.codenaam = null; a.userId = null; }
+      if (raakt) {
+        aanvraagIds.push(a.id);
+        a.naam = OP_VERZOEK; a.contact = ''; a.codenaam = null; a.userId = null; a.accountId = null;
+      }
     }
+    if (typeof redigeerAanmeldingOntvangsten === 'function')
+      redigeerAanmeldingOntvangsten({ accountId: sessie.account && sessie.account.id, aanvraagIds });
+    else if (Object.hasOwn(db.data, 'aanmeldingOntvangsten'))
+      throw Error('Aanmeldingontvangsten hebben geen redactiepoort.');
   }
 
   /* Cadeaukaarten zijn een geval apart: daar zit geld in dat de zaak nog moet
@@ -131,6 +147,7 @@ module.exports = function maakAnoniem({ db, accounts, spelVergeet }) {
 
   // Alles in een keer, in de volgorde waarin ../vergeten.js het deed.
   function anonimiseer(key, cn, sessie) {
+    controleerRedactie();
     reacties(key, cn);
     sollicitaties(key);
     contactboek(cn);
@@ -142,5 +159,5 @@ module.exports = function maakAnoniem({ db, accounts, spelVergeet }) {
     speluitslagen(key);  // en dan pas anonimiseren
   }
 
-  return { anonimiseer };
+  return { anonimiseer, controleerRedactie };
 };

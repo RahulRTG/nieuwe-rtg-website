@@ -53,7 +53,7 @@ async function loop(w, stap) {
     return { klopt: r.status === 200 && !!m && m.status === 'open' && m.van === 'u', ziet: 'plaatsen ' + r.status + ', ' + (m && m.statusLabel) };
   });
 
-  await stap('voltooibaar', 'het restaurant op Ibiza ziet de vraag op codenaam; een bar ziet hem niet en mag niet reageren', async () => {
+  await stap('bevoegd', 'het restaurant op Ibiza ziet de vraag op codenaam; een bar ziet hem niet en mag niet reageren', async () => {
     Z = await zaakSessie(w, RESTAURANT);
     const z = await bijZaak();
     const B = await zaakSessie(w, BAR);

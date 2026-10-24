@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-19T15:37:11.501Z",
-  "commit": "6b86ac0d",
+  "op": "2026-10-22T18:13:28.488Z",
+  "commit": "cebe17ca76",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 6,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.0"
+  "node": "v26.12.0"
  },
  "gemeten": {
-  "artefacten": 395,
+  "artefacten": 396,
   "bron": 57,
-  "afgeleid": 207,
+  "afgeleid": 208,
   "fragmenten": 28,
   "momentopname": 1,
   "onbeslist": 102,
   "afgeleidZonderEigenaar": 0,
-  "metEigenaar": 236,
-  "afgeleidEigenaarHard": 207,
-  "afgeleidGrendelt": 69,
-  "metStempel": 131,
+  "metEigenaar": 237,
+  "afgeleidEigenaarHard": 208,
+  "afgeleidGrendelt": 70,
+  "metStempel": 132,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -205,6 +205,18 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "APPWERKT-RAAKVLAK.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/appwerkt.js",
+   "graad": "stempel",
+   "schrijvers": [],
+   "stempelInstrument": "scripts/appwerkt.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

@@ -34,7 +34,7 @@ module.exports = (ctx) => {
   function dienstVervalt(code, staffId, melding) {
     const s = findSupplier(code);
     if (!s || !isBeveiliging(s) || !melding || !melding.van) return 0;
-    const van = melding.van > vandaag() ? melding.van : vandaag();
+    const van = melding.van > vandaag(s) ? melding.van : vandaag(s);
     const tot = melding.tot || plusDagen(van, VOORUIT_DAGEN);
     const gid = Number(staffId);
     const geraakt = diensten().filter(d => d.supplierCode === s.code && d.guardId === gid && d.status === 'gepland' &&

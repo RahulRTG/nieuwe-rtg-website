@@ -80,7 +80,7 @@ module.exports = (ctx) => {
     const v = lijst().find(x => x.id === vid && x.supplierCode === supplier.code);
     if (!v) return { status: 404, error: 'Verblijf niet gevonden.' };
     if (v.status !== 'bevestigd') return { status: 409, error: 'Alleen een bevestigd verblijf kan een no-show zijn.' };
-    if (v.aankomst > vandaag()) return { status: 409, error: 'De aankomstdag is nog niet geweest.' };
+    if (v.aankomst > vandaag(supplier)) return { status: 409, error: 'De aankomstdag is nog niet geweest.' };
     v.status = 'no-show';
     save();
     sseToSupplier(supplier.code, 'sync', { scope: 'receptie' });
@@ -103,7 +103,8 @@ module.exports = (ctx) => {
   /* De kamerkalender: wie zit waar, welke nachten, ook vooruit. */
   function kamerplanning(supplier, dagenIn) {
     const n = Math.max(7, Math.min(30, parseInt(dagenIn, 10) || 14));
-    const dagen = [...Array(n)].map((_, i) => new Date(Date.now() + i * 86400000).toISOString().slice(0, 10));
+    const start = vandaag(supplier); // de nachten van het hotel, in zijn eigen zone
+    const dagen = [...Array(n)].map((_, i) => require('../tijdzone').plusDagen(start, i));
     const van = lijst().filter(v => v.supplierCode === supplier.code && ['bevestigd', 'ingecheckt'].includes(v.status));
     const kamers = (supplier.rooms || []).map(r => ({
       id: r.id, name: r.name,
@@ -117,7 +118,7 @@ module.exports = (ctx) => {
 
   /* Het receptiebord: vandaag in een oogopslag. */
   function receptie(supplier, datumIn) {
-    const datum = isDatum(datumIn) ? datumIn : vandaag();
+    const datum = isDatum(datumIn) ? datumIn : vandaag(supplier);
     const van = lijst().filter(v => v.supplierCode === supplier.code);
     const kas = db.data.posSales[supplier.code] || [];
     const openVan = naam => {

@@ -25,6 +25,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
+// de codeportalen vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per server
+require('./portaalaccount').zetPortaalAccount();
 
 let srv, BASE, LAND;
 const P = {};

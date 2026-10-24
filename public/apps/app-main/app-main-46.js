@@ -68,7 +68,7 @@
       const v = dpLees(); if (!v) return;
       ov.remove();
       payWithFaceId(eur(v.bedrag), async () => {
-        const d = await API.call('/betaal/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, bron: opts.bron || 'app', idem });
+        const d = await API.call('/api/betaal/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, bron: opts.bron || 'app', idem });
         return d.betaling;
       }, { message: b => T('dp.betaald','Betaald aan') + ' ' + name + ': ' + eur((b.bedrag||0)/100), after: () => { if (opts.after) opts.after(); } });
     });
@@ -78,15 +78,15 @@
       ov.remove();
       openMuntSheet({
         euro: v.bedrag, titel: name,
-        maak: async (munt) => (await API.call('/munt/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, munt })).verzoek,
-        klaar: async () => { const mine = (await API.call('/betaal/mijn')).betalingen || []; return mine.some(p => p.betaalwijze === 'munt' && p.supplierCode === code && Math.round(p.bedrag) === Math.round(v.bedrag * 100)); }
+        maak: async (munt) => (await API.call('/api/munt/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, munt })).verzoek,
+        klaar: async () => { const mine = (await API.call('/api/betaal/mijn')).betalingen || []; return mine.some(p => p.betaalwijze === 'munt' && p.supplierCode === code && Math.round(p.bedrag) === Math.round(v.bedrag * 100)); }
       });
     });
   }
   // Een betaalverzoek van een partner met Face ID afrekenen.
   function betaalVerzoekPay(v){
     payWithFaceId(eur((v.bedrag||0)/100), async () => {
-      const d = await API.call('/betaal/verzoek/pay', { ref: v.ref, idem: 'bv-' + v.ref });
+      const d = await API.call('/api/betaal/verzoek/pay', { ref: v.ref, idem: 'bv-' + v.ref });
       return d.betaling;
     }, { message: () => T('dp.verzoekbetaald','Betaalverzoek voldaan:') + ' ' + eur((v.bedrag||0)/100), after: () => { laadBetaalVerzoeken(); renderHome(); } });
   }
@@ -94,7 +94,7 @@
   let betaalVerzoeken = [];
   async function laadBetaalVerzoeken(){
     if (!user || user.tier === 'guest') { betaalVerzoeken = []; return; }
-    try { betaalVerzoeken = (await API.call('/betaal/verzoeken', {})).verzoeken || []; } catch(e){ betaalVerzoeken = []; }
+    try { betaalVerzoeken = (await API.call('/api/betaal/verzoeken', {})).verzoeken || []; } catch(e){ betaalVerzoeken = []; }
   }
 
   function renderPay(){

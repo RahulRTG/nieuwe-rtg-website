@@ -9,7 +9,7 @@
    eigen app. De echte actie (afrekenen, inchecken) blijft in de bestaande
    routes; dit levert alleen de geverifieerde soort + code terug. */
 module.exports = (kern) => {
-  const { app, express, resolveSession, sessionFor, dyncode } = kern;
+  const { app, express, resolveSession, sessionFor, dyncode, betaalcode, codenaamVan } = kern;
 
   /* Een geldige app-sessie: een lid (account/demo-pas) of een zaak-/personeels-
      /kantoorsessie. Stond hier als eigen functie tot er een tweede deur kwam die
@@ -27,19 +27,29 @@ module.exports = (kern) => {
     office: ['tafel', 'entree', 'deur', 'kas', 'pas', 'zegel']
   };
 
-  app.post('/api/code/dyn', express.json({ limit: '4kb' }), (req, res) => {
+  app.post('/api/code/dyn', express.json({ limit: '4kb' }), async (req, res) => {
     const sess = appSessie(req);
     if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
     const soort = String(req.body && req.body.soort || '').toLowerCase();
     const mag = MAG[sess.soort] || [];
     if (!mag.includes(soort)) return res.status(403).json({ error: 'Deze codesoort mag u niet maken.' });
     try {
-      const c = dyncode.maak({ soort, code: req.body.code, ttlMs: req.body.ttlMs });
+      /* DE PAS VAN EEN LID IS PERSOONLIJK, en draagt daarom geen naam maar een
+         ondoorzichtige verwijzing die alleen de server kent (kern/betaalcode.js).
+         Wat de client als `code` meestuurt, telt hier niet. */
+      let code = req.body.code;
+      if (soort === 'pas' && sess.soort === 'lid') {
+        const ttl = Math.min(300000, Math.max(1000, Number(req.body.ttlMs) || dyncode.DEFAULT_TTL));
+        const g = await betaalcode.geef(sess.key ? codenaamVan(sess.key) : null, Date.now() + ttl);
+        if (g.error) return res.status(g.status || 400).json({ error: g.error });
+        code = g.ref;
+      }
+      const c = dyncode.maak({ soort, code, ttlMs: req.body.ttlMs });
       res.json({ token: c.token, soort: c.soort, exp: c.exp, ttlMs: c.ttlMs });
     } catch (e) { res.status(400).json({ error: 'Kon de code niet maken.' }); }
   });
 
-  app.post('/api/code/scan', express.json({ limit: '4kb' }), (req, res) => {
+  app.post('/api/code/scan', express.json({ limit: '4kb' }), async (req, res) => {
     const sess = appSessie(req);
     if (!sess) return res.status(401).json({ error: 'Niet ingelogd.' });
     const r = dyncode.lees(req.body && req.body.token);
@@ -48,6 +58,15 @@ module.exports = (kern) => {
       return res.status(status).json({ ok: false, reden: r.reden,
         error: r.reden === 'verlopen' ? 'Deze code is verlopen. Laat een verse code tonen.'
              : 'Dit is geen geldige RTG-code.' });
+    }
+    /* Een pas: een kassa (zaak, personeel, kantoor) krijgt de codenaam om af te
+       rekenen en verbruikt de code -- eenmalig. Een lid krijgt niets
+       persoonlijks en verbruikt niets. */
+    if (r.soort === 'pas') {
+      const kassa = sess.soort !== 'lid';
+      const v = kassa ? await betaalcode.verbruik(r.code, sess.soort + ':' + (sess.code || '')) : betaalcode.lees(r.code);
+      if (!v.ok) return res.status(v.status || 422).json({ ok: false, error: v.error });
+      return res.json(Object.assign({ ok: true, soort: r.soort, code: r.code, exp: r.exp }, kassa ? { codenaam: v.codenaam } : {}));
     }
     res.json({ ok: true, soort: r.soort, code: r.code, exp: r.exp });
   });

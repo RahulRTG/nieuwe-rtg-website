@@ -1,0 +1,14 @@
+/* De bestaande accountdeur; gedrag en autorisatie blijven in hun eigen laag. */
+@layer rtg.component {
+  .ds-accountdeur { font-family: var(--ds-letter-tekst); color: var(--ds-inkt); border-block-start: 1px solid var(--ds-lijnkleur); padding-block: var(--ds-ruimte-6); max-inline-size: 26rem; }
+  .ds-accountdeur h2 { font-family: var(--ds-letter-display); font-weight: 500; margin-block: 0 var(--ds-ruimte-2); }
+  .ds-accountdeur p { margin-block: 0 var(--ds-ruimte-4); line-height: 1.5; }
+  .ds-accountdeur label { display: block; margin-block: var(--ds-ruimte-3) var(--ds-ruimte-1); }
+  .ds-accountdeur input { inline-size: 100%; box-sizing: border-box; padding: var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); font: inherit; background: var(--ds-oppervlak); color: var(--ds-inkt); min-block-size: var(--ds-doel); }
+  .ds-accountdeur button { font: inherit; padding: var(--ds-ruimte-3) var(--ds-ruimte-4); margin-block-start: var(--ds-ruimte-4); margin-inline-end: var(--ds-ruimte-2); min-block-size: var(--ds-doel); border: 1px solid var(--ds-accent); cursor: pointer; background: var(--ds-oppervlak); color: var(--ds-accent); }
+  .ds-accountdeur button.hoofd { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-accountdeur button.hoofd:hover { background: var(--ds-accent-hover); }
+  .ds-accountdeur .wissel { background: none; border: 0; text-decoration: underline; color: inherit; }
+  .ds-accountdeur [role=status] { min-block-size: 1.5em; margin-block-start: var(--ds-ruimte-3); }
+  .ds-accountdeur :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+}

@@ -2827,3 +2827,14 @@ test('DE TEGENPROEF: een BRUIKBARE lezer laat de meter gewoon meten', () => {
 });
 
 module.exports = { IJKINGEN };
+
+test('gedeelde rolcontracten weigeren crashes, afwijkende inhoud en onbekende routes', () => {
+  const rol = require('../scripts/rolronde.js');
+      const openbaar = { status: 200, data: { key: 'publieke-sleutel' } };
+      assert.equal(rol.gedeeldAntwoordGeldig('GET /api/push/key', openbaar, openbaar), true);
+      assert.equal(rol.gedeeldAntwoordGeldig('GET /api/push/key', openbaar,
+        { status: 200, data: { key: 'publieke-sleutel', privateKey: 'geheim' } }), false);
+      for (const status of [0, 401, 403, 500, 503])
+        assert.equal(rol.gedeeldAntwoordGeldig('GET /api/push/key', openbaar, { status, data: openbaar.data }), false);
+      assert.equal(rol.gedeeldAntwoordGeldig('POST /api/member/geheim', openbaar, openbaar), false);
+});

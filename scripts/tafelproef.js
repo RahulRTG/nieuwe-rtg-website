@@ -43,6 +43,7 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+const { registreerGratis } = require('./lib/gratisaccount');
 /* Het volle stempel (commit + boomVuil + instrument) en niet een kale datum:
    APPWERKT.json leest deze proef als bewijsbron, en zonder waartegen-is-dit-
    gemeten kan versheid() niet zeggen of het bewijs nog bij deze code hoort. */
@@ -70,8 +71,17 @@ function schakel(nr, van, naar, wat, opts) {
   return Object.assign({ nr, van, naar, wat }, opts);
 }
 
+/* De gast aan tafel heeft een account (eigenaarsbesluit 19 oktober 2026): de
+   QR is een extra sleutel bij een gratis account, nooit een vervanging. Elke
+   /api/gast-aanroep zonder eigen token reist daarom met dat account mee. */
+async function gastP(basis) {
+  const lid = await registreerGratis(basis);
+  if (!lid) throw new Error('geen gratis account voor de gast aan tafel');
+  return (pad, lijf, tok) => post(basis, pad, lijf, tok === undefined && pad.startsWith('/api/gast/') ? lid.token : tok);
+}
+
 async function loop(basis, uit) {
-  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  const P = await gastP(basis);
   const stap = async (s, doe, zien) => {
     const t0 = Date.now();
     let r, gezien = null, fout = null;
@@ -293,7 +303,7 @@ async function loop(basis, uit) {
    storing noemt WAT hij belooft; komt het antwoord niet overeen, dan is de
    uitslag `gebroken` en zakt de proef. ---- */
 async function storingen(basis, uit) {
-  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  const P = await gastP(basis);
   const S = (await P('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;
   const item = (await P('/api/supplier/horeca/kaart', {}, S)).data.groepen[0].items[0];
   const TAFEL = "PROEF-2";

@@ -41,13 +41,27 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
+// de codeportalen vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per server
+require('./portaalaccount').zetPortaalAccount();
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfos5-'));
 const OFFICE_CODE = 'RTFOS5-KEURING';
 
 let srv, BASE, LAND, STAD, PROJECT, VRIJW, VCODE, CASUS, DCODE;
 
-const post = (pad, body, tok) => fetch(BASE + pad, {
+/* De buurt-app vraagt een account (eigenaarsbesluit 19 oktober 2026): een
+   aanroep van /api/rtfos/publiek/{steden,stad,campagnes} zonder eigen token
+   reist met een gratis account mee; een expliciete null is zonder account. */
+let buurtLid = null;
+async function post(pad, body, tok) {
+  if (tok === undefined && /^\/api\/rtfos\/publiek\/(steden|stad|campagnes)$/.test(pad)) {
+    buurtLid = buurtLid || await registreerGratis(BASE);
+    tok = buurtLid.token;
+  }
+  return postKaal(pad, body, tok);
+}
+const postKaal = (pad, body, tok) => fetch(BASE + pad, {
   method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
   body: JSON.stringify(body || {})
@@ -329,6 +343,7 @@ test('de publieke app toont geen enkel getal over hulpvragen en geen namen', asy
     capaciteit: 40, wanneer: '2026-12-05', tijd: '18:00', locatie: 'buurthuis' });
   await os_('/api/rtfos/activiteit/open', { id: a.body.activiteit.id });
 
+  assert.equal((await post('/api/rtfos/publiek/steden', {}, null)).status, 401, 'de buurt-app vraagt een account');
   const steden = await post('/api/rtfos/publiek/steden', {});
   assert.equal(steden.status, 200, JSON.stringify(steden.body).slice(0, 200));
   assert.equal(steden.body.steden.length, 1);

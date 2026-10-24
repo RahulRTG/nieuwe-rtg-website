@@ -67,6 +67,7 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-modus="world" data-rtg-dating="vonk" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -153,8 +154,11 @@
   document.addEventListener('DOMContentLoaded', () => { document.querySelector('.rtg-spring')?.remove(); document.body.prepend($('.skip')); }, { once:true });
 
   function meld(tekst) { const m=$('#melding');m.textContent=tekst;m.style.opacity='1';clearTimeout(m._timer);m._timer=setTimeout(()=>{m.style.opacity='0';},3400); }
+  /* HET VOLLE PAD STAAT BIJ DE AANROEP (zie public/apps/pay.html): met een stam
+     plus staart zag de routetelling (scripts/schermroutes.js) van dit scherm
+     geen enkele Vonk-route, en kon geen proef eraan koppelen. */
   async function api(pad, body) {
-    const r=await fetch('/api/vonk/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(body||{})});
+    const r=await fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(body||{})});
     const data=await r.json().catch(()=>({})); if(!r.ok){const e=new Error(data.error||'Er ging iets mis.');e.status=r.status;e.code=data.code;throw e;} return data;
   }
   async function fotoUpload(bestand, visibility) {
@@ -222,9 +226,9 @@
     $('#inhoud').innerHTML='<section class="dating-gate"><div class="dating-seal">V</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+titel+'</h2><p>'+esc(fout.message)+'</p><p>Vonk toont leden uitsluitend op codenaam.</p><div class="dating-actions"><a class="dating-button primary" href="/apps/app.html" data-rtg-safe-exit>'+(kyc?'Start identiteitscontrole':'Terug naar de leden-app')+'</a></div></section>';
   }
   function openSafety(naam){safetyTarget=naam;$('#safetyReason').value='';$('#safetyTitle').textContent=naam+' blokkeren?';$('#safetyDialog').showModal();}
-  async function safety(report){if(!safetyTarget)return;const reden=$('#safetyReason').value.trim();if(report&&!reden){meld('Vul kort een reden in voor RTG.');return;}const knop=report?$('#blockReport'):$('#blockOnly');return eenmaal('safety:'+safetyTarget,knop,async()=>{try{await api('blokkeer',{codenaam:safetyTarget,meld:report?reden:''});$('#safetyDialog').close();meld(report?'Geblokkeerd en veilig gemeld bij RTG.':'Geblokkeerd. Jullie zien elkaar niet meer.');await laad();}catch(e){meld(e.message);}});}
+  async function safety(report){if(!safetyTarget)return;const reden=$('#safetyReason').value.trim();if(report&&!reden){meld('Vul kort een reden in voor RTG.');return;}const knop=report?$('#blockReport'):$('#blockOnly');return eenmaal('safety:'+safetyTarget,knop,async()=>{try{await api('/api/vonk/blokkeer',{codenaam:safetyTarget,meld:report?reden:''});$('#safetyDialog').close();meld(report?'Geblokkeerd en veilig gemeld bij RTG.':'Geblokkeerd. Jullie zien elkaar niet meer.');await laad();}catch(e){meld(e.message);}});}
   function openPay(id){payTarget=matches.find(x=>x.id===id);if(!payTarget||!payTarget.tafel)return;$('#payTitle').textContent='Bevestig '+payTarget.tafel.supplierName;$('#payCopy').textContent=payTarget.tafel.datum+' om '+payTarget.tafel.tijd+' · '+payTarget.tafel.plek+'. De reservering ontstaat pas nadat jullie allebei persoonlijk hebben bevestigd.';$('#payTotal').textContent='€ '+payTarget.tafel.prijsPP;$('#payConfirm').textContent='€ '+payTarget.tafel.prijsPP+' persoonlijk bevestigen';$('#payDialog').showModal();}
-  async function betalen(){if(!payTarget)return;return eenmaal('betaling:'+payTarget.id,$('#payConfirm'),async()=>{try{const r=await api('betaal',{id:payTarget.id,stateRevision:connectionEdge&&connectionEdge.revision(payTarget.id)||undefined});$('#payDialog').close();meld(r.status2==='reservering-aangevraagd'?'Beide bedragen zijn vastgelegd. De zaak beslist nu over de tafel.':r.status2==='reservering-onbekend'?'De betalingen staan vast; RTG controleert of de aanvraag is ontvangen.':'Uw aandeel is bevestigd. De tafel blijft in afwachting van de ander.');await laad();}catch(e){meld(e.message);if(connectionEdge&&window.RTGConnectionEdge.shouldReconcile(e))await connectionEdge.refresh(true);}});}
+  async function betalen(){if(!payTarget)return;return eenmaal('betaling:'+payTarget.id,$('#payConfirm'),async()=>{try{const r=await api('/api/vonk/betaal',{id:payTarget.id,stateRevision:connectionEdge&&connectionEdge.revision(payTarget.id)||undefined});$('#payDialog').close();meld(r.status2==='reservering-aangevraagd'?'Beide bedragen zijn vastgelegd. De zaak beslist nu over de tafel.':r.status2==='reservering-onbekend'?'De betalingen staan vast; RTG controleert of de aanvraag is ontvangen.':'Uw aandeel is bevestigd. De tafel blijft in afwachting van de ander.');await laad();}catch(e){meld(e.message);if(connectionEdge&&window.RTGConnectionEdge.shouldReconcile(e))await connectionEdge.refresh(true);}});}
   $('#blockOnly').onclick=e=>{e.preventDefault();safety(false);}; $('#blockReport').onclick=e=>{e.preventDefault();safety(true);}; $('#payConfirm').onclick=e=>{e.preventDefault();betalen();};
 
   /* Meenemen (shared/uitvoer.js): uw matches met de tafel die erbij hoort --
@@ -302,12 +306,12 @@
   function koppelKies(mid){
     document.querySelectorAll('[data-kies="'+CSS.escape(mid)+'"]').forEach(b=>b.onclick=()=>eenmaal('plek:'+mid,b,async()=>{
       try{
-        const r=await api('kies',{id:mid,optie:b.dataset.optie,stateRevision:connectionEdge&&connectionEdge.revision(mid)||undefined});
+        const r=await api('/api/vonk/kies',{id:mid,optie:b.dataset.optie,stateRevision:connectionEdge&&connectionEdge.revision(mid)||undefined});
         meld(r.rond?'U koos allebei dezelfde plek.':r.beideGekozen?'U koos verschillend; u ziet nu allebei de keuzes.':'Genoteerd.');
         if(r.rond){await laad();return;} // de tafel staat nu klaar; het hele blad mag mee
         const doel=document.getElementById('hw-'+mid);
         if(connectionEdge)await connectionEdge.refresh(true);
-        const hw=await api('halfweg',{id:mid,stateRevision:connectionEdge&&connectionEdge.revision(mid)||undefined});
+        const hw=await api('/api/vonk/halfweg',{id:mid,stateRevision:connectionEdge&&connectionEdge.revision(mid)||undefined});
         doel.innerHTML=tekenOpties(mid,hw); koppelKies(mid);
       }catch(e){meld(e.message);if(connectionEdge&&window.RTGConnectionEdge.shouldReconcile(e))await connectionEdge.refresh(true);}
     }));
@@ -316,7 +320,7 @@
   async function openHalfweg(id, revision){
     const doel=document.getElementById('hw-'+id);if(!doel)return;
     doel.innerHTML='<p class="dating-copy">Even kijken…</p>';
-    try{const hw=await api('halfweg',{id,stateRevision:revision||undefined});doel.innerHTML=tekenOpties(id,hw);koppelKies(id);doel.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+    try{const hw=await api('/api/vonk/halfweg',{id,stateRevision:revision||undefined});doel.innerHTML=tekenOpties(id,hw);koppelKies(id);doel.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
     catch(e){doel.innerHTML='<p class="dating-copy">'+esc(e.message)+'</p>';if(connectionEdge&&window.RTGConnectionEdge.shouldReconcile(e))await connectionEdge.refresh(true);}
   }
 
@@ -331,7 +335,7 @@
   function zetTab(nieuw){ga(nieuw,'',true);}
   function startConnectionEdge(){
     if(!window.RTGConnectionEdge)return;
-    connectionEdge=RTGConnectionEdge.create({product:'vonk',load:ctx=>api('edge',ctx.kind==='match'?{id:ctx.id}:{}),
+    connectionEdge=RTGConnectionEdge.create({product:'vonk',load:ctx=>api('/api/vonk/edge',ctx.kind==='match'?{id:ctx.id}:{}),
       onError:fout=>meld(fout.message||'De bediening kon niet worden bijgewerkt.'),
       onAction:async({action,context,projection})=>{
         if(context.kind==='root'){
@@ -381,11 +385,11 @@
     $('#inhoud').innerHTML=werk;
     $('#geoButton').onclick=()=>{if(!navigator.geolocation){meld('Dit apparaat ondersteunt geen locatiebepaling.');return;}$('#geoStatus').textContent='Locatie wordt alleen voor afstand bepaald…';navigator.geolocation.getCurrentPosition(pos=>{geo={lat:pos.coords.latitude,lng:pos.coords.longitude};$('#geoStatus').textContent='Afstand ingesteld. Uw precieze positie wordt niet aan leden getoond.';meld('Afstand is ingesteld.');},()=>{$('#geoStatus').textContent='Locatie niet gedeeld. U kunt uw profiel zonder afstand bewaren.';meld('Locatie is niet gedeeld.');},{enableHighAccuracy:false,timeout:8000,maximumAge:300000});};
     const fotoKnop=$('#photoChoose'),fotoInput=$('#photoInput');if(fotoKnop&&fotoInput){fotoKnop.onclick=()=>fotoInput.click();fotoInput.onchange=()=>{const bestand=fotoInput.files&&fotoInput.files[0];if(!bestand)return;eenmaal('foto-upload',fotoKnop,async()=>{try{fotoKnop.textContent='Veilig verwerken…';await fotoUpload(bestand,$('#photoVisibility').value);meld('De foto is veilig verwerkt en staat nog als concept.');await laad();}catch(e){meld(e.message);}finally{if(fotoKnop.isConnected)fotoKnop.textContent='Kies een foto';}});};}
-    document.querySelectorAll('[data-photo-publish]').forEach(b=>b.onclick=()=>eenmaal('foto-publiceer:'+b.dataset.photoPublish,b,async()=>{try{const sel=document.querySelector('[data-photo-visibility="'+CSS.escape(b.dataset.photoPublish)+'"]');await api('profile-photo/publish',{id:b.dataset.photoPublish,visibility:sel&&sel.value,publish:true});meld('De foto is gepubliceerd binnen de gekozen context.');await laad();}catch(e){meld(e.message);}}));
-    document.querySelectorAll('[data-photo-unpublish]').forEach(b=>b.onclick=()=>eenmaal('foto-intrekken:'+b.dataset.photoUnpublish,b,async()=>{try{await api('profile-photo/publish',{id:b.dataset.photoUnpublish,publish:false});meld('De foto is direct uit alle nieuwe projecties gehaald.');await laad();}catch(e){meld(e.message);}}));
-    document.querySelectorAll('[data-photo-remove]').forEach(b=>b.onclick=()=>eenmaal('foto-verwijder:'+b.dataset.photoRemove,b,async()=>{try{await api('profile-photo/remove',{id:b.dataset.photoRemove});meld('De foto is verwijderd.');await laad();}catch(e){meld(e.message);}}));
-    document.querySelectorAll('[data-photo-move]').forEach(b=>b.onclick=()=>eenmaal('foto-volgorde:'+b.dataset.photoMove,b,async()=>{const ids=(p.media||[]).map(x=>x.id),i=ids.indexOf(b.dataset.photoMove),j=i+Number(b.dataset.direction);if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];try{await api('profile-photo/order',{ids});meld(j===0?'Hoofdbeeld bijgewerkt.':'Fotovolgorde bijgewerkt.');await laad();}catch(e){meld(e.message);}}));
-    $('#pBewaar').onclick=async()=>{const target=[...document.querySelectorAll('[data-looking]:checked')].map(x=>x.dataset.looking);if(!target.length){meld('Kies ten minste één voorkeur.');return;}const data={over:$('#pOver').value,stad:$('#pStad').value,geslacht:(document.querySelector('[name="gender"]:checked')||{}).value||'x',zoekt:target,leeftijdMin:$('#pMin').value,leeftijdMax:$('#pMax').value,maxKm:$('#pKm').value,actief:$('#pActief').checked,interesses:[...document.querySelectorAll('[data-interest]:checked')].map(x=>x.dataset.interest).concat($('#pExtra').value.split(',').map(x=>x.trim()).filter(Boolean))};if(geo)Object.assign(data,geo);try{await api('profiel',data);$('#pStatus').textContent='Bewaard · '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});meld('Uw Vonk-profiel is veilig bewaard.');await laad();}catch(e){meld(e.message);}};
+    document.querySelectorAll('[data-photo-publish]').forEach(b=>b.onclick=()=>eenmaal('foto-publiceer:'+b.dataset.photoPublish,b,async()=>{try{const sel=document.querySelector('[data-photo-visibility="'+CSS.escape(b.dataset.photoPublish)+'"]');await api('/api/vonk/profile-photo/publish',{id:b.dataset.photoPublish,visibility:sel&&sel.value,publish:true});meld('De foto is gepubliceerd binnen de gekozen context.');await laad();}catch(e){meld(e.message);}}));
+    document.querySelectorAll('[data-photo-unpublish]').forEach(b=>b.onclick=()=>eenmaal('foto-intrekken:'+b.dataset.photoUnpublish,b,async()=>{try{await api('/api/vonk/profile-photo/publish',{id:b.dataset.photoUnpublish,publish:false});meld('De foto is direct uit alle nieuwe projecties gehaald.');await laad();}catch(e){meld(e.message);}}));
+    document.querySelectorAll('[data-photo-remove]').forEach(b=>b.onclick=()=>eenmaal('foto-verwijder:'+b.dataset.photoRemove,b,async()=>{try{await api('/api/vonk/profile-photo/remove',{id:b.dataset.photoRemove});meld('De foto is verwijderd.');await laad();}catch(e){meld(e.message);}}));
+    document.querySelectorAll('[data-photo-move]').forEach(b=>b.onclick=()=>eenmaal('foto-volgorde:'+b.dataset.photoMove,b,async()=>{const ids=(p.media||[]).map(x=>x.id),i=ids.indexOf(b.dataset.photoMove),j=i+Number(b.dataset.direction);if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];try{await api('/api/vonk/profile-photo/order',{ids});meld(j===0?'Hoofdbeeld bijgewerkt.':'Fotovolgorde bijgewerkt.');await laad();}catch(e){meld(e.message);}}));
+    $('#pBewaar').onclick=async()=>{const target=[...document.querySelectorAll('[data-looking]:checked')].map(x=>x.dataset.looking);if(!target.length){meld('Kies ten minste één voorkeur.');return;}const data={over:$('#pOver').value,stad:$('#pStad').value,geslacht:(document.querySelector('[name="gender"]:checked')||{}).value||'x',zoekt:target,leeftijdMin:$('#pMin').value,leeftijdMax:$('#pMax').value,maxKm:$('#pKm').value,actief:$('#pActief').checked,interesses:[...document.querySelectorAll('[data-interest]:checked')].map(x=>x.dataset.interest).concat($('#pExtra').value.split(',').map(x=>x.trim()).filter(Boolean))};if(geo)Object.assign(data,geo);try{await api('/api/vonk/profiel',data);$('#pStatus').textContent='Bewaard · '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});meld('Uw Vonk-profiel is veilig bewaard.');await laad();}catch(e){meld(e.message);}};
     const wB=$('#wBewaar');if(wB)wB.onclick=async()=>{
       const kenmerken={},wensen={},zicht={};
       for(const as of TABEL.assen){
@@ -399,17 +403,17 @@
            ook weer INTREKKEN; een eis die je niet kwijtraakt is een val. */
         wensen[as.id]=(g&&g.value&&in_.length)?{in:in_,gewicht:g.value}:'';
       }
-      try{await api('profiel',{kenmerken,wensen,zicht});$('#wStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
+      try{await api('/api/vonk/profiel',{kenmerken,wensen,zicht});$('#wStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
     };
     const bB=$('#bBewaar');if(bB)bB.onclick=async()=>{
       const beschikbaar=Array.from(document.querySelectorAll('[data-slot]')).filter(c=>c.checked).map(c=>c.dataset.slot);
-      try{await api('profiel',{beschikbaar});$('#bStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
+      try{await api('/api/vonk/profiel',{beschikbaar});$('#bStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
     };
     const dB=$('#dBewaar');if(dB)dB.onclick=async()=>{
       const eisen=Array.from(document.querySelectorAll('[data-eis]')).filter(c=>c.checked).map(c=>c.dataset.eis);
       const soorten=Array.from(document.querySelectorAll('[data-soort]')).filter(c=>c.checked).map(c=>c.dataset.soort);
       const budget=($('#dBudget')||{}).value||'egaal';
-      try{await api('profiel',{datewens:{eisen,soorten,budget}});$('#dStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
+      try{await api('/api/vonk/profiel',{datewens:{eisen,soorten,budget}});$('#dStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
     };
   }
 
@@ -435,7 +439,7 @@
     return '<div class="vonk-card__why"><strong>Waarom vandaag</strong><ul>'+r.passend.map(t=>'<li>'+esc(t)+'</li>').join('')+r.open.map(t=>'<li class="open">'+esc(t)+'</li>').join('')+'</ul></div>';
   }
   async function kiesKandidaat(codenaam,aan,knop){
-    return eenmaal('kandidaat:'+codenaam,knop,async()=>{try{const r=await api('like',{codenaam,aan:aan?undefined:false});sluitCandidate(false);meld(r.match?'Jullie staan allebei open voor contact. Het gesprek is geopend.':aan?'Uw interesse is discreet genoteerd.':'Overgeslagen. Alleen u weet dit.');await laad();if(r.match)ga('matches','',true);}catch(e){meld(e.message);}});
+    return eenmaal('kandidaat:'+codenaam,knop,async()=>{try{const r=await api('/api/vonk/like',{codenaam,aan:aan?undefined:false});sluitCandidate(false);meld(r.match?'Jullie staan allebei open voor contact. Het gesprek is geopend.':aan?'Uw interesse is discreet genoteerd.':'Overgeslagen. Alleen u weet dit.');await laad();if(r.match)ga('matches','',true);}catch(e){meld(e.message);}});
   }
 
   function renderMatches(){
@@ -465,15 +469,15 @@
 
   async function stuurBericht(id,knop){
     const inp=document.querySelector('[data-text="'+CSS.escape(id)+'"]');if(!inp||!inp.value.trim()){meld('Schrijf eerst een bericht.');return;}
-    const tekst=inp.value.trim();return eenmaal('bericht:'+id,knop,async()=>{try{await api('bericht',{id,tekst,stateRevision:connectionEdge&&connectionEdge.revision(id)||undefined});inp.value='';meld('Uw bericht is verstuurd.');await laad();}catch(e){meld(e.message);if(connectionEdge&&window.RTGConnectionEdge.shouldReconcile(e))await connectionEdge.refresh(true);}});
+    const tekst=inp.value.trim();if(inp.dataset.idemTekst!==tekst){inp.dataset.idem=RTGId('vonk-bericht');inp.dataset.idemTekst=tekst;}return eenmaal('bericht:'+id,knop,async()=>{try{await api('/api/vonk/bericht',{id,tekst,idem:inp.dataset.idem,stateRevision:connectionEdge&&connectionEdge.revision(id)||undefined});inp.value='';delete inp.dataset.idem;delete inp.dataset.idemTekst;meld('Uw bericht is verstuurd.');await laad();}catch(e){meld(e.message);if(connectionEdge&&window.RTGConnectionEdge.shouldReconcile(e))await connectionEdge.refresh(true);}});
   }
 
   function render(){if(!selectie)return;document.body.dataset.vonkTab=tab;tekenTabs();if(tab==='profiel')renderProfiel();else if(tab==='vandaag')renderVandaag();else renderMatches();}
-  async function laad(){if(!token){toonGate(new Error('Log eerst in via de leden-app.'));return;}try{selectie=await api('selectie');
+  async function laad(){if(!token){toonGate(new Error('Log eerst in via de leden-app.'));return;}try{selectie=await api('/api/vonk/selectie');
     /* De drie kaarten uit de ONTMOETEN.md-ronde reizen mee met /selectie zolang
        er een profiel is; eenmaal gezien blijven ze staan. */
     if(selectie.tabel)TABEL=selectie.tabel;if(selectie.rooster)ROOSTER=selectie.rooster;if(selectie.tafelkaart)KAART=selectie.tafelkaart;
-    matches=(await api('mijn')).matches||[];if(!selectie.profiel)tab='profiel';render();const route=Experience.leesHash(location.hash);if(route.kandidaat&&!$('#candidateDialog').open)openCandidate(route.kandidaat,false);if(connectionEdge)connectionEdge.refresh(true);}catch(e){if(e.status===401||e.status===403)toonGate(e);else{$('#inhoud').innerHTML='<div class="dating-empty"><strong>Vonk kon niet laden</strong><p>'+esc(e.message)+'</p><button class="dating-button" type="button" id="retryVonk">Opnieuw proberen</button></div>';const retry=$('#retryVonk');if(retry)retry.onclick=laad;meld(e.message);}}}
+    matches=(await api('/api/vonk/mijn')).matches||[];if(!selectie.profiel)tab='profiel';render();const route=Experience.leesHash(location.hash);if(route.kandidaat&&!$('#candidateDialog').open)openCandidate(route.kandidaat,false);if(connectionEdge)connectionEdge.refresh(true);}catch(e){if(e.status===401||e.status===403)toonGate(e);else{$('#inhoud').innerHTML='<div class="dating-empty"><strong>Vonk kon niet laden</strong><p>'+esc(e.message)+'</p><button class="dating-button" type="button" id="retryVonk">Opnieuw proberen</button></div>';const retry=$('#retryVonk');if(retry)retry.onclick=laad;meld(e.message);}}}
   startConnectionEdge();laad();
 })();
 /* WAAR JE BENT, gezegd door dit scherm zelf (EDGE.md, ronde 2). De sociale

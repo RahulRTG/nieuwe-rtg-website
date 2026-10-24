@@ -111,9 +111,15 @@ test('de export laat een auditregel achter die de boardroom terugleest', async (
   assert.equal(r.status, 200);
   await r.text();
 
+  const tweede = await fetch(base + '/api/office/aidata/export', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + office.token },
+    body: JSON.stringify({ naam: 'auditproef' }) });
+  assert.equal(tweede.status, 200);
+  await tweede.text();
+
   const na = await api('office/boardroom', {}, office.token);
   const regels = (na.body.audit || []).filter(r => /AI-dataset geexporteerd/.test(r.wat || ''));
-  assert.ok(regels.length > tellingVoor, 'na de export hoort er een regel bij te staan');
+  assert.equal(regels.length, tellingVoor + 2, 'iedere bewuste export krijgt exact een eigen auditregel');
   /* WIE HET DEED KOMT UIT DE SESSIE. Deze bewering eiste tot 23 september 2026
      precies het omgekeerde: dat de naam uit het verzoek in het spoor kwam. Een
      spoor waarin de aanroeper zijn eigen naam typt, bewijst niets. */

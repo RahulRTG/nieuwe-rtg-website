@@ -1,4 +1,5 @@
 const klok = require('../../lib/klok');
+const tijdzone = require('../../kern/tijdzone');
 /* Backoffice (deelmodule): de identiteitsverificaties.
 
    De wachtrij, het besluit (goedkeuren of afwijzen) en wat er daarna met het
@@ -80,7 +81,7 @@ module.exports = (octx, gedeeld) => {
       const gebIn = String(req.body.geboortedatum || '').slice(0, 10);
       if (gebIn) {
         const jaar = Number(gebIn.slice(0, 4));
-        const nuJaar = klok.datum().getFullYear();
+        const nuJaar = tijdzone.jaarIn(klok.datum());
         if (!/^\d{4}-\d{2}-\d{2}$/.test(gebIn) || isNaN(Date.parse(gebIn)) || jaar < nuJaar - 120 || jaar > nuJaar) {
           return res.status(400).json({ error: 'Die geboortedatum lijkt niet te kloppen; controleer hem op het document.' });
         }

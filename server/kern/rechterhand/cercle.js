@@ -19,11 +19,12 @@
 
    Wat hier NIET komt: een clubgids die wij zouden "kennen". Wij verzinnen geen
    reciprociteit; wat u invult is wat er staat, en dat zegt de app er ook bij. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { save, rid, nu, schoon, getal, L } = ctx;
 
   function C(key) { const l = L(key); if (!Array.isArray(l.cercle)) l.cercle = []; return l.cercle; }
-  const jaar = () => new Date().getFullYear();
+  const jaar = () => tijdzone.jaarIn();
 
   /* Van tekstregel naar lijst. Doet dienst als zachte migratie: wat er vroeger
      als "Soho House, Annabel's" stond, leest nu als twee clubs. */

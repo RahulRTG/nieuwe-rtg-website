@@ -33,6 +33,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, klikEnWacht, tekstVan } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pda-'));
 
@@ -128,10 +129,15 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     // en een gast die om hulp vraagt: grens 3 minuten
     const qr = (await H('/api/supplier/horeca/gast/qr', { tafel: 'PDA-DRAAG' })).body;
-    const aan = (await post(base, '/api/gast/aanschuiven', { token: qr.token, naam: 'Sam' })).body;
+    /* Een tafel-QR vult de accountdeur aan en vervangt haar niet. Gebruik hier
+       dezelfde gratis-accountweg als het gastscherm en de toegangsproef; anders
+       toetst deze browserproef een sinds 19 oktober verboden anonieme route. */
+    const gast = await registreerGratis(base);
+    assert.ok(gast && gast.token, 'de gast heeft een gratis account');
+    const aan = (await post(base, '/api/gast/aanschuiven', { token: qr.token, naam: 'Sam' }, gast.token)).body;
     assert.ok(aan.sleutel, 'de gast zit aan tafel');
     const vz = (await post(base, '/api/gast/verzoek', { sleutel: aan.sleutel, soort: 'hulp',
-      tekst: 'Het glas is gebarsten' })).body;
+      tekst: 'Het glas is gebarsten' }, gast.token)).body;
     assert.ok(vz.verzoek, 'het verzoek staat: ' + JSON.stringify(vz).slice(0, 120));
 
     /* ---- ingelogd: de lijst ---- */
@@ -247,10 +253,14 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     const hh = String(tijd.getHours()).padStart(2, '0') + ':' + String(tijd.getMinutes()).padStart(2, '0');
     const dag = tijd.getFullYear() + '-' + String(tijd.getMonth() + 1).padStart(2, '0') +
       '-' + String(tijd.getDate()).padStart(2, '0');
+    /* een account voor alles (19 oktober 2026): de aanvraag doet een ingelogd lid */
+    const u = String(Date.now()).slice(-8);
+    const lid = (await post(base, '/api/auth/register', { name: 'Aankomend Lid', email: 'pd' + u + '@voorbeeld.nl',
+      phone: '06' + u, password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' })).body.token;
     const pass = (await post(base, '/api/arrival/request', {
       requestToken: 'pdahostaanvraagcode1234.geheimgeheimgeheim1234ab',
-      supplierCode: 'KIKUNOI', naam: 'Aankomst', datum: dag,
-      tijd: hh, personen: 2, allergie: true })).body.pass;
+      supplierCode: 'KIKUNOI', datum: dag,
+      tijd: hh, personen: 2, allergie: true }, lid)).body.pass;
     assert.ok(pass, 'de aankomst is aangevraagd');
 
     await page.click('[data-modus="host"]');

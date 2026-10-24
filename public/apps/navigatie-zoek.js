@@ -52,7 +52,7 @@
      wat we weten, en niets meer. */
   async function zoekBestemmingen(q) {
     const vraag = ++zoekVraag, hier = S.hier;
-    const r = await api('bestemmingen', hier ? { q, lat: hier.lat, lng: hier.lng } : { q });
+    const r = await api('/api/nav/bestemmingen', hier ? { q, lat: hier.lat, lng: hier.lng } : { q });
     if (vraag !== zoekVraag) return;
     if (r.status !== 200) return meldInLijst(r.body.error || 'Zoeken lukt hier nu niet.');
     const rij = (r.body.bestemmingen || []).slice(0, 18);
@@ -88,7 +88,7 @@
   N.berekenRoute = async function berekenRoute() {
     if (!S.naar) return;
     if (!S.hier) { zeg('Ik weet nog niet waar u bent. Kies eerst uw vertrekpunt.'); N.vraagVertrekpunt(); return; }
-    const r = await api('route', { van: S.hier, naar: S.naar, modus: S.modus, profiel: S.profiel });
+    const r = await api('/api/nav/route', { van: S.hier, naar: S.naar, modus: S.modus, profiel: S.profiel });
     if (r.status !== 200) { zeg(r.body.error || 'Geen route gevonden.'); return; }
     S.route = r.body;
     toonRoute();

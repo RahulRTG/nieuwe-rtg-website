@@ -28,7 +28,7 @@ module.exports = (ctx) => {
 
   function mijnDiensten(supplierCode, gid) {
     const s = findSupplier(supplierCode); if (!isBeveiliging(s)) return { diensten: [], ronde: null };
-    const van = vandaag();
+    const van = vandaag(s);
     const lijst = diensten()
       .filter(d => d.supplierCode === s.code && d.guardId === gid && d.status !== 'geannuleerd' && d.datum >= van)
       .sort((a, b) => (a.datum + a.shiftId).localeCompare(b.datum + b.shiftId))

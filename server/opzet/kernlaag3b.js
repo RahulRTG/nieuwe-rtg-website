@@ -44,7 +44,7 @@ Object.assign(kern, require('../kern/levensgraaf')({ db,
 // bezitZet komt uit de lifestyle-mount hierboven: een geregelde inkoopzaak
 // schrijft zichzelf in het register. Vandaar NA die twee.
 
-Object.assign(kern, require('../kern/bureau')({ db, save, crypto, anthropic, liveCodename, notify, notifySupplier,
+Object.assign(kern, require('../kern/bureau')({ db, save, bewerkCollectie: hulp.bewerkCollectie, crypto, anthropic, liveCodename, notify, notifySupplier,
   bezitZet: kern.bezitZet, levensgraaf: kern.levensgraaf }));
 /* Postdatums (kern/postdatum.js): de datums die in de EIGEN post staan, als
    voorstel. Staat hier omdat hij de tower voedt langs de agenda -- niet als

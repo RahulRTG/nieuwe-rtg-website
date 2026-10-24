@@ -5,8 +5,6 @@
    af. Alleen de BEDOELING blijft mensenwerk: is herhaling een dubbeltik of een
    tweede handeling, en hoort een open deur open te staan?
 
-   Dat staat hier, per route, met de reden erbij.
-
    DE VOLGORDE IS EEN GRENS EN GEEN GEWOONTE. Eerst het contract, dan de route.
    scripts/check.js weigert een schrijfroute zonder contract.
 
@@ -32,10 +30,7 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
-  /* De eerste zestien domeinbestanden staan in ./mutatiecontracten-eerste.js:
-     deze lijst ging over de 10 kB van keuringsregel 13. De VOLGORDE blijft
-     dezelfde (Object.assign laat de laatste winnen), want dat bestand komt hier
-     als eerste. */
+  /* Eerste domeinen; Object.assign bewaart de bestaande overschrijfvolgorde. */
   require('./mutatiecontracten-eerste').CONTRACTEN,
   /* RTG Vrijheid en RTG zelf als werkgever (VRIJHEID.md). */
   require('./mutatiecontracten-vrijheid').CONTRACTEN,
@@ -113,6 +108,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-reisherkomst').CONTRACTEN,
   require('./mutatiecontracten-conciergelus').CONTRACTEN,
+  require('./mutatiecontracten-partnernetwerk').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */
   require('./mutatiecontracten-lidabonnement').CONTRACTEN,
@@ -174,7 +170,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-proefronde-lijst'),
   require('./mutatiecontracten-ovronde'),
   require('./mutatiecontracten-objectronde'),
-  require('./mutatiecontracten-effect'));
+  require('./mutatiecontracten-effect'),
+  require('./mutatiecontracten-premium-opdrachten').CONTRACTEN,
+  require('./mutatiecontracten-deepgreen-r3').CONTRACTEN);
 
 
 require('./mutatiecontracten-effectguard');

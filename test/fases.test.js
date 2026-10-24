@@ -1,6 +1,7 @@
 /* Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd;
    lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten.
    Draai los: node --test test/fases.test.js */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -74,7 +75,7 @@ test('1b. fase 0: de snee werkt echt, en de rest zit dicht', async () => {
   assert.equal((await api('/api/gegevens/nodig', {}, lid)).status, 200,
     'de gegevenspoort MOET open zijn: een livegang zonder AVG-rechten is niet smal maar onrechtmatig');
   assert.equal((await api('/api/aanmelding/aanvraag',
-    { pas: 'lifestyle', naam: 'Proef', contact: 'proef@x.nl' }, lid)).status, 200, 'aanmelden kan');
+    { idem: randomUUID(), pas: 'lifestyle', naam: 'Proef', contact: 'proef@x.nl' }, lid)).status, 200, 'aanmelden kan');
 
   // en opnieuw inloggen blijft kunnen -- anders sluit de fase de deur achter zich
   assert.ok((await api('/api/auth/login',

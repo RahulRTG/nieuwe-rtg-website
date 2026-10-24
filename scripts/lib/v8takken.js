@@ -150,7 +150,14 @@ function neemScript(doel, functies) {
    niet te lezen is (een proces dat midden in het schrijven werd gestopt) wordt
    GETELD en niet overgeslagen: wat daarin stond ontbreekt in de meting, en dat
    hoort te zien te zijn. */
+// V8 meldt het fysieke bronpad, ook als cwd via een symlink kwam (/var op
+// macOS is /private/var). Vergelijk beide kanten fysiek; anders verdwijnt de
+// hele eigen bron uit de meting. Niet-lokale referentiedata blijft leesbaar.
+function bronPad(pad) {
+  try { return fs.realpathSync(pad); } catch (e) { return path.resolve(pad); }
+}
 function uitRuw(map, wortel) {
+  const bronWortel = bronPad(wortel);
   const per = new Map();
   let onleesbaar = 0;
   let namen = [];
@@ -161,7 +168,7 @@ function uitRuw(map, wortel) {
     for (const s of (j && j.result) || []) {
       if (!s || typeof s.url !== 'string' || !s.url.startsWith('file:')) continue;
       let rel;
-      try { rel = path.relative(wortel, fileURLToPath(s.url)).split(path.sep).join('/'); } catch (e) { continue; }
+      try { rel = path.relative(bronWortel, bronPad(fileURLToPath(s.url))).split(path.sep).join('/'); } catch (e) { continue; }
       if (!BINNEN.test(rel) || rel.includes('/node_modules/')) continue;
       let doel = per.get(rel);
       if (!doel) { doel = leeg(); per.set(rel, doel); }

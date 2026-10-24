@@ -76,6 +76,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="labpas" class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -104,7 +105,8 @@
 
   <div class="kaart" id="buurt">
     <div class="sec">Vragen uit de buurt</div>
-    <div class="leeg">Wat zou hier onderzocht moeten worden? Iedereen mag een vraag aandragen en op vragen stemmen.</div>
+    <div class="leeg">Wat zou hier onderzocht moeten worden? Met een RTG-account draagt u een vraag aan en stemt u op vragen; een gratis account is genoeg.</div>
+    <div id="bDeur"></div>
     <div class="rij">
       <select class="veld s-jv64vw" id="bLab" aria-label="Kies een lab"></select>
     </div>
@@ -117,7 +119,7 @@
 
   <div class="kaart" id="ontdek">
     <div class="sec">Wat er in dit lab onderzocht wordt</div>
-    <div class="leeg">Open voor iedereen. U ziet de vraag en waar het onderzoek staat -- geen deelnemers
+    <div class="leeg">Voor iedereen met een account. U ziet de vraag en waar het onderzoek staat -- geen deelnemers
       en geen ruwe gegevens. Een onderzoek dat zijn data gescheiden houdt, toont ook zijn vraagstelling niet.</div>
     <div id="oLijst"><div class="leeg">Laden...</div></div>
   </div>
@@ -125,7 +127,8 @@
   <div class="kaart" id="pasKaart">
     <div class="sec">Uw labpaspoort</div>
     <div class="leeg">Punten en badges over onderzoeken heen, op een code die u zelf houdt. U verdient ze
-      niet met veel insturen maar met goed werk.</div>
+      niet met veel insturen maar met goed werk. Het paspoort hangt aan uw account en bestaat alleen voor
+      leden van 18 jaar of ouder van wie RTG het identiteitsbewijs heeft gezien.</div>
     <div class="rij">
       <input class="veld" id="paspVeld" placeholder="LABPAS-XXXXXXX" maxlength="20" autocomplete="off">
       <button class="knop stil" id="paspOpen" type="button">Open</button>
@@ -141,6 +144,7 @@
 <script src="/shared/deur.js"></script>
 <!-- RTGId zonder defer en vóór de app: hij levert de gastnaam waaronder een
      bezoeker zonder labpas op een buurtvraag stemt. -->
+<script src="/shared/accountdeur.js"></script>
 <script src="/apps/labpas-buurt.js"></script>
 <script src="/apps/labpas-ontdek.js"></script>
 <script src="/apps/labpas.js"></script>

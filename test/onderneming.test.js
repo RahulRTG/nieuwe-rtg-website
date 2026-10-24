@@ -24,6 +24,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, elevateTier } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const RV = require('../server/kern/onderneming/rechtsvorm');
 const FASE = require('../server/kern/onderneming/fase');
@@ -175,6 +176,22 @@ test('een onderneming bestaat vanaf "ik denk erover na", zonder zaak en zonder r
   assert.deepEqual(r.onderneming.werkvormen, [], 'zonder zaak DOET zij nog niets');
 });
 
+test('dezelfde herhaalsleutel maakt geen tweede onderneming, ook niet na een herstart', () => {
+  const K = stubKern([]);
+  const a = K.ondernemingNieuw('LID1', { naam: 'Koffiebar' }, 'poging-1');
+  /* Dit is wat er na een stroomstoring gebeurt: het antwoord kwam nooit aan,
+     en het scherm stuurt hetzelfde verzoek opnieuw. */
+  const b = K.ondernemingNieuw('LID1', { naam: 'Koffiebar' }, 'poging-1');
+  assert.equal(b.herhaald, true);
+  assert.equal(b.onderneming.id, a.onderneming.id);
+  assert.equal(K.ondernemingVanEigenaar('LID1').length, 1, 'een herhaling is geen tweede onderneming');
+  assert.notEqual(K.ondernemingNieuw('LID2', { naam: 'Koffiebar' }, 'poging-1').herhaald, true,
+    'de sleutel van een ander lid is een eigen onderneming');
+  assert.equal(K.ondernemingNieuw('LID1', { naam: 'Koffiebar' }).herhaald, undefined, 'zonder sleutel blijft het een nieuwe');
+  const ander = K.ondernemingNieuw('LID1', { naam: 'Iets anders' }, 'poging-1');
+  assert.equal(ander.status, 409, 'dezelfde sleutel bij een ander verzoek is een fout, geen stille herhaling');
+});
+
 test('koppelen dicht de naad: de naam woont daarna op precies één plek', () => {
   const zaak = { code: 'GLAS', name: 'Jansen Glasheldere Ramen', type: 'zzp', staff: [{ id: 1 }] };
   const K = stubKern([zaak]);
@@ -298,11 +315,12 @@ test('een gewoon RTG-lid mag een onderneming beginnen -- geen paslaag voor naden
   assert.equal(mijn.ondernemingen.length, 1);
 });
 
-test('zonder inlog kom je er niet in, met de rechtsvormen als tegenproef', async () => {
+test('zonder inlog kom je er niet in, ook niet bij de rechtsvormen; een gratis account wel', async () => {
   const dicht = await post('/api/onderneming/mijn', {});
   assert.equal(dicht.status, 401, 'de eigen ondernemingen zitten achter de inlog');
-  // en de tegenproef: de voorlichting staat wél open, dus 401 is een besluit
-  const open = await fetch(BASE + '/api/onderneming/rechtsvormen');
+  // de voorlichting vraagt sinds het eigenaarsbesluit van 19 oktober 2026 ook een account
+  assert.equal((await fetch(BASE + '/api/onderneming/rechtsvormen')).status, 401);
+  const open = await fetch(BASE + '/api/onderneming/rechtsvormen', { headers: { Authorization: 'Bearer ' + (await registreerGratis(BASE)).token } });
   assert.equal(open.status, 200);
   const lijst = (await open.json()).rechtsvormen.map(r => r.id);
   for (const v of ['eenmanszaak', 'bv', 'stichting']) assert.ok(lijst.includes(v), v + ' hoort in de keuzelijst');

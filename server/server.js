@@ -184,15 +184,8 @@ const { trustPlane, bewijsHospitalityBesluit, markeerHospitalityRequest } =
   maakTrustBewijs({ db, save, betaal,
     vindReservering: id => (db.data.reserveringen || []).find(r => r.id === id) });
 
-/* Eén blijvende waarheid voor inkomende betalingen, vóór routes en webhooks
-   worden bedraad. Ze hangt niet aan Stripe of Mollie: providers leveren alleen
-   gebeurtenissen aan. Daardoor kan een zaak van rail wisselen zonder dat de
-   betekenis van "betaald" mee verhuist. */
-const betaalWaarheid = require('./kern/betaalwaarheid')({
-  d: () => db.data, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log
-});
-const betaalRegie = require('./kern/betaalregie')({
-  d: () => db.data, save, betaal, env: process.env, nu: () => systeemKlok.datum().toISOString()
+const { betaalWaarheid, betaalRegie } = require('./opzet/betaalketen')({
+  db, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log, env: process.env
 });
 
 /* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde
@@ -1060,7 +1053,8 @@ const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto
   dyncodeGeef: () => kern && kern.dyncode });
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
-const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon });
+const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon, bewerkCollectie,
+  verifieerGezin: (code, token, foundation) => rtf.verifieerProfiel(code, token, foundation) });
 // De slimme boerderij-laag (kern/boerderij.js): boerderijtypes, percelen+gewassen,
 // dieren, takenbord, seizoensbriefing en een AI-adviseur die ook dingen doet.
 const boerderij = require('./kern/boerderij').maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon });
@@ -1084,7 +1078,7 @@ const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, bijee
 const handelsketen = require('./kern/handelsketen').maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon, facturatie });
 // De marktplaats (kern/markt.js): één gedeelde motor voor de RTFoundation-app
 // (gezinnen kopen/verkopen) en voor leveranciers die er ook op willen verkopen.
-const markt = require('./kern/markt').maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal });
+const markt = require('./kern/markt').maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal, betaalWaarheid });
 rtf.setMarkt(markt);
 const {
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken

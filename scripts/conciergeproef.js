@@ -194,7 +194,7 @@ async function proef(basis) {
   storing(4, 'een tweede zaak ziet niets van een onderdeel dat niet het zijne is',
     r.status === 200 && buurZiet === 0, buurZiet + ' onderdeel/onderdelen gezien');
 
-  r = await post('/api/member/bureau/zaak/open', { titel: 'Probeer de lus te forceren', domein: 'gelegenheden', werkwijze: 'voorstel' }, ander);
+  r = await post('/api/member/bureau/zaak/open', { idem: 'zaak-fixture-197', titel: 'Probeer de lus te forceren', domein: 'gelegenheden', werkwijze: 'voorstel' }, ander);
   storing(5, 'een lid kan de werkwijze niet zelf zetten: een gewone case blijft gewoon',
     // de case moet WEL ontstaan: een weigering bewijst niet dat de werkwijze niet te zetten is
     r.status === 200 && !!(r.body.zaak || {}).id && (r.body.zaak || {}).werkwijze !== 'voorstel',

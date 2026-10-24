@@ -65,7 +65,7 @@
   function bestel(b) {
     var voor = $('tVoor').value;
     api('/rekening/regel', {
-      rekeningId: REK.id, itemId: b.getAttribute('data-item'),
+      rekeningId: REK.id, itemId: b.getAttribute('data-item'), idem: RTGId('tik'),
       aantal: 1, gang: Number($('tGang').value) || 0,
       gastNr: voor ? Number(voor) : undefined,
       allergie: $('tAllergie').value.trim() || undefined

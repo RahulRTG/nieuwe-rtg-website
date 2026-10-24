@@ -3,7 +3,8 @@
       try { await API.call('/supplier/groothandel/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); renderGroothandel(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-ghverder]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/groothandel/order/status', { ref:b.dataset.ghverder, actie:'verder' }); renderGroothandel(); } catch(e){ toast(e.message); }
+      // de stand die op het scherm stond gaat mee: een tweede tik slaat geen stap over
+      try { await API.call('/supplier/groothandel/order/status', { ref:b.dataset.ghverder, actie:'verder', van:b.dataset.ghvan }); renderGroothandel(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-ghweiger]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/groothandel/order/status', { ref:b.dataset.ghweiger, actie:'weiger' }); renderGroothandel(); } catch(e){ toast(e.message); }
@@ -18,7 +19,7 @@
       '<div class="s-1x93s7l"><b class="s-1q6kbkp">'+esc(naam)+' · '+eur(o.subtotaal)+'</b>'+
       '<span class="sub">'+esc(o.soort)+(o.bron==='ai'?' · AI':'')+' · '+esc(o.status)+'</span></div>'+
       '<div class="sub">'+o.regels.map(r=>r.aantal+'× '+esc(r.naam)).join(', ')+'</div>'+
-      (open ? '<div class="s-1stuony"><button data-ghverder="'+o.ref+'" class="s-7o62ce">'+T('gh.verder','Volgende stap')+'</button>'+
+      (open ? '<div class="s-1stuony"><button data-ghverder="'+o.ref+'" data-ghvan="'+esc(o.status)+'" class="s-7o62ce">'+T('gh.verder','Volgende stap')+'</button>'+
         '<button data-ghweiger="'+o.ref+'" class="s-1gth2jo">'+T('gh.weiger','Weiger')+'</button></div>' : '')+'</div>';
   }
   function ghForm(cats){

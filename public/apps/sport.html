@@ -77,6 +77,7 @@
 <link href="/shared/rtg-sport-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl rtg-sport-flow" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -124,7 +125,7 @@ const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
-const api=(pad,body,herkans)=>fetch('/api/member/sport'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
+const api=(pad,body,herkans)=>fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
   // 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door
   const p=herkans?null:(window.RTGGegevensPoort&&window.RTGGegevensPoort.vang(d,r.status,()=>api(pad,body,true),(q,b)=>fetch(q,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(b||{})}).then(x=>x.json())));
   if(p)return p;
@@ -173,12 +174,12 @@ async function laad(){
 }
 
 async function laadBord(){
-  let d; try{ d=await api('/bord'); /* Ontbreekt een lijst, dan de melding hieronder -- nooit een leeg bord (LIEGRONDE.json). */ if(!(d && Array.isArray(d.clubs) && Array.isArray(d.wedstrijden))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d=await api('/api/member/sport/bord'); /* Ontbreekt een lijst, dan de melding hieronder -- nooit een leeg bord (LIEGRONDE.json). */ if(!(d && Array.isArray(d.clubs) && Array.isArray(d.wedstrijden))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   CLUB = (d.clubs[0]||{}).code || CLUB;
   CLUBNAAM = (d.clubs[0]||{}).naam || CLUBNAAM;
   BORD = d.wedstrijden||[];
   const komend=d.wedstrijden.filter(w=>!w.uitslag).reverse(), gespeeld=d.wedstrijden.filter(w=>w.uitslag);
-  let stand=null; try{const s=await api('/stand',{club:CLUB}); stand=heeftTabel(s)?s:null;}catch(e){}
+  let stand=null; try{const s=await api('/api/member/sport/stand',{club:CLUB}); stand=heeftTabel(s)?s:null;}catch(e){}
   const wedstrijd=(w,komendNu)=>'<article class="sport-match'+(komendNu?' sport-fixture':'')+'">'+
     '<span class="sport-team"><span class="sport-crest">'+esc((w.thuis?w.club:w.tegen).slice(0,3).toUpperCase())+'</span>'+esc(w.thuis?w.club:w.tegen)+'</span>'+
     '<span class="sport-score"><b>'+(w.uitslag?esc(w.uitslag):'VS')+'</b><small>'+(w.uitslag?'Afgelopen':esc(w.datum)+' · '+esc(w.tijd))+'</small></span>'+
@@ -203,7 +204,7 @@ function tekenStand(d,max){
     '<tr'+(r.team===d.team?' class="eigen"':'')+'><td>'+(i+1)+'</td><td>'+esc(r.team)+'</td><td>'+r.g+'</td><td>'+r.w+'</td><td>'+r.gl+'</td><td>'+r.v+'</td><td>'+(r.dv-r.dt)+'</td><td><b>'+r.p+'</b></td></tr>').join('')+'</table></div>';
 }
 async function laadStand(){
-  let d; try{ d=await api('/stand',{club:CLUB}); if(!heeftTabel(d)) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d=await api('/api/member/sport/stand',{club:CLUB}); if(!heeftTabel(d)) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   $('#inhoud').innerHTML='<div class="sport-section"><h3>'+esc(d.competitie||'De stand')+'</h3></div>'+tekenStand(d)+
     '<div class="item"><div class="meta">Rechtstreeks berekend uit de uitslagen die de club invoert.</div></div>';
 }
@@ -211,7 +212,7 @@ async function laadStand(){
 async function laadTickets(voorWedstrijd){
   voorWedstrijd=voorWedstrijd||GEKOZEN_WEDSTRIJD; GEKOZEN_WEDSTRIJD=null;
   let b, p;
-  try{ b=await api('/bord'); p=await api('/plattegrond',{club:CLUB}); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  try{ b=await api('/api/member/sport/bord'); p=await api('/api/member/sport/plattegrond',{club:CLUB}); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const clubInfo=(b.clubs||[]).find(c=>c.code===CLUB); if(clubInfo) CLUBNAAM=clubInfo.naam;
   const thuis=b.wedstrijden.filter(w=>w.clubCode===CLUB&&w.thuis&&!w.uitslag).reverse();
   if(!thuis.length){ $('#inhoud').innerHTML='<div class="leeg">Geen thuiswedstrijden in de verkoop.</div>'; return; }
@@ -229,16 +230,22 @@ async function laadTickets(voorWedstrijd){
     '<button class="knop h-flex1" id="tkGo">Reserveer</button></div>'+
     '<div class="meta">Afrekenen aan de poort: contant of RTG Pay bij de kassa. Uw code licht op onder Mijn tickets.</div></div>';
   document.querySelectorAll('[data-vak]').forEach(b2=>b2.onclick=()=>{ VAK=b2.dataset.vak; laadTickets($('#tkW').value); });
+  /* Een sleutel per reservering: een tweede tik, of dezelfde tik opnieuw nadat
+     het antwoord wegviel, vindt de eerste reservering terug in plaats van een
+     tweede plaats te bezetten. Een andere wedstrijd of aantal is een nieuwe. */
+  let tkIdem=null; $('#tkW').onchange=$('#tkN').onchange=()=>{ tkIdem=null; };
   $('#tkGo').onclick=async()=>{
-    try{ const r=await api('/ticket/koop',{club:CLUB,wedstrijdId:$('#tkW').value,vak:VAK,aantal:$('#tkN').value});
-      meld('Gereserveerd: '+r.ticket.code+' · '+r.ticket.vak+'. '+r.ticket.let);
+    const knop=$('#tkGo'); if(knop.disabled) return; knop.disabled=true;
+    try{ tkIdem=tkIdem||RTGIdem('sport-ticket');
+      const r=await api('/api/member/sport/ticket/koop',{club:CLUB,wedstrijdId:$('#tkW').value,vak:VAK,aantal:$('#tkN').value,idem:tkIdem});
+      tkIdem=null; meld('Gereserveerd: '+r.ticket.code+' · '+r.ticket.vak+'. '+r.ticket.let);
       zetStand('mijn');
-    }catch(e){ meld(e.message); }
+    }catch(e){ meld(e.message); }finally{ knop.disabled=false; }
   };
 }
 
 async function laadMijn(){
-  let d; try{ d=await api('/tickets'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  let d; try{ d=await api('/api/member/sport/tickets'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   TICKETS=d.tickets||[];
   $('#inhoud').innerHTML=d.tickets.length?d.tickets.map(t=>
     '<div class="pass"><div class="regel"><span>Wedstrijd</span><b>'+esc(t.wedstrijd)+'</b></div>'+
@@ -254,7 +261,7 @@ async function laadMijn(){
 
 async function laadClub(){
   let m, sp, st, bord;
-  try{ bord=await api('/bord'); m=await api('/momenten',{club:CLUB}); sp=await api('/sponsors',{club:CLUB}); st=await api('/stand',{club:CLUB}); }
+  try{ bord=await api('/api/member/sport/bord'); m=await api('/api/member/sport/momenten',{club:CLUB}); sp=await api('/api/member/sport/sponsors',{club:CLUB}); st=await api('/api/member/sport/stand',{club:CLUB}); }
   catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   const clubInfo=(bord.clubs||[]).find(c=>c.code===CLUB); if(clubInfo) CLUBNAAM=clubInfo.naam;
   $('#inhoud').innerHTML=
@@ -270,7 +277,7 @@ async function laadClub(){
       :'<div class="item"><div class="meta">Geen open sponsorpakketten op dit moment.</div></div>')+
     '<div class="item"><div class="meta">Interesse tonen kan op codenaam; de club beslist zelf en neemt contact op.</div></div>';
   document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=async()=>{
-    try{ const r=await api('/sponsor',{club:CLUB,id:b.dataset.sp}); meld('U staat op de lijst voor "'+r.sponsor.pakket+'"; de club neemt contact op.'); }
+    try{ const r=await api('/api/member/sport/sponsor',{club:CLUB,id:b.dataset.sp}); meld('U staat op de lijst voor "'+r.sponsor.pakket+'"; de club neemt contact op.'); }
     catch(e){ meld(e.message); }
   });
   verbindOpen();

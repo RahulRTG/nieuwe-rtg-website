@@ -1,16 +1,18 @@
 'use strict';
+// De betaallink is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026).
 module.exports = ({ app, db, kern }, deel, betalen, stuur) => {
+  const { auth } = kern, { handleVan } = require('../kern/gast/naad')();
   const weg = { status:404, error:'Deze link is verlopen, ingetrokken of niet geldig.' };
   async function actueel() {
     if (typeof db.verversVerzoekCollectie === 'function') {
       for (const c of ['tenants','werkruimtes','betaalWaarheid','betaalWaarheidMeldingen']) await db.verversVerzoekCollectie(c);
     } else if (process.env.NODE_ENV === 'production') throw new Error('Actuele betaalbevoegdheid ontbreekt');
   }
-  app.post('/api/werk-gast/betaling/start', async (req,res) => {
+  app.post('/api/werk-gast/betaling/start', auth, async (req,res) => {
     await actueel(); let r;
     await kern.bijeen(() => {
       const g = deel.gast(req.body || {});
-      r = g ? betalen.voorbereid(g,req.body || {}) : weg;
+      r = g ? betalen.voorbereid(g,req.body || {},handleVan(req.session)) : weg;
     }, { duurzaam:true });
     if (!r.ok) return stuur(res,r);
     try {
@@ -21,7 +23,7 @@ module.exports = ({ app, db, kern }, deel, betalen, stuur) => {
       return stuur(res,{ status:502, error:'De betaalprovider gaf nog geen uitsluitsel. Vernieuw de betaalstatus; start geen andere betaling.' });
     }
   });
-  app.post('/api/werk-gast/betaling/status', async (req,res) => {
+  app.post('/api/werk-gast/betaling/status', auth, async (req,res) => {
     await actueel();
     const g = deel.gast(req.body || {}); if (!g) return stuur(res,weg);
     const r = betalen.record(g.w,g.p,g.x);

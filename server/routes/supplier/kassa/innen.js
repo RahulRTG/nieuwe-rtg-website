@@ -58,7 +58,7 @@ app.post('/api/supplier/pos/redeem', supplierAuth, async (req, res) => {
        bon die vorige maand is geplaatst en vandaag wordt opgehaald mee in de
        VORIGE maand -- en dan wijkt hij af van de factuur hieronder, die de datum
        van vandaag draagt. */
-    o.paidAt = new Date().toISOString();
+    o.paidAt = require('../../../lib/klok').datum().toISOString();
     sale = {
       id: crypto.randomBytes(4).toString('hex'),
       bon: pickupCode(),
@@ -68,7 +68,7 @@ app.post('/api/supplier/pos/redeem', supplierAuth, async (req, res) => {
       desc: 'RTG-ophaalbestelling ' + o.ref,
       room: null,
       items: o.items, total: o.total, method: 'rtg',
-      at: new Date().toISOString()
+      at: require('../../../lib/klok').datum().toISOString()
     };
     const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
     list.unshift(sale);

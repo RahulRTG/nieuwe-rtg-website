@@ -142,6 +142,10 @@ function main() {
     process.exit(1);
   }
   const takken = v8takken.tel(samen);
+  if (!takken.totaal) {
+    console.error('Geen gemeten brontakken: een lege takkenmeting is geen 100% dekking.');
+    process.exit(1);
+  }
   /* De sleutel B:<begin> rust op een aanname die binnen een proces te
      controleren is (scripts/lib/v8takken.js). Faalt die ergens, dan kan een
      sleutel twee takken betekenen: niet rekenen. */

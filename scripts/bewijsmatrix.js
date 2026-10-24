@@ -65,7 +65,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
 
-const { stempel } = require('./lib/stempel');
+const { stempel, versheid } = require('./lib/stempel');
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'BEWIJSMATRIX.json');
 
@@ -318,12 +318,17 @@ function geraakt() {
 /* De rolproef per route: welke schrijfroutes zijn met een verkeerde rol
    beproefd. Staat een route er NIET in, dan blijven ACL en PRIVACY ongemeten --
    "geen bevinding" is hier geen groen, want er is niet gekeken. */
-function rolproefUitslag() {
+function rolproefUitslag({ lees = () => fs.readFileSync(ROLPROEF, 'utf8'), vers = versheid } = {}) {
   if (!ROLPROEF) return null;
   try {
-    const j = JSON.parse(fs.readFileSync(ROLPROEF, 'utf8'));
+    const j = JSON.parse(lees());
     if (!Array.isArray(j.perRoute)) return null;
     const kaart = new Map();
+    kaart.stempel = j.stempel;
+    kaart.versheid = j.stempel && j.stempel.boomVuil === false &&
+      j.stempel.instrument === 'scripts/rolproef-route.js'
+      ? vers(j.stempel) : { vers: false, reden: 'ROLPROEF.json heeft geen geldig bronstempel van de rolproef' };
+    kaart.gemeten = j.gemeten;
     for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
     /* NIET TE KRUISEN IS GEEN GAT. Een route waarvan de rol geen sleutel heeft
        (`openbaar`, `omgeving`, `eigen-poort`) kan per definitie niet met een
@@ -715,11 +720,19 @@ function bouw(invoer) {
         if (beproefd) {
           /* Beproefd EN doorstaan is bewezen; beproefd en gezakt is een
              bevinding, en die hoort niet als bewijs te tellen. */
-          const stuk = s.id === 'ACL' ? beproefd.acl === 'OPEN' : beproefd.privacy === 'LEK';
+          const oordeel = require('./lib/rolproef').beoordeelRolrij(beproefd);
+          const g = rol.gemeten;
+          const stuk = (s.id === 'ACL' ? oordeel.acl === 'OPEN' : oordeel.privacy === 'LEK') ||
+            (s.id === 'ACL' && Number.isInteger(g?.zijeffecten) && g.zijeffecten > 0);
+          const vers = rol.versheid?.vers === true;
+          const geslaagd = vers && g && ['zijeffecten', 'blindeRondes'].every(k => Number.isInteger(g[k]) && g[k] === 0);
+          const bewezen = geslaagd && (s.id === 'ACL' ? oordeel.acl === 'dicht' : oordeel.privacy === 'schoon');
           cellen[s.id] = stuk
-            ? { staat: 'gezakt', bron: 'rolproef', rollen: beproefd.geprobeerd }
-            : { staat: 'bewezen', bron: 'rolproef', rollen: beproefd.geprobeerd };
-        } else if (geenSleutel) {
+            ? { staat: 'gezakt', bron: 'rolproef', rollen: beproefd.geprobeerd, reden: g?.zijeffecten > 0 ? 'de rolproef mat blijvende ongeoorloofde wijzigingen' : oordeel.reden }
+            : { staat: bewezen ? 'bewezen' : 'ongemeten', bron: 'rolproef', rollen: beproefd.geprobeerd,
+                reden: !vers ? 'ROLPROEF.json niet vers: ' + (rol.versheid?.reden || 'geen broncontrole')
+                  : geslaagd ? oordeel.reden : 'geen aantoonbaar geslaagde hele rolmeting' };
+        } else if (geenSleutel && rol.versheid?.vers === true) {
           cellen[s.id] = { staat: 'nvt', bron: 'rolproef', reden: geenSleutel.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
@@ -812,6 +825,21 @@ function bouw(invoer) {
       }
 
       cellen[s.id] = { staat: 'ongemeten' };
+    }
+
+    /* ONGEMETEN ZONDER REDEN BESTAAT NIET. Het routedossier belooft "ongemeten
+       met de reden erbij" (routes/office/dossier.js), maar de terugval van elke
+       tak hierboven gaf { staat: 'ongemeten' } -- ruim 9.700 cellen zonder een
+       woord (scripts/lib/voltooi/routedossier.js). De meest voorkomende reden
+       is dat geen register de route voor die schakel noemt; dat staat er nu.
+       En een 'verklaard' zegt door wie en waar, want dat is alles wat het is. */
+    for (const s of SCHAKELS) {
+      const c = cellen[s.id];
+      if (c.staat === 'ongemeten' && !c.reden) c.reden = c.bron
+        ? c.bron + ' gaf voor deze route geen oordeel'
+        : 'geen register noemt deze route voor ' + s.id;
+      if (c.staat === 'verklaard' && !c.reden) c.reden = 'verklaard door ' + (c.bron || 'de brontekst') +
+        (c.waar ? ' (' + c.waar + ')' : '') + '; niemand heeft het nagevraagd';
     }
 
     rijen.push({
@@ -944,7 +972,7 @@ function ketenKaartUit(scenarios) {
    vormgrendel kan zien AFGAAN. Een grendel die niemand heeft zien dichtvallen,
    is geen grendel (LAT.md regel 10) -- en juist deze is er omdat een stille
    `return null` de AUDIT-kolom ruim een jaar op nul hield. */
-module.exports = { bouw, achteruit, ketenUitslag, ketenKaartUit, objectRegister, perRouteKaart,
+module.exports = { bouw, achteruit, ketenUitslag, ketenKaartUit, objectRegister, perRouteKaart, rolproefUitslag,
   SCHAKELS, LEESMETHODEN, CONTROL };
 
 /* Alleen doen als iemand dit bestand DRAAIT. Wordt het geladen (door een toets,

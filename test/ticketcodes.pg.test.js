@@ -26,7 +26,8 @@ test('ticket- en kaartcodes zijn hash-only en claimen atomair over twee PG/Redis
     const { merge3 } = require('../server/db/merge');
     const { createClient } = require('../server/redis');
     const kluis = require('../server/kluis');
-    const nieuwPg = () => maakPg({ merge3, kluis, log: { warn() {} }, url: PG_URL });
+    const iso = await require('./lib/living-world-pg-database')(PG_URL);
+    const nieuwPg = () => maakPg({ merge3, kluis, log: { warn() {} }, url: iso.url });
     const a = nieuwPg(), b = nieuwPg();
     const ra = createClient({ url: REDIS_URL }), rb = createClient({ url: REDIS_URL });
     try {
@@ -44,7 +45,10 @@ test('ticket- en kaartcodes zijn hash-only en claimen atomair over twee PG/Redis
       await a.schema();
       await a.flush({ ticketToegang: {}, mobKaartToegang: {} }, true);
       const dataA = await a.laadAlles(), dataB = await b.laadAlles();
-      const vandaag = new Date().toISOString().slice(0, 10);
+      // Vaste klok na lokale middernacht: de ticketdag is Amsterdam, niet UTC.
+      // Dezelfde klok voedt beide instanties en beide bearer-implementaties.
+      const nu = () => '2026-10-22T22:30:00.000Z';
+      const vandaag = '2026-10-23';
       /* De boeking en het kaartje zijn op beide instances dezelfde: in productie
          komen ze uit hun eigen opslag. Hier telt alleen wat in de toegangsrij
          serialiseert. */
@@ -53,11 +57,11 @@ test('ticket- en kaartcodes zijn hash-only en claimen atomair over twee PG/Redis
       ['PG-T2', { ref: 'PG-T2', kind: 'ticket', supplierCode: 'ZAAK', customerKey: 'lid:2',
         datum: vandaag, tijd: '23:00', paid: true, status: 'bevestigd' }]]);
       const kaartje = { id: 'kt-pg', key: 'lid:3', vervoerder: 'BUS', product: 'enkel', validaties: [],
-        geldigTot: new Date(Date.now() + 3600000).toISOString() };
-      const tk = (pg, data) => require('../server/kern/tickettoegang')({ db: { data, writable: true }, save() {}, crypto,
+        geldigTot: new Date(Date.parse(nu()) + 3600000).toISOString() };
+      const tk = (pg, data) => require('../server/kern/tickettoegang')({ db: { data, writable: true }, save() {}, crypto, nu,
         bewerkCollectie: (sleutel, werk) => pg.bewerkCollectie(sleutel, data, werk) });
       const ov = (pg, data) => require('../server/kern/mobiliteit/kaarttoegang')({ crypto, save() {},
-        nu: () => new Date().toISOString(), opslag: { bak: () => [] }, KAART_PRODUCTEN: { enkel: { ritten: 1 } },
+        nu, opslag: { bak: () => [] }, KAART_PRODUCTEN: { enkel: { ritten: 1 } },
         bewerkCollectie: (sleutel, werk) => pg.bewerkCollectie(sleutel, data, werk) });
       const ta = tk(a, dataA), tb = tk(b, dataB), oa = ov(a, dataA), ob = ov(b, dataB);
       const boekingVan = ref => tickets.get(ref);
@@ -69,7 +73,10 @@ test('ticket- en kaartcodes zijn hash-only en claimen atomair over twee PG/Redis
 
       // 1. twee poorten scannen hetzelfde ticket tegelijk: een keer binnen
       const t1 = await ta.uitgeven({ boeking: tickets.get('PG-T1'), key: 'lid:1' });
-      assert.equal(t1.status, 200);
+      assert.equal(t1.status, 200, JSON.stringify(t1));
+      assert.equal((await ta.uitgeven({ boeking: { ...tickets.get('PG-T1'), ref: 'PG-OUD',
+        datum: '2026-10-22' }, key: 'lid:1' })).status, 409,
+      'gisteren blijft verlopen terwijl het geldige ticket vandaag bruikbaar is');
       const poorten = await Promise.all([
         ta.claim({ code: t1.code, supplierCode: 'ZAAK', actor: { name: 'A' }, boekingVan }),
         tb.claim({ code: t1.code, supplierCode: 'ZAAK', actor: { name: 'B' }, boekingVan })
@@ -82,6 +89,7 @@ test('ticket- en kaartcodes zijn hash-only en claimen atomair over twee PG/Redis
 
       // 2. een scan op A tegen een rotatie op B: nooit allebei
       const t2 = await ta.uitgeven({ boeking: tickets.get('PG-T2'), key: 'lid:2' });
+      assert.equal(t2.status, 200, JSON.stringify(t2));
       const [scan, rot] = await Promise.all([
         ta.claim({ code: t2.code, supplierCode: 'ZAAK', actor: { name: 'A' }, boekingVan }),
         tb.uitgeven({ boeking: tickets.get('PG-T2'), key: 'lid:2' })
@@ -106,5 +114,6 @@ test('ticket- en kaartcodes zijn hash-only en claimen atomair over twee PG/Redis
     } finally {
       await Promise.allSettled([ra.quit(), rb.quit()]);
       await Promise.allSettled([a.sluit(), b.sluit()]);
+      await iso.close();
     }
   });

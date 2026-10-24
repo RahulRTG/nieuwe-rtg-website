@@ -7,8 +7,8 @@
 module.exports = (kern) => {
   const { app, db, save, supplierAuth } = kern;
 
-  const vandaag = () => new Date().toISOString().slice(0, 10);
-  const overDagen = d => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
+  const vandaag = () => require('../../kern/tijdzone').datumIn();
+  const overDagen = d => require('../../kern/tijdzone').plusDagen(vandaag(), d);
   const bak = (naam, code) => (db.data[naam] || {})[code] || null;
   const t = (id, prio, tekst) => ({ id, prio, tekst });
   /* Net als de pols: de genre-motor wekken als hij nog nooit is geopend.

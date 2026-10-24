@@ -9,6 +9,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const { LANDEN } = require('../server/kern/fiscaal/landen');
 const reis = require('../server/kern/reis')({ LANDEN });
@@ -91,8 +92,9 @@ test('de reiswijzer-API: elk land opvraagbaar, ook voor de gratis app', async ()
   assert.ok(w.body.visum.tekst && w.body.alarm === '112' && w.body.fooi);
   const landen = await api('reis/landen', {}, lid.token);
   assert.ok(landen.body.landen.length >= 180, 'alle landen staan in de lijst');
-  const gast = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'guest' }) })).json();
-  assert.equal((await api('reis/wijzer', { land: 'FR' }, gast.token)).status, 200, 'veilig reizen is er ook voor gasten');
+  // de gast van vroeger is een gratis account (eigenaarsbesluit 19 oktober 2026)
+  const gast = await registreerGratis(base);
+  assert.equal((await api('reis/wijzer', { land: 'FR' }, gast.token)).status, 200, 'veilig reizen is er ook voor een gratis account');
 });
 
 test('reisbureau-aanvraag: de boeker krijgt automatisch alle regels van de bestemming mee', async () => {
@@ -103,9 +105,11 @@ test('reisbureau-aanvraag: de boeker krijgt automatisch alle regels van de beste
   assert.match(r.body.reiswijzer.visum.tekst, /Geen visum nodig/);
 });
 
-test('partnerboeking (niet-lid): ook daar reizen de regels mee', async () => {
+test('partnerboeking (zonder pas): ook daar reizen de regels mee', async () => {
+  // boeken vraagt een account, en een gratis account zonder pas is genoeg
+  const klant = await registreerGratis(base);
   const r = await fetch(base + '/api/book', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + klant.token },
     body: JSON.stringify({ tripId: 'gstaad-alpien', name: 'Test Reiziger', email: 'reiziger@test.nl' })
   });
   assert.equal(r.status, 200);

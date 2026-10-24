@@ -63,8 +63,8 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
     const tok = await proeflid(base);
 
     /* Een afspraak van 08:00 en een charter van 09:30: twee onderdelen op twee
-       plekken, en de tweede is een vlucht -- dus de volgende plek is een
-       luchthaven en niet de bestemming. */
+       plekken, en de tweede is een vlucht. Eerst moet de reiziger naar de afspraak,
+       daarna naar de luchthaven en niet rechtstreeks naar de bestemming. */
     const d = morgen();
     const bk = await post(base, '/api/booking/request', { supplierCode: 'KAITO', serviceId: 's1', date: d, time: '08:00' }, tok);
     assert.equal(bk.status, 200, 'boeking: ' + JSON.stringify(bk.data));
@@ -85,9 +85,11 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
     assert.match(dekking, /%/, 'de dekking staat erbij: "' + dekking + '"');
     assert.match(cijfers, /min/, 'de minuten staan erbij: "' + cijfers + '"');
 
+    const eerste = await post(base, '/api/move/volgende', {}, tok);
+    assert.equal(eerste.status, 200);
+    assert.equal(eerste.data.volgende.kenmerk, bk.data.boeking.ref, 'de afspraak van 08:00 komt eerst');
     const label = (await page.locator('#verder').textContent()).trim();
-    assert.match(label, /airport|luchthaven/i, 'de verderknop noemt de luchthaven: "' + label + '"');
-    assert.doesNotMatch(label, /parijs|bourget/i, 'en niet de bestemming: "' + label + '"');
+    assert.equal(label, 'Naar ' + eerste.data.volgende.plek.label);
 
     /* De verderknop is een handeling van het scherm (data-ds-actie): de Edge
        biedt hem onder Acties aan, zoals een lid hem daar ook vindt. */
@@ -99,6 +101,25 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
     assert.ok(Number.isFinite(naar[0]) && Number.isFinite(naar[1]), 'en die plek is OPGELOST: ' + page.url());
     assert.deepEqual(fouten, [], 'geen paginafout op het scherm of in de overdracht');
     await ctx.close();
+
+    // Een afzonderlijke reis begint met een charter: dan is de luchthaven
+    // de eerstvolgende plek. De afspraak hierboven mag niet worden overgeslagen.
+    const vliegTok = await proeflid(base);
+    assert.equal((await post(base, '/api/member/vluchten/charter',
+      { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, vliegTok)).status, 200);
+    const vlucht = await blad(browser, vliegTok);
+    await vlucht.page.goto(base + SCHERM, { waitUntil: 'domcontentloaded' });
+    await vlucht.page.waitForFunction(() => !document.querySelector('#verderVak').hidden);
+    const vliegLabel = (await vlucht.page.locator('#verder').textContent()).trim();
+    assert.match(vliegLabel, /airport|luchthaven/i, 'de charterknop noemt de luchthaven');
+    assert.doesNotMatch(vliegLabel, /parijs|bourget/i, 'niet de bestemming');
+    await vlucht.page.locator('[data-ds-edge="acties"]').click();
+    await vlucht.page.locator('#dsEdgeBlad button', { hasText: vliegLabel }).click();
+    await vlucht.page.waitForURL(/navigatie\.html/);
+    const vliegPlek = (await post(base, '/api/move/volgende', {}, vliegTok)).data.volgende.plek;
+    assert.equal(new URL(vlucht.page.url()).searchParams.get('naar'), vliegPlek.lat + ',' + vliegPlek.lng);
+    assert.deepEqual(vlucht.fouten, []);
+    await vlucht.ctx.close();
   } finally {
     if (browser) await browser.close();
     stop(srv);

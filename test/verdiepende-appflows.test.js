@@ -64,8 +64,8 @@ test('WorkOS opent werkdag, besluit en overdracht direct in de bestaande command
   // besluiten voorleggen en nemen doet Decision Room (SCHERMEIGENAAR.json): RTG One
   // opent daar een nieuw besluit, en keurt niet zelf goed
   assert.match(one, /\/apps\/decision-room\.html\?nieuw=1/);
-  assert.doesNotMatch(one, /endpoint:'goedkeuring'/);
-  assert.match(one, /endpoint:'overdracht'/);
+  assert.doesNotMatch(one, /endpoint:'(?:\/api\/rtgone\/)?goedkeuring(?:\/beslis)?'/);
+  assert.match(one, /endpoint:'\/api\/rtgone\/overdracht'/);
 });
 
 test('FoundationOS verbindt schooldag, huiswerkhulp en bericht zonder de toegangspoort te omzeilen', () => {

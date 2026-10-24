@@ -62,6 +62,8 @@ module.exports = ctx => {
   function zet(key, tier, data) {
     tier = tierVan(tier);
     const p = eigen.bak('ovRegie')[key] || standaard(tier);
+    const voor = JSON.stringify({ automaten: p.automaten, comfort: p.comfort,
+      privacy: { discreteMeldingen: !!p.privacy.discreteMeldingen, locatieNaRitWissen: true } });
     if (data.automaat) {
       const a = AUTOMATEN[data.automaat];
       if (!a || !a.tiers.includes(tier)) return { status: 403, error: 'Deze regie hoort niet bij uw lidmaatschap.' };
@@ -74,6 +76,9 @@ module.exports = ctx => {
     }
     if (data.privacy) p.privacy.discreteMeldingen = tier === 'business' && data.privacy.discreteMeldingen === true;
     p.privacy.locatieNaRitWissen = true;
+    const na = JSON.stringify({ automaten: p.automaten, comfort: p.comfort,
+      privacy: { discreteMeldingen: !!p.privacy.discreteMeldingen, locatieNaRitWissen: true } });
+    if (voor === na) return profiel(key, tier);
     p.bijgewerkt = klokDatum().toISOString();
     eigen.bak('ovRegie')[key] = p; save();
     return profiel(key, tier);

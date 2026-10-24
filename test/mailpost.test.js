@@ -18,6 +18,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
+// de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
+const { GEHEIM, zetKop } = require('./mailpoort');
+zetKop();
 
 let BASE, child, lidTok, lidAdres;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mailpost-'));
@@ -32,7 +35,7 @@ const post = async (pad, body, tok, kop) => (await rauw(pad, body, tok, kop)).bo
 
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  ({ child, base: BASE } = await startServer({ env: { RTG_MAILPOORT_GEHEIM: GEHEIM, RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   const reg = await post('/api/auth/register', { name: 'Poort Lid', email: 'poort@x.nl',
     phone: '0612345661', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lidTok = reg.token;

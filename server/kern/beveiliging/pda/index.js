@@ -99,7 +99,7 @@ module.exports = (ctx) => {
   /* ---- het commandocentrum: alles in een oogopslag ---- */
   function command(s) {
     const b = defaults(s);
-    const dag = vandaag();
+    const dag = vandaag(s);
     const rst = rooster(s, dag, 1).dagen[0];
     const opDienst = diensten().filter(d => d.supplierCode === s.code && d.status === 'ingeklokt')
       .map(d => dienstPubliek(s, d));

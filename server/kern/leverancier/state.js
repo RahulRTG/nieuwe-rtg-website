@@ -79,7 +79,7 @@ module.exports = (ctx) => {
             .map(r => ({ id: r.id, codename: r.codename, score: r.score, tekst: r.tekst, at: r.at, reactie: r.reactie || null }))
         };
       })(),
-      tickets: (db.data.tickets[s.code] || []).slice(0, 40),
+      tickets: require('./zaak').ticketsVanZaak(db, s.code).slice(0, 40),
       lostfound: (db.data.lostfound[s.code] || []).slice(0, 40),
       /* De gastgesprekken komen sinds de verhuizing uit de communicatiekern
          (kern/comm/gast.js). voorZaak() levert dezelfde vorm als hiervoor

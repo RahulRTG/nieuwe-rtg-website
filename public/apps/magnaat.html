@@ -130,6 +130,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="magnaat-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="false" data-mv-scherm="wereld" data-rtg-layout="standard">
 <section class="magnaat-voorzijde" id="magnaatVoorzijde" aria-label="Magnaat veilige oefenwereld">
@@ -426,7 +427,7 @@ document.querySelectorAll('[data-screen]').forEach(b=>b.onclick=()=>go(b.dataset
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 
 async function load(){
-  try{DATA=await api('overzicht');/* Onvolledig antwoord: langs de foutweg, niet om vallen met een ruwe TypeError in de toast (LIEGRONDE.json). */if(!(DATA&&DATA.speler&&DATA.wereld&&DATA.capabilityGraph&&DATA.capabilityGraph.cijfers&&DATA.spelbrug&&Array.isArray(DATA.catalogus)))throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');render();if(DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;renderPda();}if(DATA.speler.kantoor)await loadControl(1);}
+  try{const volgende=await api('overzicht');/* Onvolledig antwoord: langs de foutweg, niet om vallen met een ruwe TypeError in de toast (LIEGRONDE.json). */if(!(volgende&&volgende.speler&&volgende.wereld&&volgende.capabilityGraph&&volgende.capabilityGraph.cijfers&&volgende.spelbrug&&Array.isArray(volgende.catalogus)))throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');DATA=volgende;render();if(DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;renderPda();}if(DATA.speler.kantoor)await loadControl(1);}
   catch(e){toast(e.message)}
 }
 function render(){
@@ -550,7 +551,7 @@ function renderTask(){
   document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>answer(Number(b.dataset.answer)));
 }
 async function submitAction(){const invoer={};document.querySelectorAll('[data-field]').forEach(e=>invoer[e.dataset.field]=e.type==='checkbox'?e.checked:e.value.trim());const b=$('#saveAction');b.disabled=true;try{const d=await api('taak/actie',{taakId:TASK.id,invoer});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.feedback)}catch(e){toast(e.message);b.disabled=false}}
-async function answer(keuze){document.querySelectorAll('[data-answer]').forEach(b=>b.disabled=true);try{const d=await api('taak/antwoord',{taakId:TASK.id,keuze});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.goed?'Sterke keuze.':'Je krijgt de juiste werkwijze mee.')}catch(e){toast(e.message);renderTask()}}
+async function answer(keuze){document.querySelectorAll('[data-answer]').forEach(b=>b.disabled=true);try{const d=await api('taak/antwoord',{taakId:TASK.id,keuze,stap:TASK.stap});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.goed?'Sterke keuze.':'Je krijgt de juiste werkwijze mee.')}catch(e){toast(e.message);renderTask()}}
 function openWorkflowScreen(){
   const stap=TASK&&TASK.huidig,frame=$(DEVICE==='pda'?'#rtgPda':'#rtgComputer');
   if(!stap||stap.soort!=='software'||!/^\/apps\/[^?#]+\.html$/.test(stap.schermPad||'')){toast('Dit werkprocesscherm kan niet veilig worden geopend.');return}
@@ -637,7 +638,9 @@ function updateTeamSummary(k){
 }
 let TEAM_CODE=null;/* de kale kamercode alleen in het geheugen van deze pagina: de server toont hem een keer */
 function onthoudTeamCode(k){if(k&&k.toegangscode)TEAM_CODE={id:k.id,code:k.toegangscode}}
-async function createTeamRoom(code){try{const d=await api('teamkamer/maak',{code});onthoudTeamCode(d.kamer);TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('Premium teamkamer gemaakt. Deel alleen de tijdelijke toegangscode.')}catch(e){toast(e.message)}}
+/* een herhaalsleutel per kamer die je wilt maken; na succes een nieuwe */
+let TEAM_IDEM='',TEAM_IDEM_VOOR='';
+async function createTeamRoom(code){if(!TEAM_IDEM||TEAM_IDEM_VOOR!==code){TEAM_IDEM=RTGId('kamer');TEAM_IDEM_VOOR=code;}try{const d=await api('teamkamer/maak',{code,idem:TEAM_IDEM});TEAM_IDEM='';onthoudTeamCode(d.kamer);TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('Premium teamkamer gemaakt. Deel alleen de tijdelijke toegangscode.')}catch(e){toast(e.message)}}
 async function openTeamRoom(id){try{const d=await api('teamkamer/mijn',{id});TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom()}catch(e){toast(e.message)}}
 async function joinTeamRoom(){const code=$('#teamJoinCode').value.trim();if(!code){toast('Vul de toegangscode in.');return}try{const d=await api('teamkamer/deelnemen',{code});TEAM_ROOM=d.kamer;$('#teamJoinCode').value='';updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('U werkt nu mee in het gedeelde synthetische dossier.')}catch(e){toast(e.message)}}
 function renderTeamRoom(){
@@ -720,7 +723,8 @@ function renderEconomy(){
   renderEconomistLab(e);
 }
 async function planShock(schokId){try{const d=await api('economie/schok',{schokId});DATA.economie=d;renderEconomy();toast('Stress-scenario staat klaar voor de volgende economische dag.')}catch(e){toast(e.message)}}
-$('#ecoStrategy').onsubmit=async ev=>{ev.preventDefault();const b=ev.submitter;b.disabled=true;const body={prijs:Number($('#ecoPrice').value),personeelDoel:Number($('#ecoStaff').value),loonMaand:Number($('#ecoWage').value),trainingDag:Number($('#ecoTraining').value),bestelling:Number($('#ecoOrder').value),impactPct:Number($('#ecoImpact').value)};try{const d=await api('economie/beslis',body);DATA.economie=d;renderEconomy();toast('Strategie vastgelegd. De markt rekent morgen door.')}catch(e){toast(e.message)}finally{b.disabled=false}};
+let ecoBedoeling=null;
+$('#ecoStrategy').onsubmit=async ev=>{ev.preventDefault();const b=ev.submitter;b.disabled=true;ecoBedoeling=ecoBedoeling||crypto.randomUUID();const body={prijs:Number($('#ecoPrice').value),personeelDoel:Number($('#ecoStaff').value),loonMaand:Number($('#ecoWage').value),trainingDag:Number($('#ecoTraining').value),bestelling:Number($('#ecoOrder').value),impactPct:Number($('#ecoImpact').value),idem:ecoBedoeling};try{const d=await api('economie/beslis',body);ecoBedoeling=null;DATA.economie=d;renderEconomy();toast('Strategie vastgelegd. De markt rekent morgen door.')}catch(e){toast(e.message)}finally{b.disabled=false}};
 $('#econAnalysis').onsubmit=async ev=>{ev.preventDefault();const b=ev.submitter;b.disabled=true;const body={hypothese:$('#econHypothesis').value,maatregel:$('#econMeasure').value,indicatoren:[...document.querySelectorAll('[data-econ-indicator]:checked')].map(x=>x.dataset.econIndicator),causaleKeten:$('#econCausal').value,alternatief:$('#econAlternative').value,opportunityCost:$('#econOpportunity').value,risico:$('#econRisk').value,zekerheid:Number($('#econConfidence').value),verwachteOmzet:Number($('#econRevenueForecast').value),verwachteWinst:Number($('#econProfitForecast').value),verwachteInflatie:Number($('#econInflationForecast').value),omzetRichting:$('#econRevenueDirection').value,winstRichting:$('#econProfitDirection').value,kasRichting:$('#econCashDirection').value};try{const d=await api('economie/analyse',body);DATA.economie=d;renderEconomy();toast('Analyse vastgelegd. De forecast wordt na de volgende dag geijkt.')}catch(e){toast(e.message)}finally{b.disabled=false}};
 $('#nextEcoDay').onclick=async()=>{const b=$('#nextEcoDay');b.disabled=true;try{const commandoId=RTGId('eco');const d=await api('economie/volgende-dag',{commandoId});DATA.economie=d;renderEconomy();toast('Speldag '+d.dag+' verwerkt door '+(d.rekenmotor==='rust'?'Rust native':'de veilige lokale motor')+': '+d.actieveSchok.naam+'.')}catch(e){toast(e.message)}finally{b.disabled=false}};
 function renderFuture(){const p=DATA.futureLab;$('#proposals').innerHTML=p.length?p.map(v=>'<article class="card proposal"><span class="lane">'+(v.spoor==='rtf'?'RTFoundation':'RTG product')+'</span><span class="phase">'+esc(v.status)+'</span><h3>'+esc(v.naam)+'</h3><p>'+esc(v.probleem)+'</p><dl><dt>Voor wie</dt><dd>'+esc(v.doelgroep)+'</dd><dt>Oplossing</dt><dd>'+esc(v.oplossing)+'</dd><dt>Impact</dt><dd>'+esc(v.impact)+'</dd>'+(v.bewijs&&Number.isFinite(v.bewijs.missies)&&Number.isFinite(v.bewijs.gemiddelde)?'<dt>Spelbewijs</dt><dd>'+v.bewijs.missies+' missies · '+v.bewijs.gemiddelde+'% kwaliteit</dd>':'')+'<dt>Bouwt op</dt><dd>'+v.gebruiktFuncties.map(esc).join(' · ')+'</dd></dl></article>').join(''):'<p class="muted">De scan heeft nog geen ontbrekende productkans gevonden.</p>'}

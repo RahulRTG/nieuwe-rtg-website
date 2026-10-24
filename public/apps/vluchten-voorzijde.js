@@ -11,8 +11,8 @@ let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catc
 const taal = () => document.documentElement.lang || 'nl';
 function datum(d) { if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '')) return esc(d); return new Intl.DateTimeFormat(taal(), { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d + 'T12:00:00')); }
 function meld(t) { const m = $('#melding'); m.textContent = t; m.classList.add('toon'); clearTimeout(m._t); m._t = setTimeout(() => m.classList.remove('toon'), 2800); }
-const api = (pad, body) => fetch('/api/member/vluchten' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
-  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+const api = (pad, body, herkans) => fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
+  .then(async r => { const d = await r.json().catch(() => ({})); const p = herkans ? null : (window.RTGGegevensPoort && window.RTGGegevensPoort.vang(d, r.status, () => api(pad, body, true), api)); if (p) return p; if (!r.ok) { throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 const START_VIEW = new URLSearchParams(location.search).get('view');
 let TAB = ['mijn', 'charter'].includes(START_VIEW) ? START_VIEW : 'bord';
 let BORD = null;   // wat er binnenkwam; waaruit dit scherm tekent
@@ -67,7 +67,7 @@ const ICOON_RICHTING = '<svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hid
 const rij = (icoon, label, invoer) => '<label class="ds-veld">' + icoon + '<span><span class="ds-veld__label">' + label + '</span>' + invoer + '</span><span></span></label>';
 async function laadBord() {
   let d; try {
-    d = await api('/bord');
+    d = await api('/api/member/vluchten/bord');
     /* Ontbreekt een veld, dan de eigen foutmelding hieronder: nooit een lege
        lijst (die zou beweren dat er niets is) en nooit een ruwe TypeError (LIEGRONDE.json). */
     if (!(d && Array.isArray(d.security) && Array.isArray(d.vluchten))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
@@ -99,7 +99,7 @@ async function laadBord() {
   }
   $('#vliegNaar').addEventListener('input', filterBord); $('#vliegDatum').addEventListener('change', filterBord); $('#vliegSoort').addEventListener('change', filterBord);
   document.querySelectorAll('[data-boek]').forEach(b => b.addEventListener('click', async () => {
-    try { const r = await api('/boek', { id: b.dataset.boek }); meld('Geboekt: ' + r.boeking.id + '. Inchecken kan zodra het open staat.'); } catch (e) { meld(e.message); }
+    try { const r = await api('/api/member/vluchten/boek', { id: b.dataset.boek }); meld('Geboekt: ' + r.boeking.id + '. Inchecken kan zodra het open staat.'); } catch (e) { meld(e.message); }
   }));
 }
 zetTab(TAB);

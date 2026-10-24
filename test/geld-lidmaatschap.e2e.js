@@ -20,6 +20,7 @@
    Draai los: node --test test/geld-lidmaatschap.e2e.js
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -49,8 +50,8 @@ async function registreer(base) {
 async function lidMetAbonnement(base, office) {
   const lid = await registreer(base);
   const aanvraag = (await api(base, '/api/aanmelding/aanvraag',
-    { pas: 'rtg', naam: 'Lid ' + lid.u, contact: lid.u + '@x.nl' }, lid.token)).body;
-  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+    { idem: randomUUID(), pas: 'rtg', naam: 'Lid ' + lid.u, contact: lid.u + '@x.nl' }, lid.token)).body;
+  const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   assert.ok(id, 'de aanvraag is binnen: ' + JSON.stringify(aanvraag).slice(0, 160));
   const besluit = await api(base, '/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, office);
   assert.equal(besluit.status, 200, 'het kantoor keurt goed');

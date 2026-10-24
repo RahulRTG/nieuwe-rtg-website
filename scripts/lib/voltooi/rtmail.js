@@ -60,7 +60,7 @@ async function loop(w, stap) {
       ziet: mijn ? 'B: van ' + mijn.van + ', gelezen ' + mijn.gelezen + ', ongelezen ' + b.ongelezen : 'B ZIET NIETS' };
   });
 
-  await stap('voltooibaar', 'A kan het bericht aan B niet lezen; B leest het, en het telt niet meer als ongelezen', async () => {
+  await stap('bevoegd', 'A kan het bericht aan B niet lezen; B leest het, en het telt niet meer als ongelezen', async () => {
     const vreemd = await w.post(LEES, { id: bericht.id }, A.token);
     const voor = (await inbox(B.token)).ongelezen;
     const l = await w.post(LEES, { id: bericht.id }, B.token);

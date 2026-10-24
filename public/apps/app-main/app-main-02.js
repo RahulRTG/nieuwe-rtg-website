@@ -58,7 +58,7 @@
 
   // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
   async function refreshState(){
-    try { applyState((await API.call('/state')).state); } catch(e){}
+    try { applyState((await API.call('/api/state')).state); } catch(e){}
   }
 
   let toastTimer;

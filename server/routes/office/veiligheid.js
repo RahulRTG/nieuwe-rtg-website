@@ -27,20 +27,30 @@ module.exports = (octx) => {
      25% van de ticketwaarde, Asset ticketwaarde + 15%) schuiven automatisch
      mee; de pool-leden krijgen direct bericht. */
   app.post('/api/office/asset/waarde', officeAuth, (req, res) => {
-    const r = kern.assetHertaxeer(req.body.assetId, req.body.waarde, 'RTG-kantoor');
+    const r = kern.assetsKantoor.assetHertaxeer(req.body.assetId, req.body.waarde, 'RTG-kantoor');
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
   // het poolbestuur: verkoop, poolkas, wachtlijst, open terugkopen en restdagen
-  app.post('/api/office/asset/overzicht', officeAuth, (req, res) => res.json(kern.assetKantoor()));
+  app.post('/api/office/asset/overzicht', officeAuth, (req, res) => res.json(kern.assetsKantoor.assetKantoor()));
   // een terugkoop uitbetalen (uiterlijk binnen het venster van dertig dagen)
   app.post('/api/office/asset/terugkoop', officeAuth, async (req, res) => {
-    const r = await kern.assetTerugkoopUit(req.body.verzoekId, 'RTG-kantoor');
+    const r = await kern.assetsKantoor.assetTerugkoopUit(req.body.verzoekId, 'RTG-kantoor');
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+  /* De aanvragen van Shared Assets: een mens van RTG OP NAAM beoordeelt
+     (kern/assets/aanvraag.js). De sleutel komt uit de kantoorsessie, nooit uit
+     het lijf; de gedeelde code heeft er geen en wordt geweigerd. */
+  app.post('/api/office/asset/aanvragen', officeAuth, (req, res) => res.json(kern.assetsKantoor.assetAanvragenKantoor()));
+  app.post('/api/office/asset/aanvraag/beslis', officeAuth, (req, res) => {
+    const r = kern.assetsKantoor.assetAanvraagBeslis({ id: req.body.id, besluit: String(req.body.besluit || ''), reden: req.body.reden,
+      doorKey: req.officeKey || null });
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
   // de jaarlijkse servicefee innen (per actief ticket een keer per jaar)
-  app.post('/api/office/asset/fees', officeAuth, async (req, res) => res.json(await kern.assetFeesInnen('RTG-kantoor')));
+  app.post('/api/office/asset/fees', officeAuth, async (req, res) => res.json(await kern.assetsKantoor.assetFeesInnen('RTG-kantoor')));
 
   // Naleving van de Salon-verplichting: welke partners zijn (niet) zichtbaar
   app.post('/api/office/salon-naleving', officeAuth, (req, res) => {

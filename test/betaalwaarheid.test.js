@@ -141,7 +141,8 @@ test('een domeinfout geeft geen vals webhook-succes en herstelt duurzaam in de r
 
   const teVroeg = await t.waarheid.ronde({ tot: Date.parse('2026-09-04T10:00:30.000Z') });
   assert.deepEqual(teVroeg, { ok: true, bekeken: 0, gelukt: 0, mislukt: 0, meldingen: 0,
-    hervat: { bekeken: 0, afgerond: 0, wachtNog: 0, geescaleerd: 0 } });
+    hervat: { bekeken: 0, afgerond: 0, wachtNog: 0, geescaleerd: 0 },
+    terug: { bekeken: 0, bevestigd: 0, geweigerd: 0, wachtNog: 0, geescaleerd: 0 } });
   t.zetNu(Date.parse('2026-09-04T10:01:01.000Z'));
   const hersteld = await t.waarheid.ronde();
   assert.equal(hersteld.gelukt, 1);

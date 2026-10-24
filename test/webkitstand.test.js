@@ -100,5 +100,9 @@ test('letOpFouten: met eigenZeef komt de afbreking ongefilterd bij de bak', () =
   const gezien = [];
   h.letOpFouten(page, { push: (m) => gezien.push(m) }, { eigenZeef: true });
   metMotor('webkit', () => luister(new Error(EIGEN)));
-  assert.deepEqual(gezien, [EIGEN]);
+  const overgang = 'Transition was aborted because of invalid state. ViewTransition opt-in disabled';
+  luister(new Error(overgang));
+  luister(new Error('Transition was skipped'));
+  assert.deepEqual(gezien, [EIGEN, overgang, 'Transition was skipped'],
+    'de eigen zeef krijgt ook native overgangsfouten, niet alleen WebKit-netwerkfouten');
 });

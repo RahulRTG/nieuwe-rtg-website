@@ -412,7 +412,7 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   // hierboven al aan zijn rekeningen-plafond)
   const l2 = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
   const cn = (await api('pay/overzicht', {}, l2.token)).body.codenaam;
-  const zak = await kapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk' }, 'RTG');
+  const zak = await kapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk', idem: 'salaris-bronrekening' }, 'RTG');
   const zakIban = zak.body.rekening.iban;
   await api('bank/storten', { iban: zakIban, centen: 100000, idem: 'sal-dek' }, l2.token);
 
@@ -959,4 +959,35 @@ test('een dubbeltik maakt geen tweede pas, vaste betaling of klompje', async () 
     'zelfde sleutel, ander bedrag: een conflict');
   assert.equal((await api('pay/verzoek', { aan: [cn], totaalCenten: 2500, idem: 'kl-2' }, k.token)).status, 200);
   assert.equal(await mijne(), voor + 2, 'en met een verse sleutel mag het wel');
+});
+
+test('periodieke bankrondes stapelen niet tijdens vertraging en herstellen na een fout', async () => {
+  const timers = [], fouten = [], gewist = [], volgorde = [];
+  let los, eerste = true, opdrachtAantal = 0;
+  const wacht = new Promise(resolve => { los = resolve; });
+  const klaar = require('../server/kern/bank/rondes')({
+    rente: async () => { volgorde.push('rente'); if (eerste) { eerste = false; await wacht; throw new Error('proef'); } },
+    incasso: async () => { volgorde.push('incasso'); },
+    opdrachten: async () => { opdrachtAantal++; },
+    omgeving: { BANK_RONDE_MS: '1234', BANK_OPDRACHT_RONDE_MS: '5678' },
+    zet: (fn, ms) => { const t = { fn, ms, vrij: false, unref() { this.vrij = true; } }; timers.push(t); return t; },
+    wis: t => gewist.push(t), meld: t => fouten.push(t)
+  });
+  assert.deepEqual(timers.map(t => t.ms), [1234, 5678]);
+  assert.ok(timers.every(t => t.vrij));
+  const lopend = timers[0].fn();
+  const dubbel = timers[0].fn();
+  assert.deepEqual(volgorde, ['rente'], 'een trage ronde mag niet stapelen');
+  await dubbel;
+  await timers[1].fn();
+  assert.equal(opdrachtAantal, 1, 'opdrachten hoeven niet op de renteronde te wachten');
+  los(); await lopend;
+  assert.deepEqual(fouten, ['[bank] ronde mislukt: proef']);
+  await timers[0].fn();
+  assert.deepEqual(volgorde, ['rente', 'rente', 'incasso']);
+  klaar();
+  await timers[0].fn(); await timers[1].fn();
+  assert.equal(volgorde.length, 3);
+  assert.equal(opdrachtAantal, 1);
+  assert.deepEqual(gewist, timers);
 });

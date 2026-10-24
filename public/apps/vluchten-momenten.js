@@ -35,7 +35,7 @@ w.RTGVluchtMomenten = function (c) {
         : v.geannuleerd ? '' : '<p class="ds-meta">Inchecken kan zodra het open staat.</p>') + '</div></article>';
   }
   async function laadMijn() {
-    let d; try { d = await api('/mijn'); } catch (e) { $('#inhoud').innerHTML = leeg(esc(e.message)); return; }
+    let d; try { d = await api('/api/member/vluchten/mijn'); } catch (e) { $('#inhoud').innerHTML = leeg(esc(e.message)); return; }
     MIJN = d;
     const pas = d.boekingen.some(b => b.status === 'ingecheckt');
     document.body.dataset.dsSchermtype = pas ? 'detail' : 'collectie';
@@ -44,22 +44,22 @@ w.RTGVluchtMomenten = function (c) {
         : '<div class="ds-status ds-status--binnen"><h2 class="ds-status__titel">Nog geen reizen.</h2><p class="ds-status__tekst">Kies eerst een vlucht, of vraag persoonlijk vervoer aan.</p><button class="ds-knop ds-knop--primair ds-status__actie" type="button" data-naar="bord">Vluchten</button></div>');
     document.querySelectorAll('[data-in]').forEach(b => b.addEventListener('click', async () => {
       const kof = document.querySelector('[data-kof="' + b.dataset.in + '"]');
-      try { const r = await api('/incheck', { id: b.dataset.in, koffers: kof ? kof.value : 0 });
+      try { const r = await api('/api/member/vluchten/incheck', { id: b.dataset.in, koffers: kof ? kof.value : 0 });
         bewaarPass(b.dataset.in, r.pass.code); meld('Ingecheckt; de boarding-passcode is eenmalig uitgegeven.'); laadMijn(); } catch (e) { meld(e.message); }
     }));
     document.querySelectorAll('[data-roteer]').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await api('/pass/roteer', { id: b.dataset.roteer, rotatie: Number(b.dataset.rotatie) });
+      try { const r = await api('/api/member/vluchten/pass/roteer', { id: b.dataset.roteer, rotatie: Number(b.dataset.rotatie) });
         bewaarPass(b.dataset.roteer, r.pass.code); meld('Nieuwe boarding-passcode eenmalig uitgegeven.'); laadMijn(); } catch (e) { meld(e.message); }
     }));
     document.querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
       if (!confirm('Deze boarding-passcode direct intrekken?')) return;
-      try { await api('/pass/intrek', { id: b.dataset.intrek, rotatie: Number(b.dataset.rotatie) });
+      try { await api('/api/member/vluchten/pass/intrek', { id: b.dataset.intrek, rotatie: Number(b.dataset.rotatie) });
         vergeetPass(b.dataset.intrek); meld('Boarding-passcode ingetrokken.'); laadMijn(); } catch (e) { meld(e.message); }
     }));
   }
   const veld = (label, invoer, icoon) => '<label class="ds-veld"><svg class="ds-veld__icoon" viewBox="0 0 24 24" aria-hidden="true">' + icoon + '</svg><span><span class="ds-veld__label">' + label + '</span>' + invoer + '</span><span></span></label>';
   async function laadCharter() {
-    let d; try { d = await api('/mijn'); } catch (e) { $('#inhoud').innerHTML = leeg(esc(e.message)); return; }
+    let d; try { d = await api('/api/member/vluchten/mijn'); } catch (e) { $('#inhoud').innerHTML = leeg(esc(e.message)); return; }
     MIJN = d;
     const aanvragen = d.charters || [];
     $('#inhoud').innerHTML = '<section class="ds-taak">' +
@@ -74,7 +74,7 @@ w.RTGVluchtMomenten = function (c) {
     $('#chDatum').value = new Date().toISOString().slice(0, 10);
     $('#chVraag').addEventListener('click', async () => {
       const soort = document.querySelector('[name="chSoort"]:checked').value;
-      try { const r = await api('/charter', { soort, bestemming: $('#chBest').value, datum: $('#chDatum').value, tijd: $('#chTijd').value });
+      try { const r = await api('/api/member/vluchten/charter', { soort, bestemming: $('#chBest').value, datum: $('#chDatum').value, tijd: $('#chTijd').value, idem: RTGIdem('charter') });
         meld('Aangevraagd (' + r.charter.code + '); Operations bevestigt persoonlijk.'); herlaad(); } catch (e) { meld(e.message); }
     });
   }

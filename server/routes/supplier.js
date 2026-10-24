@@ -137,6 +137,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/kamers')(kern);
   require('./supplier/gastcontact')(kern);
   require('./supplier/concierge')(kern);
+  require('./supplier/netwerk')(kern);   // Partner Network: tellingen met een bron (kern/partnernetwerk.js)
   require('./supplier/tafels-team')(kern);
   require('./supplier/boekingen')(kern);
   require('./supplier/vakpro')(kern);

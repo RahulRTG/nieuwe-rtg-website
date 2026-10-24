@@ -125,9 +125,11 @@ toets zet één verboden ding neer en eist dat het wordt tegengehouden).
 **Per bestand, niet als som.** Een som laat toe dat het ene scherm opruimt en
 het andere er evenveel bij zet. Daar waarschuwde de deltapoort al voor.
 
-**Uitzonderingen** gaan in `ONTWERPNORM.json` → `uitzonderingen`, met `pad`,
-`reden` en `vervalt`. Een uitzondering zonder een van die drie, of over haar
-datum, laat de controle zakken. `--vastleggen` zet de lat strakker zodra er iets
+**Uitzonderingen** gaan in `ONTWERPNORM.json` → `uitzonderingen` (en een
+stijlzettend script op een ds-scherm in `contract.json` → `overgangsscripts`),
+met `pad`, `eigenaar`, `reden`, `plan` (het verwijderplan) en `vervalt`. Een
+uitzondering zonder een van die vijf, of over haar datum, laat de controle
+zakken. `--vastleggen` zet de lat strakker zodra er iets
 is opgeruimd, en weigert hem ooit losser te zetten of een nieuw pad op te nemen.
 
 **Wat de controle niet ziet**, en dat hoort er even groot bij te staan: of een
@@ -185,3 +187,79 @@ dan niet alleen mooier uit, maar is ook aantoonbaar schoon.
 Dit is geen garantie dat er nooit meer een ontwerpfout ontstaat. Het zorgt er
 wel voor dat de oorzaak van deze fout, het stapelen van lagen, niet ongemerkt
 kan terugkomen.
+
+## 7. Luxury Without Complexity: de nadruk (eigenaarsbesluit van 19 oktober 2026)
+
+> **De gebruiker hoeft nooit te kiezen tussen schoonheid, eenvoud, snelheid,
+> toegankelijkheid en betrouwbaarheid.**
+
+Dit is het ene ontwerpcontract voor het hele platform: elke wereld en elke app,
+nu en later. Het heeft twee gelijkwaardige kanten. De **beleving** gaat over de
+merkidentiteit uit de zes goedgekeurde mockups: cinematografisch beeld,
+Bodoni Moda, het wereldaccent, redactionele lucht en de Edge. Het
+**gereedschap** gaat over functionele eenvoud: voorspelbare bediening,
+begrijpelijke formulieren en fouten, geen onnodige handelingen, eerlijke
+status, herstelbare taken, toetsenbord en schermlezer, 19 talen en snelheid op
+een eenvoudig toestel.
+
+**Het zijn geen twee stijlsystemen, maar vier nadrukken binnen dit ene
+systeem.** Een nadruk is een handvol tokens in `tokens.css` die bepalen wat een
+deel van een scherm vooropzet. Het attribuut heet `data-ds-nadruk`, want
+`data-ds-modus` was al bezet door de Edge.
+
+| Nadruk | Mockup-term | Waarvoor | Wat hij verlegt |
+|---|---|---|---|
+| `beleving` | Experience | covers, ontdekken, inspireren | meer lucht (64px), staand beeld (4:5) |
+| `balans` | Balanced | collecties, vergelijken, details | lucht 48px, beeld 4:3 |
+| `gereedschap` | Utility | formulieren, dagelijks werk, communicatie, betalen | compacte kop, lucht 32px, liggend beeld (16:9), korte beweging |
+| `bevestiging` | Confirmation | bevestigingen, resultaten, herstel, belangrijke status | de uitkomst op titelmaat |
+
+De nadruk komt zonder attribuut uit het schermtype (`contract.json` →
+`nadrukStandaard`): Cover is beleving, Collectie en Detail zijn balans, Taak,
+Gesprek en Canvas zijn gereedschap, en Status is bevestiging. Een scherm
+verlegt hem met `data-ds-nadruk` op zichzelf of op een deel. Zo is op de
+TravelOS-Cover het binnenkomen beleving, het overzicht eronder balans, en
+"zelf iets toevoegen" en het taxiblad gereedschap. De identiteit blijft
+overal gelijk: dezelfde letters, kleuren, componenten en Edge.
+
+**Handhaving** (contractregel 9, `scripts/lib/nadruk.js`, toetsen in
+`test/ontwerpsysteem.test.js`):
+
+- de lijst is gesloten;
+- elk schermtype heeft een standaard;
+- `tokens.css` zet per nadruk precies de tokens uit `nadrukTokens`;
+- de standaard van een schermtype is letterlijk die nadruk, en staat in
+  `:where()`, zodat het attribuut altijd wint;
+- alleen `tokens.css` zet een nadruktoken, en een thema kan het niet, want het
+  staat niet in `themabaar`;
+- een onbekende `data-ds-nadruk` in een scherm of script laat de controle
+  zakken.
+
+`test/ontwerpvoorbeeld.e2e.js` meet in de browser dat elk schermtype zijn
+standaard volgt en dat elke nadruk de berekende stijl werkelijk verandert.
+`test/reizen-ds.e2e.js` doet dat op het echte scherm.
+
+**De kwaliteitslat** die bij dit contract hoort:
+
+- WCAG 2.2 AA;
+- bedienelementen van minimaal 24×24 px (poort: `scripts/a11y.js`), met 44 als
+  ontwerpdoel (`--ds-doel` is 48);
+- 19 talen met rechts-naar-links;
+- LCP ≤ 2,5 s, INP ≤ 200 ms en CLS ≤ 0,1 onder benoemde labcondities;
+- geen onterechte claims over reserveringen, betalingen of bevestigingen.
+
+Een groene CI is geen UX-acceptatie: iOS Safari, Android Chromium en
+desktopbrowsers worden ook met de hand gekeurd. De meting van de drie
+web-vitals staat in `TRAVELOS-MIGRATIE.md` zodra hij er is. Tot dan is hij
+niet gemeten, en dat staat er dan ook zo.
+
+**Wat dit contract verbiedt**, naast par. 3:
+
+- een tweede componentbibliotheek, of een tweede set tokens per nadruk;
+- een knop die een functie suggereert die niet bestaat (`AFBOUWPROGRAMMA.md`
+  par. 2), in de Edge net zo goed als op een scherm;
+- een tijdelijke uitzondering zonder eigenaar, reden, vervaldatum en
+  verwijderplan.
+
+De drie overgangsscripts in `contract.json` worden vóór 31 januari 2027
+beoordeeld.

@@ -5,7 +5,7 @@
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, anthropic, schoon,
     ALLE_WIE, PAS_WIE, VELD_TYPES, DEFAULT_CONTRACT,
-    nu, standaardVelden, standaardMoment, standaardScope, store, scopeVan, profielVan, profielId } = ctx;
+    nu, standaardVelden, standaardMoment, standaardScope, store, scopeVan, profielVan, profielId, scopeLezen } = ctx;
   /* Het moment ('nu' of 'later') reist overal mee. Dat is geen sierlijkheid: een
      voorstel dat het veld niet kent, zou elk veld weer op 'nu' zetten en dan
      staat de hele intake stilletjes terug in de poort na het inloggen. */
@@ -13,7 +13,7 @@ module.exports = (ctx) => {
     return { velden: sc.velden.map(v => ({ id: v.id, label: v.label, type: v.type, voorWie: [...(v.voorWie || [])], moment: v.moment || 'nu' })),
       contract: { versie: sc.contract.versie, titel: sc.contract.titel, tekst: sc.contract.tekst, bijgewerkt: sc.contract.bijgewerkt } };
   }
-  function config(scope) { return publiekeConfig(scopeVan(scope)); }
+  function config(scope) { return publiekeConfig(scopeLezen(scope)); }
 
   /* Een voorgestelde config valideren/normaliseren voordat we hem toepassen.
      `huidig` is de scope zoals hij nu is: daaruit komt het moment terug als het
@@ -42,18 +42,32 @@ module.exports = (ctx) => {
     }
     return uit.length ? uit : null;
   }
-  // De config (deels) overschrijven; contracttekst-wijziging = nieuwe versie.
+  // De getoonde titel en tekst horen samen bij één onveranderlijke versie.
   function zetConfig(scope, voorstel) {
     const sc = scopeVan(scope);
-    if (voorstel && voorstel.velden) { const v = normaliseerVelden(voorstel.velden, sc); if (v) sc.velden = v; }
+    let gewijzigd = false;
+    if (voorstel && voorstel.velden) {
+      const v = normaliseerVelden(voorstel.velden, sc);
+      if (v && JSON.stringify(v) !== JSON.stringify(sc.velden)) { sc.velden = v; gewijzigd = true; }
+    }
     if (voorstel && voorstel.contract) {
       const c = voorstel.contract;
-      if (c.titel != null) sc.contract.titel = schoon(String(c.titel), 100) || sc.contract.titel;
+      const titel = c.titel != null ? schoon(String(c.titel), 100) || sc.contract.titel : sc.contract.titel;
+      let tekst = sc.contract.tekst;
       if (c.tekst != null) {
-        const tekst = String(c.tekst).slice(0, 20000);
-        if (tekst.trim().length >= 20 && tekst !== sc.contract.tekst) { sc.contract.tekst = tekst; sc.contract.versie += 1; }
+        const kandidaat = String(c.tekst).slice(0, 20000);
+        if (kandidaat.trim().length >= 20) tekst = kandidaat;
+      }
+      if (titel !== sc.contract.titel || tekst !== sc.contract.tekst) {
+        require('./ontvangst').bewaarContract(sc);
+        sc.contract = { ...sc.contract, titel, tekst, versie: sc.contract.versie + 1 };
+        gewijzigd = true;
       }
     }
+    /* Een transportretry van exact dezelfde gewenste configuratie is geen
+       tweede beheerhandeling. Laat ook `bijgewerkt` staan: anders ziet een
+       herhaling eruit als een nieuwe contract- of intakewijziging. */
+    if (!gewijzigd) return config(scope);
     sc.contract.bijgewerkt = nu();
     save();
     return config(scope);
@@ -123,9 +137,9 @@ module.exports = (ctx) => {
 
   // Wie tekende er binnen een scope (voor de leverancier/eigenaar): overzicht.
   function ondertekenaars(scope) {
-    const s = store();
+    const profielen = (db.data.onboarding && db.data.onboarding.profielen) || {};
     const uit = [];
-    for (const [pid, p] of Object.entries(s.profielen)) {
+    for (const [pid, p] of Object.entries(profielen)) {
       const o = (p.ondertekend || {})[scope];
       if (o) uit.push({ wie: pid, naam: o.naam, versie: o.versie, at: o.at });
     }

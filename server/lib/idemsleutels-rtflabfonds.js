@@ -21,6 +21,14 @@
 'use strict';
 
 const SLEUTELS = {
+  /* De ledeningang gebruikt exact dezelfde kern en dezelfde betekenis. */
+  'POST /api/labfonds/doneer': { nietIdempotent: true,
+    waarom: 'zonder sleutel is iedere bewuste toezegging een nieuwe toezegging; met sleutel bewaakt de domeinkern replay en inhoudsconflict' },
+  'POST /api/labfonds/voorstel/maak': { nietIdempotent: true,
+    waarom: 'zonder sleutel is ieder bewust ingediend voorstel een nieuw voorstel; met sleutel vergelijkt de domeinkern de volledige inhoud' },
+  'POST /api/labfonds/beslis': { nietIdempotent: true,
+    waarom: 'de domeinkern weigert een tweede besluit met 409; een antwoordcache mag die actuele toestandscontrole niet verbergen' },
+
   /* Lezen. De drie leesroutes van het fonds veranderen niets; drie leesrondes
      achter elkaar bewegen de pot niet (toets 5). Een besluit, geen gat. */
   'POST /api/rtf/labfonds/overzicht': { leest: true },

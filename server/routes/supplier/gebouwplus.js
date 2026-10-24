@@ -39,8 +39,8 @@ module.exports = (kern) => {
     return p[code];
   }
   const cap = l => { if (l.length > MAX) l.length = MAX; };
-  const vandaag = () => new Date().toISOString().slice(0, 10);
-  const overDagen = d => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
+  const vandaag = () => require('../../kern/tijdzone').datumIn();
+  const overDagen = d => require('../../kern/tijdzone').plusDagen(vandaag(), d);
 
   /* De signalen: wat verdient nu aandacht? Aflopende contracten binnen
      negentig dagen, leads die stil liggen en een energieweek die meer dan

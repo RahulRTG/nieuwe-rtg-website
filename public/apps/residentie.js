@@ -5,10 +5,15 @@
 (function () {
   const $ = s => document.querySelector(s);
   let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
-  const api = (pad, body) => fetch(pad, {
+  let kamerBeschikbaar = false;
+  const api = (pad, body) => {
+    if (!kamerBeschikbaar && pad.startsWith('/api/residentie/') && !['/api/residentie/betreed','/api/residentie/pols'].includes(pad))
+      return Promise.reject(new Error('Laad eerst de kamergegevens opnieuw.'));
+    return fetch(pad, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
     body: JSON.stringify(body || {})
-  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { const fout = new Error((d && d.error) || 'Er ging iets mis.'); fout.status=r.status; throw fout; } return d; });
+  };
   function meld(t){ const m = $('#melding'); m.textContent = t; m.classList.add('toon'); clearTimeout(m._t); m._t = setTimeout(() => m.classList.remove('toon'), 2600); }
   /* Op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom G) is elke laag
      (gids, atelier, huistelefoon, spel) een <dialog>; dit script zet nergens
@@ -599,7 +604,21 @@
   }
 
   /* ---------- staat bijwerken vanuit server-antwoorden ---------- */
+  function geldigeKamerstaat(d) {
+    return d && d.kamer && typeof d.kamer.naam === 'string' &&
+      Number.isFinite(d.kamer.b) && Number.isFinite(d.kamer.d) && Array.isArray(d.kamer.meubels) &&
+      Array.isArray(d.leden) && d.leden.every(l => l && typeof l.codenaam === 'string' &&
+        [l.x,l.y,l.dx,l.dy].every(Number.isFinite));
+  }
+  function kamerFout(kamerId) {
+    kamerBeschikbaar=false;
+    $('#balk').hidden = true;
+    $('#poort').innerHTML = '<div class="ds-canvaslaag__vlak" role="status"><p>De kamergegevens zijn niet beschikbaar. Probeer opnieuw.</p><button class="ds-knop" id="residentieHerstel" type="button">Opnieuw proberen</button></div>';
+    $('#poort').hidden = false;
+    $('#residentieHerstel').onclick = () => betreed(kamerId || (S.kamer && S.kamer.id) || 'lobby');
+  }
   function neemStaat(d, hou) {
+    if (!geldigeKamerstaat(d)) { kamerFout(); throw new Error('De kamergegevens zijn niet beschikbaar. Probeer opnieuw.'); }
     if (d.ik) S.ik = d.ik;
     if ('paar' in d) S.paar = d.paar;
     S.kamer = d.kamer;
@@ -616,6 +635,10 @@
         zeg: was && was.zeg, zegTot: was ? was.zegTot : 0, emote: was && was.emote, emoteTot: was ? was.emoteTot : 0 });
     }
     maat();
+    // Zowel betreden als een geldige achtergrondpols herstelt dezelfde toestand.
+    kamerBeschikbaar=true;
+    $('#poort').hidden = true;
+    $('#balk').hidden = false;
   }
   const lid = naam => S.leden.get(naam);
 
@@ -623,10 +646,9 @@
     try {
       const d = await api('/api/residentie/betreed', { kamer: kamerId });
       neemStaat(d, false);
-      $('#balk').hidden = false;
     } catch (e) {
-      meld(e.message);
-      if (!S.kamer && kamerId !== 'lobby') betreed('lobby');
+      if (e.status === 404 && !S.kamer && kamerId !== 'lobby') return betreed('lobby');
+      kamerFout(kamerId);
     }
   }
 
@@ -664,7 +686,7 @@
   // de rustige pols: houdt de plek warm en vangt gemiste seintjes op
   setInterval(async () => {
     if (!S.kamer) return;
-    try { neemStaat(await api('/api/residentie/pols', {}), true); } catch (e) {}
+    try { neemStaat(await api('/api/residentie/pols', {}), true); } catch (e) { kamerFout(); }
   }, 25000);
   // weggaan hoeft niet netjes: wie het tabblad sluit, verdwijnt vanzelf
   // via de 90-seconden-pols aan de serverkant
@@ -2029,7 +2051,7 @@
         const r = await api('/api/residentie/meubel/weg', { i });
         S.kamer.meubels = r.meubels.map(m => [m.soort, m.x, m.y]);
       } else {
-        const r = await api('/api/residentie/meubel/zet', { soort: S.editor.soort, x: t2.x, y: t2.y });
+        const r = await api('/api/residentie/meubel/zet', { soort: S.editor.soort, x: t2.x, y: t2.y, idem: RTGIdem('meubel') });
         S.kamer.meubels = r.meubels.map(m => [m.soort, m.x, m.y]);
         if (window.RTGWauw) RTGWauw.tik && RTGWauw.tik();
       }

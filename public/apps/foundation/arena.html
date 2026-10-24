@@ -113,6 +113,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <main id="main">
@@ -350,7 +351,10 @@
     const vrienden = [], klasgenoten = [];
     document.querySelectorAll('.persoon.aan').forEach(r => (r.dataset.bron === 'klas' ? klasgenoten : vrienden).push(r.dataset.key));
     try {
-      const d = await api('nieuw', { soort, grootte: gekozen.size + 1, vrienden, klasgenoten });
+      // een sleutel per uitdaging: een tweede tik of een nieuwe poging is hetzelfde potje
+      const knop = $('#kiesStart'); if (!knop.dataset.idem) knop.dataset.idem = RTGIdem('spel-nieuw');
+      const d = await api('nieuw', { soort, grootte: gekozen.size + 1, vrienden, klasgenoten, idem: knop.dataset.idem });
+      delete knop.dataset.idem;
       $('#wachtWie').textContent = 'We wachten tot iedereen de uitdaging heeft aangenomen...';
       toon('sWacht');
       volgPotje(d.id);

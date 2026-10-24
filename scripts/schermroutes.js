@@ -67,7 +67,7 @@ const { execSync } = require('child_process');
 /* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
    invoerspoor-preload is dit undefined en verandert het stempel niet. */
 const { blok: invoerBlok } = require('./lib/invoerspoor');
-const { lex } = require('./ast/lexer');
+const { paden } = require('./lib/schermroutepaden');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -98,9 +98,6 @@ function bestanden(map, exts) {
   return uit;
 }
 
-const IS_API = s => typeof s === 'string' && s.startsWith('/api/');
-const ontdoe = s => String(s).replace(/^['"`]|['"`]$/g, '');
-
 /* De scriptblokken uit een HTML-bestand; een scherm draagt zijn aanroepen vaak
    inline. Wat buiten een <script> staat wordt niet gelezen -- een pad in een
    attribuut is geen aanroep.
@@ -130,44 +127,19 @@ function scriptsUit(html) {
   return uit;
 }
 
-function paden(bron) {
-  const exact = new Set(), voorvoegsels = new Set();
-  let tokens;
-  try { tokens = lex(bron); } catch (e) { return null; }          // niet te lezen: reden, geen stilte
-  for (let i = 0; i < tokens.length; i++) {
-    const t = tokens[i];
-    if (t.type === 'string') {
-      const v = ontdoe(t.value);
-      if (!IS_API(v)) continue;
-      const volgende = tokens[i + 1];
-      const gaatVerder = (volgende && volgende.type === 'lees' && volgende.value === '+') || v.endsWith('/') || v.includes('?');
-      if (gaatVerder) voorvoegsels.add(v); else exact.add(v);
-    }
-    else if (t.type === 'template' && t.value && Array.isArray(t.value.quasis)) {
-      const eerste = t.value.quasis[0];
-      if (IS_API(eerste)) {
-        /* Een sjabloon ZONDER gaten is gewoon een exact pad. Met gaten is de
-           kop een voorvoegsel en nooit een route. */
-        if (!t.value.exprs || t.value.exprs.length === 0) exact.add(eerste);
-        else voorvoegsels.add(eerste);
-      }
-    }
-  }
-  return { exact: [...exact].sort(), voorvoegsels: [...voorvoegsels].sort() };
-}
-
 const perScherm = [], nietGelezen = [], teLezenViaBundel = new Set();
 for (const rel of bestanden('public', ['.js', '.html'])) {
   if (BUNDELS.has(rel)) continue;
   const ruw = fs.readFileSync(path.join(WORTEL, rel), 'utf8');
   const brokken = rel.endsWith('.html') ? scriptsUit(ruw) : [ruw];
-  const exact = new Set(), voor = new Set();
+  const exact = new Set(), voor = new Set(), verfijndeHelpers = [];
   let mislukt = 0;
   for (const brok of brokken) {
     const p = paden(brok);
     if (!p) { mislukt++; continue; }
     for (const x of p.exact) exact.add(x);
     for (const x of p.voorvoegsels) voor.add(x);
+    for (const x of p.verfijndeHelpers || []) verfijndeHelpers.push(x);
   }
   if (mislukt && !exact.size && !voor.size) {
     /* Een bundeldeel kan middenin een sjabloon zijn geknipt; dan stopt de lexer
@@ -182,7 +154,9 @@ for (const rel of bestanden('public', ['.js', '.html'])) {
     continue;
   }
   if (!exact.size && !voor.size) continue;
-  perScherm.push({ bestand: rel, exact: [...exact].sort(), voorvoegsels: [...voor].sort(), deelsOnleesbaar: mislukt > 0 || undefined });
+  perScherm.push({ bestand: rel, exact: [...exact].sort(), voorvoegsels: [...voor].sort(),
+    verfijndeHelpers: verfijndeHelpers.length ? verfijndeHelpers : undefined,
+    deelsOnleesbaar: mislukt > 0 || undefined });
 }
 
 /* De bundels waarvan een deel onleesbaar was, alsnog in hun geheel lezen. */

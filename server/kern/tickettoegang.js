@@ -8,8 +8,8 @@
      de deur verkoopt of vernieuwt een deurticket. Kaal staat de code alleen in
      dat antwoord; op schijf de SHA-256 in `ticketToegang` (per ref), en de
      vorige gaat ingetrokken de historie in.
-   - issuer/doel/scope, verval aan het eind van de ticketdag (UTC, dezelfde dag
-     die de deur vergelijkt), max_gebruik 1.
+   - issuer/doel/scope, verval aan het eind van de ticketdag in de Amsterdamse
+     huiszone (dezelfde kalenderdag die de deur vergelijkt), max_gebruik 1.
    - constant-time zoeken over elke hash, ook historische; een treffer bij een
      ANDERE zaak telt niet.
    - de claim legt de check-in vast in DEZELFDE collectietransactie
@@ -23,21 +23,17 @@
 'use strict';
 
 const klok = require('../lib/klok');
-
-const DOEL = 'activiteit-entree';
-const SCOPE = Object.freeze(['zaak.ticket.checkin']);
-const BEWAAR_MS = 30 * 86400000;
-const DICHT = ['geweigerd', 'geannuleerd'];
+const beleid = require('./tickettoegang/beleid');
+const { DOEL, SCOPE, BEWAAR_MS, DICHT } = beleid;
 
 // oudeRijen(): boekingen en kassabonnen voor ruimLegacy(), van hun eigenaar
 module.exports = ({ db, save, bewerkCollectie, crypto, oudeRijen, nu = () => klok.datum().toISOString() }) => {
   if (typeof bewerkCollectie !== 'function') throw new Error('De ticketcode vereist een collectietransactie.');
   const bearer = require('./bearercode')({ crypto, namespace: 'travelos.activity_ticket_entry', nu });
   const eigen = require('./eigencollectie')({ db, domein: 'kern/tickettoegang', bezit: { ticketToegang: 'kaart' } });
-  const afdruk = s => crypto.createHash('sha256').update(String(s)).digest('hex');
-  const houder = b => afdruk('rtg-ticket-houder-v1|' + String(b.customerKey || b.customerTier || ('deur:' + b.supplierCode)));
-  const vandaag = () => nu().slice(0, 10);
-  const eindVan = datum => Date.parse(String(datum) + 'T23:59:59.999Z');
+  const houder = b => beleid.houder(crypto, b);
+  const vandaag = () => beleid.vandaag(nu());
+  const eindVan = beleid.eindVan;
 
   const transactie = werk => bewerkCollectie('ticketToegang', bron => {
     if (!bron || typeof bron !== 'object' || Array.isArray(bron)) throw new Error('ticketToegang hoort een kaart te zijn');

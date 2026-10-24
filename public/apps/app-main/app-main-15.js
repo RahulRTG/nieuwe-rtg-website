@@ -1,6 +1,6 @@
 /* de knoppen onder een zorgpakket: betalen en openen */
     el.querySelectorAll('[data-carepakpay]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
+      try { await API.call('/api/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-carepakopen]').forEach(x => x.addEventListener('click', () => {
@@ -11,8 +11,8 @@
     const pb = document.getElementById('carePakBoek');
     if (pb) pb.addEventListener('click', async () => {
       try {
-        const r = await API.call('/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
-        await API.call('/care/pakket/betaal', { ref: r.pakket.ref });
+        const r = await API.call('/api/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
+        await API.call('/api/care/pakket/betaal', { ref: r.pakket.ref });
         toast(T('care.paktoast','Pakket betaald. Fijn verblijf.'));
         carePakOpen = null; carePakKeuze = null;
         laadCare();
@@ -34,9 +34,9 @@
   }
   async function laadVerhuur(){
     if (!API.live) return;
-    try { vhPartners = (await API.call('/verhuur/aanbod')).partners || []; } catch(e){ vhPartners = []; }
+    try { vhPartners = (await API.call('/api/verhuur/aanbod')).partners || []; } catch(e){ vhPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/huur/mijn')).huren || []; } catch(e){}
+    try { mijn = (await API.call('/api/huur/mijn')).huren || []; } catch(e){}
     const el = $('#vhMijn');
     const VH_ST = { 'aangevraagd': T('vh.m.geboekt','geboekt; leg de staat vast bij het ophalen'), 'lopend': T('vh.m.lopend','onderweg; goede reis'), 'afgerond': T('vh.m.af','afgerond') };
     if (el) el.innerHTML = mijn.filter(h => h.status !== 'afgerond' || h.tot >= new Date().toISOString().slice(0, 10)).map(h =>
@@ -65,7 +65,7 @@
       file.onchange = () => {
         if (!file.files[0]) return;
         vhFotoKlein(file.files[0], async (dataUrl) => {
-          try { await API.call('/huur/foto', { ref: b.dataset.vhf, fase: b.dataset.fase, foto: dataUrl });
+          try { await API.call('/api/huur/foto', { ref: b.dataset.vhf, fase: b.dataset.fase, foto: dataUrl });
             toast(T('vh.m.foto.ok','Vastgelegd. Dit is uw bewijs van de staat.')); laadVerhuur(); }
           catch(e){ toast(e.message); }
         });
@@ -76,7 +76,7 @@
     document.querySelectorAll('[data-vhsos]').forEach(b => b.addEventListener('click', () => {
       const bericht = prompt(T('vh.m.sosvraag','Wat is er aan de hand? (gaat direct naar de verhuurder EN naar RTG)'));
       if (bericht == null) return;
-      const stuur = (lat, lng) => API.call('/huur/sos', { ref: b.dataset.vhsos, bericht, lat, lng })
+      const stuur = (lat, lng) => API.call('/api/huur/sos', { ref: b.dataset.vhsos, bericht, lat, lng })
         .then(() => toast(T('vh.m.sosok','SOS verstuurd. De verhuurder en RTG zijn gewaarschuwd.')))
         .catch(e => toast(e.message));
       if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => stuur(p.coords.latitude, p.coords.longitude), () => stuur());
@@ -87,11 +87,11 @@
       try {
         if (aan && navigator.geolocation){
           vhLocWatch[ref] = navigator.geolocation.watchPosition(p =>
-            API.call('/huur/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
-          await API.call('/huur/locatie', { ref, aan: true });
+            API.call('/api/huur/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
+          await API.call('/api/huur/locatie', { ref, aan: true });
         } else {
           if (vhLocWatch[ref] != null){ navigator.geolocation.clearWatch(vhLocWatch[ref]); delete vhLocWatch[ref]; }
-          await API.call('/huur/locatie', { ref, aan: false });
+          await API.call('/api/huur/locatie', { ref, aan: false });
         }
         toast(aan ? T('vh.m.locaanok','U deelt uw locatie met de verhuurder; uitzetten kan altijd.') : T('vh.m.locuitok','Locatie delen staat uit en is gewist.'));
         laadVerhuur();

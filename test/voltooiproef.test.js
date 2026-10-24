@@ -32,6 +32,11 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    lid kreeg, ook onder de storingen. Een scenario schrijft het niet; zonder
    uitgelokte weigering draagt het geen schakels en `nietBeproefd`. */
 const AFGELEID = 'menselijk';
+const BEVOEGD = 'bevoegd';
+/* De autorisatieratel hoort naast de functionele ratel. Op 24 oktober 2026
+   waren 76 scenario's voorzien van een daadwerkelijk uitgevoerde tegenproef;
+   een volgende meting mag die niet stil terugbrengen naar alleen kernwerk. */
+const BEVOEGD_MINIMUM = 82;
 /* DE RATEL: zoveel bewijzen staan op 11 oktober 2026 gesloten (twee
    onderdelen, drie bewijzen). Alleen omhoog; wie hem verlaagt, schrijft erbij
    waarom. */
@@ -53,6 +58,24 @@ test('1. het instrument draait in de testwereld en vraagt een schone boom om vas
   assert.doesNotMatch(proef + wereld, /localhost:3000|127\.0\.0\.1:3000/, 'de ontwikkelserver is van iemand anders');
 });
 
+test('1a. bevoegdheid vraagt een gesloten kernworkflow en een expliciete tegenproef', () => {
+  const { bevoegdUit } = require('../scripts/voltooiproef');
+  const kern = { sluit: true, telling: { gesloten: 4, schakels: 4 } };
+  const niets = bevoegdUit(kern, [], null);
+  assert.equal(niets.sluit, false);
+  assert.match(niets.nietBeproefd, /geen uitgevoerde kruisproef/);
+
+  const dicht = bevoegdUit(kern, [{ nr: 2, soort: 'tegenproef', wat: 'B blijft buiten', stand: 'gesloten' }], null);
+  assert.equal(dicht.sluit, true);
+  assert.deepEqual(dicht.schakels.map((s) => s.soort), ['bevoegde-workflow', 'tegenproef']);
+
+  const open = bevoegdUit(kern, [{ nr: 2, soort: 'tegenproef', wat: 'B kwam binnen', stand: 'open' }], null);
+  assert.equal(open.sluit, false);
+  assert.equal(open.telling.open, 1);
+  assert.equal(bevoegdUit({ sluit: false, telling: { gesloten: 3, schakels: 4 } }, dicht.schakels.slice(1), null).sluit, false);
+  assert.equal(bevoegdUit(kern, dicht.schakels.slice(1), 'afgebroken').sluit, false);
+});
+
 test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de scenario\'s dekken elkaar', () => {
   const reg = require('../scripts/lib/wereldregister');
   const { CONTRACT } = require('../scripts/lib/appcontract');
@@ -62,17 +85,37 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
   assert.ok(lijst.length >= 2, 'minder dan twee scenario\'s');
   for (const sc of lijst) {
     const sleutel = sc.functie.slice(sc.functie.indexOf(':') + 1);
-    const bron = reg.LINKS[sleutel];
-    assert.ok(bron && bron.url, sc.functie + ' staat niet met een adres in MAPPEN');
-    assert.equal(bron.url, sc.ingang, sc.functie + ': het scenario noemt een andere ingang dan MAPPEN');
-    assert.ok(sc.belofte && sc.grens && typeof sc.loop === 'function', sc.bestand + ' mist belofte, grens of loop');
     const c = CONTRACT[sc.functie];
     assert.ok(c, sc.functie + ' heeft een scenario maar geen contract: zijn bewijs telt dan stil niet mee');
+    if (sc.functie.startsWith('link:')) {
+      const bron = reg.LINKS[sleutel];
+      assert.ok(bron && bron.url, sc.functie + ' staat niet met een adres in MAPPEN');
+      assert.equal(bron.url, sc.ingang, sc.functie + ': het scenario noemt een andere ingang dan MAPPEN');
+    } else {
+      /* Een tab of OS-app heeft geen eigen adres. Hij telt alleen als de app hem
+         echt kent, het contract de echte navigatiestap noemt en zijn eigen delen
+         aanwijst die SCHERMROUTES.json kent -- nooit via een verzonnen adres. */
+      const los = reg.los(sc.functie);
+      assert.ok(los.bestaat, sc.functie + ' kent de app niet als tab of OS-app');
+      assert.ok(c.ingang && c.ingang === sc.ingang, sc.functie + ': het contract en het scenario noemen een andere ingang');
+      assert.ok(typeof c.via === 'string' && c.via.trim(), sc.functie + ': het contract noemt geen navigatiestap (via)');
+      const sr = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHERMROUTES.json'), 'utf8'));
+      const bekend = new Set(sr.perScherm.map((x) => x.bestand));
+      assert.ok(Array.isArray(c.bestanden) && c.bestanden.length, sc.functie + ': het contract wijst geen eigen delen aan');
+      for (const b of c.bestanden) assert.ok(bekend.has(b), sc.functie + ': ' + b + ' staat niet in SCHERMROUTES.json');
+    }
+    assert.ok(sc.belofte && sc.grens && typeof sc.loop === 'function', sc.bestand + ' mist belofte, grens of loop');
     for (const b of BEWIJZEN.concat(AFGELEID)) {
       assert.equal(c[b] && c[b].soort, 'voltooiproef', sc.functie + ': ' + b + ' komt niet uit de voltooiproef');
       assert.equal(c[b].instrument, sc.bestand);
-      const raak = B.gedeeld(B.proefRoutes(sc.bestand), B.ingangRoutes(sc.ingang));
-      assert.ok(raak.length >= 2, sc.functie + ': het scenario raakt ' + raak.length + ' routes van ' + sc.ingang);
+      /* Minstens twee routes van de ingang, of ALLE als het scherm er minder
+         heeft: een scherm met één route (het routedossier) kan geen tweede
+         leveren, en dan moet het scenario juist die ene raken. */
+      const ingang = B.ingangVan(sc.functie.startsWith('link:') ? sc.ingang : null, c);
+      const raak = B.gedeeld(B.proefRoutes(sc.bestand), ingang);
+      const aantal = ingang.exact.size + ingang.voor.size;
+      assert.ok(aantal >= 1, sc.functie + ': de ingang ' + sc.ingang + ' roept geen bekende route aan');
+      assert.ok(raak.length >= Math.min(2, aantal), sc.functie + ': het scenario raakt ' + raak.length + ' van de ' + aantal + ' routes van ' + sc.ingang);
     }
   }
   /* De versheid van het register ziet alleen wat het instrument letterlijk
@@ -105,6 +148,23 @@ test('3. het echte register is bruikbaar als bewijs en spreekt zichzelf niet teg
       (d.sluit ? gesloten++ : open++);
     }
   }
+  for (const [f, a] of Object.entries(reg.apps)) {
+    const b = a[BEVOEGD];
+    assert.ok(b && Array.isArray(b.schakels), f + '/' + BEVOEGD + ' ontbreekt');
+    if (b.nietBeproefd) {
+      assert.equal(b.schakels.length, 0, f + '/' + BEVOEGD + ': niet beproefd en toch schakels');
+      assert.equal(b.sluit, false, f + '/' + BEVOEGD + ': niet beproefd en toch gesloten');
+    } else {
+      assert.equal(b.schakels.filter((s) => s.soort === 'bevoegde-workflow').length, 1, f + ': precies één positieve kernworkflow');
+      assert.ok(b.schakels.some((s) => s.soort === 'tegenproef'), f + ': geen vreemde-actorproef');
+      const g = b.schakels.filter((s) => s.stand === 'gesloten').length;
+      assert.equal(b.sluit, g === b.schakels.length && !a.afgebroken, f + '/' + BEVOEGD + ': `sluit` spreekt de rijen tegen');
+    }
+  }
+  const bevoegdGesloten = Object.values(reg.apps).filter((a) => a[BEVOEGD].sluit).length;
+  assert.equal(reg.telling.bevoegdGesloten, bevoegdGesloten, 'de bevoegd-telling overstemt de rijen');
+  assert.ok(bevoegdGesloten >= BEVOEGD_MINIMUM,
+    'de bevoegd-ratel: ' + bevoegdGesloten + ' gesloten workflows, het minimum is ' + BEVOEGD_MINIMUM);
   assert.equal(reg.telling.bewijzenGesloten, gesloten);
   assert.equal(reg.telling.bewijzenOpen, open);
   assert.equal(reg.sluit, open === 0);

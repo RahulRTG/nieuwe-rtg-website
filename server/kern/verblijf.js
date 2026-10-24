@@ -19,7 +19,8 @@
 module.exports = ({ db, save, crypto, schoon, findSupplier, notify, notifySupplier, sseToSupplier, sseToCustomer }) => {
   const id = () => crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  // de kalenderdag van de zaak (zonder zaak: het huis), niet die van de UTC-container
+  const vandaag = (s) => require('./tijdzone').datumIn(null, require('./tijdzone').zaakZoneOfHuis(s));
   const isDatum = x => /^\d{4}-\d{2}-\d{2}$/.test(String(x || ''));
   const eigen = require('./eigencollectie')({ db, domein: 'kern/verblijf', bezit: { verblijven: 'lijst' } });
   const lijst = () => eigen.bak('verblijven');

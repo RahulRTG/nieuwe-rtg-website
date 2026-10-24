@@ -196,7 +196,7 @@ const INRICHTING = [
   /^git\s+(?:config|add|commit|push|fetch|checkout|switch|remote|tag|rev-parse)\b/,
   /^(?:set|export|exit|echo|printf|cat|mkdir|mv|cp|rm|ls|find|touch|tee|shopt|sleep|test|true|false|source|\.|:)\b/,
   /^(?:if|then|else|elif|fi|for|do|done|while|case|esac|function)\b/,
-  /^[A-Za-z_][A-Za-z0-9_]*=/,
+  /^[A-Za-z_][A-Za-z0-9_]*\+?=/,
   /^[{}()]/,
   /^\|\|/,
   /^:(?:\s|$)/,

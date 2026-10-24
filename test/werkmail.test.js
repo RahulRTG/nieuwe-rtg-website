@@ -10,6 +10,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+// de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
+const { GEHEIM, zetKop } = require('./mailpoort');
+zetKop();
 
 let BASE, manToken, stafToken, domein, eigenaarAdres, eigenaarPubliek, rahulAdres, rosterStaff;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkmail-'));
@@ -23,7 +26,7 @@ function api(pad, body, token) {
 const json = r => r.json();
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '',
+  ({ child, base: BASE } = await startServer({ env: { RTG_MAILPOORT_GEHEIM: GEHEIM, RTG_DATA_DIR: TMP, SMTP_URL: '',
     RTG_MAIL_PUBLIEK_BASIS:'rahultravelgroup.com' } }));
   const roster = await json(await api('/api/supplier/roster', { code: 'ESVEDRA' }));
   rosterStaff = roster.staff;

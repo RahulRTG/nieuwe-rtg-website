@@ -62,7 +62,7 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    // een lid (voor de plaatslaag) en een Arrival Pass (anoniem, los daarvan)
+    // een lid, en zijn Arrival Pass (een account voor alles, 19 oktober 2026)
     const u = String(process.pid) + String(Date.now()).slice(-6);
     const reg = await api(base, '/api/auth/register', { name: 'Naderend Lid', email: 'nl' + u + '@voorbeeld.test',
       password: 'nadergeheim123', geboortedatum: '1990-04-04', tier: 'rtg', pasApp: 'rtg' });
@@ -74,7 +74,7 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
     const deel = (p) => (p + 'abcdefghijklmnopqrstuvwxyz').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 32);
     const vraag = await api(base, '/api/arrival/request', {
       requestToken: deel('id' + u) + '.' + deel('geheim' + u), supplierCode: ZAAK,
-      datum: morgen(), tijd: '20:00', personen: 2, naam: 'Gast', zone: 'zaal' });
+      datum: morgen(), tijd: '20:00', personen: 2, zone: 'zaal' }, reg.token);
     assert.ok(vraag.pass && vraag.pass.accessToken, 'de Arrival Pass staat er: ' + JSON.stringify(vraag).slice(0, 200));
     const pasToken = vraag.pass.accessToken;
     assert.equal(vraag.pass.pulse, 'nog-niet-onderweg', 'en er is nog niets gedeeld');
@@ -125,7 +125,7 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
        waarheidsgetrouw, dus zo'n wachtlus is meteen klaar en meet niets. */
     let pas = null;
     for (let i = 0; i < 60; i++) {
-      pas = await api(base, '/api/arrival/pass', { pass: pasToken });
+      pas = await api(base, '/api/arrival/pass', { pass: pasToken }, reg.token);
       if (pas && pas.pass && pas.pass.pulse === 'in-de-buurt') break;
       await new Promise(r => setTimeout(r, 400));
     }
@@ -191,7 +191,7 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
     const deel = (p) => (p + 'abcdefghijklmnopqrstuvwxyz').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 32);
     const vraag = await api(base, '/api/arrival/request', {
       requestToken: deel('id2' + u) + '.' + deel('geheim2' + u), supplierCode: ZAAK,
-      datum: morgen(), tijd: '20:00', personen: 2, naam: 'Gast', zone: 'zaal' });
+      datum: morgen(), tijd: '20:00', personen: 2, zone: 'zaal' }, reg.token);
     assert.ok(vraag.pass && vraag.pass.accessToken, 'de pass staat er');
 
     // een hek van een ANDERE zaak, ver genoeg van de zaak van de pass
@@ -253,7 +253,7 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
        toetsbaar zodra de pagina is uitgepraat, want dan is alles wat zij nog
        ging melden ook gemeld. */
     await wachtOpNetstilte(page);
-    const pas = await api(base, '/api/arrival/pass', { pass: vraag.pass.accessToken });
+    const pas = await api(base, '/api/arrival/pass', { pass: vraag.pass.accessToken }, reg.token);
     assert.equal(pas.pass.pulse, 'nog-niet-onderweg',
       'maar de zaak van de pass heeft niets gehoord: langslopen is geen aankomst');
 

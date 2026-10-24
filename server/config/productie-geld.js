@@ -32,6 +32,11 @@ function keurGeld(env, fouten, waarschuwingen) {
        moet de hele rail aantoonbaar fail-closed uit staan. Testbetalingen horen
        uitsluitend bij de afzonderlijke Magnaat Test-installatie. */
     const echteProvider = !!(env.STRIPE_SECRET_KEY || env.MOLLIE_API_KEY || env.ADYEN_API_KEY);
+    /* De simulatiebank (betalen EN uitbetalen) weigert zichzelf al in productie
+       (../betaal/synthetisch.js); hier staat het daarnaast als startfout, zodat
+       een vergeten vlag niet stil "uit" is maar luid niet start. */
+    if (env.RTG_SIMULATIEBANK === '1')
+      fouten.push('RTG_SIMULATIEBANK=1 staat aan in productie. De simulatiebank maakt geld uit niets en betaalt uit naar niemand; haal de vlag weg.');
     if (betalingenUit) {
       if (echteProvider || env.STRIPE_WEBHOOK_SECRET || env.ADYEN_HMAC_KEY ||
           env.MUNT_PROVIDER_KEY || env.MUNT_WEBHOOK_SECRET)

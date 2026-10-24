@@ -23,23 +23,7 @@ module.exports = (kern) => {
      null het eerlijke antwoord -- de kern beslist wat daarmee mag, want die
      kent de pas waar het over gaat. Zelfde patroon als bij RTG Bank. */
   const wie = req => boardroomWie(req) || null;
-  // Is er een geldig leden-token meegestuurd? Dan koppelen we dat account aan de
-  // aanvraag (server-side, nooit uit de body), zodat een menselijk akkoord op een
-  // Lifestyle/Business-aanvraag dat account kan optillen.
-  const aanvragerVan = req => {
-    try {
-      const h = req.get('authorization') || '';
-      const tok = h.startsWith('Bearer ') ? h.slice(7) : null;
-      const u = tok && accounts && accounts.verifyToken(tok);
-      return u ? u.id : null;
-    } catch (e) { return null; }
-  };
-
-  // een aanvraag indienen (publiek, met een lichte rem tegen misbruik)
-  app.post('/api/aanmelding/aanvraag', (req, res) => {
-    if (tooManyTries && tooManyTries(res, 'aanmelding:' + req.ip)) return;
-    veilig(res, () => aanmeldingen.aanvraag(req.body || {}, aanvragerVan(req)));
-  });
+  const aanvragerVan = require('./aanmeldingen/aanvraag')({ app, accounts, tooManyTries, aanmeldingen });
 
   // de wachtrij en het besluit: alleen RTG-personeel
   app.post('/api/aanmelding/lijst', officeAuth, (req, res) => veilig(res, () => aanmeldingen.lijst((req.body || {}).status)));

@@ -11,7 +11,7 @@ module.exports = (m) => {
   function nieuweState() {
     return {
       versie: STAAT_VERSIE, mutatieVersie: 0, startdatum: STARTDATUM, dag: 0, boekVolgorde: 0,
-      rekeningen: {}, commandos: {},
+      rekeningen: {}, commandos: {}, besluitOntvangsten: {},
       laatstToegepast: 0, totalen: { debet: 0, credit: 0, aantal: 0 }, recent: [], vandaag: null,
       wachtend: [], integriteit: null,
       bedrijven: Object.fromEntries(Object.entries(m.profiel.bedrijven).map(([id, b]) => [id, kopieBedrijf(id, b.start)])),
@@ -55,6 +55,9 @@ module.exports = (m) => {
 
   function zorgVorm(e) {
     if (!Number.isSafeInteger(e.mutatieVersie) || e.mutatieVersie < 0) e.mutatieVersie = 0;
+    if (!e.besluitOntvangsten || typeof e.besluitOntvangsten !== 'object' || Array.isArray(e.besluitOntvangsten)) {
+      e.besluitOntvangsten = {};
+    }
     m.zorgVorm(e);
     for (const b of Object.values(e.bedrijven || {})) {
       if (!b.kostenUitsplitsing || typeof b.kostenUitsplitsing !== 'object') {

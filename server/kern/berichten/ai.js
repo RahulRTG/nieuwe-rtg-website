@@ -13,6 +13,7 @@
    is het enige wat het model van een gesprek ziet. */
 const { tekst } = require('../../ai-kort');
 const { samenvat: lokaalSamenvatten, zinnen } = require('../../lib/lokale-taal');
+const tijdzone = require('../tijdzone');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Schrijf rustig, ' +
   'zeker en zonder opsmuk. Nooit uitroeptekens, nooit overdrijven. Antwoord in het Nederlands.';
@@ -24,35 +25,33 @@ const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag
 const UREN = { een: 1, twee: 2, drie: 3, vier: 4, vijf: 5, zes: 6, zeven: 7,
   acht: 8, negen: 9, tien: 10, elf: 11, twaalf: 12 };
 
-function iso(d) {
-  const jaar = d.getFullYear();
-  const maand = String(d.getMonth() + 1).padStart(2, '0');
-  const dag = String(d.getDate()).padStart(2, '0');
-  return jaar + '-' + maand + '-' + dag;
+function iso(j, m, d) {
+  const t = new Date(Date.UTC(j, m - 1, d));
+  if (t.getUTCFullYear() !== j || t.getUTCMonth() !== m - 1 || t.getUTCDate() !== d) return '';
+  return t.toISOString().slice(0, 10);
 }
 
 function datumUit(regel, nu) {
+  const vandaag = tijdzone.datumIn(nu); // "morgen" is morgen bij het lid, niet in de container
   const expliciet = regel.match(/\b(20\d{2})-(\d{2})-(\d{2})\b/);
   if (expliciet && DATUM.test(expliciet[0])) return expliciet[0];
   const kort = regel.match(/\b(\d{1,2})[-/](\d{1,2})(?:[-/](\d{2,4}))?\b/);
   if (kort) {
-    let jaar = kort[3] ? Number(kort[3]) : nu.getFullYear();
+    let jaar = kort[3] ? Number(kort[3]) : Number(vandaag.slice(0, 4));
     if (jaar < 100) jaar += 2000;
-    const d = new Date(jaar, Number(kort[2]) - 1, Number(kort[1]));
-    if (d.getFullYear() === jaar && d.getMonth() === Number(kort[2]) - 1 && d.getDate() === Number(kort[1]))
-      return iso(d);
+    const d = iso(jaar, Number(kort[2]), Number(kort[1]));
+    if (d) return d;
   }
   const laag = regel.toLowerCase();
   const plus = laag.match(/\b(overmorgen|morgen|vandaag)\b/);
   if (plus) {
-    const d = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + ({ vandaag: 0, morgen: 1, overmorgen: 2 })[plus[1]]);
-    return iso(d);
+    return tijdzone.plusDagen(vandaag, ({ vandaag: 0, morgen: 1, overmorgen: 2 })[plus[1]]);
   }
   for (let i = 0; i < DAGEN.length; i++) {
     if (!new RegExp('\\b' + DAGEN[i] + '\\b', 'i').test(regel)) continue;
-    let afstand = (i - nu.getDay() + 7) % 7;
+    let afstand = (i - tijdzone.weekdagVan(vandaag) + 7) % 7;
     if (!afstand || /volgende\s+/i.test(regel)) afstand += 7;
-    return iso(new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + afstand));
+    return tijdzone.plusDagen(vandaag, afstand);
   }
   return '';
 }

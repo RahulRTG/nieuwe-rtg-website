@@ -33,7 +33,7 @@ test('1. de AI begint met meelezen en doet NIETS; de tellers lopen mee met het v
   assert.equal(s0.fase, 'meelezen');
   assert.equal(s0.roerRondes, 0, 'geen enkele actie');
   // wat verkeer over meerdere domeinen genereren
-  for (let i = 0; i < 12; i++) { await api(base, '/api/health'); await api(base, '/api/gids/app', { pad: '/apps/mall.html' }); await api(base, '/api/login', { tier: 'guest', pasApp: 'rtg' }); }
+  for (let i = 0; i < 12; i++) { await api(base, '/api/health'); await api(base, '/api/gids/app', { pad: '/apps/mall.html' }, office); await api(base, '/api/login', { tier: 'guest', pasApp: 'rtg' }); }
   const s1 = (await api(base, '/api/office/rtgai', {}, office)).body;
   assert.ok(s1.waarnemingen > s0.waarnemingen, 'hij leest mee');
   assert.ok(s1.domeinen >= 3, 'meerdere domeinen gezien');
@@ -68,7 +68,8 @@ test('3. de knop geeft het roer; daarna lopen aantoonbare rondes veilig door', a
   assert.ok(s.journaal.some(j => j.soort === 'roer' && /Alles draait door/.test(j.tekst)));
   // en het systeem blijft gewoon werken terwijl hij aan het roer staat
   assert.equal((await fetch(base + '/api/health')).status, 200);
-  assert.equal((await api(base, '/api/gids/app', { pad: '/apps/rtgkantoor.html' })).status, 200);
+  // de gids hoort bij een ingelogd scherm (eigenaarsbesluit 19 oktober 2026): hier het kantoor
+  assert.equal((await api(base, '/api/gids/app', { pad: '/apps/rtgkantoor.html' }, office)).status, 200);
 });
 
 test('4. het roer terug: de mens houdt het laatste woord, en zonder kantoor-inlog geen knoppen', async () => {

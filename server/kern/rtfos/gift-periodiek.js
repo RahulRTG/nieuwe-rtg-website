@@ -111,11 +111,16 @@ module.exports = (ctx, { standVan }) => {
     if (jaren < JAREN_MIN) {
       return { status: 400, error: 'Een periodieke gift loopt ten minste ' + JAREN_MIN + ' jaar. Korter kan, maar dan is het een gewone gift met een drempel.' };
     }
+    // een herhaalsleutel per voorstel: dezelfde sleutel is hetzelfde plan
+    const idem = typeof b.idem === 'string' && b.idem ? b.idem.slice(0, 80) : null;
+    const al = idem && P().find(x => x.codenaam === ik && x.idem === idem);
+    if (al) return al.centenPerJaar === centen && al.jaren === jaren ? { ok: true, herhaald: true, plan: beeld(al) }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een ander voorstel.' };
     if (P().filter(x => x.codenaam === ik && x.stand !== 'gestopt').length >= 5) {
       return { status: 429, error: 'Je hebt er al vijf lopen. Stop er eerst een.' };
     }
     const p = { id: rid(), codenaam: ik, stand: 'voorgesteld', jaren,
-      centenPerJaar: centen, betaald: [], kenmerk: null, tot: null, at: nu() };
+      centenPerJaar: centen, betaald: [], kenmerk: null, tot: null, idem, at: nu() };
     P().push(p);
     audit(ik, 'giftplan.voorstel', p.id, euro(centen) + ' euro per jaar, ' + jaren + ' jaar');
     save();

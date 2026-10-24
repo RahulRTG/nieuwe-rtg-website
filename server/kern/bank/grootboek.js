@@ -17,7 +17,7 @@
 const { vingerafdruk } = require('../pay/vingerafdruk');
 
 module.exports = (g) => {
-  const { MIN_CENTEN, MAX_CENTEN, saldi, grootboek, saldoVan, rekMeta, isExtern,
+  const { MIN_CENTEN, MAX_CENTEN, saldi, saldiLezen, grootboek, saldoVan, rekMeta, isExtern,
     bodem, id, schoon, nu, save, d, geldModus, motorklant, bordSeintje } = g;
   const betalingenUit = process.env.RTG_BETALEN_UIT === '1';
   const uitFout = () => ({ status: 503,
@@ -135,7 +135,7 @@ module.exports = (g) => {
   // de sluitcontrole: som van alle saldi is nul, en niemand zit onder zijn bodem
   function sluitcontrole() {
     let som = 0; const onderBodem = [];
-    for (const [rek, c] of Object.entries(saldi())) { som += c; if (c < bodem(rek)) onderBodem.push(rek); }
+    for (const [rek, c] of Object.entries(saldiLezen())) { som += c; if (c < bodem(rek)) onderBodem.push(rek); }
     return { klopt: som === 0 && !onderBodem.length, som, onderBodem };
   }
 
@@ -147,7 +147,7 @@ module.exports = (g) => {
     aan: geldModus === 'motor', modus: geldModus,
     stand: async () => {
       const s = sluitcontrole();
-      const jsAfdruk = vingerafdruk(saldi());
+      const jsAfdruk = vingerafdruk(saldiLezen());
       if (geldModus !== 'motor') return { modus: geldModus, jsSom: s.som, jsVingerafdruk: jsAfdruk };
       const r = await motorklant.bankSaldiSnapshot();
       if (!r || r.error) return { modus: geldModus, jsSom: s.som, jsVingerafdruk: jsAfdruk, fout: (r && r.error) || 'geen motor-saldi' };

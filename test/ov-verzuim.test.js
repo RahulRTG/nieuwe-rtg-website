@@ -41,3 +41,16 @@ test('een ziekgemelde chauffeur start zijn dienst wel, en krijgt het erbij te ho
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen mag falen */ }
   }
 });
+
+// Verzuim wordt in de huisdatum vastgelegd; UTC kan nog op gisteren staan.
+test('OV-dienst vraagt verzuim op dezelfde huisdatum, ook na lokale middernacht', () => {
+  let datum;
+  const lijn = { id: 'L1', naam: 'Lijn', soort: 'bus', haltes: [{ lat: 52, lng: 4 }] };
+  const { ovDienst } = require('../server/kern/ov/dienst')({
+    db: { data: { ovVoertuigen: [] } }, save() {}, schoon: v => v || '',
+    nu: () => '2026-10-19T23:30:00.000Z', ensureOv() {}, lijnVan: () => lijn,
+    afwezigOp: (code, id, dag) => { datum = dag; return { afwezig: dag === '2026-10-20' }; }
+  });
+  ovDienst({ code: 'TRANSIT' }, { staffId: 7 }, { lijnId: 'L1' });
+  assert.equal(datum, '2026-10-20', 'verzuim gebruikt de huisdatum, niet de UTC-datum');
+});

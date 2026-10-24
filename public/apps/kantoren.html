@@ -501,6 +501,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -1402,6 +1403,7 @@
 <script src="/shared/zwaarstap.js"></script>
 <script src="/apps/kantoren-reisuitnodiging.js"></script>
 <script src="/apps/kantoren-reisteruggave.js"></script>
+<script src="/apps/kantoren-terugbetaling.js"></script>
 <script src="/apps/reisprogramma-velden.js"></script>
 <script src="/apps/reisprogramma-weergave.js"></script>
 <script src="/apps/reisprogramma-editor.js"></script>
@@ -1710,9 +1712,13 @@ async function laadBetaalKamer(kamer){
         '<div class="s-ohiako"><span class="betaal-stip '+klas+'"></span>'+esc(p.faseLabel)+(d.voorkeur===p.id?' · voorkeur':'')+'</div>'+
         p.checklist.map(x => '<div class="betaal-check">'+(x.ingesteld?'✓':'○')+' '+esc(x.label)+'</div>').join('')+'</div>';
     }).join('');
+    // een vastgelopen terugbetaling en een betaling op controle krijgen een regel met knop (kantoren-terugbetaling.js)
+    const terugVast = RTGTerugVastgelopen({ api, meld, esc });
     $('#kBetaalProblemen').innerHTML = (d.problemen||[]).length
-      ? d.problemen.map(p => '<div class="betaal-waarschuwing"><strong>'+esc(p.code)+'</strong> · '+esc(p.tekst)+'</div>').join('')
+      ? d.problemen.map(p => terugVast.kent(p.code) ? terugVast.regel(p)
+        : '<div class="betaal-waarschuwing"><strong>'+esc(p.code)+'</strong> · '+esc(p.tekst)+'</div>').join('')
       : '<div class="leeg">Alle betaalcontroles zijn groen.</div>';
+    terugVast.bedraad($('#kBetaalProblemen'), () => laadBetaalKamer(kamer));
   } catch (e) { $('#kBetaalProviders').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
@@ -3395,6 +3401,8 @@ function bankRenderSalaris(reks){
   sel.innerHTML = (reks || []).map(m => '<option value="' + m.iban + '">' + esc(m.codenaam) + ' · ' + esc(m.soort) + ' · ' + bkEuro(m.saldoCenten) + '</option>').join('');
   if (keuze) sel.value = keuze;
 }
+let bankOpenBedoeling = null;
+try { bankOpenBedoeling = sessionStorage.getItem('rtg_bank_open_bedoeling'); } catch (e) {}
 function bankRenderRekOpen(){
   $('#bankRekOpen').innerHTML =
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
@@ -3402,7 +3410,15 @@ function bankRenderRekOpen(){
     '<span><label for="bankOpenSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Soort</label><select id="bankOpenSoort"><option value="betaal">Betaalrekening</option><option value="spaar">Spaarrekening</option><option value="zakelijk">Zakelijke rekening</option></select></span>' +
     '<button class="knop stil" id="bankOpenZet" type="button">Open rekening</button></div>';
   $('#bankOpenZet').addEventListener('click', async () => {
-    try { const d = await api('bank/rekening/open', { codenaam: $('#bankOpenCode').value, soort: $('#bankOpenSoort').value }); meld('Geopend: ' + d.rekening.iban); $('#bankOpenCode').value = ''; bankVervers(); } catch (e) { meld(e.message); }
+    // Een verloren antwoord houdt dezelfde sleutel; veranderde invoer wordt
+    // server-side een conflict, nooit ongemerkt een tweede rekening.
+    if (!bankOpenBedoeling) bankOpenBedoeling = crypto.randomUUID();
+    try {
+      sessionStorage.setItem('rtg_bank_open_bedoeling', bankOpenBedoeling);
+      if (sessionStorage.getItem('rtg_bank_open_bedoeling') !== bankOpenBedoeling) throw new Error('Opslagcontrole mislukt.');
+    } catch (e) { meld('Niet verzonden: de opdrachtsleutel kan niet veilig worden bewaard. Herstel de browseropslag en probeer opnieuw.'); return; }
+    const verzonden = bankOpenBedoeling;
+    try { const d = await api('bank/rekening/open', { codenaam: $('#bankOpenCode').value, soort: $('#bankOpenSoort').value, idem: verzonden }); if (bankOpenBedoeling !== verzonden || sessionStorage.getItem('rtg_bank_open_bedoeling') !== verzonden) return; bankOpenBedoeling = null; try { sessionStorage.removeItem('rtg_bank_open_bedoeling'); } catch (e) {} meld('Geopend: ' + d.rekening.iban); $('#bankOpenCode').value = ''; bankVervers(); } catch (e) { meld(e.message); }
   });
 }
 function bankRenderRek(rij){

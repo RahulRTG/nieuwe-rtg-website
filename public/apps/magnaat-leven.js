@@ -33,11 +33,21 @@
       }); });
   }
   function meldFout(t) { var e = q('#vnFout'); e.textContent = t; e.hidden = !t; }
-  function laad() { return vraag('staat').then(teken).catch(function (e) { meldFout(e.message); }); }
+  var herstel = document.createElement('button'); herstel.id = 'vnHerstel'; herstel.type = 'button';
+  herstel.textContent = 'Opnieuw proberen'; herstel.hidden = true; herstel.className = 'btn';
+  q('#vnFout').after(herstel); herstel.addEventListener('click', laad);
+  var eigenBlokkades = new Set();
+  function nietBeschikbaar() {
+    LEVEN = null; clearTimeout(KLOK); herstel.hidden = false;
+    document.querySelectorAll('[data-vn-actie],[data-vn-doe],[data-vn-schrap],[data-vn-opnieuw],#vnTempo').forEach(function(b){ if (!b.disabled) { eigenBlokkades.add(b); b.disabled=true; } });
+    meldFout('De levensgegevens zijn niet beschikbaar. Probeer opnieuw; de uitkomst is niet bevestigd.');
+  }
+  function laad() { return vraag('staat').then(teken).catch(nietBeschikbaar); }
   /* Elke handeling draagt een eigen sleutel. Valt de verbinding weg, dan gaat
      dezelfde handeling met dezelfde sleutel nog een keer: de server voert hem
      hooguit een keer uit, dus je sluit geen dag twee keer af (V5). */
   function doe(body) {
+    if (!LEVEN) return;
     meldFout('');
     body.verzoek = window.RTGId('vn');
     var klaar = function (s) { KEUZE = null; teken(s); };
@@ -115,6 +125,20 @@
   }
 
   function teken(s) {
+    if (!(s && typeof s.dagNaam === 'string' && Number.isFinite(s.dag) && s.geld && Number.isFinite(s.geld.bank) &&
+      s.vandaag && Array.isArray(s.vandaag.aandacht) && Array.isArray(s.vandaag.volgende) &&
+      s.vandaag.aandacht.every(function(x){ return x && typeof x.soort==='string' && typeof x.tekst==='string'; }) &&
+      s.vandaag.volgende.every(function(a){ return a && typeof a.label==='string' && typeof a.waarom==='string'; }) &&
+      Array.isArray(s.vandaag.meldingen) && s.vandaag.meldingen.every(function(m){return m && typeof m.tekst==='string' && typeof m.soort==='string' && Number.isFinite(m.dag);}) &&
+      Array.isArray(s.vandaag.agenda) && s.vandaag.agenda.every(function(d){ return d && typeof d.naam==='string' && Number.isFinite(d.dag) && Number.isFinite(d.rest) &&
+        Array.isArray(d.items) && d.items.every(function(x){return x && typeof x.naam==='string' && typeof x.wat==='string' && Number.isFinite(x.minuten);}) &&
+        Array.isArray(d.betalingen) && d.betalingen.every(function(p){return p && typeof p.naam==='string' && Number.isFinite(p.bedrag);}); }) &&
+      Array.isArray(s.rtg) && s.rtg.every(function(r){return r && typeof r.naam==='string' && Number.isFinite(r.dag);}) &&
+      s.werk && s.netwerk && Array.isArray(s.netwerk.contacten) && s.wereld)) {
+      nietBeschikbaar(); return;
+    }
+    herstel.hidden = true; meldFout('');
+    eigenBlokkades.forEach(function(b){ b.disabled=false; }); eigenBlokkades.clear();
     LEVEN = s;
     tekenVandaag(s);
     var hulp = { q: q, esc: esc, euro: euro, duur: duur };

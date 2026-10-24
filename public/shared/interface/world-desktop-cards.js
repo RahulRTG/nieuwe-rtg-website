@@ -21,10 +21,10 @@
     input.id = 'wdSearch'; input.type = 'search'; label.htmlFor = input.id; label.appendChild(input);
     top.appendChild(heading); top.appendChild(label); o.library.appendChild(top);
     var filters = U.el('div', 'wd-filters'), filter = U.el('select'); filter.setAttribute('aria-label', w.RTGWidgetCopy('all'));
-    ['all', 'favorites'].forEach(function (key) { var option = U.el('option', '', w.RTGWidgetCopy(key)); option.dataset.i18n = 'widget.' + key;
+    ['all', 'favorites'].forEach(function (key) { var option = U.key(U.el('option', '', w.RTGWidgetCopy(key)), 'widget.' + key);
       option.value = key; filter.appendChild(option); });
     filter.onchange = function () { onlyFavorites = filter.value === 'favorites'; index = 0; drawLibrary(); }; filters.appendChild(filter);
-    ['grid', 'list'].forEach(function (mode) { var b = U.el('button', '', w.RTGWidgetCopy(mode)); b.type = 'button'; b.dataset.i18n = 'widget.' + mode;
+    ['grid', 'list'].forEach(function (mode) { var b = U.key(U.el('button', '', w.RTGWidgetCopy(mode)), 'widget.' + mode); b.type = 'button';
       b.setAttribute('aria-pressed', String(mode === 'grid')); b.onclick = function () {
         o.library.dataset.view = mode; filters.querySelectorAll('button').forEach(function (other) { other.setAttribute('aria-pressed', String(other === b)); });
       }; filters.appendChild(b); }); top.appendChild(filters);
@@ -39,7 +39,7 @@
     var notice = U.el('p', 'wd-muted'); notice.setAttribute('role', 'status');
     var retry = U.button('retry', function () { if (status === 'readError') read(); else save(); }, 'wd-text-button');
     function translated(text, key) {
-      var s = U.el('span', '', text); s.dataset.i18n = 'desktopApp.' + key; s.dataset.i18nSource = text; return s;
+      return U.key(U.el('span', '', text), 'desktopApp.' + key, text);
     }
     function card(app, compact) {
       var box = U.el('article', 'wd-widget'); box.dataset.widget = app.id; box.dataset.widgetType = app.type;

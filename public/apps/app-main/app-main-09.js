@@ -14,7 +14,7 @@
     box.querySelectorAll('.js-opensnap').forEach(b => b.addEventListener('click', () => openSnap(b.dataset.id)));
   }
   async function openSnap(id){
-    let d; try { d = await API.call('/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
+    let d; try { d = await API.call('/api/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
     const ov = snapOverlay();
     ov.querySelector('#snapOvVan').textContent = 'Snap van ' + d.van;
     ov.querySelector('#snapOvImg').src = d.foto;

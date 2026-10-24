@@ -139,7 +139,7 @@ module.exports = (kern) => {
 
   app.post('/api/rtf/bericht', auth, (req, res) => {
     if (!eisAccount(req, res)) return;
-    const r = rtf.berichtVanGast({ userId: req.session.account.id, code: req.body.code, tekst: req.body.tekst });
+    const r = rtf.berichtVanGast({ userId: req.session.account.id, code: req.body.code, tekst: req.body.tekst, idem: req.body.idem });
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json({ ok: true });
   });

@@ -2,6 +2,7 @@
    Alles achter de leverancier-inlog; adresbeheer (aanmaken, afpakken) is
    aan de werkgever (manager). De buitenpoort staat los: die neemt post van
    buiten aan en levert ALTIJD in de onbetrouwde baan af. */
+const { mailpoort } = require('../kern/mailpoort');
 module.exports = (kern) => {
   const { app, supplierAuth, rtmail, werkmail } = kern;
   const alleenBaas = (req, res) => {
@@ -50,12 +51,13 @@ module.exports = (kern) => {
       req.body.onderwerp, req.body.tekst, req.actor));
   });
 
-  /* De buitenpoort: zoals een mailserver post van het open internet aanneemt.
-     Zonder inlog, dus met een strakke rem en zonder enige vertrouwensclaim:
-     alles wat hier binnenkomt is per definitie onbetrouwbaar (links op slot,
-     bijlagen bestaan niet). */
+  /* De buitenpoort: zoals een mailserver post aanneemt. Zonder ledeninlog,
+     maar alleen van de eigen mailserver met het gedeelde geheim
+     (kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026), met een strakke rem
+     en zonder enige vertrouwensclaim over de INHOUD: alles wat hier binnenkomt
+     is per definitie onbetrouwbaar (links op slot, bijlagen bestaan niet). */
   let poortVenster = 0, poortTeller = 0;
-  app.post('/api/werkmail/bezorg', (req, res) => {
+  app.post('/api/werkmail/bezorg', mailpoort, (req, res) => {
     const nuMin = Math.floor(Date.now() / 60000);
     if (nuMin !== poortVenster) { poortVenster = nuMin; poortTeller = 0; }
     if (++poortTeller > 60) return res.status(429).json({ error: 'De buitenpoort staat even dicht; probeer het over een minuut.' });

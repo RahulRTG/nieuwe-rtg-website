@@ -40,11 +40,13 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'LIEGRONDE.json');
-const { rijen, maakContext, POORTEN } = require('./appwerkt');
+const { rijen, meetIngang, maakContext, POORTEN } = require('./appwerkt');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
+const { haalSchoolsessies } = require('./lib/schoolproefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
 const { magLiegen } = require('../server/opzet/liegpoort');
 const { stempel } = require('./lib/stempel');
+const { isBrowserruis } = require('./lib/browserruis');
 
 const LIEG = '/api/';
 /* De deuren liegen niet: anders meet je de inlog en niet het scherm. Dat zijn de
@@ -52,7 +54,20 @@ const LIEG = '/api/';
    die elk scherm nodig heeft om op te bouwen (dezelfde lijst als
    test/liegend-scherm.e2e.js). */
 const SPAAR = ['/api/auth/', '/api/login', '/api/office/login', '/api/supplier/login',
-  '/api/supplier/roster', '/api/foundation/gezin/maak', '/api/account/', '/api/onboarding/status',
+  '/api/supplier/roster', '/api/foundation/gezin/maak',
+  /* Proefopbouw, niet de gegevens die Bord en Schrift tonen: een echt gekozen
+     kinderprofiel en een echte les leveren de tijdelijke Schoolpas. De schermen
+     lezen daarna andere routes; die blijven dus gewoon leeggelogen. */
+  '/api/foundation/gezin/profiel/maak', '/api/foundation/gezin/profiel/kies',
+  '/api/foundation/les/maak', '/api/foundation/les/join',
+  '/api/account/', '/api/onboarding/status',
+  /* Dit is de serverdeur van beschermde Foundation-schermen. Hem leeg laten
+     antwoorden houdt het echte scherm kunstmatig dicht en meet vervolgens de
+     deur in plaats van wat het scherm over zijn gegevens beweert. Net als de
+     sessiemunters hierboven blijft alleen deze toegangspoort echt; de
+     functionele Foundation-antwoorden achter de deur worden nog steeds door de
+     liegpoort vervangen. */
+  '/api/rtf/toegang',
   '/api/config', '/api/i18n', '/api/talen', '/api/vertaal/', '/api/gids/app', '/api/push/key'].join(',');
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 4);
 const GRENS = 'alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt';
@@ -83,25 +98,32 @@ function oordeel(m) {
   return { status: 'BEWEZEN', reden: m.gelogen.length + ' antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; ' + GRENS };
 }
 
+function meetAdres(rij) {
+  const meetbaar = meetIngang(rij);
+  if (!meetbaar) return null;
+  return { ingang: meetbaar.pad, pad: meetbaar.bestemming };
+}
+
 async function meetRij(rij, base, contexten) {
   const uit = { functie: rij.functie, app: rij.app, ingang: rij.ingang, persona: rij.persona };
-  if (!rij.pad) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen eigen adres: een stand of kiezer binnen de ledenapp' });
-  const ctx = contexten[rij.persona];
+  const adres = meetAdres(rij);
+  if (!adres) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen meetbare contractingang: een stand of kiezer binnen de ledenapp' });
+  const ctx = contexten[rij.functie] || contexten[rij.persona];
   if (!ctx) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen sessie voor de persona ' + rij.persona });
-  const statisch = await fetch(base + rij.pad).then((r) => (r.ok ? r.text() : '')).catch(() => '');
-  const m = { pad: rij.pad, klachten: [], gelogen: [], landing: null, deur: null };
+  const statisch = await fetch(base + adres.pad).then((r) => (r.ok ? r.text() : '')).catch(() => '');
+  const m = { pad: adres.pad, klachten: [], gelogen: [], landing: null, deur: null };
   if (!statisch) m.klachten.push('scherm niet op te halen');
   const page = await ctx.newPage();
   const fouten = [];
   const gelogen = new Set();
-  page.on('pageerror', (e) => fouten.push(String((e && e.message) || e)));
+  page.on('pageerror', (e) => { if (!isBrowserruis(e)) fouten.push(String((e && e.message) || e)); });
   page.on('request', (req) => {
     const p = new URL(req.url()).pathname;
     if (p.startsWith('/api/') && magLiegen(p, LIEG, SPAAR)) gelogen.add(req.method() + ' ' + p);
   });
   try {
     if (statisch) {
-      await page.goto(base + rij.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await page.goto(base + adres.ingang, { waitUntil: 'domcontentloaded', timeout: 20000 });
       await page.waitForTimeout(2500);
       m.landing = new URL(page.url()).pathname;
       m.deur = await page.evaluate((sel) => sel.find((s) => document.querySelector(s)) || null, POORTEN);
@@ -117,6 +139,21 @@ async function meetRij(rij, base, contexten) {
   return Object.assign(uit, oordeel(m), { gelogen: m.gelogen.length, klachten: m.klachten });
 }
 
+async function maakSchoolContext(browser, school) {
+  const ctx = await maakContext(browser, school.lokaal);
+  /* De Schoolpas is tabgebonden. Houd deze proefopbouw daarom lokaal bij de
+     enige ronde die hem nodig heeft; de gedeelde contextbouwer blijft gelijk en
+     andere bewijsregisters vervallen niet door een Foundation-fixture. */
+  await ctx.addInitScript((o) => {
+    try {
+      for (const k of Object.keys(o)) sessionStorage.setItem(k, JSON.stringify({
+        merk: 'rtg-school-sessie-v1', waarde: o[k], verloopt: Date.now() + 30 * 60 * 1000
+      }));
+    } catch (e) {}
+  }, school.tijdelijk);
+  return ctx;
+}
+
 async function meet() {
   const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
   const pw = laadBrowser({ eigenDriver: false });
@@ -127,12 +164,18 @@ async function meet() {
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   try {
     const { sessies, overgeslagen } = await haalSessies(base);
+    const school = await haalSchoolsessies(base, sessies);
+    if (!school) overgeslagen.push({ rol: 'schoolproef', reden: 'de echte les- en leerlingensessies konden niet worden gemaakt' });
     const lijst = rijen();
     const uit = [];
     let n = 0;
     await Promise.all(Array.from({ length: PAR }, async () => {
       const contexten = {};
       for (const rol of Object.keys(sessies)) contexten[rol] = await maakContext(browser, opslagVoor({ [rol]: sessies[rol] }));
+      if (school) {
+        contexten['link:rtfbord'] = await maakSchoolContext(browser, school.bord);
+        contexten['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift);
+      }
       while (true) {
         const i = n++; if (i >= lijst.length) break;
         uit.push(await meetRij(lijst[i], base, contexten));
@@ -157,7 +200,7 @@ async function meet() {
   }
 }
 
-module.exports = { oordeel, isZekerheid, SPAAR, DOEL };
+module.exports = { oordeel, isZekerheid, meetAdres, SPAAR, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

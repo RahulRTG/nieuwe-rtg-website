@@ -106,7 +106,11 @@ module.exports = ({ opslag, save }) => {
      `eenmalig` en de aanroeper geeft hem door aan de mixer. Een knop die
      stilletjes je instelling verandert, is precies de manipulatie waar deze
      laag tegen is. */
-  function signaal(sleutel, onderwerp, welk) {
+  /* `idem`: een herhaalsleutel per tik (19 oktober 2026). Een dubbele tik is EEN
+     bedoeling; telde hij twee keer, dan vertekent hij wat de mens wil. De
+     laatste vijftig sleutels staan bij de horizon, zodat het een herstart
+     overleeft; dezelfde sleutel met een ander signaal is een fout (409). */
+  function signaal(sleutel, onderwerp, welk, idem) {
     const h = van(sleutel);
     const s = SIGNALEN.find(x => x.id === String(welk || ''));
     if (!h) return { ok: false, reden: 'Een horizon hangt aan een codenaam; die ontbreekt.' };
@@ -122,9 +126,15 @@ module.exports = ({ opslag, save }) => {
     /* De grenzen -3 en +3 zijn er zodat honderd keer drukken niet iets anders
        betekent dan drie keer. Een voorkeur die onbeperkt kan groeien, wordt
        vanzelf de enige. */
+    const k = typeof idem === 'string' && idem ? idem.slice(0, 80) : null;
+    const al = k && (h.tikken || []).find(x => x.k === k);
+    if (al) return al.o === o && al.s === s.id
+      ? { ok: true, eenmalig: false, onderwerp: o, gewicht: Number(h.onderwerpen[o] || 0), bewaard: true, herhaald: true }
+      : { ok: false, status: 409, reden: 'Deze herhaalsleutel hoort bij een ander signaal.' };
     const nu = Number(h.onderwerpen[o] || 0);
     const na = Math.max(-3, Math.min(3, nu + s.richting));
     if (na === 0) delete h.onderwerpen[o]; else h.onderwerpen[o] = na;
+    if (k) h.tikken = (h.tikken || []).concat([{ k, o, s: s.id }]).slice(-50);
     if (save) save();
     return { ok: true, eenmalig: false, onderwerp: o, gewicht: na, bewaard: true };
   }

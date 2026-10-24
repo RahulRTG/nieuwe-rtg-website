@@ -11,6 +11,9 @@ const os = require('node:os');
 const path = require('node:path');
 const maakLevenscyclus = require('../server/kern/codelevenscyclus');
 const { startServer, stop, stopHard, kantoorAlsPersoon } = require('./helper');
+// de codeportalen vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per server
+require('./portaalaccount').zetPortaalAccount();
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 function motor() {
   const rijen = [];
@@ -450,16 +453,19 @@ test('transactionele toestemming en audit overleven een harde SQLite-herstart', 
     toestemming: 'gegevens delen met gekozen hulporganisatie' })).status, 200);
   const toegang = await rtf('casus/code', { id, max_gebruik: 20 });
   assert.equal(toegang.status, 200);
+  /* De hulpvrager draagt zijn eigen account (eigenaarsbesluit 19 oktober 2026):
+     de code hangt na de eerste keer aan dat account, ook na de herstart. */
+  const hulpvrager = await registreerGratis(BASE);
   const ingetrokken = await post('/api/rtfos/portaal/deelnemer/intrekken', {
     code: toegang.body.code, reden: 'duurzaam stoppen'
-  });
+  }, hulpvrager.token);
   assert.equal(ingetrokken.status, 200, JSON.stringify(ingetrokken.body));
 
   await stopHard(srv.child);
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
   BASE = srv.base;
   LAND = await kantoorAlsPersoon(BASE);
-  const na = await post('/api/rtfos/portaal/deelnemer', { code: toegang.body.code });
+  const na = await post('/api/rtfos/portaal/deelnemer', { code: toegang.body.code }, hulpvrager.token);
   assert.equal(na.status, 200, JSON.stringify(na.body));
   assert.equal(na.body.hulpvraag.toestemming, null);
   assert.equal(na.body.hulpvraag.ingetrokken.at != null, true);

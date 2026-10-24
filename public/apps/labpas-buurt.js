@@ -1,9 +1,13 @@
 /* Mijn Living Lab, deel "buurt": de vragen die bewoners aandragen, en de
    stemmen erop.
 
-   Dit staat OPEN, ook zonder labpas, en dat is het punt. Wie nog nergens aan
+   Dit staat open zonder labpas, en dat is het punt. Wie nog nergens aan
    meedoet moet juist kunnen zeggen wat er onderzocht zou moeten worden -- dat is
-   de trechter waar een Living Lab uit put. Wie wél een pas heeft, stemt daaronder.
+   de trechter waar een Living Lab uit put. Wel vraagt het een account (een
+   gratis account is genoeg) of een gezinsprofiel onder het account van een
+   ouder: eigenaarsbesluit 19 oktober 2026, en een stem is een per account.
+   De deur daarvoor staat hier in het scherm (deur(), shared/accountdeur.js),
+   ook voor de labpas: labpas.js opent een pas pas na deur().
 
    Afgesplitst uit ./labpas.js toen die de 10 KB passeerde. Hij krijgt zijn
    gereedschap (api, esc, meld) van de hoofdmodule mee in plaats van
@@ -18,10 +22,14 @@
     api = o.api; esc = o.esc; meld = o.meld;
   }
   function zetLab(id) { LAB = id; }
+  function gezin() { try { return JSON.parse(localStorage.getItem('rtf_sessie') || 'null') || {}; } catch (e) { return {}; } }
+  function deur() {
+    if (RTGAccountDeur.token() || gezin().token) return Promise.resolve();
+    return RTGAccountDeur.eis($('#bDeur'), { waarom: 'Vragen aandragen, stemmen, een klacht indienen en zien wat het lab onderzoekt doe je met een RTG-account. Een gratis account is genoeg.' });
+  }
 
   /* ---------- de buurt: vragen aandragen en stemmen ----------
-     Dit staat OPEN, ook zonder labpas. Wie nog nergens aan meedoet, moet juist
-     kunnen zeggen wat er zou moeten worden onderzocht. */
+     Open zonder labpas, met een account: zie boven. */
   function laadThemas() {
     if (!LAB) return Promise.resolve();
     return api('bewoner/themas', { labId: LAB }).then(function (d) {
@@ -63,5 +71,5 @@
     return api('bewoner/thema', { labId: LAB, vraag: vraag, alias: stemNaam() }).then(laadThemas);
   }
 
-  window.LabpasBuurt = { init: init, zetLab: zetLab, laadThemas: laadThemas, stuurVraag: stuurVraag };
+  window.LabpasBuurt = { init: init, zetLab: zetLab, gezin: gezin, deur: deur, laadThemas: laadThemas, stuurVraag: stuurVraag };
 })();

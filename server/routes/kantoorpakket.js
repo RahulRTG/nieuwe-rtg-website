@@ -26,7 +26,7 @@ module.exports = (kern) => {
     stuur(res, await fn('sup:' + req.supplier.code, req.body || {}));
   };
   app.post('/api/supplier/kantoorpakket/mijn', supplierAuth, supDoe((key) => office.mijn(key)));
-  app.post('/api/supplier/kantoorpakket/maak', supplierAuth, supDoe((key, b) => office.maak(key, b)));
+  app.post('/api/supplier/kantoorpakket/maak', supplierAuth, supDoe((key, b) => office.maak(key, b, undefined, b.idem)));
   app.post('/api/supplier/kantoorpakket/open', supplierAuth, supDoe((key, b) => office.open(key, b.id)));
   app.post('/api/supplier/kantoorpakket/bewaar', ruim, supplierAuth, supDoe((key, b) => office.bewaar(key, b.id, b)));
   app.post('/api/supplier/kantoorpakket/deel', supplierAuth, supDoe((key, b) => office.deel(key, b.id, b.codenaam, b.aan !== false, b.rechten)));
@@ -51,7 +51,7 @@ module.exports = (kern) => {
     stuur(res, await fn('rtg:kantoor', req.body || {}));
   };
   app.post('/api/office/kantoorpakket/mijn', officeAuth, kantoorDoe((key) => office.mijn(key)));
-  app.post('/api/office/kantoorpakket/maak', officeAuth, kantoorDoe((key, b) => office.maak(key, b)));
+  app.post('/api/office/kantoorpakket/maak', officeAuth, kantoorDoe((key, b) => office.maak(key, b, undefined, b.idem)));
   app.post('/api/office/kantoorpakket/open', officeAuth, kantoorDoe((key, b) => office.open(key, b.id)));
   app.post('/api/office/kantoorpakket/bewaar', ruim, officeAuth, kantoorDoe((key, b) => office.bewaar(key, b.id, b)));
   app.post('/api/office/kantoorpakket/deel', officeAuth, kantoorDoe((key, b) => office.deel(key, b.id, b.codenaam, b.aan !== false, b.rechten)));
@@ -77,7 +77,7 @@ module.exports = (kern) => {
       stuur(res, await fn(req.session.key, req.body || {}));
     };
     app.post('/api/kantoorpakket/mijn', ...ledenAuth, doe((key) => office.mijn(key)));
-    app.post('/api/kantoorpakket/maak', ...ledenAuth, doe((key, b) => office.maak(key, b)));
+    app.post('/api/kantoorpakket/maak', ...ledenAuth, doe((key, b) => office.maak(key, b, undefined, b.idem)));
     app.post('/api/kantoorpakket/open', ...ledenAuth, doe((key, b) => office.open(key, b.id)));
     app.post('/api/kantoorpakket/bewaar', ruim, ...ledenAuth, doe((key, b) => office.bewaar(key, b.id, b)));
     app.post('/api/kantoorpakket/deel', ...ledenAuth, doe((key, b) => office.deel(key, b.id, b.codenaam, b.aan !== false, b.rechten)));

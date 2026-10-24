@@ -7,7 +7,7 @@
    tekening in SVG (de hoogte van een staaf is een attribuut, geen stijl). */
 const $ = s => document.querySelector(s);
 const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-const api = (pad, body) => fetch('/api/flits/' + pad, { method: 'POST',
+const api = (pad, body) => fetch(pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 let meldT;
@@ -75,7 +75,7 @@ function toonAlarm(m) {
 }
 async function ververs() {
   if (!hier) return;                       // zonder plek is "rond mij" een lege vraag
-  const r = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
+  const r = await api('/api/flits/rond', { lat: hier.lat, lng: hier.lng, land: LAND });
   if (r.status !== 200) return;
   rond = r.body;
   $('#bron').textContent = rond.bron + '.';
@@ -92,9 +92,9 @@ async function ververs() {
     b.firstChild.setAttribute('aria-hidden', 'true');
     b.addEventListener('click', async () => {
       if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om te kunnen melden.');
-      const m = await api('meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND });
+      const m = await api('/api/flits/meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND, idem: RTGIdem('flits') });
       if (m.body.error) return zeg(m.body.error);
-      zeg(m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
+      zeg(m.body.herhaald ? (m.body.let_op || 'Deze melding stond er al.') : m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
       ververs();
     });
     rij.appendChild(b);
@@ -112,9 +112,9 @@ async function ververs() {
   toonAlarm(rond.meldingen.find(m => m.afstandKm != null && m.afstandKm <= 1.2) || null);
 }
 $('#stemKlopt').addEventListener('click', async () => { if (!alarmMelding) return;
-  await api('stem', { id: alarmMelding.id, klopt: true }); zeg('Dank u.'); ververs(); });
+  await api('/api/flits/stem', { id: alarmMelding.id, klopt: true }); zeg('Dank u.'); ververs(); });
 $('#stemWeg').addEventListener('click', async () => { if (!alarmMelding) return;
-  const r = await api('stem', { id: alarmMelding.id, klopt: false });
+  const r = await api('/api/flits/stem', { id: alarmMelding.id, klopt: false });
   zeg(r.body.weg ? 'De melding is weggehaald.' : 'Genoteerd.'); ververs(); });
 
 /* ---- de vooruitblik (Ghost Driver-motor), vast voor Ibiza ----
@@ -142,7 +142,7 @@ function tekenUren() {
 }
 window.addEventListener('resize', tekenUren);
 async function vooruit() {
-  const r = await api('vooruit', { stad: 'Ibiza' });
+  const r = await api('/api/flits/vooruit', { stad: 'Ibiza' });
   if (r.status !== 200) return;
   uurbeeld = r.body.uurbeeld || [];
   tekenUren();
@@ -169,7 +169,7 @@ async function vooruit() {
       return;
     }
   }
-  const eerste = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
+  const eerste = await api('/api/flits/rond', { lat: hier.lat, lng: hier.lng, land: LAND });
   if (eerste.status !== 200) { $('#poortReden').textContent = eerste.body.error || 'Log eerst in via de app.'; $('#vPoort').hidden = false; return; }
   $('#vRit').hidden = false;
   rond = eerste.body;

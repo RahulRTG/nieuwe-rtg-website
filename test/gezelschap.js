@@ -35,6 +35,7 @@
    die aan een persoon hangt. Een meegegeven token zou dus niets meer doen, en
    een parameter die niets doet is een belofte die niet klopt.
 */
+const { randomUUID } = require('node:crypto');
 const assert = require('node:assert/strict');
 const { kantoorAlsPersoon } = require('./helper');
 
@@ -101,9 +102,11 @@ async function bouwGezelschap(base, opties) {
 
   async function tilOp(l, pas) {
     const aanvraag = await post('/api/aanmelding/aanvraag',
-      { pas, naam: l.naam, contact: l.email }, l.token);
+      { idem: randomUUID(), pas, naam: l.naam, contact: l.email }, l.token);
     assert.equal(aanvraag.status, 200, 'aanvraag lukt: ' + JSON.stringify(aanvraag.body));
-    assert.equal(aanvraag.body.aanmelding.gekoppeld, true, 'de aanvraag hangt aan het account');
+    const dossier = await post('/api/aanmelding/een', { id: aanvraag.body.ontvangst.aanvraagId }, persoonlijkKantoor);
+    assert.equal(dossier.status, 200, 'het bevoegde kantoor kan de aanvraag lezen');
+    assert.equal(dossier.body.aanmelding.gekoppeld, true, 'de aanvraag hangt aan het account');
     /* Het contractbedrag hoort bij het besluit sinds de ladder: een contractuele
        pas (Business, Lifestyle) heeft geen lijstprijs, dus accepteren zonder
        afgesproken maandbedrag wordt geweigerd. De bodem komt uit de ladder en
@@ -111,7 +114,7 @@ async function bouwGezelschap(base, opties) {
        proefpubliek laten zakken op een reden die niets met zijn onderwerp te
        maken heeft. */
     const trede = require('../server/kern/pasladder').trede(pas);
-    const lijf = { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'proefpubliek' };
+    const lijf = { id: aanvraag.body.ontvangst.aanvraagId, besluit: 'geaccepteerd', notitie: 'proefpubliek' };
     if (trede && trede.contractueel) lijf.contractEuro = trede.bodemCenten / 100;
     const besluit = await post('/api/aanmelding/beslis', lijf, persoonlijkKantoor);
     assert.equal(besluit.status, 200, 'het menselijke besluit lukt: ' + JSON.stringify(besluit.body));

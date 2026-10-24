@@ -304,10 +304,10 @@ const STROMEN = [
       'bewaarveger). Het lid kan een SOS niet intrekken; de zaak of het kantoor sluit hem.' },
 
   { naam: 'flits-melding', wat: 'een verkeersmelding: de plek waar het lid was, met zijn codenaam',
-    bron: [S('kern/flits.js', 'const m = { id: id(), soort, lat, lng, door: codenaam, bevestigingen: 0, weg: 0, at: nu(), laatstBevestigd: null };')],
+    bron: [S('kern/flits.js', 'const m = { id: id(), soort, lat, lng, door: codenaam, melder: key, bevestigingen: 0, weg: 0, at: nu(), laatstBevestigd: null };')],
     collectie: 'flitsMeldingen', sleutel: 'codenaam', van: 'lid', klasse: 'noodzakelijk',
     termijn: { soort: 'module', bewijs: S('kern/flits.js', 'return Date.now() - basis < s.ttlMin * 60 * 1000 && (m.weg || 0) < WEG_STEMMEN;') },
-    waarom: 'een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam en de sleutels van ' +
+    waarom: 'een bewust gedane melding met een levensduur van 45 minuten tot een dag; de codenaam, de meldersleutel en de sleutels van ' +
       'wie bevestigt reizen mee. Sinds 18 oktober haalt de vergeetroute de eigen meldingen weg en de stem uit die ' +
       'van anderen (flitsVergeet in kern/flits.js)' },
 

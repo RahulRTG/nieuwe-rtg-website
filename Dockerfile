@@ -30,7 +30,7 @@ RUN chmod 0555 /usr/local/bin/rtg-backup /usr/local/bin/rtg-herstel
 # vandaar dat --experimental-sqlite uit de hele boom is); de ondergrens staat
 # in package.json (engines) en wordt afgedwongen in server/server.js, vóór
 # het eerste require.
-FROM node:26-slim@sha256:193fe51b64e77981119c98c2002c9e32a70e2f006fb4d25068ce0558998917f0
+FROM node:26-slim@sha256:0d1e33586362bb9e608c4e751e7a9e7edb55c9ac11461ed5666af696cc461dd4
 
 # Alleen productie-afhankelijkheden; de dev-tools (terser, axe) horen niet in de
 # runtime-image. npm ci is reproduceerbaar op basis van de lockfile.

@@ -43,6 +43,7 @@
 
    Draai los: node --test test/vakwerk-pro.test.js
    ========================================================================== */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -77,11 +78,11 @@ test.before(async () => {
 
   // een echte hovenier laten ontstaan: aanmelding -> menselijk besluit -> termijn
   office = (await api('/api/office/login', { code: OFFICE_CODE })).body.token;
-  const aanvraag = await api('/api/aanmelding/aanvraag', {
+  const aanvraag = await api('/api/aanmelding/aanvraag', { idem: randomUUID(),
     pas: 'rtg', naam: 'Toni Mari', contact: 'toni' + Date.now().toString(36) + '@voorbeeld.test',
     bedrijf: { naam: 'Jardins Mari', type: 'hovenier', plaats: 'Ibiza', behoeften: [] }
   });
-  const id = aanvraag.body && aanvraag.body.aanmelding && aanvraag.body.aanmelding.id;
+  const id = aanvraag.body && aanvraag.body.ontvangst && aanvraag.body.ontvangst.aanvraagId;
   assert.ok(office && id, 'de aanmelding staat klaar');
   await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', notitie: 'Rahul Imran Ismail' }, office);
   const t = await api('/api/aanmelding/termijn-voldaan', { id, maand: 1 }, office);

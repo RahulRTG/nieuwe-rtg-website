@@ -1,4 +1,4 @@
-/* DEMOCRATIEOS bij ./idemsleutels-nooit-routes.js -- twaalf routes die het ZELF
+/* DEMOCRATIEOS bij ./idemsleutels-nooit-routes.js -- veertien routes die het ZELF
    al weten. De meeste weigeren een herhaling met 409 en zeggen waarom, en
    precies die reden mag een duplicaatlaag niet opslikken (MUTATIECONTRACT.md
    par. 5o). Vier van de Political Connector doen iets anders en ook dat met
@@ -35,6 +35,11 @@ module.exports = Object.freeze({
   'POST /api/office/democratie/partij/sleutel':
     'geeft elke keer een NIEUWE sleutel en maakt de vorige ongeldig: een afgespeeld antwoord zou een sleutel ' +
     'tonen die al niet meer werkt',
+  'POST /api/democratie/partij/koppel':
+    'de koppelcode werkt een keer: een tweede koppeling krijgt 401, en een afgespeeld succes zou een account ' +
+    'laten denken dat het namens de partij handelt terwijl een ander de code al gebruikte',
+  'POST /api/office/democratie/partij/ontkoppel':
+    'weigert met 404 als het account al los is; een afgespeeld succes zou verbergen dat een ander hem voor was',
   'POST /api/democratie/partij/voorstel/plaats':
     'een tweede voorstel met dezelfde tekst is een tweede voorstel en telt mee voor de daglimiet; wie dubbel ' +
     'plaatst hoort dat te zien en niet een afgespeeld eerste antwoord',

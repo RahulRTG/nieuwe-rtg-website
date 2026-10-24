@@ -61,7 +61,7 @@ module.exports = (kern) => {
   // de kanaalchat, cadeautjes en het maandabonnement (RTG Pay, idempotent)
   app.post('/api/podium/chat', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, podiumChatStuur(req.session.key, String(req.body.id || ''), req.body.tekst));
+    stuur(res, podiumChatStuur(req.session.key, String(req.body.id || ''), req.body.tekst, req.body.idem));
   });
   app.post('/api/podium/cadeau', auth, async (req, res) => {
     if (geenGast(req, res)) return;

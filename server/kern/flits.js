@@ -66,6 +66,19 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
       return { status: 400, error: 'Geen geldige plek.' };
     if (soort === 'flitser' && flitsVerbodenIn(data.land))
       return { status: 403, error: 'In dit land zijn flitsermeldingen wettelijk niet toegestaan; file- en gevaarmeldingen werken gewoon.' };
+    /* DE HERHAALSLEUTEL hoort bij de melding en overleeft dus een herstart:
+       dezelfde tik nog eens (een afgebroken verzoek, een dubbeltik) geeft de
+       eerste uitkomst terug, en dezelfde sleutel voor iets anders is een 409. */
+    const idem = String(data.idem || '').slice(0, 80);
+    const merk = idem ? key + '|' + idem : null;
+    if (merk) {
+      const eerder = lijst().find(m => Array.isArray(m.idems) && m.idems.includes(merk));
+      if (eerder) {
+        if (eerder.soort !== soort || haversine({ lat, lng }, eerder) > DEDUPE_M)
+          return { status: 409, error: 'Deze herhaalsleutel hoort bij een andere melding.' };
+        return { status: 200, ok: true, herhaald: true, melding: beeld(eerder, { lat, lng }) };
+      }
+    }
     const vorige = laatsteMelder.get(key);
     if (vorige && Date.now() - vorige < MELD_PAUZE_MS)
       return { status: 429, error: 'Rustig aan: uw vorige melding staat er net.' };
@@ -73,13 +86,24 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
     // dichtbij dezelfde soort? Dan telt de tik als bevestiging, niet als nieuw.
     const buurman = rij.find(m => m.soort === soort && haversine({ lat, lng }, m) <= DEDUPE_M);
     laatsteMelder.set(key, Date.now());
+    const onthoud = (m) => { if (merk) { m.idems = (m.idems || []).concat(merk).slice(-50); } };
     if (buurman) {
+      /* EEN MELDER BEVESTIGT ZICHZELF NIET. Wie hem zelf meldde of al
+         bevestigde, meldt hem nu opnieuw: dat is een herhaling en telt niet. */
+      if (buurman.melder === key || (buurman.stemmers || []).includes(key)) {
+        onthoud(buurman); save();
+        return { status: 200, ok: true, herhaald: true, melding: beeld(buurman, { lat, lng }),
+          let_op: 'U had deze melding al gedaan of bevestigd; hij telt een keer.' };
+      }
       buurman.bevestigingen = (buurman.bevestigingen || 0) + 1;
       buurman.laatstBevestigd = nu(); buurman.weg = 0;
+      buurman.stemmers = (buurman.stemmers || []).concat(key).slice(-50);
+      onthoud(buurman);
       save();
       return { status: 200, ok: true, bevestigd: true, melding: beeld(buurman, { lat, lng }) };
     }
-    const m = { id: id(), soort, lat, lng, door: codenaam, bevestigingen: 0, weg: 0, at: nu(), laatstBevestigd: null };
+    const m = { id: id(), soort, lat, lng, door: codenaam, melder: key, bevestigingen: 0, weg: 0, at: nu(), laatstBevestigd: null };
+    onthoud(m);
     rij.push(m); save();
     return { status: 200, ok: true, melding: beeld(m, { lat, lng }) };
   }
@@ -88,6 +112,8 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
   function stem(key, meldingId, klopt) {
     const m = lijst().find(x => x.id === String(meldingId || ''));
     if (!m || !vers(m)) return { status: 404, error: 'Deze melding is er niet meer.' };
+    if (klopt && m.melder === key)
+      return { status: 403, error: 'Uw eigen melding kunt u niet zelf bevestigen; dat doet een ander die hem ook ziet.' };
     m.stemmers = m.stemmers || [];
     if (m.stemmers.includes(key)) return { status: 200, ok: true, al: true };
     m.stemmers.push(key); if (m.stemmers.length > 50) m.stemmers = m.stemmers.slice(-50);

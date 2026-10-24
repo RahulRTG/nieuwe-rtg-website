@@ -25,7 +25,7 @@
    test/vergeten.test.js en test/vergeten-gezelschap.test.js vegen na afloop door
    de HELE database en rekenen af wat er nog van het lid in staat -- voor elke
    pas apart, want een Lifestyle-lid heeft takken die een RTG-lid niet heeft. */
-module.exports = function maakVergeten(kern) {
+module.exports = function maakVergeten(kern, aanvraagPrivacy = {}) {
   const { db, save, bijeen, accounts, sessions, forgetSession, fs, path, UPLOAD_DIR,
     broadcastSync, gidsWeg, liveCodename, media, bestanden } = kern;
   /* Het lidboard staat onder een eigen naam op de kern; alleen het wissen van
@@ -40,7 +40,7 @@ module.exports = function maakVergeten(kern) {
   const sporen = require('./vergeten/sporen')({ kern, sessions, forgetSession });
   // de positie van dit lid in de domeinen met een eigen deur
   const positie = require('./vergeten/positie')(kern);
-  const anoniem = require('./vergeten/anoniem')({ db, accounts, spelVergeet: kern.spelVergeet });
+  const anoniem = require('./vergeten/anoniem')({ db, accounts, spelVergeet: kern.spelVergeet, ...aanvraagPrivacy });
   const { wisGesprekkenVan: wisGesprekken, wisSollicitatiechats } = require('./vergeten/gesprekken');
   const eigen = require('./vergeten/eigen')({ db, lidBoardLogWis });
   const aanwezigheid = require('./aanwezigheid');
@@ -50,6 +50,8 @@ module.exports = function maakVergeten(kern) {
      afstand kan zijn (S3); de aanroeper wacht erop voordat hij antwoordt --
      anders meldt het scherm "verwijderd" terwijl de foto's nog gaan. */
   async function wisLid(sessie) {
+    // Een onleesbaar ontvangstboek mag niet pas na de eerste wissing weigeren.
+    anoniem.controleerRedactie();
     const key = sessie.key;
     /* DE CODENAAM WORDT HIER GEPAKT, VOOR DE EERSTE VEEG. In de idempotentiering
        van betalen staat niet de sleutel maar de CODENAAM, en zodra de ledengids

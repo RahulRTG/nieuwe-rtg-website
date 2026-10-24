@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '3da8253d';
+var RTG_BOUW = '406d63a9';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -191,7 +191,7 @@ var RTG_BOUW = '3da8253d';
 
   // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
   async function refreshState(){
-    try { applyState((await API.call('/state')).state); } catch(e){}
+    try { applyState((await API.call('/api/state')).state); } catch(e){}
   }
 
   let toastTimer;
@@ -1030,7 +1030,7 @@ var RTG_BOUW = '3da8253d';
     const tekst = prompt(T('snap.tekst','Tekst erbij (mag leeg):'),'') || '';
     try {
       if (snapStoryMode){ await API.call('/member/story/post', { foto, tekst }); toast(''+T('snap.storyok','Je verhaal staat er 24 uur op.')); loadStories(); }
-      else { await API.call('/member/snap/send', { toKey: snapNaar, foto, tekst }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
+      else { await API.call('/api/member/snap/send', { toKey: snapNaar, foto, tekst, idem: RTGIdem('snap') }); toast(''+T('snap.verstuurd','Snap verstuurd. Hij verdwijnt na bekijken.')); }
     } catch(err){ toast(err.message); }
   }
   function snapVerklein(file){
@@ -1456,7 +1456,7 @@ var RTG_BOUW = '3da8253d';
     // verhalen-strip + inkomende snaps bovenaan de contactenkaart
     let stories = [], snaps = [];
     try { stories = (await API.call('/member/stories')).stories || []; } catch(e){}
-    try { snaps = (await API.call('/member/snaps')).snaps || []; } catch(e){}
+    try { snaps = (await API.call('/api/member/snaps')).snaps || []; } catch(e){}
     let box = el.querySelector('#snapStrip');
     if (!box){ box = document.createElement('div'); box.id='snapStrip'; el.insertBefore(box, el.firstChild.nextSibling); }
 /* de storyrij bovenaan De Salon */
@@ -1475,7 +1475,7 @@ var RTG_BOUW = '3da8253d';
     box.querySelectorAll('.js-opensnap').forEach(b => b.addEventListener('click', () => openSnap(b.dataset.id)));
   }
   async function openSnap(id){
-    let d; try { d = await API.call('/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
+    let d; try { d = await API.call('/api/member/snap/view', { id }); } catch(e){ toast(e.message); return; }
     const ov = snapOverlay();
     ov.querySelector('#snapOvVan').textContent = 'Snap van ' + d.van;
     ov.querySelector('#snapOvImg').src = d.foto;
@@ -1980,7 +1980,7 @@ var RTG_BOUW = '3da8253d';
 /* DIRECTE BERICHTEN, DELEN EN HET BEGIN VAN DE LIVE-VERBINDING. */
     $('#dmInput').value = '';
     try {
-      const d = await API.call('/member/dm/send', { toKey: dmWith, text });
+      const d = await API.call('/api/member/dm/send', { toKey: dmWith, text });
       dmToevoegen(d.message);
     } catch(e){ toast(e.message); }
   }
@@ -2004,7 +2004,7 @@ var RTG_BOUW = '3da8253d';
     ).join('');
     $('#shareList').querySelectorAll('[data-deel]').forEach(b => b.addEventListener('click', async () => {
       try {
-        await API.call('/member/dm/send', { toKey: b.dataset.deel, postId: deelPost, text: '' });
+        await API.call('/api/member/dm/send', { toKey: b.dataset.deel, postId: deelPost, text: '' });
         toast(T('sal.gedeeld','Gedeeld.'));
         $('#share-sheet').classList.remove('open'); $('#share-scrim').classList.remove('open');
       } catch(e){ toast(e.message); }
@@ -2023,7 +2023,7 @@ var RTG_BOUW = '3da8253d';
     csMee = window.RTGMeelezen.maak({
       stroom: () => (call && call.stream) || null,
       stuur: r => {
-        if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
+        if (call) API.call('/api/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
       } });
     csMee.el.style.cssText += 'position:absolute;left:12px;right:12px;bottom:96px;z-index:4;color:#F7F5F1;';
     const scherm = $('#callScreen'); if (scherm) scherm.appendChild(csMee.el);
@@ -2043,11 +2043,11 @@ var RTG_BOUW = '3da8253d';
     if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.update({duration:tijd});
   }
   let iceConfig = null;
-  async function haalIce(){ try { iceConfig = (await API.call('/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
+  async function haalIce(){ try { iceConfig = (await API.call('/api/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
     const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(t => pc.addTrack(t, call.stream));
-    pc.onicecandidate = ev => { if (ev.candidate && call) API.call('/member/call', { toKey: call.withKey, kind: 'ice', payload: ev.candidate }).catch(()=>{}); };
+    pc.onicecandidate = ev => { if (ev.candidate && call) API.call('/api/member/call', { toKey: call.withKey, kind: 'ice', payload: ev.candidate }).catch(()=>{}); };
     pc.ontrack = ev => {
       const v = $('#csRemote');
       if (v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0];
@@ -2065,6 +2065,12 @@ var RTG_BOUW = '3da8253d';
     try { return await RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }); }
     catch(e){ toast((e.rtg && e.rtg.kort) || T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
   }
+  /* De rand draagt Opnemen en Ophangen boven de werktafel. Stond hij er nog
+     niet (app net open), dan kon niemand opnemen: probeer tot hij staat. */
+  function toonRand(spec, nog){
+    (function p(n){ if (!nog()) return; const ok = window.RTGAdaptiveEdgeVisual && RTGAdaptiveEdgeVisual.present(spec);
+      if (!ok && n < 40) setTimeout(() => p(n + 1), 250); })(0);
+  }
   function toonGesprek(naam, video){
     $('#csNaam').textContent = naam; $('#csNaam2').textContent = naam;
     $('#csAv').textContent = initCN(naam);
@@ -2073,7 +2079,7 @@ var RTG_BOUW = '3da8253d';
     $('#csCam').style.display = video ? '' : 'none';
     $('#csTijd').textContent = T('sal.belt','gaat over…');
     belUI(true);
-    if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'active-call',name:naam,duration:T('sal.belt','gaat over…')});
+    const c = call; toonRand({kind:'active-call',name:naam,duration:T('sal.belt','gaat over…')}, () => call === c);
   }
   async function beginGesprek(video){
     if (!dmWith) return;
@@ -2084,7 +2090,7 @@ var RTG_BOUW = '3da8253d';
     call = { withKey: dmWith, naam: dmNaam, video, richting: 'uit', pendingIce: [], stream, t0: 0 };
     $('#csLocal').srcObject = stream;
     toonGesprek(dmNaam, video);
-    try { await API.call('/member/call', { toKey: call.withKey, kind: 'ring', video }); }
+    try { await API.call('/api/member/call', { toKey: call.withKey, kind: 'ring', video }); }
     catch(e){ toast(e.message); eindeGesprek(false); }
   }
   $('#dmBel').addEventListener('click', () => beginGesprek(false));
@@ -2094,8 +2100,8 @@ var RTG_BOUW = '3da8253d';
     const keuze = prompt('Wat wil je doen met ' + dmNaam + '?\n\n1 = Blokkeren\n2 = Melden\n3 = Blokkeren en melden', '1');
     if (keuze === null) return;
     try {
-      if (keuze === '2' || keuze === '3') { const reden = prompt('Wat is er aan de hand?', '') || ''; await API.call('/member/report', { key: dmWith, reden }); }
-      if (keuze === '1' || keuze === '3') { await API.call('/member/block', { key: dmWith }); $('#dm-sheet').classList.remove('open'); loadSocial(); }
+      if (keuze === '2' || keuze === '3') { const reden = prompt('Wat is er aan de hand?', '') || ''; await API.call('/api/member/report', { key: dmWith, reden }); }
+      if (keuze === '1' || keuze === '3') { await API.call('/api/member/block', { key: dmWith }); $('#dm-sheet').classList.remove('open'); loadSocial(); }
       toast(keuze === '2' ? T('sal.gemeld', 'Bedankt, je melding is doorgegeven.') : T('sal.geblokkeerd', 'Geblokkeerd.'));
     } catch (e) { toast(e.message); }
   });
@@ -2105,24 +2111,24 @@ var RTG_BOUW = '3da8253d';
     if (!inkomend) return;
     await haalIce();
     const stream = await pakMedia(inkomend.video);
-    if (!stream){ API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{}); inkomend = null; return; }
+    if (!stream){ API.call('/api/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{}); inkomend = null; return; }
     call = { withKey: inkomend.from, naam: inkomend.codename, video: inkomend.video, richting: 'in', pendingIce: [], stream, t0: 0 };
     $('#csLocal').srcObject = stream;
     toonGesprek(inkomend.codename, inkomend.video);
-    await API.call('/member/call', { toKey: call.withKey, kind: 'accept' }).catch(()=>{});
+    await API.call('/api/member/call', { toKey: call.withKey, kind: 'accept' }).catch(()=>{});
     inkomend = null;
   }
   $('#ciJa').addEventListener('click', neemOp);
   $('#ciNee').addEventListener('click', () => {
     $('#callIncoming').classList.remove('open');
-    if (inkomend) API.call('/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{});
+    if (inkomend) API.call('/api/member/call', { toKey: inkomend.from, kind: 'decline' }).catch(()=>{});
     inkomend = null;
     if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.close();
   });
 
   function eindeGesprek(zeggen){
     if (!call) { belUI(false); return; }
-    if (zeggen) API.call('/member/call', { toKey: call.withKey, kind: 'hangup' }).catch(()=>{});
+    if (zeggen) API.call('/api/member/call', { toKey: call.withKey, kind: 'hangup' }).catch(()=>{});
     clearInterval(call.timer);
     try { call.stream.getTracks().forEach(t => t.stop()); } catch(e){}
     try { if (call.pc) call.pc.close(); } catch(e){}
@@ -2143,19 +2149,20 @@ var RTG_BOUW = '3da8253d';
     $('#csCam').classList.toggle('dicht', !t.enabled);
   });
 
+/* DE BELSIGNALEN VAN DE LIVE-VERBINDING (uit app-main-10.js geknipt op de 10 kB): ICE die vooruit liep, en de eerste helft van opBelsignaal; -11 gaat erin verder. */
   async function flushIce(){
     if (!call || !call.pc || !call.pc.remoteDescription) return;
     for (const c of call.pendingIce.splice(0)) { try { await call.pc.addIceCandidate(c); } catch(e){} }
   }
   async function opBelsignaal(d){
     if (d.kind === 'ring'){
-      if (call){ API.call('/member/call', { toKey: d.from, kind: 'busy' }).catch(()=>{}); return; }
+      if (call){ API.call('/api/member/call', { toKey: d.from, kind: 'busy' }).catch(()=>{}); return; }
       inkomend = { from: d.from, codename: d.codename, video: d.video };
       $('#ciAv').textContent = initCN(d.codename);
       $('#ciNaam').textContent = d.codename;
       $('#ciSoort').textContent = d.video ? T('sal.videogesprek','Videogesprek') : T('sal.spraakoproep','Spraakoproep');
       $('#callIncoming').classList.add('open');
-      if(window.RTGAdaptiveEdgeVisual)RTGAdaptiveEdgeVisual.present({kind:'incoming-call',name:d.codename});
+      const wie = inkomend; toonRand({kind:'incoming-call',name:d.codename}, () => inkomend === wie);
       return;
     }
     if (!call || d.from !== call.withKey) return;
@@ -2164,14 +2171,14 @@ var RTG_BOUW = '3da8253d';
       const pc = maakPc();
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      API.call('/member/call', { toKey: call.withKey, kind: 'offer', payload: offer }).catch(()=>{});
+      API.call('/api/member/call', { toKey: call.withKey, kind: 'offer', payload: offer }).catch(()=>{});
     } else if (d.kind === 'offer'){
       const pc = maakPc();
       await pc.setRemoteDescription(d.payload);
       await flushIce();
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      API.call('/member/call', { toKey: call.withKey, kind: 'answer', payload: answer }).catch(()=>{});
+      API.call('/api/member/call', { toKey: call.withKey, kind: 'answer', payload: answer }).catch(()=>{});
     } else if (d.kind === 'answer'){
       await call.pc.setRemoteDescription(d.payload);
       await flushIce();
@@ -2200,7 +2207,7 @@ var RTG_BOUW = '3da8253d';
     else if (d.kind === 'accepted'){ toast('' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
     else if (d.kind === 'dm'){
       if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
-        const gesprek = API.call('/member/dm', { withKey: d.from }).catch(()=>null);
+        const gesprek = API.call('/api/member/dm', { withKey: d.from }).catch(()=>null);
         if (d.postId == null) dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
         else gesprek.then(r => {
           const lijst = (r && r.messages) || [];
@@ -2237,7 +2244,7 @@ var RTG_BOUW = '3da8253d';
 
   async function kletsLaad(){
     try {
-      const d = await API.call('/klets', {});
+      const d = await API.call('/api/klets', {});
       kletsAan = !!d.aan;
       return d;
     } catch(e){ return { aan: false, gesprekken: [], uitleg: '' }; }
@@ -2262,13 +2269,13 @@ var RTG_BOUW = '3da8253d';
         : '');
     const schakel = $('#kletsSchakel');
     if (schakel) schakel.addEventListener('change', async () => {
-      try { const r = await API.call('/klets/zet', { aan: schakel.checked }); kletsAan = !!r.aan; $('#kletsGo').disabled = !kletsAan; }
+      try { const r = await API.call('/api/klets/zet', { aan: schakel.checked }); kletsAan = !!r.aan; $('#kletsGo').disabled = !kletsAan; }
       catch(e){ toast(e.message); schakel.checked = kletsAan; }
     });
     const go = $('#kletsGo');
     if (go) go.addEventListener('click', kletsStart);
     $('#kletsBody').querySelectorAll('[data-klets]').forEach(b => b.addEventListener('click', async () => {
-      try { kletsToon(await API.call('/klets/gesprek', { id: b.dataset.klets })); } catch(e){ toast(e.message); }
+      try { kletsToon(await API.call('/api/klets/gesprek', { id: b.dataset.klets })); } catch(e){ toast(e.message); }
     }));
   }
 
@@ -2287,7 +2294,7 @@ var RTG_BOUW = '3da8253d';
     if (!dmWith) return;
     const go = $('#kletsGo');
     if (go) { go.disabled = true; go.textContent = 'Ze zijn bezig...'; }
-    try { kletsToon(await API.call('/klets/start', { vriend: dmWith })); }
+    try { kletsToon(await API.call('/api/klets/start', { vriend: dmWith })); }
     catch(e){ toast(e.message); if (go) { go.disabled = false; go.textContent = 'Laat ze kletsen'; } }
   }
 
@@ -2308,7 +2315,7 @@ var RTG_BOUW = '3da8253d';
   async function syncScope(scope){
     if (!API.live) return;
     try {
-      const data = await API.call('/state');
+      const data = await API.call('/api/state');
       applyState(data.state);
     } catch (e) { return; }
     if (scope === 'payments'){ renderPay(); renderHome(); renderTrip(); }
@@ -2692,9 +2699,9 @@ var RTG_BOUW = '3da8253d';
      gaat over tickets. */
   async function laadTickets(){
     if (!API.live) return;
-    try { tkPartners = (await API.call('/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
+    try { tkPartners = (await API.call('/api/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/tickets/mijn')).tickets || []; } catch(e){}
+    try { mijn = (await API.call('/api/tickets/mijn')).tickets || []; } catch(e){}
     const mijnEl = $('#tkMijn');
     if (mijnEl) mijnEl.innerHTML = mijn.filter(t => !t.gebruikt || t.datum >= new Date().toISOString().slice(0, 10)).map(t =>
       '<div class="card s-j84k16">'+
@@ -2721,7 +2728,7 @@ var RTG_BOUW = '3da8253d';
       '</div>').join('');
     document.querySelectorAll('[data-tktoon]').forEach(b => b.addEventListener('click', async () => {
       try {
-        const r = await API.call('/ticket/toon', { ref: b.dataset.tktoon });
+        const r = await API.call('/api/ticket/toon', { ref: b.dataset.tktoon });
         const el = document.getElementById('tkCode-' + b.dataset.tktoon);
         if (el) el.textContent = r.code;
       } catch(e){ toast(e.message); }
@@ -2729,8 +2736,8 @@ var RTG_BOUW = '3da8253d';
     document.querySelectorAll('[data-trvraag]').forEach(b => b.addEventListener('click', async () => {
       const veld = document.getElementById('trVan-' + b.dataset.trvraag);
       try {
-        const r = await API.call('/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
-        if (Number(b.dataset.trprijs) > 0) await API.call('/ride/pay', { ref: r.ride.ref });
+        const r = await API.call('/api/transfer/aanvraag', { ticketRef: b.dataset.trvraag, van: veld ? veld.value : '' });
+        if (Number(b.dataset.trprijs) > 0) await API.call('/api/ride/pay', { ref: r.ride.ref });
         toast(T('tk.tr.ok','Transfer aangevraagd. U ziet hier wie u komt halen.'));
         laadTickets();
       } catch(e){ toast(e.message); }
@@ -2805,11 +2812,11 @@ var RTG_BOUW = '3da8253d';
   const careSoort = { spa: 'Spa', wellness: 'Wellness', kliniek: 'Kliniek' };
   async function laadCare(){
     if (!API.live) return;
-    try { careOv = await API.call('/care', {}); } catch(e){ careOv = null; }
+    try { careOv = await API.call('/api/care', {}); } catch(e){ careOv = null; }
     let mijn = [];
-    try { mijn = (await API.call('/care/mijn', {})).boekingen || []; } catch(e){}
-    try { carePak = (await API.call('/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
-    try { carePakMijn = (await API.call('/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
+    try { mijn = (await API.call('/api/care/mijn', {})).boekingen || []; } catch(e){}
+    try { carePak = (await API.call('/api/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
+    try { carePakMijn = (await API.call('/api/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
     renderCareMijn(mijn);
     renderCareIntakes();
     renderCarePakketten();
@@ -2830,11 +2837,11 @@ var RTG_BOUW = '3da8253d';
           '<button class="bz-btn" data-care-annul="'+esc(b.ref)+'">'+T('care.annuleer','Annuleer')+'</button>'+
         '</div></div>').join('');
     el.querySelectorAll('[data-care-pay]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/betaal', { ref: x.dataset.carePay }); toast(T('care.paytoast','Betaald. Tot uw afspraak.')); laadCare(); }
+      try { await API.call('/api/care/betaal', { ref: x.dataset.carePay }); toast(T('care.paytoast','Betaald. Tot uw afspraak.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-care-annul]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/annuleer', { ref: x.dataset.careAnnul }); toast(T('care.annultoast','Afspraak geannuleerd.')); laadCare(); }
+      try { await API.call('/api/care/annuleer', { ref: x.dataset.careAnnul }); toast(T('care.annultoast','Afspraak geannuleerd.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -2849,7 +2856,7 @@ var RTG_BOUW = '3da8253d';
         '<button class="bz-btn" data-care-intakestop="'+esc(i.id)+'">'+T('care.stopdelen','Stop delen')+'</button></div>').join('')+
       '</div>';
     el.querySelectorAll('[data-care-intakestop]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/intake/stop', { id: x.dataset.careIntakestop }); toast(T('care.stoptoast','Deling gestopt. Weg is weg.')); laadCare(); }
+      try { await API.call('/api/care/intake/stop', { id: x.dataset.careIntakestop }); toast(T('care.stoptoast','Deling gestopt. Weg is weg.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -2906,7 +2913,7 @@ var RTG_BOUW = '3da8253d';
     el.querySelectorAll('[data-care-intaketxt]').forEach(t => t.addEventListener('input', () => { careIntakeTekst[t.dataset.careIntaketxt] = t.value; }));
     el.querySelectorAll('[data-care-intakedeel]').forEach(x => x.addEventListener('click', async () => {
       const id = x.dataset.careIntakedeel;
-      try { await API.call('/care/intake/deel', { aanbiederId: id, medisch: careIntakeTekst[id] || '' }); careIntakeTekst[id] = ''; toast(T('care.deeltoast','Gedeeld. Alleen deze kliniek ziet het, tot u stopt.')); laadCare(); }
+      try { await API.call('/api/care/intake/deel', { aanbiederId: id, medisch: careIntakeTekst[id] || '' }); careIntakeTekst[id] = ''; toast(T('care.deeltoast','Gedeeld. Alleen deze kliniek ziet het, tot u stopt.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-careopen]').forEach(x => x.addEventListener('click', () => {
@@ -2918,8 +2925,8 @@ var RTG_BOUW = '3da8253d';
     if (boek) boek.addEventListener('click', async () => {
       const [aanbiederId, behandelingId] = careOpen.split(':');
       try {
-        const r = await API.call('/care/boek', { aanbiederId, behandelingId, datum: careKeuze.datum, tijd: careKeuze.tijd });
-        await API.call('/care/betaal', { ref: r.boeking.ref });
+        const r = await API.call('/api/care/boek', { aanbiederId, behandelingId, datum: careKeuze.datum, tijd: careKeuze.tijd });
+        await API.call('/api/care/betaal', { ref: r.boeking.ref });
         toast(T('care.oktoast','Geboekt en betaald. Tot uw afspraak.'));
         careOpen = null; careKeuze = null;
         laadCare();
@@ -3052,7 +3059,7 @@ var RTG_BOUW = '3da8253d';
     el.innerHTML = html;
 /* de knoppen onder een zorgpakket: betalen en openen */
     el.querySelectorAll('[data-carepakpay]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
+      try { await API.call('/api/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-carepakopen]').forEach(x => x.addEventListener('click', () => {
@@ -3063,8 +3070,8 @@ var RTG_BOUW = '3da8253d';
     const pb = document.getElementById('carePakBoek');
     if (pb) pb.addEventListener('click', async () => {
       try {
-        const r = await API.call('/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
-        await API.call('/care/pakket/betaal', { ref: r.pakket.ref });
+        const r = await API.call('/api/care/pakket/boek', { pakketId: carePakOpen, datum: carePakKeuze.datum, tijd: carePakKeuze.tijd });
+        await API.call('/api/care/pakket/betaal', { ref: r.pakket.ref });
         toast(T('care.paktoast','Pakket betaald. Fijn verblijf.'));
         carePakOpen = null; carePakKeuze = null;
         laadCare();
@@ -3086,9 +3093,9 @@ var RTG_BOUW = '3da8253d';
   }
   async function laadVerhuur(){
     if (!API.live) return;
-    try { vhPartners = (await API.call('/verhuur/aanbod')).partners || []; } catch(e){ vhPartners = []; }
+    try { vhPartners = (await API.call('/api/verhuur/aanbod')).partners || []; } catch(e){ vhPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/huur/mijn')).huren || []; } catch(e){}
+    try { mijn = (await API.call('/api/huur/mijn')).huren || []; } catch(e){}
     const el = $('#vhMijn');
     const VH_ST = { 'aangevraagd': T('vh.m.geboekt','geboekt; leg de staat vast bij het ophalen'), 'lopend': T('vh.m.lopend','onderweg; goede reis'), 'afgerond': T('vh.m.af','afgerond') };
     if (el) el.innerHTML = mijn.filter(h => h.status !== 'afgerond' || h.tot >= new Date().toISOString().slice(0, 10)).map(h =>
@@ -3117,7 +3124,7 @@ var RTG_BOUW = '3da8253d';
       file.onchange = () => {
         if (!file.files[0]) return;
         vhFotoKlein(file.files[0], async (dataUrl) => {
-          try { await API.call('/huur/foto', { ref: b.dataset.vhf, fase: b.dataset.fase, foto: dataUrl });
+          try { await API.call('/api/huur/foto', { ref: b.dataset.vhf, fase: b.dataset.fase, foto: dataUrl });
             toast(T('vh.m.foto.ok','Vastgelegd. Dit is uw bewijs van de staat.')); laadVerhuur(); }
           catch(e){ toast(e.message); }
         });
@@ -3128,7 +3135,7 @@ var RTG_BOUW = '3da8253d';
     document.querySelectorAll('[data-vhsos]').forEach(b => b.addEventListener('click', () => {
       const bericht = prompt(T('vh.m.sosvraag','Wat is er aan de hand? (gaat direct naar de verhuurder EN naar RTG)'));
       if (bericht == null) return;
-      const stuur = (lat, lng) => API.call('/huur/sos', { ref: b.dataset.vhsos, bericht, lat, lng })
+      const stuur = (lat, lng) => API.call('/api/huur/sos', { ref: b.dataset.vhsos, bericht, lat, lng })
         .then(() => toast(T('vh.m.sosok','SOS verstuurd. De verhuurder en RTG zijn gewaarschuwd.')))
         .catch(e => toast(e.message));
       if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => stuur(p.coords.latitude, p.coords.longitude), () => stuur());
@@ -3139,11 +3146,11 @@ var RTG_BOUW = '3da8253d';
       try {
         if (aan && navigator.geolocation){
           vhLocWatch[ref] = navigator.geolocation.watchPosition(p =>
-            API.call('/huur/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
-          await API.call('/huur/locatie', { ref, aan: true });
+            API.call('/api/huur/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
+          await API.call('/api/huur/locatie', { ref, aan: true });
         } else {
           if (vhLocWatch[ref] != null){ navigator.geolocation.clearWatch(vhLocWatch[ref]); delete vhLocWatch[ref]; }
-          await API.call('/huur/locatie', { ref, aan: false });
+          await API.call('/api/huur/locatie', { ref, aan: false });
         }
         toast(aan ? T('vh.m.locaanok','U deelt uw locatie met de verhuurder; uitzetten kan altijd.') : T('vh.m.locuitok','Locatie delen staat uit en is gewist.'));
         laadVerhuur();
@@ -3189,9 +3196,12 @@ var RTG_BOUW = '3da8253d';
     const boek = document.getElementById('vhBoek');
     if (boek) boek.addEventListener('click', async () => {
       const [code, autoId] = vhOpen.split(':');
+      const van = $('#vhVan').value, tot = $('#vhTot').value;
+      // een sleutel per keuze: dezelfde tik is dezelfde huur, een andere periode een nieuwe
+      if (vhKeuze.idemVoor !== vhOpen + '|' + van + '|' + tot) { vhKeuze.idemVoor = vhOpen + '|' + van + '|' + tot; vhKeuze.idem = RTGIdem('huur'); }
       try {
-        const h = await API.call('/huur/boek', { supplierCode: code, autoId, van: $('#vhVan').value, tot: $('#vhTot').value });
-        await API.call('/booking/pay', { ref: h.huur.ref });
+        const h = await API.call('/api/huur/boek', { supplierCode: code, autoId, van, tot, idem: vhKeuze.idem });
+        await API.call('/api/booking/pay', { ref: h.huur.ref });
         toast(T('vh.ok','Geboekt en betaald: ') + eur(h.huur.price) + T('vh.ok2',' vast, geen verrassingen aan de balie.'));
         vhOpen = null; vhKeuze = null;
         laadVerhuur();
@@ -3203,9 +3213,9 @@ var RTG_BOUW = '3da8253d';
   let chPartners = [], chOpen = null, chKeuze = null, chLocWatch = {};
   async function laadCharter(){
     if (!API.live) return;
-    try { chPartners = (await API.call('/charter/aanbod')).partners || []; } catch(e){ chPartners = []; }
+    try { chPartners = (await API.call('/api/charter/aanbod')).partners || []; } catch(e){ chPartners = []; }
     let mijn = [];
-    try { mijn = (await API.call('/charter/mijn')).charters || []; } catch(e){}
+    try { mijn = (await API.call('/api/charter/mijn')).charters || []; } catch(e){}
     const el = $('#chMijn');
     const CH_ST = { 'aangevraagd': T('ch.m.geboekt','geboekt; leg de staat vast bij het uitvaren'), 'lopend': T('ch.m.lopend','op zee; behouden vaart'), 'afgerond': T('ch.m.af','afgerond') };
     if (el) el.innerHTML = mijn.filter(c => c.status !== 'afgerond' || c.tot >= new Date().toISOString().slice(0, 10)).map(c =>
@@ -3234,7 +3244,7 @@ var RTG_BOUW = '3da8253d';
       file.onchange = () => {
         if (!file.files[0]) return;
         vhFotoKlein(file.files[0], async (dataUrl) => {
-          try { await API.call('/charter/foto', { ref: b.dataset.chf, fase: b.dataset.fase, foto: dataUrl });
+          try { await API.call('/api/charter/foto', { ref: b.dataset.chf, fase: b.dataset.fase, foto: dataUrl });
             toast(T('ch.m.foto.ok','Vastgelegd. Dit is uw bewijs van de staat.')); laadCharter(); }
           catch(e){ toast(e.message); }
         });
@@ -3245,7 +3255,7 @@ var RTG_BOUW = '3da8253d';
     document.querySelectorAll('[data-chsos]').forEach(b => b.addEventListener('click', () => {
       const bericht = prompt(T('ch.m.sosvraag','Wat is er aan de hand? (gaat direct naar het charterbedrijf EN naar RTG)'));
       if (bericht == null) return;
-      const stuur = (lat, lng) => API.call('/charter/sos', { ref: b.dataset.chsos, bericht, lat, lng })
+      const stuur = (lat, lng) => API.call('/api/charter/sos', { ref: b.dataset.chsos, bericht, lat, lng })
         .then(() => toast(T('ch.m.sosok','SOS verstuurd. Het charterbedrijf en RTG zijn gewaarschuwd.')))
         .catch(e => toast(e.message));
       if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => stuur(p.coords.latitude, p.coords.longitude), () => stuur());
@@ -3256,11 +3266,11 @@ var RTG_BOUW = '3da8253d';
       try {
         if (aan && navigator.geolocation){
           chLocWatch[ref] = navigator.geolocation.watchPosition(p =>
-            API.call('/charter/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
-          await API.call('/charter/locatie', { ref, aan: true });
+            API.call('/api/charter/locatie', { ref, aan: true, lat: p.coords.latitude, lng: p.coords.longitude }).catch(()=>{}));
+          await API.call('/api/charter/locatie', { ref, aan: true });
         } else {
           if (chLocWatch[ref] != null){ navigator.geolocation.clearWatch(chLocWatch[ref]); delete chLocWatch[ref]; }
-          await API.call('/charter/locatie', { ref, aan: false });
+          await API.call('/api/charter/locatie', { ref, aan: false });
         }
         toast(aan ? T('ch.m.locaanok','U deelt uw positie met het charterbedrijf; uitzetten kan altijd.') : T('ch.m.locuitok','Positie delen staat uit en is gewist.'));
         laadCharter();
@@ -3314,8 +3324,8 @@ var RTG_BOUW = '3da8253d';
       const body = { supplierCode: code, bootId, van: $('#chVan').value, tot: $('#chTot').value, gasten: Number($('#chGasten').value), metSkipper };
       if (!metSkipper && $('#chVaarbewijs')) body.vaarbewijs = $('#chVaarbewijs').checked;
       try {
-        const c = await API.call('/charter/boek', body);
-        await API.call('/booking/pay', { ref: c.charter.ref });
+        const c = await API.call('/api/charter/boek', body);
+        await API.call('/api/booking/pay', { ref: c.charter.ref });
         toast(T('ch.ok','Geboekt en betaald: ') + eur(c.charter.price) + T('ch.ok2',' vast. Behouden vaart.'));
         chOpen = null; chKeuze = null;
         laadCharter();
@@ -3329,7 +3339,7 @@ var RTG_BOUW = '3da8253d';
   async function laadVastgoed(){
     if (!API.live) return;
     let d = { panden: [], bezichtigingen: [], biedingen: [] };
-    try { d = await API.call('/vastgoed/aanbod'); } catch(e){}
+    try { d = await API.call('/api/vastgoed/aanbod'); } catch(e){}
     const el = $('#vgMijn'); if (!el) return;
     if (!d.panden.length && !d.bezichtigingen.length && !d.biedingen.length){ el.innerHTML = ''; return; }
     let html = '';
@@ -3375,18 +3385,18 @@ var RTG_BOUW = '3da8253d';
       const [code, pid] = b.dataset.vgint.split(':');
       const wens = prompt(T('vg.m.wensvraag','Wanneer zou u willen bezichtigen? (bijv. zaterdagochtend)'));
       if (wens === null) return;
-      try { await API.call('/vastgoed/interesse', { supplierCode: code, pandId: pid, wens }); toast(T('vg.m.intok','De makelaar krijgt uw aanvraag en bevestigt een moment.')); laadVastgoed(); }
+      try { await API.call('/api/vastgoed/interesse', { supplierCode: code, pandId: pid, wens }); toast(T('vg.m.intok','De makelaar krijgt uw aanvraag en bevestigt een moment.')); laadVastgoed(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-vgbod]').forEach(b => b.addEventListener('click', async () => {
       const [code, pid] = b.dataset.vgbod.split(':');
       const bod = prompt(T('vg.m.bodvraag','Uw bod in euro:'));
       if (!bod) return;
-      try { await API.call('/vastgoed/bod', { supplierCode: code, pandId: pid, bedrag: Number(bod) }); toast(T('vg.m.bodok','Uw bod is verstuurd naar de makelaar.')); laadVastgoed(); }
+      try { await API.call('/api/vastgoed/bod', { supplierCode: code, pandId: pid, bedrag: Number(bod) }); toast(T('vg.m.bodok','Uw bod is verstuurd naar de makelaar.')); laadVastgoed(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-vgkey]').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await API.call('/vastgoed/keyless', { ref: b.dataset.vgkey }); toast('\uD83D\uDD13 '+T('vg.m.geopend','De deur is open. Code: ')+r.code); }
+      try { const r = await API.call('/api/vastgoed/keyless', { ref: b.dataset.vgkey }); toast('\uD83D\uDD13 '+T('vg.m.geopend','De deur is open. Code: ')+r.code); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -3395,7 +3405,7 @@ var RTG_BOUW = '3da8253d';
   async function laadContracten(){
     if (!API.live) return;
     let lijst = [];
-    try { lijst = (await API.call('/contracten/mijn')).contracten || []; } catch(e){}
+    try { lijst = (await API.call('/api/contracten/mijn')).contracten || []; } catch(e){}
     const el = $('#conMijn'); if (!el) return;
     const open = lijst.filter(c => c.status !== 'geweigerd');
     if (!open.length){ el.innerHTML = ''; return; }
@@ -3412,12 +3422,12 @@ var RTG_BOUW = '3da8253d';
     document.querySelectorAll('[data-conteken]').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('con.tekenvraag','Typ uw naam om digitaal te ondertekenen. Zo gaat u akkoord met de voorwaarden.'));
       if (!naam) return;
-      try { await API.call('/contract/teken', { ref: b.dataset.conteken, naam, akkoord: true }); toast(T('con.tekenok','Getekend. Bedankt!')); laadContracten(); }
+      try { await API.call('/api/contract/teken', { ref: b.dataset.conteken, naam, akkoord: true }); toast(T('con.tekenok','Getekend. Bedankt!')); laadContracten(); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-conweiger]').forEach(b => b.addEventListener('click', async () => {
       if (!confirm(T('con.weigervraag','Dit contract weigeren?'))) return;
-      try { await API.call('/contract/weiger', { ref: b.dataset.conweiger }); toast(T('con.weigerok','Geweigerd.')); laadContracten(); }
+      try { await API.call('/api/contract/weiger', { ref: b.dataset.conweiger }); toast(T('con.weigerok','Geweigerd.')); laadContracten(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -3426,7 +3436,7 @@ var RTG_BOUW = '3da8253d';
   let bzPartners = [], bzZaak = null, bzMand = {}, bzLevering = 'bezorgen', bzGeo = null, bzAdresW = '';
   async function laadBestellen(){
     if (!API.live) return;
-    try { bzPartners = (await API.call('/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
+    try { bzPartners = (await API.call('/api/bezorg/partners')).partners || []; } catch(e){ bzPartners = []; }
     renderBestellen();
     laadBzMijn();
   }
@@ -3436,7 +3446,7 @@ var RTG_BOUW = '3da8253d';
     const el = $('#showroom'); if (!el || !API.live) return;
     if (user && user.tier === 'guest'){ el.innerHTML = ''; return; }
     let d, mijn;
-    try { d = await API.call('/verkoop/showroom'); mijn = await API.call('/verkoop/mijn'); } catch(e){ el.innerHTML = ''; return; }
+    try { d = await API.call('/api/verkoop/showroom'); mijn = await API.call('/api/verkoop/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const autos = d.autos || [];
     const deals = (mijn.deals || []).filter(x => !['gereden','afgeleverd','afgewezen','geannuleerd'].includes(x.status));
     if (!autos.length && !deals.length){ el.innerHTML = ''; return; }
@@ -3457,11 +3467,11 @@ var RTG_BOUW = '3da8253d';
     el.innerHTML = h;
     el.querySelectorAll('.js-vkteken').forEach(b => b.addEventListener('click', async () => {
       const naam = prompt(T('vk.tekennaam','Typ uw naam om het koopcontract te tekenen:')); if (!naam) return;
-      try { await API.call('/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/teken', { ref: b.dataset.ref, naam }); toast('' + T('vk.getekend','Getekend. De zaak levert de auto af.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vkproef').forEach(b => b.addEventListener('click', async () => {
       const wens = prompt(T('vk.wens','Wanneer wilt u proefrijden? (bv. zaterdagochtend)')) || '';
-      try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens, idem: b.dataset.idem || (b.dataset.idem = RTGIdem('vkproef')) }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
 /* een auto kopen of inruilen, met een bod */
     el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
@@ -3472,7 +3482,7 @@ var RTG_BOUW = '3da8253d';
       if (wilInruil){ const merk = prompt(T('vk.inmerk','Merk + model van uw inruilauto:')); if (merk){ const jaar = prompt(T('vk.injaar','Bouwjaar?'),''); const km = prompt(T('vk.inkm','Kilometerstand?'),''); inruil = { merk, model: '', jaar, km }; } }
       const concierge = confirm(T('vk.concvraag','Concierge-aflevering op uw adres?'));
       const adres = concierge ? (prompt(T('vk.adres','Afleveradres:')) || '') : '';
-      try { await API.call('/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/verkoop/koop', { supplierCode: b.dataset.code, autoId: b.dataset.id, bod: bod===''?undefined:bod, inruil, concierge, adres, idem: b.dataset.idem || (b.dataset.idem = RTGIdem('vkkoop')) }); toast('' + T('vk.koopok','Aanvraag verstuurd. U hoort snel van de zaak.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
   }
 
@@ -3481,7 +3491,7 @@ var RTG_BOUW = '3da8253d';
     const el = $('#boodschappen'); if (!el || !API.live) return;
     if (user && user.tier === 'guest'){ el.innerHTML = ''; return; }
     let markt, mijn;
-    try { markt = await API.call('/groothandel/markt'); mijn = await API.call('/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
+    try { markt = await API.call('/api/groothandel/markt'); mijn = await API.call('/api/groothandel/mijn'); } catch(e){ el.innerHTML = ''; return; }
     const winkels = markt.groothandels || [];
     if (!winkels.length && !(mijn.bestellingen||[]).length){ el.innerHTML = ''; return; }
     let h = '<h3 class="s-1k5gg2w">' + T('bo.h','Boodschappen') + '</h3><p class="sub" style="margin-bottom:0.5rem;">' + T('bo.sub','Bestel en laat bezorgen.') + '</p>';
@@ -3495,20 +3505,27 @@ var RTG_BOUW = '3da8253d';
     }
     if ((mijn.bestellingen||[]).length){
       h += '<div class="sub" style="margin:0.6rem 0 0.3rem;">' + T('bo.mijn','Mijn boodschappen') + '</div>';
-      h += mijn.bestellingen.slice(0,10).map(o => '<div class="s-1jikyld"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">' + escT(o.groothandelNaam) + ' · € ' + o.subtotaal + '</b><span class="sub">' + escT(o.status) + '</span></div></div>').join('');
+      h += mijn.bestellingen.slice(0,10).map(o => '<div class="s-1jikyld"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">' + escT(o.groothandelNaam) + ' · € ' + o.subtotaal + '</b><span class="sub">' + escT(o.status) + '</span>' +
+        // een nog niet bevestigde bestelling kan het lid zelf annuleren (kern/groothandel/orderlaag.js)
+        (o.status === 'aangevraagd' ? '<button class="mo-code js-boann" data-ref="' + escT(o.ref) + '">✕ ' + T('erv.annuleer','Annuleer') + '</button>' : '') + '</div></div>').join('');
     }
     el.innerHTML = h;
     el.querySelectorAll('.js-bobestel').forEach(b => b.addEventListener('click', async () => {
       const regels = [];
       el.querySelectorAll('.js-boq[data-code="' + b.dataset.code + '"]').forEach(inp => { const a = Number(inp.value)||0; if (a>0) regels.push({ productId: inp.dataset.pid, aantal: a }); });
       if (!regels.length) return toast(T('bo.kies','Vul minstens een aantal in.'));
-      try { await API.call('/groothandel/bestel', { groothandelCode: b.dataset.code, regels }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+      // een sleutel per samengestelde bestelling: een tweede tik of een herhaling is dezelfde bestelling
+      const vorm = JSON.stringify(regels); if (b.dataset.idemVorm !== vorm) { b.dataset.idem = RTGId('boodschappen'); b.dataset.idemVorm = vorm; }
+      try { await API.call('/api/groothandel/bestel', { groothandelCode: b.dataset.code, regels, idem: b.dataset.idem }); toast('' + T('bo.ok','Boodschappen besteld.')); laadBoodschappen(); } catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('.js-boann').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/api/groothandel/annuleer', { ref: b.dataset.ref }); toast(T('bo.geann','Bestelling geannuleerd; de voorraad is terug bij de winkel.')); laadBoodschappen(); } catch(e){ toast(e.message); }
     }));
   }
   async function laadBzMijn(){
     const el = $('#bzMijn'); if (!el || !API.live) return;
     let mijn = [];
-    try { mijn = ((await API.call('/orders/mine')).orders || []).filter(o => o.levering && !['bezorgd','opgehaald','geweigerd','terugbetaald','wacht-op-betaling'].includes(o.status)); } catch(e){}
+    try { mijn = ((await API.call('/api/orders/mine')).orders || []).filter(o => o.levering && !['bezorgd','opgehaald','geweigerd','terugbetaald','wacht-op-betaling'].includes(o.status)); } catch(e){}
     if (!mijn.length){ el.innerHTML = ''; return; }
     el.innerHTML = mijn.map(o => {
       const st = { 'nieuw': T('bz.m.nieuw','ontvangen door de zaak'), 'in bereiding': T('bz.m.bereid','wordt bereid'),
@@ -3589,10 +3606,10 @@ var RTG_BOUW = '3da8253d';
       const items = Object.entries(bzMand).map(([id, qty]) => ({ id, qty }));
       if (!items.length) return;
       try {
-        const b = await API.call('/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
+        const b = await API.call('/api/bezorg/bestel', { supplierCode: p.code, levering: bzLevering, items,
           adres: bzLevering === 'bezorgen' ? bzAdresW : undefined,
           lat: bzGeo ? bzGeo.lat : undefined, lng: bzGeo ? bzGeo.lng : undefined });
-        await API.call('/order/pay', { ref: b.order.ref });
+        await API.call('/api/order/pay', { ref: b.order.ref });
         // niet-leden zien de servicekosten eerlijk terug op de bevestiging
         // het bedrag komt van de server (order.servicekosten), niet uit deze regel:
         // stond het hier ook, dan noemt dit scherm het oude tarief bij een nieuw totaal
@@ -3623,7 +3640,7 @@ var RTG_BOUW = '3da8253d';
          "RTG-partners in Ibiza" te zien kreeg. Zonder reis vragen we de hele
          lijst op en zegt de ondertitel dat ook. */
       const stad = trip ? trip.dest : null;
-      const [sd, od] = await Promise.all([API.call('/suppliers', stad ? { city: stad } : {}), API.call('/orders/mine')]);
+      const [sd, od] = await Promise.all([API.call('/api/suppliers', stad ? { city: stad } : {}), API.call('/api/orders/mine')]);
       suppliers = sd.suppliers || [];
       myOrders = od.orders || [];
       const waar = sd.city || stad;
@@ -4001,7 +4018,8 @@ var RTG_BOUW = '3da8253d';
        niets tegen: een onbekende sleutel levert geen tegel op, en beide adressen
        bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
-    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
+    // de netwerkkant van een partnerzaak: alleen voor wie een zaak opent (werkrol, app-main-24a3.js)
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html', werkrol: 'zaak' },
     rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     klimaat:     { naam: 'Klimaatfonds', url: '/apps/foundation/klimaatfonds.html' },
     buurtruil:   { naam: 'Buurtruil', url: '/apps/foundation/buurtruil.html' },
@@ -4066,13 +4084,15 @@ var RTG_BOUW = '3da8253d';
     uitgaan:     { naam: 'Uitgaan',       url: '/apps/uitgaan.html' },
     foodcourt:   { naam: 'Food Court',    url: '/apps/foodcourt.html' },
     spelavond:   { naam: 'Game Night',    url: '/apps/spelscherm.html' },
-    tweedescherm:{ naam: 'Tweede scherm', url: '/apps/scherm.html' },
+    /* Het tweede scherm toont keuken, bar en kassa van een zaak en leest alleen de
+       zaaksessie (rtg_sup_token); een lid zag een tegel die nooit opende. */
+    tweedescherm:{ naam: 'Tweede scherm', url: '/apps/scherm.html', werkrol: 'zaak' }, // zie app-main-24a3.js
     /* Het inkoopdossier staat bij het LID en niet achter een kantoorpoort
        (APPSTORE.md). Dat het nergens aan hing, maakte die belofte leeg. */
     appdossier:  { naam: 'App-dossier',   url: '/apps/appstore-dossier.html' },
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
     routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html', werkrol: 'kantoor' }, // zie app-main-24a3.js
-    ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
+    ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html', werkrol: 'personeel' }, // draait alleen op een PDA-sessie (rtg_pda_token)
     /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
        scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken
        als wat een mens er doet, en de werknaam van een laag is geen productnaam
@@ -4524,7 +4544,12 @@ var RTG_BOUW = '3da8253d';
     fetch('/api/account/rollen', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { werkrollen = new Set(((d && d.rollen) || []).map((r) => r.rol)); if (werkrollen.size) bouw(); })
+      /* Een manager die via zijn dienstverband aan een zaak hangt (rol
+         personeel, manager) opent de zaak-app net als wie de zaak koppelde
+         (app-main-25.js); voor een ingang met werkrol 'zaak' telt hij dus ook. */
+      .then((d) => { const rollen = (d && d.rollen) || [];
+        werkrollen = new Set(rollen.map((r) => r.rol).concat(rollen.some((r) => r.rol === 'personeel' && r.manager) ? ['zaak'] : []));
+        if (werkrollen.size) bouw(); })
       .catch(() => {});
   })();
 
@@ -4631,9 +4656,13 @@ var RTG_BOUW = '3da8253d';
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
+    /* De paden van de werkkiezer staan voluit, zodat de routemeting
+       (SCHERMROUTES.json) ziet welke deuren hij aanroept; API.call zet zelf
+       /api ervoor, dus dat gaat er hier weer af. */
+    const werkApi = (pad, body) => API.call(pad.replace(/^\/api(?=\/)/, ''), body);
     belTitel.textContent = T('werk.h', 'Mijn werkplekken');
     belLijst.textContent = '';
-    API.call('/account/rollen', {}).then(d => {
+    werkApi('/api/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
       if (!rollen.length) {
         const leeg = document.createElement('div');
@@ -4666,12 +4695,12 @@ var RTG_BOUW = '3da8253d';
               if (u.geenPasskey) { location.href = deur.PASSKEYS; return; }
               if (!u.token) throw new Error(u.error || T('werk.mis', 'Openen lukte niet.'));
               s = u;
-            } else try { s = await API.call('/account/start', body); }
+            } else try { s = await werkApi('/api/account/start', body); }
             catch (e1) {
               if (!(e1.data && e1.data.locatieNodig)) throw e1;
               const pos = await vraagPositie();
               if (!pos) throw e1;
-              s = await API.call('/account/start', Object.assign({ positie: pos }, body));
+              s = await werkApi('/api/account/start', Object.assign({ positie: pos }, body));
             }
             try { doel.bewaar(s.token, r); } catch (e2) {}
             // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren
@@ -6014,6 +6043,63 @@ var RTG_BOUW = '3da8253d';
     RTGCommand.systeem(knop ? [{ sleutel: 'instellingen', naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
       doe: function () { knop.click(); } }] : []);
   }
+  /* ---------- Heel RTG leest de functiegids (eigenaarsbesluit 19 oktober 2026) ----------
+     Het zoekmenu "Heel RTG" in de rand (shared/rtg-edge-smart-menu.js) toonde
+     alleen de URL-catalogus van de widgets. De OS-apps -- Videobellen, Bellen,
+     Snaps, Werk -- hebben geen adres en stonden er dus niet in, terwijl Rahul ze
+     met "open videobellen" wel vindt. Hier zoekt het menu in DEZELFDE gids als
+     gidsCommando (RTGWorkspaceDirectory over RTGWorkspaceWorldCatalog, met
+     gidsToegang als poort): geen tweede lijst, en wat een lid niet mag openen
+     (werkrol, pas) vindt hij ook niet. Een treffer opent via gidsOpen, dezelfde
+     weg als Rahul; een link die de catalogus al toont, komt er niet dubbel bij. */
+  function heelRtgZoek(invoer) {
+    const D = window.RTGWorkspaceDirectory, gezicht = invoer.closest('.rtg-edge-face-all');
+    const lijst = gezicht && gezicht.querySelector('.rtg-edge-groups');
+    if (!D || !lijst) return;
+    let groep = lijst.querySelector('[data-edge-gids]');
+    const uit = D.search(invoer.value, { catalog: window.RTGWorkspaceWorldCatalog, guard: gidsContext(), allow: gidsToegang, alles: true });
+    // het adres staat in dezelfde catalogus; een OS-app heeft er geen
+    const urlVan = id => { for (const w of window.RTGWorkspaceWorldCatalog || []) for (const i of w.items || []) if (i.id === id) return i.url || null; return null; };
+    const al = new Set(Array.from(lijst.querySelectorAll('a[href]:not([data-gids-id])')).map(a => a.getAttribute('href')));
+    const treffers = uit.status === 'ready' ? uit.matches.filter(m => m.kind === 'item' && !(urlVan(m.id) && al.has(urlVan(m.id)))) : [];
+    if (!treffers.length) { if (groep) groep.remove(); return; }
+    if (!groep) {
+      groep = document.createElement('section'); groep.className = 'rtg-edge-group'; groep.setAttribute('data-edge-gids', '');
+      const kop = document.createElement('h3'); kop.textContent = T('edge.gids', 'In de app'); groep.appendChild(kop);
+      lijst.prepend(groep);
+    }
+    groep.querySelectorAll('a').forEach(a => a.remove());
+    treffers.forEach((m, i) => {
+      const a = document.createElement('a'), nr = document.createElement('span'), naam = document.createElement('b'), pijl = document.createElement('em');
+      a.href = urlVan(m.id) || '#'; a.dataset.gidsId = m.id; a.dataset.search = (m.world + ' ' + m.name).toLowerCase();
+      nr.textContent = String(i + 1).padStart(2, '0'); naam.textContent = m.name; pijl.textContent = '→';
+      a.append(nr, naam, pijl);
+      a.addEventListener('click', ev => {
+        ev.preventDefault();
+        const menu = document.querySelector('.rtg-edge-menu[aria-expanded="true"]'); if (menu) menu.click();
+        gidsOpen(m);
+      });
+      groep.appendChild(a);
+    });
+    groep.hidden = false;
+    const geen = gezicht.querySelector('.rtg-edge-none'); if (geen) geen.hidden = true;
+  }
+  /* EN DE CATALOGUS LOOPT DOOR DEZELFDE POORT. De widgetcatalogus van Heel RTG
+     kent geen werkrol en geen pas, en toonde zo "Tweede scherm" (werkrol zaak)
+     aan elk lid. Heeft een catalogusadres een ingang in de gids, dan beslist
+     gidsToegang: false als geen van die ingangen voor dit lid zichtbaar is. Geen
+     ingang in de gids: null, en het menu laat hem staan zoals voorheen. Het adres
+     telt zonder query, met hash (/apps/geld.html#wallet is een eigen ingang). */
+  const zonderQuery = u => { const s = String(u || ''), h = s.indexOf('#'); return (h < 0 ? s : s.slice(0, h)).split('?')[0] + (h < 0 ? '' : s.slice(h)); };
+  window.RTGAppCatalogusPoort = url => {
+    const doel = zonderQuery(url), ids = [];
+    for (const w of window.RTGWorkspaceWorldCatalog || []) for (const i of w.items || []) if (i.url && zonderQuery(i.url) === doel) ids.push(i.id);
+    return ids.length ? ids.some(id => gidsToegang(id)) : null;
+  };
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (t && t.matches && t.matches('.rtg-edge-face-all .rtg-edge-find input')) heelRtgZoek(t);
+  });
 /* de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard */
   bouw();
 
@@ -6247,7 +6333,7 @@ var RTG_BOUW = '3da8253d';
     const ld = $('#liveDeel');
     if (ld) ld.addEventListener('click', async () => {
       try {
-        const r = await API.call('/locatie/deel', { supplierCode: $('#liveDest').value });
+        const r = await API.call('/api/locatie/deel', { supplierCode: $('#liveDest').value });
         toast('' + r.deel.supplierName + ' ' + T('live.deelok','kijkt nu met u mee, tot het niet meer nodig is.'));
         renderZorg();
       } catch(e){ toast(e.message); }
@@ -6262,8 +6348,8 @@ var RTG_BOUW = '3da8253d';
     if (!API.live){ el.innerHTML = ''; return; }
     let d, mijn;
     try {
-      d = await API.call('/assets');
-      mijn = (await API.call('/asset/mijn')).posities || [];
+      d = await API.call('/api/assets');
+      mijn = (await API.call('/api/asset/mijn')).posities || [];
     } catch(e){ el.innerHTML = ''; return; }
     const posVan = id => mijn.find(p => p.assetId === id);
     el.innerHTML = d.assets.map(a => {
@@ -6281,6 +6367,7 @@ var RTG_BOUW = '3da8253d';
             '<b>' + T('as.mijn','Mijn positie') + ':</b> ' + p.tickets + ' ' + T('as.tickets','tickets') + ' (' + p.access + ' Access · ' + p.asset + ' Asset)' + (p.tickets ? ' · ' +
             '<b style="color:var(--gold-bright,#C99A2E);">' + p.dagenTegoed + '</b> ' + T('as.dagen','x 24 uur over dit jaar') + ' · ' + T('as.geldig','geldig tot') + ' ' + p.vervaltOp : '') +
             (p.asset ? '<br>' + T('as.uitstapw','Uitstapwaarde vandaag') + ': <b>' + eur(p.uitstapWaarde) + '</b>' : '') +
+            (p.herroepLoopt ? '<br>' + T('as.herloopt','Terugbetaling loopt voor') + ' ' + p.herroepLoopt + ' ' + T('as.herloopt2','ticket(s); u hoort het zodra de bank haar bevestigt.') : '') +
             ((p.terugkoopOnderweg||[]).length ? '<br>' + T('as.tkw','Terugkoop onderweg') + ': ' + p.terugkoopOnderweg.map(v => eur(v.waarde) + ' ' + T('as.uiterlijk','uiterlijk') + ' ' + v.uiterlijk).join(', ') : '') +
             (p.gepland.length ? '<br>' + T('as.gepland','Gepland') + ': ' + p.gepland.join(', ') : '') +
             '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;">' +
@@ -6317,20 +6404,50 @@ var RTG_BOUW = '3da8253d';
           T('as.akk4','Gaat u akkoord?'))) return;
         body.akkoord = true;
       }
+      // een herhaalsleutel per aanvraag: een dubbeltik of een herhaling na een
+      // afgebroken verbinding wordt geen tweede aanvraag
+      const vorm = body.assetId + '|' + body.smaak + '|' + aantal;
+      if (b.dataset.idemVorm !== vorm){ b.dataset.idem = RTGId('assetkoop'); b.dataset.idemVorm = vorm; }
+      body.idem = b.dataset.idem;
       try {
-        const r = await API.call('/asset/koop', body);
-        toast('' + r.tickets.length + ' ticket(s) · ' + eur(r.totaalPrijs) + '. ' + T('as.welkom','Welkom in de pool.'));
+        const r = await API.call('/api/asset/koop', body);
+        delete b.dataset.idemVorm;
+        toast(T('as.aanvraag','Uw aanvraag staat. Een mens van RTG beoordeelt hem; er is nog niets afgeschreven en er is nog geen ticket.') + ' ' + eur(r.aanvraag.totaal));
         renderAssets();
       } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-aswacht').forEach(b => b.addEventListener('click', async () => {
-      try { const r = await API.call('/asset/wachtlijst', { assetId: b.dataset.id }); toast('' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
+      try { const r = await API.call('/api/asset/wachtlijst', { assetId: b.dataset.id }); toast('' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
+      catch(e){ toast(e.message); }
+    }));
+/* RTG Shared Assets: een koop is een aanvraag (kern/assets/aanvraag.js). Het lid
+   ziet hier wat er met zijn aanvraag gebeurt, betaalt pas na goedkeuring, en
+   hoort pas van tickets als de betaling bevestigd is. */
+    let aanvragen = [];
+    try { aanvragen = (await API.call('/api/asset/aanvragen')).aanvragen || []; } catch(e){}
+    const open = aanvragen.filter(x => ['aangevraagd', 'goedgekeurd', 'betaling-loopt'].includes(x.status));
+    const STAND = { aangevraagd: T('as.st.aan','wacht op de beoordeling door een mens van RTG; er is niets afgeschreven'),
+      goedgekeurd: T('as.st.goed','goedgekeurd; betaal om uw tickets te krijgen'),
+      'betaling-loopt': T('as.st.loopt','de betaling wacht op bevestiging; uw tickets komen pas daarna') };
+    if (open.length) el.insertAdjacentHTML('afterbegin', '<div class="live-start h-mt80"><div class="lh">' + T('as.aanvragen','Mijn aanvragen') + '</div>' +
+      open.map(x => '<div class="ld h-mt50">' + esc(x.assetNaam) + ' · ' + x.aantal + ' ' + esc(x.smaak) + ' · ' + eur(x.totaal) + '<br>' + esc(STAND[x.status] || x.status) +
+        '<div class="h-rij h-wrap h-mt40">' +
+        (x.status !== 'aangevraagd' ? '<button class="live-go js-asbetaal h-mt0" data-id="' + esc(x.id) + '">' + T('as.betaal','Betaal') + ' ' + eur(x.totaal) + '</button>' : '') +
+        (x.status !== 'betaling-loopt' ? '<button class="mo-code js-asintrek" data-id="' + esc(x.id) + '">' + T('as.intrek','Trek in') + '</button>' : '') +
+        '</div></div>').join('') + '</div>');
+    el.querySelectorAll('.js-asbetaal').forEach(b => b.addEventListener('click', async () => {
+      if (!b.dataset.idem) b.dataset.idem = RTGId('assetbetaal');
+      try { await API.call('/api/asset/aanvraag/betaal', { id: b.dataset.id, idem: b.dataset.idem }); toast(T('as.betaald','Betaald en bevestigd. Uw tickets staan klaar; u heeft 14 dagen bedenktijd.')); renderAssets(); }
+      catch(e){ delete b.dataset.idem; toast(e.message); renderAssets(); }
+    }));
+    el.querySelectorAll('.js-asintrek').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await API.call('/api/asset/herroep', { id: b.dataset.id }); toast(r.let); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
 /* een asset herroepen binnen de bedenktijd */
     el.querySelectorAll('.js-asherroep').forEach(b => b.addEventListener('click', async () => {
-      if (!window.confirm(T('as.herroepvraag','Herroepen binnen de bedenktijd? U krijgt de volledige koopsom') + ' (' + eur(Number(b.dataset.p)) + ') ' + T('as.herroepvraag2','terug via een Tik.'))) return;
-      try { const r = await API.call('/asset/herroep', { ticketId: b.dataset.tid }); toast('↩ ' + T('as.herroepok','Herroepen. De Tik van') + ' ' + eur(r.terug) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
+      if (!window.confirm(T('as.herroepvraag','Herroepen binnen de bedenktijd? De volledige koopsom') + ' (' + eur(Number(b.dataset.p)) + ') ' + T('as.herroepvraag2','gaat terug naar de rekening waarmee u betaalde.'))) return;
+      try { const r = await API.call('/api/asset/herroep', { ticketId: b.dataset.tid }); toast('↩ ' + r.let); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asdoc').forEach(b => b.addEventListener('click', async () => {
@@ -6338,7 +6455,7 @@ var RTG_BOUW = '3da8253d';
       if (!uit) return;
       if (uit.style.display !== 'none'){ uit.style.display = 'none'; return; }
       try {
-        const d = (await API.call('/asset/document', { assetId: b.dataset.id })).document;
+        const d = (await API.call('/api/asset/document', { assetId: b.dataset.id })).document;
         uit.innerHTML = '<b style="color:var(--txt);">' + esc(d.object) + '</b> · ' + esc(d.entiteit) + '<br>' +
           esc(d.gebruik) + '<br><b>Access:</b> ' + esc(d.smaken.access.aard) + '<br><b>Asset:</b> ' + esc(d.smaken.asset.aard) + '<br>' +
           esc(d.kosten.serviceFee) + '<br>' + esc(d.kosten.overdracht) + '<br><b>' + T('as.doc.uit','Uitstappen') + ':</b> ' + esc(d.uitstappen) + '<br><b>' + T('as.doc.bed','Bedenktijd') + ':</b> ' + esc(d.bedenktijd) + '<br><b>' + T('as.doc.risico','Risico') + ':</b> ' + esc(d.risico);
@@ -6348,12 +6465,12 @@ var RTG_BOUW = '3da8253d';
     el.querySelectorAll('.js-asboek').forEach(b => b.addEventListener('click', async () => {
       const datum = (el.querySelector('[data-asdatum="' + b.dataset.id + '"]') || {}).value;
       if (!datum){ toast(T('as.kiesdag','Kies eerst een dag.')); return; }
-      try { const r = await API.call('/asset/gebruik', { assetId: b.dataset.id, datum }); toast('' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
+      try { const r = await API.call('/api/asset/gebruik', { assetId: b.dataset.id, datum }); toast('' + datum + ' ' + T('as.vast','staat vast.') + ' ' + r.dagenTegoed + ' ' + T('as.dagenover','x 24 uur over dit jaar.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-asuit').forEach(b => b.addEventListener('click', async () => {
       if (!window.confirm(T('as.uitvraag','Uitstappen? RTG betaalt de actuele ticketwaarde') + ' (' + eur(Number(b.dataset.w)) + ') ' + T('as.uitvraag2','uit via een Tik en het ticket gaat terug in de pool.'))) return;
-      try { const r = await API.call('/asset/uitstap', { ticketId: b.dataset.tid }); toast('' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
+      try { const r = await API.call('/api/asset/uitstap', { ticketId: b.dataset.tid }); toast('' + T('as.uitok','Uitgestapt. De Tik van') + ' ' + eur(r.waarde) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -6368,21 +6485,21 @@ var RTG_BOUW = '3da8253d';
     // de inklap-laag deelt (alleen) de gebruikstellers, zodat Rahul leert
     if (window.FocusUI && Date.now() - fluisterSyncAt > 60000){
       fluisterSyncAt = Date.now();
-      API.call('/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
+      API.call('/api/fluister/focus', { scores: FocusUI.scores() }).catch(() => {});
     }
     let prof;
-    try { prof = await API.call('/fluister/profiel'); } catch(e){ el.innerHTML = ''; return; }
+    try { prof = await API.call('/api/fluister/profiel'); } catch(e){ el.innerHTML = ''; return; }
     // de voorspeller: RTG leert uw ritme en zet de beste verwachting klaar
     let vw = null;
-    try { vw = await API.call('/voorspel'); } catch(e){}
+    try { vw = await API.call('/api/voorspel'); } catch(e){}
     const v = vw && (vw.verwachtingen || [])[0];
     // synergie-pakketten: aanbod dat zaken samen hebben samengesteld
     let pk = [];
-    try { pk = ((await API.call('/pakketten')).pakketten || []).slice(0, 2); } catch(e){}
+    try { pk = ((await API.call('/api/pakketten')).pakketten || []).slice(0, 2); } catch(e){}
     // sparren: gedachten die Rahul heeft geparkeerd om er op een rustig moment
     // op terug te komen
     let sparLijst = [];
-    try { sparLijst = ((await API.call('/spar/lijst', {})).spar) || []; } catch(e){}
+    try { sparLijst = ((await API.call('/api/spar/lijst', {})).spar) || []; } catch(e){}
     el.innerHTML =
       (v
         ? '<div class="live-start s-j0vkha">' +
@@ -6420,7 +6537,7 @@ var RTG_BOUW = '3da8253d';
         sparBlokHtml(sparLijst) +
       '</div>';
     el.querySelectorAll('.js-flweg').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/fluister/vergeet', { wat: Number(b.dataset.i) }); renderFluister(); } catch(e){ toast(e.message); }
+      try { await API.call('/api/fluister/vergeet', { wat: Number(b.dataset.i) }); renderFluister(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('.js-vsdoe').forEach(b => b.addEventListener('click', () => {
       const tegel = document.querySelector('.os-app[data-tab="ai"]'); if (tegel) tegel.click();
@@ -6432,7 +6549,7 @@ var RTG_BOUW = '3da8253d';
       const prijs = '€ ' + (Number(b.dataset.pkprijs)/100).toFixed(2).replace('.', ',');
       if (!window.confirm(T('pk.zeker','Pakket boeken voor') + ' ' + prijs + '? ' + T('pk.zeker2','Het bedrag gaat direct van uw RTG Pay-saldo.'))) return;
       try {
-        await API.call('/pakket/koop', { id: b.dataset.pk, idem: RTGIdem('pk') });
+        await API.call('/api/pakket/koop', { id: b.dataset.pk, idem: RTGIdem('pk') });
         toast('' + T('pk.ok','Geboekt. De zaken weten ervan.'));
         renderFluister();
       } catch(e){ toast(e.message); }
@@ -6445,8 +6562,8 @@ var RTG_BOUW = '3da8253d';
     if (!API.live){ el.innerHTML = ''; return; }
     let zorg, delen;
     try {
-      zorg = (await API.call('/zorgprofiel')).zorg;
-      delen = await API.call('/locatie/mijn');
+      zorg = (await API.call('/api/zorgprofiel')).zorg;
+      delen = await API.call('/api/locatie/mijn');
     } catch(e){ el.innerHTML = ''; return; }
 /* mijn zorgprofiel */
     el.innerHTML =
@@ -7559,7 +7676,7 @@ var RTG_BOUW = '3da8253d';
   async function loadGuestHistory(){
     const el = $('#homePay'); if (!el) return;
     let orders = [];
-    try { orders = (await API.call('/orders/mine')).orders || []; } catch(e){}
+    try { orders = (await API.call('/api/orders/mine')).orders || []; } catch(e){}
     /* Drie bakken en geen twee. Een teruggestorte bon IS betaald geweest, dus
        `!o.paid` vangt hem niet -- zonder de derde bak stond hij in de som van
        wat je hebt betaald, terwijl het geld terug is. */
@@ -7582,7 +7699,7 @@ var RTG_BOUW = '3da8253d';
           }).join('')+'</div>'
         : '<div class="meta">'+T('app.guest.none','Je hebt nog niets besteld. Betaal bij een partner via Ter plaatse.')+'</div>');
     el.querySelectorAll('[data-guestpay]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/order/pay', { ref: b.dataset.guestpay }); toast(T('app.guest.paid2','Betaald.')); loadGuestHistory(); }
+      try { await API.call('/api/order/pay', { ref: b.dataset.guestpay }); toast(T('app.guest.paid2','Betaald.')); loadGuestHistory(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -7630,12 +7747,12 @@ var RTG_BOUW = '3da8253d';
     feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
       (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
       (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');
-    fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', async ()=>{ const [code,pid]=b.dataset.los.split('|'); if(!confirm('Dit gezin niet meer volgen?')) return; try{ await API.call('/rtf/ontkoppel',{code,profielId:pid}); toast('Ontkoppeld.'); await refreshState(); renderFoundation(); if(!(rtf.gekoppeld||[]).length) openTab('home'); }catch(e){ toast(e.message); } }));
+    fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', async ()=>{ const [code,pid]=b.dataset.los.split('|'); if(!confirm('Dit gezin niet meer volgen?')) return; try{ await API.call('/api/rtf/ontkoppel',{code,profielId:pid}); toast('Ontkoppeld.'); await refreshState(); renderFoundation(); if(!(rtf.gekoppeld||[]).length) openTab('home'); }catch(e){ toast(e.message); } }));
     const kb=$('#rtfKoppelBtn2'); if(kb) kb.addEventListener('click', rtfKoppelStart);
     const pb=$('#rtfPushBtn'); if(pb) pb.addEventListener('click', ()=> ensurePush(true));
     const rb=$('#rtfReplyBtn'); if(rb) rb.addEventListener('click', rtfReply);
     const ri=$('#rtfReplyIn'); if(ri) ri.addEventListener('keydown', e=>{ if(e.key==='Enter') rtfReply(); });
-    if (m.filter(x=>!x.gelezen).length) API.call('/rtf/meldingen/gelezen').catch(()=>{});
+    if (m.filter(x=>!x.gelezen).length) API.call('/api/rtf/meldingen/gelezen').catch(()=>{});
     if (g.length){ laadGezinInfo(); laadGezinChat(); } else { const gc=$('#gezinChat'); if(gc) gc.style.display='none'; }
   }
   let grtInit=false, grtActief=null;
@@ -7643,7 +7760,7 @@ var RTG_BOUW = '3da8253d';
     const box=$('#gezinChat'); if(!box) return;
     const g=(rtf.gekoppeld||[]); if(!g.length){ box.style.display='none'; return; }
     box.style.display='';
-    let kan; try{ kan=await API.call('/rtf/kanaal',{ code:g[0].code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
+    let kan; try{ kan=await API.call('/api/rtf/kanaal',{ code:g[0].code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
     if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:onGrtChat }); grtInit=true; }
     else if (window.GezinRT){ GezinRT.setLeden(kan.leden); if (GezinRT.setToken) GezinRT.setToken(kan.token); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
@@ -7676,7 +7793,7 @@ var RTG_BOUW = '3da8253d';
   function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString(lang(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
   async function laadGezinInfo(){
     const box = $('#gezinInfo'); if(!box) return;
-    let d; try{ d = await API.call('/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
+    let d; try{ d = await API.call('/api/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
     box.innerHTML = (d.gezinnen||[]).map(gz=>{
       const o = gz.oppasinfo||{};
       const meerdan1 = (d.gezinnen||[]).length>1;
@@ -7707,14 +7824,16 @@ var RTG_BOUW = '3da8253d';
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
     const g=(rtf.gekoppeld||[]); if(!g.length) return;
-    try{ await API.call('/rtf/bericht',{ code:g[0].code, tekst:t }); inp.value=''; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    // een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht
+    if(inp.dataset.idemTekst!==t){ inp.dataset.idem=RTGId('gezin-bericht'); inp.dataset.idemTekst=t; }
+    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){
     const uitnodiging = prompt('Plak de persoonlijke uitnodigingslink of code die je van het gezin kreeg:');
     if (!uitnodiging) return;
     try {
-      const r = await API.call('/rtf/uitnodiging/accepteer', { uitnodiging: uitnodiging.trim() });
+      const r = await API.call('/api/rtf/uitnodiging/accepteer', { uitnodiging: uitnodiging.trim() });
       toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu ook op je telefoon.');
       await refreshState(); renderFoundation(); openTab('gezin');
       ensurePush(true);
@@ -7729,7 +7848,7 @@ var RTG_BOUW = '3da8253d';
   async function ensurePush(interactief){
     try{
       if (!('serviceWorker' in navigator) || !('PushManager' in window)){ if(interactief) toast('Push wordt op dit toestel niet ondersteund.'); return; }
-      const keyRes = await fetch('/api/push/key').then(r=>r.json()).catch(()=>({}));
+      const keyRes = await fetch('/api/push/key',{headers:{Authorization:'Bearer '+API.token}}).then(r=>r.json()).catch(()=>({}));
       if (!keyRes.key){ if(interactief) toast('Meldingen zijn nu niet beschikbaar.'); return; }
       if (interactief || Notification.permission==='default'){
         const perm = await Notification.requestPermission();
@@ -7738,7 +7857,7 @@ var RTG_BOUW = '3da8253d';
       const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
       if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8(keyRes.key) });
-      await API.call('/push/subscribe', { subscription: sub });
+      await API.call('/api/push/subscribe', { subscription: sub });
       if (interactief) toast('Top! Gezinsmeldingen komen nu ook op je telefoon binnen.');
     }catch(e){ if(interactief) toast('Meldingen aanzetten lukte niet.'); }
   }
@@ -7784,7 +7903,7 @@ var RTG_BOUW = '3da8253d';
       $('#tripList').insertAdjacentElement('afterend', wrap);
     }
     let dagen = [];
-    try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch(e){ return; }
+    try { dagen = (await API.call('/api/agenda/mijn')).dagen || []; } catch(e){ return; }
     if (!dagen.length){ wrap.innerHTML = ''; return; }
     const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang(), { weekday: 'long', day: 'numeric', month: 'long' });
     wrap.innerHTML = '<div class="sec-label h-mt120">' + T('erv.agenda','Mijn programma') + '</div>' +
@@ -7809,7 +7928,7 @@ var RTG_BOUW = '3da8253d';
   async function executePay(target){
     let foundation = 0;
     if (API.live){
-      const data = await API.call('/pay', target === 'all' ? {all:true} : {invoiceId: target});
+      const data = await API.call('/api/pay', target === 'all' ? {all:true} : {invoiceId: target});
       foundation = data.foundation;
       applyState(data.state);
     } else {
@@ -7959,7 +8078,7 @@ var RTG_BOUW = '3da8253d';
       const v = dpLees(); if (!v) return;
       ov.remove();
       payWithFaceId(eur(v.bedrag), async () => {
-        const d = await API.call('/betaal/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, bron: opts.bron || 'app', idem });
+        const d = await API.call('/api/betaal/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, bron: opts.bron || 'app', idem });
         return d.betaling;
       }, { message: b => T('dp.betaald','Betaald aan') + ' ' + name + ': ' + eur((b.bedrag||0)/100), after: () => { if (opts.after) opts.after(); } });
     });
@@ -7969,15 +8088,15 @@ var RTG_BOUW = '3da8253d';
       ov.remove();
       openMuntSheet({
         euro: v.bedrag, titel: name,
-        maak: async (munt) => (await API.call('/munt/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, munt })).verzoek,
-        klaar: async () => { const mine = (await API.call('/betaal/mijn')).betalingen || []; return mine.some(p => p.betaalwijze === 'munt' && p.supplierCode === code && Math.round(p.bedrag) === Math.round(v.bedrag * 100)); }
+        maak: async (munt) => (await API.call('/api/munt/direct', { supplierCode: code, bedrag: v.bedrag, omschrijving: v.note, munt })).verzoek,
+        klaar: async () => { const mine = (await API.call('/api/betaal/mijn')).betalingen || []; return mine.some(p => p.betaalwijze === 'munt' && p.supplierCode === code && Math.round(p.bedrag) === Math.round(v.bedrag * 100)); }
       });
     });
   }
   // Een betaalverzoek van een partner met Face ID afrekenen.
   function betaalVerzoekPay(v){
     payWithFaceId(eur((v.bedrag||0)/100), async () => {
-      const d = await API.call('/betaal/verzoek/pay', { ref: v.ref, idem: 'bv-' + v.ref });
+      const d = await API.call('/api/betaal/verzoek/pay', { ref: v.ref, idem: 'bv-' + v.ref });
       return d.betaling;
     }, { message: () => T('dp.verzoekbetaald','Betaalverzoek voldaan:') + ' ' + eur((v.bedrag||0)/100), after: () => { laadBetaalVerzoeken(); renderHome(); } });
   }
@@ -7985,7 +8104,7 @@ var RTG_BOUW = '3da8253d';
   let betaalVerzoeken = [];
   async function laadBetaalVerzoeken(){
     if (!user || user.tier === 'guest') { betaalVerzoeken = []; return; }
-    try { betaalVerzoeken = (await API.call('/betaal/verzoeken', {})).verzoeken || []; } catch(e){ betaalVerzoeken = []; }
+    try { betaalVerzoeken = (await API.call('/api/betaal/verzoeken', {})).verzoeken || []; } catch(e){ betaalVerzoeken = []; }
   }
 
   function renderPay(){
@@ -9524,7 +9643,7 @@ var RTG_BOUW = '3da8253d';
         post.likes += post.liked ? 1 : -1;
         ev.currentTarget.classList.toggle('liked', post.liked);
         el.querySelector('.lc').textContent = post.likes;
-        if (API.live) API.call('/like', {postId: post.id, liked: post.liked}).catch(() => {});
+        if (API.live) API.call('/api/like', {postId: post.id, liked: post.liked}).catch(() => {});
       });
       const shareBtn = el.querySelector('.js-share');
       if (shareBtn) shareBtn.addEventListener('click', () => openShare(post.id));
@@ -9595,8 +9714,11 @@ var RTG_BOUW = '3da8253d';
         const inp = el.querySelector('.cform input');
         if (!inp.value.trim()) return;
         if (API.live){
-          try { await API.call('/comment', {postId: post.id, text: inp.value.trim()}); }
+          // een sleutel per reactie: een tweede tik of een nieuwe poging is dezelfde
+          if (!inp.dataset.idem) inp.dataset.idem = RTGIdem('salon-reactie');
+          try { await API.call('/api/comment', {postId: post.id, text: inp.value.trim(), idem: inp.dataset.idem}); }
           catch (e) { toast(e.message || T('app.salon.notallowed','Reageren niet toegestaan.')); return; }
+          delete inp.dataset.idem;
         }
         post.comments.push({who: user.full, tier: user.tier, text: inp.value.trim()});
         const d = document.createElement('div');

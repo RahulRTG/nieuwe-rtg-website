@@ -117,52 +117,11 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
     } finally { startend.delete(id); }
   }
 
-  async function providerMelding(invoer) {
-    const meldingen = d().betaalWaarheidMeldingen || (d().betaalWaarheidMeldingen = {});
-    const eventId = String(invoer.eventId || (invoer.aanbieder + ':' + invoer.providerId + ':' + invoer.status));
-    if (meldingen[eventId] && meldingen[eventId].verwerktAt) {
-      if (meldingen[eventId].conflict) return false;
-      const eerder = meldingen[eventId].betalingId && doos()[meldingen[eventId].betalingId];
-      if (eerder) await afhandeling.handelAf(eerder); /* herstel na een lokale afhandelstoring */
-      return meldingen[eventId].betalingId || null;
-    }
-    if (!meldingen[eventId]) meldingen[eventId] = { eventId, aanbieder: invoer.aanbieder,
-      providerId: invoer.providerId || null, ontvangenAt: nuIso(), verwerktAt: null };
-    save(); /* duurzame inbox vóór een 2xx aan de provider */
-    /* De eigen referentie wint van het provider-id. Bij Adyen valt het
-       paymentLinkId buiten de HMAC, de merchantReference niet: wie in een echt
-       ondertekend bericht alleen het link-id verwisselt, mag daarmee geen
-       andere betaling raken. Wijst het provider-id naar een ander record dan
-       de referentie, dan raakt deze melding geen van beide en staat het
-       conflict in de inbox. */
-    const opReferentie = invoer.referentie ? doos()[String(invoer.referentie)] : null;
-    const opProviderId = invoer.providerId ? Object.values(doos()).find(x =>
-      x.providerId === invoer.providerId || x.providerPaymentId === invoer.providerId) : null;
-    if (opReferentie && opProviderId && opReferentie !== opProviderId) {
-      meldingen[eventId].conflict = { referentie: opReferentie.id, providerId: opProviderId.id };
-      meldingen[eventId].betalingId = null;
-      meldingen[eventId].verwerktAt = nuIso();
-      save();
-      if (log && log.warn) log.warn('betaalmelding wijst naar twee betalingen; niets toegepast',
-        { eventId, aanbieder: invoer.aanbieder });
-      return false;
-    }
-    const r = opReferentie || opProviderId;
-    if (!r && /^BW-/.test(String(invoer.referentie || ''))) {
-      meldingen[eventId].wachtOpWaarheid = true;
-      save();
-      throw new Error('De betaalwaarheid is nog niet zichtbaar; provider moet opnieuw proberen.');
-    }
-    if (r) {
-      meldingen[eventId].betalingId = r.id;
-      save(); /* koppeling staat vast vóór de mogelijk falende domeinafhandeling */
-      await pasProviderToe(r, invoer, eventId, invoer.gebeurtenis,
-        invoer.providerProof || bewijs.providerProof(invoer.providerSource));
-    } else meldingen[eventId].betalingId = null;
-    meldingen[eventId].verwerktAt = nuIso();
-    save();
-    return r ? r.id : null;
-  }
+  const providerMelding = require('./inbox')({
+    meldingenVan: () => d().betaalWaarheidMeldingen || (d().betaalWaarheidMeldingen = {}),
+    doos, save, nuIso, handelAf: r => afhandeling.handelAf(r), pasProviderToe,
+    providerProof: bron => bewijs.providerProof(bron), log
+  });
 
   function van(id) { return doos()[String(id || '')] || null; }
   function vanActor(id, actor) { const r = van(id); return r && r.actor === String(actor || '') ? r : null; }
@@ -173,13 +132,21 @@ module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log 
 
   // gestrande afhandelingen, dan de veegronde zonder uitsluitsel (./hervat.js)
   const veeg = require('./hervat')({ doos, save, nuIso, gebeurtenis, STATUS, definitiefBetaald, log });
+  // en de terugbetalingen die op een providerbevestiging wachten (./terugveeg.js)
+  const terugveeg = require('./terugveeg')({ doos, save, nuIso, gebeurtenis, betaal,
+    providerTerugbetaling: terug.providerTerugbetaling, log });
   async function ronde(opties) {
     const a = await afhandeling.ronde(opties);
     const h = await veeg.hervat(Object.assign({}, opties || {}, { begin }));
-    return Object.assign(a, { hervat: h });
+    const t = await terugveeg.veeg(opties || {});
+    return Object.assign(a, { hervat: h, terug: t });
   }
+  const openstaand = () => Object.assign(veeg.openstaand(), terugveeg.openstaand());
+  // een betaling op controle afronden: alleen een mens op naam (./controle.js)
+  const controle = require('./controle')({ doos, save, nuIso, gebeurtenis, STATUS });
 
   return { STATUS, maak, bereidVoor: veeg.bereidVoor, begin, publiek, van, vanActor, providerMelding,
     terugbetalen: terug.terugbetalen, providerTerugbetaling: terug.providerTerugbetaling,
-    registreerAfhandeling, ronde, openstaand: veeg.openstaand, definitiefBetaald };
+    registreerAfhandeling, ronde, openstaand, definitiefBetaald,
+    terugAfhandelen: terugveeg.terugAfhandelen, controleAfronden: controle.controleAfronden };
 };

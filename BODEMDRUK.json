@@ -1,17 +1,17 @@
 {
   "stempel": {
-    "op": "2026-10-20T09:21:45.684Z",
-    "commit": "d14f1ae752",
+    "op": "2026-10-24T14:50:00.551Z",
+    "commit": "897d49afc0",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/bodemdruk.js",
-    "node": "v26.12.0"
+    "node": "v26.12.1"
   },
   "graad": "vermoed",
   "uitleg": "Per scherm dat een pad van de universele bodem aanroept (afgeleid uit de verklaring, het functieregister en SCHERMROUTES.json): staat er een uitnodiging om te betalen op? SAMENLEVING.md par. 6, eis 5.",
   "grens": "Lexicaal en zonder commentaar gelezen, dus een ONDERGRENS: druk zonder deze woorden (een slotje, een kleur, een badge) ziet deze meter niet. Een deur die zegt dat iets bij een pas hoort is een weigering en geen druk; of die weigering op de bodem mag, meet npm run onvervreemdbaar. Gebruikstijd wordt niet gemeten (SAM-05).",
   "gemeten": {
-    "schermen": 56,
+    "schermen": 59,
     "metDruk": 0,
     "treffers": 0
   },
@@ -211,6 +211,15 @@
       ]
     },
     {
+      "bestand": "public/apps/hangar-voorzijde.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
+      ]
+    },
+    {
       "bestand": "public/apps/isolatie.js",
       "werkwoorden": [
         "verbinden"
@@ -311,6 +320,15 @@
       ],
       "functies": [
         "dom-overheid"
+      ]
+    },
+    {
+      "bestand": "public/apps/reisboek-momenten.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
       ]
     },
     {
@@ -458,6 +476,15 @@
       ],
       "functies": [
         "rust"
+      ]
+    },
+    {
+      "bestand": "public/apps/werkvloer.js",
+      "werkwoorden": [
+        "orienteren"
+      ],
+      "functies": [
+        "kern-gids"
       ]
     },
     {

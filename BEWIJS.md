@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 3003 |
 | losse beweringen (`test(...)`) | 20318 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 414 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2814 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2815 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 182 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 6 |
+| niets van beide | 5 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -139,7 +139,7 @@ toets omvalt.
 | `anthropic.test.js` | 4 | gezakt op `return-weg#3` | Test voor de eigen Claude-client (server/anthropic.js), die @anthropic-ai/sdk verving. We draaien tegen een lokale nep-API (geen echte sleutel/kosten) en controleren: de juiste headers + body gaan eruit, het antwoord... |
 | `antivirus.test.js` | 23 | gezakt op `true->false` | Tests voor De Ontsmetter (server/kern/antivirus.js): de platform-malware- scanner. Handtekeningen, magie-controle, extensies en entropie. |
 | `antwoord-einde.test.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `antwoordspoor.test.js` | 2 | -- | HET ANTWOORDSPOOR -- post-response auditwerk zonder een gesloten verzoekcontext. server/lib/antwoordspoor.js bundelt alle schrijvers achter een response in registratievolgorde en voert de bundel buiten de... |
+| `antwoordspoor.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | HET ANTWOORDSPOOR -- post-response auditwerk zonder een gesloten verzoekcontext. server/lib/antwoordspoor.js bundelt alle schrijvers achter een response in registratievolgorde en voert de bundel buiten de... |
 | `api-contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracttests: leggen de VORM (velden + types) van de belangrijkste API- antwoorden vast, los van de flow-tests. Zo kan een refactor of herindeling niet stilletjes een veld weglaten waar een van de apps op leunt (bijv. |
 | `api-spoor-wissing-append.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `apipoort-levensduur.test.js` | 6 | gezakt op `liegpoort /api/` | De machinesleutel van de API-poort als gemigreerde credential (CODECREDENTIALS.json, command.api_machinesleutel). Wat hier moet kunnen zakken: 1. |

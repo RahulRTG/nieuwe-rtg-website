@@ -1,3 +1,12 @@
+/* HET ANTWOORDSPOOR -- post-response auditwerk zonder een gesloten verzoekcontext.
+
+   server/lib/antwoordspoor.js bundelt alle schrijvers achter een response in
+   registratievolgorde en voert de bundel buiten de AsyncLocalStorage-context
+   van het afgeronde verzoek uit. Dit bestand bewaakt beide grenzen:
+
+     1. Meerdere schrijvers delen een bundel en lopen precies eenmaal en in
+        registratievolgorde.
+     2. Een schrijver na `finish` erft geen gesloten verzoekcontext. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

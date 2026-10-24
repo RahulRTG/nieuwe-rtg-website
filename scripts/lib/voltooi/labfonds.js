@@ -63,7 +63,7 @@ async function loop(w, stap) {
       ziet: 'indienen ' + r.status + ', scheidsrechter ' + (voorstel && voorstel.scheids && voorstel.scheids.oordeel) };
   });
 
-  await stap('voltooibaar', 'B stemt voor; B ziet het voorstel, maar niet A\'s bijdrage als de zijne, en kan de stemming niet sluiten', async () => {
+  await stap('bevoegd', 'B stemt voor; B ziet het voorstel, maar niet A\'s bijdrage als de zijne, en kan de stemming niet sluiten', async () => {
     const st = await w.post(STEM, { id: voorstel.id, keuze: 'voor' }, B.token);
     const oB = await ov(B.token);
     const sluit = await w.post(BESLIS, { id: voorstel.id }, B.token);

@@ -74,7 +74,7 @@ async function loop(w, stap) {
     return { klopt: r.status === 200 && l.length === 1 && l[0].frequentieMin === 6, ziet: 'aanpassen ' + r.status + ', bij het lid elke ' + (l[0] && l[0].frequentieMin) + ' min' };
   });
 
-  await stap('voltooibaar', 'een chauffeur van dezelfde zaak mag niet tekenen, en een zaak die geen OV-vervoerder is ook niet', async () => {
+  await stap('bevoegd', 'een chauffeur van dezelfde zaak mag niet tekenen, en een zaak die geen OV-vervoerder is ook niet', async () => {
     const C = await login(w, VERVOERDER, false);
     const c = await w.post(ZET, lijf(merk + ' chauffeur'), C);
     const H = await login(w, 'BRISA', true);

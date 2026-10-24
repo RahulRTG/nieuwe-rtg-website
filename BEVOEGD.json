@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-24T15:41:36.458Z",
-    "commit": "60ac6464b2",
+    "op": "2026-10-24T16:32:35.183Z",
+    "commit": "1103d4a621",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -38,10 +38,10 @@
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "f7174231cad10d4c7a8e0ef8373cf588258638f2f54a6ccc40bd18e30378addd",
+        "sha256": "9ce9dc3f7198a47572a765a4f412675f961093bcaee80c41c33f56b7a20c386a",
         "stempel": {
-          "op": "2026-10-24T15:23:00.455Z",
-          "commit": "d46a624b10",
+          "op": "2026-10-24T16:09:43.779Z",
+          "commit": "73c23b8e33",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -51,8 +51,8 @@
     ]
   },
   "telling": {
-    "BEWEZEN": 85,
-    "NIET_GETEST": 29
+    "BEWEZEN": 90,
+    "NIET_GETEST": 24
   },
   "regels": [
     {
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/8ZVCAF/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/FBVRSK/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -421,10 +421,10 @@
       "app": "Wie ben ik",
       "ingang": "/apps/ik.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 12,
-      "reden": "12 van de 12 routes niet gemeten, o.a. /api/ik: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/geloof: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/toegankelijk/zet: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 12 routes niet gemeten, o.a. /api/ik: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/geloof: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/toegankelijk/zet: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:juridisch",
@@ -664,10 +664,10 @@
       "app": "Mijn neigingen",
       "ingang": "/apps/mijn-neigingen.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 20,
-      "open": 18,
-      "reden": "18 van de 20 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/toestel/introk: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 18 van de 20 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/toestel/introk: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:nieuws",
@@ -774,10 +774,10 @@
       "app": "Post van RTG",
       "ingang": "/apps/mijn-post.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 17,
-      "open": 15,
-      "reden": "15 van de 17 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/post: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mijn/post/alles-uit: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 15 van de 17 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/post: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mijn/post/alles-uit: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:projectroom",
@@ -824,10 +824,10 @@
       "app": "Reizen & Veilig",
       "ingang": "/apps/reizen-veilig.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 9,
-      "open": 7,
-      "reden": "7 van de 9 routes niet gemeten, o.a. /api/move/volgende: IDOR draagt geen volledige ruwe antwoordafbakening; /api/reisbureau: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/veiligheid/moment: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 9 routes niet gemeten, o.a. /api/move/volgende: IDOR draagt geen volledige ruwe antwoordafbakening; /api/reisbureau: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/veiligheid/moment: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:relaties",
@@ -1207,10 +1207,10 @@
       "app": "RTG Werk OS",
       "ingang": "/apps/werk.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 18,
-      "open": 18,
-      "reden": "18 van de 18 routes niet gemeten, o.a. /api/auth/login staat niet in IDOR.json; /api/auth/register staat niet in IDOR.json; /api/bedrijf/mijn: IDOR draagt geen volledige ruwe antwoordafbakening; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 18 van de 18 routes niet gemeten, o.a. /api/auth/login staat niet in IDOR.json; /api/auth/register staat niet in IDOR.json; /api/bedrijf/mijn: IDOR draagt geen volledige ruwe antwoordafbakening"
     },
     {
       "functie": "link:wonen",

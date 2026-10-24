@@ -307,7 +307,13 @@ async function meet() {
 }
 
 async function maakContext(browser, opslag) {
-  const ctx = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 1280, height: 900 } });
+  /* Bedienbaarheid meet of een mens een functie kan gebruiken, niet of een
+     cinematografische overgang exact binnen een drukke CI-tik klaar is. De
+     gereduceerde-bewegingsstand is bovendien een ondersteunde
+     toegankelijkheidsstand. Zonder deze vaste voorkeur verschoof een knop na
+     het markeren maar voor de klik en onderschepte de body de invoer; dezelfde
+     bronstand wisselde daardoor tussen 11/72 en 39/70 aangetikte knoppen. */
+  const ctx = await browser.newContext({ serviceWorkers: 'block', reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
   /* De intake is niet wat hier gemeten wordt: een vers lid staat voor de
      ledenovereenkomst, en die tekent een mens een keer in zijn leven. Zelfde
      ingreep als in scripts/tikken.js en de schermtoetsen. */

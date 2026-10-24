@@ -33,10 +33,10 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    uitgelokte weigering draagt het geen schakels en `nietBeproefd`. */
 const AFGELEID = 'menselijk';
 const BEVOEGD = 'bevoegd';
-/* De autorisatieratel hoort naast de functionele ratel. Op 24 oktober 2026
-   waren 76 scenario's voorzien van een daadwerkelijk uitgevoerde tegenproef;
+/* De autorisatieratel hoort naast de functionele ratel. Op 25 oktober 2026
+   waren 98 scenario's voorzien van een daadwerkelijk uitgevoerde tegenproef;
    een volgende meting mag die niet stil terugbrengen naar alleen kernwerk. */
-const BEVOEGD_MINIMUM = 87;
+const BEVOEGD_MINIMUM = 98;
 /* DE RATEL: zoveel bewijzen staan op 11 oktober 2026 gesloten (twee
    onderdelen, drie bewijzen). Alleen omhoog; wie hem verlaagt, schrijft erbij
    waarom. */

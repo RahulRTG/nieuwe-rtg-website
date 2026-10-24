@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-24T21:41:06.552Z",
-    "commit": "bda6ec2b5b",
+    "op": "2026-10-24T23:25:44.557Z",
+    "commit": "2a80194365",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -38,10 +38,10 @@
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "9ce9dc3f7198a47572a765a4f412675f961093bcaee80c41c33f56b7a20c386a",
+        "sha256": "d8cd05a04d9b5e0b4f6d9668260df1d919ae8e502df78e5f80dd50cb8221ed90",
         "stempel": {
-          "op": "2026-10-24T16:09:43.779Z",
-          "commit": "73c23b8e33",
+          "op": "2026-10-24T22:26:21.858Z",
+          "commit": "4e04876545",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -51,8 +51,8 @@
     ]
   },
   "telling": {
-    "BEWEZEN": 90,
-    "NIET_GETEST": 24
+    "BEWEZEN": 101,
+    "NIET_GETEST": 13
   },
   "regels": [
     {
@@ -80,10 +80,10 @@
       "app": "Attenties",
       "ingang": "/apps/attenties.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 12,
-      "reden": "12 van de 12 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 12 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:balans",
@@ -168,20 +168,20 @@
       "app": "Cellier",
       "ingang": "/apps/cellier.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 6,
-      "open": 6,
-      "reden": "6 van de 6 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cellier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 6 van de 6 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cellier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:cercle",
       "app": "Cercle",
       "ingang": "/apps/cercle.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 13,
-      "open": 13,
-      "reden": "13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cercle: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cercle: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:clips",
@@ -269,10 +269,10 @@
       "app": "Entourage",
       "ingang": "/apps/entourage.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 13,
-      "open": 13,
-      "reden": "13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/entourage: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/entourage: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:flits",
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/4MQKCG/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/WNPF7J/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -342,10 +342,10 @@
       "app": "Garde-robe",
       "ingang": "/apps/garderobe.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 7,
-      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/garderobe: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 7 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/garderobe: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:gegevens",
@@ -391,10 +391,10 @@
       "app": "Hangar",
       "ingang": "/apps/hangar.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 70,
-      "reden": "70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:horeca",
@@ -534,10 +534,10 @@
       "app": "Logboek",
       "ingang": "/apps/geld.html#logboek",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 99,
-      "open": 96,
-      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:loonstrook",
@@ -574,10 +574,10 @@
       "app": "Maison",
       "ingang": "/apps/maison.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 10,
-      "open": 10,
-      "reden": "10 van de 10 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/maison: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 10 van de 10 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/maison: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:mall",
@@ -594,10 +594,10 @@
       "app": "Mecenaat",
       "ingang": "/apps/geld.html#mecenaat",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 99,
-      "open": 96,
-      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:mediaos",
@@ -644,10 +644,10 @@
       "app": "Nalatenschap",
       "ingang": "/apps/geld.html#nalatenschap",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 99,
-      "open": 96,
-      "reden": "96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:navigatie",
@@ -1058,10 +1058,10 @@
       "app": "Table",
       "ingang": "/apps/table.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 9,
-      "open": 9,
-      "reden": "9 van de 9 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/table: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 9 van de 9 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/table: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:theater",

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-24T15:52:33.501Z",
-    "commit": "6d08b15e8a",
+    "op": "2026-10-24T17:02:06.496Z",
+    "commit": "a0dbeb35c9",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.1"
   },

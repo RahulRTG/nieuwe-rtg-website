@@ -36,7 +36,7 @@ const BEVOEGD = 'bevoegd';
 /* De autorisatieratel hoort naast de functionele ratel. Op 24 oktober 2026
    waren 76 scenario's voorzien van een daadwerkelijk uitgevoerde tegenproef;
    een volgende meting mag die niet stil terugbrengen naar alleen kernwerk. */
-const BEVOEGD_MINIMUM = 76;
+const BEVOEGD_MINIMUM = 79;
 /* DE RATEL: zoveel bewijzen staan op 11 oktober 2026 gesloten (twee
    onderdelen, drie bewijzen). Alleen omhoog; wie hem verlaagt, schrijft erbij
    waarom. */

@@ -79,7 +79,7 @@ async function loop(w, stap) {
       ziet: 'status ' + r.status + ', ingetrokken_tokens ' + voor + ' -> ' + ingetrokkenNa };
   });
 
-  await stap('voltooibaar', 'het gesloten toestel merkt het: zijn token wordt geweigerd', async () => {
+  await stap('bevoegd', 'het gesloten toestel merkt het: zijn token wordt geweigerd', async () => {
     const r = await w.post(LIJST, {}, B);
     return { klopt: r.status === 401, ziet: 'het andere toestel krijgt ' + r.status };
   });

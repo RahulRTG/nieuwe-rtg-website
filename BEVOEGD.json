@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-24T13:13:56.464Z",
-    "commit": "72c2dbc348",
+    "op": "2026-10-24T14:59:11.031Z",
+    "commit": "aaa23d6b92",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -38,10 +38,10 @@
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "2b405b8cd0e48ac2cc144121246611a2800144a7240faa5de41142ca208c96a4",
+        "sha256": "bd712221933a1a0188f0c0c88aaaae28f8b258b31c1c229dd68a9b782b8c9fb3",
         "stempel": {
-          "op": "2026-10-24T12:50:52.032Z",
-          "commit": "1dfc7b576f",
+          "op": "2026-10-24T14:31:56.579Z",
+          "commit": "d003044732",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -51,8 +51,8 @@
     ]
   },
   "telling": {
-    "BEWEZEN": 79,
-    "NIET_GETEST": 35
+    "BEWEZEN": 82,
+    "NIET_GETEST": 32
   },
   "regels": [
     {
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/NU5PYA/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/E25TFJ/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -614,10 +614,10 @@
       "app": "Mijn bestellingen",
       "ingang": "/apps/mijnmall.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 18,
-      "open": 17,
-      "reden": "17 van de 18 routes niet gemeten, o.a. /api/mall/aanvraag: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: mallAanvragen.plaats(req.session.key, ...) maakt een nieuwe aanvraag voor B; de pool vulde openbare categorie- en etage-id's in, en met verzonnen waarden faalt de validatie (400). Er wordt geen aanvraag van A aangeraakt; deze smalle duiding is geen ruwe proef van afscherming; /api/mall/aanvraag/heropen: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mall/aanvraag/kies: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 17 van de 18 routes niet gemeten, o.a. /api/mall/aanvraag: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: mallAanvragen.plaats(req.session.key, ...) maakt een nieuwe aanvraag voor B; de pool vulde openbare categorie- en etage-id's in, en met verzonnen waarden faalt de validatie (400). Er wordt geen aanvraag van A aangeraakt; deze smalle duiding is geen ruwe proef van afscherming; /api/mall/aanvraag/heropen: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mall/aanvraag/kies: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:move",
@@ -792,10 +792,10 @@
       "app": "Pulse",
       "ingang": "/apps/pulse.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 15,
-      "open": 15,
-      "reden": "15 van de 15 routes niet gemeten, o.a. /api/member/pulse/bewaar: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: een bladwijzer op andermans bericht, in B's EIGEN plank; het bericht moet door zichtbaar() heen; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewaard: IDOR noemt de route nagekeken: B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewerk: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 15 van de 15 routes niet gemeten, o.a. /api/member/pulse/bewaar: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: een bladwijzer op andermans bericht, in B's EIGEN plank; het bericht moet door zichtbaar() heen; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewaard: IDOR noemt de route nagekeken: B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewerk: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:rechterhand",
@@ -986,10 +986,10 @@
       "app": "Waar ben ik aanwezig",
       "ingang": "/apps/mijn-sessies.html",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "routes": 18,
-      "open": 16,
-      "reden": "16 van de 18 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/sessies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
+      "status": "BEWEZEN",
+      "scenario": true,
+      "tegenproeven": 1,
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 16 van de 18 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/sessies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     },
     {
       "functie": "link:sitemaker",

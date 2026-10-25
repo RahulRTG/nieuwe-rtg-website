@@ -2,15 +2,15 @@
  "soort": "meting",
  "uitleg": "Per bestand dat in het raakvlak van een bewijs in APPWERKT.json zit, de sha256 van zijn inhoud op het moment van de meting (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i). Wordt alleen samen met APPWERKT.json geschreven, door scripts/appwerkt.js.",
  "stempel": {
-  "op": "2026-10-25T13:47:43.097Z",
-  "commit": "ed992d23df",
+  "op": "2026-10-25T17:01:22.815Z",
+  "commit": "348298c982",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
   "node": "v26.12.1"
  },
  "bestanden": 6061,
- "samen": "836b51915b24789f3fab8b0f7fe86b3b7bf04e48d8704b0846e5a5bb741bc36b",
+ "samen": "664563c9e4fae770b35349dc8170b176759c66042166403a06a0c887b300aca1",
  "hashes": {
   "IDEMPROEF.json": "a252ece47b856742ee77e8f4368e057d50c237296adfb7f4670c9131ff0df745",
   "package.json": "558de98416a46c5e3d0000fbac4c536611cf221b21057e16c34f091685165af8",
@@ -1242,7 +1242,7 @@
   "public/shared/zwaarstap.js": "b38a01f6c31e1c5ab38e6a48747921be4672bb70e5606f079ca75b459a92a468",
   "public/sw.js": "0ed99387948cc6fbdea419e34cbb972bf51cf83e5aa42b1b2d0d1d88406827a0",
   "scripts/afbouw-slot.js": "eb70e72f5aa666e173bf81be9d5748f87cbe4384a182cd051e458bad28866440",
-  "scripts/appwerkt.js": "7212c0afaea11b5496b04fce26715bd447ed2b9e304d28f7feec227e777f3adb",
+  "scripts/appwerkt.js": "f050bf9819706108a9c79b7982b9599077043692f9c9fea130def09b784d9e95",
   "scripts/ast/lexer.js": "1bb1ce7a622a6923e97f793cf70a1e112d402bc27f99bb6b1357624ee388d770",
   "scripts/ast/parser.js": "211782d82a3d9c3e50e793f465dea1f44656b1d89e50966ae97879bb2841998a",
   "scripts/bevoegdronde.js": "5cfdac9a3abf88b5ef39d521b8d71987bb1285fb13cd9e55a98b913ffb24da2e",

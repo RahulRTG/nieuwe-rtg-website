@@ -124,7 +124,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const reg = require('./lib/wereldregister');
-const { haalSessies, opslagVoor } = require('./lib/proefsessies');
+const { haalSessies, opslagVoor, verbindProeflid } = require('./lib/proefsessies');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
@@ -227,13 +227,16 @@ function rijen() {
    ingang hebben. Het bestaande appcontract benoemt dan het echte scherm en de
    echte hash-navigatie. Alleen een declaratieve hash mag hier rechtstreeks
    worden geopend; natuurlijke-taalstappen voor OS-kiezers moeten door een
-   eigen bedieningsadapter worden uitgevoerd en blijven dus eerlijk ongemeten. */
+   expliciet gedeclareerde bedieningsadapter worden uitgevoerd. Alleen proza
+   blijft eerlijk ongemeten: de meter leidt daar nooit zelf een route uit af. */
 function meetIngang(rij, contract = CONTRACT) {
   if (rij && rij.pad) return { pad: rij.pad, bestemming: rij.pad, via: null };
   const c = rij && contract && contract[rij.functie];
-  if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') ||
-      typeof c.via !== 'string' || !c.via.startsWith('#')) return null;
-  return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via };
+  if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') || typeof c.via !== 'string') return null;
+  if (c.via.startsWith('#')) return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via };
+  const a = c.adapter;
+  if (!a || a.type !== 'rahul-opdracht' || !a.opdracht || !a.verwacht || !a.bereik || !a.titel) return null;
+  return { pad: c.ingang, bestemming: c.ingang, via: c.via, adapter: { ...a } };
 }
 
 /* ---- de vijf bewijzen die een testwereld nodig hebben ---- */
@@ -271,6 +274,8 @@ async function meet() {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
 
   const { sessies, overgeslagen } = await haalSessies(base);
+  const contact = await verbindProeflid(base, sessies);
+  if (!contact.ok) overgeslagen.push({ rol: 'lid-contact', reden: contact.reden });
   log('sessies: ' + Object.keys(sessies).join(', ') + (overgeslagen.length ? ' -- overgeslagen: ' + overgeslagen.map((o) => o.rol).join(', ') : ''));
 
   const lijst = rijen();
@@ -375,7 +380,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     vulOngemeten(r);
     return r;
   }
-  const eersteBezoek = await bezoek(eigen, base, meet.pad);
+  const eersteBezoek = await bezoek(eigen, base, meet);
   r.waarnemingen.push('als ' + rij.persona + ': ' + eersteBezoek.samenvatting);
   if (eersteBezoek.rem.length) r.waarnemingen.push('proef: bij het laden ' + eersteBezoek.rem.length + 'x de rem (429) geraakt, door het gedeelde adres van de meting');
 
@@ -386,7 +391,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     let opener = null;
     for (const rol of rollen) {
       if (rol === rij.persona) continue;
-      const proef = await bezoek(persoonlijk[rol], base, meet.pad);
+      const proef = await bezoek(persoonlijk[rol], base, meet);
       if (!proef.poort && !proef.crash.length) { opener = rol; break; }
     }
     /* TWEE HEEL VERSCHILLENDE UITKOMSTEN, en ze door elkaar halen maakt dit
@@ -435,7 +440,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
       const anderen = [];
       for (const rol of rollen) {
         if (rol === rij.persona || !persoonlijk[rol]) continue;
-        const b = await bezoek(persoonlijk[rol], base, meet.pad);
+        const b = await bezoek(persoonlijk[rol], base, meet);
         if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || meet.bestemming });
       }
       o = beoordeelBestemming({ ingang: meet.bestemming, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
@@ -451,7 +456,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   }
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
-  const bediening = await bedien(eigen, base, meet.pad);
+  const bediening = await bedien(eigen, base, meet);
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
   r.schil = bediening.schil;
@@ -538,13 +543,47 @@ function eindstand(r) {
 }
 
 /* ---- een bezoek: laden en kijken wat er gebeurt ---- */
-async function bezoek(ctx, base, pad) {
+function ingangOpties(ingang) {
+  return typeof ingang === 'string' ? { pad: ingang, bestemming: ingang, via: null } : ingang;
+}
+
+/* Voer alleen adapters uit die het appcontract expliciet verklaart. Dit loopt
+   dezelfde zichtbare Edge/Rahul-route als een lid; geen private browserfunctie,
+   verzonnen URL of directe openOsApp-aanroep. Het verwachte scherm en zijn
+   titel zijn deel van het contract, zodat een opdracht die stil niets opent de
+   meting laat falen. */
+async function voerIngangAdapterUit(page, meet) {
+  if (!meet.adapter) return meet;
+  await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
+    null, { timeout: 12000 });
+  const mond = page.locator('.rtg-adaptive-item[aria-label="Praat met Rahul"]:visible').first();
+  await mond.waitFor({ state: 'visible', timeout: 10000 });
+  await mond.click();
+  const vraag = page.locator('input[placeholder^="Vraag Rahul"]:visible').first();
+  await vraag.waitFor({ state: 'visible', timeout: 10000 });
+  await vraag.fill(meet.adapter.opdracht);
+  await vraag.press('Enter');
+  await page.waitForSelector(meet.adapter.verwacht, { state: 'visible', timeout: 10000 });
+  const titel = ((await page.textContent(meet.adapter.verwacht + ' #osBelTitel').catch(() => '')) || '').trim();
+  if (titel !== meet.adapter.titel) throw new Error('bedieningsadapter verwachtte titel "' + meet.adapter.titel + '", zag "' + titel + '"');
+  return meet;
+}
+
+async function openIngang(page, base, ingang) {
+  const meet = ingangOpties(ingang);
+  await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await voerIngangAdapterUit(page, meet);
+  return meet;
+}
+
+async function bezoek(ctx, base, ingang) {
+  const meet = ingangOpties(ingang);
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [], rem = [];
   luister(page, base, { crash, config, serverfout, rem });
   let eind = '', poort = false, poortTekst = '', tekst = 0;
   try {
-    await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await openIngang(page, base, meet);
     await page.waitForTimeout(2600);
     eind = page.url().replace(base, '');
     const p = await page.evaluate((sel) => {
@@ -591,7 +630,10 @@ function onderschepper(log) {
   return tag.toLowerCase() + (id ? '#' + id : '') + klas.map((c) => '.' + c).join('');
 }
 
-async function bedien(ctx, base, pad) {
+async function bedien(ctx, base, ingang) {
+  const meet = ingangOpties(ingang);
+  const pad = meet.pad;
+  const bereik = meet.adapter && meet.adapter.bereik;
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
   let laatste = null;
@@ -608,8 +650,9 @@ async function bedien(ctx, base, pad) {
     await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
       null, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(400);
-    bedekt.push(...await bedektDoorSchil(page));
     luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
+    if (meet.adapter) await voerIngangAdapterUit(page, meet);
+    bedekt.push(...await bedektDoorSchil(page, bereik));
     /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een
        andere taal dan nl na een tik, met de knop erbij. */
     page.on('request', (q) => {
@@ -620,7 +663,7 @@ async function bedien(ctx, base, pad) {
     const gehad = new Set();
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       let k;
-      try { k = await kijkRonde(page, gehad); }
+      try { k = await kijkRonde(page, gehad, bereik); }
       catch (e) {
         /* Een tik kan navigeren, en dan is de context van de pagina weg op het
            moment dat de volgende ronde kijkt ("Execution context was
@@ -630,7 +673,7 @@ async function bedien(ctx, base, pad) {
            beschuldiging uitschrijft is erger dan geen instrument. */
         if (!/Execution context was destroyed|Target closed|Navigation|frame was detached/i.test(String(e.message || e))) throw e;
         instrument.push('de proef verloor de pagina door een navigatie en opende hem opnieuw');
-        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad); }
+        try { await openIngang(page, base, meet); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad, bereik); }
         catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
       }
       gevonden = Math.max(gevonden, k.zichtbaar || 0);
@@ -683,7 +726,7 @@ async function bedien(ctx, base, pad) {
         await page.waitForTimeout(250).catch(() => {});
       }
       if (page.url().replace(base, '').split('#')[0] !== pad) {
-        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { break; }
+        try { await openIngang(page, base, meet); await page.waitForTimeout(1500); } catch (e) { break; }
       }
     }
   } catch (e) {
@@ -767,9 +810,9 @@ async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
    meteen daarna: de knop stond dan nog op zijn oude plek, onder de balk. Zo
    meldde de meting op os-portaal.html vier "bedekte" tegels die na de animatie
    vrij lagen (0 van 45 meetpunten). `behavior: 'instant'` gaat boven de CSS. */
-async function bedektDoorSchil(page) {
+async function bedektDoorSchil(page, bereik) {
   try {
-    return await page.evaluate((SCHIL) => {
+    return await page.evaluate(({ SCHIL, bereik }) => {
       /* Een knop in een dichtgeklapte <details> ziet niemand: een regel die de
          inhoud van <details> een vaste display geeft, geeft hem toch een vak.
          Zo meldde deze meting op 18 oktober 2026 de standen van rtg.html als
@@ -779,7 +822,9 @@ async function bedektDoorSchil(page) {
         if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
         const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
       const uit = [];
-      const knoppen = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+      const wortel = bereik ? document.querySelector(bereik) : document;
+      if (!wortel) return [];
+      const knoppen = Array.from(wortel.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
         .filter(zie).filter((el) => !el.closest(SCHIL) && !el.closest('#rtg-lang-modal'));
       for (const el of knoppen) {
         el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
@@ -799,12 +844,12 @@ async function bedektDoorSchil(page) {
       }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       return uit;
-    }, GEDEELDE_SCHIL);
+    }, { SCHIL: GEDEELDE_SCHIL, bereik });
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad) {
-  return page.evaluate(({ alGehad, SCHIL }) => {
+async function kijkRonde(page, gehad, bereik) {
+  return page.evaluate(({ alGehad, SCHIL, bereik }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
@@ -814,7 +859,9 @@ async function kijkRonde(page, gehad) {
     /* De taalkeuze wordt niet aangetikt: een taal kiezen verandert de persona
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).
        Dat is een instelling, geen functie van het scherm onder de meting. */
-    const kandidaten = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+    const wortel = bereik ? document.querySelector(bereik) : document;
+    if (!wortel) return { klaar: true, zichtbaar: 0, schil: 0 };
+    const kandidaten = Array.from(wortel.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
       .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'))
       .filter((el) => !el.closest('#rtg-lang-modal'));
     /* DE SCHIL IS NIET DIT SCHERM. De Edge (.rtg-edge-chrome) en de toetsknop
@@ -845,7 +892,7 @@ async function kijkRonde(page, gehad) {
     nieuwe[0].setAttribute('data-appwerkt', '1');
     return { klaar: false, zichtbaar, schil, merk: merk(nieuwe[0]),
       tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
-  }, { alGehad: [...gehad], SCHIL: GEDEELDE_SCHIL });
+  }, { alGehad: [...gehad], SCHIL: GEDEELDE_SCHIL, bereik });
 }
 
 /* Een 503 die zichzelf uitlegt is CONFIG en geen DEFECT. Dit huis schrijft die
@@ -1051,7 +1098,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, weigerZin, rijen, meetIngang, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

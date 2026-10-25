@@ -37,6 +37,12 @@ function contractMetadata(naam, waarde) {
     assert.ok(['gezin', 'school:docent', 'school:leerling'].includes(waarde), 'onbekende bevoegdContext: ' + waarde);
     return true;
   }
+  if (naam === 'adapter') {
+    assert.equal(waarde && waarde.type, 'rahul-opdracht', 'alleen de bestaande Rahul-opdrachtadapter is toegestaan');
+    for (const veld of ['opdracht', 'verwacht', 'bereik', 'titel'])
+      assert.equal(typeof waarde[veld], 'string', 'adapter.' + veld + ' moet tekst zijn');
+    return true;
+  }
   return ['belofte', 'ingang', 'via', 'bestanden'].includes(naam);
 }
 

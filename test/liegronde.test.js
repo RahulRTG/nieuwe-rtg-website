@@ -76,11 +76,12 @@ test('4. een liegronde levert waarheidsgetrouw en niets anders', () => {
 
 test('de liegronde gebruikt ook een expliciete contractingang voor interne tabs', () => {
   assert.deepEqual(meetAdres({ functie: 'link:x', pad: '/apps/x.html' }),
-    { ingang: '/apps/x.html', pad: '/apps/x.html' });
+    { ingang: { pad: '/apps/x.html', bestemming: '/apps/x.html', via: null }, pad: '/apps/x.html' });
   assert.deepEqual(meetAdres({ functie: 'tab:assets', pad: null }),
-    { ingang: '/apps/app.html#tab=assets', pad: '/apps/app.html' });
-  assert.equal(meetAdres({ functie: 'os:werk', pad: null }), null,
-    'een natuurlijke-taalkeuze zonder declaratieve route wordt niet geraden');
+    { ingang: { pad: '/apps/app.html#tab=assets', bestemming: '/apps/app.html', via: '#tab=assets' }, pad: '/apps/app.html' });
+  const werk = meetAdres({ functie: 'os:werk', pad: null });
+  assert.equal(werk.pad, '/apps/app.html');
+  assert.equal(werk.ingang.adapter.opdracht, 'open werk', 'de expliciete adapter wordt doorgegeven; proza wordt niet geraden');
 });
 
 test('de Foundation-toegangspoort blijft echt zodat het scherm zelf wordt gemeten', () => {

@@ -97,6 +97,43 @@ async function post(url, lijf) {
   return r.json().catch(() => null);
 }
 
+async function postAls(url, lijf, token) {
+  const r = await fetch(url, { method: 'POST', headers: {
+    'Content-Type': 'application/json', Authorization: 'Bearer ' + token
+  }, body: JSON.stringify(lijf) });
+  return { status: r.status, data: await r.json().catch(() => null) };
+}
+
+/* Bellen en Snaps zijn geen lege dialoog: hun eigen bediening bestaat uit de
+   mensen met wie het lid verbonden is. Browserkwalificaties krijgen daarom
+   op verzoek EEN echte verbinding, langs dezelfde vind-, verzoek- en
+   aanvaardroutes als De Salon. Dit verandert geen standaardproefsessie en
+   verzint geen clientstaat; alleen de metingen die deze fixture nodig hebben
+   roepen hem aan. */
+async function verbindProeflid(basis, sessies) {
+  const eerste = sessies && sessies.lid && sessies.lid.waarde;
+  if (!eerste || typeof eerste !== 'string') return { ok: false, reden: 'geen ledensessie' };
+  const tweede = await ROLLEN.lid.haal(basis);
+  if (!tweede) return { ok: false, reden: 'tweede proeflid kon niet worden gemaakt' };
+  const [a, b] = await Promise.all([
+    postAls(basis + '/api/member/connections', {}, eerste),
+    postAls(basis + '/api/member/connections', {}, tweede)
+  ]);
+  const codenaam = b.data && (b.data.codename || (b.data.me && b.data.me.codename));
+  const sleutelA = a.data && (typeof a.data.me === 'string' ? a.data.me : a.data.me && a.data.me.key);
+  if (!codenaam || !sleutelA) return { ok: false, reden: 'proefleden kregen geen sociale identiteit' };
+  const vondst = await postAls(basis + '/api/member/find', { q: codenaam }, eerste);
+  const doel = ((vondst.data && vondst.data.results) || []).find((x) => x.codename === codenaam);
+  if (!doel || !doel.key) return { ok: false, reden: 'tweede proeflid was niet vindbaar' };
+  const verzoek = await postAls(basis + '/api/member/connect', { key: doel.key }, eerste);
+  if (verzoek.status >= 400) return { ok: false, reden: 'verbindingsverzoek gaf HTTP ' + verzoek.status };
+  const antwoord = await postAls(basis + '/api/member/connect/respond', { key: sleutelA, action: 'accept' }, tweede);
+  if (antwoord.status >= 400 || !antwoord.data || antwoord.data.status !== 'verbonden') {
+    return { ok: false, reden: 'verbinding aanvaarden gaf HTTP ' + antwoord.status };
+  }
+  return { ok: true, codenaam, token: tweede };
+}
+
 /* Haalt de gevraagde rollen op (standaard allemaal) tegen een draaiende
    server. Geeft { sessies, overgeslagen }: sessies is wat er in localStorage
    moet, overgeslagen zegt per mislukte rol waarom. */
@@ -125,4 +162,4 @@ function opslagVoor(sessies) {
   return uit;
 }
 
-module.exports = { ROLLEN, haalSessies, opslagVoor };
+module.exports = { ROLLEN, haalSessies, opslagVoor, verbindProeflid };

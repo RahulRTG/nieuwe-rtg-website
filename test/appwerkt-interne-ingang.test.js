@@ -19,3 +19,15 @@ test('een OS-kiezer met alleen bedieningsproza krijgt geen verzonnen URL', () =>
   assert.equal(meetIngang({ functie: 'os:a', pad: null }, contract), null);
   assert.equal(meetIngang({ functie: 'os:zonder-contract', pad: null }, contract), null);
 });
+
+test('een OS-kiezer wordt alleen meetbaar met een volledige expliciete bedieningsadapter', () => {
+  const adapter = { type: 'rahul-opdracht', opdracht: 'open A', verwacht: '#a.open', bereik: '#a.open', titel: 'A' };
+  const contract = { 'os:a': { ingang: '/apps/app.html', via: 'vraag Rahul om A', adapter } };
+  assert.deepEqual(meetIngang({ functie: 'os:a', pad: null }, contract), {
+    pad: '/apps/app.html', bestemming: '/apps/app.html', via: 'vraag Rahul om A', adapter
+  });
+  for (const ontbreekt of ['opdracht', 'verwacht', 'bereik', 'titel']) {
+    const stuk = { ...adapter }; delete stuk[ontbreekt];
+    assert.equal(meetIngang({ functie: 'os:a', pad: null }, { 'os:a': { ingang: '/apps/app.html', via: 'proza', adapter: stuk } }), null);
+  }
+});

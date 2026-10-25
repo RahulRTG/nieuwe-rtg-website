@@ -40,7 +40,7 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'LIEGRONDE.json');
-const { rijen, meetIngang, maakContext, POORTEN } = require('./appwerkt');
+const { rijen, meetIngang, maakContext, openIngang, POORTEN } = require('./appwerkt');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
 const { haalSchoolsessies } = require('./lib/schoolproefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
@@ -101,7 +101,7 @@ function oordeel(m) {
 function meetAdres(rij) {
   const meetbaar = meetIngang(rij);
   if (!meetbaar) return null;
-  return { ingang: meetbaar.pad, pad: meetbaar.bestemming };
+  return { ingang: meetbaar, pad: meetbaar.bestemming };
 }
 
 async function meetRij(rij, base, contexten) {
@@ -123,7 +123,7 @@ async function meetRij(rij, base, contexten) {
   });
   try {
     if (statisch) {
-      await page.goto(base + adres.ingang, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await openIngang(page, base, adres.ingang);
       await page.waitForTimeout(2500);
       m.landing = new URL(page.url()).pathname;
       m.deur = await page.evaluate((sel) => sel.find((s) => document.querySelector(s)) || null, POORTEN);

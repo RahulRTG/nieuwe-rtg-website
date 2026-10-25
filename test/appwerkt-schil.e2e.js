@@ -16,6 +16,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('http');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const { browserOpties, geenBrowser } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
@@ -61,5 +64,45 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     await ctx.close();
   } finally {
     await browser.close(); srv.close();
+  }
+});
+
+/* OS-apps hebben geen eigen URL. De meter moet daarom dezelfde zichtbare route
+   als een lid lopen (Edge -> Rahul -> opdracht), en daarna uitsluitend de
+   geopende kiezer tellen. Bellen en Snaps krijgen een echt verbonden
+   proefcontact; zonder contact zou een lege kiezer geen bediening bewijzen. */
+test('OS-apps openen via Rahul en APPWERKT meet uitsluitend hun kiezer',
+  { skip: geenBrowser(pw), timeout: 120000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies, opslagVoor, verbindProeflid } = require('../scripts/lib/proefsessies');
+  const { rijen, meetIngang, maakContext, bezoek } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-os-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies } = await haalSessies(base, ['lid']);
+    const contact = await verbindProeflid(base, sessies);
+    assert.equal(contact.ok, true, contact.reden);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await maakContext(browser, opslagVoor({ lid: sessies.lid }));
+    const perFunctie = new Map(rijen().map((r) => [r.functie, r]));
+    for (const functie of ['os:bellen', 'os:snaps', 'os:werk']) {
+      const meet = meetIngang(perFunctie.get(functie));
+      assert.equal(meet.adapter.type, 'rahul-opdracht', functie);
+      const gezien = await bezoek(ctx, base, meet);
+      assert.deepEqual(gezien.crash, [], functie + ': de zichtbare ingang opent niet');
+      assert.equal(gezien.poort, false, functie + ': de ingang bleef achter een poort');
+      const bediening = await require('../scripts/appwerkt').bedien(ctx, base, meet);
+      assert.ok(bediening.gevonden >= 1, functie + ': de geopende appstand heeft geen eigen bediening');
+      assert.ok(bediening.geklikt * 2 >= bediening.gevonden,
+        functie + ': minder dan de helft van de appbediening werkte (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+      assert.deepEqual(bediening.crash.concat(bediening.serverfout), [], functie + ': de appstand veroorzaakte fouten');
+      assert.equal(bediening.schil, 0, functie + ': gedeelde Edge-bediening lekte in het meetbereik');
+    }
+    await ctx.close();
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
   }
 });

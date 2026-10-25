@@ -69,6 +69,12 @@ const SPAAR = ['/api/auth/', '/api/login', '/api/office/login', '/api/supplier/l
      liegpoort vervangen. */
   '/api/rtf/toegang',
   '/api/config', '/api/i18n', '/api/talen', '/api/vertaal/', '/api/gids/app', '/api/push/key'].join(',');
+/* Een OS-kiezer heeft de echte accountstaat nodig om de bestaande Rahul-ingang
+   zichtbaar te maken. Alleen voor die drie expliciete adapters draait een
+   normale wegwerpserver en liegt Playwright daarna de functionele antwoorden
+   leeg. /api/state blijft dan uitsluitend de toegangsschil; /api/account/
+   wordt juist NIET breed gespaard, want de rollenlijst is de inhoud van Werk. */
+const ADAPTER_SPAAR = SPAAR.split(',').filter((p) => p !== '/api/account/').concat(['/api/state']).join(',');
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 4);
 const GRENS = 'alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt';
 
@@ -104,7 +110,7 @@ function meetAdres(rij) {
   return { ingang: meetbaar, pad: meetbaar.bestemming };
 }
 
-async function meetRij(rij, base, contexten) {
+async function meetRij(rij, base, contexten, opties = {}) {
   const uit = { functie: rij.functie, app: rij.app, ingang: rij.ingang, persona: rij.persona };
   const adres = meetAdres(rij);
   if (!adres) return Object.assign(uit, { status: 'NIET_GETEST', reden: 'geen meetbare contractingang: een stand of kiezer binnen de ledenapp' });
@@ -116,10 +122,18 @@ async function meetRij(rij, base, contexten) {
   const page = await ctx.newPage();
   const fouten = [];
   const gelogen = new Set();
+  const spaar = opties.clientLieg ? ADAPTER_SPAAR : SPAAR;
+  if (opties.clientLieg) {
+    await page.route('**/api/**', async (route) => {
+      const p = new URL(route.request().url()).pathname;
+      if (!magLiegen(p, LIEG, spaar)) return route.continue();
+      return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+    });
+  }
   page.on('pageerror', (e) => { if (!isBrowserruis(e)) fouten.push(String((e && e.message) || e)); });
   page.on('request', (req) => {
     const p = new URL(req.url()).pathname;
-    if (p.startsWith('/api/') && magLiegen(p, LIEG, SPAAR)) gelogen.add(req.method() + ' ' + p);
+    if (p.startsWith('/api/') && magLiegen(p, LIEG, spaar)) gelogen.add(req.method() + ' ' + p);
   });
   try {
     if (statisch) {
@@ -160,10 +174,14 @@ async function meet() {
   if (!pw) { console.error('Geen browser beschikbaar; deze ronde meet in een echte browser.'); process.exit(2); }
   const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-'));
+  const TMP_ADAPTER = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-os-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_LIEG: LIEG, RTG_LIEG_NIET: SPAAR } });
+  const adapterServer = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP_ADAPTER } });
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   try {
     const { sessies, overgeslagen } = await haalSessies(base);
+    const adapterSessies = await haalSessies(adapterServer.base, ['lid']);
+    overgeslagen.push(...adapterSessies.overgeslagen.map((o) => ({ rol: 'os-adapter:' + o.rol, reden: o.reden })));
     const school = await haalSchoolsessies(base, sessies);
     if (!school) overgeslagen.push({ rol: 'schoolproef', reden: 'de echte les- en leerlingensessies konden niet worden gemaakt' });
     const lijst = rijen();
@@ -172,15 +190,21 @@ async function meet() {
     await Promise.all(Array.from({ length: PAR }, async () => {
       const contexten = {};
       for (const rol of Object.keys(sessies)) contexten[rol] = await maakContext(browser, opslagVoor({ [rol]: sessies[rol] }));
+      const adapterContext = adapterSessies.sessies.lid
+        ? await maakContext(browser, opslagVoor({ lid: adapterSessies.sessies.lid })) : null;
       if (school) {
         contexten['link:rtfbord'] = await maakSchoolContext(browser, school.bord);
         contexten['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift);
       }
       while (true) {
         const i = n++; if (i >= lijst.length) break;
-        uit.push(await meetRij(lijst[i], base, contexten));
+        const heeftAdapter = !!meetIngang(lijst[i])?.adapter;
+        uit.push(heeftAdapter && adapterContext
+          ? await meetRij(lijst[i], adapterServer.base, { lid: adapterContext }, { clientLieg: true })
+          : await meetRij(lijst[i], base, contexten));
       }
       for (const c of Object.values(contexten)) await c.close();
+      if (adapterContext) await adapterContext.close();
     }));
     uit.sort((a, b) => a.functie.localeCompare(b.functie));
     const telling = {};
@@ -196,11 +220,13 @@ async function meet() {
   } finally {
     await browser.close();
     try { child.kill(); } catch (e) {}
+    try { adapterServer.child.kill(); } catch (e) {}
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+    try { fs.rmSync(TMP_ADAPTER, { recursive: true, force: true }); } catch (e) {}
   }
 }
 
-module.exports = { oordeel, isZekerheid, meetAdres, SPAAR, DOEL };
+module.exports = { oordeel, isZekerheid, meetAdres, SPAAR, ADAPTER_SPAAR, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

@@ -17,7 +17,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { oordeel, meetAdres, SPAAR } = require('../scripts/liegronde');
+const { oordeel, meetAdres, SPAAR, ADAPTER_SPAAR } = require('../scripts/liegronde');
 const B = require('../scripts/lib/bewijsbron');
 const { BRONSOORTEN, ALGEMEEN } = require('../scripts/lib/appcontract');
 
@@ -91,6 +91,13 @@ test('de Foundation-toegangspoort blijft echt zodat het scherm zelf wordt gemete
     '/api/foundation/les/maak', '/api/foundation/les/join']) {
     assert.ok(SPAAR.split(',').includes(pad), pad + ' moet echt blijven om een tijdelijke Schoolpas te kunnen maken');
   }
+});
+
+test('de OS-adapter spaart alleen zijn toegangsschil en liegt zijn eigen werk leeg', () => {
+  assert.ok(ADAPTER_SPAAR.split(',').includes('/api/state'), 'zonder echte accountstaat is Rahul niet zichtbaar');
+  assert.ok(!ADAPTER_SPAAR.split(',').includes('/api/account/'), 'de rollenlijst van Werk is inhoud en moet leeg worden beproefd');
+  assert.equal(SPAAR.split(',').includes('/api/state'), false,
+    'de uitzondering is uitsluitend voor OS-adapters en verzwakt de gewone schermronde niet');
 });
 
 test('5. het echte register spreekt zichzelf niet tegen', () => {

@@ -820,7 +820,13 @@ async function kijkRonde(page, gehad) {
        rijen NIET_GETEST, geen enkele boven de 14 tikken). De .rnd-toets staat
        bovendien met opzet buiten beeld tot hij focus krijgt; zijn "outside of
        the viewport" was de proef, niet het scherm. */
-    const SCHIL = '.rtg-edge-chrome, .rnd-toets';
+    /* Command/Spatial is net als Edge een gedeelde werkruimte rond het actieve
+       scherm. Op app.html staan #rtgCommand en #shell tegelijk in de DOM. De
+       18 Command-acties achter het actieve OS-blad werden daardoor als knoppen
+       van bijvoorbeeld Assets geteld en vervolgens terecht door #shell
+       onderschept. Command heeft eigen browsertoetsen; deze rij kwalificeert
+       alleen de actieve app. */
+    const SCHIL = '.rtg-edge-chrome, .rnd-toets, #rtgCommand';
     const alle = kandidaten.filter((el) => !el.closest(SCHIL));
     /* En een knop telt EEN keer: vier kaarten met "Bekijken" zijn een handeling,
        en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer

@@ -92,6 +92,23 @@ async function loop(w, stap) {
     return { klopt: havo.length >= 1 && vwo.length >= 1, ziet: 'havo-uitslag in ' + havo.map((p) => p.sleutel || p.tabel).join(',') + '; lopende vwo in ' + vwo.map((p) => p.sleutel || p.tabel).join(',') };
   });
 
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander lid ziet of beantwoordt de lopende training niet en begint bij zijn eigen eerste vraag', async () => {
+    const ander = await nieuwLid(w, 'sch-ander');
+    const B = ander.token;
+    const vreemdeVraag = await w.post(ANTWOORD, { antwoord: 'x', nr }, B);
+    const startB = await w.post(START, { fase: 'havo' }, B);
+    const antwoordB = await w.post(ANTWOORD, { antwoord: '1', nr: startB.data && startB.data.nr }, B);
+    const voorA = nr;
+    const antwoordA = await antwoord(T, 'eigen');
+    return {
+      klopt: vreemdeVraag.status === 400 && startB.status === 200 && startB.data.nr === 1 &&
+        antwoordB.status === 200 && antwoordB.data.nr === 2 && antwoordA.status === 200 && antwoordA.data.nr === voorA + 1,
+      ziet: 'vreemd antwoord ' + vreemdeVraag.status + '; B start/antwoord ' + startB.status + '/' + antwoordB.status +
+        ' bij vraag ' + (antwoordB.data && antwoordB.data.nr) + '; A gaat zelfstandig van ' + voorA + ' naar ' + (antwoordA.data && antwoordA.data.nr)
+    };
+  });
+
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'dubbeltik op "antwoord": een vraag verder, niet twee, en de tweede tik hoort waar de leerling is', async () => {
     const voor = nr;

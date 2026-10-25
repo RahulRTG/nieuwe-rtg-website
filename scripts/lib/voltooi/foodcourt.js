@@ -14,6 +14,7 @@
    ========================================================================== */
 'use strict';
 const { nieuwLid, inloggen, KANTOORWERELD } = require('../voltooiwereld');
+const tijdzone = require('../../../server/kern/tijdzone');
 
 const OVERZICHT = '/api/foodcourt';
 const TIJDEN = '/api/foodcourt/tijden';
@@ -22,7 +23,7 @@ const MIJN = '/api/reserveringen/mijn';
 const ANNULEER = '/api/reservering/annuleer';
 const ZAAK_BESLIS = '/api/supplier/reservering/beslis';
 
-const dag = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const dag = (n) => tijdzone.plusDagen(tijdzone.huis().datum, n);
 const geen5xx = (r) => r && r.status > 0 && r.status < 500;
 
 async function zaakSessie(w, code) {
@@ -95,6 +96,31 @@ async function loop(w, stap) {
   await stap('persistent', 'de reservering staat in de opslag zelf', async () => {
     const plek = w.vindInOpslag(res.id);
     return { klopt: plek.length >= 1, ziet: 'reservering in ' + plek.map((p) => p.bestand + '/' + (p.sleutel || p.tabel)).join(', ') };
+  });
+
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander lid ziet of annuleert deze reservering niet en kan wel een eigen tafel aanvragen', async () => {
+    const ander = await nieuwLid(w, 'fco-ander');
+    const B = ander.token;
+    const voorB = await mijn(B);
+    const aanval = await w.post(ANNULEER, { id: res.id }, B);
+    const vrijeDag = dag(6);
+    const tijdenB = await w.post(TIJDEN, { code: zaak.code, datum: vrijeDag, personen: 2 }, B);
+    const slotB = ((tijdenB.data && tijdenB.data.slots) || []).find((s) => !s.vol);
+    const eigenB = await w.post(RESERVEER, { supplierCode: zaak.code, datum: vrijeDag, tijd: slotB && slotB.tijd, personen: 2 }, B);
+    const naA = await mijn();
+    const naB = await mijn(B);
+    const aBehoudtEigen = naA.some((x) => x.id === res.id && x.status === 'bevestigd');
+    const bZietA = voorB.concat(naB).some((x) => x.id === res.id);
+    const idB = eigenB.data && eigenB.data.reservering && eigenB.data.reservering.id;
+    const bZietEigen = naB.some((x) => x.id === idB);
+    const aZietB = naA.some((x) => x.id === idB);
+    return {
+      klopt: geen5xx(aanval) && tijdenB.status === 200 && !!slotB && eigenB.status === 200 &&
+        aBehoudtEigen && !bZietA && bZietEigen && !aZietB,
+      ziet: 'vreemd annuleren ' + aanval.status + '; A behoudt eigen=' + aBehoudtEigen +
+        ', B ziet A=' + bZietA + ', B houdt eigen=' + bZietEigen + ', A ziet B=' + aZietB
+    };
   });
 
   /* ---------------- herstelbaar ---------------- */

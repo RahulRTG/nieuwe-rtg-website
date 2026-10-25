@@ -50,10 +50,20 @@ const STANDWISSEL = '<!doctype html><html><body><main id="vlak">' +
   Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="document.querySelector(\'main\').innerHTML=\'<p>Stand ' + i + '</p>\';window.gedaan=' + (i + 1) + '">Stand ' + i + '</button>').join('') +
   '</main></body></html>';
 
+/* De eerste bediening laat bewust een niet-sluitende laag achter. De overige
+   knoppen zijn op de schone ingang wel bereikbaar. Dit onderscheidt een door
+   de meetvolgorde veroorzaakte blokkade van een echte overlap in het product. */
+const ACHTERGEBLEVEN_LAAG = '<!doctype html><html><body><main>' +
+  '<button type="button" onclick="document.body.insertAdjacentHTML(\'beforeend\',\'<div id=&quot;achtergebleven&quot; style=&quot;position:fixed;inset:0;z-index:99;background:#fff&quot;></div>\')">Open laag</button>' +
+  Array.from({ length: 5 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1">Actie ' + i + '</button>').join('') +
+  '</main></body></html>';
+
 test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', { skip: geenBrowser(pw) }, async () => {
   const { bedien } = require('../scripts/appwerkt');
   const srv = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html');
-    res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT : (req.url.startsWith('/apps/standwissel') ? STANDWISSEL : SCHERM)); });
+    res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT :
+      (req.url.startsWith('/apps/standwissel') ? STANDWISSEL :
+        (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG : SCHERM))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -76,6 +86,12 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(s.geklikt, 6, 'iedere handeling is na een schone heropening werkelijk aangetikt');
     assert.ok(s.instrument.some((x) => /oorspronkelijke stand/.test(x)), 'de meting verantwoordt haar heropeningen');
     assert.deepEqual(s.crash.concat(s.serverfout), [], 'de standwissels bleven zonder browser- of serverfout');
+
+    const a = await bedien(ctx, base, '/apps/achtergebleven.html');
+    assert.equal(a.gevonden, 6, 'de schone ingang bevat zes eigen handelingen');
+    assert.equal(a.geklikt, 6, 'een achtergebleven laag blokkeert de overige tegenproeven niet');
+    assert.deepEqual(a.nietKlikbaar, [], 'een uitsluitend door de vorige proefstand geblokkeerde knop is opnieuw getoetst');
+    assert.ok(a.instrument.some((x) => /schone ingang/.test(x)), 'de herhaalde tegenproef is verantwoord');
     await ctx.close();
   } finally {
     await browser.close(); srv.close();

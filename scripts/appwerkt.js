@@ -654,6 +654,7 @@ async function bedien(ctx, base, ingang) {
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
   let heropeningen = 0, laatsteHeropenStand = -1;
+  const opnieuwGeprobeerd = new Set();
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -746,6 +747,31 @@ async function bedien(ctx, base, ingang) {
            onder een balk is iets anders dan een knop die er niet is. */
         const log = String(e.message || e);
         const waarom = klikReden(log);
+        /* Een eerdere geslaagde bediening kan een laag achterlaten die niet met
+           Escape sluit. De volgende, op zichzelf geldige knop wordt dan door
+           die PROEFSTAND onderschept. Toets zo'n knop eenmaal opnieuw vanaf de
+           gedeclareerde, schone ingang. Pas wanneer dezelfde bediening daar
+           opnieuw niet bereikbaar is, telt zij als werkelijk niet klikbaar.
+
+           `gehad.delete()` is hier essentieel: kijkRonde selecteert op de
+           stabiele handtekening van de bediening. De Set begrenst dit tot een
+           enkele tegenproef per knop, zodat een echte overlap nooit in een
+           heropeningslus verdwijnt. */
+        const opnieuwVanafSchoon = /intercepts pointer events|element is outside of the viewport/i.test(waarom) &&
+          !opnieuwGeprobeerd.has(k.merk);
+        if (opnieuwVanafSchoon) {
+          opnieuwGeprobeerd.add(k.merk);
+          gehad.delete(k.merk);
+          try {
+            await openIngang(page, base, meet);
+            await page.waitForTimeout(1200);
+            instrument.push('de proef toetste een door de vorige stand geblokkeerde bediening opnieuw vanaf de schone ingang');
+            continue;
+          } catch (x) {
+            gehad.add(k.merk);
+            instrument.push('schoon hertesten van de geblokkeerde bediening lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80));
+          }
+        }
         nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
         /* WIE ligt erover. "intercepts pointer events" alleen zegt niet of het
            een lade is die een mens eerst dichttikt of een balk die de knop

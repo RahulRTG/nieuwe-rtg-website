@@ -5870,7 +5870,6 @@
       "server/routes/supplier/horeca/rahul-doen.js",
       "server/routes/supplier/horeca/rahul.js",
       "server/routes/supplier/kamers/huishouding.js",
-      "server/routes/supplier/kassa/afrekenen.js",
       "server/routes/supplier/ketenchat.js",
       "server/routes/supplier/keuken.js",
       "server/routes/supplier/moedertaal.js",
@@ -9075,7 +9074,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/service.js"
         ],
@@ -9083,7 +9082,8 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
-          "public/apps/rtg.html"
+          "public/apps/rtg.html",
+          "public/apps/service-bel.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -9372,7 +9372,7 @@
         "declaredMutationSemantics": 35,
         "sourceFileCount": 3,
         "kernelDependencyCount": 0,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/bureau-lus.js",
           "server/routes/member/bureau.js",
@@ -9382,6 +9382,7 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/concierge.html",
           "public/apps/lifestyle.html",
           "public/apps/living-os.html"
         ],
@@ -15802,7 +15803,7 @@
         "declaredMutationSemantics": 326,
         "sourceFileCount": 205,
         "kernelDependencyCount": 2732,
-        "screenCount": 42,
+        "screenCount": 40,
         "sourceFiles": [
           "server/routes/agenda.js",
           "server/routes/alpine.js",
@@ -15863,7 +15864,7 @@
           "public/apps/horeca-pda.html",
           "public/apps/horeca.html"
         ],
-        "screensOmitted": 30,
+        "screensOmitted": 28,
         "signals": [
           "decision",
           "feedback",
@@ -26311,7 +26312,7 @@
         "declaredMutationSemantics": 6,
         "sourceFileCount": 6,
         "kernelDependencyCount": 10,
-        "screenCount": 3,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/auth/account.js",
           "server/routes/auth/herstel.js",
@@ -26337,6 +26338,7 @@
         "screens": [
           "public/apps/passkeys.html",
           "public/apps/personeel.html",
+          "public/apps/reisuitnodiging.html",
           "public/apps/rtg.html"
         ],
         "screensOmitted": 0,
@@ -27168,7 +27170,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
         "kernelDependencyCount": 142,
-        "screenCount": 3,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/ik-workspace-rechten.js",
           "server/routes/ik.js",
@@ -27206,7 +27208,8 @@
         "screens": [
           "public/apps/app.html",
           "public/apps/geld.html",
-          "public/apps/ik.html"
+          "public/apps/ik.html",
+          "public/apps/reizen.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -28314,7 +28317,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 1,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/gids.js"
         ],
@@ -28322,6 +28325,8 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/hangar.html",
+          "public/apps/reisboek.html",
           "public/apps/rtg.html"
         ],
         "screensOmitted": 0,
@@ -28735,7 +28740,7 @@
         "declaredMutationSemantics": 23,
         "sourceFileCount": 2,
         "kernelDependencyCount": 0,
-        "screenCount": 4,
+        "screenCount": 5,
         "sourceFiles": [
           "server/routes/reis-opgave.js",
           "server/routes/reis.js"
@@ -28747,6 +28752,7 @@
           "public/apps/living-os.html",
           "public/apps/reisboek.html",
           "public/apps/reisbureau.html",
+          "public/apps/reisuitnodiging.html",
           "public/apps/reizen.html"
         ],
         "screensOmitted": 0,

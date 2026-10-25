@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3003 bestanden en 20318 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3003 bestanden en 20319 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3003 |
-| losse beweringen (`test(...)`) | 20318 |
+| losse beweringen (`test(...)`) | 20319 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 414 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2815 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2622 bestanden, 19609 beweringen.
+2622 bestanden, 19610 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -496,7 +496,7 @@ toets omvalt.
 | `context-lijn.test.js` | 5 | gezakt op `liegpoort /api/` | De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met het aantal aangemelde koks). |
 | `contextbrug-model.test.js` | 8 | gezakt op `liegpoort /api/` | DE CONTEXT BRIDGE OP EEN ECHTE SERVER -- wat het model werkelijk ontvangt (EDGE.md par. 14.4). |
 | `contextbrug.test.js` | 12 | gezakt op `voorwaarde-omkeren#0` | DE CONTEXT BRIDGE -- wat Rahul van het scherm krijgt, en wat niet (EDGE.md par. 14.4). |
-| `contextdoorgifte-server.test.js` | 1 | gezakt op `===->!==#0` | DE SERVERHELFT VAN DE CONTEXTDOORGIFTE -- een echte server, een deelronde. scripts/contextdoorgifte.js start een wegwerpserver met de peiling als preload, rijdt de eerste routes en vergelijkt I1, I3, I4 en I10 met de... |
+| `contextdoorgifte-server.test.js` | 2 | gezakt op `===->!==#0` | DE SERVERHELFT VAN DE CONTEXTDOORGIFTE -- een echte server, een deelronde. scripts/contextdoorgifte.js start een wegwerpserver met de peiling als preload, rijdt de eerste routes en vergelijkt I1, I3, I4 en I10 met de... |
 | `contextdoorgifte.test.js` | 4 | gezakt op `===->!==#0` | DE CONTEXTDOORGIFTE MAG ALLEEN DE GOEDE KANT OP (scripts/contextdoorgifte.js, CONTEXTDOORGIFTE.json). Twaalf invarianten uit het Fase 2-onderzoek naar een verzoekframe. |
 | `contextpakket.test.js` | 12 | gezakt op `===->!==#0` | DE CONTEXTSAMENSTELLER -- nooit stil afkappen. Een eigen modelserver kapt stil af wat niet in zijn venster past, vanaf het begin, en daar staat de grondwet. |
 | `contextspoor.test.js` | 3 | geen module gevonden | HET CONTEXTSPOOR STAAT UIT, EN ZWIJGT ALS HET AAN STAAT. Deze meting hangt in een HEET PAD: de domeingrens-Proxy waar elke toegang tot het contextobject langskomt, dus tienduizenden keren per opstart en opnieuw bij... |

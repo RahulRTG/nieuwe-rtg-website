@@ -839,6 +839,16 @@
       "stand": "blijft",
       "eigenaar": null,
       "reden": "De gedeelde paden zijn de generieke kantoorschil (het /api/office/-voorvoegsel van de api-helper en de kantoorstroom); kantoren beheert vestigingen, de Stadsdoos is een veldapparaat dat zich aanmeldt en een hartslag stuurt."
+    },
+    {
+      "schermen": [
+        "apps/memo.html",
+        "apps/reizen.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": "apps/bestanden.html",
+      "reden": "Memo bewaart spraakopnamen in de Bestanden-kluis; Reizen gebruikt dezelfde opslag voor bewijsstukken in het reisdossier. De gedeelde bestandspaden zijn opslagvermogen, geen tweede implementatie van de reis- of opnamefunctie."
     }
   ],
   "schermen": {

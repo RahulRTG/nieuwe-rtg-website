@@ -654,6 +654,12 @@ async function bedien(ctx, base, ingang) {
   const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
+  const gevondenMerken = new Set();
+  const telStand = (stand) => {
+    for (const merk of (stand && stand.merken) || []) gevondenMerken.add(merk);
+    gevonden = gevondenMerken.size;
+    schil = Math.max(schil, (stand && stand.schil) || 0);
+  };
   let heropeningen = 0, laatsteHeropenStand = -1;
   const opnieuwGeprobeerd = new Set();
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
@@ -670,6 +676,21 @@ async function bedien(ctx, base, ingang) {
     await page.waitForTimeout(400);
     luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
     if (meet.adapter) await voerIngangAdapterUit(page, meet);
+    /* Een interne module tekent haar inhoud vaak pas na meerdere API-antwoorden.
+       De vaste algemene laadpauze was onder parallelle belasting soms eerder
+       voorbij dan bijvoorbeeld Zorg, waardoor dezelfde bronstand wisselde
+       tussen 0 en 28 zichtbare moduleknoppen. Wacht bij een expliciet bereik
+       op ten minste een eigen zichtbare bediening; een werkelijk lege module
+       blijft na de begrensde wacht eerlijk op nul staan. */
+    if (bereik) await page.waitForFunction((selector) => {
+      const root = document.querySelector(selector);
+      if (!root) return false;
+      return [...root.querySelectorAll('button,[role=button],[data-tab],[data-stand]')].some((el) => {
+        if (el.hidden || el.disabled || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 1 && r.height > 1 && getComputedStyle(el).visibility !== 'hidden';
+      });
+    }, bereik, { timeout: 8000 }).catch(() => {});
     bedekt.push(...await bedektDoorSchil(page, bereik));
     /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een
        andere taal dan nl na een tik, met de knop erbij. */
@@ -694,8 +715,7 @@ async function bedien(ctx, base, ingang) {
         try { await openIngang(page, base, meet); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad, bereik); }
         catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
       }
-      gevonden = Math.max(gevonden, k.zichtbaar || 0);
-      schil = Math.max(schil, k.schil || 0);
+      telStand(k);
       if (k.klaar) {
         /* Een echte bediening kan het hele scherm van stand laten wisselen.
            De meter had dan bijvoorbeeld 49 knoppen GEZIEN, tikte een tab aan,
@@ -752,10 +772,7 @@ async function bedien(ctx, base, ingang) {
            begrenzen; de bewijsdrempel wordt niet verlaagd. */
         let vervolg = null;
         try { vervolg = await kijkRonde(page, gehad, bereik); } catch (e) { vervolg = null; }
-        if (vervolg) {
-          gevonden = Math.max(gevonden, vervolg.zichtbaar || 0);
-          schil = Math.max(schil, vervolg.schil || 0);
-        }
+        if (vervolg) telStand(vervolg);
         if (!vervolg || vervolg.klaar) {
           await page.keyboard.press('Escape').catch(() => {});
           await page.waitForTimeout(250);
@@ -957,8 +974,16 @@ async function kijkRonde(page, gehad, bereik) {
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).
        Dat is een instelling, geen functie van het scherm onder de meting. */
     const wortel = bereik ? document.querySelector(bereik) : document;
-    if (!wortel) return { klaar: true, zichtbaar: 0, schil: 0 };
-    const kandidaten = Array.from(wortel.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+    if (!wortel) return { klaar: true, zichtbaar: 0, merken: [], schil: 0 };
+    /* Een open modale dialoog maakt de achtergrond tijdelijk onbedienbaar,
+       ook al geeft offsetParent daar nog maten voor terug. Meet in die stand
+       uitsluitend de top-layer dialoog. Zonder dit onderscheid telde de
+       meter zowel paneel als achtergrond in dezelfde noemer en maakte hij
+       zijn eigen bewijsgrens onhaalbaar. */
+    const modaal = [...document.querySelectorAll('dialog[open], [role="dialog"][aria-modal="true"]')]
+      .find((el) => zie(el) && wortel.contains(el));
+    const actiefWortel = modaal || wortel;
+    const kandidaten = Array.from(actiefWortel.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
       .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'))
       .filter((el) => !el.closest('#rtg-lang-modal'));
     /* DE SCHIL IS NIET DIT SCHERM. De Edge (.rtg-edge-chrome) en de toetsknop
@@ -981,7 +1006,8 @@ async function kijkRonde(page, gehad, bereik) {
     /* En een knop telt EEN keer: vier kaarten met "Bekijken" zijn een handeling,
        en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer
        stonden ze vier keer. */
-    const zichtbaar = new Set(alle.map(merk)).size;
+    const merken = [...new Set(alle.map(merk))];
+    const zichtbaar = merken.length;
     const schil = kandidaten.length - alle.length;
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
     /* In een app-eigen dialoog staat de sluitknop vaak als eerste in de DOM.
@@ -993,9 +1019,9 @@ async function kijkRonde(page, gehad, bereik) {
       (el.getAttribute('aria-label') || el.innerText || el.title || '').trim());
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)))
       .sort((a, b) => Number(sluiter(a)) - Number(sluiter(b)));
-    if (!nieuwe.length) return { klaar: true, zichtbaar, schil };
+    if (!nieuwe.length) return { klaar: true, zichtbaar, merken, schil };
     nieuwe[0].setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar, schil, merk: merk(nieuwe[0]),
+    return { klaar: false, zichtbaar, merken, schil, merk: merk(nieuwe[0]),
       tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
   }, { alGehad: [...gehad], SCHIL: GEDEELDE_SCHIL, bereik });
 }

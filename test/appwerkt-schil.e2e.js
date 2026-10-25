@@ -111,7 +111,7 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.ok(a.instrument.some((x) => /schone ingang/.test(x)), 'de herhaalde tegenproef is verantwoord');
 
     const v = await bedien(ctx, base, '/apps/vervolg.html');
-    assert.equal(v.gevonden, 8, 'de opener, sluitroute en zes app-eigen dialoogacties zijn zichtbaar gemeten');
+    assert.equal(v.gevonden, 8, 'de opener, sluitroute en zes app-eigen dialoogacties zijn over alle standen uniek gemeten');
     assert.equal(v.geklikt, 8, 'de sluitroute en alle zeven unieke handelingen zijn werkelijk aangetikt');
     assert.deepEqual(v.nietKlikbaar, [], 'de dialooginhoud bleef bereikbaar');
 

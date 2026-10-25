@@ -42,9 +42,18 @@ const BEDEKT = '<!doctype html><html><body><main><p>x</p></main>' +
   '<button type="button" style="width:200px">Onder de balk</button><button type="button" style="width:200px">Half vrij</button></nav>' +
   '<div class="rtg-edge-chrome" style="position:fixed;bottom:0;left:0;width:300px;height:80px;z-index:9;background:#000"></div></body></html>';
 
+/* Elke knop vervangt de hele stand. Een meter die na de eerste tik alleen de
+   nieuwe stand bekijkt, rapporteert 1/6 terwijl alle zes knoppen afzonderlijk
+   gewoon werken. Heropenen moet de oorspronkelijke stand terugbrengen zonder
+   een klik administratief als geslaagd te tellen. */
+const STANDWISSEL = '<!doctype html><html><body><main id="vlak">' +
+  Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="document.querySelector(\'main\').innerHTML=\'<p>Stand ' + i + '</p>\';window.gedaan=' + (i + 1) + '">Stand ' + i + '</button>').join('') +
+  '</main></body></html>';
+
 test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', { skip: geenBrowser(pw) }, async () => {
   const { bedien } = require('../scripts/appwerkt');
-  const srv = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html'); res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT : SCHERM); });
+  const srv = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html');
+    res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT : (req.url.startsWith('/apps/standwissel') ? STANDWISSEL : SCHERM)); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -61,6 +70,12 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     const d = await bedien(ctx, base, '/apps/bedekt.html');
     assert.equal(d.bedekt.length, 1, 'de tab onder de balk is bedekt: ' + JSON.stringify(d.bedekt));
     assert.match(d.bedekt[0], /^Onder de balk onder div\.rtg-edge-chrome/);
+
+    const s = await bedien(ctx, base, '/apps/standwissel.html');
+    assert.equal(s.gevonden, 6, 'de oorspronkelijke stand bevat zes eigen handelingen');
+    assert.equal(s.geklikt, 6, 'iedere handeling is na een schone heropening werkelijk aangetikt');
+    assert.ok(s.instrument.some((x) => /oorspronkelijke stand/.test(x)), 'de meting verantwoordt haar heropeningen');
+    assert.deepEqual(s.crash.concat(s.serverfout), [], 'de standwissels bleven zonder browser- of serverfout');
     await ctx.close();
   } finally {
     await browser.close(); srv.close();

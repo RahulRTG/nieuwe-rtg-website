@@ -653,6 +653,7 @@ async function bedien(ctx, base, ingang) {
   const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
+  let heropeningen = 0, laatsteHeropenStand = -1;
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -693,7 +694,34 @@ async function bedien(ctx, base, ingang) {
       }
       gevonden = Math.max(gevonden, k.zichtbaar || 0);
       schil = Math.max(schil, k.schil || 0);
-      if (k.klaar) break;
+      if (k.klaar) {
+        /* Een echte bediening kan het hele scherm van stand laten wisselen.
+           De meter had dan bijvoorbeeld 49 knoppen GEZIEN, tikte een tab aan,
+           zag in de nieuwe stand alleen de al aangetikte tab terug en stopte
+           op 12/49. De overige 37 waren niet onbereikbaar: de proef had ze
+           zelf uit beeld geschakeld.
+
+           Open daarom de gedeclareerde ingang opnieuw zolang een schone
+           beginstand nog eerder geziene maar niet aangetikte bediening kan
+           bevatten. `laatsteHeropenStand` voorkomt een lus als die resterende
+           bediening alleen via een al beproefde tussenstand bereikbaar is;
+           MAXKLIK begrenst zowel tikken als herstelpogingen. Dit verlaagt de
+           bewijsgrens niet: elke extra knop wordt nog steeds echt aangetikt en
+           op browser- en serverfouten beoordeeld. */
+        if (gehad.size < gevonden && heropeningen < MAXKLIK && laatsteHeropenStand !== gehad.size) {
+          laatsteHeropenStand = gehad.size;
+          heropeningen++;
+          try {
+            await openIngang(page, base, meet);
+            await page.waitForTimeout(1200);
+            instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
+            continue;
+          } catch (e) {
+            instrument.push('heropenen van de oorspronkelijke stand lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80));
+          }
+        }
+        break;
+      }
       gehad.add(k.merk);
       if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
       laatste = k.tekst || '(naamloos)';

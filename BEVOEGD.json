@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-25T13:21:18.997Z",
-    "commit": "bcc96cfbc0",
+    "op": "2026-10-25T16:52:04.291Z",
+    "commit": "3fc6ebf566",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/bevoegdronde.js",
-    "node": "v24.18.0"
+    "node": "v26.12.1"
   },
   "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode, en expliciet gemarkeerde vreemde-actorproeven uit de volledige appscenario's. Een concreet lek uit een bron blokkeert altijd. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.",
   "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist.",
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/MEZ38W/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/ZAP3XS/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1170,7 +1170,7 @@
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 3,
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden)"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, gescheiden)"
     },
     {
       "functie": "link:wallet",

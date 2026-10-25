@@ -156,6 +156,14 @@ const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slic
    met de telling erbij. */
 const MAXKLIK = 40;
 
+/* Gedeelde bediening bewijst het scherm niet. Naast de generieke Edge en
+   Command hebben gemigreerde Design-Systemschermen hun eigen .ds-edge en
+   opent [data-ds-zoek] dezelfde globale sprong als .rtgsprong-greep. Als de
+   appmeter die eerst aantikt, blijft de sprong over de app liggen en lijken
+   alle volgende appknoppen onbereikbaar. Deze oppervlakken hebben eigen
+   browsercontracten; APPWERKT telt en bedient uitsluitend het actieve scherm. */
+const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], .rtgsprong, .rtgsprong-greep';
+
 /* Knoppen die iets doen wat je niet wilt uitlokken op een proefserver met een
    echte sessie. Ze worden NIET stil overgeslagen: elke rij noemt ze bij naam,
    zodat zichtbaar blijft welk deel van de bediening ongemeten is. Dit is de
@@ -761,8 +769,7 @@ async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
    vrij lagen (0 van 45 meetpunten). `behavior: 'instant'` gaat boven de CSS. */
 async function bedektDoorSchil(page) {
   try {
-    return await page.evaluate(() => {
-      const SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal';
+    return await page.evaluate((SCHIL) => {
       /* Een knop in een dichtgeklapte <details> ziet niemand: een regel die de
          inhoud van <details> een vaste display geeft, geeft hem toch een vak.
          Zo meldde deze meting op 18 oktober 2026 de standen van rtg.html als
@@ -792,12 +799,12 @@ async function bedektDoorSchil(page) {
       }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       return uit;
-    });
+    }, GEDEELDE_SCHIL);
   } catch (e) { return []; }
 }
 
 async function kijkRonde(page, gehad) {
-  return page.evaluate((alGehad) => {
+  return page.evaluate(({ alGehad, SCHIL }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
@@ -826,7 +833,6 @@ async function kijkRonde(page, gehad) {
        van bijvoorbeeld Assets geteld en vervolgens terecht door #shell
        onderschept. Command heeft eigen browsertoetsen; deze rij kwalificeert
        alleen de actieve app. */
-    const SCHIL = '.rtg-edge-chrome, .rnd-toets, #rtgCommand';
     const alle = kandidaten.filter((el) => !el.closest(SCHIL));
     /* En een knop telt EEN keer: vier kaarten met "Bekijken" zijn een handeling,
        en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer
@@ -839,7 +845,7 @@ async function kijkRonde(page, gehad) {
     nieuwe[0].setAttribute('data-appwerkt', '1');
     return { klaar: false, zichtbaar, schil, merk: merk(nieuwe[0]),
       tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
-  }, [...gehad]);
+  }, { alGehad: [...gehad], SCHIL: GEDEELDE_SCHIL });
 }
 
 /* Een 503 die zichzelf uitlegt is CONFIG en geen DEFECT. Dit huis schrijft die

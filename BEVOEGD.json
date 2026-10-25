@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-25T02:07:02.462Z",
-    "commit": "0f97703b11",
+    "op": "2026-10-25T07:41:56.929Z",
+    "commit": "84b49a9cf8",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -14,10 +14,10 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "01fe026d14d39f6e3624ab55d20699d466e16b8ea6281b46fcbb61413d9f99f7",
+        "sha256": "c60024a0dabfc46053f7419874cae3c683f9e29fe410729422ce9b6a725eb9de",
         "stempel": {
-          "op": "2026-10-23T23:32:12.054Z",
-          "commit": "570eb43621",
+          "op": "2026-10-25T06:59:14.325Z",
+          "commit": "54ec1f664a",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/idorproef.js",
@@ -26,10 +26,10 @@
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "aa9f04f567083317aca81933d092084076b525cac8cc72c538ec2c191d22fb47",
+        "sha256": "c17dcffd3cc83bd2e2c3191a0743233d661330024208dc3680bb5347627703fe",
         "stempel": {
-          "op": "2026-10-23T23:37:23.927Z",
-          "commit": "aa373171e4",
+          "op": "2026-10-25T07:22:29.262Z",
+          "commit": "3c8749c5a9",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/rolproef-route.js",
@@ -38,10 +38,10 @@
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "d4b234cd5a8704af1ef52dbc654364b1e98d10b5bc89c11e71558a0e08ba6435",
+        "sha256": "9343b52e0a72a43817ef9d4ed356484c5f9f7ac8e42fa8fe3bee08da44c5b1af",
         "stempel": {
-          "op": "2026-10-25T00:22:42.286Z",
-          "commit": "aa5a00016b",
+          "op": "2026-10-25T07:23:30.659Z",
+          "commit": "b412ab31ba",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -292,7 +292,7 @@
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 5 van de 7 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 5 van de 7 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: openingstijden van een restaurant zijn publiek; deze smalle duiding is geen ruwe proef van afscherming"
     },
     {
       "functie": "link:foundationzorg",
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/8ZAAJT/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/23P6TE/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,

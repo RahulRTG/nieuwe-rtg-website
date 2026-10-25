@@ -234,7 +234,8 @@ function meetIngang(rij, contract = CONTRACT) {
   if (rij && rij.pad) return { pad: rij.pad, bestemming: rij.pad, via: null };
   const c = rij && contract && contract[rij.functie];
   if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') || typeof c.via !== 'string') return null;
-  if (c.via.startsWith('#')) return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via };
+  if (c.via.startsWith('#')) return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via,
+    ...(typeof c.bereik === 'string' && c.bereik ? { bereik: c.bereik } : {}) };
   const a = c.adapter;
   if (!a || a.type !== 'rahul-opdracht' || !a.opdracht || !a.verwacht || !a.bereik || !a.titel) return null;
   return { pad: c.ingang, bestemming: c.ingang, via: c.via, adapter: { ...a } };
@@ -648,7 +649,7 @@ function onderschepper(log) {
 async function bedien(ctx, base, ingang) {
   const meet = ingangOpties(ingang);
   const pad = meet.pad;
-  const bereik = meet.adapter && meet.adapter.bereik;
+  const bereik = meet.bereik || (meet.adapter && meet.adapter.bereik);
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
   let laatste = null;
@@ -738,8 +739,27 @@ async function bedien(ctx, base, ingang) {
            allemaal onder zo'n gedeelde laag). Escape is de gewone weg dicht; wat
            daarna nog over een knop ligt, sluit niet met Escape of bedekt hem
            echt -- en dat is wel een bevinding. */
-        await page.keyboard.press('Escape').catch(() => {});
-        await page.waitForTimeout(250);
+        /* Een app-eigen opener kan een dialoog, blad of vervolgstand tonen met
+           de bediening die de gebruiker werkelijk nodig heeft. Meteen Escape
+           sturen sloot die inhoud voordat de volgende meetronde haar ooit kon
+           zien (Instellingen: 7/19 ondanks vijf goed werkende panelen).
+
+           Kijk daarom eerst of de tik nieuwe, nog niet beproefde bediening
+           zichtbaar maakte. Zolang die er is blijft de stand open en loopt de
+           volgende ronde er echt doorheen. Alleen een eindstand zonder nieuwe
+           bediening sluiten we met de gewone Escape-route. De bestaande
+           schone-tegenproef blijft een achtergebleven, niet-sluitende laag
+           begrenzen; de bewijsdrempel wordt niet verlaagd. */
+        let vervolg = null;
+        try { vervolg = await kijkRonde(page, gehad, bereik); } catch (e) { vervolg = null; }
+        if (vervolg) {
+          gevonden = Math.max(gevonden, vervolg.zichtbaar || 0);
+          schil = Math.max(schil, vervolg.schil || 0);
+        }
+        if (!vervolg || vervolg.klaar) {
+          await page.keyboard.press('Escape').catch(() => {});
+          await page.waitForTimeout(250);
+        }
       } catch (e) {
         /* De reden van een time-out staat in de LOG van Playwright ("intercepts
            pointer events", "element is not visible"), niet in de boodschap.
@@ -964,7 +984,15 @@ async function kijkRonde(page, gehad, bereik) {
     const zichtbaar = new Set(alle.map(merk)).size;
     const schil = kandidaten.length - alle.length;
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
-    const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
+    /* In een app-eigen dialoog staat de sluitknop vaak als eerste in de DOM.
+       Die als eerste aantikken maakt alle inhoud onzichtbaar en laat de meter
+       daarna zonder replaypad achter. Een mens opent het paneel juist om de
+       inhoud te gebruiken en sluit het daarna. Houd uitsluitend expliciete
+       sluitbediening daarom achteraan; zij wordt nog steeds echt beproefd. */
+    const sluiter = (el) => /^(sluiten|close|×|✕)$/i.test(
+      (el.getAttribute('aria-label') || el.innerText || el.title || '').trim());
+    const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)))
+      .sort((a, b) => Number(sluiter(a)) - Number(sluiter(b)));
     if (!nieuwe.length) return { klaar: true, zichtbaar, schil };
     nieuwe[0].setAttribute('data-appwerkt', '1');
     return { klaar: false, zichtbaar, schil, merk: merk(nieuwe[0]),

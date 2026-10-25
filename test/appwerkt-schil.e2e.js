@@ -58,12 +58,29 @@ const ACHTERGEBLEVEN_LAAG = '<!doctype html><html><body><main>' +
   Array.from({ length: 5 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1">Actie ' + i + '</button>').join('') +
   '</main></body></html>';
 
+/* Een app-eigen dialoog is geen schil: de opener is pas de ingang naar de
+   bediening die gekwalificeerd moet worden. De sluitknop staat bewust voor de
+   zes dialoogacties in de DOM; na de eerste heropening moet de meter de al
+   beproefde sluitknop overslaan en de inhoud werkelijk doorlopen. */
+const VERVOLGDIALOOG = '<!doctype html><html><body><main>' +
+  '<button type="button" id="open" onclick="document.querySelector(\'dialog\').showModal()">Open instellingen</button>' +
+  '<dialog><button type="button" onclick="this.closest(\'dialog\').close()">Sluiten</button>' +
+  Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1">Keuze ' + i + '</button>').join('') +
+  '</dialog></main></body></html>';
+
+const MODULEBEREIK = '<!doctype html><html><body><main>' +
+  Array.from({ length: 8 }, (_, i) => '<button type="button">Andere module ' + i + '</button>').join('') +
+  '<section data-view="doel"><button type="button">Doel een</button><button type="button">Doel twee</button></section>' +
+  '</main></body></html>';
+
 test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', { skip: geenBrowser(pw) }, async () => {
   const { bedien } = require('../scripts/appwerkt');
   const srv = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html');
     res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT :
       (req.url.startsWith('/apps/standwissel') ? STANDWISSEL :
-        (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG : SCHERM))); });
+        (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
+          (req.url.startsWith('/apps/vervolg') ? VERVOLGDIALOOG :
+            (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -92,6 +109,20 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(a.geklikt, 6, 'een achtergebleven laag blokkeert de overige tegenproeven niet');
     assert.deepEqual(a.nietKlikbaar, [], 'een uitsluitend door de vorige proefstand geblokkeerde knop is opnieuw getoetst');
     assert.ok(a.instrument.some((x) => /schone ingang/.test(x)), 'de herhaalde tegenproef is verantwoord');
+
+    const v = await bedien(ctx, base, '/apps/vervolg.html');
+    assert.equal(v.gevonden, 8, 'de opener, sluitroute en zes app-eigen dialoogacties zijn zichtbaar gemeten');
+    assert.equal(v.geklikt, 8, 'de sluitroute en alle zeven unieke handelingen zijn werkelijk aangetikt');
+    assert.deepEqual(v.nietKlikbaar, [], 'de dialooginhoud bleef bereikbaar');
+
+    const { meetIngang } = require('../scripts/appwerkt');
+    const meet = meetIngang({ functie: 'tab:doel' }, {
+      'tab:doel': { ingang: '/apps/module.html', via: '#tab=doel', bereik: '[data-view="doel"]' }
+    });
+    assert.equal(meet.bereik, '[data-view="doel"]', 'het modulecontract draagt zijn expliciete meetbereik');
+    const m = await bedien(ctx, base, meet);
+    assert.equal(m.gevonden, 2, 'alleen de bediening van de bedoelde interne module telt');
+    assert.equal(m.geklikt, 2, 'beide modulehandelingen zijn aangetikt');
     await ctx.close();
   } finally {
     await browser.close(); srv.close();

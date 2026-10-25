@@ -238,6 +238,7 @@ const CONTRACT = {
     belofte: 'het lid ziet het zorgaanbod, boekt en betaalt een behandeling of pakket, deelt medische context apart met een kliniek en stopt dat zelf, en annuleert wat hij niet meer wil',
     ingang: '/apps/app.html',
     via: '#tab=zorg',
+    bereik: '[data-view="zorg"]',
     bestanden: ['public/apps/app-main/app-main-13.js', 'public/apps/app-main/app-main-14.js', 'public/apps/app-main/app-main-15.js']
   }, voltooi('tabzorg', 'het scenario loopt /api/care, /mijn, /boek, /betaal, /annuleer, /intake/deel, /intake/stop en /pakket/*, de routes die de zorgtab in app-main-13, -14 en -15 aanroept')),
   /* TravelOS zonder eigen adres: de stand Reizen van de ledenapp (sprong
@@ -444,6 +445,7 @@ const CONTRACT = {
     belofte: 'een oppas of familielid koppelt zich met de eenmalige uitnodiging van een RTFoundation-gezin, ziet wat het gezin hem toevertrouwt, stuurt het gezin een bericht en ontkoppelt zelf',
     ingang: '/apps/app.html',
     via: '#tab=gezin',
+    bereik: '[data-view="gezin"]',
     // app-main-43.js: kanaal en ontkoppelen; -44.js: overzicht, uitnodiging accepteren, bericht
     bestanden: ['public/apps/app-main/app-main-43.js', 'public/apps/app-main/app-main-44.js']
   }, voltooi('gezin', 'het scenario loopt /api/rtf/uitnodiging/accepteer, /overzicht, /kanaal, /bericht en /ontkoppel, de routes die de stand Gezin in app-main-43 en -44 aanroept, met een echte ouder aan de andere kant')),

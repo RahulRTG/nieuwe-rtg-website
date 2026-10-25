@@ -68,6 +68,11 @@ kenv.maak = function (o) {
 const echtBinnen = haak.binnen;
 haak.binnen = function (d, fn, pas, herkomst) {
   return echtBinnen.call(this, d, () => {
+    /* Dienst- en overdrachtframes zijn bewust los van het HTTP-verzoek.
+       Hun kostenhaak is geen auth-punt en hoort dus niet in I10/I14.
+       Zonder frame blijft de ijking (en een echt ontbrekend frame) meetellen. */
+    const frame = vf.huidig();
+    if (frame && frame.soort !== 'verzoek') return fn();
     try {
       const a = doel.auth, h = handeling.huidige(), c = aic.huidig(), t = em.huidig();
       const req = c && c.req;

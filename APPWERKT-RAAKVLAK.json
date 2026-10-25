@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "Per bestand dat in het raakvlak van een bewijs in APPWERKT.json zit, de sha256 van zijn inhoud op het moment van de meting (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i). Wordt alleen samen met APPWERKT.json geschreven, door scripts/appwerkt.js.",
  "stempel": {
-  "op": "2026-10-24T23:40:32.962Z",
-  "commit": "26d82953f4",
+  "op": "2026-10-25T00:15:34.771Z",
+  "commit": "4b5b9b9237",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",

@@ -109,6 +109,36 @@ async function loop(w, stap) {
     return { klopt: plek.length >= 1, ziet: 'in ' + plek.map((p) => p.bestand + '/' + (p.sleutel || p.tabel)).join(', ') };
   });
 
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander lid ziet of wijzigt de lijst en appkast niet en kan wel een eigen lijst en appkast gebruiken', async () => {
+    const ander = await nieuwLid(w, 'mal-ander');
+    const B = ander.token;
+    const voorB = await lijsten(B);
+    const kastVoorB = await kast(B);
+    const aanvalToevoegen = await w.post(VOEGTOE, { id: lijst.id, aanbodId: aanbod[0].id }, B);
+    const aanvalWeg = await w.post(LIJST_WEG, { id: lijst.id }, B);
+    const maakB = await w.post(LIJST_NIEUW, { naam: 'Eigen lijst ' + merk }, B);
+    const lijstB = maakB.data && maakB.data.lijst;
+    const voegB = await w.post(VOEGTOE, { id: lijstB && lijstB.id, aanbodId: aanbod[0].id }, B);
+    const installeerB = await w.post(INSTALLEER, { id: app.id }, B);
+    const naA = await lijsten();
+    const naB = await lijsten(B);
+    const kastNaA = await kast();
+    const kastNaB = await kast(B);
+    const aBehoudtLijst = naA.some((x) => x.id === lijst.id) && !!(await toon(lijst.id));
+    const bZietA = voorB.concat(naB).some((x) => x.id === lijst.id);
+    const bZietEigen = !!lijstB && !!(await toon(lijstB.id, B));
+    const aZietB = naA.some((x) => x.id === (lijstB && lijstB.id));
+    return {
+      klopt: geen5xx(aanvalToevoegen) && geen5xx(aanvalWeg) && maakB.status === 200 && voegB.status === 200 &&
+        installeerB.status === 200 && aBehoudtLijst && !bZietA && bZietEigen && !aZietB &&
+        kastVoorB.length === 0 && kastNaB.some((x) => x.id === app.id) && kastNaA.some((x) => x.id === app.id),
+      ziet: 'vreemd toevoegen/weghalen ' + aanvalToevoegen.status + '/' + aanvalWeg.status +
+        '; A behoudt lijst=' + aBehoudtLijst + ', B ziet A=' + bZietA + ', B houdt eigen=' + bZietEigen +
+        ', A ziet B=' + aZietB + '; kasten A/B=' + kastNaA.length + '/' + kastNaB.length
+    };
+  });
+
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'dubbeltik op "nieuwe lijst": een lijst, niet twee', async () => {
     const lijf = { naam: 'Dubbel ' + merk };

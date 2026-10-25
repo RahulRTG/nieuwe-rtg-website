@@ -109,6 +109,27 @@ async function loop(w, stap) {
     return { klopt: plek.length >= 1, ziet: 'machtiging in ' + plek.map((p) => p.bestand + '/' + (p.sleutel || p.tabel)).join(', ') };
   });
 
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een derde lid ziet of sluit de relatie en machtiging van A en B niet en opent alleen zijn eigen lege overzicht', async () => {
+    const C = await nieuwLid(w, 'rlc');
+    const toestelC = await gebondenToestel(w, C.token);
+    const overzichtC = await w.post(OVERZICHT, {}, C.token);
+    const relatiesC = await w.post(RELATIES, {}, C.token);
+    const gevolgenC = await w.post(GEVOLGEN, { partij: partijB }, C.token);
+    const sluitC = await w.post(SLUIT, { partij: partijB }, C.token, await toestelC.bewijs('POST', SLUIT));
+    const naA = await relatie();
+    const naB = await zietB();
+    const cZietIets = ((overzichtC.data && overzichtC.data.toestemmingen) || []).length > 0 ||
+      ((relatiesC.data && relatiesC.data.relaties) || []).length > 0 ||
+      ((gevolgenC.data && gevolgenC.data.sluit) || []).length > 0;
+    return {
+      klopt: overzichtC.status === 200 && relatiesC.status === 200 && geen5xx(gevolgenC) && geen5xx(sluitC) &&
+        !cZietIets && !!naA && naB.some((x) => x.dienst === 'Notaris'),
+      ziet: 'C overzicht/relaties/gevolgen/sluiten ' + overzichtC.status + '/' + relatiesC.status + '/' + gevolgenC.status + '/' + sluitC.status +
+        '; C ziet iets=' + cZietIets + ', A behoudt relatie=' + !!naA + ', B behoudt Notaris=' + naB.some((x) => x.dienst === 'Notaris')
+    };
+  });
+
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'dubbeltik op "sluit": een keer gesloten, de tweede is een nette weigering of een herhaling', async () => {
     const kop = await toestel.bewijs('POST', SLUIT);

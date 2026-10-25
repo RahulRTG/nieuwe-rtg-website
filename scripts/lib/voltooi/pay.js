@@ -130,6 +130,28 @@ async function loop(w, stap) {
       ziet: 'nieuwe sessie ' + o.status + ', saldo ' + (o.data && o.data.saldo) + ', ' + oplaadregels(o).length + ' oplaadregel' };
   });
 
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander geverifieerd lid ziet het saldo en de betaalhistorie niet en laadt uitsluitend zijn eigen wallet op', async () => {
+    const ander = await geverifieerdLid(w, 'pay-ander');
+    const toestelB = await gebondenToestel(w, ander.token);
+    const postB = async (pad, lijf) => w.post(pad, lijf, ander.token, await toestelB.bewijs('POST', pad));
+    const voorB = await postB(OVERZICHT, {});
+    const codenaamB = voorB.data && voorB.data.codenaam;
+    const sleutelB = sleutelVoor(codenaamB, 'betaald', 'eigen-b');
+    const laadB = await postB(OPLAAD, { centen: 300, idem: sleutelB.idem });
+    const naB = await postB(OVERZICHT, {});
+    const naA = await overzicht();
+    const regelsB = oplaadregels(naB);
+    const regelsA = oplaadregels(naA);
+    return {
+      klopt: voorB.status === 200 && codenaamB !== codenaam && voorB.data.saldo === 0 && oplaadregels(voorB).length === 0 &&
+        laadB.status === 200 && naB.data.saldo === 300 && regelsB.length === 1 && regelsB[0].centen === 300 &&
+        naA.data.saldo === BEDRAG && regelsA.length === 1 && regelsA[0].centen === BEDRAG,
+      ziet: 'B voor/laden/na ' + voorB.status + '/' + laadB.status + '/' + naB.status +
+        ' saldo ' + naB.data.saldo + ' met ' + regelsB.length + ' regel; A saldo ' + naA.data.saldo + ' met ' + regelsA.length + ' regel'
+    };
+  });
+
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'een dubbele tik met dezelfde herhaalsleutel laadt een keer op', async () => {
     const k = sleutelVoor(codenaam, 'betaald', 'dubbel');

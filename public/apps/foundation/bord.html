@@ -57,6 +57,7 @@
   .ag button{margin-left:auto;background:none;color:var(--zacht);font-size:1rem;}
   .verberg-zij .zij{display:none;}
   .verberg-zij .app{grid-template-columns:1fr;}
+  .verberg-zij .top{grid-column:1;}
   dialog{border:none;background:transparent;color:var(--txt);}
   dialog::backdrop{background:rgba(4,4,3,.75);}
   .modal{width:min(94vw,44rem);max-height:88vh;overflow:auto;padding:1.4rem;}
@@ -202,7 +203,17 @@ let LESCODE=(RTGSchoolSession.lees('rtf_docent')||{}).lescode||'';
 if(LESCODE) RTGSchoolSession.zet('rtf_docent',{code:CODE,token:TOKEN});
 function toonCode(){ const v=LESCODE||'vernieuw', c=$('#codeInline'); $('#lesCode').textContent=v; if(c) c.textContent=v; $('#btnKopieer').textContent=LESCODE?'Kopieer':'Nieuwe lescode'; }
 toonCode();
-$('#btnKopieer').addEventListener('click', async ()=>{ if(LESCODE) return navigator.clipboard&&navigator.clipboard.writeText(LESCODE); try{ LESCODE=(await api('/api/foundation/les/code/roteer',{})).lescode; toonCode(); }catch(e){ alert(e.message); } });
+$('#btnKopieer').addEventListener('click', async ()=>{
+  const knop=$('#btnKopieer');
+  if(LESCODE){
+    try{
+      if(!navigator.clipboard||!navigator.clipboard.writeText) throw new Error('klembord niet beschikbaar');
+      await navigator.clipboard.writeText(LESCODE); knop.textContent='Gekopieerd';
+    }catch(e){ knop.textContent='Selecteer code hierboven'; }
+    setTimeout(toonCode,1800); return;
+  }
+  try{ LESCODE=(await api('/api/foundation/les/code/roteer',{})).lescode; toonCode(); }catch(e){ alert(e.message); }
+});
 $('#btnZij').addEventListener('click', ()=> document.body.classList.toggle('verberg-zij'));
 
 const bord = new TekenBord($('#bord'), { background:'#12110F', onStroke: s => { api('/api/foundation/bord/stroke',{ stroke:s }).catch(()=>{}); } });

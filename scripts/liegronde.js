@@ -42,7 +42,7 @@ const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'LIEGRONDE.json');
 const { rijen, meetIngang, maakContext, openIngang, POORTEN } = require('./appwerkt');
 const { haalSessies, opslagVoor } = require('./lib/proefsessies');
-const { haalSchoolsessies } = require('./lib/schoolproefsessies');
+const { haalSchoolsessies, maakSchoolContext } = require('./lib/schoolproefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
 const { magLiegen } = require('../server/opzet/liegpoort');
 const { stempel } = require('./lib/stempel');
@@ -153,21 +153,6 @@ async function meetRij(rij, base, contexten, opties = {}) {
   return Object.assign(uit, oordeel(m), { gelogen: m.gelogen.length, klachten: m.klachten });
 }
 
-async function maakSchoolContext(browser, school) {
-  const ctx = await maakContext(browser, school.lokaal);
-  /* De Schoolpas is tabgebonden. Houd deze proefopbouw daarom lokaal bij de
-     enige ronde die hem nodig heeft; de gedeelde contextbouwer blijft gelijk en
-     andere bewijsregisters vervallen niet door een Foundation-fixture. */
-  await ctx.addInitScript((o) => {
-    try {
-      for (const k of Object.keys(o)) sessionStorage.setItem(k, JSON.stringify({
-        merk: 'rtg-school-sessie-v1', waarde: o[k], verloopt: Date.now() + 30 * 60 * 1000
-      }));
-    } catch (e) {}
-  }, school.tijdelijk);
-  return ctx;
-}
-
 async function meet() {
   const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
   const pw = laadBrowser({ eigenDriver: false });
@@ -193,8 +178,8 @@ async function meet() {
       const adapterContext = adapterSessies.sessies.lid
         ? await maakContext(browser, opslagVoor({ lid: adapterSessies.sessies.lid })) : null;
       if (school) {
-        contexten['link:rtfbord'] = await maakSchoolContext(browser, school.bord);
-        contexten['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift);
+        contexten['link:rtfbord'] = await maakSchoolContext(browser, school.bord, maakContext);
+        contexten['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift, maakContext);
       }
       while (true) {
         const i = n++; if (i >= lijst.length) break;

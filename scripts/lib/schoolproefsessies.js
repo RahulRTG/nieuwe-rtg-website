@@ -39,4 +39,20 @@ async function haalSchoolsessies(basis, sessies) {
   };
 }
 
-module.exports = { haalSchoolsessies };
+/* De Schoolpas is tabgebonden. Zowel de waarheidsronde als APPWERKT moeten
+   daarom naast de echte lokale gezinssessie dezelfde tijdelijke docent- of
+   leerlingsleutel in sessionStorage zetten. */
+async function maakSchoolContext(browser, school, maakContext) {
+  if (!school || typeof maakContext !== 'function') return null;
+  const ctx = await maakContext(browser, school.lokaal);
+  await ctx.addInitScript((o) => {
+    try {
+      for (const k of Object.keys(o)) sessionStorage.setItem(k, JSON.stringify({
+        merk: 'rtg-school-sessie-v1', waarde: o[k], verloopt: Date.now() + 30 * 60 * 1000
+      }));
+    } catch (e) {}
+  }, school.tijdelijk);
+  return ctx;
+}
+
+module.exports = { haalSchoolsessies, maakSchoolContext };

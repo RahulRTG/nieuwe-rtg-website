@@ -125,6 +125,7 @@ const os = require('os');
 const path = require('path');
 const reg = require('./lib/wereldregister');
 const { haalSessies, opslagVoor, verbindProeflid } = require('./lib/proefsessies');
+const { haalSchoolsessies, maakSchoolContext } = require('./lib/schoolproefsessies');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
@@ -276,6 +277,8 @@ async function meet() {
   const { sessies, overgeslagen } = await haalSessies(base);
   const contact = await verbindProeflid(base);
   if (!contact.ok) overgeslagen.push({ rol: 'lid-contact', reden: contact.reden });
+  const school = await haalSchoolsessies(base, sessies);
+  if (!school) overgeslagen.push({ rol: 'schoolproef', reden: 'de echte les- en leerlingensessies konden niet worden gemaakt' });
   log('sessies: ' + Object.keys(sessies).join(', ') + (overgeslagen.length ? ' -- overgeslagen: ' + overgeslagen.map((o) => o.rol).join(', ') : ''));
 
   const lijst = rijen();
@@ -308,6 +311,10 @@ async function meet() {
        van Bestellen door deze fixture. */
     if (contact.ok) persoonlijk.adapterLid = await maakContext(browser,
       opslagVoor({ lid: { ...sessies.lid, waarde: contact.token } }));
+    if (school) {
+      persoonlijk['link:rtfbord'] = await maakSchoolContext(browser, school.bord, maakContext);
+      persoonlijk['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift, maakContext);
+    }
     while (true) {
       const i = n++; if (i >= lijst.length) break;
       const rij = lijst[i];
@@ -378,9 +385,9 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.personaAfwijking = personaAfwijking(rij.persona, meet.bestemming, SCHERMREGISTER());
 
   // ---- bewijs 1: bereikbaar voor de persona van deze wereld ----
-  const eigen = meet.adapter && rij.persona === 'lid' && persoonlijk.adapterLid
+  const eigen = persoonlijk[rij.functie] || (meet.adapter && rij.persona === 'lid' && persoonlijk.adapterLid
     ? persoonlijk.adapterLid
-    : persoonlijk[rij.persona];
+    : persoonlijk[rij.persona]);
   if (!eigen) {
     r.bewijzen.bereikbaar = { status: 'NIET_GETEST',
       reden: 'inloggen als ' + rij.persona + ' lukte niet; niet gemeten mag nooit als in orde langskomen', bewijs: null };
@@ -832,6 +839,14 @@ async function bedektDoorSchil(page, bereik) {
       const uit = [];
       const wortel = bereik ? document.querySelector(bereik) : document;
       if (!wortel) return [];
+      /* scrollIntoView kan ook een overflow:hidden-vlak programmatisch
+         verschuiven. Op het digitale bord schoof zo de tekenwerkbalk onder de
+         bovenbalk en maakte de overlapmeting haar eigen bedieningsfout. Bewaar
+         daarom alle werkelijk scrollbare vlakken en zet ze exact terug. */
+      const scrollStand = [document.scrollingElement, ...document.querySelectorAll('*')]
+        .filter((el, i, a) => el && a.indexOf(el) === i &&
+          (el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth))
+        .map(el => ({ el, top: el.scrollTop, left: el.scrollLeft }));
       const knoppen = Array.from(wortel.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
         .filter(zie).filter((el) => !el.closest(SCHIL) && !el.closest('#rtg-lang-modal'));
       for (const el of knoppen) {
@@ -850,7 +865,7 @@ async function bedektDoorSchil(page, bereik) {
           uit.push((el.innerText || el.getAttribute('aria-label') || el.title || '(naamloos)').trim().replace(/\s+/g, ' ').slice(0, 30) + ' onder ' + door);
         }
       }
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      for (const s of scrollStand) { s.el.scrollTop = s.top; s.el.scrollLeft = s.left; }
       return uit;
     }, { SCHIL: GEDEELDE_SCHIL, bereik });
   } catch (e) { return []; }

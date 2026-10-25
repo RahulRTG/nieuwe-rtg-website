@@ -16,7 +16,11 @@
     d.body.insertBefore(surface, nodes[0] || null);
     nodes.forEach(function (el) { move(surface, el); });
     var canvas = w.RTGHeritageRegistry && w.RTGHeritageRegistry.canvas[w.location.pathname];
-    if (canvas && nodes.some(function (el) { return el.matches(canvas); })) surface.dataset.rtgCanvasSurface = 'true';
+    /* De registerselector wijst vaak naar het canvas BINNEN de bestaande
+       schermwortel (bord, schrift, camera). Alleen matches() op de directe
+       body-kinderen miste die routes, waardoor hun werkvlak op inhoudshoogte
+       inklapte zodra een zijpaneel sloot. */
+    if (canvas && nodes.some(function (el) { return el.matches(canvas) || !!el.querySelector(canvas); })) surface.dataset.rtgCanvasSurface = 'true';
     return surface;
   }
   /* Verhuizen zonder herladen. Een gewone appendChild haalt een element los en

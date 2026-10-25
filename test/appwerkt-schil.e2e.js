@@ -108,3 +108,41 @@ test('OS-apps openen via Rahul en APPWERKT meet uitsluitend hun kiezer',
     try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('APPWERKT opent Bord en Schrift met hun echte tabgebonden Schoolpas',
+  { skip: geenBrowser(pw), timeout: 120000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies } = require('../scripts/lib/proefsessies');
+  const { haalSchoolsessies, maakSchoolContext } = require('../scripts/lib/schoolproefsessies');
+  const { rijen, meetIngang, maakContext, bezoek, bedien } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-school-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies, overgeslagen } = await haalSessies(base, ['lid', 'gezin']);
+    assert.deepEqual(overgeslagen, []);
+    const school = await haalSchoolsessies(base, sessies);
+    assert.ok(school, 'de echte les- en leerlingensessies moeten bestaan');
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const perFunctie = new Map(rijen().map((r) => [r.functie, r]));
+    for (const [functie, sleutel] of [['link:rtfbord', 'bord'], ['link:rtfschrift', 'schrift']]) {
+      const ctx = await maakSchoolContext(browser, school[sleutel], maakContext);
+      const meet = meetIngang(perFunctie.get(functie));
+      const gezien = await bezoek(ctx, base, meet);
+      assert.deepEqual(gezien.crash, [], functie + ': de ingang opent niet');
+      assert.equal(gezien.poort, false, functie + ': de Schoolpas opende de deur niet');
+      const bediening = await bedien(ctx, base, meet);
+      assert.ok(bediening.gevonden >= 1, functie + ': het scherm heeft geen meetbare bediening');
+      assert.ok(bediening.geklikt * 2 >= bediening.gevonden,
+        functie + ': minder dan de helft van de bediening werkte (' + bediening.geklikt + '/' + bediening.gevonden + '): ' +
+        JSON.stringify({ overgeslagen: bediening.overgeslagen, nietKlikbaar: bediening.nietKlikbaar,
+          onderschept: bediening.onderschept, instrument: bediening.instrument }));
+      assert.deepEqual(bediening.crash.concat(bediening.serverfout), [], functie + ': de bediening veroorzaakte fouten');
+      await ctx.close();
+    }
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
+  }
+});

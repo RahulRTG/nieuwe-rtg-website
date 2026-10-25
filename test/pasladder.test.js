@@ -140,11 +140,11 @@ test('8. de geld-regie serveert exact de ladder, met vanaf en niet met prijs', (
    nergens in kan. */
 test('9. elke beschikbare trede is ook echt uitgerold', () => {
   const caps = require('../server/kern/commercie/capaciteiten');
-  const bron = require('fs').readFileSync(require.resolve('../server/kern/aanmeldingen.js'), 'utf8');
+  const { PASSEN } = require('../server/kern/aanmeldingen/catalogus');
 
   for (const t of ladder.treden().filter(x => x.beschikbaar)) {
     if (t.id === 'gratis') continue;   // de gratis app kent geen aanmeldingsstroom
-    assert.ok(bron.includes("'" + t.id + "'") || bron.includes(t.id + ':'),
+    assert.ok(PASSEN[t.id] && ['naam', 'stem', 'welkom'].every(k => typeof PASSEN[t.id][k] === 'string' && PASSEN[t.id][k].trim()),
       t.id + ' is beschikbaar maar komt niet voor in de aanmeldingsstroom (naam, stem, welkom)');
     assert.ok(caps.capsVan(t.id).length > 0,
       t.id + ' is beschikbaar maar heeft geen capability-profiel: dan mag een klant niets');

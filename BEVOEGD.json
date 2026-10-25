@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-25T01:33:39.784Z",
-    "commit": "47b78f584a",
+    "op": "2026-10-25T02:07:02.462Z",
+    "commit": "0f97703b11",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/WAFN2Q/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/8ZAAJT/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-25T10:32:30.117Z",
-    "commit": "612d911dd1",
+    "op": "2026-10-25T12:16:59.376Z",
+    "commit": "1d0b4d1179",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 2,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.1"
   },
@@ -14,10 +14,10 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "9acd55d075cb76eb40eb2e4d19cbdcb2be85732bc7605059953d041d71e6b1c3",
+        "sha256": "27294ae8caeb2b5e366e7d8bba9b052bcd9a12850bbc17f95f7d75e85350f037",
         "stempel": {
-          "op": "2026-10-25T10:18:39.319Z",
-          "commit": "3f61ec56ff",
+          "op": "2026-10-25T12:15:32.196Z",
+          "commit": "1d0b4d1179",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/idorproef.js",
@@ -26,22 +26,22 @@
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "e40d675f7c2262191ffb110921e4eda43a097f82eb74702860dc2b5dfa743b83",
+        "sha256": "59561b454739e27767741cb5ffdd9d6eac55339aed3757b02b0dd7cc57993ed4",
         "stempel": {
-          "op": "2026-10-25T10:31:44.350Z",
-          "commit": "b3c20c1a71",
+          "op": "2026-10-25T12:16:16.040Z",
+          "commit": "1d0b4d1179",
           "boomVuil": false,
-          "boomAnders": 0,
+          "boomAnders": 1,
           "instrument": "scripts/rolproef-route.js",
           "node": "v26.12.1"
         }
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "37ec0cb10bb4fd0af7805ebcf10b301ec131da8ecc120ae1d0a388842ff1b413",
+        "sha256": "2361774fd4cf465f325fa350dab0b79da2e9724dfc313efe6e135cd2f5c3d40a",
         "stempel": {
-          "op": "2026-10-25T08:30:14.022Z",
-          "commit": "1dba086ca6",
+          "op": "2026-10-25T11:55:56.136Z",
+          "commit": "823586aaa9",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/56YRFP/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/MNCBUY/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1170,7 +1170,7 @@
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 3,
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, gescheiden)"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden)"
     },
     {
       "functie": "link:wallet",

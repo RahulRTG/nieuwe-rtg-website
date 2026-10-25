@@ -274,7 +274,7 @@ async function meet() {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
 
   const { sessies, overgeslagen } = await haalSessies(base);
-  const contact = await verbindProeflid(base, sessies);
+  const contact = await verbindProeflid(base);
   if (!contact.ok) overgeslagen.push({ rol: 'lid-contact', reden: contact.reden });
   log('sessies: ' + Object.keys(sessies).join(', ') + (overgeslagen.length ? ' -- overgeslagen: ' + overgeslagen.map((o) => o.rol).join(', ') : ''));
 
@@ -302,6 +302,12 @@ async function meet() {
          plek te staan, ook als er hier maar een rol in gaat. */
       persoonlijk[rol] = await maakContext(browser, opslagVoor({ [rol]: sessies[rol] }));
     }
+    /* De drie expliciete Rahul-adapters draaien op een eigen echt lid. De
+       verbinding die Bellen en Snaps nodig hebben mag de staat van de gewone
+       lidmeting niet wijzigen; anders verandert bijvoorbeeld de knopnoemer
+       van Bestellen door deze fixture. */
+    if (contact.ok) persoonlijk.adapterLid = await maakContext(browser,
+      opslagVoor({ lid: { ...sessies.lid, waarde: contact.token } }));
     while (true) {
       const i = n++; if (i >= lijst.length) break;
       const rij = lijst[i];
@@ -372,7 +378,9 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.personaAfwijking = personaAfwijking(rij.persona, meet.bestemming, SCHERMREGISTER());
 
   // ---- bewijs 1: bereikbaar voor de persona van deze wereld ----
-  const eigen = persoonlijk[rij.persona];
+  const eigen = meet.adapter && rij.persona === 'lid' && persoonlijk.adapterLid
+    ? persoonlijk.adapterLid
+    : persoonlijk[rij.persona];
   if (!eigen) {
     r.bewijzen.bereikbaar = { status: 'NIET_GETEST',
       reden: 'inloggen als ' + rij.persona + ' lukte niet; niet gemeten mag nooit als in orde langskomen', bewijs: null };

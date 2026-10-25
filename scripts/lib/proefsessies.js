@@ -106,13 +106,13 @@ async function postAls(url, lijf, token) {
 
 /* Bellen en Snaps zijn geen lege dialoog: hun eigen bediening bestaat uit de
    mensen met wie het lid verbonden is. Browserkwalificaties krijgen daarom
-   op verzoek EEN echte verbinding, langs dezelfde vind-, verzoek- en
-   aanvaardroutes als De Salon. Dit verandert geen standaardproefsessie en
-   verzint geen clientstaat; alleen de metingen die deze fixture nodig hebben
-   roepen hem aan. */
-async function verbindProeflid(basis, sessies) {
-  const eerste = sessies && sessies.lid && sessies.lid.waarde;
-  if (!eerste || typeof eerste !== 'string') return { ok: false, reden: 'geen ledensessie' };
+   op verzoek TWEE aparte echte proefleden met EEN echte verbinding, langs
+   dezelfde vind-, verzoek- en aanvaardroutes als De Salon. De gewone
+   ledensessie blijft bewust onaangeraakt: een sociale fixture mag de meting
+   van Bestellen of een andere app niet van extra objecten voorzien. */
+async function verbindProeflid(basis) {
+  const eerste = await ROLLEN.lid.haal(basis);
+  if (!eerste) return { ok: false, reden: 'eerste proeflid kon niet worden gemaakt' };
   const tweede = await ROLLEN.lid.haal(basis);
   if (!tweede) return { ok: false, reden: 'tweede proeflid kon niet worden gemaakt' };
   const [a, b] = await Promise.all([
@@ -131,7 +131,7 @@ async function verbindProeflid(basis, sessies) {
   if (antwoord.status >= 400 || !antwoord.data || antwoord.data.status !== 'verbonden') {
     return { ok: false, reden: 'verbinding aanvaarden gaf HTTP ' + antwoord.status };
   }
-  return { ok: true, codenaam, token: tweede };
+  return { ok: true, codenaam, token: eerste, contactToken: tweede };
 }
 
 /* Haalt de gevraagde rollen op (standaard allemaal) tegen een draaiende

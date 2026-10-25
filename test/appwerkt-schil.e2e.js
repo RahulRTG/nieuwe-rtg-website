@@ -81,10 +81,12 @@ test('OS-apps openen via Rahul en APPWERKT meet uitsluitend hun kiezer',
   let browser;
   try {
     const { sessies } = await haalSessies(base, ['lid']);
-    const contact = await verbindProeflid(base, sessies);
+    const contact = await verbindProeflid(base);
     assert.equal(contact.ok, true, contact.reden);
     browser = await pw.chromium.launch(browserOpties(pw));
-    const ctx = await maakContext(browser, opslagVoor({ lid: sessies.lid }));
+    const ctx = await maakContext(browser, opslagVoor({
+      lid: { ...sessies.lid, waarde: contact.token }
+    }));
     const perFunctie = new Map(rijen().map((r) => [r.functie, r]));
     for (const functie of ['os:bellen', 'os:snaps', 'os:werk']) {
       const meet = meetIngang(perFunctie.get(functie));

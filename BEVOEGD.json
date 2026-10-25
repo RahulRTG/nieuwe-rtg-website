@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-25T16:52:04.291Z",
-    "commit": "3fc6ebf566",
+    "op": "2026-10-25T22:04:24.253Z",
+    "commit": "8c1d078473",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.1"
   },
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/ZAP3XS/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/YP4YWC/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1170,7 +1170,7 @@
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 3,
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, gescheiden)"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden)"
     },
     {
       "functie": "link:wallet",

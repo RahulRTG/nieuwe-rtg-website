@@ -50,6 +50,7 @@ const PICKUP_CODE_ISSUERS = Object.freeze({
     'server/routes/member/kopen/bezorg.js',
     'server/routes/supplier/kassa/afrekenen.js',
     'server/routes/supplier/kassa/premium.js',
+    'server/routes/supplier/kassa/tafelticket-afrekenen.js',
     'server/routes/supplier/kassa/verkoop.js',
     'server/routes/supplier/kassa/innen.js',
     'server/routes/supplier/kamers/voorzieningen.js',

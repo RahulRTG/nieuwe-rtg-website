@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-25T02:06:19.077Z",
-    "commit": "9c7b703998",
+    "op": "2026-10-25T06:56:30.351Z",
+    "commit": "56f25065c1",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
@@ -11,8 +11,8 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 109,
-    "NIET_GETEST": 5
+    "BEWEZEN": 112,
+    "NIET_GETEST": 2
   },
   "regels": [
     {
@@ -1030,8 +1030,10 @@
       "app": "Bellen",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "33 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 33,
+      "klachten": []
     },
     {
       "functie": "os:rtf",
@@ -1046,8 +1048,10 @@
       "app": "Snaps",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "33 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 33,
+      "klachten": []
     },
     {
       "functie": "os:videobellen",
@@ -1062,8 +1066,10 @@
       "app": "Werk",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "33 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 33,
+      "klachten": []
     },
     {
       "functie": "tab:assets",

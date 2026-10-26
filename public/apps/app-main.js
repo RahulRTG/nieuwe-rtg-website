@@ -2671,6 +2671,12 @@ var RTG_BOUW = '60faa1b3';
            elementFromPoint op het midden van het venster stelt de enige vraag
            die telt: kijkt de gebruiker naar iets van de app, of naar niets? */
         const thuis = document.querySelector('.os-thuisscherm');
+        /* Deze gezondheidscontrole hoort uitsluitend bij Home. Op iedere
+           interne appstand is de home-view bewust niet actief en heeft het
+           thuisscherm dus hoogte nul. Dat als leeg scherm melden maakte iedere
+           directe #tab-ingang na 2,5 s ten onrechte defect, terwijl de gekozen
+           app gewoon zichtbaar was. */
+        if (!thuis || !thuis.closest('.view[data-view="home"].active')) return;
         const tegels = document.querySelectorAll('.os-app').length;
         const hoog = thuis ? thuis.getBoundingClientRect().height : 0;
         const midden = document.elementFromPoint(Math.round(innerWidth / 2), Math.round(innerHeight / 2));

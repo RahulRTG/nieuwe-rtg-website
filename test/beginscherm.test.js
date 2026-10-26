@@ -29,6 +29,12 @@ test('het beginscherm draagt geen losse app-tegels naast de werelden', () => {
     'de functierij onder de klok is weer gevuld; het beginscherm hoort alleen de werelden te dragen');
 });
 
+test('de leeg-schermbewaking beoordeelt Home alleen wanneer Home actief is', () => {
+  const bron = lees('public', 'apps', 'app-main', 'app-main-12a.js');
+  assert.match(bron, /thuis\.closest\('\.view\[data-view="home"\]\.active'\)/,
+    'een interne appstand wordt weer als leeg Home-scherm gemeld omdat Home daar terecht hoogte nul heeft');
+});
+
 test('en het zijn er VIER, elk met een eigen wereldpagina die bestaat', () => {
   /* DRIE WERD VIER OP 19 AUGUSTUS 2026, en dat is een besluit en geen slijtage.
      PLATFORM.md par. 0 telde er drie; WERELDEN.md vervangt die telling door

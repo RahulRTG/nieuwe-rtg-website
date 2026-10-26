@@ -76,13 +76,14 @@ const ACHTERGEBLEVEN_LAAG = '<!doctype html><html><body><main>' +
   '</main></body></html>';
 
 /* Een app-eigen dialoog is geen schil: de opener is pas de ingang naar de
-   bediening die gekwalificeerd moet worden. De sluitknop staat bewust voor de
-   zes dialoogacties in de DOM; na de eerste heropening moet de meter de al
-   beproefde sluitknop overslaan en de inhoud werkelijk doorlopen. */
+   bediening die gekwalificeerd moet worden. De dialoog zit bewust achter twee
+   opeenvolgende openers en sluit na iedere keuze beide lagen. De meter moet dus
+   A -> B kunnen herhalen om ELKE volgende unieke dialoogactie te bereiken. */
 const VERVOLGDIALOOG = '<!doctype html><html><body><main>' +
-  '<button type="button" id="open" onclick="document.querySelector(\'dialog\').showModal()">Open instellingen</button>' +
-  '<dialog><button type="button" onclick="this.closest(\'dialog\').close()">Sluiten</button>' +
-  Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1;this.closest(\'dialog\').close()">Keuze ' + i + '</button>').join('') +
+  '<button type="button" id="open" onclick="document.getElementById(\'categorie\').hidden=false">Open categorie</button>' +
+  '<section id="categorie" hidden><button type="button" id="instellingen" onclick="document.querySelector(\'dialog\').showModal()">Open instellingen</button></section>' +
+  '<dialog><button type="button" onclick="this.closest(\'dialog\').close();document.getElementById(\'categorie\').hidden=true">Sluiten</button>' +
+  Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1;this.closest(\'dialog\').close();document.getElementById(\'categorie\').hidden=true">Keuze ' + i + '</button>').join('') +
   '</dialog></main></body></html>';
 
 const MODULEBEREIK = '<!doctype html><html><body><main>' +
@@ -148,7 +149,7 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     const breed = await bedien(ctx, base, '/apps/breed.html');
     assert.equal(breed.gevonden, 82, 'alle unieke handelingen van het brede scherm staan in de noemer');
     assert.equal(breed.geklikt, breed.gevonden, 'de proef raakt alle brede bediening met echte tikken');
-    assert.ok(breed.geklikt <= 256, 'de brede tegenproef blijft begrensd');
+    assert.ok(breed.geklikt <= 1024, 'de brede tegenproef blijft begrensd');
     assert.deepEqual(breed.nietKlikbaar, [], 'geen handeling is administratief groen gemaakt');
 
     const risico = await bedien(ctx, base, '/apps/risico.html');
@@ -166,11 +167,11 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.ok(a.instrument.some((x) => /schone ingang/.test(x)), 'de herhaalde tegenproef is verantwoord');
 
     const v = await bedien(ctx, base, '/apps/vervolg.html');
-    assert.equal(v.gevonden, 8, 'de opener, sluitroute en zes app-eigen dialoogacties zijn over alle standen uniek gemeten');
-    assert.equal(v.geklikt, 8, 'de sluitroute en alle zeven unieke handelingen zijn werkelijk aangetikt');
+    assert.equal(v.gevonden, 9, 'beide openers, sluitroute en zes app-eigen dialoogacties zijn over alle standen uniek gemeten');
+    assert.equal(v.geklikt, 9, 'de volledige tweelaagse route en alle dialooghandelingen zijn werkelijk aangetikt');
     assert.deepEqual(v.nietKlikbaar, [], 'de dialooginhoud bleef bereikbaar');
-    assert.ok(v.instrument.some((x) => /oorspronkelijke stand/.test(x)),
-      'de meter herhaalt een bewezen opener zonder de herhaling dubbel te tellen');
+    assert.ok(v.instrument.some((x) => /toestandsafhankelijke openerketen/.test(x)),
+      'de meter verantwoordt de meerlaagse replay zonder de openers dubbel te tellen');
 
     const { meetIngang } = require('../scripts/appwerkt');
     const meet = meetIngang({ functie: 'tab:doel' }, {

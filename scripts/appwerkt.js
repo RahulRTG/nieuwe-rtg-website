@@ -152,12 +152,12 @@ const stil = process.argv.includes('--stil');
 const alleenInventaris = process.argv.includes('--inventaris');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
-/* Hoogstens zoveel meetrondes per scherm. Een ronde kan behalve een echte tik
-   ook een begrensde heropening of tegenproef zijn. De volledige-bedieningsnorm
-   eist dat alle unieke knoppen werkelijk worden geraakt. Het huidige grootste
-   scherm heeft 122 unieke handelingen; 256 laat herstelrondes toe en begrenst
-   tegelijk een defect of cyclisch scherm. */
-const MAXKLIK = 256;
+/* De grootste gemeten schermen bevatten ruim 190 unieke handelingen. Omdat
+   een vervolgstand soms twee of meer reeds bewezen openers moet herhalen, is
+   256 rondes geen geldige bovengrens voor volledige dekking. 1024 blijft een
+   harde, eindige veiligheidsgrens, maar laat de meter wel ieder uniek control
+   plus zijn begrensde navigatiepad werkelijk aanraken. */
+const MAXKLIK = 1024;
 const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[type=button],input[type=submit],input[type=reset]';
 
 /* Gedeelde bediening bewijst het scherm niet. Naast de generieke Edge en
@@ -692,10 +692,11 @@ async function bedien(ctx, base, ingang) {
   };
   let heropeningen = 0;
   const opnieuwGeprobeerd = new Set();
-  /* Per opener de omvang van de unieke klikset toen hij voor het laatst werd
-     herhaald. Na aantoonbare voortgang mag dezelfde opener opnieuw nodig zijn
-     (een dialoog die na iedere keuze sluit); zonder voortgang niet. */
-  const herhaald = new Map();
+  /* Een opener mag eenmaal per zichtbare stand en bewijsvoortgang worden
+     herhaald. De stand hoort bij de sleutel: zo kan de meter A -> B opnieuw
+     doorlopen om een volgende keuze achter twee lagen te bereiken, zonder in
+     A -> B -> A te blijven draaien wanneer de pagina geen voortgang oplevert. */
+  const herhaald = new Set();
   const overgeslagen = [], risicovolAangeraakt = [], risicoFixtures = [], nietKlikbaar = [], onderschept = [], instrument = [];
   /* APPWERKT bewijst dat de zichtbare bediening reageert; de mutatie-,
      voltooi- en financiële proeven bewijzen het zakelijke gevolg. Dat
@@ -801,19 +802,22 @@ async function bedien(ctx, base, ingang) {
            MAXKLIK begrenst zowel tikken als herstelpogingen. Dit verlaagt de
            bewijsgrens niet: elke extra knop wordt nog steeds echt aangetikt en
            op browser- en serverfouten beoordeeld. */
-        if (gehad.size < gevonden && heropeningen < MAXKLIK) {
-          heropeningen++;
+        if (gehad.size < gevonden) {
           try {
-            await openIngang(page, base, meet);
-            await page.waitForTimeout(1200);
-            instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
-            /* De resterende bediening kan achter een opener zitten die zelf al
-               is beproefd. Herhaal vanaf de schone ingang dan precies één
-               eerder geslaagde bediening. Die herhaling telt niet nogmaals,
-               maar maakt haar vervolgstand bereikbaar. Elke unieke opener
-               wordt hoogstens eenmaal herhaald; MAXKLIK blijft de harde grens. */
+            /* Probeer eerst in de HUIDIGE stand verder te lopen. Een resterende
+               actie kan achter A -> B zitten; na het herhalen van A is B pas in
+               deze stand zichtbaar. Meteen opnieuw openen zou die tussenstand
+               weer vernietigen en maakte zulke ketens onbereikbaar. */
             k = await kijkRonde(page, gehad, bereik, herhaald, true);
             telStand(k);
+            if (k.klaar && heropeningen < MAXKLIK) {
+              heropeningen++;
+              await openIngang(page, base, meet);
+              await page.waitForTimeout(1200);
+              instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
+              k = await kijkRonde(page, gehad, bereik, herhaald, true);
+              telStand(k);
+            }
             if (k.klaar) break;
           } catch (e) {
             instrument.push('heropenen van de oorspronkelijke stand lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80));
@@ -822,8 +826,12 @@ async function bedien(ctx, base, ingang) {
         }
         else break;
       }
-      if (k.herhaling) herhaald.set(k.merk, gehad.size);
-      else gehad.add(k.merk);
+      if (k.herhaling) {
+        herhaald.add(k.herhaalSleutel);
+        if (!instrument.some((x) => /toestandsafhankelijke openerketen/.test(x))) {
+          instrument.push('de proef volgde een toestandsafhankelijke openerketen naar resterende bediening');
+        }
+      } else gehad.add(k.merk);
       laatste = k.tekst || '(naamloos)';
       const isRisicovol = RISICOVOL.test(laatste);
       if (isRisicovol && !risicovolAangeraakt.includes(laatste)) risicovolAangeraakt.push(laatste);
@@ -1057,7 +1065,7 @@ async function bedektDoorSchil(page, bereik) {
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad, bereik, herhaald = new Map(), magHerhalen = false) {
+async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false) {
   return page.evaluate(({ alGehad, alHerhaald, magHerhalen, SCHIL, bereik, bediening, risicovol }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
@@ -1121,18 +1129,21 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Map(), magHerhalen 
     };
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)))
       .sort((a, b) => risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)));
-    let doel = nieuwe[0], herhaling = false;
+    let doel = nieuwe[0], herhaling = false, herhaalSleutel = null;
     if (!doel && magHerhalen) {
-      const herhaalStand = new Map(alHerhaald);
-      doel = alle.filter((el) => alGehad.includes(merk(el)) && herhaalStand.get(merk(el)) !== alGehad.length)
+      const stand = merken.slice().sort().join('¦');
+      const herhaalStand = new Set(alHerhaald);
+      doel = alle.filter((el) => alGehad.includes(merk(el)) &&
+          !herhaalStand.has(alGehad.length + '§' + stand + '§' + merk(el)))
         .sort((a, b) => risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
       herhaling = !!doel;
+      if (doel) herhaalSleutel = alGehad.length + '§' + stand + '§' + merk(doel);
     }
     if (!doel) return { klaar: true, zichtbaar, merken, schil };
     doel.setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar, merken, schil, merk: merk(doel), herhaling,
+    return { klaar: false, zichtbaar, merken, schil, merk: merk(doel), herhaling, herhaalSleutel,
       tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
-  }, { alGehad: [...gehad], alHerhaald: [...herhaald.entries()], magHerhalen, SCHIL: GEDEELDE_SCHIL, bereik,
+  }, { alGehad: [...gehad], alHerhaald: [...herhaald], magHerhalen, SCHIL: GEDEELDE_SCHIL, bereik,
     bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });
 }
 

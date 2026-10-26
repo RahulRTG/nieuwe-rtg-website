@@ -1173,6 +1173,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        sluitbediening daarom achteraan; zij wordt nog steeds echt beproefd. */
     const sluiter = (el) => /^(sluiten|close|×|✕)$/i.test(
       (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim());
+    const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[aria-controls]');
     const risico = new RegExp(risicovol, 'i');
     const risicoRang = (el) => {
       const tekst = (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim();
@@ -1196,7 +1197,13 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
            en voegt geen uniek bedieningsbewijs toe. Buiten een modal blijven
            openers vooraan om A -> B -> resterende keuze te kunnen replayen. */
         .sort((a, b) => modaal
-          ? Number(!sluiter(a)) - Number(!sluiter(b)) || risicoRang(a) - risicoRang(b)
+          /* Als een reeds geziene tab een nog onaangeraakte paneelactie kan
+             onthullen, moet die route voor de sluitknop worden herhaald. Dit
+             is expliciete standnavigatie, geen willekeurige taakactie. Zonder
+             deze rangorde zag het Social Control Plane AAN en ANALYSEER
+             CONTEXT wel, maar sloot het deck voordat hun tab terugkwam. */
+          ? Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+            Number(!sluiter(a)) - Number(!sluiter(b)) || risicoRang(a) - risicoRang(b)
           : risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
       herhaling = !!doel;
       if (doel) herhaalSleutel = alGehad.length + '§' + stand + '§' + merk(doel);

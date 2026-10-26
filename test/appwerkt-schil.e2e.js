@@ -109,6 +109,21 @@ const ROLE_DIALOG = '<!doctype html><html><body><main>' +
   '<button id="later" type="button" style="opacity:0" onclick="window.vervolg=true">Verborgen vervolg</button></div>' +
   '</main></body></html>';
 
+/* Een dialoog met tabpanelen kan een handeling laten zien en daarna weer
+   verbergen voordat zij in DOM-volgorde aan de beurt komt. De meter moet de
+   expliciete tabroute dan herhalen en pas sluiten als beide panelen werkelijk
+   zijn bediend. */
+const PANEEL_TABS = '<!doctype html><html><body><main>' +
+  '<button type="button" onclick="document.getElementById(\'deck\').hidden=false">Open control plane</button>' +
+  '<section id="deck" role="dialog" hidden><button type="button" aria-label="Sluiten" onclick="this.parentNode.hidden=true">Sluiten</button>' +
+  '<button type="button" role="tab" aria-controls="overzicht" onclick="toon(\'overzicht\')">Overzicht</button>' +
+  '<button type="button" role="tab" aria-controls="beleid" onclick="toon(\'beleid\')">Beleid</button>' +
+  '<button type="button" role="tab" aria-controls="rahul" onclick="toon(\'rahul\')">Rahul</button>' +
+  '<div id="overzicht"></div><div id="beleid" hidden><button type="button" onclick="window.beleid=true">AAN</button></div>' +
+  '<div id="rahul" hidden><button type="button" onclick="window.rahul=true">ANALYSEER CONTEXT</button></div></section>' +
+  '<script>function toon(id){for(const el of document.querySelectorAll("#overzicht,#beleid,#rahul"))el.hidden=el.id!==id}</script>' +
+  '</main></body></html>';
+
 const NAVIGEERT = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="location.href=\'/apps/bestemming.html\'">Terug</button>' +
   '<button type="button" onclick="window.lokaal=true">Lokale actie</button>' +
@@ -156,10 +171,11 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
         (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
           (req.url.startsWith('/apps/vervolg') ? VERVOLGDIALOOG :
             (req.url.startsWith('/apps/afgewerkt') ? AFGEWERKTE_DIALOOG :
-              (req.url.startsWith('/apps/roledialog') ? ROLE_DIALOG :
+                (req.url.startsWith('/apps/roledialog') ? ROLE_DIALOG :
+                (req.url.startsWith('/apps/paneeltabs') ? PANEEL_TABS :
                 (req.url.startsWith('/apps/navigeert') ? NAVIGEERT :
                   (req.url.startsWith('/apps/bestemming') ? BESTEMMING :
-                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))))))); });
+                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -221,6 +237,11 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(role.gevonden, 5, 'de role-dialog en het pas later zichtbare vervolg tellen ieder precies eenmaal');
     assert.equal(role.geklikt, role.gevonden, 'ook een role-dialog zonder aria-modal wordt volledig bediend');
     assert.deepEqual(role.onaangeraakt, [], 'CSS-onzichtbare bediening telt pas zodra zij werkelijk zichtbaar is');
+
+    const panelen = await bedien(ctx, base, '/apps/paneeltabs.html');
+    assert.equal(panelen.gevonden, 7, 'opener, sluiter, drie tabs en twee paneelacties staan in de noemer');
+    assert.equal(panelen.geklikt, panelen.gevonden, 'iedere paneelactie wordt via herhaalde expliciete tabnavigatie geraakt');
+    assert.deepEqual(panelen.onaangeraakt, [], 'geen eerder geziene maar tijdelijk verborgen paneelactie blijft liggen');
 
     const nav = await bedien(ctx, base, '/apps/navigeert.html');
     assert.equal(nav.gevonden, 2, 'bediening van het bestemmingsscherm vervuilt de noemer van de bronapp niet');

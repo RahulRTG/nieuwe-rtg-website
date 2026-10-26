@@ -269,6 +269,16 @@ test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale 
   }
 });
 
+test('Het Vooruitzicht gebruikt zijn bestaande schil als begrensd en klikbaar wereldcanvas', () => {
+  const registry = require('../public/shared/rtg-heritage-registry');
+  const css = lees('public/shared/rtg-world-desktop.css');
+  assert.equal(registry.canvas['/apps/living-os.html'], '.lo-shell');
+  assert.match(css, /\.wd-page\[data-rtg-canvas-surface\]>\[data-rtg-native-canvas\]/,
+    'een native wereldcanvas krijgt binnen de desktopcompositie een eigen hit-testvlak');
+  assert.match(css, /position:absolute!important;inset:0!important;[^}]*height:100%!important/,
+    'het klikbare canvas vult het begrensde werkvlak');
+});
+
 test('beide offline shells bevatten de volledige gedeelde intelligentielaag', () => {
   const files = ['rtg-route-memory-core.js', 'rtg-route-memory.js', 'rtg-operation.js', 'rtg-side-sheet.js', 'rtg-edge-preferences.js', 'rtg-action-dock.js', 'rtg-heritage-registry.js', 'rtg-heritage-components.js', 'rtg-heritage-transition.js', 'rtg-intelligence.css', 'rtg-intelligence-shell.css', 'rtg-world-start.css', 'rtg-world-start.js'];
   for (const sw of ['public/sw.js','public/apps/foundation/sw.js']) for (const file of files)

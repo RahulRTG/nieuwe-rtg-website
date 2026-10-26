@@ -36,6 +36,14 @@ body[data-rtg-desktop] .wd-page :is(main,[data-rtg-screen-root],.wrap,.shell,.sc
 body[data-rtg-desktop] .wd-page>:is([data-rtg-screen-root],main,header){position:relative!important;inset:auto!important;height:auto!important;overflow:visible!important}
 body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{height:max(560px,calc(100dvh - 240px));overflow:hidden!important}
 body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-screen-root="immersive"]{height:100%!important}
+/* Canvasroutes houden hun bestaande werkvlak binnen de gemeenschappelijke
+   wereldkolom. Een fixed canvas in een layout-contained .wd-page kan wel
+   tekenen, maar valt buiten de hit-testlaag wanneer die pagina geen eigen
+   hoogte heeft. De registry bepaalt welke routes canvas zijn; deze regel geeft
+   hun bestaande wortel dezelfde begrensde ruimte als op mobiel. */
+body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-native-canvas]{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important
+}
 body[data-rtg-desktop] :is(.saloon-shell,.saloon-feed-layout,.wd-home .dag,.wd-home .wh-travel-layout,.wd-home .tweeluik){max-width:100%;grid-template-columns:minmax(0,1fr)!important}
 body[data-rtg-desktop="living"] .schil{display:contents!important;min-height:0!important}body[data-rtg-desktop="living"] .schil>:is(.bank,.topbar){display:none!important}
 body[data-rtg-desktop] .wd-home .kompas{position:static}.wp-tabs{display:none}

@@ -501,6 +501,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.risicovolAangeraakt = bediening.risicovolAangeraakt;
   r.risicoFixtures = bediening.risicoFixtures;
   r.nietKlikbaar = bediening.nietKlikbaar;
+  r.onaangeraakt = bediening.onaangeraakt;
   r.onderschept = bediening.onderschept;
   if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
   if (bediening.rem.length) r.waarnemingen.push('proef: ' + bediening.rem.length + 'x de rem (429) geraakt, door het gedeelde adres van de meting');
@@ -516,7 +517,9 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' eigen knoppen aangetikt zonder fout'
     + (bediening.schil ? ' (plus ' + bediening.schil + ' van de gedeelde schil, die hier niet telt)' : '')
     + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
-    + (bediening.risicovolAangeraakt.length ? ', ' + bediening.risicovolAangeraakt.length + ' risicovolle bediening(en) aangeraakt op de wegwerpserver' : '');
+    + (bediening.risicovolAangeraakt.length ? ', ' + bediening.risicovolAangeraakt.length + ' risicovolle bediening(en) aangeraakt op de wegwerpserver' : '')
+    + (bediening.onaangeraakt.length ? ', onaangeraakt: ' + bediening.onaangeraakt.slice(0, 8).map((n) => '"' + n + '"').join(', ')
+      + (bediening.onaangeraakt.length > 8 ? ' en ' + (bediening.onaangeraakt.length - 8) + ' meer' : '') : '');
   if (bediening.geklikt === 0 && !bediening.gevonden) {
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen eigen knop zonder bestemming gevonden' + (bediening.schil ? ' (alleen ' + bediening.schil + ' van de gedeelde schil)' : '') + '; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
@@ -685,8 +688,13 @@ async function bedien(ctx, base, ingang) {
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
   const gevondenMerken = new Set();
+  const gevondenNamen = new Map();
+  const aangetiktMerken = new Set();
   const telStand = (stand) => {
     for (const merk of (stand && stand.merken) || []) gevondenMerken.add(merk);
+    for (const bediening of (stand && stand.bedieningen) || []) {
+      if (!gevondenNamen.has(bediening.merk)) gevondenNamen.set(bediening.merk, bediening.tekst);
+    }
     gevonden = gevondenMerken.size;
     schil = Math.max(schil, (stand && stand.schil) || 0);
   };
@@ -746,6 +754,13 @@ async function bedien(ctx, base, ingang) {
     await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
       null, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(400);
+    /* De ledenapp tekent eerst de verplichte onboardinglaag en verbergt die
+       pas nadat haar status bekend is. Onder parallelle belasting kon de
+       vaste laadpauze verlopen terwijl #onbGate nog boven interne tabbladen
+       lag; de meter beschuldigde daarna Assets, Betalen en Reizen van de deur
+       die hij zelf te vroeg had gemeten. Wacht op het waarneembare product-
+       gedrag. Een scherm zonder zo'n laag voldoet meteen aan `hidden`. */
+    await page.waitForSelector('#onbGate', { state: 'hidden', timeout: 12000 }).catch(() => {});
     luister(page, base, { crash, config, serverfout, rem, weigering, wachtend });   // pas NA het laden: laadfouten horen bij bewijs 1
     if (meet.adapter) await voerIngangAdapterUit(page, meet);
     /* Een interne module tekent haar inhoud vaak pas na meerdere API-antwoorden.
@@ -838,9 +853,12 @@ async function bedien(ctx, base, ingang) {
       try {
         actieveRisicoklik = isRisicovol ? laatste : null;
         await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
+        if (!k.herhaling) {
+          aangetiktMerken.add(k.merk);
+          geklikt = aangetiktMerken.size;
+        }
         await page.waitForTimeout(600);
         actieveRisicoklik = null;
-        if (!k.herhaling) geklikt++;
         await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
         /* EN DAN DICHT, zoals een mens doet. Een tik opent vaak een laag (het
            paneel van Rahul, de sprong, de taalkeuze); bleef die open, dan lag hij
@@ -938,7 +956,9 @@ async function bedien(ctx, base, ingang) {
   }
   await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
   await page.close();
-  return { geklikt, gevonden, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  const onaangeraakt = [...gevondenMerken].filter((merk) => !aangetiktMerken.has(merk))
+    .map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
+  return { geklikt, gevonden, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -1069,6 +1089,8 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
   return page.evaluate(({ alGehad, alHerhaald, magHerhalen, SCHIL, bereik, bediening, risicovol }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
@@ -1077,13 +1099,13 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).
        Dat is een instelling, geen functie van het scherm onder de meting. */
     const wortel = bereik ? document.querySelector(bereik) : document;
-    if (!wortel) return { klaar: true, zichtbaar: 0, merken: [], schil: 0 };
+    if (!wortel) return { klaar: true, zichtbaar: 0, merken: [], bedieningen: [], schil: 0 };
     /* Een open modale dialoog maakt de achtergrond tijdelijk onbedienbaar,
        ook al geeft offsetParent daar nog maten voor terug. Meet in die stand
        uitsluitend de top-layer dialoog. Zonder dit onderscheid telde de
        meter zowel paneel als achtergrond in dezelfde noemer en maakte hij
        zijn eigen bewijsgrens onhaalbaar. */
-    const modaal = [...document.querySelectorAll('dialog[open], [role="dialog"][aria-modal="true"]')]
+    const modaal = [...document.querySelectorAll('dialog[open], [role="dialog"]')]
       .find((el) => zie(el) && wortel.contains(el));
     const actiefWortel = modaal || wortel;
     const kandidaten = Array.from(actiefWortel.querySelectorAll(bediening))
@@ -1110,6 +1132,10 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer
        stonden ze vier keer. */
     const merken = [...new Set(alle.map(merk))];
+    const bedieningen = [...new Map(alle.map((el) => [merk(el), {
+      merk: merk(el),
+      tekst: (el.innerText || el.value || el.getAttribute('aria-label') || el.title || '').trim().replace(/\s+/g, ' ').slice(0, 80)
+    }])).values()];
     const zichtbaar = merken.length;
     const schil = kandidaten.length - alle.length;
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
@@ -1148,9 +1174,9 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       herhaling = !!doel;
       if (doel) herhaalSleutel = alGehad.length + '§' + stand + '§' + merk(doel);
     }
-    if (!doel) return { klaar: true, zichtbaar, merken, schil };
+    if (!doel) return { klaar: true, zichtbaar, merken, bedieningen, schil };
     doel.setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar, merken, schil, merk: merk(doel), herhaling, herhaalSleutel,
+    return { klaar: false, zichtbaar, merken, bedieningen, schil, merk: merk(doel), herhaling, herhaalSleutel,
       tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
   }, { alGehad: [...gehad], alHerhaald: [...herhaald], magHerhalen, SCHIL: GEDEELDE_SCHIL, bereik,
     bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });

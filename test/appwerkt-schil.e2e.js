@@ -97,6 +97,17 @@ const AFGEWERKTE_DIALOOG = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="fetch(\'/api/dialoogactie\',{method:\'POST\'})">Taakactie</button></dialog>' +
   '</main></body></html>';
 
+/* Veel RTG-panelen gebruiken het toegankelijke role=dialog-contract zonder
+   aria-modal. Ook daar is de dialoog de actieve laag. De CSS-onzichtbare knop
+   mag pas meetellen nadat de zichtbare actie haar werkelijk onthult. */
+const ROLE_DIALOG = '<!doctype html><html><body><main>' +
+  '<button type="button" onclick="document.getElementById(\'paneel\').hidden=false">Open paneel</button>' +
+  '<button type="button" onclick="window.hoofdactie=true">Volgende hoofdactie</button>' +
+  '<div id="paneel" role="dialog" hidden><button type="button" onclick="this.parentNode.hidden=true">Sluiten</button>' +
+  '<button type="button" onclick="document.getElementById(\'later\').style.opacity=1">Toon vervolg</button>' +
+  '<button id="later" type="button" style="opacity:0" onclick="window.vervolg=true">Verborgen vervolg</button></div>' +
+  '</main></body></html>';
+
 const MODULEBEREIK = '<!doctype html><html><body><main>' +
   Array.from({ length: 8 }, (_, i) => '<button type="button">Andere module ' + i + '</button>').join('') +
   '<section data-view="doel"><button type="button">Doel een</button><button type="button">Doel twee</button></section>' +
@@ -136,7 +147,8 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
         (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
           (req.url.startsWith('/apps/vervolg') ? VERVOLGDIALOOG :
             (req.url.startsWith('/apps/afgewerkt') ? AFGEWERKTE_DIALOOG :
-              (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))))); });
+              (req.url.startsWith('/apps/roledialog') ? ROLE_DIALOG :
+                (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -191,6 +203,12 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(klaar.geklikt, klaar.gevonden, 'na de afgewerkte dialoog wordt de resterende hoofdactie geraakt');
     assert.equal(dialoogActies, 1, 'een reeds bewezen taakactie wordt niet opnieuw uitgevoerd om de dialoog te verlaten');
     assert.deepEqual(klaar.nietKlikbaar, [], 'de expliciete sluitroute houdt de achtergrond bereikbaar');
+    assert.deepEqual(klaar.onaangeraakt, [], 'de bewijsuitvoer noemt geen reeds geraakte bediening als restant');
+
+    const role = await bedien(ctx, base, '/apps/roledialog.html');
+    assert.equal(role.gevonden, 5, 'de role-dialog en het pas later zichtbare vervolg tellen ieder precies eenmaal');
+    assert.equal(role.geklikt, role.gevonden, 'ook een role-dialog zonder aria-modal wordt volledig bediend');
+    assert.deepEqual(role.onaangeraakt, [], 'CSS-onzichtbare bediening telt pas zodra zij werkelijk zichtbaar is');
 
     const { meetIngang } = require('../scripts/appwerkt');
     const meet = meetIngang({ functie: 'tab:doel' }, {

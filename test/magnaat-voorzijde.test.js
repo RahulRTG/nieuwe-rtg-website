@@ -51,11 +51,12 @@ test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert e
   for(const id of ['mvGaVerder','mvVoerKeuzeUit','mvStartVolledig','mvVolgende','capsMeer']){
     assert.match(html,new RegExp('<button[^>]*id="'+id+'"[^>]*data-stand="magnaat-[^"]+"'));
   }
-  assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" aria-label="Kies aanpak:/);
-  assert.match(html,/data-duty="'\+esc\(x\.functieId\)\+'" data-stand="magnaat-dossier" aria-label="Open dossier/);
+  assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie aria-label="Kies aanpak:/);
+  assert.match(html,/data-duty="'\+esc\(x\.functieId\)\+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier/);
   assert.match(html,/data-start="'\+esc\(c\.id\)\+'" data-stand="magnaat-capability" aria-label="'\+label\+'"/);
   assert.match(html,/const label='Start '\+esc\(c\.naam\)\+' in '\+esc\(c\.software\.naam\)/);
   assert.match(html,/document\.addEventListener\('keydown',e=>\{/);
   assert.match(html,/if\(e\.key!=='Escape'\)return/);
   for(const laag of ['teamOverlay','partnerOverlay','taskOverlay'])assert.ok(html.includes("sluitLaag('#"+laag+"')"),laag);
+  for(const label of ['Sluit opdracht','Sluit bedrijfstraining','Sluit teamkamer'])assert.match(html,new RegExp('aria-label="'+label+'"'));
 });

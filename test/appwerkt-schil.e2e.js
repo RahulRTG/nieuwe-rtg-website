@@ -28,7 +28,9 @@ const schil = '<div class="rtg-edge-chrome">' +
   '</div><button type="button" class="rnd-toets" style="position:absolute;left:-9999px">Instellingen openen</button>' +
   '<button type="button" data-ds-zoek onclick="window.schilGetikt=(window.schilGetikt||0)+1">Spring naar een functie</button>' +
   '<div class="ds-edge"><button type="button" onclick="window.schilGetikt=(window.schilGetikt||0)+1">Vraag Rahul</button></div>' +
-  '<div class="rtgsprong"><button type="button" onclick="window.schilGetikt=(window.schilGetikt||0)+1">Globale sprong</button></div>';
+  '<div class="rtgsprong"><button type="button" onclick="window.schilGetikt=(window.schilGetikt||0)+1">Globale sprong</button></div>' +
+  '<button type="button" class="rtg-rahul-tab">Rahul <small>KOMPAS</small></button>' +
+  '<section class="rtg-rahul-page"><button type="button">Command-actie</button></section>';
 const kaart = '<div class="kaart"><button type="button" onclick="window.eigen=(window.eigen||0)+1">Bekijken</button></div>';
 const SCHERM = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="window.eigen=(window.eigen||0)+1">Vernieuwen</button>' +
@@ -51,12 +53,17 @@ const STANDWISSEL = '<!doctype html><html><body><main id="vlak">' +
   '</main></body></html>';
 
 /* De productie-inventaris bevat schermen met meer dan tachtig unieke
-   handelingen. De bewijsgrens is minstens de helft werkelijk aantikken. Elke
+   handelingen. De bewijsgrens is ze allemaal werkelijk aantikken. Elke
    tik hieronder schakelt bewust zichzelf en haar vaste paar uit: na 41 echte tikken is
-   de hele stand doorlopen. Een plafond van 40 maakt dit scherm per definitie
-   onbewijsbaar; een passende begrenzing bereikt exact de bestaande grens. */
+   de hele stand doorlopen. De schone heropening moet daarna ook de overige
+   unieke handtekeningen echt raken; een passende begrenzing bereikt ze alle. */
 const BREED_SCHERM = '<!doctype html><html><body><main>' +
   Array.from({ length: 82 }, (_, i) => '<button type="button" id="breed-' + i + '" onclick="document.getElementById(\'breed-' + (i < 41 ? i + 41 : i) + '\').disabled=true;this.disabled=true">Handeling ' + i + '</button>').join('') +
+  '</main></body></html>';
+
+const RISICO_SCHERM = '<!doctype html><html><body><main>' +
+  '<button type="button" onclick="if(confirm(\'zeker?\'))window.verwijderd=true">Verwijder mijn gegevens</button>' +
+  '<input type="button" value="Download overzicht" onclick="window.downloadAangeraakt=true">' +
   '</main></body></html>';
 
 /* De eerste bediening laat bewust een niet-sluitende laag achter. De overige
@@ -102,9 +109,10 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT :
       (req.url.startsWith('/apps/standwissel') ? STANDWISSEL :
         (req.url.startsWith('/apps/breed') ? BREED_SCHERM :
+        (req.url.startsWith('/apps/risico') ? RISICO_SCHERM :
         (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
           (req.url.startsWith('/apps/vervolg') ? VERVOLGDIALOOG :
-            (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))); });
+            (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -113,9 +121,9 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     const b = await bedien(ctx, base, '/apps/x.html');
     assert.equal(b.gevonden, 3, 'drie eigen knoppen; vier keer "Bekijken" is een handeling');
     assert.equal(b.geklikt, 3, 'en alle drie zijn aangetikt');
-    assert.equal(b.schil, 34, 'de generieke en Design-Systemschil worden apart gemeld');
+    assert.equal(b.schil, 36, 'de generieke Edge-, Rahul- en Design-Systemschil worden apart gemeld');
     assert.deepEqual(b.nietKlikbaar, [], 'de toetsknop buiten beeld is geen bevinding over dit scherm');
-    assert.ok(b.geklikt * 2 >= b.gevonden, 'met deze noemer is BEWEZEN haalbaar');
+    assert.equal(b.geklikt, b.gevonden, 'alle unieke eigen bediening is aangetikt');
     assert.deepEqual(b.bedekt, [], 'niets van het scherm ligt onder de schil');
 
     const d = await bedien(ctx, base, '/apps/bedekt.html');
@@ -130,10 +138,14 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
 
     const breed = await bedien(ctx, base, '/apps/breed.html');
     assert.equal(breed.gevonden, 82, 'alle unieke handelingen van het brede scherm staan in de noemer');
-    assert.ok(breed.geklikt >= 41, 'de proef bereikt minstens de helft met echte tikken');
-    assert.ok(breed.geklikt <= 72, 'de brede tegenproef blijft begrensd');
-    assert.ok(breed.geklikt * 2 >= breed.gevonden, 'de bestaande bewijsgrens is voor een breed scherm haalbaar');
+    assert.equal(breed.geklikt, breed.gevonden, 'de proef raakt alle brede bediening met echte tikken');
+    assert.ok(breed.geklikt <= 256, 'de brede tegenproef blijft begrensd');
     assert.deepEqual(breed.nietKlikbaar, [], 'geen handeling is administratief groen gemaakt');
+
+    const risico = await bedien(ctx, base, '/apps/risico.html');
+    assert.equal(risico.geklikt, risico.gevonden, 'ook risicovolle en input-knoppen zijn werkelijk aangeraakt');
+    assert.deepEqual(risico.risicovolAangeraakt.sort(), ['Download overzicht', 'Verwijder mijn gegevens']);
+    assert.ok(risico.instrument.some((x) => /browserbevestiging/.test(x)), 'de onomkeerbare bevestiging is afgebroken');
 
     const a = await bedien(ctx, base, '/apps/achtergebleven.html');
     assert.equal(a.gevonden, 6, 'de schone ingang bevat zes eigen handelingen');
@@ -189,8 +201,8 @@ test('OS-apps openen via Rahul en APPWERKT meet uitsluitend hun kiezer',
       assert.equal(gezien.poort, false, functie + ': de ingang bleef achter een poort');
       const bediening = await require('../scripts/appwerkt').bedien(ctx, base, meet);
       assert.ok(bediening.gevonden >= 1, functie + ': de geopende appstand heeft geen eigen bediening');
-      assert.ok(bediening.geklikt * 2 >= bediening.gevonden,
-        functie + ': minder dan de helft van de appbediening werkte (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+      assert.equal(bediening.geklikt, bediening.gevonden,
+        functie + ': niet alle appbediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
       assert.deepEqual(bediening.crash.concat(bediening.serverfout), [], functie + ': de appstand veroorzaakte fouten');
       assert.equal(bediening.schil, 0, functie + ': gedeelde Edge-bediening lekte in het meetbereik');
     }
@@ -226,8 +238,8 @@ test('APPWERKT opent Bord en Schrift met hun echte tabgebonden Schoolpas',
       assert.equal(gezien.poort, false, functie + ': de Schoolpas opende de deur niet');
       const bediening = await bedien(ctx, base, meet);
       assert.ok(bediening.gevonden >= 1, functie + ': het scherm heeft geen meetbare bediening');
-      assert.ok(bediening.geklikt * 2 >= bediening.gevonden,
-        functie + ': minder dan de helft van de bediening werkte (' + bediening.geklikt + '/' + bediening.gevonden + '): ' +
+      assert.equal(bediening.geklikt, bediening.gevonden,
+        functie + ': niet alle bediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + '): ' +
         JSON.stringify({ overgeslagen: bediening.overgeslagen, nietKlikbaar: bediening.nietKlikbaar,
           onderschept: bediening.onderschept, instrument: bediening.instrument }));
       assert.deepEqual(bediening.crash.concat(bediening.serverfout), [], functie + ': de bediening veroorzaakte fouten');

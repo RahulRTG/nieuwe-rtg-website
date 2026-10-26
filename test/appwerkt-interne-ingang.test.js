@@ -1,7 +1,17 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { meetIngang } = require('../scripts/appwerkt');
+const { meetIngang, volledigeBediening } = require('../scripts/appwerkt');
+
+test('bedienbaar vereist honderd procent van de unieke toepasselijke bediening', () => {
+  assert.equal(volledigeBediening({ gevonden: 10, geklikt: 10, overgeslagen: [] }), true);
+  assert.equal(volledigeBediening({ gevonden: 10, geklikt: 9, overgeslagen: [] }), false,
+    'ook negentig procent blijft open');
+  assert.equal(volledigeBediening({ gevonden: 10, geklikt: 10, overgeslagen: ['Betaal'] }), false,
+    'een overgeslagen risicoknop mag niet administratief groen worden');
+  assert.equal(volledigeBediening({ gevonden: 0, geklikt: 0, overgeslagen: [] }), false,
+    'een scherm zonder gemeten bediening heeft geen bedieningsbewijs');
+});
 
 test('een gewone app houdt zijn bestaande adres als meetingang', () => {
   assert.deepEqual(meetIngang({ functie: 'link:a', pad: '/apps/a.html' }, {}),

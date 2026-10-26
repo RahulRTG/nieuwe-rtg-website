@@ -73,7 +73,8 @@ const RISICO_SCHERM = '<!doctype html><html><body><main>' +
 const ACHTERGEBLEVEN_LAAG = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="document.body.insertAdjacentHTML(\'beforeend\',\'<div id=&quot;achtergebleven&quot; style=&quot;position:fixed;inset:0;z-index:99;background:#fff&quot;></div>\')">Open laag</button>' +
   Array.from({ length: 5 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1">Actie ' + i + '</button>').join('') +
-  '</main></body></html>';
+  '</main><div id="onbGate" style="position:fixed;inset:0;z-index:130;background:#000"></div>' +
+  '<script>setTimeout(()=>document.getElementById("onbGate").hidden=true,350)</script></body></html>';
 
 /* Een app-eigen dialoog is geen schil: de opener is pas de ingang naar de
    bediening die gekwalificeerd moet worden. De dialoog zit bewust achter twee
@@ -201,6 +202,7 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(a.geklikt, 6, 'een achtergebleven laag blokkeert de overige tegenproeven niet');
     assert.deepEqual(a.nietKlikbaar, [], 'een uitsluitend door de vorige proefstand geblokkeerde knop is opnieuw getoetst');
     assert.ok(a.instrument.some((x) => /schone ingang/.test(x)), 'de herhaalde tegenproef is verantwoord');
+    assert.deepEqual(a.onderschept, [], 'ook na iedere schone heropening wacht de meter tot de echte onboardinglaag weg is');
 
     const v = await bedien(ctx, base, '/apps/vervolg.html');
     assert.equal(v.gevonden, 9, 'beide openers, sluitroute en zes app-eigen dialoogacties zijn over alle standen uniek gemeten');

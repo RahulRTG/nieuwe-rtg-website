@@ -607,9 +607,20 @@ async function voerIngangAdapterUit(page, meet) {
   return meet;
 }
 
+async function wachtOpOnboarding(page) {
+  /* Iedere schone heropening bouwt app.html opnieuw op. De onboardinglaag is
+     dan kort zichtbaar terwijl de echte serverstatus wordt gelezen, ook als
+     dezelfde proefsessie al volledig is afgerond. Alleen bij de eerste ingang
+     wachten maakte de volle parallelle ronde afhankelijk van machinesnelheid:
+     Assets was los 8/8, maar werd onder belasting door #onbGate geblokkeerd.
+     Een scherm zonder deze laag voldoet direct aan `hidden`. */
+  await page.waitForSelector('#onbGate', { state: 'hidden', timeout: 12000 }).catch(() => {});
+}
+
 async function openIngang(page, base, ingang) {
   const meet = ingangOpties(ingang);
   await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await wachtOpOnboarding(page);
   await voerIngangAdapterUit(page, meet);
   return meet;
 }
@@ -763,7 +774,7 @@ async function bedien(ctx, base, ingang) {
        lag; de meter beschuldigde daarna Assets, Betalen en Reizen van de deur
        die hij zelf te vroeg had gemeten. Wacht op het waarneembare product-
        gedrag. Een scherm zonder zo'n laag voldoet meteen aan `hidden`. */
-    await page.waitForSelector('#onbGate', { state: 'hidden', timeout: 12000 }).catch(() => {});
+    await wachtOpOnboarding(page);
     luister(page, base, { crash, config, serverfout, rem, weigering, wachtend });   // pas NA het laden: laadfouten horen bij bewijs 1
     if (meet.adapter) await voerIngangAdapterUit(page, meet);
     /* Een interne module tekent haar inhoud vaak pas na meerdere API-antwoorden.

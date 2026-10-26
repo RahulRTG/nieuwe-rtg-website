@@ -53,6 +53,9 @@ test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert e
   }
   assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie aria-label="Kies aanpak:/);
   assert.match(html,/data-duty="'\+esc\(x\.functieId\)\+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier/);
+  assert.match(html,/if\(actief\)\{TASK=actief;toast\('Rond eerst het actieve dossier af; uw andere dossiers blijven klaarstaan\.'/);
+  assert.doesNotMatch(html,/\(klaar\|\|geblokkeerd\)\?'disabled'/);
+  assert.match(html,/data-next-duty data-contextactie data-hoofdactie/);
   assert.match(html,/data-start="'\+esc\(c\.id\)\+'" data-stand="magnaat-capability" aria-label="'\+label\+'"/);
   assert.match(html,/const label='Start '\+esc\(c\.naam\)\+' in '\+esc\(c\.software\.naam\)/);
   assert.match(html,/document\.addEventListener\('keydown',e=>\{/);

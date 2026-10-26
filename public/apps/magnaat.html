@@ -183,7 +183,7 @@
         <section class="mv-sectie"><h2>Uw speelruimte</h2><div class="mv-speelruimte"><div class="mv-feit"><small>Budget</small><b>€ 1.800</b></div><div class="mv-feit"><small>Team</small><b>7 mensen</b></div><div class="mv-feit"><small>Tijd</small><b>25 min</b></div></div></section>
         <section class="mv-sectie"><h2>Kies uw aanpak</h2><div class="mv-keuzes" id="mvKeuzes"></div></section>
         <p class="mv-grens">Dit is een korte, lokale oefening. Pas bij “Start volledige missie” wordt een echt synthetisch Magnaat-dossier geopend.</p>
-        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvVoerKeuzeUit" data-stand="magnaat-resultaat" data-hoofdactie disabled>Bekijk het gevolg</button><button class="mv-knop mv-knop--wijn" type="button" data-mv-diep="wereld" data-stand="magnaat-diep">Vraag uw team</button></div>
+        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvVoerKeuzeUit" data-stand="magnaat-resultaat" data-hoofdactie data-contextactie disabled>Bekijk het gevolg</button><button class="mv-knop mv-knop--wijn" type="button" data-mv-diep="wereld" data-stand="magnaat-diep">Vraag uw team</button></div>
       </section>
 
       <section class="mv-scherm" id="mvResultaat" data-mv-paneel="resultaat" hidden>
@@ -507,11 +507,12 @@ function renderDienst(){
   $('#dienstDossiers').innerHTML=d.dossiers.map(x=>{
     const bezig=x.status==='bezig',klaar=x.status==='klaar',geblokkeerd=!!actief&&!bezig;
     const status=klaar?'Afgerond':bezig?'In behandeling':'Open dossier';
-    return '<button class="dossier '+esc(x.status)+'" data-duty="'+esc(x.functieId)+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier '+esc(x.naam)+'" '+((klaar||geblokkeerd)?'disabled':'')+'><span class="d-status">0'+x.volgorde+' · '+status+'</span><h4>'+esc(x.naam)+'</h4><p>'+esc(x.software.naam)+' · '+esc(x.spelvorm)+'</p></button>';
+    return '<button class="dossier '+esc(x.status)+(geblokkeerd?' geblokkeerd':'')+'" data-duty="'+esc(x.functieId)+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier '+esc(x.naam)+'" '+(klaar?'disabled':'')+'><span class="d-status">0'+x.volgorde+' · '+status+'</span><h4>'+esc(x.naam)+'</h4><p>'+esc(x.software.naam)+' · '+esc(x.spelvorm)+'</p></button>';
   }).join('');
   document.querySelectorAll('[data-duty]').forEach(b=>b.onclick=()=>{
     const x=d.dossiers.find(v=>v.functieId===b.dataset.duty);
     if(x&&x.status==='bezig'&&DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;openTask();return}
+    if(actief){TASK=actief;toast('Rond eerst het actieve dossier af; uw andere dossiers blijven klaarstaan.');openTask();return}
     startTask(b.dataset.duty);
   });
 }
@@ -571,7 +572,7 @@ document.addEventListener('keydown',e=>{
   if(sluitLaag('#partnerOverlay')){e.preventDefault();return}
   if(sluitLaag('#taskOverlay'))e.preventDefault();
 });
-function renderPda(){const e=$('#pdaTask'),m=$('#missionNow');const t=TASK&&TASK.status==='bezig'?TASK:(DATA&&DATA.speler.actieveTaak);if(!t){const dienst=DATA&&DATA.speler.dienst,next=dienst&&dienst.dossiers.find(x=>x.status==='open');if(next){e.innerHTML='<b>Volgend dossier</b><p>'+esc(next.naam)+'<br>Open '+esc(next.software.naam)+' in de echte RTG-app.</p><button class="btn" data-next-duty data-contextactie>Start dossier 0'+next.volgorde+'</button>';e.querySelector('button').onclick=()=>startTask(next.functieId);if(m)m.innerHTML='<b>Dagdienst '+dienst.voltooid+'/'+dienst.doel+'</b>Volgende: '+esc(next.naam)+' via '+esc(next.software.naam)+'.';return}e.innerHTML='<b>Dienst voltooid</b><p>Alle dossiers van vandaag zijn verwerkt.</p><button class="btn" data-pda-hall data-contextactie>Vrije functie</button>';e.querySelector('button').onclick=()=>go('speelhal');if(m)m.innerHTML='<b>Dienst voltooid</b>De bonus is verwerkt. Vrije missies blijven beschikbaar.';return}const actie=t.huidig&&t.huidig.soort==='software'?t.huidig.vraag:'Maak de operationele keuze in het dossier.';e.innerHTML='<b>'+esc(t.functieNaam)+'</b><p>'+esc(actie)+'<br>Stap '+(t.stap+1)+' van '+t.stappen+'</p><button class="btn" data-resume data-contextactie>Bekijk dossier</button>';e.querySelector('button').onclick=()=>{TASK=t;openTask()};if(m)m.innerHTML='<b>'+esc(t.titel)+'</b>'+esc(actie)}
+function renderPda(){const e=$('#pdaTask'),m=$('#missionNow');const t=TASK&&TASK.status==='bezig'?TASK:(DATA&&DATA.speler.actieveTaak);if(!t){const dienst=DATA&&DATA.speler.dienst,next=dienst&&dienst.dossiers.find(x=>x.status==='open');if(next){e.innerHTML='<b>Volgend dossier</b><p>'+esc(next.naam)+'<br>Open '+esc(next.software.naam)+' in de echte RTG-app.</p><button class="btn" data-next-duty data-contextactie data-hoofdactie>Start dossier 0'+next.volgorde+'</button>';e.querySelector('button').onclick=()=>startTask(next.functieId);if(m)m.innerHTML='<b>Dagdienst '+dienst.voltooid+'/'+dienst.doel+'</b>Volgende: '+esc(next.naam)+' via '+esc(next.software.naam)+'.';return}e.innerHTML='<b>Dienst voltooid</b><p>Alle dossiers van vandaag zijn verwerkt.</p><button class="btn" data-pda-hall data-contextactie data-hoofdactie>Vrije functie</button>';e.querySelector('button').onclick=()=>go('speelhal');if(m)m.innerHTML='<b>Dienst voltooid</b>De bonus is verwerkt. Vrije missies blijven beschikbaar.';return}const actie=t.huidig&&t.huidig.soort==='software'?t.huidig.vraag:'Maak de operationele keuze in het dossier.';e.innerHTML='<b>'+esc(t.functieNaam)+'</b><p>'+esc(actie)+'<br>Stap '+(t.stap+1)+' van '+t.stappen+'</p><button class="btn" data-resume data-contextactie data-hoofdactie>Bekijk dossier</button>';e.querySelector('button').onclick=()=>{TASK=t;openTask()};if(m)m.innerHTML='<b>'+esc(t.titel)+'</b>'+esc(actie)}
 
 /* De twee apparaten tonen niet een nagetekende game-app maar de echte
    public/apps/app.html uit deze codebase. In ?magnaat=1 praat dat OS niet met

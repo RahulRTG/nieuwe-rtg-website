@@ -66,7 +66,8 @@
    WAT DIT SCRIPT NIET ZIET, en dat staat er even groot bij: het vult geen
    formulieren in. Het raakt sinds de volledige-bedieningsnorm wel iedere
    zichtbare knop, inclusief risicovolle bediening, maar uitsluitend op de
-   lokale wegwerpserver; browserbevestigingen worden afgebroken en de
+   lokale wegwerpserver; browserbevestigingen worden afgebroken, muterende
+   verzoeken van zo'n UI-tik worden als `risicoFixtures` verantwoord en de
    risicovolle namen staan per rij in `risicovolAangeraakt`. Een groene rij betekent dus
    "de ingang opent en de bediening breekt niet", en nadrukkelijk niet "de
    functie werkt". Dat verschil is de hele reden dat de andere vijf bewijzen er
@@ -169,9 +170,10 @@ const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[t
 const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page';
 
 /* Risicovolle namen worden als laatste bediend op de lokale wegwerpserver en
-   afzonderlijk verantwoord. Een browserbevestiging wordt afgebroken; de knop
-   zelf is dan wel echt geraakt, terwijl verwijdering of betaling niet buiten
-   de daarvoor bedoelde voltooi- en financiële proef wordt uitgevoerd. */
+   afzonderlijk verantwoord. Een browserbevestiging wordt afgebroken en een
+   muterend verzoek wordt voor die ene UI-tik gefixttured; de knop zelf is dan
+   wel echt geraakt, terwijl verwijdering of betaling niet buiten de daarvoor
+   bedoelde voltooi- en financiële proef wordt uitgevoerd. */
 const RISICOVOL = /uitlog|log uit|sign ?out|verwijder|delete|wis alles|betaal|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
 
 /* De DRIE toegangspoorten in dit huis, als selector. Geen woordenlijst en geen
@@ -368,7 +370,7 @@ async function maakContext(browser, opslag) {
 }
 
 async function meetRij(rij, base, persoonlijk, rollen) {
-  const r = { ...rij, bewijzen: {}, gevonden: 0, geklikt: 0, overgeslagen: [], risicovolAangeraakt: [], nietKlikbaar: [], waarnemingen: [] };
+  const r = { ...rij, bewijzen: {}, gevonden: 0, geklikt: 0, overgeslagen: [], risicovolAangeraakt: [], risicoFixtures: [], nietKlikbaar: [], waarnemingen: [] };
   delete r.soort; delete r.pad;
 
   const meet = meetIngang(rij);
@@ -492,6 +494,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.bedekt = bediening.bedekt;
   r.overgeslagen = bediening.overgeslagen;
   r.risicovolAangeraakt = bediening.risicovolAangeraakt;
+  r.risicoFixtures = bediening.risicoFixtures;
   r.nietKlikbaar = bediening.nietKlikbaar;
   r.onderschept = bediening.onderschept;
   if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
@@ -684,7 +687,39 @@ async function bedien(ctx, base, ingang) {
   };
   let heropeningen = 0, laatsteHeropenStand = -1;
   const opnieuwGeprobeerd = new Set();
-  const overgeslagen = [], risicovolAangeraakt = [], nietKlikbaar = [], onderschept = [], instrument = [];
+  const overgeslagen = [], risicovolAangeraakt = [], risicoFixtures = [], nietKlikbaar = [], onderschept = [], instrument = [];
+  /* APPWERKT bewijst dat de zichtbare bediening reageert; de mutatie-,
+     voltooi- en financiële proeven bewijzen het zakelijke gevolg. Dat
+     onderscheid is ook een veiligheidsgrens. Een echte tik op bijvoorbeeld
+     Uitloggen trok vroeger de server-side proefsessie in die nog door andere
+     apps werd gebruikt. De eerste volledige 100%-ronde maakte daardoor na
+     twintig apps zijn eigen volgende metingen ongeldig.
+
+     Laat de browser de risicovolle knop daarom werkelijk bedienen, inclusief
+     alle lokale handlers, dialoog en navigatie, maar vang uitsluitend gedurende
+     die ene tik een muterend verzoek aan DE LOKALE WEGWERPSERVER af. GET/HEAD
+     blijven echt, externe adressen blijven ongemoeid en iedere fixture wordt
+     met methode en pad verantwoord. Dit is geen productie-mock en maakt geen
+     zakelijk bewijs groen: die gevolgen blijven uitsluitend uit de aparte
+     contractproeven komen. */
+  let actieveRisicoklik = null;
+  const basisHerkomst = new URL(base).origin;
+  await page.route('**/*', async (route) => {
+    const verzoek = route.request();
+    const methode = verzoek.method().toUpperCase();
+    let url;
+    try { url = new URL(verzoek.url()); } catch (e) { return route.continue(); }
+    if (!actieveRisicoklik || url.origin !== basisHerkomst || /^(GET|HEAD|OPTIONS)$/.test(methode)) {
+      return route.continue();
+    }
+    const bewijs = { knop: actieveRisicoklik, methode, pad: url.pathname };
+    if (!risicoFixtures.some((x) => x.knop === bewijs.knop && x.methode === bewijs.methode && x.pad === bewijs.pad)) {
+      risicoFixtures.push(bewijs);
+    }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      ok: true, success: true, status: 'appwerkt-proef', id: 'appwerkt-proef', reference: 'appwerkt-proef'
+    }) });
+  });
   page.on('dialog', async (dialoog) => {
     instrument.push('de proef raakte bediening met een browserbevestiging en brak de onomkeerbare bevestiging af');
     await dialoog.dismiss().catch(() => {});
@@ -772,10 +807,13 @@ async function bedien(ctx, base, ingang) {
       }
       gehad.add(k.merk);
       laatste = k.tekst || '(naamloos)';
-      if (RISICOVOL.test(laatste) && !risicovolAangeraakt.includes(laatste)) risicovolAangeraakt.push(laatste);
+      const isRisicovol = RISICOVOL.test(laatste);
+      if (isRisicovol && !risicovolAangeraakt.includes(laatste)) risicovolAangeraakt.push(laatste);
       try {
+        actieveRisicoklik = isRisicovol ? laatste : null;
         await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
         await page.waitForTimeout(600);
+        actieveRisicoklik = null;
         geklikt++;
         await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
         /* EN DAN DICHT, zoals een mens doet. Een tik opent vaak een laag (het
@@ -804,6 +842,7 @@ async function bedien(ctx, base, ingang) {
           await page.waitForTimeout(250);
         }
       } catch (e) {
+        actieveRisicoklik = null;
         /* De reden van een time-out staat in de LOG van Playwright ("intercepts
            pointer events", "element is not visible"), niet in de boodschap.
            Zonder die reden is "niet aan te tikken" een dood getal: een knop
@@ -866,7 +905,7 @@ async function bedien(ctx, base, ingang) {
   }
   await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
   await page.close();
-  return { geklikt, gevonden, schil, bedekt, overgeslagen, risicovolAangeraakt, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  return { geklikt, gevonden, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.

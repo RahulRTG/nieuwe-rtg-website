@@ -63,6 +63,7 @@ const BREED_SCHERM = '<!doctype html><html><body><main>' +
 
 const RISICO_SCHERM = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="if(confirm(\'zeker?\'))window.verwijderd=true">Verwijder mijn gegevens</button>' +
+  '<button type="button" onclick="fetch(\'/api/risico\',{method:\'POST\',headers:{\'content-type\':\'application/json\'},body:\'{}\'})">Betaal proef</button>' +
   '<input type="button" value="Download overzicht" onclick="window.downloadAangeraakt=true">' +
   '</main></body></html>';
 
@@ -105,7 +106,15 @@ test('APPWERKT wijst de canonieke premium-suite aan een Lifestyle-lid toe', () =
 
 test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', { skip: geenBrowser(pw) }, async () => {
   const { bedien } = require('../scripts/appwerkt');
-  const srv = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html');
+  let risicoMutaties = 0;
+  const srv = http.createServer((req, res) => {
+    if (req.url === '/api/risico') {
+      risicoMutaties++;
+      res.setHeader('Content-Type', 'application/json');
+      res.end('{"ok":true}');
+      return;
+    }
+    res.setHeader('Content-Type', 'text/html');
     res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT :
       (req.url.startsWith('/apps/standwissel') ? STANDWISSEL :
         (req.url.startsWith('/apps/breed') ? BREED_SCHERM :
@@ -144,8 +153,11 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
 
     const risico = await bedien(ctx, base, '/apps/risico.html');
     assert.equal(risico.geklikt, risico.gevonden, 'ook risicovolle en input-knoppen zijn werkelijk aangeraakt');
-    assert.deepEqual(risico.risicovolAangeraakt.sort(), ['Download overzicht', 'Verwijder mijn gegevens']);
+    assert.deepEqual(risico.risicovolAangeraakt.sort(), ['Betaal proef', 'Download overzicht', 'Verwijder mijn gegevens']);
     assert.ok(risico.instrument.some((x) => /browserbevestiging/.test(x)), 'de onomkeerbare bevestiging is afgebroken');
+    assert.equal(risicoMutaties, 0, 'de UI-meting voert geen risicovolle servermutatie uit');
+    assert.deepEqual(risico.risicoFixtures, [{ knop: 'Betaal proef', methode: 'POST', pad: '/api/risico' }],
+      'de onderschepte mutatie is expliciet en controleerbaar verantwoord');
 
     const a = await bedien(ctx, base, '/apps/achtergebleven.html');
     assert.equal(a.gevonden, 6, 'de schone ingang bevat zes eigen handelingen');

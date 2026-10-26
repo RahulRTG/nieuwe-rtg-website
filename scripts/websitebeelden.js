@@ -9,7 +9,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { start } = require('./lib/wegwerpserver');
 const { startChromium } = require('./lib/scherm');
-const { haalSessies, opslagVoor } = require('./lib/proefsessies');
+const { haalSessies, opslagVoor, rondLidAf } = require('./lib/proefsessies');
 const { schermBronHash, PLATFORM } = require('./websitewaarheid');
 
 const ROOT = path.join(__dirname, '..');
@@ -21,30 +21,6 @@ async function post(basis, pad, body) {
   const data = await antwoord.json().catch(() => ({}));
   if (!antwoord.ok) throw new Error(pad + ' gaf ' + antwoord.status + ': ' + JSON.stringify(data).slice(0, 180));
   return data;
-}
-
-async function postMetToken(basis, pad, body, token) {
-  const antwoord = await fetch(basis + pad, { method: 'POST', headers: {
-    'Content-Type': 'application/json', Authorization: 'Bearer ' + token
-  }, body: JSON.stringify(body || {}) });
-  const data = await antwoord.json().catch(() => ({}));
-  if (!antwoord.ok) throw new Error(pad + ' gaf ' + antwoord.status + ': ' + JSON.stringify(data).slice(0, 180));
-  return data;
-}
-
-async function rondLidAf(basis, token) {
-  let status = await postMetToken(basis, '/api/onboarding/status', {}, token);
-  const waarden = { geboortedatum: '1985-05-05', naam: 'Rahul Imran',
-    email: 'roellie.i@gmail.com', telefoon: '0612345678', adres: 'Voorbeeldstraat 1',
-    postcode: '1000 AA', woonplaats: 'Amsterdam', land: 'Nederland', nationaliteit: 'Nederlands' };
-  const velden = {};
-  (status.velden || []).filter((veld) => !veld.ingevuld && veld.type !== 'kyc')
-    .forEach((veld) => { if (waarden[veld.id]) velden[veld.id] = waarden[veld.id]; });
-  if (Object.keys(velden).length) status = await postMetToken(basis, '/api/onboarding/opslaan', { velden }, token);
-  if (!status.klaar) status = await postMetToken(basis, '/api/onboarding/teken', {
-    naam: 'Rahul Imran', akkoord: true, contractVersion: status.contract.versie
-  }, token);
-  if (!status.klaar) throw new Error('de demosessie kon niet volledig worden afgerond');
 }
 
 async function werkSessie(basis) {
@@ -71,7 +47,7 @@ async function main() {
       login: 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran'
     });
     if (!eigenaar.token) throw new Error('de bestaande demosessie leverde geen lid-token op');
-    await rondLidAf(server.basis, eigenaar.token);
+    await rondLidAf(server.basis, eigenaar.token, 'Rahul Imran');
     opslag.rtg_member_token = eigenaar.token;
     opslag.rtg_werk_sessie = JSON.stringify(await werkSessie(server.basis));
     opslag.rtg_lang = 'nl';

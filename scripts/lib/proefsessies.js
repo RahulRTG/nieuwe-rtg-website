@@ -32,7 +32,9 @@ const ROLLEN = {
       const r = await post(basis + '/api/auth/register', { name: 'Proeflid',
         email: 'pf' + u + '@voorbeeld.nl', phone: '06' + u.slice(0, 8),
         password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
-      return r && r.token ? r.token : null;
+      if (!r || !r.token) return null;
+      await rondLidAf(basis, r.token, 'Proeflid');
+      return r.token;
     }
   },
   zaak: {
@@ -103,6 +105,38 @@ async function postAls(url, lijf, token) {
     'Content-Type': 'application/json', Authorization: 'Bearer ' + token
   }, body: JSON.stringify(lijf) });
   return { status: r.status, data: await r.json().catch(() => null) };
+}
+
+/* Een browserproef die een gewone, bestaande functie meet hoort niet achter
+   de eenmalige ledenovereenkomst te blijven staan. Rond de proefsessie daarom
+   via exact dezelfde publieke onboardingroutes af als een mens. Dit vervangt
+   de verspreide `status: klaar`-mocks: de deur is werkelijk open, inclusief
+   de actuele contractversie en server-side ondertekening. */
+async function rondLidAf(basis, token, naam = 'Proeflid') {
+  let antwoord = await postAls(basis + '/api/onboarding/status', {}, token);
+  if (antwoord.status >= 400 || !antwoord.data) throw new Error('onboarding/status gaf HTTP ' + antwoord.status);
+  let status = antwoord.data;
+  const waarden = { geboortedatum: '1985-05-05', naam, email: 'proeflid@voorbeeld.nl',
+    telefoon: '0612345678', adres: 'Proefstraat 1', postcode: '1000 AA',
+    woonplaats: 'Amsterdam', land: 'Nederland', nationaliteit: 'Nederlands' };
+  const velden = {};
+  for (const veld of status.velden || []) {
+    if (!veld.ingevuld && veld.type !== 'kyc' && waarden[veld.id]) velden[veld.id] = waarden[veld.id];
+  }
+  if (Object.keys(velden).length) {
+    antwoord = await postAls(basis + '/api/onboarding/opslaan', { velden }, token);
+    if (antwoord.status >= 400 || !antwoord.data) throw new Error('onboarding/opslaan gaf HTTP ' + antwoord.status);
+    status = antwoord.data;
+  }
+  if (!status.klaar) {
+    antwoord = await postAls(basis + '/api/onboarding/teken', {
+      naam, akkoord: true, contractVersion: status.contract && status.contract.versie
+    }, token);
+    if (antwoord.status >= 400 || !antwoord.data) throw new Error('onboarding/teken gaf HTTP ' + antwoord.status);
+    status = antwoord.data;
+  }
+  if (!status.klaar) throw new Error('de echte onboardingroute rondde de proefsessie niet af');
+  return status;
 }
 
 /* Een Lifestyle-lid ontstaat hier niet door een tier in een testsessie te
@@ -186,4 +220,4 @@ function opslagVoor(sessies) {
   return uit;
 }
 
-module.exports = { ROLLEN, haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid };
+module.exports = { ROLLEN, haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid, rondLidAf };

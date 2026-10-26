@@ -42,6 +42,10 @@ test('Lifestyle-proefsessie ontstaat via menselijk besluit en opent alleen daarm
 
   const { sessies, overgeslagen } = await haalSessies(srv.base, ['lid']);
   assert.deepEqual(overgeslagen, []);
+  const onboarding = await api('/api/onboarding/status', sessies.lid.waarde);
+  assert.equal(onboarding.status, 200);
+  assert.equal(onboarding.body.klaar, true,
+    'de centrale browserpersona moet de echte onboardingroute hebben afgerond');
   const gewoon = await api('/api/member/rechterhand/hangar', sessies.lid.waarde);
   assert.equal(gewoon.status, 403, 'een gewone RTG Pass kreeg onverwacht toegang tot Hangar');
   assert.match(String(gewoon.body.error || ''), /Lifestyle Pass/);

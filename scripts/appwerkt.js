@@ -361,11 +361,9 @@ async function maakContext(browser, opslag) {
      het markeren maar voor de klik en onderschepte de body de invoer; dezelfde
      bronstand wisselde daardoor tussen 11/72 en 39/70 aangetikte knoppen. */
   const ctx = await browser.newContext({ serviceWorkers: 'block', reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
-  /* De intake is niet wat hier gemeten wordt: een vers lid staat voor de
-     ledenovereenkomst, en die tekent een mens een keer in zijn leven. Zelfde
-     ingreep als in scripts/tikken.js en de schermtoetsen. */
-  await ctx.route('**/api/onboarding/status', (r) => r.fulfill({ status: 200,
-    contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
+  /* haalSessies() rondt de echte onboarding en actuele overeenkomst via de
+     server af. Hier staat dus geen `klaar:true`-mock meer: interne ledenapp-
+     standen worden gemeten met dezelfde geactiveerde identiteit als een mens. */
   /* DE PERSONA SPREEKT NEDERLANDS. Zonder rtg_lang volgde het scherm de taal
      van de headless browser (en-US), dus mat deze proef de Engelse schil van
      een Nederlands huis -- gezien op 24 september 2026. */

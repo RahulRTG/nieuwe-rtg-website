@@ -50,6 +50,15 @@ const STANDWISSEL = '<!doctype html><html><body><main id="vlak">' +
   Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="document.querySelector(\'main\').innerHTML=\'<p>Stand ' + i + '</p>\';window.gedaan=' + (i + 1) + '">Stand ' + i + '</button>').join('') +
   '</main></body></html>';
 
+/* De productie-inventaris bevat schermen met meer dan tachtig unieke
+   handelingen. De bewijsgrens is minstens de helft werkelijk aantikken. Elke
+   tik hieronder schakelt bewust zichzelf en haar vaste paar uit: na 41 echte tikken is
+   de hele stand doorlopen. Een plafond van 40 maakt dit scherm per definitie
+   onbewijsbaar; een passende begrenzing bereikt exact de bestaande grens. */
+const BREED_SCHERM = '<!doctype html><html><body><main>' +
+  Array.from({ length: 82 }, (_, i) => '<button type="button" id="breed-' + i + '" onclick="document.getElementById(\'breed-' + (i < 41 ? i + 41 : i) + '\').disabled=true;this.disabled=true">Handeling ' + i + '</button>').join('') +
+  '</main></body></html>';
+
 /* De eerste bediening laat bewust een niet-sluitende laag achter. De overige
    knoppen zijn op de schone ingang wel bereikbaar. Dit onderscheidt een door
    de meetvolgorde veroorzaakte blokkade van een echte overlap in het product. */
@@ -92,9 +101,10 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
   const srv = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html');
     res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT :
       (req.url.startsWith('/apps/standwissel') ? STANDWISSEL :
+        (req.url.startsWith('/apps/breed') ? BREED_SCHERM :
         (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
           (req.url.startsWith('/apps/vervolg') ? VERVOLGDIALOOG :
-            (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))); });
+            (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -117,6 +127,13 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(s.geklikt, 6, 'iedere handeling is na een schone heropening werkelijk aangetikt');
     assert.ok(s.instrument.some((x) => /oorspronkelijke stand/.test(x)), 'de meting verantwoordt haar heropeningen');
     assert.deepEqual(s.crash.concat(s.serverfout), [], 'de standwissels bleven zonder browser- of serverfout');
+
+    const breed = await bedien(ctx, base, '/apps/breed.html');
+    assert.equal(breed.gevonden, 82, 'alle unieke handelingen van het brede scherm staan in de noemer');
+    assert.ok(breed.geklikt >= 41, 'de proef bereikt minstens de helft met echte tikken');
+    assert.ok(breed.geklikt <= 72, 'de brede tegenproef blijft begrensd');
+    assert.ok(breed.geklikt * 2 >= breed.gevonden, 'de bestaande bewijsgrens is voor een breed scherm haalbaar');
+    assert.deepEqual(breed.nietKlikbaar, [], 'geen handeling is administratief groen gemaakt');
 
     const a = await bedien(ctx, base, '/apps/achtergebleven.html');
     assert.equal(a.gevonden, 6, 'de schone ingang bevat zes eigen handelingen');

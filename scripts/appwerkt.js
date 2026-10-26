@@ -150,12 +150,14 @@ const stil = process.argv.includes('--stil');
 const alleenInventaris = process.argv.includes('--inventaris');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
-/* Hoogstens zoveel tikken per scherm. Het oordeel eist dat de proef minstens
-   de helft van de eigen knoppen raakt, dus een plafond van 14 maakte elk scherm
-   met meer dan 28 eigen knoppen per definitie onbewijsbaar (routedossier.html
-   heeft er 55). Met 40 kan dat tot 80; wat daarboven zit blijft NIET_GETEST,
-   met de telling erbij. */
-const MAXKLIK = 40;
+/* Hoogstens zoveel meetrondes per scherm. Een ronde kan behalve een echte tik
+   ook een begrensde heropening of tegenproef zijn. Het oude plafond van 40 was
+   daarom niet alleen een tiklimiet: schermen met 81-109 eigen handelingen
+   konden de ongewijzigde bewijsgrens van minstens de helft zelfs bij foutloze
+   bediening nooit halen. Met 72 is die grens voor de huidige grootste schermen
+   wel bereikbaar, terwijl een defect scherm nog steeds eindig wordt beproefd.
+   De bewijsgrens zelf blijft ongewijzigd. */
+const MAXKLIK = 72;
 
 /* Gedeelde bediening bewijst het scherm niet. Naast de generieke Edge en
    Command hebben gemigreerde Design-Systemschermen hun eigen .ds-edge en

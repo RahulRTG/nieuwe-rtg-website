@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-26T05:14:20.583Z",
-    "commit": "fb348ecfea",
+    "op": "2026-10-26T06:26:21.888Z",
+    "commit": "d11e9b0e4d",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 3,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.1"
   },
@@ -11,8 +11,7 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 112,
-    "NIET_GETEST": 2
+    "BEWEZEN": 114
   },
   "regels": [
     {
@@ -1040,8 +1039,10 @@
       "app": "RTFoundation",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "33 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 33,
+      "klachten": []
     },
     {
       "functie": "os:snaps",
@@ -1058,8 +1059,10 @@
       "app": "Videobellen",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "geen meetbare contractingang: een stand of kiezer binnen de ledenapp"
+      "status": "BEWEZEN",
+      "reden": "33 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 33,
+      "klachten": []
     },
     {
       "functie": "os:werk",

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-26T05:56:18.578Z",
-    "commit": "fb348ecfea",
+    "op": "2026-10-26T06:25:36.280Z",
+    "commit": "d11e9b0e4d",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 2,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.1"
   },
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/PP2KNP/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/5YC9B6/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1170,7 +1170,7 @@
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 3,
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden)"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: niet elk paar bewijst A en B op eigen code binnen, B op A's code en anoniem geweigerd met 401/403 (gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, gescheiden, eigenaarWeg, gescheiden, gescheiden)"
     },
     {
       "functie": "link:wallet",
@@ -1238,7 +1238,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp; appkruisproef: geen expliciete appkruisproef in VOLTOOIPROEF.json"
+      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen; appkruisproef: geen expliciete appkruisproef in VOLTOOIPROEF.json"
     },
     {
       "functie": "os:snaps",
@@ -1255,7 +1255,9 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp; appkruisproef: geen expliciete appkruisproef in VOLTOOIPROEF.json"
+      "routes": 11,
+      "open": 11,
+      "reden": "11 van de 11 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/klets: IDOR draagt geen volledige ruwe antwoordafbakening; /api/klets/gesprek: IDOR draagt geen volledige ruwe antwoordafbakening; appkruisproef: geen expliciete appkruisproef in VOLTOOIPROEF.json"
     },
     {
       "functie": "os:werk",

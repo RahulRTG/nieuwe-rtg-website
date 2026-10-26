@@ -254,7 +254,7 @@ async function laadMijn(){
     '<div class="regel"><span>Aan de poort</span><b>'+eur(t.prijsCenten)+' ('+(t.status==='gescand'?'gescand':'contant of RTG Pay')+')</b></div>'+
     '<div class="sport-ticket"><img class="sport-ticket-qr" data-ticket-code="'+esc(t.code)+'" alt="QR-toegangscode voor '+esc(t.wedstrijd)+'"><div><small>Toegangscode</small><div class="sport-ticket-code">'+esc(t.code)+'</div><div class="meta">'+(t.status==='gescand'?'Gescand bij de entree; veel plezier.':'Laat deze code zien bij de entree van '+esc(t.club))+'</div></div></div>'+
     '<div class="sport-ticket-actions"><a href="#mijn">Toon toegang</a><a href="/apps/navigatie.html">Open route</a></div></div>').join('')
-    :'<div class="leeg">Nog geen tickets.<div class="rij"><button class="knop" data-open="tickets">Kies een wedstrijd</button></div></div>';
+    :'<div class="leeg">Nog geen tickets.<div class="rij"><button class="knop" data-open="tickets" data-hoofdactie>Kies een wedstrijd</button></div></div>';
   document.querySelectorAll('[data-ticket-code]').forEach(img=>{try{if(window.RTGQRteken)img.src=RTGQRteken.dataURL(img.dataset.ticketCode,{schaal:5,quiet:3});}catch(e){img.hidden=true;}});
   verbindOpen();
 }

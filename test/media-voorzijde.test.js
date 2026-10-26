@@ -45,6 +45,18 @@ test('de Media-voordeur legt de aanbeveling eerlijk uit', () => {
   assert.doesNotMatch(html, /oneindige feed|automatisch abonnement|universeel abonnement/i);
 });
 
+test('de releasecontrole is een toegankelijke laag met focusherstel', () => {
+  const html = lees('public/apps/media.html');
+  const studio = lees('public/apps/media/studio.js');
+  assert.match(html, /id="mediaRechten" role="dialog" aria-modal="true"/);
+  assert.match(html, /aria-controls="mediaRechten" aria-expanded="false"/);
+  assert.match(html, /id="rechtenSluit"[^>]*aria-label="Sluit releasecontrole"/);
+  assert.match(studio, /setAttribute\('aria-expanded','true'\)/);
+  assert.match(studio, /setAttribute\('aria-expanded','false'\)/);
+  assert.match(studio, /rechtenHerkomst\.focus\(\)/);
+  assert.match(studio, /e\.key==='Escape'/);
+});
+
 test('de nieuwe Media-laag blijft klein en de systeemradius blijft centraal', () => {
   const css = lees('public/shared/rtg-media-2026.css');
   const js = lees('public/apps/media/voorzijde.js');

@@ -479,7 +479,7 @@ async function openBericht(m){
       (volledig.map!=='prullenbak'?'<button class="knp" data-act="prullenbak">Weggooien</button>':'')+
       '<button class="knp" data-act="ster">'+(volledig.favoriet?'Ster eraf':'Ster erop')+'</button>'+
       '<button class="knp" data-act="sluimer">Sluimeren tot morgen</button>'+
-      '<button class="knp" data-act="draad">Toon het gesprek</button>'+
+      '<button class="knp" data-act="draad" data-stand="gesprek">Toon het gesprek</button>'+
     '</div>'+
     '<div class="fout" id="aFout" hidden></div></div>';
   bindLinks($('#body'));
@@ -508,7 +508,9 @@ async function handel(m, wat){
 /* Het gesprek. Wat er buiten beeld blijft wordt GETELD en genoemd: verzwijgen
    dat een draad meer bevat, misleidt net zo goed als het tonen ervan. */
 async function toonDraad(m){
+  const main=$('#main'); main.setAttribute('aria-busy','true');
   let d; try{ d=await api('draad',{id:m.id}); }catch(e){ return; }
+  finally { main.removeAttribute('aria-busy'); }
   $('#main').innerHTML =
     '<button class="terug" id="terug">← alle berichten</button>'+
     '<div class="kaart"><h2>Gesprek</h2>'+
@@ -519,9 +521,9 @@ async function toonDraad(m){
         '<div class="body">'+veiligBody(b.tekst, !!b.vertrouwd)+'</div></div>'; }).join('')+
     (d.let?'<div class="noot s-2q4tfg">'+esc(d.let)+'</div>':'')+
     '<div class="acties">'+
-      '<button class="knp" data-hulp="samenvatting">Vat dit gesprek samen</button>'+
-      '<button class="knp" data-hulp="acties">Wat wordt er van mij gevraagd?</button>'+
-      '<button class="knp" data-hulp="risico">Is dit te vertrouwen?</button>'+
+      '<button class="knp" data-hulp="samenvatting" data-contextactie>Vat dit gesprek samen</button>'+
+      '<button class="knp" data-hulp="acties" data-contextactie>Wat wordt er van mij gevraagd?</button>'+
+      '<button class="knp" data-hulp="risico" data-contextactie>Is dit te vertrouwen?</button>'+
     '</div><div id="hulpUit"></div></div>';
   $('#main').querySelectorAll('.body').forEach(bindLinks);
   $('#terug').addEventListener('click', laadInbox);
@@ -535,7 +537,7 @@ async function hulp(m, wat){
   const uit=$('#hulpUit'); if(!uit) return;
   uit.innerHTML='<div class="noot s-2q4tfg">Even kijken…</div>';
   let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ uit.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
-  const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'">'+tekst+'</button>';
+  const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'" data-contextactie>'+tekst+'</button>';
   if(wat==='acties'){
     uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
       d.acties.map(a=>naar(a.bericht, esc(a.zin)+(a.datums.length?' <span class="etiket">'+esc(a.datums.join(', '))+'</span>':''))).join('')+

@@ -889,6 +889,12 @@ async function bedien(ctx, base, ingang) {
           aangetiktMerken.add(k.merk);
           geklikt = aangetiktMerken.size;
         }
+        /* Een scherm mag zijn asynchrone overgang met aria-busy kenbaar
+           maken. Wacht dan op de werkelijke nieuwe inhoud in plaats van op
+           machinesnelheid te gokken. RTMAIL gebruikt dit bij bericht ->
+           gesprek; dezelfde standaard werkt voor iedere app. */
+        await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'),
+          null, { timeout: 5000 }).catch(() => {});
         await page.waitForTimeout(600);
         actieveRisicoklik = null;
         await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
@@ -1200,8 +1206,18 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        sluitbediening daarom achteraan; zij wordt nog steeds echt beproefd. */
     const sluiter = (el) => /^(?:sluit(?:en)?|close)(?:\b|$)|^[×✕]$/i.test(
       (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim());
-    const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[aria-controls]');
+    /* Ook app-eigen openers zijn echte standnavigatie. Sport gebruikt
+       data-open voor Mijn tickets -> Wedstrijddag en RTMAIL data-i voor de
+       inbox -> berichtweergave. Bij een schone replay moeten deze routes vóór
+       willekeurige taakacties terugkeren, anders blijven bedieningselementen
+       achter hun tweede scherm ten onrechte onaangeraakt. */
+    const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[data-open],[data-i],[aria-controls]');
     const dialoogOpener = (el) => el.matches('[aria-haspopup="dialog"]');
+    /* Een primaire lege-toestandactie kan door een latere mutatie verdwijnen.
+       Raak haar daarom aan zodra zij zichtbaar is. Dit is dezelfde semantische
+       hoofdactie die de interface al voor de gebruiker declareert. */
+    const hoofdactie = (el) => el.matches('[data-hoofdactie]');
+    const contextactie = (el) => el.matches('[data-contextactie]');
     const risico = new RegExp(risicovol, 'i');
     const risicoRang = (el) => {
       const tekst = (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim();
@@ -1210,7 +1226,10 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       return risico.test(tekst) ? 1 : 0;
     };
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)))
-      .sort((a, b) => risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)));
+      .sort((a, b) => Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
+        Number(!contextactie(a)) - Number(!contextactie(b)) ||
+        Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+        risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)));
     let doel = nieuwe[0], herhaling = false, herhaalSleutel = null;
     if (!doel && magHerhalen) {
       const stand = merken.slice().sort().join('¦');

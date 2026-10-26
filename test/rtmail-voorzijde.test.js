@@ -54,4 +54,7 @@ test('de bestaande volledige mailbox blijft bereikbaar', () => {
   assert.match(gedrag, /Rustig overzicht/);
   assert.match(gedrag, /mail\.laad\(\)/);
   assert.match(gedrag, /d\.body\.classList\.remove\('rtm-voorzijde-actief'\)/);
+  assert.match(html, /main\.setAttribute\('aria-busy','true'\)/,
+    'de asynchrone overgang naar een gesprek is waarneembaar');
+  assert.match(html, /main\.removeAttribute\('aria-busy'\)/);
 });

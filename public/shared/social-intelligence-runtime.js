@@ -24,12 +24,14 @@
     function openDeck() {
       lastFocus = document.activeElement;
       scrim.hidden = false;
+      opener.setAttribute('aria-expanded', 'true');
       document.body.classList.add('rtg-intel-open');
       closeButton.focus();
       document.dispatchEvent(new CustomEvent('rtg:intel-open'));
     }
     function closeDeck() {
       scrim.hidden = true;
+      opener.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('rtg-intel-open');
       if (lastFocus && lastFocus.focus) lastFocus.focus();
     }

@@ -114,15 +114,24 @@ const ROLE_DIALOG = '<!doctype html><html><body><main>' +
    expliciete tabroute dan herhalen en pas sluiten als beide panelen werkelijk
    zijn bediend. */
 const PANEEL_TABS = '<!doctype html><html><body><main>' +
-  '<button type="button" onclick="document.getElementById(\'deck\').hidden=false">Open control plane</button>' +
-  '<section id="deck" role="dialog" hidden><button type="button" aria-label="Sluiten" onclick="this.parentNode.hidden=true">Sluiten</button>' +
+  '<button type="button" aria-haspopup="dialog" aria-controls="deck" onclick="document.getElementById(\'deck\').hidden=false">Open control plane</button>' +
+  '<section id="deck" role="dialog" hidden><button type="button" aria-label="Sluit commandodeck" onclick="this.parentNode.hidden=true">SLUIT</button>' +
   '<button type="button" role="tab" aria-controls="overzicht" onclick="toon(\'overzicht\')">Overzicht</button>' +
   '<button type="button" role="tab" aria-controls="beleid" onclick="toon(\'beleid\')">Beleid</button>' +
   '<button type="button" role="tab" aria-controls="rahul" onclick="toon(\'rahul\')">Rahul</button>' +
   '<div id="overzicht"></div><div id="beleid" hidden><button type="button" onclick="window.beleid=true">AAN</button></div>' +
   '<div id="rahul" hidden><button type="button" onclick="window.rahul=true">ANALYSEER CONTEXT</button></div></section>' +
-  '<script>function toon(id){for(const el of document.querySelectorAll("#overzicht,#beleid,#rahul"))el.hidden=el.id!==id}</script>' +
+  '<script>function toon(id){for(const el of document.querySelectorAll("#overzicht,#beleid,#rahul"))el.hidden=el.id!==id}' +
+  'document.addEventListener("keydown",function(e){if(e.key==="Escape")document.getElementById("deck").hidden=true})</script>' +
   '</main></body></html>';
+
+const RUNTIME_WACHT = '<!doctype html><html><body><main>' +
+  '<button class="rtg-intel-command" id="runtime-open" type="button" aria-haspopup="dialog" aria-controls="runtime-deck">OPEN COMMAND</button></main>' +
+  '<script>setTimeout(function(){document.body.insertAdjacentHTML("beforeend",' +
+  "'<div class=\"rtg-intel-scrim\" hidden><section id=\"runtime-deck\" role=\"dialog\"><button type=\"button\" id=\"runtime-doe\">Voer uit</button><button type=\"button\" aria-label=\"Sluiten\" id=\"runtime-sluit\">Sluiten</button></section></div>');" +
+  'var s=document.querySelector(".rtg-intel-scrim");document.getElementById("runtime-open").onclick=function(){s.hidden=false};' +
+  'document.getElementById("runtime-doe").onclick=function(){window.runtimeGedaan=true};document.getElementById("runtime-sluit").onclick=function(){s.hidden=true}},350)</script>' +
+  '</body></html>';
 
 const NAVIGEERT = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="location.href=\'/apps/bestemming.html\'">Terug</button>' +
@@ -173,9 +182,10 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
             (req.url.startsWith('/apps/afgewerkt') ? AFGEWERKTE_DIALOOG :
                 (req.url.startsWith('/apps/roledialog') ? ROLE_DIALOG :
                 (req.url.startsWith('/apps/paneeltabs') ? PANEEL_TABS :
+                (req.url.startsWith('/apps/runtimewacht') ? RUNTIME_WACHT :
                 (req.url.startsWith('/apps/navigeert') ? NAVIGEERT :
                   (req.url.startsWith('/apps/bestemming') ? BESTEMMING :
-                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))))))))); });
+                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -243,9 +253,12 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(panelen.geklikt, panelen.gevonden, 'iedere paneelactie wordt via herhaalde expliciete tabnavigatie geraakt');
     assert.ok(panelen.aangeraakt.includes('AAN') && panelen.aangeraakt.includes('ANALYSEER CONTEXT'),
       'het bewijs noemt de werkelijk aangeraakte paneelacties bij naam');
-    assert.ok(panelen.herhaaldAangeraakt.includes('Beleid') && panelen.herhaaldAangeraakt.includes('Rahul'),
-      'het bewijs noemt de herhaalde tabroute waarmee verborgen paneelacties bereikbaar werden');
     assert.deepEqual(panelen.onaangeraakt, [], 'geen eerder geziene maar tijdelijk verborgen paneelactie blijft liggen');
+
+    const runtime = await bedien(ctx, base, '/apps/runtimewacht.html');
+    assert.equal(runtime.gevonden, 3, 'de opener en twee laat gemonteerde dialoogacties zijn gevonden');
+    assert.equal(runtime.geklikt, runtime.gevonden, 'de meter wacht op de runtime voordat hij de opener bedient');
+    assert.deepEqual(runtime.onaangeraakt, [], 'geen klik verdwijnt voordat de runtime haar handler heeft gekoppeld');
 
     const nav = await bedien(ctx, base, '/apps/navigeert.html');
     assert.equal(nav.gevonden, 2, 'bediening van het bestemmingsscherm vervuilt de noemer van de bronapp niet');

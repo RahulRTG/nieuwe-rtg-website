@@ -619,10 +619,23 @@ async function wachtOpOnboarding(page) {
   await page.waitForSelector('#onbGate', { state: 'hidden', timeout: 12000 }).catch(() => {});
 }
 
+async function wachtOpInteractielaag(page) {
+  /* De Social Control Plane-opener wordt eerder getekend dan de runtime haar
+     dialoog en klikhandler monteert. Een vaste pauze was onder volle belasting
+     te kort: de knop werd technisch geklikt maar kon nog niets openen. Wacht
+     op de bijbehorende, waarneembare laag. Pagina's zonder deze opener zijn
+     onmiddellijk klaar. */
+  await page.waitForFunction(() => {
+    const opener = document.querySelector('.rtg-intel-command');
+    return !opener || !!document.querySelector('.rtg-intel-scrim [role="dialog"]');
+  }, null, { timeout: 12000 }).catch(() => {});
+}
+
 async function openIngang(page, base, ingang) {
   const meet = ingangOpties(ingang);
   await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await wachtOpOnboarding(page);
+  await wachtOpInteractielaag(page);
   await voerIngangAdapterUit(page, meet);
   return meet;
 }
@@ -777,6 +790,7 @@ async function bedien(ctx, base, ingang) {
        die hij zelf te vroeg had gemeten. Wacht op het waarneembare product-
        gedrag. Een scherm zonder zo'n laag voldoet meteen aan `hidden`. */
     await wachtOpOnboarding(page);
+    await wachtOpInteractielaag(page);
     luister(page, base, { crash, config, serverfout, rem, weigering, wachtend });   // pas NA het laden: laadfouten horen bij bewijs 1
     if (meet.adapter) await voerIngangAdapterUit(page, meet);
     /* Een interne module tekent haar inhoud vaak pas na meerdere API-antwoorden.
@@ -912,7 +926,15 @@ async function bedien(ctx, base, ingang) {
         let vervolg = null;
         try { vervolg = await kijkRonde(page, gehad, bereik, herhaald); } catch (e) { vervolg = null; }
         if (vervolg) telStand(vervolg);
-        if (!vervolg || vervolg.klaar) {
+        /* Na een herhaalde opener kan de dialoog uitsluitend bediening tonen
+           die al eerder is gezien. `vervolg.klaar` betekent dan niet dat het
+           herstelpad klaar is: bekende, nog onaangeraakte paneelacties kunnen
+           achter een reeds beproefde tab zitten. Escape sloot het echte Social
+           Control Plane hier direct na OPEN COMMAND. Laat de laag in precies
+           die begrensde situatie staan; de volgende ronde herhaalt expliciete
+           standnavigatie en MAXKLIK blijft de bovengrens. */
+        const herstelpadOpen = k.herhaling && gehad.size < gevonden;
+        if ((!vervolg || vervolg.klaar) && !herstelpadOpen) {
           await page.keyboard.press('Escape').catch(() => {});
           await page.waitForTimeout(250);
         }
@@ -1176,9 +1198,10 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        daarna zonder replaypad achter. Een mens opent het paneel juist om de
        inhoud te gebruiken en sluit het daarna. Houd uitsluitend expliciete
        sluitbediening daarom achteraan; zij wordt nog steeds echt beproefd. */
-    const sluiter = (el) => /^(sluiten|close|×|✕)$/i.test(
+    const sluiter = (el) => /^(?:sluit(?:en)?|close)(?:\b|$)|^[×✕]$/i.test(
       (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim());
     const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[aria-controls]');
+    const dialoogOpener = (el) => el.matches('[aria-haspopup="dialog"]');
     const risico = new RegExp(risicovol, 'i');
     const risicoRang = (el) => {
       const tekst = (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim();
@@ -1209,7 +1232,9 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
              CONTEXT wel, maar sloot het deck voordat hun tab terugkwam. */
           ? Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(!sluiter(a)) - Number(!sluiter(b)) || risicoRang(a) - risicoRang(b)
-          : risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
+          : Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
+            Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+            risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
       herhaling = !!doel;
       if (doel) herhaalSleutel = alGehad.length + '§' + stand + '§' + merk(doel);
     }

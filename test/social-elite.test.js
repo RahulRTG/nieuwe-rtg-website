@@ -225,6 +225,10 @@ test('Reality Engine blijft bruikbaar, leesbaar en rustig op mobiel', () => {
   const css = lees('public/shared/social-intelligence.css');
   assert.match(css, /--rtg-intel-height:76px/);
   assert.match(css, /\.rtg-intel-command\{[\s\S]*min-height:44px/);
+  assert.match(lees('public/shared/social-intelligence.js'), /aria-expanded/,
+    'de commandodeck-opener publiceert zijn open of gesloten toestand');
+  assert.match(lees('public/shared/social-intelligence-runtime.js'), /aria-expanded/,
+    'de commandodeck-runtime houdt de toegankelijke toestand actueel');
   assert.match(css, /@media\(max-width:760px\)[\s\S]*rtg-intel-deck/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)[\s\S]*animation:none/);
   assert.match(css, /\.rtg-suitehero\.rtg-intel-host[\s\S]*min-height:330px/);

@@ -101,6 +101,7 @@
     command.type = 'button';
     command.setAttribute('aria-haspopup', 'dialog');
     command.setAttribute('aria-controls', 'rtgIntelDeck');
+    command.setAttribute('aria-expanded', 'false');
     /* Dezelfde handeling als de declaratie in de runtime: het Edge-blad toont
        hem dan een keer, en niet ook nog als overgenomen knop. */
     command.setAttribute('data-rtg-action-key', 'sociaal.context');

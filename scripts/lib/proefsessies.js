@@ -17,6 +17,7 @@
    `overgeslagen` met de reden erbij. Een proef die een kapotte inlog als "niets
    gevonden" telt, laat een stuk huis er gezond uitzien. */
 'use strict';
+const { zetSignatureKlaar } = require('./wereld-signature');
 
 /* De sleutel in localStorage per rol, plus hoe je aan zo'n sessie komt. De
    sleutelnaam hoort hierbij: wie een token haalt maar op de verkeerde sleutel
@@ -104,6 +105,29 @@ async function postAls(url, lijf, token) {
   return { status: r.status, data: await r.json().catch(() => null) };
 }
 
+/* Een Lifestyle-lid ontstaat hier niet door een tier in een testsessie te
+   stoppen. Dit hulpje loopt de bestaande menselijke productroute af: gratis
+   account, aanvraag, besluit door een kantoormens op naam, opnieuw inloggen en
+   identiteitscontrole. APPWERKT kan zo de premium-apps meten zonder de
+   toegangspoort die het juist moet bewijzen te omzeilen. */
+async function haalLifestyleLid(basis, kantoorToken) {
+  if (!kantoorToken) return { ok: false,
+    reden: 'geen kantoorsessie op naam; Lifestyle mag niet via de gedeelde kantoorcode worden toegekend' };
+  let uit;
+  try {
+    uit = await zetSignatureKlaar({
+      post: (pad, lijf, token) => postAls(basis + pad, lijf, token),
+      tokens: { 'kantoor-op-naam': kantoorToken }
+    });
+  } catch (e) {
+    return { ok: false, reden: String(e && e.message || e), stappen: [] };
+  }
+  if (!uit || !uit.klaar || !uit.token) return { ok: false,
+    reden: uit && uit.reden || 'de menselijke Lifestyle-goedkeuring leverde geen sessie op',
+    stappen: uit && uit.stappen || [] };
+  return { ok: true, token: uit.token, userId: uit.userId, tier: uit.tier, stappen: uit.stappen || [] };
+}
+
 /* Bellen en Snaps zijn geen lege dialoog: hun eigen bediening bestaat uit de
    mensen met wie het lid verbonden is. Browserkwalificaties krijgen daarom
    op verzoek TWEE aparte echte proefleden met EEN echte verbinding, langs
@@ -162,4 +186,4 @@ function opslagVoor(sessies) {
   return uit;
 }
 
-module.exports = { ROLLEN, haalSessies, opslagVoor, verbindProeflid };
+module.exports = { ROLLEN, haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid };

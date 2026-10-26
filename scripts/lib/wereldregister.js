@@ -124,6 +124,11 @@ function waarde(n) {
 const LINKS = draai(blok('const LINKS', '{', '}'));
 const OSAPPS = draai(blok('const OSAPPS', '{', '}'));
 const MAPPEN = draai(blok('const MAPPEN', '[', ']'));
+/* De Lifestyle-suite bepaalt niet alleen wat de client verbergt voor een
+   gewone RTG Pass, maar ook met welke echte persona de bewijsmachine de ingang
+   moet openen. Lees daarom dezelfde set uit dezelfde bundel; een handmatig
+   tweede lijstje zou na de eerstvolgende appwijziging uiteenlopen. */
+const PREMIUM = new Set(draai(blok('const PREMIUM', '[', ']')));
 const WERELDEN = MAPPEN.filter((m) => m.wereld);
 
 const APP_HTML = fs.readFileSync(path.join(PUB, 'apps/app.html'), 'utf8');
@@ -166,4 +171,4 @@ function los(item) {
   def.werkrol ? { werkrol: def.werkrol } : {});
 }
 
-module.exports = { LINKS, OSAPPS, MAPPEN, WERELDEN, TABS, APP_HTML, BRON, blok, draai, kaal, bestaat, los, PUB, WORTEL };
+module.exports = { LINKS, OSAPPS, MAPPEN, PREMIUM, WERELDEN, TABS, APP_HTML, BRON, blok, draai, kaal, bestaat, los, PUB, WORTEL };

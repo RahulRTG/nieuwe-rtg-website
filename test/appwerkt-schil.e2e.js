@@ -73,6 +73,20 @@ const MODULEBEREIK = '<!doctype html><html><body><main>' +
   '<section data-view="doel"><button type="button">Doel een</button><button type="button">Doel twee</button></section>' +
   '</main></body></html>';
 
+test('APPWERKT wijst de canonieke premium-suite aan een Lifestyle-lid toe', () => {
+  const { PREMIUM } = require('../scripts/lib/wereldregister');
+  const { rijen } = require('../scripts/appwerkt');
+  const alle = rijen();
+  for (const sleutel of PREMIUM) {
+    const rij = alle.find((r) => r.functie === 'link:' + sleutel);
+    assert.ok(rij, 'premium-app ontbreekt uit de wereldkaart: ' + sleutel);
+    assert.equal(rij.persona, 'lifestyle', sleutel + ' wordt niet met de menselijke Lifestyle-route gemeten');
+  }
+  const gewone = alle.find((r) => r.functie === 'link:ik');
+  assert.ok(gewone, 'de gewone ledenapp Ik ontbreekt');
+  assert.equal(gewone.persona, 'lid', 'een gewone ledenapp mag niet onbedoeld Lifestyle vereisen');
+});
+
 test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', { skip: geenBrowser(pw) }, async () => {
   const { bedien } = require('../scripts/appwerkt');
   const srv = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html');

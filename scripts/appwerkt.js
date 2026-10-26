@@ -124,7 +124,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const reg = require('./lib/wereldregister');
-const { haalSessies, opslagVoor, verbindProeflid } = require('./lib/proefsessies');
+const { haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid } = require('./lib/proefsessies');
 const { haalSchoolsessies, maakSchoolContext } = require('./lib/schoolproefsessies');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
@@ -214,7 +214,9 @@ function rijen() {
         /* Een ingang met een werkrol toont de wereld alleen aan wie die rol in
            zijn sleutelbos heeft (app-main-24a3.js); dat is dan aan wie hij
            beloofd wordt, en dus de persona die erdoor moet kunnen. */
-        persona: (bron && bron.werkrol) || PERSONA_VAN_WERELD[map.naam] || 'lid',
+        persona: (bron && bron.werkrol) ||
+          (soort === 'link' && reg.PREMIUM.has(sleutel) ? 'lifestyle' : null) ||
+          PERSONA_VAN_WERELD[map.naam] || 'lid',
         ingang: url || ('(' + soort + ' in de app, geen eigen adres)'),
         soort,
         pad: url ? url.split('#')[0].split('?')[0] : null
@@ -271,11 +273,19 @@ async function meet() {
   const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
   const pw = laadBrowser({ eigenDriver: false });
   if (!pw) { console.error('Geen browser beschikbaar; dit script meet in een echte browser.'); process.exit(2); }
-  const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
+  const { startServer, kantoorAlsPersoon } = require(path.join(WORTEL, 'test', 'helper.js'));
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
 
   const { sessies, overgeslagen } = await haalSessies(base);
+  const kantoormens = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+  const lifestyle = await haalLifestyleLid(base, kantoormens);
+  if (lifestyle.ok) sessies.lifestyle = {
+    sleutel: 'rtg_member_token', waarde: lifestyle.token,
+    start: '/apps/app.html?pas=lifestyle',
+    uitleg: 'een door een kantoormens op naam goedgekeurd en geverifieerd Lifestyle-lid'
+  };
+  else overgeslagen.push({ rol: 'lifestyle', reden: lifestyle.reden });
   const contact = await verbindProeflid(base);
   if (!contact.ok) overgeslagen.push({ rol: 'lid-contact', reden: contact.reden });
   const school = await haalSchoolsessies(base, sessies);

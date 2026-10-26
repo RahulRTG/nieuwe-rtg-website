@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-26T07:35:53.955Z",
-    "commit": "f7c7c9ba0d",
+    "op": "2026-10-26T08:44:50.184Z",
+    "commit": "f97c8cbf28",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
-    "node": "v26.12.1"
+    "node": "v24.18.0"
   },
   "uitleg": "Bewijs 4 (waarheidsgetrouw) per onderdeel uit MAPPEN: het scherm met de persona van de rij, terwijl de backend buiten de deuren leeg antwoordt (RTG_LIEG). Zie de kop van scripts/liegronde.js.",
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",

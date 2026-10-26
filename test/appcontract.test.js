@@ -43,7 +43,7 @@ function contractMetadata(naam, waarde) {
       assert.equal(typeof waarde[veld], 'string', 'adapter.' + veld + ' moet tekst zijn');
     return true;
   }
-  return ['belofte', 'ingang', 'via', 'bestanden'].includes(naam);
+  return ['belofte', 'ingang', 'via', 'bereik', 'bestanden'].includes(naam);
 }
 
 

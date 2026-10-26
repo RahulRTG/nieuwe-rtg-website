@@ -396,6 +396,18 @@ const CONTRACT = {
     // app-main-25.js: de werkkiezer (openWerkKiezer) met /api/account/rollen en /api/account/start
     bestanden: ['public/apps/app-main/app-main-25.js']
   }, voltooi('werk', 'het scenario loopt /api/account/rollen en /api/account/start, de routes die de werkkiezer in app-main-25.js zelf aanroept, met personeel via de wervingslink, het kantoor via een uitnodiging en een ander lid dat geen rol krijgt')),
+  /* RTFoundation is net als Werk een keuze in de ledenapp. De keuze opent eerst
+     de leeftijdsgroepen; pas daarna ontstaat een Foundation-adres. APPWERKT
+     liep deze zichtbare ingang eerder helemaal niet en noemde de hele app
+     daardoor ongemeten, hoewel de kiezer al door app-main-26 wordt bediend. */
+  'os:rtf': {
+    belofte: 'een lid opent de RTFoundation en kiest de passende leeftijdswereld voordat de Foundation-jas wordt geopend',
+    ingang: '/apps/app.html',
+    via: 'de rand: "Praat met Rahul" -> "open RTFoundation", dat de leeftijdskeuze van de RTFoundation opent',
+    adapter: { type: 'rahul-opdracht', opdracht: 'open RTFoundation', verwacht: '#osBelScrim.open',
+      bereik: '#osBelScrim.open', titel: 'RTFoundation' },
+    bestanden: ['public/apps/app-main/app-main-26.js']
+  },
   'link:browser': Object.assign({
     belofte: 'een lid vindt en opent de site van een ander lid en stuurt via het formulier een bericht dat precies een keer als gesprek aankomt, alleen tussen verbonden leden'
   }, voltooi('browser', 'het scenario loopt /api/browser/gids, /zoek, /open en /bericht, de routes die /apps/browser.html zelf aanroept, met de maker die het gesprek leest, een zaak die de klus in haar werklijst ziet en een vreemde die er niet door komt')),
@@ -483,6 +495,19 @@ const CONTRACT = {
     // app-main-26 (de kiezer) roept zelf geen route aan; de koppeling loopt op -10, -10a en -11
     bestanden: ['public/apps/app-main/app-main-10.js', 'public/apps/app-main/app-main-10a.js', 'public/apps/app-main/app-main-11.js']
   }, voltooi('bellen', 'het scenario loopt /api/member/call met een echte live-verbinding (/api/stroom/ticket, /api/stream) per lid, de signalering die RTGSocial.bel in app-main-10 en de doorgifte in app-main-11 gebruiken, met een onverbonden, een geblokkeerd en een gratis lid')),
+  /* Videobellen gebruikt dezelfde sociale kiezer, maar is een afzonderlijke
+     OS-app en krijgt daarom zijn eigen zichtbare contractingang. De bestaande
+     echte WebRTC-proef blijft de media bewijzen; deze adapter levert op zichzelf
+     geen voltooi-, opslag- of herstelbewijs. */
+  'os:videobellen': {
+    belofte: 'een lid opent videobellen, kiest een verbonden contact en start uitsluitend met expliciete camera- en microfoontoestemming',
+    ingang: '/apps/app.html',
+    via: 'de rand: "Praat met Rahul" -> "open videobellen", dat de kiezer met verbonden Salon-contacten opent',
+    adapter: { type: 'rahul-opdracht', opdracht: 'open videobellen', verwacht: '#osBelScrim.open',
+      bereik: '#osBelScrim.open', titel: 'Videobellen' },
+    bestanden: ['public/apps/app-main/app-main-10.js', 'public/apps/app-main/app-main-10a.js',
+      'public/apps/app-main/app-main-11.js', 'public/apps/app-main/app-main-26.js']
+  },
 
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
@@ -636,8 +661,11 @@ const ALGEMEEN = {
    tabel). Voor de meeste onderdelen ontbreekt alleen een scenario; voor deze
    ontbreekt een ADAPTER, en dan helpt een scenario niet. Alleen wat de tabel
    als ontbrekend noemt staat hier -- geen gok per app. */
-const TESTWERELD_ONTBREEKT = {
-  'os:videobellen': 'videobellen vraagt test-identiteiten voor WebRTC in een headless browser, en dat vraagt een besluit (BETROUWBAARHEID.md par. 4)'
-};
+/* Alleen werkelijk ontbrekende testwereldvoorzieningen horen hier. De
+   headless WebRTC-identiteiten en nepmedia voor Videobellen bestaan inmiddels
+   in test/videobellen-echt.e2e.js; wat nog ontbreekt is een passende bronsoort
+   die dat browserbewijs eerlijk aan APPWERKT kan koppelen. Dat is geen
+   ontbrekende adapter in de testwereld. */
+const TESTWERELD_ONTBREEKT = {};
 
 module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN, TESTWERELD_ONTBREEKT };

@@ -164,7 +164,7 @@ test('OS-apps openen via Rahul en APPWERKT meet uitsluitend hun kiezer',
       lid: { ...sessies.lid, waarde: contact.token }
     }));
     const perFunctie = new Map(rijen().map((r) => [r.functie, r]));
-    for (const functie of ['os:bellen', 'os:snaps', 'os:werk']) {
+    for (const functie of ['os:bellen', 'os:videobellen', 'os:snaps', 'os:werk', 'os:rtf']) {
       const meet = meetIngang(perFunctie.get(functie));
       assert.equal(meet.adapter.type, 'rahul-opdracht', functie);
       const gezien = await bezoek(ctx, base, meet);

@@ -57,4 +57,9 @@ test('de bestaande volledige mailbox blijft bereikbaar', () => {
   assert.match(html, /main\.setAttribute\('aria-busy','true'\)/,
     'de asynchrone overgang naar een gesprek is waarneembaar');
   assert.match(html, /main\.removeAttribute\('aria-busy'\)/);
+  assert.match(html, /vak\.setAttribute\('aria-busy','true'\)/,
+    'ook Rahul-hulp maakt de asynchrone overgang waarneembaar');
+  assert.match(html, /vak\.removeAttribute\('aria-busy'\)/);
+  assert.match(html, /vak\.dataset\.hulpUit=wat/,
+    'iedere hulpsoort houdt zijn eigen zichtbare resultaat');
 });

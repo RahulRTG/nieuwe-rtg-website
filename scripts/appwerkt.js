@@ -1250,8 +1250,10 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
              deze rangorde zag het Social Control Plane AAN en ANALYSEER
              CONTEXT wel, maar sloot het deck voordat hun tab terugkwam. */
           ? Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+            Number(!contextactie(a)) - Number(!contextactie(b)) ||
             Number(!sluiter(a)) - Number(!sluiter(b)) || risicoRang(a) - risicoRang(b)
-          : Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
+          : Number(!contextactie(a)) - Number(!contextactie(b)) ||
+            Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
             Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
       herhaling = !!doel;

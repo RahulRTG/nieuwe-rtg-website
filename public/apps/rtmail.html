@@ -535,24 +535,28 @@ async function toonDraad(m){
    springen, is een tweede versie van de waarheid. */
 async function hulp(m, wat){
   const uit=$('#hulpUit'); if(!uit) return;
-  uit.innerHTML='<div class="noot s-2q4tfg">Even kijken…</div>';
-  let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ uit.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
+  let vak=uit.querySelector('[data-hulp-uit="'+wat+'"]');
+  if(!vak){ vak=document.createElement('section'); vak.dataset.hulpUit=wat; uit.appendChild(vak); }
+  vak.setAttribute('aria-busy','true');
+  vak.innerHTML='<div class="noot s-2q4tfg">Even kijken…</div>';
+  let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ vak.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
+  finally { vak.removeAttribute('aria-busy'); }
   const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'" data-contextactie>'+tekst+'</button>';
   if(wat==='acties'){
-    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
+    vak.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
       d.acties.map(a=>naar(a.bericht, esc(a.zin)+(a.datums.length?' <span class="etiket">'+esc(a.datums.join(', '))+'</span>':''))).join('')+
       '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   } else if(wat==='risico'){
-    uit.innerHTML='<div class="hulpblok"><b>'+esc(d.oordeel)+'</b>'+
+    vak.innerHTML='<div class="hulpblok"><b>'+esc(d.oordeel)+'</b>'+
       (d.redenen.length?'<ul class="hulplijst">'+d.redenen.map(r=>'<li'+(r.zwaar?' class="zwaar"':'')+'>'+esc(r.uitleg)+'</li>').join('')+'</ul>':'')+
       '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   } else {
-    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' bericht(en), '+esc(d.deelnemers.join(' en '))+'</b>'+
+    vak.innerHTML='<div class="hulpblok"><b>'+d.aantal+' bericht(en), '+esc(d.deelnemers.join(' en '))+'</b>'+
       '<div class="meta">Aan zet: '+esc(d.aanZet)+'</div>'+
       d.punten.map(p=>naar(p.bericht, (p.vanMij?'<span class="etiket">u</span> ':'')+esc(p.zin))).join('')+
       '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   }
-  uit.querySelectorAll('[data-spring]').forEach(b=>b.addEventListener('click',()=>{
+  vak.querySelectorAll('[data-spring]').forEach(b=>b.addEventListener('click',()=>{
     const el=$('#b-'+b.dataset.spring);
     if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('aangewezen'); setTimeout(()=>el.classList.remove('aangewezen'),1600); }
   }));

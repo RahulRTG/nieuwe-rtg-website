@@ -52,9 +52,15 @@ app.post('/api/groothandel/annuleer', auth, (req, res) => {
 });
 
 /* ================== contracten: het lid tekent digitaal ================== */
+/* `db.data.contracten` draagt twee bestaande contractsoorten: zaakcontracten
+   hebben `partij`, lidmaatschapscontracten uit de commerciele kern niet. De
+   ledenbalie leest uitsluitend de eerste soort en moet de tweede dus herkennen
+   als een andere rij in dezelfde bestaande collectie, niet derefereren alsof
+   iedere rij een zaakcontract is. */
+const isLidContract = (c, key) => !!(c && c.partij && c.partij.kind === 'lid' && c.partij.key === key);
 app.post('/api/contracten/mijn', auth, (req, res) => {
   const mijn = db.data.contracten
-    .filter(c => c.partij.kind === 'lid' && c.partij.key === req.session.key)
+    .filter(c => isLidContract(c, req.session.key))
     .slice(0, 50)
     .map(c => ({ ref: c.ref, soort: c.soort, supplierName: c.supplierName, titel: c.titel, tekst: c.tekst,
       velden: c.velden || [], status: c.status, getekendDoorMij: !!c.tekenPartij, getekendDoorZaak: !!c.tekenZaak,
@@ -63,7 +69,7 @@ app.post('/api/contracten/mijn', auth, (req, res) => {
 });
 
 app.post('/api/contract/teken', auth, (req, res) => {
-  const c = db.data.contracten.find(x => x.ref === String(req.body.ref || '') && x.partij.kind === 'lid' && x.partij.key === req.session.key);
+  const c = db.data.contracten.find(x => x && x.ref === String(req.body.ref || '') && isLidContract(x, req.session.key));
   if (!c) return res.status(404).json({ error: 'Contract niet gevonden.' });
   if (c.status === 'geweigerd') return res.status(409).json({ error: 'Dit contract is al geweigerd.' });
   if (c.tekenPartij) return res.status(409).json({ error: 'U heeft dit contract al ondertekend.' });
@@ -78,7 +84,7 @@ app.post('/api/contract/teken', auth, (req, res) => {
 });
 
 app.post('/api/contract/weiger', auth, (req, res) => {
-  const c = db.data.contracten.find(x => x.ref === String(req.body.ref || '') && x.partij.kind === 'lid' && x.partij.key === req.session.key);
+  const c = db.data.contracten.find(x => x && x.ref === String(req.body.ref || '') && isLidContract(x, req.session.key));
   if (!c) return res.status(404).json({ error: 'Contract niet gevonden.' });
   if (c.tekenPartij) return res.status(409).json({ error: 'U heeft dit contract al ondertekend.' });
   c.status = 'geweigerd';

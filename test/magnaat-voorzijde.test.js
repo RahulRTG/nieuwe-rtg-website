@@ -55,6 +55,9 @@ test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert e
   assert.doesNotMatch(html,/<button[^>]*id="mvStartVolledig"[^>]*data-hoofdactie/,
     'de volledige missie start pas nadat de herstelbare resultaatacties zijn bewezen');
   assert.match(html,/<button[^>]*id="mvGaVerder"[^>]*data-hoofdactie[^>]*data-contextactie/);
+  assert.equal((html.match(/data-mv-uitdaging="[0-2]"[^>]*data-contextactie/g)||[]).length,3);
+  assert.match(js,/doorgaan\.toggleAttribute\('data-hoofdactie',!taak\)/);
+  assert.match(js,/doorgaan\.toggleAttribute\('data-contextactie',!taak\)/);
   assert.match(html,/<button[^>]*id="mvVolgende"[^>]*data-contextactie/);
   assert.doesNotMatch(html,/<button[^>]*id="mvVolgende"[^>]*data-hoofdactie/);
   assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie aria-label="Kies aanpak:/);

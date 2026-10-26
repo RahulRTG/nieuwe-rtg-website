@@ -39,7 +39,10 @@ function renderBron(){
   const pct=taak&&taak.stappen?Math.round((taak.stap/taak.stappen)*100):d&&d.status==='klaar'?100:40;
   q('#mvVoortgang').style.width=pct+'%';
   q('#mvVoortgangTekst').textContent=taak?'Stap '+Math.min(taak.stap+1,taak.stappen)+' van '+taak.stappen:d&&d.status==='klaar'?'Afgerond':'Klaar om te beginnen';
-  q('#mvGaVerder').firstChild.nodeValue=taak?'Hervat missie ':'Ga verder ';
+  const doorgaan=q('#mvGaVerder');
+  doorgaan.firstChild.nodeValue=taak?'Hervat missie ':'Ga verder ';
+  doorgaan.toggleAttribute('data-hoofdactie',!taak);
+  doorgaan.toggleAttribute('data-contextactie',!taak);
   q('#mvReputatie').textContent=Number.isFinite(p.reputatie)?p.reputatie:'-';
   q('#mvNiveau').textContent=Number.isFinite(p.niveau)?p.niveau:'-';
   q('#mvBalans').textContent=Number.isFinite(p.virtueelBudget)?euro(p.virtueelBudget):'-';

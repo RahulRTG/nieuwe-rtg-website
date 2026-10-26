@@ -175,6 +175,11 @@ const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal, #
    wel echt geraakt, terwijl verwijdering of betaling niet buiten de daarvoor
    bedoelde voltooi- en financiële proef wordt uitgevoerd. */
 const RISICOVOL = /uitlog|log uit|sign ?out|verwijder|delete|wis alles|betaal|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
+/* Alleen deze servermutaties zouden de gedeelde testpersona of zijn hele
+   account voor volgende appmetingen vernietigen. Andere risicovolle acties
+   draaien tegen de echte wegwerpdata en blijven dus zichtbaar voor de gewone
+   serverfoutmeting. De synthetische /api/risico-route ijkt deze grens. */
+const VERNIETIGENDE_ROUTE = /^\/api\/(?:logout|privacy\/delete|risico)$/;
 
 /* De DRIE toegangspoorten in dit huis, als selector. Geen woordenlijst en geen
    tekstherkenning: dit zijn de mechanismen zelf.
@@ -676,7 +681,7 @@ async function bedien(ctx, base, ingang) {
   const pad = meet.pad;
   const bereik = meet.bereik || (meet.adapter && meet.adapter.bereik);
   const page = await ctx.newPage();
-  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
+  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [], wachtend = [];
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
   const gevondenMerken = new Set();
@@ -685,8 +690,12 @@ async function bedien(ctx, base, ingang) {
     gevonden = gevondenMerken.size;
     schil = Math.max(schil, (stand && stand.schil) || 0);
   };
-  let heropeningen = 0, laatsteHeropenStand = -1;
+  let heropeningen = 0;
   const opnieuwGeprobeerd = new Set();
+  /* Per opener de omvang van de unieke klikset toen hij voor het laatst werd
+     herhaald. Na aantoonbare voortgang mag dezelfde opener opnieuw nodig zijn
+     (een dialoog die na iedere keuze sluit); zonder voortgang niet. */
+  const herhaald = new Map();
   const overgeslagen = [], risicovolAangeraakt = [], risicoFixtures = [], nietKlikbaar = [], onderschept = [], instrument = [];
   /* APPWERKT bewijst dat de zichtbare bediening reageert; de mutatie-,
      voltooi- en financiële proeven bewijzen het zakelijke gevolg. Dat
@@ -709,7 +718,8 @@ async function bedien(ctx, base, ingang) {
     const methode = verzoek.method().toUpperCase();
     let url;
     try { url = new URL(verzoek.url()); } catch (e) { return route.continue(); }
-    if (!actieveRisicoklik || url.origin !== basisHerkomst || /^(GET|HEAD|OPTIONS)$/.test(methode)) {
+    if (!actieveRisicoklik || url.origin !== basisHerkomst || /^(GET|HEAD|OPTIONS)$/.test(methode) ||
+        !VERNIETIGENDE_ROUTE.test(url.pathname)) {
       return route.continue();
     }
     const bewijs = { knop: actieveRisicoklik, methode, pad: url.pathname };
@@ -735,7 +745,7 @@ async function bedien(ctx, base, ingang) {
     await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
       null, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(400);
-    luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
+    luister(page, base, { crash, config, serverfout, rem, weigering, wachtend });   // pas NA het laden: laadfouten horen bij bewijs 1
     if (meet.adapter) await voerIngangAdapterUit(page, meet);
     /* Een interne module tekent haar inhoud vaak pas na meerdere API-antwoorden.
        De vaste algemene laadpauze was onder parallelle belasting soms eerder
@@ -763,7 +773,7 @@ async function bedien(ctx, base, ingang) {
     const gehad = new Set();
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       let k;
-      try { k = await kijkRonde(page, gehad, bereik); }
+      try { k = await kijkRonde(page, gehad, bereik, herhaald); }
       catch (e) {
         /* Een tik kan navigeren, en dan is de context van de pagina weg op het
            moment dat de volgende ronde kijkt ("Execution context was
@@ -773,7 +783,7 @@ async function bedien(ctx, base, ingang) {
            beschuldiging uitschrijft is erger dan geen instrument. */
         if (!/Execution context was destroyed|Target closed|Navigation|frame was detached/i.test(String(e.message || e))) throw e;
         instrument.push('de proef verloor de pagina door een navigatie en opende hem opnieuw');
-        try { await openIngang(page, base, meet); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad, bereik); }
+        try { await openIngang(page, base, meet); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad, bereik, herhaald); }
         catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
       }
       telStand(k);
@@ -791,21 +801,29 @@ async function bedien(ctx, base, ingang) {
            MAXKLIK begrenst zowel tikken als herstelpogingen. Dit verlaagt de
            bewijsgrens niet: elke extra knop wordt nog steeds echt aangetikt en
            op browser- en serverfouten beoordeeld. */
-        if (gehad.size < gevonden && heropeningen < MAXKLIK && laatsteHeropenStand !== gehad.size) {
-          laatsteHeropenStand = gehad.size;
+        if (gehad.size < gevonden && heropeningen < MAXKLIK) {
           heropeningen++;
           try {
             await openIngang(page, base, meet);
             await page.waitForTimeout(1200);
             instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
-            continue;
+            /* De resterende bediening kan achter een opener zitten die zelf al
+               is beproefd. Herhaal vanaf de schone ingang dan precies één
+               eerder geslaagde bediening. Die herhaling telt niet nogmaals,
+               maar maakt haar vervolgstand bereikbaar. Elke unieke opener
+               wordt hoogstens eenmaal herhaald; MAXKLIK blijft de harde grens. */
+            k = await kijkRonde(page, gehad, bereik, herhaald, true);
+            telStand(k);
+            if (k.klaar) break;
           } catch (e) {
             instrument.push('heropenen van de oorspronkelijke stand lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80));
+            break;
           }
         }
-        break;
+        else break;
       }
-      gehad.add(k.merk);
+      if (k.herhaling) herhaald.set(k.merk, gehad.size);
+      else gehad.add(k.merk);
       laatste = k.tekst || '(naamloos)';
       const isRisicovol = RISICOVOL.test(laatste);
       if (isRisicovol && !risicovolAangeraakt.includes(laatste)) risicovolAangeraakt.push(laatste);
@@ -814,8 +832,8 @@ async function bedien(ctx, base, ingang) {
         await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
         await page.waitForTimeout(600);
         actieveRisicoklik = null;
-        geklikt++;
-        await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
+        if (!k.herhaling) geklikt++;
+        await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
         /* EN DAN DICHT, zoals een mens doet. Een tik opent vaak een laag (het
            paneel van Rahul, de sprong, de taalkeuze); bleef die open, dan lag hij
            over elke volgende knop en telde de proef zijn eigen lade als
@@ -835,7 +853,7 @@ async function bedien(ctx, base, ingang) {
            schone-tegenproef blijft een achtergebleven, niet-sluitende laag
            begrenzen; de bewijsdrempel wordt niet verlaagd. */
         let vervolg = null;
-        try { vervolg = await kijkRonde(page, gehad, bereik); } catch (e) { vervolg = null; }
+        try { vervolg = await kijkRonde(page, gehad, bereik, herhaald); } catch (e) { vervolg = null; }
         if (vervolg) telStand(vervolg);
         if (!vervolg || vervolg.klaar) {
           await page.keyboard.press('Escape').catch(() => {});
@@ -859,6 +877,13 @@ async function bedien(ctx, base, ingang) {
            stabiele handtekening van de bediening. De Set begrenst dit tot een
            enkele tegenproef per knop, zodat een echte overlap nooit in een
            heropeningslus verdwijnt. */
+        if (k.herhaling) {
+          instrument.push('een herhaalde opener was vanuit de schone stand niet opnieuw te bedienen: ' +
+            (k.tekst || '(naamloos)') + ' (' + waarom + ')');
+          await page.keyboard.press('Escape').catch(() => {});
+          await page.waitForTimeout(250).catch(() => {});
+          continue;
+        }
         const opnieuwVanafSchoon = /intercepts pointer events|element is outside of the viewport/i.test(waarom) &&
           !opnieuwGeprobeerd.has(k.merk);
         if (opnieuwVanafSchoon) {
@@ -903,7 +928,7 @@ async function bedien(ctx, base, ingang) {
   } catch (e) {
     instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
   }
-  await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
+  await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
   await page.close();
   return { geklikt, gevonden, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
@@ -954,7 +979,12 @@ async function gegevensVraagGetoond(page, w) {
   }, { tekst: vraag.tekst, veld: vraag.veld }).catch(() => false);
 }
 
-async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
+async function beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend = []) {
+  /* Playwright wacht niet op een async response-listener. Lees daarom eerst
+     alle reeds ontvangen foutantwoorden uit voordat het scherm wordt bekeken;
+     anders kon de meter een zichtbare foutzin pas na het sluiten van haar
+     formulier administreren en onterecht een productdefect melden. */
+  if (wachtend.length) await Promise.allSettled(wachtend.splice(0));
   while (weigering.length) {
     const w = weigering.shift();
     let tekst = '';
@@ -1027,8 +1057,8 @@ async function bedektDoorSchil(page, bereik) {
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad, bereik) {
-  return page.evaluate(({ alGehad, SCHIL, bereik, bediening, risicovol }) => {
+async function kijkRonde(page, gehad, bereik, herhaald = new Map(), magHerhalen = false) {
+  return page.evaluate(({ alGehad, alHerhaald, magHerhalen, SCHIL, bereik, bediening, risicovol }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
@@ -1091,11 +1121,18 @@ async function kijkRonde(page, gehad, bereik) {
     };
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)))
       .sort((a, b) => risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)));
-    if (!nieuwe.length) return { klaar: true, zichtbaar, merken, schil };
-    nieuwe[0].setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar, merken, schil, merk: merk(nieuwe[0]),
-      tekst: (nieuwe[0].innerText || nieuwe[0].value || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
-  }, { alGehad: [...gehad], SCHIL: GEDEELDE_SCHIL, bereik,
+    let doel = nieuwe[0], herhaling = false;
+    if (!doel && magHerhalen) {
+      const herhaalStand = new Map(alHerhaald);
+      doel = alle.filter((el) => alGehad.includes(merk(el)) && herhaalStand.get(merk(el)) !== alGehad.length)
+        .sort((a, b) => risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
+      herhaling = !!doel;
+    }
+    if (!doel) return { klaar: true, zichtbaar, merken, schil };
+    doel.setAttribute('data-appwerkt', '1');
+    return { klaar: false, zichtbaar, merken, schil, merk: merk(doel), herhaling,
+      tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
+  }, { alGehad: [...gehad], alHerhaald: [...herhaald.entries()], magHerhalen, SCHIL: GEDEELDE_SCHIL, bereik,
     bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });
 }
 
@@ -1117,7 +1154,8 @@ function luister(page, base, bak) {
   page.on('pageerror', (e) => {
     if (!isBrowserruis(e)) bak.crash.push('JS: ' + String(e.message || e).slice(0, 180));
   });
-  page.on('response', async (res) => {
+  page.on('response', (res) => {
+    const werk = (async () => {
     const s = res.status();
     const pad = res.url().replace(base, '').slice(0, 80);
     let poort = null;
@@ -1142,6 +1180,8 @@ function luister(page, base, bak) {
        bedien() na de tik op het scherm na. */
     else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol), ...(poort ? { poort } : {}) });
     else bak.serverfout.push(s + ' ' + pad + (lijf ? ' -- ' + lijf.slice(0, 100) : ''));
+    })();
+    if (bak.wachtend) bak.wachtend.push(werk);
   });
 }
 

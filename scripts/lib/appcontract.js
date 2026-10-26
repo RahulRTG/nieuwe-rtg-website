@@ -250,6 +250,7 @@ const CONTRACT = {
     belofte: 'de reistab toont het dagprogramma van de reis en de autoshowroom: het lid vraagt een proefrit aan die de zaak inplant, doet een bod, en tekent het koopcontract zodra de zaak aanvaardt',
     ingang: '/apps/app.html',
     via: '#tab=reizen',
+    bereik: '[data-view="reizen"]',
     bestanden: ['public/apps/app-main/app-main-45.js', 'public/apps/app-main/app-main-18.js', 'public/apps/app-main/app-main-19.js']
   }, voltooi('reistab', 'het scenario loopt /api/agenda/mijn, /api/verkoop/showroom, /mijn, /proefrit, /koop en /teken, de routes die de reistab in app-main-45, -18 en -19 aanroept, met de zaak die inplant en aanvaardt en een tweede lid')),
   /* TravelOS zonder eigen adres: de stand Ter plaatse (sprong #tab=terplaatse
@@ -262,6 +263,7 @@ const CONTRACT = {
     belofte: 'ter plaatse huurt het lid een auto tegen een vaste dagprijs, betaalt vooraf, deelt vrijwillig zijn locatie, en tekent of weigert het huurcontract dat de zaak opstelt',
     ingang: '/apps/app.html',
     via: '#tab=terplaatse',
+    bereik: '[data-view="terplaatse"]',
     bestanden: ['public/apps/app-main/app-main-15.js', 'public/apps/app-main/app-main-16.js', 'public/apps/app-main/app-main-18.js']
   }, voltooi('terplaatse', 'het scenario loopt /api/verhuur/aanbod, /api/huur/boek, /api/booking/pay, /api/huur/mijn, /api/huur/locatie, /api/contracten/mijn, /api/contract/teken en /weiger, de routes die de verhuur- en contractdelen van de tab Ter plaatse aanroepen, met de zaak die het contract opstelt en tekent en een tweede lid')),
   'link:wereldlaag': Object.assign({
@@ -465,6 +467,7 @@ const CONTRACT = {
     belofte: 'een lid rekent het betaalverzoek van een zaak een keer af, betaalt een zaak rechtstreeks en hoort het als de bank weigert',
     ingang: '/apps/app.html',
     via: '#tab=betalen',
+    bereik: '[data-view="betalen"]',
     // app-main-46.js: verzoeken, rechtstreeks betalen en de eigen betalingen
     bestanden: ['public/apps/app-main/app-main-46.js']
   }, voltooi('betalen', 'het scenario loopt /api/betaal/verzoeken, /verzoek/pay, /direct en /mijn, de routes die de stand Betalen in app-main-46 aanroept, met de simulatiebank en een gebonden toestel')),
@@ -472,6 +475,7 @@ const CONTRACT = {
     belofte: 'een lid bestelt boodschappen bij een groothandel, ziet de bestelling verder gaan en annuleert er een die nog niet bevestigd is',
     ingang: '/apps/app.html',
     via: '#tab=bestellen',
+    bereik: '[data-view="bestellen"]',
     // app-main-19.js: de markt, bestellen, mijn bestellingen en annuleren
     bestanden: ['public/apps/app-main/app-main-19.js']
   }, voltooi('bestellen', 'het scenario loopt /api/groothandel/markt, /bestel, /mijn en /annuleer, de routes die de stand Bestellen in app-main-19 aanroept, met de groothandel die de bestelling verder zet')),
@@ -479,6 +483,7 @@ const CONTRACT = {
     belofte: 'een betalend lid vraagt tickets aan, een mens van RTG op naam keurt, en pas een bevestigde betaling geeft precies de tickets; herroepen zegt alleen wat waar is',
     ingang: '/apps/app.html',
     via: '#tab=assets',
+    bereik: '[data-view="assets"]',
     // app-main-32.js: overzicht en aanvragen; -32a.js: aanvragen, betalen, intrekken; -33.js: herroepen, document, gebruik
     bestanden: ['public/apps/app-main/app-main-32.js', 'public/apps/app-main/app-main-32a.js', 'public/apps/app-main/app-main-33.js']
   }, voltooi('assets', 'het scenario loopt /api/assets, /api/asset/koop, /aanvragen, /aanvraag/betaal, /mijn en /herroep, de routes die de stand Assets in app-main-32, -32a en -33 aanroept, met een kantoormens op naam en de simulatiebank')),
@@ -561,6 +566,7 @@ const CONTRACT = {
     belofte: 'een lid ziet de posts van De Salon, waardeert ze en reageert onder zijn codenaam, en een post voor vrienden ziet alleen een vriend',
     ingang: '/apps/app.html',
     via: '#tab=salon',
+    bereik: '[data-view="salon"]',
     // app-main-58.js: de knoppen onder een Salon-bericht (waarderen, reageren)
     bestanden: ['public/apps/app-main/app-main-58.js']
   }, voltooi('salon', 'het scenario loopt /api/state, /api/like en /api/comment, de routes die de stand Salon van /apps/app.html (app-main-58.js) aanroept, met een vriend, een vreemde en een gratis account')),

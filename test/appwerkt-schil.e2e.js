@@ -82,7 +82,7 @@ const ACHTERGEBLEVEN_LAAG = '<!doctype html><html><body><main>' +
 const VERVOLGDIALOOG = '<!doctype html><html><body><main>' +
   '<button type="button" id="open" onclick="document.querySelector(\'dialog\').showModal()">Open instellingen</button>' +
   '<dialog><button type="button" onclick="this.closest(\'dialog\').close()">Sluiten</button>' +
-  Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1">Keuze ' + i + '</button>').join('') +
+  Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1;this.closest(\'dialog\').close()">Keuze ' + i + '</button>').join('') +
   '</dialog></main></body></html>';
 
 const MODULEBEREIK = '<!doctype html><html><body><main>' +
@@ -169,6 +169,8 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(v.gevonden, 8, 'de opener, sluitroute en zes app-eigen dialoogacties zijn over alle standen uniek gemeten');
     assert.equal(v.geklikt, 8, 'de sluitroute en alle zeven unieke handelingen zijn werkelijk aangetikt');
     assert.deepEqual(v.nietKlikbaar, [], 'de dialooginhoud bleef bereikbaar');
+    assert.ok(v.instrument.some((x) => /oorspronkelijke stand/.test(x)),
+      'de meter herhaalt een bewezen opener zonder de herhaling dubbel te tellen');
 
     const { meetIngang } = require('../scripts/appwerkt');
     const meet = meetIngang({ functie: 'tab:doel' }, {

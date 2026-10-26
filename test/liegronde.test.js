@@ -93,6 +93,12 @@ test('de Foundation-toegangspoort blijft echt zodat het scherm zelf wordt gemete
   }
 });
 
+test('de Lifestyle-persona doorloopt echte menselijke goedkeuring voor de premium-schermen', () => {
+  for (const pad of ['/api/aanmelding/', '/api/office/verify']) {
+    assert.ok(SPAAR.split(',').includes(pad), pad + ' moet echt blijven om de Lifestyle-persona langs de productroute te maken');
+  }
+});
+
 test('de OS-adapter spaart alleen zijn toegangsschil en liegt zijn eigen werk leeg', () => {
   assert.ok(ADAPTER_SPAAR.split(',').includes('/api/state'), 'zonder echte accountstaat is Rahul niet zichtbaar');
   assert.ok(!ADAPTER_SPAAR.split(',').includes('/api/account/'), 'de rollenlijst van Werk is inhoud en moet leeg worden beproefd');

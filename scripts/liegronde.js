@@ -41,7 +41,7 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'LIEGRONDE.json');
 const { rijen, meetIngang, maakContext, openIngang, POORTEN } = require('./appwerkt');
-const { haalSessies, opslagVoor } = require('./lib/proefsessies');
+const { haalSessies, haalLifestyleLid, opslagVoor } = require('./lib/proefsessies');
 const { haalSchoolsessies, maakSchoolContext } = require('./lib/schoolproefsessies');
 const { vindKlachten, zichtbareTekst } = require('./lib/schermleugen');
 const { magLiegen } = require('../server/opzet/liegpoort');
@@ -55,6 +55,11 @@ const LIEG = '/api/';
    test/liegend-scherm.e2e.js). */
 const SPAAR = ['/api/auth/', '/api/login', '/api/office/login', '/api/supplier/login',
   '/api/supplier/roster', '/api/foundation/gezin/maak',
+  /* De premium-schermen horen bij een echte Lifestyle-persoon. Deze routes
+     bouwen die persona via het bestaande menselijke besluit en de bestaande
+     identiteitscontrole. Ze zijn deuren van de proef, niet de functionele
+     schermantwoorden die de liegpoort onderzoekt. */
+  '/api/aanmelding/', '/api/office/verify',
   /* Proefopbouw, niet de gegevens die Bord en Schrift tonen: een echt gekozen
      kinderprofiel en een echte les leveren de tijdelijke Schoolpas. De schermen
      lezen daarna andere routes; die blijven dus gewoon leeggelogen. */
@@ -157,7 +162,7 @@ async function meet() {
   const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
   const pw = laadBrowser({ eigenDriver: false });
   if (!pw) { console.error('Geen browser beschikbaar; deze ronde meet in een echte browser.'); process.exit(2); }
-  const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
+  const { startServer, kantoorAlsPersoon } = require(path.join(WORTEL, 'test', 'helper.js'));
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-'));
   const TMP_ADAPTER = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegronde-os-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_LIEG: LIEG, RTG_LIEG_NIET: SPAAR } });
@@ -165,6 +170,14 @@ async function meet() {
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   try {
     const { sessies, overgeslagen } = await haalSessies(base);
+    const kantoormens = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+    const lifestyle = await haalLifestyleLid(base, kantoormens);
+    if (lifestyle.ok) sessies.lifestyle = {
+      sleutel: 'rtg_member_token', waarde: lifestyle.token,
+      start: '/apps/app.html?pas=lifestyle',
+      uitleg: 'een door een kantoormens op naam goedgekeurd en geverifieerd Lifestyle-lid'
+    };
+    else overgeslagen.push({ rol: 'lifestyle', reden: lifestyle.reden });
     const adapterSessies = await haalSessies(adapterServer.base, ['lid']);
     overgeslagen.push(...adapterSessies.overgeslagen.map((o) => ({ rol: 'os-adapter:' + o.rol, reden: o.reden })));
     const school = await haalSchoolsessies(base, sessies);

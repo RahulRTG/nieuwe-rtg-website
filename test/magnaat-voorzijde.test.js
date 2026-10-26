@@ -60,11 +60,16 @@ test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert e
   assert.match(js,/doorgaan\.toggleAttribute\('data-contextactie',!taak\)/);
   assert.match(html,/<button[^>]*id="mvVolgende"[^>]*data-contextactie/);
   assert.doesNotMatch(html,/<button[^>]*id="mvVolgende"[^>]*data-hoofdactie/);
-  assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie aria-label="Kies aanpak:/);
+  assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie data-contextactie aria-label="Kies aanpak:/);
   assert.match(html,/data-duty="'\+esc\(x\.functieId\)\+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier/);
   assert.match(html,/if\(actief\)\{TASK=actief;toast\('Rond eerst het actieve dossier af; uw andere dossiers blijven klaarstaan\.'/);
   assert.doesNotMatch(html,/\(klaar\|\|geblokkeerd\)\?'disabled'/);
   assert.match(html,/data-next-duty data-contextactie data-hoofdactie/);
+  assert.match(html,/id="vnHoofd"[^>]*data-stand="magnaat-leven-keuze"[^>]*data-hoofdactie[^>]*data-contextactie/);
+  assert.match(lees('public/apps/magnaat-leven.js'),/data-vn-actie="' \+ \(n \+ 1\) \+ '" data-stand="magnaat-leven-keuze" data-contextactie aria-label="' \+ esc\(a\.label\)/);
+  for(const label of ['Bekijk nieuwe kansen','Zoek spelers','Bestuur de economie','Ontmoet bedrijven','Open lab']){
+    assert.match(html,new RegExp('<button[^>]*data-contextactie[^>]*>'+label+'</button>'));
+  }
   assert.match(html,/data-start="'\+esc\(c\.id\)\+'" data-stand="magnaat-capability" aria-label="'\+label\+'"/);
   assert.match(html,/const label='Start '\+esc\(c\.naam\)\+' in '\+esc\(c\.software\.naam\)/);
   assert.match(html,/document\.addEventListener\('keydown',e=>\{/);

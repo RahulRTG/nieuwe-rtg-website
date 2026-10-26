@@ -69,3 +69,12 @@ test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenp
   assert.equal(redenVoorSchoneTegenproef('tik verstuurd maar niet afgerond binnen de limiet'), false,
     'een onzekere mutatie mag nooit automatisch opnieuw worden verstuurd');
 });
+
+test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {
+  const { herstelgrens } = require('../scripts/appwerkt');
+  assert.equal(herstelgrens(0), 32);
+  assert.equal(herstelgrens(1), 32);
+  assert.equal(herstelgrens(2), 64);
+  assert.equal(herstelgrens(4), 128);
+  assert.equal(herstelgrens(40), 128, 'de meter kan nooit onbeperkt blijven herhalen');
+});

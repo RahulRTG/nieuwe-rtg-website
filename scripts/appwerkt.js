@@ -158,12 +158,16 @@ const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slic
    harde, eindige veiligheidsgrens, maar laat de meter wel ieder uniek control
    plus zijn begrensde navigatiepad werkelijk aanraken. */
 const MAXKLIK = 1024;
-/* Een echte openerketen in RTG is kort. Meer dan 32 herhaalde standstappen
-   zonder één nieuw uniek bedieningselement is geen verdieping meer maar een
-   herstelcyclus. Stop dan met een eerlijke restlijst; verlaag nooit de 100%-
-   bewijsgrens. Dit begrenst brede apps zoals Mall van tientallen minuten naar
-   een bruikbare diagnose. */
+/* Een echte openerketen in RTG is kort. Per nog onaangeraakte eindtak krijgt
+   de meter 32 herhaalde standstappen, met 128 als harde bovengrens. Een vaste
+   grens van 32 stopte Magnaat na de eerste van meerdere geldige eindtakken:
+   de restlijst verschoof per ronde, terwijl iedere tak afzonderlijk bereikbaar
+   was. De adaptieve grens blijft eindig en verlaagt nooit de 100%-bewijsgrens. */
 const MAXHERSTELZONDERNIEUW = 32;
+const MAXHERSTELTOTAAL = 128;
+function herstelgrens(resterend) {
+  return Math.min(MAXHERSTELTOTAAL, MAXHERSTELZONDERNIEUW * Math.max(1, Number(resterend) || 0));
+}
 const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[type=button],input[type=submit],input[type=reset]';
 
 /* Gedeelde bediening bewijst het scherm niet. Naast de generieke Edge en
@@ -918,8 +922,9 @@ async function bedien(ctx, base, ingang) {
         herhaald.add(k.herhaalSleutel);
         herstelketenActief = true;
         herstelZonderNieuw++;
-        if (herstelZonderNieuw > MAXHERSTELZONDERNIEUW) {
-          instrument.push('de proef stopte een openercyclus na ' + MAXHERSTELZONDERNIEUW +
+        const grens = herstelgrens(gevonden - gehad.size);
+        if (herstelZonderNieuw > grens) {
+          instrument.push('de proef stopte een openercyclus na ' + grens +
             ' herstelstappen zonder nieuwe unieke bediening; de resterende bediening blijft eerlijk onaangeraakt');
           break;
         }
@@ -1531,7 +1536,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

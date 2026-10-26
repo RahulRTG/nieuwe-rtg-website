@@ -45,7 +45,7 @@
   var zetKamer = function (id) { kamer = id; try { id ? localStorage.setItem(KAMERKEY, id) : localStorage.removeItem(KAMERKEY); } catch (e) {} };
 
   var knop = maakEl('<button class="rsm-knop" type="button" aria-label="Samen">Samen</button>');
-  var sheet = maakEl('<section class="rsm-sheet" aria-label="Samen" hidden><div class="rsm-kop"><span>Samen</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div><div class="rsm-vak"></div></section>');
+  var sheet = maakEl('<section class="rsm-sheet" role="dialog" aria-modal="false" aria-label="Samen" hidden><div class="rsm-kop"><span>Samen</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div><div class="rsm-vak"></div></section>');
   /* Wacht kort op de sessiebalk; val anders terug naar het begin van main. */
   window.rtfDok = window.rtfDok || function (el) {
     var balk = document.querySelector('.sb-balk');

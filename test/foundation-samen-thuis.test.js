@@ -8,6 +8,14 @@ const lees = p => fs.readFileSync(path.join(wortel, p), 'utf8');
 const html = lees('public/apps/foundation/samen-thuis.html');
 const gedrag = lees('public/apps/foundation/samen-thuis.js');
 const beeld = lees('public/apps/foundation/samen-thuis-weergave.js');
+const samen = lees('public/apps/foundation/samen.js');
+const samenBron = lees('public/apps/foundation/samen/samen-01.js');
+
+test('de Samen-laag is als benoemde, niet-modale dialoog herkenbaar', () => {
+  const dialoog = /<section class="rsm-sheet" role="dialog" aria-modal="false" aria-label="Samen" hidden>/;
+  assert.match(samen, dialoog);
+  assert.match(samenBron, dialoog);
+});
 const stijl = lees('public/shared/rtg-foundation-samen-thuis-2026.css');
 
 test('Samen Thuis draagt de drie getekende schermen en vijf herkenbare navigatiekeuzes', () => {

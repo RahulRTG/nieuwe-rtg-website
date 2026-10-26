@@ -52,6 +52,7 @@ test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert e
     assert.match(html,new RegExp('<button[^>]*id="'+id+'"[^>]*data-stand="magnaat-[^"]+"'));
   }
   assert.match(html,/<button[^>]*id="mvStartVolledig"[^>]*data-hoofdactie[^>]*data-contextactie/);
+  assert.match(html,/<button[^>]*id="mvGaVerder"[^>]*data-hoofdactie[^>]*data-contextactie/);
   assert.match(html,/<button[^>]*id="mvVolgende"[^>]*data-contextactie/);
   assert.doesNotMatch(html,/<button[^>]*id="mvVolgende"[^>]*data-hoofdactie/);
   assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie aria-label="Kies aanpak:/);

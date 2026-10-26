@@ -687,6 +687,16 @@ function klikReden(log) {
   return 'reden niet gemeld';
 }
 
+/* Sommige schermen tekenen hun hoofdactie opnieuw zodra de serverstand
+   binnenkomt. Playwright kan dan precies het oude element hebben gevonden:
+   de knop bestaat in de schone stand, maar verdwijnt tussen zoeken en tikken.
+   Net als bij een bedekking toetsen we zo'n bediening precies eenmaal opnieuw
+   vanaf de gedeclareerde ingang. Een knop die daar verborgen blijft, faalt
+   nog steeds; dit maakt een werkelijk onzichtbare bediening dus niet groen. */
+function redenVoorSchoneTegenproef(waarom) {
+  return /intercepts pointer events|element is outside of the viewport|element is not visible/i.test(String(waarom || ''));
+}
+
 /* De productnorm voor bewijs 2 staat op één plek. Een percentage, een
    afgeronde verhouding of een overgeslagen risicoknop mag nooit als volledige
    bediening worden gepresenteerd. */
@@ -1013,7 +1023,7 @@ async function bedien(ctx, base, ingang) {
           await page.waitForTimeout(250).catch(() => {});
           continue;
         }
-        const opnieuwVanafSchoon = /intercepts pointer events|element is outside of the viewport/i.test(waarom) &&
+        const opnieuwVanafSchoon = redenVoorSchoneTegenproef(waarom) &&
           !opnieuwGeprobeerd.has(k.merk);
         if (opnieuwVanafSchoon) {
           opnieuwGeprobeerd.add(k.merk);
@@ -1021,7 +1031,7 @@ async function bedien(ctx, base, ingang) {
           try {
             await openIngang(page, base, meet);
             await page.waitForTimeout(1200);
-            instrument.push('de proef toetste een door de vorige stand geblokkeerde bediening opnieuw vanaf de schone ingang');
+            instrument.push('de proef toetste een verdwenen of geblokkeerde bediening opnieuw vanaf de schone ingang');
             continue;
           } catch (x) {
             gehad.add(k.merk);
@@ -1521,7 +1531,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

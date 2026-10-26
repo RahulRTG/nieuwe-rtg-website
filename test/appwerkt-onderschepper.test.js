@@ -58,3 +58,14 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
   assert.equal(klikReden('Timeout 2500ms exceeded.\n - waiting for locator'), 'reden niet gemeld');
   assert.equal(klikReden(''), 'reden niet gemeld');
 });
+
+test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenproef', () => {
+  const { redenVoorSchoneTegenproef } = require('../scripts/appwerkt');
+  for (const reden of ['intercepts pointer events', 'element is outside of the viewport', 'element is not visible']) {
+    assert.equal(redenVoorSchoneTegenproef(reden), true, reden);
+  }
+  assert.equal(redenVoorSchoneTegenproef('element is not enabled'), false,
+    'een echt uitgeschakelde bediening mag door heropenen niet groen worden');
+  assert.equal(redenVoorSchoneTegenproef('tik verstuurd maar niet afgerond binnen de limiet'), false,
+    'een onzekere mutatie mag nooit automatisch opnieuw worden verstuurd');
+});

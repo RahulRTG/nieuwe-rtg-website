@@ -51,6 +51,9 @@ test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert e
   for(const id of ['mvGaVerder','mvVoerKeuzeUit','mvStartVolledig','mvVolgende','capsMeer']){
     assert.match(html,new RegExp('<button[^>]*id="'+id+'"[^>]*data-stand="magnaat-[^"]+"'));
   }
+  assert.match(html,/<button[^>]*id="mvStartVolledig"[^>]*data-hoofdactie[^>]*data-contextactie/);
+  assert.match(html,/<button[^>]*id="mvVolgende"[^>]*data-contextactie/);
+  assert.doesNotMatch(html,/<button[^>]*id="mvVolgende"[^>]*data-hoofdactie/);
   assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie aria-label="Kies aanpak:/);
   assert.match(html,/data-duty="'\+esc\(x\.functieId\)\+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier/);
   assert.match(html,/if\(actief\)\{TASK=actief;toast\('Rond eerst het actieve dossier af; uw andere dossiers blijven klaarstaan\.'/);

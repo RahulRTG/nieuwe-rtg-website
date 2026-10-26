@@ -158,6 +158,12 @@ const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slic
    harde, eindige veiligheidsgrens, maar laat de meter wel ieder uniek control
    plus zijn begrensde navigatiepad werkelijk aanraken. */
 const MAXKLIK = 1024;
+/* Een echte openerketen in RTG is kort. Meer dan 32 herhaalde standstappen
+   zonder één nieuw uniek bedieningselement is geen verdieping meer maar een
+   herstelcyclus. Stop dan met een eerlijke restlijst; verlaag nooit de 100%-
+   bewijsgrens. Dit begrenst brede apps zoals Mall van tientallen minuten naar
+   een bruikbare diagnose. */
+const MAXHERSTELZONDERNIEUW = 32;
 const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[type=button],input[type=submit],input[type=reset]';
 
 /* Gedeelde bediening bewijst het scherm niet. Naast de generieke Edge en
@@ -728,6 +734,12 @@ async function bedien(ctx, base, ingang) {
     schil = Math.max(schil, (stand && stand.schil) || 0);
   };
   let heropeningen = 0;
+  /* Tijdens een verklaarde A -> B-herstelroute moet B in de huidige stand
+     worden herhaald voordat we opnieuw naar de ingang springen. Buiten zo'n
+     route gaan we juist eerst schoon terug, zodat een blijvende contextopener
+     geen gewone beginacties gevangen houdt. */
+  let herstelketenActief = false;
+  let herstelZonderNieuw = 0;
   const opnieuwGeprobeerd = new Set();
   /* Een opener mag eenmaal per zichtbare stand en bewijsvoortgang worden
      herhaald. De stand hoort bij de sleutel: zo kan de meter A -> B opnieuw
@@ -849,17 +861,38 @@ async function bedien(ctx, base, ingang) {
            op browser- en serverfouten beoordeeld. */
         if (gehad.size < gevonden) {
           try {
-            /* Probeer eerst in de HUIDIGE stand verder te lopen. Een resterende
-               actie kan achter A -> B zitten; na het herhalen van A is B pas in
-               deze stand zichtbaar. Meteen opnieuw openen zou die tussenstand
-               weer vernietigen en maakte zulke ketens onbereikbaar. */
-            k = await kijkRonde(page, gehad, bereik, herhaald, true);
-            telStand(k);
+            /* Een reeds ingezette openerketen vervolgen we in de huidige
+               stand. Zo blijft A -> B -> dialoog bereikbaar. Dit pad wordt
+               uitsluitend gezet door een expliciet herhaalde standopener en
+               valt terug naar de schone ingang zodra het geen vervolg heeft. */
+            if (herstelketenActief) {
+              k = await kijkRonde(page, gehad, bereik, herhaald, true);
+              telStand(k);
+              if (k.klaar) herstelketenActief = false;
+            }
+            /* Eerst terug naar de schone ingang. Een dynamisch scherm kan na
+               een keuze tientallen eerder gevonden knoppen verbergen. In de
+               oude volgorde herhaalde de proef dan iedere bekende opener in de
+               gemuteerde stand voordat zij terugging; Mall bereikte daardoor
+               MAXKLIK terwijl 45 gewone beginknoppen onaangeraakt bleven.
+
+               De schone ingang is de kortste route naar zulke bediening. Pas
+               wanneer daar niets nieuws staat, herhalen we een verklaarde
+               opener om A -> B -> resterende keuze opnieuw te bereiken. De
+               bewijsgrens verandert niet: iedere unieke knop wordt nog steeds
+               werkelijk aangetikt. */
             if (k.klaar && heropeningen < MAXKLIK) {
               heropeningen++;
               await openIngang(page, base, meet);
               await page.waitForTimeout(1200);
+              herstelketenActief = false;
               instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
+            }
+            if (k.klaar) {
+              k = await kijkRonde(page, gehad, bereik, herhaald);
+              telStand(k);
+            }
+            if (k.klaar) {
               k = await kijkRonde(page, gehad, bereik, herhaald, true);
               telStand(k);
             }
@@ -873,10 +906,21 @@ async function bedien(ctx, base, ingang) {
       }
       if (k.herhaling) {
         herhaald.add(k.herhaalSleutel);
+        herstelketenActief = true;
+        herstelZonderNieuw++;
+        if (herstelZonderNieuw > MAXHERSTELZONDERNIEUW) {
+          instrument.push('de proef stopte een openercyclus na ' + MAXHERSTELZONDERNIEUW +
+            ' herstelstappen zonder nieuwe unieke bediening; de resterende bediening blijft eerlijk onaangeraakt');
+          break;
+        }
         if (!instrument.some((x) => /toestandsafhankelijke openerketen/.test(x))) {
           instrument.push('de proef volgde een toestandsafhankelijke openerketen naar resterende bediening');
         }
-      } else gehad.add(k.merk);
+      } else {
+        gehad.add(k.merk);
+        herstelketenActief = false;
+        herstelZonderNieuw = 0;
+      }
       laatste = k.tekst || '(naamloos)';
       const isRisicovol = RISICOVOL.test(laatste);
       if (isRisicovol && !risicovolAangeraakt.includes(laatste)) risicovolAangeraakt.push(laatste);
@@ -1235,6 +1279,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       const stand = merken.slice().sort().join('¦');
       const herhaalStand = new Set(alHerhaald);
       doel = alle.filter((el) => alGehad.includes(merk(el)) &&
+          (standNavigatie(el) || dialoogOpener(el) || contextactie(el)) &&
           !herhaalStand.has(alGehad.length + '§' + stand + '§' + merk(el)))
         /* Nieuwe dialooginhoud wordt hierboven altijd voor de sluitknop
            aangeraakt. Is in een modale stand niets nieuws meer over, dan doet

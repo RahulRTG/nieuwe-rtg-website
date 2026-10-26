@@ -52,6 +52,16 @@ const STANDWISSEL = '<!doctype html><html><body><main id="vlak">' +
   Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="document.querySelector(\'main\').innerHTML=\'<p>Stand ' + i + '</p>\';window.gedaan=' + (i + 1) + '">Stand ' + i + '</button>').join('') +
   '</main></body></html>';
 
+/* De contextactie blijft na haar tik als enige bediening in de gemuteerde
+   stand staan. Zij is al bewezen en kan daar eindeloos worden herhaald. De
+   overige beginacties zijn alleen via een schone heropening bereikbaar. Dit
+   bootst de Mall na: een geopende dienst of bibliotheek verborg tientallen
+   gewone kaarten, terwijl de oude meter de bekende opener bleef herhalen. */
+const HERHAALVAL = '<!doctype html><html><body><main id="vlak">' +
+  '<button type="button" data-contextactie onclick="document.querySelector(\'main\').innerHTML=this.outerHTML">Open context</button>' +
+  Array.from({ length: 5 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1">Gewone actie ' + i + '</button>').join('') +
+  '</main></body></html>';
+
 /* De productie-inventaris bevat schermen met meer dan tachtig unieke
    handelingen. De bewijsgrens is ze allemaal werkelijk aantikken. Elke
    tik hieronder schakelt bewust zichzelf en haar vaste paar uit: na 41 echte tikken is
@@ -81,9 +91,9 @@ const ACHTERGEBLEVEN_LAAG = '<!doctype html><html><body><main>' +
    opeenvolgende openers en sluit na iedere keuze beide lagen. De meter moet dus
    A -> B kunnen herhalen om ELKE volgende unieke dialoogactie te bereiken. */
 const VERVOLGDIALOOG = '<!doctype html><html><body><main>' +
-  '<button type="button" id="open" onclick="document.getElementById(\'categorie\').hidden=false">Open categorie</button>' +
-  '<section id="categorie" hidden><button type="button" id="instellingen" onclick="document.querySelector(\'dialog\').showModal()">Open instellingen</button></section>' +
-  '<dialog><button type="button" onclick="this.closest(\'dialog\').close();document.getElementById(\'categorie\').hidden=true">Sluiten</button>' +
+  '<button type="button" id="open" aria-controls="categorie" onclick="document.getElementById(\'categorie\').hidden=false">Open categorie</button>' +
+  '<section id="categorie" hidden><button type="button" id="instellingen" aria-haspopup="dialog" aria-controls="vervolgdeck" onclick="document.querySelector(\'dialog\').showModal()">Open instellingen</button></section>' +
+  '<dialog id="vervolgdeck"><button type="button" onclick="this.closest(\'dialog\').close();document.getElementById(\'categorie\').hidden=true">Sluiten</button>' +
   Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1;this.closest(\'dialog\').close();document.getElementById(\'categorie\').hidden=true">Keuze ' + i + '</button>').join('') +
   '</dialog></main></body></html>';
 
@@ -92,9 +102,9 @@ const VERVOLGDIALOOG = '<!doctype html><html><body><main>' +
    knop gaat. De taakactie blijft bewust open: haar een tweede keer aantikken
    is geen nieuw bewijs en veroorzaakt in echte apps opnieuw dezelfde taak. */
 const AFGEWERKTE_DIALOOG = '<!doctype html><html><body><main>' +
-  '<button type="button" onclick="document.querySelector(\'dialog\').showModal()">Open taak</button>' +
+  '<button type="button" aria-haspopup="dialog" aria-controls="taakdeck" onclick="document.querySelector(\'dialog\').showModal()">Open taak</button>' +
   '<button type="button" onclick="window.verder=true">Volgende hoofdactie</button>' +
-  '<dialog><button type="button" onclick="this.closest(\'dialog\').close()">Sluiten</button>' +
+  '<dialog id="taakdeck"><button type="button" onclick="this.closest(\'dialog\').close()">Sluiten</button>' +
   '<button type="button" onclick="fetch(\'/api/dialoogactie\',{method:\'POST\'})">Taakactie</button></dialog>' +
   '</main></body></html>';
 
@@ -102,7 +112,7 @@ const AFGEWERKTE_DIALOOG = '<!doctype html><html><body><main>' +
    aria-modal. Ook daar is de dialoog de actieve laag. De CSS-onzichtbare knop
    mag pas meetellen nadat de zichtbare actie haar werkelijk onthult. */
 const ROLE_DIALOG = '<!doctype html><html><body><main>' +
-  '<button type="button" onclick="document.getElementById(\'paneel\').hidden=false">Open paneel</button>' +
+  '<button type="button" aria-haspopup="dialog" aria-controls="paneel" onclick="document.getElementById(\'paneel\').hidden=false">Open paneel</button>' +
   '<button type="button" onclick="window.hoofdactie=true">Volgende hoofdactie</button>' +
   '<div id="paneel" role="dialog" hidden><button type="button" onclick="this.parentNode.hidden=true">Sluiten</button>' +
   '<button type="button" onclick="document.getElementById(\'later\').style.opacity=1">Toon vervolg</button>' +
@@ -175,6 +185,7 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     res.setHeader('Content-Type', 'text/html');
     res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT :
       (req.url.startsWith('/apps/standwissel') ? STANDWISSEL :
+        (req.url.startsWith('/apps/herhaalval') ? HERHAALVAL :
         (req.url.startsWith('/apps/breed') ? BREED_SCHERM :
         (req.url.startsWith('/apps/risico') ? RISICO_SCHERM :
         (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
@@ -185,7 +196,7 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
                 (req.url.startsWith('/apps/runtimewacht') ? RUNTIME_WACHT :
                 (req.url.startsWith('/apps/navigeert') ? NAVIGEERT :
                   (req.url.startsWith('/apps/bestemming') ? BESTEMMING :
-                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))))))))); });
+                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))))))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -208,6 +219,13 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(s.geklikt, 6, 'iedere handeling is na een schone heropening werkelijk aangetikt');
     assert.ok(s.instrument.some((x) => /oorspronkelijke stand/.test(x)), 'de meting verantwoordt haar heropeningen');
     assert.deepEqual(s.crash.concat(s.serverfout), [], 'de standwissels bleven zonder browser- of serverfout');
+
+    const val = await bedien(ctx, base, '/apps/herhaalval.html');
+    assert.equal(val.gevonden, 6, 'de contextactie en vijf gewone beginacties staan in de noemer');
+    assert.equal(val.geklikt, val.gevonden, 'de meter keert eerst schoon terug en raakt alle gewone beginacties');
+    assert.deepEqual(val.onaangeraakt, [], 'de bekende contextopener houdt geen beginactie gevangen');
+    assert.ok(val.instrument.some((x) => /oorspronkelijke stand/.test(x)),
+      'de kortste herstelroute via de schone ingang is controleerbaar vastgelegd');
 
     const breed = await bedien(ctx, base, '/apps/breed.html');
     assert.equal(breed.gevonden, 82, 'alle unieke handelingen van het brede scherm staan in de noemer');

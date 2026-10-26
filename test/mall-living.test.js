@@ -93,6 +93,22 @@ test('de voorzijde gebruikt de standaard Edge en houdt de volledige bestaande Ma
   assert.match(experience, /\/api\/mall\/bewaar/);
   const view = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'mall-experience-view.js'), 'utf8');
   assert.match(view, /\/api\/reviews/);
+  assert.match(html, /data-department="all" data-stand="mall-department"/,
+    'de afdelingen zijn expliciete, herhaalbare Mall-staten');
+  assert.match(view, /data-mall-item=/,
+    'ieder etalage-item blijft een afzonderlijke bedienbare keuze');
+  assert.doesNotMatch(view, /data-stand="mall-selection"/,
+    'productkaarten zijn keuzes en geen navigatiestand die herhaald moet worden');
+  assert.doesNotMatch(html, /data-open="mall-(?:boutique|service)"/,
+    'leverancierskaarten zijn keuzes en geen herhaalbare navigatiestand');
+  assert.match(html, /id="blad" role="dialog" aria-modal="true"/,
+    'het boutique-blad is een toegankelijke modale werklaag');
+  assert.match(html, /id="lezer" role="dialog" aria-modal="true"/,
+    'de reisgidslezer is een toegankelijke modale werklaag');
+  assert.match(html, /e\.key !== 'Escape'/,
+    'alle Mall-bladen hebben dezelfde voorspelbare toetsenbordsluiting');
+  assert.match(html, /id="mallCompleteTrigger"[^>]+aria-controls="vast"/,
+    'de compacte Mall-ingang benoemt de volledige inhoud die zij ontsluit');
   assert.match(front, /!d\.body\.classList\.contains\('rtg-mall-living'\)/,
     'de oude winkelbalk wordt niet naast de standaard Edge geplaatst');
 });

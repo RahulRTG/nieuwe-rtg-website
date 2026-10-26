@@ -1135,7 +1135,16 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       const herhaalStand = new Set(alHerhaald);
       doel = alle.filter((el) => alGehad.includes(merk(el)) &&
           !herhaalStand.has(alGehad.length + '§' + stand + '§' + merk(el)))
-        .sort((a, b) => risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
+        /* Nieuwe dialooginhoud wordt hierboven altijd voor de sluitknop
+           aangeraakt. Is in een modale stand niets nieuws meer over, dan doet
+           een mens het omgekeerde: sluit de afgewerkte laag en gaat verder op
+           het scherm eronder. Een reeds gebruikte taakactie opnieuw kiezen
+           kan dezelfde overlay steeds heropenen (Magnaat: actieve opdracht)
+           en voegt geen uniek bedieningsbewijs toe. Buiten een modal blijven
+           openers vooraan om A -> B -> resterende keuze te kunnen replayen. */
+        .sort((a, b) => modaal
+          ? Number(!sluiter(a)) - Number(!sluiter(b)) || risicoRang(a) - risicoRang(b)
+          : risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
       herhaling = !!doel;
       if (doel) herhaalSleutel = alGehad.length + '§' + stand + '§' + merk(doel);
     }

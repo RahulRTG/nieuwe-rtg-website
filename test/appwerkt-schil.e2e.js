@@ -86,6 +86,17 @@ const VERVOLGDIALOOG = '<!doctype html><html><body><main>' +
   Array.from({ length: 6 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1;this.closest(\'dialog\').close();document.getElementById(\'categorie\').hidden=true">Keuze ' + i + '</button>').join('') +
   '</dialog></main></body></html>';
 
+/* Als alle unieke bediening van een open dialoog al is geraakt, moet de
+   replay de laag sluiten voordat hij naar een nog onaangeraakte achtergrond-
+   knop gaat. De taakactie blijft bewust open: haar een tweede keer aantikken
+   is geen nieuw bewijs en veroorzaakt in echte apps opnieuw dezelfde taak. */
+const AFGEWERKTE_DIALOOG = '<!doctype html><html><body><main>' +
+  '<button type="button" onclick="document.querySelector(\'dialog\').showModal()">Open taak</button>' +
+  '<button type="button" onclick="window.verder=true">Volgende hoofdactie</button>' +
+  '<dialog><button type="button" onclick="this.closest(\'dialog\').close()">Sluiten</button>' +
+  '<button type="button" onclick="fetch(\'/api/dialoogactie\',{method:\'POST\'})">Taakactie</button></dialog>' +
+  '</main></body></html>';
+
 const MODULEBEREIK = '<!doctype html><html><body><main>' +
   Array.from({ length: 8 }, (_, i) => '<button type="button">Andere module ' + i + '</button>').join('') +
   '<section data-view="doel"><button type="button">Doel een</button><button type="button">Doel twee</button></section>' +
@@ -108,7 +119,9 @@ test('APPWERKT wijst de canonieke premium-suite aan een Lifestyle-lid toe', () =
 test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', { skip: geenBrowser(pw) }, async () => {
   const { bedien } = require('../scripts/appwerkt');
   let risicoMutaties = 0;
+  let dialoogActies = 0;
   const srv = http.createServer((req, res) => {
+    if (req.url === '/api/dialoogactie') { dialoogActies++; res.writeHead(200, { 'content-type': 'application/json' }); return res.end('{"ok":true}'); }
     if (req.url === '/api/risico') {
       risicoMutaties++;
       res.setHeader('Content-Type', 'application/json');
@@ -122,7 +135,8 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
         (req.url.startsWith('/apps/risico') ? RISICO_SCHERM :
         (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
           (req.url.startsWith('/apps/vervolg') ? VERVOLGDIALOOG :
-            (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))); });
+            (req.url.startsWith('/apps/afgewerkt') ? AFGEWERKTE_DIALOOG :
+              (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -172,6 +186,11 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.deepEqual(v.nietKlikbaar, [], 'de dialooginhoud bleef bereikbaar');
     assert.ok(v.instrument.some((x) => /toestandsafhankelijke openerketen/.test(x)),
       'de meter verantwoordt de meerlaagse replay zonder de openers dubbel te tellen');
+
+    const klaar = await bedien(ctx, base, '/apps/afgewerkt.html');
+    assert.equal(klaar.geklikt, klaar.gevonden, 'na de afgewerkte dialoog wordt de resterende hoofdactie geraakt');
+    assert.equal(dialoogActies, 1, 'een reeds bewezen taakactie wordt niet opnieuw uitgevoerd om de dialoog te verlaten');
+    assert.deepEqual(klaar.nietKlikbaar, [], 'de expliciete sluitroute houdt de achtergrond bereikbaar');
 
     const { meetIngang } = require('../scripts/appwerkt');
     const meet = meetIngang({ functie: 'tab:doel' }, {

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-25T22:04:24.253Z",
-    "commit": "8c1d078473",
+    "op": "2026-10-26T05:56:18.578Z",
+    "commit": "fb348ecfea",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 7,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.1"
   },
@@ -14,36 +14,36 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "27294ae8caeb2b5e366e7d8bba9b052bcd9a12850bbc17f95f7d75e85350f037",
+        "sha256": "b074025e2552675576f2d7f6bbe35a5e6d849bc75ad7885202313f8b6d48f6da",
         "stempel": {
-          "op": "2026-10-25T12:15:32.196Z",
-          "commit": "1d0b4d1179",
+          "op": "2026-10-26T05:14:58.305Z",
+          "commit": "fb348ecfea",
           "boomVuil": false,
-          "boomAnders": 0,
+          "boomAnders": 4,
           "instrument": "scripts/idorproef.js",
           "node": "v26.12.1"
         }
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "59561b454739e27767741cb5ffdd9d6eac55339aed3757b02b0dd7cc57993ed4",
+        "sha256": "888b592e989b3907be2fae13a13d67c759a52fd48c32f6ae789f9fab935727d7",
         "stempel": {
-          "op": "2026-10-25T12:16:16.040Z",
-          "commit": "1d0b4d1179",
+          "op": "2026-10-26T05:15:15.248Z",
+          "commit": "fb348ecfea",
           "boomVuil": false,
-          "boomAnders": 1,
+          "boomAnders": 5,
           "instrument": "scripts/rolproef-route.js",
           "node": "v26.12.1"
         }
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "2361774fd4cf465f325fa350dab0b79da2e9724dfc313efe6e135cd2f5c3d40a",
+        "sha256": "3c5919641ed2da281e86ca34c44edd130a3abf7555f1dd2868fa472e2e4e2a49",
         "stempel": {
-          "op": "2026-10-25T11:55:56.136Z",
-          "commit": "823586aaa9",
+          "op": "2026-10-26T05:15:28.839Z",
+          "commit": "fb348ecfea",
           "boomVuil": false,
-          "boomAnders": 0,
+          "boomAnders": 6,
           "instrument": "scripts/voltooiproef.js",
           "node": "v26.12.1"
         }
@@ -79,11 +79,11 @@
       "functie": "link:attenties",
       "app": "Attenties",
       "ingang": "/apps/attenties.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 12 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:balans",
@@ -167,21 +167,21 @@
       "functie": "link:cellier",
       "app": "Cellier",
       "ingang": "/apps/cellier.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 6 van de 6 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cellier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:cercle",
       "app": "Cercle",
       "ingang": "/apps/cercle.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/cercle: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:clips",
@@ -268,11 +268,11 @@
       "functie": "link:entourage",
       "app": "Entourage",
       "ingang": "/apps/entourage.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 13 van de 13 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/entourage: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:flits",
@@ -304,7 +304,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/YP4YWC/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/PP2KNP/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -341,11 +341,11 @@
       "functie": "link:garderobe",
       "app": "Garde-robe",
       "ingang": "/apps/garderobe.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 7 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/garderobe: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:gegevens",
@@ -390,11 +390,11 @@
       "functie": "link:hangar",
       "app": "Hangar",
       "ingang": "/apps/hangar.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 70 van de 70 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/attenties: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:horeca",
@@ -533,11 +533,11 @@
       "functie": "link:logboek",
       "app": "Logboek",
       "ingang": "/apps/geld.html#logboek",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:loonstrook",
@@ -573,11 +573,11 @@
       "functie": "link:maison",
       "app": "Maison",
       "ingang": "/apps/maison.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 10 van de 10 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/maison: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:mall",
@@ -593,11 +593,11 @@
       "functie": "link:mecenaat",
       "app": "Mecenaat",
       "ingang": "/apps/geld.html#mecenaat",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:mediaos",
@@ -643,11 +643,11 @@
       "functie": "link:nalatenschap",
       "app": "Nalatenschap",
       "ingang": "/apps/geld.html#nalatenschap",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:navigatie",
@@ -803,21 +803,21 @@
       "functie": "link:rechterhand",
       "app": "Privekantoor",
       "ingang": "/apps/lifestyle.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 3,
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 48 van de 48 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/bureau/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/bureau/beveiliging: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:reisboek",
       "app": "Reisboek",
       "ingang": "/apps/reisboek.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 10 van de 12 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/reis/item: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/reis/item/weg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:reizen",
@@ -843,11 +843,11 @@
       "functie": "link:rendezvous",
       "app": "Rendez-vous",
       "ingang": "/apps/rendezvous.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 3,
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 37 van de 37 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ice staat niet in IDOR.json; /api/member/rendezvous/aanwezig/wis: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:residentie",
@@ -1057,11 +1057,11 @@
       "functie": "link:table",
       "app": "Table",
       "ingang": "/apps/table.html",
-      "persona": "lid",
+      "persona": "lifestyle",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 1,
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 9 van de 9 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rechterhand/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/rechterhand/table: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: de generieke ronde heeft geen kruisproef voor de persona lifestyle"
     },
     {
       "functie": "link:theater",

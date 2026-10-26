@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-24T14:51:33.052Z",
-    "commit": "3f68407538",
+    "op": "2026-10-26T06:06:17.815Z",
+    "commit": "fb348ecfea",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 8,
     "instrument": "scripts/mutatie.js",
     "node": "v26.12.1"
   },
@@ -14259,6 +14259,13 @@
       "operator": "return-weg#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "proefsessies-lifestyle.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "proefsessies-personeel.test.js": {
       "soort": "server",

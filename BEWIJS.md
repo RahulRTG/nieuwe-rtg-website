@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 3004 |
 | losse beweringen (`test(...)`) | 20326 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 414 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2815 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2816 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 182 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 6 |
+| niets van beide | 5 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1710,7 +1710,7 @@ toets omvalt.
 | `productiekeuring-regels.test.js` | 19 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productiepoorten-weerbaar.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE PRODUCTIEPOORTEN -- een gesloten deur is onder elke spelling dicht. Vier grendels in server/middleware/ houden in productie routes dicht tot hun eigen bewijs rond is: de simulatiebrug, het legacy-codeportaal, een... |
 | `productieseed.test.js` | 3 | gezakt op `return-weg#0` | DE PRODUCTIESEED HOUDT ZIJN EIGEN BELOFTE. server/seed/index.js droeg de sleutel `trip` TWEE KEER in hetzelfde objectliteraal: `trip: null` met een uitleg erboven, en drie regels lager `trip: { dest: '', dates: '',... |
-| `proefsessies-lifestyle.test.js` | 1 | -- | De APPWERKT-persona `lifestyle` mag niet als een kunstmatige tier of handgemaakt token ontstaan. Deze proef loopt de echte menselijke goedkeuringsroute af en bewijst daarna beide kanten van de premiumdeur: het... |
+| `proefsessies-lifestyle.test.js` | 1 | gezakt op `liegpoort /api/` | De APPWERKT-persona `lifestyle` mag niet als een kunstmatige tier of handgemaakt token ontstaan. Deze proef loopt de echte menselijke goedkeuringsroute af en bewijst daarna beide kanten van de premiumdeur: het... |
 | `proefsessies-personeel.test.js` | 1 | gezakt op `liegpoort /api/` | De persona `personeel` uit scripts/lib/proefsessies.js: een echte PDA-sessie van de vervoerder TRANSIT, langs de rooster- en pin-inlog. Met die sessie opent OV-routes (/api/staff/ov/lijnen); met een lidsessie niet. |
 | `proefsessies-school.test.js` | 1 | gezakt op `liegpoort /api/` | De waarheidsproef opent Bord en Schrift niet met een nagebouwde sleutel. Deze tegenproef bewijst dat de centrale helper de twee echte Foundation- deuren doorloopt en docent en leerling gescheiden houdt. |
 | `proefsleutels.test.js` | 13 | gezakt op `!==->===#0` | DE SLEUTELBOS VAN DE PROEVEN -- scripts/lib/proefsleutels.js Deze toets bestaat om een fout te vangen die hier echt is gemaakt en die NIEMAND zag, omdat hij groen kleurde: de bewakerskaart kreeg vier eigenrollen... |

@@ -494,6 +494,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
   r.aangeraakt = bediening.aangeraakt;
+  r.herhaaldAangeraakt = bediening.herhaaldAangeraakt;
   r.schil = bediening.schil;
   r.bedekt = bediening.bedekt;
   r.overgeslagen = bediening.overgeslagen;
@@ -719,7 +720,7 @@ async function bedien(ctx, base, ingang) {
      herhaald. De stand hoort bij de sleutel: zo kan de meter A -> B opnieuw
      doorlopen om een volgende keuze achter twee lagen te bereiken, zonder in
      A -> B -> A te blijven draaien wanneer de pagina geen voortgang oplevert. */
-  const herhaald = new Set();
+  const herhaald = new Set(), herhaaldAangeraakt = [];
   const overgeslagen = [], risicovolAangeraakt = [], risicoFixtures = [], nietKlikbaar = [], onderschept = [], instrument = [];
   /* APPWERKT bewijst dat de zichtbare bediening reageert; de mutatie-,
      voltooi- en financiële proeven bewijzen het zakelijke gevolg. Dat
@@ -868,7 +869,9 @@ async function bedien(ctx, base, ingang) {
       try {
         actieveRisicoklik = isRisicovol ? laatste : null;
         await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
-        if (!k.herhaling) {
+        if (k.herhaling) {
+          if (!herhaaldAangeraakt.includes(k.tekst || '(naamloos)')) herhaaldAangeraakt.push(k.tekst || '(naamloos)');
+        } else {
           aangetiktMerken.add(k.merk);
           geklikt = aangetiktMerken.size;
         }
@@ -987,7 +990,7 @@ async function bedien(ctx, base, ingang) {
   const onaangeraakt = [...gevondenMerken].filter((merk) => !aangetiktMerken.has(merk))
     .map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
   const aangeraakt = [...aangetiktMerken].map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
-  return { geklikt, gevonden, aangeraakt, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  return { geklikt, gevonden, aangeraakt, herhaaldAangeraakt, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.

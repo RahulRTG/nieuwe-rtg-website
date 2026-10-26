@@ -243,6 +243,8 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(panelen.geklikt, panelen.gevonden, 'iedere paneelactie wordt via herhaalde expliciete tabnavigatie geraakt');
     assert.ok(panelen.aangeraakt.includes('AAN') && panelen.aangeraakt.includes('ANALYSEER CONTEXT'),
       'het bewijs noemt de werkelijk aangeraakte paneelacties bij naam');
+    assert.ok(panelen.herhaaldAangeraakt.includes('Beleid') && panelen.herhaaldAangeraakt.includes('Rahul'),
+      'het bewijs noemt de herhaalde tabroute waarmee verborgen paneelacties bereikbaar werden');
     assert.deepEqual(panelen.onaangeraakt, [], 'geen eerder geziene maar tijdelijk verborgen paneelactie blijft liggen');
 
     const nav = await bedien(ctx, base, '/apps/navigeert.html');

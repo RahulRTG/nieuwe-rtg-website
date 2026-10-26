@@ -41,3 +41,21 @@ test('de volledige bestaande wereld blijft bereikbaar en de veiligheidsgrens bli
   assert.match(html,/sandbox="allow-scripts allow-same-origin"/);
   assert.match(html,/payment 'none'/);
 });
+
+test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert een bereikbare UI-stand',()=>{
+  for(const attribuut of ['data-mv-diep','data-mv-uitdaging','data-mv-naar','data-mv-nav','data-screen','data-go','data-quick']){
+    const knoppen=[...html.matchAll(new RegExp('<button[^>]*'+attribuut+'[^>]*>','g'))].map(x=>x[0]);
+    assert.ok(knoppen.length>0,attribuut+' ontbreekt');
+    for(const knop of knoppen)assert.match(knop,/data-stand="magnaat-[^"]+"/,knop);
+  }
+  for(const id of ['mvGaVerder','mvVoerKeuzeUit','mvStartVolledig','mvVolgende','capsMeer']){
+    assert.match(html,new RegExp('<button[^>]*id="'+id+'"[^>]*data-stand="magnaat-[^"]+"'));
+  }
+  assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" aria-label="Kies aanpak:/);
+  assert.match(html,/data-duty="'\+esc\(x\.functieId\)\+'" data-stand="magnaat-dossier" aria-label="Open dossier/);
+  assert.match(html,/data-start="'\+esc\(c\.id\)\+'" data-stand="magnaat-capability" aria-label="'\+label\+'"/);
+  assert.match(html,/const label='Start '\+esc\(c\.naam\)\+' in '\+esc\(c\.software\.naam\)/);
+  assert.match(html,/document\.addEventListener\('keydown',e=>\{/);
+  assert.match(html,/if\(e\.key!=='Escape'\)return/);
+  for(const laag of ['teamOverlay','partnerOverlay','taskOverlay'])assert.ok(html.includes("sluitLaag('#"+laag+"')"),laag);
+});

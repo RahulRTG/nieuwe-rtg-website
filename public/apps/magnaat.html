@@ -138,7 +138,7 @@
     <header class="mv-kop">
       <a class="mv-merk" href="/apps/kantoor.html" aria-label="RTG WorkOS"><b>RTG</b><span>Magnaat</span></a>
       <span class="mv-kopruimte"></span>
-      <button class="mv-profiel" type="button" data-mv-diep="home" aria-label="Open mijn Magnaat-profiel">RI</button>
+      <button class="mv-profiel" type="button" data-mv-diep="home" data-stand="magnaat-diep" aria-label="Open mijn Magnaat-profiel">RI</button>
     </header>
 
     <main>
@@ -154,28 +154,28 @@
           <h2 id="mvMissieTitel">Uw werkvloer vraagt een keuze</h2>
           <p id="mvMissieMeta">Magnaat Test · veilige praktijkmissie</p>
           <div class="mv-voortgang"><span class="mv-meter" aria-hidden="true"><i id="mvVoortgang"></i></span><small id="mvVoortgangTekst">Klaar om te beginnen</small></div>
-          <button class="mv-knop mv-knop--goud" type="button" id="mvGaVerder">Ga verder <span aria-hidden="true">›</span></button>
+          <button class="mv-knop mv-knop--goud" type="button" id="mvGaVerder" data-stand="magnaat-missie">Ga verder <span aria-hidden="true">›</span></button>
         </article>
 
-        <div class="mv-sectiekop"><h2>Kies uw volgende uitdaging</h2><button type="button" data-mv-diep="speelhal">Bekijk alle</button></div>
+        <div class="mv-sectiekop"><h2>Kies uw volgende uitdaging</h2><button type="button" data-mv-diep="speelhal" data-stand="magnaat-diep">Bekijk alle</button></div>
         <div class="mv-uitdagingen" id="mvUitdagingen">
-          <button class="mv-uitdaging" type="button" data-mv-uitdaging="0"><i aria-hidden="true">◎</i><b>Personeel plannen</b><small>Operatie · 15 min</small><em>Gemiddeld</em></button>
-          <button class="mv-uitdaging" type="button" data-mv-uitdaging="1"><i aria-hidden="true">◇</i><b>Voorraad onder druk</b><small>Inkoop · 12 min</small><em>Uitdagend</em></button>
-          <button class="mv-uitdaging" type="button" data-mv-uitdaging="2"><i aria-hidden="true">△</i><b>Klantbelofte bewaken</b><small>Service · 10 min</small><em>Gericht</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="0" data-stand="magnaat-uitdaging"><i aria-hidden="true">◎</i><b>Personeel plannen</b><small>Operatie · 15 min</small><em>Gemiddeld</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="1" data-stand="magnaat-uitdaging"><i aria-hidden="true">◇</i><b>Voorraad onder druk</b><small>Inkoop · 12 min</small><em>Uitdagend</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="2" data-stand="magnaat-uitdaging"><i aria-hidden="true">△</i><b>Klantbelofte bewaken</b><small>Service · 10 min</small><em>Gericht</em></button>
         </div>
 
-        <div class="mv-sectiekop"><h2>Uw wereld vandaag</h2><button type="button" data-mv-diep="economie">Open economie</button></div>
+        <div class="mv-sectiekop"><h2>Uw wereld vandaag</h2><button type="button" data-mv-diep="economie" data-stand="magnaat-diep">Open economie</button></div>
         <div class="mv-cijfers" aria-label="Uw virtuele Magnaat-waarden">
           <div class="mv-cijfer"><small>Reputatie</small><b id="mvReputatie">-</b></div>
           <div class="mv-cijfer"><small>Niveau</small><b id="mvNiveau">-</b></div>
           <div class="mv-cijfer"><small>Balans</small><b id="mvBalans">-</b><em>spelwaarde</em></div>
         </div>
-        <button class="mv-knop mv-knop--goud mv-verdieping" type="button" data-mv-diep="vandaag">FROM ZERO: begin met € 64,32 en een baan</button>
-        <button class="mv-knop mv-verdieping" type="button" data-mv-diep="werkplek">Open de volledige Magnaat-wereld</button>
+        <button class="mv-knop mv-knop--goud mv-verdieping" type="button" data-mv-diep="vandaag" data-stand="magnaat-diep">FROM ZERO: begin met € 64,32 en een baan</button>
+        <button class="mv-knop mv-verdieping" type="button" data-mv-diep="werkplek" data-stand="magnaat-diep">Open de volledige Magnaat-wereld</button>
       </section>
 
       <section class="mv-scherm" id="mvMissie" data-mv-paneel="missie" hidden>
-        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="wereld" aria-label="Terug naar wereld">‹</button><span class="mv-boventitel" id="mvBedrijf">Magnaat Test</span><button class="mv-meer" type="button" data-mv-diep="speelhal" aria-label="Meer missies">•••</button></div>
+        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="wereld" data-stand="magnaat-voorzijde" aria-label="Terug naar wereld">‹</button><span class="mv-boventitel" id="mvBedrijf">Magnaat Test</span><button class="mv-meer" type="button" data-mv-diep="speelhal" data-stand="magnaat-diep" aria-label="Meer missies">•••</button></div>
         <span class="mv-oog" id="mvMissieStap">Korte oefening</span>
         <h1 class="mv-titel" id="mvVraag">De werkvloer loopt vol. Wat doet u?</h1>
         <div class="mv-bericht"><span class="mv-avatar" aria-hidden="true">NB</span><div><b id="mvAfzender">Nora Bakker</b><small id="mvRol">Operationeel manager</small><p id="mvSituatie">De vraag loopt op. Twee onderdelen van de operatie hebben tegelijk versterking nodig.</p></div></div>
@@ -183,11 +183,11 @@
         <section class="mv-sectie"><h2>Uw speelruimte</h2><div class="mv-speelruimte"><div class="mv-feit"><small>Budget</small><b>€ 1.800</b></div><div class="mv-feit"><small>Team</small><b>7 mensen</b></div><div class="mv-feit"><small>Tijd</small><b>25 min</b></div></div></section>
         <section class="mv-sectie"><h2>Kies uw aanpak</h2><div class="mv-keuzes" id="mvKeuzes"></div></section>
         <p class="mv-grens">Dit is een korte, lokale oefening. Pas bij “Start volledige missie” wordt een echt synthetisch Magnaat-dossier geopend.</p>
-        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvVoerKeuzeUit" disabled>Bekijk het gevolg</button><button class="mv-knop mv-knop--wijn" type="button" data-mv-diep="wereld">Vraag uw team</button></div>
+        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvVoerKeuzeUit" data-stand="magnaat-resultaat" disabled>Bekijk het gevolg</button><button class="mv-knop mv-knop--wijn" type="button" data-mv-diep="wereld" data-stand="magnaat-diep">Vraag uw team</button></div>
       </section>
 
       <section class="mv-scherm" id="mvResultaat" data-mv-paneel="resultaat" hidden>
-        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="missie" aria-label="Terug naar de keuze">‹</button><span class="mv-boventitel">Resultaat</span><button class="mv-meer" type="button" data-mv-diep="home" aria-label="Open Magnaat-profiel">•••</button></div>
+        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="missie" data-stand="magnaat-voorzijde" aria-label="Terug naar de keuze">‹</button><span class="mv-boventitel">Resultaat</span><button class="mv-meer" type="button" data-mv-diep="home" data-stand="magnaat-diep" aria-label="Open Magnaat-profiel">•••</button></div>
         <span class="mv-oog">Oefenresultaat · nog niet opgeslagen</span>
         <h1 class="mv-resultaatkop" id="mvResultaatTitel">Uw keuze bracht rust op de vloer.</h1>
         <div class="mv-score"><span class="mv-score-ring" id="mvScore">86</span><div><b id="mvScoreTitel">Sterke beslissing</b><small>U hield overzicht én liet ruimte voor herstel.</small></div></div>
@@ -197,16 +197,16 @@
         </div>
         <section class="mv-sectie"><h2>Meegenomen naar uw werk</h2><div class="mv-leren"><div class="mv-leerregel">Capaciteit onder druk verdelen</div><div class="mv-leerregel">Kosten afwegen tegen kwaliteit</div></div></section>
         <p class="mv-grens">Alleen een volledige Magnaat-missie wordt als synthetisch dossier vastgelegd. Klantdata, echte betalingen en productieacties blijven buiten bereik.</p>
-        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvStartVolledig">Start volledige missie</button><button class="mv-knop mv-knop--wijn" type="button" id="mvVolgende">Volgende uitdaging</button></div>
+        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvStartVolledig" data-stand="magnaat-diep">Start volledige missie</button><button class="mv-knop mv-knop--wijn" type="button" id="mvVolgende" data-stand="magnaat-missie">Volgende uitdaging</button></div>
       </section>
     </main>
   </div>
 
   <nav class="mv-navigatie" aria-label="Magnaat hoofdnavigatie">
-    <button type="button" data-mv-nav="wereld" aria-current="page"><i aria-hidden="true">⌂</i>Wereld</button>
-    <button type="button" data-mv-nav="missie"><i aria-hidden="true">◇</i>Missies</button>
-    <button type="button" data-mv-diep="wereld"><i aria-hidden="true">♙</i>Team</button>
-    <button type="button" data-mv-diep="home"><i aria-hidden="true">○</i>Profiel</button>
+    <button type="button" data-mv-nav="wereld" data-stand="magnaat-voorzijde" aria-current="page"><i aria-hidden="true">⌂</i>Wereld</button>
+    <button type="button" data-mv-nav="missie" data-stand="magnaat-voorzijde"><i aria-hidden="true">◇</i>Missies</button>
+    <button type="button" data-mv-diep="wereld" data-stand="magnaat-diep"><i aria-hidden="true">♙</i>Team</button>
+    <button type="button" data-mv-diep="home" data-stand="magnaat-diep"><i aria-hidden="true">○</i>Profiel</button>
   </nav>
 </section>
 
@@ -214,18 +214,18 @@
   <aside class="rail">
     <div class="brand"><div class="crest">M</div><div><b>Magnaat Wereld</b><small>RTG living economy</small></div></div>
     <nav class="nav" aria-label="Magnaat navigatie">
-      <button type="button" data-magnaat-voorzijde-open><span class="ni">00</span><span>Start</span></button>
-      <button class="aan" data-screen="vandaag"><span class="ni">01</span><span>Vandaag</span></button>
-      <button data-screen="wereld"><span class="ni">02</span><span>Wereld</span></button>
-      <button data-screen="werkplek"><span class="ni">03</span><span>Werk</span></button>
-      <button data-screen="geld"><span class="ni">04</span><span>Geld</span></button>
-      <button data-screen="netwerk"><span class="ni">05</span><span>Netwerk</span></button>
-      <button data-screen="bedrijf" id="vnNavBedrijf" hidden><span class="ni">06</span><span>Mijn bedrijf</span></button>
+      <button type="button" data-magnaat-voorzijde-open data-stand="magnaat-voorzijde"><span class="ni">00</span><span>Start</span></button>
+      <button class="aan" data-screen="vandaag" data-stand="magnaat-scherm"><span class="ni">01</span><span>Vandaag</span></button>
+      <button data-screen="wereld" data-stand="magnaat-scherm"><span class="ni">02</span><span>Wereld</span></button>
+      <button data-screen="werkplek" data-stand="magnaat-scherm"><span class="ni">03</span><span>Werk</span></button>
+      <button data-screen="geld" data-stand="magnaat-scherm"><span class="ni">04</span><span>Geld</span></button>
+      <button data-screen="netwerk" data-stand="magnaat-scherm"><span class="ni">05</span><span>Netwerk</span></button>
+      <button data-screen="bedrijf" data-stand="magnaat-scherm" id="vnNavBedrijf" hidden><span class="ni">06</span><span>Mijn bedrijf</span></button>
       <details class="nav-meer"><summary><span class="ni">··</span><span>Meer</span></summary>
-        <button data-screen="home"><span class="ni">C</span><span>Commandocentrum</span></button>
-        <button data-screen="speelhal"><span class="ni">F</span><span>Functiehal</span></button>
-        <button data-screen="economie"><span class="ni">E</span><span>Economie</span></button>
-        <button data-screen="future"><span class="ni">L</span><span>Future Lab</span></button>
+        <button data-screen="home" data-stand="magnaat-scherm"><span class="ni">C</span><span>Commandocentrum</span></button>
+        <button data-screen="speelhal" data-stand="magnaat-scherm"><span class="ni">F</span><span>Functiehal</span></button>
+        <button data-screen="economie" data-stand="magnaat-scherm"><span class="ni">E</span><span>Economie</span></button>
+        <button data-screen="future" data-stand="magnaat-scherm"><span class="ni">L</span><span>Future Lab</span></button>
       </details>
     </nav>
     <div class="rail-foot"><div class="live"><i class="dot"></i><b>Magnaat Test actief</b></div><small>Afgeschermd van klantdata, geldstromen en productieacties.</small></div>
@@ -261,7 +261,7 @@
           <div class="eyebrow">Eén wereld · iedere RTG-functie speelbaar</div>
           <h1>Je bedrijf leeft.<br>De wereld reageert.</h1>
           <p>Bestuur je onderneming vanuit een echte RTG-werkplek. Open de kantoorcomputer, neem een dossier mee op je PDA en ontdek in het Future Lab welke producten RTG en de Foundation nog missen.</p>
-          <div class="hero-actions"><button class="btn primary" id="quick">Quick Match</button><button class="btn" data-go="werkplek">Betreed mijn kantoor</button><button class="btn subtle" data-go="future">Bekijk nieuwe kansen</button></div>
+          <div class="hero-actions"><button class="btn primary" id="quick" data-stand="magnaat-quick">Quick Match</button><button class="btn" data-go="werkplek" data-stand="magnaat-scherm">Betreed mijn kantoor</button><button class="btn subtle" data-go="future" data-stand="magnaat-scherm">Bekijk nieuwe kansen</button></div>
         </div>
       </div>
       <div class="stats">
@@ -272,11 +272,11 @@
       </div>
       <div class="section-head"><div><div class="eyebrow">Spelvormen</div><h2>Kies hoe je vandaag instapt</h2></div><p>De bestaande klassieke Magnaat blijft volledig beschikbaar.</p></div>
       <div class="modegrid">
-        <div class="card mode"><span class="tag">Snel</span><h3>Quick Match</h3><p>Vier spelers, directe matchmaking en het vertrouwde bord.</p><button class="btn primary" data-quick>Zoek spelers</button></div>
+        <div class="card mode"><span class="tag">Snel</span><h3>Quick Match</h3><p>Vier spelers, directe matchmaking en het vertrouwde bord.</p><button class="btn primary" data-quick data-stand="magnaat-quick">Zoek spelers</button></div>
         <div class="card mode"><span class="tag">Klassiek</span><h3>Eigen lobby</h3><p>Kies twee tot zes spelers en nodig vrienden of een codenaam uit.</p><a class="btn" href="/apps/spelen.html?direct=magnaat">Lobby maken</a></div>
-        <div class="card mode"><span class="tag">Doorlopend</span><h3>Magnaat Wereld</h3><p>Werkmissies, echte steden en één gedeelde virtuele economie.</p><button class="btn" data-go="economie">Bestuur de economie</button></div>
-        <div class="card mode"><span class="tag">Geverifieerd netwerk</span><h3>Partnerwereld</h3><p>Train in goedgekeurde digitale tweelingen van echte RTG-partners, zonder echt geld of klantdata.</p><button class="btn" data-go="wereld">Ontmoet bedrijven</button></div>
-        <div class="card mode"><span class="tag">RTG testdomein</span><h3>Future Lab</h3><p>Ontdek productgaten en test oplossingen voordat een mens beslist.</p><button class="btn" data-go="future">Open lab</button></div>
+        <div class="card mode"><span class="tag">Doorlopend</span><h3>Magnaat Wereld</h3><p>Werkmissies, echte steden en één gedeelde virtuele economie.</p><button class="btn" data-go="economie" data-stand="magnaat-scherm">Bestuur de economie</button></div>
+        <div class="card mode"><span class="tag">Geverifieerd netwerk</span><h3>Partnerwereld</h3><p>Train in goedgekeurde digitale tweelingen van echte RTG-partners, zonder echt geld of klantdata.</p><button class="btn" data-go="wereld" data-stand="magnaat-scherm">Ontmoet bedrijven</button></div>
+        <div class="card mode"><span class="tag">RTG testdomein</span><h3>Future Lab</h3><p>Ontdek productgaten en test oplossingen voordat een mens beslist.</p><button class="btn" data-go="future" data-stand="magnaat-scherm">Open lab</button></div>
       </div>
       <p class="notice">Realistisch betekent hier: echte plaatsnamen en echte RTG-proceslogica. Bedragen, dossiers en economische indices zijn speldata. Persoonsgegevens en productieacties komen nooit in de game.</p>
     </section>
@@ -293,7 +293,7 @@
         <div class="monitor">
           <iframe class="rtg-frame" id="rtgComputer" title="Echte RTG Business Pass op de kantoorcomputer" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe>
         </div>
-        <div class="pda"><iframe class="rtg-frame" id="rtgPda" title="Echte mobiele RTG Business Pass op de PDA" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe><div class="pda-task" id="pdaTask"><b>Geen actieve opdracht</b><p>Open een RTG-app om direct een missie te starten.</p><button class="btn" data-go="speelhal">Kies een functie</button></div></div>
+        <div class="pda"><iframe class="rtg-frame" id="rtgPda" title="Echte mobiele RTG Business Pass op de PDA" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe><div class="pda-task" id="pdaTask"><b>Geen actieve opdracht</b><p>Open een RTG-app om direct een missie te starten.</p><button class="btn" data-go="speelhal" data-stand="magnaat-scherm">Kies een functie</button></div></div>
         <div class="office-label"><div class="eyebrow">Kantoor 14 · Amsterdam · TEST</div><h2>Echte RTG-code, volledig geïsoleerd</h2><p>Dezelfde Business Pass, apptegels, Rahul, Pay, Salon en reisschermen. Alle gegevens zijn herkenbare Magnaat-testdata; klantdata en productieacties blijven buiten bereik.</p><div class="mission-now" id="missionNow"><b>Vrije dienst</b>Open een app op de computer of PDA; Magnaat maakt er een gecontroleerd testdossier van.</div></div>
       </div>
       <section class="officepick" aria-labelledby="officeRoleTitle">
@@ -318,7 +318,7 @@
       <div class="section-head"><div><div class="eyebrow">De volledige code als gameplay</div><h2>RTG Functiehal</h2><p id="capSummary">Alle geregistreerde functies worden automatisch uit de code gelezen.</p></div></div>
       <div class="guard"><span class="guard-mark">SAFE</span><div><b>Spelbrug actief</b><p id="bridgeRule">Laden…</p></div></div>
       <div class="tools"><input class="search" id="search" placeholder="Zoek een functie, categorie of spelvorm"><select class="search" id="filter"><option value="">Alle categorieën</option></select></div>
-      <div class="capgrid" id="caps"></div><button class="btn" type="button" id="capsMeer" hidden>Toon meer</button>
+      <div class="capgrid" id="caps"></div><button class="btn" type="button" id="capsMeer" data-stand="magnaat-capabilities" hidden>Toon meer</button>
     </section>
 
     <section class="screen" id="wereld">
@@ -507,7 +507,7 @@ function renderDienst(){
   $('#dienstDossiers').innerHTML=d.dossiers.map(x=>{
     const bezig=x.status==='bezig',klaar=x.status==='klaar',geblokkeerd=!!actief&&!bezig;
     const status=klaar?'Afgerond':bezig?'In behandeling':'Open dossier';
-    return '<button class="dossier '+esc(x.status)+'" data-duty="'+esc(x.functieId)+'" '+((klaar||geblokkeerd)?'disabled':'')+'><span class="d-status">0'+x.volgorde+' · '+status+'</span><h4>'+esc(x.naam)+'</h4><p>'+esc(x.software.naam)+' · '+esc(x.spelvorm)+'</p></button>';
+    return '<button class="dossier '+esc(x.status)+'" data-duty="'+esc(x.functieId)+'" data-stand="magnaat-dossier" aria-label="Open dossier '+esc(x.naam)+'" '+((klaar||geblokkeerd)?'disabled':'')+'><span class="d-status">0'+x.volgorde+' · '+status+'</span><h4>'+esc(x.naam)+'</h4><p>'+esc(x.software.naam)+' · '+esc(x.spelvorm)+'</p></button>';
   }).join('');
   document.querySelectorAll('[data-duty]').forEach(b=>b.onclick=()=>{
     const x=d.dossiers.find(v=>v.functieId===b.dataset.duty);
@@ -517,8 +517,9 @@ function renderDienst(){
 }
 function card(c, compact){
   const safe='<span class="risk '+c.veiligheidsniveau+'"></span>'+c.veiligheidsniveau;
-  if(compact)return '<button class="appicon" data-start="'+esc(c.id)+'"><b>'+safe+' · '+esc(c.naam)+'</b><small>'+esc(c.spelvorm)+' · '+esc(c.voorkeur)+'</small></button>';
-  return '<article class="card cap"><div class="cap-top"><span class="cap-code">'+safe+' · '+esc(c.spelvorm)+'</span><span class="badge">'+esc(c.software.naam)+'</span></div><h3>'+esc(c.naam)+'</h3><p>'+esc(c.uitleg||'Train deze RTG-functie in een realistisch synthetisch dossier.')+'</p><div class="meta">Echte RTG-software · productiedata uit</div><button class="btn" data-start="'+esc(c.id)+'">Start in '+esc(c.software.naam)+'</button></article>';
+  const label='Start '+esc(c.naam)+' in '+esc(c.software.naam);
+  if(compact)return '<button class="appicon" data-start="'+esc(c.id)+'" data-stand="magnaat-capability" aria-label="'+label+'"><b>'+safe+' · '+esc(c.naam)+'</b><small>'+esc(c.spelvorm)+' · '+esc(c.voorkeur)+'</small></button>';
+  return '<article class="card cap"><div class="cap-top"><span class="cap-code">'+safe+' · '+esc(c.spelvorm)+'</span><span class="badge">'+esc(c.software.naam)+'</span></div><h3>'+esc(c.naam)+'</h3><p>'+esc(c.uitleg||'Train deze RTG-functie in een realistisch synthetisch dossier.')+'</p><div class="meta">Echte RTG-software · productiedata uit</div><button class="btn" data-start="'+esc(c.id)+'" data-stand="magnaat-capability" aria-label="'+label+'">Start in '+esc(c.software.naam)+'</button></article>';
 }
 function filtered(){return (DATA?DATA.catalogus:[]).filter(c=>(!FILTER||c.categorie===FILTER)&&(!SEARCH||[c.naam,c.id,c.categorie,c.spelvorm].join(' ').toLowerCase().includes(SEARCH)))}
 /* De hal toont een handvol per keer: alle functies onder elkaar werd een
@@ -560,9 +561,16 @@ function openWorkflowScreen(){
   frame.addEventListener('load',async()=>{try{const loc=frame.contentWindow.location;if(loc.pathname!==doel.pathname||new URLSearchParams(loc.search).get('magnaat')!=='1')throw new Error('Het veilige scherm is niet geladen.');const d=await api('taak/handeling',{taakId,handeling});TASK=d.taak;neemSpeler(d.speler);toast(d.feedback);openTask()}catch(e){toast(e.message)}},{once:true});
   frame.src=doel.pathname+doel.search;frame.scrollIntoView({behavior:'smooth',block:'center'});
 }
-$('#taskClose').onclick=()=>{$('#taskOverlay').hidden=true};
-$('#partnerTaskClose').onclick=()=>{$('#partnerOverlay').hidden=true};
-$('#teamClose').onclick=()=>{$('#teamOverlay').hidden=true;TEAM_ROOM=null};
+function sluitLaag(id){const laag=$(id);if(!laag||laag.hidden)return false;laag.hidden=true;return true}
+$('#taskClose').onclick=()=>{sluitLaag('#taskOverlay')};
+$('#partnerTaskClose').onclick=()=>{sluitLaag('#partnerOverlay')};
+$('#teamClose').onclick=()=>{if(sluitLaag('#teamOverlay'))TEAM_ROOM=null};
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(sluitLaag('#teamOverlay')){TEAM_ROOM=null;e.preventDefault();return}
+  if(sluitLaag('#partnerOverlay')){e.preventDefault();return}
+  if(sluitLaag('#taskOverlay'))e.preventDefault();
+});
 function renderPda(){const e=$('#pdaTask'),m=$('#missionNow');const t=TASK&&TASK.status==='bezig'?TASK:(DATA&&DATA.speler.actieveTaak);if(!t){const dienst=DATA&&DATA.speler.dienst,next=dienst&&dienst.dossiers.find(x=>x.status==='open');if(next){e.innerHTML='<b>Volgend dossier</b><p>'+esc(next.naam)+'<br>Open '+esc(next.software.naam)+' in de echte RTG-app.</p><button class="btn" data-next-duty>Start dossier 0'+next.volgorde+'</button>';e.querySelector('button').onclick=()=>startTask(next.functieId);if(m)m.innerHTML='<b>Dagdienst '+dienst.voltooid+'/'+dienst.doel+'</b>Volgende: '+esc(next.naam)+' via '+esc(next.software.naam)+'.';return}e.innerHTML='<b>Dienst voltooid</b><p>Alle dossiers van vandaag zijn verwerkt.</p><button class="btn" data-pda-hall>Vrije functie</button>';e.querySelector('button').onclick=()=>go('speelhal');if(m)m.innerHTML='<b>Dienst voltooid</b>De bonus is verwerkt. Vrije missies blijven beschikbaar.';return}const actie=t.huidig&&t.huidig.soort==='software'?t.huidig.vraag:'Maak de operationele keuze in het dossier.';e.innerHTML='<b>'+esc(t.functieNaam)+'</b><p>'+esc(actie)+'<br>Stap '+(t.stap+1)+' van '+t.stappen+'</p><button class="btn" data-resume>Bekijk dossier</button>';e.querySelector('button').onclick=()=>{TASK=t;openTask()};if(m)m.innerHTML='<b>'+esc(t.titel)+'</b>'+esc(actie)}
 
 /* De twee apparaten tonen niet een nagetekende game-app maar de echte

@@ -53,7 +53,7 @@ function renderMissie(){
   q('#mvMissieStap').textContent='Korte oefening · '+(c&&c.spelvorm||'operatie');
   q('#mvVraag').textContent=s.vraag;q('#mvSituatie').textContent=event&&event.beschrijving||s.situatie;
   q('#mvAfzender').textContent=event&&event.stad?event.stad+' operatie':'Nora Bakker';q('#mvRol').textContent=missieNaam(d,c);
-  q('#mvKeuzes').innerHTML=s.keuzes.map((x,i)=>'<button class="mv-keuze" type="button" aria-pressed="false" data-mv-keuze="'+i+'"><span><b>'+veilig(x.titel)+'</b><small>'+veilig(x.sub)+'</small></span><i aria-hidden="true">›</i></button>').join('');
+  q('#mvKeuzes').innerHTML=s.keuzes.map((x,i)=>'<button class="mv-keuze" type="button" aria-pressed="false" data-mv-keuze="'+i+'" data-stand="magnaat-keuze" aria-label="Kies aanpak: '+veilig(x.titel)+'"><span><b>'+veilig(x.titel)+'</b><small>'+veilig(x.sub)+'</small></span><i aria-hidden="true">›</i></button>').join('');
   qa('[data-mv-keuze]').forEach(b=>b.addEventListener('click',()=>{KEUZE=Number(b.dataset.mvKeuze);qa('[data-mv-keuze]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));q('#mvVoerKeuzeUit').disabled=false}));
 }
 function renderResultaat(){

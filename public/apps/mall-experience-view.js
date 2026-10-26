@@ -29,7 +29,7 @@
     }
     function productCard(item) {
       var selected = state.current && state.current.id === item.id;
-      return '<button class="mall-product" type="button" data-mall-item="' + html(item.id) + '" aria-current="' + selected + '">' +
+      return '<button class="mall-product" type="button" data-mall-item="' + html(item.id) + '" aria-label="Bekijk ' + html(item.title) + '" aria-current="' + selected + '">' +
         '<span class="mall-product__image ' + visualClass(item) + '" aria-hidden="true"></span>' +
         '<span class="mall-product__body"><span class="mall-product__state"><span>' + html(item.category || item.department) + '</span><span>' + html(item.stateLabel) + '</span></span>' +
         '<h3>' + html(item.title) + '</h3><p>' + html(item.description || 'Ontdek wat deze mogelijkheid toevoegt aan uw wereld.') + '</p>' +

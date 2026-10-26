@@ -62,6 +62,14 @@ const HERHAALVAL = '<!doctype html><html><body><main id="vlak">' +
   Array.from({ length: 5 }, (_, i) => '<button type="button" onclick="window.gedaan=(window.gedaan||0)+1">Gewone actie ' + i + '</button>').join('') +
   '</main></body></html>';
 
+/* De zichtbare status in een kaart mag veranderen zonder dat dezelfde knop
+   een tweede, spookachtige identiteit krijgt. De toegankelijke naam is het
+   stabiele contract; de tekst eronder blijft vrij om actuele status te tonen. */
+const STABIELE_NAAM = '<!doctype html><html><body><main>' +
+  '<button type="button" aria-label="Open dossier" onclick="this.textContent=\'Dossier geopend\';window.openAantal=(window.openAantal||0)+1">Dossier beschikbaar</button>' +
+  '<button type="button" onclick="window.andere=true">Andere actie</button>' +
+  '</main></body></html>';
+
 /* De productie-inventaris bevat schermen met meer dan tachtig unieke
    handelingen. De bewijsgrens is ze allemaal werkelijk aantikken. Elke
    tik hieronder schakelt bewust zichzelf en haar vaste paar uit: na 41 echte tikken is
@@ -186,6 +194,7 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     res.end(req.url.startsWith('/apps/bedekt') ? BEDEKT :
       (req.url.startsWith('/apps/standwissel') ? STANDWISSEL :
         (req.url.startsWith('/apps/herhaalval') ? HERHAALVAL :
+        (req.url.startsWith('/apps/stabielenaam') ? STABIELE_NAAM :
         (req.url.startsWith('/apps/breed') ? BREED_SCHERM :
         (req.url.startsWith('/apps/risico') ? RISICO_SCHERM :
         (req.url.startsWith('/apps/achtergebleven') ? ACHTERGEBLEVEN_LAAG :
@@ -196,7 +205,7 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
                 (req.url.startsWith('/apps/runtimewacht') ? RUNTIME_WACHT :
                 (req.url.startsWith('/apps/navigeert') ? NAVIGEERT :
                   (req.url.startsWith('/apps/bestemming') ? BESTEMMING :
-                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM)))))))))))))); });
+                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))))))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -226,6 +235,10 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.deepEqual(val.onaangeraakt, [], 'de bekende contextopener houdt geen beginactie gevangen');
     assert.ok(val.instrument.some((x) => /oorspronkelijke stand/.test(x)),
       'de kortste herstelroute via de schone ingang is controleerbaar vastgelegd');
+
+    const stabiel = await bedien(ctx, base, '/apps/stabielenaam.html');
+    assert.equal(stabiel.gevonden, 2, 'de toegankelijke naam houdt een knop stabiel bij veranderende statustekst');
+    assert.equal(stabiel.geklikt, 2, 'beide werkelijke handelingen zijn eenmaal aangeraakt');
 
     const breed = await bedien(ctx, base, '/apps/breed.html');
     assert.equal(breed.gevonden, 82, 'alle unieke handelingen van het brede scherm staan in de noemer');

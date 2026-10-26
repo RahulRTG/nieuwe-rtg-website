@@ -619,9 +619,9 @@ async function tekenTreffers(){
         ? 'Niets dat hieraan voldoet. "Nu open" en "Op voorraad" komen uit wat de zaken zelf bijhouden; een zaak zonder vastgelegde openingstijden staat er bewust niet bij.'
         : 'Niets gevonden. Probeer een ander woord, of zet de plek op Overal; er staan '+d.totaalVoorFilter+' dingen in de Mall.')+'</div>';
   $('#trefBlader').innerHTML = d.paginas > 1
-    ? '<button class="knop stil" id="tVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+    ? '<button class="knop stil" id="tVorig" data-stand="mall-search"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
       '<span class="bladtel">pagina '+d.pagina+' van '+d.paginas+'</span>'+
-      '<button class="knop stil" id="tVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+      '<button class="knop stil" id="tVolgend" data-stand="mall-search"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
     : '';
   koppelBewaar($('#treffers'));
   const v = $('#tVorig'), n = $('#tVolgend');
@@ -740,7 +740,7 @@ async function tekenRtf(){
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => rtfKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
-        ? '<button class="knop stil" id="rfVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        ? '<button class="knop stil" id="rfVorig" data-stand="rtf-bibliotheek"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
           '<button class="knop stil" id="rfVolgend" data-stand="rtf-bibliotheek"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
@@ -818,7 +818,7 @@ async function tekenApps(){
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => appKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
-        ? '<button class="knop stil" id="abVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        ? '<button class="knop stil" id="abVorig" data-stand="app-bibliotheek"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
           '<button class="knop stil" id="abVolgend" data-stand="app-bibliotheek"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
@@ -1020,7 +1020,7 @@ async function tekenStore(){
           ? 'Je hebt nog geen apps van derden. Blader hierboven en kies zelf wat je een app geeft.'
           : 'Er staat nog geen app van een derde in de store. Elke app hier is door een mens van RTG bekeken voordat hij verschijnt; zolang er geen doorheen is, blijft dit leeg.')+'</div>';
     if (d && d.paginas > 1) {
-      blader.innerHTML = '<button class="knop stil" id="asVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+      blader.innerHTML = '<button class="knop stil" id="asVorig" data-stand="app-store"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
         '<span class="bladtel">pagina '+d.pagina+' van '+d.paginas+' · '+d.totaal+' apps</span>'+
         '<button class="knop stil" id="asVolgend" data-stand="app-store"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>';
       const v = $('#asVorig'), n = $('#asVolgend');
@@ -1295,7 +1295,7 @@ async function tekenReis(){
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => reisKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
-        ? '<button class="knop stil" id="rbVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        ? '<button class="knop stil" id="rbVorig" data-stand="reis-bibliotheek"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' gidsen</span>'+
           '<button class="knop stil" id="rbVolgend" data-stand="reis-bibliotheek"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';

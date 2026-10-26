@@ -97,6 +97,8 @@ test('de voorzijde gebruikt de standaard Edge en houdt de volledige bestaande Ma
     'de afdelingen zijn expliciete, herhaalbare Mall-staten');
   assert.match(view, /data-mall-item=/,
     'ieder etalage-item blijft een afzonderlijke bedienbare keuze');
+  assert.match(view, /aria-label="Bekijk /,
+    'de etalagekaart houdt een stabiele toegankelijke naam wanneer haar status verandert');
   assert.doesNotMatch(view, /data-stand="mall-selection"/,
     'productkaarten zijn keuzes en geen navigatiestand die herhaald moet worden');
   assert.doesNotMatch(html, /data-open="mall-(?:boutique|service)"/,

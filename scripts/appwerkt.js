@@ -173,7 +173,7 @@ const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[t
    appmeter die eerst aantikt, blijft de sprong over de app liggen en lijken
    alle volgende appknoppen onbereikbaar. Deze oppervlakken hebben eigen
    browsercontracten; APPWERKT telt en bedient uitsluitend het actieve scherm. */
-const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page';
+const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page';
 
 /* Risicovolle namen worden als laatste bediend op de lokale wegwerpserver en
    afzonderlijk verantwoord. Een browserbevestiging wordt afgebroken en een
@@ -1197,8 +1197,11 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
           !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
-    const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
-      (el.innerText || el.value || el.title || '').trim().slice(0, 40)].join('|');
+    const merk = (el) => {
+      const label = (el.getAttribute('aria-label') || '').trim();
+      const naam = label || (el.innerText || el.value || el.title || '').trim();
+      return [el.tagName, el.id || '', naam.slice(0, 60)].join('|');
+    };
     /* De taalkeuze wordt niet aangetikt: een taal kiezen verandert de persona
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).
        Dat is een instelling, geen functie van het scherm onder de meting. */

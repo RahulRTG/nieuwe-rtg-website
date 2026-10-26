@@ -174,7 +174,7 @@ const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal, #
    muterend verzoek wordt voor die ene UI-tik gefixttured; de knop zelf is dan
    wel echt geraakt, terwijl verwijdering of betaling niet buiten de daarvoor
    bedoelde voltooi- en financiële proef wordt uitgevoerd. */
-const RISICOVOL = /uitlog|log uit|sign ?out|verwijder|delete|wis alles|betaal|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
+const RISICOVOL = /uitlog|log uit|sign ?out|verlaat|leave|verwijder|delete|wis alles|betaal|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
 /* Alleen deze servermutaties zouden de gedeelde testpersona of zijn hele
    account voor volgende appmetingen vernietigen. Andere risicovolle acties
    draaien tegen de echte wegwerpdata en blijven dus zichtbaar voor de gewone
@@ -680,6 +680,11 @@ function onderschepper(log) {
 async function bedien(ctx, base, ingang) {
   const meet = ingangOpties(ingang);
   const pad = meet.pad;
+  const ingangPad = String(meet.bestemming || pad).split('#')[0].split('?')[0];
+  const opIngang = () => {
+    try { return new URL(page.url()).pathname === ingangPad; }
+    catch (e) { return false; }
+  };
   const bereik = meet.bereik || (meet.adapter && meet.adapter.bereik);
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [], wachtend = [];
@@ -858,6 +863,19 @@ async function bedien(ctx, base, ingang) {
         await page.waitForTimeout(600);
         actieveRisicoklik = null;
         await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
+        /* Een app-eigen knop kan navigeren (Terug, Open volledig, enzovoort).
+           De tik bewijst die knop, maar de bediening op het bestemmingsscherm
+           hoort niet in de noemer van de bronapp. Voorheen keek `vervolg`
+           eerst rond en pas onderaan de iteratie naar de URL; Commerce erfde
+           daardoor 70 Mall-knoppen die het nooit kon bedienen. Keer meteen
+           terug naar de gedeclareerde ingang en inventariseer pas daar verder.
+           Hashwissels binnen dezelfde ingang blijven wel onderdeel van de app. */
+        if (!opIngang()) {
+          await openIngang(page, base, meet);
+          await page.waitForTimeout(1500);
+          instrument.push('de proef raakte een navigatieknop en opende de app opnieuw zonder bediening van het bestemmingsscherm mee te tellen');
+          continue;
+        }
         /* EN DAN DICHT, zoals een mens doet. Een tik opent vaak een laag (het
            paneel van Rahul, de sprong, de taalkeuze); bleef die open, dan lag hij
            over elke volgende knop en telde de proef zijn eigen lade als
@@ -945,7 +963,7 @@ async function bedien(ctx, base, ingang) {
         await page.keyboard.press('Escape').catch(() => {});
         await page.waitForTimeout(250).catch(() => {});
       }
-      if (page.url().replace(base, '').split('#')[0] !== pad) {
+      if (!opIngang()) {
         try { await openIngang(page, base, meet); await page.waitForTimeout(1500); } catch (e) { break; }
       }
     }
@@ -1148,7 +1166,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
     const risicoRang = (el) => {
       const tekst = (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim();
       if (/uitlog|log uit|sign ?out/i.test(tekst)) return 3;
-      if (/verwijder|delete|wis alles|sluit account/i.test(tekst)) return 2;
+      if (/verlaat|leave|verwijder|delete|wis alles|sluit account/i.test(tekst)) return 2;
       return risico.test(tekst) ? 1 : 0;
     };
     const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)))

@@ -108,6 +108,14 @@ const ROLE_DIALOG = '<!doctype html><html><body><main>' +
   '<button id="later" type="button" style="opacity:0" onclick="window.vervolg=true">Verborgen vervolg</button></div>' +
   '</main></body></html>';
 
+const NAVIGEERT = '<!doctype html><html><body><main>' +
+  '<button type="button" onclick="location.href=\'/apps/bestemming.html\'">Terug</button>' +
+  '<button type="button" onclick="window.lokaal=true">Lokale actie</button>' +
+  '</main></body></html>';
+const BESTEMMING = '<!doctype html><html><body><main>' +
+  Array.from({ length: 12 }, (_, i) => '<button type="button">Vreemde actie ' + i + '</button>').join('') +
+  '</main></body></html>';
+
 const MODULEBEREIK = '<!doctype html><html><body><main>' +
   Array.from({ length: 8 }, (_, i) => '<button type="button">Andere module ' + i + '</button>').join('') +
   '<section data-view="doel"><button type="button">Doel een</button><button type="button">Doel twee</button></section>' +
@@ -148,7 +156,9 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
           (req.url.startsWith('/apps/vervolg') ? VERVOLGDIALOOG :
             (req.url.startsWith('/apps/afgewerkt') ? AFGEWERKTE_DIALOOG :
               (req.url.startsWith('/apps/roledialog') ? ROLE_DIALOG :
-                (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))))); });
+                (req.url.startsWith('/apps/navigeert') ? NAVIGEERT :
+                  (req.url.startsWith('/apps/bestemming') ? BESTEMMING :
+                    (req.url.startsWith('/apps/module') ? MODULEBEREIK : SCHERM))))))))))); });
   await new Promise((k) => srv.listen(0, '127.0.0.1', k));
   const base = 'http://127.0.0.1:' + srv.address().port;
   const browser = await pw.chromium.launch(browserOpties(pw));
@@ -209,6 +219,12 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     assert.equal(role.gevonden, 5, 'de role-dialog en het pas later zichtbare vervolg tellen ieder precies eenmaal');
     assert.equal(role.geklikt, role.gevonden, 'ook een role-dialog zonder aria-modal wordt volledig bediend');
     assert.deepEqual(role.onaangeraakt, [], 'CSS-onzichtbare bediening telt pas zodra zij werkelijk zichtbaar is');
+
+    const nav = await bedien(ctx, base, '/apps/navigeert.html');
+    assert.equal(nav.gevonden, 2, 'bediening van het bestemmingsscherm vervuilt de noemer van de bronapp niet');
+    assert.equal(nav.geklikt, 2, 'de navigatieknop en de lokale actie worden beide werkelijk aangeraakt');
+    assert.deepEqual(nav.onaangeraakt, [], 'de twaalf vreemde bestemmingsknoppen zijn geen schijnrestant');
+    assert.ok(nav.instrument.some((x) => /bestemmingsscherm/.test(x)), 'de navigatieheropening is controleerbaar verantwoord');
 
     const { meetIngang } = require('../scripts/appwerkt');
     const meet = meetIngang({ functie: 'tab:doel' }, {

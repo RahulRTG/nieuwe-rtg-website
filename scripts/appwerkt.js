@@ -493,6 +493,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   const bediening = await bedien(eigen, base, meet);
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
+  r.aangeraakt = bediening.aangeraakt;
   r.schil = bediening.schil;
   r.bedekt = bediening.bedekt;
   r.overgeslagen = bediening.overgeslagen;
@@ -985,7 +986,8 @@ async function bedien(ctx, base, ingang) {
   await page.close();
   const onaangeraakt = [...gevondenMerken].filter((merk) => !aangetiktMerken.has(merk))
     .map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
-  return { geklikt, gevonden, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  const aangeraakt = [...aangetiktMerken].map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
+  return { geklikt, gevonden, aangeraakt, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.

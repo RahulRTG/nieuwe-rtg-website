@@ -241,6 +241,8 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     const panelen = await bedien(ctx, base, '/apps/paneeltabs.html');
     assert.equal(panelen.gevonden, 7, 'opener, sluiter, drie tabs en twee paneelacties staan in de noemer');
     assert.equal(panelen.geklikt, panelen.gevonden, 'iedere paneelactie wordt via herhaalde expliciete tabnavigatie geraakt');
+    assert.ok(panelen.aangeraakt.includes('AAN') && panelen.aangeraakt.includes('ANALYSEER CONTEXT'),
+      'het bewijs noemt de werkelijk aangeraakte paneelacties bij naam');
     assert.deepEqual(panelen.onaangeraakt, [], 'geen eerder geziene maar tijdelijk verborgen paneelactie blijft liggen');
 
     const nav = await bedien(ctx, base, '/apps/navigeert.html');

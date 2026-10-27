@@ -51,13 +51,21 @@
     spraak.addEventListener('error', () => { $('#voice').setAttribute('aria-pressed', 'false'); zeg('Inspreken is nu niet beschikbaar.'); });
   })();
 
-  $('#manualStart').addEventListener('click', () => {
-    $('#manualStart').hidden = true; $('#manualPanel').hidden = false; $('#startZoek').focus();
+  function openVertrekkeuze() {
+    $('#poort').dataset.poortSoort = 'locatie';
+    toon('#poort', true);
+    $('#manualStart').hidden = true;
+    $('#manualStart').setAttribute('aria-expanded', 'true');
+    $('#wijzigVertrek').setAttribute('aria-expanded', 'true');
+    $('#manualPanel').hidden = false; $('#startZoek').focus();
     zoekVertrek('');
-  });
+  }
+  $('#manualStart').addEventListener('click', openVertrekkeuze);
+  $('#wijzigVertrek').addEventListener('click', openVertrekkeuze);
   /* Kiest iemand een bestemming terwijl zijn plek onbekend is, dan landt hij
      hier en niet bij een serverfout over een veld dat hij nooit heeft gezien. */
   N.vraagVertrekpunt = function vraagVertrekpunt() {
+    $('#poort').dataset.poortSoort = 'locatie';
     if (!$('#poortReden').textContent.trim()) $('#poortReden').textContent = 'RTG weet nog niet waar u bent. Kies zelf uw vertrekpunt; RTG verzint nooit waar u staat.';
     toon('#poort', true);
     if (token) $('#poortKaarten').hidden = false;
@@ -74,12 +82,16 @@
     const lijst = $('#startResultaten'); lijst.textContent = '';
     for (const p of (r.body.bestemmingen || []).slice(0, 8)) {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'ds-vel__rij';
+      b.setAttribute('data-contextactie', '');
       const nm = document.createElement('span'); nm.className = 'ds-vel__naam';
       const naam = document.createElement('strong'); naam.textContent = p.naam;
       const soort = document.createElement('small'); soort.textContent = (LAAG[p.laag] || LAAG.leverancier).naam + (p.extra ? ' · ' + p.extra : '');
       nm.append(naam, soort); b.append(N.stip(p.laag), nm);
       b.addEventListener('click', async () => {
         S.hier = { lat: p.lat, lng: p.lng }; S.land = landVan(S.hier); S.wachtNogOpPlek = false;
+        $('#manualStart').setAttribute('aria-expanded', 'false');
+        $('#wijzigVertrek').setAttribute('aria-expanded', 'false');
+        $('#wijzigVertrek').hidden = false;
         toon('#poort', false);
         await N.initialiseerKaart(); zeg('Vertrekpunt ingesteld op ' + p.naam + '.');
       });

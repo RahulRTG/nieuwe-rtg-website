@@ -78,3 +78,10 @@ test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening
   assert.equal(herstelgrens(4), 128);
   assert.equal(herstelgrens(40), 128, 'de meter kan nooit onbeperkt blijven herhalen');
 });
+
+test('een herstelbare locatiekeuze telt niet als gesloten toegangsdeur', () => {
+  const { POORTEN } = require('../scripts/appwerkt');
+  assert.ok(POORTEN.includes('#poort.zien:not([data-poort-soort="locatie"])'));
+  assert.ok(!POORTEN.includes('#poort.zien'),
+    'de generieke selector zou Navigatie na een geweigerde locatie ten onrechte afsluiten');
+});

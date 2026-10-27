@@ -211,7 +211,7 @@ const VERNIETIGENDE_ROUTE = /^\/api\/(?:logout|privacy\/delete|risico|pay(?:\/sa
    met opzet en na het openen van de deur. Een meter die dat niet kent, meldt
    een deur als een defect en verliest zijn geloofwaardigheid bij de eerste
    ronde. */
-const POORTEN = ['#poort.zien', 'html.rtf-toegang-dicht', '#rtf-toegang-slot',
+const POORTEN = ['#poort.zien:not([data-poort-soort="locatie"])', 'html.rtf-toegang-dicht', '#rtf-toegang-slot',
   'html.rtf-school-dicht', '#rtf-school-slot'];
 
 /* Welke persona hoort bij welke wereld? Dit is de kern van bewijs 1: een ingang
@@ -647,11 +647,22 @@ async function wachtOpInteractielaag(page) {
   }, null, { timeout: 12000 }).catch(() => {});
 }
 
+async function wachtOpAppGereed(page) {
+  /* Een app die haar eigen hoofdvlak als busy markeert, publiceert daarmee dat
+     de eerste bruikbare stand nog onderweg is. Navigatie wacht bijvoorbeeld op
+     een expliciet locatiebesluit. Zonder dit signaal keek een schone replay al
+     rond terwijl de vertrekkeuze nog niet bestond en bleven geldige opties
+     onaangeraakt. Pagina's zonder zo'n busy hoofdvlak voldoen onmiddellijk. */
+  await page.waitForFunction(() => !document.querySelector('main[aria-busy="true"]'),
+    null, { timeout: 15000 }).catch(() => {});
+}
+
 async function openIngang(page, base, ingang) {
   const meet = ingangOpties(ingang);
   await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await wachtOpOnboarding(page);
   await wachtOpInteractielaag(page);
+  await wachtOpAppGereed(page);
   await voerIngangAdapterUit(page, meet);
   return meet;
 }
@@ -823,6 +834,7 @@ async function bedien(ctx, base, ingang) {
        gedrag. Een scherm zonder zo'n laag voldoet meteen aan `hidden`. */
     await wachtOpOnboarding(page);
     await wachtOpInteractielaag(page);
+    await wachtOpAppGereed(page);
     luister(page, base, { crash, config, serverfout, rem, weigering, wachtend });   // pas NA het laden: laadfouten horen bij bewijs 1
     if (meet.adapter) await voerIngangAdapterUit(page, meet);
     /* Een interne module tekent haar inhoud vaak pas na meerdere API-antwoorden.

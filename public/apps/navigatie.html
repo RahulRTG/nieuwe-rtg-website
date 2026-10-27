@@ -18,7 +18,7 @@
      is de objectkaart onderaan. Zonder kaartpakket rekent de motor op een
      demonstratienet, en de badge zegt dat ("Demonstratienet"). -->
 <body class="ds-scherm" data-rtg-world="travel" data-ds-schermtype="canvas">
-<main class="ds-canvas" id="main">
+<main class="ds-canvas" id="main" aria-busy="true">
   <canvas class="ds-canvas__vlak ds-gebaren" id="kaart" aria-label="3D-navigatiekaart van het netwerk"></canvas>
   <header class="ds-kop ds-kop--op-beeld">
     <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
@@ -48,6 +48,8 @@
       <b>De weg denkt mee.</b>
       <span class="ds-meta"> Netwerk <b id="sourceNetwork">·</b> · Partners <b id="sourcePartners">·</b> · <b id="sourceCore">Eigen</b> <span id="sourceCoreLabel">Routekern</span></span>
       <span class="ds-meta"> Uw positie wordt niet als reisgeschiedenis bewaard.</span>
+      <button class="ds-knop ds-knop--stil ds-knop--klein" id="wijzigVertrek" type="button" data-contextactie aria-controls="manualPanel" aria-expanded="false" hidden>Wijzig vertrekpunt</button>
+      <span id="navigatieUitvoer" aria-label="Routegegevens meenemen"></span>
     </span>
   </section>
 
@@ -93,11 +95,11 @@
     <p class="ds-meta" id="bron"></p>
   </section>
 
-  <section class="ds-vel ds-vel--midden" id="poort" aria-labelledby="poortTitel" hidden>
+  <section class="ds-vel ds-vel--midden" id="poort" aria-labelledby="poortTitel" data-poort-soort="toegang" hidden>
     <h2 class="ds-titel" id="poortTitel">RTG Navigatie</h2>
     <p class="ds-meta" id="poortReden">Log eerst in met je RTG-account om te navigeren.</p>
     <a class="ds-knop ds-knop--stil" href="/apps/app.html">Naar de app</a>
-    <button class="ds-knop ds-knop--primair" type="button" id="manualStart" data-ds-actie="Kies vertrekpunt" hidden>Kies vertrekpunt</button>
+    <button class="ds-knop ds-knop--primair" type="button" id="manualStart" data-ds-actie="Kies vertrekpunt" data-contextactie aria-controls="manualPanel" aria-expanded="false" hidden>Kies vertrekpunt</button>
     <!-- Welke kaarten u wilt hebben, hangt niet af van waar u nu staat: deze
          knop verschijnt als de poort over de LOCATIE gaat. -->
     <button class="ds-knop ds-knop--stil" type="button" id="poortKaarten" hidden>Kaarten kiezen</button>

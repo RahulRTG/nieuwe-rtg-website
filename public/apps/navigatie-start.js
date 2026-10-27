@@ -6,6 +6,7 @@
   const N = window.RTGNav, { $, S, api, toon, token, landVan } = N;
   const haalStatus = () => N.haalStatus(), haalFlits = () => N.haalFlits();
   const canvas = $('#kaart');
+  const gereed = () => $('#main').setAttribute('aria-busy', 'false');
 
   /* ---- gps: jouw echte positie (blijft op het toestel) ----
      Je positie is hier de hele functie, dus de app vraagt erom (plek.js) en
@@ -18,6 +19,7 @@
     stopVolgen = RTGPlek.volg(plek => {
       const eerste = !S.hier;
       S.hier = { lat: plek.lat, lng: plek.lng }; S.land = landVan(S.hier);
+      $('#wijzigVertrek').hidden = false;
       if (S.kaartData) N.bouwPinnen();
       if (S.navigerend && S.naar && Date.now() - S.laatsteHerberekening > 30000) {
         S.laatsteHerberekening = Date.now(); N.berekenRoute();
@@ -48,6 +50,7 @@
       await haalStatus();                       // de badge hoort hetzelfde te zeggen als de poort
       $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.';
       toon('#poort', true);
+      gereed();
       return;
     }
     S.kaartBegonnen = true; S.kaartData = r.body; N.P.ref = S.kaartData.ref; S.land = landVan(N.P.ref); N.P.cosRef = Math.cos(N.P.ref.lat * Math.PI / 180);
@@ -60,10 +63,11 @@
       $('#zoek').value = N.meegegeven.naam;
       await N.kiesBestemming(N.meegegeven);
     }
+    gereed();
   }
   window.addEventListener('resize', N.grootte);
   (async () => {
-    if (!token) { toon('#poort', true); return; }
+    if (!token) { $('#poort').dataset.poortSoort = 'toegang'; toon('#poort', true); gereed(); return; }
     /* Wachten op de eerste plek in plaats van er een te verzinnen. */
     if (!S.hier) {
       const uitslag = await new Promise(klaar => {
@@ -72,6 +76,7 @@
         setTimeout(() => { if (opPlek || opGeenPlek) { opPlek = null; opGeenPlek = null; klaar({ plek: false, reden: 'geen-antwoord' }); } }, 12000);
       });
       if (!uitslag.plek) {
+        $('#poort').dataset.poortSoort = 'locatie';
         /* "Niet beschikbaar" is drie verschillende dingen. */
         $('#poortReden').textContent = {
           'niet-toegestaan': 'Uw locatie is niet vrijgegeven. Kies zelf uw vertrekpunt; RTG verzint nooit waar u bent.',
@@ -84,6 +89,7 @@
         $('#poortKaarten').hidden = false;
         toon('#poort', true);
         S.wachtNogOpPlek = true;                  // komt hij alsnog, dan bouwen we alsnog
+        gereed();
         return;
       }
     }

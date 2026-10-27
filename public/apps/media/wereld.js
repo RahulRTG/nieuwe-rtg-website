@@ -60,6 +60,9 @@
     var m = el('div', 'm');
     var mk = el('button', 'maker', s.maker.codenaam);
     mk.type = 'button';
+    mk.setAttribute('aria-haspopup', 'dialog');
+    mk.setAttribute('aria-controls', 'lade');
+    mk.setAttribute('data-contextactie', '');
     mk.addEventListener('click', function () { window.RTGMediaBlad.maker(s.maker.codenaam); });
     m.appendChild(mk);
     m.appendChild(document.createTextNode(' · ' + s.meta));
@@ -69,8 +72,14 @@
     var rij = el('div', 'rij');
     var speelNaam = s.spelen.soort === 'stream' ? '▶ Kijk'
       : (s.spelen.soort === 'motor' ? '▶ Luister' : (s.spelen.soort === 'p2p' && S.deler ? '▶ Speel' : '↗ Open'));
-    rij.appendChild(knop(speelNaam, 'vol', function () { S.speel(s); }));
-    rij.appendChild(knop('Alles hierover', '', function () { window.RTGMediaBlad.stuk(s.id); }));
+    var speel = knop(speelNaam, 'vol', function () { S.speel(s); });
+    speel.setAttribute('data-contextactie', '');
+    rij.appendChild(speel);
+    var alles = knop('Alles hierover', '', function () { window.RTGMediaBlad.stuk(s.id); });
+    alles.setAttribute('aria-haspopup', 'dialog');
+    alles.setAttribute('aria-controls', 'lade');
+    alles.setAttribute('data-contextactie', '');
+    rij.appendChild(alles);
     var bew = knop(s.bewaard ? '✓ Bewaard' : '+ Bewaar', s.bewaard ? 'aan' : '', function () {
       api('/api/mediaos/bewaar', { id: s.id, aan: !s.bewaard }).then(function (d) {
         if (d.error) return zeg(d.error);

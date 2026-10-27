@@ -57,6 +57,25 @@ test('de releasecontrole is een toegankelijke laag met focusherstel', () => {
   assert.match(studio, /e\.key==='Escape'/);
 });
 
+test('de Media-detailroutes verklaren hun dialoog en contextbediening', () => {
+  const html = lees('public/apps/media.html');
+  const wereld = lees('public/apps/media/wereld.js');
+  const blad = lees('public/apps/media/blad.js');
+  const studio = lees('public/apps/media/studio.js');
+  assert.match(html, /id="lade" role="dialog" aria-label="Details" aria-modal="true" aria-hidden="true"/);
+  assert.match(html, /id="lijstKnop"[^>]*aria-haspopup="dialog"[^>]*aria-controls="lade"[^>]*data-contextactie/);
+  assert.match(wereld, /alles\.setAttribute\('aria-haspopup', 'dialog'\)/);
+  assert.match(wereld, /alles\.setAttribute\('data-contextactie', ''\)/);
+  assert.match(wereld, /speel\.setAttribute\('data-contextactie', ''\)/);
+  assert.match(html, /id="nieuwKnop"[^>]*data-contextactie[^>]*aria-controls="mediaStudio"[^>]*aria-expanded="false"/);
+  assert.match(studio, /studioKnoppen\(\)\.forEach\(function\(b\)\{b\.setAttribute\('aria-expanded','true'\)\}\)/);
+  assert.match(studio, /studioHerkomst\.focus\(\)/);
+  assert.match(blad, /lade\.setAttribute\('aria-hidden', 'false'\)/);
+  assert.match(blad, /lade\.setAttribute\('aria-hidden', 'true'\)/);
+  assert.match(blad, /herkomst\.focus\(\)/);
+  assert.doesNotMatch(blad, /(?:inLijst|deel|samen|kopieer)\.setAttribute\('data-contextactie'/);
+});
+
 test('de nieuwe Media-laag blijft klein en de systeemradius blijft centraal', () => {
   const css = lees('public/shared/rtg-media-2026.css');
   const js = lees('public/apps/media/voorzijde.js');

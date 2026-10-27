@@ -11,16 +11,29 @@
   'use strict';
   var $ = function (s) { return document.querySelector(s); };
   var M = window.RTGMediaOS;
+  var herkomst = null;
 
   function open(bouw) {
     var vlak = $('#ladeVlak');
+    var lade = $('#lade');
+    if (!lade.classList.contains('open')) herkomst = document.activeElement;
     vlak.textContent = '';
-    vlak.appendChild(M.knop('Sluit', '', dicht));
+    var sluit = M.knop('Sluit', '', dicht);
+    sluit.setAttribute('aria-label', 'Sluit details');
+    vlak.appendChild(sluit);
     bouw(vlak);
-    $('#lade').classList.add('open');
+    lade.classList.add('open');
+    lade.setAttribute('aria-hidden', 'false');
     vlak.scrollIntoView({ block: 'start' });
+    sluit.focus();
   }
-  function dicht() { $('#lade').classList.remove('open'); }
+  function dicht() {
+    var lade = $('#lade');
+    lade.classList.remove('open');
+    lade.setAttribute('aria-hidden', 'true');
+    if (herkomst && document.contains(herkomst) && typeof herkomst.focus === 'function') herkomst.focus();
+    herkomst = null;
+  }
   $('#lade').addEventListener('click', function (e) { if (e.target === $('#lade')) dicht(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') dicht(); });
 

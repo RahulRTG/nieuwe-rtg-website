@@ -98,6 +98,11 @@
     }
     kop.setAttribute('role', 'button');
     kop.setAttribute('tabindex', '0');
+    // De kaartkop is echte bediening. Markeer hem ook als contextactie zodat
+    // de APPWERKT-herhaling hem na dynamische schermwissels opnieuw kan
+    // vinden en aantikken, net als een gewone knop.
+    kop.setAttribute('data-contextactie', '');
+    kop.setAttribute('aria-label', n + ' in- of uitklappen');
     // een kaart die pas verscheen nadat je de app al kende (een nieuwe
     // functie) valt een dag lang op: hij staat open, ook als de
     // geschiedenis hem anders zou verstoppen

@@ -184,12 +184,15 @@ const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-ed
    muterend verzoek wordt voor die ene UI-tik gefixttured; de knop zelf is dan
    wel echt geraakt, terwijl verwijdering of betaling niet buiten de daarvoor
    bedoelde voltooi- en financiële proef wordt uitgevoerd. */
-const RISICOVOL = /uitlog|log uit|sign ?out|verlaat|leave|verwijder|delete|wis alles|betaal|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
-/* Alleen deze servermutaties zouden de gedeelde testpersona of zijn hele
-   account voor volgende appmetingen vernietigen. Andere risicovolle acties
-   draaien tegen de echte wegwerpdata en blijven dus zichtbaar voor de gewone
-   serverfoutmeting. De synthetische /api/risico-route ijkt deze grens. */
-const VERNIETIGENDE_ROUTE = /^\/api\/(?:logout|privacy\/delete|risico)$/;
+const RISICOVOL = /uitlog|log uit|sign ?out|verlaat|leave|verwijder|delete|wis alles|betaal|uit\s+rtg\s+pay-saldo|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
+/* Alleen deze servermutaties zouden de gedeelde testpersona, haar hele account
+   of de UI-fixture voor alternatieve betaalwegen wijzigen. Een echte betaling
+   laat terecht de andere betaalbuttons verdwijnen; APPWERKT zou ze dan nooit
+   allemaal kunnen aanraken. Daarom worden `/api/pay` en `/api/pay/saldo`
+   uitsluitend tijdens die ene echte UI-tik gefixttured. De afzonderlijke
+   financiële proeven blijven het zakelijke gevolg, concurrency en herstel
+   bewijzen. Andere risicovolle acties draaien tegen de wegwerpdata. */
+const VERNIETIGENDE_ROUTE = /^\/api\/(?:logout|privacy\/delete|risico|pay(?:\/saldo)?)$/;
 
 /* De DRIE toegangspoorten in dit huis, als selector. Geen woordenlijst en geen
    tekstherkenning: dit zijn de mechanismen zelf.
@@ -955,6 +958,14 @@ async function bedien(ctx, base, ingang) {
         await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'),
           null, { timeout: 5000 }).catch(() => {});
         await page.waitForTimeout(600);
+        /* Face ID bevestigt pas na 1,1 seconde en verstuurt de betaling dus
+           later dan de gewone klikpauze. Houd de tijdelijke routefixture vast
+           zolang de echte betaaloverlay open staat. Zonder deze wacht liep
+           `/api/pay/saldo` alsnog door, verdween de factuur en bleven twee
+           alternatieve betaalbuttons ten onrechte onaangeraakt. */
+        if (isRisicovol) {
+          await page.waitForSelector('#paywait.open', { state: 'hidden', timeout: 3000 }).catch(() => {});
+        }
         actieveRisicoklik = null;
         await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
         /* Een app-eigen knop kan navigeren (Terug, Open volledig, enzovoort).

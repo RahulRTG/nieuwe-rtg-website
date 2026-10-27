@@ -82,8 +82,9 @@ const BREED_SCHERM = '<!doctype html><html><body><main>' +
 const RISICO_SCHERM = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="if(confirm(\'zeker?\'))window.verwijderd=true">Verwijder mijn gegevens</button>' +
   '<button type="button" onclick="fetch(\'/api/risico\',{method:\'POST\',headers:{\'content-type\':\'application/json\'},body:\'{}\'})">Betaal proef</button>' +
+  '<button type="button" onclick="document.getElementById(\'paywait\').classList.add(\'open\');setTimeout(()=>fetch(\'/api/pay/saldo\',{method:\'POST\'}).finally(()=>document.getElementById(\'paywait\').classList.remove(\'open\')),1100)">Uit RTG Pay-saldo</button>' +
   '<input type="button" value="Download overzicht" onclick="window.downloadAangeraakt=true">' +
-  '</main></body></html>';
+  '</main><div id="paywait"></div><style>#paywait{display:none}#paywait.open{display:block;position:fixed;inset:0}</style></body></html>';
 
 /* De eerste bediening laat bewust een niet-sluitende laag achter. De overige
    knoppen zijn op de schone ingang wel bereikbaar. Dit onderscheidt een door
@@ -181,11 +182,18 @@ test('APPWERKT wijst de canonieke premium-suite aan een Lifestyle-lid toe', () =
 test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', { skip: geenBrowser(pw) }, async () => {
   const { bedien } = require('../scripts/appwerkt');
   let risicoMutaties = 0;
+  let uitgesteldeBetaalmutaties = 0;
   let dialoogActies = 0;
   const srv = http.createServer((req, res) => {
     if (req.url === '/api/dialoogactie') { dialoogActies++; res.writeHead(200, { 'content-type': 'application/json' }); return res.end('{"ok":true}'); }
     if (req.url === '/api/risico') {
       risicoMutaties++;
+      res.setHeader('Content-Type', 'application/json');
+      res.end('{"ok":true}');
+      return;
+    }
+    if (req.url === '/api/pay/saldo') {
+      uitgesteldeBetaalmutaties++;
       res.setHeader('Content-Type', 'application/json');
       res.end('{"ok":true}');
       return;
@@ -248,10 +256,14 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
 
     const risico = await bedien(ctx, base, '/apps/risico.html');
     assert.equal(risico.geklikt, risico.gevonden, 'ook risicovolle en input-knoppen zijn werkelijk aangeraakt');
-    assert.deepEqual(risico.risicovolAangeraakt.sort(), ['Betaal proef', 'Download overzicht', 'Verwijder mijn gegevens']);
+    assert.deepEqual(risico.risicovolAangeraakt.sort(), ['Betaal proef', 'Download overzicht', 'Uit RTG Pay-saldo', 'Verwijder mijn gegevens']);
     assert.ok(risico.instrument.some((x) => /browserbevestiging/.test(x)), 'de onomkeerbare bevestiging is afgebroken');
     assert.equal(risicoMutaties, 0, 'de UI-meting voert geen risicovolle servermutatie uit');
-    assert.deepEqual(risico.risicoFixtures, [{ knop: 'Betaal proef', methode: 'POST', pad: '/api/risico' }],
+    assert.equal(uitgesteldeBetaalmutaties, 0, 'ook een uitgestelde Face ID-mutatie blijft in de tijdelijke UI-fixture');
+    assert.deepEqual(risico.risicoFixtures, [
+      { knop: 'Betaal proef', methode: 'POST', pad: '/api/risico' },
+      { knop: 'Uit RTG Pay-saldo', methode: 'POST', pad: '/api/pay/saldo' }
+    ],
       'de onderschepte mutatie is expliciet en controleerbaar verantwoord');
 
     const a = await bedien(ctx, base, '/apps/achtergebleven.html');

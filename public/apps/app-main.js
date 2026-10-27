@@ -1588,9 +1588,9 @@ var RTG_BOUW = '60faa1b3';
           '<button id="scPinLive" class="aanbevolen">' + T('pin.live','Tijdelijke QR') + ' · ' + T('pin.aanbev','aanbevolen') + '</button>' +
           '<button id="scPinKopie">' + T('pin.kopieer','Kopieer') + '</button>' +
           '<button id="scPinQr">' + T('pin.qr','Vaste QR') + '</button>' +
-          '<button id="scPinNieuw">' + T('pin.nieuw','Nieuwe pin') + '</button>' +
+          '<button id="scPinNieuw" data-contextactie>' + T('pin.nieuw','Nieuwe pin') + '</button>' +
           '<button id="scPinUit">' + (mijnPin && mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten')) + '</button>' +
-          '<button id="scPinNood" class="gevaar">' + T('pin.nood','Noodslot') + '</button>' +
+          '<button id="scPinNood" class="gevaar" data-contextactie>' + T('pin.nood','Noodslot') + '</button>' +
         '</div>' +
         '<img id="scPinQrBeeld" alt="' + T('pin.qralt','QR-code met jouw pin') + '" hidden>' +
         '<div id="scPinLiveDoek" hidden></div>' +
@@ -2775,7 +2775,7 @@ var RTG_BOUW = '60faa1b3';
             '<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.5rem;">'+
             '<span class="s-1m8ehf5">'+T('tk.personen','Personen')+'</span>'+
             '<button class="bz-btn s-qk3yxe" data-tkp="-1">\u2212</button><b>'+k.personen+'</b><button class="bz-btn s-qk3yxe" data-tkp="1">+</button></div>'+
-            '<button class="bz-groot h-mt70" id="tkKoop"'+(k.tijd?'':' disabled')+'>'+T('tk.koop','Koop tickets')+' \u00B7 '+eur(a.prijs * k.personen)+'</button></div>';
+            '<button class="bz-groot h-mt70" id="tkKoop" aria-label="'+T('tk.koop','Koop tickets')+'"'+(k.tijd?'':' disabled')+'>'+T('tk.koop','Koop tickets')+' \u00B7 '+eur(a.prijs * k.personen)+'</button></div>';
         } else {
           html += '<button class="bz-btn h-mt45" data-tkopen="'+p.code+':'+a.id+'">'+T('tk.kies','Kies datum en tijd')+'</button>';
         }
@@ -6687,12 +6687,12 @@ var RTG_BOUW = '60faa1b3';
        en de knop staat er ook zonder gedeelde positie. */
     const kanBevestigen = dest && !L.arrived;
     const acts = '<div class="live-acts">' +
-      (kanBevestigen ? '<button class="' + (L.nabij ? 'prim glowbtn' : 'sec') + '" id="liveHier">' + (L.nabij ? T('live.benuer','Bent u er? Bevestig uw aankomst') : T('live.ikbener','Ik ben er')) + '</button>' : '') +
+      (kanBevestigen ? '<button class="' + (L.nabij ? 'prim glowbtn' : 'sec') + '" id="liveHier" data-contextactie>' + (L.nabij ? T('live.benuer','Bent u er? Bevestig uw aankomst') : T('live.ikbener','Ik ben er')) + '</button>' : '') +
       (canDoor ? '<button class="prim glowbtn" id="liveDoor">' + T('live.door','Open de deur') + '</button>' : '') +
-      '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
-      (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
-      (canDoor ? '' : '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>') +
-      (canDoor ? '<button class="sec" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>' : '') +
+      '<button class="sec" id="liveSim" data-contextactie>' + T('live.simulate','Simuleer rit') + '</button>' +
+      (hasVeh ? '' : '<button class="sec" id="liveTaxi" data-hoofdactie>' + T('live.taxi','Vraag een taxi') + '</button>') +
+      (canDoor ? '' : '<button class="prim" id="liveShare" data-contextactie>' + T('live.share','Deel mijn locatie') + '</button>') +
+      (canDoor ? '<button class="sec" id="liveShare" data-contextactie>' + T('live.share','Deel mijn locatie') + '</button>' : '') +
     '</div>';
 
     $('#livePanel').innerHTML =

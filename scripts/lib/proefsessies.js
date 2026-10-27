@@ -19,6 +19,14 @@
 'use strict';
 const { zetSignatureKlaar } = require('./wereld-signature');
 
+/* Een geldhandeling vraagt eenmalig om een identiteitsdocument. De centrale
+   browserpersona moet ook die echte productpoort hebben doorlopen; anders
+   opent de eerste betaalproef terecht het onboardinggesprek en kan dezelfde
+   proef de overige zichtbare bediening niet meer afzonderlijk aanraken.
+   Dit is een minimale wegwerpafbeelding en geen nagemaakte verificatiestatus:
+   /api/verify/upload zet haar via de gewone route op `pending`. */
+const PROEF_IDENTITEIT = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+
 /* De sleutel in localStorage per rol, plus hoe je aan zo'n sessie komt. De
    sleutelnaam hoort hierbij: wie een token haalt maar op de verkeerde sleutel
    zet, meet een uitgelogde browser. */
@@ -136,6 +144,10 @@ async function rondLidAf(basis, token, naam = 'Proeflid') {
     status = antwoord.data;
   }
   if (!status.klaar) throw new Error('de echte onboardingroute rondde de proefsessie niet af');
+  antwoord = await postAls(basis + '/api/verify/upload', { image: PROEF_IDENTITEIT }, token);
+  if (antwoord.status >= 400 || !antwoord.data || antwoord.data.status !== 'pending') {
+    throw new Error('verify/upload activeerde de betaalpoort niet: HTTP ' + antwoord.status);
+  }
   return status;
 }
 

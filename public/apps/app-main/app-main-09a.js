@@ -24,9 +24,9 @@
           '<button id="scPinLive" class="aanbevolen">' + T('pin.live','Tijdelijke QR') + ' · ' + T('pin.aanbev','aanbevolen') + '</button>' +
           '<button id="scPinKopie">' + T('pin.kopieer','Kopieer') + '</button>' +
           '<button id="scPinQr">' + T('pin.qr','Vaste QR') + '</button>' +
-          '<button id="scPinNieuw">' + T('pin.nieuw','Nieuwe pin') + '</button>' +
+          '<button id="scPinNieuw" data-contextactie>' + T('pin.nieuw','Nieuwe pin') + '</button>' +
           '<button id="scPinUit">' + (mijnPin && mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten')) + '</button>' +
-          '<button id="scPinNood" class="gevaar">' + T('pin.nood','Noodslot') + '</button>' +
+          '<button id="scPinNood" class="gevaar" data-contextactie>' + T('pin.nood','Noodslot') + '</button>' +
         '</div>' +
         '<img id="scPinQrBeeld" alt="' + T('pin.qralt','QR-code met jouw pin') + '" hidden>' +
         '<div id="scPinLiveDoek" hidden></div>' +

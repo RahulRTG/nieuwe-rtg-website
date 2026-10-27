@@ -1,5 +1,5 @@
-/* Presentatie van de Living Mall. Domeinacties worden als callbacks geleend;
-   deze module beslist niet over installeren, bestellen of bewaren. */
+/* Presentatie van de Living Mall. Domeinacties komen via callbacks binnen;
+   deze module installeert, bestelt of bewaart niet. */
 (function (w) {
   'use strict';
   var worldNames = { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS' };

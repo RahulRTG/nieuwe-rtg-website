@@ -349,7 +349,7 @@ omlaag.
 
 ## `apps/magnaat-leven.js`
 
-`public/apps/magnaat-leven/` -- 2 delen, 177 regels in de delen
+`public/apps/magnaat-leven/` -- 2 delen, 179 regels in de delen
 
 | deel | onderwerp |
 |---|---|

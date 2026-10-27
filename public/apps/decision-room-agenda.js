@@ -18,7 +18,7 @@
     dag.textContent = 'Vandaag · ' + lijst.length + (lijst.length === 1 ? ' besluit vraagt aandacht' : ' besluiten vragen aandacht');
     var vak = root.querySelector('#drAgenda');
     if (!lijst.length) {
-      vak.innerHTML = '<div class="dr-leeg"><h2>De agenda is rustig.</h2><p>Er ligt geen echt voorstel op menselijke beoordeling te wachten.</p><button class="dr-primair" type="button" data-dr-nieuw>Leg een besluit voor</button></div>';
+      vak.innerHTML = '<div class="dr-leeg"><h2>De agenda is rustig.</h2><p>Er ligt geen echt voorstel op menselijke beoordeling te wachten.</p><button class="dr-primair" type="button" data-dr-nieuw aria-haspopup="dialog" aria-controls="drIntake">Leg een besluit voor</button></div>';
       return null;
     }
     var focus = lijst.find(function (x) { return String(x.id) === String(gekozen || ''); }) || lijst[0], c = compleet(focus);

@@ -63,3 +63,17 @@ test('de bestaande volledige mailbox blijft bereikbaar', () => {
   assert.match(html, /vak\.dataset\.hulpUit=wat/,
     'iedere hulpsoort houdt zijn eigen zichtbare resultaat');
 });
+
+test('toestandsafhankelijke postacties verklaren hun replay- en Edge-context', () => {
+  const instellingen = lees('public/apps/rtmail-instellingen.js');
+  assert.match(gedrag, /data-rtm-gesprek="[^"]+" data-stand="gesprek"/);
+  assert.match(html, /id="instKnp" data-stand="instellingen"/);
+  assert.match(html, /data-rtm-diep="bericht" data-contextactie/);
+  assert.match(html, /data-rtm-naar-werk data-contextactie/);
+  for (const actie of ['archief', 'prullenbak', 'ster', 'sluimer']) {
+    assert.match(html, new RegExp('data-act="' + actie + '" data-contextactie'));
+  }
+  for (const id of ['iHandBewaar', 'iAfAan', 'iAliasMaak', 'iRMaak']) {
+    assert.match(instellingen, new RegExp('id="' + id + '" data-contextactie'));
+  }
+});

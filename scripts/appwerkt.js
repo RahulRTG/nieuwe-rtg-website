@@ -184,15 +184,18 @@ const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-ed
    muterend verzoek wordt voor die ene UI-tik gefixttured; de knop zelf is dan
    wel echt geraakt, terwijl verwijdering of betaling niet buiten de daarvoor
    bedoelde voltooi- en financiële proef wordt uitgevoerd. */
-const RISICOVOL = /uitlog|log uit|sign ?out|verlaat|leave|verwijder|delete|wis alles|betaal|uit\s+rtg\s+pay-saldo|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
+const RISICOVOL = /uitlog|log uit|sign ?out|verlaat|leave|verwijder|delete|wis alles|betaal|uit\s+rtg\s+pay-saldo|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot|opbergen|weggooien|ster erop|sluimeren/i;
 /* Alleen deze servermutaties zouden de gedeelde testpersona, haar hele account
    of de UI-fixture voor alternatieve betaalwegen wijzigen. Een echte betaling
    laat terecht de andere betaalbuttons verdwijnen; APPWERKT zou ze dan nooit
    allemaal kunnen aanraken. Daarom worden `/api/pay` en `/api/pay/saldo`
    uitsluitend tijdens die ene echte UI-tik gefixttured. De afzonderlijke
    financiële proeven blijven het zakelijke gevolg, concurrency en herstel
-   bewijzen. Andere risicovolle acties draaien tegen de wegwerpdata. */
-const VERNIETIGENDE_ROUTE = /^\/api\/(?:logout|privacy\/delete|risico|pay(?:\/saldo)?)$/;
+   bewijzen. De drie RTMail-mutaties veranderen dezelfde enige berichtfixture;
+   ook zij worden per echte UI-tik gefixttured, zodat opbergen, ster, sluimeren
+   en weggooien allemaal bediend kunnen worden. De RTMail-voltooi- en
+   regressieproeven bewijzen hun werkelijke zakelijke effect. */
+const VERNIETIGENDE_ROUTE = /^\/api\/(?:logout|privacy\/delete|risico|pay(?:\/saldo)?|member\/rtmail\/(?:verplaats|ster|sluimer))$/;
 
 /* De DRIE toegangspoorten in dit huis, als selector. Geen woordenlijst en geen
    tekstherkenning: dit zijn de mechanismen zelf.

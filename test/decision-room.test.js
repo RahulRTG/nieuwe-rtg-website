@@ -16,6 +16,14 @@ test('Decision Room heeft vier echte, responsive werkstanden', () => {
   assert.match(lees('public/shared/rtg-decision-room-2026.css'), /@media\(max-width:720px\)/);
 });
 
+test('de besluitintake is een herkenbare en heropenbare dialoog', () => {
+  const html = lees('public/apps/decision-room.html');
+  const agenda = lees('public/apps/decision-room-agenda.js');
+  assert.match(html, /id="drIntake" role="dialog" aria-modal="true" aria-labelledby="drIntakeTitel"/);
+  assert.match(html, /data-dr-nieuw aria-haspopup="dialog" aria-controls="drIntake"/);
+  assert.match(agenda, /data-dr-nieuw aria-haspopup="dialog" aria-controls="drIntake"/);
+});
+
 test('Decision Room leest echte RTG One-data en bewaart de menselijke grens', () => {
   const controller = lees('public/apps/decision-room.js');
   const afweging = lees('public/apps/decision-room-afweging.js');

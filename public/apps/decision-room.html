@@ -25,7 +25,7 @@
       <button type="button" data-dr-huis="gedeeld" aria-pressed="false">Samen</button>
     </div>
     <span class="dr-kopruimte"></span>
-    <button class="dr-nieuw" type="button" data-dr-nieuw>Nieuw besluit</button>
+    <button class="dr-nieuw" type="button" data-dr-nieuw aria-haspopup="dialog" aria-controls="drIntake">Nieuw besluit</button>
     <a class="dr-profiel" href="/apps/rtgone.html?view=governance" aria-label="Open mijn werkprofiel">RI</a>
   </header>
 
@@ -68,11 +68,11 @@
   </nav>
 </div>
 
-<div class="dr-laag" id="drIntake" hidden>
+<div class="dr-laag" id="drIntake" role="dialog" aria-modal="true" aria-labelledby="drIntakeTitel" hidden>
   <form class="dr-dialoog" id="drIntakeForm">
     <button class="dr-sluit" type="button" data-dr-sluit aria-label="Sluiten">×</button>
     <div class="dr-ey">Nieuw voorstel · besluitroute</div>
-    <h2>Leg de afweging compleet voor.</h2>
+    <h2 id="drIntakeTitel">Leg de afweging compleet voor.</h2>
     <p>Niet het formulier, maar de onderbouwing maakt een voorstel besluitrijp.</p>
     <div class="dr-velden">
       <label><span>Voorstel</span><input name="titel" maxlength="160" required autocomplete="off"></label>

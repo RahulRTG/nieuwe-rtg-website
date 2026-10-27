@@ -162,8 +162,8 @@
         <div class="rtm-draad" id="rtmDraad"><div class="rtm-leeg">Kies bij Mijn aandacht welk gesprek u wilt openen.</div></div>
         </div><aside class="rtm-samenvatting" id="rtmGesprekHulp"><b>In één oogopslag</b><p>De samenvatting blijft herleidbaar tot de oorspronkelijke post.</p></aside>
         <div class="rtm-gesprekacties">
-          <button class="rtm-secundair" type="button" data-rtm-diep="bericht">Open volledige post</button>
-          <button class="rtm-primair" type="button" data-rtm-naar-werk>Maak er werk van &rsaquo;</button>
+          <button class="rtm-secundair" type="button" data-rtm-diep="bericht" data-contextactie>Open volledige post</button>
+          <button class="rtm-primair" type="button" data-rtm-naar-werk data-contextactie>Maak er werk van &rsaquo;</button>
         </div>
       </section>
 
@@ -305,7 +305,7 @@ async function laadInbox(){
   if(tel.sluimert){ sl.textContent=tel.sluimert+' sluimert'; sl.hidden=false; } else { sl.textContent=''; sl.hidden=true; }
   const balk = '<div id="mapbalkPlek"></div>'+
     '<div class="zoekrij"><input class="vld" id="zoekVeld" placeholder="Zoek in je eigen postvak" maxlength="120" value="'+esc(ZOEK)+'">'+
-    '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+(window.RTGMailInstellingen?'<button class="knp" id="instKnp">Instellingen</button>':'')+'</div>'+
+    '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+(window.RTGMailInstellingen?'<button class="knp" id="instKnp" data-stand="instellingen">Instellingen</button>':'')+'</div>'+
     (ZOEK?'<div class="noot s-1pzsxo3">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
   $('#main').innerHTML = kaart + balk + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
@@ -475,10 +475,10 @@ async function openBericht(m){
        omdat je op een knop drukte. Echt vernietigen loopt via het bewaarbeleid
        en laat een spoor na -- dat hoort niet onder een knop in een postvak. */
     '<div class="acties">'+
-      (volledig.map!=='archief'?'<button class="knp" data-act="archief">Opbergen</button>':'<button class="knp" data-act="in">Terug naar postvak in</button>')+
-      (volledig.map!=='prullenbak'?'<button class="knp" data-act="prullenbak">Weggooien</button>':'')+
-      '<button class="knp" data-act="ster">'+(volledig.favoriet?'Ster eraf':'Ster erop')+'</button>'+
-      '<button class="knp" data-act="sluimer">Sluimeren tot morgen</button>'+
+      (volledig.map!=='archief'?'<button class="knp" data-act="archief" data-contextactie>Opbergen</button>':'<button class="knp" data-act="in" data-contextactie>Terug naar postvak in</button>')+
+      (volledig.map!=='prullenbak'?'<button class="knp" data-act="prullenbak" data-contextactie>Weggooien</button>':'')+
+      '<button class="knp" data-act="ster" data-contextactie>'+(volledig.favoriet?'Ster eraf':'Ster erop')+'</button>'+
+      '<button class="knp" data-act="sluimer" data-contextactie>Sluimeren tot morgen</button>'+
       '<button class="knp" data-act="draad" data-stand="gesprek">Toon het gesprek</button>'+
     '</div>'+
     '<div class="fout" id="aFout" hidden></div></div>';

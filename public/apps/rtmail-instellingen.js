@@ -42,7 +42,7 @@
       '<div class="kop">Handtekening</div>'+
       '<textarea class="vld" id="iHand" rows="3" maxlength="500" placeholder="Bijvoorbeeld je naam en hoe je bereikbaar bent">'+esc(inst.handtekening||'')+'</textarea>'+
       '<div class="noot inst-noot">Gaat onder elk bericht dat je hier zelf opstelt en verstuurt, ook als het gepland was. Niet onder een bericht namens een team.</div>'+
-      '<div class="knprij"><button class="knp prim" id="iHandBewaar">Handtekening bewaren</button></div><div id="iHandUit" hidden></div>'+
+      '<div class="knprij"><button class="knp prim" id="iHandBewaar" data-contextactie>Handtekening bewaren</button></div><div id="iHandUit" hidden></div>'+
 
       '<div class="kop">Afwezigheid</div>'+
       '<div class="noot inst-noot inst-ruim" id="iAfStand">'+esc(afStand)+'</div>'+
@@ -50,7 +50,7 @@
       '<label class="noot inst-veld">Vanaf (leeg is nu)<input class="vld" type="datetime-local" id="iAfVan" value="'+esc(naarLokaal(af&&af.van))+'"></label>'+
       '<label class="noot inst-veld">Tot (leeg is tot je hem uitzet)<input class="vld" type="datetime-local" id="iAfTot" value="'+esc(naarLokaal(af&&af.tot))+'"></label>'+
       '<div class="noot inst-noot">Iedere afzender krijgt dit antwoord een keer per periode. Berichten van RTG zelf en andere afwezigheidsberichten krijgen geen antwoord, zodat twee postvakken elkaar niet eindeloos terugschrijven.</div>'+
-      '<div class="knprij"><button class="knp prim" id="iAfAan">'+(af?'Afwezigheid bijwerken':'Afwezigheid aanzetten')+'</button>'+
+      '<div class="knprij"><button class="knp prim" id="iAfAan" data-contextactie>'+(af?'Afwezigheid bijwerken':'Afwezigheid aanzetten')+'</button>'+
         (af?'<button class="knp" id="iAfUit">Afwezigheid uitzetten</button>':'')+'</div><div id="iAfUitslag" hidden></div>'+
 
       '<div class="kop">Aliassen</div>'+
@@ -60,7 +60,7 @@
           '<button class="knp" data-alias-uit="'+esc(a)+'">Alias uitzetten</button></div>'; }).join('')
         : '<div class="noot inst-noot inst-ruim">Nog geen alias.</div>')+
       '<input class="vld" id="iAlias" maxlength="40" placeholder="Bijvoorbeeld inkoop">'+
-      '<div class="knprij"><button class="knp prim" id="iAliasMaak">Alias toevoegen</button></div><div id="iAliasUit" hidden></div>'+
+      '<div class="knprij"><button class="knp prim" id="iAliasMaak" data-contextactie>Alias toevoegen</button></div><div id="iAliasUit" hidden></div>'+
 
       '<div class="kop">Regels bij binnenkomst</div>'+
       '<div class="noot inst-noot inst-ruim">Een regel draait op het moment dat post binnenkomt, ook als je de app niet open hebt. De teller zegt hoe vaak hij iets deed.</div>'+
@@ -77,7 +77,7 @@
       '<label class="noot inst-veld inst-ruim"><input type="checkbox" id="iROnv"> Alleen voor niet-geverifieerde post</label>'+
       '<select class="vld" id="iRActie" aria-label="Wat doet de regel?">'+(regels.acties||[]).map(function(a){return '<option value="'+esc(a)+'">Dan: '+esc(ACTIENAAM[a]||a)+'</option>';}).join('')+'</select>'+
       '<input class="vld" id="iRWaarde" maxlength="40" placeholder="Welk etiket? (alleen bij een etiket)">'+
-      '<div class="knprij"><button class="knp prim" id="iRMaak">Regel maken</button></div><div id="iRUit" hidden></div>'+
+      '<div class="knprij"><button class="knp prim" id="iRMaak" data-contextactie>Regel maken</button></div><div id="iRUit" hidden></div>'+
       '</div>';
 
     d.getElementById('terug').addEventListener('click',mail.laad);

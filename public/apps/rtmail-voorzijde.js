@@ -86,10 +86,10 @@
       '<span class="rtm-label">' + veilig(m.gelezen ? (m.favoriet ? 'Bewaard' : 'Gelezen') : 'Ongelezen') + '</span></div>' +
       '<h2>' + veilig(m.onderwerp || 'Bericht zonder onderwerp') + '</h2>' +
       '<p>' + veilig(kort(m.tekst, 210) || 'Open het gesprek om de volledige inhoud en herkomst te bekijken.') + '</p>' +
-      '<div class="rtm-focusvoet"><span class="rtm-betekenis">' + veilig(betekenis(m)) + '</span><button class="rtm-primair" type="button" data-rtm-gesprek="' + veilig(m.id) + '">Open gesprek &rsaquo;</button></div>';
+      '<div class="rtm-focusvoet"><span class="rtm-betekenis">' + veilig(betekenis(m)) + '</span><button class="rtm-primair" type="button" data-rtm-gesprek="' + veilig(m.id) + '" data-stand="gesprek">Open gesprek &rsaquo;</button></div>';
     var daarna = lijst.filter(function (x) { return x.id !== m.id; }).slice(0, 5);
     vind('#rtmDaarna').innerHTML = daarna.length ? daarna.map(function (x) {
-      return '<button class="rtm-rij" type="button" data-rtm-gesprek="' + veilig(x.id) + '">' +
+      return '<button class="rtm-rij" type="button" data-rtm-gesprek="' + veilig(x.id) + '" data-stand="gesprek">' +
         '<span class="rtm-rijtijd">' + veilig(tijd(x.at)) + '</span><span><b>' + veilig(x.onderwerp || 'Bericht zonder onderwerp') +
         '</b><small>' + veilig(x.van || 'Onbekende afzender') + ' · ' + veilig(kort(x.tekst, 92)) + '</small></span>' +
         '<span class="rtm-soort">' + veilig(x.gelezen ? (x.favoriet ? 'Bewaard' : 'Lezen') : 'Nieuw') + '</span></button>';

@@ -381,7 +381,7 @@
       <h1 class="rtd-titel">Niet zoeken. Meteen verder.</h1>
       <p class="rtd-inleiding">RTDocs brengt de juiste versie, haar context en de mensen eromheen bij elkaar.</p>
       <article class="rtd-focus" id="rtdFocus" aria-live="polite"><div class="rtd-leeg">Uw documenten worden geordend…</div></article>
-      <div class="rtd-sectiekop"><h2>Daarna</h2><button type="button" data-rtd-diep="lijst">Open alle documenten</button></div>
+      <div class="rtd-sectiekop"><h2>Daarna</h2><button type="button" data-rtd-diep="lijst" data-stand="documenten">Open alle documenten</button></div>
       <div class="rtd-lijst" id="rtdDaarna"></div>
       <div class="rtd-rust"><b>Geen mappenjacht.</b><span>U ziet welke versie geldt, waarom een stuk aandacht vraagt en wie nog aan zet is.</span></div>
     </section>
@@ -402,7 +402,7 @@
     <button type="button" data-rtd-open="nodig" aria-current="page"><i aria-hidden="true">&#9679;</i>Nodig</button>
     <button type="button" data-rtd-open="dossier"><i aria-hidden="true">&#9671;</i>Dossiers</button>
     <button type="button" data-rtd-open="besluit"><i aria-hidden="true">B</i>Besluit</button>
-    <button type="button" data-rtd-diep="lijst"><i aria-hidden="true">&#8801;</i>Alle docs</button>
+    <button type="button" data-rtd-diep="lijst" data-stand="documenten"><i aria-hidden="true">&#8801;</i>Alle docs</button>
   </nav>
 </section>
 <header class="kop">
@@ -417,13 +417,13 @@
   <section id="lijst">
     <aside id="rail">
       <div class="sec">Nieuw</div>
-      <button class="nieuwe" id="nieuwTekst" type="button"><span data-glyf="logboek"></span><span>Document<small>Brief, memo, notitie</small></span></button>
-      <button class="nieuwe" id="nieuwBlad" type="button"><span data-glyf="grafiek"></span><span>Rekenblad<small>Cijfers met formules</small></span></button>
-      <button class="nieuwe" id="nieuwPres" type="button"><span data-glyf="podium"></span><span>Presentatie<small>Deck met notities</small></span></button>
-      <button class="nieuwe" id="nieuwFormulier" type="button"><span data-glyf="opties"></span><span>Formulier<small>Vragen en antwoorden</small></span></button>
-      <button class="nieuwe" id="nieuwSchets" type="button"><span data-glyf="ontwerp"></span><span>Schets<small>Diagram met kaders en pijlen</small></span></button>
-      <button class="nieuwe" id="nieuwBord" type="button"><span data-glyf="agenda"></span><span>Bord<small>Lijsten met kaarten, samen plannen</small></span></button>
-      <button class="nieuwe" id="inleesXlsx" type="button"><span data-glyf="grafiek"></span><span>XLSX inlezen<small>Een Excel-werkblad als nieuw rekenblad</small></span></button>
+      <button class="nieuwe" id="nieuwTekst" type="button" data-contextactie><span data-glyf="logboek"></span><span>Document<small>Brief, memo, notitie</small></span></button>
+      <button class="nieuwe" id="nieuwBlad" type="button" data-contextactie><span data-glyf="grafiek"></span><span>Rekenblad<small>Cijfers met formules</small></span></button>
+      <button class="nieuwe" id="nieuwPres" type="button" data-contextactie><span data-glyf="podium"></span><span>Presentatie<small>Deck met notities</small></span></button>
+      <button class="nieuwe" id="nieuwFormulier" type="button" data-contextactie><span data-glyf="opties"></span><span>Formulier<small>Vragen en antwoorden</small></span></button>
+      <button class="nieuwe" id="nieuwSchets" type="button" data-contextactie><span data-glyf="ontwerp"></span><span>Schets<small>Diagram met kaders en pijlen</small></span></button>
+      <button class="nieuwe" id="nieuwBord" type="button" data-contextactie><span data-glyf="agenda"></span><span>Bord<small>Lijsten met kaarten, samen plannen</small></span></button>
+      <button class="nieuwe" id="inleesXlsx" type="button" data-contextactie><span data-glyf="grafiek"></span><span>XLSX inlezen<small>Een Excel-werkblad als nieuw rekenblad</small></span></button>
       <input type="file" id="inleesBestand" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
       <div class="sec">Sjablonen</div>
       <div id="sjablonen"></div>

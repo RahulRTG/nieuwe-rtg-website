@@ -66,7 +66,7 @@
       '<div class="rtd-contextblok"><span>Laatste wijziging</span><b>' + veilig((doc.werkstroom && doc.werkstroom.laatstDoor) || doc.door || 'Niet bekend') + ' · ' + veilig(datum(doc.gewijzigd)) + '</b></div>' +
       '<div class="rtd-contextblok"><span>Versies</span><b>' + veilig(String((versies || []).length)) + ' eerdere ' + ((versies || []).length === 1 ? 'versie' : 'versies') + ' bewaard</b></div>' +
       '<div class="rtd-contextblok"><span>Beslisroute</span><b>' + veilig(faseUitleg(fase)) + '</b></div></div>' +
-      '<div class="rtd-dossieracties"><button type="button" data-rtd-versies="' + veilig(doc.id) + '">Bekijk versies</button><button type="button" data-rtd-open="besluit">Naar besluitklaar &rarr;</button></div>';
+      '<div class="rtd-dossieracties"><button type="button" data-rtd-versies="' + veilig(doc.id) + '" data-contextactie>Bekijk versies</button><button type="button" data-rtd-open="besluit" data-contextactie>Naar besluitklaar &rarr;</button></div>';
   }
   async function open(root, office, kop) {
     root.querySelector('#rtdDossier').innerHTML = '<div class="rtd-leeg">Het dossier wordt opgebouwd uit de echte documentgegevens…</div>';

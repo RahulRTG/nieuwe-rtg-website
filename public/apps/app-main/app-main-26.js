@@ -68,6 +68,7 @@
       try { onthouden = localStorage.getItem('rtf_app_groep'); } catch (e) {}
       for (const gr of RTF_GROEPEN) {
         const b = document.createElement('button');
+        b.setAttribute('aria-label', gr.naam + ' · ' + gr.sub);
         const zi = document.createElement('span'); zi.className = 'zi';
         const gg = window.RTGGlyf && RTGGlyf.svg('rtf-' + gr.g);
         if (gg) zi.appendChild(gg); else zi.textContent = (gr.naam.match(/[A-Z]/g) || ['R']).slice(0, 2).join('');

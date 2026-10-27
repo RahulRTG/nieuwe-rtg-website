@@ -136,7 +136,7 @@
     <label title="Kaartkleur (blokken met een vlak)"><span>Kaart</span><input type="color" id="kCard" aria-label="Kaartkleur"></label>
     <button class="knop" id="kReset" title="Kleuren terug naar het thema">Reset</button>
   </div>
-  <div class="apparaten" id="paginabar" role="group" aria-label="Pagina's van je site"></div>
+  <div class="apparaten" id="paginabar" role="tablist" aria-label="Pagina's van je site"></div>
   <div class="apparaten" id="apparaten" role="group" aria-label="Versie per toestel">
     <button type="button" data-a="telefoon">Telefoon</button>
     <button type="button" data-a="tablet">Tablet</button>
@@ -260,7 +260,9 @@ function stashPagina(){ if(PAG===-1) HOMEBLOK=DESIGN.blokken; else if(DESIGN.pag
 function wisselPagina(i){ stashPagina(); PAG=i; DESIGN.blokken=(i===-1?HOMEBLOK:DESIGN.paginas[i].blokken); paginaBar(); render(); }
 function paginaBar(){
   const el=$('#paginabar'); if(!el)return; el.textContent='';
-  const maak=(naam,i)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(i===PAG)b.classList.add('aan'); b.addEventListener('click',()=>{ if(i!==PAG)wisselPagina(i); }); el.appendChild(b); };
+  const maak=(naam,i)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; b.role='tab';
+    b.setAttribute('aria-selected',String(i===PAG)); if(i===PAG)b.classList.add('aan');
+    b.addEventListener('click',()=>{ if(i!==PAG)wisselPagina(i); }); el.appendChild(b); };
   maak('Home',-1);
   (DESIGN.paginas||[]).forEach((p,i)=>maak(p.naam,i));
   if((DESIGN.paginas||[]).length<7){
@@ -272,9 +274,11 @@ function paginaBar(){
   }
   if(PAG>=0){
     const h=document.createElement('button'); h.type='button'; h.textContent='✎'; h.title='Pagina hernoemen';
+    h.setAttribute('data-hoofdactie','');
     h.addEventListener('click',()=>{ const n=(prompt('Nieuwe naam',DESIGN.paginas[PAG].naam)||'').trim(); if(!n)return; DESIGN.paginas[PAG].naam=n.slice(0,40); DESIGN.paginas[PAG].slug=''; paginaBar(); });
     el.appendChild(h);
     const w=document.createElement('button'); w.type='button'; w.textContent='×'; w.title='Pagina verwijderen';
+    w.setAttribute('data-contextactie','');
     w.addEventListener('click',()=>{ if(!confirm('Pagina "'+DESIGN.paginas[PAG].naam+'" en alle blokken erop verwijderen?'))return; DESIGN.paginas.splice(PAG,1); PAG=-1; DESIGN.blokken=HOMEBLOK; paginaBar(); render(); });
     el.appendChild(w);
   }
@@ -420,7 +424,7 @@ function renderBlok(blok,p){
       s.appendChild(d);
     });
     if(BEWERK){
-      const plus=document.createElement('button'); plus.type='button'; plus.textContent='+ rij';
+      const plus=document.createElement('button'); plus.type='button'; plus.textContent='+ rij'; plus.setAttribute('data-hoofdactie','');
       plus.style.cssText='margin-top:.6rem;background:transparent;border:1px dashed currentColor;color:inherit;border-radius:0;padding:.3rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;';
       plus.addEventListener('click',()=>{ rijen.push(t==='faq'?{v:'Nieuwe vraag',a:'Het antwoord.'}:{naam:'Nieuwe regel',prijs:'€ 0',wat:''}); render(); });
       s.appendChild(plus);
@@ -489,7 +493,7 @@ function bouwBeeldgrid(){
 async function laadMijnFotos(){ try{ const r=await api('/api/site/fotos',{}); MIJNFOTOS=(r.fotos||[]); }catch(e){} }
 async function laadSalon(){ try{ const r=await fetch('/api/salon/promo',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:'{}'}); const d=await r.json().catch(()=>({})); if(r.ok)SALONFOTOS=(d.fotos||[]); }catch(e){} }
 function leesBestand(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>rej(new Error('lezen mislukt')); fr.readAsDataURL(file); }); }
-function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.setAttribute('data-contextactie','');b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{const nb=nieuwBlok(bt.t);DESIGN.blokken.push(nb);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>DESIGN.volgorde[k].push(nb.id));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
+function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.setAttribute('data-contextactie','');b.setAttribute('data-stand','blok-'+bt.t);b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{const nb=nieuwBlok(bt.t);DESIGN.blokken.push(nb);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>DESIGN.volgorde[k].push(nb.id));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
 function bouwSwatches(){const g=$('#swatches');g.textContent='';ACCENTEN.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='swatch'+(c===DESIGN.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{DESIGN.accent=c;bouwSwatches();render();});g.appendChild(b);});}
 function zetBewerk(aan){BEWERK=aan;$('#bewerkKnop').textContent=aan?'Voorbeeld':'Bewerken';$('#bewerkKnop').classList.toggle('aan',!aan);render();}
 
@@ -544,7 +548,7 @@ async function openen(){
   $('#versievak').hidden=true;   // het sheet doet twee dingen; toon alleen wat je vroeg
   try{ const d=await api('/api/site/mijn'); MIJNSITES=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div class="s-1eltjr2">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
-    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.setAttribute('data-contextactie','');ob.addEventListener('click',async()=>{try{const dd=await api('/api/site/haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
+    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.setAttribute('data-contextactie','');ob.setAttribute('data-stand','site-'+it.id);ob.addEventListener('click',async()=>{try{const dd=await api('/api/site/haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
     laadSjablonen();
   }catch(e){ meld(e.message); }

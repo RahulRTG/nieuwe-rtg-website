@@ -23,6 +23,7 @@ const APPWERKT = lees('scripts/appwerkt.js');
 const MAGNAAT = lees('public/apps/magnaat.html');
 const PERSONAL_IMAGES = lees('public/shared/interface/personal-images.js');
 const PERSONAL_IMAGE_EDITOR = lees('public/shared/interface/personal-image-editor.js');
+const DESKTOP_FRAME = lees('public/shared/interface/world-desktop-frame.js');
 
 test('Adaptive Edge heeft vier toestanden en zeven swipebare decks', () => {
   assert.deepEqual(kern.STATES, ['peek', 'dock', 'deck', 'expanded']);
@@ -89,6 +90,12 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'een primaire schermactie wordt aangeraakt voordat een Edge-actie haar toestand kan vervangen');
   assert.match(APPWERKT, /gehad\.size >= gevonden/,
     'Edge-dialoogopeners worden pas herhaald nadat bekende paginaacties zijn afgewerkt');
+  assert.match(APPWERKT, /RTGDesktopFrame\.isOpen[\s\S]{0,260}!desktopOpen/,
+    'een open DesktopFrame blijft de publieke heropenroute naar zijn Edge-acties');
+  assert.match(DESKTOP_FRAME, /rtgAdaptiveSource = 'desktop-item:' \+ item\.id[\s\S]{0,80}rtgAdaptiveRoute = 'true'/,
+    'DesktopFrame-secties dragen een stabiele bron en herhaalbare standroute');
+  assert.match(APPWERKT, /\[data-rtg-adaptive-route\]/,
+    'APPWERKT kan een DesktopFrame-sectie opnieuw openen voor een resterende actie');
   assert.match(APPWERKT, /if \(!k\.edgeApp\)[\s\S]{0,400}RTGAdaptiveEdge\.setState\('dock'\)/,
     'een gewone paginaactie sluit eerst een nog uitgeklapt appdeck');
   assert.match(APPWERKT, /behoudHuidigeStand = !vervolg\.klaar/,

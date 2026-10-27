@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'ab777f3d';
+var RTG_BOUW = 'cbd260ac';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4912,6 +4912,7 @@ var RTG_BOUW = 'ab777f3d';
       try { onthouden = localStorage.getItem('rtf_app_groep'); } catch (e) {}
       for (const gr of RTF_GROEPEN) {
         const b = document.createElement('button');
+        b.setAttribute('aria-label', gr.naam + ' · ' + gr.sub);
         const zi = document.createElement('span'); zi.className = 'zi';
         const gg = window.RTGGlyf && RTGGlyf.svg('rtf-' + gr.g);
         if (gg) zi.appendChild(gg); else zi.textContent = (gr.naam.match(/[A-Z]/g) || ['R']).slice(0, 2).join('');

@@ -177,7 +177,7 @@ const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[t
    appmeter die eerst aantikt, blijft de sprong over de app liggen en lijken
    alle volgende appknoppen onbereikbaar. Deze oppervlakken hebben eigen
    browsercontracten; APPWERKT telt en bedient uitsluitend het actieve scherm. */
-const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], #osMenuBtn, .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page';
+const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], #osMenuBtn, .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page, .wd-people, .wd-favorites, .wd-library, .wd-greeting, .wd-announcement';
 
 /* Risicovolle namen worden als laatste bediend op de lokale wegwerpserver en
    afzonderlijk verantwoord. Een browserbevestiging wordt afgebroken en een
@@ -657,6 +657,28 @@ async function wachtOpAppGereed(page) {
     null, { timeout: 15000 }).catch(() => {});
 }
 
+async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
+  if (!ontbrekendeMerken.length) return false;
+  return page.waitForFunction(({ bediening, ontbrekend }) => {
+    const merk = (el) => {
+      const label = (el.getAttribute('aria-label') || '').trim();
+      const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
+      return [el.tagName, el.id || el.getAttribute('data-rtg-adaptive-source') || '', naam.slice(0, 60)].join('|');
+    };
+    const zichtbaar = (el) => {
+      if (!el || el.hidden || el.disabled || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      if (el.closest('details:not([open])') && !el.closest('summary')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 1 && r.height > 1;
+    };
+    return [...document.querySelectorAll(bediening)]
+      .some((el) => zichtbaar(el) && ontbrekend.includes(merk(el)));
+  }, { bediening: BEDIENINGSSELECTOR, ontbrekend: ontbrekendeMerken }, { timeout: 3000 })
+    .then(() => true).catch(() => false);
+}
+
 async function openIngang(page, base, ingang) {
   const meet = ingangOpties(ingang);
   await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -715,7 +737,8 @@ function klikReden(log) {
    vanaf de gedeclareerde ingang. Een knop die daar verborgen blijft, faalt
    nog steeds; dit maakt een werkelijk onzichtbare bediening dus niet groen. */
 function redenVoorSchoneTegenproef(waarom) {
-  return /intercepts pointer events|element is outside of the viewport|element is not visible/i.test(String(waarom || ''));
+  return /intercepts pointer events|element is outside of the viewport|element is not visible|pagina antwoordde niet binnen de limiet/i
+    .test(String(waarom || ''));
 }
 
 /* De productnorm voor bewijs 2 staat op één plek. Een percentage, een
@@ -872,19 +895,22 @@ async function bedien(ctx, base, ingang) {
       if (naar && naar !== 'nl' && laatste && !taalWissel.some((w) => w.knop === laatste && w.naar === naar)) taalWissel.push({ knop: laatste, naar });
     });
     const gehad = new Set();
+    const kijk = (magHerhalen = false, alleenStructuur = false) =>
+      kijkRonde(page, gehad, bereik, herhaald, magHerhalen, alleenStructuur, gevondenMerken);
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
-      /* Adaptive Edge vervangt vaste appbalken door werkende klonen in zijn
-         Acties-blad. De bronknoppen zijn daarna bewust onzichtbaar. Open het
-         blad zolang daar nog niet aangeraakte appbediening staat, zodat de
-         proef de knop raakt zoals de gebruiker hem nu werkelijk bedient. De
-         universele Home/Rahul/Menu-knoppen blijven buiten deze appmeting. */
-      /* Een reeds gebruikte Edge-dialoogopener pas opnieuw openen wanneer alle
-         tot nu toe bekende bediening is afgewerkt. Anders bleef het deck boven
-         gewone paginaacties staan terwijl de meter nog bekende knoppen moest
-         bedienen. De heropening kan daarna nog steeds onbekende dialooginhoud
-         ontdekken zonder de 100%-grens te verlagen. */
+      /* Werk eerst het zichtbare scherm af. Adaptive Edge vervangt vaste
+         appbalken door werkende klonen in zijn Acties-blad, maar gewone
+         paginabediening hoort niet achter dat blad te verdwijnen voordat zij
+         is gebruikt. Open Edge daarom pas wanneer de huidige appstand geen
+         nieuwe eigen bediening meer heeft. De universele
+         Home/Rahul/Menu-knoppen blijven buiten deze appmeting. */
+      let vooraf = null;
       if (!behoudHuidigeStand && !heropenGeslotenDialoog) {
-        await openAppBedieningInEdge(page, gehad, gehad.size >= gevonden);
+        vooraf = await kijk().catch(() => null);
+        if (!vooraf || vooraf.klaar) {
+          await openAppBedieningInEdge(page, gehad, gehad.size >= gevonden);
+          vooraf = null;
+        }
       }
       behoudHuidigeStand = false;
       let k;
@@ -901,12 +927,12 @@ async function bedien(ctx, base, ingang) {
           k = actieveDialoogOpener
             ? await markeerBekendeDialoogopener(page, actieveDialoogOpener, gehad.size)
             : null;
-          if (!k) k = await kijkRonde(page, gehad, bereik, herhaald, true, true);
+          if (!k) k = await kijk(true, true);
           /* Als de opener niet meer bestaat, ga eerlijk verder met de
              zichtbare stand. De ontbrekende bediening blijft dan in de
              restlijst staan. */
-          if (k.klaar) k = await kijkRonde(page, gehad, bereik, herhaald);
-        } else k = await kijkRonde(page, gehad, bereik, herhaald);
+          if (k.klaar) k = await kijk();
+        } else k = vooraf || await kijk();
       }
       catch (e) {
         /* Een tik kan navigeren, en dan is de context van de pagina weg op het
@@ -917,7 +943,7 @@ async function bedien(ctx, base, ingang) {
            beschuldiging uitschrijft is erger dan geen instrument. */
         if (!/Execution context was destroyed|Target closed|Navigation|frame was detached/i.test(String(e.message || e))) throw e;
         instrument.push('de proef verloor de pagina door een navigatie en opende hem opnieuw');
-        try { await openIngang(page, base, meet); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad, bereik, herhaald); }
+        try { await openIngang(page, base, meet); await page.waitForTimeout(1200); k = await kijk(); }
         catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
       }
       telStand(k);
@@ -942,7 +968,7 @@ async function bedien(ctx, base, ingang) {
                uitsluitend gezet door een expliciet herhaalde standopener en
                valt terug naar de schone ingang zodra het geen vervolg heeft. */
             if (herstelketenActief) {
-              k = await kijkRonde(page, gehad, bereik, herhaald, true);
+              k = await kijk(true);
               telStand(k);
               if (k.klaar) herstelketenActief = false;
             }
@@ -951,7 +977,7 @@ async function bedien(ctx, base, ingang) {
                voordat de herhaalroute naar bekende, nog onaangeraakte
                dialoogbediening kan beginnen. */
             if (k.klaar) {
-              k = await kijkRonde(page, gehad, bereik, herhaald, true, true);
+              k = await kijk(true, true);
               telStand(k);
             }
             /* Eerst terug naar de schone ingang. Een dynamisch scherm kan na
@@ -968,16 +994,23 @@ async function bedien(ctx, base, ingang) {
             if (k.klaar && heropeningen < MAXKLIK) {
               heropeningen++;
               await openIngang(page, base, meet);
-              await page.waitForTimeout(1200);
+              const ontbrekend = [...gevondenMerken].filter((merk) => !gehad.has(merk));
+              /* Sommige apps tekenen hun gewone paginabediening pas na het
+                 antwoord op hun eerste gegevensvraag. Geef een reeds geziene,
+                 nog onaangeraakte knop daarom voorrang boven het opnieuw
+                 openen van Adaptive Edge. Komt geen bekende bediening terug,
+                 dan is de expliciete Edge-route de juiste herstelweg. */
+              const paginaTerug = await wachtOpBekendeBediening(page, ontbrekend);
+              if (!paginaTerug) await openAppBedieningInEdge(page, gehad, true);
               herstelketenActief = false;
               instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
             }
             if (k.klaar) {
-              k = await kijkRonde(page, gehad, bereik, herhaald);
+              k = await kijk();
               telStand(k);
             }
             if (k.klaar) {
-              k = await kijkRonde(page, gehad, bereik, herhaald, true);
+              k = await kijk(true);
               telStand(k);
             }
             if (k.klaar) break;
@@ -995,7 +1028,7 @@ async function bedien(ctx, base, ingang) {
              contextacties doen hier niet mee; die opnieuw uitvoeren zou
              zakelijke handelingen herhalen zonder een nieuwe schermroute te
              bewijzen. */
-          k = await kijkRonde(page, gehad, bereik, herhaald, true, true);
+          k = await kijk(true, true);
           telStand(k);
           if (k.klaar) break;
         }
@@ -1071,7 +1104,9 @@ async function bedien(ctx, base, ingang) {
         }
         actieveRisicoklik = null;
         await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
-        if (k.modaal && gehad.size < gevonden) {
+        const resterendUitDezeModal = k.modaal && Array.isArray(k.merken) &&
+          k.merken.some((merk) => gevondenMerken.has(merk) && !gehad.has(merk));
+        if (resterendUitDezeModal) {
           /* Een bevestigende actie kan zichzelf uitschakelen terwijl de
              opslag loopt en de dialoog pas daarna sluiten. Wacht op die
              waarneembare uitkomst; een vaste klikpauze keek bij de
@@ -1118,7 +1153,7 @@ async function bedien(ctx, base, ingang) {
            schone-tegenproef blijft een achtergebleven, niet-sluitende laag
            begrenzen; de bewijsdrempel wordt niet verlaagd. */
         let vervolg = null;
-        try { vervolg = await kijkRonde(page, gehad, bereik, herhaald); } catch (e) { vervolg = null; }
+        try { vervolg = await kijk(); } catch (e) { vervolg = null; }
         if (vervolg) {
           telStand(vervolg);
           behoudHuidigeStand = !vervolg.klaar;
@@ -1246,7 +1281,16 @@ async function openAppBedieningInEdge(page, gehad, herstel) {
         .some((el) => !el.disabled && !alGehad.includes(merk(el)));
       const herhaalbaar = herstel && [...document.querySelectorAll('[data-rtg-adaptive-control="app"]')]
         .some((el) => !el.disabled && alGehad.includes(merk(el)) && el.getAttribute('aria-haspopup') === 'dialog');
-      if ((!over && !bron && !herhaalbaar) || !window.RTGAdaptiveEdge.openView) {
+      /* Een app in de bestaande DesktopFrame heeft haar bronknoppen in het
+         same-origin iframe. Na iedere contextactie klapt het Edge-deck dicht;
+         een zoekopdracht in het hostdocument ziet die bron dan terecht niet.
+         De publieke FrameHost-status is in die situatie de heropenroute. Zonder
+         deze route ontdekte de meter bijvoorbeeld alle Pay-secties, maar kon
+         hij na de eerste sectiekeuze de overige echte Edge-knoppen niet meer
+         bereiken. */
+      const desktopOpen = !!(window.RTGDesktopFrame && window.RTGDesktopFrame.isOpen &&
+        window.RTGDesktopFrame.isOpen());
+      if ((!over && !bron && !herhaalbaar && !desktopOpen) || !window.RTGAdaptiveEdge.openView) {
         if (document.body.dataset.rtgAdaptiveState === 'expanded' && window.RTGAdaptiveEdge.setState) {
           window.RTGAdaptiveEdge.setState('dock');
           return true;
@@ -1414,8 +1458,8 @@ async function bedektDoorSchil(page, bereik) {
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false) {
-  return page.evaluate(({ alGehad, alHerhaald, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol }) => {
+async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false, bekend = new Set()) {
+  return page.evaluate(({ alGehad, alHerhaald, alBekend, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (typeof el.checkVisibility === 'function' &&
@@ -1498,7 +1542,9 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        achter hun tweede scherm ten onrechte onaangeraakt. */
     const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[data-open],[data-i],[aria-controls],'
       + '[data-rtd-open],[data-rtd-diep],[data-rtm-open],[data-rtm-diep],[data-rtm-compose],'
-      + '[data-mv-nav],[data-mv-diep],[data-saloon-edge],[data-rtg-adaptive-control="app"]');
+      + '[data-mv-nav],[data-mv-diep],[data-saloon-edge],[data-rtg-adaptive-route],'
+      + '#paginabar button,#blokkies button,'
+      + '[data-rtg-adaptive-control="app"]');
     const dialoogOpener = (el) => el.matches('[aria-haspopup="dialog"]');
     /* Een primaire lege-toestandactie kan door een latere mutatie verdwijnen.
        Raak haar daarom aan zodra zij zichtbaar is. Dit is dezelfde semantische
@@ -1522,7 +1568,13 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
     const isBestandskiezer = (el) => /upload|bestand kiezen/i.test(
       (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim());
     const nieuwe = eigen.filter((el) => !alGehad.includes(merk(el)))
-      .sort((a, b) => Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
+      .sort((a, b) => Number(!alBekend.includes(merk(a))) - Number(!alBekend.includes(merk(b))) ||
+        /* Een bediening die al in een eerdere geldige stand is gezien, maar
+           nog niet is aangeraakt, gaat vóór een nieuwe verkenningsroute. Zo
+           wordt een kortlevende vervolgactie afgewerkt zodra haar stand
+           terugkomt, in plaats van opnieuw te verdwijnen achter een andere
+           tab of opener. */
+        Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
         /* Een primaire schermactie kan na een Edge- of taakactie verdwijnen.
            Raak haar daarom vóór de overige appklonen aan. De kliklus klapt een
            eventueel open Edge-deck eerst via zijn publieke toestand dicht, dus
@@ -1583,7 +1635,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       edgeApp: edgeApp(doel), modaal: !!modaal, bestandskiezer: isBestandskiezer(doel),
       dialoogOpener: dialoogOpener(doel),
       tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
-  }, { alGehad: [...gehad], alHerhaald: [...herhaald], magHerhalen, alleenStructuur, SCHIL: GEDEELDE_SCHIL, bereik,
+  }, { alGehad: [...gehad], alHerhaald: [...herhaald], alBekend: [...bekend], magHerhalen, alleenStructuur, SCHIL: GEDEELDE_SCHIL, bereik,
     bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });
 }
 

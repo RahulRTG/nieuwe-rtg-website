@@ -61,7 +61,8 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
 
 test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenproef', () => {
   const { redenVoorSchoneTegenproef } = require('../scripts/appwerkt');
-  for (const reden of ['intercepts pointer events', 'element is outside of the viewport', 'element is not visible']) {
+  for (const reden of ['intercepts pointer events', 'element is outside of the viewport', 'element is not visible',
+    'pagina antwoordde niet binnen de limiet']) {
     assert.equal(redenVoorSchoneTegenproef(reden), true, reden);
   }
   assert.equal(redenVoorSchoneTegenproef('element is not enabled'), false,

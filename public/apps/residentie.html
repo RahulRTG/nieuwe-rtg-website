@@ -37,9 +37,9 @@
     <button class="ds-chip" id="knopPaar" type="button" hidden>Wandel samen</button>
     <button class="ds-chip" id="knopSpel" type="button" hidden data-ds-actie="Samen spelen">Samen spelen</button>
     <button class="ds-chip" id="knopVraag" type="button" hidden>Vraag</button>
-    <button class="ds-chip" id="knopGids" type="button" data-ds-actie="De gids">Gids</button>
-    <button class="ds-chip" id="knopSuite" type="button" data-ds-actie="Mijn suite">Mijn suite</button>
-    <button class="ds-chip" id="knopAtelier" type="button" hidden data-ds-actie="Suite inrichten">Inrichten</button>
+    <button class="ds-chip" id="knopGids" type="button" data-ds-actie="De gids" data-stand="residentie-gids" aria-haspopup="dialog">Gids</button>
+    <button class="ds-chip" id="knopSuite" type="button" data-ds-actie="Mijn suite" data-stand="residentie-suite">Mijn suite</button>
+    <button class="ds-chip" id="knopAtelier" type="button" hidden data-ds-actie="Suite inrichten" data-stand="residentie-atelier" aria-haspopup="dialog">Inrichten</button>
   </div>
   <div class="ds-canvaslaag__vlak" id="vraagKaart" role="status" hidden></div>
 </div>
@@ -71,7 +71,7 @@
   <div class="ds-velden" id="gidsZalen"></div>
   <p class="ds-label">open suites van leden</p>
   <div class="ds-velden" id="gidsSuites"></div>
-  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="gidsDicht" type="button">Sluiten</button></div>
+  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="gidsDicht" type="button" data-contextactie>Sluiten</button></div>
 </div>
 </dialog>
 
@@ -89,7 +89,7 @@
   </div>
   <p class="ds-meta" id="atelierUitleg">Kies een meubel en tik daarna op een tegel; in de weghaal-modus tikt u op een meubel om het terug te geven.</p>
   <div class="ds-veldgroep" id="catalogus"></div>
-  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="atelierDicht" type="button">Klaar met inrichten</button></div>
+  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="atelierDicht" type="button" data-contextactie>Klaar met inrichten</button></div>
 </div>
 </dialog>
 

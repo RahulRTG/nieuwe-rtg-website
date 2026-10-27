@@ -24,7 +24,7 @@
         'huishouden dat u zonder nadenken typt en dat niemand vreemd vindt.</p>' +
         '<p class="stil h-mt40">Hoofdletters, accenten en leestekens maken niet uit. ' +
         'Uw zin mag midden in een gewoon bericht staan.</p>' +
-        '<button class="knop hoofd groot h-mt80" id="zet">Instellen</button>';
+        '<button class="knop hoofd groot h-mt80" id="zet" data-hoofdactie data-contextactie>Instellen</button>';
       $('#zet').addEventListener('click', async function () {
         var zin = $('#zin').value.trim();
         try {
@@ -80,7 +80,7 @@
         'Oefen als u alleen bent, niet als het erop aankomt.</p>' +
         '<div class="rij h-mt60">' +
           '<input id="oefen" maxlength="200" placeholder="Typ uw zin, of een zin met uw zin erin" aria-label="Oefenzin">' +
-          '<button class="knop" id="oefenKnop">Proberen</button>' +
+          '<button class="knop" id="oefenKnop" data-contextactie>Proberen</button>' +
         '</div>' +
         '<p class="stil h-mt50" id="oefenUit"></p>' +
       '</div>' +

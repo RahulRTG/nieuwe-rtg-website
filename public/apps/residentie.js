@@ -1961,10 +1961,10 @@
     try {
       const d = await api('/api/residentie/gids', {});
       $('#gidsZalen').innerHTML = d.zalen.map(z =>
-        '<button class="ds-veld" data-kamer="' + esc(z.id) + '">' + DEURICOON + '<span><span class="ds-veld__label">' + esc(z.naam) + '</span><span class="ds-veld__waarde">' + esc(z.sub) + '</span></span>' +
+        '<button class="ds-veld" data-kamer="' + esc(z.id) + '" data-contextactie>' + DEURICOON + '<span><span class="ds-veld__label">' + esc(z.naam) + '</span><span class="ds-veld__waarde">' + esc(z.sub) + '</span></span>' +
         '<span class="ds-meta">' + z.aanwezig + ' aanwezig</span></button>').join('');
       $('#gidsSuites').innerHTML = d.suites.length ? d.suites.map(s2 =>
-        '<button class="ds-veld" data-kamer="' + esc(s2.adres) + '">' + DEURICOON + '<span><span class="ds-veld__label">' + esc(s2.naam) + '</span><span class="ds-veld__waarde">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
+        '<button class="ds-veld" data-kamer="' + esc(s2.adres) + '" data-contextactie>' + DEURICOON + '<span><span class="ds-veld__label">' + esc(s2.naam) + '</span><span class="ds-veld__waarde">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
         '<span class="ds-meta">' + s2.aanwezig + ' aanwezig</span></button>').join('')
         : '<p class="ds-meta">Nog geen open suites; richt de uwe in en zet hem open.</p>';
       laagOpen('#gidsLaag');
@@ -2006,7 +2006,7 @@
     $('#suiteNaam').value = S.suite ? S.suite.naam : '';
     $('#suiteOpen').textContent = S.suite && S.suite.open ? 'Open voor bezoek: ja' : 'Open voor bezoek: nee';
     $('#catalogus').innerHTML = S.catalogus.map(c =>
-      '<button class="ds-keuze" type="button" aria-pressed="' + !!(S.editor && S.editor.soort === c.soort) + '" data-soort="' + esc(c.soort) + '">' + esc(c.naam) +
+      '<button class="ds-keuze" type="button" aria-pressed="' + !!(S.editor && S.editor.soort === c.soort) + '" data-soort="' + esc(c.soort) + '" data-contextactie>' + esc(c.naam) +
       '\n<span class="ds-meta">' + c.b + 'x' + c.d + (c.zit ? ' · zitplek' : '') + '</span></button>').join('');
     $('#catalogus').querySelectorAll('[data-soort]').forEach(b => b.addEventListener('click', () => {
       S.editor = { soort: b.dataset.soort };

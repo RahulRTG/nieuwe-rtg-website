@@ -399,7 +399,7 @@ function toonMand(m){
        samentrekken zou hier een belofte maken die de kern juist weigert. */
     ((a.bevestigBij||[]).length
       ? '<div class="deur">Bevestigen doe je bij de verkoper zelf. Je keuze gaat mee: ' +
-        a.bevestigBij.map(p => '<button type="button" class="ga" data-ga="'+esc(a.aanbiederCode||'__rtg')+'" data-pagina="'+esc(p)+'"'+
+        a.bevestigBij.map(p => '<button type="button" class="ga" data-contextactie data-ga="'+esc(a.aanbiederCode||'__rtg')+'" data-pagina="'+esc(p)+'"'+
           (a.bevestigbaar ? '' : ' disabled')+'>Naar '+
           esc((p.replace('/apps/','').replace('.html','')||'').replace(/^./, c => c.toUpperCase()))+'</button>').join(' ') + '</div>'
       : '<div class="deur">Voor deze verkoper is geen plek bekend waar dit wordt bevestigd. RTG stuurt je niet naar een deur die hij niet kent.</div>')+

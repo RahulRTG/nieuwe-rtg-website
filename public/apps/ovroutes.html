@@ -43,7 +43,7 @@
         plekken in uw stad, zodat u zich makkelijk oriënteert. Leden zien de lijn meteen in de OV-app.</p>
     </div>
     <ul class="ds-lijst" id="lijnLijst"></ul>
-    <button class="ds-knop ds-knop--stil ds-taak__actie" id="nieuwBtn" type="button" data-ds-actie="Nieuwe lijn">+ Nieuwe lijn</button>
+    <button class="ds-knop ds-knop--stil ds-taak__actie" id="nieuwBtn" type="button" data-ds-actie="Nieuwe lijn" data-stand="ov-nieuwe-lijn">+ Nieuwe lijn</button>
 
     <section id="editor" class="ds-velden" hidden aria-labelledby="editorKop">
       <h2 class="ds-titel ds-titel--scherm" id="editorKop">Nieuwe lijn</h2>
@@ -58,10 +58,10 @@
       <label class="ds-veld"><span></span><span><span class="ds-veld__label">Om de … minuten</span><input class="ds-veld__invoer" id="fFreq" type="number" min="1" max="240" value="15"></span><span></span></label>
       <label class="ds-veld"><span></span><span><span class="ds-veld__label">Basistarief (€)</span><input class="ds-veld__invoer" id="fBasis" type="number" min="0" max="100" step="0.05" value="1.80"></span><span></span></label>
       <label class="ds-veld"><span></span><span><span class="ds-veld__label">Per km (€)</span><input class="ds-veld__invoer" id="fKm" type="number" min="0" max="20" step="0.05" value="0.20"></span><span></span></label>
-      <button class="ds-knop ds-knop--primair ds-knop--breed" id="bewaarBtn" type="button" data-ds-actie="Bewaar de lijn">Bewaar de lijn</button>
+      <button class="ds-knop ds-knop--primair ds-knop--breed" id="bewaarBtn" type="button" data-ds-actie="Bewaar de lijn" data-contextactie>Bewaar de lijn</button>
       <div class="ds-veldgroep">
-        <button class="ds-knop ds-knop--stil ds-knop--klein" id="leegBtn" type="button" data-ds-actie="Haltes wissen">Haltes wissen</button>
-        <button class="ds-knop ds-knop--stil ds-knop--klein" id="wegBtn" type="button" data-ds-actie="Lijn verwijderen" hidden>Lijn verwijderen</button>
+        <button class="ds-knop ds-knop--stil ds-knop--klein" id="leegBtn" type="button" data-ds-actie="Haltes wissen" data-contextactie>Haltes wissen</button>
+        <button class="ds-knop ds-knop--stil ds-knop--klein" id="wegBtn" type="button" data-ds-actie="Lijn verwijderen" data-contextactie hidden>Lijn verwijderen</button>
       </div>
     </section>
   </section>

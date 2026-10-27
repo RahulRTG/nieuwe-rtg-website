@@ -177,7 +177,7 @@ const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[t
    appmeter die eerst aantikt, blijft de sprong over de app liggen en lijken
    alle volgende appknoppen onbereikbaar. Deze oppervlakken hebben eigen
    browsercontracten; APPWERKT telt en bedient uitsluitend het actieve scherm. */
-const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page';
+const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], #osMenuBtn, .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page';
 
 /* Risicovolle namen worden als laatste bediend op de lokale wegwerpserver en
    afzonderlijk verantwoord. Een browserbevestiging wordt afgebroken en een

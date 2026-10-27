@@ -192,7 +192,7 @@ async function start(){
 }
 function teken(){
   $('#main').innerHTML = '<div class="chips" id="chips"></div><div id="paneel"><div class="leeg">Laden…</div></div>';
-  $('#chips').innerHTML = TABS.map(([k,l])=>'<button class="chip'+(k===tab?' aan':'')+'" data-t="'+k+'">'+l+'</button>').join('');
+  $('#chips').innerHTML = TABS.map(([k,l])=>'<button class="chip'+(k===tab?' aan':'')+'" data-t="'+k+'" data-stand="lifestyle-'+k+'">'+l+'</button>').join('');
   $('#chips').querySelectorAll('.chip').forEach(b=> b.onclick=()=>{ tab=b.dataset.t; teken(); });
   ({nu:vNu, vooruit:vVooruit, zaken:vZaken, kantoor:vKantoor, woning:vWoning, kring:vKring, bezit:vBezit, reis:vReis, veilig:vVeilig, mandaat:vMandaat, graaf:vGraaf}[tab])();
 }

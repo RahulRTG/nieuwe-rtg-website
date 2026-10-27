@@ -21,6 +21,7 @@
     beheer.lijnen.forEach(function (l) {
       var li = maak('li');
       var b = maak('button', 'ds-keuze'); b.type = 'button';
+      b.setAttribute('data-stand', 'ov-lijn-' + l.id);
       b.appendChild(maak('span', 'ds-lijst__titel', (ICOON[l.soort] || '') + ' ' + l.naam));
       b.appendChild(maak('span', 'ds-meta', l.haltes.length + ' haltes · om de ' + l.frequentieMin + ' min · ' +
         R.eur(l.tarief.basis) + ' + ' + R.eur(l.tarief.perKm) + '/km'));

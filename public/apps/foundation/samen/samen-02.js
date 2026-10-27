@@ -24,11 +24,11 @@
      juist; de trigger is niet gevonden. */
   rCss += '.rsm-x{background:transparent;border:1px solid #444;border-radius:0;color:inherit;padding:.15rem .5rem;cursor:pointer;min-width:24px;min-height:24px;display:grid;place-items:center;}';
   var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
-  var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul">✶ Rahul</button>');
+  var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul" aria-haspopup="dialog" data-stand="rahul-venster">✶ Rahul</button>');
   var rSheet = maakEl('<section class="rsm-rsheet" aria-label="Vraag Rahul" hidden>' +
     '<div class="rsm-kop"><span>✶ Vraag het Rahul</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="rsm-ruit" aria-live="polite"></div>' +
-    '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen">→</button></form></section>');
+    '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen" data-contextactie>→</button></form></section>');
   (function dokR() {
     if (window.rtfDok && window.rtfDok(rFab)) return;
     var n = 0, tik = setInterval(function () {

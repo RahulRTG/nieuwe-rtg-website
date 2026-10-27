@@ -44,7 +44,7 @@
   };
   var zetKamer = function (id) { kamer = id; try { id ? localStorage.setItem(KAMERKEY, id) : localStorage.removeItem(KAMERKEY); } catch (e) {} };
 
-  var knop = maakEl('<button class="rsm-knop" type="button" aria-label="Samen">Samen</button>');
+  var knop = maakEl('<button class="rsm-knop" type="button" aria-label="Samen" aria-haspopup="dialog" data-stand="samen-venster">Samen</button>');
   var sheet = maakEl('<section class="rsm-sheet" role="dialog" aria-modal="false" aria-label="Samen" hidden><div class="rsm-kop"><span>Samen</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div><div class="rsm-vak"></div></section>');
   /* Wacht kort op de sessiebalk; val anders terug naar het begin van main. */
   window.rtfDok = window.rtfDok || function (el) {
@@ -79,7 +79,7 @@
   function teken() {
     if (!kamer) {
       vak.innerHTML = '<div class="rsm-uit">Samen kijken en doen met je gezin en je bevestigde vrienden. Start een kamer en deel de code, of doe mee met een code.</div>' +
-        '<button class="rsm-go" data-start type="button" style="width:100%;">Start een samen-kamer</button>' +
+        '<button class="rsm-go" data-start data-stand="samen-actief" type="button" style="width:100%;">Start een samen-kamer</button>' +
         '<form class="rsm-rij" data-mee><input placeholder="Code van gezin of vriend" maxlength="48" style="text-transform:uppercase;" aria-label="Samen-code"><button class="rsm-go" type="submit">Doe mee</button></form>';
       vak.querySelector('[data-start]').addEventListener('click', function () {
         api('maak', { idem: veiligeIdem('rtf-samen-maak') }).then(function (d) {
@@ -102,10 +102,10 @@
         : 'Samen-kamer actief. De deelcode wordt niet opnieuw getoond.';
       vak.innerHTML = '<div class="rsm-uit">' + toegang + '<br>Hier zijn: ' + k.leden.map(esc).join(', ') + '</div>' +
         '<div class="rsm-chat" data-chat>' + k.chat.map(function (c) { return '<div><b>' + esc(c.van) + ':</b> ' + esc(c.tekst) + '</div>'; }).join('') + '</div>' +
-        '<form class="rsm-rij" data-zeg><input placeholder="Zeg iets" maxlength="300" aria-label="Chatbericht"><button class="rsm-go" type="submit">→</button></form>' +
-        '<div class="rsm-rij"><button class="rsm-stil h-flex1" data-hier type="button">Kom hierheen</button>' +
-        (k.benGastheer ? '<button class="rsm-stil" data-code type="button">Nieuwe deelcode</button><button class="rsm-stil" data-sluit type="button">Sluit</button>' : '') +
-        '<button class="rsm-stil" data-weg type="button">Verlaat</button></div>';
+        '<form class="rsm-rij" data-zeg><input placeholder="Zeg iets" maxlength="300" aria-label="Chatbericht"><button class="rsm-go" type="submit" data-contextactie>→</button></form>' +
+        '<div class="rsm-rij"><button class="rsm-stil h-flex1" data-hier type="button" data-contextactie>Kom hierheen</button>' +
+        (k.benGastheer ? '<button class="rsm-stil" data-code type="button" data-contextactie>Nieuwe deelcode</button><button class="rsm-stil" data-sluit type="button" data-contextactie>Sluit</button>' : '') +
+        '<button class="rsm-stil" data-weg type="button" data-contextactie>Verlaat</button></div>';
       var chatEl = vak.querySelector('[data-chat]'); chatEl.scrollTop = chatEl.scrollHeight;
       vak.querySelector('[data-zeg]').addEventListener('submit', function (ev) {
         ev.preventDefault(); var i2 = ev.target.querySelector('input'); var t = i2.value.trim(); if (!t) return; i2.value = '';
@@ -192,11 +192,11 @@
      juist; de trigger is niet gevonden. */
   rCss += '.rsm-x{background:transparent;border:1px solid #444;border-radius:0;color:inherit;padding:.15rem .5rem;cursor:pointer;min-width:24px;min-height:24px;display:grid;place-items:center;}';
   var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
-  var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul">✶ Rahul</button>');
+  var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul" aria-haspopup="dialog" data-stand="rahul-venster">✶ Rahul</button>');
   var rSheet = maakEl('<section class="rsm-rsheet" aria-label="Vraag Rahul" hidden>' +
     '<div class="rsm-kop"><span>✶ Vraag het Rahul</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="rsm-ruit" aria-live="polite"></div>' +
-    '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen">→</button></form></section>');
+    '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen" data-contextactie>→</button></form></section>');
   (function dokR() {
     if (window.rtfDok && window.rtfDok(rFab)) return;
     var n = 0, tik = setInterval(function () {

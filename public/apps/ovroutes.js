@@ -75,12 +75,12 @@
       rij.appendChild(inp);
       var weg = maak('button', 'ds-knop ds-knop--stil ds-knop--klein', 'weg'); weg.type = 'button';
       weg.setAttribute('aria-label', 'Verwijder halte ' + (i + 1));
+      weg.setAttribute('data-contextactie', '');
       weg.addEventListener('click', function () { huidig.haltes.splice(i, 1); teken(); halteLijst(); });
       rij.appendChild(weg);
       wrap.appendChild(rij);
     });
   }
-
   /* ---- de editor openen, bewaren, verwijderen ---- */
   function eur(c) { return (c / 100).toFixed(2); }
   function openEditor(l) {
@@ -104,6 +104,7 @@
     beheer.lijnen.forEach(function (l) {
       var li = maak('li');
       var b = maak('button', 'ds-keuze'); b.type = 'button';
+      b.setAttribute('data-stand', 'ov-lijn-' + l.id);
       b.appendChild(maak('span', 'ds-lijst__titel', (ICOON[l.soort] || '') + ' ' + l.naam));
       b.appendChild(maak('span', 'ds-meta', l.haltes.length + ' haltes · om de ' + l.frequentieMin + ' min · ' +
         R.eur(l.tarief.basis) + ' + ' + R.eur(l.tarief.perKm) + '/km'));

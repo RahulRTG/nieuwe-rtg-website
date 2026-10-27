@@ -114,7 +114,7 @@
       </div>
       <div class="rij ruimte">
         <input class="kfveld" id="nieuwIdee" maxlength="180" placeholder="Wat zou je willen uitzoeken over het klimaat in je buurt?" aria-label="Je vraag of idee">
-        <button class="kfknop vol" id="stuur">Zet erbij</button>
+        <button class="kfknop vol" id="stuur" data-hoofdactie data-contextactie>Zet erbij</button>
       </div>
       <div class="uitleg ruimte">Je vraag komt in het Living Lab van je stad te staan, waar bewoners erop kunnen stemmen.
         Een vraag met draagvlak kan een onderzoek worden &mdash; en dan blijft zichtbaar waar hij vandaan kwam.</div>
@@ -236,7 +236,7 @@ async function start() {
     /* Zonder lijst geen "Er is nog geen lab open" -- dat zou beweren dat er niets is (LIEGRONDE.json). */
     if (!(r && Array.isArray(r.labs))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
     $('#labs').innerHTML = r.labs.length
-      ? r.labs.map(l => '<button type="button" class="stadknop" data-lab="' + esc(l.id) + '" aria-pressed="false">' +
+      ? r.labs.map(l => '<button type="button" class="stadknop" data-lab="' + esc(l.id) + '" data-stand="klimaat-lab-' + esc(l.id) + '" aria-pressed="false">' +
           '<b>' + esc(l.stad) + '</b><span>' + esc(l.naam) + '</span></button>').join('')
       : '<div class="leeg">Er is nog geen lab open. Zodra er in een stad een start, staat hij hier.</div>';
     $('#labs').querySelectorAll('[data-lab]').forEach(k =>

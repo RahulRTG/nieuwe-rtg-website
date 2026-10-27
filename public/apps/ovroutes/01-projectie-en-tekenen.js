@@ -75,9 +75,9 @@
       rij.appendChild(inp);
       var weg = maak('button', 'ds-knop ds-knop--stil ds-knop--klein', 'weg'); weg.type = 'button';
       weg.setAttribute('aria-label', 'Verwijder halte ' + (i + 1));
+      weg.setAttribute('data-contextactie', '');
       weg.addEventListener('click', function () { huidig.haltes.splice(i, 1); teken(); halteLijst(); });
       rij.appendChild(weg);
       wrap.appendChild(rij);
     });
   }
-

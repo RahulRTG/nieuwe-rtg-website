@@ -714,7 +714,7 @@
   function teken(chatOnder) {
     if (!kamerId) {
       vak.innerHTML = '<div class="mgz-uit">Kijk en doe samen: start een sessie en deel de code, of doe mee met de code van een vriend. Wie ergens heen gaat, kan de rest met een tik laten meegaan.</div>' +
-        '<button class="mgz-go" data-start type="button" style="width:100%;">Start een samen-sessie</button>' +
+        '<button class="mgz-go" data-start data-stand="samen-actief" type="button" style="width:100%;">Start een samen-sessie</button>' +
         '<form class="mgz-rij" data-mee><input placeholder="Code van een vriend" maxlength="48" style="text-transform:uppercase;" aria-label="Samen-code"><button class="mgz-go" type="submit">Doe mee</button></form>';
       vak.querySelector('[data-start]').addEventListener('click', function () {
         api('maak', { idem: veiligeIdem('samen-maak') })
@@ -738,10 +738,10 @@
         : 'Samen-kamer actief. De deelcode wordt niet opnieuw getoond.';
       vak.innerHTML = '<div class="mgz-uit">' + toegang + '<br>In de kamer: ' + k.leden.map(esc).join(', ') + '</div>' +
         '<div class="mgz-chat" data-chat>' + k.chat.map(function (c) { return '<div><b>' + esc(c.van) + ':</b> ' + esc(c.tekst) + '</div>'; }).join('') + '</div>' +
-        '<form class="mgz-rij" data-zeg><input placeholder="Zeg iets tegen de kamer" maxlength="300" aria-label="Chatbericht"><button class="mgz-go" type="submit">→</button></form>' +
-        '<div class="mgz-rij"><button class="mgz-stil" data-hier type="button" style="flex:1;">Kom hierheen</button>' +
-        (k.benGastheer ? '<button class="mgz-stil" data-code type="button">Nieuwe deelcode</button><button class="mgz-stil" data-sluit type="button">Sluit</button>' : '') +
-        '<button class="mgz-stil" data-weg type="button">Verlaat</button></div>';
+        '<form class="mgz-rij" data-zeg><input placeholder="Zeg iets tegen de kamer" maxlength="300" aria-label="Chatbericht"><button class="mgz-go" type="submit" data-contextactie>→</button></form>' +
+        '<div class="mgz-rij"><button class="mgz-stil" data-hier type="button" style="flex:1;" data-contextactie>Kom hierheen</button>' +
+        (k.benGastheer ? '<button class="mgz-stil" data-code type="button" data-contextactie>Nieuwe deelcode</button><button class="mgz-stil" data-sluit type="button" data-contextactie>Sluit</button>' : '') +
+        '<button class="mgz-stil" data-weg type="button" data-contextactie>Verlaat</button></div>';
       var chatEl = vak.querySelector('[data-chat]'); chatEl.scrollTop = chatEl.scrollHeight;
       vak.querySelector('[data-zeg]').addEventListener('submit', function (ev) {
         ev.preventDefault(); var inp2 = ev.target.querySelector('input'); var t = inp2.value.trim(); if (!t) return; inp2.value = '';

@@ -15,9 +15,11 @@
     var hoofd = q('#vnHoofd'), eerste = v.volgende[0];
     hoofd.hidden = !eerste;
     hoofd.textContent = eerste ? eerste.label : '';
+    if (eerste) hoofd.setAttribute('aria-label', eerste.label);
+    else hoofd.removeAttribute('aria-label');
     meldContext();
     q('#vnActies').innerHTML = v.volgende.slice(1).map(function (a, n) {
-      return '<button type="button" class="btn" data-vn-actie="' + (n + 1) + '">' + esc(a.label) + '</button>';
+      return '<button type="button" class="btn" data-vn-actie="' + (n + 1) + '" data-stand="magnaat-leven-keuze" data-contextactie aria-label="' + esc(a.label) + '">' + esc(a.label) + '</button>';
     }).join('');
     q('#vnWaarom').innerHTML = v.volgende.map(function (a) { return '<li><b>' + esc(a.label) + '</b> ' + esc(a.waarom) + '</li>'; }).join('');
     var a = KEUZE == null ? null : v.volgende[KEUZE];

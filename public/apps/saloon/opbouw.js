@@ -24,6 +24,7 @@
     var nav = document.querySelector('body > nav.balk');
     var knoppen = Object.keys(acties).map(function (id) {
       var b = document.createElement('button'); b.type = 'button'; b.id = 'saloonEdge' + id;
+      b.dataset.saloonEdge = id.toLowerCase();
       b.textContent = acties[id].naam; b.onclick = acties[id].doe; b.hidden = true; nav.appendChild(b);
       return { id: id, knop: b };
     });

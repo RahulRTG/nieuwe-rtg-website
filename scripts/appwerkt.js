@@ -862,6 +862,12 @@ async function bedien(ctx, base, ingang) {
     });
     const gehad = new Set();
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
+      /* Adaptive Edge vervangt vaste appbalken door werkende klonen in zijn
+         Acties-blad. De bronknoppen zijn daarna bewust onzichtbaar. Open het
+         blad zolang daar nog niet aangeraakte appbediening staat, zodat de
+         proef de knop raakt zoals de gebruiker hem nu werkelijk bedient. De
+         universele Home/Rahul/Menu-knoppen blijven buiten deze appmeting. */
+      await openAppBedieningInEdge(page, gehad, gehad.size < gevonden);
       let k;
       try { k = await kijkRonde(page, gehad, bereik, herhaald); }
       catch (e) {
@@ -902,6 +908,14 @@ async function bedien(ctx, base, ingang) {
               telStand(k);
               if (k.klaar) herstelketenActief = false;
             }
+            /* Staat het app-actiedek al open, probeer dan eerst zijn expliciete
+               route- of dialoogopener. Anders zou `openIngang` het dek sluiten
+               voordat de herhaalroute naar bekende, nog onaangeraakte
+               dialoogbediening kan beginnen. */
+            if (k.klaar) {
+              k = await kijkRonde(page, gehad, bereik, herhaald, true, true);
+              telStand(k);
+            }
             /* Eerst terug naar de schone ingang. Een dynamisch scherm kan na
                een keuze tientallen eerder gevonden knoppen verbergen. In de
                oude volgorde herhaalde de proef dan iedere bekende opener in de
@@ -934,7 +948,19 @@ async function bedien(ctx, base, ingang) {
             break;
           }
         }
-        else break;
+        else {
+          /* Alles wat NU bekend is, is aangetikt. Dat bewijst nog niet dat
+             alle appstanden zijn bezocht: RTMail tekent Nieuw bericht pas
+             achter Alle post, RTDocs zijn documentbediening pas achter Alle
+             docs. Herhaal daarom iedere expliciete stand- of dialoogopener
+             begrensd eenmaal om nog onbekende bediening te ontdekken. Gewone
+             contextacties doen hier niet mee; die opnieuw uitvoeren zou
+             zakelijke handelingen herhalen zonder een nieuwe schermroute te
+             bewijzen. */
+          k = await kijkRonde(page, gehad, bereik, herhaald, true, true);
+          telStand(k);
+          if (k.klaar) break;
+        }
       }
       if (k.herhaling) {
         herhaald.add(k.herhaalSleutel);
@@ -1106,6 +1132,48 @@ async function bedien(ctx, base, ingang) {
   return { geklikt, gevonden, aangeraakt, herhaaldAangeraakt, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
 }
 
+async function openAppBedieningInEdge(page, gehad, herstel) {
+  try {
+    const geopend = await page.evaluate(({ alGehad, herstel }) => {
+      const merk = (el) => {
+        const label = (el.getAttribute('aria-label') || '').trim();
+        const naam = label || (el.innerText || el.value || el.title || '').trim();
+        return [el.tagName, el.id || '', naam.slice(0, 60)].join('|');
+      };
+      const oppervlak = [...document.querySelectorAll('[data-rtg-adaptive-surface-owner="app"] button,'
+        + '[data-rtg-adaptive-surface-owner="app"] [role="button"],'
+        + '[data-rtg-adaptive-surface-owner="app"] input[type="button"],'
+        + '[data-rtg-adaptive-surface-owner="app"] input[type="submit"]')]
+        .some((el) => !el.disabled && !alGehad.includes(merk(el)));
+      if (!window.RTGAdaptiveEdge) return false;
+      /* Een geleend live-oppervlak staat in dock juist zichtbaar; expanded
+         verbergt het ten gunste van het actiedek. Werk dit oppervlak daarom
+         eerst af en open pas daarna de gekloonde appnavigatie. */
+      if (oppervlak && window.RTGAdaptiveEdge.setState) {
+        window.RTGAdaptiveEdge.setState('dock');
+        return true;
+      }
+      const over = [...document.querySelectorAll('[data-rtg-adaptive-control="app"]')]
+        .some((el) => !el.disabled && !alGehad.includes(merk(el)));
+      /* Een dynamische appgroep kan verschijnen terwijl de Edge dicht is. De
+         Edge rendert haar klonen pas bij openen; alleen naar bestaande klonen
+         kijken zou dus een kip-ei-situatie maken. Dit zijn exact de bestaande
+         bronwortels van Adaptive Edge, zonder universele Edge-bediening. */
+      const bron = [...document.querySelectorAll('.wd-output button,.connection-edge button,.wos-dock button,'
+        + '.wos-rail button,.rtgdeel-balk button,.rv-tabs button,body>nav.balk button,.wd-page>nav.balk button,'
+        + '.rtg-edge-owned-bar button,.rtm-nav button,.mv-navigatie button,.rtd-dossieracties button,'
+        + '.rtd-besluitacties button,.rtg-v4-route-actions button')]
+        .some((el) => !el.disabled && !alGehad.includes(merk(el)));
+      const herhaalbaar = herstel && [...document.querySelectorAll('[data-rtg-adaptive-control="app"]')]
+        .some((el) => !el.disabled && alGehad.includes(merk(el)) && el.getAttribute('aria-haspopup') === 'dialog');
+      if ((!over && !bron && !herhaalbaar) || !window.RTGAdaptiveEdge.openView) return false;
+      window.RTGAdaptiveEdge.openView('now');
+      return true;
+    }, { alGehad: [...gehad], herstel: !!herstel });
+    if (geopend) await page.waitForTimeout(80);
+  } catch (e) {}
+}
+
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
 
    Hier stond eerst: markeer in EEN keer veertien knoppen met `data-appwerkt` en
@@ -1230,8 +1298,8 @@ async function bedektDoorSchil(page, bereik) {
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false) {
-  return page.evaluate(({ alGehad, alHerhaald, magHerhalen, SCHIL, bereik, bediening, risicovol }) => {
+async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false) {
+  return page.evaluate(({ alGehad, alHerhaald, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (typeof el.checkVisibility === 'function' &&
@@ -1275,15 +1343,27 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        van bijvoorbeeld Assets geteld en vervolgens terecht door #shell
        onderschept. Command heeft eigen browsertoetsen; deze rij kwalificeert
        alleen de actieve app. */
-    const alle = kandidaten.filter((el) => !el.closest(SCHIL));
+    const alle = kandidaten.filter((el) => !el.closest(SCHIL) ||
+      el.matches('[data-rtg-adaptive-control="app"]') ||
+      el.closest('[data-rtg-adaptive-surface-owner="app"]'));
+    /* Als Edge een bronknop overneemt, bestaan bron en kloon kort tegelijk.
+       Ze zijn dezelfde handeling en tellen eenmaal; kies voor de echte tik de
+       zichtbare Edge-versie, anders pakt DOM-volgorde alsnog de bedekte bron. */
+    const perMerk = new Map();
+    alle.forEach((el) => {
+      const sleutel = merk(el), huidig = perMerk.get(sleutel);
+      if (!huidig || el.matches('[data-rtg-adaptive-control="app"]') ||
+          el.closest('[data-rtg-adaptive-surface-owner="app"]')) perMerk.set(sleutel, el);
+    });
+    const eigen = [...perMerk.values()];
     /* En een knop telt EEN keer: vier kaarten met "Bekijken" zijn een handeling,
        en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer
        stonden ze vier keer. */
-    const merken = [...new Set(alle.map(merk))];
-    const bedieningen = [...new Map(alle.map((el) => [merk(el), {
+    const merken = [...perMerk.keys()];
+    const bedieningen = eigen.map((el) => ({
       merk: merk(el),
       tekst: (el.innerText || el.value || el.getAttribute('aria-label') || el.title || '').trim().replace(/\s+/g, ' ').slice(0, 80)
-    }])).values()];
+    }));
     const zichtbaar = merken.length;
     const schil = kandidaten.length - alle.length;
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
@@ -1299,7 +1379,9 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        inbox -> berichtweergave. Bij een schone replay moeten deze routes vóór
        willekeurige taakacties terugkeren, anders blijven bedieningselementen
        achter hun tweede scherm ten onrechte onaangeraakt. */
-    const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[data-open],[data-i],[aria-controls]');
+    const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[data-open],[data-i],[aria-controls],'
+      + '[data-rtd-open],[data-rtd-diep],[data-rtm-open],[data-rtm-diep],[data-rtm-compose],'
+      + '[data-mv-nav],[data-mv-diep],[data-saloon-edge],[data-rtg-adaptive-control="app"]');
     const dialoogOpener = (el) => el.matches('[aria-haspopup="dialog"]');
     /* Een primaire lege-toestandactie kan door een latere mutatie verdwijnen.
        Raak haar daarom aan zodra zij zichtbaar is. Dit is dezelfde semantische
@@ -1313,17 +1395,24 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       if (/verlaat|leave|verwijder|delete|wis alles|sluit account/i.test(tekst)) return 2;
       return risico.test(tekst) ? 1 : 0;
     };
-    const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)))
+    const nieuwe = eigen.filter((el) => !alGehad.includes(merk(el)))
       .sort((a, b) => Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
-        Number(!contextactie(a)) - Number(!contextactie(b)) ||
+        /* Eerst de hoofdstanden bereikbaar maken. Een scherm als Magnaat kan
+           honderden dynamische taakacties tekenen; als contextacties altijd
+           voorgaan, komen de vier vaste hoofdnavigatieknoppen pas na de harde
+           herstelgrens aan bod. Dat meet veel bijzaken en mist juist de
+           routes waarmee een mens de app bedient. Iedere taakactie blijft in
+           de noemer en wordt daarna nog steeds werkelijk aangetikt. */
         Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+        Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
+        Number(!contextactie(a)) - Number(!contextactie(b)) ||
         risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)));
     let doel = nieuwe[0], herhaling = false, herhaalSleutel = null;
     if (!doel && magHerhalen) {
       const stand = merken.slice().sort().join('¦');
       const herhaalStand = new Set(alHerhaald);
-      doel = alle.filter((el) => alGehad.includes(merk(el)) &&
-          (standNavigatie(el) || dialoogOpener(el) || contextactie(el)) &&
+      doel = eigen.filter((el) => alGehad.includes(merk(el)) &&
+          (standNavigatie(el) || dialoogOpener(el) || (!alleenStructuur && contextactie(el))) &&
           !herhaalStand.has(alGehad.length + '§' + stand + '§' + merk(el)))
         /* Nieuwe dialooginhoud wordt hierboven altijd voor de sluitknop
            aangeraakt. Is in een modale stand niets nieuws meer over, dan doet
@@ -1341,9 +1430,9 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
           ? Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(!contextactie(a)) - Number(!contextactie(b)) ||
             Number(!sluiter(a)) - Number(!sluiter(b)) || risicoRang(a) - risicoRang(b)
-          : Number(!contextactie(a)) - Number(!contextactie(b)) ||
+          : Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
-            Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+            Number(!contextactie(a)) - Number(!contextactie(b)) ||
             risicoRang(a) - risicoRang(b) || Number(sluiter(a)) - Number(sluiter(b)))[0];
       herhaling = !!doel;
       if (doel) herhaalSleutel = alGehad.length + '§' + stand + '§' + merk(doel);
@@ -1352,7 +1441,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
     doel.setAttribute('data-appwerkt', '1');
     return { klaar: false, zichtbaar, merken, bedieningen, schil, merk: merk(doel), herhaling, herhaalSleutel,
       tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
-  }, { alGehad: [...gehad], alHerhaald: [...herhaald], magHerhalen, SCHIL: GEDEELDE_SCHIL, bereik,
+  }, { alGehad: [...gehad], alHerhaald: [...herhaald], magHerhalen, alleenStructuur, SCHIL: GEDEELDE_SCHIL, bereik,
     bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });
 }
 

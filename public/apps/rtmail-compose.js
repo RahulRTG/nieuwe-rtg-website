@@ -73,7 +73,7 @@
     }catch(err){tell('Verzending is niet bevestigd. Uw concept blijft open. '+err.message);}
     finally{sending=false;Array.from(fields.elements).forEach(function(n){n.disabled=false;});controls.querySelectorAll('button').forEach(function(n){n.disabled=false;});}
   });
-  [['Nieuw bericht',function(){open();}],['Concepten',list]].forEach(function(x){var b=d.createElement('button');b.type='button';b.textContent=x[0];b.onclick=x[1];home.querySelector('.rtm-nav').appendChild(b);});
+  [['Nieuw bericht',function(){open();}],['Concepten',list]].forEach(function(x){var b=d.createElement('button');b.type='button';b.dataset.rtmCompose=x[0].toLowerCase().replace(/\s+/g,'-');b.textContent=x[0];b.onclick=x[1];home.querySelector('.rtm-nav').appendChild(b);});
   w.addEventListener('rtg-adaptive-ready',mount);
   w.addEventListener('beforeunload',function(e){if(!form.hidden&&revision!==stored){e.preventDefault();e.returnValue='';}});
 }(window,document));

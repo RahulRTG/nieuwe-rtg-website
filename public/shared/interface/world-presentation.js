@@ -87,6 +87,7 @@
       var b = U.el('button', 'wp-edit-images'); b.append(U.icon('camera'), U.el('span', '', 'Beelden aanpassen')); b.type = 'button'; b.onclick = function () { w.RTGPersonalImageEditor.open(world + '/hoofd'); };
       // The header action remains available through the single mobile Edge.
       b.setAttribute('data-rtg-edge-controls', '');
+      b.setAttribute('aria-haspopup', 'dialog');
       b.setAttribute('aria-label', 'Beelden aanpassen'); top.appendChild(b);
     }
     toolbar(); var observer = new MutationObserver(toolbar); observer.observe(d.body, { childList: true, subtree: true });

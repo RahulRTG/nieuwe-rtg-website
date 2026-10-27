@@ -61,6 +61,17 @@ test('de hoofdactie wordt niet meer als snelkoppeling geregistreerd; de voortgan
   assert.doesNotMatch(VIEW, /K\.defaults\(/);
 });
 
+test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
+  const appRoots = CONTROLS.match(/var APP='([^']+)'/);
+  assert.ok(appRoots, 'de appbronnen moeten expliciet afgebakend zijn');
+  for (const selector of ['.rtm-nav', '.mv-navigatie', '.rtd-dossieracties', '.rtd-besluitacties']) {
+    assert.ok(appRoots[1].includes(selector), selector + ' ontbreekt als appbron');
+  }
+  assert.ok(!appRoots[1].includes('[data-rtg-edge-controls]'), 'universele Edge-bediening is geen appbediening');
+  assert.match(CONTROLS, /if \(src\.app\) b\.dataset\.rtgAdaptiveControl = 'app'/);
+  assert.match(CONTROLS, /'aria-haspopup'/, 'een gekloonde dialoogopener behoudt zijn semantiek');
+});
+
 test('de Edge toont geen generieke foutmelding naast contextuele bediening', () => {
   assert.doesNotMatch(VIEW, /Voor deze context zijn geen veilige acties beschikbaar/);
   assert.match(VIEW, /if \(rt\.renderControls\) rt\.renderControls\(\)/);
@@ -165,7 +176,7 @@ test('beeld, apps, objecten en communicatie zijn toestanden van dezelfde Edge', 
   assert.match(EDITORIAL, /\.rtg-edge-app-icon--photos/);
   assert.match(CINEMA, /rtg-edge-cinema__story/);
   assert.match(CINEMA, /travel-inspiration\.webp/);
-  assert.match(CONTROLS, /RTGAdaptiveEdgeCinema\.render\(container,rt\.model\)/);
+  assert.match(CONTROLS, /RTGAdaptiveEdgeCinema\.render\(c,rt\.model\)/);
   assert.match(CINEMA, /Open filmisch RTG-overzicht/);
   assert.doesNotMatch(CINEMA, /rtg-adaptive-bar/,
     'de filmische laag kaapt de universele Rahul-knop niet');

@@ -145,6 +145,7 @@
       knop = document.createElement('button');
       knop.type = 'button';
       knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast';
+      knop.setAttribute('aria-haspopup', 'dialog');
       knop.textContent = 'Meenemen';
       knop.addEventListener('click', toon);
     }

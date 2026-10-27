@@ -206,7 +206,7 @@
     uitleg: 'Hoe u er financieel voor staat en wat er aankomt, uit alle standen tegelijk. Rahul let mee binnen uw regels; werken doet u in de stand zelf.',
     html: '<div id="ovAlles"><div id="ovVak"><p class="stil">Laden...</p></div>' +
       '<div id="ovWaarom" hidden></div><div id="ovTijd"></div>' +
-      '<button class="knop" type="button" id="ovBeleidKnop">Beleid</button>' +
+      '<button class="knop" type="button" id="ovBeleidKnop" data-stand="geld-beleid" data-contextactie>Beleid</button>' +
       '<div id="ovBeleid" hidden></div>' +
       '<div class="kaart"><h2>Vraag Rahul</h2><div id="ovRahulUit" class="stil" hidden aria-live="polite"></div>' +
       '<form id="ovRahulForm"><div class="ov-vraagrij">' +

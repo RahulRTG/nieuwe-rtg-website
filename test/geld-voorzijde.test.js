@@ -38,3 +38,10 @@ test('de primaire Geld-navigatie gebruikt Meer als actieve ingang voor een detai
   assert.match(schil, /navId = hoofd\.indexOf\(s\.id\) >= 0 \? s\.id : 'meer'/);
   assert.match(schil, /class="gx-plus" href="\/apps\/pay\.html"/);
 });
+
+test('het beleidspaneel declareert zijn vervolgstand voor volledige bedieningsreplay', () => {
+  const overzicht = lees('public/apps/geld/overzichtc.js');
+  assert.match(overzicht,
+    /id="ovBeleidKnop" data-stand="geld-beleid" data-contextactie/,
+    'de bestaande opener moet na een schone ingang opnieuw bereikbaar zijn');
+});

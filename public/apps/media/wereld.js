@@ -1,13 +1,4 @@
-/* RTG Media -- de wereld: één catalogus, drie standen.
-
-   MUZIEK, KIJK en FLOW zijn geen drie apps maar drie standen op dezelfde
-   wereld: dezelfde makers, dezelfde bibliotheek, dezelfde regelaars. Wat u in
-   FLOW hoort, staat één tik later als heel stuk voor u (zie blad.js).
-
-   Twee dingen die dit scherm bewust NIET doet. Er is geen oneindige scroll: de
-   wereld heeft een einde en dat staat eronder. En er staat bij ELK stuk waarom
-   het er staat -- die zin komt van de server, uit dezelfde code die de
-   volgorde bepaalt, en niet uit een geruststellend tekstje hier. */
+/* RTG Media: één catalogus met Muziek, Kijk en Flow als gedeelde standen. */
 (function () {
   'use strict';
   var $ = function (s) { return document.querySelector(s); };

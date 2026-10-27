@@ -1,12 +1,4 @@
-/* RTG Media -- de lade: de stuk-hub, het makersprofiel, de bibliotheek en het
-   makersbord. Alles wat dieper gaat dan de wereldkaart komt hier binnen, in
-   hetzelfde scherm: u verlaat de wereld niet om iets te bekijken.
-
-   De stuk-hub is het hart van het idee. Eén nummer is zelden één ding: er
-   hangen korte video's onder die het als geluid gebruiken, ander werk van
-   dezelfde maker, en soms een livekanaal. Wat u hier ziet zijn ALLEEN
-   verbindingen die echt in de gegevens staan -- de server raadt niets bij
-   elkaar, en dat zegt hij er zelf bij. */
+/* RTG Media: stuk-hub, makersprofiel, bibliotheek en makersbord in één lade. */
 (function () {
   'use strict';
   var $ = function (s) { return document.querySelector(s); };

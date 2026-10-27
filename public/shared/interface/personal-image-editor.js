@@ -32,7 +32,7 @@
     var foot = node('footer', 'pi-foot'), privacy = node('span', '', 'Alleen zichtbaar voor u'), cancel = button('Annuleren', close), save = button('Opslaan', function () {
       if (busy) return; busy = true; save.disabled = true; status.textContent = 'Opslaan…';
       P.save(current.id, draft).then(function () { if (dialog === active) close(); }).catch(function (e) { status.textContent = e.message; }).finally(function () { busy = false; save.disabled = !P.authenticated(); });
-    }); save.className = 'pi-save'; foot.append(privacy, cancel, save); dialog.append(head, content, foot); d.body.appendChild(dialog);
+    }); save.className = 'pi-save'; save.dataset.dialogResult = 'save'; foot.append(privacy, cancel, save); dialog.append(head, content, foot); d.body.appendChild(dialog);
     dialog.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
     picker.onchange = function () { current = all.find(function (r) { return r.id === picker.value; }); choose(); };
     function button(label, run) { var b = node('button', '', label); b.type = 'button'; b.onclick = run; return b; }

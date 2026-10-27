@@ -19,6 +19,10 @@ const ADAPTIVE_LOADER = lees('public/shared/rtg-adaptive-edge-loader.js');
 const SIGNALS = lees('public/shared/rtg-adaptive-edge-signals.js');
 const EDITORIAL = lees('public/shared/rtg-editorial-v4.css');
 const SW = lees('public/sw.js');
+const APPWERKT = lees('scripts/appwerkt.js');
+const MAGNAAT = lees('public/apps/magnaat.html');
+const PERSONAL_IMAGES = lees('public/shared/interface/personal-images.js');
+const PERSONAL_IMAGE_EDITOR = lees('public/shared/interface/personal-image-editor.js');
 
 test('Adaptive Edge heeft vier toestanden en zeven swipebare decks', () => {
   assert.deepEqual(kern.STATES, ['peek', 'dock', 'deck', 'expanded']);
@@ -64,12 +68,57 @@ test('de hoofdactie wordt niet meer als snelkoppeling geregistreerd; de voortgan
 test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
   const appRoots = CONTROLS.match(/var APP='([^']+)'/);
   assert.ok(appRoots, 'de appbronnen moeten expliciet afgebakend zijn');
-  for (const selector of ['.rtm-nav', '.mv-navigatie', '.rtd-dossieracties', '.rtd-besluitacties']) {
+  for (const selector of ['.rtm-nav', '.mv-navigatie', '.roomrail', '.rolechoice', '.rtd-dossieracties', '.rtd-besluitacties']) {
     assert.ok(appRoots[1].includes(selector), selector + ' ontbreekt als appbron');
+    assert.ok(APPWERKT.includes(selector + ' button'), selector + ' ontbreekt in de Edge-opener van APPWERKT');
   }
   assert.ok(!appRoots[1].includes('[data-rtg-edge-controls]'), 'universele Edge-bediening is geen appbediening');
   assert.match(CONTROLS, /if \(src\.app\) b\.dataset\.rtgAdaptiveControl = 'app'/);
+  assert.doesNotMatch(CONTROLS, /RTGDesktopFrame\.controls\(c, srcButtons\)\) return/,
+    'een actieve desktopwerkplek mag de bediening van haar host niet verdringen');
   assert.match(CONTROLS, /'aria-haspopup'/, 'een gekloonde dialoogopener behoudt zijn semantiek');
+  assert.match(CONTROLS, /el\.innerText\|\|el\.textContent/,
+    'Edge-labels behouden zichtbare woordgrenzen tussen geneste tekstelementen');
+  assert.match(APPWERKT, /el\.id \|\| el\.getAttribute\('data-rtg-adaptive-source'\)/,
+    'de bron en haar Edge-kloon moeten als dezelfde handeling tellen');
+  assert.match(APPWERKT, /replace\(\/\\s\+\/g, ' '\)\.trim\(\)/,
+    'verschillen in tekstlayout mogen een Edge-kloon niet als tweede handeling tellen');
+  assert.match(APPWERKT, /rtgAdaptiveState === 'expanded'[\s\S]{0,180}setState\('dock'\)/,
+    'na de laatste appkloon sluit de meter de Edge voor de volgende paginaactie');
+  assert.match(APPWERKT, /Number\(!hoofdactie\(a\)\) - Number\(!hoofdactie\(b\)\)[\s\S]{0,500}Number\(!edgeApp\(a\)\) - Number\(!edgeApp\(b\)\)/,
+    'een primaire schermactie wordt aangeraakt voordat een Edge-actie haar toestand kan vervangen');
+  assert.match(APPWERKT, /gehad\.size >= gevonden/,
+    'Edge-dialoogopeners worden pas herhaald nadat bekende paginaacties zijn afgewerkt');
+  assert.match(APPWERKT, /if \(!k\.edgeApp\)[\s\S]{0,400}RTGAdaptiveEdge\.setState\('dock'\)/,
+    'een gewone paginaactie sluit eerst een nog uitgeklapt appdeck');
+  assert.match(APPWERKT, /behoudHuidigeStand = !vervolg\.klaar/,
+    'nieuwe vervolgbediening blijft zichtbaar voordat het Edge-deck opnieuw opent');
+  assert.match(APPWERKT, /data-bweg[\s\S]{0,300}upload\|bestand kiezen/,
+    'verwijderen en de systeembestandskiezer komen na gewone paneelbediening');
+  assert.match(APPWERKT, /Buiten een modal[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)[\s\S]{0,160}Number\(!standNavigatie\(a\)\)/,
+    'een onafgewerkte dialoog wordt vóór algemene standnavigatie heropend');
+  assert.match(APPWERKT, /heropenGeslotenDialoog = !nogModaal/,
+    'een gesloten dialoog met resterende bekende bediening wordt meteen heropend');
+  assert.match(APPWERKT, /const geraakt = document\.querySelector\('\[data-appwerkt="1"\]'\)[\s\S]{0,100}!geraakt\.disabled/,
+    'een asynchrone modale actie bereikt een stabiele open of gesloten stand');
+  assert.match(APPWERKT, /querySelectorAll\('\[aria-haspopup="dialog"\]'\)[\s\S]{0,220}timeout: 1500/,
+    'de publieke dialoogopener mag na opslag één rendercyclus terugkeren');
+  assert.match(APPWERKT, /waitForEvent\('filechooser'/,
+    'de meter wacht op de echte systeembestandskiezer');
+  assert.match(APPWERKT, /chooser\.setFiles\(\[\]\)/,
+    'de geopende systeembestandskiezer wordt gecontroleerd geannuleerd');
+  assert.match(APPWERKT, /async function markeerBekendeDialoogopener/,
+    'meerdere slotacties gebruiken opnieuw dezelfde zichtbare dialoogopener');
+  assert.match(APPWERKT, /await page\.click\('\[data-appwerkt="1"\]'/,
+    'ook een heropende dialoogroute gebruikt de gewone browserklik');
+  assert.match(APPWERKT, /annuleer\|annuleren\|cancel/,
+    'annuleren sluit een dialoog pas nadat de overige bediening is aangeraakt');
+  assert.match(PERSONAL_IMAGES, /button\.setAttribute\('aria-haspopup', 'dialog'\)/,
+    'de beeldbewerker is als heropenbare dialoog herkenbaar voor gebruiker en meter');
+  assert.match(PERSONAL_IMAGE_EDITOR, /save\.dataset\.dialogResult = 'save'/,
+    'Opslaan publiceert dat het de beeldbewerker bij succes afsluit');
+  assert.match(MAGNAAT, /padding-bottom:calc\((?:2|3)rem \+ var\(--rtg-adaptive-inset,0px\)\)/,
+    'lange Magnaat-schermen reserveren de echte Edge-inset voor hun laatste actie');
 });
 
 test('de Edge toont geen generieke foutmelding naast contextuele bediening', () => {

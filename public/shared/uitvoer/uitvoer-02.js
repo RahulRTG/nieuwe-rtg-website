@@ -1,4 +1,3 @@
-  // Visible export action and modal share the active host.
   var LIJN = '1px solid var(--line,var(--lijn,#2A2724))';
   /* --rtg-muted VOOR --muted: de eerste volgt het thema. Op goud haalde
      #8A8680 4,07:1 waar 4,5 moet (A11Y-INGELOGD.json). De knop staat op de

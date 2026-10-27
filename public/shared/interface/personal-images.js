@@ -46,6 +46,7 @@
     if (box && !box.querySelector('.pi-change')) {
       var button = d.createElement('button'); button.type = 'button'; button.className = 'pi-change';
       button.appendChild(w.RTGDesktopUI.icon('camera')); if (id === 'hoofd') button.appendChild(d.createTextNode('Foto wijzigen')); button.setAttribute('aria-label', label + ' wijzigen');
+      button.setAttribute('aria-haspopup', 'dialog');
       button.onclick = function (e) { e.preventDefault(); e.stopPropagation(); w.RTGPersonalImageEditor.open(full); }; box.appendChild(button);
     }
   }

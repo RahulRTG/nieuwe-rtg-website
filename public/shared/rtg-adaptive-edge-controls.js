@@ -1,9 +1,9 @@
 (function(w,d){
   'use strict';
-  var APP='.wd-output,.connection-edge,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtm-nav,.mv-navigatie,.rtd-dossieracties,.rtd-besluitacties,.rtg-v4-route-actions';
+  var APP='.wd-output,.connection-edge,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtm-nav,.mv-navigatie,.roomrail,.rolechoice,.rtd-dossieracties,.rtd-besluitacties,.rtg-v4-route-actions';
   var R=APP+',.cmd-balk,[data-rtg-edge-controls],.rtgsprong-greep,.ios-nav-acties,.ios-nav-extra';
 
-  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.textContent||'').replace(/\s+/g,' ').trim()}
+  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
   function avail(el,root){
     var view=el.ownerDocument.defaultView||w;
     for(var p=el;p;p=p.parentElement){
@@ -44,7 +44,7 @@
     }
     var focus = c.contains(d.activeElement) ? d.activeElement.dataset.cap : '', sx = c.scrollLeft;
     c.textContent = '';
-    if (w.RTGDesktopFrame && w.RTGDesktopFrame.controls(c, srcButtons)) return;
+    if (w.RTGDesktopFrame) w.RTGDesktopFrame.controls(c, srcButtons);
     var A = w.RTGAdaptief;
     if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;
     var primary = d.querySelector('.rtg-edge-action');
@@ -146,10 +146,10 @@
     var obs = new w.MutationObserver(function (records) {
       w.RTGAdaptiveEdgeInput.reflect(rt);
       if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
-      var commandBar = d.querySelector('#rtgCommand .cmd-balk');
-      if (commandBar && commandBar.classList.contains('vraagt')) {
-        if (rt.questionOwner !== commandBar) {
-          rt.questionOwner = commandBar;
+      var bar = d.querySelector('#rtgCommand .cmd-balk');
+      if (bar && bar.classList.contains('vraagt')) {
+        if (rt.questionOwner !== bar) {
+          rt.questionOwner = bar;
           w.RTGAdaptiveEdge.setDeck('rahul'); w.RTGAdaptiveEdge.setState('expanded');
         }
       } else rt.questionOwner = null;

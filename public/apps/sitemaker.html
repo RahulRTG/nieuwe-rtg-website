@@ -55,8 +55,8 @@
   .bew{outline:none;border-radius:0;cursor:text;}
   .bewerk .bew:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent);}
   .bewerk .b-beeld img,.bewerk .b-gal img{cursor:pointer;}
-  .bwbalk{position:absolute;top:6px;right:6px;display:none;gap:.25rem;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--line);border-radius:0;padding:.2rem;}
-  .bewerk .wb-blok:hover>.bwbalk{display:flex;}
+  .bwbalk{position:absolute;top:6px;right:6px;display:flex;gap:.25rem;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--line);border-radius:0;padding:.2rem;opacity:.72;transition:opacity .15s;}
+  .bewerk .wb-blok:hover>.bwbalk,.bewerk .wb-blok:focus-within>.bwbalk{opacity:1;}
   .bwbalk button{width:26px;height:26px;border-radius:0;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
   .bwbalk button:hover{border-color:var(--gold);}
   .bwbalk button.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
@@ -368,7 +368,7 @@ function veld(waarde,zetter,meer){
 }
 function balk(blok,p){
   const b=document.createElement('div'); b.className='bwbalk';
-  const mk=(txt,cls,fn,titel,html)=>{const x=document.createElement('button');x.type='button';if(html)x.innerHTML=txt;else x.textContent=txt;if(cls)x.className=cls;x.title=titel||'';x.addEventListener('click',ev=>{ev.stopPropagation();fn();});return x;};
+  const mk=(txt,cls,fn,titel,html)=>{const x=document.createElement('button');x.type='button';if(html)x.innerHTML=txt;else x.textContent=txt;if(cls)x.className=cls;x.title=titel||'';if(titel)x.setAttribute('aria-label',titel);x.addEventListener('click',ev=>{ev.stopPropagation();fn();});return x;};
   b.appendChild(mk('↑','',()=>verplaats(p,-1),'Omhoog'));
   b.appendChild(mk('↓','',()=>verplaats(p,1),'Omlaag'));
   b.appendChild(mk('⧉','',()=>dupliceer(blok),'Dupliceren'));

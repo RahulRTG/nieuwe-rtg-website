@@ -1293,7 +1293,7 @@ async function bedien(ctx, base, ingang) {
            bewijs over de bestemming. Accepteer daarom uitsluitend de
            waarneembare URL-overgang, open de gedeclareerde ingang opnieuw en
            tel nooit een time-out die op dezelfde URL bleef. */
-        const navigeerdeOndanksWacht = /pagina antwoordde niet binnen de limiet/i.test(waarom) && !opIngang();
+        const navigeerdeOndanksWacht = k.routeOpener && !opIngang();
         if (navigeerdeOndanksWacht) {
           if (k.herhaling) {
             if (!herhaaldAangeraakt.includes(k.tekst || '(naamloos)')) herhaaldAangeraakt.push(k.tekst || '(naamloos)');

@@ -116,6 +116,9 @@ test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan
   assert.match(lees('public/shared/deelmenu/deelmenu-02.js'),
     /data-rtg-adaptive-source['"], ['"]deel-[\s\S]{0,120}data-stand/,
     'een herbouwde deeltab moet dezelfde appstand en control-identiteit houden');
+  assert.match(lees('public/apps/mijnmall.js'),
+    /data-rtg-adaptive-source="mijnmall-lijst-open" data-stand="mijnmall-lijst"/,
+    'de wisselende labels Openen en Inklappen moeten één herstelbare lijststand houden');
   assert.match(lees('public/shared/rtg-docs-2026.css'),
     /\.rtd-nav\{[^}]*z-index:45/,
     'RTDocs-navigatie moet boven de iOS-kop en onder dialogen blijven');
@@ -156,8 +159,8 @@ test('herstel onthoudt de waargenomen openerroute voor resterende bediening', ()
 test('alleen een aantoonbare URL-overgang bewijst een trage navigatieklik', () => {
   const bron = require('node:fs').readFileSync(
     require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
-  assert.match(bron, /const navigeerdeOndanksWacht = \/pagina antwoordde niet binnen de limiet\/i\.test\(waarom\) && !opIngang\(\)/,
-    'een gewone time-out op dezelfde app mag nooit administratief als klik slagen');
+  assert.match(bron, /const navigeerdeOndanksWacht = k\.routeOpener && !opIngang\(\)/,
+    'alleen een verklaarde navigatiebediening met werkelijk gewijzigde URL mag als geraakte knop tellen');
 });
 
 test('een herstelbare locatiekeuze telt niet als gesloten toegangsdeur', () => {

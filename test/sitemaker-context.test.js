@@ -23,3 +23,10 @@ test('Website-maker houdt diepe bestaande acties in de actieve context bereikbaa
   assert.match(html, /ob\.textContent='Open';ob\.setAttribute\('data-contextactie',''\)/);
   assert.match(html, /kb\.textContent='Gebruik';kb\.setAttribute\('data-contextactie',''\)/);
 });
+
+test('blokbediening blijft zichtbaar, aanraakbaar en benoemd zonder muishover', () => {
+  assert.match(html, /\.bwbalk\{[^}]*display:flex[^}]*opacity:\.72/);
+  assert.match(html, /\.wb-blok:focus-within>\.bwbalk\{opacity:1/);
+  assert.match(html, /if\(titel\)x\.setAttribute\('aria-label',titel\)/);
+  assert.doesNotMatch(html, /\.bwbalk\{[^}]*display:none/);
+});

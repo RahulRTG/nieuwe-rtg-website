@@ -125,7 +125,7 @@ test('een herhaalde hoofdopener gaat voor algemene dialoogopeners', () => {
   const bron = require('node:fs').readFileSync(
     require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
   assert.match(bron,
-    /if \(!doel && magHerhalen\)[\s\S]{0,2600}Number\(!hoofdactie\(a\)\)[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)/,
+    /const hoofdopener = \(el\) => hoofdactie\(el\) && dialoogOpener\(el\)[\s\S]{0,4000}if \(!doel && magHerhalen\)[\s\S]{0,2600}Number\(!hoofdopener\(a\)\)[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)/,
     'kortlevende vervolgacties moeten via hun gedeclareerde hoofdopener worden hersteld');
 });
 

@@ -1592,6 +1592,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        Raak haar daarom aan zodra zij zichtbaar is. Dit is dezelfde semantische
        hoofdactie die de interface al voor de gebruiker declareert. */
     const hoofdactie = (el) => el.matches('[data-hoofdactie]');
+    const hoofdopener = (el) => hoofdactie(el) && dialoogOpener(el);
     const contextactie = (el) => el.matches('[data-contextactie]');
     const edgeApp = (el) => el.matches('[data-rtg-adaptive-control="app"]') ||
       !!el.closest('[data-rtg-adaptive-surface-owner="app"]');
@@ -1653,7 +1654,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
              is expliciete standnavigatie, geen willekeurige taakactie. Zonder
              deze rangorde zag het Social Control Plane AAN en ANALYSEER
              CONTEXT wel, maar sloot het deck voordat hun tab terugkwam. */
-          ? Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
+          ? Number(!hoofdopener(a)) - Number(!hoofdopener(b)) ||
             Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(sluiter(a)) - Number(sluiter(b)) ||
             risicoRang(a) - risicoRang(b) ||
@@ -1671,7 +1672,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
                openers en bereikte zij de laatste twee geldige veegacties pas
                na MAXKLIK. De opener blijft een gewone browserklik; alleen de
                volgorde van reeds bewezen herstelroutes wordt specifieker. */
-            Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
+            Number(!hoofdopener(a)) - Number(!hoofdopener(b)) ||
             Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
             Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(sluiter(a)) - Number(sluiter(b)) ||

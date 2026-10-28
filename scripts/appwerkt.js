@@ -1653,7 +1653,8 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
              is expliciete standnavigatie, geen willekeurige taakactie. Zonder
              deze rangorde zag het Social Control Plane AAN en ANALYSEER
              CONTEXT wel, maar sloot het deck voordat hun tab terugkwam. */
-          ? Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+          ? Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
+            Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(sluiter(a)) - Number(sluiter(b)) ||
             risicoRang(a) - risicoRang(b) ||
             Number(!contextactie(a)) - Number(!contextactie(b))
@@ -1663,6 +1664,14 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
                wereldnavigatie; anders kon Saloon alle globale standen
                doorlopen terwijl Upload en Opslaan achter dezelfde geldige
                foto-opener bleven wachten. */
+            /* Een expliciet gedeclareerde hoofdopener is de kortste publieke
+               route terug naar kortlevende dialoogbediening. RTDocs heeft
+               naast de veegactiedeur veel document- en werkdialogen. Zonder
+               deze rangorde doorliep de integrale proef eerst al die andere
+               openers en bereikte zij de laatste twee geldige veegacties pas
+               na MAXKLIK. De opener blijft een gewone browserklik; alleen de
+               volgorde van reeds bewezen herstelroutes wordt specifieker. */
+            Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
             Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
             Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(sluiter(a)) - Number(sluiter(b)) ||

@@ -121,6 +121,14 @@ test('de integrale klikgrens laat grote dynamische schermen hun vervolgacties af
     'meer dan tweehonderd unieke controls met replaypaden moeten binnen een eindige ronde passen');
 });
 
+test('een herhaalde hoofdopener gaat voor algemene dialoogopeners', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron,
+    /if \(!doel && magHerhalen\)[\s\S]{0,2600}Number\(!hoofdactie\(a\)\)[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)/,
+    'kortlevende vervolgacties moeten via hun gedeclareerde hoofdopener worden hersteld');
+});
+
 test('een herstelbare locatiekeuze telt niet als gesloten toegangsdeur', () => {
   const { POORTEN } = require('../scripts/appwerkt');
   assert.ok(POORTEN.includes('#poort.zien:not([data-poort-soort="locatie"])'));

@@ -42,7 +42,8 @@
     }
     if (open.eigenaar && fase === 'archief') acties.push(['concept', 'Heropen als concept', 'vol']);
     $('#faseActies').innerHTML = acties.map(function (a) {
-      return '<button class="knop ' + a[2] + '" type="button" data-fase-naar="' + a[0] + '">' + a[1] + '</button>';
+      return '<button class="knop ' + a[2] + '" type="button" data-fase-naar="' + a[0] + '" data-rtg-adaptive-source="office-fase-' + a[0] + '"' +
+        (a[2] === 'vol' ? ' data-hoofdactie' : '') + '>' + a[1] + '</button>';
     }).join('');
     Array.prototype.forEach.call($('#faseActies').querySelectorAll('[data-fase-naar]'), function (b) {
       b.addEventListener('click', function () { zetFase(b.dataset.faseNaar); });

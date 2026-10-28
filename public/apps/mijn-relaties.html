@@ -230,6 +230,8 @@
     const rij = maak('div', 'acties');
     const bevestig = maak('button', 'knop rood');
     bevestig.type = 'button';
+    bevestig.id = 'sluitToestemmingen';
+    bevestig.setAttribute('data-hoofdactie', '');
     bevestig.textContent = 'Ja, sluit deze ' + r.body.sluit.length + ' toestemming(en)';
     bevestig.addEventListener('click', () => sluit(partij, bevestig));
     const terug = maak('button', 'knop');

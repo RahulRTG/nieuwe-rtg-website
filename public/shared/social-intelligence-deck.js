@@ -27,7 +27,7 @@
       '<section class="rtg-deck-panel" id="rtgPanelPolicy" role="tabpanel" aria-labelledby="rtgTabPolicy" hidden><div class="rtg-panel-loading">Beleid wordt geladen…</div></section>' +
       '<section class="rtg-deck-panel" id="rtgPanelRahul" role="tabpanel" aria-labelledby="rtgTabRahul" hidden>' +
       '<span class="rtg-panel-code">GROUNDED SOCIAL INTELLIGENCE</span><h3>Vraag Rahul op basis van uw graaf.</h3><p>Rahul leest dezelfde sociale context als u en noemt de gegevens waarop het antwoord rust. Hij verstuurt en bevestigt niets.</p>' +
-      '<form class="rtg-rahul-form" id="rtgSocialRahulForm"><label for="rtgSocialRahulQuestion">Uw vraag</label><textarea id="rtgSocialRahulQuestion" maxlength="400" rows="3" placeholder="Wat vraagt vandaag mijn aandacht?"></textarea><button type="submit">ANALYSEER CONTEXT</button></form>' +
+      '<form class="rtg-rahul-form" id="rtgSocialRahulForm"><label for="rtgSocialRahulQuestion">Uw vraag</label><textarea id="rtgSocialRahulQuestion" maxlength="400" rows="3" placeholder="Wat vraagt vandaag mijn aandacht?"></textarea><button id="rtgSocialRahulSubmit" type="submit" data-hoofdactie>ANALYSEER CONTEXT</button></form>' +
       '<div class="rtg-rahul-answer" id="rtgSocialRahulAnswer" role="status" hidden></div></section>' +
       '<section class="rtg-deck-panel" id="rtgPanelLog" role="tabpanel" aria-labelledby="rtgTabLog" hidden><div class="rtg-panel-loading">Logboek wordt geladen…</div></section></div></section></div>' +
       '<footer><span id="rtgIntelSystemState"><i></i>SYSTEM READY</span><b>NO AUTO-SEND · CTRL / CMD + K</b></footer></aside>';

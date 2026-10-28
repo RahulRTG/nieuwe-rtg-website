@@ -704,6 +704,7 @@
   function knopVoor(a, rij) {
     var b = d.createElement('button');
     b.type = 'button';
+    b.setAttribute('data-hoofdactie', '');
     if (a.sig) b.setAttribute('data-sig', a.sig);
     b.innerHTML = svg(a.teken);
     var s = d.createElement('span');
@@ -779,7 +780,6 @@
     if (eerste) try { eerste.focus(); } catch (e) {}
   }
   function sluitBlad() { if (blad) { try { blad.close(); } catch (e) { blad.remove(); blad = null; } } }
-
 /* Slot van de gebarenlaag, deel twee: WAT EEN SCHERM ERVAN ZIET. De uitleg die
    aan elke regel hangt, de vier kant-en-klare acties die overal hetzelfde
    betekenen, en de publieke deur. Hierboven staat de actielade zelf.

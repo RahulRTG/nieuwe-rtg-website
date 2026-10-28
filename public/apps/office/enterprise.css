@@ -20,8 +20,25 @@ body[data-rtg-desktop] .wd-page{container:rtg-office/inline-size;}
    nog geen begrensd werkvlak. */
 body.rtd-voorzijde-actief .wd-page>:is(.kop,main){display:none!important;}
 body.rtd-voorzijde-actief[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{display:block;height:auto;overflow:visible!important;}
+/* Na de rustige voorzijde leeft Office in de vaste World Desktop-canvas. Die
+   canvas moet dan opnieuw een echte flexkolom zijn; anders krijgt main zijn
+   volledige inhoudshoogte en staat de onderste documentbediening buiten het
+   zichtbare, niet-scrollende werkvlak. */
+body:not(.rtd-voorzijde-actief) .wd-page[data-rtg-canvas-surface]{
+  display:flex;flex-direction:column;overflow:hidden!important;
+}
+body:not(.rtd-voorzijde-actief) .wd-page[data-rtg-canvas-surface]>main{
+  flex:1;min-height:0;height:auto;overflow:hidden;
+}
 /* De vaste drive en editor houden ook onderaan ruimte voor de gedeelde Edge. */
 html:not([data-rtg-oppervlak="1"]) body[data-rtg-adaptive-ready="true"]:not(.rtd-voorzijde-actief)>main{padding-bottom:var(--rtg-adaptive-inset)!important;}
+/* De twee echte scrollvlakken moeten die vrije ruimte zelf dragen. Padding op
+   main verkleint alleen het flexvlak; het geeft het laatste document of de
+   laatste maakactie geen scrollruimte boven de vaste Edge. */
+html:not([data-rtg-oppervlak="1"]) body[data-rtg-adaptive-ready="true"]:not(.rtd-voorzijde-actief) :is(#rail,#vak){
+  padding-bottom:calc(var(--rtg-adaptive-inset) + 2.5rem)!important;
+  scroll-padding-bottom:calc(var(--rtg-adaptive-inset) + 1rem);
+}
 /* GOUD ALS KLEINE TEKST HOORT HET LEESGOUD TE ZIJN. Hier stond het huisgoud op
    62%, en dat komt op het lichtste paneel van dit scherm op 3,28:1 uit -- op een
    sectiekop van 10px in kapitalen. Dezelfde les als in rtg-themas.css: goud is

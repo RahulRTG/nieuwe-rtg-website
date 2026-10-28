@@ -16,6 +16,7 @@
   function knopVoor(a, rij) {
     var b = d.createElement('button');
     b.type = 'button';
+    b.setAttribute('data-hoofdactie', '');
     if (a.sig) b.setAttribute('data-sig', a.sig);
     b.innerHTML = svg(a.teken);
     var s = d.createElement('span');
@@ -91,4 +92,3 @@
     if (eerste) try { eerste.focus(); } catch (e) {}
   }
   function sluitBlad() { if (blad) { try { blad.close(); } catch (e) { blad.remove(); blad = null; } } }
-

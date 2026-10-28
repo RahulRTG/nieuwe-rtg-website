@@ -73,6 +73,8 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     assert.ok(appRoots[1].includes(selector), selector + ' ontbreekt als appbron');
     assert.ok(APPWERKT.includes(selector + ' button'), selector + ' ontbreekt in de Edge-opener van APPWERKT');
   }
+  assert.ok(appRoots[1].includes('[data-rtg-platform-chrome]'),
+    'app-eigen suitenavigatie moet via dezelfde Edge bedienbaar blijven');
   assert.ok(!appRoots[1].includes('[data-rtg-edge-controls]'), 'universele Edge-bediening is geen appbediening');
   assert.match(CONTROLS, /if \(src\.app\) b\.dataset\.rtgAdaptiveControl = 'app'/);
   assert.doesNotMatch(CONTROLS, /RTGDesktopFrame\.controls\(c, srcButtons\)\) return/,

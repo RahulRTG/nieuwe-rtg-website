@@ -1,6 +1,6 @@
 (function(w,d){
   'use strict';
-  var APP='.wd-output,.connection-edge,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtm-nav,.mv-navigatie,.roomrail,.rolechoice,.rtd-dossieracties,.rtd-besluitacties,.rtg-v4-route-actions';
+  var APP='.wd-output,.connection-edge,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtm-nav,.mv-navigatie,.roomrail,.rolechoice,.rtd-dossieracties,.rtd-besluitacties,.rtg-v4-route-actions,[data-rtg-platform-chrome]';
   var R=APP+',.cmd-balk,[data-rtg-edge-controls],.rtgsprong-greep,.ios-nav-acties,.ios-nav-extra';
 
   function lbl(el){return(el.getAttribute('aria-label')||el.title||el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
@@ -18,10 +18,10 @@
     (doc||d).querySelectorAll(R+(embed?',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]':'')).forEach(function(root){
       var controls=root.matches('button')?[root]:root.querySelectorAll('button,a[href]');
       controls.forEach(function(el){
-        if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab')) return;
-        var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
-        var action = el.getAttribute('data-rtg-action-key');
-        if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab)) && (!action || !actions.has(action)) && !out.some(function (x) { return x.el === el; })) {
+        if(el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab'))return;
+        var tab=root.matches('.wos-dock,.wos-rail')&&el.getAttribute('data-tab');
+        var action=el.getAttribute('data-rtg-action-key');
+        if(lbl(el)&&avail(el,root)&&(!tab||!tabs.has(tab))&&(!action||!actions.has(action))&&!out.some(function(x){return x.el===el})){
           out.push({el:el,root:root,app:root.matches(APP)||el.matches('.rtguitvoer-knop')});if(tab)tabs.add(tab);if(action)actions.add(action);
         }
       });

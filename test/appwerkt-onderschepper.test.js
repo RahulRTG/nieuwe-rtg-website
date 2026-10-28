@@ -85,6 +85,17 @@ test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtb
     'inventarisatie, replay en controle moeten dezelfde stabiele bronidentiteit gebruiken');
 });
 
+test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan de bedieningsmeter', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const lees = (bestand) => fs.readFileSync(path.join(__dirname, '..', bestand), 'utf8');
+  assert.match(lees('public/apps/mijn-relaties.html'), /sluitToestemmingen[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/shared/social-intelligence-data.js'), /sociaal-beleid-[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/shared/social-intelligence-deck.js'), /rtgSocialRahulSubmit[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/apps/office/app/app-02a2.js'), /office-fase-[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/shared/gebaar/gebaar-04.js'), /data-hoofdactie/);
+});
+
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {
   const { herstelgrens } = require('../scripts/appwerkt');
   assert.equal(herstelgrens(0), 32);

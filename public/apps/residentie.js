@@ -1961,10 +1961,10 @@
     try {
       const d = await api('/api/residentie/gids', {});
       $('#gidsZalen').innerHTML = d.zalen.map(z =>
-        '<button class="ds-veld" data-kamer="' + esc(z.id) + '" data-contextactie>' + DEURICOON + '<span><span class="ds-veld__label">' + esc(z.naam) + '</span><span class="ds-veld__waarde">' + esc(z.sub) + '</span></span>' +
+        '<button class="ds-veld" data-kamer="' + esc(z.id) + '" data-stand="residentie-kamer-' + esc(z.id) + '" data-rtg-adaptive-source="residentie-kamer-' + esc(z.id) + '" data-contextactie data-hoofdactie>' + DEURICOON + '<span><span class="ds-veld__label">' + esc(z.naam) + '</span><span class="ds-veld__waarde">' + esc(z.sub) + '</span></span>' +
         '<span class="ds-meta">' + z.aanwezig + ' aanwezig</span></button>').join('');
       $('#gidsSuites').innerHTML = d.suites.length ? d.suites.map(s2 =>
-        '<button class="ds-veld" data-kamer="' + esc(s2.adres) + '" data-contextactie>' + DEURICOON + '<span><span class="ds-veld__label">' + esc(s2.naam) + '</span><span class="ds-veld__waarde">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
+        '<button class="ds-veld" data-kamer="' + esc(s2.adres) + '" data-stand="residentie-suite-' + esc(s2.adres) + '" data-rtg-adaptive-source="residentie-suite-' + esc(s2.adres) + '" data-contextactie data-hoofdactie>' + DEURICOON + '<span><span class="ds-veld__label">' + esc(s2.naam) + '</span><span class="ds-veld__waarde">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
         '<span class="ds-meta">' + s2.aanwezig + ' aanwezig</span></button>').join('')
         : '<p class="ds-meta">Nog geen open suites; richt de uwe in en zet hem open.</p>';
       laagOpen('#gidsLaag');

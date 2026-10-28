@@ -234,6 +234,8 @@
     bevestig.addEventListener('click', () => sluit(partij, bevestig));
     const terug = maak('button', 'knop');
     terug.type = 'button';
+    terug.id = 'sluitVoorbeschouwing';
+    terug.setAttribute('data-hoofdactie', '');
     terug.textContent = 'Laat maar';
     terug.addEventListener('click', () => { g.remove(); knop.closest('.acties').classList.remove('weg'); });
     rij.appendChild(bevestig); rij.appendChild(terug);

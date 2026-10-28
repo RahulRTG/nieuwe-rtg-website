@@ -274,11 +274,11 @@ function paginaBar(){
   }
   if(PAG>=0){
     const h=document.createElement('button'); h.type='button'; h.textContent='✎'; h.title='Pagina hernoemen';
-    h.setAttribute('data-hoofdactie','');
+    h.setAttribute('data-hoofdactie',''); h.setAttribute('data-stand','pagina-hernoemen-'+PAG);
     h.addEventListener('click',()=>{ const n=(prompt('Nieuwe naam',DESIGN.paginas[PAG].naam)||'').trim(); if(!n)return; DESIGN.paginas[PAG].naam=n.slice(0,40); DESIGN.paginas[PAG].slug=''; paginaBar(); });
     el.appendChild(h);
     const w=document.createElement('button'); w.type='button'; w.textContent='×'; w.title='Pagina verwijderen';
-    w.setAttribute('data-contextactie','');
+    w.setAttribute('data-contextactie',''); w.setAttribute('data-stand','pagina-verwijderen-'+PAG);
     w.addEventListener('click',()=>{ if(!confirm('Pagina "'+DESIGN.paginas[PAG].naam+'" en alle blokken erop verwijderen?'))return; DESIGN.paginas.splice(PAG,1); PAG=-1; DESIGN.blokken=HOMEBLOK; paginaBar(); render(); });
     el.appendChild(w);
   }

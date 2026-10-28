@@ -84,23 +84,22 @@
         srcs = srcs.concat(srcButtons(frame.contentDocument, true, items));
     } catch (e) {}
     srcs.forEach(function (src) {
-      var el = src.el, b = d.createElement('button'); b.type = 'button';
-      var action = el.getAttribute('data-rtg-action-key');
-      b.className = 'rtg-adaptive-sheet-action'; b.textContent = lbl(el);
+      var el=src.el,b=d.createElement('button');b.type='button';
+      var action=el.dataset.rtgActionKey
+      b.className='rtg-adaptive-sheet-action';b.textContent=lbl(el);
       if (src.app) b.dataset.rtgAdaptiveControl = 'app';
-      if (action) b.dataset.rtgActionKey = action;
-      if (el.id) b.dataset.rtgAdaptiveSource = el.id;
-      if (el.hasAttribute('data-tab')) b.dataset.rtgAdaptiveTab = el.getAttribute('data-tab');
-      b.disabled = el.disabled || el.getAttribute('aria-disabled') === 'true';
-      ['aria-current', 'aria-pressed', 'aria-haspopup'].forEach(function (name) {
-        if (el.hasAttribute(name)) b.setAttribute(name, el.getAttribute(name));
+      if(action)b.dataset.rtgActionKey=action
+      b.dataset.rtgAdaptiveSource=el.id||el.dataset.rtgAdaptiveSource||'control:'+lbl(el);
+      if(el.tagName==='A'&&el.getAttribute('href'))b.dataset.rtgAdaptiveRoute='true';
+      if(el.dataset.tab)b.dataset.rtgAdaptiveTab=el.dataset.tab;
+      b.disabled=el.disabled||el.getAttribute('aria-disabled')==='true';
+      ['aria-current','aria-pressed','aria-haspopup'].forEach(function(name){if(el.hasAttribute(name))b.setAttribute(name,el.getAttribute(name))});
+      if(el.hasAttribute('aria-selected'))b.setAttribute('aria-pressed',el.getAttribute('aria-selected'));
+      b.addEventListener('click',function(){
+        if(!avail(el,src.root)||el.disabled||el.getAttribute('aria-disabled')==='true')return;
+        el.click();close();
       });
-      if (el.hasAttribute('aria-selected')) b.setAttribute('aria-pressed', el.getAttribute('aria-selected'));
-      b.addEventListener('click', function () {
-        if (!avail(el, src.root) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
-        el.click(); close();
-      });
-      c.appendChild(b);
+      c.appendChild(b)
     });
     if (focus) c.querySelectorAll('[data-cap]').forEach(function (b) {
       if (b.dataset.cap === focus) b.focus({ preventScroll: true });

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'cbd260ac';
+var RTG_BOUW = '81509fa5';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1588,9 +1588,9 @@ var RTG_BOUW = 'cbd260ac';
           '<button id="scPinLive" class="aanbevolen">' + T('pin.live','Tijdelijke QR') + ' · ' + T('pin.aanbev','aanbevolen') + '</button>' +
           '<button id="scPinKopie">' + T('pin.kopieer','Kopieer') + '</button>' +
           '<button id="scPinQr">' + T('pin.qr','Vaste QR') + '</button>' +
-          '<button id="scPinNieuw" data-contextactie>' + T('pin.nieuw','Nieuwe pin') + '</button>' +
+          '<button id="scPinNieuw" data-contextactie data-hoofdactie>' + T('pin.nieuw','Nieuwe pin') + '</button>' +
           '<button id="scPinUit">' + (mijnPin && mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten')) + '</button>' +
-          '<button id="scPinNood" class="gevaar" data-contextactie>' + T('pin.nood','Noodslot') + '</button>' +
+          '<button id="scPinNood" class="gevaar" data-contextactie data-hoofdactie>' + T('pin.nood','Noodslot') + '</button>' +
         '</div>' +
         '<img id="scPinQrBeeld" alt="' + T('pin.qralt','QR-code met jouw pin') + '" hidden>' +
         '<div id="scPinLiveDoek" hidden></div>' +

@@ -100,14 +100,16 @@
       if (items.length && scope.win.RTGAdaptiefBalkKnoppen) {
         var buttons = scope.win.RTGAdaptiefBalkKnoppen({ items: function () { return A.voorNu(); }, titel: function () { return A.context().titel; } });
         items.forEach(function (item) { var b = U.el('button', 'rtg-adaptive-sheet-action', item.naam); b.type = 'button';
+          b.dataset.rtgAdaptiveControl = 'app';
           b.dataset.rtgAdaptiveSource = 'desktop-item:' + item.id; b.dataset.rtgAdaptiveRoute = 'true';
           b.onclick = function () { var latest = A.voorNu().find(function (i) { return i.id === item.id; });
             if (latest) { w.RTGAdaptiveEdge.setDeck('home'); w.RTGAdaptiveEdge.setState('dock'); buttons.voer(latest); } }; container.appendChild(b); });
       }
       collect(scope.doc, true, items).forEach(function (source) {
         var el = source.el, b = U.el('button', 'rtg-adaptive-sheet-action', el.getAttribute('aria-label') || el.textContent.trim());
-        b.type = 'button'; b.dataset.desktopSource = el.id || ''; b.dataset.rtgAdaptiveSource = 'desktop-control:' +
+        b.type = 'button'; b.dataset.rtgAdaptiveControl = 'app'; b.dataset.desktopSource = el.id || ''; b.dataset.rtgAdaptiveSource = 'desktop-control:' +
           (el.id || el.getAttribute('aria-label') || el.textContent.trim());
+        if (el.tagName === 'A' && el.getAttribute('href')) b.dataset.rtgAdaptiveRoute = 'true';
         b.disabled = el.disabled || el.getAttribute('aria-disabled') === 'true';
         b.onclick = function () {
           if (!collect(scope.doc, true, items).some(function (s) { return s.el === el; }) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;

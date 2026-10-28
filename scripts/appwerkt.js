@@ -663,7 +663,8 @@ async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
       const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-      return [el.tagName, el.id || el.getAttribute('data-rtg-adaptive-source') || '', naam.slice(0, 60)].join('|');
+      const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
     };
     const zichtbaar = (el) => {
       if (!el || el.hidden || el.disabled || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
@@ -737,8 +738,35 @@ function klikReden(log) {
    vanaf de gedeclareerde ingang. Een knop die daar verborgen blijft, faalt
    nog steeds; dit maakt een werkelijk onzichtbare bediening dus niet groen. */
 function redenVoorSchoneTegenproef(waarom) {
-  return /intercepts pointer events|element is outside of the viewport|element is not visible|pagina antwoordde niet binnen de limiet/i
+  return /intercepts pointer events|element is outside of the viewport|element is not visible|element is not stable|pagina antwoordde niet binnen de limiet/i
     .test(String(waarom || ''));
+}
+
+/* Een bewegende Edge-capsule kan zichtbaar en focusbaar zijn, maar tijdens
+   haar korte compositorovergang niet lang genoeg geometrisch stilstaan voor
+   Playwrights muiscontrole. Dat is geen reden om de bediening over te slaan:
+   toetsenbordactivatie is een volwaardige gebruikersroute en tegelijk een
+   toegankelijkheidsbewijs. Gebruik deze terugval uitsluitend voor de
+   expliciete stabiliteitsfout; onzichtbare of bedekte bediening blijft falen. */
+async function tikAlsGebruiker(page) {
+  try {
+    await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
+    return 'muis';
+  } catch (e) {
+    if (!/element is not stable/i.test(klikReden(String(e.message || e)))) throw e;
+    const focusbaar = await page.evaluate(() => {
+      const el = document.querySelector('[data-appwerkt="1"]');
+      if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return false;
+      if (el.hidden || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      el.focus({ preventScroll: true });
+      return document.activeElement === el;
+    }).catch(() => false);
+    if (!focusbaar) throw e;
+    await page.keyboard.press('Enter');
+    return 'toetsenbord';
+  }
 }
 
 /* De productnorm voor bewijs 2 staat op één plek. Een percentage, een
@@ -1071,7 +1099,10 @@ async function bedien(ctx, base, ingang) {
         const bestandskeuze = k.bestandskiezer
           ? page.waitForEvent('filechooser', { timeout: 2500 }).catch(() => null)
           : null;
-        await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
+        const invoerwijze = await tikAlsGebruiker(page);
+        if (invoerwijze === 'toetsenbord') {
+          instrument.push('een bewegende maar zichtbare bediening is via de toegankelijke Enter-route geactiveerd');
+        }
         if (k.dialoogOpener) actieveDialoogOpener = k.merk;
         /* De systeemkiezer is zelf het waarneembare gevolg van Upload. Maak
            hem leeg zoals een gebruiker die annuleert; anders verwerkt een
@@ -1253,7 +1284,8 @@ async function openAppBedieningInEdge(page, gehad, herstel) {
       const merk = (el) => {
         const label = (el.getAttribute('aria-label') || '').trim();
         const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-        return [el.tagName, el.id || el.getAttribute('data-rtg-adaptive-source') || '', naam.slice(0, 60)].join('|');
+        const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+        return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
       };
       const oppervlak = [...document.querySelectorAll('[data-rtg-adaptive-surface-owner="app"] button,'
         + '[data-rtg-adaptive-surface-owner="app"] [role="button"],'
@@ -1320,7 +1352,8 @@ async function markeerBekendeDialoogopener(page, openerMerk, voortgang) {
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
       const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-      return [el.tagName, el.id || el.getAttribute('data-rtg-adaptive-source') || '', naam.slice(0, 60)].join('|');
+      const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
     };
     const doel = [...document.querySelectorAll('[aria-haspopup="dialog"]')]
       .find((el) => zie(el) && merk(el) === openerMerk);
@@ -1469,7 +1502,8 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
       const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-      return [el.tagName, el.id || el.getAttribute('data-rtg-adaptive-source') || '', naam.slice(0, 60)].join('|');
+      const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
     };
     /* De taalkeuze wordt niet aangetikt: een taal kiezen verandert de persona
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).

@@ -62,13 +62,27 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
 test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenproef', () => {
   const { redenVoorSchoneTegenproef } = require('../scripts/appwerkt');
   for (const reden of ['intercepts pointer events', 'element is outside of the viewport', 'element is not visible',
-    'pagina antwoordde niet binnen de limiet']) {
+    'element is not stable', 'pagina antwoordde niet binnen de limiet']) {
     assert.equal(redenVoorSchoneTegenproef(reden), true, reden);
   }
   assert.equal(redenVoorSchoneTegenproef('element is not enabled'), false,
     'een echt uitgeschakelde bediening mag door heropenen niet groen worden');
   assert.equal(redenVoorSchoneTegenproef('tik verstuurd maar niet afgerond binnen de limiet'), false,
     'een onzekere mutatie mag nooit automatisch opnieuw worden verstuurd');
+});
+
+test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenbordroute als terugval', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1500}element is not stable[\s\S]{0,1500}keyboard\.press\('Enter'\)/);
+  assert.doesNotMatch(bron, /async function tikAlsGebruiker[\s\S]{0,1800}dispatchEvent\(['"]click/,
+    'de meter mag een klik niet rechtstreeks in het DOM veinzen');
+});
+
+test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtbare status wijzigt', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  const stabieleMerken = bron.match(/return bron \? \[el\.tagName, bron\]\.join\('\|'\)/g) || [];
+  assert.equal(stabieleMerken.length, 4,
+    'inventarisatie, replay en controle moeten dezelfde stabiele bronidentiteit gebruiken');
 });
 
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {

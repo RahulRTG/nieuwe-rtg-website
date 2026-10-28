@@ -147,6 +147,8 @@
       const aan = s.kanalen.includes(k.id);
       const b = maak('button', 'kanaal');
       b.type = 'button';
+      b.setAttribute('data-hoofdactie', '');
+      b.setAttribute('data-stand', 'post-' + s.id + '-' + k.id);
       b.setAttribute('aria-pressed', aan ? 'true' : 'false');
       b.setAttribute('aria-label', k.naam + ' voor ' + s.naam + ': ' + (aan ? 'staat aan' : 'staat uit'));
       b.appendChild(maak('i'));
@@ -174,6 +176,8 @@
     const aantalAan = (stand.soorten || []).filter(s => s.aan).length;
     const knop = maak('button', 'knop rood');
     knop.type = 'button';
+    knop.id = 'allePostUit';
+    knop.setAttribute('data-hoofdactie', '');
     knop.textContent = 'Zet alle post van RTG uit';
     knop.disabled = !aantalAan;
     knop.addEventListener('click', async () => {

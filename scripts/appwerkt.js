@@ -1071,7 +1071,17 @@ async function bedien(ctx, base, ingang) {
                  openen van Adaptive Edge. Komt geen bekende bediening terug,
                  dan is de expliciete Edge-route de juiste herstelweg. */
               const paginaTerug = await wachtOpBekendeBediening(page, ontbrekend);
-              if (!paginaTerug) await openAppBedieningInEdge(page, gehad, true);
+              if (!paginaTerug) {
+                await openAppBedieningInEdge(page, gehad, true);
+                /* Adaptive Edge bouwt haar appklonen na `openView` in een
+                   rendercyclus. Tachtig milliseconden was op een onbelaste
+                   machine vaak genoeg, maar liet de integrale proef soms
+                   kijken vóór de bekende ontbrekende kloon bestond en daarna
+                   voortijdig stoppen. Wacht op exact een reeds waargenomen
+                   ontbrekend merk; onbekende of niet-zichtbare bediening
+                   wordt hiermee nooit groen gemaakt. */
+                await wachtOpBekendeBediening(page, ontbrekend);
+              }
               herstelketenActief = false;
               instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
             }

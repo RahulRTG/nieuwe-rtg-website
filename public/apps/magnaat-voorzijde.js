@@ -47,7 +47,7 @@ function renderBron(){
   q('#mvNiveau').textContent=Number.isFinite(p.niveau)?p.niveau:'-';
   q('#mvBalans').textContent=Number.isFinite(p.virtueelBudget)?euro(p.virtueelBudget):'-';
   const bron=huidigeDossiers().length?huidigeDossiers():(BRON&&BRON.catalogus||[]).slice(0,3).map(x=>({naam:x.naam,functieId:x.id,software:x.software,status:'open'}));
-  qa('[data-mv-uitdaging]').forEach((b,i)=>{const x=bron[i];if(!x)return;b.hidden=false;b.querySelector('b').textContent=x.naam||'Nieuwe uitdaging';b.querySelector('small').textContent=[x.software&&x.software.naam,x.status==='klaar'?'Afgerond':'veilige missie'].filter(Boolean).join(' · ');b.querySelector('em').textContent=x.status==='klaar'?'Voltooid':i?'Uitdagend':'Vandaag'});
+  qa('[data-mv-uitdaging]').forEach((b,i)=>{const x=bron[i];b.hidden=!x;b.disabled=!x;b.toggleAttribute('aria-busy',!BRON);if(!x)return;b.querySelector('b').textContent=x.naam||'Nieuwe uitdaging';b.querySelector('small').textContent=[x.software&&x.software.naam,x.status==='klaar'?'Afgerond':'veilige missie'].filter(Boolean).join(' · ');b.querySelector('em').textContent=x.status==='klaar'?'Voltooid':i?'Uitdagend':'Vandaag'});
 }
 function renderMissie(){
   KEUZE=null;q('#mvVoerKeuzeUit').disabled=true;

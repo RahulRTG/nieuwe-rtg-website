@@ -33,6 +33,11 @@ test('de rustige voorzijde gebruikt echte Magnaat-bronnen en bewaart geen schijn
   assert.match(html,/RTGMagnaatVoorzijde\.ontvang\(DATA\)/);
 });
 
+test('voorbeeldmissies worden pas bedienbaar wanneer echte Magnaat-data bestaat',()=>{
+  assert.equal((html.match(/data-mv-uitdaging="[0-2]"[^>]*disabled[^>]*aria-busy="true"/g)||[]).length,3);
+  assert.match(js,/b\.hidden=!x;b\.disabled=!x;b\.toggleAttribute\('aria-busy',!BRON\)/);
+});
+
 test('de volledige bestaande wereld blijft bereikbaar en de veiligheidsgrens blijft zichtbaar',()=>{
   for(const scherm of ['werkplek','speelhal','wereld','economie','home'])assert.ok(js.includes("openDiep('"+scherm)||html.includes('data-mv-diep="'+scherm+'"'),scherm);
   assert.match(html,/data-magnaat-voorzijde-open/);

@@ -752,7 +752,25 @@ function redenVoorSchoneTegenproef(waarom) {
    toetsenbordactivatie is een volwaardige gebruikersroute en tegelijk een
    toegankelijkheidsbewijs. Gebruik deze terugval uitsluitend voor de
    expliciete stabiliteitsfout; onzichtbare of bedekte bediening blijft falen. */
-async function tikAlsGebruiker(page) {
+async function tikAlsGebruiker(page, toetsenbordEerst = false) {
+  const activeerMetToetsenbord = async () => {
+    const focusbaar = await page.evaluate(() => {
+      const el = document.querySelector('[data-appwerkt="1"]');
+      if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return false;
+      if (el.hidden || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      el.focus({ preventScroll: true });
+      return document.activeElement === el;
+    }).catch(() => false);
+    if (!focusbaar) return false;
+    await page.keyboard.press('Enter');
+    return true;
+  };
+  /* Modale en Edge-lagen bewegen tijdens hun compositorovergang. Hun
+     toetsenbordroute is een gewone, toegankelijke gebruikersroute en blijft
+     stabiel terwijl een muisklik op geometrische rust moet wachten. */
+  if (toetsenbordEerst && await activeerMetToetsenbord()) return 'toetsenbord';
   try {
     /* De volle meting draait meerdere echte browsers tegelijk. Een zichtbare
        control die onder die normale kwalificatielast iets langer nodig heeft
@@ -772,17 +790,7 @@ async function tikAlsGebruiker(page) {
        stabiliteitsantwoord gaf. Zodra de log zegt dat de klik al is
        verstuurd, volgt nooit een tweede activatie. */
     if (!/element is not stable|pagina antwoordde niet binnen de limiet/i.test(reden)) throw e;
-    const focusbaar = await page.evaluate(() => {
-      const el = document.querySelector('[data-appwerkt="1"]');
-      if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return false;
-      if (el.hidden || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
-      if (typeof el.checkVisibility === 'function' &&
-          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
-      el.focus({ preventScroll: true });
-      return document.activeElement === el;
-    }).catch(() => false);
-    if (!focusbaar) throw e;
-    await page.keyboard.press('Enter');
+    if (!await activeerMetToetsenbord()) throw e;
     return 'toetsenbord';
   }
 }
@@ -1161,7 +1169,7 @@ async function bedien(ctx, base, ingang) {
         const bestandskeuze = k.bestandskiezer
           ? page.waitForEvent('filechooser', { timeout: 2500 }).catch(() => null)
           : null;
-        const invoerwijze = await tikAlsGebruiker(page);
+        const invoerwijze = await tikAlsGebruiker(page, k.modaal || k.edgeApp);
         if (invoerwijze === 'toetsenbord') {
           instrument.push('een bewegende maar zichtbare bediening is via de toegankelijke Enter-route geactiveerd');
         }

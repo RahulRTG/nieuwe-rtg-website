@@ -73,11 +73,15 @@ test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenp
 
 test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenbordroute als terugval', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
-  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1700}element is not stable\|pagina antwoordde niet binnen de limiet[\s\S]{0,1500}keyboard\.press\('Enter'\)/);
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1800}keyboard\.press\('Enter'\)/);
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,2600}element is not stable\|pagina antwoordde niet binnen de limiet/,
+    'alleen een nog niet verstuurde geometrische muisactie mag naar het toetsenbord terugvallen');
   assert.doesNotMatch(bron, /async function tikAlsGebruiker[\s\S]{0,1800}dispatchEvent\(['"]click/,
     'de meter mag een klik niet rechtstreeks in het DOM veinzen');
   assert.match(bron, /page\.click\('\[data-appwerkt="1"\]', \{ timeout: 10000, noWaitAfter: true \}\)/,
     'de echte muisroute krijgt een begrensde stabiliteitswacht onder integrale belasting');
+  assert.match(bron, /tikAlsGebruiker\(page, k\.modaal \|\| k\.edgeApp\)/,
+    'bewegende modale en Edge-bediening gebruikt de volwaardige focus- en Enter-route');
 });
 
 test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtbare status wijzigt', () => {

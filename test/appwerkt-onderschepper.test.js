@@ -137,6 +137,13 @@ test('herstel onthoudt de waargenomen openerroute voor resterende bediening', ()
     'nieuw ontdekte bediening moet aan haar werkelijk gebruikte opener worden gekoppeld');
 });
 
+test('alleen een aantoonbare URL-overgang bewijst een trage navigatieklik', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const navigeerdeOndanksWacht = \/pagina antwoordde niet binnen de limiet\/i\.test\(waarom\) && !opIngang\(\)/,
+    'een gewone time-out op dezelfde app mag nooit administratief als klik slagen');
+});
+
 test('een herstelbare locatiekeuze telt niet als gesloten toegangsdeur', () => {
   const { POORTEN } = require('../scripts/appwerkt');
   assert.ok(POORTEN.includes('#poort.zien:not([data-poort-soort="locatie"])'));

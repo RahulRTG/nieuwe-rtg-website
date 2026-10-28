@@ -1257,6 +1257,25 @@ async function bedien(ctx, base, ingang) {
            onder een balk is iets anders dan een knop die er niet is. */
         const log = String(e.message || e);
         const waarom = klikReden(log);
+        /* Playwright wacht na een echte ankertik ook op het antwoord van de
+           bestemmingspagina. Een zware OS-ingang kan die kliklimiet
+           overschrijden terwijl de browser al aantoonbaar van de gemeten app
+           is vertrokken. Dat is wél bewijs voor de navigatieknop en géén
+           bewijs over de bestemming. Accepteer daarom uitsluitend de
+           waarneembare URL-overgang, open de gedeclareerde ingang opnieuw en
+           tel nooit een time-out die op dezelfde URL bleef. */
+        const navigeerdeOndanksWacht = /pagina antwoordde niet binnen de limiet/i.test(waarom) && !opIngang();
+        if (navigeerdeOndanksWacht) {
+          if (k.herhaling) {
+            if (!herhaaldAangeraakt.includes(k.tekst || '(naamloos)')) herhaaldAangeraakt.push(k.tekst || '(naamloos)');
+          } else {
+            aangetiktMerken.add(k.merk);
+            geklikt = aangetiktMerken.size;
+          }
+          instrument.push('de proef zag de URL na een trage navigatieklik veranderen en opende de app opnieuw zonder de bestemming mee te meten');
+          try { await openIngang(page, base, meet); await page.waitForTimeout(1200); } catch (x) {}
+          continue;
+        }
         /* Een eerdere geslaagde bediening kan een laag achterlaten die niet met
            Escape sluit. De volgende, op zichzelf geldige knop wordt dan door
            die PROEFSTAND onderschept. Toets zo'n knop eenmaal opnieuw vanaf de

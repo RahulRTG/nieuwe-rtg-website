@@ -76,12 +76,14 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
   assert.ok(appRoots[1].includes('[data-rtg-platform-chrome]'),
     'app-eigen suitenavigatie moet via dezelfde Edge bedienbaar blijven');
   assert.ok(!appRoots[1].includes('[data-rtg-edge-controls]'), 'universele Edge-bediening is geen appbediening');
-  assert.match(CONTROLS, /if \(src\.app\) b\.dataset\.rtgAdaptiveControl = 'app'/);
+  assert.match(CONTROLS, /if\s*\(src\.app\)\s*b\.dataset\.rtgAdaptiveControl\s*=\s*'app'/);
   assert.doesNotMatch(CONTROLS, /RTGDesktopFrame\.controls\(c, srcButtons\)\) return/,
     'een actieve desktopwerkplek mag de bediening van haar host niet verdringen');
   assert.match(CONTROLS, /'aria-haspopup'/, 'een gekloonde dialoogopener behoudt zijn semantiek');
   assert.match(CONTROLS, /el\.innerText\|\|el\.textContent/,
     'Edge-labels behouden zichtbare woordgrenzen tussen geneste tekstelementen');
+  assert.match(CONTROLS, /el\.href\?'route:'\+el\.href:'control:'\+lbl\(el\)/,
+    'een gekloonde navigatielink behoudt een route-identiteit over tekst- en framewissels');
   assert.match(APPWERKT, /el\.id \|\| el\.getAttribute\('data-rtg-adaptive-source'\)/,
     'de bron en haar Edge-kloon moeten als dezelfde handeling tellen');
   assert.match(APPWERKT, /replace\(\/\\s\+\/g, ' '\)\.trim\(\)/,
@@ -108,7 +110,7 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'nieuwe vervolgbediening blijft zichtbaar voordat het Edge-deck opnieuw opent');
   assert.match(APPWERKT, /data-bweg[\s\S]{0,300}upload\|bestand kiezen/,
     'verwijderen en de systeembestandskiezer komen na gewone paneelbediening');
-  assert.match(APPWERKT, /Buiten een modal[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)[\s\S]{0,160}Number\(!standNavigatie\(a\)\)/,
+  assert.match(APPWERKT, /Number\(!hoofdopener\(a\)\)[\s\S]{0,160}Number\(!dialoogOpener\(a\)\)[\s\S]{0,160}Number\(!standNavigatie\(a\)\)/,
     'een onafgewerkte dialoog wordt vóór algemene standnavigatie heropend');
   assert.match(APPWERKT, /heropenGeslotenDialoog = !nogModaal/,
     'een gesloten dialoog met resterende bekende bediening wordt meteen heropend');

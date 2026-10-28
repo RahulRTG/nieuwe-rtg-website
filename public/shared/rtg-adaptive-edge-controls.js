@@ -1,8 +1,7 @@
 (function(w,d){
   'use strict';
   var APP='.wd-output,.connection-edge,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtm-nav,.mv-navigatie,.roomrail,.rolechoice,.rtd-dossieracties,.rtd-besluitacties,.rtg-v4-route-actions,[data-rtg-platform-chrome]';
-  var R=APP+',.cmd-balk,[data-rtg-edge-controls],.rtgsprong-greep,.ios-nav-acties,.ios-nav-extra';
-
+  var R=APP+',.cmd-balk,[data-rtg-edge-controls],.rtgsprong-greep,.ios-nav-acties,.ios-nav-extra'
   function lbl(el){return(el.getAttribute('aria-label')||el.title||el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
   function avail(el,root){
     var view=el.ownerDocument.defaultView||w;
@@ -36,13 +35,13 @@
   }
   function render(rt){
     w.RTGAdaptiveEdgeInput.reflect(rt);
-    var c = rt.controls;
-    if (!c) {
-      c = d.createElement('div'); c.className = 'rtg-adaptive-controls';
+    var c=rt.controls;
+    if(!c){
+      c=d.createElement('div');c.className='rtg-adaptive-controls';
       c.setAttribute('role', 'group'); c.setAttribute('aria-label', 'Handelingen van dit scherm');
       rt.sheet.appendChild(c); rt.controls = c;
     }
-    var focus = c.contains(d.activeElement) ? d.activeElement.dataset.cap : '', sx = c.scrollLeft;
+    var focus=c.contains(d.activeElement)?d.activeElement.dataset.cap:'',sx=c.scrollLeft;
     c.textContent = '';
     if (w.RTGDesktopFrame) w.RTGDesktopFrame.controls(c, srcButtons);
     var A = w.RTGAdaptief;
@@ -87,9 +86,9 @@
       var el=src.el,b=d.createElement('button');b.type='button';
       var action=el.dataset.rtgActionKey
       b.className='rtg-adaptive-sheet-action';b.textContent=lbl(el);
-      if (src.app) b.dataset.rtgAdaptiveControl = 'app';
+      if(src.app)b.dataset.rtgAdaptiveControl='app';
       if(action)b.dataset.rtgActionKey=action
-      b.dataset.rtgAdaptiveSource=el.id||el.dataset.rtgAdaptiveSource||'control:'+lbl(el);
+      b.dataset.rtgAdaptiveSource=el.id||el.dataset.rtgAdaptiveSource||(el.href?'route:'+el.href:'control:'+lbl(el));
       if(el.tagName==='A'&&el.getAttribute('href'))b.dataset.rtgAdaptiveRoute='true';
       if(el.dataset.tab)b.dataset.rtgAdaptiveTab=el.dataset.tab;
       b.disabled=el.disabled||el.getAttribute('aria-disabled')==='true';

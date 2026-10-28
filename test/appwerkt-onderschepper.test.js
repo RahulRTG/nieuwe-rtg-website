@@ -73,7 +73,7 @@ test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenp
 
 test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenbordroute als terugval', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
-  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1500}element is not stable[\s\S]{0,1500}keyboard\.press\('Enter'\)/);
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1700}element is not stable\|pagina antwoordde niet binnen de limiet[\s\S]{0,1500}keyboard\.press\('Enter'\)/);
   assert.doesNotMatch(bron, /async function tikAlsGebruiker[\s\S]{0,1800}dispatchEvent\(['"]click/,
     'de meter mag een klik niet rechtstreeks in het DOM veinzen');
 });

@@ -761,7 +761,13 @@ async function tikAlsGebruiker(page) {
     await page.click('[data-appwerkt="1"]', { timeout: 5000, noWaitAfter: true });
     return 'muis';
   } catch (e) {
-    if (!/element is not stable/i.test(klikReden(String(e.message || e)))) throw e;
+    const reden = klikReden(String(e.message || e));
+    /* Als Playwright nog uitsluitend op stabiele geometrie wachtte, is geen
+       klik verstuurd. Probeer dan dezelfde zichtbare, focusbare bediening via
+       Enter. Dit omvat een drukke hoofddraad die binnen de muislimiet geen
+       stabiliteitsantwoord gaf. Zodra de log zegt dat de klik al is
+       verstuurd, volgt nooit een tweede activatie. */
+    if (!/element is not stable|pagina antwoordde niet binnen de limiet/i.test(reden)) throw e;
     const focusbaar = await page.evaluate(() => {
       const el = document.querySelector('[data-appwerkt="1"]');
       if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return false;

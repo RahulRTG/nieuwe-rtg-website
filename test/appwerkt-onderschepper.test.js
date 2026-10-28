@@ -76,6 +76,8 @@ test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenb
   assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1700}element is not stable\|pagina antwoordde niet binnen de limiet[\s\S]{0,1500}keyboard\.press\('Enter'\)/);
   assert.doesNotMatch(bron, /async function tikAlsGebruiker[\s\S]{0,1800}dispatchEvent\(['"]click/,
     'de meter mag een klik niet rechtstreeks in het DOM veinzen');
+  assert.match(bron, /page\.click\('\[data-appwerkt="1"\]', \{ timeout: 10000, noWaitAfter: true \}\)/,
+    'de echte muisroute krijgt een begrensde stabiliteitswacht onder integrale belasting');
 });
 
 test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtbare status wijzigt', () => {

@@ -758,8 +758,11 @@ async function tikAlsGebruiker(page) {
        control die onder die normale kwalificatielast iets langer nodig heeft
        om geometrisch stabiel te worden, is nog geen productdefect. Vijf
        seconden blijft een harde, korte grens, maar voorkomt dat dezelfde
-       sociale navigatie geïsoleerd 25/25 en parallel willekeurig 22/25 meet. */
-    await page.click('[data-appwerkt="1"]', { timeout: 5000, noWaitAfter: true });
+       sociale navigatie geïsoleerd 25/25 en parallel willekeurig 22/25 meet.
+       Op de volledige seriële kwalificatie bleef de drukke hoofddraad bij
+       vier wisselende controls incidenteel net boven vijf seconden; tien
+       seconden blijft begrensd en bewaart de echte muisroute. */
+    await page.click('[data-appwerkt="1"]', { timeout: 10000, noWaitAfter: true });
     return 'muis';
   } catch (e) {
     const reden = klikReden(String(e.message || e));

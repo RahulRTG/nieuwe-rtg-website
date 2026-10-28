@@ -750,7 +750,12 @@ function redenVoorSchoneTegenproef(waarom) {
    expliciete stabiliteitsfout; onzichtbare of bedekte bediening blijft falen. */
 async function tikAlsGebruiker(page) {
   try {
-    await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
+    /* De volle meting draait meerdere echte browsers tegelijk. Een zichtbare
+       control die onder die normale kwalificatielast iets langer nodig heeft
+       om geometrisch stabiel te worden, is nog geen productdefect. Vijf
+       seconden blijft een harde, korte grens, maar voorkomt dat dezelfde
+       sociale navigatie geïsoleerd 25/25 en parallel willekeurig 22/25 meet. */
+    await page.click('[data-appwerkt="1"]', { timeout: 5000, noWaitAfter: true });
     return 'muis';
   } catch (e) {
     if (!/element is not stable/i.test(klikReden(String(e.message || e)))) throw e;

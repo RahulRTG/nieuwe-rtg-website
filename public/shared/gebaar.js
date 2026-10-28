@@ -508,6 +508,12 @@
       el.type = 'button';
       el.setAttribute('aria-label', T('gebaar.acties', 'Acties voor deze regel', 'Actions for this row'));
       el.setAttribute('aria-haspopup', 'dialog');
+      /* De greep is de toegankelijke, klikbare deur naar de veegacties. Geef
+         die kortlevende deur een vaste identiteit en primaire prioriteit,
+         zodat Edge en APPWERKT haar bedienen voordat een render van de rij
+         haar vervangt. De handeling zelf blijft dezelfde publieke klik. */
+      el.setAttribute('data-rtg-adaptive-source', 'gebaar-acties');
+      el.setAttribute('data-hoofdactie', '');
     }
     el.className = 'gb-greep';
     el.innerHTML = svg('meer');
@@ -583,7 +589,6 @@
   /* Scrollen sluit een openstaande lade. Een lade die tien regels verderop nog
      openstaat is geen geheugen maar een vergeten venster. */
   addEventListener('scroll', function () { if (openLade) sluitAlles(true); }, { passive: true, capture: true });
-
 /* Vervolg van gebaar-03: VASTHOUDEN, in zijn twee betekenissen. Lang drukken
    opent de acties als lijst; vasthouden op een borg-actie voert hem uit. Apart
    bestand omdat de maat het vroeg (check.js regel 13) en omdat het een eigen

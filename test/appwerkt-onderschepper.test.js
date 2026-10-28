@@ -94,6 +94,9 @@ test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan
   assert.match(lees('public/shared/social-intelligence-deck.js'), /rtgSocialRahulSubmit[\s\S]{0,120}data-hoofdactie/);
   assert.match(lees('public/apps/office/app/app-02a2.js'), /office-fase-[\s\S]{0,120}data-hoofdactie/);
   assert.match(lees('public/shared/gebaar/gebaar-04.js'), /data-hoofdactie/);
+  assert.match(lees('public/shared/gebaar/gebaar-03.js'),
+    /data-rtg-adaptive-source['"], ['"]gebaar-acties[\s\S]{0,160}data-hoofdactie/,
+    'de kortlevende deur naar veegacties moet vóór een verversing bedienbaar zijn');
 });
 
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {

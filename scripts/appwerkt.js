@@ -665,8 +665,9 @@ async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
   return page.waitForFunction(({ bediening, ontbrekend }) => {
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
-      const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-      const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+      let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      if (bron.startsWith('control:')) bron = '';
       return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
     };
     const zichtbaar = (el) => {
@@ -1366,8 +1367,9 @@ async function openAppBedieningInEdge(page, gehad, herstel) {
     const geopend = await page.evaluate(({ alGehad, herstel }) => {
       const merk = (el) => {
         const label = (el.getAttribute('aria-label') || '').trim();
-        const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-        const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+        const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+        let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+        if (bron.startsWith('control:')) bron = '';
         return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
       };
       const oppervlak = [...document.querySelectorAll('[data-rtg-adaptive-surface-owner="app"] button,'
@@ -1434,8 +1436,9 @@ async function markeerBekendeDialoogopener(page, openerMerk, voortgang) {
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
-      const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-      const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+      let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      if (bron.startsWith('control:')) bron = '';
       return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
     };
     const doel = [...document.querySelectorAll('[aria-haspopup="dialog"]')]
@@ -1584,8 +1587,9 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
-      const naam = (label || el.innerText || el.value || el.title || '').replace(/\s+/g, ' ').trim();
-      const bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+      let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      if (bron.startsWith('control:')) bron = '';
       return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
     };
     /* De taalkeuze wordt niet aangetikt: een taal kiezen verandert de persona

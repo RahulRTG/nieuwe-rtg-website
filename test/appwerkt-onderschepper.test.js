@@ -85,6 +85,14 @@ test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtb
     'inventarisatie, replay en controle moeten dezelfde stabiele bronidentiteit gebruiken');
 });
 
+test('een Edge-kloon en haar bronbediening delen één toegankelijke identiteit', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.equal((bron.match(/label \|\| el\.title \|\| el\.innerText \|\| el\.value/g) || []).length, 4,
+    'bron en kloon moeten dezelfde naamvolgorde gebruiken');
+  assert.equal((bron.match(/if \(bron\.startsWith\('control:'\)\) bron = '';/g) || []).length, 4,
+    'de technische control-prefix mag geen tweede zakelijke handeling maken');
+});
+
 test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan de bedieningsmeter', () => {
   const fs = require('node:fs');
   const path = require('node:path');

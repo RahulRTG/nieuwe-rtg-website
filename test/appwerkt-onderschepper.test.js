@@ -125,8 +125,16 @@ test('een herhaalde hoofdopener gaat voor algemene dialoogopeners', () => {
   const bron = require('node:fs').readFileSync(
     require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
   assert.match(bron,
-    /const hoofdopener = \(el\) => hoofdactie\(el\) && dialoogOpener\(el\)[\s\S]{0,4000}if \(!doel && magHerhalen\)[\s\S]{0,2600}Number\(!hoofdopener\(a\)\)[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)/,
+    /if \(!doel && magHerhalen\)[\s\S]{0,5000}Number\(!alVoorkeur\.includes\(merk\(a\)\)\)[\s\S]{0,300}Number\(!hoofdopener\(a\)\)[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)/,
     'kortlevende vervolgacties moeten via hun gedeclareerde hoofdopener worden hersteld');
+});
+
+test('herstel onthoudt de waargenomen openerroute voor resterende bediening', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const openerVoorMerk = new Map\(\);/);
+  assert.match(bron, /if \(k\.routeOpener && !bekendVoorKlik\.has\(merk\)[\s\S]{0,320}openerVoorMerk\.set\(merk, k\.merk\)/,
+    'nieuw ontdekte bediening moet aan haar werkelijk gebruikte opener worden gekoppeld');
 });
 
 test('een herstelbare locatiekeuze telt niet als gesloten toegangsdeur', () => {

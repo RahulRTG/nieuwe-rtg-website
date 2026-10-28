@@ -812,8 +812,37 @@ async function bedien(ctx, base, ingang) {
   const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [], wachtend = [];
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
+  const gehad = new Set();
   const gevondenMerken = new Set();
   const gevondenNamen = new Map();
+  /* Onthoud via welke werkelijk aangetikte bediening een nieuwe bediening
+     voor het eerst zichtbaar werd. Een brede app kan tientallen geldige
+     openers hebben. Zonder deze herkomst liep herstel ze in DOM-volgorde
+     opnieuw af, ook wanneer al was waargenomen dat precies opener B naar de
+     nog onaangeraakte actie leidde. De kaart bewaart alleen stabiele
+     bedieningsmerken en voert zelf niets uit. */
+  const openerVoorMerk = new Map();
+  const zouCyclusMaken = (kind, opener) => {
+    let huidig = opener;
+    const gezien = new Set();
+    while (huidig && !gezien.has(huidig)) {
+      if (huidig === kind) return true;
+      gezien.add(huidig);
+      huidig = openerVoorMerk.get(huidig);
+    }
+    return false;
+  };
+  const voorkeursopeners = () => {
+    const uit = new Set();
+    const voegToe = (merk) => {
+      const opener = openerVoorMerk.get(merk);
+      if (!opener || uit.has(opener)) return;
+      uit.add(opener);
+      voegToe(opener);
+    };
+    for (const merk of gevondenMerken) if (!gehad.has(merk)) voegToe(merk);
+    return uit;
+  };
   const aangetiktMerken = new Set();
   const telStand = (stand) => {
     for (const merk of (stand && stand.merken) || []) gevondenMerken.add(merk);
@@ -930,9 +959,8 @@ async function bedien(ctx, base, ingang) {
       let naar = null; try { naar = JSON.parse(q.postData() || '{}').naar; } catch (e) {}
       if (naar && naar !== 'nl' && laatste && !taalWissel.some((w) => w.knop === laatste && w.naar === naar)) taalWissel.push({ knop: laatste, naar });
     });
-    const gehad = new Set();
     const kijk = (magHerhalen = false, alleenStructuur = false) =>
-      kijkRonde(page, gehad, bereik, herhaald, magHerhalen, alleenStructuur, gevondenMerken);
+      kijkRonde(page, gehad, bereik, herhaald, magHerhalen, alleenStructuur, gevondenMerken, voorkeursopeners());
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       /* Werk eerst het zichtbare scherm af. Adaptive Edge vervangt vaste
          appbalken door werkende klonen in zijn Acties-blad, maar gewone
@@ -1069,6 +1097,12 @@ async function bedien(ctx, base, ingang) {
           if (k.klaar) break;
         }
       }
+      /* `kijkRonde` inventariseert de hele huidige stand. Neem het nulpunt
+         pas daarna: alleen bediening die NA de klik verschijnt hoort bij de
+         opener. Een nulpunt vóór `kijkRonde` zou alle overige beginknoppen
+         ten onrechte kinderen van de eerste klik maken en herstelcycli
+         veroorzaken. */
+      const bekendVoorKlik = new Set(gevondenMerken);
       if (k.herhaling) {
         herhaald.add(k.herhaalSleutel);
         herstelketenActief = true;
@@ -1195,6 +1229,12 @@ async function bedien(ctx, base, ingang) {
         try { vervolg = await kijk(); } catch (e) { vervolg = null; }
         if (vervolg) {
           telStand(vervolg);
+          for (const merk of vervolg.merken || []) {
+            if (k.routeOpener && !bekendVoorKlik.has(merk) && merk !== k.merk &&
+                !openerVoorMerk.has(merk) && !zouCyclusMaken(merk, k.merk)) {
+              openerVoorMerk.set(merk, k.merk);
+            }
+          }
           behoudHuidigeStand = !vervolg.klaar;
         }
         /* Na een herhaalde opener kan de dialoog uitsluitend bediening tonen
@@ -1499,8 +1539,8 @@ async function bedektDoorSchil(page, bereik) {
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false, bekend = new Set()) {
-  return page.evaluate(({ alGehad, alHerhaald, alBekend, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol }) => {
+async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false, bekend = new Set(), voorkeur = new Set()) {
+  return page.evaluate(({ alGehad, alHerhaald, alBekend, alVoorkeur, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (typeof el.checkVisibility === 'function' &&
@@ -1654,7 +1694,8 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
              is expliciete standnavigatie, geen willekeurige taakactie. Zonder
              deze rangorde zag het Social Control Plane AAN en ANALYSEER
              CONTEXT wel, maar sloot het deck voordat hun tab terugkwam. */
-          ? Number(!hoofdopener(a)) - Number(!hoofdopener(b)) ||
+          ? Number(!alVoorkeur.includes(merk(a))) - Number(!alVoorkeur.includes(merk(b))) ||
+            Number(!hoofdopener(a)) - Number(!hoofdopener(b)) ||
             Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
             Number(sluiter(a)) - Number(sluiter(b)) ||
             risicoRang(a) - risicoRang(b) ||
@@ -1672,6 +1713,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
                openers en bereikte zij de laatste twee geldige veegacties pas
                na MAXKLIK. De opener blijft een gewone browserklik; alleen de
                volgorde van reeds bewezen herstelroutes wordt specifieker. */
+            Number(!alVoorkeur.includes(merk(a))) - Number(!alVoorkeur.includes(merk(b))) ||
             Number(!hoofdopener(a)) - Number(!hoofdopener(b)) ||
             Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
             Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
@@ -1685,9 +1727,9 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
     doel.setAttribute('data-appwerkt', '1');
     return { klaar: false, zichtbaar, merken, bedieningen, schil, merk: merk(doel), herhaling, herhaalSleutel,
       edgeApp: edgeApp(doel), modaal: !!modaal, bestandskiezer: isBestandskiezer(doel),
-      dialoogOpener: dialoogOpener(doel),
+      dialoogOpener: dialoogOpener(doel), routeOpener: standNavigatie(doel) || dialoogOpener(doel),
       tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
-  }, { alGehad: [...gehad], alHerhaald: [...herhaald], alBekend: [...bekend], magHerhalen, alleenStructuur, SCHIL: GEDEELDE_SCHIL, bereik,
+  }, { alGehad: [...gehad], alHerhaald: [...herhaald], alBekend: [...bekend], alVoorkeur: [...voorkeur], magHerhalen, alleenStructuur, SCHIL: GEDEELDE_SCHIL, bereik,
     bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });
 }
 

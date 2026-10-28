@@ -97,6 +97,12 @@ test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan
   assert.match(lees('public/shared/gebaar/gebaar-03.js'),
     /data-rtg-adaptive-source['"], ['"]gebaar-acties[\s\S]{0,160}data-hoofdactie/,
     'de kortlevende deur naar veegacties moet vóór een verversing bedienbaar zijn');
+  assert.match(lees('public/shared/deelmenu/deelmenu-02.js'),
+    /data-rtg-adaptive-source['"], ['"]deel-[\s\S]{0,120}data-stand/,
+    'een herbouwde deeltab moet dezelfde appstand en control-identiteit houden');
+  assert.match(lees('public/shared/rtg-docs-2026.css'),
+    /\.rtd-nav\{[^}]*z-index:45/,
+    'RTDocs-navigatie moet boven de iOS-kop en onder dialogen blijven');
 });
 
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {

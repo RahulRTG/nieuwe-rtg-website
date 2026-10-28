@@ -152,12 +152,15 @@ const stil = process.argv.includes('--stil');
 const alleenInventaris = process.argv.includes('--inventaris');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
-/* De grootste gemeten schermen bevatten ruim 190 unieke handelingen. Omdat
-   een vervolgstand soms twee of meer reeds bewezen openers moet herhalen, is
-   256 rondes geen geldige bovengrens voor volledige dekking. 1024 blijft een
-   harde, eindige veiligheidsgrens, maar laat de meter wel ieder uniek control
-   plus zijn begrensde navigatiepad werkelijk aanraken. */
-const MAXKLIK = 1024;
+/* De grootste gemeten schermen bevatten ruim 200 unieke handelingen. Een
+   volledige testwereld kan daar extra contextbediening aan toevoegen die een
+   geisoleerde appmeting niet ziet. Iedere vervolgactie kan bovendien twee of
+   meer reeds bewezen openers nodig hebben. De grens van 1024 eindigde in de
+   integrale ronde precies voor de laatste drie geldige vervolgacties, hoewel
+   er geen onklikbare bediening was. 2048 blijft een harde, eindige
+   veiligheidsgrens; normale schermen stoppen nog steeds meteen zodra alle
+   bekende bediening is aangeraakt. */
+const MAXKLIK = 2048;
 /* Een echte openerketen in RTG is kort. Per nog onaangeraakte eindtak krijgt
    de meter 32 herhaalde standstappen, met 128 als harde bovengrens. Een vaste
    grens van 32 stopte Magnaat na de eerste van meerdere geldige eindtakken:

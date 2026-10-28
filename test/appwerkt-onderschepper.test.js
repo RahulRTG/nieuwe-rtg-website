@@ -114,6 +114,13 @@ test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening
   assert.equal(herstelgrens(40), 128, 'de meter kan nooit onbeperkt blijven herhalen');
 });
 
+test('de integrale klikgrens laat grote dynamische schermen hun vervolgacties afmaken', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const MAXKLIK = 2048;/,
+    'meer dan tweehonderd unieke controls met replaypaden moeten binnen een eindige ronde passen');
+});
+
 test('een herstelbare locatiekeuze telt niet als gesloten toegangsdeur', () => {
   const { POORTEN } = require('../scripts/appwerkt');
   assert.ok(POORTEN.includes('#poort.zien:not([data-poort-soort="locatie"])'));

@@ -665,7 +665,8 @@ async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
   return page.waitForFunction(({ bediening, ontbrekend }) => {
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
-      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+        .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
       let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
       if (bron.startsWith('control:')) bron = '';
       return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
@@ -1378,7 +1379,8 @@ async function openAppBedieningInEdge(page, gehad, herstel) {
     const geopend = await page.evaluate(({ alGehad, herstel }) => {
       const merk = (el) => {
         const label = (el.getAttribute('aria-label') || '').trim();
-        const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+        const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+          .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
         let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
         if (bron.startsWith('control:')) bron = '';
         return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
@@ -1447,7 +1449,8 @@ async function markeerBekendeDialoogopener(page, openerMerk, voortgang) {
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
-      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+        .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
       let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
       if (bron.startsWith('control:')) bron = '';
       return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
@@ -1598,7 +1601,8 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
     const merk = (el) => {
       const label = (el.getAttribute('aria-label') || '').trim();
-      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim();
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+        .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
       let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
       if (bron.startsWith('control:')) bron = '';
       return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');

@@ -97,6 +97,8 @@ test('een Edge-kloon en haar bronbediening delen één toegankelijke identiteit'
     'bron en kloon moeten dezelfde naamvolgorde gebruiken');
   assert.equal((bron.match(/if \(bron\.startsWith\('control:'\)\) bron = '';/g) || []).length, 4,
     'de technische control-prefix mag geen tweede zakelijke handeling maken');
+  assert.equal((bron.match(/replace\(\/\^\(\[\^\\p\{L\}\\p\{N\}\]\+\)\\s\+\/u, '\$1'\)/g) || []).length, 4,
+    'witruimte na een visueel pictogram mag bron en Edge-kloon niet verdubbelen');
 });
 
 test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan de bedieningsmeter', () => {

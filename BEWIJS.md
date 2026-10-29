@@ -17,9 +17,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 416 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2816 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 182 |
+| niet te meten (al rood, geen module gevonden, ...) | 184 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 7 |
+| niets van beide | 5 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -145,7 +145,7 @@ toets omvalt.
 | `apipoort-levensduur.test.js` | 6 | gezakt op `liegpoort /api/` | De machinesleutel van de API-poort als gemigreerde credential (CODECREDENTIALS.json, command.api_machinesleutel). Wat hier moet kunnen zakken: 1. |
 | `apipoort-takken.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | DE API-POORT VAN COMMAND op zijn randen (kern/command/apipoort.js, apipoort-controle.js en apipoort-levensduur.js), aanvulling op test/apipoort.test.js en test/apipoort-levensduur.test.js. De poort geeft... |
 | `apipoort.test.js` | 10 | gezakt op `===->!==#0` | De API-poort (kern/command/apipoort.js): sleutels, scopes, quota en contractregels voor koppelingen. WAT DEZE TOETS VOORAL BEWAAKT zijn vier dingen die allemaal onzichtbaar kapot kunnen gaan: 1. |
-| `app-main-bediening.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `app-main-bediening.test.js` | 4 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `appbieb.test.js` | 5 | gezakt op `liegpoort /api/` | De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je startscherm. |
 | `appbrug.test.js` | 10 | gezakt op `===->!==#0` | DE APPBRUG (kern/mobiliteit/appbrug.js) -- van app-rit naar vervoersopdracht. Het besluit erachter staat in MAATSTAF.md par. |
 | `appcluster.test.js` | 6 | gezakt op `===->!==#0` | ROOD CLUSTEREN -- de rode cellen van APPWERKT.json per kandidaat-oorzaak. Wat vastligt, en elke regel kan zakken: 1. |
@@ -171,7 +171,7 @@ toets omvalt.
 | `appurlvast.test.js` | 2 | gezakt op `liegpoort /api/` | DE VASTE LINKBASIS: APP_URL, of een ECHTE openbare hostnaam uit RTG_DOMAINS. server/server.js nam het EERSTE element van RTG_DOMAINS als hostnaam voor de links in een e-mail. |
 | `appwereldcatalogus.test.js` | 6 | al rood | DE VIER MEGA-APPS BEGINNEN BIJ EIGENAARSCHAP, NIET BIJ VORM. Iedere bediende app-route hoort precies één keer bij LIFE, WORK, FOUNDATION of INSTELLINGEN. |
 | `appwerkt-interne-ingang.test.js` | 5 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `appwerkt-onderschepper.test.js` | 18 | gezakt op `===->!==#8` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `appwerkt-onderschepper.test.js` | 18 | gezakt op `regex-alternatief-weg#2` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `appwerkt-vers-releasepoort.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE VERSHEID VAN APPWERKT IS EEN RELEASEPOORT, GEEN RAPPORT. Een app die als 8/8 geldt terwijl een van zijn bewijzen sinds de meting is vervallen, is geen 8/8 meer (BETROUWBAARHEID.md par. |
 | `archief.test.js` | 5 | gezakt op `liegpoort /api/` | De archiefkast: afgeronde tickets ouder dan een afgesloten kwartaal verhuizen naar append-only maandbestanden. De levende kast blijft klein, maar niets raakt zoek: de backoffice-totalen tellen het archief mee en de... |
 | `architect.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Architectenbureau: het huizen-ontwerpbureau van de kantoren (villa's, penthouses, landgoederen, chalets, paviljoens). Een AI tekent het concept uit (typologie, constructie, materialen, gedempt palet,... |
@@ -1887,7 +1887,7 @@ toets omvalt.
 | `rtfwelzijn.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 1): het gevoelsdagboek. Opt-in (de server bewaart alleen wat het kind zelf instuurt), prive per profiel (ook dicht voor gasten), een woord per dag (vandaag herzien mag, gisteren blijft staan), en... |
 | `rtfwelzijn2.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 2): de nieuwe coach-soorten voor de welzijnsapps. Zonder AI-sleutel geeft elke soort zijn EIGEN warme demotekst (de knop werkt dus altijd), een onbekende soort valt veilig terug, en de... |
 | `rtg-a11y.test.js` | 8 | gezakt op `&&->||#0` | DE TOEGANKELIJKHEIDSADAPTER -- leest hij de keuring werkelijk goed uit? scripts/rtg-a11y.js voegt geen regels toe: hij richt de bestaande machinerie (scripts/a11ykeuring.js en scripts/raakvlakkeuring.js) op een... |
-| `rtg-adaptive-edge.test.js` | 19 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtg-adaptive-edge.test.js` | 19 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-continue-key.test.js` | 10 | gezakt op `===->!==#0` | De Continue Key mag rijk bewegen, maar blijft exact de bestaande primaire Edge-knop. Deze toets bewaakt identiteit, veilige ankers, toetsenbord, langdruk, geometrie, a11y, opslag en motion-koppeling. |
 | `rtg-edge-2-pilots.test.js` | 15 | gezakt op `===->!==#0` | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
 | `rtg-edge-2.test.js` | 14 | gezakt op `===->!==#0` | Edge 2.0 bestuurt het bestaande casco. Deze toets borgt dat er geen tweede balkenstelsel, netwerklaag of onbegrensde contextselectie ontstaat. |
@@ -2072,7 +2072,7 @@ toets omvalt.
 | `simulatie-uitbetaling.test.js` | 7 | gezakt op `===->!==#0` | De simulatieve uitbetaalrail: terugstorten naar het eigen IBAN, beproefbaar zonder echt geld (server/betaal/synthetisch.js `uitbetaal`, server/betaal/uitbetaling.js, kern/betaalopdracht/inzending.js). Gevraagd door... |
 | `simulatiebank.test.js` | 7 | gezakt op `liegpoort /api/` | DE SIMULATIEBANK, EN DE POORT DIE HIJ NIET AANRAAKT. MAGNAATLAB.md par. |
 | `simulatiebrug-productiepoort.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `sitemaker-context.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `sitemaker-context.test.js` | 3 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `skipwacht.test.js` | 2 | geen module gevonden | EEN OVERGESLAGEN SCHERMTOETS IS ROOD. Afspraak van Rahul, 11 augustus 2026. |
 | `sleutel-wedloop.test.js` | 4 | gezakt op `!==->===#0` | ELKE SLEUTEL IN DE DATAMAP, ONDER GELIJKTIJDIG OPSTARTEN. DE AANLEIDING IS OPNIEUW EEN CI-UITVAL. |
 | `sleutelwoorden.test.js` | 7 | gezakt op `===->!==#0` | Sleutelwoorden: inloggen door een gesprek met Rahul in plaats van een wachtwoord. Getoetst op kern-niveau (met een nep-kluis en echte crypto): het instellen keurt precies vier verschillende woorden van minstens drie... |

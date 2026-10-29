@@ -99,6 +99,15 @@ test('de Lifestyle-persona doorloopt echte menselijke goedkeuring voor de premiu
   }
 });
 
+test('de gewone proefpersoon rondt de echte onboarding en identiteitsdeur af', () => {
+  const spaar = SPAAR.split(',');
+  assert.ok(spaar.includes('/api/onboarding/'),
+    'status alleen is niet genoeg: opslaan en tekenen moeten de proefpersoon werkelijk afronden');
+  assert.ok(spaar.includes('/api/verify/upload'),
+    'de identiteitsupload is fixtureopbouw en moet de echte pending-status kunnen geven');
+  assert.ok(!spaar.includes('/api/'), 'functionele app-antwoorden mogen niet door deze fixturedeur ontsnappen');
+});
+
 test('de OS-adapter spaart alleen zijn toegangsschil en liegt zijn eigen werk leeg', () => {
   assert.ok(ADAPTER_SPAAR.split(',').includes('/api/state'), 'zonder echte accountstaat is Rahul niet zichtbaar');
   assert.ok(!ADAPTER_SPAAR.split(',').includes('/api/account/'), 'de rollenlijst van Werk is inhoud en moet leeg worden beproefd');

@@ -65,7 +65,12 @@ const SPAAR = ['/api/auth/', '/api/login', '/api/office/login', '/api/supplier/l
      lezen daarna andere routes; die blijven dus gewoon leeggelogen. */
   '/api/foundation/gezin/profiel/maak', '/api/foundation/gezin/profiel/kies',
   '/api/foundation/les/maak', '/api/foundation/les/join',
-  '/api/account/', '/api/onboarding/status',
+  /* De proefpersoon moet de bestaande onboarding en identiteitsupload echt
+     kunnen afronden voordat de functionele antwoorden worden leeggelogen.
+     Alleen status sparen was onvoldoende: opslaan en tekenen kregen dan het
+     lege proefantwoord `{ok:true}`, waardoor 75 ledenschermen ten onrechte als
+     "geen sessie" eindigden. Dit zijn fixturedeuren, geen app-uitkomsten. */
+  '/api/account/', '/api/onboarding/', '/api/verify/upload',
   /* Dit is de serverdeur van beschermde Foundation-schermen. Hem leeg laten
      antwoorden houdt het echte scherm kunstmatig dicht en meet vervolgens de
      deur in plaats van wat het scherm over zijn gegevens beweert. Net als de

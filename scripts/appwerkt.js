@@ -731,6 +731,7 @@ function klikReden(log) {
   const l = String(log || '');
   const bekend = l.match(/intercepts pointer events|element is not visible|element is not stable|element is not enabled|element is outside of the viewport/i);
   if (bekend) return bekend[0];
+  if (/waiting for locator\('\[data-appwerkt="1"\]'\)/i.test(l)) return 'bediening werd opnieuw getekend voor activering';
   if (/performing click action/i.test(l)) return 'tik verstuurd maar niet afgerond binnen de limiet';
   if (/waiting for element to be visible, enabled and stable/i.test(l)) return 'pagina antwoordde niet binnen de limiet';
   return 'reden niet gemeld';
@@ -743,7 +744,7 @@ function klikReden(log) {
    vanaf de gedeclareerde ingang. Een knop die daar verborgen blijft, faalt
    nog steeds; dit maakt een werkelijk onzichtbare bediening dus niet groen. */
 function redenVoorSchoneTegenproef(waarom) {
-  return /intercepts pointer events|element is outside of the viewport|element is not visible|element is not stable|pagina antwoordde niet binnen de limiet/i
+  return /intercepts pointer events|element is outside of the viewport|element is not visible|element is not stable|pagina antwoordde niet binnen de limiet|bediening werd opnieuw getekend voor activering/i
     .test(String(waarom || ''));
 }
 
@@ -773,6 +774,17 @@ async function tikAlsGebruiker(page, toetsenbordEerst = false) {
      stabiel terwijl een muisklik op geometrische rust moet wachten. */
   if (toetsenbordEerst && await activeerMetToetsenbord()) return 'toetsenbord';
   try {
+    /* Een vaste Edge reserveert onderaan ruimte, maar Playwrights ingebouwde
+       `scrollIntoViewIfNeeded` kent vaste lagen niet: een net zichtbare knop
+       kan daardoor precies achter de Edge eindigen. Centreer de werkelijk
+       gemarkeerde bediening zoals een gebruiker die naar de handeling
+       scrolt. Een echte overlay in het midden blijft de gewone klik nog steeds
+       blokkeren en wordt dus niet administratief groen. */
+    await page.evaluate(() => {
+      const el = document.querySelector('[data-appwerkt="1"]');
+      if (el) el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+    });
+    await page.waitForTimeout(80);
     /* De volle meting draait meerdere echte browsers tegelijk. Een zichtbare
        control die onder die normale kwalificatielast iets langer nodig heeft
        om geometrisch stabiel te worden, is nog geen productdefect. Vijf
@@ -1170,6 +1182,24 @@ async function bedien(ctx, base, ingang) {
            toestand; de knop zelf blijft een normale, niet-geforceerde browser-
            klik. Edge-acties blijven vanzelf in het open deck staan. */
         if (!k.edgeApp) {
+          /* De systeemstatus, functiebibliotheek en Rahul-laag zijn normale
+             Edge-schermen. Nadat hun eigen bediening is beproefd kan zo'n
+             laag nog openstaan en een latere paginaactie afdekken. Een mens
+             sluit die laag met Escape; doe exact dat vóór een gewone,
+             niet-modale paginaactie en controleer dat de laag werkelijk dicht
+             is. Een appdialoog laten we ongemoeid, omdat dezelfde Escape daar
+             ook een betekenis kan hebben. */
+          const gedeeldeLaagOpen = !k.modaal && await page.evaluate(() => !!document.querySelector(
+            '.rtg-edge-index[aria-hidden="false"],.rtg-edge-status-panel[aria-hidden="false"],'
+            + '.rtg-edge-ai-panel[aria-hidden="false"],[data-rtg-edge-2-context-open]'));
+          if (gedeeldeLaagOpen) {
+            await page.keyboard.press('Escape');
+            await page.waitForFunction(() => !document.querySelector(
+              '.rtg-edge-index[aria-hidden="false"],.rtg-edge-status-panel[aria-hidden="false"],'
+              + '.rtg-edge-ai-panel[aria-hidden="false"],[data-rtg-edge-2-context-open]'),
+            null, { timeout: 2500 }).catch(() => {});
+            instrument.push('de proef sloot een eerder beproefde Edge-laag via Escape voordat zij de pagina verder bediende');
+          }
           const edgeGesloten = await page.evaluate(() => {
             if (document.body.dataset.rtgAdaptiveState !== 'expanded' ||
                 !window.RTGAdaptiveEdge || !window.RTGAdaptiveEdge.setState) return false;
@@ -1297,6 +1327,9 @@ async function bedien(ctx, base, ingang) {
            Zonder die reden is "niet aan te tikken" een dood getal: een knop
            onder een balk is iets anders dan een knop die er niet is. */
         const log = String(e.message || e);
+        if (process.env.APPWERKT_DEBUG === '1') {
+          console.error('[appwerkt-debug] ' + pad + ' :: ' + (k.tekst || '(naamloos)') + '\n' + log);
+        }
         const waarom = klikReden(log);
         /* Playwright wacht na een echte ankertik ook op het antwoord van de
            bestemmingspagina. Een zware OS-ingang kan die kliklimiet

@@ -55,6 +55,8 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
     'tik verstuurd maar niet afgerond binnen de limiet');
   assert.equal(klikReden('Timeout 2500ms exceeded.\n - attempting click action\n - waiting for element to be visible, enabled and stable'),
     'pagina antwoordde niet binnen de limiet');
+  assert.equal(klikReden('Timeout 10000ms exceeded.\n - waiting for locator(\'[data-appwerkt="1"]\')'),
+    'bediening werd opnieuw getekend voor activering');
   assert.equal(klikReden('Timeout 2500ms exceeded.\n - waiting for locator'), 'reden niet gemeld');
   assert.equal(klikReden(''), 'reden niet gemeld');
 });
@@ -62,7 +64,7 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
 test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenproef', () => {
   const { redenVoorSchoneTegenproef } = require('../scripts/appwerkt');
   for (const reden of ['intercepts pointer events', 'element is outside of the viewport', 'element is not visible',
-    'element is not stable', 'pagina antwoordde niet binnen de limiet']) {
+    'element is not stable', 'pagina antwoordde niet binnen de limiet', 'bediening werd opnieuw getekend voor activering']) {
     assert.equal(redenVoorSchoneTegenproef(reden), true, reden);
   }
   assert.equal(redenVoorSchoneTegenproef('element is not enabled'), false,
@@ -74,12 +76,16 @@ test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenp
 test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenbordroute als terugval', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
   assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1800}keyboard\.press\('Enter'\)/);
-  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,2600}element is not stable\|pagina antwoordde niet binnen de limiet/,
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,4200}element is not stable\|pagina antwoordde niet binnen de limiet/,
     'alleen een nog niet verstuurde geometrische muisactie mag naar het toetsenbord terugvallen');
   assert.doesNotMatch(bron, /async function tikAlsGebruiker[\s\S]{0,1800}dispatchEvent\(['"]click/,
     'de meter mag een klik niet rechtstreeks in het DOM veinzen');
   assert.match(bron, /page\.click\('\[data-appwerkt="1"\]', \{ timeout: 10000, noWaitAfter: true \}\)/,
     'de echte muisroute krijgt een begrensde stabiliteitswacht onder integrale belasting');
+  assert.match(bron, /scrollIntoView\(\{ block: 'center', inline: 'nearest', behavior: 'instant' \}\)/,
+    'de normale scrollroute houdt de gemarkeerde bediening buiten vaste Edge-lagen');
+  assert.match(bron, /gedeeldeLaagOpen[\s\S]{0,900}keyboard\.press\('Escape'\)[\s\S]{0,900}rtg-edge-status-panel\[aria-hidden=/,
+    'een reeds beproefde gedeelde Edge-laag sluit via haar gewone Escape-route voor de app verdergaat');
   assert.match(bron, /tikAlsGebruiker\(page, k\.modaal \|\| k\.edgeApp\)/,
     'bewegende modale en Edge-bediening gebruikt de volwaardige focus- en Enter-route');
 });

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-29T00:28:53.311Z",
-    "commit": "8fd7ed6b33",
-    "boomVuil": false,
+    "op": "2026-10-29T11:57:55.508Z",
+    "commit": "1b7bb1ecf0",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.10.0"
+    "node": "v26.12.1"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -5069,6 +5069,14 @@
       "staat": "gezakt",
       "module": "server/kern/experience/broker-evidence.js",
       "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "experience-coverage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/coverage.js",
+      "operator": "voorwaarde-omkeren#0",
       "gezakt": 1,
       "geprobeerd": 1
     },

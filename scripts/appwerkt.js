@@ -695,6 +695,23 @@ async function wachtOpAppGereed(page) {
   }, null, { timeout: 15000 }).catch(() => {});
 }
 
+/* Een klik kan een bestaande Edge-projectie via requestAnimationFrame opnieuw
+   tekenen. Als de meter in diezelfde taak ziet dat alle BEKENDE bediening klaar
+   is, mag hij nog niet concluderen dat het scherm klaar is: het volgende beeld
+   kan een nieuwe, toepasselijke knop bevatten. Wacht twee echte beelden en
+   inventariseer daarna opnieuw. De timer is uitsluitend een fail-safe voor een
+   browser die geen frames meer levert; hij levert zelf geen bewijs. */
+async function wachtOpDefinitiefBedieningsbeeld(page) {
+  await page.evaluate(() => new Promise((resolve) => {
+    let klaar = false;
+    const einde = () => { if (klaar) return; klaar = true; resolve(); };
+    const grens = setTimeout(einde, 750);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      clearTimeout(grens); einde();
+    }));
+  })).catch(() => {});
+}
+
 async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
   if (!ontbrekendeMerken.length) return false;
   return page.waitForFunction(({ bediening, ontbrekend }) => {
@@ -1244,6 +1261,11 @@ async function bedien(ctx, base, ingang) {
              bewijzen. */
           k = await kijk(true, true);
           telStand(k);
+          if (k.klaar) {
+            await wachtOpDefinitiefBedieningsbeeld(page);
+            k = await kijk();
+            telStand(k);
+          }
           if (k.klaar) break;
         }
       }

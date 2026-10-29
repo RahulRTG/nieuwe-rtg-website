@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-23",
-    "commit": "072ba5d57e"
+    "op": "2026-10-29",
+    "commit": "5cd79010f5"
   },
   "bronnen": {
     "schermroutes": {
@@ -9854,11 +9854,12 @@
         "/api/veiligheid"
       ],
       "zonderServer": false,
-      "inkomend": 5,
+      "inkomend": 6,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/rtg.html",
+        "public/shared/rtg-heritage-registry.js",
         "server/functies/register/cat-apps2.js",
         "server/kern/appgids-data/deel12.js",
         "server/kern/werkplek-kantoren-bovenbouw.js"

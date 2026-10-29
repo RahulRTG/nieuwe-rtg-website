@@ -92,8 +92,8 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'na de laatste appkloon sluit de meter de Edge voor de volgende paginaactie');
   assert.match(APPWERKT, /Number\(!hoofdactie\(a\)\) - Number\(!hoofdactie\(b\)\)[\s\S]{0,500}Number\(!edgeApp\(a\)\) - Number\(!edgeApp\(b\)\)/,
     'een primaire schermactie wordt aangeraakt voordat een Edge-actie haar toestand kan vervangen');
-  assert.match(APPWERKT, /gehad\.size >= gevonden/,
-    'Edge-dialoogopeners worden pas herhaald nadat bekende paginaacties zijn afgewerkt');
+  assert.match(APPWERKT, /onbewezenMerken\(\)\.length === 0/,
+    'Edge-dialoogopeners worden pas herhaald nadat alle bekende paginaacties werkelijk zijn aangeraakt');
   assert.match(APPWERKT, /RTGDesktopFrame\.isOpen[\s\S]{0,260}!desktopOpen/,
     'een open DesktopFrame blijft de publieke heropenroute naar zijn Edge-acties');
   assert.match(DESKTOP_FRAME, /rtgAdaptiveSource = 'desktop-item:' \+ item\.id[\s\S]{0,80}rtgAdaptiveRoute = 'true'/,

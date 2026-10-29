@@ -133,6 +133,19 @@ test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening
   assert.equal(herstelgrens(40), 128, 'de meter kan nooit onbeperkt blijven herhalen');
 });
 
+test('de afsluitronde kijkt naar werkelijk aangeraakte bediening en niet alleen naar geselecteerde bediening', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const onbewezenMerken = \(\) => \[\.\.\.gevondenMerken\][\s\S]{0,180}!aangetiktMerken\.has\(merk\)/,
+    'een dynamisch herbouwde knop blijft open totdat haar tik werkelijk is bewezen');
+  assert.match(bron, /for \(const merk of onbewezenMerken\(\)\) gehad\.delete\(merk\)/,
+    'een geselecteerde maar onbewezen knop moet opnieuw selecteerbaar worden');
+  assert.match(bron, /misluktMerken\.add\(k\.merk\)[\s\S]{0,120}nietKlikbaar\.push/,
+    'een aantoonbaar mislukte knop blijft een fout en mag geen eindeloze retry worden');
+  assert.doesNotMatch(bron, /if \(gehad\.size < gevonden\)/,
+    'selectie alleen mag de 100%-afsluitregel niet meer bepalen');
+});
+
 test('de integrale klikgrens laat grote dynamische schermen hun vervolgacties afmaken', () => {
   const bron = require('node:fs').readFileSync(
     require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');

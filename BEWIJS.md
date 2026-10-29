@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3006 bestanden en 20356 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3006 bestanden en 20364 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3006 |
-| losse beweringen (`test(...)`) | 20356 |
+| losse beweringen (`test(...)`) | 20364 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 416 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2816 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2625 bestanden, 19644 beweringen.
+2625 bestanden, 19652 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -171,7 +171,7 @@ toets omvalt.
 | `appurlvast.test.js` | 2 | gezakt op `liegpoort /api/` | DE VASTE LINKBASIS: APP_URL, of een ECHTE openbare hostnaam uit RTG_DOMAINS. server/server.js nam het EERSTE element van RTG_DOMAINS als hostnaam voor de links in een e-mail. |
 | `appwereldcatalogus.test.js` | 6 | al rood | DE VIER MEGA-APPS BEGINNEN BIJ EIGENAARSCHAP, NIET BIJ VORM. Iedere bediende app-route hoort precies één keer bij LIFE, WORK, FOUNDATION of INSTELLINGEN. |
 | `appwerkt-interne-ingang.test.js` | 5 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `appwerkt-onderschepper.test.js` | 12 | gezakt op `===->!==#8` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `appwerkt-onderschepper.test.js` | 18 | gezakt op `===->!==#8` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `appwerkt-vers-releasepoort.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE VERSHEID VAN APPWERKT IS EEN RELEASEPOORT, GEEN RAPPORT. Een app die als 8/8 geldt terwijl een van zijn bewijzen sinds de meting is vervallen, is geen 8/8 meer (BETROUWBAARHEID.md par. |
 | `archief.test.js` | 5 | gezakt op `liegpoort /api/` | De archiefkast: afgeronde tickets ouder dan een afgesloten kwartaal verhuizen naar append-only maandbestanden. De levende kast blijft klein, maar niets raakt zoek: de backoffice-totalen tellen het archief mee en de... |
 | `architect.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Architectenbureau: het huizen-ontwerpbureau van de kantoren (villa's, penthouses, landgoederen, chalets, paviljoens). Een AI tekent het concept uit (typologie, constructie, materialen, gedempt palet,... |
@@ -1268,7 +1268,7 @@ toets omvalt.
 | `magnaat-teamkamer-credential.test.js` | 8 | gezakt op `liegpoort /api/` | De toegangscode van een Magnaat-teamkamer (magnaat.teamkamer_toegangscode), control voor control: 128 bit en eenmaal tonen, hash-only opslag, issuer/doel/ scope, vervaltijd, max_gebruik, roteren en intrekken door de... |
 | `magnaat-teamkamer-productie.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-trainingslobby.test.js` | 5 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `magnaat-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `magnaat-voorzijde.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-werkroutefabriek.test.js` | 2 | gezakt op `>=->>#0` | Bewijs dat de automatische routefabriek iedere gevonden codefamilie omzet in een startbaar, synthetisch en schermgebonden trainingsdossier. |
 | `magnaat-world-boekhouding.test.js` | 7 | gezakt op `&&->||#0` | Magnaat World ronde A2.2: de vijf tegenpartijen, minimaal (MAGNAAT.md). 1. |
 | `magnaat-world-geld.test.js` | 12 | gezakt op `true->false#0` | Het geld van Magnaat World in ronde A2 (MAGNAAT.md). 1. |
@@ -2072,7 +2072,7 @@ toets omvalt.
 | `simulatie-uitbetaling.test.js` | 7 | gezakt op `===->!==#0` | De simulatieve uitbetaalrail: terugstorten naar het eigen IBAN, beproefbaar zonder echt geld (server/betaal/synthetisch.js `uitbetaal`, server/betaal/uitbetaling.js, kern/betaalopdracht/inzending.js). Gevraagd door... |
 | `simulatiebank.test.js` | 7 | gezakt op `liegpoort /api/` | DE SIMULATIEBANK, EN DE POORT DIE HIJ NIET AANRAAKT. MAGNAATLAB.md par. |
 | `simulatiebrug-productiepoort.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `sitemaker-context.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `sitemaker-context.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `skipwacht.test.js` | 2 | geen module gevonden | EEN OVERGESLAGEN SCHERMTOETS IS ROOD. Afspraak van Rahul, 11 augustus 2026. |
 | `sleutel-wedloop.test.js` | 4 | gezakt op `!==->===#0` | ELKE SLEUTEL IN DE DATAMAP, ONDER GELIJKTIJDIG OPSTARTEN. DE AANLEIDING IS OPNIEUW EEN CI-UITVAL. |
 | `sleutelwoorden.test.js` | 7 | gezakt op `===->!==#0` | Sleutelwoorden: inloggen door een gesprek met Rahul in plaats van een wachtwoord. Getoetst op kern-niveau (met een nep-kluis en echte crypto): het instellen keurt precies vier verschillende woorden van minstens drie... |

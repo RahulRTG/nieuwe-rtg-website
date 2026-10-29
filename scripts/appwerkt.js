@@ -834,6 +834,10 @@ async function bedien(ctx, base, ingang) {
   const gehad = new Set();
   const gevondenMerken = new Set();
   const gevondenNamen = new Map();
+  const aangetiktMerken = new Set();
+  const misluktMerken = new Set();
+  const onbewezenMerken = () => [...gevondenMerken]
+    .filter((merk) => !aangetiktMerken.has(merk) && !misluktMerken.has(merk));
   /* Onthoud via welke werkelijk aangetikte bediening een nieuwe bediening
      voor het eerst zichtbaar werd. Een brede app kan tientallen geldige
      openers hebben. Zonder deze herkomst liep herstel ze in DOM-volgorde
@@ -859,10 +863,9 @@ async function bedien(ctx, base, ingang) {
       uit.add(opener);
       voegToe(opener);
     };
-    for (const merk of gevondenMerken) if (!gehad.has(merk)) voegToe(merk);
+    for (const merk of onbewezenMerken()) voegToe(merk);
     return uit;
   };
-  const aangetiktMerken = new Set();
   const telStand = (stand) => {
     for (const merk of (stand && stand.merken) || []) gevondenMerken.add(merk);
     for (const bediening of (stand && stand.bedieningen) || []) {
@@ -991,7 +994,8 @@ async function bedien(ctx, base, ingang) {
       if (!behoudHuidigeStand && !heropenGeslotenDialoog) {
         vooraf = await kijk().catch(() => null);
         if (!vooraf || vooraf.klaar) {
-          await openAppBedieningInEdge(page, gehad, gehad.size >= gevonden);
+          await openAppBedieningInEdge(page, aangetiktMerken,
+            onbewezenMerken().length === 0);
           vooraf = null;
         }
       }
@@ -1044,8 +1048,15 @@ async function bedien(ctx, base, ingang) {
            MAXKLIK begrenst zowel tikken als herstelpogingen. Dit verlaagt de
            bewijsgrens niet: elke extra knop wordt nog steeds echt aangetikt en
            op browser- en serverfouten beoordeeld. */
-        if (gehad.size < gevonden) {
+        if (onbewezenMerken().length) {
           try {
+            /* `gehad` betekent dat de meter een bediening heeft geselecteerd;
+               het is geen bewijs dat de tik ook is gelukt. Een dynamische
+               Edge-herbouw kan precies tussen selectie en tik vallen. Maak
+               uitsluitend zulke nog onbewezen, niet-defecte bediening opnieuw
+               selecteerbaar. Anders stopte de brede ronde op 1929/1930 terwijl
+               de gerichte tegenproef dezelfde knop wel degelijk bediende. */
+            for (const merk of onbewezenMerken()) gehad.delete(merk);
             /* Een reeds ingezette openerketen vervolgen we in de huidige
                stand. Zo blijft A -> B -> dialoog bereikbaar. Dit pad wordt
                uitsluitend gezet door een expliciet herhaalde standopener en
@@ -1077,7 +1088,7 @@ async function bedien(ctx, base, ingang) {
             if (k.klaar && heropeningen < MAXKLIK) {
               heropeningen++;
               await openIngang(page, base, meet);
-              const ontbrekend = [...gevondenMerken].filter((merk) => !gehad.has(merk));
+              const ontbrekend = onbewezenMerken();
               /* Sommige apps tekenen hun gewone paginabediening pas na het
                  antwoord op hun eerste gegevensvraag. Geef een reeds geziene,
                  nog onaangeraakte knop daarom voorrang boven het opnieuw
@@ -1085,7 +1096,7 @@ async function bedien(ctx, base, ingang) {
                  dan is de expliciete Edge-route de juiste herstelweg. */
               const paginaTerug = await wachtOpBekendeBediening(page, ontbrekend);
               if (!paginaTerug) {
-                await openAppBedieningInEdge(page, gehad, true);
+                await openAppBedieningInEdge(page, aangetiktMerken, true);
                 /* Adaptive Edge bouwt haar appklonen na `openView` in een
                    rendercyclus. Tachtig milliseconden was op een onbelaste
                    machine vaak genoeg, maar liet de integrale proef soms
@@ -1136,7 +1147,7 @@ async function bedien(ctx, base, ingang) {
         herhaald.add(k.herhaalSleutel);
         herstelketenActief = true;
         herstelZonderNieuw++;
-        const grens = herstelgrens(gevonden - gehad.size);
+        const grens = herstelgrens(onbewezenMerken().length);
         if (herstelZonderNieuw > grens) {
           instrument.push('de proef stopte een openercyclus na ' + grens +
             ' herstelstappen zonder nieuwe unieke bediening; de resterende bediening blijft eerlijk onaangeraakt');
@@ -1207,7 +1218,8 @@ async function bedien(ctx, base, ingang) {
         actieveRisicoklik = null;
         await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
         const resterendUitDezeModal = k.modaal && Array.isArray(k.merken) &&
-          k.merken.some((merk) => gevondenMerken.has(merk) && !gehad.has(merk));
+          k.merken.some((merk) => gevondenMerken.has(merk) &&
+            !aangetiktMerken.has(merk) && !misluktMerken.has(merk));
         if (resterendUitDezeModal) {
           /* Een bevestigende actie kan zichzelf uitschakelen terwijl de
              opslag loopt en de dialoog pas daarna sluiten. Wacht op die
@@ -1273,7 +1285,7 @@ async function bedien(ctx, base, ingang) {
            Control Plane hier direct na OPEN COMMAND. Laat de laag in precies
            die begrensde situatie staan; de volgende ronde herhaalt expliciete
            standnavigatie en MAXKLIK blijft de bovengrens. */
-        const herstelpadOpen = k.herhaling && gehad.size < gevonden;
+        const herstelpadOpen = k.herhaling && onbewezenMerken().length > 0;
         if ((!vervolg || vervolg.klaar) && !herstelpadOpen) {
           await page.keyboard.press('Escape').catch(() => {});
           await page.waitForTimeout(250);
@@ -1337,6 +1349,7 @@ async function bedien(ctx, base, ingang) {
             instrument.push('schoon hertesten van de geblokkeerde bediening lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80));
           }
         }
+        misluktMerken.add(k.merk);
         nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
         /* WIE ligt erover. "intercepts pointer events" alleen zegt niet of het
            een lade is die een mens eerst dichttikt of een balk die de knop

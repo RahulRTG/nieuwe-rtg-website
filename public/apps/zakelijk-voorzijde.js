@@ -120,12 +120,9 @@
      opgeslagen beleid binnenkomen en de zichtbare keuze terugzetten. */
   let beleidVraag = 0;
   let beleidBewerking = 0;
-  /* Een verse serverlezing mag een invoer die de werkgever intussen begon
-     nooit terugzetten. De tab start bewust een achtergrondlezing; op een
-     trage machine kon die NA de eerste toetsaanslag binnenkomen en vlak voor
-     Bewaren de drempel weer leegmaken. De vraagvolgorde beschermt tegen oude
-     lezingen onderling, deze teller beschermt de gebruiker tegen elke lezing
-     die vóór diens laatste bewerking begon. */
+  /* Een serverlezing mag invoer die intussen begon niet terugzetten. De
+     vraagvolgorde beschermt lezingen onderling; deze teller beschermt de
+     gebruiker tegen een lezing die vóór diens laatste bewerking begon. */
   document.querySelectorAll('#tBeleid input, #tBeleid select').forEach(el => {
     el.addEventListener('input', () => { beleidBewerking++; });
     el.addEventListener('change', () => { beleidBewerking++; });

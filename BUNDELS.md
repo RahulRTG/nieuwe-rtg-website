@@ -918,12 +918,12 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 297 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 295 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `uitvoer-01.js` | Uitvoer: uw gegevens meenemen uit elke app |
-| `uitvoer-02.js` | Uitvoer, deel 2: toegankelijke bediening, exportdialoog en statusfeedback |
+| `uitvoer-02.js` | Uitvoer: bediening, dialoog en feedback |
 
 ## `shared/verbinding.js`
 

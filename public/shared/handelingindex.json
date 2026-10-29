@@ -1418,6 +1418,12 @@
       "url": "/apps/navigatie.html"
     },
     {
+      "label": "Wijzig vertrekpunt",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
       "label": "Zeker",
       "app": "Navigatie",
       "wereld": "TravelOS",

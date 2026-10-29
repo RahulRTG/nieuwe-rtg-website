@@ -267,6 +267,7 @@
     knop.type = 'button';
     knop.textContent = 'Sluit deze relatie';
     knop.setAttribute('aria-label', 'Sluit de relatie met ' + rel.naam);
+    knop.setAttribute('data-stand', 'relatie-gevolgen');
     knop.addEventListener('click', () => toonGevolgen(el, rel.partij, knop));
     acties.appendChild(knop);
     el.appendChild(acties);

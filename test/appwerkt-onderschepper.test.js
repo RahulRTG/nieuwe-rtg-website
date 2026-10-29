@@ -138,16 +138,33 @@ test('Zorg laadt via haar eigen tab en niet via een uitgestelde achtergrondtaak'
   const path = require('node:path');
   const tabbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-12.js'), 'utf8');
   const opbouwbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-12a.js'), 'utf8');
+  const zorgbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-13.js'), 'utf8');
+  const meterbron = fs.readFileSync(path.join(__dirname, '../scripts/appwerkt.js'), 'utf8');
   assert.match(tabbron, /zorg:\s*\[\['laadCare',\s*\(\)\s*=>\s*laadCare\(\)\]\]/,
     'de directe Zorg-ingang moet de echte zorglader activeren');
   assert.doesNotMatch(opbouwbron, /\[\s*['"]laadCare['"]\s*,\s*laadCare\s*\]/,
     'Home mag Zorg niet daarnaast nog eens als achtergrondtaak laden');
+  assert.match(zorgbron, /data-view=["']zorg["'][\s\S]{0,180}aria-busy[\s\S]{0,900}removeAttribute\(['"]aria-busy['"]\)/,
+    'Zorg moet zijn echte asynchrone laadvenster toegankelijk publiceren');
+  assert.match(meterbron, /\.view\.active\[aria-busy=\\?"true\\?"\]/,
+    'de bedieningsmeter moet het actieve drukke tabblad afwachten');
 });
 
 test('een definitieve relatiebeëindiging blijft achter de veilige annuleringsroute', () => {
-  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const bron = fs.readFileSync(path.join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  const scherm = fs.readFileSync(path.join(__dirname, '../public/apps/mijn-relaties.html'), 'utf8');
   assert.match(bron, /\^ja,\\s\*sluit deze\\b/,
     'de definitieve sluitactie moet als risicostap na Laat maar worden bediend');
+  assert.match(scherm, /Sluit deze relatie[\s\S]{0,180}data-stand["'], ['"]relatie-gevolgen/,
+    'de gevolgenopener moet na Laat maar via zijn bestaande schermstand herhaalbaar zijn');
+});
+
+test('Cercle declareert zijn terugroute als herstelbare schermstand', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../public/apps/cercle.html'), 'utf8');
+  assert.match(bron, /class="terug" data-stand="cercle-kantoor" href="\/apps\/lifestyle\.html"/,
+    'de kantoorroute moet na dynamische Cercle-acties opnieuw bedienbaar blijven');
 });
 
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {

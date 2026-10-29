@@ -676,7 +676,7 @@ async function wachtOpAppGereed(page) {
      een expliciet locatiebesluit. Zonder dit signaal keek een schone replay al
      rond terwijl de vertrekkeuze nog niet bestond en bleven geldige opties
      onaangeraakt. Pagina's zonder zo'n busy hoofdvlak voldoen onmiddellijk. */
-  await page.waitForFunction(() => !document.querySelector('main[aria-busy="true"]'),
+  await page.waitForFunction(() => !document.querySelector('main[aria-busy="true"],.view.active[aria-busy="true"]'),
     null, { timeout: 15000 }).catch(() => {});
 }
 

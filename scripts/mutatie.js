@@ -1428,6 +1428,14 @@ const GEEN_BRONMUTATIE = new Map([
      nulmetingen. Beide mutaties zijn daarna teruggezet. */
   ['website-text-style.test.js', 'tekstcontract; handmutatie AI in de paginatitel laat exact de publieke-webteksttoets zakken; vier toetsen in de nulmeting groen'],
   ['website-codeproof.test.js', 'HTML-contract; handmutatie van een fragmentklasse laat exact de zes-kaartenbewering zakken; drie toetsen in de nulmeting groen'],
+  /* Deze bedieningstoetsen bewaken letterlijke HTML-contracten. De generieke
+     operatoren veranderen geen tekst binnen tekenreeksen: 236 respectievelijk
+     93 geldige bronmutaties overleefden daarom zonder het contract te raken.
+     Op 29 oktober 2026 zijn de relevante contracten afzonderlijk gemuteerd en
+     teruggezet: aria-haspopup="dialog" -> "menu" laat sitemaker-context zakken;
+     de klasse js-asintrek verwijderen laat app-main-bediening zakken. */
+  ['sitemaker-context.test.js', 'letterlijk HTML-contract; 236 generieke mutaties raakten geen tekenreeks, handmutatie dialog -> menu laat de dialoogbewering zakken'],
+  ['app-main-bediening.test.js', 'letterlijke browsercontracten; 93 generieke mutaties raakten geen tekenreeks, handmutatie zonder js-asintrek laat de Assets-bewering zakken'],
   /* DE AFBOUWWET WOONT IN scripts/, EN DAAR KOMT DEZE MOTOR NIET.
 
      Beide toetsen gaan over scripts/lib/afbouw-afloop.js en scripts/afbouw-slot.js.

@@ -251,6 +251,7 @@ function rijen() {
       const [soort, sleutel] = [item.slice(0, item.indexOf(':')), item.slice(item.indexOf(':') + 1)];
       const bron = soort === 'link' ? reg.LINKS[sleutel] : (soort === 'os' ? reg.OSAPPS[sleutel] : null);
       const url = bron && bron.url ? bron.url : null;
+      const appcontract = CONTRACT[item];
       uit.push({
         app: bron && bron.naam ? bron.naam : sleutel,
         functie: item,
@@ -258,7 +259,7 @@ function rijen() {
         /* Een ingang met een werkrol toont de wereld alleen aan wie die rol in
            zijn sleutelbos heeft (app-main-24a3.js); dat is dan aan wie hij
            beloofd wordt, en dus de persona die erdoor moet kunnen. */
-        persona: (bron && bron.werkrol) ||
+        persona: (appcontract && appcontract.persona) || (bron && bron.werkrol) ||
           (soort === 'link' && reg.PREMIUM.has(sleutel) ? 'lifestyle' : null) ||
           PERSONA_VAN_WERELD[map.naam] || 'lid',
         ingang: url || ('(' + soort + ' in de app, geen eigen adres)'),

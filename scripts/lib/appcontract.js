@@ -252,6 +252,7 @@ const CONTRACT = {
      stoppen), -14 (intake delen, boeken) en -15 (pakketten). */
   'tab:zorg': Object.assign({
     belofte: 'het lid ziet het zorgaanbod, boekt en betaalt een behandeling of pakket, deelt medische context apart met een kliniek en stopt dat zelf, en annuleert wat hij niet meer wil',
+    persona: 'lid',
     ingang: '/apps/app.html',
     via: '#tab=zorg',
     bereik: '[data-view="zorg"]',

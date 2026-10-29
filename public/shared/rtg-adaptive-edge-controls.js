@@ -21,7 +21,11 @@
         var tab=root.matches('.wos-dock,.wos-rail')&&el.getAttribute('data-tab');
         var action=el.getAttribute('data-rtg-action-key');
         if(lbl(el)&&avail(el,root)&&(!tab||!tabs.has(tab))&&(!action||!actions.has(action))&&!out.some(function(x){return x.el===el})){
-          out.push({el:el,root:root,app:root.matches(APP)||el.matches('.rtguitvoer-knop')});if(tab)tabs.add(tab);if(action)actions.add(action);
+          /* Bediening uit een same-origin appframe blijft bediening van die
+             app. Zonder dit eigendom werd een iframe-header wel gekloond,
+             maar als algemene Edge-schil behandeld. Na een toestandswissel
+             kon Edge de eigen Terug-route dan niet gericht terughalen. */
+          out.push({el:el,root:root,app:!!embed||root.matches(APP)||el.matches('.rtguitvoer-knop')});if(tab)tabs.add(tab);if(action)actions.add(action);
         }
       });
     });

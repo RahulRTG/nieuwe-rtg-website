@@ -150,6 +150,14 @@ test('Zorg laadt via haar eigen tab en niet via een uitgestelde achtergrondtaak'
     'de bedieningsmeter moet het actieve drukke tabblad afwachten');
 });
 
+test('een intern appcontract kan de persona van zijn organisatorische wereld preciseren', () => {
+  const { rijen } = require('../scripts/appwerkt');
+  const zorg = rijen().find((rij) => rij.functie === 'tab:zorg');
+  assert.equal(zorg && zorg.wereld, 'FoundationOS');
+  assert.equal(zorg && zorg.persona, 'lid',
+    'de ledenapp-Zorgtab gebruikt het ledenaccount, ook al staat hij onder de gezinswereld');
+});
+
 test('een definitieve relatiebeëindiging blijft achter de veilige annuleringsroute', () => {
   const fs = require('node:fs');
   const path = require('node:path');
@@ -163,8 +171,11 @@ test('een definitieve relatiebeëindiging blijft achter de veilige annuleringsro
 
 test('Cercle declareert zijn terugroute als herstelbare schermstand', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../public/apps/cercle.html'), 'utf8');
+  const edge = require('node:fs').readFileSync(require('node:path').join(__dirname, '../public/shared/rtg-adaptive-edge-controls.js'), 'utf8');
   assert.match(bron, /class="terug" data-stand="cercle-kantoor" href="\/apps\/lifestyle\.html"/,
     'de kantoorroute moet na dynamische Cercle-acties opnieuw bedienbaar blijven');
+  assert.match(edge, /app:!!embed\|\|root\.matches\(APP\)/,
+    'bediening uit een embedded appheader moet app-eigendom houden in Adaptive Edge');
 });
 
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {

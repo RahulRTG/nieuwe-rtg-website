@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-26T06:06:17.815Z",
-    "commit": "fb348ecfea",
+    "op": "2026-10-29T00:28:53.311Z",
+    "commit": "8fd7ed6b33",
     "boomVuil": false,
-    "boomAnders": 8,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.12.1"
+    "node": "v26.10.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -830,6 +830,11 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "app-main-bediening.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "letterlijke browsercontracten; 93 generieke mutaties raakten geen tekenreeks, handmutatie zonder js-asintrek laat de Assets-bewering zakken"
+    },
     "appbieb.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1062,9 +1067,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/appwerkt.js",
-      "operator": "===->!==#8",
-      "gezakt": 2,
-      "geprobeerd": 50
+      "operator": "regex-alternatief-weg#2",
+      "gezakt": 1,
+      "geprobeerd": 40
     },
     "appwerkt-schil.e2e.js": {
       "soort": "puur",
@@ -15895,9 +15900,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/rtg-adaptive-edge-core.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 3
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "rtg-continue-key.test.js": {
       "soort": "puur",
@@ -17508,6 +17513,11 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "sitemaker-context.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "letterlijk HTML-contract; 236 generieke mutaties raakten geen tekenreeks, handmutatie dialog -> menu laat de dialoogbewering zakken"
     },
     "skipwacht.test.js": {
       "soort": "puur",

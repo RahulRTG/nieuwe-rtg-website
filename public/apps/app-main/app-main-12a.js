@@ -125,10 +125,12 @@
     }
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
        ze opent -- zie LADERS_PER_TAB in ./app-main-12.js voor waarom, en wat
-       er gemeten is. Hier blijven alleen de drie laders staan die aan geen
-       enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een. */
+       er gemeten is. Hier blijven alleen de twee laders staan die aan geen
+       enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een.
+       Zorg staat bewust niet meer hier: openTab vult die eigen tab via
+       LADERS_PER_TAB, zodat een directe #tab=zorg-ingang niet afhankelijk is
+       van een later idle-moment. */
     naBeeld([
-      ...(guest ? [] : [['laadCare', laadCare]]),
       ['laadBestellen', laadBestellen], ['loadCv', loadCv]
     ]);
 

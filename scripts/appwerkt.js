@@ -1767,7 +1767,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
     const risicoRang = (el) => {
       const tekst = (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim();
       if (/uitlog|log uit|sign ?out/i.test(tekst)) return 3;
-      if (/verlaat|leave|verwijder|delete|wis alles|sluit account/i.test(tekst) ||
+      if (/verlaat|leave|verwijder|delete|wis alles|sluit account|^ja,\s*sluit deze\b/i.test(tekst) ||
           el.matches('[data-bweg],[data-blweg]')) return 2;
       /* Een bestandskiezer neemt de browserfocus over. Bedien eerst alle
          overige acties in hetzelfde paneel en open de kiezer pas als laatste,

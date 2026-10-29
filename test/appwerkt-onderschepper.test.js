@@ -133,6 +133,23 @@ test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan
     'RTDocs-navigatie moet boven de iOS-kop en onder dialogen blijven');
 });
 
+test('Zorg laadt via haar eigen tab en niet via een uitgestelde achtergrondtaak', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const tabbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-12.js'), 'utf8');
+  const opbouwbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-12a.js'), 'utf8');
+  assert.match(tabbron, /zorg:\s*\[\['laadCare',\s*\(\)\s*=>\s*laadCare\(\)\]\]/,
+    'de directe Zorg-ingang moet de echte zorglader activeren');
+  assert.doesNotMatch(opbouwbron, /\[\s*['"]laadCare['"]\s*,\s*laadCare\s*\]/,
+    'Home mag Zorg niet daarnaast nog eens als achtergrondtaak laden');
+});
+
+test('een definitieve relatiebeëindiging blijft achter de veilige annuleringsroute', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /\^ja,\\s\*sluit deze\\b/,
+    'de definitieve sluitactie moet als risicostap na Laat maar worden bediend');
+});
+
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {
   const { herstelgrens } = require('../scripts/appwerkt');
   assert.equal(herstelgrens(0), 32);

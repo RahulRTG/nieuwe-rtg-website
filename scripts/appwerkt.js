@@ -126,7 +126,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const reg = require('./lib/wereldregister');
-const { haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid } = require('./lib/proefsessies');
+const { haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid,
+  verbindGezinProeflid } = require('./lib/proefsessies');
 const { haalSchoolsessies, maakSchoolContext } = require('./lib/schoolproefsessies');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
@@ -152,6 +153,20 @@ const stil = process.argv.includes('--stil');
 const alleenInventaris = process.argv.includes('--inventaris');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
+
+/* Navigatie weigert Nederlandse routes terecht als het NWB-pakket ontbreekt.
+   Een browserkwalificatie hoort die productieconfiguratie niet als appdefect of
+   als eeuwige externe blokkade te registreren. Leg daarom vóór serverstart het
+   bestaande kleine, echte SQLite+graaf-pakket in de wegwerpdatamap. De app en
+   server gebruiken daarna hun gewone pakketlezer en router; er wordt geen API
+   gemockt en niets gedownload. */
+function bereidAppwerktDatamapVoor(datamap) {
+  const nav = path.join(datamap, 'navigatie');
+  fs.mkdirSync(nav, { recursive: true });
+  require('../test/navigatie-pakket-fixture').bouwPakket({ map: nav,
+    code: 'nederland', lat: 52.36, lng: 4.89, plaats: 'Amsterdam',
+    land: 'Nederland', bron: 'NWB APPWERKT-fixture', licentie: 'CC0 1.0' });
+}
 /* De grootste gemeten schermen bevatten ruim 200 unieke handelingen. Een
    volledige testwereld kan daar extra contextbediening aan toevoegen die een
    geisoleerde appmeting niet ziet. Iedere vervolgactie kan bovendien twee of
@@ -304,6 +319,7 @@ async function meet() {
   if (!pw) { console.error('Geen browser beschikbaar; dit script meet in een echte browser.'); process.exit(2); }
   const { startServer, kantoorAlsPersoon } = require(path.join(WORTEL, 'test', 'helper.js'));
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-'));
+  bereidAppwerktDatamapVoor(TMP);
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
 
   const { sessies, overgeslagen } = await haalSessies(base);
@@ -317,6 +333,8 @@ async function meet() {
   else overgeslagen.push({ rol: 'lifestyle', reden: lifestyle.reden });
   const contact = await verbindProeflid(base);
   if (!contact.ok) overgeslagen.push({ rol: 'lid-contact', reden: contact.reden });
+  const gezinLid = await verbindGezinProeflid(base);
+  if (!gezinLid.ok) overgeslagen.push({ rol: 'lid-gezin', reden: gezinLid.reden });
   const school = await haalSchoolsessies(base, sessies);
   if (!school) overgeslagen.push({ rol: 'schoolproef', reden: 'de echte les- en leerlingensessies konden niet worden gemaakt' });
   log('sessies: ' + Object.keys(sessies).join(', ') + (overgeslagen.length ? ' -- overgeslagen: ' + overgeslagen.map((o) => o.rol).join(', ') : ''));
@@ -351,6 +369,8 @@ async function meet() {
        van Bestellen door deze fixture. */
     if (contact.ok) persoonlijk.adapterLid = await maakContext(browser,
       opslagVoor({ lid: { ...sessies.lid, waarde: contact.token } }));
+    if (gezinLid.ok) persoonlijk['tab:gezin'] = await maakContext(browser,
+      opslagVoor({ lid: { ...sessies.lid, waarde: gezinLid.token } }));
     if (school) {
       persoonlijk['link:rtfbord'] = await maakSchoolContext(browser, school.bord, maakContext);
       persoonlijk['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift, maakContext);
@@ -2046,7 +2066,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, bereidAppwerktDatamapVoor, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

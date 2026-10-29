@@ -100,6 +100,8 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'DesktopFrame-secties dragen een stabiele bron en herhaalbare standroute');
   assert.match(DESKTOP_FRAME, /rtgAdaptiveControl = 'app'/,
     'bediening uit het actieve appframe blijft als appbediening herkenbaar');
+  assert.equal((DESKTOP_FRAME.match(/rtgAdaptiveFrame = 'true'/g) || []).length, 2,
+    'zowel contextacties als gewone bediening uit DesktopFrame behouden hun werkbladeigenaar');
   assert.match(DESKTOP_FRAME, /el\.tagName === 'A'[\s\S]{0,100}rtgAdaptiveRoute = 'true'/,
     'een app-link in DesktopFrame blijft een herhaalbare route naar zijn bediening');
   assert.match(APPWERKT, /\[data-rtg-adaptive-route\]/,

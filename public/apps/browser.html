@@ -76,7 +76,7 @@ header.ios-nav{top:var(--edge-randboven,0px);margin-top:var(--edge-randboven,0px
   /* de melding dat een site machinevertaald is */
   .vertaallint{padding:.4rem .9rem;background:var(--card2);border-bottom:1px solid var(--line);color:var(--soft);font-size:.72rem;}
   /* de paginabalk van een site met meerdere pagina's */
-  .paginanav{display:flex;gap:.4rem;flex-wrap:wrap;padding:.55rem .9rem;background:var(--card);border-bottom:1px solid var(--line);}
+  .paginanav{display:flex;gap:.4rem;flex-wrap:wrap;padding:.55rem .9rem;background:var(--card);border-bottom:1px solid var(--line);scroll-margin-block-start:8rem;}
   .paginanav button{border:1px solid var(--line);border-radius:0;background:var(--card2);color:var(--muted);font:inherit;font-size:.75rem;padding:.28rem .7rem;cursor:pointer;}
   .paginanav button:hover{border-color:var(--gold);}
   .paginanav button.aan{background:var(--bg);color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);}
@@ -415,7 +415,7 @@ async function toonSite(adres,pad){
     // de paginabalk: Home plus de extra pagina's van de site
     if(paginas.length){
       const nav=document.createElement('nav'); nav.className='paginanav'; nav.setAttribute('aria-label',"Pagina's van deze site");
-      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(aan)b.className='aan';
+      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(aan){b.className='aan';b.disabled=true;b.setAttribute('aria-current','page');}
         b.addEventListener('click',()=>{ if(!aan) ga({adres,pad:doel}); }); nav.appendChild(b); };
       maak('Home','',!pad);
       paginas.forEach(p=>maak(p.naam,p.slug,pad===p.slug));

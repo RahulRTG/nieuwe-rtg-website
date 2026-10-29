@@ -246,6 +246,23 @@ test('een script buiten de sluiting van het instrument maakt niets oud; erbinnen
   assert.equal(nu('a').stand, 'VERVALLEN');
 }));
 
+test('een serverronde blijft vers na frontendwerk en vervalt bij iedere server- of instrumentwijziging', () => metRepo(({ map }) => {
+  schrijf(map, 'scripts/idorproef.js', "require('./lib/idor-hulp');\n");
+  schrijf(map, 'scripts/lib/idor-hulp.js', 'module.exports = 1;\n');
+  schrijf(map, 'package.json', '{"name":"proef"}\n');
+  const sha = commit(map, 'serverronde');
+  const st = { op: 'nu', commit: sha, boomVuil: false, instrument: 'scripts/idorproef.js' };
+  const vers = () => R.serverRondeVersheid(wereld(map), st, grofSpion());
+  assert.equal(vers().vers, true, vers().reden);
+  schrijf(map, 'public/apps/a.html', BESTANDEN['public/apps/a.html'] + '<p>nieuw</p>\n');
+  assert.equal(vers().vers, true, 'clientwerk raakt een serverbrede autorisatieronde niet');
+  schrijf(map, 'server/routes/b.js', BESTANDEN['server/routes/b.js'] + '// server anders\n');
+  assert.equal(vers().vers, false, 'ieder serverbestand telt mee');
+  schrijf(map, 'server/routes/b.js', BESTANDEN['server/routes/b.js']);
+  schrijf(map, 'scripts/lib/idor-hulp.js', 'module.exports = 2;\n');
+  assert.equal(vers().vers, false, 'de volledige instrumentsluiting telt mee');
+}));
+
 test('een nieuw serverbestand dat niemand statisch laadt, maakt alles oud: het kan dynamisch geladen worden', () => metRepo(({ map, nu }) => {
   schrijf(map, 'server/kern/los.js', 'module.exports = 1;\n');
   assert.equal(nu('a').stand, 'VERVALLEN');

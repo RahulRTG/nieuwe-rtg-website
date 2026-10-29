@@ -119,6 +119,9 @@ test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan
   assert.match(lees('public/shared/gebaar/gebaar-03.js'),
     /data-rtg-adaptive-source['"], ['"]gebaar-acties[\s\S]{0,160}data-hoofdactie/,
     'de kortlevende deur naar veegacties moet vóór een verversing bedienbaar zijn');
+  assert.match(lees('public/shared/uitvoer/uitvoer-02.js'),
+    /rtguitvoer-knop[\s\S]{0,420}data-hoofdactie/,
+    'Meenemen bestaat alleen bij uitvoerbare gegevens en moet vóór een hertekening worden bediend');
   assert.match(lees('public/shared/deelmenu/deelmenu-02.js'),
     /data-rtg-adaptive-source['"], ['"]deel-[\s\S]{0,120}data-stand/,
     'een herbouwde deeltab moet dezelfde appstand en control-identiteit houden');

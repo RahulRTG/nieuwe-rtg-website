@@ -144,6 +144,11 @@
       knop.type = 'button';
       knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast';
       knop.setAttribute('aria-haspopup', 'dialog');
+      /* Deze knop bestaat alleen zolang het scherm werkelijk uitvoerbare
+         gegevens heeft. Bedien hem daarom als kortlevende hoofdactie voordat
+         een andere schermhandeling de bron opnieuw tekent. Dit is ook voor
+         toetsenbord- en Edge-regie de expliciete betekenis van de knop. */
+      knop.setAttribute('data-hoofdactie', '');
       knop.textContent = 'Meenemen';
       knop.addEventListener('click', toon);
     }

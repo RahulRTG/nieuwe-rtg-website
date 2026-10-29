@@ -688,6 +688,13 @@ async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
 async function openIngang(page, base, ingang) {
   const meet = ingangOpties(ingang);
   await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  /* Iedere replay doorloopt dezelfde Edge-overname als het eerste bezoek.
+     Zonder deze waarneembare gereedheidsgrens kon de meter de nog zichtbare
+     bronknop kiezen en hem een tel later verliezen zodra Adaptive Edge hem
+     als appactie overnam. Wacht op het bestaande publieke contract; een app
+     zonder Adaptive Edge blijft door de begrensde wacht gewoon meetbaar. */
+  await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
+    null, { timeout: 8000 }).catch(() => {});
   await wachtOpOnboarding(page);
   await wachtOpInteractielaag(page);
   await wachtOpAppGereed(page);

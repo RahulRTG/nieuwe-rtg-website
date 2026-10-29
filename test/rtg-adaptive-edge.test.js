@@ -112,6 +112,8 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'de gedeelde sluitroute gebruikt de publieke Adaptive Edge-toestand');
   assert.match(APPWERKT, /behoudHuidigeStand = !vervolg\.klaar/,
     'nieuwe vervolgbediening blijft zichtbaar voordat het Edge-deck opnieuw opent');
+  assert.match(APPWERKT, /rtg-world-desktop\.js[\s\S]{0,500}ready\|error[\s\S]{0,160}rtgDesktopState/,
+    'de appmeting begint pas nadat de bestaande World Desktop-laag haar eindtoestand publiceert');
   assert.match(APPWERKT, /data-bweg[\s\S]{0,300}upload\|bestand kiezen/,
     'verwijderen en de systeembestandskiezer komen na gewone paneelbediening');
   assert.match(APPWERKT, /Number\(!hoofdopener\(a\)\)[\s\S]{0,160}Number\(!dialoogOpener\(a\)\)[\s\S]{0,160}Number\(!standNavigatie\(a\)\)/,

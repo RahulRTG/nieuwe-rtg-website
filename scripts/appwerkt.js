@@ -679,6 +679,20 @@ async function wachtOpAppGereed(page) {
      onaangeraakt. Pagina's zonder zo'n busy hoofdvlak voldoen onmiddellijk. */
   await page.waitForFunction(() => !document.querySelector('main[aria-busy="true"],.view.active[aria-busy="true"]'),
     null, { timeout: 15000 }).catch(() => {});
+  /* World Desktop wordt bewust na de pagina opgebouwd: eerst zijn modules,
+     daarna de appcatalogus en ten slotte de Edge-projectie. Onder parallelle
+     belasting kon APPWERKT al beginnen terwijl die gedeelde schil nog niet
+     klaar was. Haar navigatie verscheen dan pas na de laatste appactie en werd
+     aan de gemeten app toegeschreven zonder nog aangetikt te kunnen worden.
+
+     Wacht op het publieke productcontract van die bestaande laag. `error` is
+     ook een eindtoestand: de browser- en configuratieluisteraars beoordelen de
+     fout vervolgens eerlijk; een defect wordt hier nooit als `ready` gemaakt. */
+  await page.waitForFunction(() => {
+    const desktop = document.querySelector('script[src$="/shared/rtg-world-desktop.js"]');
+    if (!desktop) return true;
+    return document.body && /^(ready|error)$/.test(document.body.dataset.rtgDesktopState || '');
+  }, null, { timeout: 15000 }).catch(() => {});
 }
 
 async function wachtOpBekendeBediening(page, ontbrekendeMerken) {

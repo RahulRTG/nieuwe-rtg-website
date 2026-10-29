@@ -101,6 +101,22 @@ function voltooi(scenario, waarom) {
 /* Sleutel: de functie-id uit MAPPEN (zoals APPWERKT.json hem als `functie`
    schrijft), zodat een hernoemde app het contract niet stil laat vallen. */
 const CONTRACT = {
+  /* Foto en videobeeld blijven in het toestel. Alleen een uitgesproken vrije
+     vraag gaat naar de sessiegebonden Rahul-route; de bevoegdronde meet zowel
+     het lokale beeldpad als de scheiding van dat persoonlijke gesprek. */
+  'link:camera': {
+    belofte: 'een lid maakt op zijn eigen toestel een foto zonder dat beeld naar RTG te sturen en gebruikt Rahul uitsluitend binnen zijn eigen ledensessie',
+    bevoegdContext: 'lokale-media-met-sessieassistent',
+    bestanden: ['public/apps/camera.html']
+  },
+  /* Juridisch is openbare, statische uitleg. Het scherm bevat geen account- of
+     domeingegevens en roept geen API aan. BEVOEGD meet dat laatste opnieuw via
+     SCHERMROUTES; zodra hier toch een route verschijnt vervalt dit contract. */
+  'link:juridisch': {
+    belofte: 'iedere bezoeker kan de juridische uitleg lezen zonder dat het scherm persoonlijke gegevens of een bevoegde handeling ontsluit',
+    bevoegdContext: 'publieke-inhoud',
+    bestanden: ['public/apps/juridisch.html']
+  },
   'link:sessies': Object.assign({
     belofte: 'een lid ziet waar het is ingelogd en sluit een ander toestel op afstand -- en dat toestel blijft buiten, ook na een herstart of een crash'
   }, voltooi('sessies', 'het scenario loopt /api/mijn/sessies, /sluit en de toestelbinding, de routes die /apps/mijn-sessies.html zelf aanroept, met een echte sleutel voor het bezitsbewijs')),
@@ -408,7 +424,19 @@ const CONTRACT = {
     via: 'de rand: "Praat met Rahul" -> "open RTFoundation", dat de leeftijdskeuze van de RTFoundation opent',
     adapter: { type: 'rahul-opdracht', opdracht: 'open RTFoundation', verwacht: '#osBelScrim.open',
       bereik: '#osBelScrim.open', titel: 'RTFoundation' },
-    bestanden: ['public/apps/app-main/app-main-26.js']
+    bestanden: ['public/apps/app-main/app-main-26.js'],
+    /* Deze kiezer leest of wijzigt geen domeingegevens. Hij bewaart alleen de
+       gekozen leeftijdsgroep op het toestel en navigeert naar een van deze
+       vijf lokale Foundation-ingangen. De ingangen zelf houden hun eigen
+       bevoegdheidscontract; de kiezer mag daar niet op meeliften. */
+    bevoegdContext: 'lokale-navigatie',
+    bevoegdBestemmingen: [
+      '/apps/foundation/index.html?groep=mini',
+      '/apps/foundation/index.html?groep=kids',
+      '/apps/foundation/index.html?groep=tiener',
+      '/apps/foundation/index.html?groep=jong',
+      '/apps/foundation/index.html?groep=volwassen'
+    ]
   },
   'link:browser': Object.assign({
     belofte: 'een lid vindt en opent de site van een ander lid en stuurt via het formulier een bericht dat precies een keer als gesprek aankomt, alleen tussen verbonden leden'
@@ -510,6 +538,11 @@ const CONTRACT = {
     via: 'de rand: "Praat met Rahul" -> "open videobellen", dat de kiezer met verbonden Salon-contacten opent',
     adapter: { type: 'rahul-opdracht', opdracht: 'open videobellen', verwacht: '#osBelScrim.open',
       bereik: '#osBelScrim.open', titel: 'Videobellen' },
+    /* Audio- en videogesprekken gebruiken exact dezelfde servergrens voor
+       contactkeuze, signalering, blokkades en de live-stroom. Het WebRTC-beeld
+       wordt apart echt in de browser gemeten; voor BEVOEGD mag daarom alleen
+       het reeds gekruiste belscenario worden hergebruikt. */
+    bevoegdVia: 'os:bellen',
     bestanden: ['public/apps/app-main/app-main-10.js', 'public/apps/app-main/app-main-10a.js',
       'public/apps/app-main/app-main-11.js', 'public/apps/app-main/app-main-26.js']
   },

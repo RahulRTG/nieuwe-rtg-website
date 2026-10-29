@@ -34,7 +34,17 @@ const WORTEL = path.join(__dirname, '..');
 function contractMetadata(naam, waarde) {
   if (naam === 'bevoegdContext') {
     assert.equal(typeof waarde, 'string', 'bevoegdContext moet een contextnaam zijn');
-    assert.ok(['gezin', 'school:docent', 'school:leerling'].includes(waarde), 'onbekende bevoegdContext: ' + waarde);
+    assert.ok(['gezin', 'school:docent', 'school:leerling', 'publieke-inhoud', 'lokale-navigatie',
+      'lokale-media-met-sessieassistent'].includes(waarde), 'onbekende bevoegdContext: ' + waarde);
+    return true;
+  }
+  if (naam === 'bevoegdBestemmingen') {
+    assert.ok(Array.isArray(waarde) && waarde.length > 0, 'bevoegdBestemmingen moet een niet-lege lijst zijn');
+    assert.ok(waarde.every((p) => /^\/apps\/[^?#]+\.html\?[^#]+$/.test(p)), 'iedere bevoegdBestemming moet een lokale app-ingang met expliciete context zijn');
+    return true;
+  }
+  if (naam === 'bevoegdVia') {
+    assert.match(waarde, /^(link|os|tab):[a-z0-9-]+$/, 'bevoegdVia moet een concrete functie-id zijn');
     return true;
   }
   if (naam === 'adapter') {
@@ -88,7 +98,8 @@ test('2. alleen de acht bewijzen, en alleen wat de bronsoort mag leveren', () =>
 });
 
 test('2b. bevoegdContext is begrensde metadata, geen negende bewijsbron of uitslag', () => {
-  for (const context of ['gezin', 'school:docent', 'school:leerling'])
+  for (const context of ['gezin', 'school:docent', 'school:leerling', 'publieke-inhoud', 'lokale-navigatie',
+    'lokale-media-met-sessieassistent'])
     assert.equal(contractMetadata('bevoegdContext', context), true);
   for (const waarde of [null, undefined, false, 0, [], {}, { soort: 'voltooiproef' },
     '', 'BEWEZEN', 'PASS', 'NIET_GETEST', 'GEBLOKKEERD_DOOR_DEFECT', 'voltooiproef', 'ketenproef', 'school:onbekend'])
@@ -97,6 +108,8 @@ test('2b. bevoegdContext is begrensde metadata, geen negende bewijsbron of uitsl
   assert.equal(contractMetadata('verzonnenBewijs', {}), false, 'onbekende velden worden niet vrijgesteld');
   assert.equal(CONTRACT['link:rtfbord'].bevoegdContext, 'school:docent');
   assert.equal(CONTRACT['link:rtfschrift'].bevoegdContext, 'school:leerling');
+  assert.equal(contractMetadata('bevoegdVia', 'os:bellen'), true);
+  assert.equal(contractMetadata('bevoegdBestemmingen', ['/apps/foundation/index.html?groep=mini']), true);
 });
 
 test('3. elke koppeling haalt de meting: de app staat in MAPPEN en de proef raakt zijn ingang', () => {

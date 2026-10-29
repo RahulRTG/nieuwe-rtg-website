@@ -59,6 +59,7 @@ const crypto = require('crypto');
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'BEVOEGD.json');
 const { stempel, versheid } = require('./lib/stempel');
+const bewijsraakvlak = require('./lib/bewijsraakvlak');
 const { ingangVan } = require('./lib/bewijsbron');
 const { CONTRACT } = require('./lib/appcontract');
 const { beoordeelRolrij } = require('./lib/rolproef');
@@ -78,9 +79,16 @@ const GRENS_GEZIN = 'alleen de verzoeken die het scherm bij het laden doet en di
 /* De twee registers als opzoektabel per PAD (methode los), met hun versheid.
    Een register dat niet vers is, maakt elke ledenrij NIET_GETEST: vervallen
    bewijs is geen bewijs, ook niet als het er netjes uitziet. */
+let bronWereld = null;
+function bronversheid(st) {
+  if (!bewijsraakvlak.SERVERRONDE_INSTRUMENTEN.has(st?.instrument)) return versheid(st);
+  bronWereld = bronWereld || bewijsraakvlak.maakWereld();
+  return bewijsraakvlak.serverRondeVersheid(bronWereld, st, versheid);
+}
+
 function laadRegisters({ lees, vers } = {}) {
   const l = lees || ((f) => { try { return fs.readFileSync(path.join(WORTEL, f), 'utf8'); } catch (e) { return null; } });
-  const v = vers || versheid;
+  const v = vers || bronversheid;
   const uit = { idor: new Map(), rol: new Map(), vervallen: [], bronnen: [],
     voltooi: new Map(), voltooiVervallen: [] };
   for (const [naam, zet] of [['IDOR.json', 'idor'], ['ROLPROEF.json', 'rol']]) {

@@ -107,6 +107,23 @@ const BRONREGISTERS = {
   }
 };
 
+/* Deze rondes meten de HELE servergrens en geen afzonderlijk scherm. Hun
+   bewijs hoort daarom niet te vervallen door een nieuwe afbeelding, CSS-regel
+   of clientbediening. De oude grove versheidsregel deed dat wel en maakte zo
+   alle 114 bevoegdheidsbewijzen tegelijk oud na een uitsluitend visuele
+   wijziging. Andersom mag een serverwijziging ook nooit buiten beeld blijven:
+   voor deze instrumenten telt ieder gevolgd bestand onder server/, de hele
+   require-sluiting van het instrument en het packagecontract. */
+const SERVERRONDE_INSTRUMENTEN = new Set([
+  'scripts/idorproef.js',
+  'scripts/rolproef-route.js',
+  /* De voltooiproef bedient geen product-UI: ieder scenario spreekt de lokale
+     API aan, herstart de server en leest de duurzame uitkomst terug. De hele
+     instrumentsluiting bevat alle scenario's, zodat een wijziging in ook maar
+     één scenario de samengestelde bronronde opnieuw laat kwalificeren. */
+  'scripts/voltooiproef.js'
+]);
+
 const sha256 = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 const blobId = (buf) => crypto.createHash('sha1').update('blob ' + buf.length + '\0').update(buf).digest('hex');
 
@@ -690,6 +707,36 @@ function stempelGebrek(st) {
   return null;
 }
 
+/* Versheid voor een register dat de volledige servergrens heeft beproefd.
+   Dit is bewust ruimer dan een route- of appraakvlak: een verandering in welk
+   serverbestand dan ook laat de ronde opnieuw lopen. Alleen frontend- en
+   documentwijzigingen blijven erbuiten. `grof` is uitsluitend de veilige
+   terugval wanneer git of de instrumentsluiting niet te bepalen is. */
+function serverRondeVersheid(w, st, grof) {
+  const gebrek = stempelGebrek(st);
+  if (gebrek) return { vers: false, reden: gebrek };
+  if (!SERVERRONDE_INSTRUMENTEN.has(st.instrument)) {
+    return grof(st);
+  }
+  const ins = instrumentDeel(w, st.instrument);
+  const lijst = w.lijst();
+  if (!ins.bepaald || !lijst) {
+    const v = grof(st);
+    return { ...v, reden: 'serverraakvlak onbepaald (' + (!ins.bepaald ? ins.reden : 'git-bestandslijst ontbreekt') +
+      '), dus de grove regel: ' + v.reden };
+  }
+  const alle = new Set(ins.bestanden);
+  for (const p of lijst) if (p.startsWith('server/')) alle.add(p);
+  for (const p of ['package.json', 'package-lock.json']) if (lijst.has(p)) alle.add(p);
+  const d = verschil(w, alle, st.commit);
+  if (!d.bekend) return { vers: false, reden: d.reden };
+  if (d.oorzaak.length) return { vers: false, oorzaak: d.oorzaak,
+    reden: 'serverronde gemeten op ' + st.commit + '; sindsdien ' + d.oorzaak.length +
+      ' relevant(e) bestand(en) gewijzigd, eerst ' + d.oorzaak[0] };
+  return { vers: true, reden: 'serverronde gemeten op ' + st.commit + '; geen van de ' + alle.size +
+    ' server-, package- of instrumentbestanden is sindsdien gewijzigd' };
+}
+
 /* Registerinhoud wordt na de codecommit geschreven. Daarom binden we de exact
    gelezen bytes met dezelfde sha256 als elders in dit raakvlak, en vergelijken
    we de broninstrumenten afzonderlijk met hun eigen meetcommit. Een nieuwe
@@ -713,11 +760,17 @@ function bronGebrek(w, instrument, bronnen, grof) {
     if (stempelGebrek(st) || st?.instrument !== bronInstrument ||
       !b.stempel || ['op', 'commit', 'instrument', 'boomVuil'].some(k => b.stempel[k] !== st[k]))
       return { reden: register + ': geen geldig overeenkomend bronstempel', oorzaak: [register] };
-    const ins = instrumentDeel(w, bronInstrument);
-    if (!ins.bepaald) {
-      const v = grof(st);
-      if (!v.vers) return { reden: register + ': ' + v.reden, oorzaak: [register] };
+    if (SERVERRONDE_INSTRUMENTEN.has(bronInstrument)) {
+      const v = serverRondeVersheid(w, st, grof);
+      if (!v.vers) return { reden: register + ': ' + v.reden,
+        oorzaak: v.oorzaak?.length ? v.oorzaak : [register] };
     } else {
+      const ins = instrumentDeel(w, bronInstrument);
+      if (!ins.bepaald) {
+        const v = grof(st);
+        if (!v.vers) return { reden: register + ': ' + v.reden, oorzaak: [register] };
+        continue;
+      }
       const d = verschil(w, ins.bestanden, st.commit);
       if (!d.bekend || d.oorzaak.length)
         return { reden: register + ': broninstrument gewijzigd sinds de meting',
@@ -854,4 +907,4 @@ function hashesVoor(appwerkt, raakvlakRegister) {
 }
 
 module.exports = { register, verwijzing, hashesVoor, REGISTER, REGISTER_PAD, maakWereld, raakvlak, versheidVoor, controleer, hashes, verschil, gedeeld, schermDeel, apiPaden,
-  handlers, instrumentDeel, kanten, samen, DYNAMISCH, SCENARIOMAP };
+  handlers, instrumentDeel, serverRondeVersheid, SERVERRONDE_INSTRUMENTEN, kanten, samen, DYNAMISCH, SCENARIOMAP };

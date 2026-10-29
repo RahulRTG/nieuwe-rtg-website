@@ -19,7 +19,7 @@
             '<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.5rem;">'+
             '<span class="s-1m8ehf5">'+T('tk.personen','Personen')+'</span>'+
             '<button class="bz-btn s-qk3yxe" data-tkp="-1">\u2212</button><b>'+k.personen+'</b><button class="bz-btn s-qk3yxe" data-tkp="1">+</button></div>'+
-            '<button class="bz-groot h-mt70" id="tkKoop"'+(k.tijd?'':' disabled')+'>'+T('tk.koop','Koop tickets')+' \u00B7 '+eur(a.prijs * k.personen)+'</button></div>';
+            '<button class="bz-groot h-mt70" id="tkKoop" aria-label="'+T('tk.koop','Koop tickets')+'"'+(k.tijd?'':' disabled')+'>'+T('tk.koop','Koop tickets')+' \u00B7 '+eur(a.prijs * k.personen)+'</button></div>';
         } else {
           html += '<button class="bz-btn h-mt45" data-tkopen="'+p.code+':'+a.id+'">'+T('tk.kies','Kies datum en tijd')+'</button>';
         }
@@ -62,11 +62,11 @@
   const careSoort = { spa: 'Spa', wellness: 'Wellness', kliniek: 'Kliniek' };
   async function laadCare(){
     if (!API.live) return;
-    try { careOv = await API.call('/care', {}); } catch(e){ careOv = null; }
+    try { careOv = await API.call('/api/care', {}); } catch(e){ careOv = null; }
     let mijn = [];
-    try { mijn = (await API.call('/care/mijn', {})).boekingen || []; } catch(e){}
-    try { carePak = (await API.call('/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
-    try { carePakMijn = (await API.call('/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
+    try { mijn = (await API.call('/api/care/mijn', {})).boekingen || []; } catch(e){}
+    try { carePak = (await API.call('/api/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
+    try { carePakMijn = (await API.call('/api/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
     renderCareMijn(mijn);
     renderCareIntakes();
     renderCarePakketten();
@@ -87,11 +87,11 @@
           '<button class="bz-btn" data-care-annul="'+esc(b.ref)+'">'+T('care.annuleer','Annuleer')+'</button>'+
         '</div></div>').join('');
     el.querySelectorAll('[data-care-pay]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/betaal', { ref: x.dataset.carePay }); toast(T('care.paytoast','Betaald. Tot uw afspraak.')); laadCare(); }
+      try { await API.call('/api/care/betaal', { ref: x.dataset.carePay }); toast(T('care.paytoast','Betaald. Tot uw afspraak.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-care-annul]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/annuleer', { ref: x.dataset.careAnnul }); toast(T('care.annultoast','Afspraak geannuleerd.')); laadCare(); }
+      try { await API.call('/api/care/annuleer', { ref: x.dataset.careAnnul }); toast(T('care.annultoast','Afspraak geannuleerd.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
   }
@@ -106,7 +106,7 @@
         '<button class="bz-btn" data-care-intakestop="'+esc(i.id)+'">'+T('care.stopdelen','Stop delen')+'</button></div>').join('')+
       '</div>';
     el.querySelectorAll('[data-care-intakestop]').forEach(x => x.addEventListener('click', async () => {
-      try { await API.call('/care/intake/stop', { id: x.dataset.careIntakestop }); toast(T('care.stoptoast','Deling gestopt. Weg is weg.')); laadCare(); }
+      try { await API.call('/api/care/intake/stop', { id: x.dataset.careIntakestop }); toast(T('care.stoptoast','Deling gestopt. Weg is weg.')); laadCare(); }
       catch(e){ toast(e.message); }
     }));
   }

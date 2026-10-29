@@ -8,11 +8,18 @@ module.exports = (ctx) => {
     GH_FUNCTIES, GH_KETEN, GH_KLAAR, CATEGORIEEN,
     id, nu, schoon, getal, isGroothandel, defaults, functieAan, klantSoortVan, functieVoorKlant, prijsVoor } = ctx;
   const { functieLijst, zetFunctie, zetProduct, zetVoorraad, orders, actieveGroothandels, publiekProduct, markt } = ctx;
+  const { publiekeOrder, mijnBestellingen, inkomend } = require('./orderbeeld')({ orders, klantSoortVan, GH_KLAAR });
   function plaatsBestelling(groothandelCode, koper, regelsIn, opts) {
     opts = opts || {};
     const s = findSupplier(groothandelCode);
     if (!isGroothandel(s)) return { status: 404, error: 'Groothandel niet gevonden.' };
     const soort = klantSoortVan(koper);
+    /* Een herhaalsleutel per bestelling (19 oktober 2026): een dubbele tik of een
+       herhaling na afbreken maakte een tweede bestelling en hield de voorraad
+       twee keer vast (voltooiproef tab:bestellen). Ook na een herstart. */
+    const idem = typeof opts.idem === 'string' && opts.idem.trim() ? opts.idem.trim().slice(0, 80) : null;
+    const al = idem && orders().find(o => o.idem === idem && o.klant.soort === soort && o.klant.id === koper.id);
+    if (al) return { status: 200, ok: true, order: publiekeOrder(al, 'klant'), herhaald: true };
     const fnodig = functieVoorKlant(soort);
     if (!functieAan(s, fnodig)) return { status: 409, error: 'Deze groothandel levert niet aan dit type klant.' };
     const bezorgen = opts.bezorgen !== false;
@@ -52,7 +59,8 @@ module.exports = (ctx) => {
       klant: { soort, id: koper.id, naam: koper.naam || 'Klant' },
       regels, subtotaal: Math.round(subtotaal * 100) / 100, bezorgen,
       soort: soort === 'lid' ? 'boodschappen' : soort === 'groothandel' ? 'doorverkoop' : 'b2b',
-      bron: opts.bron === 'ai' ? 'ai' : 'handmatig', status: 'aangevraagd', at: nu(), stappen: [{ status: 'aangevraagd', at: nu() }]
+      bron: opts.bron === 'ai' ? 'ai' : 'handmatig', status: 'aangevraagd', at: nu(), stappen: [{ status: 'aangevraagd', at: nu() }],
+      ...(idem ? { idem } : {})
     };
     orders().unshift(order);
     db.data.groothandelOrders = orders().slice(0, 20000);
@@ -75,10 +83,13 @@ module.exports = (ctx) => {
     }
   }
 
-  function orderVerder(groothandelCode, ref, actie, actor) {
+  /* `van`: de stand die het scherm zag. Een dubbele tik op "Volgende stap" sloeg
+     anders een stap over (bevestigd -> onderweg); nu is de tweede een 409. */
+  function orderVerder(groothandelCode, ref, actie, actor, van) {
     const o = orders().find(x => x.ref === ref && x.groothandelCode === groothandelCode);
     if (!o) return { status: 404, error: 'Bestelling niet gevonden.' };
     if (GH_KLAAR[o.status]) return { status: 409, error: 'Deze bestelling is al afgerond.' };
+    if (van && van !== o.status) return { status: 409, error: 'Deze bestelling staat al op ' + o.status + '.' };
     // weigeren is ook een niet-doorgegane bestelling: voorraad terug. Dat gebeurde
     // alleen bij annuleren, dus een geweigerde order bleef als verkocht afgeboekt.
     if (actie === 'weiger') { o.status = 'geweigerd'; voorraadTerug(o); }
@@ -119,27 +130,6 @@ module.exports = (ctx) => {
     save();
     sseToSupplier(o.groothandelCode, 'sync', { scope: 'groothandel' });
     return { status: 200, ok: true };
-  }
-
-  function publiekeOrder(o, kant) {
-    return {
-      ref: o.ref, groothandelCode: o.groothandelCode, groothandelNaam: o.groothandelNaam,
-      klant: kant === 'groothandel' ? o.klant : { soort: o.klant.soort, naam: o.klant.naam },
-      regels: o.regels, subtotaal: o.subtotaal, bezorgen: o.bezorgen, soort: o.soort, bron: o.bron,
-      status: o.status, at: o.at, stappen: o.stappen, ontvangst: o.ontvangst || null
-    };
-  }
-  function mijnBestellingen(koper) {
-    const soort = klantSoortVan(koper);
-    return orders().filter(o => o.klant.soort === soort && o.klant.id === koper.id).slice(0, 100).map(o => publiekeOrder(o, 'klant'));
-  }
-  function inkomend(groothandelCode) {
-    const lijst = orders().filter(o => o.groothandelCode === groothandelCode);
-    return {
-      open: lijst.filter(o => !GH_KLAAR[o.status]).map(o => publiekeOrder(o, 'groothandel')),
-      afgerond: lijst.filter(o => GH_KLAAR[o.status]).slice(0, 60).map(o => publiekeOrder(o, 'groothandel')),
-      omzet: Math.round(lijst.filter(o => o.status === 'geleverd').reduce((n, o) => n + o.subtotaal, 0) * 100) / 100
-    };
   }
 
   /* Het slimme bijbestelvoorstel is een eigen onderwerp (verkoopdata lezen,

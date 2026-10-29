@@ -12,9 +12,20 @@
    ctx.volwassenSleutel. Is die binding er niet, dan is het antwoord nee. Een
    ontbrekende poort mag nooit als een open poort lezen.
 
-   Buiten productie staat de plicht uit, want de toetsen en lokale fixtures
-   kennen anonieme gezinnen. RTF_GEZIN_ACCOUNTPLICHT=1 zet hem aan, zodat hij
-   tegen een echte server te beproeven is (test/gezinseigenaar.test.js).
+   Sinds het eigenaarsbesluit van 19 oktober 2026 (AGENTS.md: gebruiken vraagt
+   een account) geldt de plicht overal BUITEN DE DEMO, en niet alleen bij
+   NODE_ENV=production: een echte server zonder NODE_ENV is geen demo. Alleen
+   de afgezonderde testomgeving (server/testomgeving.js) kent nog anonieme
+   gezinnen, voor de toetsen en Magnaat. RTF_GEZIN_ACCOUNTPLICHT=1 zet hem
+   ook daar aan (test/gezinseigenaar.test.js).
+
+   poort(): zes /api/rtf-families staan niet onder de vrijgavepoort en leunden
+   alleen op deze plicht (connect, labfonds, beroepen, bieb, geloof,
+   knelpunt). Hun eigen handlers zeggen bij elk geweigerd token "log opnieuw
+   in bij je gezin" (403); voor een GELDIG token in een gezin zonder
+   eigenaar-account is dat de verkeerde raad. Daar antwoordt de poort 401 met
+   `accountNodig`, zodat het scherm naar de inlog kan sturen
+   (test/toegang-gezin.test.js).
 
    Dit vervangt de vrijgavepoort NIET: zonder extern dossier blijven de
    beschermde routes in productie 503 (middleware/foundation-productiepoort.js).
@@ -23,11 +34,14 @@
    (zie hieronder). */
 'use strict';
 
+const testomgeving = require('../testomgeving');
+
 const VOLWASSEN_ROLLEN = ['beheerder', 'ouder', 'gezinslid', 'gast'];
 
 function maak({ ctx, isBeschermd }) {
   function accountplicht() {
-    return process.env.NODE_ENV === 'production' || process.env.RTF_GEZIN_ACCOUNTPLICHT === '1';
+    return process.env.NODE_ENV === 'production' || process.env.RTF_GEZIN_ACCOUNTPLICHT === '1' ||
+      !testomgeving.actief(process.env);
   }
   function volwassenAccount(userId) {
     if (userId == null || typeof ctx.volwassenSleutel !== 'function') return false;
@@ -55,7 +69,21 @@ function maak({ ctx, isBeschermd }) {
       res.status(409).json({ error: 'Voeg je kind toe via Mijn gezin in je RTG-account.' });
     });
   }
-  return { accountplicht, volwassenAccount, magDoor, bewaak };
+  function poort({ G, gezinstoken }) {
+    return function gezinAccountPoort(req, res, next) {
+      if (!accountplicht() || !ACCOUNT_FAMILIES.some(f => req.path === f || req.path.startsWith(f + '/'))) return next();
+      const b = req.body || {};
+      const g = G()[String(b.code || '').toUpperCase()];
+      const p = g && gezinstoken.vind(g, b.token);
+      if (!p || (g.eigenaar && g.eigenaar.userId != null)) return next();
+      res.status(401).json({ accountNodig: true,
+        error: 'Dit gezin hangt nog niet aan een RTG-account. Log in met het account van een ouder; een gratis account is genoeg.' });
+    };
+  }
+  return { accountplicht, volwassenAccount, magDoor, bewaak, poort };
 }
 
-module.exports = { maak };
+const ACCOUNT_FAMILIES = Object.freeze(['/api/rtf/connect', '/api/rtf/labfonds', '/api/rtf/beroepen',
+  '/api/rtf/bieb', '/api/rtf/geloof', '/api/rtf/knelpunt']);
+
+module.exports = { maak, ACCOUNT_FAMILIES };

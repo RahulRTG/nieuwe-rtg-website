@@ -33,6 +33,9 @@ test('Ontdekken en Mijn avond gebruiken de bestaande horeca- en aanbiederdata', 
     assert.match(ontdekken, new RegExp(route));
   }
   assert.match(ontdekken, /id="avondZoek"/);
+  assert.match(ontdekken, /id="blad" role="dialog" aria-modal="true"/,
+    'het reserveerblad is een echte modale laag voor toetsenbord en schermlezer');
+  assert.match(ontdekken, /id="bladTerug" aria-label="Sluit reservering"/);
   assert.match(ontdekken, /Het restaurant ontvangt uw aanvraag en bevestigt zelf/);
   assert.match(ontdekken, /U heeft nu nog niets aangevraagd/);
 

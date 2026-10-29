@@ -69,6 +69,7 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <main id="main">
@@ -145,7 +146,7 @@ const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&a
 
 function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
 
-const api = (pad, body) => fetch('/api/rtfos/' + pad, {
+const api = (pad, body) => fetch(pad, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
   body: JSON.stringify(body || {})
@@ -156,6 +157,7 @@ const api = (pad, body) => fetch('/api/rtfos/' + pad, {
 });
 
 let STAD = null;
+let AANBODSLEUTEL = null;
 let TAB = '';
 
 function zeg(tekst, goed) {
@@ -167,7 +169,7 @@ async function start() {
   $('#app').classList.remove('verborgen');
   try {
     const r = await fetch('/api/rtfos/publiek/steden', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() }, body: '{}'
     }).then(x => x.json());
     $('#steden').innerHTML = (r.steden || []).length
       ? r.steden.map(s => '<button type="button" class="stadknop" data-stad="' + esc(s.id) + '" aria-pressed="false">' +
@@ -207,8 +209,8 @@ function rij(r) {
 
 async function teken() {
   try {
-    const r = TAB === 'mijn' ? await api('ruil/mijn', {})
-      : await api('ruil/lijst', { stad: STAD, soort: TAB || undefined });
+    const r = TAB === 'mijn' ? await api('/api/rtfos/ruil/mijn', {})
+      : await api('/api/rtfos/ruil/lijst', { stad: STAD, soort: TAB || undefined });
     const rijen = r.ruil || [];
     $('#lijst').innerHTML = rijen.length ? rijen.map(rij).join('')
       : '<div class="leeg">' + (TAB === 'mijn'
@@ -216,16 +218,16 @@ async function teken() {
         : 'Nog niets in deze stad. Het eerste mag van jou zijn.') + '</div>';
 
     $('#lijst').querySelectorAll('[data-int]').forEach(b => b.addEventListener('click', () => doe(
-      'ruil/interesse', { id: b.dataset.int },
+      '/api/rtfos/ruil/interesse', { id: b.dataset.int },
       'Genoteerd. De eigenaar ziet dat je belangstelling hebt en kan contact zoeken; wij sturen niets.')));
     $('#lijst').querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', () => doe(
-      'ruil/sluit', { id: b.dataset.sluit, status: 'weg' }, 'Afgerond.')));
+      '/api/rtfos/ruil/sluit', { id: b.dataset.sluit, status: 'weg' }, 'Afgerond.')));
     $('#lijst').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', () => doe(
-      'ruil/sluit', { id: b.dataset.intrek, status: 'ingetrokken' }, 'Ingetrokken.')));
+      '/api/rtfos/ruil/sluit', { id: b.dataset.intrek, status: 'ingetrokken' }, 'Ingetrokken.')));
     $('#lijst').querySelectorAll('[data-meld]').forEach(b => b.addEventListener('click', async () => {
       const reden = prompt('Wat klopt er niet aan dit aanbod?');
       if (reden === null) return;
-      try { const r2 = await api('ruil/meld', { id: b.dataset.meld, reden }); zeg(r2.bericht, true); teken(); }
+      try { const r2 = await api('/api/rtfos/ruil/meld', { id: b.dataset.meld, reden }); zeg(r2.bericht, true); teken(); }
       catch (e) { zeg(e.message); }
     }));
   } catch (e) { $('#lijst').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
@@ -245,9 +247,14 @@ $('#tabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click
 $('#plaats').addEventListener('click', async () => {
   const titel = $('#nTitel').value.trim();
   if (!STAD || titel.length < 3) { zeg('Wat is het? Een paar woorden is genoeg.'); return; }
+  /* Een herhaalsleutel per opgesteld aanbod: een dubbele tik of een nieuwe
+     poging na een fout is hetzelfde aanbod, een aangepast aanbod een nieuw. */
+  const inhoud = [STAD, $('#nSoort').value, titel, $('#nWat').value.trim(), $('#nStaat').value.trim()].join('|');
+  if (!AANBODSLEUTEL || AANBODSLEUTEL.inhoud !== inhoud) AANBODSLEUTEL = { inhoud, idem: RTGId('ruil') };
   try {
-    await api('ruil/plaats', { stad: STAD, soort: $('#nSoort').value, titel,
-      wat: $('#nWat').value.trim(), staat: $('#nStaat').value.trim() });
+    await api('/api/rtfos/ruil/plaats', { stad: STAD, soort: $('#nSoort').value, titel,
+      wat: $('#nWat').value.trim(), staat: $('#nStaat').value.trim(), idem: AANBODSLEUTEL.idem });
+    AANBODSLEUTEL = null;
     $('#nTitel').value = ''; $('#nWat').value = ''; $('#nStaat').value = '';
     zeg('Staat erbij.', true);
     teken();

@@ -142,6 +142,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="muziek" class="rtg-stijl rtg-music-experience" data-rtg-world="living" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-edge-2-context="none" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -404,13 +405,13 @@
   function sesApi(pad, body) {
     var h = { 'Content-Type': 'application/json' };
     if (token) h.Authorization = 'Bearer ' + token;
-    return fetch('/api/samen/' + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
+    return fetch(pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
       .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; }); });
   }
   function samenPubliceer() {
     if (!sesGastheer || !sesId) return;
     var s = G.stand(); if (!s) return;
-    sesApi('muziek', { id: sesId, media: { stationId: s.stationId, seed: s.seed, startOffsetMs: Math.round(s.positie * 1000), speelt: s.speelt } }).catch(function () {});
+    sesApi('/api/samen/muziek', { id: sesId, media: { stationId: s.stationId, seed: s.seed, startOffsetMs: Math.round(s.positie * 1000), speelt: s.speelt } }).catch(function () {});
   }
   function samenBasis() {
     if (!sesGastheer) return 'Je luistert mee in een Samen-kamer.';
@@ -438,12 +439,12 @@
   }
   function samenStop(stuurWeg) {
     if (sesTimer) { clearInterval(sesTimer); sesTimer = null; }
-    if (stuurWeg && sesId) sesApi('weg', { id: sesId }).catch(function () {});
+    if (stuurWeg && sesId) sesApi('/api/samen/weg', { id: sesId }).catch(function () {});
     sesId = null; sesDeelCode = null; sesGastheer = false; sesLaatst = ''; samenToon();
   }
   function samenPoll() {
     if (!sesId) return;
-    sesApi('staat', { id: sesId }).then(function (j) {
+    sesApi('/api/samen/staat', { id: sesId }).then(function (j) {
       var k = j.kamer; if (!k) return;
       sesGastheer = !!k.benGastheer;
       if (elSamenStatus) {
@@ -457,7 +458,7 @@
   var elWeg = $('#samenWeg'), elVernieuw = $('#samenVernieuw');
   if (!token) { document.querySelectorAll('#samen button, #samen input').forEach(function (b) { b.disabled = true; }); }
   if (elMaak) elMaak.addEventListener('click', function () {
-    sesApi('maak', { idem: RTGIdem('sound-samen-maak') }).then(function (j) {
+    sesApi('/api/samen/maak', { idem: RTGIdem('sound-samen-maak') }).then(function (j) {
       sesId = j.kamer.id; sesDeelCode = j.code; sesGastheer = true; sesLaatst = ''; samenToon();
       sesTimer = setInterval(samenPoll, 4000); samenPubliceer();
       zeg('Samen luisteren staat aan. Deel de eenmalig getoonde code ' + sesDeelCode + '.');
@@ -466,7 +467,7 @@
   if (elMeeForm) elMeeForm.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var c = ($('#samenCode').value || '').trim().toUpperCase(); if (!c) { zeg('Vul eerst de code in die u kreeg.'); $('#samenCode').focus(); return; }
-    sesApi('mee', { code: c }).then(function (j) {
+    sesApi('/api/samen/mee', { code: c }).then(function (j) {
       sesId = j.kamer.id; sesDeelCode = null; sesGastheer = false; sesLaatst = ''; samenToon();
       samenSync(j.kamer.muziek, j.kamer.now);
       sesTimer = setInterval(samenPoll, 4000);
@@ -474,7 +475,7 @@
     }).catch(function (e) { zeg(e.message); });
   });
   if (elVernieuw) elVernieuw.addEventListener('click', function () {
-    sesApi('code', { id: sesId, idem: RTGIdem('sound-samen-code') }).then(function (j) {
+    sesApi('/api/samen/code', { id: sesId, idem: RTGIdem('sound-samen-code') }).then(function (j) {
       sesDeelCode = j.code; samenToon();
       zeg('Nieuwe deelcode gemaakt. Zij wordt alleen nu getoond.');
     }).catch(function (e) { zeg(e.message); });

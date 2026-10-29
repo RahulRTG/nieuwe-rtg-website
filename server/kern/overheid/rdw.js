@@ -20,7 +20,7 @@ module.exports = (ctx) => {
     const merk = schoon(data.merk, 40) || 'Onbekend';
     const h = hash(kenteken);
     const bouwjaar = 2008 + (h % 17);
-    const apk = new Date(); apk.setMonth(apk.getMonth() + 6 + (h % 12));
+    const apk = new Date(); apk.setUTCMonth(apk.getUTCMonth() + 6 + (h % 12));
     const v = { id: id(), key: sess.key, kenteken, merk, bouwjaar, apkTot: apk.toISOString().slice(0, 10), geschorst: false, at: nu() };
     db.data.rijkVoertuigen.unshift(v);
     db.data.rijkVoertuigen = db.data.rijkVoertuigen.slice(0, 60000);
@@ -37,7 +37,7 @@ module.exports = (ctx) => {
     seed();
     let r = (db.data.rijkRijbewijzen || []).find(x => x.key === key);
     if (!r) {
-      const g = new Date(); g.setFullYear(g.getFullYear() + 5 + (hash(key) % 5));
+      const g = new Date(); g.setUTCFullYear(g.getUTCFullYear() + 5 + (hash(key) % 5));
       r = { key, categorieen: ['B'], geldigTot: g.toISOString().slice(0, 10), at: nu() };
       db.data.rijkRijbewijzen.unshift(r); save();
     }
@@ -47,7 +47,7 @@ module.exports = (ctx) => {
     seed();
     let r = (db.data.rijkRijbewijzen || []).find(x => x.key === key);
     if (!r) { rijbewijs(key); r = (db.data.rijkRijbewijzen || []).find(x => x.key === key); }
-    const g = new Date(); g.setFullYear(g.getFullYear() + 10);
+    const g = new Date(); g.setUTCFullYear(g.getUTCFullYear() + 10);
     r.geldigTot = g.toISOString().slice(0, 10); r.verlengd = nu(); save();
     bericht(key, 'RDW', 'Rijbewijs verlengd', 'Je rijbewijs is verlengd tot ' + r.geldigTot + '. Je haalt het op bij de gemeentebalie.', 'rdw');
     return { ok: true, rijbewijs: { categorieen: r.categorieen, geldigTot: r.geldigTot } };
@@ -65,7 +65,7 @@ module.exports = (ctx) => {
         const kt = String(a.plate || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (kt.length < 4 || bestaat.has(kt)) continue;
         const h = hash(kt);
-        const apk = new Date(); apk.setMonth(apk.getMonth() + 7 + (h % 11));
+        const apk = new Date(); apk.setUTCMonth(apk.getUTCMonth() + 7 + (h % 11));
         db.data.rijkVoertuigen.unshift({ id: id(), key: null, vloot: s.code, kenteken: kt,
           merk: a.name || s.name, bouwjaar: 2018 + (h % 7), apkTot: apk.toISOString().slice(0, 10), geschorst: false, at: nu() });
         bestaat.add(kt); n++;

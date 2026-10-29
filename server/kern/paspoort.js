@@ -28,7 +28,7 @@
 
    maakPaspoort(state) volgt het vaste kern-patroon. */
 
-const { idVanKey } = require('../lib/lidsleutel');
+const accountOpSleutel = require('../lib/account-op-sleutel');
 
 const NIVEAUS = ['bevestiging', 'idkaart', 'paspoort'];
 const VIEW_TTL_MS = 10 * 60 * 1000;     // een goedgekeurde inzage is 10 minuten geldig
@@ -48,11 +48,7 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   const lijsten = opslag.alle;
   // Een sleutel ('user-<id>') terug naar het account. Alleen echte accounts
   // hebben een paspoort; persona's/gasten niet.
-  function accountVanKey(key) {
-    const id = idVanKey(key);
-    if (id == null) return null;
-    try { return accounts.getUserById(id); } catch (e) { return null; }
-  }
+  const accountVanKey = key => accountOpSleutel(accounts, key);
   function memberState(u) { try { return accounts.getMemberState(u.id) || {}; } catch (e) { return {}; } }
 
   /* De vervaldatum van het eigen reisdocument, of null.

@@ -23,8 +23,8 @@
     var actueelVersie = !!doc.gewijzigd;
     var beoordeling = fase !== 'concept';
     var knop = fase === 'concept' && doc.magBewerken
-      ? '<button type="button" data-rtd-vraag="' + RTGDocsDossier.veilig(doc.id) + '">Vraag beoordeling &rarr;</button>'
-      : '<button type="button" data-rtd-room="' + RTGDocsDossier.veilig(doc.id) + '">Open Decision Room &rarr;</button>';
+      ? '<button type="button" data-rtd-vraag="' + RTGDocsDossier.veilig(doc.id) + '" data-hoofdactie data-contextactie>Vraag beoordeling &rarr;</button>'
+      : '<button type="button" data-rtd-room="' + RTGDocsDossier.veilig(doc.id) + '" data-hoofdactie data-contextactie>Open Decision Room &rarr;</button>';
     vak.innerHTML = '<article class="rtd-besluitkaart"><div class="rtd-besluitkop"><span class="rtd-zegel">B</span><span><h2>' +
       RTGDocsDossier.veilig(doc.titel) + '</h2><p>' + RTGDocsDossier.veilig(RTGDocsDossier.faseNaam(fase)) + ' · ' + RTGDocsDossier.veilig(doc.door || 'eigenaar onbekend') + '</p></span></div>' +
       '<div class="rtd-controles">' +
@@ -34,7 +34,7 @@
       regel(openActies === 0, 'Open acties verwerkt', openActies ? openActies + (openActies === 1 ? ' actie staat' : ' acties staan') + ' nog open' : 'Geen open acties in het dossier') +
       regel(beoordeling, 'Menselijke beoordeling gestart', fase === 'concept' ? 'Nog aan te vragen' : RTGDocsDossier.faseNaam(fase)) +
       '</div></article><div class="rtd-grens"><b>De mens beslist.</b> RTDocs controleert volledigheid, versie en herkomst. Het keurt geen bedrag, contract of koerswijziging goed.</div>' +
-      '<div class="rtd-besluitacties"><button type="button" data-rtd-open="dossier">Terug naar dossier</button>' + knop + '</div>';
+      '<div class="rtd-besluitacties">' + knop + '<button type="button" data-rtd-open="dossier" data-contextactie>Terug naar dossier</button></div>';
   }
   async function vraag(root, office, actueel) {
     if (!actueel || !actueel.doc || !actueel.doc.magBewerken) return { ok: false, fout: 'U heeft geen schrijfrecht op dit document.' };

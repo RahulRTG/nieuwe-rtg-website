@@ -32,7 +32,7 @@
       '<button data-bop="-1" style="' + KNOP + '">↑</button>' +
       '<button data-bop="1" style="' + KNOP + '">↓</button>' +
       '<span class="h-flex1"></span>' +
-      '<button data-bweg="1" style="color:var(--burgundy-on-dark,#C23A5E);' + KNOP.replace('color:inherit;', '') + '">Weg</button></div></div>';
+      '<button data-bweg="1" data-contextactie style="color:var(--burgundy-on-dark,#C23A5E);' + KNOP.replace('color:inherit;', '') + '">Weg</button></div></div>';
   }
 
   window.RTGOfficeBordPaneel = { html: html };

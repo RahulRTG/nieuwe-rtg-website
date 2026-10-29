@@ -17,7 +17,7 @@ module.exports = (kern, { heeftTickets }) => {
     if (!(act.tijden || []).includes(tijd)) return res.status(400).json({ error: 'Kies een tijdslot.' });
     const personen = Math.min(20, Math.max(1, parseInt(req.body.personen, 10) || 1));
     const vip = req.body.vip === true;
-    const datum = new Date().toISOString().slice(0, 10);
+    const datum = require('../../kern/tijdzone').datumIn();
     const total = Math.round((act.prijs || 0) * personen * 100) / 100;
     const method = req.body.method === 'rtgpay' ? 'rtgpay' : 'contant';
     const betaalt = method === 'rtgpay' && total > 0;

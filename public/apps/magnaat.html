@@ -28,7 +28,7 @@
      De RAND houdt de kleur, de cijfers worden wit. */
   .nav .ni{width:1.75rem;height:1.75rem;border:1px solid var(--line);border-radius:0;display:grid;place-items:center;color:#FFFFFF;font-size:.65rem;font-weight:800}.nav button.aan .ni{background:var(--gold);color:#122019;border-color:var(--gold)}
   .rail-foot{margin-top:auto;padding:.9rem;border:1px solid var(--line);border-radius:0;background:rgba(255,255,255,.025)}.live{display:flex;gap:.5rem;align-items:center;font-size:.75rem}.dot{width:.55rem;height:.55rem;border-radius:50%;background:#6fbd8a;box-shadow:0 0 14px #6fbd8a}.rail-foot small{color:var(--soft);display:block;margin-top:.45rem;line-height:1.5}
-  main{min-width:0;padding:1.2rem 1.4rem 3rem}.topbar{display:flex;align-items:center;gap:1rem;min-height:3rem}.crumb{color:var(--soft);font-size:.78rem;letter-spacing:.09em;text-transform:uppercase}.top-spacer{flex:1}.statuspill{display:flex;gap:.55rem;align-items:center;padding:.45rem .7rem;border:1px solid var(--line);border-radius:0;color:var(--soft);font-size:.75rem}.statuspill b{color:var(--paper)}.exit{color:#FFFFFF;text-decoration:none;font-size:.8rem}
+  main{min-width:0;padding:1.2rem 1.4rem 3rem}body[data-rtg-adaptive-ready="true"]>.app main{padding-bottom:calc(3rem + var(--rtg-adaptive-inset,0px))}.topbar{display:flex;align-items:center;gap:1rem;min-height:3rem}.crumb{color:var(--soft);font-size:.78rem;letter-spacing:.09em;text-transform:uppercase}.top-spacer{flex:1}.statuspill{display:flex;gap:.55rem;align-items:center;padding:.45rem .7rem;border:1px solid var(--line);border-radius:0;color:var(--soft);font-size:.75rem}.statuspill b{color:var(--paper)}.exit{color:#FFFFFF;text-decoration:none;font-size:.8rem}
   .screen{display:none;animation:in .24s ease}.screen.aan{display:block}@keyframes in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
   h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:500}h1{font-size:clamp(2.1rem,4vw,4.4rem);line-height:1.02;margin:.35rem 0 1rem}h2{margin:.1rem 0 .45rem;font-size:1.45rem}p{line-height:1.6}.eyebrow{color:#FFFFFF;text-transform:uppercase;letter-spacing:.17em;font-size:.68rem;font-weight:800}.muted{color:var(--soft)}
   .hero{position:relative;overflow:hidden;min-height:27rem;border:1px solid var(--line);border-radius:0;padding:clamp(1.4rem,4vw,3.5rem);display:flex;align-items:center;background:
@@ -59,7 +59,7 @@
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(14px);z-index:80;display:grid;place-items:center;padding:1rem}.overlay[hidden]{display:none}.taskbox{width:min(38rem,100%);border:1px solid rgba(216,189,120,.35);border-radius:0;background:linear-gradient(145deg,#142b26,#0a1714);box-shadow:var(--shadow);padding:1.35rem}.task-head{display:flex;gap:.8rem;align-items:flex-start}.task-seal{width:3.2rem;height:3.2rem;border:1px solid var(--gold);border-radius:0;display:grid;place-items:center;color:var(--rtg-leesgoud,var(--gold));font-size:.65rem;font-weight:900}.task-head>div:nth-child(2){flex:1}.task-head h2{font-size:1.3rem}.task-head p{font-size:.72rem;color:var(--soft);margin:.2rem 0}.x{border:0;background:transparent;color:var(--soft);cursor:pointer;font-size:1.1rem}.progress{height:4px;background:rgba(255,255,255,.08);border-radius:0;margin:1rem 0;overflow:hidden}.progress i{display:block;height:100%;background:var(--gold);transition:width .25s}.brief{padding:.8rem;border-left:2px solid var(--gold);background:rgba(216,189,120,.05);font-size:.77rem;color:#c4d0c9;margin:.8rem 0}.question{font-family:Georgia,serif;font-size:1.15rem;margin:1.2rem 0 .7rem}.answers{display:grid;gap:.5rem}.answer{border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:0;text-align:left;padding:.75rem .85rem;cursor:pointer}.answer:hover{border-color:var(--gold);background:rgba(216,189,120,.08)}.feedback{min-height:1.4rem;font-size:.74rem;color:var(--gold2);margin-top:.7rem}.complete{text-align:center;padding:1rem}.complete strong{display:block;font-family:Georgia,serif;font-size:2.1rem;color:var(--gold2)}
   .toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);padding:.65rem 1rem;border:1px solid var(--gold);background:#10211e;border-radius:0;font-size:.76rem;z-index:100;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,-5px)}
   @media(max-width:1050px){.app{grid-template-columns:5rem 1fr}.brand>div:last-child,.nav button span:last-child,.rail-foot{display:none}.brand{padding-left:.18rem}.nav button{padding:.6rem;justify-content:center}.monitor{width:76%}.pda{right:2%;width:13rem}.modegrid,.worldgrid,.partnerworld,.teamrooms{grid-template-columns:repeat(2,1fr)}.capgrid{grid-template-columns:repeat(2,1fr)}.codeband{grid-template-columns:repeat(3,1fr)}.officepick{grid-template-columns:1fr}.rolecard{border-right:0;border-bottom:1px solid var(--line)}}
-  @media(max-width:700px){.app{display:block}.rail{position:sticky;top:var(--edge-top,0px);height:auto;padding:.35rem .5rem;border-right:0;border-bottom:1px solid var(--line);z-index:60;overflow-x:auto;scrollbar-width:none}.brand,.rail-foot{display:none}.nav{display:flex;gap:.25rem;width:max-content}.nav button{width:auto;display:flex;gap:.4rem;padding:.5rem .7rem;font-size:.72rem;white-space:nowrap}.nav button span:last-child{display:block}.nav .ni{width:1.5rem;height:1.5rem}main{padding:.7rem .75rem 2rem}.topbar{padding:.2rem}.statuspill{display:none}.hero{min-height:32rem;align-items:end;padding:1.25rem}.city{inset:0 0 32% 20%;height:55%}.stats{grid-template-columns:repeat(2,1fr)}.modegrid,.capgrid,.worldgrid,.partnerworld,.teamrooms,.futuregrid{grid-template-columns:1fr}.office{min-height:54rem}.monitor{left:3%;right:3%;top:3%;width:auto;height:45%;border-width:7px;border-bottom-width:18px}.window{right:5%;top:50%;width:37%;height:15%}.pda{right:4%;bottom:3%;width:12rem;height:24rem}.office-label{left:4%;bottom:4%;max-width:43%;padding:.7rem}.office-label p{display:none}.stand{display:none}.section-head{align-items:start;flex-direction:column}.worldcard{min-height:auto}.codeband{grid-template-columns:repeat(2,1fr)}.codeband div{border-bottom:1px solid var(--line)}.roomchip{min-width:7rem}.teamjoin{width:100%;flex-wrap:wrap}.teamjoin input{flex:1}}
+  @media(max-width:700px){.app{display:block}.rail{position:sticky;top:var(--edge-top,0px);height:auto;padding:.35rem .5rem;border-right:0;border-bottom:1px solid var(--line);z-index:60;overflow-x:auto;scrollbar-width:none}.brand,.rail-foot{display:none}.nav{display:flex;gap:.25rem;width:max-content}.nav button{width:auto;display:flex;gap:.4rem;padding:.5rem .7rem;font-size:.72rem;white-space:nowrap}.nav button span:last-child{display:block}.nav .ni{width:1.5rem;height:1.5rem}main{padding:.7rem .75rem 2rem}body[data-rtg-adaptive-ready="true"]>.app main{padding-bottom:calc(2rem + var(--rtg-adaptive-inset,0px))}.topbar{padding:.2rem}.statuspill{display:none}.hero{min-height:32rem;align-items:end;padding:1.25rem}.city{inset:0 0 32% 20%;height:55%}.stats{grid-template-columns:repeat(2,1fr)}.modegrid,.capgrid,.worldgrid,.partnerworld,.teamrooms,.futuregrid{grid-template-columns:1fr}.office{min-height:54rem}.monitor{left:3%;right:3%;top:3%;width:auto;height:45%;border-width:7px;border-bottom-width:18px}.window{right:5%;top:50%;width:37%;height:15%}.pda{right:4%;bottom:3%;width:12rem;height:24rem}.office-label{left:4%;bottom:4%;max-width:43%;padding:.7rem}.office-label p{display:none}.stand{display:none}.section-head{align-items:start;flex-direction:column}.worldcard{min-height:auto}.codeband{grid-template-columns:repeat(2,1fr)}.codeband div{border-bottom:1px solid var(--line)}.roomchip{min-width:7rem}.teamjoin{width:100%;flex-wrap:wrap}}
 
   /* RTG-huisstijl: de spelchroom wijkt niet af van de software erin. */
   :root{--ink:#0C0C0B;--night:#0C0C0B;--panel:#151312;--panel2:#1B1817;--line:rgba(222,219,213,.18);--paper:#FFFFFF;--soft:#8A8680;--gold:#C23A5E;--gold2:#FFFFFF;--green:#C23A5E;--red:#C23A5E;--shadow:none;--radius:0}
@@ -119,17 +119,12 @@
 <script src="/shared/realtime.js"></script>
 <link href="/shared/rtg-magnaat-2026.css" rel="stylesheet">
 <style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
+/* Presentatie uit inline attributen blijft in het bestaande stijlblad. */
 .s-14svwza:not(#_#_#_){margin-top:1.25rem}
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="magnaat-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="false" data-mv-scherm="wereld" data-rtg-layout="standard">
 <section class="magnaat-voorzijde" id="magnaatVoorzijde" aria-label="Magnaat veilige oefenwereld">
@@ -137,7 +132,7 @@
     <header class="mv-kop">
       <a class="mv-merk" href="/apps/kantoor.html" aria-label="RTG WorkOS"><b>RTG</b><span>Magnaat</span></a>
       <span class="mv-kopruimte"></span>
-      <button class="mv-profiel" type="button" data-mv-diep="home" aria-label="Open mijn Magnaat-profiel">RI</button>
+      <button class="mv-profiel" type="button" data-mv-diep="home" data-stand="magnaat-diep" aria-label="Open mijn Magnaat-profiel">RI</button>
     </header>
 
     <main>
@@ -153,28 +148,28 @@
           <h2 id="mvMissieTitel">Uw werkvloer vraagt een keuze</h2>
           <p id="mvMissieMeta">Magnaat Test · veilige praktijkmissie</p>
           <div class="mv-voortgang"><span class="mv-meter" aria-hidden="true"><i id="mvVoortgang"></i></span><small id="mvVoortgangTekst">Klaar om te beginnen</small></div>
-          <button class="mv-knop mv-knop--goud" type="button" id="mvGaVerder">Ga verder <span aria-hidden="true">›</span></button>
+          <button class="mv-knop mv-knop--goud" type="button" id="mvGaVerder" data-stand="magnaat-missie" data-hoofdactie data-contextactie>Ga verder <span aria-hidden="true">›</span></button>
         </article>
 
-        <div class="mv-sectiekop"><h2>Kies uw volgende uitdaging</h2><button type="button" data-mv-diep="speelhal">Bekijk alle</button></div>
+        <div class="mv-sectiekop"><h2>Kies uw volgende uitdaging</h2><button type="button" data-mv-diep="speelhal" data-stand="magnaat-diep">Bekijk alle</button></div>
         <div class="mv-uitdagingen" id="mvUitdagingen">
-          <button class="mv-uitdaging" type="button" data-mv-uitdaging="0"><i aria-hidden="true">◎</i><b>Personeel plannen</b><small>Operatie · 15 min</small><em>Gemiddeld</em></button>
-          <button class="mv-uitdaging" type="button" data-mv-uitdaging="1"><i aria-hidden="true">◇</i><b>Voorraad onder druk</b><small>Inkoop · 12 min</small><em>Uitdagend</em></button>
-          <button class="mv-uitdaging" type="button" data-mv-uitdaging="2"><i aria-hidden="true">△</i><b>Klantbelofte bewaken</b><small>Service · 10 min</small><em>Gericht</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="0" data-stand="magnaat-uitdaging" data-contextactie disabled aria-busy="true"><i aria-hidden="true">◎</i><b>Personeel plannen</b><small>Operatie · 15 min</small><em>Gemiddeld</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="1" data-stand="magnaat-uitdaging" data-contextactie disabled aria-busy="true"><i aria-hidden="true">◇</i><b>Voorraad onder druk</b><small>Inkoop · 12 min</small><em>Uitdagend</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="2" data-stand="magnaat-uitdaging" data-contextactie disabled aria-busy="true"><i aria-hidden="true">△</i><b>Klantbelofte bewaken</b><small>Service · 10 min</small><em>Gericht</em></button>
         </div>
 
-        <div class="mv-sectiekop"><h2>Uw wereld vandaag</h2><button type="button" data-mv-diep="economie">Open economie</button></div>
+        <div class="mv-sectiekop"><h2>Uw wereld vandaag</h2><button type="button" data-mv-diep="economie" data-stand="magnaat-diep">Open economie</button></div>
         <div class="mv-cijfers" aria-label="Uw virtuele Magnaat-waarden">
           <div class="mv-cijfer"><small>Reputatie</small><b id="mvReputatie">-</b></div>
           <div class="mv-cijfer"><small>Niveau</small><b id="mvNiveau">-</b></div>
           <div class="mv-cijfer"><small>Balans</small><b id="mvBalans">-</b><em>spelwaarde</em></div>
         </div>
-        <button class="mv-knop mv-knop--goud mv-verdieping" type="button" data-mv-diep="vandaag">FROM ZERO: begin met € 64,32 en een baan</button>
-        <button class="mv-knop mv-verdieping" type="button" data-mv-diep="werkplek">Open de volledige Magnaat-wereld</button>
+        <button class="mv-knop mv-knop--goud mv-verdieping" type="button" data-mv-diep="vandaag" data-stand="magnaat-diep">FROM ZERO: begin met € 64,32 en een baan</button>
+        <button class="mv-knop mv-verdieping" type="button" data-mv-diep="werkplek" data-stand="magnaat-diep">Open de volledige Magnaat-wereld</button>
       </section>
 
       <section class="mv-scherm" id="mvMissie" data-mv-paneel="missie" hidden>
-        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="wereld" aria-label="Terug naar wereld">‹</button><span class="mv-boventitel" id="mvBedrijf">Magnaat Test</span><button class="mv-meer" type="button" data-mv-diep="speelhal" aria-label="Meer missies">•••</button></div>
+        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="wereld" data-stand="magnaat-voorzijde" aria-label="Terug naar wereld">‹</button><span class="mv-boventitel" id="mvBedrijf">Magnaat Test</span><button class="mv-meer" type="button" data-mv-diep="speelhal" data-stand="magnaat-diep" aria-label="Meer missies">•••</button></div>
         <span class="mv-oog" id="mvMissieStap">Korte oefening</span>
         <h1 class="mv-titel" id="mvVraag">De werkvloer loopt vol. Wat doet u?</h1>
         <div class="mv-bericht"><span class="mv-avatar" aria-hidden="true">NB</span><div><b id="mvAfzender">Nora Bakker</b><small id="mvRol">Operationeel manager</small><p id="mvSituatie">De vraag loopt op. Twee onderdelen van de operatie hebben tegelijk versterking nodig.</p></div></div>
@@ -182,11 +177,11 @@
         <section class="mv-sectie"><h2>Uw speelruimte</h2><div class="mv-speelruimte"><div class="mv-feit"><small>Budget</small><b>€ 1.800</b></div><div class="mv-feit"><small>Team</small><b>7 mensen</b></div><div class="mv-feit"><small>Tijd</small><b>25 min</b></div></div></section>
         <section class="mv-sectie"><h2>Kies uw aanpak</h2><div class="mv-keuzes" id="mvKeuzes"></div></section>
         <p class="mv-grens">Dit is een korte, lokale oefening. Pas bij “Start volledige missie” wordt een echt synthetisch Magnaat-dossier geopend.</p>
-        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvVoerKeuzeUit" disabled>Bekijk het gevolg</button><button class="mv-knop mv-knop--wijn" type="button" data-mv-diep="wereld">Vraag uw team</button></div>
+        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvVoerKeuzeUit" data-stand="magnaat-resultaat" data-hoofdactie data-contextactie disabled>Bekijk het gevolg</button><button class="mv-knop mv-knop--wijn" type="button" data-mv-diep="wereld" data-stand="magnaat-diep">Vraag uw team</button></div>
       </section>
 
       <section class="mv-scherm" id="mvResultaat" data-mv-paneel="resultaat" hidden>
-        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="missie" aria-label="Terug naar de keuze">‹</button><span class="mv-boventitel">Resultaat</span><button class="mv-meer" type="button" data-mv-diep="home" aria-label="Open Magnaat-profiel">•••</button></div>
+        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="missie" data-stand="magnaat-voorzijde" aria-label="Terug naar de keuze">‹</button><span class="mv-boventitel">Resultaat</span><button class="mv-meer" type="button" data-mv-diep="home" data-stand="magnaat-diep" aria-label="Open Magnaat-profiel">•••</button></div>
         <span class="mv-oog">Oefenresultaat · nog niet opgeslagen</span>
         <h1 class="mv-resultaatkop" id="mvResultaatTitel">Uw keuze bracht rust op de vloer.</h1>
         <div class="mv-score"><span class="mv-score-ring" id="mvScore">86</span><div><b id="mvScoreTitel">Sterke beslissing</b><small>U hield overzicht én liet ruimte voor herstel.</small></div></div>
@@ -196,16 +191,16 @@
         </div>
         <section class="mv-sectie"><h2>Meegenomen naar uw werk</h2><div class="mv-leren"><div class="mv-leerregel">Capaciteit onder druk verdelen</div><div class="mv-leerregel">Kosten afwegen tegen kwaliteit</div></div></section>
         <p class="mv-grens">Alleen een volledige Magnaat-missie wordt als synthetisch dossier vastgelegd. Klantdata, echte betalingen en productieacties blijven buiten bereik.</p>
-        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvStartVolledig">Start volledige missie</button><button class="mv-knop mv-knop--wijn" type="button" id="mvVolgende">Volgende uitdaging</button></div>
+        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvStartVolledig" data-stand="magnaat-diep">Start volledige missie</button><button class="mv-knop mv-knop--wijn" type="button" id="mvVolgende" data-stand="magnaat-missie" data-contextactie>Volgende uitdaging</button></div>
       </section>
     </main>
   </div>
 
   <nav class="mv-navigatie" aria-label="Magnaat hoofdnavigatie">
-    <button type="button" data-mv-nav="wereld" aria-current="page"><i aria-hidden="true">⌂</i>Wereld</button>
-    <button type="button" data-mv-nav="missie"><i aria-hidden="true">◇</i>Missies</button>
-    <button type="button" data-mv-diep="wereld"><i aria-hidden="true">♙</i>Team</button>
-    <button type="button" data-mv-diep="home"><i aria-hidden="true">○</i>Profiel</button>
+    <button type="button" data-mv-nav="wereld" data-stand="magnaat-voorzijde" data-hoofdactie aria-current="page"><i aria-hidden="true">⌂</i>Wereld</button>
+    <button type="button" data-mv-nav="missie" data-stand="magnaat-voorzijde" data-hoofdactie><i aria-hidden="true">◇</i>Missies</button>
+    <button type="button" data-mv-diep="wereld" data-stand="magnaat-diep" data-hoofdactie><i aria-hidden="true">♙</i>Team</button>
+    <button type="button" data-mv-diep="home" data-stand="magnaat-diep" data-hoofdactie><i aria-hidden="true">○</i>Profiel</button>
   </nav>
 </section>
 
@@ -213,18 +208,18 @@
   <aside class="rail">
     <div class="brand"><div class="crest">M</div><div><b>Magnaat Wereld</b><small>RTG living economy</small></div></div>
     <nav class="nav" aria-label="Magnaat navigatie">
-      <button type="button" data-magnaat-voorzijde-open><span class="ni">00</span><span>Start</span></button>
-      <button class="aan" data-screen="vandaag"><span class="ni">01</span><span>Vandaag</span></button>
-      <button data-screen="wereld"><span class="ni">02</span><span>Wereld</span></button>
-      <button data-screen="werkplek"><span class="ni">03</span><span>Werk</span></button>
-      <button data-screen="geld"><span class="ni">04</span><span>Geld</span></button>
-      <button data-screen="netwerk"><span class="ni">05</span><span>Netwerk</span></button>
-      <button data-screen="bedrijf" id="vnNavBedrijf" hidden><span class="ni">06</span><span>Mijn bedrijf</span></button>
+      <button type="button" data-magnaat-voorzijde-open data-stand="magnaat-voorzijde"><span class="ni">00</span><span>Start</span></button>
+      <button class="aan" data-screen="vandaag" data-stand="magnaat-scherm"><span class="ni">01</span><span>Vandaag</span></button>
+      <button data-screen="wereld" data-stand="magnaat-scherm"><span class="ni">02</span><span>Wereld</span></button>
+      <button data-screen="werkplek" data-stand="magnaat-scherm"><span class="ni">03</span><span>Werk</span></button>
+      <button data-screen="geld" data-stand="magnaat-scherm"><span class="ni">04</span><span>Geld</span></button>
+      <button data-screen="netwerk" data-stand="magnaat-scherm"><span class="ni">05</span><span>Netwerk</span></button>
+      <button data-screen="bedrijf" data-stand="magnaat-scherm" id="vnNavBedrijf" hidden><span class="ni">06</span><span>Mijn bedrijf</span></button>
       <details class="nav-meer"><summary><span class="ni">··</span><span>Meer</span></summary>
-        <button data-screen="home"><span class="ni">C</span><span>Commandocentrum</span></button>
-        <button data-screen="speelhal"><span class="ni">F</span><span>Functiehal</span></button>
-        <button data-screen="economie"><span class="ni">E</span><span>Economie</span></button>
-        <button data-screen="future"><span class="ni">L</span><span>Future Lab</span></button>
+        <button data-screen="home" data-stand="magnaat-scherm"><span class="ni">C</span><span>Commandocentrum</span></button>
+        <button data-screen="speelhal" data-stand="magnaat-scherm"><span class="ni">F</span><span>Functiehal</span></button>
+        <button data-screen="economie" data-stand="magnaat-scherm"><span class="ni">E</span><span>Economie</span></button>
+        <button data-screen="future" data-stand="magnaat-scherm"><span class="ni">L</span><span>Future Lab</span></button>
       </details>
     </nav>
     <div class="rail-foot"><div class="live"><i class="dot"></i><b>Magnaat Test actief</b></div><small>Afgeschermd van klantdata, geldstromen en productieacties.</small></div>
@@ -241,7 +236,7 @@
       <div class="vn-weg" id="vnWeg" hidden></div>
       <div class="vn-gids" id="vnGids" hidden></div>
       <p class="vn-stil" id="vnLive" aria-live="polite"></p>
-      <div class="rtg-duimbalk vn-acties"><button type="button" class="btn primary" id="vnHoofd" data-vn-actie="0" data-hoofdactie data-rtg-edge-bar hidden></button><div class="vn-acties" id="vnActies"></div></div>
+      <div class="rtg-duimbalk vn-acties"><button type="button" class="btn primary" id="vnHoofd" data-vn-actie="0" data-stand="magnaat-leven-keuze" data-hoofdactie data-contextactie data-rtg-edge-bar hidden></button><div class="vn-acties" id="vnActies"></div></div>
       <div class="card vn-invoer" id="vnInvoer" hidden></div>
       <ul class="vn-waarom" id="vnWaarom" aria-label="Waarom deze handelingen nu kunnen"></ul>
       <h3>Je week</h3>
@@ -260,7 +255,7 @@
           <div class="eyebrow">Eén wereld · iedere RTG-functie speelbaar</div>
           <h1>Je bedrijf leeft.<br>De wereld reageert.</h1>
           <p>Bestuur je onderneming vanuit een echte RTG-werkplek. Open de kantoorcomputer, neem een dossier mee op je PDA en ontdek in het Future Lab welke producten RTG en de Foundation nog missen.</p>
-          <div class="hero-actions"><button class="btn primary" id="quick">Quick Match</button><button class="btn" data-go="werkplek">Betreed mijn kantoor</button><button class="btn subtle" data-go="future">Bekijk nieuwe kansen</button></div>
+          <div class="hero-actions"><button class="btn primary" id="quick" data-stand="magnaat-quick">Quick Match</button><button class="btn" data-go="werkplek" data-stand="magnaat-scherm">Betreed mijn kantoor</button><button class="btn subtle" data-go="future" data-stand="magnaat-scherm" data-contextactie>Bekijk nieuwe kansen</button></div>
         </div>
       </div>
       <div class="stats">
@@ -271,11 +266,11 @@
       </div>
       <div class="section-head"><div><div class="eyebrow">Spelvormen</div><h2>Kies hoe je vandaag instapt</h2></div><p>De bestaande klassieke Magnaat blijft volledig beschikbaar.</p></div>
       <div class="modegrid">
-        <div class="card mode"><span class="tag">Snel</span><h3>Quick Match</h3><p>Vier spelers, directe matchmaking en het vertrouwde bord.</p><button class="btn primary" data-quick>Zoek spelers</button></div>
+        <div class="card mode"><span class="tag">Snel</span><h3>Quick Match</h3><p>Vier spelers, directe matchmaking en het vertrouwde bord.</p><button class="btn primary" data-quick data-stand="magnaat-quick" data-contextactie>Zoek spelers</button></div>
         <div class="card mode"><span class="tag">Klassiek</span><h3>Eigen lobby</h3><p>Kies twee tot zes spelers en nodig vrienden of een codenaam uit.</p><a class="btn" href="/apps/spelen.html?direct=magnaat">Lobby maken</a></div>
-        <div class="card mode"><span class="tag">Doorlopend</span><h3>Magnaat Wereld</h3><p>Werkmissies, echte steden en één gedeelde virtuele economie.</p><button class="btn" data-go="economie">Bestuur de economie</button></div>
-        <div class="card mode"><span class="tag">Geverifieerd netwerk</span><h3>Partnerwereld</h3><p>Train in goedgekeurde digitale tweelingen van echte RTG-partners, zonder echt geld of klantdata.</p><button class="btn" data-go="wereld">Ontmoet bedrijven</button></div>
-        <div class="card mode"><span class="tag">RTG testdomein</span><h3>Future Lab</h3><p>Ontdek productgaten en test oplossingen voordat een mens beslist.</p><button class="btn" data-go="future">Open lab</button></div>
+        <div class="card mode"><span class="tag">Doorlopend</span><h3>Magnaat Wereld</h3><p>Werkmissies, echte steden en één gedeelde virtuele economie.</p><button class="btn" data-go="economie" data-stand="magnaat-scherm" data-contextactie>Bestuur de economie</button></div>
+        <div class="card mode"><span class="tag">Geverifieerd netwerk</span><h3>Partnerwereld</h3><p>Train in goedgekeurde digitale tweelingen van echte RTG-partners, zonder echt geld of klantdata.</p><button class="btn" data-go="wereld" data-stand="magnaat-scherm" data-contextactie>Ontmoet bedrijven</button></div>
+        <div class="card mode"><span class="tag">RTG testdomein</span><h3>Future Lab</h3><p>Ontdek productgaten en test oplossingen voordat een mens beslist.</p><button class="btn" data-go="future" data-stand="magnaat-scherm" data-contextactie>Open lab</button></div>
       </div>
       <p class="notice">Realistisch betekent hier: echte plaatsnamen en echte RTG-proceslogica. Bedragen, dossiers en economische indices zijn speldata. Persoonsgegevens en productieacties komen nooit in de game.</p>
     </section>
@@ -292,7 +287,7 @@
         <div class="monitor">
           <iframe class="rtg-frame" id="rtgComputer" title="Echte RTG Business Pass op de kantoorcomputer" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe>
         </div>
-        <div class="pda"><iframe class="rtg-frame" id="rtgPda" title="Echte mobiele RTG Business Pass op de PDA" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe><div class="pda-task" id="pdaTask"><b>Geen actieve opdracht</b><p>Open een RTG-app om direct een missie te starten.</p><button class="btn" data-go="speelhal">Kies een functie</button></div></div>
+        <div class="pda"><iframe class="rtg-frame" id="rtgPda" title="Echte mobiele RTG Business Pass op de PDA" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe><div class="pda-task" id="pdaTask"><b>Geen actieve opdracht</b><p>Open een RTG-app om direct een missie te starten.</p><button class="btn" data-go="speelhal" data-stand="magnaat-scherm">Kies een functie</button></div></div>
         <div class="office-label"><div class="eyebrow">Kantoor 14 · Amsterdam · TEST</div><h2>Echte RTG-code, volledig geïsoleerd</h2><p>Dezelfde Business Pass, apptegels, Rahul, Pay, Salon en reisschermen. Alle gegevens zijn herkenbare Magnaat-testdata; klantdata en productieacties blijven buiten bereik.</p><div class="mission-now" id="missionNow"><b>Vrije dienst</b>Open een app op de computer of PDA; Magnaat maakt er een gecontroleerd testdossier van.</div></div>
       </div>
       <section class="officepick" aria-labelledby="officeRoleTitle">
@@ -317,7 +312,7 @@
       <div class="section-head"><div><div class="eyebrow">De volledige code als gameplay</div><h2>RTG Functiehal</h2><p id="capSummary">Alle geregistreerde functies worden automatisch uit de code gelezen.</p></div></div>
       <div class="guard"><span class="guard-mark">SAFE</span><div><b>Spelbrug actief</b><p id="bridgeRule">Laden…</p></div></div>
       <div class="tools"><input class="search" id="search" placeholder="Zoek een functie, categorie of spelvorm"><select class="search" id="filter"><option value="">Alle categorieën</option></select></div>
-      <div class="capgrid" id="caps"></div><button class="btn" type="button" id="capsMeer" hidden>Toon meer</button>
+      <div class="capgrid" id="caps"></div><button class="btn" type="button" id="capsMeer" data-stand="magnaat-capabilities" hidden>Toon meer</button>
     </section>
 
     <section class="screen" id="wereld">
@@ -383,19 +378,19 @@
 
 <div class="overlay" id="taskOverlay" hidden>
   <div class="taskbox" role="dialog" aria-modal="true" aria-labelledby="taskTitle">
-    <div class="task-head"><div class="task-seal">RTG</div><div><h2 id="taskTitle">Opdracht</h2><p id="taskMeta"></p></div><button class="x" id="taskClose" aria-label="Sluiten">×</button></div>
+    <div class="task-head"><div class="task-seal">RTG</div><div><h2 id="taskTitle">Opdracht</h2><p id="taskMeta"></p></div><button class="x" id="taskClose" aria-label="Sluit opdracht">×</button></div>
     <div class="progress"><i id="taskProgress"></i></div><div id="taskBody"></div>
   </div>
 </div>
 <div class="overlay" id="partnerOverlay" hidden>
   <div class="taskbox" role="dialog" aria-modal="true" aria-labelledby="partnerTaskTitle">
-    <div class="task-head"><div class="task-seal">B2B</div><div><h2 id="partnerTaskTitle">Bedrijfstraining</h2><p id="partnerTaskMeta"></p></div><button class="x" id="partnerTaskClose" aria-label="Sluiten">×</button></div>
+    <div class="task-head"><div class="task-seal">B2B</div><div><h2 id="partnerTaskTitle">Bedrijfstraining</h2><p id="partnerTaskMeta"></p></div><button class="x" id="partnerTaskClose" aria-label="Sluit bedrijfstraining">×</button></div>
     <div class="progress"><i id="partnerProgress"></i></div><div id="partnerTaskBody"></div>
   </div>
 </div>
 <div class="overlay" id="teamOverlay" hidden>
   <div class="taskbox" role="dialog" aria-modal="true" aria-labelledby="teamTitle">
-    <div class="task-head"><div class="task-seal">TEAM</div><div><h2 id="teamTitle">Bedrijfsteamkamer</h2><p id="teamMeta"></p></div><button class="x" id="teamClose" aria-label="Sluiten">×</button></div>
+    <div class="task-head"><div class="task-seal">TEAM</div><div><h2 id="teamTitle">Bedrijfsteamkamer</h2><p id="teamMeta"></p></div><button class="x" id="teamClose" aria-label="Sluit teamkamer">×</button></div>
     <div class="progress"><i id="teamProgress"></i></div><div id="teamBody"></div>
   </div>
 </div>
@@ -426,7 +421,7 @@ document.querySelectorAll('[data-screen]').forEach(b=>b.onclick=()=>go(b.dataset
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 
 async function load(){
-  try{DATA=await api('overzicht');/* Onvolledig antwoord: langs de foutweg, niet om vallen met een ruwe TypeError in de toast (LIEGRONDE.json). */if(!(DATA&&DATA.speler&&DATA.wereld&&DATA.capabilityGraph&&DATA.capabilityGraph.cijfers&&DATA.spelbrug&&Array.isArray(DATA.catalogus)))throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');render();if(DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;renderPda();}if(DATA.speler.kantoor)await loadControl(1);}
+  try{const volgende=await api('overzicht');/* Onvolledig antwoord: langs de foutweg, niet om vallen met een ruwe TypeError in de toast (LIEGRONDE.json). */if(!(volgende&&volgende.speler&&volgende.wereld&&volgende.capabilityGraph&&volgende.capabilityGraph.cijfers&&volgende.spelbrug&&Array.isArray(volgende.catalogus)))throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');DATA=volgende;render();if(DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;renderPda();}if(DATA.speler.kantoor)await loadControl(1);}
   catch(e){toast(e.message)}
 }
 function render(){
@@ -506,18 +501,20 @@ function renderDienst(){
   $('#dienstDossiers').innerHTML=d.dossiers.map(x=>{
     const bezig=x.status==='bezig',klaar=x.status==='klaar',geblokkeerd=!!actief&&!bezig;
     const status=klaar?'Afgerond':bezig?'In behandeling':'Open dossier';
-    return '<button class="dossier '+esc(x.status)+'" data-duty="'+esc(x.functieId)+'" '+((klaar||geblokkeerd)?'disabled':'')+'><span class="d-status">0'+x.volgorde+' · '+status+'</span><h4>'+esc(x.naam)+'</h4><p>'+esc(x.software.naam)+' · '+esc(x.spelvorm)+'</p></button>';
+    return '<button class="dossier '+esc(x.status)+(geblokkeerd?' geblokkeerd':'')+'" data-duty="'+esc(x.functieId)+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier '+esc(x.naam)+'" '+(klaar?'disabled':'')+'><span class="d-status">0'+x.volgorde+' · '+status+'</span><h4>'+esc(x.naam)+'</h4><p>'+esc(x.software.naam)+' · '+esc(x.spelvorm)+'</p></button>';
   }).join('');
   document.querySelectorAll('[data-duty]').forEach(b=>b.onclick=()=>{
     const x=d.dossiers.find(v=>v.functieId===b.dataset.duty);
     if(x&&x.status==='bezig'&&DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;openTask();return}
+    if(actief){TASK=actief;toast('Rond eerst het actieve dossier af; uw andere dossiers blijven klaarstaan.');openTask();return}
     startTask(b.dataset.duty);
   });
 }
 function card(c, compact){
   const safe='<span class="risk '+c.veiligheidsniveau+'"></span>'+c.veiligheidsniveau;
-  if(compact)return '<button class="appicon" data-start="'+esc(c.id)+'"><b>'+safe+' · '+esc(c.naam)+'</b><small>'+esc(c.spelvorm)+' · '+esc(c.voorkeur)+'</small></button>';
-  return '<article class="card cap"><div class="cap-top"><span class="cap-code">'+safe+' · '+esc(c.spelvorm)+'</span><span class="badge">'+esc(c.software.naam)+'</span></div><h3>'+esc(c.naam)+'</h3><p>'+esc(c.uitleg||'Train deze RTG-functie in een realistisch synthetisch dossier.')+'</p><div class="meta">Echte RTG-software · productiedata uit</div><button class="btn" data-start="'+esc(c.id)+'">Start in '+esc(c.software.naam)+'</button></article>';
+  const label='Start '+esc(c.naam)+' in '+esc(c.software.naam);
+  if(compact)return '<button class="appicon" data-start="'+esc(c.id)+'" data-stand="magnaat-capability" aria-label="'+label+'"><b>'+safe+' · '+esc(c.naam)+'</b><small>'+esc(c.spelvorm)+' · '+esc(c.voorkeur)+'</small></button>';
+  return '<article class="card cap"><div class="cap-top"><span class="cap-code">'+safe+' · '+esc(c.spelvorm)+'</span><span class="badge">'+esc(c.software.naam)+'</span></div><h3>'+esc(c.naam)+'</h3><p>'+esc(c.uitleg||'Train deze RTG-functie in een realistisch synthetisch dossier.')+'</p><div class="meta">Echte RTG-software · productiedata uit</div><button class="btn" data-start="'+esc(c.id)+'" data-stand="magnaat-capability" aria-label="'+label+'">Start in '+esc(c.software.naam)+'</button></article>';
 }
 function filtered(){return (DATA?DATA.catalogus:[]).filter(c=>(!FILTER||c.categorie===FILTER)&&(!SEARCH||[c.naam,c.id,c.categorie,c.spelvorm].join(' ').toLowerCase().includes(SEARCH)))}
 /* De hal toont een handvol per keer: alle functies onder elkaar werd een
@@ -550,7 +547,7 @@ function renderTask(){
   document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>answer(Number(b.dataset.answer)));
 }
 async function submitAction(){const invoer={};document.querySelectorAll('[data-field]').forEach(e=>invoer[e.dataset.field]=e.type==='checkbox'?e.checked:e.value.trim());const b=$('#saveAction');b.disabled=true;try{const d=await api('taak/actie',{taakId:TASK.id,invoer});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.feedback)}catch(e){toast(e.message);b.disabled=false}}
-async function answer(keuze){document.querySelectorAll('[data-answer]').forEach(b=>b.disabled=true);try{const d=await api('taak/antwoord',{taakId:TASK.id,keuze});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.goed?'Sterke keuze.':'Je krijgt de juiste werkwijze mee.')}catch(e){toast(e.message);renderTask()}}
+async function answer(keuze){document.querySelectorAll('[data-answer]').forEach(b=>b.disabled=true);try{const d=await api('taak/antwoord',{taakId:TASK.id,keuze,stap:TASK.stap});TASK=d.taak;neemSpeler(d.speler);renderTask();toast(d.goed?'Sterke keuze.':'Je krijgt de juiste werkwijze mee.')}catch(e){toast(e.message);renderTask()}}
 function openWorkflowScreen(){
   const stap=TASK&&TASK.huidig,frame=$(DEVICE==='pda'?'#rtgPda':'#rtgComputer');
   if(!stap||stap.soort!=='software'||!/^\/apps\/[^?#]+\.html$/.test(stap.schermPad||'')){toast('Dit werkprocesscherm kan niet veilig worden geopend.');return}
@@ -559,10 +556,17 @@ function openWorkflowScreen(){
   frame.addEventListener('load',async()=>{try{const loc=frame.contentWindow.location;if(loc.pathname!==doel.pathname||new URLSearchParams(loc.search).get('magnaat')!=='1')throw new Error('Het veilige scherm is niet geladen.');const d=await api('taak/handeling',{taakId,handeling});TASK=d.taak;neemSpeler(d.speler);toast(d.feedback);openTask()}catch(e){toast(e.message)}},{once:true});
   frame.src=doel.pathname+doel.search;frame.scrollIntoView({behavior:'smooth',block:'center'});
 }
-$('#taskClose').onclick=()=>{$('#taskOverlay').hidden=true};
-$('#partnerTaskClose').onclick=()=>{$('#partnerOverlay').hidden=true};
-$('#teamClose').onclick=()=>{$('#teamOverlay').hidden=true;TEAM_ROOM=null};
-function renderPda(){const e=$('#pdaTask'),m=$('#missionNow');const t=TASK&&TASK.status==='bezig'?TASK:(DATA&&DATA.speler.actieveTaak);if(!t){const dienst=DATA&&DATA.speler.dienst,next=dienst&&dienst.dossiers.find(x=>x.status==='open');if(next){e.innerHTML='<b>Volgend dossier</b><p>'+esc(next.naam)+'<br>Open '+esc(next.software.naam)+' in de echte RTG-app.</p><button class="btn" data-next-duty>Start dossier 0'+next.volgorde+'</button>';e.querySelector('button').onclick=()=>startTask(next.functieId);if(m)m.innerHTML='<b>Dagdienst '+dienst.voltooid+'/'+dienst.doel+'</b>Volgende: '+esc(next.naam)+' via '+esc(next.software.naam)+'.';return}e.innerHTML='<b>Dienst voltooid</b><p>Alle dossiers van vandaag zijn verwerkt.</p><button class="btn" data-pda-hall>Vrije functie</button>';e.querySelector('button').onclick=()=>go('speelhal');if(m)m.innerHTML='<b>Dienst voltooid</b>De bonus is verwerkt. Vrije missies blijven beschikbaar.';return}const actie=t.huidig&&t.huidig.soort==='software'?t.huidig.vraag:'Maak de operationele keuze in het dossier.';e.innerHTML='<b>'+esc(t.functieNaam)+'</b><p>'+esc(actie)+'<br>Stap '+(t.stap+1)+' van '+t.stappen+'</p><button class="btn" data-resume>Bekijk dossier</button>';e.querySelector('button').onclick=()=>{TASK=t;openTask()};if(m)m.innerHTML='<b>'+esc(t.titel)+'</b>'+esc(actie)}
+function sluitLaag(id){const laag=$(id);if(!laag||laag.hidden)return false;laag.hidden=true;return true}
+$('#taskClose').onclick=()=>{sluitLaag('#taskOverlay')};
+$('#partnerTaskClose').onclick=()=>{sluitLaag('#partnerOverlay')};
+$('#teamClose').onclick=()=>{if(sluitLaag('#teamOverlay'))TEAM_ROOM=null};
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(sluitLaag('#teamOverlay')){TEAM_ROOM=null;e.preventDefault();return}
+  if(sluitLaag('#partnerOverlay')){e.preventDefault();return}
+  if(sluitLaag('#taskOverlay'))e.preventDefault();
+});
+function renderPda(){const e=$('#pdaTask'),m=$('#missionNow');const t=TASK&&TASK.status==='bezig'?TASK:(DATA&&DATA.speler.actieveTaak);if(!t){const dienst=DATA&&DATA.speler.dienst,next=dienst&&dienst.dossiers.find(x=>x.status==='open');if(next){e.innerHTML='<b>Volgend dossier</b><p>'+esc(next.naam)+'<br>Open '+esc(next.software.naam)+' in de echte RTG-app.</p><button class="btn" data-next-duty data-contextactie data-hoofdactie>Start dossier 0'+next.volgorde+'</button>';e.querySelector('button').onclick=()=>startTask(next.functieId);if(m)m.innerHTML='<b>Dagdienst '+dienst.voltooid+'/'+dienst.doel+'</b>Volgende: '+esc(next.naam)+' via '+esc(next.software.naam)+'.';return}e.innerHTML='<b>Dienst voltooid</b><p>Alle dossiers van vandaag zijn verwerkt.</p><button class="btn" data-pda-hall data-contextactie data-hoofdactie>Vrije functie</button>';e.querySelector('button').onclick=()=>go('speelhal');if(m)m.innerHTML='<b>Dienst voltooid</b>De bonus is verwerkt. Vrije missies blijven beschikbaar.';return}const actie=t.huidig&&t.huidig.soort==='software'?t.huidig.vraag:'Maak de operationele keuze in het dossier.';e.innerHTML='<b>'+esc(t.functieNaam)+'</b><p>'+esc(actie)+'<br>Stap '+(t.stap+1)+' van '+t.stappen+'</p><button class="btn" data-resume data-contextactie data-hoofdactie>Bekijk dossier</button>';e.querySelector('button').onclick=()=>{TASK=t;openTask()};if(m)m.innerHTML='<b>'+esc(t.titel)+'</b>'+esc(actie)}
 
 /* De twee apparaten tonen niet een nagetekende game-app maar de echte
    public/apps/app.html uit deze codebase. In ?magnaat=1 praat dat OS niet met
@@ -637,7 +641,9 @@ function updateTeamSummary(k){
 }
 let TEAM_CODE=null;/* de kale kamercode alleen in het geheugen van deze pagina: de server toont hem een keer */
 function onthoudTeamCode(k){if(k&&k.toegangscode)TEAM_CODE={id:k.id,code:k.toegangscode}}
-async function createTeamRoom(code){try{const d=await api('teamkamer/maak',{code});onthoudTeamCode(d.kamer);TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('Premium teamkamer gemaakt. Deel alleen de tijdelijke toegangscode.')}catch(e){toast(e.message)}}
+/* een herhaalsleutel per kamer die je wilt maken; na succes een nieuwe */
+let TEAM_IDEM='',TEAM_IDEM_VOOR='';
+async function createTeamRoom(code){if(!TEAM_IDEM||TEAM_IDEM_VOOR!==code){TEAM_IDEM=RTGId('kamer');TEAM_IDEM_VOOR=code;}try{const d=await api('teamkamer/maak',{code,idem:TEAM_IDEM});TEAM_IDEM='';onthoudTeamCode(d.kamer);TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('Premium teamkamer gemaakt. Deel alleen de tijdelijke toegangscode.')}catch(e){toast(e.message)}}
 async function openTeamRoom(id){try{const d=await api('teamkamer/mijn',{id});TEAM_ROOM=d.kamer;updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom()}catch(e){toast(e.message)}}
 async function joinTeamRoom(){const code=$('#teamJoinCode').value.trim();if(!code){toast('Vul de toegangscode in.');return}try{const d=await api('teamkamer/deelnemen',{code});TEAM_ROOM=d.kamer;$('#teamJoinCode').value='';updateTeamSummary(TEAM_ROOM);$('#teamOverlay').hidden=false;renderTeamRoom();toast('U werkt nu mee in het gedeelde synthetische dossier.')}catch(e){toast(e.message)}}
 function renderTeamRoom(){
@@ -720,7 +726,8 @@ function renderEconomy(){
   renderEconomistLab(e);
 }
 async function planShock(schokId){try{const d=await api('economie/schok',{schokId});DATA.economie=d;renderEconomy();toast('Stress-scenario staat klaar voor de volgende economische dag.')}catch(e){toast(e.message)}}
-$('#ecoStrategy').onsubmit=async ev=>{ev.preventDefault();const b=ev.submitter;b.disabled=true;const body={prijs:Number($('#ecoPrice').value),personeelDoel:Number($('#ecoStaff').value),loonMaand:Number($('#ecoWage').value),trainingDag:Number($('#ecoTraining').value),bestelling:Number($('#ecoOrder').value),impactPct:Number($('#ecoImpact').value)};try{const d=await api('economie/beslis',body);DATA.economie=d;renderEconomy();toast('Strategie vastgelegd. De markt rekent morgen door.')}catch(e){toast(e.message)}finally{b.disabled=false}};
+let ecoBedoeling=null;
+$('#ecoStrategy').onsubmit=async ev=>{ev.preventDefault();const b=ev.submitter;b.disabled=true;ecoBedoeling=ecoBedoeling||crypto.randomUUID();const body={prijs:Number($('#ecoPrice').value),personeelDoel:Number($('#ecoStaff').value),loonMaand:Number($('#ecoWage').value),trainingDag:Number($('#ecoTraining').value),bestelling:Number($('#ecoOrder').value),impactPct:Number($('#ecoImpact').value),idem:ecoBedoeling};try{const d=await api('economie/beslis',body);ecoBedoeling=null;DATA.economie=d;renderEconomy();toast('Strategie vastgelegd. De markt rekent morgen door.')}catch(e){toast(e.message)}finally{b.disabled=false}};
 $('#econAnalysis').onsubmit=async ev=>{ev.preventDefault();const b=ev.submitter;b.disabled=true;const body={hypothese:$('#econHypothesis').value,maatregel:$('#econMeasure').value,indicatoren:[...document.querySelectorAll('[data-econ-indicator]:checked')].map(x=>x.dataset.econIndicator),causaleKeten:$('#econCausal').value,alternatief:$('#econAlternative').value,opportunityCost:$('#econOpportunity').value,risico:$('#econRisk').value,zekerheid:Number($('#econConfidence').value),verwachteOmzet:Number($('#econRevenueForecast').value),verwachteWinst:Number($('#econProfitForecast').value),verwachteInflatie:Number($('#econInflationForecast').value),omzetRichting:$('#econRevenueDirection').value,winstRichting:$('#econProfitDirection').value,kasRichting:$('#econCashDirection').value};try{const d=await api('economie/analyse',body);DATA.economie=d;renderEconomy();toast('Analyse vastgelegd. De forecast wordt na de volgende dag geijkt.')}catch(e){toast(e.message)}finally{b.disabled=false}};
 $('#nextEcoDay').onclick=async()=>{const b=$('#nextEcoDay');b.disabled=true;try{const commandoId=RTGId('eco');const d=await api('economie/volgende-dag',{commandoId});DATA.economie=d;renderEconomy();toast('Speldag '+d.dag+' verwerkt door '+(d.rekenmotor==='rust'?'Rust native':'de veilige lokale motor')+': '+d.actieveSchok.naam+'.')}catch(e){toast(e.message)}finally{b.disabled=false}};
 function renderFuture(){const p=DATA.futureLab;$('#proposals').innerHTML=p.length?p.map(v=>'<article class="card proposal"><span class="lane">'+(v.spoor==='rtf'?'RTFoundation':'RTG product')+'</span><span class="phase">'+esc(v.status)+'</span><h3>'+esc(v.naam)+'</h3><p>'+esc(v.probleem)+'</p><dl><dt>Voor wie</dt><dd>'+esc(v.doelgroep)+'</dd><dt>Oplossing</dt><dd>'+esc(v.oplossing)+'</dd><dt>Impact</dt><dd>'+esc(v.impact)+'</dd>'+(v.bewijs&&Number.isFinite(v.bewijs.missies)&&Number.isFinite(v.bewijs.gemiddelde)?'<dt>Spelbewijs</dt><dd>'+v.bewijs.missies+' missies · '+v.bewijs.gemiddelde+'% kwaliteit</dd>':'')+'<dt>Bouwt op</dt><dd>'+v.gebruiktFuncties.map(esc).join(' · ')+'</dd></dl></article>').join(''):'<p class="muted">De scan heeft nog geen ontbrekende productkans gevonden.</p>'}

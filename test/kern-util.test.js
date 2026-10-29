@@ -31,3 +31,14 @@ test('codes zijn leesbaar en van de juiste lengte', () => {
   assert.match(u.entreeCode(), /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/);
   assert.doesNotMatch(u.pickupCode(), /[01OI]/); // geen verwarrende tekens
 });
+
+
+test('mediaan bewaart invoer, decimalen en het verschil tussen leeg en nul', () => {
+  const { mediaan } = require('../server/kern/util');
+  const reeks = [9, 2, 1, 3];
+  assert.equal(mediaan(reeks), 2.5);
+  assert.deepEqual(reeks, [9, 2, 1, 3]);
+  assert.equal(mediaan([4, 0, 2]), 2);
+  assert.equal(mediaan([0]), 0);
+  assert.equal(mediaan([]), null);
+});

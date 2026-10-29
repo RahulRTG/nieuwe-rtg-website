@@ -26,7 +26,7 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
      mediastore (een foto die eraf valt of wordt weggehaald, moet ook van
      schijf) en dat is een ander soort werk dan het bouwen van een pagina. */
   const fotolaag = require('./webmaker-fotos')({ store, save, media });
-  const { fotos, fotoBewaar, fotoWeg } = fotolaag;
+  const { fotos, fotoBewaar, fotoWeg, fotoHerhaling } = fotolaag;
   // meerdere pagina's per site: schoonmaak in ./webmaker-paginas.js
   const paginalaag = require('./webmaker-paginas')({ scho, schoonBlok, crypto, slug });
   /* De versiegeschiedenis staat in ./webmaker-versies.js: bij elke bewaring
@@ -77,6 +77,11 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
     const s = store();
     let bestaand = null;
     if (d.id) bestaand = s.lijst.find(x => x.id === scho(d.id, 20) && x.eigenaar === key);
+    /* Een NIEUW ontwerp heeft nog geen id, dus de maker stuurt een herhaalsleutel
+       mee. Kwam het antwoord op de eerste bewaring niet aan (afgebroken, een
+       herstart), dan bewaart de volgende in dezelfde site in plaats van een
+       tweede te maken (gevonden door scripts/lib/voltooi/sitemaker.js). */
+    if (!bestaand && !d.id && d.idem) bestaand = s.lijst.find(x => x.eigenaar === key && x.idem && x.idem === scho(d.idem, 60)) || null;
     if (!bestaand && s.lijst.filter(x => x.eigenaar === key).length >= PER_LID) {
       return { error: 'Je hebt het maximum aantal websites bereikt. Verwijder er eerst een.', status: 400 };
     }
@@ -144,5 +149,5 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
   return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht, cijfers, domein, publiekeStand: publiek, siteVoorHost: domeinlaag.siteVoorHost, siteVanZaak: domeinlaag.siteVanZaak, webOverzicht: meting.overzicht, telFormulier: meting.formulier,
            publiceer: pub.publiceer, zetLive: pub.zetLive, offline: pub.offline, plan: pub.plan, spoorVan: pub.spoorVan, planVeeg: pub.veeg,
            gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres, idVanAdres: blader.idVanAdres,
-           fotos, fotoBewaar, fotoWeg, TYPES };
+           fotos, fotoBewaar, fotoWeg, fotoHerhaling, TYPES };
 };

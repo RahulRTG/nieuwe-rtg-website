@@ -2,6 +2,7 @@
 (function (w, d) {
   'use strict';
   var dialog, trigger;
+  var UPLOAD = { upload: '/api/bestanden/upload', upstart: '/api/bestanden/upstart', updeel: '/api/bestanden/updeel', upklaar: '/api/bestanden/upklaar' };
   function node(tag, cls, text) { var e = d.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
   function close() { if (!dialog) return; dialog.close(); dialog.remove(); dialog = null; delete d.body.dataset.imageEditor; if (trigger && trigger.isConnected) trigger.focus(); }
   function open(id) {
@@ -31,7 +32,7 @@
     var foot = node('footer', 'pi-foot'), privacy = node('span', '', 'Alleen zichtbaar voor u'), cancel = button('Annuleren', close), save = button('Opslaan', function () {
       if (busy) return; busy = true; save.disabled = true; status.textContent = 'Opslaan…';
       P.save(current.id, draft).then(function () { if (dialog === active) close(); }).catch(function (e) { status.textContent = e.message; }).finally(function () { busy = false; save.disabled = !P.authenticated(); });
-    }); save.className = 'pi-save'; foot.append(privacy, cancel, save); dialog.append(head, content, foot); d.body.appendChild(dialog);
+    }); save.className = 'pi-save'; save.dataset.dialogResult = 'save'; foot.append(privacy, cancel, save); dialog.append(head, content, foot); d.body.appendChild(dialog);
     dialog.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
     picker.onchange = function () { current = all.find(function (r) { return r.id === picker.value; }); choose(); };
     function button(label, run) { var b = node('button', '', label); b.type = 'button'; b.onclick = run; return b; }
@@ -68,7 +69,7 @@
       var f = upload.files[0]; if (!f) return;
       if (!/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > 15 * 1024 * 1024) { status.textContent = 'Kies een JPG-, PNG- of WebP-foto van maximaal 15 MB.'; return; }
       uploadButton.disabled = true; save.disabled = true; status.textContent = 'Foto veilig uploaden…';
-      w.RTGBestandUpload(f, function (action, body) { return P.api('/api/bestanden/' + action, body).then(function (j) { return { status: 200, body: j }; }); }, { chunkBytes: 3 * 1024 * 1024 }).then(function (j) { return selectFile(j.body.id); })
+      w.RTGBestandUpload(f, function (action, body) { return P.api(UPLOAD[action], body).then(function (j) { return { status: 200, body: j }; }); }, { chunkBytes: 3 * 1024 * 1024 }).then(function (j) { return selectFile(j.body.id); })
         .catch(function (e) { status.textContent = e.message; }).finally(function () { uploadButton.disabled = !P.authenticated(); save.disabled = !P.authenticated(); upload.value = ''; });
     };
     var drag;

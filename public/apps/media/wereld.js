@@ -1,13 +1,4 @@
-/* RTG Media -- de wereld: één catalogus, drie standen.
-
-   MUZIEK, KIJK en FLOW zijn geen drie apps maar drie standen op dezelfde
-   wereld: dezelfde makers, dezelfde bibliotheek, dezelfde regelaars. Wat u in
-   FLOW hoort, staat één tik later als heel stuk voor u (zie blad.js).
-
-   Twee dingen die dit scherm bewust NIET doet. Er is geen oneindige scroll: de
-   wereld heeft een einde en dat staat eronder. En er staat bij ELK stuk waarom
-   het er staat -- die zin komt van de server, uit dezelfde code die de
-   volgorde bepaalt, en niet uit een geruststellend tekstje hier. */
+/* RTG Media: één catalogus met Muziek, Kijk en Flow als gedeelde standen. */
 (function () {
   'use strict';
   var $ = function (s) { return document.querySelector(s); };
@@ -15,7 +6,7 @@
   try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) { TOKEN = null; }
 
   function api(pad, body) {
-    return fetch('/api/mediaos/' + pad, {
+    return fetch(pad, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
       body: JSON.stringify(body || {})
     }).then(function (r) { return r.json().catch(function () { return {}; }); });
@@ -60,6 +51,9 @@
     var m = el('div', 'm');
     var mk = el('button', 'maker', s.maker.codenaam);
     mk.type = 'button';
+    mk.setAttribute('aria-haspopup', 'dialog');
+    mk.setAttribute('aria-controls', 'lade');
+    mk.setAttribute('data-contextactie', '');
     mk.addEventListener('click', function () { window.RTGMediaBlad.maker(s.maker.codenaam); });
     m.appendChild(mk);
     m.appendChild(document.createTextNode(' · ' + s.meta));
@@ -69,10 +63,16 @@
     var rij = el('div', 'rij');
     var speelNaam = s.spelen.soort === 'stream' ? '▶ Kijk'
       : (s.spelen.soort === 'motor' ? '▶ Luister' : (s.spelen.soort === 'p2p' && S.deler ? '▶ Speel' : '↗ Open'));
-    rij.appendChild(knop(speelNaam, 'vol', function () { S.speel(s); }));
-    rij.appendChild(knop('Alles hierover', '', function () { window.RTGMediaBlad.stuk(s.id); }));
+    var speel = knop(speelNaam, 'vol', function () { S.speel(s); });
+    speel.setAttribute('data-contextactie', '');
+    rij.appendChild(speel);
+    var alles = knop('Alles hierover', '', function () { window.RTGMediaBlad.stuk(s.id); });
+    alles.setAttribute('aria-haspopup', 'dialog');
+    alles.setAttribute('aria-controls', 'lade');
+    alles.setAttribute('data-contextactie', '');
+    rij.appendChild(alles);
     var bew = knop(s.bewaard ? '✓ Bewaard' : '+ Bewaar', s.bewaard ? 'aan' : '', function () {
-      api('bewaar', { id: s.id, aan: !s.bewaard }).then(function (d) {
+      api('/api/mediaos/bewaar', { id: s.id, aan: !s.bewaard }).then(function (d) {
         if (d.error) return zeg(d.error);
         s.bewaard = d.bewaard;
         bew.textContent = s.bewaard ? '✓ Bewaard' : '+ Bewaar';
@@ -93,7 +93,7 @@
     if (doel && doel.maker) b.maker = doel.maker;
     if (doel && doel.onderwerp) b.onderwerp = doel.onderwerp;
     if (doel && doel.aan != null) b.aan = doel.aan;
-    api('stuur', b).then(function (d) {
+    api('/api/mediaos/stuur', b).then(function (d) {
       if (d.error) return zeg(d.error);
       zeg(d.gedaan || 'Bijgewerkt.');
       haal();
@@ -198,7 +198,7 @@
     if (d.smaak) tekenRegelaars(d); else $('#regelaars').hidden = true;
   }
   function haal() {
-    api('wereld', { modus: modus }).then(teken);
+    api('/api/mediaos/wereld', { modus: modus }).then(teken);
   }
 
   /* Wat blad.js (de lade met de hub, de maker en het bord) nodig heeft. Eén

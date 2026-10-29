@@ -60,16 +60,16 @@ module.exports = (ctx) => {
      aan, en een onbekende zone hoort een nette 400 te geven in plaats van een
      zaak op een gegokte plek. De overige regels (tekstlengte, het aantal open
      meldingen, de duplicaatvraag) staan in de motor. */
-  function meld({ codenaam, zone, soort, tekst }) {
+  function meld({ codenaam, zone, soort, tekst, idem }) {
     zorgBasis();
     const cn = String(codenaam || '').trim();
     if (!cn) return { status: 401, error: 'Log opnieuw in.' };
     const z = String(zone || '').trim();
     if (!zones().includes(z)) return { status: 400, error: 'Kies een bestaande zone: ' + zones().join(', ') + '.' };
     if (!SOORTEN[String(soort || '')]) return { status: 400, error: 'Kies wat er speelt: ' + Object.keys(SOORTEN).join(', ') + '.' };
-    const r = weefsel.weefselMeld({ kanaal: 'bewonersapp', soort: String(soort), tekst, gebied: z, melder: cn });
+    const r = weefsel.weefselMeld({ kanaal: 'bewonersapp', soort: String(soort), tekst, gebied: z, melder: cn, idem });
     if (!r.ok) return r;
-    return { ok: true, samengevoegd: r.duplicaat,
+    return { ok: true, samengevoegd: r.duplicaat, ...(r.herhaald ? { herhaald: true } : {}),
       melding: { id: r.zaak.id, ref: r.zaak.ref, zone: z, soort: r.zaak.categorie, status: r.zaak.status },
       ...(r.duplicaat ? { let_op: 'Dit was al bij ons bekend; je melding is bij die zaak gevoegd.' } : {}) };
   }

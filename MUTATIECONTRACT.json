@@ -1,31 +1,30 @@
 {
  "stempel": {
-  "op": "2026-10-18T19:50:29.476Z",
-  "commit": "8f7e59c7c",
+  "op": "2026-10-22T08:16:52.655Z",
+  "commit": "43f7ddb048",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.0"
+  "node": "v26.12.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5398,
-  "geclassificeerd": 5373,
+  "totaal": 5412,
+  "geclassificeerd": 5412,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
-   "NOT_APPLICABLE": 1298,
-   "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 705,
-   "INTENTIONALLY_NON_IDEMPOTENT": 206
+   "NOT_APPLICABLE": 1300,
+   "PROTECTED": 723,
+   "INTENTIONALLY_NON_IDEMPOTENT": 225
   },
-  "vastgesteldDoorMens": 2261,
+  "vastgesteldDoorMens": 2300,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4438,
-   "PUBLIC": 142,
-   "OBJECT_SCOPED": 785,
-   "(niet af te leiden -- vraagt een verklaring)": 17,
+   "AUTHENTICATED": 4499,
+   "PUBLIC": 84,
+   "OBJECT_SCOPED": 791,
+   "(niet af te leiden -- vraagt een verklaring)": 22,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -33,24 +32,34 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 251
+   "niet gemeten": 265
   },
-  "voorstellen": {
-   "NOT_APPLICABLE": 1
-  },
+  "voorstellen": {},
   "metingVan": "2026-09-29T18:39:11.935Z"
  },
  "tegenspraken": [
   {
+   "route": "POST /api/arrival/interpret",
+   "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
    "route": "POST /api/arrival/pass/intrek",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
    "route": "POST /api/arrival/pass/roteer",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/asset/aanvraag/betaal",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -156,9 +165,9 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
-   "route": "POST /api/lab2/bewoner/studie",
-   "bedoeld": "AUTHENTICATED",
-   "waargenomen": "PUBLIC",
+   "route": "POST /api/krant/gids",
+   "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -200,6 +209,12 @@
   {
    "route": "POST /api/mob/kaart/toon",
    "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/asset/aanvraag/beslis",
+   "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -420,6 +435,54 @@
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
+   "route": "POST /api/rtf/onboarding/teken",
+   "bedoeld": "AUTHENTICATED",
+   "waargenomen": "OBJECT_SCOPED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfkantoor/club/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfkantoor/stadsraad/partner-code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/gemeente/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/ondernemer/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/partner/code/roteren",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/portaal/partner/genootschap",
+   "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/rtfos/portaal/partner/genootschap/erken",
+   "bedoeld": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
    "route": "POST /api/service/bel",
    "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
@@ -572,37 +635,37 @@
   {
    "route": "POST /api/werk-gast/beeld",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
    "route": "POST /api/werk-gast/besluit",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
    "route": "POST /api/werk-gast/betaling/start",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
    "route": "POST /api/werk-gast/betaling/status",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
    "route": "POST /api/werk-leverancier/beeld",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
    "route": "POST /api/werk-leverancier/besluit",
    "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
+   "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
   {
@@ -693,12 +756,14 @@
   {
    "mutatieId": "aanmelding.aanvraag",
    "route": "POST /api/aanmelding/aanvraag",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -708,10 +773,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "aanmelding.beslis",
@@ -2988,11 +3053,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3015,11 +3080,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "OBJECT_SCOPED",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "mw",
+     "auth",
      "arrivalPassAuth"
     ]
    },
@@ -3043,11 +3108,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3070,11 +3135,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3097,11 +3162,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "OBJECT_SCOPED",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "mw",
+     "auth",
      "arrivalPassAuth"
     ]
    },
@@ -3125,11 +3190,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "mw"
+     "auth"
     ]
    },
    "bewijs": {
@@ -3141,6 +3206,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "asset.aanvraag.betalen",
+   "route": "POST /api/asset/aanvraag/betaal",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "asset.aanvragen.mijn",
+   "route": "POST /api/asset/aanvragen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3972,12 +4079,14 @@
   {
    "mutatieId": "bank.akkoord",
    "route": "POST /api/bank/akkoord",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3989,10 +4098,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "deze route draagt een duplicaatregel in lib/idemsleutels.js; dat zegt dat een herhaling WEL iets zou doen, en dus is NOT_APPLICABLE hier uitgesloten -- de meters zagen niets omdat de stand al op de doelwaarde stond"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.bevries",
@@ -9823,10 +9932,12 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -14195,12 +14306,14 @@
   {
    "mutatieId": "command.uitrol.pauze",
    "route": "POST /api/command/uitrol/pauze",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -14212,10 +14325,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.uitrol.zet",
@@ -17722,6 +17835,28 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "democratie.partij.koppel",
+   "route": "POST /api/democratie/partij/koppel",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "democratie.partij.kwesties",
    "route": "POST /api/democratie/partij/kwesties",
    "semantiek": {
@@ -21108,7 +21243,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
@@ -26842,12 +26977,14 @@
   {
    "mutatieId": "foundation.school.overdracht.pakket",
    "route": "POST /api/foundation/school/overdracht/pakket",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -26857,10 +26994,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.pas.blokkeer",
@@ -29278,10 +29415,12 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
-    "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -30059,10 +30198,12 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
-    "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -32348,9 +32489,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -33246,7 +33387,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -35008,10 +35149,12 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -35033,10 +35176,12 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -35058,10 +35203,12 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -35731,7 +35878,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -35758,9 +35905,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -35785,7 +35932,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -35812,9 +35959,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -35839,9 +35986,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -35867,9 +36014,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -35894,9 +36041,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -35921,7 +36068,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
@@ -35948,9 +36095,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -35975,9 +36122,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -36704,9 +36851,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -36732,9 +36879,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -36760,9 +36907,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -36788,9 +36935,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -36816,9 +36963,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -36844,9 +36991,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -36872,9 +37019,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "mw",
      "mw"
@@ -37197,9 +37344,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37224,9 +37371,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37251,9 +37398,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37278,9 +37425,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -37305,9 +37452,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -38056,12 +38203,14 @@
   {
    "mutatieId": "labfonds.beslis",
    "route": "POST /api/labfonds/beslis",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38073,10 +38222,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "labfonds.boardroom",
@@ -38108,12 +38257,14 @@
   {
    "mutatieId": "labfonds.doneer",
    "route": "POST /api/labfonds/doneer",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38125,10 +38276,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "labfonds.financiering",
@@ -38214,12 +38365,14 @@
   {
    "mutatieId": "labfonds.scheidsrechter",
    "route": "POST /api/labfonds/scheidsrechter",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38231,10 +38384,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "labfonds.stem",
@@ -38266,12 +38419,14 @@
   {
    "mutatieId": "labfonds.voorstel.maak",
    "route": "POST /api/labfonds/voorstel/maak",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38283,10 +38438,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "leerhuis.doe",
@@ -41170,7 +41325,9 @@
     "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bewakers": [
+     "mailpoort"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -46022,14 +46179,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "member.bureau.zaak.open",
+   "mutatieId": "bureau.zaak.open",
    "route": "POST /api/member/bureau/zaak/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -46041,10 +46200,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.zaken",
@@ -48176,12 +48335,14 @@
   {
    "mutatieId": "member.magnaat.economie.beslis",
    "route": "POST /api/member/magnaat/economie/beslis",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -48193,10 +48354,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.magnaat.economie.schok",
@@ -54432,7 +54593,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "geen anonieme demo-gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -55752,7 +55913,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -57160,7 +57321,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57187,7 +57348,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57214,7 +57375,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -57241,7 +57402,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -59922,12 +60083,14 @@
   {
    "mutatieId": "office.aidata.export",
    "route": "POST /api/office/aidata/export",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -59939,10 +60102,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.anker",
@@ -60296,14 +60459,58 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "office.asset.fees",
-   "route": "POST /api/office/asset/fees",
-   "semantiek": null,
+   "mutatieId": "asset.aanvraag.beslissen",
+   "route": "POST /api/office/asset/aanvraag/beslis",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "asset.aanvragen.kantoor",
+   "route": "POST /api/office/asset/aanvragen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.asset.fees",
+   "route": "POST /api/office/asset/fees",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -60315,10 +60522,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.asset.overzicht",
@@ -61057,12 +61264,14 @@
   {
    "mutatieId": "office.balie.zoek",
    "route": "POST /api/office/balie/zoek",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth",
      "balieAuth"
@@ -61075,10 +61284,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.bank",
@@ -62173,12 +62382,14 @@
   {
    "mutatieId": "office.bank.rekening.open",
    "route": "POST /api/office/bank/rekening/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "kluisAuth"
     ]
@@ -62190,10 +62401,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.rood.aanvragen",
@@ -62658,6 +62869,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "betaalwaarheid.controle.afronden",
+   "route": "POST /api/office/betalingen/controle/afrond",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "naamAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.betalingen.status",
    "route": "POST /api/office/betalingen/status",
    "semantiek": {
@@ -62680,6 +62912,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "betaalwaarheid.terugbetaling.afhandelen",
+   "route": "POST /api/office/betalingen/terug/afhandel",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "naamAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -63880,6 +64133,27 @@
    },
    "bewijs": null,
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "democratie.partij.ontkoppel",
+   "route": "POST /api/office/democratie/partij/ontkoppel",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -67197,12 +67471,14 @@
   {
    "mutatieId": "office.magnaat.scan",
    "route": "POST /api/office/magnaat/scan",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -67214,10 +67490,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.magnaat.status",
@@ -74079,14 +74355,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "office.techniek.integraties.noodstop",
+   "mutatieId": "office.integraties.noodstop",
    "route": "POST /api/office/techniek/integraties/noodstop",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -74098,10 +74376,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.techniek.integraties.schakel",
@@ -79860,12 +80138,14 @@
   {
    "mutatieId": "ov.regie.zet",
    "route": "POST /api/ov/regie/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -79877,10 +80157,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "ov.uit",
@@ -83129,7 +83409,7 @@
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83183,7 +83463,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83237,7 +83517,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83264,7 +83544,7 @@
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83291,7 +83571,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83318,7 +83598,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83345,7 +83625,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83372,7 +83652,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83399,7 +83679,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83426,7 +83706,7 @@
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83453,7 +83733,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83480,7 +83760,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83507,7 +83787,7 @@
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83534,7 +83814,7 @@
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83561,7 +83841,7 @@
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83588,7 +83868,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83615,7 +83895,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "een echt account",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -86230,7 +86510,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -86257,7 +86537,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -86527,7 +86807,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -86554,7 +86834,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
@@ -87448,10 +87728,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -87476,10 +87757,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -90690,12 +90972,14 @@
   {
    "mutatieId": "rtf.onboarding.teken",
    "route": "POST /api/rtf/onboarding/teken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -90705,10 +90989,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.ontkoppel",
@@ -90776,6 +91060,7 @@
     "uitHandler": "object: code",
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -90804,6 +91089,7 @@
     "uitHandler": "object: code",
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -90828,10 +91114,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -90860,6 +91147,7 @@
     "uitHandler": "object: code",
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -92439,7 +92727,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
-    "uitHandler": null,
+    "uitHandler": "object: code",
     "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
@@ -93784,6 +94072,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfkantoor.club.code.roteren",
+   "route": "POST /api/rtfkantoor/club/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfkantoor.club.maak",
    "route": "POST /api/rtfkantoor/club/maak",
    "semantiek": {
@@ -94185,6 +94494,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfkantoor.stadsraad.partnercode.roteren",
+   "route": "POST /api/rtfkantoor/stadsraad/partner-code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -95803,6 +96133,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.gemeente.code.roteren",
+   "route": "POST /api/rtfos/gemeente/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.gemeente.maak",
    "route": "POST /api/rtfos/gemeente/maak",
    "semantiek": {
@@ -96974,6 +97325,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.ondernemer.code.roteren",
+   "route": "POST /api/rtfos/ondernemer/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfos.ondernemer.koppel",
    "route": "POST /api/rtfos/ondernemer/koppel",
    "semantiek": {
@@ -97078,6 +97450,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.partner.code.roteren",
+   "route": "POST /api/rtfos/partner/code/roteren",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -97224,10 +97617,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97252,10 +97646,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97280,10 +97675,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97308,10 +97704,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97336,10 +97733,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97364,10 +97762,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97392,10 +97791,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97420,10 +97820,11 @@
    },
    "duplicaatregel": "leest",
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97442,10 +97843,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97464,10 +97866,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97548,10 +97951,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97576,10 +97980,11 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
+     "auth",
      "mw",
      "mw"
     ]
@@ -97847,7 +98252,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -97901,9 +98306,9 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw"
     ]
@@ -97928,7 +98333,7 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": null,
     "uitHandler": null,
     "bedoeld": "PUBLIC",
     "bewakers": [
@@ -104263,7 +104668,9 @@
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -105411,7 +105818,7 @@
    "semantiek": {
     "klasse": "onbekend"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
@@ -105438,7 +105845,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
@@ -106863,10 +107270,12 @@
    },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -121226,12 +121635,14 @@
   {
    "mutatieId": "supplier.mep.daily",
    "route": "POST /api/supplier/mep/daily",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -121243,10 +121654,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.mep.daily.done",
@@ -122516,6 +122927,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "partnernetwerk.overzicht",
+   "route": "POST /api/supplier/netwerk/overzicht",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.notifications",
    "route": "POST /api/supplier/notifications",
    "semantiek": {
@@ -122626,12 +123058,14 @@
   {
    "mutatieId": "supplier.onboarding.zet",
    "route": "POST /api/supplier/onboarding/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -122643,10 +123077,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "onderneming.zaakkant.lezen",
@@ -124622,12 +125056,14 @@
   {
    "mutatieId": "supplier.poort.online",
    "route": "POST /api/supplier/poort/online",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -124639,10 +125075,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.poort.rondleiding",
@@ -126471,12 +126907,14 @@
   {
    "mutatieId": "supplier.rooster.voorstel",
    "route": "POST /api/supplier/rooster/voorstel",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -126488,10 +126926,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.roster",
@@ -127061,12 +127499,14 @@
   {
    "mutatieId": "supplier.rtmail.export",
    "route": "POST /api/supplier/rtmail/export",
-   "semantiek": null,
-   "duplicaatregel": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -127078,10 +127518,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.rtmail.gesprekken",
@@ -132331,12 +132771,14 @@
   {
    "mutatieId": "supplier.werkbeleid.zet",
    "route": "POST /api/supplier/werkbeleid/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -132348,10 +132790,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.werkmail.adressen",
@@ -139546,7 +139988,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139574,7 +140016,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139602,7 +140044,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139630,7 +140072,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139658,7 +140100,7 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
-     "geenGast"
+     "eenAccount"
     ]
    },
    "bewijs": {
@@ -139790,7 +140232,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -140462,10 +140904,12 @@
    },
    "duplicaatregel": "leest",
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": null,
    "stand": "NOT_APPLICABLE",
@@ -140481,10 +140925,12 @@
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": null,
    "stand": "PROTECTED",
@@ -140500,10 +140946,12 @@
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": null,
    "stand": "PROTECTED",
@@ -140519,10 +140967,12 @@
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": null,
    "stand": "PROTECTED",
@@ -140538,10 +140988,12 @@
    },
    "duplicaatregel": "leest",
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": null,
    "stand": "NOT_APPLICABLE",
@@ -140557,10 +141009,12 @@
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
-    "waargenomen": "PUBLIC",
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
     "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
+    "bewakers": [
+     "auth"
+    ]
    },
    "bewijs": null,
    "stand": "PROTECTED",
@@ -140579,7 +141033,9 @@
     "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": "PUBLIC",
-    "bewakers": []
+    "bewakers": [
+     "mailpoort"
+    ]
    },
    "bewijs": {
     "op": "2026-09-29T18:39:11.935Z",
@@ -142715,12 +143171,14 @@
   {
    "mutatieId": "werkplek.taak",
    "route": "POST /api/werkplek/taak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -142732,10 +143190,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.taak-zet",

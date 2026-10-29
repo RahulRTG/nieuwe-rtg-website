@@ -14,6 +14,7 @@
    test/aanmeldbesluit.test.js.
 
    Draai los: node --test test/pas-escalatie.test.js */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -73,10 +74,12 @@ test('4. het menselijke akkoord tilt het gekoppelde account op naar Business', a
   const { token } = await nieuwLid('rtg', 'rtg');
   assert.equal(await tierVan(token), 'rtg', 'begint als RTG');
   const aanvraag = await api('/api/aanmelding/aanvraag',
-    { pas: 'business', naam: 'Zaak Proef', contact: 'zaak@proef.test' }, token);
+    { idem: randomUUID(), pas: 'business', naam: 'Zaak Proef', contact: 'zaak@proef.test' }, token);
   assert.equal(aanvraag.status, 200);
-  const id = aanvraag.body.aanmelding.id;
-  assert.equal(aanvraag.body.aanmelding.gekoppeld, true, 'de aanvraag is aan het account gekoppeld');
+  const id = aanvraag.body.ontvangst.aanvraagId;
+  const dossier = await api('/api/aanmelding/een', { id }, kantoor);
+  assert.equal(dossier.status, 200, 'het bevoegde kantoor kan de aanvraag lezen');
+  assert.equal(dossier.body.aanmelding.gekoppeld, true, 'de aanvraag is aan het account gekoppeld');
 
   // het menselijke besluit: RTG-personeel accepteert
   /* `contractEuro` hoort erbij sinds de ladder: de Business Pass heeft geen
@@ -97,10 +100,12 @@ test('4. het menselijke akkoord tilt het gekoppelde account op naar Business', a
 
 test('5. een aanvraag zonder ingelogd account kan niets optillen', async () => {
   const aanvraag = await api('/api/aanmelding/aanvraag',
-    { pas: 'business', naam: 'Anoniem', contact: 'anon@proef.test' }, null);
+    { idem: randomUUID(), pas: 'business', naam: 'Anoniem', contact: 'anon@proef.test' }, null);
   assert.equal(aanvraag.status, 200);
-  assert.equal(aanvraag.body.aanmelding.gekoppeld, false, 'geen account gekoppeld');
+  const dossier = await api('/api/aanmelding/een', { id: aanvraag.body.ontvangst.aanvraagId }, kantoor);
+  assert.equal(dossier.status, 200, 'het bevoegde kantoor kan de anonieme aanvraag lezen');
+  assert.equal(dossier.body.aanmelding.gekoppeld, false, 'geen account gekoppeld');
   // accepteren mag, maar er is geen account om op te tillen (geen crash)
-  const besluit = await api('/api/aanmelding/beslis', { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', contractEuro: 5000 }, kantoor);
+  const besluit = await api('/api/aanmelding/beslis', { id: aanvraag.body.ontvangst.aanvraagId, besluit: 'geaccepteerd', contractEuro: 5000 }, kantoor);
   assert.equal(besluit.status, 200);
 });

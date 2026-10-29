@@ -8,6 +8,31 @@ module.exports = function profileer() {
   const { Session } = require('node:inspector');
   const dir = path.resolve(process.env.RTG_CPU_PROFILE_DIR);
   fs.mkdirSync(dir, { recursive: true });
+  // Diagnose per route, zonder payloads. Wacht op de normale moduleinitialisatie:
+  // de preload mag geen tweede database of gewijzigde opstartvolgorde maken.
+  const saves = new Map(), sqlitePath = require.resolve('../server/db/sqlite');
+  const handelingPath = require.resolve('../server/opzet/handeling');
+  const koppel = setInterval(() => {
+    const sqlite = require.cache[sqlitePath];
+    if (!sqlite?.loaded) return;
+    clearInterval(koppel);
+    const origineel = sqlite.exports.saveSqlite;
+    sqlite.exports.saveSqlite = function(...args) {
+      const h = require.cache[handelingPath]?.exports.huidige?.();
+      const sleutel = (h?.methode || '') + ' ' + (h?.pad || 'achtergrond');
+      const naam = saves.has(sleutel) || saves.size < 5000 ? sleutel : 'overig';
+      const rij = saves.get(naam) || { route: naam, count: 0, ms: 0, maxMs: 0, full: 0 };
+      const start = performance.now();
+      try { return origineel.apply(this, args); }
+      finally {
+        const ms = performance.now() - start;
+        rij.count++; rij.ms += ms; rij.maxMs = Math.max(rij.maxMs, ms);
+        if (args[1] === undefined) rij.full++;
+        saves.set(naam, rij);
+      }
+    };
+  }, 1000);
+  koppel.unref();
   const session = new Session();
   session.connect();
   const post = method => new Promise((resolve, reject) => session.post(method, (error, value) => error ? reject(error) : resolve(value)));
@@ -29,7 +54,9 @@ module.exports = function profileer() {
           collections = Object.entries(data).map(([name, value]) => ({ name, bytes: Buffer.byteLength(JSON.stringify(value) || '') }))
             .sort((a, b) => b.bytes - a.bytes).slice(0, 20);
         } catch (error) { collections = { error: error.message }; }
-        fs.writeFileSync(path.join(dir, stem + '.json'), JSON.stringify({ pid: process.pid, begin, end, diagnosticOnly: true, collections }));
+        const storage = [...saves.values()].sort((a, b) => b.ms - a.ms).slice(0, 30);
+        fs.writeFileSync(path.join(dir, stem + '.json'), JSON.stringify({ pid: process.pid, begin, end, diagnosticOnly: true, collections, storage }));
+        saves.clear();
         begin = end;
         await post('Profiler.start');
       } catch (error) { console.error('[cpu-profile]', error.message); }

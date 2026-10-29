@@ -260,6 +260,22 @@ test('19. een voorkeur kan niet onbeperkt groeien', () => {
     'honderd keer drukken betekent hetzelfde als drie keer; anders wordt een voorkeur vanzelf de enige');
 });
 
+/* Gevonden door de voltooiproef van Connect: een dubbele tik op "Meer hiervan"
+   telde twee keer, en dan vertekent de horizon wat het lid wil. */
+test('19b. een herhaalsleutel per tik: dezelfde sleutel telt een keer, ook als hij later terugkomt', () => {
+  const { c } = bouw();
+  c.connect.signaal('AB', 'sterren', 'meer', 'tik-1');
+  const twee = c.connect.signaal('AB', 'sterren', 'meer', 'tik-1');
+  assert.equal(twee.herhaald, true, 'de tweede tik met dezelfde sleutel is een herhaling');
+  assert.equal(c.connect.horizon('AB').onderwerpen.find((o) => o.onderwerp === 'sterren').gewicht, 1,
+    'een dubbele tik telde twee keer');
+  assert.equal(c.connect.signaal('AB', 'sterren', 'minder', 'tik-1').status, 409,
+    'dezelfde sleutel met een ander signaal is een fout, geen stille herhaling');
+  c.connect.signaal('AB', 'sterren', 'meer', 'tik-2');
+  assert.equal(c.connect.horizon('AB').onderwerpen.find((o) => o.onderwerp === 'sterren').gewicht, 2,
+    'een bewuste tweede tik met een eigen sleutel telt gewoon');
+});
+
 test('20. een motor zonder bron zegt dat hij niet kijkt', () => {
   const { c } = bouw();
   const m = c.connect.motoren();

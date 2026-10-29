@@ -120,7 +120,7 @@ async function loop(w, stap) {
     const n = (await mijne()).filter((f) => f.wat === lijf.wat).length;
     return { klopt: r.status === 200 && n === 1, ziet: 'zetten ' + r.status + ', na SIGKILL ' + n + ' regel' };
   });
-  await stap('herstelbaar', 'een crash direct na het stopzetten van de deelcode: de vreemde ziet niets meer, ook na de herstart', async () => {
+  await stap('bevoegd', 'een crash direct na het stopzetten van de deelcode: de vreemde ziet niets meer, ook na de herstart', async () => {
     const s = await w.post(STOPDELEN, { id: deelId }, T);
     await w.crash();
     const t = await w.post(TOON, { code }, null);

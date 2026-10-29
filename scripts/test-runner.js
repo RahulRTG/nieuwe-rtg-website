@@ -327,12 +327,15 @@ const testBatches = maakBatches(gewoon, { maxBestanden: batchBestanden,
    bewering van een regel. Zo kost het niets, en een mens die zich afvraagt wat
    er straks apart draait, krijgt hetzelfde antwoord. */
 if (argv.includes('--toon')) {
-  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency,
+  const uitvoer = JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency,
     batchTelling: testBatches.length, batchGroottes: testBatches.map(b => b.length), batchBestanden,
     dekking: dekkingMap || dekkingVloer, journaal, postgres:opslagPlan.pg,
-    postgresUitgesteld:opslagPlan.uitgesteld || [] }, null, 2));
+    postgresUitgesteld:opslagPlan.uitgesteld || [] }, null, 2) + '\n';
   geefAfbouwSlotVrij();
-  process.exit(0);
+  // Een grote inventaris past niet altijd in één pipebuffer. Wacht tot alle
+  // bytes geschreven zijn; direct exit liet geldige JSON op 64 KiB afbreken.
+  process.stdout.write(uitvoer, () => { process.exitCode = 0; });
+  return;
 }
 leegMaken();
 console.log('[tests] ' + gewoon.length + ' bestanden in ' + testBatches.length +

@@ -59,7 +59,12 @@ module.exports = function hangRoutesOp(kern) {
     .split(',').map(s => s.trim()).filter(s => s && s !== '-'); // '-' = bewust geen domeinen (vloot)
   for (const naam of gekozenDomeinen) {
     if (!ALLE_DOMEINEN.includes(naam)) { console.warn('[start] onbekend domein overgeslagen:', naam); continue; }
-    require('../routes/' + naam)(grens(naam));
+    // Alleen de twee privacyhandelingen; member krijgt geen aanvraagmotor.
+    const aanvraagPrivacy = naam === 'member' ? Object.freeze({
+      controleerAanmeldingOntvangsten: kern.aanmeldingen.controleerOntvangstRedactie,
+      redigeerAanmeldingOntvangsten: kern.aanmeldingen.redigeerOntvangsten
+    }) : undefined;
+    require('../routes/' + naam)(grens(naam), aanvraagPrivacy);
   }
   // De verplichte onboarding + het contract raken leden, gasten, de eigenaar en
   // leveranciers; net als de infra-endpoints draait dit altijd mee.

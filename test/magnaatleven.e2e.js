@@ -12,7 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, edgeBediening, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, edgeActies, edgeBediening, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -39,14 +39,18 @@ test('FROM ZERO: voorzijde, Vandaag, kiezen, plannen, schrappen en de dag afslui
     assert.match(await page.textContent('#vnAgenda'), /Telefoon en zorgverzekering/, 'de betaling van woensdag staat in je week');
     assert.equal(await page.$eval('#vnNavBedrijf', e => getComputedStyle(e).display), 'none', 'Mijn bedrijf bestaat pas met een onderneming');
 
-    const hoofdacties = () => page.$$eval('[data-hoofdactie]', bs => bs.map(b => b.textContent.trim()));
     const waarom = (re) => page.waitForFunction(r => new RegExp(r).test(document.getElementById('vnWaarom').textContent), re.source, { timeout: 10000 });
 
     await edgeBediening(page, 'Kies wat je gaat maken');
     await page.selectOption('#vnF-aanbod', 'websites');
     await page.click('[data-vn-doe]');
     await waarom(/Werk aan je eigen portfolio-site/);
-    assert.deepEqual(await hoofdacties(), ['Werk aan je eigen portfolio-site'], 'precies een hoofdactie, en het is de actuele');
+    await edgeActies(page);
+    const edgeControls = page.locator('.rtg-adaptive-controls');
+    assert.equal(await edgeControls.getByRole('button', { name: 'Werk aan je eigen portfolio-site', exact: true }).count(), 1,
+      'de Edge toont de actuele hoofdactie precies eenmaal');
+    assert.equal(await edgeControls.getByRole('button', { name: 'Kies wat je gaat maken', exact: true }).count(), 0,
+      'de afgehandelde hoofdactie blijft niet in de Edge staan');
 
     await edgeBediening(page, 'Werk aan je eigen portfolio-site');
     await page.selectOption('#vnF-minuten', '240');

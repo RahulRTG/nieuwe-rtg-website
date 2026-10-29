@@ -102,6 +102,7 @@ header.ios-nav{top:var(--edge-randboven,0px);margin-top:var(--edge-randboven,0px
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="browser" class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <header>
@@ -125,7 +126,7 @@ header.ios-nav{top:var(--edge-randboven,0px);margin-top:var(--edge-randboven,0px
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
-const api=(pad,body)=>fetch('/api/browser/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+const api=(pad,body)=>fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
 function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
 function slug(v){return String(v==null?'':v).toLowerCase().replace(/^rtg:\/\//,'').replace(/\.rtg$/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30);}
 /* "naam.rtg/contact" of "rtg://naam/contact" -> {adres, pad} */
@@ -239,7 +240,7 @@ async function toonStart(){
     if(GIDS.some(it=>it.adres===a)){ ga({adres:a}); return; }
     const uit=$('#zoekUit'); uit.innerHTML='<div class="kop2">Zoeken…</div>';
     try{
-      const d=await api('zoek',{q});
+      const d=await api('/api/browser/zoek',{q});
       const sites=d.sites||[], zaken=d.zaken||[];
       uit.textContent='';
       if(!sites.length&&!zaken.length){ uit.innerHTML='<div class="kop2">Resultaten</div><div class="leeg" style="padding:1rem;">Niets gevonden voor "'+esc(q)+'".</div>'; return; }
@@ -264,7 +265,7 @@ async function toonStart(){
     }catch(err){ uit.innerHTML='<div class="leeg">'+esc(err.message)+'</div>'; }
   });
   try{
-    const d=await api('gids');
+    const d=await api('/api/browser/gids');
     GIDS=d.lijst||[];
     const r=$('#rooster'); r.textContent='';
     if(!GIDS.length){ r.innerHTML='<div class="leeg">Nog geen sites online. Wees de eerste: open de Website-maker in de App Store.</div>'; return; }
@@ -315,9 +316,13 @@ function tekenBlok(blok,ver){
     ta.style.cssText='width:100%;background:transparent;border:1px solid currentColor;border-radius:0;padding:.7rem;color:inherit;font:inherit;opacity:.9;';
     const kn=document.createElement('button');kn.type='submit';kn.className='b-knop';tekst(kn,T.knop);kn.style.cssText='margin-top:.6rem;cursor:pointer;border:0;';
     f.appendChild(ta);f.appendChild(kn);
+    /* Een herhaalsleutel per bericht, pas na succes een nieuwe: verstuurt het
+       lid opnieuw na een afgebroken verbinding, dan komt het een keer aan. */
+    let idem='';
     f.addEventListener('submit',async ev=>{ev.preventDefault();
       const tk=ta.value.trim(); if(tk.length<3){meld('Schrijf eerst een bericht.');return;}
-      try{ const r=await api('bericht',{adres:HUIDIGE.site.adres,tekst:tk,soort:blok.soort||'vraag'}); ta.value='';
+      idem=idem||RTGId('web');
+      try{ const r=await api('/api/browser/bericht',{adres:HUIDIGE.site.adres,tekst:tk,soort:blok.soort||'vraag',idem}); ta.value=''; idem='';
         meld(r.via==='chat'?'Verstuurd als gesprek in de leden-app, op uw codenaam.':'Verstuurd. Het bedrijf ziet uw bericht in zijn werklijst, op uw codenaam.'); }
       catch(e){ meld(e.message); }
     });
@@ -358,7 +363,7 @@ window.addEventListener('resize',()=>{ clearTimeout(window._rt); window._rt=setT
 async function toonSite(adres,pad){
   const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
   try{
-    const d=await api('open',{adres,pad:pad||''});
+    const d=await api('/api/browser/open',{adres,pad:pad||''});
     let site=d.site;
     /* een site kan meerdere pagina's dragen: het pad achter het adres kiest er
        een; de voorpagina is het lege pad */

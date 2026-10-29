@@ -17,7 +17,9 @@
       niemand zei waarom. De tekst moet dus veranderen ten opzichte van de
       standaardtekst die in de HTML staat, en de oorzaak van de mediapoort
       bevatten -- leeg blijven en zwijgen zien er van buiten hetzelfde uit.
-   3. De fototips en de looks werken ZONDER camera. Dat is geen bijzaak: de
+   3. De fototips en de looks werken ZONDER camera.
+   4. De Studio bewaart een echt JPEG-bestand met de bewerking in de pixels
+      (zie bij bewering 4 waarom dat de belofte afsluit). Dat is geen bijzaak: de
       pagina belooft het letterlijk ("Rahul's fototips werken ondertussen
       gewoon"), en een belofte in een melding is een bewering.
 
@@ -55,7 +57,7 @@ test('camera.html: het beeld opent, en zonder camera zegt het scherm WAAROM',
   try {
     /* ---- 1) MET camera: het beeld komt binnen ---- */
     browser = await pw.chromium.launch(browserOpties(pw, { args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] }));
-    let ctx = await browser.newContext({ permissions: ['camera'] });
+    let ctx = await browser.newContext({ permissions: ['camera'], acceptDownloads: true });
     let page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -118,6 +120,44 @@ test('camera.html: het beeld opent, en zonder camera zegt het scherm WAAROM',
       rasterVoor, 'de rasterknop hoort het raster echt om te zetten');
     assert.equal(await page.evaluate(() => document.querySelector('#rasterKnop').getAttribute('aria-pressed')),
       String(!rasterVoor), 'en de knop hoort zijn toestand te melden aan een schermlezer');
+
+    /* ---- 4) de Studio bewaart het NABEWERKTE beeld ----
+
+       De belofte van de app eindigt niet bij de sluiter maar bij "Opslaan (volle
+       resolutie)": de foto gaat als bestand naar het toestel, met de bewerking
+       erin. Een download die er is maar het origineel bevat, of een leeg
+       bestand, zou alle vorige beweringen laten slagen. Dus: een echt JPEG-
+       bestand, en de look Z/W is in de PIXELS te zien -- het testbeeld van de
+       nepcamera heeft kleur, het bewaarde beeld niet meer. */
+    const kleur = (bron) => page.evaluate(async (b64OfUrl) => {
+      // via een <img> met een blob-adres, zoals de pagina zelf de foto toont
+      const bm = new Image();
+      bm.src = b64OfUrl.startsWith('blob:') ? b64OfUrl
+        : URL.createObjectURL(new Blob([Uint8Array.from(atob(b64OfUrl), (c) => c.charCodeAt(0))], { type: 'image/jpeg' }));
+      await bm.decode();
+      const c = document.createElement('canvas'); c.width = bm.naturalWidth; c.height = bm.naturalHeight;
+      const x = c.getContext('2d'); x.drawImage(bm, 0, 0);
+      const d = x.getImageData(0, 0, c.width, c.height).data;
+      let max = 0;
+      for (let i = 0; i < d.length; i += 4 * 97) max = Math.max(max, Math.abs(d[i] - d[i + 1]), Math.abs(d[i + 1] - d[i + 2]), Math.abs(d[i] - d[i + 2]));
+      return { max, w: c.width, h: c.height };
+    }, bron);
+    const origineel = await kleur(await page.evaluate(() => document.querySelector('#duimBeeld').src));
+    assert.ok(origineel.max > 20, 'het testbeeld van de nepcamera hoort kleur te hebben, anders bewijst Z/W niets (' + origineel.max + ')');
+    await page.click('#duimpje');
+    await page.waitForFunction(() => document.querySelector('#studio').classList.contains('aan'), null, { timeout: 10000 });
+    await page.click('#studio [data-look="zw"]');
+    const [download] = await Promise.all([page.waitForEvent('download', { timeout: 15000 }), page.click('#stBewaar')]);
+    assert.match(download.suggestedFilename(), /^rtg-studio-\d+\.jpg$/);
+    const bestand = path.join(TMP, 'studio.jpg');
+    await download.saveAs(bestand);
+    const bytes = fs.readFileSync(bestand);
+    assert.ok(bytes.length > 1000, 'het bewaarde bestand is (bijna) leeg: ' + bytes.length + ' bytes');
+    assert.deepEqual([...bytes.subarray(0, 3)], [0xff, 0xd8, 0xff], 'het bewaarde bestand is geen JPEG');
+    const bewaard = await kleur(bytes.toString('base64'));
+    assert.ok(bewaard.max <= 6, 'de look Z/W staat niet in het bewaarde beeld: kleurverschil ' + bewaard.max + ' (origineel ' + origineel.max + ')');
+    assert.ok(bewaard.w > 0 && bewaard.h > 0, 'het bewaarde beeld heeft geen afmeting');
+    await page.waitForFunction(() => /Opgeslagen op volle resolutie/.test(document.querySelector('#stRahul').textContent), null, { timeout: 5000 });
 
     assert.deepEqual(fouten, [], 'de pagina logde fouten: ' + JSON.stringify(fouten).slice(0, 400));
     await ctx.close();

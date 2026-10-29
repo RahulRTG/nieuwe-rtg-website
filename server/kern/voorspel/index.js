@@ -15,6 +15,7 @@
    hier; de pure rekenkern in ./rekenen. */
 
 const { DAGEN, VOLGORDE, volgorde, seintjeVoor, ketenUit, gewoontenUit, combinatiesUit } = require('./rekenen');
+const tijdzone = require('../tijdzone');
 
 function maakVoorspel({ db, findSupplier, plaats }) {
   const boek = () => Array.isArray(db.data.payBoekingen) ? db.data.payBoekingen : [];
@@ -142,10 +143,10 @@ function maakVoorspel({ db, findSupplier, plaats }) {
     }
     const oudste = Math.min(...rijen.map(r => new Date(r.at).getTime()));
     const weken = Math.max(1, (nu.getTime() - oudste) / (7 * 86400000));
-    const morgenDag = (nu.getDay() + 1) % 7;
-    const opDag = rijen.filter(r => new Date(r.at).getDay() === morgenDag);
+    const morgenDag = (tijdzone.weekdagIn(nu) + 1) % 7;
+    const opDag = rijen.filter(r => tijdzone.weekdagIn(r.at) === morgenDag);
     const perUur = {};
-    for (const r of opDag) { const u = new Date(r.at).getHours(); perUur[u] = (perUur[u] || 0) + 1; }
+    for (const r of opDag) { const u = tijdzone.uurIn(r.at); perUur[u] = (perUur[u] || 0) + 1; }
     const drukUren = Object.entries(perUur).sort((a, b) => b[1] - a[1]).slice(0, 3)
       .map(([u, n]) => ({ uur: +u, n }));
     const perGast = {};

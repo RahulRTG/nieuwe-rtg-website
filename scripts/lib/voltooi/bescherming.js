@@ -103,6 +103,32 @@ async function loop(w, stap) {
     return { klopt: plek.length >= 1, ziet: 'in ' + plek.map((p) => p.bestand + '/' + (p.sleutel || p.tabel)).join(', ') };
   });
 
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander lid ziet of bestuurt de beschermingsstand en ontsluitceremonie van dit lid niet, maar beheert wel zijn eigen stand', async () => {
+    await w.post(ZET, { drager: 'sessie', naar: 'beschermd', reden: 'kruisproef ' + merk }, T);
+    const openA = await w.post(ONTSLUITING, { drager: 'sessie', naar: 'normaal', reden: 'eigen verzoek voor kruisproef ' + merk }, T);
+    const id = openA.data && openA.data.verzoek && openA.data.verzoek.id;
+    const ander = await nieuwLid(w, 'bsc-ander');
+    const B = ander.token;
+    const voorB = await mijn(B);
+    const aanvalStap = await w.post(STAP, { id, soort: 'reden' }, B);
+    const aanvalAfbreken = await w.post(AFBREKEN, { id, reden: 'vreemde actor' }, B);
+    const eigenB = await w.post(ZET, { drager: 'identiteit', naar: 'beschermd', reden: 'eigen beveiliging' }, B);
+    const naA = await mijn();
+    const naB = await mijn(B);
+    const ruimAOp = await w.post(AFBREKEN, { id, reden: 'kruisproef afgerond' }, T);
+    const aBehoudtOpen = (naA.open || []).some((v) => v.id === id);
+    const bZietA = (voorB.open || []).concat(naB.open || []).some((v) => v.id === id);
+    return {
+      klopt: openA.status === 200 && geen5xx(aanvalStap) && geen5xx(aanvalAfbreken) &&
+        eigenB.status === 200 && aBehoudtOpen && !bZietA && naA.mijn.identiteit === 'beschermd' &&
+        naB.mijn.identiteit === 'beschermd' && ruimAOp.status === 200,
+      ziet: 'vreemde stap/afbreken ' + aanvalStap.status + '/' + aanvalAfbreken.status +
+        '; A behoudt verzoek=' + aBehoudtOpen + ', B ziet A=' + bZietA +
+        ', eigen stand B=' + (naB.mijn && naB.mijn.identiteit)
+    };
+  });
+
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'dubbeltik op "verstrengen" van de sessie: een keer verstrengd, en de tweede tik zet niets opnieuw', async () => {
     const [a, b] = await w.dubbel(ZET, { drager: 'sessie', naar: 'beschermd', reden: 'dubbel ' + merk }, T);

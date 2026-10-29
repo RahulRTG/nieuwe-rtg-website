@@ -40,6 +40,11 @@
     fetch('/api/account/rollen', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { werkrollen = new Set(((d && d.rollen) || []).map((r) => r.rol)); if (werkrollen.size) bouw(); })
+      /* Een manager die via zijn dienstverband aan een zaak hangt (rol
+         personeel, manager) opent de zaak-app net als wie de zaak koppelde
+         (app-main-25.js); voor een ingang met werkrol 'zaak' telt hij dus ook. */
+      .then((d) => { const rollen = (d && d.rollen) || [];
+        werkrollen = new Set(rollen.map((r) => r.rol).concat(rollen.some((r) => r.rol === 'personeel' && r.manager) ? ['zaak'] : []));
+        if (werkrollen.size) bouw(); })
       .catch(() => {});
   })();

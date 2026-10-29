@@ -185,7 +185,10 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
       /* `width` uit de berekende stijl en niet de bounding box: de lade staat op
          content-box en draagt een rand van 1px, dus de box is altijd een pixel
          breder dan zijn doel. */
-      return doel > 0 && Math.abs(parseFloat(st.width) - doel) < 0.5;
+      /* Op de doelbreedte zelf en niet "binnen een halve pixel": een lade die
+         nog groeit liet een knop half uitsteken en verborg zo dat hij in rust
+         1px uitstak, omdat een reset de content-box overschreef. */
+      return doel > 0 && Math.abs(parseFloat(st.width) - doel) < 0.05;
     }, null, { timeout: 15000 });
     const uit = await page.evaluate(() => {
       const l = document.querySelector('#lijst .gb-lade');

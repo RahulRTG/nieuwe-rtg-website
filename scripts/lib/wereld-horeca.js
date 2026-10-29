@@ -60,7 +60,8 @@ async function zetHorecaKlaar({ post, sleutels, tokens }) {
 
   /* De gast kijkt naar zijn eigen rekening. Dat is een LEESroute en hij geeft
      terug wat de zaak straks onder `rekeningId` moet aanspreken. */
-  const mijn = await doe('de rekening van de tafel', '/api/gast/rekening', { sleutel: gast.sleutel }, null);
+  // de tafelsleutel werkt alleen met het account dat aanschoof (scripts/lib/lijfsleutels.js, familie 'gast')
+  const mijn = await doe('de rekening van de tafel', '/api/gast/rekening', { sleutel: gast.sleutel }, tokens.member);
   const rekeningId = mijn && (mijn.rekeningId || (mijn.rekening && (mijn.rekening.id || mijn.rekening.rekeningId)));
 
   const extra = {};

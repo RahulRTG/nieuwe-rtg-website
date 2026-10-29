@@ -61,7 +61,7 @@
     if (!huidig) return K.meld('Open eerst een roomservicebestelling.');
     var naam = $('sNaam').value.trim();
     if (!naam) return K.meld('Wat wordt er besteld?');
-    K.api('/rekening/regel', { rekeningId: huidig, naam: naam, prijs: Number($('sPrijs').value) || 0,
+    K.api('/rekening/regel', { rekeningId: huidig, idem: RTGId('tik'), naam: naam, prijs: Number($('sPrijs').value) || 0,
       aantal: Number($('sAantal').value) || 1, gang: 1, station: 'roomservice',
       allergie: $('sAllergie').value.trim() }).then(function (r) {
       if (r.body.error) return K.meld(r.body.error);

@@ -1,25 +1,25 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-10-18",
+  "vastgelegd": "2026-10-23",
   "gemeten": {
-    "bestanden": 2971,
-    "domeinenTotaal": 737,
-    "koopbareVormen": 617,
+    "bestanden": 3026,
+    "domeinenTotaal": 753,
+    "koopbareVormen": 619,
     "koopbareDomeinen": 126,
     "envelopDrempel": 8,
     "envelop": 45,
-    "veldenDomeineigen": 793,
-    "veldenNietEnvelop": 1063,
+    "veldenDomeineigen": 801,
+    "veldenNietEnvelop": 1073,
     "gelijkendeVormparen": 18,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 43,
+    "werkwoordCombinaties": 42,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 122,
+    "optellingen": 123,
     "optelDomeinen": 62,
-    "optelCenten": 68,
+    "optelCenten": 69,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 49
@@ -76,7 +76,7 @@
     "prijs": 41,
     "beschikbaarheid": 55,
     "reserveer": 32,
-    "bevestig": 63,
+    "bevestig": 64,
     "lever": 25,
     "annuleer": 37,
     "retour": 9
@@ -262,7 +262,7 @@
         "toon": "bankbeeld",
         "prijs": "afkoopsom",
         "beschikbaarheid": "capaciteit",
-        "reserveer": "maakBoekhouding",
+        "reserveer": "inhoudVan",
         "bevestig": "afkoopsom",
         "lever": "levering",
         "annuleer": "vervalMs"
@@ -721,6 +721,26 @@
       "telt": 5
     },
     {
+      "domein": "kern/aanmeldingen",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "som",
+        "beschikbaarheid": "lopendContract",
+        "bevestig": "geldigBoek"
+      },
+      "telt": 4
+    },
+    {
       "domein": "kern/assets",
       "heeft": {
         "toon": true,
@@ -1121,25 +1141,6 @@
       "telt": 4
     },
     {
-      "domein": "kern/aanmeldingen",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "prijs": "som",
-        "beschikbaarheid": "lopendContract"
-      },
-      "telt": 3
-    },
-    {
       "domein": "kern/autoverkoop",
       "heeft": {
         "toon": true,
@@ -1210,7 +1211,7 @@
       },
       "bewijs": {
         "toon": "publiek",
-        "beschikbaarheid": "openstaand",
+        "beschikbaarheid": "open",
         "bevestig": "boek"
       },
       "telt": 3
@@ -1286,7 +1287,7 @@
       },
       "bewijs": {
         "beschikbaarheid": "ticketsVoorSlot",
-        "bevestig": "bewaarLogboek",
+        "bevestig": "logboekVoor",
         "lever": "bezorgtNu"
       },
       "telt": 3
@@ -2669,7 +2670,7 @@
     },
     {
       "gelijkenis": 0.67,
-      "a": "server/kern/directpay/betalen.js",
+      "a": "server/kern/directpay/bevestigd.js",
       "b": "server/kern/settlement.js",
       "domeinA": "kern/directpay",
       "domeinB": "kern/settlement",
@@ -2868,6 +2869,14 @@
       ]
     },
     {
+      "domein": "kern/assets",
+      "plekken": 2,
+      "waar": [
+        "server/kern/assets/aanvraag-betaal.js",
+        "server/kern/assets/aanvraag.js"
+      ]
+    },
+    {
       "domein": "kern/bank",
       "plekken": 2,
       "waar": [
@@ -2911,8 +2920,8 @@
       "domein": "kern/labfonds",
       "plekken": 2,
       "waar": [
-        "server/kern/labfonds/onderzoek.js",
-        "server/kern/labfonds.js"
+        "server/kern/labfonds/beeld.js",
+        "server/kern/labfonds/onderzoek.js"
       ]
     },
     {
@@ -2961,14 +2970,6 @@
       "waar": [
         "server/kern/thuis/aanbod.js",
         "server/kern/thuis/extra.js"
-      ]
-    },
-    {
-      "domein": "kern/voorspel",
-      "plekken": 2,
-      "waar": [
-        "server/kern/voorspel/index.js",
-        "server/kern/voorspel/rekenen.js"
       ]
     }
   ]

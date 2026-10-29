@@ -56,7 +56,7 @@ async function tekenLijsten() {
         '<span class="meta">' + (l.soort === 'reis' ? 'reis' : 'lijst') + ' &middot; ' + l.aantal + '</span>' +
         (l.plek ? '<span class="meta">' + esc(l.plek) + (l.van ? ' &middot; ' + esc(l.van) + ' t/m ' + esc(l.tot || '') : '') + '</span>' : '') +
         '<span class="duw"></span>' +
-        '<button class="knop stil open" data-id="' + esc(l.id) + '" type="button">' + (OPEN.has(l.id) ? 'Inklappen' : 'Openen') + '</button>' +
+        '<button class="knop stil open" data-id="' + esc(l.id) + '" data-rtg-adaptive-source="mijnmall-lijst-open" data-stand="mijnmall-lijst" type="button">' + (OPEN.has(l.id) ? 'Inklappen' : 'Openen') + '</button>' +
         (l.soort === 'reis' ? '<a class="knop stil" href="/apps/mall.html?lijst=' + encodeURIComponent(l.id) + '">Zoeken voor deze reis</a>' : '') +
         '<button class="knop stil weg" data-id="' + esc(l.id) + '" type="button">Verwijder</button>' +
       '</div>' +

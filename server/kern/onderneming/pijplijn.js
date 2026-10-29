@@ -62,12 +62,7 @@ const dagenGeleden = (iso, nuMs) => {
 
 /* De mediaan en niet het gemiddelde: één offerte die een half jaar bleef
    liggen, trekt een gemiddelde scheef en dan lijkt de hele zaak traag. */
-function mediaan(reeks) {
-  const r = reeks.filter(n => Number.isFinite(n)).sort((a, b) => a - b);
-  if (!r.length) return null;
-  const m = Math.floor(r.length / 2);
-  return r.length % 2 ? r[m] : Math.round((r[m - 1] + r[m]) / 2);
-}
+const { mediaan } = require('../util');
 
 module.exports = ({ db }) => {
 
@@ -141,7 +136,7 @@ module.exports = ({ db }) => {
        plaats van als nul door te rekenen. */
     const antwoordDagen = mediaan(alle
       .filter(x => x.antwoordAt && x.at)
-      .map(x => Math.floor((Date.parse(x.antwoordAt) - Date.parse(x.at)) / DAG)));
+      .map(x => Math.floor((Date.parse(x.antwoordAt) - Date.parse(x.at)) / DAG)).filter(Number.isFinite));
 
     const stil = uitgebracht
       .map(x => ({ id: x.id, dagen: dagenGeleden(x.antwoordAt || x.at, nuT), bedrag: Number(x.prijs) || 0 }))
@@ -168,7 +163,7 @@ module.exports = ({ db }) => {
             over: openBedrag, percentage: kans.percentage,
             let: 'Dit is het openstaande bedrag maal uw eigen scoringskans, en geen toezegging. Eén grote offerte kan het in zijn eentje kantelen.' },
       doorlooptijd: {
-        naarPrijs: antwoordDagen,
+        naarPrijs: antwoordDagen === null ? null : Math.round(antwoordDagen),
         uitleg: antwoordDagen === null
           ? 'Nog geen beantwoorde offerte om aan te meten.'
           : 'Mediaan aantal dagen tussen aanvraag en uw prijs.'

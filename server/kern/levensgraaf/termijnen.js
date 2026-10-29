@@ -41,7 +41,7 @@ const ZWAAR = new Set(['verzekering', 'paspoort', 'visum', 'rijbewijs', 'keuring
 
 module.exports = (ctx) => {
   const { graaf } = ctx;
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const { vandaag } = require('./hulp'); // de dag van het lid, op de klok
 
   // hele dagen tussen twee kale datums; middag als klokstand zodat zomertijd
   // geen halve dag oplevert (dat kostte hier eerder een dag verschil)

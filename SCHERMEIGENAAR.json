@@ -390,6 +390,16 @@
     },
     {
       "schermen": [
+        "apps/app.html",
+        "apps/foundation/zorg.html"
+      ],
+      "klasse": "gedeeltelijk",
+      "stand": "blijft",
+      "eigenaar": "apps/app.html",
+      "reden": "Het overlappende afspraakbeheer blijft eigendom van RTG Care in de ledenapp (app-main-13.js). Hulp & Zorg presenteert dezelfde afspraken en intakedelingen in de gezinscontext (foundation/zorg-hulp.js) en biedt betalen en annuleren via dezelfde vier ledenroutes: /api/care, /api/care/mijn, /api/care/betaal en /api/care/annuleer. Beide gebruiken de ledensessie; persoonlijk-care.js en kern/care/leden.js blijven de ene implementatie van toegang, opslag, betaling en annulering. Foundation behoudt zijn eigen gezinsgezondheid en hulpwijzer via de Foundation-routes met het gezinsprofiel. Dit is de bestaande gedeeltelijke-presentatieregel zoals bij Salon/wereld: de bron voert de overlappende handeling uit. De gedeelde paden betekenen niet dat een gezinsprofiel toegang krijgt tot de Care-afspraken van andere leden. Vastgelegd op 20 oktober 2026 na vergelijking van beide schermmodules en de routehandlers."
+    },
+    {
+      "schermen": [
         "apps/foundation/gezondheid-welzijn.html",
         "apps/foundation/zorg.html"
       ],
@@ -829,6 +839,16 @@
       "stand": "blijft",
       "eigenaar": null,
       "reden": "De gedeelde paden zijn de generieke kantoorschil (het /api/office/-voorvoegsel van de api-helper en de kantoorstroom); kantoren beheert vestigingen, de Stadsdoos is een veldapparaat dat zich aanmeldt en een hartslag stuurt."
+    },
+    {
+      "schermen": [
+        "apps/memo.html",
+        "apps/reizen.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": "apps/bestanden.html",
+      "reden": "Memo bewaart spraakopnamen in de Bestanden-kluis; Reizen gebruikt dezelfde opslag voor bewijsstukken in het reisdossier. De gedeelde bestandspaden zijn opslagvermogen, geen tweede implementatie van de reis- of opnamefunctie."
     }
   ],
   "schermen": {

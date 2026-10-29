@@ -22,6 +22,7 @@
    Draai los: node --experimental-sqlite --test test/vakbewijs-routes.test.js
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -277,14 +278,16 @@ test('9. het nummer gaat alleen open met een reden, en dat staat in het journaal
    routes/aanmeldingen.js).
    ========================================================================== */
 test('10. een verlopen bedrijfsbewijs komt over de route op de herkeuringslijst', async () => {
-  const aanvraag = await api('/api/aanmelding/aanvraag', {
+  const aanvraag = await api('/api/aanmelding/aanvraag', { idem: randomUUID(),
     naam: 'Nienke Vos', email: 'nido-herkeur@test.example', telefoon: '0612349999',
     pas: 'business', motivatie: 'Ik begin een kinderopvang.',
     bedrijf: { naam: 'Opvang De Vlinder', type: 'kinderopvang', plaats: 'Utrecht' }
   });
   assert.equal(aanvraag.status, 200, 'de aanvraag komt binnen: ' + JSON.stringify(aanvraag.body).slice(0, 200));
-  const id = aanvraag.body.aanmelding.id;
-  assert.equal(aanvraag.body.aanmelding.bedrijf.bewijsNodig, true,
+  const id = aanvraag.body.ontvangst.aanvraagId;
+  const dossier = await api('/api/aanmelding/een', { id }, office);
+  assert.equal(dossier.status, 200, 'het bevoegde kantoor kan de bedrijfseis lezen');
+  assert.equal(dossier.body.aanmelding.bedrijf.bewijsNodig, true,
     'een kinderopvang vraagt om een stuk; anders meet de rest van deze toets niets');
 
   /* Het stuk is AL verlopen bij het indienen. Dat moet kunnen: zo legt een

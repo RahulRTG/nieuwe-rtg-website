@@ -98,6 +98,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl rtg-night-flow rtg-night-discover" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -135,9 +136,9 @@
   <div class="lijst" id="lijst"></div>
 </main>
 
-<section class="blad" id="blad" aria-label="Reserveren">
+<section class="blad" id="blad" role="dialog" aria-modal="true" aria-label="Reserveren">
   <div class="blad-kop">
-    <button class="terug" id="bladTerug">← Food Court</button>
+    <button class="terug" id="bladTerug" aria-label="Sluit reservering">← Food Court</button>
     <div><div class="ey s-z2auej" id="bladMeta"></div><h1 id="bladNaam" class="s-1ik90f3"></h1></div>
   </div>
   <div class="paneel">

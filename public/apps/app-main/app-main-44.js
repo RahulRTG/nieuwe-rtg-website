@@ -26,7 +26,7 @@
   function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString(lang(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
   async function laadGezinInfo(){
     const box = $('#gezinInfo'); if(!box) return;
-    let d; try{ d = await API.call('/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
+    let d; try{ d = await API.call('/api/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
     box.innerHTML = (d.gezinnen||[]).map(gz=>{
       const o = gz.oppasinfo||{};
       const meerdan1 = (d.gezinnen||[]).length>1;
@@ -57,14 +57,16 @@
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
     const g=(rtf.gekoppeld||[]); if(!g.length) return;
-    try{ await API.call('/rtf/bericht',{ code:g[0].code, tekst:t }); inp.value=''; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    // een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht
+    if(inp.dataset.idemTekst!==t){ inp.dataset.idem=RTGId('gezin-bericht'); inp.dataset.idemTekst=t; }
+    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){
     const uitnodiging = prompt('Plak de persoonlijke uitnodigingslink of code die je van het gezin kreeg:');
     if (!uitnodiging) return;
     try {
-      const r = await API.call('/rtf/uitnodiging/accepteer', { uitnodiging: uitnodiging.trim() });
+      const r = await API.call('/api/rtf/uitnodiging/accepteer', { uitnodiging: uitnodiging.trim() });
       toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu ook op je telefoon.');
       await refreshState(); renderFoundation(); openTab('gezin');
       ensurePush(true);

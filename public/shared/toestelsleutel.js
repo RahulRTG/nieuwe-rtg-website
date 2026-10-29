@@ -109,7 +109,7 @@
      bepaalt niets, hij weet alleen wanneer het zin heeft te tekenen. Loopt hij
      achter, dan weigert de server -- de verkeerde kant om te falen is dat de
      CLIENT zou beslissen dat iets niet zwaar is. */
-  var ZWAAR = ['/api/pay/', '/api/betaal/', '/api/wallet/', '/api/bank/', '/api/auth/password',
+  var ZWAAR = ['/api/pay/', '/api/betaal/', '/api/wallet/', '/api/bank/', '/api/wbw/verreken', '/api/auth/password',
     '/api/webauthn/registreer', '/api/webauthn/weg', '/api/mijn/toestel/introk',
     '/api/privacy/delete', '/api/rtgid/machtig', '/api/mijn/sessies/sluit',
     '/api/privacy/export', '/api/privacy/inzage', '/api/gegevens/start', '/api/gegevens/zeg',

@@ -1,5 +1,6 @@
 /* Shared-assets (deelmodule): hertaxatie, het kantooroverzicht, terugkoop uitbetalen en de service-fees.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/assets.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, vastleggen, crypto, schoon, notify, pay,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
@@ -30,7 +31,7 @@ module.exports = (ctx) => {
   // restdagen die dit jaar extern verhuurd kunnen worden
   function assetKantoor() {
     lijsten();
-    const jaar = String(new Date().getFullYear());
+    const jaar = String(tijdzone.jaarIn());
     return {
       ok: true,
       objecten: db.data.sharedAssets.map(a => {
@@ -65,7 +66,7 @@ module.exports = (ctx) => {
   // de jaarlijkse servicefee innen: per actief ticket een keer per jaar, naar de poolkas
   async function assetFeesInnen(wie) {
     lijsten();
-    const jaar = new Date().getFullYear();
+    const jaar = tijdzone.jaarIn();
     let geind = 0, totaal = 0, mislukt = 0;
     let reden = null;
     for (const t of db.data.assetTickets) {
@@ -106,8 +107,20 @@ module.exports = (ctx) => {
          dat niet vastgelegd kon worden telt als MISLUKT met de reden erbij --
          het geld is dan geind en het merkteken niet, en dat moet een mens
          zien, niet een teller verbergen. */
+      let geboekt = false;
+      const boekFee = () => {
+        // De betaling kan hierboven hebben gewacht terwijl een andere ronde
+        // dit ticketjaar al vastlegde. Herlees binnen de bestaande bundel;
+        // betaal-idempotentie alleen voorkomt geen dubbele poolkasboeking.
+        const actueel = db.data.assetTickets.find(x => x.id === t.id);
+        if (!actueel) throw new Error('Het betaalde assetticket ontbreekt bij de vastlegging.');
+        if (actueel.feeJaar === jaar) return;
+        actueel.feeJaar = jaar;
+        kasAdd(a.id, fee * 100);
+        geboekt = true;
+      };
       if (vastleggen) {
-        const nietVast = await vastleggen(() => { t.feeJaar = jaar; kasAdd(a.id, fee * 100); });
+        const nietVast = await vastleggen(boekFee);
         if (nietVast) {
           mislukt++;
           if (!reden) reden = 'De fee is geind maar niet vastgelegd; de opslag bevestigde het niet. ' +
@@ -115,10 +128,10 @@ module.exports = (ctx) => {
           continue;
         }
       } else {
-        t.feeJaar = jaar;
-        kasAdd(a.id, fee * 100);
+        boekFee();
         save();
       }
+      if (!geboekt) continue;
       geind++; totaal += fee;
     }
     return { ok: true, geind, totaal, mislukt, reden, door: schoon(wie, 40) || 'RTG-kantoor',

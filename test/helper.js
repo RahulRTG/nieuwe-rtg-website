@@ -2,12 +2,14 @@
    poort en wacht robuust tot hij gezond is. Zo botsen parallelle of snel
    opeenvolgende tests niet meer op dezelfde poort (de oude oorzaak van
    sporadische "fetch failed"), en kan de suite weer met concurrency draaien. */
+const { randomUUID } = require('node:crypto');
 const { spawn } = require('node:child_process');
 const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
 const fs = require('node:fs');
 const dekkingsvang = require('./lib/dekkingsvang');
+const { isBrowserruis } = require('../scripts/lib/browserruis');
 
 /* DE BROWSER VOOR EEN SCHERMTOETS, en waarom dit hier staat en niet 32 keer.
 
@@ -674,8 +676,8 @@ async function kantoorKoppelBody(base, lidToken, extra, opties) {
    op een omweg. */
 async function elevateTier(base, memberToken, pas, approverToken) {
   const post = postJson(base);
-  const aanvraag = await post('/api/aanmelding/aanvraag', { pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
-  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+  const aanvraag = await post('/api/aanmelding/aanvraag', { idem: randomUUID(), pas, naam: 'Test ' + pas, contact: pas + '@test.example' }, memberToken);
+  const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   if (!id) throw new Error('elevateTier: aanvraag mislukt (' + JSON.stringify(aanvraag).slice(0, 120) + ')');
   let goedkeurder = approverToken;
   if (pas === 'lifestyle' || pas === 'business') goedkeurder = (await kantoorAlsPersoon(base)) || approverToken;
@@ -738,8 +740,6 @@ async function elevateTier(base, memberToken, pas, approverToken) {
 
    Zet hier dus alleen een melding bij die de browser over zijn eigen animatie
    doet. Alles wat de APP zegt hoort door te komen. */
-const BROWSERRUIS = ['Transition was skipped',
-  'Transition was aborted because of invalid state. ViewTransition opt-in disabled'];
 /* WEBKIT MELDT EEN VERZOEK DAT AFBREEKT OMDAT ZIJN DOCUMENT WORDT VERLATEN --
    een pagina die dichtgaat of weg-navigeert -- als onafgevangen fout, met de
    misleidende tekst "<adres> due to access control checks.". Voor een adres op
@@ -779,7 +779,7 @@ function letOpFouten(page, bak, opties) {
     let origin = '';
     try { origin = new URL(page.url()).origin; } catch (_) { /* nog geen adres */ }
     if (!(opties && opties.eigenZeef) && webkitAfbreking(bericht, origin, motorVan(page))) { afgebrokenTelling.set(bak, afgebrokenIn(bak) + 1); return; }
-    if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
+    if ((opties && opties.eigenZeef) || !isBrowserruis(bericht)) bak.push(bericht);
   });
   return bak;
 }

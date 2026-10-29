@@ -1,8 +1,8 @@
 (function(w,d){
   'use strict';
-  var R='.wd-output,.connection-edge,.cmd-balk,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,[data-rtg-edge-controls],.rtgsprong-greep,.rtm-nav,.ios-nav-acties,.ios-nav-extra,.rtg-v4-route-actions';
-
-  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.textContent||'').replace(/\s+/g,' ').trim()}
+  var APP='.wd-output,.connection-edge,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtm-nav,.mv-navigatie,.roomrail,.rolechoice,.rtd-dossieracties,.rtd-besluitacties,.rtg-v4-route-actions,[data-rtg-platform-chrome]';
+  var R=APP+',.cmd-balk,[data-rtg-edge-controls],.rtgsprong-greep,.ios-nav-acties,.ios-nav-extra'
+  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
   function avail(el,root){
     var view=el.ownerDocument.defaultView||w;
     for(var p=el;p;p=p.parentElement){
@@ -12,38 +12,38 @@
     }
     return el.isConnected
   }
-  function sourceButtons(doc,embed,items){
+  function srcButtons(doc,embed,items){
     var out=[],tabs=new Set(),actions=new Set((items||[]).map(function(item){return item.id}));
     (doc||d).querySelectorAll(R+(embed?',body>header,.ios-nav,.rtg-duimbalk,[data-rtg-edge-bar]':'')).forEach(function(root){
       var controls=root.matches('button')?[root]:root.querySelectorAll('button,a[href]');
       controls.forEach(function(el){
-        if (el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab')) return;
-        var tab = root.matches('.wos-dock,.wos-rail') && el.getAttribute('data-tab');
-        var action = el.getAttribute('data-rtg-action-key');
-        if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab)) && (!action || !actions.has(action)) && !out.some(function (x) { return x.el === el; })) {
-          out.push({el:el,root:root});if(tab)tabs.add(tab);if(action)actions.add(action);
+        if(el.matches('.cmd-actie,.cmd-meer,.cmd-anker,.cmd-lade,.cmd-mondknop,.cmd-vraagstuur,.rtg-edge-2-context-button,.amn-knop,#osMenuBtn,.rtg-rahul-tab'))return;
+        var tab=root.matches('.wos-dock,.wos-rail')&&el.getAttribute('data-tab');
+        var action=el.getAttribute('data-rtg-action-key');
+        if(lbl(el)&&avail(el,root)&&(!tab||!tabs.has(tab))&&(!action||!actions.has(action))&&!out.some(function(x){return x.el===el})){
+          out.push({el:el,root:root,app:root.matches(APP)||el.matches('.rtguitvoer-knop')});if(tab)tabs.add(tab);if(action)actions.add(action);
         }
       });
     });
     return out;
   }
   function close(){w.RTGAdaptiveEdge.setState('dock')}
-  function currentItems(){
+  function cur(){
     if(w.RTGEdgeBlikveld)return w.RTGEdgeBlikveld.acties();
     var A=w.RTGAdaptief,items=A&&A.voorNu?A.voorNu():[],command=d.getElementById('rtgCommand');
     return items.length||A&&A.context().acties.length?items:command&&command.rtgEdgeItems?command.rtgEdgeItems():[]
   }
   function render(rt){
     w.RTGAdaptiveEdgeInput.reflect(rt);
-    var container = rt.controls;
-    if (!container) {
-      container = d.createElement('div'); container.className = 'rtg-adaptive-controls';
-      container.setAttribute('role', 'group'); container.setAttribute('aria-label', 'Handelingen van dit scherm');
-      rt.sheet.appendChild(container); rt.controls = container;
+    var c=rt.controls;
+    if(!c){
+      c=d.createElement('div');c.className='rtg-adaptive-controls';
+      c.setAttribute('role', 'group'); c.setAttribute('aria-label', 'Handelingen van dit scherm');
+      rt.sheet.appendChild(c); rt.controls = c;
     }
-    var focused = container.contains(d.activeElement) ? d.activeElement.dataset.cap : '', schuif = container.scrollLeft;
-    container.textContent = '';
-    if (w.RTGDesktopFrame && w.RTGDesktopFrame.controls(container, sourceButtons)) return;
+    var focus=c.contains(d.activeElement)?d.activeElement.dataset.cap:'',sx=c.scrollLeft;
+    c.textContent = '';
+    if (w.RTGDesktopFrame) w.RTGDesktopFrame.controls(c, srcButtons);
     var A = w.RTGAdaptief;
     if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;
     var primary = d.querySelector('.rtg-edge-action');
@@ -62,48 +62,48 @@
       rt.sheet.prepend(vraag);
     }
     if (vraag) vraag.hidden = rt.model.deck !== 'rahul';
-    var items = currentItems();
+    var items = cur();
     if (items.length && w.RTGAdaptiefBalkKnoppen) {
       var buttons = w.RTGAdaptiefBalkKnoppen({ items: function () { return items; }, titel: function () { return A.context().titel; } });
       items.forEach(function (item) {
         var b = buttons.knop(item); b.classList.add('rtg-adaptive-sheet-action');
         b.addEventListener('click', function (event) {
-          var current = currentItems().find(function (x) { return x.id === item.id; });
+          var current = cur().find(function (x) { return x.id === item.id; });
           event.stopImmediatePropagation();
           if (!current) { refreshLater(); return; }
           if (current.aan === undefined) close();
           buttons.voer(current);
         }, true);
-        b.textContent = item.naam; container.appendChild(b);
+        b.textContent = item.naam; c.appendChild(b);
       });
     }
-    var sources = sourceButtons(d, false, items), frame = d.querySelector('#rtgCommand .cmd-pane.actief iframe');
+    var srcs = srcButtons(d, false, items), frame = d.querySelector('#rtgCommand .cmd-pane.actief iframe');
     try {
       if (frame && frame.contentDocument && frame.contentDocument.body)
-        sources = sources.concat(sourceButtons(frame.contentDocument, true, items));
+        srcs = srcs.concat(srcButtons(frame.contentDocument, true, items));
     } catch (e) {}
-    sources.forEach(function (source) {
-      var el = source.el, b = d.createElement('button'); b.type = 'button';
-      var action = el.getAttribute('data-rtg-action-key');
-      b.className = 'rtg-adaptive-sheet-action'; b.textContent = lbl(el);
-      if (action) b.dataset.rtgActionKey = action;
-      if (el.id) b.dataset.rtgAdaptiveSource = el.id;
-      if (el.hasAttribute('data-tab')) b.dataset.rtgAdaptiveTab = el.getAttribute('data-tab');
-      b.disabled = el.disabled || el.getAttribute('aria-disabled') === 'true';
-      ['aria-current', 'aria-pressed'].forEach(function (name) {
-        if (el.hasAttribute(name)) b.setAttribute(name, el.getAttribute(name));
+    srcs.forEach(function (src) {
+      var el=src.el,b=d.createElement('button');b.type='button';
+      var action=el.dataset.rtgActionKey
+      b.className='rtg-adaptive-sheet-action';b.textContent=lbl(el);
+      if(src.app)b.dataset.rtgAdaptiveControl='app';
+      if(action)b.dataset.rtgActionKey=action
+      b.dataset.rtgAdaptiveSource=el.id||el.dataset.rtgAdaptiveSource||(el.href?'route:'+el.href:'control:'+lbl(el));
+      if(el.tagName==='A'&&el.getAttribute('href'))b.dataset.rtgAdaptiveRoute='true';
+      if(el.dataset.tab)b.dataset.rtgAdaptiveTab=el.dataset.tab;
+      b.disabled=el.disabled||el.getAttribute('aria-disabled')==='true';
+      ['aria-current','aria-pressed','aria-haspopup'].forEach(function(name){if(el.hasAttribute(name))b.setAttribute(name,el.getAttribute(name))});
+      if(el.hasAttribute('aria-selected'))b.setAttribute('aria-pressed',el.getAttribute('aria-selected'));
+      b.addEventListener('click',function(){
+        if(!avail(el,src.root)||el.disabled||el.getAttribute('aria-disabled')==='true')return;
+        el.click();close();
       });
-      if (el.hasAttribute('aria-selected')) b.setAttribute('aria-pressed', el.getAttribute('aria-selected'));
-      b.addEventListener('click', function () {
-        if (!avail(el, source.root) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
-        el.click(); close();
-      });
-      container.appendChild(b);
+      c.appendChild(b)
     });
-    if (focused) container.querySelectorAll('[data-cap]').forEach(function (b) {
-      if (b.dataset.cap === focused) b.focus({ preventScroll: true });
+    if (focus) c.querySelectorAll('[data-cap]').forEach(function (b) {
+      if (b.dataset.cap === focus) b.focus({ preventScroll: true });
     });
-    container.scrollLeft = schuif;
+    c.scrollLeft = sx;
     function refreshLater() { rt.win.requestAnimationFrame(function () { render(rt); }); }
     var command = d.querySelector('#rtgCommand .cmd-vraagvorm');
     if (command && rt.model.deck === 'rahul') {
@@ -111,7 +111,7 @@
       var input = d.createElement('input'); input.type = 'text'; input.maxLength = 300;
       input.setAttribute('aria-label', 'Vraag Rahul'); input.placeholder = 'Vraag Rahul…';
       var send = d.createElement('button'); send.type = 'submit'; send.textContent = 'Versturen';
-      form.appendChild(input); form.appendChild(send); container.prepend(form);
+      form.appendChild(input); form.appendChild(send); c.prepend(form);
       form.addEventListener('submit', function (event) {
         event.preventDefault();
         var original = d.querySelector('#rtgCommand .cmd-vraagvorm');
@@ -124,9 +124,9 @@
         var reply = d.querySelector('#rtgCommand .cmd-praat');
         if (reply && reply.children.length) reply.hidden = false;
       });
-      container.appendChild(w.RTGAdaptiveEdgeServices.secureConversation(close));
+      c.appendChild(w.RTGAdaptiveEdgeServices.secureConversation(close));
     }
-    if(w.RTGAdaptiveEdgeCinema)w.RTGAdaptiveEdgeCinema.render(container,rt.model);
+    if(w.RTGAdaptiveEdgeCinema)w.RTGAdaptiveEdgeCinema.render(c,rt.model);
   }
   function start(rt){
     if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
@@ -141,29 +141,28 @@
       if (frame || rt.model.state !== 'expanded' || (rt.controls && rt.controls.contains(d.activeElement) && d.activeElement.tagName === 'INPUT')) return;
       frame = w.requestAnimationFrame(function () { frame = 0; render(rt); });
     }
-    var observer = new w.MutationObserver(function (records) {
+    var obs = new w.MutationObserver(function (records) {
       w.RTGAdaptiveEdgeInput.reflect(rt);
       if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(d, w);
-      var commandBar = d.querySelector('#rtgCommand .cmd-balk');
-      if (commandBar && commandBar.classList.contains('vraagt')) {
-        if (rt.questionOwner !== commandBar) {
-          rt.questionOwner = commandBar;
+      var bar = d.querySelector('#rtgCommand .cmd-balk');
+      if (bar && bar.classList.contains('vraagt')) {
+        if (rt.questionOwner !== bar) {
+          rt.questionOwner = bar;
           w.RTGAdaptiveEdge.setDeck('rahul'); w.RTGAdaptiveEdge.setState('expanded');
         }
       } else rt.questionOwner = null;
-      if (records.some(function (r) {
-        if (rt.host.contains(r.target) || !r.target.closest) return false;
-        return r.type === 'attributes' && r.attributeName === 'class'
-          ? r.target.matches && r.target.matches(R)
-          : !!r.target.closest(R);
-      })) refresh();
+      if(records.some(function(r){
+        if(rt.host.contains(r.target))return false;
+        if(r.type==='attributes')return r.target.matches&&r.target.matches(R);
+        return r.target.closest&&r.target.closest(R)||[].some.call(r.addedNodes,function(n){return n.matches&&(n.matches(R)||n.querySelector(R))})
+      }))refresh();
     });
-    observer.observe(d.body, { subtree: true, childList: true, attributes: true,
+    obs.observe(d.body, { subtree: true, childList: true, attributes: true,
       attributeFilter: ['disabled', 'hidden', 'class', 'aria-disabled', 'aria-current', 'aria-pressed', 'aria-expanded'] });
     var unsubscribe = w.RTGAdaptief && w.RTGAdaptief.opContext(refresh);
     rt.controlsStop = function () {
       rt.sheet.removeEventListener('click', primaryClick, true);
-      observer.disconnect(); if (frame) w.cancelAnimationFrame(frame);
+      obs.disconnect(); if (frame) w.cancelAnimationFrame(frame);
       if (typeof unsubscribe === 'function') unsubscribe();
       if (rt.primarySlot && rt.primaryParent) rt.primaryParent.appendChild(rt.primarySlot);
       if (rt.contextPanel && rt.contextParent) {

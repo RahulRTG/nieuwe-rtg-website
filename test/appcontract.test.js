@@ -29,6 +29,24 @@ const reg = require('../scripts/lib/wereldregister');
 
 const WORTEL = path.join(__dirname, '..');
 
+// Metadata verklaart de benodigde context; zij levert zelf geen bewijs.
+// Nieuwe concrete contexten vragen een expliciet contract en consumentproef.
+function contractMetadata(naam, waarde) {
+  if (naam === 'bevoegdContext') {
+    assert.equal(typeof waarde, 'string', 'bevoegdContext moet een contextnaam zijn');
+    assert.ok(['gezin', 'school:docent', 'school:leerling'].includes(waarde), 'onbekende bevoegdContext: ' + waarde);
+    return true;
+  }
+  if (naam === 'adapter') {
+    assert.equal(waarde && waarde.type, 'rahul-opdracht', 'alleen de bestaande Rahul-opdrachtadapter is toegestaan');
+    for (const veld of ['opdracht', 'verwacht', 'bereik', 'titel'])
+      assert.equal(typeof waarde[veld], 'string', 'adapter.' + veld + ' moet tekst zijn');
+    return true;
+  }
+  return ['belofte', 'ingang', 'via', 'bereik', 'bestanden'].includes(naam);
+}
+
+
 const VERS = () => ({ vers: true, reden: 'gemeten op de huidige commit' });
 const OUD = () => ({ vers: false, reden: 'sindsdien zijn 3 codebestand(en) gewijzigd' });
 const STEMPEL = { op: '2026-09-24T10:00:00.000Z', commit: 'abc1234', boomVuil: false, instrument: 'scripts/x.js' };
@@ -57,7 +75,9 @@ test('2. alleen de acht bewijzen, en alleen wat de bronsoort mag leveren', () =>
   for (const [functie, c] of Object.entries(CONTRACT)) {
     assert.ok(typeof c.belofte === 'string' && c.belofte.length > 20, functie + ': de belofte in woorden ontbreekt');
     for (const [naam, bron] of Object.entries(c)) {
-      if (naam === 'belofte') continue;
+      /* Koppeling en benodigde context zijn metadata; contextwaarden worden
+         gevalideerd en mogen geen bronobject of bewijsstatus bevatten. */
+      if (contractMetadata(naam, bron)) continue;
       assert.ok(BEWIJZEN.includes(naam), functie + ': "' + naam + '" is geen bewijs');
       assert.ok((BRONSOORTEN[bron.soort] || []).includes(naam), functie + ': een ' + bron.soort + ' mag geen ' + naam + ' leveren');
     }
@@ -67,19 +87,35 @@ test('2. alleen de acht bewijzen, en alleen wat de bronsoort mag leveren', () =>
   assert.throws(() => B.bewijsVoor('link:x', 'herstelbaar', '/apps/x.html', { contract: vals }), /mag geen herstelbaar/);
 });
 
+test('2b. bevoegdContext is begrensde metadata, geen negende bewijsbron of uitslag', () => {
+  for (const context of ['gezin', 'school:docent', 'school:leerling'])
+    assert.equal(contractMetadata('bevoegdContext', context), true);
+  for (const waarde of [null, undefined, false, 0, [], {}, { soort: 'voltooiproef' },
+    '', 'BEWEZEN', 'PASS', 'NIET_GETEST', 'GEBLOKKEERD_DOOR_DEFECT', 'voltooiproef', 'ketenproef', 'school:onbekend'])
+    assert.throws(() => contractMetadata('bevoegdContext', waarde), /bevoegdContext/);
+  for (const bewijs of BEWIJZEN) assert.equal(contractMetadata(bewijs, {}), false, bewijs + ' blijft een te controleren bewijsbron');
+  assert.equal(contractMetadata('verzonnenBewijs', {}), false, 'onbekende velden worden niet vrijgesteld');
+  assert.equal(CONTRACT['link:rtfbord'].bevoegdContext, 'school:docent');
+  assert.equal(CONTRACT['link:rtfschrift'].bevoegdContext, 'school:leerling');
+});
+
 test('3. elke koppeling haalt de meting: de app staat in MAPPEN en de proef raakt zijn ingang', () => {
   assert.ok(Object.keys(CONTRACT).length >= 1, 'een leeg contract bewijst niets over de koppeling');
   for (const [functie, c] of Object.entries(CONTRACT)) {
     const i = functie.indexOf(':');
-    const bron = functie.slice(0, i) === 'link' ? reg.LINKS[functie.slice(i + 1)] : reg.OSAPPS[functie.slice(i + 1)];
-    assert.ok(bron && bron.url, functie + ' staat niet (met een adres) in MAPPEN');
+    const link = functie.slice(0, i) === 'link';
+    const bron = link ? reg.LINKS[functie.slice(i + 1)] : null;
+    /* Een tab of OS-app heeft geen adres: hij staat in de app (reg.los) en het
+       contract wijst de navigatiestap en zijn eigen delen aan. */
+    if (link) assert.ok(bron && bron.url, functie + ' staat niet (met een adres) in MAPPEN');
+    else assert.ok(reg.los(functie).bestaat && c.ingang && c.via && Array.isArray(c.bestanden), functie + ' staat niet in de app, of mist ingang, via of bestanden');
+    const ing = B.ingangVan(link ? bron.url : null, c);
     for (const [naam, b] of Object.entries(c)) {
-      if (naam === 'belofte') continue;
+      if (contractMetadata(naam, b)) continue;
       assert.ok(fs.existsSync(path.join(WORTEL, b.instrument)), b.instrument + ' bestaat niet');
       const proef = B.proefRoutes(b.instrument);
-      const ing = B.ingangRoutes(bron.url);
       const raak = B.gedeeld(proef, ing);
-      assert.ok(raak.length > 0, functie + ': ' + b.instrument + ' raakt geen route van ' + bron.url);
+      assert.ok(raak.length > 0, functie + ': ' + b.instrument + ' raakt geen route van ' + (link ? bron.url : c.bestanden.join(', ')));
     }
   }
   for (const z of ZONDER_APP) assert.ok(z.reden && z.nodig, 'een keten zonder app draagt zijn reden en wat er nodig is');
@@ -145,6 +181,18 @@ test('6. een breed voorvoegsel maakt geen koppeling', () => {
   const lees = (rel) => (rel === 'public/apps/breed.html' ? '<html></html>' : null);
   const breed = B.ingangRoutes('/apps/breed.html', { lees, schermroutes: sr });
   assert.deepEqual(B.gedeeld(new Set(['/api/ride/pay']), breed), []);
+});
+
+test('6b. een gebundeld script draagt de routes van zijn delen', () => {
+  /* public/apps/office/app.js is een bundel van public/apps/office/app/*.js
+     (scripts/bundel.js); de meting schrijft de paden aan de delen toe. */
+  const sr = { perScherm: [{ bestand: 'public/apps/office/app/app-01.js', exact: [], voorvoegsels: ['/api/office/kantoorpakket/'] }] };
+  const lees = (rel) => (rel === 'public/apps/kantoor.html' ? '<script src="/apps/office/app.js?v=1"></script>' : null);
+  const ing = B.ingangRoutes('/apps/kantoor.html', { lees, schermroutes: sr });
+  assert.deepEqual(B.gedeeld(new Set(['/api/office/kantoorpakket/maak', '/api/ride/pay']), ing), ['/api/office/kantoorpakket/maak']);
+  /* Een gewoon script krijgt de delen van een ander niet. */
+  const los = B.ingangRoutes('/apps/kantoor.html', { lees: () => '<script src="/apps/los.js"></script>', schermroutes: sr });
+  assert.deepEqual(B.gedeeld(new Set(['/api/office/kantoorpakket/maak']), los), []);
 });
 
 test('7. een koppeling die de meting niet haalt, telt niet -- ook met een vers register', () => {

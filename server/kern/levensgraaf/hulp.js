@@ -46,7 +46,10 @@ const OPEN = 0, PERSOONLIJK = 1, VERTROUWELIJK = 2, BESLOTEN = 3;
    omweg. En in productie weigert de klok zich te laten verzetten, dus dit kan
    daar niets verschuiven. */
 const { datum: klokDatum } = require('../../lib/klok');
-const vandaag = () => klokDatum().toISOString().slice(0, 10);
+/* De dag van het LID, niet van de UTC-container: om 00:30 in Amsterdam is het
+   daar al morgen. Elke graaf (leven, geld, sociaal) leest hem hier. */
+const tijdzone = require('../tijdzone');
+const vandaag = () => tijdzone.datumIn(klokDatum());
 /* EEN VORMCONTROLE IS GEEN CONTROLE (regel 8 van de lat). Dit stond hier als
    alleen de regex, en daar komt '2027-13-45' vrolijk doorheen: vier cijfers,
    streepje, twee, streepje, twee. Maand dertien en dag vijfenveertig bestaan
@@ -72,10 +75,7 @@ const isDatum = d => {
    dag was dit" schrijven is precies de vorm die stil uiteenloopt (regel 4); dat
    geldgraaf hem hiervandaan haalt in plaats van andersom, is omdat geld geen
    algemene laag is en sociaal er dan van zou afhangen. */
-const dagVan = (t) => {
-  const d = new Date(t);
-  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
-};
+const dagVan = (t) => tijdzone.datumVan(t);
 
 /* Een gebeurtenis telt alleen mee als hij nog moet komen; een diner van vorig
    jaar is geschiedenis en hoort niet als "achterstallig" in de tower. Een

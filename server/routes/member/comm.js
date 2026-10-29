@@ -132,7 +132,7 @@ module.exports = (kern) => {
       }
       comm.levensteken(mij(req));
       comm.bericht({ gesprekId: id, van: mij(req), tekst: req.body.tekst,
-        antwoordOp: req.body.antwoordOp });
+        antwoordOp: req.body.antwoordOp, idem: req.body.idem });
       res.json({ ok: true, gesprek: comm.gesprek(mij(req), id) });
     } catch (e) { fout(res, e); }
   });

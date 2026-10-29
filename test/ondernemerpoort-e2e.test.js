@@ -55,6 +55,9 @@ test('3. online zetten kan pas als de poort klaar is (rondleidingen)', async () 
   const ja = await api(base, '/api/supplier/poort/online', { online: true }, brand);
   assert.equal(ja.status, 200);
   assert.equal(ja.body.online, true);
+  const retry = await api(base, '/api/supplier/poort/online', { online: true }, brand);
+  assert.equal(retry.status, 200);
+  assert.deepEqual(retry.body, ja.body, 'dezelfde gewenste online-stand is een no-op met hetzelfde beeld');
   const dir = await api(base, '/api/suppliers', { city: 'Ibiza' }, lid);
   assert.ok(zichtbaar(dir, CODE), 'weer zichtbaar na het online zetten');
 });

@@ -56,7 +56,7 @@ async function loop(w, stap) {
     return { klopt: !!vanB, ziet: rs.length + ' reactie(s)' + (vanB ? ', die van B erbij' : ', DIE VAN B ONTBREEKT') };
   });
 
-  await stap('voltooibaar', 'B kan de post van A niet weghalen; A wel, en dan is hij voor B weg, met de reacties', async () => {
+  await stap('bevoegd', 'B kan de post van A niet weghalen; A wel, en dan is hij voor B weg, met de reacties', async () => {
     const vreemd = await w.post(WEG, { id: post.id }, B.token);
     const nog = await vind(B.token, post.id);
     const r = await w.post(WEG, { id: post.id }, A.token);

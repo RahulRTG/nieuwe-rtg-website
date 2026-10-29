@@ -170,8 +170,12 @@ test('geldbedrag canonicaliseert, exact doet dat met opzet niet', () => {
    herhaling van een oud verzoek 409 "al gebruikt voor een ander verzoek". */
 test('bank.akkoord en pay.partner.uitbetaal: byte voor byte de oude afdruk, en de handler gebruikt hem', () => {
   assert.equal(contract.identiteitVan('bank.akkoord', { codenaam: 'Blauwe Fenix 8427' }), 'bankakkoord|Blauwe Fenix 8427');
+  for (const tier of ['rtg', 'lifestyle', 'business']) {
+    assert.equal(contract.identiteitVan('bank.akkoord', { codenaam: 'Blauwe Fenix 8427', tier }),
+      'bankakkoord|Blauwe Fenix 8427', 'de meegestuurde tier verandert geen bestaande akkoordafdruk');
+  }
   assert.equal(contract.identiteitVan('pay.partner.uitbetaal', { supplierCode: 'KIKUNOI' }), 'uit|KIKUNOI');
-  assert.match(bron('server/kern/bank/ledenbank.js'), /identiteitVan\('bank\.akkoord', \{ codenaam: c \}\)/,
+  assert.match(bron('server/kern/bank/ledenbank.js'), /identiteitVan\('bank\.akkoord', \{ codenaam: c, tier: tier \|\| 'rtg' \}\)/,
     'ledenAkkoord() hoort zijn afdruk uit het contract te halen');
   assert.match(bron('server/kern/pay/partner-uitbetaal.js'), /identiteitVan\('pay\.partner\.uitbetaal', \{ supplierCode \}\)/,
     'partnerUitbetaal() hoort zijn afdruk uit het contract te halen');

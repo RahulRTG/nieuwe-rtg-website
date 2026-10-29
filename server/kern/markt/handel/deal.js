@@ -3,11 +3,10 @@
    chatlaag via de context. Krijgt de gedeelde context een keer bij het
    opstarten vanuit kern/markt/handel.js. */
 const S = require('./samenkomst');
+const tijdzone = require('../../tijdzone');
+const { SAMEN_METER, SAMEN_VERS_MS } = require('../regels');
 module.exports = (ctx) => {
-  const { db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal,
-    CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN,
-    RICHTPRIJS, STAAT_FACTOR, SAMEN_METER, SAMEN_VERS_MS,
-    store, rid, nu, clip, pk, keurTekst, scanVeiligheid, pub, zichtbaar, vind } = ctx;
+  const { save, haversine, store, nu, pk, vind } = ctx;
   const { chatId, sein } = ctx;
   /* ---------- veilig samen betalen (GPS bij elkaar -> factuur -> Apple Pay) ----------
      De koper betaalt de verkoper pas nadat ze fysiek samen zijn: beide delen bij
@@ -69,7 +68,7 @@ module.exports = (ctx) => {
   function maakFactuur(chat) {
     const m = store();
     m.teller = (m.teller || 0) + 1;
-    const jaar = new Date().getFullYear();
+    const jaar = tijdzone.jaarIn();
     return {
       nummer: 'SAL-' + jaar + '-' + String(m.teller).padStart(6, '0'),
       bedrag: chat.deal.bedrag, verkoper: chat.verkoper.naam, koper: chat.koper.naam,
@@ -77,39 +76,8 @@ module.exports = (ctx) => {
     };
   }
 
-  // De koper betaalt de verkoper via zijn account (Apple Pay). Kan alleen als ze
-  // samen zijn (GPS bij elkaar) en de factuur klaarstaat.
-  async function dealBetaal(cid, partij, methode) {
-    const chat = chatMet(cid);
-    if (!chat) return { error: 'Gesprek niet gevonden.', status: 404 };
-    if (!isDeelnemer(chat, partij)) return { error: 'Dit gesprek is niet van jou.', status: 403 };
-    if (rolIn(chat, partij) !== 'koper') return { error: 'Alleen de koper betaalt.', status: 403 };
-    if (!chat.deal || !chat.deal.samen) return { error: 'Betalen kan pas als jullie samen zijn (locaties bij elkaar).', status: 409 };
-    if (chat.deal.betaald) return { error: 'Deze aankoop is al betaald.', status: 409 };
-    const m = ['apple-pay', 'ideal', 'kaart'].includes(methode) ? methode : 'apple-pay';
-    // De betaling loopt via de betaal-naad (met Apple Pay als methode). In demo
-    // rondt die direct af; met een echte aanbieder bevestigt de app de Apple Pay
-    // betaling met de clientSecret.
-    if (!betaal || typeof betaal.maakBetaling !== 'function')
-      return { error: 'De betaalrail is niet beschikbaar. Er is niets afgeschreven.', status: 503 };
-    let res;
-    try {
-      res = await betaal.maakBetaling({ bedrag: Math.round(chat.deal.bedrag * 100), valuta: 'eur',
-        referentie: chat.deal.factuur.nummer, omschrijving: 'De Salon: ' + (chat.adTitel || 'aankoop') });
-    } catch (e) { return { error: 'De betaling kon niet worden gestart. Er is niets afgeschreven.', status: 502 }; }
-    if (res.status !== 'betaald' && res.clientSecret) {
-      chat.deal.methode = m; chat.deal.clientSecret = res.clientSecret; chat.deal.status = 'in-behandeling';
-      save();
-      return { ok: true, inBehandeling: true, clientSecret: res.clientSecret, chat: chatPub(chat, partij) };
-    }
-    chat.deal.betaald = true; chat.deal.status = 'betaald'; chat.deal.methode = m; chat.deal.betaaldAt = nu();
-    // de advertentie is verkocht
-    const ad = vind(chat.adId); if (ad) ad.status = 'verkocht';
-    chat.berichten.push({ van: pk(partij), naam: chat.koper.naam, tekst: 'Betaald via ' + (m === 'apple-pay' ? 'Apple Pay' : m) + ': € ' + chat.deal.bedrag + '. Bedankt!', at: nu(), systeem: true });
-    save();
-    sein(chat.verkoper, { icon: 'pas', title: 'Betaald', body: chat.koper.naam + ' heeft € ' + chat.deal.bedrag + ' betaald voor "' + (chat.adTitel || '').slice(0, 30) + '".' });
-    return { ok: true, betaald: true, factuur: chat.deal.factuur, chat: chatPub(chat, partij) };
-  }
+  // De koper betaalt de verkoper: via de betaalwaarheid, in ./dealbetaal.js
+  function dealBetaal(...a) { return betaalDeel.dealBetaal(...a); }
 
   function dealPub(chat, kijker) {
     const d = chat.deal;
@@ -148,5 +116,8 @@ module.exports = (ctx) => {
         deal: c.deal ? { status: c.deal.status, bedrag: c.deal.bedrag, samen: !!c.deal.samen, betaald: !!c.deal.betaald } : null
       }));
   }
+  /* Een keer gebouwd, na chatPub: de afhandelaar van de betaalwaarheid hoort bij
+     het opstarten geregistreerd te zijn, niet pas bij de eerste betaling. */
+  const betaalDeel = require('./dealbetaal')(ctx, { chatMet, isDeelnemer, rolIn, chatPub });
   return { postvak, chatPub, dealVoorstel, dealHier, dealBetaal };
 };

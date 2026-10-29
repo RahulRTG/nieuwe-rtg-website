@@ -2,7 +2,7 @@
    - /api/supplier/redactie/*  : de redactie zelf (achter de leverancier-inlog)
    - /api/krant/*              : de gepubliceerde krant lezen (openbaar) */
 module.exports = (kern) => {
-  const { app, db, supplierAuth, journalistiek } = kern;
+  const { app, auth, db, supplierAuth, journalistiek } = kern;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const code = req => req.supplier.code;
 
@@ -58,8 +58,8 @@ module.exports = (kern) => {
     catch (e) { res.json({ chapo: '', koppen: [] }); }
   }));
 
-  // openbaar: de krant lezen
-  app.post('/api/krant/gids', (req, res) => res.json({ lijst: journalistiek.krantGids() }));
-  app.post('/api/krant/open', (req, res) => stuur(res, journalistiek.krant(String((req.body || {}).code || '').toUpperCase())));
-  app.post('/api/krant/artikel', (req, res) => stuur(res, journalistiek.leesArtikel(String((req.body || {}).code || '').toUpperCase(), (req.body || {}).id)));
+  // de krant lezen: met een account (eigenaarsbesluit 19 oktober 2026); de lezer in de Saloon stuurt zijn Bearer mee
+  app.post('/api/krant/gids', auth, (req, res) => res.json({ lijst: journalistiek.krantGids() }));
+  app.post('/api/krant/open', auth, (req, res) => stuur(res, journalistiek.krant(String((req.body || {}).code || '').toUpperCase())));
+  app.post('/api/krant/artikel', auth, (req, res) => stuur(res, journalistiek.leesArtikel(String((req.body || {}).code || '').toUpperCase(), (req.body || {}).id)));
 };

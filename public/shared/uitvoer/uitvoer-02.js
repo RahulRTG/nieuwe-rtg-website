@@ -1,8 +1,6 @@
-  // Visible export action and modal share the active host.
+/* Uitvoer: bediening, dialoog en feedback. */
   var LIJN = '1px solid var(--line,var(--lijn,#2A2724))';
-  /* --rtg-muted VOOR --muted: de eerste volgt het thema. Op goud haalde
-     #8A8680 4,07:1 waar 4,5 moet (A11Y-INGELOGD.json). De knop staat op de
-     schermgrond; op een ds-scherm (ivoor) is dat --ds-inkt-zacht. */
+  /* Themakleur vóór de fallback: behoudt minimaal 4,5:1 contrast. */
   var ZACHT = 'var(--rtg-muted,var(--muted,var(--zacht,#8A8680)))';
   var css = '.rtguitvoer-knop.rtguitvoer-knop,.rtguitvoer-rij button{background:none;cursor:pointer;' +
       'min-height:44px;padding:.5rem .9rem;white-space:nowrap;border:' + LIJN + ';color:' + ZACHT + ';' +
@@ -145,6 +143,7 @@
       knop = document.createElement('button');
       knop.type = 'button';
       knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast';
+      knop.setAttribute('aria-haspopup', 'dialog');
       knop.textContent = 'Meenemen';
       knop.addEventListener('click', toon);
     }

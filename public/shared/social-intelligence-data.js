@@ -75,7 +75,8 @@
     var key = kind === 'knop' ? item.knop : item.soort;
     return '<article class="rtg-policy-row"><div><b>' + esc(item.naam || item.soort) + '</b>' +
       (item.uitleg ? '<p>' + esc(item.uitleg) + '</p>' : '') + '</div><button type="button" role="switch" aria-checked="' +
-      String(!!item.aan) + '" data-policy-kind="' + kind + '" data-policy-key="' + esc(key) + '"><i></i><span>' +
+      String(!!item.aan) + '" data-policy-kind="' + kind + '" data-policy-key="' + esc(key) +
+      '" data-rtg-adaptive-source="sociaal-beleid-' + kind + '-' + esc(key) + '" data-hoofdactie><i></i><span>' +
       (item.aan ? 'AAN' : 'UIT') + '</span></button></article>';
   }
   function renderPolicy(data) {

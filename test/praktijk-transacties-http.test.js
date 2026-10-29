@@ -2,10 +2,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),http=require('node:http');
 const {startServer,stopHard}=require('./helper');
+const {registreerGratis}=require('../scripts/lib/gratisaccount');
 test('echte werk-, leveranciers- en betaalroutes: scope, duurzame herhaling, annulering en providercontrole',async()=>{
   const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-praktijk-transacties-'));
-  let srv,base,provider,betaald=false,posten=0,verzoeken=[];
-  const api=async(p,b={})=>{const r=await fetch(base+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
+  let srv,base,provider,betaald=false,posten=0,verzoeken=[],klant;
+  // Een gastlink is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026): klant en leverancier hebben een gratis account.
+  const api=async(p,b={},tok=/^\/api\/werk-(gast|leverancier)\//.test(p)&&klant?klant.token:null)=>{const r=await fetch(base+p,{method:'POST',headers:{'Content-Type':'application/json',...(tok?{Authorization:'Bearer '+tok}:{})},body:JSON.stringify(b)});
     return {status:r.status,body:await r.json()};};
   try {
     provider=http.createServer(async(req,res)=>{
@@ -20,6 +22,7 @@ test('echte werk-, leveranciers- en betaalroutes: scope, duurzame herhaling, ann
     const env={RTG_DATA_DIR:tmp,SMTP_URL:'',STRIPE_SECRET_KEY:'sk_test_local_fixture',STRIPE_BASE_URL:'http://127.0.0.1:'+provider.address().port,
       MOLLIE_API_KEY:'',ADYEN_API_KEY:'',PAYMENT_PROVIDER:'stripe',RTG_BETALEN_UIT:'0',RTG_WERK_BETAAL_ORIGIN:'https://rtg.example'};
     srv=await startServer({env});base=srv.base;
+    klant=await registreerGratis(base);assert.ok(klant,'een gratis account');
     const w=(await api('/api/bedrijf/werkruimte/maak',{naam:'Testbedrijf',idem:crypto.randomUUID()})).body;
     assert.ok(w.beheerToken);
     const context={werkruimte:w.werkruimte,beheerToken:w.beheerToken};
@@ -31,6 +34,7 @@ test('echte werk-, leveranciers- en betaalroutes: scope, duurzame herhaling, ann
     assert.equal((await doe('stap',{projectId:p,versie:await versie(),stap:'voorstel',toelichting:'Totaal afgesproken',bedragMinor:4200})).status,200);
     const klantlink=(await doe('delen',{projectId:p,versie:await versie()})).body.link;
     const sleutel=klantlink.split('#gast=')[1];
+    assert.equal((await api('/api/werk-gast/besluit',{sleutel,versie:await versie(),keuze:'akkoord'},null)).status,401,'de link alleen is geen toegang');
     assert.equal((await api('/api/werk-gast/besluit',{sleutel,versie:await versie(),keuze:'akkoord'})).status,200);
     const aanvraag={projectId:p,versie:await versie(),actie:'aanvragen',leverancier:'Lokale leverancier',onderdeel:'Transfer',
       datum:'2026-12-01',locatie:'Afgesproken adres',bedragMinor:2000,voorwaarden:'Twee personen, geen extra kosten',idem:crypto.randomUUID()};

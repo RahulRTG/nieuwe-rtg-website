@@ -9,12 +9,10 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { rij, save, nu, STATUS, AF, OPEN, publiek, zet, klacht, ramMax } = ctx;
+  const { d, save, nu, STATUS, AF, OPEN, publiek, zet, klacht, ramMax } = ctx;
   const { maakOpenstaandOverzicht } = require('./status');
-  // dienIn wordt door ./index pas NA dit bestand op de ctx gezet (de twee delen
-  // kennen elkaar over en weer), dus lezen we hem per aanroep en niet hier
-  const dienIn = (o) => ctx.dienIn(o);
-
+  const opslag = require('./opslag')(d);
+  const rij = opslag.schrijfRij, rijLezen = opslag.leesRij;
   /* Een nieuwe opdracht in de rij zetten, en de rij op maat houden. Opruimen mag
      ALLEEN wat af is: de staart afknippen zonder te kijken is precies hoe boeking
      50.001 verdween (LAT.md regel 1), en hier zou het een openstaande betaling
@@ -49,7 +47,7 @@ module.exports = (ctx) => {
        deze regel zou de lus alleen zinloos de hele rij aflopen. Het als grendel
        opschrijven zou suggereren dat er een geval is dat hij tegenhoudt. */
     if (!k) return null;
-    const r = rij();
+    const r = rijLezen();
     for (let i = r.length - 1; i >= 0; i--) if (r[i].idemSleutel === k) return r[i];
     return null;
   }
@@ -116,9 +114,9 @@ module.exports = (ctx) => {
     const grens = Number.isFinite(tot) ? tot : nu();
     let gedaan = 0, gelukt = 0, opgegeven = 0;
     try {
-      for (const o of rij().filter(x => !AF.has(x.status) && x.status !== STATUS.MISLUKT && x.status !== STATUS.ONBEKEND && (x.volgendeAt || 0) <= grens)) {
+      for (const o of rijLezen().filter(x => !AF.has(x.status) && x.status !== STATUS.MISLUKT && x.status !== STATUS.ONBEKEND && (x.volgendeAt || 0) <= grens)) {
         const voor = o.status;
-        await dienIn(o);
+        await ctx.dienIn(o);
         gedaan++;
         if ((o.status === STATUS.INGEDIEND || o.status === STATUS.AFGEWIKKELD) && voor === STATUS.GEBOEKT) gelukt++;
         if (o.status === STATUS.MISLUKT || o.status === STATUS.TERUGGEBOEKT) opgegeven++;
@@ -126,7 +124,7 @@ module.exports = (ctx) => {
       /* Crash tussen externe bevestiging en de interne claim-/ledgerfinalisatie:
          AFGEWIKKELD blijft waar over de rail, maar is pas klaar als ook de hook
          duurzaam is verwerkt. De ronde herstelt precies die naad. */
-      for (const o of rij().filter(x => x.status === STATUS.AFGEWIKKELD && x.afwikkelingNodig && !x.afwikkelingVerwerktAt))
+      for (const o of rijLezen().filter(x => x.status === STATUS.AFGEWIKKELD && x.afwikkelingNodig && !x.afwikkelingVerwerktAt))
         await ctx.verwerkAfwikkeling(o);
     } finally { bezig = false; }
     return { ok: true, gedaan, gelukt, opgegeven };
@@ -137,9 +135,9 @@ module.exports = (ctx) => {
      vertelt. Hij leest de rij via vind() en vindOpSettlement() hieronder. */
   const { bevestig } = require('./bevestiging')(ctx, { vind: (id) => vind(id), vindOpSettlement: (r) => vindOpSettlement(r) });
 
-  function openstaand() { return maakOpenstaandOverzicht(rij()); }
+  function openstaand() { return maakOpenstaandOverzicht(rijLezen()); }
 
-  function vind(id) { return rij().find(o => o.id === String(id || '')) || null; }
+  function vind(id) { return rijLezen().find(o => o.id === String(id || '')) || null; }
   /* Opzoeken op de referentie van de rail. NIEUWSTE EERST, en dat is het enige
      wat hier gedrag is: dezelfde ref kan aan twee opdrachten hangen als er met
      de hand opnieuw is ingediend, en dan gaat de webhook over de laatste poging.
@@ -149,11 +147,12 @@ module.exports = (ctx) => {
   function vindOpSettlement(ref) {
     const r = String(ref || '');
     if (!r) return null;
-    for (let i = rij().length - 1; i >= 0; i--) if (rij()[i].settlementRef === r) return rij()[i];
+    const opdrachten = rijLezen();
+    for (let i = opdrachten.length - 1; i >= 0; i--) if (opdrachten[i].settlementRef === r) return opdrachten[i];
     return null;
   }
   function lijst({ limit = 50, status, ledgerRef, bron } = {}) {
-    let r = rij().slice().reverse();
+    let r = rijLezen().slice().reverse();
     if (status) r = r.filter(o => o.status === status);
     if (ledgerRef) r = r.filter(o => o.ledgerRef === ledgerRef);
     if (bron) r = r.filter(o => o.bron === bron);

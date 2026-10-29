@@ -1,27 +1,28 @@
-/* RTG Office Enterprise
-
-   De inhoud blijft het middelpunt. Bordeaux markeert betekenis, goud alleen
-   de menselijke hoofdhandeling. Geen kaartjesregen en geen tweede app-schil:
-   in Work OS levert de buitenste werktafel de bank en tabstrip. */
+/* Office: bordeaux duidt betekenis; goud blijft de menselijke hoofdactie. */
 
 #rail{padding:1.2rem .95rem;background:
   linear-gradient(180deg,rgba(127,22,52,.08),transparent 12rem),var(--rail);}
 body.rtg-stijl>main{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;}
-/* OFFICE PAST ZICH AAN DE RUIMTE DIE HET KRIJGT, NIET AAN HET VENSTER. Sinds de
-   wereldschil (PR #413) staat Office in de middenkolom van een bureau van 1440px;
-   de smalle regels (werkbalk die ombreekt, lijst met minder kolommen) keken naar
-   het venster en sloegen daar dus nooit aan, waardoor de werkbalk onder de
-   favorietenkolom doorliep. Los en in een ingesloten surface is het venster de
-   ruimte, dus de body is de container; in de schil is dat het werkvlak. */
+/* Office breekt op zijn wereldkolom via rtg-office, niet op de viewport. */
 body{container:rtg-office/inline-size;}
 body[data-rtg-desktop] .wd-page{container:rtg-office/inline-size;}
-/* In de schil staan kop en main niet meer direct onder body, dus de voorzijde
-   verbergt ze hier zelf; en zolang de voorzijde leest, is Office een pagina en
-   nog geen begrensd werkvlak. */
+/* De voorzijde verbergt kop en main en gebruikt nog geen begrensd werkvlak. */
 body.rtd-voorzijde-actief .wd-page>:is(.kop,main){display:none!important;}
 body.rtd-voorzijde-actief[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{display:block;height:auto;overflow:visible!important;}
-/* De vaste drive en editor houden ook onderaan ruimte voor de gedeelde Edge. */
+/* Na de voorzijde is Office een flexkolom in de vaste desktop-canvas. */
+body:not(.rtd-voorzijde-actief) .wd-page[data-rtg-canvas-surface]{
+  display:flex;flex:1;flex-direction:column;height:100%;min-height:0;overflow:hidden;
+}
+body:not(.rtd-voorzijde-actief) .wd-page[data-rtg-canvas-surface]>main{
+  flex:1;min-height:0;height:auto;overflow:hidden;
+}
+/* Drive en editor houden ruimte voor de Edge. */
 html:not([data-rtg-oppervlak="1"]) body[data-rtg-adaptive-ready="true"]:not(.rtd-voorzijde-actief)>main{padding-bottom:var(--rtg-adaptive-inset)!important;}
+/* De scrollvlakken dragen zelf de vrije ruimte boven de Edge. */
+html:not([data-rtg-oppervlak="1"]) body[data-rtg-adaptive-ready="true"]:not(.rtd-voorzijde-actief) :is(#rail,#vak){
+  padding-bottom:calc(var(--rtg-adaptive-inset) + 2.5rem);
+  scroll-padding-bottom:calc(var(--rtg-adaptive-inset) + 1rem);
+}
 /* GOUD ALS KLEINE TEKST HOORT HET LEESGOUD TE ZIJN. Hier stond het huisgoud op
    62%, en dat komt op het lichtste paneel van dit scherm op 3,28:1 uit -- op een
    sectiekop van 10px in kapitalen. Dezelfde les als in rtg-themas.css: goud is

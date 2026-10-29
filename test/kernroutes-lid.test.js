@@ -38,7 +38,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { randomUUID } = require('node:crypto');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kernroutes-lid-'));
 let srv, base;
@@ -199,6 +200,23 @@ test('contracten/mijn en contract/weiger: het lid ziet en weigert zijn eigen con
   const me = await api('/api/auth/me', {}, lid);
   const codenaam = me.body.user && me.body.user.codename;
   assert.ok(codenaam, 'het lid heeft een codenaam');
+
+  /* De commerciele lidmaatschapskern en de zaakcontracten delen van oudsher
+     dezelfde collectie, maar hebben bewust een andere vorm. Maak eerst langs
+     de echte menselijke besluitroute zo'n commercieel contract. Dit was de
+     combinatie die APPWERKT op Ter plaatse liet crashen: contracten/mijn nam
+     ten onrechte aan dat elke rij `partij.kind` droeg. */
+  const aanvraag = await api('/api/aanmelding/aanvraag', {
+    idem: randomUUID(), pas: 'lifestyle', naam: 'Kern Toets', contact: 'kernroutes-contract@toets.example'
+  }, lid);
+  assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 200));
+  const kantoor = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+  assert.ok(kantoor, 'de kantoormens op naam kon niet inloggen');
+  const besluit = await api('/api/aanmelding/beslis', {
+    id: aanvraag.body.ontvangst.aanvraagId, besluit: 'geaccepteerd', contractEuro: 20000,
+    notitie: 'vormgrens van de gedeelde contractencollectie'
+  }, kantoor);
+  assert.equal(besluit.status, 200, JSON.stringify(besluit.body).slice(0, 200));
 
   const rooster = await api('/api/supplier/roster', { code: 'CASTELL' });
   const mg = (rooster.body.staff || []).find(x => x.role === 'manager');

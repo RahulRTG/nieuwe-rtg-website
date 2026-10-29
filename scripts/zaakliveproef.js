@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { randomUUID } = require('node:crypto');
 /* ============================================================================
    DE ZAAK-LIVE-PROEF -- de vierde gouden keten: van goedgekeurde aanvraag naar
    een zaak die een lid werkelijk kan zien.
@@ -99,10 +100,10 @@ async function wereld(basis, merk) {
   const K = keur.data && keur.data.token;
   if (!K) throw new Error('geen keurderssessie -- bestaat het demo-eigenaarsaccount?');
 
-  const aan = await P('/api/aanmelding/aanvraag', { pas: 'business', naam: 'Proef Ondernemer',
+  const aan = await P('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'business', naam: 'Proef Ondernemer',
     contact: mail, viaUitnodiging: true,
     bedrijf: { naam: 'Proefhotel ' + merk, type: GENRE, plaats: 'Amsterdam' } }, O);
-  const id = aan.data && aan.data.aanmelding && aan.data.aanmelding.id;
+  const id = aan.data && aan.data.ontvangst && aan.data.ontvangst.aanvraagId;
   if (!id) throw new Error('geen aanmelding (status ' + aan.status + ')');
   await P('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 5000 }, K);
   const t = await P('/api/aanmelding/termijn-voldaan', { id, maand: 1 }, K);

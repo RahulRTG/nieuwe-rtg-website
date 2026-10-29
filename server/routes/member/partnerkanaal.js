@@ -6,7 +6,8 @@ const caps = require('../../kern/commercie/capaciteiten');
 const ladder = require('../../kern/pasladder');
 
 module.exports = (kern) => {
-  const { app, db, save, crypto, findPartner, publicTrip, ondernemingBijdrageOver } = kern;
+  const { app, auth, db, save, crypto, findPartner, publicTrip, ondernemingBijdrageOver } = kern;
+  const { handleVan } = require('../../kern/gast/naad')();
 
   /* B14: de partnercode (`code`) is een openbare attributie en verandert geen
      prijs; alleen een geldige personeelscode (kern/partnerpersoneelscode.js,
@@ -24,8 +25,10 @@ module.exports = (kern) => {
   /* Een boeking met een personeelscode verbruikt EEN gebruik, atomair in de
      collectietransactie (claim), en pas NA de invoercontrole: een fout
      formulier kost de medewerker geen boeking. Met alleen een partnercode is het
-     het gewone tarief; de code legt alleen vast wie de boeker stuurde. */
-  app.post('/api/book', async (req, res) => {
+     het gewone tarief; de code legt alleen vast wie de boeker stuurde.
+     Boeken vraagt een account (eigenaarsbesluit 19 oktober 2026); de boeking
+     hangt aan de codenaam ervan (kern/gast/naad.js). */
+  app.post('/api/book', auth, async (req, res) => {
    try {
     const trip = db.data.partnerTrips.find(t => t.id === req.body.tripId);
     if (!trip) return res.status(404).json({ error: 'Reis niet gevonden.' });
@@ -72,7 +75,7 @@ module.exports = (kern) => {
     const partnerCut = service - rtgCut;
     const ref = 'RTG-B-' + crypto.randomBytes(3).toString('hex').toUpperCase();
     db.data.bookings.push({
-      ref, tripId: trip.id, channel, name, email,
+      ref, tripId: trip.id, channel, name, email, codenaam: handleVan(req.session),
       partnerCode: partner ? partner.code : null, personeelsplek: plek,
       netto: trip.netto, service, total, partnerCut, rtgCut,
       bijdrage: { grondslag: bijdrage.grondslag, promille: bijdrage.promille, reden: bijdrage.reden || null },

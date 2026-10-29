@@ -26,6 +26,7 @@ const MAX = 20000; // ring: zoveel sleutels houden we vast
 /* De handeling waarin een boeking valt: ./idem-handeling.js. */
 const { handeling, volgendeStap } = require('./idem-handeling');
 const { zonderSleutelPad, nietVastgelegd, vergeetSleutel } = require('./idem-zondersleutel');
+const idemBehouden = require('./idem-behouden');
 
 /* `naam` is de sleutel in de database, bijv. 'payIdem' of 'bankIdem'; de
    afdrukken staan naast in '<naam>Afdruk'. `d` geeft het datablok, `save`
@@ -55,7 +56,9 @@ const { zonderSleutelPad, nietVastgelegd, vergeetSleutel } = require('./idem-zon
    `poort` (optioneel, een functie): de vrijgavepoort voor NIEUW werk -- na de
    herhaling, voor het werk. Wat dat betekent en waarom juist daar, staat in
    ./idem-nieuwwerk.js. */
-function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
+function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort, behoudSleutel, geldigeOntvangst }) {
+  // Beschermde ontvangsten blijven in dezelfde store, buiten de gewone ring.
+  const behouden = k => typeof behoudSleutel === 'function' && behoudSleutel(k) === true;
   const poortVoorNieuwWerk = require('./idem-nieuwwerk').maakPoortVoorNieuwWerk(poort);
   function store() {
     if (!d()[naam] || typeof d()[naam] !== 'object') d()[naam] = { _keys: [] };
@@ -94,14 +97,9 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
     if (sleutel === '_keys' || sleutel === '__proto__') {
       return { status: 400, code: 'IDEMPOTENTIESLEUTEL_ONGELDIG', error: 'Deze idem-sleutel is niet bruikbaar.' };
     }
-    const s = store();
-    const a = afdrukStore();
-    if (Object.hasOwn(s, sleutel)) {
-      if (afdruk && typeof a[sleutel] === 'string' && a[sleutel] !== afdruk) {
-        return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
-      }
-      return Object.assign({}, s[sleutel], { herhaald: true });
-    }
+    // De bundel zet het antwoord al in de werkkopie voordat de opslag het
+    // bevestigt. Een lopende vlucht gaat daarom VOOR het bewaarde antwoord:
+    // bij rollback moeten beide aanroepers de mislukking ontvangen.
     const bezig = inVlucht.get(sleutel);
     if (bezig) {
       if (afdruk && bezig.afdruk && bezig.afdruk !== afdruk) {
@@ -109,6 +107,16 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
       }
       const eerder = await bezig.belofte;
       return (eerder && typeof eerder === 'object') ? Object.assign({}, eerder, { herhaald: true }) : eerder;
+    }
+    const s = store();
+    const a = afdrukStore();
+    if (Object.hasOwn(s, sleutel)) {
+      if (afdruk && typeof a[sleutel] === 'string' && (!behouden(sleutel) || a[sleutel]) && a[sleutel] !== afdruk) {
+        return { status: 409, error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' };
+      }
+      if (behouden(sleutel)) return idemBehouden.herhaal({ s, a, sleutel, afdruk, geldigeOntvangst,
+        behouden, save, bijeen, duurzaam, naam, inVlucht });
+      return Object.assign({}, s[sleutel], { herhaald: true });
     }
     /* Geen herhaling en geen lopende vlucht: dit is NIEUW werk. Pas hier de
        vrijgavepoort (zie de kop van maakIdem). */
@@ -127,7 +135,8 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
          een derde verzoek ziet altijd of de bewaarde sleutel of de vlucht -- nooit
          het gat ertussen. */
       if (!fout && r && r.ok) {
-        s._keys.push(sleutel);
+        if (behoudSleutel) s._keys = s._keys.filter(k => !behouden(k));
+        if (!behouden(sleutel)) s._keys.push(sleutel);
         if (s._keys.length > MAX) {
           for (const weg of s._keys.splice(0, s._keys.length - MAX)) { delete s[weg]; delete a[weg]; }
         }

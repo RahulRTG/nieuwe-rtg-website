@@ -27,6 +27,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');
+// de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
+const { GEHEIM, zetKop } = require('./mailpoort');
+zetKop();
 
 const GESLAAGD = { dkim: 'geslaagd', spf: 'niet gemeld', dmarc: 'niet gemeld' };
 
@@ -108,7 +111,7 @@ test('een bevestigde, bekende afzender krijgt een zaak op kanaal mail', () => {
 });
 
 test('het adres hulp@ bestaat vanaf de eerste dag en levert geen bounce', async () => {
-  const srv = await startServer({ env: { SMTP_URL: '' } });
+  const srv = await startServer({ env: { RTG_MAILPOORT_GEHEIM: GEHEIM, SMTP_URL: '' } });
   try {
     const adres = require('../server/kern/rtmail-adres');
     const hulp = 'hulp@' + adres.domeinVoor('kantoor');

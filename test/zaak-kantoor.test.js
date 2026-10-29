@@ -28,6 +28,7 @@
 
    Draai los: node --test test/zaak-kantoor.test.js
    ========================================================================== */
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -66,12 +67,12 @@ test.before(async () => {
      lijst-uitgang -- en bewees dan niets over de index. Dat is precies de vorm
      die ik deze week vaker tegenkwam, dus hier de echte opzet. */
   office = (await api('/api/office/login', { code: OFFICE_CODE })).body.token;
-  const aanvraag = await api('/api/aanmelding/aanvraag', {
+  const aanvraag = await api('/api/aanmelding/aanvraag', { idem: randomUUID(),
     pas: 'rtg', naam: 'Marta Vidal', contact: 'marta' + Date.now().toString(36) + '@voorbeeld.test',
     bedrijf: { naam: 'Cafe Vidal', type: 'restaurant', plaats: 'Ibiza',
       behoeften: ['Een kassasysteem', 'Personeelsplanning', 'Een eigen website'] }
   });
-  const aanmeldId = aanvraag.body && aanvraag.body.aanmelding && aanvraag.body.aanmelding.id;
+  const aanmeldId = aanvraag.body && aanvraag.body.ontvangst && aanvraag.body.ontvangst.aanvraagId;
   if (office && aanmeldId) {
     await api('/api/aanmelding/beslis', { id: aanmeldId, besluit: 'geaccepteerd', notitie: 'Rahul Imran Ismail' }, office);
     const t = await api('/api/aanmelding/termijn-voldaan', { id: aanmeldId, maand: 1 }, office);
@@ -176,9 +177,13 @@ test('5. het intakeformulier zet de eigenaar, en het blijft van de eigen zaak', 
   assert.equal((await api('/api/supplier/onboarding/zet', { voorstel: { titel: 'Aanmelden' } }, werker)).status, 403,
     'het intakeformulier is geen knop voor de bediening');
 
-  const z = await api('/api/supplier/onboarding/zet',
-    { voorstel: { titel: 'Welkom bij Sal de Mar', velden: [{ id: 'allergie', label: 'Allergieën', soort: 'tekst' }] } }, baas);
+  const voorstel = { titel: 'Welkom bij Sal de Mar', velden: [{ id: 'allergie', label: 'Allergieën', soort: 'tekst' }] };
+  const z = await api('/api/supplier/onboarding/zet', { voorstel }, baas);
   assert.equal(z.status, 200, JSON.stringify(z.body).slice(0, 200));
+  const herhaald = await api('/api/supplier/onboarding/zet', { voorstel }, baas);
+  assert.equal(herhaald.status, 200);
+  assert.equal(herhaald.body.config.contract.bijgewerkt, z.body.config.contract.bijgewerkt,
+    'dezelfde gewenste configuratie krijgt geen nieuw wijzigingstijdstip');
 
   const mijn = await api('/api/supplier/onboarding/config', {}, baas);
   assert.equal(mijn.status, 200);

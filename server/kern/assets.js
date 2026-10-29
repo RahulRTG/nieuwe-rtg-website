@@ -41,7 +41,7 @@ const ACCESS_FACTOR = 0.25;
 const ASSET_FACTOR = 1.15;
 const netjes = n => Math.round(n / 100) * 100; // prijzen op honderden
 
-module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay }) => {
+module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay, betaalWaarheid }) => {
   /* HET MERKTEKEN VAN EEN GEINDE FEE IS GEEN AFGELEIDE TOESTAND, en daarom
      hangt deze module aan de duurzame vastlegger. De reden staat uitgeschreven
      bij assetFeesInnen() in ./assets/kantoor.js: de BETALING was al duurzaam
@@ -58,12 +58,15 @@ module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay }) =
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const lijsten = () => {
+    let gewijzigd = !db.data.assetTickets || !db.data.assetGebruik || !db.data.assetWachtlijst ||
+      !db.data.assetTerugkoop || !db.data.assetKas;
     if (!db.data.assetTickets) db.data.assetTickets = [];       // gekochte tickets, per lid en object
     if (!db.data.assetGebruik) db.data.assetGebruik = [];       // geboekte 24-uursblokken
     if (!db.data.assetWachtlijst) db.data.assetWachtlijst = []; // kopers die op een Asset-ticket wachten
     if (!db.data.assetTerugkoop) db.data.assetTerugkoop = [];   // uitstapverzoeken die op de kantoor-uitbetaling wachten
     if (!db.data.assetKas) db.data.assetKas = {};               // poolkas per object, in centen
     if (!Array.isArray(db.data.sharedAssets) || !db.data.sharedAssets.length) {
+      gewijzigd = true;
       db.data.sharedAssets = [
         { id: 'sa-jet', naam: 'Aria One, Gulfstream G650', soort: 'privejet', icon: 'vluchten', waar: 'Thuisbasis Schiphol Oost',
           entiteit: 'RTG Asset Pool Aria One B.V.',
@@ -80,9 +83,24 @@ module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay }) =
       ];
     }
     // oudere pools: elk object hoort in een eigen entiteit
-    for (const a of db.data.sharedAssets) if (!a.entiteit) a.entiteit = 'RTG Asset Pool ' + a.naam.split(',')[0] + ' B.V.';
+    for (const a of db.data.sharedAssets) if (!a.entiteit) {
+      a.entiteit = 'RTG Asset Pool ' + a.naam.split(',')[0] + ' B.V.';
+      gewijzigd = true;
+    }
+    // Ook initialisatie is een mutatie. PostgreSQL bevestigt die voor het
+    // HTTP-antwoord; bestaande, volledige lijsten veroorzaken geen save.
+    if (gewijzigd) save();
   };
-  const objectVan = id => (db.data.sharedAssets || []).find(a => a.id === String(id || ''));
+  // Aanvragen en ticketuitgifte blijven onder dezelfde poolopslag als de winkel.
+  // De betaalafhandelaar krijgt alleen deze operaties, niet de volledige database.
+  const aanvragen = () => {
+    lijsten();
+    if (!Array.isArray(db.data.assetAanvragen)) db.data.assetAanvragen = [];
+    return db.data.assetAanvragen;
+  };
+  const ticketsVoor = key => { lijsten(); return db.data.assetTickets.filter(t => t.key === key); };
+  const geefTicketsUit = tickets => { lijsten(); db.data.assetTickets.unshift(...tickets); };
+  const objectVan = id => { lijsten(); return db.data.sharedAssets.find(a => a.id === String(id || '')); };
   const ticketWaarde = a => Math.round(a.waarde / TICKETS_PER_OBJECT);
   const prijsAccessVan = a => netjes(ticketWaarde(a) * ACCESS_FACTOR);
   const prijsAssetVan = a => netjes(ticketWaarde(a) * ASSET_FACTOR);
@@ -90,27 +108,31 @@ module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay }) =
   const actieveVan = assetId => db.data.assetTickets.filter(t => t.assetId === assetId && t.status === 'actief');
   // bezet = actief plus alles wat op een terugkoop-uitbetaling wacht: pas na
   // de uitbetaling valt het ticket echt terug in de pool
-  const bezetVan = assetId => db.data.assetTickets.filter(t => t.assetId === assetId && ['actief', 'uitstap-aangevraagd'].includes(t.status));
+  const bezetVan = assetId => db.data.assetTickets.filter(t => t.assetId === assetId && ['actief', 'uitstap-aangevraagd', 'herroep-loopt'].includes(t.status));
   const magKopen = sess => BETALENDE_PASSEN.includes(sess.tier);
   const kasAdd = (assetId, centen) => { db.data.assetKas[assetId] = (db.data.assetKas[assetId] || 0) + Math.round(centen); };
   const binnenBedenktijd = t => (Date.now() - new Date(t.at).getTime()) < BEDENKTIJD_DAGEN * 86400000;
 
   /* De drie lagen (winkel, gebruik, kantoor) draaien als submodules op een
      gedeelde context, een keer opgebouwd bij het opstarten. */
-  const ctx = { db, save, vastleggen, crypto, schoon, notify, pay,
+  const ctx = { db, save, vastleggen, crypto, schoon, notify, pay, betaalWaarheid,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
     TERUGKOOP_VENSTER_DAGEN, SERVICE_FEE_PCT, OVERDRACHT_FEE_PCT, ONDERHOUD_DAGEN, PIEK_MAANDEN,
     ACCESS_FACTOR, ASSET_FACTOR, netjes,
-    nu, vandaag, lijsten, objectVan, ticketWaarde, prijsAccessVan, prijsAssetVan, serviceFeeVan,
+    nu, vandaag, lijsten, aanvragen, ticketsVoor, geefTicketsUit, objectVan, ticketWaarde, prijsAccessVan, prijsAssetVan, serviceFeeVan,
     actieveVan, bezetVan, magKopen, kasAdd, binnenBedenktijd };
   const deelWinkel = require('./assets/winkel')(ctx);
   Object.assign(ctx, deelWinkel);
   const deelGebruik = require('./assets/gebruik')(ctx);
   Object.assign(ctx, deelGebruik);
   const deelKantoor = require('./assets/kantoor')(ctx);
-  const { assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet } = deelWinkel;
-  const { assetMijn, assetGebruik, assetUitstap } = deelGebruik;
+  const { assetsOverzicht, assetDocument, assetWachtlijstZet } = deelWinkel;
+  // kopen is een aanvraag die een mens beoordeelt (./assets/aanvraag.js, 19 oktober 2026)
+  const { assetKoop, assetHerroep, assetHerroepBijwerken, assetAanvragenMijn, assetAanvragenKantoor, assetAanvraagBeslis, assetAanvraagBetaal } = require('./assets/aanvraag')(ctx);
+  const { assetGebruik, assetUitstap } = deelGebruik;
+  const assetMijn = (key) => { assetHerroepBijwerken(key); return deelGebruik.assetMijn(key); };
   const { assetHertaxeer, assetKantoor, assetTerugkoopUit, assetFeesInnen } = deelKantoor;
 
-  return { assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap, assetHertaxeer, assetKantoor, assetTerugkoopUit, assetFeesInnen };
+  return { assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap, assetHertaxeer, assetKantoor, assetTerugkoopUit, assetFeesInnen,
+    assetAanvragenMijn, assetAanvragenKantoor, assetAanvraagBeslis, assetAanvraagBetaal };
 };

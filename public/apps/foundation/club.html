@@ -46,6 +46,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="foundation.club" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -53,6 +54,7 @@
   <h1>Clubportaal</h1>
 </header>
 <main id="main">
+  <div id="accountDeur"></div>
   <div class="kaart" id="inlog">
     <div class="sec">Aanmelden met uw clubcode</div>
     <p class="leeg s-1s5f6sj">De RTFoundation werkt met grote clubs in elke stad aan de jeugd en de buurt. Hier ziet u alleen het dossier van uw eigen club: de programma's, de afspraken en het gedeelde logboek met het RTF-team.</p>
@@ -85,11 +87,15 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
+<script src="/shared/accountdeur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const api = (pad, body) => fetch('/api/rtf/club/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
-  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+/* Een account en de clubcode (eigenaarsbesluit 19 oktober 2026): de code
+   koppelt het account de eerste keer aan het clubdossier; de deur staat hier. */
+const metAccount = () => RTGAccountDeur.eis($('#accountDeur'), { waarom: 'Het clubportaal opent u met een RTG-account; een gratis account is genoeg. Uw clubcode koppelt dat account aan uw club.' });
+const api = (pad, body) => metAccount().then(() => fetch('/api/rtf/club/' + pad, { method: 'POST', headers: RTGAccountDeur.kop({ 'Content-Type': 'application/json' }), body: JSON.stringify(body || {}) }))
+  .then(async r => { const d = await r.json().catch(() => ({})); if (r.status === 401) RTGAccountDeur.vergeet(); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 let CODE = '';
 try { CODE = localStorage.getItem('rtf_club_code') || ''; } catch (e) {}
 

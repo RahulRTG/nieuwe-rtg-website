@@ -2,13 +2,13 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-19",
-    "commit": "b4eb222c"
+    "op": "2026-10-29",
+    "commit": "5cd79010f5"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-10-18",
-      "commit": "8df75d5a2",
+      "op": "2026-10-23",
+      "commit": "94493e9497",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -47,6 +47,7 @@
           "public/apps/app-main/app-main-09a2.js",
           "public/apps/app-main/app-main-09b.js",
           "public/apps/app-main/app-main-10.js",
+          "public/apps/app-main/app-main-10a.js",
           "public/apps/app-main/app-main-11.js",
           "public/apps/app-main/app-main-12.js",
           "public/apps/app-main/app-main-12a.js",
@@ -83,10 +84,12 @@
           "public/apps/app-main/app-main-29.js",
           "public/apps/app-main/app-main-29b.js",
           "public/apps/app-main/app-main-29c.js",
+          "public/apps/app-main/app-main-29d.js",
           "public/apps/app-main/app-main-30.js",
           "public/apps/app-main/app-main-31.js",
           "public/apps/app-main/app-main-31c.js",
           "public/apps/app-main/app-main-32.js",
+          "public/apps/app-main/app-main-32a.js",
           "public/apps/app-main/app-main-33.js",
           "public/apps/app-main/app-main-34.js",
           "public/apps/app-main/app-main-34b.js",
@@ -129,6 +132,7 @@
           "public/apps/appstore-kantoor.html",
           "public/apps/appstore-uitgever.html",
           "public/apps/architect-pda.html",
+          "public/apps/arrival-voorzijde.js",
           "public/apps/arrival.html",
           "public/apps/attenties.html",
           "public/apps/avond.html",
@@ -208,6 +212,7 @@
           "public/apps/defensie.html",
           "public/apps/defensie/defensie-01.js",
           "public/apps/defensie/defensie-02.js",
+          "public/apps/dispatch-voorzijde.js",
           "public/apps/dispatch.html",
           "public/apps/doelen.html",
           "public/apps/doos.html",
@@ -228,6 +233,7 @@
           "public/apps/festival/programma.js",
           "public/apps/festival/schil.js",
           "public/apps/festival/vooruit.js",
+          "public/apps/flits-voorzijde.js",
           "public/apps/flits.html",
           "public/apps/foodcourt-intent.js",
           "public/apps/foodcourt.html",
@@ -420,10 +426,13 @@
           "public/apps/gereedschap/klok.js",
           "public/apps/gereedschap/reken.js",
           "public/apps/gereedschap/tijd.js",
+          "public/apps/ghost-voorzijde.js",
           "public/apps/ghost.html",
           "public/apps/handel-aanvraag.js",
           "public/apps/handel.html",
           "public/apps/handel.js",
+          "public/apps/hangar-toestel.js",
+          "public/apps/hangar-voorzijde.js",
           "public/apps/hangar.html",
           "public/apps/hardware-pda.html",
           "public/apps/home.html",
@@ -498,6 +507,7 @@
           "public/apps/kantoren-reisuitnodiging.js",
           "public/apps/kantoren-rtgboek.js",
           "public/apps/kantoren-rtgcampagne.js",
+          "public/apps/kantoren-terugbetaling.js",
           "public/apps/kantoren.html",
           "public/apps/kassa.html",
           "public/apps/kassa/wachtrij.js",
@@ -715,7 +725,10 @@
           "public/apps/loonstrook.html",
           "public/apps/loopbaan.html",
           "public/apps/loopbaanbewijs.html",
+          "public/apps/luchthaven-bord.js",
+          "public/apps/luchthaven-loket.js",
           "public/apps/luchthaven.html",
+          "public/apps/luchthaven.js",
           "public/apps/magnaat-data.js",
           "public/apps/magnaat-kantoor.html",
           "public/apps/magnaat-leven-bedrijf.js",
@@ -723,7 +736,8 @@
           "public/apps/magnaat-leven-schermen.js",
           "public/apps/magnaat-leven-stad.js",
           "public/apps/magnaat-leven-verhaal.js",
-          "public/apps/magnaat-leven.js",
+          "public/apps/magnaat-leven/01-toegang-en-handelingen.js",
+          "public/apps/magnaat-leven/02-presentatie-en-bediening.js",
           "public/apps/magnaat-partnerstudio.html",
           "public/apps/magnaat-sandbox.js",
           "public/apps/magnaat-voorzijde-scenarios.js",
@@ -736,6 +750,7 @@
           "public/apps/mall-experience.js",
           "public/apps/mall.html",
           "public/apps/marechaussee.html",
+          "public/apps/marechaussee.js",
           "public/apps/mecenaat.html",
           "public/apps/media.html",
           "public/apps/media/blad.js",
@@ -781,6 +796,12 @@
           "public/apps/muziek-feed.js",
           "public/apps/muziek.html",
           "public/apps/nalatenschap.html",
+          "public/apps/navigatie-bediening.js",
+          "public/apps/navigatie-drie.js",
+          "public/apps/navigatie-kaarten.js",
+          "public/apps/navigatie-kern.js",
+          "public/apps/navigatie-start.js",
+          "public/apps/navigatie-zoek.js",
           "public/apps/navigatie.html",
           "public/apps/nieuws.html",
           "public/apps/notities.html",
@@ -828,10 +849,15 @@
           "public/apps/oog.html",
           "public/apps/ov.html",
           "public/apps/ovcontrol.html",
+          "public/apps/ovcontrol.js",
+          "public/apps/ovdienst-scan.js",
           "public/apps/ovdienst.html",
+          "public/apps/ovdienst.js",
           "public/apps/overheid.html",
           "public/apps/overheidspda.html",
           "public/apps/ovroutes.html",
+          "public/apps/ovroutes/01-projectie-en-tekenen.js",
+          "public/apps/ovroutes/02-editor-en-herstel.js",
           "public/apps/pakketten.html",
           "public/apps/partner-network.html",
           "public/apps/partner-network.js",
@@ -897,27 +923,37 @@
           "public/apps/reisboek-momenten.js",
           "public/apps/reisboek.html",
           "public/apps/reisboek.js",
+          "public/apps/reisbureau-aanvragen.js",
           "public/apps/reisbureau-experience.js",
+          "public/apps/reisbureau-voorzijde.js",
           "public/apps/reisbureau.html",
           "public/apps/reisprogramma-editor.js",
           "public/apps/reisprogramma-velden.js",
           "public/apps/reisprogramma-weergave.js",
           "public/apps/reisuitnodiging-client.js",
           "public/apps/reisuitnodiging.html",
+          "public/apps/reizen-beeld-editor.js",
+          "public/apps/reizen-beeld.js",
           "public/apps/reizen-context.js",
+          "public/apps/reizen-invoer.js",
           "public/apps/reizen-performance-boeken.js",
           "public/apps/reizen-performance-rahul.js",
           "public/apps/reizen-performance-reis.js",
           "public/apps/reizen-performance-taxi.js",
           "public/apps/reizen-performance.js",
+          "public/apps/reizen-regel.js",
+          "public/apps/reizen-register.js",
           "public/apps/reizen-samen-besluit.js",
           "public/apps/reizen-samen-delen.js",
           "public/apps/reizen-samen-mensen.js",
           "public/apps/reizen-samen-voorstel.js",
           "public/apps/reizen-samen.js",
+          "public/apps/reizen-stand.js",
           "public/apps/reizen-veilig-reis.js",
           "public/apps/reizen-veilig.html",
           "public/apps/reizen-veilig.js",
+          "public/apps/reizen-wacht.js",
+          "public/apps/reizen-wereld.js",
           "public/apps/reizen.html",
           "public/apps/rendezvous.html",
           "public/apps/residentie.html",
@@ -942,7 +978,9 @@
           "public/apps/rit-ontvangst.js",
           "public/apps/rit.html",
           "public/apps/rit.js",
+          "public/apps/routedekking-voorzijde.js",
           "public/apps/routedekking.html",
+          "public/apps/routedossier-voorzijde.js",
           "public/apps/routedossier.html",
           "public/apps/rtg-context.js",
           "public/apps/rtg-dossier.js",
@@ -1036,6 +1074,7 @@
           "public/apps/sport.html",
           "public/apps/sportclub.html",
           "public/apps/stad.html",
+          "public/apps/stad.js",
           "public/apps/stadsdoos.html",
           "public/apps/studio-pda.html",
           "public/apps/table.html",
@@ -1074,6 +1113,8 @@
           "public/apps/vertaler/app.js",
           "public/apps/vertegenwoordiging.html",
           "public/apps/vitaal.html",
+          "public/apps/vluchten-momenten.js",
+          "public/apps/vluchten-voorzijde.js",
           "public/apps/vluchten.html",
           "public/apps/voeding.html",
           "public/apps/voertuig.html",
@@ -1110,9 +1151,11 @@
           "public/apps/werkplek-bureaus/werkplek-bureaus-02.js",
           "public/apps/werkplek-campus.js",
           "public/apps/werkplek-landing.js",
+          "public/apps/werkplek-taken.js",
           "public/apps/werkplek.html",
           "public/apps/werkplek.js",
           "public/apps/werkruimte.html",
+          "public/apps/werkvloer.js",
           "public/apps/winkel-voorzijde.js",
           "public/apps/wonen.html",
           "public/apps/wonen.js",
@@ -1123,8 +1166,16 @@
           "public/apps/zaakpay.html",
           "public/apps/zaakweb.html",
           "public/apps/zaal.html",
+          "public/apps/zakelijk-overzicht.js",
+          "public/apps/zakelijk-voorzijde.js",
           "public/apps/zakelijk.html",
           "public/apps/zorgbalie.html",
+          "public/ds/edge-modi.js",
+          "public/ds/edge.js",
+          "public/ds/register.js",
+          "public/ds/shell.js",
+          "public/ds/voorbeeld.html",
+          "public/shared/accountdeur.js",
           "public/shared/accounts-brug.js",
           "public/shared/accounts-os.js",
           "public/shared/adaptief.js",
@@ -1157,6 +1208,7 @@
           "public/shared/basis/basis-01ab-heritage-order.js",
           "public/shared/basis/basis-01ac-edge.js",
           "public/shared/basis/basis-01ad-intelligence.js",
+          "public/shared/basis/basis-01ae-sessie.js",
           "public/shared/basis/basis-01b.js",
           "public/shared/basis/basis-01c.js",
           "public/shared/basis/basis-02.js",
@@ -1588,6 +1640,7 @@
           "public/sw.js",
           "scripts/ast/lexer.js",
           "scripts/bundel.js",
+          "scripts/lib/schermroutepaden.js",
           "scripts/schermroutes.js"
         ],
         "bestaat": [
@@ -1679,6 +1732,9 @@
             "pad": "public/apps/living-world"
           },
           {
+            "pad": "public/apps/magnaat-leven"
+          },
+          {
             "pad": "public/apps/media"
           },
           {
@@ -1704,6 +1760,9 @@
           },
           {
             "pad": "public/apps/office/blad"
+          },
+          {
+            "pad": "public/apps/ovroutes"
           },
           {
             "pad": "public/apps/personeel"
@@ -1776,6 +1835,18 @@
           },
           {
             "pad": "public/campagne"
+          },
+          {
+            "pad": "public/ds"
+          },
+          {
+            "pad": "public/ds/componenten"
+          },
+          {
+            "pad": "public/ds/schermen"
+          },
+          {
+            "pad": "public/ds/thema"
           },
           {
             "pad": "public/fonts"
@@ -1985,7 +2056,7 @@
         "omgevingGekopieerd": false,
         "omgeving": [],
         "onwaarneembaar": [],
-        "nodeHoofdversie": 22
+        "nodeHoofdversie": 26
       }
     },
     "schermgedrag": {
@@ -2153,9 +2224,9 @@
   "totaal": {
     "schermen": 328,
     "aliassen": 20,
-    "zonderServer": 54,
+    "zonderServer": 52,
     "zonderInkomend": 1,
-    "overlapParen": 21,
+    "overlapParen": 23,
     "titelbotsingen": 1,
     "menuOpAlias": 0
   },
@@ -2234,18 +2305,6 @@
       ]
     },
     {
-      "a": "public/apps/foundation/bord.html",
-      "b": "public/apps/foundation/schrift.html",
-      "gedeeld": 3,
-      "jaccard": 0.6,
-      "omvatting": 1,
-      "voorbeeld": [
-        "/api/foundation",
-        "/api/foundation/les/",
-        "/api/foundation/les/stroomticket"
-      ]
-    },
-    {
       "a": "public/apps/foundation/beheer.html",
       "b": "public/apps/foundation/contact.html",
       "gedeeld": 2,
@@ -2271,7 +2330,7 @@
       "a": "public/apps/foundation/bord.html",
       "b": "public/apps/foundation/markt.html",
       "gedeeld": 2,
-      "jaccard": 0.67,
+      "jaccard": 0.17,
       "omvatting": 1,
       "voorbeeld": [
         "/api/foundation/les/",
@@ -2304,7 +2363,7 @@
       "a": "public/apps/foundation/markt.html",
       "b": "public/apps/foundation/schrift.html",
       "gedeeld": 2,
-      "jaccard": 0.4,
+      "jaccard": 0.25,
       "omvatting": 1,
       "voorbeeld": [
         "/api/foundation/les/",
@@ -2356,27 +2415,79 @@
       ]
     },
     {
-      "a": "public/apps/kantoren.html",
-      "b": "public/apps/stadsdoos.html",
-      "gedeeld": 2,
-      "jaccard": 0.25,
+      "a": "public/apps/app.html",
+      "b": "public/apps/foundation/zorg.html",
+      "gedeeld": 4,
+      "jaccard": 0.04,
       "omvatting": 0.67,
       "voorbeeld": [
-        "/api/office/",
-        "/api/office/stream"
+        "/api/care",
+        "/api/care/annuleer",
+        "/api/care/betaal",
+        "/api/care/mijn"
+      ]
+    },
+    {
+      "a": "public/apps/leverancier.html",
+      "b": "public/apps/personeel.html",
+      "gedeeld": 3,
+      "jaccard": 0.43,
+      "omvatting": 0.6,
+      "voorbeeld": [
+        "/api/account/koppel",
+        "/api/account/rollen",
+        "/api/supplier/stream"
+      ]
+    },
+    {
+      "a": "public/apps/foundation/bord.html",
+      "b": "public/apps/foundation/schrift.html",
+      "gedeeld": 4,
+      "jaccard": 0.25,
+      "omvatting": 0.5,
+      "voorbeeld": [
+        "/api/foundation/bord/",
+        "/api/foundation/les/",
+        "/api/foundation/les/stroomticket",
+        "/api/foundation/schrift/"
+      ]
+    },
+    {
+      "a": "public/apps/ov.html",
+      "b": "public/apps/rit.html",
+      "gedeeld": 4,
+      "jaccard": 0.12,
+      "omvatting": 0.5,
+      "voorbeeld": [
+        "/api/mob/aanbod",
+        "/api/mob/mijn",
+        "/api/mob/plekken",
+        "/api/mob/volg"
       ]
     },
     {
       "a": "public/apps/reizen.html",
       "b": "public/apps/rit.html",
       "gedeeld": 4,
-      "jaccard": 0.1,
+      "jaccard": 0.09,
       "omvatting": 0.5,
       "voorbeeld": [
         "/api/mob/aanbod",
         "/api/mob/mijn",
         "/api/mob/plekken",
         "/api/mob/vraag"
+      ]
+    },
+    {
+      "a": "public/apps/memo.html",
+      "b": "public/apps/reizen.html",
+      "gedeeld": 3,
+      "jaccard": 0.07,
+      "omvatting": 0.5,
+      "voorbeeld": [
+        "/api/bestanden/",
+        "/api/bestanden/haal",
+        "/api/bestanden/mijn"
       ]
     },
     {
@@ -2400,17 +2511,6 @@
       "voorbeeld": [
         "/api/supplier/doe/bevestig",
         "/api/supplier/roster"
-      ]
-    },
-    {
-      "a": "public/apps/muziek.html",
-      "b": "public/apps/rtg.html",
-      "gedeeld": 2,
-      "jaccard": 0.09,
-      "omvatting": 0.5,
-      "voorbeeld": [
-        "/api/fluister",
-        "/api/samen/"
       ]
     }
   ],
@@ -2523,12 +2623,111 @@
       "paden": [
         "/api/",
         "/api/account/rollen",
+        "/api/agenda/mijn",
+        "/api/asset/aanvraag/betaal",
+        "/api/asset/aanvragen",
+        "/api/asset/document",
+        "/api/asset/gebruik",
+        "/api/asset/herroep",
+        "/api/asset/koop",
+        "/api/asset/mijn",
+        "/api/asset/uitstap",
+        "/api/asset/wachtlijst",
+        "/api/assets",
         "/api/bank/overzicht",
+        "/api/betaal/direct",
+        "/api/betaal/mijn",
+        "/api/betaal/verzoek/pay",
+        "/api/betaal/verzoeken",
+        "/api/bezorg/bestel",
+        "/api/bezorg/partners",
+        "/api/booking/pay",
+        "/api/care",
+        "/api/care/annuleer",
+        "/api/care/betaal",
+        "/api/care/boek",
+        "/api/care/intake/deel",
+        "/api/care/intake/stop",
+        "/api/care/mijn",
+        "/api/care/pakket/betaal",
+        "/api/care/pakket/boek",
+        "/api/care/pakket/mijn",
+        "/api/care/pakketten",
+        "/api/charter/aanbod",
+        "/api/charter/boek",
+        "/api/charter/foto",
+        "/api/charter/locatie",
+        "/api/charter/mijn",
+        "/api/charter/sos",
+        "/api/comment",
+        "/api/contract/teken",
+        "/api/contract/weiger",
+        "/api/contracten/mijn",
+        "/api/fluister/focus",
+        "/api/fluister/profiel",
+        "/api/fluister/vergeet",
         "/api/foundation",
+        "/api/groothandel/annuleer",
+        "/api/groothandel/bestel",
+        "/api/groothandel/markt",
+        "/api/groothandel/mijn",
+        "/api/huur/boek",
+        "/api/huur/foto",
+        "/api/huur/locatie",
+        "/api/huur/mijn",
+        "/api/huur/sos",
+        "/api/klets",
+        "/api/klets/gesprek",
+        "/api/klets/start",
+        "/api/klets/zet",
+        "/api/like",
+        "/api/locatie/deel",
+        "/api/locatie/mijn",
         "/api/member/apps",
+        "/api/member/block",
         "/api/member/boardroom",
+        "/api/member/call",
+        "/api/member/dm",
+        "/api/member/dm/send",
         "/api/member/pin/live",
-        "/api/push/key"
+        "/api/member/report",
+        "/api/member/snap/send",
+        "/api/member/snap/view",
+        "/api/member/snaps",
+        "/api/munt/direct",
+        "/api/order/pay",
+        "/api/orders/mine",
+        "/api/pakket/koop",
+        "/api/pakketten",
+        "/api/pay",
+        "/api/push/key",
+        "/api/push/subscribe",
+        "/api/ride/pay",
+        "/api/rtf/bericht",
+        "/api/rtf/kanaal",
+        "/api/rtf/meldingen/gelezen",
+        "/api/rtf/ontkoppel",
+        "/api/rtf/overzicht",
+        "/api/rtf/uitnodiging/accepteer",
+        "/api/spar/lijst",
+        "/api/state",
+        "/api/suppliers",
+        "/api/ticket/toon",
+        "/api/tickets/aanbod",
+        "/api/tickets/mijn",
+        "/api/transfer/aanvraag",
+        "/api/vastgoed/aanbod",
+        "/api/vastgoed/bod",
+        "/api/vastgoed/interesse",
+        "/api/vastgoed/keyless",
+        "/api/verhuur/aanbod",
+        "/api/verkoop/koop",
+        "/api/verkoop/mijn",
+        "/api/verkoop/proefrit",
+        "/api/verkoop/showroom",
+        "/api/verkoop/teken",
+        "/api/voorspel",
+        "/api/zorgprofiel"
       ],
       "schilPaden": [
         "/api/translate"
@@ -2536,13 +2735,49 @@
       "domeinen": [
         "/api/",
         "/api/account",
+        "/api/agenda",
+        "/api/asset",
+        "/api/assets",
         "/api/bank",
+        "/api/betaal",
+        "/api/bezorg",
+        "/api/booking",
+        "/api/care",
+        "/api/charter",
+        "/api/comment",
+        "/api/contract",
+        "/api/contracten",
+        "/api/fluister",
         "/api/foundation",
+        "/api/groothandel",
+        "/api/huur",
+        "/api/klets",
+        "/api/like",
+        "/api/locatie",
         "/api/member",
-        "/api/push"
+        "/api/munt",
+        "/api/order",
+        "/api/orders",
+        "/api/pakket",
+        "/api/pakketten",
+        "/api/pay",
+        "/api/push",
+        "/api/ride",
+        "/api/rtf",
+        "/api/spar",
+        "/api/state",
+        "/api/suppliers",
+        "/api/ticket",
+        "/api/tickets",
+        "/api/transfer",
+        "/api/vastgoed",
+        "/api/verhuur",
+        "/api/verkoop",
+        "/api/voorspel",
+        "/api/zorgprofiel"
       ],
       "zonderServer": false,
-      "inkomend": 209,
+      "inkomend": 212,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -2742,7 +2977,10 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/arrival/"
+        "/api/arrival/interpret",
+        "/api/arrival/pass",
+        "/api/arrival/pulse",
+        "/api/arrival/request"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -2777,7 +3015,12 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rechterhand/"
+        "/api/member/rechterhand/ai",
+        "/api/member/rechterhand/attenties",
+        "/api/member/rechterhand/attenties/gift",
+        "/api/member/rechterhand/attenties/gift/weg",
+        "/api/member/rechterhand/attenties/relatie",
+        "/api/member/rechterhand/attenties/relatie/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3252,7 +3495,10 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/browser/"
+        "/api/browser/bericht",
+        "/api/browser/gids",
+        "/api/browser/open",
+        "/api/browser/zoek"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3334,7 +3580,11 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rechterhand/"
+        "/api/member/rechterhand/ai",
+        "/api/member/rechterhand/cellier",
+        "/api/member/rechterhand/cellier/schenk",
+        "/api/member/rechterhand/cellier/weg",
+        "/api/member/rechterhand/cellier/zet"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3371,7 +3621,13 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rechterhand/"
+        "/api/member/rechterhand/ai",
+        "/api/member/rechterhand/cercle",
+        "/api/member/rechterhand/cercle/club",
+        "/api/member/rechterhand/cercle/club/weg",
+        "/api/member/rechterhand/cercle/gast",
+        "/api/member/rechterhand/cercle/gast/terug",
+        "/api/member/rechterhand/cercle/waarheen"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3450,7 +3706,16 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/clips/"
+        "/api/clips/feed",
+        "/api/clips/geluid",
+        "/api/clips/knip",
+        "/api/clips/maak",
+        "/api/clips/meld",
+        "/api/clips/ondertitels",
+        "/api/clips/reactie",
+        "/api/clips/reacties",
+        "/api/clips/volg",
+        "/api/clips/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3672,7 +3937,17 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/office/"
+        "/api/office/bureau",
+        "/api/office/concierge",
+        "/api/office/concierge/voortgang",
+        "/api/office/rendezvous/arrangement/step",
+        "/api/office/rendezvous/arrangements",
+        "/api/office/rendezvous/circle/create",
+        "/api/office/rendezvous/circle/gathering",
+        "/api/office/rendezvous/circle/invite",
+        "/api/office/rendezvous/circles",
+        "/api/office/rendezvous/concierge",
+        "/api/office/rendezvous/concierge/step"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3706,7 +3981,6 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/connect/",
         "/api/connect/dossier",
         "/api/connect/horizon",
         "/api/connect/ontdek",
@@ -3715,7 +3989,14 @@
         "/api/connect/schuif",
         "/api/connect/signaal",
         "/api/connect/werk",
-        "/api/rtf/connect/"
+        "/api/rtf/connect/dossier",
+        "/api/rtf/connect/horizon",
+        "/api/rtf/connect/ontdek",
+        "/api/rtf/connect/open",
+        "/api/rtf/connect/portfolio",
+        "/api/rtf/connect/schuif",
+        "/api/rtf/connect/signaal",
+        "/api/rtf/connect/werk"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3750,7 +4031,9 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/rtgone/"
+        "/api/rtgone/goedkeuring",
+        "/api/rtgone/goedkeuring/beslis",
+        "/api/rtgone/state"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3815,7 +4098,11 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/supplier/mob/"
+        "/api/supplier/mob/dispatch",
+        "/api/supplier/mob/plekken",
+        "/api/supplier/mob/telefoon",
+        "/api/supplier/mob/toewijzen",
+        "/api/supplier/mob/voorstel"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -3910,7 +4197,13 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rechterhand/"
+        "/api/member/rechterhand/ai",
+        "/api/member/rechterhand/entourage",
+        "/api/member/rechterhand/entourage/doc",
+        "/api/member/rechterhand/entourage/doc/weg",
+        "/api/member/rechterhand/entourage/gezelschap",
+        "/api/member/rechterhand/entourage/persoon",
+        "/api/member/rechterhand/entourage/persoon/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4049,7 +4342,10 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/flits/"
+        "/api/flits/meld",
+        "/api/flits/rond",
+        "/api/flits/stem",
+        "/api/flits/vooruit"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4208,7 +4504,14 @@
       ],
       "paden": [
         "/api/foundation/gezin/",
-        "/api/rtf/baby/"
+        "/api/rtf/baby/boek",
+        "/api/rtf/baby/entry-maak",
+        "/api/rtf/baby/entry-weg",
+        "/api/rtf/baby/favoriet",
+        "/api/rtf/baby/gezin-zet",
+        "/api/rtf/baby/instellen",
+        "/api/rtf/baby/moment-ai",
+        "/api/rtf/baby/tijdlijn"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4279,7 +4582,11 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/beroepen"
+        "/api/rtf/beroepen",
+        "/api/rtf/beroepen/catalogus",
+        "/api/rtf/beroepen/installeer",
+        "/api/rtf/beroepen/mijn",
+        "/api/rtf/beroepen/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4311,7 +4618,12 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/bieb"
+        "/api/rtf/bieb",
+        "/api/rtf/bieb/ai",
+        "/api/rtf/bieb/catalogus",
+        "/api/rtf/bieb/installeer",
+        "/api/rtf/bieb/mijn",
+        "/api/rtf/bieb/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4350,9 +4662,18 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/foundation",
+        "/api/foundation/agenda",
+        "/api/foundation/agenda/verwijder",
+        "/api/foundation/bord/",
+        "/api/foundation/bord/stroke",
+        "/api/foundation/bord/undo",
+        "/api/foundation/bord/wis",
         "/api/foundation/les/",
-        "/api/foundation/les/stroomticket"
+        "/api/foundation/les/code/roteer",
+        "/api/foundation/les/stroomticket",
+        "/api/foundation/opgave",
+        "/api/foundation/opgaven/",
+        "/api/foundation/schrift/"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4423,8 +4744,13 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtfos/",
-        "/api/rtfos/publiek/steden"
+        "/api/rtfos/publiek/steden",
+        "/api/rtfos/ruil/interesse",
+        "/api/rtfos/ruil/lijst",
+        "/api/rtfos/ruil/meld",
+        "/api/rtfos/ruil/mijn",
+        "/api/rtfos/ruil/plaats",
+        "/api/rtfos/ruil/sluit"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4493,7 +4819,8 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/rtf/club/"
+        "/api/rtf/club/bericht",
+        "/api/rtf/club/portaal"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4525,7 +4852,15 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtfkantoor/"
+        "/api/rtfkantoor/club/afspraak",
+        "/api/rtfkantoor/club/afspraak-zet",
+        "/api/rtfkantoor/club/bericht",
+        "/api/rtfkantoor/club/maak",
+        "/api/rtfkantoor/club/programma",
+        "/api/rtfkantoor/club/programma-zet",
+        "/api/rtfkantoor/club/team",
+        "/api/rtfkantoor/club/zet",
+        "/api/rtfkantoor/clubs"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4730,7 +5065,13 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/geloof"
+        "/api/rtf/geloof",
+        "/api/rtf/geloof/ai",
+        "/api/rtf/geloof/catalogus",
+        "/api/rtf/geloof/installeer",
+        "/api/rtf/geloof/lees",
+        "/api/rtf/geloof/mijn",
+        "/api/rtf/geloof/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4767,7 +5108,16 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtfos/gift/"
+        "/api/rtfos/gift/bevestig",
+        "/api/rtfos/gift/machtiging/intrek",
+        "/api/rtfos/gift/machtiging/mijn",
+        "/api/rtfos/gift/machtiging/teken",
+        "/api/rtfos/gift/plan/mijn",
+        "/api/rtfos/gift/plan/stop",
+        "/api/rtfos/gift/plan/voorstel",
+        "/api/rtfos/gift/projecten",
+        "/api/rtfos/gift/stand",
+        "/api/rtfos/gift/voorbereid"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4800,7 +5150,9 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/welzijn/"
+        "/api/rtf/welzijn/dagboek",
+        "/api/rtf/welzijn/stemming",
+        "/api/rtf/welzijn/toestemming"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4991,8 +5343,20 @@
       "paden": [
         "/api/office/rtfwallet",
         "/api/office/rtfwallet/maak",
-        "/api/rtfkantoor/",
-        "/api/rtfos/gift/"
+        "/api/rtfkantoor/kamer",
+        "/api/rtfkantoor/kamer/advies",
+        "/api/rtfkantoor/kamer/taak",
+        "/api/rtfkantoor/kamer/taak-zet",
+        "/api/rtfkantoor/kamers",
+        "/api/rtfkantoor/overzicht",
+        "/api/rtfkantoor/stadsraad",
+        "/api/rtfkantoor/stadsraad/besluit-sluit",
+        "/api/rtfkantoor/stadsraad/besluit-start",
+        "/api/rtfkantoor/stadsraad/partner-maak",
+        "/api/rtfkantoor/stadsraad/partner-stop",
+        "/api/rtfkantoor/stadsraad/stem",
+        "/api/rtfos/gift/stand/kantoor",
+        "/api/rtfos/gift/stand/zet"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -5138,7 +5502,11 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/lab2/bewoner/",
+        "/api/lab2/bewoner/labs",
+        "/api/lab2/bewoner/overzicht",
+        "/api/lab2/bewoner/stem",
+        "/api/lab2/bewoner/thema",
+        "/api/lab2/bewoner/themas",
         "/api/rtfos/gift/projecten"
       ],
       "schilPaden": [],
@@ -5270,7 +5638,10 @@
       ],
       "paden": [
         "/api/member/democratie/actie/",
-        "/api/member/democratie/kwestie/",
+        "/api/member/democratie/kwestie/gezien",
+        "/api/member/democratie/kwestie/inbreng",
+        "/api/member/democratie/kwestie/intrek",
+        "/api/member/democratie/kwestie/mijn",
         "/api/member/democratie/kwestie/voorstellen"
       ],
       "schilPaden": [],
@@ -5700,11 +6071,12 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 6,
+      "inkomend": 7,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/foundation/hulpwijzer.html",
         "public/apps/foundation/index.html",
+        "public/apps/foundation/os-deelnemer.html",
         "public/apps/foundation/veilig-vertrouwd.html",
         "public/apps/foundation/wegwijzer.html",
         "server/kern/appgids-data/deel4.js",
@@ -5818,7 +6190,8 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/rtfos/portaal/"
+        "/api/rtfos/portaal/deelnemer",
+        "/api/rtfos/portaal/deelnemer/intrekken"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -5851,7 +6224,8 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/rtfos/portaal/"
+        "/api/rtfos/portaal/donateur",
+        "/api/rtfos/portaal/donateur/bewijs"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -5888,7 +6262,9 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/rtfos/portaal/"
+        "/api/rtfos/portaal/gemeente",
+        "/api/rtfos/portaal/ondernemer",
+        "/api/rtfos/portaal/partner"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -5925,7 +6301,9 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtfos/publiek/"
+        "/api/rtfos/publiek/campagnes",
+        "/api/rtfos/publiek/stad",
+        "/api/rtfos/publiek/steden"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -5995,7 +6373,9 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/rtfos/portaal/"
+        "/api/rtfos/portaal/vrijwilliger",
+        "/api/rtfos/portaal/vrijwilliger/uren",
+        "/api/rtfos/portaal/vrijwilliger/zet"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6060,7 +6440,20 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/leren/"
+        "/api/rtf/leren/herhaal",
+        "/api/rtf/leren/herhaal-antwoord",
+        "/api/rtf/leren/herhaal-stand",
+        "/api/rtf/leren/lijst-ai",
+        "/api/rtf/leren/lijst-haal",
+        "/api/rtf/leren/lijst-maak",
+        "/api/rtf/leren/lijst-weg",
+        "/api/rtf/leren/lijsten",
+        "/api/rtf/leren/overhoor-klaar",
+        "/api/rtf/leren/sessie-antwoord",
+        "/api/rtf/leren/sessie-staat",
+        "/api/rtf/leren/sessie-start",
+        "/api/rtf/leren/sessie-zet",
+        "/api/rtf/leren/sessies"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6092,7 +6485,10 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/rtf/partner/"
+        "/api/rtf/partner/besluit-sluit",
+        "/api/rtf/partner/besluit-start",
+        "/api/rtf/partner/raad",
+        "/api/rtf/partner/stem"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6211,7 +6607,16 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/leren/"
+        "/api/rtf/leren/notitie",
+        "/api/rtf/leren/project-ai",
+        "/api/rtf/leren/project-antwoord",
+        "/api/rtf/leren/project-maak",
+        "/api/rtf/leren/project-staat",
+        "/api/rtf/leren/project-uitnodig",
+        "/api/rtf/leren/project-weg",
+        "/api/rtf/leren/projecten",
+        "/api/rtf/leren/taak-maak",
+        "/api/rtf/leren/taak-zet"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6278,8 +6683,12 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/foundation/gezin/",
-        "/api/foundation/registratie/"
+        "/api/foundation/gezin/maak",
+        "/api/foundation/gezin/uitnodiging/accepteer",
+        "/api/foundation/gezin/uitnodiging/bekijk",
+        "/api/foundation/registratie/aanvragen",
+        "/api/foundation/registratie/catalogus",
+        "/api/foundation/registratie/status"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6461,7 +6870,11 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/school"
+        "/api/rtf/school",
+        "/api/rtf/school/catalogus",
+        "/api/rtf/school/installeer",
+        "/api/rtf/school/mijn",
+        "/api/rtf/school/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6503,9 +6916,12 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/foundation",
+        "/api/foundation/ai",
+        "/api/foundation/bord/",
         "/api/foundation/les/",
         "/api/foundation/les/stroomticket",
+        "/api/foundation/opgave/inleveren",
+        "/api/foundation/schrift/",
         "/api/foundation/schrift/opslaan",
         "/api/foundation/tip"
       ],
@@ -6543,7 +6959,10 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/leren/"
+        "/api/rtf/leren/schrijf-bewaar",
+        "/api/rtf/leren/schrijf-feedback",
+        "/api/rtf/leren/schrijf-opdracht",
+        "/api/rtf/leren/schrijfsels"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6759,7 +7178,10 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/tiener/"
+        "/api/rtf/tiener/toets-maak",
+        "/api/rtf/tiener/toets-stap",
+        "/api/rtf/tiener/toets-weg",
+        "/api/rtf/tiener/toetsen"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -6935,8 +7357,35 @@
         "/api/rtf/ice",
         "/api/rtf/link/koppelingen",
         "/api/rtf/link/los",
-        "/api/rtf/social",
+        "/api/rtf/social/block",
+        "/api/rtf/social/call",
+        "/api/rtf/social/connect",
+        "/api/rtf/social/dm",
+        "/api/rtf/social/dm/send",
+        "/api/rtf/social/find",
+        "/api/rtf/social/goedkeuren",
+        "/api/rtf/social/kind/boardroom",
+        "/api/rtf/social/kind/boardroom/zet",
+        "/api/rtf/social/kind/contacten",
+        "/api/rtf/social/kind/verwijder",
+        "/api/rtf/social/opdracht",
+        "/api/rtf/social/oudervoeg",
+        "/api/rtf/social/pin",
+        "/api/rtf/social/pin/connect",
         "/api/rtf/social/pin/live",
+        "/api/rtf/social/pin/live/kijk",
+        "/api/rtf/social/pin/live/verbind",
+        "/api/rtf/social/pin/nieuw",
+        "/api/rtf/social/pin/uit",
+        "/api/rtf/social/pin/zoek",
+        "/api/rtf/social/report",
+        "/api/rtf/social/respond",
+        "/api/rtf/social/snap/send",
+        "/api/rtf/social/snap/view",
+        "/api/rtf/social/snaps",
+        "/api/rtf/social/stories",
+        "/api/rtf/social/story/post",
+        "/api/rtf/social/story/view",
         "/api/rtf/social/stream?code="
       ],
       "schilPaden": [
@@ -7047,7 +7496,9 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtfos/winkel"
+        "/api/rtfos/winkel",
+        "/api/rtfos/winkel/koop",
+        "/api/rtfos/winkel/mijn"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -7079,7 +7530,11 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/tiener/"
+        "/api/rtf/tiener/boek",
+        "/api/rtf/tiener/doel-inleg",
+        "/api/rtf/tiener/doel-maak",
+        "/api/rtf/tiener/doel-weg",
+        "/api/rtf/tiener/potje"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -7190,7 +7645,12 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rechterhand/"
+        "/api/member/rechterhand/ai",
+        "/api/member/rechterhand/garderobe",
+        "/api/member/rechterhand/garderobe/stuk",
+        "/api/member/rechterhand/garderobe/stuk/weg",
+        "/api/member/rechterhand/garderobe/vakman",
+        "/api/member/rechterhand/garderobe/vakman/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -7379,7 +7839,8 @@
         "/api/geld/grens",
         "/api/geld/grens/weg",
         "/api/geld/grens/zet",
-        "/api/geld/pot/",
+        "/api/geld/pot/reserveer",
+        "/api/geld/pot/weg",
         "/api/geld/pot/zet",
         "/api/geld/rahul",
         "/api/kosten/grens",
@@ -7469,12 +7930,13 @@
         "/api/wbw"
       ],
       "zonderServer": false,
-      "inkomend": 40,
+      "inkomend": 41,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-12.js",
         "public/apps/app-main/app-main-23a.js",
         "public/apps/app-main/app-main-24.js",
+        "public/apps/app-main/app-main-29d.js",
         "public/apps/app-main/app-main-30.js",
         "public/apps/balans.html",
         "public/apps/bank.html",
@@ -7482,8 +7944,7 @@
         "public/apps/foundation/index.html",
         "public/apps/foundation/klimaatfonds.html",
         "public/apps/foundation/magazine.html",
-        "public/apps/geld-command.html",
-        "public/apps/geld-command.js"
+        "public/apps/geld-command.html"
       ]
     },
     {
@@ -7750,10 +8211,12 @@
         "public/ds/shell.js"
       ],
       "paden": [
+        "/api/gids/app",
         "/api/member/rechterhand/"
       ],
       "schilPaden": [],
       "domeinen": [
+        "/api/gids",
         "/api/member"
       ],
       "zonderServer": false,
@@ -8572,7 +9035,15 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/supplier/",
+        "/api/supplier/kassa/artikel",
+        "/api/supplier/kassa/dagrapport",
+        "/api/supplier/kassa/derving",
+        "/api/supplier/kassa/instel",
+        "/api/supplier/kassa/kasopmaak",
+        "/api/supplier/kassa/parkeer",
+        "/api/supplier/kassa/retour",
+        "/api/supplier/kassa/scherm",
+        "/api/supplier/kassa/wachtbon",
         "/api/supplier/pos/sale"
       ],
       "schilPaden": [],
@@ -8707,7 +9178,9 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/krant/"
+        "/api/krant/artikel",
+        "/api/krant/gids",
+        "/api/krant/open"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -8737,7 +9210,14 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/lab/"
+        "/api/lab/ai",
+        "/api/lab/kennisbank",
+        "/api/lab/overzicht",
+        "/api/lab/project/bevinding",
+        "/api/lab/project/fase",
+        "/api/lab/project/log",
+        "/api/lab/project/maak",
+        "/api/lab/project/veiligheid"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -9046,7 +9526,16 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/supplier/service/"
+        "/api/supplier/service/bericht",
+        "/api/supplier/service/bevestig",
+        "/api/supplier/service/bevestigingen",
+        "/api/supplier/service/keuzes",
+        "/api/supplier/service/mens",
+        "/api/supplier/service/mijn",
+        "/api/supplier/service/open",
+        "/api/supplier/service/stand",
+        "/api/supplier/service/weiger",
+        "/api/supplier/service/zaak"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -9076,8 +9565,10 @@
         "public/apps/translate.js"
       ],
       "paden": [
-        "/api/account/",
+        "/api/account/koppel",
+        "/api/account/rollen",
         "/api/doos/status",
+        "/api/supplier/apply",
         "/api/supplier/stream"
       ],
       "schilPaden": [
@@ -9124,7 +9615,30 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/library/"
+        "/api/library/agreement/accept",
+        "/api/library/agreement/propose",
+        "/api/library/context",
+        "/api/library/edition/create",
+        "/api/library/edition/freeze",
+        "/api/library/feedback/create",
+        "/api/library/feedback/decide",
+        "/api/library/feedback/list",
+        "/api/library/feedback/resolve",
+        "/api/library/publication/confirm",
+        "/api/library/publication/consent",
+        "/api/library/publication/preview",
+        "/api/library/reader/bookmark",
+        "/api/library/reader/note",
+        "/api/library/reader/open",
+        "/api/library/reader/progress",
+        "/api/library/reader/search",
+        "/api/library/reader/state",
+        "/api/library/revision/add",
+        "/api/library/rights/grant",
+        "/api/library/structure/reorder",
+        "/api/library/studio/workspace",
+        "/api/library/work/create",
+        "/api/library/work/list"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -9228,7 +9742,53 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/bureau/"
+        "/api/member/bureau/ai",
+        "/api/member/bureau/beveiliging",
+        "/api/member/bureau/beveiliging/incident",
+        "/api/member/bureau/beveiliging/post",
+        "/api/member/bureau/beveiliging/risico",
+        "/api/member/bureau/briefing",
+        "/api/member/bureau/collectie",
+        "/api/member/bureau/collectie/bruikleen",
+        "/api/member/bureau/collectie/herkomst",
+        "/api/member/bureau/collectie/taxatie",
+        "/api/member/bureau/collectie/terug",
+        "/api/member/bureau/delegatie",
+        "/api/member/bureau/delegatie/zet",
+        "/api/member/bureau/dieren",
+        "/api/member/bureau/dieren/dier",
+        "/api/member/bureau/dieren/zorg",
+        "/api/member/bureau/graaf",
+        "/api/member/bureau/kamers",
+        "/api/member/bureau/knoop",
+        "/api/member/bureau/lus/beslis",
+        "/api/member/bureau/lus/intake",
+        "/api/member/bureau/lus/toelichting",
+        "/api/member/bureau/lus/verrassing",
+        "/api/member/bureau/lus/zaak",
+        "/api/member/bureau/nu",
+        "/api/member/bureau/overzicht",
+        "/api/member/bureau/raakvlak",
+        "/api/member/bureau/reisdek",
+        "/api/member/bureau/reisdek/bon",
+        "/api/member/bureau/reisdek/gevolg",
+        "/api/member/bureau/reisdek/vergeten",
+        "/api/member/bureau/reisdek/verstoring",
+        "/api/member/bureau/relaties",
+        "/api/member/bureau/relaties/band",
+        "/api/member/bureau/relaties/context",
+        "/api/member/bureau/relaties/ontmoeting",
+        "/api/member/bureau/reputatie",
+        "/api/member/bureau/reputatie/lijn",
+        "/api/member/bureau/reputatie/optreden",
+        "/api/member/bureau/tower",
+        "/api/member/bureau/twin",
+        "/api/member/bureau/twin/beurt",
+        "/api/member/bureau/twin/installatie",
+        "/api/member/bureau/twin/ruimte",
+        "/api/member/bureau/zaak/beslis",
+        "/api/member/bureau/zaak/open",
+        "/api/member/bureau/zaken"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -9298,8 +9858,8 @@
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
-        "public/apps/partner-network.html",
         "public/apps/rtg.html",
+        "public/shared/rtg-heritage-registry.js",
         "server/functies/register/cat-apps2.js",
         "server/kern/appgids-data/deel12.js",
         "server/kern/werkplek-kantoren-bovenbouw.js"
@@ -9413,12 +9973,18 @@
         }
       ],
       "rollen": [],
-      "schrijft": "nee",
+      "schrijft": "onbekend",
       "schil": [],
-      "paden": [],
+      "paden": [
+        "/api/member/dossier",
+        "/api/member/identiteit/verzoeken",
+        "/api/member/loonstroken"
+      ],
       "schilPaden": [],
-      "domeinen": [],
-      "zonderServer": true,
+      "domeinen": [
+        "/api/member"
+      ],
+      "zonderServer": false,
       "inkomend": 3,
       "inIndex": 7,
       "inkomendVan": [
@@ -9445,7 +10011,13 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/carriere/ledger",
+        "/api/carriere/ledger/afschrift",
+        "/api/carriere/ledger/deel",
+        "/api/carriere/ledger/delen",
+        "/api/carriere/ledger/intrek",
+        "/api/carriere/ledger/mijn",
+        "/api/carriere/ledger/stopdelen",
+        "/api/carriere/ledger/zet",
         "/api/concern/mijnwerk"
       ],
       "schilPaden": [],
@@ -9527,13 +10099,15 @@
         "/api/lucht/vlucht/gate",
         "/api/lucht/vlucht/maak",
         "/api/lucht/vlucht/status",
-        "/api/lucht/vlucht/vertraag",
+        "/api/lucht/vlucht/vertraag"
+      ],
+      "schilPaden": [
+        "/api/gids/app",
+        "/api/supplier/login",
         "/api/supplier/roster"
       ],
-      "schilPaden": [],
       "domeinen": [
-        "/api/lucht",
-        "/api/supplier"
+        "/api/lucht"
       ],
       "zonderServer": false,
       "inkomend": 5,
@@ -9663,7 +10237,15 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rechterhand/"
+        "/api/member/rechterhand/ai",
+        "/api/member/rechterhand/maison",
+        "/api/member/rechterhand/maison/log",
+        "/api/member/rechterhand/maison/log/weg",
+        "/api/member/rechterhand/maison/staf",
+        "/api/member/rechterhand/maison/staf/weg",
+        "/api/member/rechterhand/maison/taak",
+        "/api/member/rechterhand/maison/taak/klaar",
+        "/api/member/rechterhand/maison/taak/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -9820,13 +10402,15 @@
         "/api/kmar/incident",
         "/api/kmar/incident/sluit",
         "/api/kmar/incidenten",
-        "/api/kmar/patrouille",
+        "/api/kmar/patrouille"
+      ],
+      "schilPaden": [
+        "/api/gids/app",
+        "/api/supplier/login",
         "/api/supplier/roster"
       ],
-      "schilPaden": [],
       "domeinen": [
-        "/api/kmar",
-        "/api/supplier"
+        "/api/kmar"
       ],
       "zonderServer": false,
       "inkomend": 4,
@@ -9881,7 +10465,27 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/mediaos/",
+        "/api/mediaos/bewaar",
+        "/api/mediaos/bieb",
+        "/api/mediaos/bord",
+        "/api/mediaos/lijst",
+        "/api/mediaos/lijst/deel",
+        "/api/mediaos/lijst/maak",
+        "/api/mediaos/lijst/stuk",
+        "/api/mediaos/lijst/zet",
+        "/api/mediaos/lijsten",
+        "/api/mediaos/maker",
+        "/api/mediaos/meldingen",
+        "/api/mediaos/samen/in",
+        "/api/mediaos/samen/mijn",
+        "/api/mediaos/samen/nodig",
+        "/api/mediaos/samen/start",
+        "/api/mediaos/samen/uit",
+        "/api/mediaos/samen/zet",
+        "/api/mediaos/stuk",
+        "/api/mediaos/stuur",
+        "/api/mediaos/volg",
+        "/api/mediaos/wereld",
         "/api/member/dm/send",
         "/api/muziek/uitgave",
         "/api/ondertiteling/fragment",
@@ -10055,7 +10659,12 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/office/"
+        "/api/office/merk/haal",
+        "/api/office/merk/lijst",
+        "/api/office/merk/maak",
+        "/api/office/merk/sjabloon",
+        "/api/office/merk/uitrol",
+        "/api/office/merk/vestiging"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10387,7 +10996,9 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/move/"
+        "/api/move/gevolg",
+        "/api/move/reis",
+        "/api/move/volgende"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10429,9 +11040,17 @@
       ],
       "paden": [
         "/api/fluister",
-        "/api/muziek/",
         "/api/muziek/bestand",
-        "/api/samen/"
+        "/api/muziek/bestand-ticket",
+        "/api/muziek/bestand-weg",
+        "/api/muziek/feed",
+        "/api/muziek/mooi",
+        "/api/samen/code",
+        "/api/samen/maak",
+        "/api/samen/mee",
+        "/api/samen/muziek",
+        "/api/samen/staat",
+        "/api/samen/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10497,7 +11116,16 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/nav/"
+        "/api/nav/bestemmingen",
+        "/api/nav/gebied/kies",
+        "/api/nav/gebied/pakket",
+        "/api/nav/gebied/weg",
+        "/api/nav/gebieden",
+        "/api/nav/kaart",
+        "/api/nav/meld",
+        "/api/nav/poi",
+        "/api/nav/route",
+        "/api/nav/status"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10539,7 +11167,9 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/nieuws"
+        "/api/member/nieuws",
+        "/api/member/nieuws/ai",
+        "/api/member/nieuws/artikel"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10696,8 +11326,20 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/onderneming/",
-        "/api/onderneming/rechtsvormen"
+        "/api/onderneming/aanvraag",
+        "/api/onderneming/aanvraag/stand",
+        "/api/onderneming/dagbeeld",
+        "/api/onderneming/ingeschreven",
+        "/api/onderneming/intake",
+        "/api/onderneming/kas/saldo",
+        "/api/onderneming/mijn",
+        "/api/onderneming/nieuw",
+        "/api/onderneming/oprichting/zet",
+        "/api/onderneming/plan/vastleggen",
+        "/api/onderneming/rechtsvorm",
+        "/api/onderneming/rechtsvormen",
+        "/api/onderneming/verkenning",
+        "/api/onderneming/werkruimte"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10733,6 +11375,12 @@
       ],
       "paden": [
         "/api/staff/oog",
+        "/api/staff/oog/leer",
+        "/api/staff/oog/nulmeting",
+        "/api/staff/oog/nulmeting/van",
+        "/api/staff/oog/schouw",
+        "/api/staff/oog/schouwen",
+        "/api/staff/oog/uitgifte",
         "/api/supplier/oog/overzicht"
       ],
       "schilPaden": [],
@@ -10773,8 +11421,36 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/mob/",
-        "/api/ov/"
+        "/api/mob/aanbod",
+        "/api/mob/abo/aanbod",
+        "/api/mob/abo/koop",
+        "/api/mob/abo/mijn",
+        "/api/mob/annuleer",
+        "/api/mob/beleid",
+        "/api/mob/kaart/aanbod",
+        "/api/mob/kaart/koop",
+        "/api/mob/kaart/mijn",
+        "/api/mob/kaart/toon",
+        "/api/mob/mijn",
+        "/api/mob/pendel",
+        "/api/mob/pendel/reserveer",
+        "/api/mob/plekken",
+        "/api/mob/reis/annuleer",
+        "/api/mob/reis/boek",
+        "/api/mob/reis/mijn",
+        "/api/mob/reis/plan",
+        "/api/mob/volg",
+        "/api/ov/code",
+        "/api/ov/code/intrek",
+        "/api/ov/hier",
+        "/api/ov/kaart",
+        "/api/ov/mijn",
+        "/api/ov/operatie/bevestig",
+        "/api/ov/operatie/concept",
+        "/api/ov/operatie/segment",
+        "/api/ov/operaties",
+        "/api/ov/regie",
+        "/api/ov/uit"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -10818,7 +11494,11 @@
       "paden": [
         "/api/supplier/ov/overzicht"
       ],
-      "schilPaden": [],
+      "schilPaden": [
+        "/api/gids/app",
+        "/api/supplier/login",
+        "/api/supplier/roster"
+      ],
       "domeinen": [
         "/api/supplier"
       ],
@@ -10856,7 +11536,11 @@
         "/api/staff/ov/",
         "/api/supplier/ov/overzicht"
       ],
-      "schilPaden": [],
+      "schilPaden": [
+        "/api/gids/app",
+        "/api/supplier/login",
+        "/api/supplier/roster"
+      ],
       "domeinen": [
         "/api/staff",
         "/api/supplier"
@@ -10919,7 +11603,9 @@
         "/api/overheid/water/meldingen/mijn",
         "/api/overheid/waterschap/betaal",
         "/api/overheid/waterschap/mijn",
-        "/api/rtgid/"
+        "/api/rtgid/start",
+        "/api/rtgid/status",
+        "/api/rtgid/wie"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11010,7 +11696,11 @@
       "paden": [
         "/api/staff/ov/"
       ],
-      "schilPaden": [],
+      "schilPaden": [
+        "/api/gids/app",
+        "/api/supplier/login",
+        "/api/supplier/roster"
+      ],
       "domeinen": [
         "/api/staff"
       ],
@@ -11058,7 +11748,7 @@
     {
       "bestand": "public/apps/partner-network.html",
       "url": "/apps/partner-network.html",
-      "titel": "RTG Symbiotic Network",
+      "titel": "Partner Network · RTG",
       "h1": "",
       "soort": "scherm",
       "aliasNaar": null,
@@ -11070,12 +11760,17 @@
         }
       ],
       "rollen": [],
-      "schrijft": "nee",
+      "schrijft": "onbekend",
       "schil": [],
-      "paden": [],
+      "paden": [
+        "/api/supplier/mall/aanvraag/reageer",
+        "/api/supplier/netwerk/overzicht"
+      ],
       "schilPaden": [],
-      "domeinen": [],
-      "zonderServer": true,
+      "domeinen": [
+        "/api/supplier"
+      ],
+      "zonderServer": false,
       "inkomend": 5,
       "inIndex": 7,
       "inkomendVan": [
@@ -11126,7 +11821,13 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/webauthn/"
+        "/api/webauthn/bevestig/opties",
+        "/api/webauthn/lijst",
+        "/api/webauthn/login",
+        "/api/webauthn/opties",
+        "/api/webauthn/registreer",
+        "/api/webauthn/registreer/opties",
+        "/api/webauthn/weg"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11166,20 +11867,40 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/"
+        "/api/link/cap/maak",
+        "/api/pay/oplaad",
+        "/api/pay/overzicht",
+        "/api/pay/stuur",
+        "/api/pay/tegoed",
+        "/api/pay/tegoed/koop",
+        "/api/pay/tegoed/roteer",
+        "/api/pay/tegoed/terug",
+        "/api/pay/tegoed/verzilver",
+        "/api/pay/tik",
+        "/api/pay/tikcode",
+        "/api/pay/tiks",
+        "/api/pay/verzoek",
+        "/api/pay/verzoek/betaal",
+        "/api/pay/verzoek/intrek"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/"
+        "/api/link",
+        "/api/pay"
       ],
       "zonderServer": false,
-      "inkomend": 7,
+      "inkomend": 12,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23b.js",
         "public/apps/geld/schil.js",
         "public/apps/geld/voorzijde.js",
+        "public/apps/krant.html",
+        "public/apps/podium.html",
         "public/apps/rtg.html",
+        "public/apps/theater.html",
+        "public/apps/thuis.html",
+        "public/apps/vonk.html",
         "public/shared/rosapps.js",
         "server/kern/appgids-data/deel1.js",
         "server/kern/appgids-data/deel1c.js"
@@ -11197,7 +11918,31 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/office/payroll/"
+        "/api/office/payroll/aangifte",
+        "/api/office/payroll/aangifte/aansluiting",
+        "/api/office/payroll/aangifte/indienen",
+        "/api/office/payroll/bron",
+        "/api/office/payroll/component",
+        "/api/office/payroll/componenten",
+        "/api/office/payroll/contract",
+        "/api/office/payroll/dekking",
+        "/api/office/payroll/dossier",
+        "/api/office/payroll/herbouw",
+        "/api/office/payroll/journaal",
+        "/api/office/payroll/loonrun",
+        "/api/office/payroll/match",
+        "/api/office/payroll/overzicht",
+        "/api/office/payroll/personeel",
+        "/api/office/payroll/regels",
+        "/api/office/payroll/regels/haal",
+        "/api/office/payroll/regels/keur",
+        "/api/office/payroll/run/definitief",
+        "/api/office/payroll/run/een",
+        "/api/office/payroll/run/keur",
+        "/api/office/payroll/run/open",
+        "/api/office/payroll/run/verklaar",
+        "/api/office/payroll/verklaar",
+        "/api/office/payroll/verval"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11241,7 +11986,7 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 51,
+      "inkomend": 52,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24b.js",
@@ -11307,7 +12052,21 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/podium/",
+        "/api/podium/abonneer",
+        "/api/podium/blokkeer",
+        "/api/podium/cadeau",
+        "/api/podium/chat",
+        "/api/podium/kanaal/aanmeld",
+        "/api/podium/kanaal/zet",
+        "/api/podium/kanalen",
+        "/api/podium/kijk",
+        "/api/podium/koop",
+        "/api/podium/live",
+        "/api/podium/meld",
+        "/api/podium/mijn",
+        "/api/podium/signaal",
+        "/api/podium/waar",
+        "/api/podium/weg",
         "/api/stream"
       ],
       "schilPaden": [],
@@ -11351,7 +12110,10 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/rtgone/"
+        "/api/rtgone/project/bewijs",
+        "/api/rtgone/project/oplever",
+        "/api/rtgone/project/taak",
+        "/api/rtgone/state"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11524,7 +12286,16 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/office/"
+        "/api/office/redactie",
+        "/api/office/redactie/ai/redactie",
+        "/api/office/redactie/ai/schrijf",
+        "/api/office/redactie/artikel/maak",
+        "/api/office/redactie/artikel/status",
+        "/api/office/redactie/artikel/verwijder",
+        "/api/office/redactie/drukproef",
+        "/api/office/redactie/editie/maak",
+        "/api/office/redactie/editie/status",
+        "/api/office/redactie/nieuwstips"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11560,6 +12331,7 @@
         "public/ds/shell.js"
       ],
       "paden": [
+        "/api/gids/app",
         "/api/member/rechterhand/reis/item",
         "/api/member/rechterhand/reis/item/weg",
         "/api/member/rechterhand/reis/weg",
@@ -11572,6 +12344,7 @@
       ],
       "schilPaden": [],
       "domeinen": [
+        "/api/gids",
         "/api/member",
         "/api/reis"
       ],
@@ -11654,11 +12427,17 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/"
+        "/api/auth/register",
+        "/api/reis/uitnodiging/eisop",
+        "/api/reis/uitnodiging/mijn",
+        "/api/reis/uitnodiging/open",
+        "/api/reis/uitnodiging/roteer",
+        "/api/reis/uitnodiging/weg"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/"
+        "/api/auth",
+        "/api/reis"
       ],
       "zonderServer": false,
       "inkomend": 7,
@@ -11737,9 +12516,12 @@
         "public/ds/shell.js"
       ],
       "paden": [
+        "/api/bestanden/",
         "/api/bestanden/haal",
         "/api/bestanden/mijn",
         "/api/fluister",
+        "/api/ik/beelden",
+        "/api/ik/beelden/zet",
         "/api/mob/aanbod",
         "/api/mob/mijn",
         "/api/mob/plekken",
@@ -11770,6 +12552,7 @@
         "/api/reis/los",
         "/api/reis/los/doe",
         "/api/reis/reizen",
+        "/api/reis/uitnodiging/nodig-uit",
         "/api/reis/wacht",
         "/api/reis/wereld"
       ],
@@ -11777,6 +12560,7 @@
       "domeinen": [
         "/api/bestanden",
         "/api/fluister",
+        "/api/ik",
         "/api/mob",
         "/api/reis"
       ],
@@ -11818,8 +12602,34 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rendezvous/",
-        "/api/member/rendezvous/profile-photo"
+        "/api/member/rendezvous/aanwezig/wis",
+        "/api/member/rendezvous/akkoord",
+        "/api/member/rendezvous/arrange",
+        "/api/member/rendezvous/blokkeer",
+        "/api/member/rendezvous/circle/rsvp",
+        "/api/member/rendezvous/circles",
+        "/api/member/rendezvous/concierge",
+        "/api/member/rendezvous/concierge/approve",
+        "/api/member/rendezvous/concierge/request",
+        "/api/member/rendezvous/date",
+        "/api/member/rendezvous/edge",
+        "/api/member/rendezvous/encounter",
+        "/api/member/rendezvous/introductie/antwoord",
+        "/api/member/rendezvous/introducties",
+        "/api/member/rendezvous/kandidaten",
+        "/api/member/rendezvous/like",
+        "/api/member/rendezvous/matches",
+        "/api/member/rendezvous/pas",
+        "/api/member/rendezvous/profiel",
+        "/api/member/rendezvous/profiel/zet",
+        "/api/member/rendezvous/profile-photo",
+        "/api/member/rendezvous/profile-photo/order",
+        "/api/member/rendezvous/profile-photo/publish",
+        "/api/member/rendezvous/profile-photo/remove",
+        "/api/member/rendezvous/samen",
+        "/api/member/rendezvous/samen/zet",
+        "/api/member/rendezvous/tafel/antwoord",
+        "/api/member/rendezvous/tafels"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -11868,6 +12678,7 @@
         "/api/member/spel/antwoord",
         "/api/member/spel/mijn",
         "/api/member/spel/nieuw",
+        "/api/residentie/",
         "/api/residentie/bel",
         "/api/residentie/betreed",
         "/api/residentie/emote",
@@ -12111,7 +12922,9 @@
         "/api/fluister",
         "/api/fluister/profiel",
         "/api/gids/app",
-        "/api/member/huis/",
+        "/api/member/huis/dossier",
+        "/api/member/huis/map",
+        "/api/member/huis/rahul",
         "/api/samen/",
         "/api/service/bel/mijn",
         "/api/service/bevestig",
@@ -12194,8 +13007,14 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/rtgid/",
-        "/api/webauthn/"
+        "/api/rtgid/bevestig",
+        "/api/rtgid/inzage",
+        "/api/rtgid/koppel",
+        "/api/rtgid/machtig",
+        "/api/rtgid/stapop/opties",
+        "/api/rtgid/weiger",
+        "/api/webauthn/registreer",
+        "/api/webauthn/registreer/opties"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -12224,7 +13043,14 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/office/"
+        "/api/office/onderzoeker",
+        "/api/office/onderzoeker/onderzoek",
+        "/api/office/onderzoeker/ontwikkel",
+        "/api/office/onderzoeker/rapport",
+        "/api/office/rtgai",
+        "/api/office/rtgai/roer/geef",
+        "/api/office/rtgai/roer/terug",
+        "/api/office/rtgai/train"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -12263,7 +13089,17 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/rtgone/"
+        "/api/rtgone/automatisering/herstel",
+        "/api/rtgone/automatisering/voer",
+        "/api/rtgone/automatisering/voorbereid",
+        "/api/rtgone/belofte",
+        "/api/rtgone/frictie",
+        "/api/rtgone/intentie",
+        "/api/rtgone/overdracht",
+        "/api/rtgone/project/van-mail",
+        "/api/rtgone/rol/geef",
+        "/api/rtgone/rol/trek",
+        "/api/rtgone/state"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -12559,7 +13395,10 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/service/",
+        "/api/service/bel",
+        "/api/service/bel/eind",
+        "/api/service/bel/mijn",
+        "/api/service/bel/signaal",
         "/api/stream"
       ],
       "schilPaden": [],
@@ -12588,7 +13427,25 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/office/service/",
+        "/api/office/service/ai/vraag",
+        "/api/office/service/bericht",
+        "/api/office/service/bevestiging/code",
+        "/api/office/service/bevestiging/vraag",
+        "/api/office/service/bundel",
+        "/api/office/service/eigenaar",
+        "/api/office/service/foutsignalen",
+        "/api/office/service/gesprek/eind",
+        "/api/office/service/gesprek/neem",
+        "/api/office/service/gesprek/signaal",
+        "/api/office/service/gesprekken",
+        "/api/office/service/incident/hersteld",
+        "/api/office/service/kanalen",
+        "/api/office/service/kwaliteit",
+        "/api/office/service/patronen",
+        "/api/office/service/stand",
+        "/api/office/service/wachtrij",
+        "/api/office/service/weeg",
+        "/api/office/service/zaak",
         "/api/stream"
       ],
       "schilPaden": [],
@@ -12627,7 +13484,20 @@
       ],
       "paden": [
         "/api/salon/promo",
-        "/api/site/"
+        "/api/site/ai",
+        "/api/site/bewaar",
+        "/api/site/foto",
+        "/api/site/fotos",
+        "/api/site/haal",
+        "/api/site/herstel",
+        "/api/site/live",
+        "/api/site/mijn",
+        "/api/site/offline",
+        "/api/site/persoonlijk",
+        "/api/site/publiceer",
+        "/api/site/sjablonen",
+        "/api/site/sjabloon",
+        "/api/site/versies"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -12748,6 +13618,40 @@
       ],
       "paden": [
         "/api/member/spel/",
+        "/api/member/spel/antwoord",
+        "/api/member/spel/arcade-bord",
+        "/api/member/spel/arcade-score",
+        "/api/member/spel/dag",
+        "/api/member/spel/dag-klaar",
+        "/api/member/spel/dag-start",
+        "/api/member/spel/mijn",
+        "/api/member/spel/nabespreking",
+        "/api/member/spel/naspelen",
+        "/api/member/spel/nieuw",
+        "/api/member/spel/online",
+        "/api/member/spel/opgeven",
+        "/api/member/spel/praat",
+        "/api/member/spel/praat-stuur",
+        "/api/member/spel/prestaties",
+        "/api/member/spel/projectie-open",
+        "/api/member/spel/projectie-sluit",
+        "/api/member/spel/rahul",
+        "/api/member/spel/random",
+        "/api/member/spel/sneek-score",
+        "/api/member/spel/staat",
+        "/api/member/spel/stand",
+        "/api/member/spel/sudoku-klaar",
+        "/api/member/spel/sudoku-nieuw",
+        "/api/member/spel/team-antwoord",
+        "/api/member/spel/team-mijn",
+        "/api/member/spel/team-nieuw",
+        "/api/member/spel/team-verlaat",
+        "/api/member/spel/toewijzen",
+        "/api/member/spel/uitslagen",
+        "/api/member/spel/varianten",
+        "/api/member/spel/zet",
+        "/api/member/spel/zichtbaar",
+        "/api/member/spel/zichtbaar-zet",
         "/api/rtf/social/stream?code=",
         "/api/rtf/spel/",
         "/api/stream"
@@ -12832,7 +13736,14 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/sport"
+        "/api/member/sport/bord",
+        "/api/member/sport/momenten",
+        "/api/member/sport/plattegrond",
+        "/api/member/sport/sponsor",
+        "/api/member/sport/sponsors",
+        "/api/member/sport/stand",
+        "/api/member/sport/ticket/koop",
+        "/api/member/sport/tickets"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -12925,12 +13836,13 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/",
+        "/api/stad/bewoner",
+        "/api/stad/melding",
         "/api/stream"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/",
+        "/api/stad",
         "/api/stream"
       ],
       "zonderServer": false,
@@ -12963,7 +13875,10 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
-        "/api/office/",
+        "/api/office/stad",
+        "/api/office/stad/node/aanmeld",
+        "/api/office/stad/werk",
+        "/api/office/stad/werk/klaar",
         "/api/office/stream",
         "/api/stad/doos/hartslag"
       ],
@@ -13022,7 +13937,14 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/member/rechterhand/"
+        "/api/member/rechterhand/ai",
+        "/api/member/rechterhand/table",
+        "/api/member/rechterhand/table/gast",
+        "/api/member/rechterhand/table/gast/weg",
+        "/api/member/rechterhand/table/menu",
+        "/api/member/rechterhand/table/menu/weg",
+        "/api/member/rechterhand/table/weg",
+        "/api/member/rechterhand/table/zet"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13129,9 +14051,25 @@
       ],
       "paden": [
         "/api/stream",
-        "/api/theater/",
+        "/api/theater/abonneer",
+        "/api/theater/huisstijl",
+        "/api/theater/kanaal/aanmeld",
         "/api/theater/kijk/",
-        "/api/theater/upload/"
+        "/api/theater/kijkplicht/gedaan",
+        "/api/theater/kijkplicht/mijn",
+        "/api/theater/kijkplicht/stand",
+        "/api/theater/kijkplicht/zet",
+        "/api/theater/meld",
+        "/api/theater/ondertitels",
+        "/api/theater/reactie",
+        "/api/theater/reacties",
+        "/api/theater/signaal",
+        "/api/theater/thuis/aanwezig",
+        "/api/theater/upload/",
+        "/api/theater/video/maak",
+        "/api/theater/zaak",
+        "/api/theater/zaak/aanmeld",
+        "/api/theater/zaal"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13173,7 +14111,26 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/thuis/"
+        "/api/thuis/annuleer",
+        "/api/thuis/bericht",
+        "/api/thuis/beslis",
+        "/api/thuis/blokkeer",
+        "/api/thuis/boek",
+        "/api/thuis/bord",
+        "/api/thuis/checkin",
+        "/api/thuis/checkuit",
+        "/api/thuis/cohost",
+        "/api/thuis/detail",
+        "/api/thuis/huis",
+        "/api/thuis/huizen",
+        "/api/thuis/mijn",
+        "/api/thuis/prijsadvies",
+        "/api/thuis/review",
+        "/api/thuis/reviews",
+        "/api/thuis/typen",
+        "/api/thuis/wens",
+        "/api/thuis/wenslijst",
+        "/api/thuis/zoek"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13531,7 +14488,12 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/vertegenwoordiging"
+        "/api/vertegenwoordiging/aanvaard",
+        "/api/vertegenwoordiging/bevoegdheden",
+        "/api/vertegenwoordiging/grens",
+        "/api/vertegenwoordiging/intrek",
+        "/api/vertegenwoordiging/mijn",
+        "/api/vertegenwoordiging/simulatie"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13589,7 +14551,13 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/member/vluchten"
+        "/api/member/vluchten/boek",
+        "/api/member/vluchten/bord",
+        "/api/member/vluchten/charter",
+        "/api/member/vluchten/incheck",
+        "/api/member/vluchten/mijn",
+        "/api/member/vluchten/pass/intrek",
+        "/api/member/vluchten/pass/roteer"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13657,7 +14625,8 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/supplier/mob/"
+        "/api/supplier/mob/vloot",
+        "/api/supplier/mob/voertuig"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13693,8 +14662,20 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/vonk/",
-        "/api/vonk/profile-photo"
+        "/api/vonk/bericht",
+        "/api/vonk/betaal",
+        "/api/vonk/blokkeer",
+        "/api/vonk/edge",
+        "/api/vonk/halfweg",
+        "/api/vonk/kies",
+        "/api/vonk/like",
+        "/api/vonk/mijn",
+        "/api/vonk/profiel",
+        "/api/vonk/profile-photo",
+        "/api/vonk/profile-photo/order",
+        "/api/vonk/profile-photo/publish",
+        "/api/vonk/profile-photo/remove",
+        "/api/vonk/selectie"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -13777,7 +14758,13 @@
         "public/apps/schermcontext.js"
       ],
       "paden": [
-        "/api/office/atelierweb/"
+        "/api/office/atelierweb/bewaar",
+        "/api/office/atelierweb/etalage",
+        "/api/office/atelierweb/foto",
+        "/api/office/atelierweb/fotos",
+        "/api/office/atelierweb/haal",
+        "/api/office/atelierweb/lijst",
+        "/api/office/atelierweb/salon"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -14109,7 +15096,18 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/supplier/site/"
+        "/api/supplier/site/cijfers",
+        "/api/supplier/site/genereer",
+        "/api/supplier/site/herstel",
+        "/api/supplier/site/live",
+        "/api/supplier/site/mijn",
+        "/api/supplier/site/offline",
+        "/api/supplier/site/plan",
+        "/api/supplier/site/publiceer",
+        "/api/supplier/site/spoor",
+        "/api/supplier/site/team",
+        "/api/supplier/site/team/zet",
+        "/api/supplier/site/versies"
       ],
       "schilPaden": [],
       "domeinen": [

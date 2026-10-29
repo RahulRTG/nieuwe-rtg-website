@@ -1,7 +1,12 @@
 /* Domein "rtfos", deel "doelgroepen": de vrijwilliger, de hulpvrager en de buurt.
 
-   DRIE INGANGEN VOOR MENSEN ZONDER RTG-ACCOUNT, en ze staan hier bij elkaar
-   omdat ze dezelfde vraag stellen: wat mag iemand zien die geen inlog heeft?
+   DRIE INGANGEN VOOR MENSEN BUITEN HET KANTOOR, en ze staan hier bij elkaar
+   omdat ze dezelfde vraag stellen: wat mag iemand zien die geen kantoor is?
+   Sinds het eigenaarsbesluit van 19 oktober 2026 vragen ze alle drie een
+   account (een gratis account is genoeg). Bij de twee codedeuren koppelt de
+   code dat account de eerste keer aan het dossier en is hij daarna een extra
+   sleutel naast de sessie (kern/codekoppel.js). Een hulpvrager in acute nood
+   hoeft niets: de beschermingsdeur blijft open (HDI.md par. 7).
 
    1. DE VRIJWILLIGER opent op zijn eigen code (RTFV-...): zijn planning, zijn
       uren, zijn VOG-datum. Hij werkt zijn beschikbaarheid zelf bij -- en niet
@@ -21,24 +26,29 @@
    bron-rem, en ruimer: dit zijn leesroutes die een buurtbewoner op zijn telefoon
    opent. Ze geven per constructie niets terug wat de moeite van het afgrazen
    waard is (kern/rtfos/publiek.js) -- de rem staat er tegen het dreunen, niet
-   tegen het lekken.
-
-   Alle acht staan met een reden op de publieke lijst van check.js regel 28. */
+   tegen het lekken. */
 const rem = require('../../rem');
 
-module.exports = ({ app, auth, officeAuth, rtfos, veilig, H }) => {
+module.exports = ({ app, auth, officeAuth, rtfos, veilig, H, rtf, resolveSession }) => {
+  const koppel = rtfos.codekoppeling;
+  /* DE BUURT VRAAGT EEN SESSIE (eigenaarsbesluit 19 oktober 2026: gebruiken
+     vraagt een account). Een lid, een zaak of het kantoor met zijn sessie; een
+     gezinsprofiel met code en token in het lijf, en dan alleen uit een gezin
+     dat aan het account van een ouder hangt (foundation/accountplicht.js). De
+     vraag staat in kern/elkesessie.js; zonder sessie 401. */
+  const { magSessie, NIET_INGELOGD } = require('../../kern/elkesessie');
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfoscode|' + codeVan(req) });
   const leesRem = rem({ windowMs: 60000, limit: 120, key: req => 'rtfpubliek|' + String(req.ip) });
 
   // ---------- de vrijwilliger, op zijn eigen code ----------
-  app.post('/api/rtfos/portaal/vrijwilliger', ipRem, codeRem, (req, res) =>
-    veilig(res, () => rtfos.vrijwilligerportaal.portaal(codeVan(req))));
-  app.post('/api/rtfos/portaal/vrijwilliger/zet', ipRem, codeRem, (req, res) =>
-    veilig(res, () => rtfos.vrijwilligerportaal.zetEigen(codeVan(req), req.body || {})));
-  app.post('/api/rtfos/portaal/vrijwilliger/uren', ipRem, codeRem, (req, res) =>
-    veilig(res, () => rtfos.vrijwilligerportaal.meldUren(codeVan(req), req.body || {})));
+  app.post('/api/rtfos/portaal/vrijwilliger', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'vrijwilliger', codeVan(req), () => rtfos.vrijwilligerportaal.portaal(codeVan(req)))));
+  app.post('/api/rtfos/portaal/vrijwilliger/zet', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'vrijwilliger', codeVan(req), () => rtfos.vrijwilligerportaal.zetEigen(codeVan(req), req.body || {}))));
+  app.post('/api/rtfos/portaal/vrijwilliger/uren', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'vrijwilliger', codeVan(req), () => rtfos.vrijwilligerportaal.meldUren(codeVan(req), req.body || {}))));
 
   /* Zijn dossier aan zijn EIGEN account koppelen: ingelogd EN met zijn code,
      allebei tegelijk (kern/rtfos/vrijwilligeraccount.js). Het account komt uit
@@ -49,17 +59,26 @@ module.exports = ({ app, auth, officeAuth, rtfos, veilig, H }) => {
     veilig(res, () => rtfos.vrijwilligerportaal.account.ontkoppel(req.session && req.session.key)));
 
   // ---------- de hulpvrager, op zijn eigen code ----------
-  app.post('/api/rtfos/portaal/deelnemer', ipRem, codeRem, (req, res) =>
-    veilig(res, () => rtfos.deelnemerportaal.portaal(codeVan(req))));
+  app.post('/api/rtfos/portaal/deelnemer', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'deelnemer', codeVan(req), () => rtfos.deelnemerportaal.portaal(codeVan(req)))));
   // wie ja zei, mag nee zeggen -- zonder eerst te bellen naar de organisatie
   // die hij juist wilde stoppen
-  app.post('/api/rtfos/portaal/deelnemer/intrekken', ipRem, codeRem, (req, res) =>
-    veilig(res, () => rtfos.deelnemerportaal.trekIn(codeVan(req), (req.body || {}).reden)));
+  app.post('/api/rtfos/portaal/deelnemer/intrekken', auth, ipRem, codeRem, (req, res) =>
+    veilig(res, () => koppel.met(req, 'deelnemer', codeVan(req), () => rtfos.deelnemerportaal.trekIn(codeVan(req), (req.body || {}).reden))));
 
-  // ---------- de buurt, zonder code ----------
-  app.post('/api/rtfos/publiek/steden', leesRem, (req, res) => veilig(res, () => rtfos.publiek.steden()));
-  app.post('/api/rtfos/publiek/stad', leesRem, (req, res) => veilig(res, () => rtfos.publiek.stad((req.body || {}).id)));
-  app.post('/api/rtfos/publiek/campagnes', leesRem, (req, res) => veilig(res, () => rtfos.publiek.campagnes()));
+  // ---------- de buurt, zonder code maar met een account of een gezinsprofiel ----------
+  app.post('/api/rtfos/publiek/steden', leesRem, (req, res) => {
+    if (!magSessie(req, { resolveSession, rtf })) return res.status(401).json(NIET_INGELOGD);
+    veilig(res, () => rtfos.publiek.steden());
+  });
+  app.post('/api/rtfos/publiek/stad', leesRem, (req, res) => {
+    if (!magSessie(req, { resolveSession, rtf })) return res.status(401).json(NIET_INGELOGD);
+    veilig(res, () => rtfos.publiek.stad((req.body || {}).id));
+  });
+  app.post('/api/rtfos/publiek/campagnes', leesRem, (req, res) => {
+    if (!magSessie(req, { resolveSession, rtf })) return res.status(401).json(NIET_INGELOGD);
+    veilig(res, () => rtfos.publiek.campagnes());
+  });
 
   /* ---------- de kantoorkant ----------
      Een code uitgeven is een besluit en geen bijvangst: er kijkt daarna iemand

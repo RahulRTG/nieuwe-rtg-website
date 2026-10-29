@@ -9,12 +9,18 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
+// Vaste starttijd via de bestaande klok; time-outs blijven gewoon doorlopen.
+const MOMENT = process.env.RTG_VERBLIJF_TEST_MOMENT || '2026-10-19T23:30:00.000Z';
+assert.ok(Number.isFinite(Date.parse(MOMENT)), 'geldig vast moment voor de verblijfproef');
+let hotelZone = tijdzone.HUIS_ZONE;
 
 let srv, base;
 let lid, hotel;               // lid-token en hotelmanager-token
 let kamer;                    // een kamer van HOSHI
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-verblijf-'));
-const dagPlus = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+// Een hotelnacht volgt de lokale kalender, ook als een dag 23 of 25 uur telt.
+const dagPlus = n => tijdzone.plusDagen(tijdzone.datumIn(MOMENT, hotelZone), n);
 
 const api = (pad, body, t) => fetch(base + '/api/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
@@ -22,7 +28,7 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: MOMENT } });
   base = srv.base;
   lid = (await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json()).token;
   const roster = await api('supplier/roster', { code: 'HOSHI' });
@@ -32,12 +38,33 @@ test.before(async () => {
     body: JSON.stringify({ code: 'HOSHI', staffId: manager.id, pin: '1234' })
   })).json();
   hotel = login.token;
+  hotelZone = tijdzone.zaakZoneOfHuis(login.state.supplier || login.state);
   kamer = ((login.state.supplier || {}).rooms || login.state.rooms || [])[0];
   assert.ok(lid && hotel && kamer, 'het lid en de receptie zijn binnen en er is een kamer');
 });
 test.after(() => {
   stop(srv && srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+});
+
+test('hotelkalender volgt lokale middernacht en zomer-/wintertijd', () => {
+  const gevallen = [
+    ['2026-01-14T22:30:00Z', '2026-01-14'],
+    ['2026-01-14T23:30:00Z', '2026-01-15'],
+    ['2026-01-15T00:30:00Z', '2026-01-15'],
+    ['2026-07-14T21:30:00Z', '2026-07-14'],
+    ['2026-07-14T22:30:00Z', '2026-07-15'],
+    ['2026-07-15T00:30:00Z', '2026-07-15'],
+    ['2026-03-28T23:30:00Z', '2026-03-29'],
+    ['2026-03-29T01:30:00Z', '2026-03-29'],
+    ['2026-10-24T22:30:00Z', '2026-10-25'],
+    ['2026-10-25T01:30:00Z', '2026-10-25']
+  ];
+  for (const [moment, verwacht] of gevallen) {
+    assert.equal(tijdzone.datumIn(moment, hotelZone), verwacht, moment + ' in ' + hotelZone);
+  }
+  assert.equal(tijdzone.plusDagen('2026-03-29', 1), '2026-03-30', '23-uursdag is één nacht');
+  assert.equal(tijdzone.plusDagen('2026-10-25', 1), '2026-10-26', '25-uursdag is één nacht');
 });
 
 let vid; // het verblijf dat de keten doorloopt

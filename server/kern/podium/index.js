@@ -19,7 +19,7 @@
    levensloop van een kanaal in ./kanaal, de zaal (chat/cadeau/abonnement/
    veiligheid) in ./interactie. */
 
-const { idVanKey } = require('../../lib/lidsleutel');
+const accountOpSleutel = require('../../lib/account-op-sleutel');
 
 const MIN_LEEFTIJD = 18;
 const CADEAUS = [
@@ -49,11 +49,7 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, keyV
      een echt account, en (waar de zone dat vraagt) is het geverifieerd en oud
      genoeg. Welke zone WELKE eis stelt staat in ./zones.js -- daar hoort dat
      besluit, niet hier. */
-  function accountVanKey(key) {
-    const id = idVanKey(key);
-    if (id == null) return null;
-    try { return accounts.getUserById(id); } catch (e) { return null; }
-  }
+  const accountVanKey = key => accountOpSleutel(accounts, key);
   function lat(key, minLeeftijd, opties) {
     const u = accountVanKey(key);
     if (!u) return { ok: false, reden: 'Alleen voor RTG-leden met een eigen account.' };

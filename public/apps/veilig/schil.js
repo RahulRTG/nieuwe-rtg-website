@@ -78,7 +78,7 @@
   function bouw() {
     var nav = $('#standen');
     nav.innerHTML = V.standen.map(function (s) {
-      return '<button type="button" data-id="' + s.id + '" aria-current="false">' + s.naam + '</button>';
+      return '<button type="button" data-id="' + s.id + '" data-stand="veilig-' + s.id + '" aria-current="false">' + s.naam + '</button>';
     }).join('');
     nav.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-id]');

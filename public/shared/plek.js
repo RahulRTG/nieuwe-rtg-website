@@ -62,12 +62,14 @@
       var doos = document.createElement('div');
       doos.className = 'rtgplek';
       doos.setAttribute('role', 'dialog');
+      doos.setAttribute('aria-modal', 'false');
       doos.setAttribute('aria-label', 'Locatie gebruiken');
       var p = document.createElement('p');
       p.textContent = waarom || 'Hiervoor heb ik je locatie nodig. Die blijft op je toestel.';
       var rij = document.createElement('div'); rij.className = 'rij';
       var ja = document.createElement('button'); ja.className = 'ja'; ja.type = 'button'; ja.textContent = 'Aanzetten';
       var nee = document.createElement('button'); nee.className = 'nee'; nee.type = 'button'; nee.textContent = 'Nu niet';
+      nee.setAttribute('data-contextactie', '');
       rij.append(nee, ja);
       doos.append(p, rij);
       document.body.appendChild(doos);

@@ -81,24 +81,13 @@ const { bewaarBijEind } = require('../lib/eindstatus');
 const { isEenmalig } = require('../lib/eenmalig-geheim-routes');
 const { EIGEN, doetHetZelf } = require('./idempotentie-eigen');
 const { wieVan } = require('../lib/idem-sleutelbepaling');
+const { sleutelVoor } = require('../lib/idemsleutels');
 
 const TTL_MS = 24 * 60 * 60 * 1000;
 const MAX = 50000;
 const MAX_LIJF = 64 * 1024;
 
-/* Het bewaarde lijf, met de huismarkering erbij. Alleen een JSON-OBJECT krijgt
-   het veld: een lijst of een kale waarde heeft geen plek om hem te dragen, en
-   die verzinnen zou het antwoord veranderen in plaats van het te merken. Lukt
-   het ontleden niet, dan gaat het lijf onveranderd terug -- liever het eerste
-   antwoord precies zoals het was dan een half omgebouwd antwoord. */
-function metHerhaald(lijf) {
-  try {
-    const d = JSON.parse(lijf);
-    if (!d || typeof d !== 'object' || Array.isArray(d)) return lijf;
-    if (d.herhaald === true) return lijf;
-    return JSON.stringify(Object.assign({}, d, { herhaald: true }));
-  } catch (e) { return lijf; }
-}
+const { metHerhaald, vingerafdruk } = require('./idempotentie-codec');
 
 module.exports = () => {
   const kas = new Map(); // hash -> { status, lijf, op }
@@ -114,7 +103,13 @@ module.exports = () => {
   return function idempotentie(req, res, next) {
     if (req.method !== 'POST' || !req.path.startsWith('/api/')) return next();
     if (isEenmalig(req.method, req.path)) return next();
+    if (require('../lib/ontvangst-operatiepad')(req.path)) return next();
     if (doetHetZelf(req.path)) return next();
+    /* Een verklaarde tweede handeling of toestandspoort mag nooit het eerste
+       antwoord uit deze proceskas terugkrijgen. Het domein moet de actuele
+       stand zien en zelf bijvoorbeeld 409 "al beslist" kunnen geven. */
+    const contract = sleutelVoor(req.method, req.path);
+    if (contract && contract.nietIdempotent) return next();
     const b = req.body;
     const sleutel = b && (typeof b.idempotentieSleutel === 'string' ? b.idempotentieSleutel
       : (typeof b.idem === 'string' ? b.idem : null));
@@ -129,7 +124,17 @@ module.exports = () => {
     const id = crypto.createHash('sha256')
       .update(req.method + ' ' + req.path + '|' + wie + '|' + sleutel).digest('hex');
 
+    /* DEZELFDE SLEUTEL, EEN ANDER VERZOEK: 409 en niet het oude antwoord. Een
+       herhaling met een ander lijf is geen herhaling; het eerste antwoord
+       teruggeven zou "gelukt" zeggen over iets wat nooit is gedaan (een ander
+       kaartje, een ander bedrag). Zo doet de geldlaag het al (pay/stuur). De
+       vingerafdruk is het lijf zonder de sleutelvelden. Besluit 19 oktober 2026. */
+    const vinger = vingerafdruk(b);
     const oud = kas.get(id);
+    if (oud && Date.now() - oud.op < TTL_MS && oud.vinger && oud.vinger !== vinger) {
+      return res.status(409).json({ error: 'Deze herhaalsleutel hoort bij een ander verzoek. Er is niets uitgevoerd.',
+        code: 'IDEM_ANDER_VERZOEK' });
+    }
     if (oud && Date.now() - oud.op < TTL_MS) {
       res.set('X-Idempotentie', 'herhaald');
       return res.status(oud.status).type('application/json').send(metHerhaald(oud.lijf));
@@ -144,7 +149,7 @@ module.exports = () => {
             !(data && typeof data === 'object' && data.ok === false);
           if (geslaagd && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
             ruim();
-            kas.set(id, { status: res.statusCode, lijf, op: Date.now() });
+            kas.set(id, { status: res.statusCode, lijf, op: Date.now(), vinger });
           }
         } catch (e) { /* een antwoord dat niet te serialiseren is, is niet te herhalen */ }
       };

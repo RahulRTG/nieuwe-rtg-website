@@ -31,13 +31,45 @@
      wat          een woord voor de rij in de uitslag ("fles", "gelegenheid")
    ========================================================================== */
 'use strict';
-const { inloggen } = require('./voltooiwereld');
+const { randomUUID } = require('node:crypto');
+const { inloggen, lifestyleLid } = require('./voltooiwereld');
 
 const geen5xx = (r) => r && r.status > 0 && r.status < 500;
 
 async function bewaarblok(w, stap, o) {
   const met = async (T, naam) => ((await o.alle(T)) || []).filter((r) => o.naamVan(r) === naam);
   const eigen = async (T) => ((await o.alle(T)) || []).filter((r) => String(o.naamVan(r)).includes(o.merk));
+
+  /* Deze elf dossier-apps delen dezelfde eigendomsgrens: de lijst en haar
+     mutaties horen bij het ingelogde Lifestyle-lid. Bewijs die grens hier een
+     keer volledig, naast de gedeelde opslag- en herstelproeven. Alleen een
+     afwijzing is onvoldoende: de tweede bevoegde actor moet zijn eigen rij
+     kunnen maken, terwijl beide dossiers voor en na de aanval gescheiden
+     blijven. */
+  await stap('bevoegd', 'een ander Lifestyle-lid leest, verwijdert of vermengt dit dossier niet en houdt een eigen dossier', async () => {
+    const ander = await lifestyleLid(w, 'iso-' + o.wat);
+    const voorA = (await o.alle(o.T)) || [];
+    const doel = voorA.find((r) => String(o.naamVan(r)).includes(o.merk));
+    if (!doel) return { klopt: false, ziet: 'geen eigen ' + o.wat + ' om de eigendomsgrens mee te toetsen' };
+
+    const voorB = (await o.alle(ander.token)) || [];
+    const aanval = o.weg(doel);
+    const geweigerd = await w.post(aanval.pad, aanval.lijf, ander.token);
+    const naamB = 'Eigen ' + o.wat + ' ' + randomUUID();
+    const maakB = o.maak(naamB);
+    const gemaakt = await w.post(maakB.pad, maakB.lijf, ander.token);
+    const naA = (await o.alle(o.T)) || [];
+    const naB = (await o.alle(ander.token)) || [];
+    const aBehoudtDoel = naA.some((r) => o.naamVan(r) === o.naamVan(doel));
+    const aZietB = naA.some((r) => o.naamVan(r) === naamB);
+    const bZietA = voorB.concat(naB).some((r) => String(o.naamVan(r)).includes(o.merk));
+    const bZietEigen = naB.filter((r) => o.naamVan(r) === naamB).length === 1;
+    return {
+      klopt: geen5xx(geweigerd) && gemaakt.status === 200 && aBehoudtDoel && !aZietB && !bZietA && bZietEigen,
+      ziet: 'vreemd verwijderen ' + geweigerd.status + ' (zonder effect); A behoudt eigen=' + aBehoudtDoel + ', ziet B=' + aZietB + '; B ziet A=' + bZietA + ', eigen=' + bZietEigen
+    };
+  });
+
   const voor = JSON.stringify(await eigen(o.T));
   const plekVoor = w.vindInOpslag(o.merk);
   await w.herstart();

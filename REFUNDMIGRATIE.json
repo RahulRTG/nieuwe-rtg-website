@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-18T12:29:44.055Z",
-  "commit": "a7ae8fc24",
+  "op": "2026-10-23T13:01:20.564Z",
+  "commit": "46a0890214",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/refundmigratie.js",
-  "node": "v22.22.0"
+  "node": "v24.18.0"
  },
  "soort": "meting",
  "uitleg": "Welke lezer van een betaalstand (`paid`) kan mee naar de tegenboeking. Orders zijn om; rides, tickets en boekingen niet. Dit telt de lezers en wijst ze aan; het VERKLAART ze niet -- een lezer staat op onbekend tot iemand hem met de hand heeft ingedeeld.",
@@ -466,17 +466,6 @@
    "tedoen": "een geweigerde charter van VANDAAG (`finishedAt || at`) valt door de tweede tak heen en wordt nu alleen door `paid` tegengehouden; gaan boekingen om, dan staat een teruggestorte charter van vandaag in het overzicht"
   },
   {
-   "bestand": "server/routes/supplier/kassa/afrekenen.js",
-   "treffers": 1,
-   "laag": "server",
-   "leesbreedte": "venster",
-   "collectie": "orders",
-   "soort": "grendel",
-   "stand": "geen-werk",
-   "wat": "afrekenen aan de kassa",
-   "gedaan": "schrijft `paid` en leest hem niet als betaalstand"
-  },
-  {
    "bestand": "server/routes/supplier/kassa/innen.js",
    "treffers": 3,
    "laag": "server",
@@ -486,6 +475,17 @@
    "stand": "geen-werk",
    "wat": "innen aan de kassa: alleen wat nog niet betaald is",
    "gedaan": "de tak hangt aan `!o.paid`, en die staat bij een teruggestorte bon op true -- er wordt dus niet nogmaals geind"
+  },
+  {
+   "bestand": "server/routes/supplier/kassa/tafelticket-afrekenen.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "orders",
+   "soort": "grendel",
+   "stand": "geen-werk",
+   "wat": "afrekenen aan de kassa",
+   "gedaan": "schrijft `paid` en leest hem niet als betaalstand"
   },
   {
    "bestand": "server/routes/supplier/orders/afhandeling.js",
@@ -662,7 +662,7 @@
  "onbekend": [],
  "verdwenen": [],
  "telling": {
-  "bestanden": 62,
+  "bestanden": 63,
   "verklaard": 54,
   "onbekend": 0,
   "verdwenen": 0,

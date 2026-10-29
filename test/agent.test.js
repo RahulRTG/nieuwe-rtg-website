@@ -69,6 +69,16 @@ test('automatisch inkopen: na de MEP-voorspelling ligt er een voorstel klaar', a
   assert.equal(na.length, voor + 1);
   assert.equal(na[0].status, 'wacht-op-goedkeuring');
   assert.ok(/AI-agent/.test(na[0].door), 'het voorstel komt van de agent zelf');
+
+  const eersteId = na[0].id;
+  const tweedeMep = await api('/api/supplier/mep/daily', { day: 'vandaag' }, managerToken);
+  assert.equal(tweedeMep.status, 200, 'een bewuste tweede analyse maakt een vers plan');
+  const vernieuwd = (await json(await api('/api/supplier/agent', {}, managerToken))).agent.voorstellen;
+  assert.notEqual(vernieuwd[0].id, eersteId, 'de nieuwe analyse krijgt een nieuw voorstel');
+  assert.equal(vernieuwd.filter(v => v.status === 'wacht-op-goedkeuring' && /AI-agent/.test(v.door)).length, 1,
+    'er blijft maar één automatisch voorstel uitvoerbaar');
+  assert.equal(vernieuwd.find(v => v.id === eersteId).status, 'vervallen',
+    'het eerdere automatische voorstel blijft zichtbaar maar kan niet dubbel worden besteld');
 });
 
 test('AI-weekrooster: voorstel, vaststellen en het echte rooster volgt het plan', async () => {
@@ -76,6 +86,9 @@ test('AI-weekrooster: voorstel, vaststellen en het echte rooster volgt het plan'
   const r = await json(await api('/api/supplier/rooster/voorstel', {}, managerToken));
   assert.equal(r.rooster.days.length, 7);
   assert.equal(r.rooster.status, 'voorstel');
+  const opnieuw = await json(await api('/api/supplier/rooster/voorstel', {}, managerToken));
+  assert.equal(opnieuw.rooster.status, 'voorstel', 'een bewuste tweede druk berekent opnieuw');
+  assert.equal(opnieuw.rooster.days.length, 7);
   const ok = await json(await api('/api/supplier/rooster/beslis', { actie: 'akkoord' }, managerToken));
   assert.equal(ok.rooster.status, 'vast');
   // het rooster in de PDA volgt nu het vastgestelde plan

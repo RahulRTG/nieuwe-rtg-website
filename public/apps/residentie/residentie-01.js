@@ -5,10 +5,15 @@
 (function () {
   const $ = s => document.querySelector(s);
   let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
-  const api = (pad, body) => fetch(pad, {
+  let kamerBeschikbaar = false;
+  const api = (pad, body) => {
+    if (!kamerBeschikbaar && pad.startsWith('/api/residentie/') && !['/api/residentie/betreed','/api/residentie/pols'].includes(pad))
+      return Promise.reject(new Error('Laad eerst de kamergegevens opnieuw.'));
+    return fetch(pad, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
     body: JSON.stringify(body || {})
-  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { const fout = new Error((d && d.error) || 'Er ging iets mis.'); fout.status=r.status; throw fout; } return d; });
+  };
   function meld(t){ const m = $('#melding'); m.textContent = t; m.classList.add('toon'); clearTimeout(m._t); m._t = setTimeout(() => m.classList.remove('toon'), 2600); }
   /* Op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom G) is elke laag
      (gids, atelier, huistelefoon, spel) een <dialog>; dit script zet nergens

@@ -125,7 +125,7 @@ module.exports = (ctx) => {
         'AI-dataset geexporteerd: ' + r.aantal + ' records (JSONL)');
       if (nietVastgelegd) return res.status(nietVastgelegd.status).json({ error: nietVastgelegd.error });
       res.setHeader('Content-Type', 'application/jsonl; charset=utf-8');
-      res.setHeader('Content-Disposition', 'attachment; filename="rtg-ai-dataset-' + new Date().toISOString().slice(0, 10) + '.jsonl"');
+      res.setHeader('Content-Disposition', 'attachment; filename="rtg-ai-dataset-' + require('../../kern/tijdzone').datumIn() + '.jsonl"');
       res.send(r.jsonl);
     } catch (e) { console.error('[aidata]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });

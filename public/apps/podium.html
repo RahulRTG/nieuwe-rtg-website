@@ -101,6 +101,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="podium" class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <a class="skip" href="#inhoud">Naar inhoud</a>
@@ -208,7 +209,8 @@
   const $ = s => document.querySelector(s);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/podium/' + pad, { method: 'POST',
+  /* het volle pad staat bij de aanroep (zie public/apps/pay.html), zodat de routetelling ziet wat dit scherm aanroept */
+  const api = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   const idem = () => RTGIdem('pod');
@@ -275,7 +277,7 @@
   }
 
   async function laadZaal() {
-    const r = await api('kanalen', { zone });
+    const r = await api('/api/podium/kanalen', { zone });
     if (r.status === 403) {
       $('#poortReden').textContent = r.body.error;
       tekenZones(r.body.zones, zone);
@@ -326,7 +328,7 @@
       for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#mGenre').appendChild(o); }
       kaart.querySelector('#mStart').addEventListener('click', async () => {
         const zk = kaart.querySelector('#mZaak');
-        const r = await api('kanaal/aanmeld', { naam: $('#mNaam').value, zone, genre: $('#mGenre').value, bio: $('#mBio').value,
+        const r = await api('/api/podium/kanaal/aanmeld', { naam: $('#mNaam').value, zone, genre: $('#mGenre').value, bio: $('#mBio').value,
           zaakCode: zk ? zk.value : undefined });
         if (r.body.error) return zeg(r.body.error);
         zeg('Aangemeld. RTG-kantoor kijkt er persoonlijk naar.'); laadZaal();
@@ -342,7 +344,7 @@
         '<button class="knop vol" id="mStudio" type="button">Open de studio</button></div>';
       el.appendChild(kaart);
       kaart.querySelector('#mZet').addEventListener('click', async () => {
-        const r = await api('kanaal/zet', { abbCenten: Math.round(parseFloat(String($('#mAbb').value).replace(',', '.')) * 100) || 0 });
+        const r = await api('/api/podium/kanaal/zet', { abbCenten: Math.round(parseFloat(String($('#mAbb').value).replace(',', '.')) * 100) || 0 });
         zeg(r.body.error || 'Bewaard.'); laadZaal();
       });
       kaart.querySelector('#mStudio').addEventListener('click', studioStart);
@@ -390,10 +392,10 @@
     pc = new RTCPeerConnection({ iceServers: await haalIce() });
     kinderPcs.set(kindKey, pc);
     if (bronStream) for (const t of bronStream.getTracks()) pc.addTrack(t, bronStream);
-    pc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: kanaalId, doelKey: kindKey, kind: 'ice', payload: ev.candidate }); };
+    pc.onicecandidate = ev => { if (ev.candidate) api('/api/podium/signaal', { id: kanaalId, doelKey: kindKey, kind: 'ice', payload: ev.candidate }); };
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
-    api('signaal', { id: kanaalId, doelKey: kindKey, kind: 'offer', payload: offer });
+    api('/api/podium/signaal', { id: kanaalId, doelKey: kindKey, kind: 'offer', payload: offer });
   }
   // mijn stream is er (of veranderde bij een herkoppeling): laat 'm zien als ik
   // kijker ben, geef de nieuwe tracks door aan mijn kinderen, en bedien wachtenden
@@ -416,11 +418,11 @@
     if (ouderPc) { try { ouderPc.close(); } catch (e) {} }
     ouderPc = new RTCPeerConnection({ iceServers: await haalIce() });
     ouderPc.ontrack = ev => zetBron(ev.streams[0]);
-    ouderPc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: open.id, doelKey: ouderKey, kind: 'ice', payload: ev.candidate }); };
+    ouderPc.onicecandidate = ev => { if (ev.candidate) api('/api/podium/signaal', { id: open.id, doelKey: ouderKey, kind: 'ice', payload: ev.candidate }); };
     await ouderPc.setRemoteDescription(d.payload);
     const antwoord = await ouderPc.createAnswer();
     await ouderPc.setLocalDescription(antwoord);
-    api('signaal', { id: open.id, doelKey: ouderKey, kind: 'answer', payload: antwoord });
+    api('/api/podium/signaal', { id: open.id, doelKey: ouderKey, kind: 'answer', payload: antwoord });
   }
   function relaisSluit() {
     if (ouderPc) { try { ouderPc.close(); } catch (e) {} ouderPc = null; }
@@ -431,7 +433,7 @@
 
   /* ---------- kijken (kijkerkant) ---------- */
   async function kijkStart(k) {
-    const r = await api('kijk', { id: k.id });
+    const r = await api('/api/podium/kijk', { id: k.id });
     if (r.body.error) return zeg(r.body.error);
     open = r.body.kanaal;
     $('#kijkTitel').textContent = open.live.titel;
@@ -447,7 +449,7 @@
       b.innerHTML = '<span aria-hidden="true">' + c.icoon + '</span><span>' + c.naam + '</span><span class="prijs">' + eur(c.centen) + '</span>';
       b.setAttribute('aria-label', c.naam + ' sturen, ' + eur(c.centen));
       b.addEventListener('click', async () => {
-        const g = await api('cadeau', { id: open.id, cadeau: c.id, idem: idem() });
+        const g = await api('/api/podium/cadeau', { id: open.id, cadeau: c.id, idem: idem() });
         if (g.body.error) zeg(g.body.error); else zeg(c.icoon + ' ' + c.naam + ' gestuurd via RTG Pay.');
       });
       rij.appendChild(b);
@@ -456,7 +458,7 @@
     chatToon($('#chatKijk'), r.body.chat);
     toon('vKijk');
     clearInterval(hartslag);
-    hartslag = setInterval(() => { if (open) api('kijk', { id: open.id }); }, 45000);
+    hartslag = setInterval(() => { if (open) api('/api/podium/kijk', { id: open.id }); }, 45000);
   }
   /* ---------- de kraam (kijkerkant) ----------
      De voorraad staat er echt bij, en dat is met opzet: "nog een" is het
@@ -480,7 +482,7 @@
         '<div class="rij"><button class="knop vol" type="button"' + (w.uitverkocht ? ' disabled' : '') + '>Koop · ' + eur(w.centen) + '</button></div>';
       kaart.querySelector('button').addEventListener('click', async (ev) => {
         const b = ev.currentTarget; b.disabled = true;
-        const r = await api('koop', { id: open.id, waarId: w.id, idem: idem() });
+        const r = await api('/api/podium/koop', { id: open.id, waarId: w.id, idem: idem() });
         if (r.body.error) { zeg(r.body.error); b.disabled = !!r.body.uitverkocht; return; }
         zeg('Gekocht via RTG Pay.' + (w.levering ? ' ' + w.levering : ''));
         b.disabled = r.body.voorraad <= 0;
@@ -498,7 +500,7 @@
   async function kijkStop() {
     clearInterval(hartslag); hartslag = null;
     relaisSluit();
-    if (open) { api('weg', { id: open.id }); open = null; }
+    if (open) { api('/api/podium/weg', { id: open.id }); open = null; }
     $('#kijkVideo').srcObject = null;
     laadZaal();
   }
@@ -518,7 +520,7 @@
     studioLive = !!(m && m.live);
     $('#studioTitel').value = m && m.live ? m.live.titel : ($('#studioTitel').value || (m ? m.naam : ''));
     tekenStudio();
-    const eigen = await api('mijn');
+    const eigen = await api('/api/podium/mijn');
     chatToon($('#chatStudio'), eigen.body.chat);
     tekenKijkers((eigen.body.kanaal || {}).kijkerLijst || []);
     tekenKraamBeheer(eigen.body.kanaal);
@@ -574,10 +576,10 @@
     el.appendChild(lijst);
   }
   async function waarZet(data) {
-    const r = await api('waar', data);
+    const r = await api('/api/podium/waar', data);
     if (r.body.error) return zeg(r.body.error);
     zeg('Kraam bijgewerkt.');
-    const eigen = await api('mijn');
+    const eigen = await api('/api/podium/mijn');
     tekenKraamBeheer(eigen.body.kanaal);
   }
   function tekenStudio() {
@@ -588,7 +590,7 @@
   }
   async function studioSchakel() {
     const abbAan = $('#studioAbb').getAttribute('aria-pressed') === 'true';
-    const r = await api('live', { aan: !studioLive, titel: $('#studioTitel').value, alleenAbonnees: abbAan });
+    const r = await api('/api/podium/live', { aan: !studioLive, titel: $('#studioTitel').value, alleenAbonnees: abbAan });
     if (r.body.error) return zeg(r.body.error);
     studioLive = !studioLive; tekenStudio();
     if (!studioLive) { relaisSluit(); tekenKijkers([]); }
@@ -603,7 +605,7 @@
       const naam = document.createElement('span'); naam.className = 'stil'; naam.style.flex = '1'; naam.textContent = x.codenaam;
       const b = document.createElement('button'); b.type = 'button'; b.className = 'knop rood'; b.textContent = 'Blokkeer';
       b.addEventListener('click', async () => {
-        const r = await api('blokkeer', { id: zaal.mijn.id, key: x.key });
+        const r = await api('/api/podium/blokkeer', { id: zaal.mijn.id, key: x.key });
         if (r.body.error) return zeg(r.body.error);
         const pc = kinderPcs.get(x.key); if (pc) { try { pc.close(); } catch (e) {} kinderPcs.delete(x.key); }
         zeg(x.codenaam + ' geblokkeerd.'); rij.remove();
@@ -619,8 +621,8 @@
     es.addEventListener('podium', async e => {
       const d = JSON.parse(e.data);
       if (d.kind === 'chat' || d.kind === 'cadeau') chatErbij(d.regel);
-      else if (d.kind === 'kijker') { nieuwKind(d.kanaalId, d.van); if (studioLive) api('mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
-      else if (d.kind === 'weg') { const pc = kinderPcs.get(d.van); if (pc) { try { pc.close(); } catch (e2) {} kinderPcs.delete(d.van); } if (studioLive) api('mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
+      else if (d.kind === 'kijker') { nieuwKind(d.kanaalId, d.van); if (studioLive) api('/api/podium/mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
+      else if (d.kind === 'weg') { const pc = kinderPcs.get(d.van); if (pc) { try { pc.close(); } catch (e2) {} kinderPcs.delete(d.van); } if (studioLive) api('/api/podium/mijn').then(r => tekenKijkers((r.body.kanaal || {}).kijkerLijst || [])); }
       else if (d.kind === 'offer') ouderOffer(d);
       else if (d.kind === 'answer') { const pc = kinderPcs.get(d.van); if (pc) try { await pc.setRemoteDescription(d.payload); } catch (e2) {} }
       else if (d.kind === 'ice') { const pc = (ouderKey && d.van === ouderKey) ? ouderPc : kinderPcs.get(d.van); if (pc) try { await pc.addIceCandidate(d.payload); } catch (e2) {} }
@@ -629,7 +631,7 @@
       /* De zaal hoort alleen dat de voorraad veranderde; wie er kocht staat er
          niet in (kern/podium/handel.js). De maker krijgt de bestelling apart. */
       else if (d.kind === 'waar') { if (open && d.kanaalId === open.id) zetVoorraad(d.waarId, d.voorraad); }
-      else if (d.kind === 'bestelling') { zeg(d.bestelling.codenaam + ' kocht ' + d.bestelling.naam + '.'); if (!$('#vStudio').classList.contains('weg')) api('mijn').then(r => tekenKraamBeheer(r.body.kanaal)); }
+      else if (d.kind === 'bestelling') { zeg(d.bestelling.codenaam + ' kocht ' + d.bestelling.naam + '.'); if (!$('#vStudio').classList.contains('weg')) api('/api/podium/mijn').then(r => tekenKraamBeheer(r.body.kanaal)); }
     });
   }
 
@@ -637,18 +639,21 @@
   $('#terugZaal').addEventListener('click', kijkStop);
   $('#terugZaal2').addEventListener('click', () => { laadZaal(); });
   $('#chatForm').addEventListener('submit', async ev => { ev.preventDefault();
-    const t = $('#chatVeld').value.trim(); if (!t || !open) return;
-    const r = await api('chat', { id: open.id, tekst: t });
-    if (r.body.error) zeg(r.body.error); else $('#chatVeld').value = '';
+    const veld = $('#chatVeld'), t = veld.value.trim(); if (!t || !open) return;
+    /* een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht */
+    if (veld.dataset.idemTekst !== t) { veld.dataset.idem = RTGId('podium-chat'); veld.dataset.idemTekst = t; }
+    const r = await api('/api/podium/chat', { id: open.id, tekst: t, idem: veld.dataset.idem });
+    if (r.body.error) zeg(r.body.error); else { veld.value = ''; delete veld.dataset.idem; delete veld.dataset.idemTekst; }
   });
   $('#chatFormStudio').addEventListener('submit', async ev => { ev.preventDefault();
-    const t = $('#chatVeldStudio').value.trim(); if (!t || !zaal || !zaal.mijn) return;
-    const r = await api('chat', { id: zaal.mijn.id, tekst: t });
-    if (r.body.error) zeg(r.body.error); else $('#chatVeldStudio').value = '';
+    const veld = $('#chatVeldStudio'), t = veld.value.trim(); if (!t || !zaal || !zaal.mijn) return;
+    if (veld.dataset.idemTekst !== t) { veld.dataset.idem = RTGId('podium-chat'); veld.dataset.idemTekst = t; }
+    const r = await api('/api/podium/chat', { id: zaal.mijn.id, tekst: t, idem: veld.dataset.idem });
+    if (r.body.error) zeg(r.body.error); else { veld.value = ''; delete veld.dataset.idem; delete veld.dataset.idemTekst; }
   });
   $('#abbKnop').addEventListener('click', async () => {
     if (!open) return;
-    const r = await api('abonneer', { id: open.id, idem: idem() });
+    const r = await api('/api/podium/abonneer', { id: open.id, idem: idem() });
     if (r.body.error) return zeg(r.body.error);
     zeg('U bent abonnee tot ' + new Date(r.body.tot).toLocaleDateString('nl-NL') + '.');
     $('#abbKnop').textContent = 'Abonnee '; $('#abbKnop').disabled = true;
@@ -657,7 +662,7 @@
     if (!open) return;
     const reden = prompt('Wat wilt u melden aan RTG-kantoor?');
     if (reden == null) return;
-    const r = await api('meld', { id: open.id, reden });
+    const r = await api('/api/podium/meld', { id: open.id, reden });
     zeg(r.body.error || 'Gemeld. Een mens van RTG-kantoor kijkt ernaar.');
   });
   $('#studioKnop').addEventListener('click', studioSchakel);

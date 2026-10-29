@@ -53,7 +53,7 @@
     staat.huidig = null;
     vind('#rtdFocus').removeAttribute('data-rtd-documentrij');
     vind('#rtdDag').textContent = 'Uw werkmoment · rustig';
-    vind('#rtdFocus').innerHTML = '<div class="rtd-leeg"><h2>Nog geen document nodig.</h2><p>' + veilig(tekst || 'Uw documentruimte is leeg.') + '</p><button class="rtd-secundair" type="button" data-rtd-nieuw>Maak een document</button></div>';
+    vind('#rtdFocus').innerHTML = '<div class="rtd-leeg"><h2>Nog geen document nodig.</h2><p>' + veilig(tekst || 'Uw documentruimte is leeg.') + '</p><button class="rtd-secundair" type="button" data-rtd-nieuw data-stand="documenten">Maak een document</button></div>';
     vind('#rtdDaarna').innerHTML = '';
   }
   function renderNodig() {
@@ -69,10 +69,10 @@
       '<span class="rtd-eigenaar"><b>' + veilig(doc.door || 'Uw documentruimte') + '</b><span>' + veilig((doc.versies || 0) + (doc.versies === 1 ? ' eerdere versie' : ' eerdere versies') + ' · ' + datum(doc.gewijzigd)) + '</span></span>' +
       '<span class="rtd-status">' + veilig(fase(doc.fase)) + '</span></div><h2>' + veilig(doc.titel || 'Document zonder titel') + '</h2>' +
       '<p>' + veilig(reden(doc)) + '. RTDocs opent dit stuk met de actuele inhoud, historie en betrokkenen.</p>' +
-      '<div class="rtd-focusvoet"><span class="rtd-moment">' + veilig(doc.omvang || type(doc.soort)) + '</span><button class="rtd-primair" type="button" data-rtd-dossier="' + veilig(doc.id) + '">Open dossier &rsaquo;</button></div>';
+      '<div class="rtd-focusvoet"><span class="rtd-moment">' + veilig(doc.omvang || type(doc.soort)) + '</span><button class="rtd-primair" type="button" data-rtd-dossier="' + veilig(doc.id) + '" data-stand="dossier" data-contextactie>Open dossier &rsaquo;</button></div>';
     var daarna = lijst.filter(function (x) { return x.id !== doc.id; }).slice(0, 5);
     vind('#rtdDaarna').innerHTML = daarna.length ? daarna.map(function (x) {
-      return '<button class="rtd-rij" type="button" data-rtd-documentrij="' + veilig(x.id) + '" data-rtd-dossier="' + veilig(x.id) + '"><span class="rtd-kleinbestand">' + veilig(type(x.soort)) + '</span><span><b>' + veilig(x.titel) + '</b><small>' + veilig(reden(x)) + ' · ' + veilig(datum(x.gewijzigd)) + '</small></span><span class="rtd-type">' + veilig(fase(x.fase)) + '</span></button>';
+      return '<button class="rtd-rij" type="button" data-rtd-documentrij="' + veilig(x.id) + '" data-rtd-dossier="' + veilig(x.id) + '" data-stand="dossier"><span class="rtd-kleinbestand">' + veilig(type(x.soort)) + '</span><span><b>' + veilig(x.titel) + '</b><small>' + veilig(reden(x)) + ' · ' + veilig(datum(x.gewijzigd)) + '</small></span><span class="rtd-type">' + veilig(fase(x.fase)) + '</span></button>';
     }).join('') : '<div class="rtd-leeg">Daarna vraagt geen ander document om aandacht.</div>';
   }
   var lijstAanvraag = 0;

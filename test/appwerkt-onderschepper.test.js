@@ -58,3 +58,127 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
   assert.equal(klikReden('Timeout 2500ms exceeded.\n - waiting for locator'), 'reden niet gemeld');
   assert.equal(klikReden(''), 'reden niet gemeld');
 });
+
+test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenproef', () => {
+  const { redenVoorSchoneTegenproef } = require('../scripts/appwerkt');
+  for (const reden of ['intercepts pointer events', 'element is outside of the viewport', 'element is not visible',
+    'element is not stable', 'pagina antwoordde niet binnen de limiet']) {
+    assert.equal(redenVoorSchoneTegenproef(reden), true, reden);
+  }
+  assert.equal(redenVoorSchoneTegenproef('element is not enabled'), false,
+    'een echt uitgeschakelde bediening mag door heropenen niet groen worden');
+  assert.equal(redenVoorSchoneTegenproef('tik verstuurd maar niet afgerond binnen de limiet'), false,
+    'een onzekere mutatie mag nooit automatisch opnieuw worden verstuurd');
+});
+
+test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenbordroute als terugval', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1800}keyboard\.press\('Enter'\)/);
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,2600}element is not stable\|pagina antwoordde niet binnen de limiet/,
+    'alleen een nog niet verstuurde geometrische muisactie mag naar het toetsenbord terugvallen');
+  assert.doesNotMatch(bron, /async function tikAlsGebruiker[\s\S]{0,1800}dispatchEvent\(['"]click/,
+    'de meter mag een klik niet rechtstreeks in het DOM veinzen');
+  assert.match(bron, /page\.click\('\[data-appwerkt="1"\]', \{ timeout: 10000, noWaitAfter: true \}\)/,
+    'de echte muisroute krijgt een begrensde stabiliteitswacht onder integrale belasting');
+  assert.match(bron, /tikAlsGebruiker\(page, k\.modaal \|\| k\.edgeApp\)/,
+    'bewegende modale en Edge-bediening gebruikt de volwaardige focus- en Enter-route');
+});
+
+test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtbare status wijzigt', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  const stabieleMerken = bron.match(/return bron \? \[el\.tagName, bron\]\.join\('\|'\)/g) || [];
+  assert.equal(stabieleMerken.length, 4,
+    'inventarisatie, replay en controle moeten dezelfde stabiele bronidentiteit gebruiken');
+});
+
+test('een Edge-kloon en haar bronbediening delen één toegankelijke identiteit', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.equal((bron.match(/label \|\| el\.title \|\| el\.innerText \|\| el\.value/g) || []).length, 4,
+    'bron en kloon moeten dezelfde naamvolgorde gebruiken');
+  assert.equal((bron.match(/if \(bron\.startsWith\('control:'\)\) bron = '';/g) || []).length, 4,
+    'de technische control-prefix mag geen tweede zakelijke handeling maken');
+  assert.equal((bron.match(/replace\(\/\^\(\[\^\\p\{L\}\\p\{N\}\]\+\)\\s\+\/u, '\$1'\)/g) || []).length, 4,
+    'witruimte na een visueel pictogram mag bron en Edge-kloon niet verdubbelen');
+});
+
+test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan de bedieningsmeter', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const lees = (bestand) => fs.readFileSync(path.join(__dirname, '..', bestand), 'utf8');
+  assert.match(lees('public/apps/mijn-relaties.html'), /sluitToestemmingen[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/shared/social-intelligence-data.js'), /sociaal-beleid-[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/shared/social-intelligence-deck.js'), /rtgSocialRahulSubmit[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/apps/office/app/app-02a2.js'), /office-fase-[\s\S]{0,120}data-hoofdactie/);
+  assert.match(lees('public/shared/gebaar/gebaar-04.js'), /data-hoofdactie/);
+  assert.match(lees('public/shared/gebaar/gebaar-03.js'),
+    /data-rtg-adaptive-source['"], ['"]gebaar-acties[\s\S]{0,160}data-hoofdactie/,
+    'de kortlevende deur naar veegacties moet vóór een verversing bedienbaar zijn');
+  assert.match(lees('public/shared/deelmenu/deelmenu-02.js'),
+    /data-rtg-adaptive-source['"], ['"]deel-[\s\S]{0,120}data-stand/,
+    'een herbouwde deeltab moet dezelfde appstand en control-identiteit houden');
+  assert.match(lees('public/apps/mijnmall.js'),
+    /data-rtg-adaptive-source="mijnmall-lijst-open" data-stand="mijnmall-lijst"/,
+    'de wisselende labels Openen en Inklappen moeten één herstelbare lijststand houden');
+  assert.match(lees('public/shared/rtg-docs-2026.css'),
+    /\.rtd-nav\{[^}]*z-index:45/,
+    'RTDocs-navigatie moet boven de iOS-kop en onder dialogen blijven');
+});
+
+test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {
+  const { herstelgrens } = require('../scripts/appwerkt');
+  assert.equal(herstelgrens(0), 32);
+  assert.equal(herstelgrens(1), 32);
+  assert.equal(herstelgrens(2), 64);
+  assert.equal(herstelgrens(4), 128);
+  assert.equal(herstelgrens(40), 128, 'de meter kan nooit onbeperkt blijven herhalen');
+});
+
+test('de afsluitronde kijkt naar werkelijk aangeraakte bediening en niet alleen naar geselecteerde bediening', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const onbewezenMerken = \(\) => \[\.\.\.gevondenMerken\][\s\S]{0,180}!aangetiktMerken\.has\(merk\)/,
+    'een dynamisch herbouwde knop blijft open totdat haar tik werkelijk is bewezen');
+  assert.match(bron, /for \(const merk of onbewezenMerken\(\)\) gehad\.delete\(merk\)/,
+    'een geselecteerde maar onbewezen knop moet opnieuw selecteerbaar worden');
+  assert.match(bron, /misluktMerken\.add\(k\.merk\)[\s\S]{0,120}nietKlikbaar\.push/,
+    'een aantoonbaar mislukte knop blijft een fout en mag geen eindeloze retry worden');
+  assert.doesNotMatch(bron, /if \(gehad\.size < gevonden\)/,
+    'selectie alleen mag de 100%-afsluitregel niet meer bepalen');
+});
+
+test('de integrale klikgrens laat grote dynamische schermen hun vervolgacties afmaken', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const MAXKLIK = 2048;/,
+    'meer dan tweehonderd unieke controls met replaypaden moeten binnen een eindige ronde passen');
+});
+
+test('een herhaalde hoofdopener gaat voor algemene dialoogopeners', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron,
+    /if \(!doel && magHerhalen\)[\s\S]{0,5000}Number\(!alVoorkeur\.includes\(merk\(a\)\)\)[\s\S]{0,300}Number\(!hoofdopener\(a\)\)[\s\S]{0,500}Number\(!dialoogOpener\(a\)\)/,
+    'kortlevende vervolgacties moeten via hun gedeclareerde hoofdopener worden hersteld');
+});
+
+test('herstel onthoudt de waargenomen openerroute voor resterende bediening', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const openerVoorMerk = new Map\(\);/);
+  assert.match(bron, /if \(k\.routeOpener && !bekendVoorKlik\.has\(merk\)[\s\S]{0,320}openerVoorMerk\.set\(merk, k\.merk\)/,
+    'nieuw ontdekte bediening moet aan haar werkelijk gebruikte opener worden gekoppeld');
+});
+
+test('alleen een aantoonbare URL-overgang bewijst een trage navigatieklik', () => {
+  const bron = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(bron, /const navigeerdeOndanksWacht = k\.routeOpener && !opIngang\(\)/,
+    'alleen een verklaarde navigatiebediening met werkelijk gewijzigde URL mag als geraakte knop tellen');
+});
+
+test('een herstelbare locatiekeuze telt niet als gesloten toegangsdeur', () => {
+  const { POORTEN } = require('../scripts/appwerkt');
+  assert.ok(POORTEN.includes('#poort.zien:not([data-poort-soort="locatie"])'));
+  assert.ok(!POORTEN.includes('#poort.zien'),
+    'de generieke selector zou Navigatie na een geweigerde locatie ten onrechte afsluiten');
+});

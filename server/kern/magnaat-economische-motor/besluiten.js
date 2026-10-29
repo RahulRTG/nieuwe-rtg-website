@@ -44,11 +44,28 @@ module.exports = (m) => {
     return uitkomst;
   }
 
-  function beslis(actor, bedrijfId, invoer) {
+  function beslis(actor, bedrijfId, invoer, bewijs) {
     if (!m.profiel.bedrijven[bedrijfId]) return { status: 400, error: 'Dat bedrijf bestaat in deze wereld niet.' };
+    invoer = invoer && typeof invoer === 'object' ? invoer : {};
+    /* De economische motor is ook een zuivere simulatiekern. Interne scenario's
+       mogen daarom zonder transportkenmerk blijven rekenen; de HTTP-deur eist
+       de sleutel. Zodra een aanroeper er wel een geeft, geldt het volledige
+       duurzame contract. */
+    const beschermd = bewijs && typeof bewijs.ontvangst === 'string' && typeof bewijs.afdruk === 'string';
+    const ontvangst = beschermd ? bewijs.ontvangst : null;
+    const afdruk = beschermd ? bewijs.afdruk : null;
+    const bestaand = beschermd ? m.state().besluitOntvangsten[ontvangst] : null;
+    if (bestaand) {
+      if (bestaand.afdruk !== afdruk) return { status: 409, error: 'Deze idempotentiesleutel hoort al bij een ander bedrijfsbesluit.' };
+      return Object.assign({ ok: true, herhaald: true }, m.overzicht(actor));
+    }
     const uitkomst = transactie(actor, (e) => {
+      const tijdens = beschermd ? e.besluitOntvangsten[ontvangst] : null;
+      if (tijdens) {
+        if (tijdens.afdruk !== afdruk) return { status: 409, error: 'Deze idempotentiesleutel hoort al bij een ander bedrijfsbesluit.' };
+        return { ok: true, herhaald: true };
+      }
       const b = e.bedrijven[bedrijfId];
-      invoer = invoer && typeof invoer === 'object' ? invoer : {};
       const velden = [
         ['prijs', 50, 350, n => b.prijs = geld(n * 100)],
         ['personeelDoel', 3, 100, n => b.personeelDoel = rond(n)],
@@ -76,9 +93,17 @@ module.exports = (m) => {
       if (!gewijzigd) return { status: 400, error: 'Geef ten minste één bedrijfsbesluit door.' };
       m.audit(e, actor, 'strategie', b.naam + ': ' + gewijzigd + ' instelling(en) gewijzigd');
       m.legUit(e, 'besluit', 'Nieuwe bedrijfsstrategie vastgelegd', 'De keuze verandert niet direct de score. De volgende dagcyclus rekent eerst alle markt-, arbeids- en kasgevolgen door.', gewijzigd + ' instelling(en)', 'spelersbesluit');
-      return { ok: true };
+      /* Minimaal ontvangstbewijs in dezelfde economische projectie. Geen
+         sleutel, actor of besluitinhoud blijft achter: alleen twee hashes en
+         de synthetische dag. Daardoor is de zakelijke mutatie atomair met haar
+         replaybewijs en blijft een andere actor met dezelfde clientsleutel
+         een eigen opdracht. */
+      if (beschermd) e.besluitOntvangsten[ontvangst] = { afdruk, dag: e.dag };
+      return { ok: true, herhaald: false };
     });
-    return uitkomst.status ? uitkomst : Object.assign({ ok: true }, m.overzicht(actor));
+    return uitkomst.status ? uitkomst : Object.assign(
+      beschermd ? { ok: true, herhaald: uitkomst.herhaald === true } : { ok: true },
+      m.overzicht(actor));
   }
 
   function kiesSchok(actor, schokId) {

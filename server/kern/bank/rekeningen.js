@@ -6,7 +6,7 @@ const { magBij } = require('./eigendom');/* RTG Bank, deel "rekeningen": het ope
    een lid kan meerdere rekeningen hebben (betaal, spaar, zakelijk). Krijgt de
    gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, SOORTEN, rekeningen, rekMeta, saldoVan, boek, bankregie, keyVanCodenaam, seintje, metIdem } = ctx;
+  const { db, save, crypto, nu, SOORTEN, rekeningen, rekMeta, saldoVan, boek, bankregie, keyVanCodenaam, findSupplier, seintje, metIdem } = ctx;
 
   // IBAN mod-97: letters -> getallen (A=10..Z=35), controlegetal = 98 - (rest mod 97).
   function mod97(str) {
@@ -47,16 +47,22 @@ module.exports = (ctx) => {
 
      Zelfde vorm als ./overboeken.js en ./incasso.js: metIdem uit de gedeelde
      sleutelruimte `bankIdem`, met een AFDRUK erbij zodat dezelfde sleutel met
-     een andere aanvraag niet stilletjes het oude antwoord krijgt. Zonder
-     sleutel verandert er niets -- wie er geen stuurt, krijgt het oude gedrag. */
-  async function open({ codenaam, soort = 'betaal', naam, wie, idem }) {
+     een andere aanvraag niet stilletjes het oude antwoord krijgt. De kantoorvariant vereist een sleutel en een serverbepaalde actor;
+     bestaande leden-, zaak- en entiteitcallers behouden hun contract. */
+  async function open({ codenaam, soort = 'betaal', naam, wie, idem, kantoorActor }) {
     const ruw = String(codenaam || '').trim();
     if (!ruw) return { status: 400, error: 'Voor wie is de rekening?' };
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekende rekeningsoort.' };
     /* Een zaak bankiert onder de eigen vlag 'zaak:<code>' (het financiele
        hart): die staat niet in de ledengids, dus geen codenaam-opzoek. */
     let c;
-    if (ruw.startsWith('zaak:')) c = ruw;
+    if (ruw.startsWith('zaak:')) {
+      if (wie === 'kantoor') {
+        const zaak = typeof findSupplier === 'function' ? await findSupplier(ruw.slice(5)) : null;
+        if (!zaak || !zaak.code) return { status: 404, error: 'Die zaak kennen we niet.' };
+        c = 'zaak:' + zaak.code;
+      } else c = ruw;
+    }
     /* Een entiteit uit de concerngraaf bankiert onder 'entiteit:<id>' (./entiteit.js),
        en ALLEEN langs die ene weg: de kantoorroute neemt de codenaam uit het verzoek. */
     else if (ruw.startsWith('entiteit:')) { if (wie !== 'entiteit') return { status: 404, error: 'Die codenaam kennen we niet.' }; c = ruw; }
@@ -65,8 +71,15 @@ module.exports = (ctx) => {
       if (!rec) return { status: 404, error: 'Die codenaam kennen we niet.' };
       c = rec.codename || ruw;
     }
-    return metIdem(idem ? 'rekopen:' + c + ':' + idem : null,
-      'rekopen|' + c + '|' + soort + '|' + String(naam || ''), () => {
+    if (wie === 'kantoor' && (typeof idem !== 'string' || !idem.trim() || idem.length > 200 || !kantoorActor))
+      return { status: 400, error: 'Een kantooractor en geldige herhaalsleutel zijn verplicht.' };
+    const sleutel = wie === 'kantoor'
+      ? 'rekopen-kantoor:' + JSON.stringify([String(kantoorActor), idem])
+      : (idem ? 'rekopen:' + c + ':' + idem : null);
+    const afdruk = wie === 'kantoor'
+      ? JSON.stringify(['rekopen-kantoor', c, soort, String(naam || '')])
+      : 'rekopen|' + c + '|' + soort + '|' + String(naam || '');
+    return metIdem(sleutel, afdruk, () => {
       const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
       if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
       const iban = genIban();

@@ -13,6 +13,7 @@
 
    De opslag hangt aan het fluister-profiel van het lid (p.spar), dus het is
    privacy-by-design van de gebruiker zelf en wist mee met "vergeet alles". */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, schoon, notify, van, nu } = ctx;
   const MAX = 40;
@@ -61,11 +62,11 @@ module.exports = (ctx) => {
   // rustig thuis + niks meer op de agenda + een net moment op de dag
   function rustMoment(key, nuDate) {
     const d = nuDate || new Date();
-    const uur = d.getHours();
+    const uur = tijdzone.uurIn(d);
     if (uur < 9 || uur > 22) return false;                 // geen nachtelijke pings
     const L = (db.data.live || {})[key];
     if (L && L.active) return false;                        // onderweg is niet "rustig thuis"
-    const dag = d.toISOString().slice(0, 10);
+    const dag = tijdzone.datumIn(d);
     const items = (db.data.agendas || {})['lid:' + key] || [];
     if (items.some(i => !i.gedaan && String(i.datum) === dag)) return false; // vandaag nog iets te doen
     return true;

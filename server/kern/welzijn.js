@@ -24,6 +24,7 @@
    het dagboek, want zonder grondslag hoort er niets te blijven staan. */
 
 const { ouderGeeftToestemming } = require('../lib/leeftijd');
+const tijdzone = require('./tijdzone');
 
 module.exports = ({ save }) => {
 
@@ -37,10 +38,7 @@ module.exports = ({ save }) => {
     if (!Array.isArray(p.welzijn.stemmingen)) p.welzijn.stemmingen = [];
     return p.welzijn;
   }
-  function vandaag() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
+  const vandaag = () => tijdzone.datumIn();
   const onder16 = ouderGeeftToestemming; // lib/leeftijd.js: onder 16 beslist de ouder
   function heeftToestemming(s) {
     if (onder16(s.p)) return !!(s.g && s.g.toestemmingGezondheid && s.g.toestemmingGezondheid.at);
@@ -57,8 +55,7 @@ module.exports = ({ save }) => {
   // het dagboek: de laatste veertien dagen, plus wat er vandaag al staat
   function dagboek(s) {
     const b = bak(s.p);
-    const grens = new Date(Date.now() - 13 * 86400000);
-    const van = grens.getFullYear() + '-' + String(grens.getMonth() + 1).padStart(2, '0') + '-' + String(grens.getDate()).padStart(2, '0');
+    const van = tijdzone.plusDagen(vandaag(), -13);
     const recent = b.stemmingen.filter(x => x.dag >= van).sort((a, z) => a.dag.localeCompare(z.dag));
     return { ok: true, vandaag: vandaag(), toestemming: heeftToestemming(s), zelfToestemming: !onder16(s.p),
       dagVandaag: b.stemmingen.find(x => x.dag === vandaag()) || null,

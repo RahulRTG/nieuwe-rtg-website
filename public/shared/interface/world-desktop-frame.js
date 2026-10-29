@@ -64,7 +64,7 @@
         x.observer = new MutationObserver(function () { if (current === x) refreshEdge(); });
         x.observer.observe(doc.body, { subtree: true, childList: true, attributes: true,
           attributeFilter: ['disabled', 'hidden', 'aria-disabled', 'aria-selected'] });
-        if (win.RTGi18n && win.document.documentElement.lang !== d.documentElement.lang) win.RTGi18n.set(d.documentElement.lang);
+        if (win.RTGi18n && win.document.documentElement.lang !== d.documentElement.lang) win.RTGi18n.set(d.documentElement.lang, false);
         x.ready = true; if (current === x) { notice.hidden = true; direct.hidden = true; retry.hidden = true; refreshEdge(); prepare(x.action); }
       } catch (e) { failed(x); }
     }
@@ -100,12 +100,17 @@
       if (items.length && scope.win.RTGAdaptiefBalkKnoppen) {
         var buttons = scope.win.RTGAdaptiefBalkKnoppen({ items: function () { return A.voorNu(); }, titel: function () { return A.context().titel; } });
         items.forEach(function (item) { var b = U.el('button', 'rtg-adaptive-sheet-action', item.naam); b.type = 'button';
+          b.dataset.rtgAdaptiveControl = 'app';
+          b.dataset.rtgAdaptiveSource = 'desktop-item:' + item.id; b.dataset.rtgAdaptiveRoute = 'true';
           b.onclick = function () { var latest = A.voorNu().find(function (i) { return i.id === item.id; });
             if (latest) { w.RTGAdaptiveEdge.setDeck('home'); w.RTGAdaptiveEdge.setState('dock'); buttons.voer(latest); } }; container.appendChild(b); });
       }
       collect(scope.doc, true, items).forEach(function (source) {
         var el = source.el, b = U.el('button', 'rtg-adaptive-sheet-action', el.getAttribute('aria-label') || el.textContent.trim());
-        b.type = 'button'; b.dataset.desktopSource = el.id || ''; b.disabled = el.disabled || el.getAttribute('aria-disabled') === 'true';
+        b.type = 'button'; b.dataset.rtgAdaptiveControl = 'app'; b.dataset.desktopSource = el.id || ''; b.dataset.rtgAdaptiveSource = 'desktop-control:' +
+          (el.id || el.getAttribute('aria-label') || el.textContent.trim());
+        if (el.tagName === 'A' && el.getAttribute('href')) b.dataset.rtgAdaptiveRoute = 'true';
+        b.disabled = el.disabled || el.getAttribute('aria-disabled') === 'true';
         b.onclick = function () {
           if (!collect(scope.doc, true, items).some(function (s) { return s.el === el; }) || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
           w.RTGAdaptiveEdge.setDeck('home'); w.RTGAdaptiveEdge.setState('dock'); el.click();
@@ -120,7 +125,7 @@
       if (source && !source.disabled) { current.action = null; source.click(); }
     }
     w.addEventListener('rtglang', function () {
-      entries.forEach(function (x) { try { if (x.frame.contentWindow.RTGi18n) x.frame.contentWindow.RTGi18n.set(d.documentElement.lang); } catch (e) {} });
+      entries.forEach(function (x) { try { if (x.frame.contentWindow.RTGi18n) x.frame.contentWindow.RTGi18n.set(d.documentElement.lang, false); } catch (e) {} });
     });
     w.addEventListener('pagehide', function () { entries.forEach(function (x) { clearTimeout(x.timer); if (x.observer) x.observer.disconnect(); }); });
     w.addEventListener('storage', function (e) { if (e.key == null || e.key === 'rtg_member_token' || e.key === 'rtf_sessie') w.location.reload(); });

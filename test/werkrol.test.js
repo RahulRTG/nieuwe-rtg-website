@@ -65,5 +65,6 @@ test('3. de afgeleide lijsten zeggen voor wie hij is', () => {
     assert.equal(rij.label, 'Kantoor', item + ' draagt geen label Kantoor in de sprongindex');
   }
   const meter = fs.readFileSync(path.join(WORTEL, 'scripts/appwerkt.js'), 'utf8');
-  assert.match(meter, /persona: \(bron && bron\.werkrol\) \|\| PERSONA_VAN_WERELD/);
+  assert.match(meter, /persona: \(bron && bron\.werkrol\) \|\|\s*\n\s*\(soort === 'link' && reg\.PREMIUM\.has\(sleutel\) \? 'lifestyle' : null\) \|\|\s*\n\s*PERSONA_VAN_WERELD/,
+    'de meter moet eerst de werkrol, daarna de goedgekeurde Lifestyle-persona en pas daarna de wereldpersona gebruiken');
 });

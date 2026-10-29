@@ -270,8 +270,8 @@ const IDENTITEIT = [
   ['/api/foundation/school/telefoonboom/mijn', 404],
   ['/api/foundation/school/telefoonboom/nummer', 404],
   ['/api/foundation/school/telefoonboom/start', 403],
-  ['/api/lab2/bewoner/paspoort', 404],
-  ['/api/lab2/bewoner/paspoort-maak', 404],
+  ['/api/lab2/bewoner/paspoort', 401], // een account eerst (eigenaarsbesluit 19 oktober 2026); daarna de 18+-poort
+  ['/api/lab2/bewoner/paspoort-maak', 401], // een account eerst (eigenaarsbesluit 19 oktober 2026); daarna de 18+-poort
   ['/api/member/lifestyle/gezondheid/dossier', 401],
   ['/api/member/lifestyle/gezondheid/dossier/weg', 401],
   ['/api/member/naam/lijst', 401],

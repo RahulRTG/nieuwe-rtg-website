@@ -22,14 +22,14 @@ const { alleenDs, edgeLabels, edgeActies, geenOverloop, beeld } = require('./lib
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const ZAAK = 'KIKUNOI';
-let srv, browser;
+let srv, browser, token;
 
 async function open(breedte, hoogte, taal = 'nl', pas = null) {
   const ctx = await browser.newContext({ viewport: { width: breedte, height: hoogte }, serviceWorkers: 'block', reducedMotion: 'reduce' });
-  await ctx.addInitScript(([l, p]) => {
-    localStorage.setItem('rtg_lang', l); localStorage.setItem('rtg_cookieinfo_v1', '1');
+  await ctx.addInitScript(([l, p, t]) => {
+    localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', l); localStorage.setItem('rtg_cookieinfo_v1', '1');
     if (p) localStorage.setItem('rtg_arrival_pass', JSON.stringify(p));
-  }, [taal, pas]);
+  }, [taal, pas, token]);
   const page = await ctx.newPage();
   const fouten = letOpFouten(page, []);
   await page.goto(srv.base + '/apps/arrival.html', { waitUntil: 'domcontentloaded' });
@@ -41,6 +41,8 @@ function morgen() { return new Date(Date.now() + 86400000).toISOString().slice(0
 test.before(async () => {
   if (skip) return;
   srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  const r = await fetch(srv.base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Arrival DS', email: 'arrival-ds-' + Date.now() + '@voorbeeld.nl', password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'guest' }) });
+  const d = await r.json(); assert.ok(d.token, 'echt account voor de aangemelde ontwerpflow'); token = d.token;
   browser = await pw.chromium.launch(browserOpties(pw));
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
@@ -72,7 +74,6 @@ test('een wens wordt een plan, en het plan een aanvraag die "Aangevraagd" blijft
   await page.fill('#time', '20:00');
   await page.fill('#people', '4');
   await page.fill('#code', ZAAK);
-  await page.fill('#name', 'Gast');
   await page.locator('#request').click();
   await page.waitForSelector('#pass:not([hidden])');
   assert.equal(await page.locator('body').getAttribute('data-ds-schermtype'), 'detail');
@@ -88,7 +89,7 @@ test('een wens wordt een plan, en het plan een aanvraag die "Aangevraagd" blijft
   await page.locator('[data-pulse="onderweg"]').click();
   let pas = null;
   for (let i = 0; i < 20; i++) {
-    pas = await fetch(srv.base + '/api/arrival/pass', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    pas = await fetch(srv.base + '/api/arrival/pass', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify({ pass: bewaard.p }) }).then(r => r.json());
     if (pas.pass && pas.pass.pulse === 'onderweg') break;
     await new Promise(r => setTimeout(r, 200));

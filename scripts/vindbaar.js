@@ -131,7 +131,7 @@ function meet() {
 }
 
 const uit = meet();
-if (magSchrijven(eisSchoneBoom('vindbaar'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+if (!controle && magSchrijven(eisSchoneBoom('vindbaar'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
 const pct = (uit.dekking * 100).toFixed(1);
 console.log('VINDBAAR.json: ' + uit.gevonden + ' van ' + uit.woorden + ' eigen woorden leiden naar hun scherm (' + pct + '%), vloer ' + (VLOER * 100) + '%.');
 const ergste = uit.perBestemming.filter((r) => r.mist.length).slice(0, 8);

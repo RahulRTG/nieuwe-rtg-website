@@ -40,6 +40,7 @@
    een mens ook loopt, met dezelfde poort ervoor. Wat de proef wint is een lid
    dat werkelijk is wie het zegt te zijn -- precies wat die 25 routes eisen. */
 'use strict';
+const { randomUUID } = require('node:crypto');
 
 const EMAIL = 'proef.signature@rtg.test';
 const WACHTWOORD = 'ProefWachtwoord-Signature-2026!';
@@ -88,8 +89,8 @@ async function zetSignatureKlaar({ post, tokens }) {
   /* 2. Dat account vraagt de pas aan, en 3. het kantoor beslist. Het bedrag is
         de ondergrens van de ladder; lager weigert de kern met reden. */
   const aanvraag = await doe('de aanvraag voor een Lifestyle Pass', '/api/aanmelding/aanvraag',
-    { pas: 'lifestyle', naam: 'Proef Signature', contact: EMAIL }, acc.token);
-  const aanmeldingId = aanvraag && aanvraag.aanmelding && aanvraag.aanmelding.id;
+    { idem: randomUUID(), pas: 'lifestyle', naam: 'Proef Signature', contact: EMAIL }, acc.token);
+  const aanmeldingId = aanvraag && aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   if (aanmeldingId) {
     await doe('het kantoor accepteert -- pas hier ontstaat de pas', '/api/aanmelding/beslis',
       { id: aanmeldingId, besluit: 'geaccepteerd', contractEuro: 20000,

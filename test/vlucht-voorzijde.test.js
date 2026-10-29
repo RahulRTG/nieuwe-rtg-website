@@ -24,8 +24,8 @@ test('RTG Vlucht draagt het goedgekeurde TravelOS-drieluik', () => {
 
 test('de reiziger gebruikt de echte vlucht-, boekings- en charterroutes', () => {
   for (const pad of ['/bord', '/boek', '/mijn', '/incheck', '/pass/roteer', '/pass/intrek', '/charter'])
-    assert.match(js, new RegExp("api\\('" + pad.replace('/', '\\/')));
-  assert.match(js, /'\/api\/member\/vluchten' \+ pad/);
+    assert.match(js, new RegExp("api\\('" + ('/api/member/vluchten' + pad).replaceAll('/', '\\/')));
+  assert.match(js, /fetch\(pad,/);
   assert.match(js, /Operations bevestigt persoonlijk/);
   assert.match(js, /Geen automatische belofte/);
 });

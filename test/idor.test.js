@@ -65,6 +65,21 @@ test('het IDOR-register draagt geen onverklaarde WERKPLEK-doorbraak', () => {
     'als ijking; vond ' + JSON.stringify(reg.gemeten.werkplek));
 });
 
+test('het IDOR-register draagt geen onverklaarde ZAAK-doorbraak', () => {
+  /* Gang 5: twee zaken (KIKUNOI tegen PONTO) op de leveranciersroutes. Een
+     andere zaak die met het object van deze zaak binnenkomt, is een lek tussen
+     bedrijven; elke kandidaat hoort nagekeken of gerepareerd. Een register van
+     voor gang 5 heeft geen zaakPerRoute en zegt hier dus niets. */
+  const fs = require('fs');
+  const path = require('path');
+  let reg;
+  try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDOR.json'), 'utf8')); }
+  catch (e) { assert.fail('IDOR.json ontbreekt of is onleesbaar: ' + e.message); }
+  const open = Object.entries(reg.zaakPerRoute || {}).filter(([, v]) => v.staat === 'doorbraak');
+  assert.deepEqual(open.map(([r]) => r), [],
+    'een andere zaak kwam binnen met het object van deze zaak: ' + open.map(([r]) => r).join(', '));
+});
+
 test('de proef overleeft zijn eigen ronde: een 401 van een DODE sessie telt niet', () => {
   /* DE FOUT DIE DIT VASTHOUDT, en hij maakte de uitslag beter dan de waarheid.
      De proef loopt alle member-schrijfroutes langs, en /api/logout hoort daarbij.

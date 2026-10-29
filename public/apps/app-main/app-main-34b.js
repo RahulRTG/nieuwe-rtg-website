@@ -58,12 +58,12 @@
        en de knop staat er ook zonder gedeelde positie. */
     const kanBevestigen = dest && !L.arrived;
     const acts = '<div class="live-acts">' +
-      (kanBevestigen ? '<button class="' + (L.nabij ? 'prim glowbtn' : 'sec') + '" id="liveHier">' + (L.nabij ? T('live.benuer','Bent u er? Bevestig uw aankomst') : T('live.ikbener','Ik ben er')) + '</button>' : '') +
+      (kanBevestigen ? '<button class="' + (L.nabij ? 'prim glowbtn' : 'sec') + '" id="liveHier" data-contextactie>' + (L.nabij ? T('live.benuer','Bent u er? Bevestig uw aankomst') : T('live.ikbener','Ik ben er')) + '</button>' : '') +
       (canDoor ? '<button class="prim glowbtn" id="liveDoor">' + T('live.door','Open de deur') + '</button>' : '') +
-      '<button class="sec" id="liveSim">' + T('live.simulate','Simuleer rit') + '</button>' +
-      (hasVeh ? '' : '<button class="sec" id="liveTaxi">' + T('live.taxi','Vraag een taxi') + '</button>') +
-      (canDoor ? '' : '<button class="prim" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>') +
-      (canDoor ? '<button class="sec" id="liveShare">' + T('live.share','Deel mijn locatie') + '</button>' : '') +
+      '<button class="sec" id="liveSim" data-contextactie>' + T('live.simulate','Simuleer rit') + '</button>' +
+      (hasVeh ? '' : '<button class="sec" id="liveTaxi" data-hoofdactie>' + T('live.taxi','Vraag een taxi') + '</button>') +
+      (canDoor ? '' : '<button class="prim" id="liveShare" data-contextactie>' + T('live.share','Deel mijn locatie') + '</button>') +
+      (canDoor ? '<button class="sec" id="liveShare" data-contextactie>' + T('live.share','Deel mijn locatie') + '</button>' : '') +
     '</div>';
 
     $('#livePanel').innerHTML =

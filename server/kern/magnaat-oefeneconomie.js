@@ -18,6 +18,7 @@
    de toetsen en de meters niets merken van de verhuizing -- en precies dat
    bewijst test/magnaat-economische-motor.test.js tegen de gouden referentie. */
 'use strict';
+const crypto = require('crypto');
 const { maak, geheugenJournaal, collectieJournaal } = require('./magnaat-economische-motor');
 const economenlab = require('./magnaat-economenlab');
 
@@ -116,9 +117,30 @@ module.exports = ({ wereldState, save = () => {}, motorklant = null, db = null, 
     return { soort: activiteit, kwaliteit, uitleg: uitleg + ' Het effect wordt bij de volgende economische dag doorgerekend.' };
   }
 
+  const BESLUITVELDEN = ['prijs', 'personeelDoel', 'loonMaand', 'trainingDag', 'bestelling', 'impactPct', 'lening'];
+  const hash = waarde => crypto.createHash('sha256').update(String(waarde)).digest('hex');
+  function besluitBewijs(actor, invoer, idem) {
+    if (idem === undefined || idem === null || idem === '') return null;
+    if (typeof idem !== 'string' || !/^[a-zA-Z0-9:_-]{8,120}$/.test(idem)) {
+      return { error: 'Een unieke idempotentiesleutel van 8 tot 120 tekens is nodig.' };
+    }
+    const canoniek = { bedrijfId: SPELERBEDRIJF };
+    for (const veld of BESLUITVELDEN) {
+      if (invoer[veld] === undefined || (veld === 'lening' && Number(invoer[veld]) <= 0)) canoniek[veld] = null;
+      else canoniek[veld] = Number(invoer[veld]);
+    }
+    return {
+      ontvangst: hash('magnaat-besluit-v1\0' + String(actor) + '\0' + idem),
+      afdruk: hash(JSON.stringify(canoniek))
+    };
+  }
+
   return {
     overzicht: motor.overzicht,
-    beslis: (actor, invoer) => motor.beslis(actor, SPELERBEDRIJF, invoer),
+    beslis: (actor, invoer, idem) => {
+      const bewijs = besluitBewijs(actor, invoer || {}, idem);
+      return bewijs && bewijs.error ? { status: 400, error: bewijs.error } : motor.beslis(actor, SPELERBEDRIJF, invoer, bewijs);
+    },
     analyse,
     volgendeDag: motor.volgendeDag,
     volgendeDagAsync: motor.volgendeDagAsync,

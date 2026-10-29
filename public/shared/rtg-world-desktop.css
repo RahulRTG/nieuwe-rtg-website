@@ -1,4 +1,4 @@
-/* Approved warm composition, shared by every route and both viewport modes. */
+/* Gedeelde warme compositie. */
 body[data-rtg-desktop]{--wd-accent:var(--rtg-world-signature);--wd-line:var(--rtg-world-line);--wd-surface:var(--rtg-world-card);--wp-inset:24px}
 body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{--edge-top:64px!important;--edge-bottom:104px!important;margin:0!important;padding:64px 0 0!important;height:auto!important;min-height:100dvh;overflow:visible!important;font-family:Inter,system-ui,sans-serif!important}
 body[data-rtg-desktop="living"]{--wp-inset:24px}
@@ -33,9 +33,13 @@ body[data-rtg-desktop] .wd-library{display:block;grid-column:2/-1;grid-row:4;bor
 .wd-focus{min-width:0;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);overflow:hidden;background:var(--rtg-world-card);scroll-margin-top:80px}.wd-focus-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:16px;border-bottom:1px solid var(--wd-line)}.wd-focus-head h2{font:500 24px/1.3 Inter,sans-serif;margin:0;margin-inline-end:auto}.wd-app-frame{display:block;width:100%;height:calc(100dvh - 220px);min-height:500px;border:0;background:var(--wh-bg)}.wd-frame-notice,.wd-direct,.wd-frame-retry{margin:16px;line-height:1.6}.wd-expanded .wd-focus{grid-column:2;grid-row:2}.wd-announcement{grid-column:2/-1;line-height:1.6;padding:16px;border:1px solid var(--wd-line)}
 .wd-page{position:relative;contain:layout;min-height:0;isolation:isolate}
 body[data-rtg-desktop] .wd-page :is(main,[data-rtg-screen-root],.wrap,.shell,.schil){width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-height:0!important}
-body[data-rtg-desktop] .wd-page>:is([data-rtg-screen-root],main,header){position:relative!important;inset:auto!important;height:auto!important;overflow:visible!important}
+body[data-rtg-desktop] .wd-page>:is([data-rtg-screen-root],header):not([data-rtg-native-canvas]),body[data-rtg-desktop] .wd-page:not([data-rtg-canvas-surface])>main{position:relative!important;inset:auto!important;height:auto!important;overflow:visible!important}
 body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]{height:max(560px,calc(100dvh - 240px));overflow:hidden!important}
 body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-screen-root="immersive"]{height:100%!important}
+/* Native canvasroutes vullen hun begrensde wereldkolom. */
+body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface]>[data-rtg-native-canvas]{
+ position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0
+}
 body[data-rtg-desktop] :is(.saloon-shell,.saloon-feed-layout,.wd-home .dag,.wd-home .wh-travel-layout,.wd-home .tweeluik){max-width:100%;grid-template-columns:minmax(0,1fr)!important}
 body[data-rtg-desktop="living"] .schil{display:contents!important;min-height:0!important}body[data-rtg-desktop="living"] .schil>:is(.bank,.topbar){display:none!important}
 body[data-rtg-desktop] .wd-home .kompas{position:static}.wp-tabs{display:none}
@@ -58,13 +62,10 @@ body[data-rtg-desktop] :is(button,summary,a,input,select,textarea){scroll-margin
 
 .wd-app-controls .wd-filters{flex-wrap:wrap}.wd-app-controls .wd-filters select{max-width:100%;min-width:0}
 
-/* Mobile has one domain surface. Desktop accessories are still the same DOM,
-   ready on a wide viewport, but never a second mobile page or navigation row. */
+/* Mobiel toont één domeinoppervlak; desktopaccessoires delen dezelfde DOM. */
 body[data-rtg-shell="mobile"] .wd-shell,
 body[data-rtg-shell="mobile"] .wd-page{display:contents;contain:none;isolation:auto}
-/* Een kaart of werkblad heeft één echt tekenvlak nodig. Display:contents zou
-   dat vlak nul pixels maken en fixed kinderen opnieuw aan de viewport hangen.
-   Dit is het inhoudskader binnen dezelfde Edge, geen extra navigatieschil. */
+/* Alleen wortels zonder eigen canvas worden plat in de wereldkolom. */
 body[data-rtg-shell="mobile"] .wd-page:is([data-rtg-canvas-surface],:has(>.rtg-werkruimte),:has(>#rtgCommand)){
  display:block;position:fixed;inset:calc(var(--edge-top,44px) + var(--rtg-command-safe-top,env(safe-area-inset-top,0px))) 0 var(--rtg-adaptive-inset,96px);contain:layout;isolation:isolate;min-height:0;
 }
@@ -83,7 +84,7 @@ body[data-rtg-shell="mobile"] .wd-app-frame{height:calc(100% - 64px);min-height:
 body[data-rtg-shell="mobile"] .wd-world-label{display:none!important}
 body[data-rtg-shell="mobile"][data-rtg-desktop-access="locked"] .wd-access{margin:calc(var(--edge-top,64px) + 20px) 16px var(--rtg-adaptive-inset,96px);width:auto}
 body[data-rtg-shell="mobile"][data-ios-home] #gate[data-rtg-access]>.access-brand{display:none}
-/* App headings stay in the content flow; only the global Edge stays fixed. */
+/* Alleen de globale Edge blijft fixed. */
 body[data-rtg-shell="mobile"] .wd-page>header.ios-nav:not(.ritkop){position:relative!important;top:auto!important}
 body.rtg-edge-host[data-rtg-shell="mobile"][data-workos-premium].workos-has-bottom{display:block!important;height:auto;min-height:100dvh;overflow:visible;padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;padding-bottom:var(--rtg-adaptive-inset,96px)!important}
 body[data-rtg-shell="mobile"] :is(button,summary,a,input,select,textarea){scroll-margin-block:calc(var(--edge-top,48px) + env(safe-area-inset-top,0px) + 12px) var(--rtg-adaptive-inset,96px)}

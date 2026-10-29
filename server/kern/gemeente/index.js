@@ -25,6 +25,7 @@ const { demoAan } = require('../demostand');
    elkaar nooit herkennen. De lijst staat nu op een plek
    (kern/stadsweefsel/categorien.js) en de gemeente is er lezer van. */
 const { CATS, PLOEG } = require('../stadsweefsel/categorien');
+const tijdzone = require('../tijdzone');
 const MELD_STATUS = ['nieuw', 'in behandeling', 'gepland', 'opgelost', 'afgewezen'];
 const BURGERZAKEN = {
   paspoort: { label: 'Paspoort', duurMin: 15, balie: true },
@@ -44,7 +45,7 @@ const BALIE_SLOTS = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:3
 
 function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier, weefsel }) {
   const nu = () => new Date().toISOString();
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => tijdzone.datumIn(); // de gemeente staat in Nederland
   const isDatum = x => /^\d{4}-\d{2}-\d{2}$/.test(String(x || ''));
   const id = () => crypto.randomBytes(4).toString('hex');
   const ref = p => 'RTG-' + p + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();

@@ -19,7 +19,7 @@ app.post('/api/verkoop/showroom', auth, (req, res) => {
 });
 app.post('/api/verkoop/proefrit', auth, (req, res) => {
   if (gegevensStop(req, res, 'reservering')) return;
-  const r = avProefrit(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''), req.body.wens);
+  const r = avProefrit(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''), req.body.wens, req.body.idem);
   if (r.error) return res.status(r.status).json({ error: r.error });
   openLijn(findSupplier(req.body.supplierCode), req);
   res.json({ ok: true, deal: r.deal });
@@ -27,7 +27,7 @@ app.post('/api/verkoop/proefrit', auth, (req, res) => {
 app.post('/api/verkoop/koop', auth, (req, res) => {
   if (gegevensStop(req, res, 'bestelling')) return;
   const r = avKoop(req.session.key, liveCodename(req.session), String(req.body.supplierCode || ''), String(req.body.autoId || ''),
-    { bod: req.body.bod, inruil: req.body.inruil, concierge: req.body.concierge === true, adres: req.body.adres });
+    { bod: req.body.bod, inruil: req.body.inruil, concierge: req.body.concierge === true, adres: req.body.adres, idem: req.body.idem });
   if (r.error) return res.status(r.status).json({ error: r.error });
   openLijn(findSupplier(req.body.supplierCode), req);
   res.json({ ok: true, deal: r.deal });

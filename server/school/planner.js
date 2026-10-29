@@ -10,10 +10,10 @@
    RTG-ecosysteemlaag -- de agenda leest school, hij herschrijft school niet. */
 
 const DAG = 86400000;
-const dagStr = ms => {
-  const d = new Date(ms);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-};
+const tijdzone = require('../kern/tijdzone');
+// een dag is een dag in het huis (Europe/Amsterdam),
+// niet in de UTC-container
+const dagStr = ms => tijdzone.datumIn(new Date(ms));
 
 /* alle schoolpunten van een gezin binnen [van, tot]: open huiswerk op de
    inleverdag en de toetsen van de tieners op de toetsdag. Alleen-lezen. */

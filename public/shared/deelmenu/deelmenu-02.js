@@ -102,6 +102,12 @@
       var b = document.createElement('button');
       b.type = 'button';
       b.textContent = d.naam;
+      /* De wacht kan de hele balk na een app-render opnieuw opbouwen. Deze
+         identiteit blijft over die vervanging gelijk en zegt tegelijk dat de
+         knop een echte appstand opent; Edge en APPWERKT hoeven daardoor geen
+         vluchtige DOM-node als nieuwe handeling te behandelen. */
+      b.setAttribute('data-rtg-adaptive-source', 'deel-' + d.id);
+      b.setAttribute('data-stand', 'deel-' + d.id);
       b.addEventListener('click', function () { open(d.id); });
       d.knop = b;
       balk.appendChild(b);

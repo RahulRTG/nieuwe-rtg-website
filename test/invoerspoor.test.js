@@ -165,3 +165,88 @@ test('9. wie de hele omgeving kopieert, krijgt een feit in het stempel en geen l
   assert.match(r.versheid(s).reden, /subproces|buiten het spoor|kopieerde/);
   assert.strictEqual(r.versheid(s).stand, 'onbekend');
 });
+
+// Een alias van de wortel mag geen gelezen invoer laten verdwijnen. Dit
+// reproduceert /var versus /private/var ook op systemen zonder die alias.
+test('10. wortelalias, ontbrekende paden en ontsnappende symlinks blijven zichtbaar', (t) => {
+  const huis = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-invoer-alias-'));
+  t.after(() => fs.rmSync(huis, { recursive: true, force: true }));
+  const echt = path.join(huis, 'bron');
+  const alias = path.join(huis, 'alias');
+  const buiten = path.join(huis, 'buiten');
+  fs.mkdirSync(echt); fs.mkdirSync(buiten);
+  fs.symlinkSync(echt, alias, 'dir');
+  fs.writeFileSync(path.join(echt, 'a.txt'), 'binnen');
+  fs.writeFileSync(path.join(echt, 'met spatie.txt'), 'url');
+  fs.symlinkSync('lus', path.join(echt, 'lus'));
+  fs.symlinkSync(buiten, path.join(echt, 'node_modules'), 'dir');
+  fs.writeFileSync(path.join(buiten, 'geheim.txt'), 'NOOIT-IN-SPOOR');
+  fs.symlinkSync(buiten, path.join(echt, 'uitgang'), 'dir');
+  fs.symlinkSync(path.join(echt, 'a.txt'), path.join(echt, 'link.txt'));
+  const code = `
+    const fs=require('fs');
+    const {pathToFileURL}=require('url');
+    fs.readFileSync('a.txt');
+    fs.readFileSync(pathToFileURL(require('path').resolve('met spatie.txt')));
+    fs.existsSync('lus');
+    fs.readFileSync('node_modules/geheim.txt');
+    fs.readFileSync('link.txt');
+    fs.existsSync('nog/niet/bestaand.txt');
+    fs.readFileSync('uitgang/geheim.txt');
+    fs.existsSync('uitgang/nog-niet.txt');
+    const s=global.__rtgInvoerspoor;
+    console.log(JSON.stringify({lees:[...s.lees], bestaat:[...s.bestaat], onbekend:[...s.onwaarneembaar]}));`;
+  const r = spawnSync(process.execPath, ['-r', PRELOAD, '-e', code], {
+    cwd: alias, env: { ...process.env, RTG_INVOER_WORTEL: alias }, encoding: 'utf8'
+  });
+  assert.equal(r.status, 0, r.stderr);
+  const s = JSON.parse(r.stdout);
+  assert.ok(s.lees.includes('a.txt'), 'canoniek cwd en aliaswortel duiden dezelfde bron aan');
+  assert.ok(s.lees.includes('met spatie.txt'), 'file URL wordt gedecodeerd');
+  assert.ok(s.lees.includes('package-lock.json'), 'gekoppelde node_modules blijft pakketbewijs');
+  assert.ok(s.onbekend.includes('invoerpad niet canoniek te bepalen'), 'een symlinklus mag niet stil verdwijnen');
+  assert.ok(s.lees.includes('link.txt'), 'het veranderen van een interne symlink is ook invoer');
+  assert.ok(s.bestaat.includes('nog/niet/bestaand.txt'), 'ontbrekende ouders verdwijnen niet uit het spoor');
+  assert.ok(s.onbekend.includes('symlink buiten de invoerwortel'), 'een externe afhankelijkheid mag niet stil actueel zijn');
+  assert.ok(!s.lees.some(p => p.includes('geheim.txt')), 'externe inhoud is geen bronpad binnen de boom');
+  assert.ok(!r.stdout.includes('NOOIT-IN-SPOOR') && !r.stdout.includes(buiten), 'geen inhoud of buitenpad in het spoor');
+});
+
+
+test('11. een interne symlink opnieuw richten maakt de eerdere meting verouderd', (t) => {
+  const r = repo();
+  t.after(() => fs.rmSync(r.d, { recursive: true, force: true }));
+  fs.symlinkSync('a.txt', path.join(r.d, 'bron.txt'));
+  // De lezing moet vóór het vastleggen van het stempel plaatsvinden.
+  const gen = fs.readFileSync(path.join(r.d, 'gen.js'), 'utf8');
+  fs.writeFileSync(path.join(r.d, 'gen.js'), gen.replace("const a =", "fs.readFileSync('bron.txt');\nconst a ="));
+  r.commit('symlinkbron');
+  const s = r.draai();
+  r.commit('meting');
+  assert.ok(s.invoer.bestanden.includes('bron.txt'), 'de binding is invoer');
+  fs.unlinkSync(path.join(r.d, 'bron.txt'));
+  fs.symlinkSync('b.txt', path.join(r.d, 'bron.txt'));
+  r.commit('andere bron');
+  const v = r.versheid(s);
+  assert.equal(v.stand, 'mogelijk-verouderd');
+  assert.ok(v.geraakt.includes('bron.txt'));
+});
+
+
+test('12. directorysymlink die opnieuw wordt gericht kan geen vals actueel bewijs geven', (t) => {
+  const r = repo();
+  t.after(() => fs.rmSync(r.d, { recursive: true, force: true }));
+  r.schrijf('een/bron.txt', 'een');
+  r.schrijf('twee/bron.txt', 'twee');
+  fs.symlinkSync('een', path.join(r.d, 'map'), 'dir');
+  const gen = fs.readFileSync(path.join(r.d, 'gen.js'), 'utf8');
+  fs.writeFileSync(path.join(r.d, 'gen.js'), gen.replace('const a =', "fs.readFileSync('map/bron.txt');\nconst a ="));
+  r.commit('mapalias');
+  const s = r.draai();
+  r.commit('meting');
+  assert.ok(s.invoer.onwaarneembaar.includes('invoer via een directorysymlink'));
+  fs.unlinkSync(path.join(r.d, 'map'));
+  fs.symlinkSync('twee', path.join(r.d, 'map'), 'dir');
+  r.commit('andere map');
+  assert.equal(r.versheid(s).stand, 'onbekend', 'geen actueel bewijs als alleen de mapbinding wijzigde');
+});

@@ -248,6 +248,19 @@
     script.src = '/shared/' + bron[0] + '.js'; script.async = false;
     (document.head || document.documentElement).appendChild(script);
   });
+/* De sessie van dit scherm, voor de app-gids (eigenaarsbesluit 19 oktober
+   2026: gebruiken vraagt een account; server/kern/elkesessie.js). Elk soort
+   scherm draagt zijn eigen token -- lid, zaak, kantoor of PDA -- en een
+   Foundation-scherm een gezinsprofiel. Wat er is, reist mee; de server
+   beslist. */
+  function gidsSessie() {
+    var L = window.localStorage, t = '', g = {};
+    try {
+      t = L.getItem('rtg_member_token') || L.getItem('rtg_sup_token') || L.getItem('rtg_office_token') || L.getItem('rtg_pda_token') || '';
+      g = JSON.parse(L.getItem('rtf_sessie') || 'null') || {};
+    } catch (e) { /* privévenster: zonder sessie */ }
+    return { kop: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }, code: g.code, token: g.token };
+  }
 /* Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van
    de consolidatieronde; de bundelvolgorde is alfabetisch, dus 01, 01b, 02).
    Sectie 1 en verder: offline, verbinding, en de rest. */
@@ -726,7 +739,8 @@
       sheet.querySelector('.bss-kop span').textContent = document.title || 'Deze app';
       document.body.appendChild(sheet);
       sheet.querySelector('.bss-x').addEventListener('click', sluit);
-      fetch('/api/gids/app', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pad: location.pathname }) })
+      var gs = gidsSessie(); // de sessie van dit scherm: ./basis-01ae-sessie.js
+      fetch('/api/gids/app', { method: 'POST', headers: gs.kop, body: JSON.stringify({ pad: location.pathname, code: gs.code, token: gs.token }) })
         .then(function (r) { return r.json(); })
         .then(function (d) {
           if (!sheet || !d || !d.gids) return;

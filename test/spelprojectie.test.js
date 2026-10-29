@@ -213,7 +213,8 @@ test('de browser gebruikt fragment, vaste POST-routes en geen persoonlijke schil
   const html = lees('public/apps/spelscherm.html');
   const scherm = lees('public/apps/spelscherm.js');
   const spelen = lees('public/apps/spelen.html');
-  const routes = lees('server/routes/spellen.js');
+  const routes = lees('server/routes/spellen/projectie.js');
+  assert.match(lees('server/routes/spellen.js'), /require\('\.\/spellen\/projectie'\)/, 'de bestaande spelrouter mount de schermingangen');
   const eenmalig = require('../server/lib/eenmalig-geheim-routes').ROUTES;
   assert.ok(html.indexOf('history.replaceState') < html.indexOf('rel="stylesheet"'),
     'het fragment wordt gewist voordat paginaresources laden');

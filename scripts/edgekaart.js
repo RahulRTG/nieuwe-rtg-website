@@ -171,7 +171,7 @@ const KAART = [
     ['beslist', 'zichtbaarheidsstand:b', 'vier balkstanden', "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"]]],
   ['rtg-adaptive-edge-controls.js', 'adaptieve-balk', 'capability-register:bl hoofdactie:s vluchtige-context:l', [
     ['leest', 'capability-register:l', 'handelingen via het blikveld', 'if(w.RTGEdgeBlikveld)return w.RTGEdgeBlikveld.acties();'],
-    ['beslist', 'capability-register:b', 'welke paginaknop geoogst wordt', 'if (lbl(el) && avail(el, root) && (!tab || !tabs.has(tab))'],
+    ['beslist', 'capability-register:b', 'welke paginaknop geoogst wordt', 'if(lbl(el)&&avail(el,root)&&(!tab||!tabs.has(tab))&&(!action||!actions.has(action))'],
     ['rendert', 'hoofdactie:s', 'verhuist de hoofdactie in het blad', 'rt.primarySlot = primary; rt.sheet.appendChild(primary);'],
     ['rendert', 'vluchtige-context:l', 'bladtitel uit RTGAdaptief', 'if (A && A.context().titel) rt.sheetTitle.textContent = A.context().titel;']]],
   ['rtg-adaptive-edge-input.js', 'adaptieve-balk', 'gebaar-drempel:l zichtbaarheidsstand:bl capability-register:l', [
@@ -559,7 +559,67 @@ function lijfAttributen(s) {
   }
   return uniek(attributen);
 }
-function meet(p, s) {
+/* Een beperkte uitbreiding op letterlijke fetch: een top-level const-helper
+   die onmiddellijk fetch(parameter) aanroept. De bestaande lexer houdt tekst,
+   commentaar en code uiteen. Geen callgraph: shadowing, ontsnapte helpers,
+   berekende paden en andere wrappervormen leveren hier geen bewijs op. */
+function helperFetch(p, bron) {
+  const uit = [];
+  const blokken = p.endsWith('.html') ? stukken(bron) : [{ soort: 'script', tekst: bron }];
+  const delen = blokken.filter((d, n) => {
+    if (d.soort !== 'script') return false;
+    if (!p.endsWith('.html')) return true;
+    // stukken bewaart de openingstag in het voorgaande markupstuk. Alleen
+    // uitvoerbare inline JS: een src-body of datablok wordt niet uitgevoerd.
+    const tag = /<script\b([^>]*)>$/i.exec(blokken[n - 1]?.tekst || '');
+    if (!tag) return false;
+    const attrs = [...tag[1].matchAll(/([^\s"'<>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g)];
+    if (attrs.some(a => a[1].toLowerCase() === 'src')) return false;
+    const types = attrs.filter(a => a[1].toLowerCase() === 'type');
+    if (types.length > 1) return false;
+    const type = types.length ? (types[0][2] ?? types[0][3] ?? types[0][4] ?? '').trim().toLowerCase() : '';
+    return ['', 'module', 'text/javascript', 'application/javascript'].includes(type);
+  });
+  if (!delen.some(d => /=>\s*fetch\s*\(/.test(d.tekst))) return uit;
+  const gelezen = delen.map(deel => ({ deel, t: require('./ast/lexer').lex(deel.tekst) }));
+  // Klassieke scriptblokken delen bindings. Een overschreven fetch in een ander
+  // blok maakt dezelfde aanname onzeker. Ook generatornamen zijn declaraties.
+  if (gelezen.some(({ t }) => t.some((x, n) => x.type === 'naam' && x.value === 'fetch' &&
+    (t[n + 1]?.value !== '(' || ['function', '*', '.', '?.', 'new'].includes(t[n - 1]?.value))))) return uit;
+  for (const { deel, t } of gelezen) {
+    if (!/=>\s*fetch\s*\(/.test(deel.tekst)) continue;
+    let diepte = 0;
+    for (let i = 0; i < t.length; i++) {
+      const v = k => t[k] && t[k].value;
+      if (t[i].type === 'lees' && v(i) === '{') diepte++;
+      if (t[i].type === 'lees' && v(i) === '}') diepte--;
+      if (diepte !== 0 || v(i) !== 'const' || t[i + 1]?.type !== 'naam' || v(i + 2) !== '=' || v(i + 3) !== '(') continue;
+      const naam = v(i + 1), params = []; let j = i + 4;
+      while (t[j]?.type === 'naam') {
+        params.push(v(j++));
+        if (v(j) !== ',') break;
+        j++;
+      }
+      if (!params.length || new Set(params).size !== params.length || v(j) !== ')' || v(j + 1) !== '=>' || v(j + 2) !== 'fetch' || v(j + 3) !== '(') continue;
+      const k = params.indexOf(v(j + 4));
+      if (k < 0 || ![',', ')'].includes(v(j + 5))) continue;
+      // Iedere andere naamreferentie maakt de binding onzeker (ook parameters,
+      // exports, herdefinities, propertycalls en overschreven fetch).
+      const refs = t.map((x, n) => x.type === 'naam' && x.value === naam ? n : -1).filter(n => n >= 0 && n !== i + 1);
+      if (refs.some(n => v(n + 1) !== '(' || ['.', '?.', 'function', '*', 'new'].includes(v(n - 1)))) continue;
+      // Geen inter-script callgraph: een helpernaam elders kan een andere
+      // binding zijn. Dan claimen we geen helperbewijs voor dit bestand.
+      if (gelezen.some(g => g.t !== t && g.t.some(x => x.type === 'naam' && x.value === naam))) continue;
+      for (const n of refs) {
+        const a = argumenten(deel.tekst, t[n + 1].end)[k];
+        const pad = letterlijk(a);
+        if (pad && pad.startsWith('/api/')) uit.push(pad.split('?')[0]);
+      }
+    }
+  }
+  return uit;
+}
+function meet(p, s, bron = s) {
   const globals = [...s.matchAll(/\b(?:w|window|root|g)\.(RTG[\w$]*)\s*=(?!=)/g)].map(m => m[1]);
   const opslag = [];
   for (const m of s.matchAll(/([\w$.()]+)\.(?:getItem|setItem|removeItem)\(\s*/g)) {
@@ -571,7 +631,7 @@ function meet(p, s) {
   const fetchen = [...s.matchAll(/\bfetch\(\s*['"`](\/api\/[^'"`$?]*)/g)].map(m => m[1]);
   const ev = events(p, s);
   return { globals: uniek(globals), zendt: ev.zendt, luistert: ev.luistert, attributen: lijfAttributen(s),
-    opslag: uniek(opslag), fetch: uniek(fetchen) };
+    opslag: uniek(opslag), fetch: uniek([...fetchen, ...helperFetch(p, bron)]) };
 }
 
 /* ------------------------------------------------------- DE DODE KANALEN
@@ -703,7 +763,7 @@ function bouw(wand = wandeling()) {
       return [...letters].map(l => ({ naam, als: ALS[l] }));
     }).sort((a, b) => (a.naam + a.als).localeCompare(b.naam + b.als));
     return { pad: vol, laag, rollen: rollen.map(([rol, etiket, wat, citaat]) => ({ rol, etiket: etiket === '-' ? null : etiket, wat, citaat })),
-      verantwoordelijkheden, gemeten: meet(vol, kaal(vol, bron)) };
+      verantwoordelijkheden, gemeten: meet(vol, kaal(vol, bron), bron) };
   }).sort((a, b) => a.pad.localeCompare(b.pad));
   const verantwoordelijkheden = {};
   for (const naam of [...NAMEN].sort()) {
@@ -722,6 +782,7 @@ function bouw(wand = wandeling()) {
       'Elk citaat hangt aan het etiket (naam:letter) waar het over gaat, of aan null als het over geen van de veertien gaat; elk etiket s of b heeft minstens een citaat. ' +
       'schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. ' +
       '`gemeten` komt uit de bron zonder commentaar en kent alleen letterlijke namen: attributen alleen op body/html of een alias daarvan, opslag `onbekend` als de opslag niet letterlijk local- of sessionStorage heet. ' +
+      'Fetch volgt daarnaast letterlijke aanroepen van eenduidige top-level const-helpers die direct fetch(parameter) doen; geen algemene callgraph. ' +
       'dodeKanalen gaat over rtg-events in public/ (zonder public/dist, .min.js en bundels, wel hun delen) plus index.html; een naam in luisterZonderZender kan nog een zender hebben onder `dynamisch`. ' +
       '`afgeleid` is wat de lexicale lezer over dezelfde wandeling vindt en naast de kaart legt: wie registerAction aanroept op de Edge-kern, wie data-rtg-world en wie data-rtg-edge-2-state op body zet. Een ondergrens: een samengestelde naam ontsnapt. ' +
       'Een dubbele eigenaar is een vondst en geen oordeel.',

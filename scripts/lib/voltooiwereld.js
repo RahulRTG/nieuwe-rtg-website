@@ -26,6 +26,7 @@
    echte post verstuurt, is een ongeluk en geen meting.
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -58,9 +59,10 @@ async function maakWereld(naam, eigenEnv) {
      af. Alleen de soort en de melding, nooit de inhoud van het antwoord. */
   const antwoorden = [];
   function noteer(pad, status, data) {
-    const weigering = status >= 400 && status < 500;
+    const weigering = status >= 400;
     const melding = data && typeof data.error === 'string' ? data.error : null;
-    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null });
+    antwoorden.push({ pad, status, lijf: data !== null && data !== undefined, melding: weigering ? melding : null,
+      hoe: status === 503 && data && typeof data.hoe === 'string' ? data.hoe : null });
   }
 
   /* `koppen`: extra kopregels, zoals het bezitsbewijs van een gebonden toestel. */
@@ -176,6 +178,9 @@ async function maakWereld(naam, eigenEnv) {
   }
 
   function klaar() {
+    // Een afgerond scenario houdt geen procesbrede opruimhaak vast.
+    // Actieve werelden blijven bij procesafsluiting wel opgeruimd worden.
+    process.removeListener('exit', klaar);
     try { srv.kind.kill('SIGKILL'); } catch (e) { /* al weg */ }
     try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) { /* al weg */ }
   }
@@ -237,9 +242,9 @@ async function eigenaarSessie(w) {
    RTG-lid verder. */
 async function lifestyleLid(w, merk) {
   const lid = await nieuwLid(w, merk);
-  const a = await w.post('/api/aanmelding/aanvraag', { pas: 'lifestyle', naam: 'Voltooilid ' + merk,
+  const a = await w.post('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'lifestyle', naam: 'Voltooilid ' + merk,
     contact: lid.email, viaUitnodiging: true }, lid.token);
-  const id = a.data && a.data.aanmelding && a.data.aanmelding.id;
+  const id = a.data && a.data.ontvangst && a.data.ontvangst.aanvraagId;
   if (a.status !== 200 || !id) throw new Error('de Lifestyle-aanvraag lukte niet (' + a.status + ')');
   const K = await eigenaarSessie(w);
   const b = await w.post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, K);
@@ -315,4 +320,29 @@ async function verbind(w, A, B) {
   return { a: { key: ca.me, codenaam: ca.codename }, b: { key: cb.me, codenaam: cb.codename } };
 }
 
-module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, verbind, KANTOORWERELD };
+/* EEN MEDEWERKER VAN HET KANTOOR OP NAAM, langs de enige weg die die rol aan
+   een account hangt (AUTHORITY.md fase 2): een vers lid, de eigenaar maakt een
+   uitnodiging op zijn codenaam, het lid koppelt de kantoorrol met die
+   uitnodiging en start daarna met zijn eigen account een kantoorsessie
+   (/api/account/start, rol kantoor) -- precies wat RTG One, Decision Room en
+   Project Room zelf doen. Buiten productie maakt de eigenaar de uitnodiging
+   zonder passkey (de terugval die de route zelf zo noemt). Geeft het lid terug
+   met `kantoor` (de kantoorsessie) en `codenaam`. */
+async function kantoorMedewerker(w, merk) {
+  const lid = await nieuwLid(w, merk);
+  const c = (await w.post('/api/member/connections', {}, lid.token)).data || {};
+  if (!c.codename) throw new Error('het nieuwe lid heeft geen codenaam');
+  const K = await eigenaarSessie(w);
+  const u = await w.post('/api/office/kantoor/uitnodiging', { codenaam: c.codename, idem: 'voltooi-' + merk + '-' + c.codename }, K);
+  if (u.status !== 200 || !u.data || !u.data.code) throw new Error('de eigenaar kon geen kantooruitnodiging maken (' + u.status + ')');
+  const k = await w.post('/api/account/koppel', { soort: 'kantoor', uitnodiging: u.data.code }, lid.token);
+  if (k.status !== 200) throw new Error('de kantoorrol koppelen lukte niet (' + k.status + ')');
+  const s = await w.post('/api/account/start', { rol: 'kantoor' }, lid.token);
+  if (s.status !== 200 || !s.data || !s.data.token) throw new Error('de kantoorsessie starten lukte niet (' + s.status + ')');
+  lid.codenaam = c.codename;
+  lid.key = c.me;
+  lid.kantoor = s.data.token;
+  return lid;
+}
+
+module.exports = { maakWereld, nieuwLid, inloggen, eigenaarSessie, lifestyleLid, geverifieerdLid, gebondenToestel, verbind, kantoorMedewerker, KANTOORWERELD };

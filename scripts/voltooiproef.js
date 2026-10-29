@@ -46,6 +46,14 @@
    leest dat als NIET_GETEST en nooit als bewezen. Een scenario kan dit bewijs
    niet zelf schrijven: `stap()` kent alleen de drie hierboven.
 
+   BEWIJS 6 (BEVOEGD) KAN EXPLICIET WORDEN AANGELEVERD AAN DE BEVOEGDRONDE.
+   Een scenario markeert daarvoor een daadwerkelijk uitgevoerde vreemde-actor-
+   stap met `stap('bevoegd', ...)`. De stap blijft tevens onderdeel van de
+   kernworkflow. Alleen een volledig gesloten kernworkflow plus minstens één
+   gesloten gemarkeerde tegenproef vormt appbewijs; tekst of een losse 401
+   wordt nooit automatisch opgewaardeerd. BEVOEGD.json blijft de enige bron die
+   APPWERKT voor bewijs 6 leest en laat concrete IDOR/rollekken altijd winnen.
+
    WAT DEZE PROEF NIET IS, en dat staat per onderdeel onder `grens`:
      - geen browser: de routes van het scherm, niet het scherm (dat is bewijs 2);
      - geen Redis en geen PostgreSQL: herstelbaar is hier een proces dat sterft
@@ -69,6 +77,13 @@ const MAP = path.join(__dirname, 'lib', 'voltooi');
 const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
 /* Afgeleid uit de antwoorden, niet door een scenario geschreven (zie de kop). */
 const AFGELEID = 'menselijk';
+/* Een scenario mag een stap die een vreemde actor werkelijk uitvoert expliciet
+   als `bevoegd` aanmerken. Die stap blijft onderdeel van `voltooibaar`; voor
+   bevoegdheid vormt hij samen met de volledig gesloten kernworkflow een
+   afzonderlijke positieve + negatieve kruisproef. Losse 401-antwoorden of
+   woorden in een stapnaam worden nooit automatisch als bevoegdheidsbewijs
+   geïnterpreteerd. */
+const BEVOEGD = 'bevoegd';
 
 /* DE SCENARIO'S STAAN HIER LETTERLIJK, en niet als een require over een
    mapinhoud. De versheid van VOLTOOIPROEF.json rekent alleen wijzigingen mee in
@@ -79,42 +94,116 @@ const AFGELEID = 'menselijk';
    bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
    stil niet mee te tellen. */
 const SCENARIOS = {
+  'aankomst.js': require('./lib/voltooi/aankomst'),
+  'appdossier.js': require('./lib/voltooi/appdossier'),
   'attenties.js': require('./lib/voltooi/attenties'),
+  'berichten.js': require('./lib/voltooi/berichten'),
   'bescherming.js': require('./lib/voltooi/bescherming'),
+  'browser.js': require('./lib/voltooi/browser'),
+  'bank.js': require('./lib/voltooi/bank'),
+  'buurtruil.js': require('./lib/voltooi/buurtruil'),
   'cellier.js': require('./lib/voltooi/cellier'),
   'cercle.js': require('./lib/voltooi/cercle'),
+  'clips.js': require('./lib/voltooi/clips'),
   'commerce.js': require('./lib/voltooi/commerce'),
+  'connect.js': require('./lib/voltooi/connect'),
+  'decisionroom.js': require('./lib/voltooi/decisionroom'),
   'entourage.js': require('./lib/voltooi/entourage'),
+  'flits.js': require('./lib/voltooi/flits'),
   'foodcourt.js': require('./lib/voltooi/foodcourt'),
+  'foundationzorg.js': require('./lib/voltooi/foundationzorg'),
   'garderobe.js': require('./lib/voltooi/garderobe'),
+  'geven.js': require('./lib/voltooi/geven'),
   'gegevens.js': require('./lib/voltooi/gegevens'),
+  'geldcommand.js': require('./lib/voltooi/geldcommand'),
+  'balans.js': require('./lib/voltooi/balans'),
   'hangar.js': require('./lib/voltooi/hangar'),
+  'horeca.js': require('./lib/voltooi/horeca'),
+  'huis.js': require('./lib/voltooi/huis'),
   'ik.js': require('./lib/voltooi/ik'),
+  'krant.js': require('./lib/voltooi/krant'),
+  'klimaat.js': require('./lib/voltooi/klimaat'),
   'kwesties.js': require('./lib/voltooi/kwesties'),
+  'library.js': require('./lib/voltooi/library'),
+  'labfonds.js': require('./lib/voltooi/labfonds'),
+  'leven.js': require('./lib/voltooi/leven'),
+  'gezin.js': require('./lib/voltooi/gezin'),
+  'betalen.js': require('./lib/voltooi/betalen'),
+  'bestellen.js': require('./lib/voltooi/bestellen'),
+  'assets.js': require('./lib/voltooi/assets'),
+  'bellen.js': require('./lib/voltooi/bellen'),
   'logboek.js': require('./lib/voltooi/logboek'),
+  'loonstrook.js': require('./lib/voltooi/loonstrook'),
   'loopbaan.js': require('./lib/voltooi/loopbaan'),
   'maison.js': require('./lib/voltooi/maison'),
+  'magnaat.js': require('./lib/voltooi/magnaat'),
   'mall.js': require('./lib/voltooi/mall'),
   'mecenaat.js': require('./lib/voltooi/mecenaat'),
+  'mediaos.js': require('./lib/voltooi/mediaos'),
   'mijnmall.js': require('./lib/voltooi/mijnmall'),
+  'move.js': require('./lib/voltooi/move'),
+  'muziek.js': require('./lib/voltooi/muziek'),
   'nalatenschap.js': require('./lib/voltooi/nalatenschap'),
+  'navigatie.js': require('./lib/voltooi/navigatie'),
   'neigingen.js': require('./lib/voltooi/neigingen'),
+  'nieuws.js': require('./lib/voltooi/nieuws'),
+  'ontdek.js': require('./lib/voltooi/ontdek'),
+  'passkeys.js': require('./lib/voltooi/passkeys'),
+  'ov.js': require('./lib/voltooi/ov'),
+  'ovroutes.js': require('./lib/voltooi/ovroutes'),
+  'onderneming.js': require('./lib/voltooi/onderneming'),
+  'office.js': require('./lib/voltooi/office'),
+  'partnernetwerk.js': require('./lib/voltooi/partnernetwerk'),
+  'pay.js': require('./lib/voltooi/pay'),
+  'podium.js': require('./lib/voltooi/podium'),
   'post.js': require('./lib/voltooi/post'),
+  'projectroom.js': require('./lib/voltooi/projectroom'),
   'pulse.js': require('./lib/voltooi/pulse'),
+  'rechterhand.js': require('./lib/voltooi/rechterhand'),
   'reisboek.js': require('./lib/voltooi/reisboek'),
+  'rendezvous.js': require('./lib/voltooi/rendezvous'),
   'reizen.js': require('./lib/voltooi/reizen'),
+  'rtfbord.js': require('./lib/voltooi/rtfbord'),
+  'rtfbuurt.js': require('./lib/voltooi/rtfbuurt'),
+  'rtfportaal.js': require('./lib/voltooi/rtfportaal'),
+  'rtfschrift.js': require('./lib/voltooi/rtfschrift'),
   'relaties.js': require('./lib/voltooi/relaties'),
+  'rtgone.js': require('./lib/voltooi/rtgone'),
+  'residentie.js': require('./lib/voltooi/residentie'),
+  'routedossier.js': require('./lib/voltooi/routedossier'),
   'rtmail.js': require('./lib/voltooi/rtmail'),
+  'salon.js': require('./lib/voltooi/salon'),
   'school.js': require('./lib/voltooi/school'),
+  'rtgcode.js': require('./lib/voltooi/rtgcode'),
   'sessies.js': require('./lib/voltooi/sessies'),
+  'sitemaker.js': require('./lib/voltooi/sitemaker'),
+  'snaps.js': require('./lib/voltooi/snaps'),
+  'sociaal.js': require('./lib/voltooi/sociaal'),
+  'spelen.js': require('./lib/voltooi/spelen'),
+  'sport.js': require('./lib/voltooi/sport'),
+  'stad.js': require('./lib/voltooi/stad'),
+  'spelavond.js': require('./lib/voltooi/spelavond'),
+  'tabzorg.js': require('./lib/voltooi/tabzorg'),
+  'reistab.js': require('./lib/voltooi/reistab'),
+  'terplaatse.js': require('./lib/voltooi/terplaatse'),
   'table.js': require('./lib/voltooi/table'),
+  'theater.js': require('./lib/voltooi/theater'),
+  'tweedescherm.js': require('./lib/voltooi/tweedescherm'),
   'uitgaan.js': require('./lib/voltooi/uitgaan'),
   'vandaag.js': require('./lib/voltooi/vandaag'),
   'veilig.js': require('./lib/voltooi/veilig'),
+  'vertegenwoordiging.js': require('./lib/voltooi/vertegenwoordiging'),
   'verificatie.js': require('./lib/voltooi/verificatie'),
+  'vrienden.js': require('./lib/voltooi/vrienden'),
+  'wallet.js': require('./lib/voltooi/wallet'),
   'wereldlaag.js': require('./lib/voltooi/wereldlaag'),
   'wonen.js': require('./lib/voltooi/wonen'),
-  'werkos.js': require('./lib/voltooi/werkos')
+  'vonk.js': require('./lib/voltooi/vonk'),
+  'wbw.js': require('./lib/voltooi/wbw'),
+  'werk.js': require('./lib/voltooi/werk'),
+  'werkos.js': require('./lib/voltooi/werkos'),
+  'vluchten.js': require('./lib/voltooi/vluchten'),
+  'vooruitzicht.js': require('./lib/voltooi/vooruitzicht')
 };
 
 function scenarios(alleen) {
@@ -127,20 +216,42 @@ function scenarios(alleen) {
     .map((n) => Object.assign({ bestand: 'scripts/lib/voltooi/' + n }, SCENARIOS[n]));
 }
 
+function bevoegdUit(kern, tegenproeven, afgebroken) {
+  if (!tegenproeven.length) {
+    return { schakels: [], storingen: [], telling: { schakels: 0, gesloten: 0, open: 0, stuk: 0 },
+      sluit: false, nietBeproefd: 'het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor' };
+  }
+  const eigen = { nr: 1, soort: 'bevoegde-workflow',
+    wat: 'de bevoegde actor voltooit de volledige kernworkflow',
+    stand: kern.sluit ? 'gesloten' : 'open',
+    ziet: kern.telling.gesloten + ' van de ' + kern.telling.schakels + ' kernschakels gesloten' };
+  const schakels = [eigen, ...tegenproeven];
+  const telling = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
+  for (const s of schakels) telling[s.stand]++;
+  return { schakels, storingen: [], telling,
+    sluit: telling.gesloten === telling.schakels && !afgebroken };
+}
+
 async function meetScenario(sc) {
   const boek = Object.fromEntries(BEWIJZEN.map((b) => [b, []]));
+  const tegenproeven = [];
   /* Een stap faalt nooit stil: een uitzondering wordt `stuk` met de fout erbij,
      en de volgende stap loopt gewoon -- een keten die na de eerste fout stopt,
      verbergt hoeveel er verder nog kapot is. */
   const stap = async (bewijs, wat, fn) => {
-    if (!boek[bewijs]) throw new Error('onbekend bewijs ' + bewijs + ' in ' + sc.bestand);
+    const doel = bewijs === BEVOEGD ? 'voltooibaar' : bewijs;
+    if (!boek[doel]) throw new Error('onbekend bewijs ' + bewijs + ' in ' + sc.bestand);
     const t0 = Date.now();
-    const nr = boek[bewijs].length + 1;
+    const nr = boek[doel].length + 1;
     try {
       const r = await fn();
-      boek[bewijs].push({ nr, wat, stand: r && r.klopt ? 'gesloten' : 'open', ziet: r && r.ziet || null, ms: Date.now() - t0 });
+      const regel = { nr, wat, stand: r && r.klopt ? 'gesloten' : 'open', ziet: r && r.ziet || null, ms: Date.now() - t0 };
+      boek[doel].push(regel);
+      if (bewijs === BEVOEGD) tegenproeven.push({ ...regel, nr: tegenproeven.length + 2, soort: 'tegenproef' });
     } catch (e) {
-      boek[bewijs].push({ nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 });
+      const regel = { nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 };
+      boek[doel].push(regel);
+      if (bewijs === BEVOEGD) tegenproeven.push({ ...regel, nr: tegenproeven.length + 2, soort: 'tegenproef' });
     }
   };
   /* `omgeving`: een scenario dat een herleidbaar mens van het kantoor nodig
@@ -170,6 +281,7 @@ async function meetScenario(sc) {
     uit[b] = { schakels, storingen: [], telling: t,
       sluit: schakels.length > 0 && t.open === 0 && t.stuk === 0 && !afgebroken };
   }
+  uit[BEVOEGD] = bevoegdUit(uit.voltooibaar, tegenproeven, afgebroken);
   return uit;
 }
 
@@ -184,12 +296,16 @@ function inWoorden(melding) {
 
 function menselijkUit(antwoorden, afgebroken) {
   const n = antwoorden.length;
-  const kaal = antwoorden.filter((a) => a.status === 0 || a.status >= 500);
+  /* BETROUWBAARHEID par. 3: een expliciete configuratieweigering is geen
+     kale serverfout. Dit bewijst alleen de melding; de route blijft 503 en
+     haar functionele/configuratiebewijs wordt hier niet opgewaardeerd. */
+  const configuratie = (a) => a.status === 503 && a.lijf && inWoorden(a.melding) && inWoorden(a.hoe);
+  const kaal = antwoorden.filter((a) => a.status === 0 || (a.status >= 500 && !configuratie(a)));
   const leeg = antwoorden.filter((a) => a.status > 0 && !a.lijf);
-  const weigeringen = antwoorden.filter((a) => a.status >= 400 && a.status < 500);
+  const weigeringen = antwoorden.filter((a) => a.status >= 400);
   const zonder = weigeringen.filter((a) => !inWoorden(a.melding));
   const samenvat = (lijst) => [...new Set(lijst.map((a) => a.status + ' ' + a.pad))].slice(0, 5).join(', ');
-  if (!n || !weigeringen.length) {
+  if (!n || (!weigeringen.length && !kaal.length && !leeg.length)) {
     return { schakels: [], storingen: [], telling: { schakels: 0, gesloten: 0, open: 0, stuk: 0 }, sluit: false,
       antwoorden: n, weigeringen: 0,
       nietBeproefd: n ? 'het scenario lokte geen enkele weigering uit, dus of een melding in woorden de gebruiker bereikt is hier niet gezien'
@@ -202,7 +318,8 @@ function menselijkUit(antwoorden, afgebroken) {
       stand: leeg.length ? 'open' : 'gesloten', ziet: leeg.length ? leeg.length + ' leeg: ' + samenvat(leeg) : 'elk antwoord droeg een lijf' },
     { nr: 3, wat: 'elke weigering (' + weigeringen.length + ') draagt een melding in woorden en geen stacktrace of foutnaam',
       stand: zonder.length ? 'open' : 'gesloten', ziet: zonder.length ? zonder.length + ' zonder melding: ' + samenvat(zonder)
-        : weigeringen.length + ' weigering(en), bijvoorbeeld "' + String(weigeringen[0].melding).slice(0, 90) + '"' }
+        : weigeringen.length ? weigeringen.length + ' weigering(en), bijvoorbeeld "' + String(weigeringen[0].melding).slice(0, 90) + '"'
+          : 'geen ontvangen weigering; verbinding of antwoord ontbreekt' }
   ];
   const t = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
   for (const s of schakels) t[s.stand]++;
@@ -220,7 +337,7 @@ async function meet(opties) {
     testwereld: {
       mail: 'postvanger (server/post-vanger.js): alleen met RTG_POSTVANGER=1, nooit in productie, nooit naast SMTP_URL of MAIL_DIRECT',
       sms: 'sms-sandbox (server/sms-sandbox.js): alleen met SMS_SANDBOX=1, nooit in productie; beide choke points (sendSms en send("sms:...")) lopen erdoor',
-      betalen: 'simulatiebank (server/betaal/synthetisch.js) bestaat; geen van de scenario\'s hieronder betaalt',
+      betalen: 'betaalscenario\'s gebruiken de simulatiebank (server/betaal/synthetisch.js), geen echte betaalrail; de grens staat per scenario',
       opslag: 'eigen RTG_DATA_DIR per scenario, gelezen met node:sqlite readOnly',
       storing: 'SIGTERM (deploy) en SIGKILL (stroomstoring) op dezelfde datamap; een afgebroken verzoek met AbortController'
     },
@@ -230,12 +347,15 @@ async function meet(opties) {
   /* De telling en `sluit` gaan over de drie geschreven bewijzen. Menselijk
      telt apart (`menselijkGesloten`, `menselijkNietBeproefd`): een scenario dat
      geen weigering uitlokte is niet gezakt, het heeft dat stuk niet gemeten. */
-  const t = { apps: 0, bewijzenGesloten: 0, bewijzenOpen: 0, menselijkGesloten: 0, menselijkOpen: 0, menselijkNietBeproefd: 0 };
+  const t = { apps: 0, bewijzenGesloten: 0, bewijzenOpen: 0, menselijkGesloten: 0, menselijkOpen: 0,
+    menselijkNietBeproefd: 0, bevoegdGesloten: 0, bevoegdOpen: 0, bevoegdNietBeproefd: 0 };
   for (const a of Object.values(reg.apps)) {
     t.apps++;
     for (const b of BEWIJZEN) (a[b].sluit ? t.bewijzenGesloten++ : t.bewijzenOpen++);
     const m = a[AFGELEID];
     if (m.nietBeproefd) t.menselijkNietBeproefd++; else if (m.sluit) t.menselijkGesloten++; else t.menselijkOpen++;
+    const b = a[BEVOEGD];
+    if (b.nietBeproefd) t.bevoegdNietBeproefd++; else if (b.sluit) t.bevoegdGesloten++; else t.bevoegdOpen++;
   }
   reg.telling = t;
   reg.sluit = t.apps > 0 && t.bewijzenOpen === 0;
@@ -253,13 +373,17 @@ function druk(reg) {
     const m = a[AFGELEID];
     console.log('  ' + AFGELEID + ' (afgeleid): ' + (m.nietBeproefd ? 'NIET BEPROEFD -- ' + m.nietBeproefd : (m.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + m.telling.gesloten + '/' + m.telling.schakels + ')'));
     for (const s of m.schakels) console.log('    ' + String(s.nr).padStart(2) + ' ' + s.stand.padEnd(9) + s.wat + (s.ziet ? '\n         ziet: ' + s.ziet : ''));
+    const q = a[BEVOEGD];
+    console.log('  ' + BEVOEGD + ' (expliciet): ' + (q.nietBeproefd ? 'NIET BEPROEFD -- ' + q.nietBeproefd : (q.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + q.telling.gesloten + '/' + q.telling.schakels + ')'));
+    for (const s of q.schakels) console.log('    ' + String(s.nr).padStart(2) + ' ' + s.stand.padEnd(9) + s.wat + (s.ziet ? '\n         ziet: ' + s.ziet : ''));
     console.log('  post: ' + a.post.gevangen + ' gevangen, ' + a.post.naarBuiten + ' naar buiten');
   }
   console.log(reg.sluit ? '\nAlle bewijzen sluiten.' : '\nNIET ALLE BEWIJZEN SLUITEN (' + reg.telling.bewijzenOpen + ' open).');
   console.log('menselijk (afgeleid): ' + reg.telling.menselijkGesloten + ' gesloten, ' + reg.telling.menselijkOpen + ' open, ' + reg.telling.menselijkNietBeproefd + ' niet beproefd.');
+  console.log('bevoegd (expliciet): ' + reg.telling.bevoegdGesloten + ' gesloten, ' + reg.telling.bevoegdOpen + ' open, ' + reg.telling.bevoegdNietBeproefd + ' niet beproefd.');
 }
 
-module.exports = { meet, scenarios, DOEL, BEWIJZEN, AFGELEID, menselijkUit, inWoorden };
+module.exports = { meet, scenarios, DOEL, BEWIJZEN, AFGELEID, BEVOEGD, bevoegdUit, menselijkUit, inWoorden };
 
 if (require.main === module) {
   const vast = process.argv.includes('--vastleggen');

@@ -24,6 +24,10 @@ const PUB = path.join(__dirname, '..', 'public');
 // gesorteerd samengevoegd (vandaar de NN- prefix), en rauw aaneengeplakt zodat
 // het resultaat exact de oorspronkelijke bron is.
 const bundels = {
+  // Gedeelde scope behouden; de bron volgt de bestaande grens tussen
+  // toegang/projectie en presentatie/editor. De uitvoer blijft byte-identiek.
+  'apps/magnaat-leven.js': 'apps/magnaat-leven',
+  'apps/ovroutes.js': 'apps/ovroutes',
   // Editorial V4: de presentatiehelpers en de annotatie-/levenscycluslaag
   // delen bewust een gesloten scope. De browser houdt een bestand; de bron
   // blijft per verantwoordelijkheid onder de modulegrens.

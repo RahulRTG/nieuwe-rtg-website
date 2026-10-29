@@ -21,6 +21,7 @@ async function metApp(doe) {
   app.use(maakIdempotentie());
   let teller = 0, status = 200;
   app.post('/api/tel', (req, res) => { teller++; res.status(status).json({ teller, echo: req.body.w || null }); });
+  app.post('/api/labfonds/beslis', (req, res) => { teller++; res.status(200).json({ teller }); });
   app.post('/api/plat', (req, res) => { teller++; res.send('geen json'); });
   const server = await new Promise(z => { const s = app.listen(0, () => z(s)); });
   const basis = 'http://127.0.0.1:' + server.address().port;
@@ -35,7 +36,7 @@ async function metApp(doe) {
 
 test('dezelfde sleutel: een uitvoering, het eerste antwoord, en het staat IN het lijf', () => metApp(async ({ post, telling }) => {
   const een = await post('/api/tel', { idem: 'a1', w: 'eerste' });
-  const twee = await post('/api/tel', { idem: 'a1', w: 'tweede' });
+  const twee = await post('/api/tel', { w: 'eerste', idem: 'a1' });
   assert.equal(telling(), 1, 'de handler draait een keer');
   /* HET EERSTE ANTWOORD, PLUS DE HUISMARKERING. Eerst stond hier alleen
      `deepEqual(twee.data, een.data)` en zat de melding uitsluitend in een KOP.
@@ -43,10 +44,27 @@ test('dezelfde sleutel: een uitvoering, het eerste antwoord, en het staat IN het
      (server/betaal.js: `Object.assign({}, bestaand, { herhaald: true })`), en
      zestien toetsen elders zakten omdat deze laag die taal niet sprak. */
   assert.deepEqual(twee.data, { ...een.data, herhaald: true },
-    'de herhaling krijgt het EERSTE antwoord met herhaald erbij, ook al is het lijf anders');
+    'de herhaling krijgt het EERSTE antwoord met herhaald erbij (de volgorde van de velden telt niet)');
   assert.equal(een.data.herhaald, undefined, 'de eerste uitvoering is geen herhaling');
   assert.equal(twee.herhaald, 'herhaald', 'de kop blijft er ook, voor wie hem wel leest');
   assert.equal(een.herhaald, null, 'de eerste uitvoering draagt geen herhaald-kop');
+}));
+
+test('dezelfde sleutel met een ANDER lijf is geen herhaling: 409 en de handler draait niet', () => metApp(async ({ post, telling }) => {
+  /* Tot 19 oktober 2026 gaf deze laag hier het eerste antwoord terug. Dat zei
+     "gelukt" over een verzoek dat nooit is uitgevoerd: zelfde sleutel, ander
+     kaartje, en het lid kreeg het oude kaartje als bewijs van het nieuwe. */
+  const een = await post('/api/tel', { idem: 'v1', w: 'eerste', diep: { a: 1 } });
+  assert.equal(een.status, 200);
+  const ander = await post('/api/tel', { idem: 'v1', w: 'tweede', diep: { a: 1 } });
+  assert.equal(ander.status, 409);
+  assert.equal(ander.data.code, 'IDEM_ANDER_VERZOEK');
+  const dieper = await post('/api/tel', { idem: 'v1', w: 'eerste', diep: { a: 2 } });
+  assert.equal(dieper.status, 409, 'ook een verschil diep in het lijf telt');
+  const zelfde = await post('/api/tel', { diep: { a: 1 }, w: 'eerste', idem: 'v1' });
+  assert.equal(zelfde.status, 200);
+  assert.equal(zelfde.data.herhaald, true);
+  assert.equal(telling(), 1, 'de handler draaide precies een keer');
 }));
 
 test('EN HIJ GAAT NIET VOOR EEN SPECIALIST STAAN', async () => {
@@ -110,6 +128,15 @@ test('zonder sleutel bemoeit de laag zich nergens mee', () => metApp(async ({ po
   await post('/api/tel', { w: 'x' });
   await post('/api/tel', { w: 'x' });
   assert.equal(telling(), 2, 'geen sleutel, geen herhaalbescherming: het oude gedrag');
+}));
+
+test('een verklaarde toestandscontrole krijgt bij herhaling de actuele domeintoestand', () => metApp(async ({ post, telling }) => {
+  const een = await post('/api/labfonds/beslis', { id: 'voorstel', idem: 'besluit-1' });
+  const twee = await post('/api/labfonds/beslis', { id: 'voorstel', idem: 'besluit-1' });
+  assert.equal(een.status, 200);
+  assert.equal(twee.status, 200);
+  assert.equal(telling(), 2, 'de algemene antwoordkas mag een verklaarde toestandscontrole niet onderscheppen');
+  assert.equal(twee.data.teller, 2, 'het antwoord komt uit de actuele handler en niet uit de kas');
 }));
 
 test('een andere sleutel, of dezelfde sleutel van een andere afzender, draait echt', () => metApp(async ({ post, telling }) => {

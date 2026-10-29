@@ -2061,7 +2061,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      betekenissen, in de veiligheidslaag. */
   // praktijkMutatie bewaakt via werkPoort binnen de duurzame commit; actuele
   // rechten en herhaling worden via echte HTTP bewezen in praktijk-http.test.js.
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|praktijkMutatie|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|sessie)\s*\(|\bpoort\s*\(\s*req/;
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|praktijkMutatie|beheerVan|lidVan|viaBeheerOfDirectie|gezinVan|sessieVan|familieVan|gezinSessie|schoolVan|personeelVan|klasVan|docentCheck|lesVan|beheerderVan|magKlus|marktVolwassen|rtfSpeler|sessie)\s*\(|\bpoort\s*\(\s*req/;
 
   /* PUBLIEK MET REDEN woont in ./lib/publiek.js, en daar alleen: keuringsregel
      28, scripts/handlerwacht.js en het mutatiecontractregister stellen dezelfde
@@ -3520,9 +3520,11 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve sessieopslag, een andere domeinmutatie en audit samen in dezelfde duurzame bundel worden bevestigd'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['test/idem-takken.test.js', 'bewijst dat idem de duurzaam-vlag van de aanroeper ongewijzigd aan een NAGEMAAKTE bundel doorgeeft; er wordt niets gecommit'],
+    ['test/idem-commit-pending.test.js', 'bewijst met de echte idem/bundellaag en bestuurbare opslagbevestiging dat retries geen succes krijgen voor commit of na rollback; geen nieuwe productaanroeper'],
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
     ['server/lib/verraad-catalogus.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep. Stond op verraad.js tot de catalogus daar op 13 september uit is geknipt (keuringsregel 13); de lijst is daarmee VERPLAATST en niet gegroeid'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
+    ['server/lib/idem-behouden.js', 'migreert een beschermde ontvangst binnen dezelfde in-vluchtpoort en draagt uitsluitend de duurzaam-vlag van de bestaande idem-aanroeper door; kiest zelf geen nieuw duurzaam domein'],
     ['server/lib/idem-zondersleutel.js', 'de tak van lib/idem.js voor werk ZONDER sleutel in een laag die duurzaam verklaarde: dezelfde belofte als met sleutel (schrijfproef 18 oktober 2026: /api/bank/rekening/open en /api/bank/pas/uitgeven gaven 200 over een opslag die niets had)'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
     ['server/opzet/lijfpoort.js', 'bouwt de duurzame vastlegger voor het kritiekspoor: een geldhandeling, privacyexport of machtiging gaat pas door als de regel `toegestaan` aantoonbaar staat (A-P1-05)'],
@@ -3549,6 +3551,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/carriereledger/deel.js', 'een deelcode gaat precies EENMAAL de deur uit; bevestigen voor de opslag hem heeft, betekent dat het lid een code in handen heeft die nergens meer bij hoort -- en dat een gestopte code na een herstart weer open zou staan'],
     ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
+    ['server/kern/betaalcode.js', 'geld aan de kassa: een betaalcode is eenmalig, dus een verbruik dat een crash niet overleeft is een code die twee keer afrekent, en een verwijzing die een herstart niet overleeft is een code die het scherm toont en de kassa weigert (test/betaalcode.test.js)'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
     ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen'],
     ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt'],
@@ -3605,7 +3608,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        afgeschreven. Eenmaal betaald, tweemaal geboekt. */
     ['server/kern/assets.js', 'de servicefee: geind geld en het merkteken dat het geind is, horen als EEN duurzame commit te landen -- anders boekt de volgende ronde de kas nog een keer'],
     ['server/opzet/inzagespoor.js', 'het inzagejournaal: wie te horen krijgt dat een kluis is geopend, hoort dat spoor na een herstart terug te vinden -- en waar het spoor niet vaststaat, gaat de inzage niet door'],
-    ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert']
+    ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert'],
+    ['test/idem-beschermd.test.js', 'bewijst met een nagemaakte duurzame bundel dat beschermde ontvangst-migratie commit of rollback deelt; de test voert geen echte commit uit']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
@@ -4841,8 +4845,11 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
   {
     const REG = path.join(ROOT, 'BEDRADING.json');
     let oud = null, onleesbaar = null;
-    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); }
-    catch (e) { if (!e || e.code !== 'ENOENT') onleesbaar = String(e && e.message); }
+    try {
+      oud = JSON.parse(fs.readFileSync(REG, 'utf8'));
+    } catch (e) {
+      if (!e || e.code !== 'ENOENT') onleesbaar = String(e && e.message);
+    }
     if (!oud) {
       fout('BEDRADING.json ' + (onleesbaar ? 'is onleesbaar (' + onleesbaar + ')' : 'ontbreekt') +
         ' -- draai node scripts/check.js met een verse meting');
@@ -5999,6 +6006,60 @@ console.log('\n76) geen element draagt twee class-attributen (de browser leest a
     console.error('  ' + n + ' element(en) in ' + bestanden.length + ' bestand(en); doel is nul');
   } else {
     ok(gemeten + ' bronbestanden gemeten, geen enkel element met meer dan een class-attribuut');
+  }
+}
+
+/* DE VERSHEID VAN APPWERKT, als MELDING (BETROUWBAARHEID.md par. 4i). Deze
+   regel velt niet, en dat is een besluit (integrator, 19 oktober 2026): check
+   draait bij elke commit, en na elke wijziging in de gedeelde kern zou hij
+   rood staan tot de volgende meetronde. De grens zelf staat in de releasepoort
+   (scripts/release-gate.js, stap APPWERKT-versheid). Hier alleen het getal,
+   zodat niemand een vervallen 8/8 aanziet voor een verse. */
+console.log('\n77) de bewijzen van APPWERKT zijn nog van deze code (melding; de grens is de releasepoort)');
+try {
+  const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'APPWERKT.json'), 'utf8'));
+  const R = require('./lib/bewijsraakvlak');
+  let rv = null;
+  try { rv = JSON.parse(fs.readFileSync(R.REGISTER_PAD, 'utf8')); } catch (e) { rv = null; }
+  const u = require('./appwerkt-vers').beoordeel(reg, { raakvlakRegister: rv });
+  const vervallen = u.rijen.reduce((n, r) => n + Object.values(r.bewijzen).filter((b) => !b.vers).length, 0);
+  console.log('  · ' + vervallen + ' bewijs/bewijzen vervallen sinds de meting' +
+    (u.gezakt.length ? ', waarvan bij ' + u.gezakt.length + ' van de ' + u.achtOpAcht + ' 8/8-rijen' : '') +
+    '; draai npm run appwerkt:vers. Meldt en velt niet.');
+} catch (e) {
+  console.log('  · niet na te gaan (' + String(e.message || e).slice(0, 120) + '); draai npm run appwerkt:vers. Meldt en velt niet.');
+}
+
+/* ============================================================================
+   77) DE WANDKLOK VAN DE CONTAINER
+
+   De server draait in een UTC-container; `getHours()`, `getDay()` en hun broers
+   lezen daar UTC. Op 19 oktober 2026 zei de cockpit om 19:00 in Amsterdam
+   "Goedemiddag" en sprong een leeftijd pas om twee uur 's nachts om. Alles is
+   omgezet naar server/kern/tijdzone.js; de telling staat in
+   scripts/lib/wandklok.js, met de uitleg. Twee delen: de lokale getters en
+   setters (doel nul, uitzondering alleen met `tijd-uitzondering: <reden>`), en
+   "vandaag" als UTC-datum (een ratel die alleen omlaag mag). */
+console.log('\n78) de server leest de klok van het lid, niet die van de container');
+{
+  const { wandklok, utcVandaag, UTC_VANDAAG_MAX } = require('./lib/wandklok');
+  const plekken = wandklok(ROOT);
+  if (plekken.length) {
+    for (const p of plekken) fout(p + ' leest of zet de lokale klok van de container (UTC in productie). ' +
+      'Gebruik kern/tijdzone.js (huis, uurIn, weekdagIn, datumIn, ...) of de UTC-vorm voor een duur; ' +
+      'een uitzondering draagt `tijd-uitzondering: <reden>`');
+  } else {
+    ok('geen lokale getter of setter van Date in server/ buiten kern/tijdzone.js');
+  }
+  const n = utcVandaag(ROOT);
+  if (n > UTC_VANDAAG_MAX) {
+    fout(n + ' keer "vandaag" als UTC-datum (new Date().toISOString().slice(0, 10)) terwijl de ratel op ' +
+      UTC_VANDAAG_MAX + ' staat; gebruik tijdzone.datumIn()');
+  } else if (n < UTC_VANDAAG_MAX) {
+    fout('nog ' + n + ' keer "vandaag" als UTC-datum; zet UTC_VANDAAG_MAX in scripts/lib/wandklok.js op ' + n +
+      ' zodat de winst blijft staan');
+  } else {
+    ok(n + ' keer "vandaag" nog als UTC-datum (ratel, alleen omlaag)');
   }
 }
 

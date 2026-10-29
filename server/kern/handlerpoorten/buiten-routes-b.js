@@ -69,11 +69,14 @@ const ROUTEPOORTEN = {
     wat: 'zelfde sessie, plus het bericht moet in DIT postvak staan' },
   'POST /api/foundation/mail/stuur': { toegang: 'OBJECT_SCOPED', veld: 'code', wat: 'zelfde sessie' },
 
+  /* DE LESMAKER VRAAGT EEN ACCOUNT (eigenaarsbesluit 19 oktober 2026).
+     De verse les heeft nog geen objecteigenaar, maar de actor die hem maakt
+     moet wel een geldige gedeelde RTG-sessie hebben. */
+  'POST /api/foundation/les/maak': { toegang: 'AUTHENTICATED',
+    wat: 'metAccount(req) in foundation/onderwijs/lesaccount.js eist een geldige account-sessie' },
+
   /* PUBLIEK MET REDEN, en hier hoort het wel -- anders dan bij de inlogdeuren
      staat er bij deze werkelijk niets tussen. */
-  'POST /api/foundation/les/maak': { toegang: 'PUBLIC',
-    waarom: 'de lesmaker maakt een verse lescode plus docenttoken en geeft die terug; er is nog niets ' +
-      'om toegang toe te hebben' },
   'POST /api/foundation/gezin/maak': { toegang: 'PUBLIC',
     waarom: 'een gezin dat nog niet bestaat heeft nog geen code; de maker krijgt hem, met een rem per IP' },
   'POST /api/foundation/reis/aanvraag': { toegang: 'PUBLIC',
@@ -92,7 +95,15 @@ const ROUTEPOORTEN = {
   'POST /api/partner/applications/mijn': { toegang: 'AUTHENTICATED', wat: 'dezelfde partnerSessie' },
 
   'POST /api/werkplek/mijn': { toegang: 'AUTHENTICATED',
-    wat: 'wie(req) levert key of baas; zonder allebei een 401' }
+    wat: 'wie(req) levert key of baas; zonder allebei een 401' },
+
+  /* De app-gids controleert de gedeelde sessie inline. De routelezer ziet de
+     aanroep van magSessie() niet als routermiddleware, maar zonder account,
+     kantoor-, zaak- of gezinssessie antwoordt de handler zelf met 401. */
+  'POST /api/gids/app': { toegang: 'AUTHENTICATED',
+    wat: 'magSessie(req) in routes/gids.js eist een geldige gedeelde sessie voordat de app-gids wordt gelezen' },
+
+
 };
 
 module.exports = { ROUTEPOORTEN };

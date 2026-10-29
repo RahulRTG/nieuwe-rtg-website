@@ -39,12 +39,15 @@ function renderBron(){
   const pct=taak&&taak.stappen?Math.round((taak.stap/taak.stappen)*100):d&&d.status==='klaar'?100:40;
   q('#mvVoortgang').style.width=pct+'%';
   q('#mvVoortgangTekst').textContent=taak?'Stap '+Math.min(taak.stap+1,taak.stappen)+' van '+taak.stappen:d&&d.status==='klaar'?'Afgerond':'Klaar om te beginnen';
-  q('#mvGaVerder').firstChild.nodeValue=taak?'Hervat missie ':'Ga verder ';
+  const doorgaan=q('#mvGaVerder');
+  doorgaan.firstChild.nodeValue=taak?'Hervat missie ':'Ga verder ';
+  doorgaan.toggleAttribute('data-hoofdactie',!taak);
+  doorgaan.toggleAttribute('data-contextactie',!taak);
   q('#mvReputatie').textContent=Number.isFinite(p.reputatie)?p.reputatie:'-';
   q('#mvNiveau').textContent=Number.isFinite(p.niveau)?p.niveau:'-';
   q('#mvBalans').textContent=Number.isFinite(p.virtueelBudget)?euro(p.virtueelBudget):'-';
   const bron=huidigeDossiers().length?huidigeDossiers():(BRON&&BRON.catalogus||[]).slice(0,3).map(x=>({naam:x.naam,functieId:x.id,software:x.software,status:'open'}));
-  qa('[data-mv-uitdaging]').forEach((b,i)=>{const x=bron[i];if(!x)return;b.hidden=false;b.querySelector('b').textContent=x.naam||'Nieuwe uitdaging';b.querySelector('small').textContent=[x.software&&x.software.naam,x.status==='klaar'?'Afgerond':'veilige missie'].filter(Boolean).join(' · ');b.querySelector('em').textContent=x.status==='klaar'?'Voltooid':i?'Uitdagend':'Vandaag'});
+  qa('[data-mv-uitdaging]').forEach((b,i)=>{const x=bron[i];b.hidden=!x;b.disabled=!x;b.toggleAttribute('aria-busy',!BRON);if(!x)return;b.querySelector('b').textContent=x.naam||'Nieuwe uitdaging';b.querySelector('small').textContent=[x.software&&x.software.naam,x.status==='klaar'?'Afgerond':'veilige missie'].filter(Boolean).join(' · ');b.querySelector('em').textContent=x.status==='klaar'?'Voltooid':i?'Uitdagend':'Vandaag'});
 }
 function renderMissie(){
   KEUZE=null;q('#mvVoerKeuzeUit').disabled=true;
@@ -53,7 +56,7 @@ function renderMissie(){
   q('#mvMissieStap').textContent='Korte oefening · '+(c&&c.spelvorm||'operatie');
   q('#mvVraag').textContent=s.vraag;q('#mvSituatie').textContent=event&&event.beschrijving||s.situatie;
   q('#mvAfzender').textContent=event&&event.stad?event.stad+' operatie':'Nora Bakker';q('#mvRol').textContent=missieNaam(d,c);
-  q('#mvKeuzes').innerHTML=s.keuzes.map((x,i)=>'<button class="mv-keuze" type="button" aria-pressed="false" data-mv-keuze="'+i+'"><span><b>'+veilig(x.titel)+'</b><small>'+veilig(x.sub)+'</small></span><i aria-hidden="true">›</i></button>').join('');
+  q('#mvKeuzes').innerHTML=s.keuzes.map((x,i)=>'<button class="mv-keuze" type="button" aria-pressed="false" data-mv-keuze="'+i+'" data-stand="magnaat-keuze" data-hoofdactie data-contextactie aria-label="Kies aanpak: '+veilig(x.titel)+'"><span><b>'+veilig(x.titel)+'</b><small>'+veilig(x.sub)+'</small></span><i aria-hidden="true">›</i></button>').join('');
   qa('[data-mv-keuze]').forEach(b=>b.addEventListener('click',()=>{KEUZE=Number(b.dataset.mvKeuze);qa('[data-mv-keuze]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));q('#mvVoerKeuzeUit').disabled=false}));
 }
 function renderResultaat(){

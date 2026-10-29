@@ -11,6 +11,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/ds/rtg-ds.css" rel="stylesheet">
 <script src="/ds/shell.js"></script>
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <!-- De Résidence op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom G):
      Canvas (de zaal en het speelveld, met de hand getekend), met de gids, het
@@ -36,9 +37,9 @@
     <button class="ds-chip" id="knopPaar" type="button" hidden>Wandel samen</button>
     <button class="ds-chip" id="knopSpel" type="button" hidden data-ds-actie="Samen spelen">Samen spelen</button>
     <button class="ds-chip" id="knopVraag" type="button" hidden>Vraag</button>
-    <button class="ds-chip" id="knopGids" type="button" data-ds-actie="De gids">Gids</button>
-    <button class="ds-chip" id="knopSuite" type="button" data-ds-actie="Mijn suite">Mijn suite</button>
-    <button class="ds-chip" id="knopAtelier" type="button" hidden data-ds-actie="Suite inrichten">Inrichten</button>
+    <button class="ds-chip" id="knopGids" type="button" data-ds-actie="De gids" data-stand="residentie-gids" aria-haspopup="dialog">Gids</button>
+    <button class="ds-chip" id="knopSuite" type="button" data-ds-actie="Mijn suite" data-stand="residentie-suite">Mijn suite</button>
+    <button class="ds-chip" id="knopAtelier" type="button" hidden data-ds-actie="Suite inrichten" data-stand="residentie-atelier" aria-haspopup="dialog">Inrichten</button>
   </div>
   <div class="ds-canvaslaag__vlak" id="vraagKaart" role="status" hidden></div>
 </div>
@@ -70,7 +71,7 @@
   <div class="ds-velden" id="gidsZalen"></div>
   <p class="ds-label">open suites van leden</p>
   <div class="ds-velden" id="gidsSuites"></div>
-  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="gidsDicht" type="button">Sluiten</button></div>
+  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="gidsDicht" type="button" data-contextactie>Sluiten</button></div>
 </div>
 </dialog>
 
@@ -80,15 +81,15 @@
   <p class="ds-meta">richt uw suite in met RTG Maison; alles is inbegrepen bij de pas</p>
   <div class="ds-vraagrij">
     <input class="ds-invoer" id="suiteNaam" maxlength="24" placeholder="Naam van de suite" aria-label="Naam van de suite">
-    <button class="ds-knop ds-knop--primair ds-knop--klein" id="suiteNaamZet" type="button">Bewaar</button>
+    <button class="ds-knop ds-knop--primair ds-knop--klein" id="suiteNaamZet" type="button" data-hoofdactie>Bewaar</button>
   </div>
   <div class="ds-dialoog__acties">
-    <button class="ds-knop ds-knop--stil ds-knop--klein" id="suiteOpen" type="button">…</button>
-    <button class="ds-knop ds-knop--stil ds-knop--klein" id="atelierWeg" type="button" aria-pressed="false">Weghaal-modus</button>
+    <button class="ds-knop ds-knop--stil ds-knop--klein" id="suiteOpen" type="button" data-hoofdactie>…</button>
+    <button class="ds-knop ds-knop--stil ds-knop--klein" id="atelierWeg" type="button" aria-pressed="false" data-hoofdactie>Weghaal-modus</button>
   </div>
   <p class="ds-meta" id="atelierUitleg">Kies een meubel en tik daarna op een tegel; in de weghaal-modus tikt u op een meubel om het terug te geven.</p>
   <div class="ds-veldgroep" id="catalogus"></div>
-  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="atelierDicht" type="button">Klaar met inrichten</button></div>
+  <div class="ds-dialoog__acties"><button class="ds-knop ds-knop--stil ds-knop--breed" id="atelierDicht" type="button" data-contextactie>Klaar met inrichten</button></div>
 </div>
 </dialog>
 

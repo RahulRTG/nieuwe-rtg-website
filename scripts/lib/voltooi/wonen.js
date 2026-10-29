@@ -92,6 +92,38 @@ async function loop(w, stap) {
     return { klopt: m.length >= 1 && d.length >= 1, ziet: 'melding in ' + m.map((p) => p.sleutel || p.tabel).join(',') + '; document in ' + d.map((p) => p.sleutel || p.tabel).join(',') };
   });
 
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander lid ziet of wijzigt de onderhoudsmelding en het woningdossier niet, en houdt een eigen woningadministratie', async () => {
+    const ander = await nieuwLid(w, 'won-ander');
+    const B = ander.token;
+    const doelDocument = (await dossier())[0];
+    const voorB = await meldingen(B);
+    const dossierVoorB = await dossier(B);
+    const aanvalMelding = await w.post(ANNULEER, { id: lek.id }, B);
+    const aanvalDocument = await w.post(UPLOAD, {
+      id: doelDocument && doelDocument.id,
+      dataUrl: pdf('vreemde versie ' + merk)
+    }, B);
+    const eigenB = await w.post(MELD, { titel: 'Eigen melding ' + merk, plek: 'Schuur' }, B);
+    const naA = await meldingen();
+    const naB = await meldingen(B);
+    const dossierNaA = await dossier();
+    const dossierNaB = await dossier(B);
+    const aBehoudtMelding = naA.some((x) => x.id === lek.id && x.status === 'gemeld');
+    const bZietA = voorB.concat(naB).some((x) => x.id === lek.id);
+    const aZietB = naA.some((x) => x.id === (eigenB.data && eigenB.data.melding && eigenB.data.melding.id));
+    const bZietEigen = naB.some((x) => x.id === (eigenB.data && eigenB.data.melding && eigenB.data.melding.id));
+    const aBehoudtDocument = dossierNaA.length === 1 && dossierNaA[0].id === (doelDocument && doelDocument.id);
+    const bZietDocument = dossierVoorB.concat(dossierNaB).some((x) => x.id === (doelDocument && doelDocument.id));
+    return {
+      klopt: geen5xx(aanvalMelding) && geen5xx(aanvalDocument) && eigenB.status === 200 &&
+        aBehoudtMelding && !bZietA && !aZietB && bZietEigen && aBehoudtDocument && !bZietDocument,
+      ziet: 'vreemd annuleren ' + aanvalMelding.status + ', vreemde versie ' + aanvalDocument.status +
+        '; A behoudt melding/document=' + aBehoudtMelding + '/' + aBehoudtDocument +
+        ', B ziet A=' + (bZietA || bZietDocument) + ', B houdt eigen=' + bZietEigen + ', A ziet B=' + aZietB
+    };
+  });
+
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'dubbeltik op "melding versturen": een melding, niet twee', async () => {
     const lijf = { titel: 'Dubbel ' + merk, plek: 'Badkamer', urgentie: 'normaal', notitie: '' };

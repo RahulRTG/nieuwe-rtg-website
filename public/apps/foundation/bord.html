@@ -18,7 +18,6 @@
 <style>
   body{height:100vh;overflow:hidden;}
   .app{display:grid;grid-template-columns:1fr 20rem;grid-template-rows:auto 1fr;height:100vh;gap:.7rem;padding:.7rem;}
-  /* wrap: merk + knop + lescode zijn breder dan een telefoon (anders 510px) */
   .top{grid-column:1/3;display:flex;flex-wrap:wrap;align-items:center;gap:1rem;}
   .brand{font-family:var(--serif);font-weight:500;font-size:1.1rem;}
   .brand b{color:var(--rtg-leesgoud,var(--goud));}
@@ -57,6 +56,7 @@
   .ag button{margin-left:auto;background:none;color:var(--zacht);font-size:1rem;}
   .verberg-zij .zij{display:none;}
   .verberg-zij .app{grid-template-columns:1fr;}
+  .verberg-zij .top{grid-column:1;}
   dialog{border:none;background:transparent;color:var(--txt);}
   dialog::backdrop{background:rgba(4,4,3,.75);}
   .modal{width:min(94vw,44rem);max-height:88vh;overflow:auto;padding:1.4rem;}
@@ -102,6 +102,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
 <div class="app" id="app" role="main">
@@ -193,36 +194,49 @@ if(!CODE || !TOKEN){
 }
 RTGSchoolSession.bewaak(['rtf_docent'],()=>{ CODE=''; TOKEN=''; RTGSchoolSession.deur({rol:'docent'}); });
 
-async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
-async function get(p){ const r=await fetch('/api/foundation'+p,{headers:{Authorization:'Bearer '+TOKEN}}); return r.json(); }
+async function api(p,b){ const r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
+async function get(p){ const r=await fetch(p,{headers:{Authorization:'Bearer '+TOKEN}}); return r.json(); }
 
 // de lescode staat EENMAAL in de sessie (B17); wie herlaadt, vernieuwt hem
 let LESCODE=(RTGSchoolSession.lees('rtf_docent')||{}).lescode||'';
 if(LESCODE) RTGSchoolSession.zet('rtf_docent',{code:CODE,token:TOKEN});
 function toonCode(){ const v=LESCODE||'vernieuw', c=$('#codeInline'); $('#lesCode').textContent=v; if(c) c.textContent=v; $('#btnKopieer').textContent=LESCODE?'Kopieer':'Nieuwe lescode'; }
 toonCode();
-$('#btnKopieer').addEventListener('click', async ()=>{ if(LESCODE) return navigator.clipboard&&navigator.clipboard.writeText(LESCODE); try{ LESCODE=(await api('/les/code/roteer',{})).lescode; toonCode(); }catch(e){ alert(e.message); } });
+$('#btnKopieer').addEventListener('click', async ()=>{
+  const knop=$('#btnKopieer');
+  if(LESCODE){
+    try{
+      if(!navigator.clipboard||!navigator.clipboard.writeText) throw new Error('klembord niet beschikbaar');
+      await navigator.clipboard.writeText(LESCODE); knop.textContent='Gekopieerd';
+    }catch(e){ knop.textContent='Selecteer code hierboven'; }
+    setTimeout(toonCode,1800); return;
+  }
+  try{ LESCODE=(await api('/api/foundation/les/code/roteer',{})).lescode; toonCode(); }catch(e){ alert(e.message); }
+});
 $('#btnZij').addEventListener('click', ()=> document.body.classList.toggle('verberg-zij'));
 
-const bord = new TekenBord($('#bord'), { background:'#12110F', onStroke: s => { api('/bord/stroke',{ stroke:s }).catch(()=>{}); } });
+const bord = new TekenBord($('#bord'), { background:'#12110F', onStroke: s => { api('/api/foundation/bord/stroke',{ stroke:s }).catch(()=>{}); } });
 $('#tools').querySelectorAll('[data-tool]').forEach(b=> b.addEventListener('click', ()=>{ $('#tools').querySelectorAll('[data-tool]').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); bord.tool=b.dataset.tool; }));
 $('#tools').querySelectorAll('[data-kleur]').forEach(b=> b.addEventListener('click', ()=>{ $('#tools').querySelectorAll('[data-kleur]').forEach(x=>x.classList.remove('aan')); b.classList.add('aan'); bord.kleur=b.dataset.kleur; }));
 $('#dikte').addEventListener('input', e=> bord.dikte=Number(e.target.value));
-$('#btnUndo').addEventListener('click', ()=>{ bord.undo(); api('/bord/undo',{}).catch(()=>{}); });
-$('#btnWis').addEventListener('click', ()=>{ if(confirm('Het hele bord wissen voor de klas?')){ bord.clear(); api('/bord/wis',{}).catch(()=>{}); } });
-get('/bord/'+CODE).then(d=> bord.setStrokes(d.strokes||[]));
+$('#btnUndo').addEventListener('click', ()=>{ bord.undo(); api('/api/foundation/bord/undo',{}).catch(()=>{}); });
+$('#btnWis').addEventListener('click', ()=>{ if(confirm('Het hele bord wissen voor de klas?')){ bord.clear(); api('/api/foundation/bord/wis',{}).catch(()=>{}); } });
+get('/api/foundation/bord/'+CODE).then(d=> bord.setStrokes(d.strokes||[]));
 
-$('#opgZet').addEventListener('click', async ()=>{ const t=$('#opgTekst').value.trim(); if(!t) return; try{ await api('/opgave',{ tekst:t }); $('#opgTekst').value=''; opgavenOphalen(); }catch(e){ alert(e.message); } });
+// een herhaalsleutel per opgestelde opgave en per agendapunt, gebonden aan de inhoud: een nieuwe
+// poging met dezelfde tekst is hetzelfde item, een aangepaste tekst een nieuw; na succes een nieuwe
+const sleutelVoor=(()=>{ const k={}; return (soort, inhoud)=>{ if(!k[soort]||k[soort].inhoud!==inhoud) k[soort]={ inhoud, idem:RTGId(soort) }; return k[soort]; }; })();
+$('#opgZet').addEventListener('click', async ()=>{ const t=$('#opgTekst').value.trim(); if(!t) return; const sl=sleutelVoor('opgave', t); try{ await api('/api/foundation/opgave',{ tekst:t, idem:sl.idem }); sl.inhoud=null; $('#opgTekst').value=''; opgavenOphalen(); }catch(e){ alert(e.message); } });
 async function opgavenOphalen(){
-  const d = await get('/opgaven/'+CODE).catch(()=>({opgaven:[]}));
+  const d = await get('/api/foundation/opgaven/'+CODE).catch(()=>({opgaven:[]}));
   $('#opgLijst').innerHTML = (d.opgaven||[]).slice().reverse().map(o=>{ const n=Object.keys(o.inzendingen||{}).length;
     return '<div class="ag"><div><div>'+esc(o.tekst)+'</div><span class="mini">'+n+' ingeleverd</span></div></div>'; }).join('') || '<div class="mini">Nog geen opgaven.</div>';
 }
 
-$('#agAdd').addEventListener('click', async ()=>{ const t=$('#agTekst').value.trim(); if(!t) return; try{ const d=await api('/agenda',{ tekst:t, datum:$('#agDatum').value }); $('#agTekst').value=''; $('#agDatum').value=''; toonAgenda(d.agenda); }catch(e){ alert(e.message); } });
+$('#agAdd').addEventListener('click', async ()=>{ const t=$('#agTekst').value.trim(); if(!t) return; const sl=sleutelVoor('agenda', t+'|'+$('#agDatum').value); try{ const d=await api('/api/foundation/agenda',{ tekst:t, datum:$('#agDatum').value, idem:sl.idem }); sl.inhoud=null; $('#agTekst').value=''; $('#agDatum').value=''; toonAgenda(d.agenda); }catch(e){ alert(e.message); } });
 function toonAgenda(list){
   $('#agLijst').innerHTML = (list||[]).map(a=> '<div class="ag"><div>'+(a.datum?'<time>'+esc(a.datum)+'</time>':'')+esc(a.tekst)+'</div><button data-del="'+esc(a.id)+'" title="Verwijder">×</button></div>').join('') || '<div class="mini">Nog niets in de agenda.</div>';
-  $('#agLijst').querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{ const d=await api('/agenda/verwijder',{ itemId:b.dataset.del }); toonAgenda(d.agenda); }));
+  $('#agLijst').querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{ const d=await api('/api/foundation/agenda/verwijder',{ itemId:b.dataset.del }); toonAgenda(d.agenda); }));
 }
 
 let LEERLINGEN = [];
@@ -252,7 +266,7 @@ async function bekijkSchrift(sid, naam){
   $('#svNaam').textContent = 'Schrift van '+naam;
   $('#svBody').innerHTML = '<div class="mini">Laden...</div>';
   $('#dlgSchrift').showModal();
-  const d = await get('/schrift/'+CODE+'/'+sid).catch(()=>({}));
+  const d = await get('/api/foundation/schrift/'+CODE+'/'+sid).catch(()=>({}));
   const pages = (d.schrift&&d.schrift.pages)||[];
   if(!pages.length){ $('#svBody').innerHTML='<div class="mini">Dit schrift is nog leeg.</div>'; return; }
   $('#svBody').innerHTML = pages.map((p,i)=>{
@@ -265,7 +279,7 @@ async function bekijkSchrift(sid, naam){
 
 KlasLive.verbind(CODE, 'docent', TOKEN, { presentie: d => toonLeerlingen(d.leerlingen||[]), inzending: () => opgavenOphalen() });
 opgavenOphalen();
-get('/les/'+CODE).then(d=> toonAgenda((d.les&&d.les.agenda)||[])).catch(()=>{});
+get('/api/foundation/les/'+CODE).then(d=> toonAgenda((d.les&&d.les.agenda)||[])).catch(()=>{});
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }());
 </script>

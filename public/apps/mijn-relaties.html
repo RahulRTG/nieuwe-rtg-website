@@ -105,6 +105,7 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header class="kop">
@@ -229,10 +230,14 @@
     const rij = maak('div', 'acties');
     const bevestig = maak('button', 'knop rood');
     bevestig.type = 'button';
+    bevestig.id = 'sluitToestemmingen';
+    bevestig.setAttribute('data-hoofdactie', '');
     bevestig.textContent = 'Ja, sluit deze ' + r.body.sluit.length + ' toestemming(en)';
     bevestig.addEventListener('click', () => sluit(partij, bevestig));
     const terug = maak('button', 'knop');
     terug.type = 'button';
+    terug.id = 'sluitVoorbeschouwing';
+    terug.setAttribute('data-hoofdactie', '');
     terug.textContent = 'Laat maar';
     terug.addEventListener('click', () => { g.remove(); knop.closest('.acties').classList.remove('weg'); });
     rij.appendChild(bevestig); rij.appendChild(terug);

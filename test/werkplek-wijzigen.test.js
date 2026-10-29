@@ -357,7 +357,7 @@ test('10. de bezetting en de takenlijst van een huis staan los van het andere', 
   const persoon = zet.body.mensen.find(m => m.codenaam === 'Zilveren Kievit 9K3M');
   assert.ok(persoon, 'de persoon staat op de lijst -- op codenaam, niet op echte naam');
 
-  const taak = await post('/api/werkplek/taak', { bedrijf: 'rtf', tekst: 'Clubhuis-sleutels tellen' }, eigenaar);
+  const taak = await post('/api/werkplek/taak', { idem: 'taak-fixture-360', bedrijf: 'rtf', tekst: 'Clubhuis-sleutels tellen' }, eigenaar);
   assert.equal(taak.status, 200);
   const tid = taak.body.taken[0].id;
 

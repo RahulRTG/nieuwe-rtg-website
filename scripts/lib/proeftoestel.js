@@ -140,8 +140,8 @@ function metToestellen(post, { toestellen, voorLid } = {}) {
   const lijst = () => ((levend ? toestellen() : toestellen) || []).filter(Boolean);
   const bekendBijStart = levend ? null : lijst();
   if (!levend && !bekendBijStart.length && !(voorLid && voorLid.lid)) return post;
-  return async (pad, lijf, token, koppen) => {
-    if (!zwaarPad(pad)) return post(pad, lijf, token, koppen);
+  return async (pad, lijf, token, koppen, methode = 'POST') => {
+    if (!zwaarPad(pad)) return post(pad, lijf, token, koppen, methode);
     const bekend = levend ? lijst() : bekendBijStart;
     let t = token;
     if (voorLid && voorLid.lid && token) {
@@ -149,9 +149,9 @@ function metToestellen(post, { toestellen, voorLid } = {}) {
       if (Array.isArray(van) ? van.includes(token) : token === van) t = voorLid.lid.token;
     }
     const toestel = (voorLid && voorLid.lid && voorLid.lid.token === t) ? voorLid.lid : bekend.find(x => x.token === t);
-    if (!toestel) return post(pad, lijf, t, koppen);
-    const bewijs = await toestel.teken('POST', pad);
-    return post(pad, lijf, t, Object.assign({}, koppen || {}, { [KOP]: bewijs }));
+    if (!toestel) return post(pad, lijf, t, koppen, methode);
+    const bewijs = await toestel.teken(methode, pad);
+    return post(pad, lijf, t, Object.assign({}, koppen || {}, { [KOP]: bewijs }), methode);
   };
 }
 

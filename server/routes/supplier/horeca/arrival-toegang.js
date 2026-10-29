@@ -10,11 +10,21 @@
 
 const rem = require('../../../rem');
 
-module.exports = ({ app, db, arrivalpas }) => {
-  const interpretRem = rem({ windowMs: 60000, limit: 30, key: req => 'arrival-interpret|' + req.ip });
-  const requestRem = rem({ windowMs: 15 * 60000, limit: 8, key: req => 'arrival-request|' + req.ip });
-  const passRem = rem({ windowMs: 60000, limit: 60, key: req => 'arrival-pass|' + req.ip });
-  const pulseRem = rem({ windowMs: 60000, limit: 20, key: req => 'arrival-pulse|' + req.ip });
+/* EEN ACCOUNT VOOR ALLES (besluit van 19 oktober 2026): iedereen is ingelogd,
+   met minimaal een gratis account. Daarom staat de ledeninlog VOOR elke rem
+   hieronder, en hangt de aanvraag aan het lid (zijn sleutel en codenaam). De
+   pass blijft een tweede sleutel NAAST de sessie, nooit in plaats ervan: een
+   ander lid met dezelfde pass komt er niet in (kern/arrivalpas.js, `lid`). */
+module.exports = ({ app, db, arrivalpas, kern }) => {
+  const lid = (req, res, next) => { req.lidNaam = kern.liveCodename(req.session); next(); };
+  /* De inlog (`auth`) staat als eigen middleware op elke route, zodat de
+     handlerwacht hem ziet; de rem erachter onthoudt ook de codenaam. Een
+     middleware en geen lijst: de router van dit huis vlakt geen lijsten uit. */
+  const deur = (r) => (req, res, next) => lid(req, res, () => r(req, res, next));
+  const interpretRem = deur(rem({ windowMs: 60000, limit: 30, key: req => 'arrival-interpret|' + req.ip }));
+  const requestRem = deur(rem({ windowMs: 15 * 60000, limit: 8, key: req => 'arrival-request|' + req.ip }));
+  const passRem = deur(rem({ windowMs: 60000, limit: 60, key: req => 'arrival-pass|' + req.ip }));
+  const pulseRem = deur(rem({ windowMs: 60000, limit: 20, key: req => 'arrival-pulse|' + req.ip }));
   const reserveringVan = id => (db.data.reserveringen || []).find(x => x.id === id) || null;
   const arrivalVan = rij => {
     const a = rij && ((db.data.horeca || {})[rij.supplierCode] || {}).arrivals;
@@ -24,7 +34,7 @@ module.exports = ({ app, db, arrivalpas }) => {
 
   async function arrivalPassAuth(req, res, next) {
     res.set('Cache-Control', 'no-store');
-    const uit = arrivalpas.lees((req.body || {}).pass, reserveringVan);
+    const uit = arrivalpas.lees((req.body || {}).pass, reserveringVan, req.session.key);
     if (uit.status !== 200) {
       if (uit.dicht) try { await arrivalpas.sluitDicht(uit.rij.id, 'reservering gaat niet door'); } catch (e) { /* de deur is al dicht */ }
       return res.status(uit.status).json({ error: uit.error });
@@ -35,19 +45,19 @@ module.exports = ({ app, db, arrivalpas }) => {
     next();
   }
 
-  app.post('/api/arrival/pass/roteer', passRem, async (req, res) => {
+  app.post('/api/arrival/pass/roteer', kern.auth, passRem, async (req, res) => {
     res.set('Cache-Control', 'no-store');
     let uit;
-    try { uit = await arrivalpas.roteer((req.body || {}).pass, reserveringVan); } catch (e) { return geenOpslag(res); }
+    try { uit = await arrivalpas.roteer((req.body || {}).pass, reserveringVan, req.session.key); } catch (e) { return geenOpslag(res); }
     if (uit.status !== 200) return res.status(uit.status).json({ error: uit.error });
     res.json({ ok: true, eenmalig: true, accessToken: uit.code,
       let: 'Dit is uw nieuwe pass; de vorige werkt niet meer.' });
   });
 
-  app.post('/api/arrival/pass/intrek', passRem, async (req, res) => {
+  app.post('/api/arrival/pass/intrek', kern.auth, passRem, async (req, res) => {
     res.set('Cache-Control', 'no-store');
     let uit;
-    try { uit = await arrivalpas.intrek((req.body || {}).pass); } catch (e) { return geenOpslag(res); }
+    try { uit = await arrivalpas.intrek((req.body || {}).pass, req.session.key); } catch (e) { return geenOpslag(res); }
     if (uit.status !== 200) return res.status(uit.status).json({ error: uit.error });
     res.json({ ok: true, let: 'De pass is ingetrokken. Uw reservering zelf blijft staan.' });
   });

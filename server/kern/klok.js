@@ -6,6 +6,7 @@
 
    De veegtimer kijkt elke 15 seconden en is unref'd: hij houdt geen
    test of afsluitend proces wakker. */
+const tijdzone = require('./tijdzone');
 
 const MAX_WEKKERS = 20;
 const MAX_TIMERS = 10;
@@ -71,9 +72,10 @@ function maakKlok({ db, save, crypto, schoon, sseToCustomer, sendPushToUser }) {
   /* ---- de veegtimer: de server is de klok ---- */
   function veeg() {
     const nu = new Date();
-    const hhmm = String(nu.getHours()).padStart(2, '0') + ':' + String(nu.getMinutes()).padStart(2, '0');
-    const vandaag = nu.toISOString().slice(0, 10);
-    const dag = nu.getDay();
+    const hier = tijdzone.huis(nu); // een wekker gaat af op de klok van het lid, niet op die van de container
+    const hhmm = hier.hhmm;
+    const vandaag = hier.datum;
+    const dag = hier.dag;
     let anders = false;
     for (const k of Object.keys(db.data.klok || {})) {
       const key = k.replace(/^lid:/, '');

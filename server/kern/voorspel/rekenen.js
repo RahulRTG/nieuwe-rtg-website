@@ -3,6 +3,7 @@
    het leren van gewoontes uit grootboekrijen en het combinatiegedrag (de grondstof
    voor een Synergie-deal). De runtime (voorLid/voorZaak) woont in index.js en roept
    deze functies aan. */
+const tijdzone = require('../tijdzone');
 const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
 /* het stille seintje. Alleen als de beste verwachting echt rijp is (het
@@ -78,8 +79,8 @@ function gewoontenUit(rijen, rek, nu = new Date()) {
   for (const [code, rs] of per) {
     if (rs.length < 3) continue;
     const tijden = rs.map(r => new Date(r.at).getTime()).sort((a, b) => a - b);
-    const uur = modus(rs.map(r => new Date(r.at).getHours()));
-    const dag = modus(rs.map(r => new Date(r.at).getDay()));
+    const uur = modus(rs.map(r => tijdzone.uurIn(r.at)));
+    const dag = modus(rs.map(r => tijdzone.weekdagIn(r.at)));
     let som = 0;
     for (let i = 1; i < tijden.length; i++) som += tijden[i] - tijden[i - 1];
     const tussenDagen = som / (tijden.length - 1) / 86400000;

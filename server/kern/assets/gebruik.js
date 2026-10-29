@@ -1,5 +1,6 @@
 /* Shared-assets (deelmodule): mijn tickets, een 24-uursblok boeken en de uitstap (terugkoop of overdracht).
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/assets.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, notify, pay,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
@@ -9,11 +10,13 @@ module.exports = (ctx) => {
     actieveVan, bezetVan, magKopen, kasAdd, binnenBedenktijd } = ctx;
   function assetMijn(key) {
     lijsten();
-    const jaar = new Date().getFullYear();
+    const jaar = tijdzone.jaarIn();
     const posities = db.data.sharedAssets.map(a => {
       const mijn = actieveVan(a.id).filter(t => t.key === key);
       const wachtend = db.data.assetTerugkoop.filter(v => v.assetId === a.id && v.key === key && v.status === 'aangevraagd');
-      if (!mijn.length && !wachtend.length) return null;
+      // een herroeping die op de bank wacht: het ticket is nog niet terugbetaald
+      const herroepLoopt = db.data.assetTickets.filter(t => t.assetId === a.id && t.key === key && t.status === 'herroep-loopt').length;
+      if (!mijn.length && !wachtend.length && !herroepLoopt) return null;
       const gebruikt = db.data.assetGebruik.filter(g => g.assetId === a.id && g.key === key && g.datum.slice(0, 4) === String(jaar)).length;
       return {
         assetId: a.id, naam: a.naam, icon: a.icon, soort: a.soort, entiteit: a.entiteit,
@@ -28,6 +31,7 @@ module.exports = (ctx) => {
         uitstapWaarde: mijn.filter(t => t.smaak === 'asset').length * ticketWaarde(a),
         assetTicketIds: mijn.filter(t => t.smaak === 'asset').map(t => t.id),
         herroepbaar: mijn.filter(binnenBedenktijd).map(t => ({ id: t.id, smaak: t.smaak, prijs: t.prijs })),
+        herroepLoopt,
         terugkoopOnderweg: wachtend.map(v => ({ waarde: v.waarde, uiterlijk: v.uiterlijk })),
         gepland: db.data.assetGebruik.filter(g => g.assetId === a.id && g.key === key && g.datum >= vandaag()).map(g => g.datum).sort().slice(0, 6)
       };

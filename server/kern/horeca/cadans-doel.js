@@ -12,6 +12,7 @@
 'use strict';
 
 const { bereidingsMinuten } = require('./keukenlaag');
+const tijdzone = require('../tijdzone');
 
 /* Twee marges, allebei klein en allebei uitlegbaar. PASMARGE is de tijd tussen
    "alles staat bij de pas" en "het staat op tafel": afwerken, controleren,
@@ -25,8 +26,7 @@ const MIN = 60000;
 const minuten = (ms) => Math.round(ms / MIN);
 
 function hhmm(ms) {
-  const d = new Date(ms);
-  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  return tijdzone.hhmmIn(new Date(ms));
 }
 
 /* "19:42" op de dag van de vrijgave. Een club serveert om half drie 's nachts,
@@ -38,9 +38,7 @@ function klokTijdNaarMs(tijd, ankerMs) {
   if (!m) return null;
   const uur = Number(m[1]), min = Number(m[2]);
   if (uur > 23) return null;
-  const anker = new Date(ankerMs);
-  const d = new Date(anker.getFullYear(), anker.getMonth(), anker.getDate(), uur, min, 0, 0);
-  let ms = d.getTime();
+  let ms = tijdzone.moment(tijdzone.datumIn(new Date(ankerMs)), uur * 60 + min).getTime();
   if (ms < ankerMs - 6 * 60 * MIN) ms += 24 * 60 * MIN;
   return ms;
 }

@@ -1,13 +1,13 @@
 {
   "grens": "Een require die er staat zegt dat de simulatielaag een kern AANRAAKT, niet dat zij hem beproeft of dat een uitkomst in Magnaat iets over productie bewijst. Een gedeelde naam is geen gedeelde kern en een gedeelde vorm is geen fout: twee uitvoeringen kunnen terecht zijn. Gemeten op statische requires; een kern die via een omweg wordt geladen, telt hier niet mee.",
   "simulatiemodules": 70,
-  "kernmodules": 2786,
-  "kernDomeinen": 717,
+  "kernmodules": 2841,
+  "kernDomeinen": 734,
   "perWereld": {
     "magnaat": {
       "modules": 67,
       "regels": 0,
-      "raaktKern": 7
+      "raaktKern": 8
     },
     "hospitality": {
       "modules": 3,
@@ -15,9 +15,9 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 158,
-  "geraakteKernmodules": 7,
-  "geraakteKernDomeinen": 6,
+  "requiresTotaal": 160,
+  "geraakteKernmodules": 8,
+  "geraakteKernDomeinen": 7,
   "bereikPct": 1,
   "modulesDiePratenNaarBuiten": 0,
   "kruisWereldAanroepen": 3,
@@ -70,6 +70,13 @@
       "aantal": 1
     },
     {
+      "doel": "server/kern/magnaatwereld/scenarios",
+      "door": [
+        "server/kern/magnaatwereld.js"
+      ],
+      "aantal": 1
+    },
+    {
       "doel": "server/kern/betaalwaarheid",
       "door": [
         "server/kern/spellen/magnaat/rtg-keten.js"
@@ -91,8 +98,8 @@
       "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 16,
-  "kandidaatparen": 42,
+  "gedeeldeOnderwerpen": 17,
+  "kandidaatparen": 43,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {

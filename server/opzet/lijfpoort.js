@@ -97,6 +97,8 @@ module.exports = function lijfpoort(deps) {
      richting uitvoeren (bijvoorbeeld toestemming intrekken); daarvoor is de
      begrensde body nodig, vandaar deze plek en niet vóór express.json(). */
   app.use(require('../middleware/foundation-productiepoort')());
+  // een gezinstoken zonder eigenaar-account: 401 (foundation/accountplicht.js)
+  app.use((req, res, next) => require('../foundation').gezinAccountPoort(req, res, next));
 
   /* 3b. De idem-poort: een verzoek met een `Idempotency-Key` header krijgt bij
      een herhaling het bewaarde antwoord in plaats van het werk nog een keer.
@@ -137,7 +139,7 @@ module.exports = function lijfpoort(deps) {
   const spoor = require('../lib/handelingsspoor')({ db, save });
   const dbKern = require('../db');
   require('./kritiekspoor').haak({ handelingsspoor: spoor,
-    vastleggen: require('../lib/duurzaam')({ bijeen: dbKern.bijeen, save, inBundel: dbKern.inBundel, bron: 'handelingsspoor' }) });
+    vastleggen: require('../lib/duurzaam')({ bijeen: dbKern.bijeen, save: save.bind(null, ['handelingLog']), inBundel: dbKern.inBundel, bron: 'handelingsspoor' }) });
   /* Een vroege PostgreSQL-commit (collectietransactie, economische boeking)
      neemt het spoor van het verzoek mee in zijn eigen transactie, plus een
      regel `vastgelegd` die deze bouwer maakt (db/verzoekspoor.js, audit P0-1). */

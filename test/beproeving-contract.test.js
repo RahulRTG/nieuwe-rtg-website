@@ -1,8 +1,26 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { alleRoutes } = require('../scripts/beproeving');
+const { alleRoutes, haal } = require('../scripts/beproeving');
 const { VERHALEN } = require('../scripts/verhalen');
+
+test('de antwoordadapter bewaart een niet-JSON weigering voor de lekscan', async () => {
+  const { EventEmitter } = require('node:events');
+  const { weegAntwoord } = require('../scripts/lib/rolproef');
+  const vraag = (_opties, antwoord) => {
+    const req = new EventEmitter();
+    req.setTimeout = () => {}; req.write = () => {};
+    req.end = () => queueMicrotask(() => {
+      const res = new EventEmitter(); res.statusCode = 403; antwoord(res);
+      res.emit('data', 'Dit dossier hoort bij jan@voorbeeld.nl'); res.emit('end');
+    });
+    return req;
+  };
+  const r = await haal('POST', '/api/proef', 'tok', {}, {}, vraag);
+  assert.equal(r.status, 403);
+  assert.equal(r.data, 'Dit dossier hoort bij jan@voorbeeld.nl');
+  assert.equal(weegAntwoord(r.status, r.data).lek, 'e-mailadres');
+});
 
 test('de storm ontvangt de HTTP-methode die de server registreert', () => {
   const routes = alleRoutes();

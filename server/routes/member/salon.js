@@ -51,8 +51,16 @@ module.exports = (kern) => {
     // Echte leden verschijnen in De Salon onder hun codenaam, nooit hun echte naam.
     const who = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].full;
     const clang = talen.taalVan(req.body.lang);
+    /* EEN HERHAALSLEUTEL PER REACTIE (19 oktober 2026): na een crash plaatste
+       dezelfde tik de reactie twee keer. De sleutel staat gehasht op de reactie
+       (met de afzender erin), dus hij overleeft een herstart en verraadt niemand. */
+    const idem = typeof req.body.idem === 'string' && req.body.idem.trim() ? req.body.idem.trim().slice(0, 80) : null;
+    const merk = idem && require('crypto').createHash('sha256').update(req.session.key + '|' + idem).digest('hex').slice(0, 32);
+    const al = merk && post.comments.find(c => c.idem === merk);
+    if (al && al.text !== text) return res.status(409).json({ error: 'Deze reactie is al met een andere tekst geplaatst.' });
+    if (al) return res.json({ ok: true, herhaald: true, comment: { who: al.who, tier: al.tier, text: al.text, lang: al.lang } });
     const comment = { who, tier: req.session.tier, text, lang: clang };
-    post.comments.push(comment);
+    post.comments.push(merk ? Object.assign({ idem: merk }, comment) : comment);
     registerContact(req.session, post);
     save();
     // alle Salon-schermen tonen de nieuwe reactie live

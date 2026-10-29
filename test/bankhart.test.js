@@ -78,6 +78,8 @@ test('Business Pass: akkoord opent de betaalrekening EN automatisch (gratis) de 
   lid.iban = akk.body.rekening.iban;
   lid.zakelijk = akk.body.zakelijk.iban;
   const nogEen = await api('bank/akkoord', {}, lid.token);
+  assert.equal(nogEen.body.herhaald, true, 'de vaste akkoordontvangst herkent ook een retry na herstart');
+  assert.equal(nogEen.body.rekening, null, 'een retry onthult of opent geen betaalrekening opnieuw');
   assert.equal(nogEen.body.zakelijk, null, 'een tweede akkoord opent geen tweede zakelijke rekening');
 });
 

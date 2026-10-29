@@ -84,6 +84,12 @@
     if (actie && actie.pad) { el = d.createElement('a'); el.href = actie.pad; }
     else if (actie && (actie.doel || typeof actie.doe === 'function')) {
       el = d.createElement('div'); el.setAttribute('role', 'button'); el.tabIndex = 0;
+      /* Een lege toestand met één interne vervolgstap is de primaire actie van
+         die toestand. Benoem dat contract expliciet, zodat Edge, toetsenbord-
+         en browserproeven dezelfde bestaande vervolgstap kunnen hervatten na
+         een hertekening. */
+      el.setAttribute('data-hoofdactie', '');
+      el.setAttribute('data-contextactie', '');
     }
     else el = d.createElement('div');
     el.className = 'rtg-leeg-vlak' + (actie ? ' rtg-leeg-vlak--actie' : '');
@@ -126,7 +132,7 @@
     o = o || {}; var actie = actieVan(o), tag = actie && actie.pad ? 'a' : 'div';
     if (actie && typeof actie.doe === 'function' && !actie.pad && !actie.doel) actie = null;
     var attribuut = actie && actie.pad ? ' href="' + esc(actie.pad) + '"' : actie && actie.doel
-      ? ' role="button" tabindex="0" data-rtg-leeg-doel="' + esc(actie.doel) + '"' : '';
+      ? ' role="button" tabindex="0" data-hoofdactie data-contextactie data-rtg-leeg-doel="' + esc(actie.doel) + '"' : '';
     var uit = '<' + tag + ' class="rtg-leeg-vlak' + (actie ? ' rtg-leeg-vlak--actie' : '') + '"' + attribuut + '>';
     if (o.ey) uit += '<span class="rtg-leeg-ey">' + esc(o.ey) + '</span>';
     if (o.titel) uit += '<b>' + esc(o.titel) + '</b>';

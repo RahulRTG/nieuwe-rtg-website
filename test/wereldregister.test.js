@@ -36,7 +36,7 @@ const path = require('path');
    en dan is niet meer te zien welke van de twee gelijk heeft (LAT.md regel 4).
    Wat er in die lezer gebeurt en waarom, staat daar. */
 const reg = require('../scripts/lib/wereldregister');
-const { LINKS, OSAPPS, MAPPEN, WERELDEN, APP_HTML, BRON, kaal, bestaat } = reg;
+const { LINKS, OSAPPS, MAPPEN, PREMIUM, WERELDEN, APP_HTML, BRON, kaal, bestaat } = reg;
 
 const WORTEL = path.join(__dirname, '..');
 const PUB = path.join(WORTEL, 'public');
@@ -332,9 +332,7 @@ test('de PREMIUM-set van de client is dezelfde suite als het register kent', () 
   assert.ok(Array.isArray(f.apps) && f.apps.length >= 5,
     'de functie `rechterhand` draagt geen `apps`-lijst; deze toets meet dan niets');
 
-  const m = /const PREMIUM = new Set\(\[([\s\S]*?)\]\)/.exec(BRON);
-  assert.ok(m, 'de PREMIUM-set is niet meer te lezen uit de app-main-bundel');
-  const client = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]);
+  const client = [...PREMIUM];
 
   assert.deepEqual([...client].sort(), [...f.apps].sort(),
     'de client en het register zijn het oneens over wat de Lifestyle-suite is\n' +

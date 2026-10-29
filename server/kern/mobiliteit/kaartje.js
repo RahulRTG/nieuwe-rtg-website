@@ -20,14 +20,7 @@
    klok. Wat wel bewaard wordt is wat er is GEBEURD: elke validatie, met tijd,
    lijn en wie hem deed. */
 
-// hoe een product zich tot de enkele-reisprijs verhoudt, en hoe lang het geldt
-const PRODUCTEN = {
-  enkel: { naam: 'Enkele reis', factor: 1, urenGeldig: 2, ritten: 1 },
-  // de terugweg met korting: een retour is geen twee losse kaartjes
-  retour: { naam: 'Retour', factor: 1.8, urenGeldig: 24, ritten: 2 },
-  dagkaart: { naam: 'Dagkaart', factor: 3, urenGeldig: 24, ritten: 99 },
-  zitplaats: { naam: 'Zitplaats', factor: 1, urenGeldig: 24, ritten: 1, toeslag: 150 }
-};
+const { PRODUCTEN } = require('./geldigheid');
 
 const { maakSleutel } = require('../../db/economische-identiteit');
 
@@ -45,33 +38,7 @@ module.exports = (ctx) => {
   const lijnVanZaak = (zaak, lijnId) => (zaak.lijnen || []).find(l => l.id === lijnId) || null;
   const halteVan = (lijn, halteId) => (lijn.haltes || []).find(h => h.id === halteId) || null;
 
-  /* Wat is dit kaartje nu waard? Geldig, opgebruikt of verlopen -- uitgerekend
-     uit het venster en de validaties, nooit uit een bewaard vlaggetje. */
-  function kaartStand(k) {
-    /* Een abonnement rekent zijn eigen stand uit (geen ritlimiet, wel een
-       looptijd) en woont in dezelfde voorraad. Via ctx, want ./abonnement wordt
-       NA deze module gemount. Zonder deze aftakking viel een abonnement terug
-       op de regels van een enkeltje en was het na een rit "gebruikt". */
-    if (k.product === 'abonnement' && ctx.aboStand) return ctx.aboStand(k);
-    /* Alleen een VOLLEDIGE teruggave maakt het kaartje ongeldig. Bij een
-       vertraging krijgt de reiziger een deel terug als vergoeding en rijdt hij
-       gewoon mee -- hier stond eerst dat elke teruggave het kaartje afsloot, en
-       dan pakt de compensatie voor een late bus zijn rit af. Bij uitval is het
-       omgekeerd juist: die rit is niet gereden en het geld is helemaal terug. */
-    if (k.terugbetaald && k.terugbetaald.volledig)
-      return { stand: 'terugbetaald', reden: 'de rit is uitgevallen; het bedrag is terugbetaald op ' +
-        k.terugbetaald.at.slice(0, 16).replace('T', ' ') };
-    const p = PRODUCTEN[k.product] || PRODUCTEN.enkel;
-    const gebruikt = (k.validaties || []).length;
-    if (gebruikt >= p.ritten) return { stand: 'gebruikt', reden: 'volledig gebruikt (' + gebruikt + ' van ' + p.ritten + ')' };
-    const nuMs = Date.now();
-    if (nuMs < new Date(k.geldigVan).getTime())
-      return { stand: 'nog-niet-geldig', reden: 'geldig vanaf ' + k.geldigVan.slice(0, 16).replace('T', ' ') };
-    if (nuMs > new Date(k.geldigTot).getTime())
-      return { stand: 'verlopen', reden: 'verlopen op ' + k.geldigTot.slice(0, 16).replace('T', ' ') };
-    return { stand: 'geldig', reden: 'geldig tot ' + k.geldigTot.slice(0, 16).replace('T', ' '),
-      rittenOver: p.ritten - gebruikt };
-  }
+  const { kaartStand } = require('./geldigheid')({ abonnementStand: () => ctx.aboStand });
 
   /* Een kaartje kopen. `session` is het lid; betalen gaat uit de wallet met
      autolaad, precies zoals het uitchecken in RTG OV. */
@@ -116,6 +83,18 @@ module.exports = (ctx) => {
 
     // betalen met autolaad, dezelfde weg als elke andere RTG-betaling
     const codenaam = codenaamVan(session.key);
+    /* MET EEN IDEM VOLGT HET ID UIT DE SLEUTEL. De idem-poort is na een crash
+       leeg; met een vers id weigerde de geldlaag de herhaling ("sleutel hoort
+       bij een andere boeking"), en viel de crash tussen boeking en kaartje, dan
+       was er betaald zonder kaartje (scripts/lib/voltooi/ov.js). */
+    const aankoopId = body.idem ? 'kt' + crypto.createHash('sha256')
+      .update(codenaam + '\u0000' + schoon(body.idem, 60)).digest('hex').slice(0, 16) : id('kt');
+    const al = body.idem ? kaartMet(aankoopId) : null;
+    const traject = (h) => (h ? h.id : null);
+    if (al) return al.key === session.key && al.lijnId === lijn.id && al.product === product &&
+      traject(al.van) === traject(van) && traject(al.naar) === traject(naar)
+      ? { ok: true, herhaald: true, kaartje: ctx.kaartBeeld(al, true) }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een andere aankoop.' };
     const rek = 'lid:' + codenaam;
     const tekort = prijs - pay.saldoVan(rek);
     if (tekort > 0) {
@@ -123,13 +102,15 @@ module.exports = (ctx) => {
         idem: body.idem ? 'kaartlaad:' + schoon(body.idem, 60) : undefined });
       if (l.error) return { status: l.status || 402, error: l.error };
     }
-    // id voor de boeking, sleutel eraan: zie ./abonnement.js
-    const aankoopId = id('kt');
+    // id voor de boeking (hierboven), sleutel eraan: zie ./abonnement.js
     const b = await pay.boekAsync({ van: rek, naar: 'partner:' + zaak.code, centen: prijs, soort: 'ovkaart',
       oms: p.naam + ' · ' + lijn.naam + (van ? ' · ' + van.naam + ' - ' + naar.naam : ''), ref: aankoopId,
       economischeSleutel: maakSleutel('pay-handeling', body.idem
         ? ['ovkaart', codenaam, schoon(body.idem, 60)] : ['ovkaart', aankoopId]) });
     if (b.error) return { status: b.status || 400, error: b.error };
+    // een gelijktijdige herhaling kan tijdens het boeken al zijn afgerond
+    const intussen = body.idem ? kaartMet(aankoopId) : null;
+    if (intussen) return { ok: true, herhaald: true, kaartje: ctx.kaartBeeld(intussen, true) };
 
     const start = new Date();
     const k = {

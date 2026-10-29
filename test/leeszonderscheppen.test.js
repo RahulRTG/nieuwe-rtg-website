@@ -95,15 +95,16 @@ test('voornemen: een onbekend voornemen staken schept geen lijst', () => {
 });
 
 /* ---------------------------------------------------------------- care/zaak */
-test('care: een onbekende pakketboeking betalen schept geen catalogus', () => {
+test('care: een onbekende pakketboeking betalen schept geen catalogus', async () => {
   const maakZaak = require('../server/kern/care/zaak.js');
   const db = { data: {} };
   const { carePakketBetaal } = maakZaak({
     db, save: () => {}, crypto: require('node:crypto'),
     nu: () => new Date().toISOString(), notify: () => {},
+    betaalZaak: async () => ({ ok: true, boeking: 'bevestigd' }),
   });
 
-  assert.equal(carePakketBetaal({ key: 'k1' }, 'RTG-P-BESTAATNIET').status, 404);
+  assert.equal((await carePakketBetaal({ key: 'k1' }, 'RTG-P-BESTAATNIET')).status, 404);
   geenMeubilair(db, 'carePakketBoekingen', 'een 404 op carePakketBetaal');
   geenMeubilair(db, 'carePakketten', 'een 404 op carePakketBetaal');
 
@@ -113,10 +114,12 @@ test('care: een onbekende pakketboeking betalen schept geen catalogus', () => {
     ref: 'R1', key: 'k1', paid: false, at: new Date().toISOString(), prijs: 995,
     naam: 'Herstel & Ontspan', nachten: 2, hotelNaam: 'Aguamarina', datum: '2026-09-07',
     tijd: '11:00', careRef: 'C1',
+    // De prijsverdeling is al besloten; alleen bevestigde providerantwoorden betalen.
+    verdeling: { zorgCode: 'ZORG', hotelCode: 'HOTEL', zorgCenten: 13500, hotelCenten: 86000 },
   }];
-  assert.equal(carePakketBetaal({ key: 'k1' }, 'R1').ok, true);
+  assert.equal((await carePakketBetaal({ key: 'k1' }, 'R1')).ok, true);
   assert.equal(db.data.carePakketBoekingen[0].paid, true, 'de betaling staat in db.data');
-  assert.equal(carePakketBetaal({ key: 'k1' }, 'R1').status, 409);
+  assert.equal((await carePakketBetaal({ key: 'k1' }, 'R1')).status, 409);
 });
 
 /* ------------------------------------------------------ fiscaal/btwaangifte */

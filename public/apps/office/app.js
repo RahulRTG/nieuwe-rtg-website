@@ -131,7 +131,7 @@
     $('#sjablonen').innerHTML = Object.keys(groepen).sort().map(function (g) {
       return '<div class="sec h-mt80">' + esc(g) + '</div>' +
         groepen[g].map(function (s) {
-          return '<button class="sjab" type="button" data-sjab="' + esc(s.id) + '">' + esc(s.titel) + '</button>';
+          return '<button class="sjab" type="button" data-sjab="' + esc(s.id) + '" data-contextactie>' + esc(s.titel) + '</button>';
         }).join('');
     }).join('');
     Array.prototype.forEach.call($('#sjablonen').querySelectorAll('[data-sjab]'), function (b) {
@@ -210,7 +210,7 @@
   function teken(rij, eigen, zoek) {
     if (!rij.length) return '<p class="stil">' + (zoek ? 'Niets gevonden.' : 'Nog niets hier.') + '</p>';
     return rij.map(function (d) {
-      return '<div class="doc" data-open="' + d.id + '" role="button" tabindex="0">' +
+      return '<div class="doc" data-open="' + d.id + '" role="button" tabindex="0" aria-label="Open document: ' + esc(d.titel) + '">' +
         '<span class="ic">' + glyf(GLYF_SOORT[d.soort] || 'logboek') + '</span>' +
         '<span class="naam"><b>' + esc(d.titel) + '<span class="office-docmeta">' +
           ((d.classificatie && d.classificatie !== 'intern') ? '<i data-klasse="' + esc(d.classificatie) + '">' + esc(d.classificatie) + '</i>' : '') +
@@ -225,8 +225,8 @@
         '<span class="kol van office-wie">' + (eigen ? datum(d.gewijzigd) : esc(d.door)) + '</span>' +
         '<span class="acties">' + (eigen
           ? '<button class="mini ster' + (d.ster ? ' aan' : '') + '" data-ster="' + d.id + '" data-aan="' + (d.ster ? '1' : '0') +
-            '" title="Markeren" aria-label="Markeren">' + (d.ster ? '★' : '☆') + '</button>' +
-            '<button class="mini weg" type="button" data-weg="' + d.id + '">Verwijderen</button>'
+            '" data-contextactie title="Markeren" aria-label="Markeren">' + (d.ster ? '★' : '☆') + '</button>' +
+            '<button class="mini weg" type="button" data-weg="' + d.id + '" data-contextactie>Verwijderen</button>'
           : '') + '</span></div>';
     }).join('');
   }
@@ -241,9 +241,15 @@
     $(s).addEventListener('input', tekenLijst); $(s).addEventListener('change', tekenLijst);
   });
 
+  /* Een sleutel per poging, pas na succes een nieuwe: een tweede tik of een
+     herhaling na een afgebroken verbinding maakt geen tweede document
+     (server/kern/office/herhaling.js). */
+  var nieuwIdem = '', nieuwVoor = '';
   function nieuw(soort, sjabloon) {
-    api('maak', sjabloon ? { sjabloon: sjabloon } : { soort: soort }).then(function (r) {
+    if (!nieuwIdem || nieuwVoor !== (sjabloon || soort)) { nieuwIdem = RTGId('doc'); nieuwVoor = sjabloon || soort; }
+    api('maak', sjabloon ? { sjabloon: sjabloon, idem: nieuwIdem } : { soort: soort, idem: nieuwIdem }).then(function (r) {
       if (r.body.error) return zeg(r.body.error);
+      nieuwIdem = '';
       openen(r.body.id);
     });
   }
@@ -602,7 +608,8 @@
     }
     if (open.eigenaar && fase === 'archief') acties.push(['concept', 'Heropen als concept', 'vol']);
     $('#faseActies').innerHTML = acties.map(function (a) {
-      return '<button class="knop ' + a[2] + '" type="button" data-fase-naar="' + a[0] + '">' + a[1] + '</button>';
+      return '<button class="knop ' + a[2] + '" type="button" data-fase-naar="' + a[0] + '" data-rtg-adaptive-source="office-fase-' + a[0] + '"' +
+        (a[2] === 'vol' ? ' data-hoofdactie' : '') + '>' + a[1] + '</button>';
     }).join('');
     Array.prototype.forEach.call($('#faseActies').querySelectorAll('[data-fase-naar]'), function (b) {
       b.addEventListener('click', function () { zetFase(b.dataset.faseNaar); });

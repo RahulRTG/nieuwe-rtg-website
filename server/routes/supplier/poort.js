@@ -30,9 +30,11 @@ module.exports = (kern) => {
     if (aan) {
       if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan de zaak online zetten.' });
       if (!poortKlaar(s)) return res.status(409).json({ error: 'Rond eerst de poort af: vul uw Salon-pagina en volg de rondleidingen door de kassa en de werk-apps.' });
+      if (s.online !== false) return res.json(poortBeeld(s));
       s.online = true;
       logActivity(s.code, req.actor, 'zette de zaak online');
     } else {
+      if (s.online === false) return res.json(poortBeeld(s));
       s.online = false;
       logActivity(s.code, req.actor, 'zette de zaak offline (gepauzeerd)');
     }

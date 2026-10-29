@@ -34,6 +34,16 @@ const GENRES = register.aanvraagbareGenres();
 module.exports = Object.assign((ctx) => {
   const { db, save, kap, nu, accounts } = ctx;
 
+  // Eén normalisatie voor de aanvraagbouwer én zijn inhoudsafdruk.
+  function normaliseer(data) {
+    if (!data || typeof data !== 'object') return null;
+    const naam = kap(data.naam, 60);
+    if (!naam) return null;
+    return { naam, type: typeof data.type === 'string' ? data.type.trim() : '',
+      plaats: kap(data.plaats, 60), behoeften: (Array.isArray(data.behoeften) ? data.behoeften : [])
+        .slice(0, 8).map(b => kap(b, 120)).filter(Boolean) };
+  }
+
   /* De behoeften-intake: wat de ondernemer invult (of aan Rahul vertelt)
      komt netjes geklemd op de aanmelding te staan.
 
@@ -46,11 +56,9 @@ module.exports = Object.assign((ctx) => {
      doorgeven. Geen bedrijf meegestuurd is geen fout -- niet elke aanmelding
      gaat over een zaak. */
   function zetBedrijf(a, data, opties) {
-    if (!data || typeof data !== 'object') return { ok: true, bedrijf: false };
-    const naam = kap(data.naam, 60);
-    if (!naam) return { ok: true, bedrijf: false };
-
-    const type = typeof data.type === 'string' ? data.type.trim() : '';
+    const inhoud = normaliseer(data);
+    if (!inhoud) return { ok: true, bedrijf: false };
+    const { type } = inhoud;
     if (!type) {
       return { status: 400, error: 'In welke branche werkt dit bedrijf?',
         uitleg: 'Zonder branche weten we niet welke tools de zaak nodig heeft. Eerder werd dit stil een zzp-zaak; dat doen we niet meer.' };
@@ -64,13 +72,7 @@ module.exports = Object.assign((ctx) => {
         genre: type, stand: poort.reden, uitleg: poort.uitleg };
     }
 
-    a.bedrijf = {
-      naam,
-      type,
-      plaats: kap(data.plaats, 60),
-      behoeften: (Array.isArray(data.behoeften) ? data.behoeften : [])
-        .slice(0, 8).map(b => kap(b, 120)).filter(Boolean)
-    };
+    a.bedrijf = inhoud;
     if (poort.bewijsNodig) a.bedrijf.bewijsNodig = true;
     return { ok: true, bedrijf: true };
   }
@@ -178,5 +180,5 @@ module.exports = Object.assign((ctx) => {
     return { ok: true, maand: t.maand, zaak };
   }
 
-  return Object.assign({ zetBedrijf, provisioneer, termijnVoldaan, GENRES }, bewijs);
+  return Object.assign({ normaliseer, zetBedrijf, provisioneer, termijnVoldaan, GENRES }, bewijs);
 }, { GENRES });

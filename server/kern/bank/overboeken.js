@@ -17,6 +17,7 @@ module.exports = (ctx) => {
      andere naam -- `!codenaam ||` -- en dekt uitgerekend het UITGAANDE
      geldpad: storten, overboeken, SEPA en naar-wallet. */
   const eigenaar = (iban, aanvrager) => magBij(rekMeta(iban), aanvrager);
+  const stort = require('./stortwaarheid')(ctx);
 
   /* Idempotentie die een herstart overleeft: dezelfde sleutel geeft exact
      hetzelfde antwoord terug en clearet nooit twee keer. Hij werd hier gemaakt
@@ -37,18 +38,13 @@ module.exports = (ctx) => {
     if (via === 'eigen' && !cl.eigen) return { status: 409, error: 'De eigen bank clearet nu niet; zet de knop verder.' };
     if (via === 'kaart' && !cl.kaart) return { status: 409, error: 'De kaart-rails staan uit; de eigen bank clearet.' };
     return metIdem(idem ? 'stort:' + iban + ':' + idem : null, 'stort|' + iban + '|' + c + '|' + via, async () => {
-      let ref = 'eigen';
-      if (via === 'kaart') {
-        let betaling;
-        try { betaling = await betaal.maakBetaling({ bedrag: c, referentie: 'bank-stort-' + iban + '-' + nu(), idempotentieSleutel: idem ? 'bank-stort:' + iban + ':' + idem : undefined, omschrijving: oms || 'RTG Bank storten' }); }
-        catch (e) { return { status: 502, error: 'De betaling lukte niet: ' + e.message }; }
-        if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
-        ref = betaling.id;
-      }
-      const van = via === 'eigen' ? 'extern:emissie' : 'extern:kaart';
-      const b = await boekAsync({ van, naar: iban, centen: c, soort: 'storting', oms: oms || 'Storting', ref });
-      if (b.error) { if (via === 'eigen') bankregie.bankClearingMislukt('emissie-boek'); return b; }
-      if (via === 'eigen') bankregie.bankClearingGelukt(); // een geslaagde eigen-clearing wist de mislukt-teller
+      /* De kaart loopt via de betaalwaarheid, en daar schrijft de afhandelaar
+         bij (./stortwaarheid.js); hier blijft alleen de eigen emissie. */
+      if (via === 'kaart') return stort.viaKaart({ iban, centen: c, idem, oms });
+      const ref = 'eigen';
+      const b = await boekAsync({ van: 'extern:emissie', naar: iban, centen: c, soort: 'storting', oms: oms || 'Storting', ref });
+      if (b.error) { bankregie.bankClearingMislukt('emissie-boek'); return b; }
+      bankregie.bankClearingGelukt(); // een geslaagde eigen-clearing wist de mislukt-teller
       seintje(rekMeta(iban).codenaam);
       return { ok: true, iban, via, saldoCenten: saldoVan(iban), gestort: c };
     }, { geld: 'stort geld op een rekening' });

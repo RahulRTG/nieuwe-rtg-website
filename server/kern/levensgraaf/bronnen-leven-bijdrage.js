@@ -74,7 +74,7 @@ function dagVan(ms) {
   if (!Number.isFinite(n) || n <= 0) return '';
   const d = new Date(n);
   if (Number.isNaN(d.getTime())) return '';
-  const kaal = d.toISOString().slice(0, 10);
+  const kaal = H.dagVan(d);
   return isDatum(kaal) ? kaal : '';
 }
 
@@ -109,7 +109,7 @@ const BIJDRAGE = [
     const uit = [];
     for (const m of lijst(obj(db.data && db.data.rtgid).machtigingen)) {
       if (!m || m.naarKey !== key || m.ingetrokken) continue;
-      const sinds = String(m.gemaakt || '').slice(0, 10);
+      const sinds = H.dagVan(m.gemaakt) || '';
       const tot = dagVan(m.tot);
       const dienst = String(m.dienst || 'een dienst').slice(0, 60);
 

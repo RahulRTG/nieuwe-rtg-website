@@ -15,7 +15,7 @@
   'use strict';
   const $ = s => document.querySelector(s);
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/nav/' + pad, { method: 'POST',
+  const api = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   let toastT;
@@ -73,6 +73,11 @@
     }
     return null;
   });
+  /* De generieke uitvoerknop hoort in de zichtbare objectkaart. Als hij als
+     eerste kind van het canvas landt, ligt de vaste TravelOS-kop erboven en is
+     hij niet aan te raken. De bestaande mountvoorziening houdt knop en dialoog
+     bij dezelfde uitvoerlaag; er komt geen tweede exportmechanisme bij. */
+  if (window.RTGUitvoer) RTGUitvoer.mount(document.getElementById('navigatieUitvoer'), document.body);
 
   /* Kleuren per laag: voor het tekenen op het doek (3D en 2D) en voor de stip
      in de laagknop. Dit is tekenwerk op een canvas en in een SVG-attribuut,

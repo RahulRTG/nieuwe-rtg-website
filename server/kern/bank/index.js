@@ -19,7 +19,7 @@
    rente in ./sparen. */
 
 module.exports = (deps) => {
-  const { db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten } = deps;
+  const { db, save, bijeen, economischeBoekingEenmaal, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, findSupplier, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten, betaalWaarheid } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -39,10 +39,11 @@ module.exports = (deps) => {
   function saldi() { if (!d().bankSaldi || typeof d().bankSaldi !== 'object') d().bankSaldi = {}; return d().bankSaldi; }
   function grootboek() { if (!Array.isArray(d().bankBoekingen)) d().bankBoekingen = []; return d().bankBoekingen; }
   function rekeningen() { if (!d().bankRekeningen || typeof d().bankRekeningen !== 'object') d().bankRekeningen = {}; return d().bankRekeningen; }
+  const lezen = require('./lezen')(d);
 
   const isExtern = rek => rek.startsWith('extern:') || rek.startsWith('rtg:');
-  const saldoVan = rek => Math.round(saldi()[rek] || 0);
-  const rekMeta = iban => rekeningen()[iban] || null;
+  const saldoVan = rek => Math.round(lezen.saldi()[rek] || 0);
+  const rekMeta = iban => lezen.rekeningen()[iban] || null;
   const id = p => (p || 'BB') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
   // de bodem van een rekening: extern/rtg mag onbeperkt negatief (dat IS de bank);
@@ -73,7 +74,7 @@ module.exports = (deps) => {
      het serialisatie-slot, de herstart-reconcile, de sluitcontrole en de drift-
      stand voor het statusbord. */
   const { boek, boekAsync, reconcileVanMotor, sluitcontrole, motorStand } = require('./grootboek')({
-    MIN_CENTEN, MAX_CENTEN, saldi, grootboek, saldoVan, rekMeta, isExtern, bodem,
+    MIN_CENTEN, MAX_CENTEN, saldi, saldiLezen: lezen.saldi, grootboek, saldoVan, rekMeta, isExtern, bodem,
     id, schoon, nu, save, d, geldModus, motorklant, bordSeintje });
 
   /* DE BETAALOPDRACHTEN: alles wat het huis verlaat krijgt een eigen rij naast
@@ -89,11 +90,23 @@ module.exports = (deps) => {
   /* EN DUURZAAM, als RTG Pay: zonder die vlag is de bundel atomair en niet
      duurzaam, en gaf /api/bank/akkoord een IBAN die de opslag nooit
      bevestigde (FAALPROEF: `gezakt`). Reikwijdte: GELDLAT.md. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen, duurzaam: true });
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen, duurzaam: true,
+    behoudSleutel: sleutel => sleutel.startsWith('rekopen-kantoor:') || sleutel.startsWith('bankakkoord:'),
+    geldigeOntvangst: (sleutel, ontvangst) => {
+      if (sleutel.startsWith('rekopen-kantoor:')) return !!(ontvangst && ontvangst.rekening &&
+        typeof ontvangst.rekening.iban === 'string' && ontvangst.rekening.iban.trim());
+      /* Oude ontvangsten bevatten alleen {ok:true}; die blijven veilig
+         herkenbaar maar openen bij replay geen rekening. Nieuwe ontvangsten
+         dragen de volledige atomair vastgelegde akkoorduitkomst. */
+      if (sleutel.startsWith('bankakkoord:')) return !!(ontvangst && ontvangst.ok === true &&
+        (ontvangst.akkoord === undefined || ontvangst.akkoord === true));
+      return true;
+    } });
 
   // de gedeelde context voor de deelbestanden
-  const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
-    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje, opdrachten, metIdem };
+  const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, findSupplier, accounts, anthropic,
+    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje, opdrachten, metIdem,
+    betaalWaarheid, economischeBoekingEenmaal }; // storten via de waarheid: ./stortwaarheid.js
 
   const rek = require('./rekeningen')(ctx);
   const over = require('./overboeken')(ctx);
@@ -112,7 +125,7 @@ module.exports = (deps) => {
   /* Het afschrift, de gezondheid en het boardroom-overzicht: alleen lezen,
      en daarom apart in ./bord. */
   const { afschrift, gezondheid, overzicht } = require('./bord')(
-    Object.assign({}, ctx, { sluitcontrole, opdrachten }));
+    Object.assign({}, ctx, lezen, { sluitcontrole, opdrachten }));
 
   /* Zelfde reden als bij pay: de zekering hoort op het bord (LAT.md regel 5).
      motorStand hierboven gaat over DRIFT (loopt de spiegel gelijk met de
@@ -127,31 +140,9 @@ module.exports = (deps) => {
     bankOpdrachtVind: (id) => opdrachten.vind(id), bankOpdrachtStemAf: (a) => opdrachten.stemAf(a || {}), bankAfstemBlik: (a) => opdrachten.afstemBlik(a) };
   Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart, entiteit);
 
-  /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
-     op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen
-     afhandelt. De boardroom-knoppen blijven bestaan voor een handmatige ronde;
-     unref() zodat de timer een proces nooit wakker houdt (zelfde patroon als de
-     tx-veegronde). */
-  const RONDE_MS = Number(process.env.BANK_RONDE_MS || 3600000);
-  const rondeTimer = setInterval(() => {
-    // de rondes zijn async (ze kunnen via de motor lopen); ketenen en de fouten
-    // opvangen zodat een hapering het proces nooit omver trekt.
-    Promise.resolve()
-      .then(() => api.bankRenteRonde({}))
-      .then(() => api.bankIncassoRonde({}))
-      .catch(e => console.warn('[bank] ronde mislukt:', e.message));
-  }, RONDE_MS);
-  if (rondeTimer.unref) rondeTimer.unref();
-
-  /* De opdrachtenronde loopt VEEL vaker dan de uurtik: een mislukte inzending is
-     geen maandelijkse rente maar geld dat vaststaat, en een uur wachten op de
-     eerste herhaling is voor wie net op "verstuur" drukte een storing. De
-     backoff in de opdracht bepaalt wie aan de beurt is; deze tik kijkt alleen. */
-  const OPDRACHT_RONDE_MS = Number(process.env.BANK_OPDRACHT_RONDE_MS || 60000);
-  const opdrachtTimer = setInterval(() => {
-    opdrachten.ronde({}).catch(e => console.warn('[bank] opdrachtenronde mislukt:', e.message));
-  }, OPDRACHT_RONDE_MS);
-  if (opdrachtTimer.unref) opdrachtTimer.unref();
+  // Periodieke uitvoering heeft eigen overlapbewaking; boekhouding blijft in haar bestaande eigenaars.
+  require('./rondes')({ rente: () => api.bankRenteRonde({}),
+    incasso: () => api.bankIncassoRonde({}), opdrachten: () => opdrachten.ronde({}) });
 
   return { bank: api };
 };

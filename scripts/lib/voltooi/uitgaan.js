@@ -91,6 +91,28 @@ async function loop(w, stap) {
     return { klopt: !!g && g.qty === 2, ziet: g ? 'in store.db/suppliers: ' + zaak.code + ' / ' + ev.id + ' / ' + g.qty + ' pers.' : 'NIET in de opslag' };
   });
 
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander lid ziet of annuleert deze gastenlijstplek niet en kan zich wel onder zijn eigen codenaam aanmelden', async () => {
+    const ander = await nieuwLid(w, 'uit-ander');
+    const B = ander.token;
+    const voorB = await mijn(B);
+    const aanval = await w.post(AFMELDEN, { supplierCode: zaak.code, eventId: ev.id }, B);
+    const eigenB = await w.post(RSVP, { supplierCode: zaak.code, eventId: ev.id, qty: 1 }, B);
+    const codenaamB = (((await w.post('/api/member/connections', {}, B)).data) || {}).codename;
+    const naA = await mijn();
+    const naB = await mijn(B);
+    const gasten = (await gastenBijZaak()) || [];
+    const aBehoudtEigen = gasten.some((x) => x.codename === codenaam && x.qty === 2);
+    const bZietA = voorB.concat(naB).some((x) => (x.eventId || x.id) === ev.id && x.codename === codenaam);
+    const bZietEigen = naB.some((x) => (x.eventId || x.id) === ev.id) && gasten.some((x) => x.codename === codenaamB && x.qty === 1);
+    const aZietAlleenEigen = naA.filter((x) => (x.eventId || x.id) === ev.id).length === 1;
+    return {
+      klopt: geen5xx(aanval) && eigenB.status === 200 && !!codenaamB && aBehoudtEigen && !bZietA && bZietEigen && aZietAlleenEigen,
+      ziet: 'vreemd afmelden ' + aanval.status + '; A behoudt eigen=' + aBehoudtEigen +
+        ', B ziet A=' + bZietA + ', B staat eigen=' + bZietEigen + ', A ziet alleen eigen=' + aZietAlleenEigen
+    };
+  });
+
   /* ---------------- herstelbaar ---------------- */
   await stap('herstelbaar', 'afmelden en dubbeltik op opnieuw aanmelden: een keer op de lijst, niet twee', async () => {
     const af = await w.post(AFMELDEN, { supplierCode: zaak.code, eventId: ev.id }, T);

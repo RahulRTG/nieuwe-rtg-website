@@ -129,6 +129,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl rtg-work-flow rtm-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <section class="rtm-voorzijde" id="rtmVoorzijde" aria-label="RTMail rustig werkpostvak">
@@ -161,8 +162,8 @@
         <div class="rtm-draad" id="rtmDraad"><div class="rtm-leeg">Kies bij Mijn aandacht welk gesprek u wilt openen.</div></div>
         </div><aside class="rtm-samenvatting" id="rtmGesprekHulp"><b>In één oogopslag</b><p>De samenvatting blijft herleidbaar tot de oorspronkelijke post.</p></aside>
         <div class="rtm-gesprekacties">
-          <button class="rtm-secundair" type="button" data-rtm-diep="bericht">Open volledige post</button>
-          <button class="rtm-primair" type="button" data-rtm-naar-werk>Maak er werk van &rsaquo;</button>
+          <button class="rtm-secundair" type="button" data-rtm-diep="bericht" data-contextactie>Open volledige post</button>
+          <button class="rtm-primair" type="button" data-rtm-naar-werk data-contextactie>Maak er werk van &rsaquo;</button>
         </div>
       </section>
 
@@ -176,10 +177,10 @@
   </div>
 
   <nav class="rtm-nav" aria-label="RTMail hoofdnavigatie">
-    <button type="button" data-rtm-open="aandacht" aria-current="page"><i aria-hidden="true">&#8962;</i>Aandacht</button>
-    <button type="button" data-rtm-open="gesprek"><i aria-hidden="true">&#9671;</i>Gesprek</button>
-    <button type="button" data-rtm-open="werk"><i aria-hidden="true">&#8644;</i>Naar werk</button>
-    <button type="button" data-rtm-diep="inbox"><i aria-hidden="true">&#8801;</i>Alle post</button>
+    <button type="button" data-rtm-open="aandacht" data-hoofdactie aria-current="page"><i aria-hidden="true">&#8962;</i>Aandacht</button>
+    <button type="button" data-rtm-open="gesprek" data-hoofdactie><i aria-hidden="true">&#9671;</i>Gesprek</button>
+    <button type="button" data-rtm-open="werk" data-hoofdactie><i aria-hidden="true">&#8644;</i>Naar werk</button>
+    <button type="button" data-rtm-diep="inbox" data-hoofdactie><i aria-hidden="true">&#8801;</i>Alle post</button>
   </nav>
 </section>
 <header aria-hidden="true"><div><div class="ey">Je eigen postvak</div><h1>RTMAIL</h1></div>
@@ -304,7 +305,7 @@ async function laadInbox(){
   if(tel.sluimert){ sl.textContent=tel.sluimert+' sluimert'; sl.hidden=false; } else { sl.textContent=''; sl.hidden=true; }
   const balk = '<div id="mapbalkPlek"></div>'+
     '<div class="zoekrij"><input class="vld" id="zoekVeld" placeholder="Zoek in je eigen postvak" maxlength="120" value="'+esc(ZOEK)+'">'+
-    '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+(window.RTGMailInstellingen?'<button class="knp" id="instKnp">Instellingen</button>':'')+'</div>'+
+    '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+(window.RTGMailInstellingen?'<button class="knp" id="instKnp" data-stand="instellingen">Instellingen</button>':'')+'</div>'+
     (ZOEK?'<div class="noot s-1pzsxo3">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
   $('#main').innerHTML = kaart + balk + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
@@ -474,11 +475,11 @@ async function openBericht(m){
        omdat je op een knop drukte. Echt vernietigen loopt via het bewaarbeleid
        en laat een spoor na -- dat hoort niet onder een knop in een postvak. */
     '<div class="acties">'+
-      (volledig.map!=='archief'?'<button class="knp" data-act="archief">Opbergen</button>':'<button class="knp" data-act="in">Terug naar postvak in</button>')+
-      (volledig.map!=='prullenbak'?'<button class="knp" data-act="prullenbak">Weggooien</button>':'')+
-      '<button class="knp" data-act="ster">'+(volledig.favoriet?'Ster eraf':'Ster erop')+'</button>'+
-      '<button class="knp" data-act="sluimer">Sluimeren tot morgen</button>'+
-      '<button class="knp" data-act="draad">Toon het gesprek</button>'+
+      (volledig.map!=='archief'?'<button class="knp" data-act="archief" data-contextactie>Opbergen</button>':'<button class="knp" data-act="in" data-contextactie>Terug naar postvak in</button>')+
+      (volledig.map!=='prullenbak'?'<button class="knp" data-act="prullenbak" data-contextactie>Weggooien</button>':'')+
+      '<button class="knp" data-act="ster" data-contextactie>'+(volledig.favoriet?'Ster eraf':'Ster erop')+'</button>'+
+      '<button class="knp" data-act="sluimer" data-contextactie>Sluimeren tot morgen</button>'+
+      '<button class="knp" data-act="draad" data-stand="gesprek">Toon het gesprek</button>'+
     '</div>'+
     '<div class="fout" id="aFout" hidden></div></div>';
   bindLinks($('#body'));
@@ -507,7 +508,9 @@ async function handel(m, wat){
 /* Het gesprek. Wat er buiten beeld blijft wordt GETELD en genoemd: verzwijgen
    dat een draad meer bevat, misleidt net zo goed als het tonen ervan. */
 async function toonDraad(m){
+  const main=$('#main'); main.setAttribute('aria-busy','true');
   let d; try{ d=await api('draad',{id:m.id}); }catch(e){ return; }
+  finally { main.removeAttribute('aria-busy'); }
   $('#main').innerHTML =
     '<button class="terug" id="terug">← alle berichten</button>'+
     '<div class="kaart"><h2>Gesprek</h2>'+
@@ -518,9 +521,9 @@ async function toonDraad(m){
         '<div class="body">'+veiligBody(b.tekst, !!b.vertrouwd)+'</div></div>'; }).join('')+
     (d.let?'<div class="noot s-2q4tfg">'+esc(d.let)+'</div>':'')+
     '<div class="acties">'+
-      '<button class="knp" data-hulp="samenvatting">Vat dit gesprek samen</button>'+
-      '<button class="knp" data-hulp="acties">Wat wordt er van mij gevraagd?</button>'+
-      '<button class="knp" data-hulp="risico">Is dit te vertrouwen?</button>'+
+      '<button class="knp" data-hulp="samenvatting" data-contextactie>Vat dit gesprek samen</button>'+
+      '<button class="knp" data-hulp="acties" data-contextactie>Wat wordt er van mij gevraagd?</button>'+
+      '<button class="knp" data-hulp="risico" data-contextactie>Is dit te vertrouwen?</button>'+
     '</div><div id="hulpUit"></div></div>';
   $('#main').querySelectorAll('.body').forEach(bindLinks);
   $('#terug').addEventListener('click', laadInbox);
@@ -532,24 +535,28 @@ async function toonDraad(m){
    springen, is een tweede versie van de waarheid. */
 async function hulp(m, wat){
   const uit=$('#hulpUit'); if(!uit) return;
-  uit.innerHTML='<div class="noot s-2q4tfg">Even kijken…</div>';
-  let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ uit.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
-  const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'">'+tekst+'</button>';
+  let vak=uit.querySelector('[data-hulp-uit="'+wat+'"]');
+  if(!vak){ vak=document.createElement('section'); vak.dataset.hulpUit=wat; uit.appendChild(vak); }
+  vak.setAttribute('aria-busy','true');
+  vak.innerHTML='<div class="noot s-2q4tfg">Even kijken…</div>';
+  let d; try{ d=await api('hulp',{id:m.id,wat:wat}); }catch(e){ vak.innerHTML='<div class="fout">'+esc(e.message)+'</div>'; return; }
+  finally { vak.removeAttribute('aria-busy'); }
+  const naar=(id,tekst)=>'<button class="hulprij" data-spring="'+esc(id)+'" data-contextactie>'+tekst+'</button>';
   if(wat==='acties'){
-    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
+    vak.innerHTML='<div class="hulpblok"><b>'+d.aantal+' actiepunt(en)</b>'+
       d.acties.map(a=>naar(a.bericht, esc(a.zin)+(a.datums.length?' <span class="etiket">'+esc(a.datums.join(', '))+'</span>':''))).join('')+
       '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   } else if(wat==='risico'){
-    uit.innerHTML='<div class="hulpblok"><b>'+esc(d.oordeel)+'</b>'+
+    vak.innerHTML='<div class="hulpblok"><b>'+esc(d.oordeel)+'</b>'+
       (d.redenen.length?'<ul class="hulplijst">'+d.redenen.map(r=>'<li'+(r.zwaar?' class="zwaar"':'')+'>'+esc(r.uitleg)+'</li>').join('')+'</ul>':'')+
       '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   } else {
-    uit.innerHTML='<div class="hulpblok"><b>'+d.aantal+' bericht(en), '+esc(d.deelnemers.join(' en '))+'</b>'+
+    vak.innerHTML='<div class="hulpblok"><b>'+d.aantal+' bericht(en), '+esc(d.deelnemers.join(' en '))+'</b>'+
       '<div class="meta">Aan zet: '+esc(d.aanZet)+'</div>'+
       d.punten.map(p=>naar(p.bericht, (p.vanMij?'<span class="etiket">u</span> ':'')+esc(p.zin))).join('')+
       '<div class="noot s-2q4tfg">'+esc(d.let)+'</div></div>';
   }
-  uit.querySelectorAll('[data-spring]').forEach(b=>b.addEventListener('click',()=>{
+  vak.querySelectorAll('[data-spring]').forEach(b=>b.addEventListener('click',()=>{
     const el=$('#b-'+b.dataset.spring);
     if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('aangewezen'); setTimeout(()=>el.classList.remove('aangewezen'),1600); }
   }));

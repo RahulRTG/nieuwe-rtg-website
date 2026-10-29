@@ -20,6 +20,7 @@
    Draai los: node --test test/lidpoort.test.js
    ========================================================================== */
 'use strict';
+const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -247,8 +248,8 @@ test('11. een lid MET een lopende afspraak levert geen bezwaar op', async () => 
     phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
   const aanvraag = (await api('/api/aanmelding/aanvraag',
-    { pas: 'rtg', naam: 'Loopt ' + u, contact: u + '@x.nl' }, reg.token)).body;
-  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+    { idem: randomUUID(), pas: 'rtg', naam: 'Loopt ' + u, contact: u + '@x.nl' }, reg.token)).body;
+  const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   assert.ok(id, 'de aanvraag staat er');
   assert.equal((await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, office)).status, 200);
 
@@ -301,8 +302,8 @@ test('13. over de echte server: contract voorbij -> basislaag, zonder opnieuw in
   const reg = (await api('/api/auth/register', { name: 'Voorbij ' + u, email,
     phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
-  const aanvraag = (await api('/api/aanmelding/aanvraag', { pas: 'rtg', naam: 'Voorbij ' + u, contact: email }, reg.token)).body;
-  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+  const aanvraag = (await api('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'rtg', naam: 'Voorbij ' + u, contact: email }, reg.token)).body;
+  const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   assert.equal((await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, office)).status, 200);
   const nu = await api('/api/mijn/abonnement', {}, reg.token);
   assert.equal(nu.status, 200);
@@ -334,8 +335,8 @@ async function lidMetContract(pas = 'rtg') {
   const reg = (await api('/api/auth/register', { name: 'Bestaand ' + u, email,
     phone: '06' + u.replace(/\D/g, '').padEnd(8, '2').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: pas, pasApp: pas })).body;
-  const aanvraag = (await api('/api/aanmelding/aanvraag', { pas, naam: 'Bestaand ' + u, contact: email }, reg.token)).body;
-  assert.equal((await api('/api/aanmelding/beslis', { id: aanvraag.aanmelding.id, besluit: 'geaccepteerd' }, office)).status, 200);
+  const aanvraag = (await api('/api/aanmelding/aanvraag', { idem: randomUUID(), pas, naam: 'Bestaand ' + u, contact: email }, reg.token)).body;
+  assert.equal((await api('/api/aanmelding/beslis', { id: aanvraag.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, office)).status, 200);
   const login = (await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: pas })).body;
   const eig = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   return { token: login.token, accountId: reg.state.user.id, office, eig, email };

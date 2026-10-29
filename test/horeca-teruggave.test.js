@@ -16,11 +16,24 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startServer, stop } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 let srv, base, MGR, MDW;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-horecateruggave-'));
 
+/* De gast aan tafel heeft een gratis account (eigenaarsbesluit 19 oktober 2026):
+   de QR is een extra sleutel bij de sessie, nooit een vervanging. Een /api/gast-
+   aanroep zonder eigen token reist met dat account mee; een expliciete null is
+   een aanroep zonder account. */
+const gastLeden = new Map();
 async function api(pad, body, token) {
+  if (token === undefined && String(pad).startsWith('/api/gast/')) {
+    if (!gastLeden.has(base)) gastLeden.set(base, await registreerGratis(base));
+    token = (gastLeden.get(base) || {}).token;
+  }
+  return apiKaal(pad, body, token);
+}
+async function apiKaal(pad, body, token) {
   const h = { 'Content-Type': 'application/json' }; if (token) h.Authorization = 'Bearer ' + token;
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
   return { status: r.status, body: await r.json().catch(() => ({})) };

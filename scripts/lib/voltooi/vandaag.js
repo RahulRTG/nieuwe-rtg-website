@@ -14,6 +14,7 @@
    ========================================================================== */
 'use strict';
 const { nieuwLid, inloggen } = require('../voltooiwereld');
+const tijdzone = require('../../../server/kern/tijdzone');
 
 const LIFE = '/api/life';
 const GEWOONTEN = '/api/gewoonten';
@@ -32,8 +33,8 @@ const NOOD_ZET = '/api/noodkaart/zet';
 const NOOD_WEG = '/api/noodkaart/weg';
 
 const geen5xx = (r) => r && r.status > 0 && r.status < 500;
-const vandaag = () => new Date().toISOString().slice(0, 10);
-const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+const vandaag = () => tijdzone.huis().datum;
+const morgen = () => tijdzone.plusDagen(vandaag(), 1);
 
 async function loop(w, stap) {
   const merk = 'vd' + Date.now().toString(36);
@@ -113,6 +114,36 @@ async function loop(w, stap) {
     const g = w.vindInOpslag('Wandelen ' + merk), n = w.vindInOpslag('rustige dag ' + merk), k = w.vindInOpslag('Zus ' + merk);
     return { klopt: g.length >= 1 && n.length >= 1 && k.length >= 1,
       ziet: 'gewoonte in ' + g.map((p) => p.sleutel || p.tabel).join(',') + '; check-in in ' + n.map((p) => p.sleutel || p.tabel).join(',') + '; noodkaart in ' + k.map((p) => p.sleutel || p.tabel).join(',') };
+  });
+
+  /* ---------------- bevoegd ---------------- */
+  await stap('bevoegd', 'een ander lid leest of wijzigt de gewoonte, meting, check-in en noodkaart niet en houdt een eigen dagboek', async () => {
+    const ander = await nieuwLid(w, 'vdg-ander');
+    const B = ander.token;
+    const voorB = await gewoonten(B);
+    const slaapB = await slaap(B);
+    const gemoedB = ((await w.post(GEMOED, {}, B)).data) || {};
+    const kaartB = await kaart(B);
+    const aanvalTik = await w.post(TIK, { id: wandelen.id, op: vandaag() }, B);
+    const aanvalStop = await w.post(STOP, { id: wandelen.id }, B);
+    const eigenB = await w.post(MAAK, { naam: 'Eigen gewoonte ' + merk, waarom: 'eigen dag' }, B);
+    const naA = await gewoonten();
+    const naB = await gewoonten(B);
+    const kaartA = await kaart();
+    const idB = eigenB.data && eigenB.data.gewoonte && eigenB.data.gewoonte.id;
+    const aBehoudtEigen = naA.some((x) => x.id === wandelen.id);
+    const bZietA = voorB.concat(naB).some((x) => x.id === wandelen.id);
+    const bZietEigen = naB.some((x) => x.id === idB);
+    const aZietB = naA.some((x) => x.id === idB);
+    return {
+      klopt: geen5xx(aanvalTik) && geen5xx(aanvalStop) && eigenB.status === 200 &&
+        aBehoudtEigen && !bZietA && bZietEigen && !aZietB && slaapB.vandaag == null &&
+        !gemoedB.vandaagIngevuld && kaartB.bestaat === false && kaartA.kaart.contactNaam === 'Zus ' + merk,
+      ziet: 'vreemd tikken/stoppen ' + aanvalTik.status + '/' + aanvalStop.status +
+        '; A behoudt eigen=' + aBehoudtEigen + ', B ziet A=' + bZietA + ', B houdt eigen=' + bZietEigen +
+        ', A ziet B=' + aZietB + '; B slaap/check-in/noodkaart=' + slaapB.vandaag + '/' +
+        !!gemoedB.vandaagIngevuld + '/' + kaartB.bestaat
+    };
   });
 
   /* ---------------- herstelbaar ---------------- */

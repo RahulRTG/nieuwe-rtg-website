@@ -590,6 +590,8 @@ const EIGEN_MODULE = new Map([
   // beweringen niet (uit #446).
   // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.
   ['a11y-hermeet.e2e.js', ['scripts/a11y-hermeet.js']],
+  ['appwerkt-gegevenspoort.e2e.js', ['public/shared/poortgesprek.js']],
+  ['contrastfoto.e2e.js', ['scripts/a11ykeuring.js']],
   ['csp.e2e.js', ['server/middleware/voordeur.js']],
   // Deze browserproeven laden clientgedrag of toetsen een keuringsmodule;
   // een gewijzigde serverrespons raakt hun beweringen niet.
@@ -602,6 +604,13 @@ const EIGEN_MODULE = new Map([
   ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
   ['team-room-voorzijde.test.js', ['public/apps/personeel.html']],
   ['winkel-voorzijde.test.js', ['public/apps/mall.html']],
+  /* Deze twee bedieningstoetsen lezen hun onderwerp via samengestelde
+     readFileSync-paden. De statische zoeker kan die paden niet volledig
+     afleiden; bind daarom alle werkelijk beoordeelde bronnen expliciet. */
+  ['sitemaker-context.test.js', ['public/apps/sitemaker.html']],
+  ['app-main-bediening.test.js', ['public/apps/app-main/app-main-32a.js',
+    'public/shared/focus.js', 'public/apps/app-main/app-main-09a.js',
+    'public/apps/app-main/app-main-13.js', 'public/apps/app-main/app-main-34b.js']],
   /* De stand van Sport: de toets voert de stukken van het inline-script van
      sport.html uit (heeftTabel, tekenStand, laadStand); de module is de pagina. */
   ['sport-stand-onvolledig.test.js', ['public/apps/sport.html']],
@@ -1419,6 +1428,14 @@ const GEEN_BRONMUTATIE = new Map([
      nulmetingen. Beide mutaties zijn daarna teruggezet. */
   ['website-text-style.test.js', 'tekstcontract; handmutatie AI in de paginatitel laat exact de publieke-webteksttoets zakken; vier toetsen in de nulmeting groen'],
   ['website-codeproof.test.js', 'HTML-contract; handmutatie van een fragmentklasse laat exact de zes-kaartenbewering zakken; drie toetsen in de nulmeting groen'],
+  /* Deze bedieningstoetsen bewaken letterlijke HTML-contracten. De generieke
+     operatoren veranderen geen tekst binnen tekenreeksen: 236 respectievelijk
+     93 geldige bronmutaties overleefden daarom zonder het contract te raken.
+     Op 29 oktober 2026 zijn de relevante contracten afzonderlijk gemuteerd en
+     teruggezet: aria-haspopup="dialog" -> "menu" laat sitemaker-context zakken;
+     de klasse js-asintrek verwijderen laat app-main-bediening zakken. */
+  ['sitemaker-context.test.js', 'letterlijk HTML-contract; 236 generieke mutaties raakten geen tekenreeks, handmutatie dialog -> menu laat de dialoogbewering zakken'],
+  ['app-main-bediening.test.js', 'letterlijke browsercontracten; 93 generieke mutaties raakten geen tekenreeks, handmutatie zonder js-asintrek laat de Assets-bewering zakken'],
   /* DE AFBOUWWET WOONT IN scripts/, EN DAAR KOMT DEZE MOTOR NIET.
 
      Beide toetsen gaan over scripts/lib/afbouw-afloop.js en scripts/afbouw-slot.js.

@@ -23,6 +23,7 @@
 'use strict';
 
 const meter = require('./meter');
+const tijdzone = require('../tijdzone');
 
 /* Onder twee meetbare bronnen geen gezondheidscijfer. Zelfde drempel als de
    kansverkenning, en om dezelfde reden. */
@@ -44,7 +45,7 @@ const GROET = {
 
 module.exports = ({ db, boekingenVanZaak, ordersVanZaak, intakeOntbreekt }) => {
 
-  const maandStart = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString(); };
+  const maandStart = () => { const h = tijdzone.huis(); return tijdzone.middernacht(h.jaar + '-' + String(h.maand).padStart(2, '0') + '-01').toISOString(); };
 
   /* ---- de cijfers ----
      Alleen wat er echt is. `gemeten:false` betekent "hier valt niets te meten",

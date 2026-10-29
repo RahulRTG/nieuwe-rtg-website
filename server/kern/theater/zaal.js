@@ -43,18 +43,26 @@ module.exports = (ctx) => {
   }
 
   /* ---- reacties en melden (op codenaam, begrensd) ---- */
-  function reactie(key, vid, tekst) {
+  /* `idem` (19 oktober 2026): een dubbele tik of een herhaling na een
+     afgebroken verbinding zette de reactie er twee keer (voltooiproef
+     Theater). Dezelfde sleutel van dezelfde codenaam bij deze video is
+     dezelfde reactie; de sleutel gaat niet mee naar de lezer. */
+  function reactie(key, vid, tekst, idem) {
     const v = videoMet(vid); if (!v || !v.klaar) return { status: 404, error: 'Video niet gevonden.' };
     // een interne video bestaat niet voor wie er niet werkt -- ook niet om op te reageren
     if (!zaak.zaakMagVideo(key, v)) return { status: 404, error: 'Video niet gevonden.' };
     tekst = schoon(tekst, 300); if (!tekst) return { status: 400, error: 'Lege reactie.' };
     const R = T.bak('theaterReacties'); const rij = R[vid] = R[vid] || [];
-    const r = { codenaam: codenaamVan(key), tekst, at: nu() };
+    const sleutel = typeof idem === 'string' && idem.trim() ? idem.trim().slice(0, 80) : null;
+    const al = sleutel && rij.find(x => x.codenaam === codenaamVan(key) && x.idem === sleutel);
+    if (al) return { status: 200, ok: true, reactie: { codenaam: al.codenaam, tekst: al.tekst, at: al.at } };
+    const r = { codenaam: codenaamVan(key), tekst, at: nu(), ...(sleutel ? { idem: sleutel } : {}) };
     rij.push(r); if (rij.length > REACTIES_MAX) R[vid] = rij.slice(-REACTIES_MAX);
     save();
-    return { status: 200, ok: true, reactie: r };
+    return { status: 200, ok: true, reactie: { codenaam: r.codenaam, tekst: r.tekst, at: r.at } };
   }
-  const reacties = vid => ({ status: 200, reacties: (T.kijk('theaterReacties')[String(vid || '')] || []).slice(-40) });
+  const reacties = vid => ({ status: 200, reacties: (T.kijk('theaterReacties')[String(vid || '')] || []).slice(-40)
+    .map(x => ({ codenaam: x.codenaam, tekst: x.tekst, at: x.at })) });
   function meld(key, vid, reden) {
     const v = videoMet(vid); if (!v) return { status: 404, error: 'Video niet gevonden.' };
     if (!zaak.zaakMagVideo(key, v)) return { status: 404, error: 'Video niet gevonden.' };

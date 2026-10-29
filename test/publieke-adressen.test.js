@@ -6,6 +6,9 @@ const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
 const { startServer }=require('./helper');
+// de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
+const { GEHEIM, zetKop } = require('./mailpoort');
+zetKop();
 
 let child, base;
 const map=fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-publieke-adressen-'));
@@ -17,7 +20,7 @@ const ruw=(naar,onderwerp) => 'From: afzender@voorbeeld.nl\r\nTo: '+naar+
   '\r\nSubject: '+onderwerp+'\r\nDate: Thu, 20 Aug 2026 10:00:00 +0000\r\n\r\nVeilig ontvangen.';
 
 test.before(async () => {
-  ({ child, base }=await startServer({ env:{ RTG_DATA_DIR:map, SMTP_URL:'',
+  ({ child, base }=await startServer({ env:{ RTG_MAILPOORT_GEHEIM: GEHEIM, RTG_DATA_DIR:map, SMTP_URL:'',
     RTG_MAIL_PUBLIEK_BASIS:'rahultravelgroup.com',
     RTF_MAIL_PUBLIEK_DOMEIN:'rahultravelfoundation.com' } }));
 });

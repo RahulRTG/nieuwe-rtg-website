@@ -1,7 +1,6 @@
-/* Stand Overzicht, deel 3 van 3: registratie, kliks en het beleid-paneel;
-   gesplitst om de 10 KB-maat. Beleid staat ACHTER een kalme knop
-   (uitzonderingsgestuurd, ONTWERP.md); de harde grens van GELD.md par. 3
-   staat in het paneel. */
+/* Stand Overzicht, deel 3 van 3: registratie, kliks en het beleid-paneel.
+   Beleid staat ACHTER een kalme knop (ONTWERP.md); de harde grens van
+   GELD.md par. 3 staat in het paneel. */
 (function (w, d) {
   'use strict';
   var V = w.RTGGeld = w.RTGGeld || { standen: [] };
@@ -15,14 +14,13 @@
 
   /* het laatste beeld; de server blijft de waarheid */
   var C = null, B = null;
-  var ZET = '/api/geld/beleid/zet', POT = '/api/geld/pot/';
+  /* paden voluit: een opgebouwd pad ziet SCHERMROUTES.json niet */
+  var ZET = '/api/geld/beleid/zet';
 
   var SOORT = { minimumbuffer: 'Minimumbuffer', maanddrempel: 'Maanddrempel',
     'reserveer-maandelijks': 'Maandelijks reserveren', 'gift-bevestiging': 'Gift-bevestiging' };
 
-  /* Naar centen via Geld.naarCenten (hulp.js), op EEN plek: het eigen regeltje
-     dat hier stond las "1.000" als een euro en zette een minimumbuffer dus
-     duizend keer te laag, stil, waarna Rahul op die drempel handelde. */
+  /* naar centen op EEN plek (hulp.js): "1.000" is duizend, geen euro */
   function naarCenten(v) { return w.Geld.naarCenten(v); }
 
   function kn(attr, txt) { return '<button class="knop" type="button" ' + attr + '>' + txt + '</button>'; }
@@ -113,25 +111,33 @@
     zet(ZET, body);
   }
 
+  /* EEN sleutel per bedoeling (shared/id.js): een tweede tik maakt geen tweede
+     pot en zet niets nog eens opzij; pas een antwoord sluit de bedoeling af. */
+  var lopend = {};
+  function metSleutel(pad, body, voor) {
+    if (!lopend[pad] || lopend[pad].voor !== voor) lopend[pad] = { voor: voor, idem: w.RTGId('pot') };
+    body.idem = lopend[pad].idem;
+    api(pad, body).then(function () { delete lopend[pad]; ververs(); },
+      function (e) { if (e.status) delete lopend[pad]; meld(e.message); });
+  }
   function potNieuw() {
     var naam = $('#ovPNaam').value.trim(), doel = naarCenten($('#ovPDoel').value);
     if (!naam || doel == null || doel <= 0) return meld('Naam en doel?');
-    zet(POT + 'zet', { naam: naam, doelCenten: doel });
+    metSleutel('/api/geld/pot/zet', { naam: naam, doelCenten: doel }, naam + '|' + doel);
   }
 
   /* vrijgeven is negatief reserveren: een route, een waarheid */
   function potDoe(b) {
     var c = naarCenten((b.parentNode.querySelector('input') || {}).value);
     if (c == null || c <= 0) return meld('Bedrag?');
-    zet(POT + 'reserveer', { id: b.dataset.ovpot, centen: b.dataset.doe === 'vrij' ? -c : c });
+    var centen = b.dataset.doe === 'vrij' ? -c : c;
+    metSleutel('/api/geld/pot/reserveer', { id: b.dataset.ovpot, centen: centen }, b.dataset.ovpot + '|' + centen);
   }
 
   /* gedelegeerd: de vlakken hertekenen, de omhulling gaat mee weg */
   function klik(e) {
-    /* #potten is geen stand maar het beleid-paneel van deze stand. Zonder
-       deze opvang viel de schil terug op de eerste stand en hertekende de
-       knop het overzicht, terwijl het lid dacht een reservering klaar te
-       zetten: een klaargezette handeling met een dode knop. */
+    /* #potten is het beleid-paneel van deze stand, geen stand: zonder deze
+       opvang hertekende de schil het overzicht en was de knop dood. */
     var anker = e.target.closest('[data-ovactie="#potten"]');
     if (anker) {
       e.preventDefault();
@@ -149,7 +155,7 @@
     else if ('ovdicht' in ds) $('#ovWaarom').hidden = true;
     else if (ds.ovregel) schakel(ds.ovregel);
     else if (ds.ovpot) potDoe(b);
-    else if (ds.ovpotweg && w.confirm('Deze pot opheffen?')) zet(POT + 'weg', { id: ds.ovpotweg });
+    else if (ds.ovpotweg && w.confirm('Deze pot opheffen?')) zet('/api/geld/pot/weg', { id: ds.ovpotweg });
   }
 
   function opSubmit(e) {
@@ -190,10 +196,8 @@
     if (w.RTGUitvoer) w.RTGUitvoer.bron(null);
   }
 
-  /* De stijl van dit paneel staat bij die van deel 1 (Deel.ovcss in overzicht-a.js):
-     een stand hoort EEN stijlblad te hebben, niet twee die elkaar in de head
-     verdringen -- en het scheelt hier de ruimte om uit te leggen waarom de
-     dingen staan zoals ze staan. */
+  /* De stijl van dit paneel staat bij die van deel 1 (Deel.ovcss in
+     overzicht-a.js): een stand heeft EEN stijlblad. */
 
   /* ovAlles, niet ovWrap: deel 1 tekent zelf #ovWrap en #ovVooruit in #ovVak */
   V.standen.push({
@@ -202,7 +206,7 @@
     uitleg: 'Hoe u er financieel voor staat en wat er aankomt, uit alle standen tegelijk. Rahul let mee binnen uw regels; werken doet u in de stand zelf.',
     html: '<div id="ovAlles"><div id="ovVak"><p class="stil">Laden...</p></div>' +
       '<div id="ovWaarom" hidden></div><div id="ovTijd"></div>' +
-      '<button class="knop" type="button" id="ovBeleidKnop">Beleid</button>' +
+      '<button class="knop" type="button" id="ovBeleidKnop" data-stand="geld-beleid" data-contextactie>Beleid</button>' +
       '<div id="ovBeleid" hidden></div>' +
       '<div class="kaart"><h2>Vraag Rahul</h2><div id="ovRahulUit" class="stil" hidden aria-live="polite"></div>' +
       '<form id="ovRahulForm"><div class="ov-vraagrij">' +

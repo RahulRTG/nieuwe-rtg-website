@@ -131,13 +131,13 @@ module.exports = (ctx) => {
     const k = bak(s.g);
     const dagNaam = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
     const dagen = [];
-    const start = new Date(); start.setHours(12, 0, 0, 0);
+    const tijdzone = require('../../kern/tijdzone'); // de weekmenu-dagen zijn dagen in het huis
+    const start = tijdzone.datumIn();
     for (let i = 0; i < 7; i++) {
-      const d = new Date(start.getTime() + i * 86400000);
-      const datum = d.toISOString().slice(0, 10);
+      const datum = tijdzone.plusDagen(start, i);
       const m = k.menu[datum] || null;
       dagen.push({
-        datum, dag: dagNaam[d.getDay()], nr: d.getDate(), vandaag: i === 0,
+        datum, dag: dagNaam[tijdzone.weekdagVan(datum)], nr: Number(datum.slice(8)), vandaag: i === 0,
         gerecht: m ? m.gerecht : '', kok: m ? m.kok : '', kokNaam: m ? naamVan(s.g, m.kok) : ''
       });
     }

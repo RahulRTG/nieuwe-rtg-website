@@ -6,7 +6,7 @@
   .ds-sectie {
     display: grid;
     gap: var(--ds-ruimte-3);
-    margin-block-start: var(--ds-ruimte-12);
+    margin-block-start: var(--ds-nadruk-lucht);
     padding-block-start: var(--ds-ruimte-8);
     border-block-start: 1px solid var(--ds-lijnkleur);
   }

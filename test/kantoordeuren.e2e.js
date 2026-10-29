@@ -20,9 +20,10 @@
    2. ER STAAT EEN DEUR, geen leeg scherm en geen JS-fout. Dood is stiller dan
       stuk: een wit scherm ziet eruit als een laadprobleem, niet als een
       gesloten deur.
-   3. DE DEUR VERTELT WAT DEZE APP IS. Niet "geen toegang" maar de app-gids:
-      wat het is en wat je er straks doet. Dat is het verschil tussen een deur
-      en een muur.
+   3. DE DEUR VERTELT WELKE APP DICHT IS. De beveiligde app-gids zelf vereist
+      sinds het accountbesluit van 19 oktober een geldige sessie; een
+      uitgelogde bezoeker krijgt daarom de titel en de eerlijke lokale weg,
+      zonder beveiligde gidsinhoud openbaar te maken.
    4. EN HIJ WIJST DE WEG TERUG. De link naar de personeels-inlog draagt het
       adres van deze app mee, zodat je na het inloggen landt waar je heen wilde.
 
@@ -85,7 +86,7 @@ test('de acht kantoor-apps tonen hun eigen deur en sturen niemand weg',
         return {
           pad: location.pathname,
           deur: !!deur,
-          items: deur ? deur.querySelectorAll('li').length : 0,
+          kop: deur && deur.querySelector('h2') ? deur.querySelector('h2').textContent.trim() : '',
           naar: link ? link.getAttribute('href') : '',
           tekst: document.body.innerText.replace(/\s+/g, ' ')
         };
@@ -95,8 +96,8 @@ test('de acht kantoor-apps tonen hun eigen deur en sturen niemand weg',
       if (r.pad !== pad) { stuk.push(app + ': stuurt weg naar ' + r.pad); continue; }
       // 2. er staat een deur
       if (!r.deur) { stuk.push(app + ': geen deur op het scherm -- ' + r.tekst.slice(0, 120)); continue; }
-      // 3. de deur vertelt wat deze app is (de gids, niet alleen een weigering)
-      if (r.items < 1) stuk.push(app + ': de deur noemt niet wat je hier straks doet');
+      // 3. de deur benoemt de app, maar lekt zonder sessie geen beveiligde gids
+      if (!r.kop) stuk.push(app + ': de deur benoemt de gekozen app niet');
       if (r.tekst.length < 120) stuk.push(app + ': de deur zegt bijna niets (' + r.tekst.length + ' tekens)');
       // 4. en wijst de weg terug, mét het adres van deze app
       if (!r.naar) { stuk.push(app + ': geen weg naar de personeels-inlog'); continue; }

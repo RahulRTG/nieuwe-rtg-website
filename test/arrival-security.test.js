@@ -20,10 +20,13 @@ function omgeving(){
   db.writable=true;
   const bewerkCollectie=require('../server/db/collectie-bewerken')({store:'json',db,save(){}});
   const arrivalpas=require('../server/kern/arrivalpas')({db,bewerkCollectie,crypto});
-  const kern={app,db,crypto,arrivalpas,supplierAuth(req,res,next){next()},accounts:{getStaffById(){return null}},save(){},schoon(v,n){return String(v||'').slice(0,n)},findSupplier(code){return code===supplier.code?supplier:null},notifySupplier(){},sseToSupplier(){},horeca:{H,Hlees,nu(){return new Date().toISOString()}}};
+  /* Een account voor alles (besluit van 19 oktober 2026): de ledeninlog staat
+     voor elke arrivalroute. De namaak-inlog laat een sessie door en geeft
+     zonder sessie een 401, zoals de echte. */
+  const kern={app,db,crypto,arrivalpas,auth(req,res,next){if(!req.session)return res.status(401).json({error:'Log eerst in.'});next()},liveCodename(s){return 'Codenaam '+s.key},supplierAuth(req,res,next){next()},accounts:{getStaffById(){return null}},save(){},schoon(v,n){return String(v||'').slice(0,n)},findSupplier(code){return code===supplier.code?supplier:null},notifySupplier(){},sseToSupplier(){},horeca:{H,Hlees,nu(){return new Date().toISOString()}}};
   require('../server/routes/supplier/horeca/invisible-arrival')(kern);
-  async function roep(p,body,ip='127.0.0.1'){
-    const req={body:body||{},ip,supplier,actor:{name:'Manager'}},antwoord={status:200,body:null};
+  async function roep(p,body,ip='127.0.0.1',lid='user-1'){
+    const req={body:body||{},ip,supplier,actor:{name:'Manager'},session:lid?{key:lid}:undefined},antwoord={status:200,body:null};
     const res={set(){return this},status(code){antwoord.status=code;return this},json(value){antwoord.body=value;return this}};
     const handlers=routes.get(p);assert.ok(handlers,'route ontbreekt: '+p);
     let i=0;
@@ -69,4 +72,16 @@ test('lezen en statusdelen vereisen exact de tijdelijke bezitssleutel',async()=>
   assert.equal((await o.roep('/api/arrival/pass',{pass:token})).status,401,'de aanvraagcode is geen pass');
   const goed=await o.roep('/api/arrival/pulse',{pass:pas,pulse:'onderweg'});
   assert.equal(goed.status,200);assert.equal(goed.body.pass.pulse,'onderweg');
+});
+
+test('een account voor alles: zonder sessie een 401, en een ander lid met dezelfde pass een 404',async()=>{
+  const o=omgeving();
+  for(const p of ['/api/arrival/interpret','/api/arrival/request','/api/arrival/pass','/api/arrival/pulse'])
+    assert.equal((await o.roep(p,aanvraag,'127.0.0.1',null)).status,401,p+' vraagt een sessie');
+  const gemaakt=await o.roep('/api/arrival/request',aanvraag),pas=gemaakt.body.pass.accessToken;
+  assert.equal(o.db.data.reserveringen[0].customerCodename,'Codenaam user-1','de aanvraag hangt aan de codenaam van het lid');
+  assert.equal((await o.roep('/api/arrival/pass',{pass:pas},'127.0.0.1','user-2')).status,404,'een ander lid leest hem niet');
+  assert.equal((await o.roep('/api/arrival/pulse',{pass:pas,pulse:'onderweg'},'127.0.0.1','user-2')).status,404,'en deelt geen status');
+  assert.equal((await o.roep('/api/arrival/request',aanvraag,'127.0.0.1','user-2')).status,409,'de aanvraagcode van een ander geeft geen pass');
+  assert.equal((await o.roep('/api/arrival/pass',{pass:pas})).status,200,'het lid zelf wel');
 });

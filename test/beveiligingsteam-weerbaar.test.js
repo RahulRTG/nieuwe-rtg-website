@@ -59,9 +59,13 @@ const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const { maakBeveiliging, BEVEILIGING_FUNCTIES } = require('../server/kern/beveiliging');
 
-const MORGEN = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-const LATER = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
-const VANDAAG = new Date().toISOString().slice(0, 10);
+// Het testhuis heeft geen eigen zone: productie gebruikt de huiszone.
+// UTC-dagen vallen tussen lokale en UTC-middernacht op gisteren.
+const { datumIn } = require('../server/kern/tijdzone');
+const NU = Date.now();
+const MORGEN = datumIn(new Date(NU + 86400000));
+const LATER = datumIn(new Date(NU + 3 * 86400000));
+const VANDAAG = datumIn(new Date(NU));
 
 function bouw(opties) {
   const o = opties || {};

@@ -10,6 +10,7 @@
 'use strict';
 const { lifestyleLid, KANTOORWERELD } = require('../voltooiwereld');
 const { bewaarblok } = require('../voltooiboek');
+const tijdzone = require('../../../server/kern/tijdzone');
 
 const OVERZICHT = '/api/member/rechterhand/attenties';
 const RELATIE = '/api/member/rechterhand/attenties/relatie';
@@ -18,8 +19,8 @@ const GIFT = '/api/member/rechterhand/attenties/gift';
 const GIFT_WEG = '/api/member/rechterhand/attenties/gift/weg';
 
 /* 'MM-DD' over n dagen, en het bijbehorende jaar-loze getal. */
-const mmdd = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(5, 10);
-const dag = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const dag = (n) => tijdzone.plusDagen(tijdzone.huis().datum, n);
+const mmdd = (n) => dag(n).slice(5, 10);
 
 async function loop(w, stap) {
   const merk = 'at' + Date.now().toString(36);

@@ -52,3 +52,22 @@ test('de volledige Office-suite en versiehistorie blijven bereikbaar', () => {
   assert.match(gedrag, /Rustig overzicht/);
   assert.match(gedrag, /classList\.remove\('rtd-voorzijde-actief'\)/);
 });
+
+test('RTDocs verklaart diepe standen en contextacties aan Edge en replay', () => {
+  const app = lees('public/apps/office/app/app-01b.js');
+  assert.match(html, /data-rtd-diep="lijst" data-stand="documenten"/);
+  for (const id of ['nieuwTekst', 'nieuwBlad', 'nieuwPres', 'nieuwFormulier', 'nieuwSchets', 'nieuwBord', 'inleesXlsx']) {
+    assert.match(html, new RegExp('id="' + id + '"[^>]*data-contextactie'));
+  }
+  assert.match(gedrag, /data-rtd-nieuw data-stand="documenten"/);
+  assert.match(gedrag, /data-rtd-dossier="[^"]+" data-stand="dossier" data-contextactie/);
+  assert.match(dossier, /data-rtd-versies="[^"]+" data-contextactie/);
+  assert.match(dossier, /data-rtd-open="besluit" data-contextactie/);
+  assert.match(besluit, /data-rtd-vraag="[^"]+" data-hoofdactie data-contextactie/);
+  assert.match(besluit, /data-rtd-room="[^"]+" data-hoofdactie data-contextactie/);
+  assert.match(besluit, /data-rtd-open="dossier" data-contextactie/);
+  assert.match(app, /data-sjab="[^"]+" data-contextactie/);
+  assert.match(app, /data-ster="[^"]+"[^>]*data-contextactie/);
+  assert.match(app, /data-weg="[^"]+" data-contextactie/);
+  assert.match(app, /role="button" tabindex="0" aria-label="Open document:/);
+});

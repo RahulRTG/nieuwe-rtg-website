@@ -112,6 +112,7 @@
 <link href="/apps/media/studio-pro.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="media" class="rtg-media-experience" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -140,21 +141,21 @@
   <a class="media-brand" href="/apps/rtg.html" aria-label="RTG LivingOS"><span>RTG</span><b>LivingOS</b><small>Film, video, muziek en live</small></a>
   <div class="media-titel"><span>Vandaag voor u</span><h1>Minder zoeken.<br>Meer beleven.</h1><p>Alles wat u wilt zien en horen, rustig bij elkaar.</p></div>
   <span class="rek"></span>
-  <button class="knop" id="lijstKnop" type="button">Lijsten</button>
-  <button class="knop" id="samenKnop" type="button">Samen</button>
-  <button class="knop" id="biebKnop" type="button">Bibliotheek</button>
-  <button class="knop" id="bordKnop" type="button">Mijn bord</button>
+  <button class="knop" id="lijstKnop" type="button" aria-haspopup="dialog" aria-controls="lade" data-contextactie>Lijsten</button>
+  <button class="knop" id="samenKnop" type="button" aria-haspopup="dialog" aria-controls="lade" data-contextactie>Samen</button>
+  <button class="knop" id="biebKnop" type="button" aria-haspopup="dialog" aria-controls="lade" data-contextactie>Bibliotheek</button>
+  <button class="knop" id="bordKnop" type="button" aria-haspopup="dialog" aria-controls="lade" data-contextactie>Mijn bord</button>
 </header>
 <!-- "Nieuwe productie" stond in deze kopbalk, op y 197 van 844 en achter vier
      andere knoppen. Zie GRAMMATICA.md: de handeling hoort bij de duim. -->
-<div class="rtg-duimbalk"><button class="knop media-nieuw" id="nieuwKnop" type="button" data-hoofdactie>Nieuwe productie</button></div>
+<div class="rtg-duimbalk"><button class="knop media-nieuw" id="nieuwKnop" type="button" data-hoofdactie data-contextactie aria-controls="mediaStudio" aria-expanded="false">Nieuwe productie</button></div>
 
 <nav class="media-ruimtes" aria-label="Media ruimtes">
   <button type="button" data-media-ruimte="wereld" aria-current="true"><span>Vandaag</span><small>voor u gekozen</small></button>
   <button type="button" data-media-ruimte="ontdek"><span>Ontdekken</span><small>makers en werk</small></button>
   <button type="button" id="ruimteBieb"><span>Bibliotheek</span><small>bewaren en verdergaan</small></button>
-  <button type="button" data-media-ruimte="studio"><span>Studio</span><small id="studioStand">nieuwe productie</small></button>
-  <button type="button" data-media-ruimte="rechten"><span>Releases</span><small id="releaseStand">geen besluit nodig</small></button>
+  <button type="button" data-media-ruimte="studio" data-contextactie aria-controls="mediaStudio" aria-expanded="false"><span>Studio</span><small id="studioStand">nieuwe productie</small></button>
+  <button type="button" data-media-ruimte="rechten" aria-controls="mediaRechten" aria-expanded="false"><span>Releases</span><small id="releaseStand">geen besluit nodig</small></button>
   <button type="button" data-media-ruimte="live"><span>Live</span><small>uitzenden en premières</small></button>
 </nav>
 
@@ -212,7 +213,7 @@
       <button class="knop" id="proUndo" type="button" disabled>Ongedaan</button>
       <button class="knop" id="proRedo" type="button" disabled>Opnieuw</button>
       <button class="knop" id="proVergelijk" type="button">Origineel</button>
-      <button class="knop" id="rechtenKnop" type="button">Rechten</button>
+      <button class="knop" id="rechtenKnop" type="button" aria-controls="mediaRechten" aria-expanded="false">Rechten</button>
     </div>
 
     <div class="pro-werkbank">
@@ -324,8 +325,8 @@
   </div>
 </section>
 
-<aside class="media-rechten" id="mediaRechten" hidden aria-labelledby="rechtenTitel">
-  <header><div><span>Rechten en publicatie</span><h2 id="rechtenTitel">Releasecontrole</h2></div><button class="knop" id="rechtenSluit" type="button">Sluiten</button></header>
+<aside class="media-rechten" id="mediaRechten" role="dialog" aria-modal="true" hidden aria-labelledby="rechtenTitel">
+  <header><div><span>Rechten en publicatie</span><h2 id="rechtenTitel">Releasecontrole</h2></div><button class="knop" id="rechtenSluit" type="button" aria-label="Sluit releasecontrole">Sluiten</button></header>
   <p class="stil">Deze tweede ruimte verschijnt alleen wanneer een productie een beslissing nodig heeft.</p>
   <div class="media-besluit"><b>Menselijke goedkeuring vereist</b><p>Controleer makers, herkenbare personen, muziekgebruik, sponsoring en beschikbare markten vóór publicatie.</p><button class="knop vol" type="button">Controle starten</button></div>
   <div class="media-rechten-regel"><b>Makers en medewerkers</b><span>Nog in te vullen</span></div>
@@ -334,7 +335,7 @@
   <div class="media-rechten-regel"><b>Logboek en toegang</b><span>Alleen u</span></div>
 </aside>
 
-<div class="lade" id="lade" role="dialog" aria-label="Details" aria-modal="true">
+<div class="lade" id="lade" role="dialog" aria-label="Details" aria-modal="true" aria-hidden="true">
   <div class="vlak" id="ladeVlak"></div>
 </div>
 

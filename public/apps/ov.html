@@ -13,6 +13,7 @@
 <link href="/ds/rtg-ds.css" rel="stylesheet">
 <script src="/shared/poortgesprek.js"></script>
 <script src="/ds/shell.js"></script>
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <!-- TravelOS op het RTG Design System (TRAVELOS-MIGRATIE.md, batch 4): Taak
      (een reis plannen, inchecken, een kaartje kopen) en Detail (de lopende
@@ -226,8 +227,6 @@
   const post = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-  const api = (pad, body) => post('/api/ov/' + pad, body);
-  const mob = (pad, body) => post('/api/mob/' + pad, body);
   let meldT;
   const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('toon');
     clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('toon'), 3600); };
@@ -290,7 +289,7 @@
      maar ook belofte, rust en beschikbare regie. De server is de bron. ---- */
   let privateMeta = null, privateModi = new Set(['chauffeur']);
   async function laadMoveWereld() {
-    const r = await api('regie'); if (r.status !== 200) return;
+    const r = await post('/api/ov/regie'); if (r.status !== 200) return;
     /* Zonder ervaring of briefing blijft de kop zoals hij in de HTML staat, in plaats van om te vallen (LIEGRONDE.json). */
     if (!(r.body && r.body.ervaring && r.body.briefing)) return;
     const e = r.body.ervaring, hero = $('#moveHero');
@@ -307,7 +306,7 @@
       b.addEventListener('click', () => { privateModi.has(id) ? privateModi.delete(id) : privateModi.add(id); b.setAttribute('aria-pressed', String(privateModi.has(id))); }); bak.appendChild(b); });
   }
   async function laadPrivate() {
-    const r = await api('operaties'); if (r.status !== 200) return; privateMeta = r.body; privateKnoppen();
+    const r = await post('/api/ov/operaties'); if (r.status !== 200) return; privateMeta = r.body; privateKnoppen();
     const lijst = $('#privLijst'); lijst.innerHTML = '';
     const actief = (r.body.operaties || []).find(o => !['geannuleerd', 'afgerond'].includes(o.status));
     if (actief) { $('#moveTitel').textContent = actief.naam; $('#moveBrief').textContent = actief.van + ' → ' + actief.naar + ' · ' + actief.personen + ' personen';
@@ -322,21 +321,21 @@
         const tekst = document.createElement('span'); tekst.textContent = seg.naam + ' · ' + seg.status;
         const acties = document.createElement('span');
         if (o.status !== 'concept' && seg.status === 'voorbereid') { const b = knopje('Vraag aan');
-          b.addEventListener('click', async () => { const z = await api('operatie/segment', { id: o.id, segmentId: seg.id, actie: 'vraag-aan', akkoord: true }); zeg(z.body.error || z.body.melding); if (!z.body.error) laadPrivate(); }); acties.appendChild(b); }
+          b.addEventListener('click', async () => { const z = await post('/api/ov/operatie/segment', { id: o.id, segmentId: seg.id, actie: 'vraag-aan', akkoord: true }); zeg(z.body.error || z.body.melding); if (!z.body.error) laadPrivate(); }); acties.appendChild(b); }
         if (['aangevraagd', 'offerte', 'bevestigd'].includes(seg.status)) { const b = knopje('Annuleer');
-          b.addEventListener('click', async () => { const z = await api('operatie/segment', { id: o.id, segmentId: seg.id, actie: 'annuleer' }); zeg(z.body.error || z.body.melding); if (!z.body.error) laadPrivate(); }); acties.appendChild(b); }
+          b.addEventListener('click', async () => { const z = await post('/api/ov/operatie/segment', { id: o.id, segmentId: seg.id, actie: 'annuleer' }); zeg(z.body.error || z.body.melding); if (!z.body.error) laadPrivate(); }); acties.appendChild(b); }
         regel.append(tekst, acties); k.appendChild(regel); });
       lijst.appendChild(kaart); });
   }
   $('#privMaak').addEventListener('click', async () => {
-    const r = await api('operatie/concept', { van: $('#privVan').value, naar: $('#privNaar').value,
+    const r = await post('/api/ov/operatie/concept', { van: $('#privVan').value, naar: $('#privNaar').value,
       personen: Number($('#privPersonen').value) || 1, modi: [...privateModi], rollen: ['hoofdgast'], reserveplan: true });
     if (r.body.error) return zeg(r.body.error); const u = $('#privUit'); u.innerHTML = '';
     const p = document.createElement('p'); p.className = 'ds-meta';
     p.textContent = r.body.operatie.segmenten.map(x => x.naam).join(' → ') + '. Code ' + r.body.bevestigCode + ' is 10 minuten geldig; nog niets geboekt of betaald.';
     const inp = document.createElement('input'); inp.maxLength = 6; inp.placeholder = 'Bevestigingscode'; inp.setAttribute('aria-label', 'Bevestigingscode'); inp.className = 'ds-invoer';
     const b = document.createElement('button'); b.className = 'ds-knop ds-knop--primair ds-knop--breed'; b.textContent = 'Activeer regie';
-    b.addEventListener('click', async () => { const z = await api('operatie/bevestig', { id: r.body.operatie.id, code: inp.value }); if (z.body.error) return zeg(z.body.error); zeg(z.body.melding); u.innerHTML = ''; laadPrivate(); });
+    b.addEventListener('click', async () => { const z = await post('/api/ov/operatie/bevestig', { id: r.body.operatie.id, code: inp.value }); if (z.body.error) return zeg(z.body.error); zeg(z.body.melding); u.innerHTML = ''; laadPrivate(); });
     u.append(p, inp, b);
   });
 
@@ -350,7 +349,7 @@
   $('#velZoek').addEventListener('input', () => {
     clearTimeout(zoekT);
     zoekT = setTimeout(async () => {
-      const r = await mob('plekken', { bij: hier, zoek: $('#velZoek').value.trim() });
+      const r = await post('/api/mob/plekken', { bij: hier, zoek: $('#velZoek').value.trim() });
       if (r.body.error) return;
       plekken = r.body.plekken || [];
       plekTotaal = r.body.totaal || 0; plekAfgekapt = r.body.afgekapt || 0;
@@ -420,7 +419,7 @@
     const naar = plekUit($('#velNaar').value);
     if (!naar) return zeg('Kies eerst een bestemming.');
     $('#velPlan').disabled = true;
-    const r = await mob('reis/plan', Object.assign({
+    const r = await post('/api/mob/reis/plan', Object.assign({
       van: plekUit($('#velVan').value) || { hier: true }, naar,
       reizigers: Number($('#velReizigers').value) || 1,
       bagage: Number($('#velBagage').value) || 0
@@ -446,7 +445,7 @@
     const code = $('#velZakOrg').value.trim().toUpperCase();
     const kaart = $('#beleidKaart'), uit = $('#beleidUit');
     if (!code) { kaart.hidden = true; return; }
-    const r = await mob('beleid', { werkgever: code });
+    const r = await post('/api/mob/beleid', { werkgever: code });
     kaart.hidden = false;
     if (r.status !== 200) { uit.textContent = r.body.error || 'Dit bedrijf kennen we niet als uw werkgever.'; return; }
     const b = r.body.beleid;
@@ -535,7 +534,7 @@
   async function boekReis(optie, knop) {
     if (!laatstePlan) return;
     knop.disabled = true;
-    const r = await mob('reis/boek', Object.assign({
+    const r = await post('/api/mob/reis/boek', Object.assign({
       van: plekUit($('#velVan').value) || { hier: true },
       naar: plekUit($('#velNaar').value),
       optie, reizigers: Number($('#velReizigers').value) || 1,
@@ -552,7 +551,7 @@
   let lopendRef = null;
 
   async function verversRit() {
-    const [m, reizen] = await Promise.all([mob('mijn'), mob('reis/mijn')]);
+    const [m, reizen] = await Promise.all([post('/api/mob/mijn'), post('/api/mob/reis/mijn')]);
     if (m.status !== 200) { $('#vPoort').hidden = false; return; }
     const lopend = m.body.lopend;
     const reis = (reizen.body.reizen || []).find(x => x.status === 'geboekt');
@@ -614,8 +613,8 @@
 
   $('#lopendAnnuleer').addEventListener('click', async () => {
     const reisId = $('#lopendAnnuleer').dataset.reis;
-    const r = reisId ? await mob('reis/annuleer', { id: reisId })
-      : (lopendRef ? await mob('annuleer', { ref: lopendRef }) : null);
+    const r = reisId ? await post('/api/mob/reis/annuleer', { id: reisId })
+      : (lopendRef ? await post('/api/mob/annuleer', { ref: lopendRef }) : null);
     if (!r) return;
     if (r.body.error) return zeg(r.body.error);
     zeg(r.body.uitleg || r.body.kostenUitleg || 'Geannuleerd.');
@@ -625,7 +624,7 @@
      deelvenster van het toestel. Wij plaatsen zelf niets ergens. */
   $('#lopendDeel').addEventListener('click', async () => {
     if (!lopendRef) return zeg('Deel werkt zodra er een rit onderweg is.');
-    const r = await mob('volg', { ref: lopendRef });
+    const r = await post('/api/mob/volg', { ref: lopendRef });
     if (r.body.error) return zeg(r.body.error);
     const tekst = 'Ik ben onderweg naar ' + r.body.opdracht.naar.label + '. Ritcode ' + r.body.opdracht.ref + '.';
     if (navigator.share) navigator.share({ text: tekst }).catch(() => {});
@@ -647,7 +646,7 @@
   });
 
   async function verversOv() {
-    const r = await api('kaart', hier || {});
+    const r = await post('/api/ov/kaart', hier || {});
     if (r.status !== 200) { $('#vPoort').hidden = false; return; }
     // de actieve rit
     const rit = r.body.rit;
@@ -681,7 +680,7 @@
   $('#knopCode').addEventListener('click', async () => {
     const lijn = nabij[0];
     if (!lijn) return zeg('Er rijdt hier geen lijn; inchecken met een code kan niet.');
-    const r = await api('code', { zaak: lijn.code });
+    const r = await post('/api/ov/code', { zaak: lijn.code });
     if (r.body.error) return zeg(r.body.error);
     $('#codeZaak').textContent = 'Geldig bij ' + lijn.zaak + '. Het personeel scant de code.';
     $('#codeTekst').textContent = r.body.code;
@@ -696,16 +695,16 @@
       $('#codeTijd').textContent = 'Nog ' + Math.floor(over / 60) + ':' + String(over % 60).padStart(2, '0') + ' geldig';
       if (over <= 0) { clearInterval(codeTimer); $('#codeScherm').close(); }
       // ingecheckt door het personeel? Dan sluit het scherm vanzelf
-      if (over % 3 === 0) api('mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').close(); zeg('Ingecheckt. Goede reis.'); verversOv(); } });
+      if (over % 3 === 0) post('/api/ov/mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').close(); zeg('Ingecheckt. Goede reis.'); verversOv(); } });
     }, 1000);
   });
   // sluiten trekt de code op de server in: een foto van het scherm opent daarna niets
-  $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').close(); api('code/intrek'); });
+  $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').close(); post('/api/ov/code/intrek'); });
 
   /* ---- snelle optie 2: een tik op GPS ---- */
   $('#knopGps').addEventListener('click', async () => {
     if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om met een tik in te checken.');
-    const r = await api('hier', hier);
+    const r = await post('/api/ov/hier', hier);
     if (r.body.error) return zeg(r.body.error);
     zeg('Ingecheckt met één tik. Goede reis.');
     verversOv();
@@ -714,7 +713,7 @@
   /* ---- uitchecken ---- */
   $('#uitKnop').addEventListener('click', async () => {
     if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om uit te checken.');
-    const r = await api('uit', { ...hier, idem: RTGIdem('ov') });
+    const r = await post('/api/ov/uit', { ...hier, idem: RTGIdem('ov') });
     if (r.body.error) return zeg(r.body.error);
     zeg('Uitgecheckt: ' + r.body.km + ' km · ' + eur(r.body.prijs) + ' · saldo ' + eur(r.body.saldo) + '.');
     verversOv();
@@ -726,7 +725,7 @@
   async function verversKaart() {
     // de kaartverkoop hangt aan een overeenkomst met de vervoerder; zonder
     // die overeenkomst is er niets te koop, en dan staat de reden er
-    const a = await mob('kaart/aanbod', { vervoerder: 'TRANSIT' });
+    const a = await post('/api/mob/kaart/aanbod', { vervoerder: 'TRANSIT' });
     aanbodLijst = (a.body && a.body.aanbod) || [];
     $('#kaartVorm').hidden = !aanbodLijst.length;
     $('#kaartReden').textContent = aanbodLijst.length
@@ -741,7 +740,7 @@
     });
     vulHaltes();
 
-    const mijn = await mob('kaart/mijn');
+    const mijn = await post('/api/mob/kaart/mijn');
     const lijst = $('#kaartLijst'); lijst.innerHTML = '';
     const kaartjes = (mijn.body && mijn.body.kaartjes) || [];
     if (!kaartjes.length) lijst.innerHTML = '<p class="ds-meta">U heeft nog geen kaartjes.</p>';
@@ -769,7 +768,7 @@
   }
 
   async function toonCode(titel, id) {
-    const r = await mob('kaart/toon', { id });
+    const r = await post('/api/mob/kaart/toon', { id });
     if (r.body.error) return zeg(r.body.error);
     toonQr(titel, r.body.code);
   }
@@ -788,14 +787,14 @@
 
   /* ---- het abonnement ---- */
   async function verversAbo() {
-    const a = await mob('abo/aanbod', { vervoerder: 'TRANSIT' });
+    const a = await post('/api/mob/abo/aanbod', { vervoerder: 'TRANSIT' });
     const aanbod = a.body && a.body.aanbod;
     $('#aboVorm').hidden = !aanbod;
     $('#aboReden').textContent = aanbod ? '' : ((a.body && a.body.reden) || 'Er is hier geen abonnement.');
     if (aanbod) $('#aboUitleg').textContent = 'Onbeperkt reizen op ' + aanbod.lijnen.length +
       ' lijn(en) van ' + aanbod.vervoerderNaam + ' voor ' + eur(aanbod.prijs) + ' per ' + aanbod.dagen + ' dagen.';
 
-    const mijn = await mob('abo/mijn');
+    const mijn = await post('/api/mob/abo/mijn');
     const lijst = $('#aboLijst'); lijst.innerHTML = '';
     for (const ab of ((mijn.body && mijn.body.abonnementen) || []).slice(0, 4)) {
       const d = rij('ov');
@@ -817,7 +816,7 @@
   }
   $('#aboKoop').addEventListener('click', async () => {
     $('#aboKoop').disabled = true;
-    const r = await mob('abo/koop', { vervoerder: 'TRANSIT', idem: RTGIdem('abo') });
+    const r = await post('/api/mob/abo/koop', { vervoerder: 'TRANSIT', idem: RTGIdem('abo') });
     $('#aboKoop').disabled = false;
     if (r.body.error) return zeg(r.body.error);
     zeg('Abonnement genomen tot ' + new Intl.DateTimeFormat(taal(), { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(r.body.abonnement.geldigTot)) + '.');
@@ -845,7 +844,7 @@
     const x = aanbodLijst[Number($('#kaartAanbod').value) || 0];
     if (!x) return zeg('Er is niets te koop.');
     $('#kaartKoop').disabled = true;
-    const r = await mob('kaart/koop', { vervoerder: 'TRANSIT', lijnId: x.lijnId,
+    const r = await post('/api/mob/kaart/koop', { vervoerder: 'TRANSIT', lijnId: x.lijnId,
       product: x.product, van: $('#kaartVan').value, naar: $('#kaartNaar').value, idem: RTGIdem('kaart') });
     $('#kaartKoop').disabled = false;
     if (r.body.error) return zeg(r.body.error);
@@ -857,7 +856,7 @@
   $('#pendelHaal').addEventListener('click', async () => {
     const code = $('#velWerkgever').value.trim().toUpperCase();
     if (!code) return zeg('Vul de code van uw werkgever in.');
-    const r = await mob('pendel', { werkgever: code });
+    const r = await post('/api/mob/pendel', { werkgever: code });
     const uit = $('#pendelLijst'); uit.innerHTML = '';
     if (r.body.error) { uit.innerHTML = '<div class="ds-kaart"><div class="ds-kaart__inhoud"><p class="ds-meta"></p></div></div>'; uit.querySelector('p').textContent = r.body.error; return; }
     if (!(r.body.pendels || []).length) { uit.innerHTML = '<div class="ds-kaart"><div class="ds-kaart__inhoud"><p class="ds-meta">Dit bedrijf heeft geen pendeldienst.</p></div></div>'; return; }
@@ -873,7 +872,7 @@
         l.textContent = v.tijd + ' · ' + (v.vrij ? v.vrij + ' plaatsen vrij' : 'vol, wachtlijst ' + v.wachtlijst);
         const b = knopje(v.mijn ? 'Afzeggen' : 'Reserveer');
         b.addEventListener('click', async () => {
-          const rr = await mob('pendel/reserveer', { werkgever: code, id: p.pendel.id, vertrek: v.vertrek, weg: v.mijn });
+          const rr = await post('/api/mob/pendel/reserveer', { werkgever: code, id: p.pendel.id, vertrek: v.vertrek, weg: v.mijn });
           zeg(rr.body.error || rr.body.uitleg || 'Afgezegd.');
           $('#pendelHaal').click();
         });
@@ -887,7 +886,7 @@
   if (!token) { $('#vPoort').hidden = false; return; }
   laadMoveWereld();
   (async () => {
-    const [a, p] = await Promise.all([mob('aanbod'), mob('plekken', { bij: hier })]);
+    const [a, p] = await Promise.all([post('/api/mob/aanbod'), post('/api/mob/plekken', { bij: hier })]);
     if (a.body.error || p.body.error) { $('#vPoort').hidden = false; return; }
     aanbod = a.body; plekken = p.body.plekken || [];
     plekTotaal = p.body.totaal || 0; plekAfgekapt = p.body.afgekapt || 0;

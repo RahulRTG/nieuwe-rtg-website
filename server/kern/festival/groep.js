@@ -4,7 +4,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { db, save, bewerkCollectie, crypto, schoon } = ctx;
+  const { festivalCollectieLezen, save, bewerkCollectie, crypto, schoon } = ctx;
   const nuIso = () => new Date().toISOString();
   const toegang = require('./groep-toegang')({ crypto, nu: nuIso });
   const MAX_LEDEN = toegang.MAX_LEDEN;
@@ -15,13 +15,6 @@ module.exports = (ctx) => {
     return e.groepen;
   };
   const isLid = (g, codenaam) => (g.leden || []).some(l => l.codenaam === codenaam);
-  const festivals = () => {
-    /* model.js is de eigenaar en initialiseert deze collectie voordat groep.js
-       wordt samengesteld. Hier lezen we die referentie alleen; de mutaties
-       lopen via de collectietransactie hierboven. */
-    return db.data.festivals && typeof db.data.festivals === 'object'
-      ? db.data.festivals : {};
-  };
   const editieIn = (bron, fid, eid) => {
     const f = bron[String(fid || '')];
     return f && f.edities ? f.edities[String(eid || '')] || null : null;
@@ -39,7 +32,7 @@ module.exports = (ctx) => {
       return werk(bron);
     };
     if (typeof bewerkCollectie === 'function') return bewerkCollectie('festivals', doe);
-    const bron = festivals(), voor = JSON.stringify(bron);
+    const bron = festivalCollectieLezen(), voor = JSON.stringify(bron);
     try {
       const antwoord = doe(bron);
       if (antwoord && typeof antwoord.then === 'function')
@@ -185,7 +178,7 @@ module.exports = (ctx) => {
   function groepEditieVanCode(code) {
     const c = schoon(code, 100);
     if (!c) return null;
-    const bron = festivals();
+    const bron = festivalCollectieLezen();
     const treffers = toegang.zoek(bron, c).filter(x => !toegang.reden(x.g))
       .map(x => ({ fid: x.f.id, eid: x.e.id }));
     if (!treffers.length) return null;

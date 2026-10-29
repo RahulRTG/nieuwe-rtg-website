@@ -8,8 +8,11 @@
 const { voegSpoorSamen } = require('./verzoeksporen');
 const { voegKostenSamen } = require('./verzoekmeters');
 const { voegRtgaiSamen } = require('./verzoekrtgai');
+const { mergeSecurity, mergeActiviteit } = require('./verzoekinlog');
 
 function voegBijzonderSamen(sleutel, basis, ons, hun) {
+  if (sleutel === 'securityLog') return mergeSecurity(basis, ons, hun);
+  if (sleutel === 'supplierActivity') return mergeActiviteit(basis, ons, hun);
   if (sleutel === 'kosten') return voegKostenSamen(basis, ons, hun);
   if (sleutel === 'rtgai') return voegRtgaiSamen(basis, ons, hun);
   return voegSpoorSamen(sleutel, basis, ons, hun);

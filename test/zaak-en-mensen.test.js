@@ -84,6 +84,11 @@ test('2. een werkgever kan alleen dichtzetten, nooit openzetten', async () => {
   assert.equal(zet.status, 200);
   const na = (zet.body.beleid.functies || zet.body.beleid.opties || []).find(f => f.id === vrij.id);
   assert.ok(na.dicht || na.uit, 'de functie staat dicht');
+  const tijd = zet.body.beleid.gewijzigd;
+  const herhaald = await api('/api/supplier/werkbeleid/zet', { uit: [vrij.id], door: 'Sal de Mar' }, baas);
+  assert.equal(herhaald.status, 200);
+  assert.equal(herhaald.body.beleid.gewijzigd, tijd,
+    'een identieke transportretry wordt niet als een tweede beleidswijziging opgeslagen');
 
   /* De lijst is de VOLLEDIGE stand, geen los aan/uit. Wat er niet in staat is
      weer vrij voor de medewerker zelf -- dat is de enige manier waarop een

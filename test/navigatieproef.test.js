@@ -143,6 +143,58 @@ test('5a. de zoeklijst is met het toetsenbord te bedienen', () => {
   assert.match(handler, /e\.key === 'ArrowDown'/, 'de pijltjes horen in dezelfde luisteraar te zitten');
 });
 
+test('5b. de handmatige vertrekkeuze verklaart haar herhaalbare vervolgstand', () => {
+  assert.match(scherm, /id="manualStart"[^>]*data-contextactie[^>]*aria-controls="manualPanel"[^>]*aria-expanded="false"/,
+    'de vertrekkeuze hoort haar vervolgstand expliciet te verklaren');
+  assert.match(schermKaal, /manualStart'\)\.setAttribute\('aria-expanded', 'true'\)/,
+    'openen publiceert de actieve vertrekkeuze niet');
+  assert.match(schermKaal, /manualStart'\)\.setAttribute\('aria-expanded', 'false'\)/,
+    'een gekozen vertrekpunt sluit de verklaarde vervolgstand niet');
+});
+
+test('5c. Navigatie publiceert wanneer de eerste bruikbare stand gereed is', () => {
+  assert.match(scherm, /<main class="ds-canvas" id="main" aria-busy="true">/,
+    'de locatie- en kaartfase wordt niet als bezig aangekondigd');
+  assert.match(schermKaal, /const gereed = \(\) => \$\('#main'\)\.setAttribute\('aria-busy', 'false'\)/,
+    'de app kan haar gereedstand niet publiceren');
+  assert.ok((schermKaal.match(/gereed\(\)/g) || []).length >= 4,
+    'niet alle terminale startpaden beëindigen de busy-stand');
+});
+
+test('5d. de locatiekeuze is geen gesloten autorisatiedeur', () => {
+  assert.match(scherm, /id="poort"[^>]*data-poort-soort="toegang"/,
+    'de poort mist haar standaard toegangsbetekenis');
+  assert.match(schermKaal, /dataset\.poortSoort = 'locatie'/,
+    'een ontbrekende plek wordt niet als herstelbare locatiekeuze verklaard');
+  assert.match(schermKaal, /!token[\s\S]{0,100}dataset\.poortSoort = 'toegang'/,
+    'een werkelijk ontbrekende sessie blijft niet als toegangsdeur herkenbaar');
+});
+
+test('5e. een gekozen vertrekpunt blijft bewust wijzigbaar', () => {
+  assert.match(scherm, /id="wijzigVertrek"[^>]*data-contextactie[^>]*aria-controls="manualPanel"[^>]*aria-expanded="false"/,
+    'na één keuze ontbreekt een herhaalbare bediening om het vertrek te wijzigen');
+  assert.match(schermKaal, /manualStart'\)\.addEventListener\('click', openVertrekkeuze\)/);
+  assert.match(schermKaal, /wijzigVertrek'\)\.addEventListener\('click', openVertrekkeuze\)/,
+    'de wijzigknop gebruikt niet dezelfde bestaande vertrekkeuze');
+  assert.match(schermKaal, /wijzigVertrek'\)\.hidden = false/,
+    'de wijzigknop verschijnt niet nadat een vertrekpunt bekend is');
+  assert.match(schermKaal, /className = 'ds-vel__rij';\s*b\.setAttribute\('data-contextactie', ''\)/,
+    'de afzonderlijke vertrekkeuzes zijn niet als acties binnen de actieve locatiecontext verklaard');
+});
+
+test('5f. de locatievraag kan als expliciete context opnieuw worden afgewezen', () => {
+  assert.match(plek, /setAttribute\('aria-modal', 'false'\)/,
+    'de locatievraag mag de zoekfunctie niet inert maken');
+  assert.match(plek, /nee\.setAttribute\('data-contextactie', ''\)/,
+    'Nu niet kan een herhaalde locatiecontext niet voorspelbaar afsluiten');
+});
+
+test('5g. route-uitvoer staat in de zichtbare objectkaart en niet onder de vaste kop', () => {
+  assert.match(scherm, /id="navigatieUitvoer"[^>]*aria-label="Routegegevens meenemen"/);
+  assert.match(schermKaal, /RTGUitvoer\.mount\(document\.getElementById\('navigatieUitvoer'\), document\.body\)/,
+    'Navigatie gebruikt de bestaande uitvoermount niet voor zijn canvasindeling');
+});
+
 test('6. de badge wordt ook bijgewerkt als de kaart faalt', () => {
   /* Dit is het defect uit BETROUWBAARHEID.md par. 6 nr. 1, en het stond er nog:
      kern/navigatie/dekking.js gaf het juiste antwoord, maar het scherm haalde

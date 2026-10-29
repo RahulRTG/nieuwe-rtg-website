@@ -24,6 +24,7 @@
    ingebouwde kennisbank + opdrachtherkenning, zodat het altijd werkt.
 
    maakBoerderij(state) volgt het vaste kern-patroon. */
+const tijdzone = require('./tijdzone');
 
 // De boerderijtypes. kind bepaalt welke modules meetellen (gewas/dier/allebei).
 const BTYPES = {
@@ -102,7 +103,7 @@ function maakBoerderij({ db, save, crypto, findSupplier, anthropic, schoon }) {
   }
 
   function seizoen(d) {
-    const m = (d || new Date()).getMonth() + 1;
+    const m = tijdzone.maandIn(d);
     if ([12, 1, 2].includes(m)) return 'winter';
     if ([3, 4, 5].includes(m)) return 'lente';
     if ([6, 7, 8].includes(m)) return 'zomer';

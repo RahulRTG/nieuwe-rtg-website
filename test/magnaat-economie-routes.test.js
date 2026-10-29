@@ -11,9 +11,9 @@ const { startServer, stop } = require('./helper');
 let server;
 let token;
 
-async function post(pad, body) {
+async function post(pad, body, sessie = token) {
   const headers = { 'Content-Type': 'application/json' };
-  if (token) headers.Authorization = 'Bearer ' + token;
+  if (sessie) headers.Authorization = 'Bearer ' + sessie;
   const response = await fetch(server.base + pad, {
     method: 'POST', headers, body: JSON.stringify(body || {})
   });
@@ -38,12 +38,35 @@ test.after(() => stop(server));
 test('bedrijfsbesluit loopt via HTTP en de duurzame economie-opslag zonder 500', async () => {
   const antwoord = await post('/api/member/magnaat/economie/beslis', {
     prijs: 117, personeelDoel: 21, loonMaand: 3650,
-    trainingDag: 1800, bestelling: 340, impactPct: 1.4
+    trainingDag: 1800, bestelling: 340, impactPct: 1.4,
+    idem: 'route-besluit-1'
   });
   assert.equal(antwoord.status, 200, JSON.stringify(antwoord.body));
   assert.equal(antwoord.body.ok, true);
   assert.equal(antwoord.body.strategie.prijs, 11700);
   assert.equal(antwoord.body.strategie.personeelDoel, 21);
+});
+
+test('bedrijfsbesluit bindt de sleutel aan actor en inhoud en boekt een lening een keer', async () => {
+  const eerste = await post('/api/member/magnaat/economie/beslis', { lening: 1000, idem: 'route-lening-1' });
+  assert.equal(eerste.status, 200, JSON.stringify(eerste.body));
+  assert.equal(eerste.body.herhaald, false);
+  const schuld = eerste.body.strategie.schuld;
+
+  const herhaald = await post('/api/member/magnaat/economie/beslis', { idem: 'route-lening-1', lening: '1000' });
+  assert.equal(herhaald.status, 200, JSON.stringify(herhaald.body));
+  assert.equal(herhaald.body.herhaald, true);
+  assert.equal(herhaald.body.strategie.schuld, schuld);
+
+  const conflict = await post('/api/member/magnaat/economie/beslis', { lening: 1001, idem: 'route-lening-1' });
+  assert.equal(conflict.status, 409, JSON.stringify(conflict.body));
+  assert.equal(conflict.body.error.includes('ander bedrijfsbesluit'), true);
+});
+
+test('bedrijfsbesluit weigert een onbeschermde client', async () => {
+  const antwoord = await post('/api/member/magnaat/economie/beslis', { prijs: 118 });
+  assert.equal(antwoord.status, 400, JSON.stringify(antwoord.body));
+  assert.equal(antwoord.body.error.includes('idempotentiesleutel'), true);
 });
 
 test('economenanalyse loopt via HTTP en de duurzame economie-opslag zonder 500', async () => {
@@ -62,4 +85,20 @@ test('economenanalyse loopt via HTTP en de duurzame economie-opslag zonder 500',
   assert.equal(antwoord.body.ok, true);
   assert.equal(antwoord.body.ingediend.status, 'wacht-op-realisatie');
   assert.equal(antwoord.body.ingediend.hypothese, 'productiviteit');
+});
+
+
+test('een bekende idempotentiesleutel verleent anoniem of als gast geen bevoegdheid', async () => {
+  const pad = '/api/member/magnaat/economie/beslis';
+  const body = {lening: 500, idempotentieSleutel: 'credential-grens-1'};
+  const geldig = await post(pad, body);
+  assert.equal(geldig.status, 200, JSON.stringify(geldig.body));
+  assert.equal((await post(pad, body, null)).status, 401);
+  const gast = await post('/api/login', {tier: 'guest'}, null);
+  assert.equal(gast.status, 200); assert.ok(gast.body.token);
+  assert.equal((await post(pad, body, gast.body.token)).status, 403);
+  const herhaal = await post(pad, body);
+  assert.equal(herhaal.status, 200);
+  assert.equal(herhaal.body.herhaald, true);
+  assert.equal(herhaal.body.strategie.schuld, geldig.body.strategie.schuld);
 });

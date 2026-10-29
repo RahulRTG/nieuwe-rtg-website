@@ -126,10 +126,17 @@ test('c. de logboekroute zelf blijft van de manager, en telt alleen wat hij mag 
 });
 
 test('e. het beveiligingsrooster: inkloktijd voor de manager en de bewaker zelf, de stand voor een collega', async () => {
-  const dag = new Date().toISOString().slice(0, 10);
-  assert.equal((await api(V, '/api/supplier/beveiliging/planauto', { datum: dag }, tokVM)).status, 200);
-  const mijn = (await api(V, '/api/supplier/beveiliging/pda/diensten', {}, tokG0)).body.diensten;
-  const d = mijn.find(x => x.datum === dag) || mijn[0];
+  // De planner kiest de kalenderdag van de zaak. UTC kan na lokale middernacht
+  // nog gisteren zijn; de PDA filtert die terecht uit. Gebruik de bevestigde
+  // plandatum en bewijs juist die dienst, zonder terugval naar een andere dag.
+  const plan = await api(V, '/api/supplier/beveiliging/planauto', {}, tokVM);
+  assert.equal(plan.status, 200, JSON.stringify(plan.body));
+  const dag = plan.body.datum;
+  assert.match(dag, /^\d{4}-\d{2}-\d{2}$/);
+  const antwoord = await api(V, '/api/supplier/beveiliging/pda/diensten', {}, tokG0);
+  assert.equal(antwoord.status, 200, JSON.stringify(antwoord.body));
+  const mijn = antwoord.body.diensten;
+  const d = mijn.find(x => x.datum === dag);
   assert.ok(d, 'de bewaker heeft een dienst');
   const ink = await api(V, '/api/supplier/beveiliging/pda/inklok', { id: d.id }, tokG0);
   assert.equal(ink.status, 200, JSON.stringify(ink.body));

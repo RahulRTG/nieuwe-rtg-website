@@ -2,8 +2,7 @@
 'use strict';
 /* RTG Invisible Arrival op het RTG Design System (TRAVELOS-MIGRATIE.md,
    batch 4). Dezelfde vier aanroepen als ervoor: /api/arrival/interpret,
-   /request, /pass en /pulse. De pass is anoniem (een accessToken, geen
-   account) en staat met zijn vervaltijd in localStorage onder
+   /request, /pass en /pulse. De pass hoort bij het ingelogde account en staat met zijn vervaltijd in localStorage onder
    rtg_arrival_pass; shared/plaatsnadering.js leest die sleutel ook, dus de
    vorm { p, tot } blijft precies zo.
 
@@ -11,7 +10,7 @@
    in de melding van het scherm, met dezelfde tekst; en wat de server
    teruggeeft (zaaknaam, stappen, beloften) gaat als tekst het scherm in en
    nooit als HTML. Datum volgt de taal van het lid via Intl. */
-var P = null, plan = null, R = null;
+var P = null, plan = null, R = null, TOKEN = null;
 var $ = function (x) { return document.getElementById(x); };
 var taal = function () { return document.documentElement.lang || 'nl'; };
 function nieuwToken() {
@@ -28,10 +27,11 @@ function meld(t) {
   clearTimeout(m._t); m._t = setTimeout(function () { m.classList.remove('toon'); }, 3600);
 }
 function api(p, b) {
-  return fetch('/api/arrival/' + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b || {}) })
+  return fetch(p, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(b || {}) })
     .then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
-        if (r.status === 401 || r.status === 410) { P = null; bewaar(null); }
+        if (r.status === 401 && !/Arrival Pass/.test(j.error || '')) { RTGAccountDeur.vergeet(); inlog(); }
+        if (r.status === 401 || r.status === 404 || r.status === 410) { P = null; bewaar(null); }
         if (!r.ok) throw new Error(j.error || 'Dit lukt nu niet.');
         return j;
       });
@@ -62,7 +62,7 @@ function gesprek(wens, herkend) {
 
 $('interpret').addEventListener('click', function () {
   var wens = $('wish').value;
-  api('interpret', { tekst: wens }).then(function (j) {
+  api('/api/arrival/interpret', { tekst: wens }).then(function (j) {
     plan = j.plan;
     $('date').value = plan.datum || ''; $('time').value = plan.tijd || '';
     $('people').value = plan.personen || ''; $('zone').value = plan.zone || 'zaal';
@@ -75,8 +75,8 @@ $('interpret').addEventListener('click', function () {
 
 $('request').addEventListener('click', function () {
   R = R || nieuwToken();
-  api('request', { requestToken: R, supplierCode: $('code').value, datum: $('date').value, tijd: $('time').value,
-    personen: $('people').value, naam: $('name').value, zone: $('zone').value,
+  api('/api/arrival/request', { requestToken: R, supplierCode: $('code').value, datum: $('date').value, tijd: $('time').value,
+    personen: $('people').value, zone: $('zone').value,
     toegankelijk: !!(plan && plan.toegankelijk), allergie: !!(plan && plan.allergie), gelegenheid: plan && plan.gelegenheid })
     .then(function (j) { P = j.pass.accessToken; R = null; teken(j.pass); bewaar(P, j.pass.vervaltAt); })
     .catch(function (e) { meld(e.message); });
@@ -107,15 +107,26 @@ function teken(a) {
 
 document.querySelectorAll('[data-pulse]').forEach(function (b) {
   b.addEventListener('click', function () {
-    api('pulse', { pass: P, pulse: b.dataset.pulse }).then(function (j) { teken(j.pass); })
+    api('/api/arrival/pulse', { pass: P, pulse: b.dataset.pulse }).then(function (j) { teken(j.pass); })
       .catch(function (e) { meld(e.message); });
   });
 });
 
+function verder() {
 try {
   var w = JSON.parse(localStorage.getItem('rtg_arrival_pass') || 'null');
   P = w && w.p && Date.parse(w.tot) > Date.now() ? w.p : null;
   if (!P) bewaar(null);
 } catch (e) { P = null; }
-if (P) api('pass', { pass: P }).then(function (j) { teken(j.pass); }).catch(function () { P = null; });
+if (P) api('/api/arrival/pass', { pass: P }).then(function (j) { teken(j.pass); }).catch(function () { P = null; });
+}
+function inlog() {
+  TOKEN = null;
+  var d = $('deur');
+  if (!d) { d = document.createElement('div'); d.id = 'deur'; $('start').parentNode.insertBefore(d, $('start')); }
+  $('start').hidden = true; $('pass').hidden = true;
+  RTGAccountDeur.eis(d, { waarom: 'Invisible Arrival is er voor wie een RTG-account heeft. Een gratis account is genoeg.' }).then(function (t) { TOKEN = t; $('start').hidden = false; verder(); });
+}
+TOKEN = RTGAccountDeur.token();
+if (TOKEN) verder(); else inlog();
 })();

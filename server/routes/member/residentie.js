@@ -66,7 +66,9 @@ module.exports = (kern) => {
   });
   app.post('/api/residentie/meubel/zet', auth, (req, res) => {
     if (!lid(req, res)) return;
-    stuur(res, res9().meubelZet(req.session.key, naamVan(req), req.body || {}));
+    // de herhaalsleutel hoort bij het meubel; de kern beslist (EIGEN in middleware/idempotentie-eigen.js)
+    const b = req.body || {};
+    stuur(res, res9().meubelZet(req.session.key, naamVan(req), Object.assign({}, b, { idem: b.idem })));
   });
   app.post('/api/residentie/meubel/weg', auth, (req, res) => {
     if (!lid(req, res)) return;

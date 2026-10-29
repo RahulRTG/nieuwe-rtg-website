@@ -33,6 +33,11 @@ test('de rustige voorzijde gebruikt echte Magnaat-bronnen en bewaart geen schijn
   assert.match(html,/RTGMagnaatVoorzijde\.ontvang\(DATA\)/);
 });
 
+test('voorbeeldmissies worden pas bedienbaar wanneer echte Magnaat-data bestaat',()=>{
+  assert.equal((html.match(/data-mv-uitdaging="[0-2]"[^>]*disabled[^>]*aria-busy="true"/g)||[]).length,3);
+  assert.match(js,/b\.hidden=!x;b\.disabled=!x;b\.toggleAttribute\('aria-busy',!BRON\)/);
+});
+
 test('de volledige bestaande wereld blijft bereikbaar en de veiligheidsgrens blijft zichtbaar',()=>{
   for(const scherm of ['werkplek','speelhal','wereld','economie','home'])assert.ok(js.includes("openDiep('"+scherm)||html.includes('data-mv-diep="'+scherm+'"'),scherm);
   assert.match(html,/data-magnaat-voorzijde-open/);
@@ -40,4 +45,40 @@ test('de volledige bestaande wereld blijft bereikbaar en de veiligheidsgrens bli
   assert.match(html,/Persoonsgegevens en productieacties komen nooit in de game/);
   assert.match(html,/sandbox="allow-scripts allow-same-origin"/);
   assert.match(html,/payment 'none'/);
+});
+
+test('ieder Magnaat-navigatiepad en iedere dynamische werkhandeling declareert een bereikbare UI-stand',()=>{
+  for(const attribuut of ['data-mv-diep','data-mv-uitdaging','data-mv-naar','data-mv-nav','data-screen','data-go','data-quick']){
+    const knoppen=[...html.matchAll(new RegExp('<button[^>]*'+attribuut+'[^>]*>','g'))].map(x=>x[0]);
+    assert.ok(knoppen.length>0,attribuut+' ontbreekt');
+    for(const knop of knoppen)assert.match(knop,/data-stand="magnaat-[^"]+"/,knop);
+  }
+  for(const id of ['mvGaVerder','mvVoerKeuzeUit','mvStartVolledig','mvVolgende','capsMeer']){
+    assert.match(html,new RegExp('<button[^>]*id="'+id+'"[^>]*data-stand="magnaat-[^"]+"'));
+  }
+  assert.match(html,/<button[^>]*id="mvStartVolledig"[^>]*data-stand="magnaat-diep"/);
+  assert.doesNotMatch(html,/<button[^>]*id="mvStartVolledig"[^>]*data-hoofdactie/,
+    'de volledige missie start pas nadat de herstelbare resultaatacties zijn bewezen');
+  assert.match(html,/<button[^>]*id="mvGaVerder"[^>]*data-hoofdactie[^>]*data-contextactie/);
+  assert.equal((html.match(/data-mv-uitdaging="[0-2]"[^>]*data-contextactie/g)||[]).length,3);
+  assert.match(js,/doorgaan\.toggleAttribute\('data-hoofdactie',!taak\)/);
+  assert.match(js,/doorgaan\.toggleAttribute\('data-contextactie',!taak\)/);
+  assert.match(html,/<button[^>]*id="mvVolgende"[^>]*data-contextactie/);
+  assert.doesNotMatch(html,/<button[^>]*id="mvVolgende"[^>]*data-hoofdactie/);
+  assert.match(js,/data-mv-keuze="'\+i\+'" data-stand="magnaat-keuze" data-hoofdactie data-contextactie aria-label="Kies aanpak:/);
+  assert.match(html,/data-duty="'\+esc\(x\.functieId\)\+'" data-stand="magnaat-dossier" data-contextactie aria-label="Open dossier/);
+  assert.match(html,/if\(actief\)\{TASK=actief;toast\('Rond eerst het actieve dossier af; uw andere dossiers blijven klaarstaan\.'/);
+  assert.doesNotMatch(html,/\(klaar\|\|geblokkeerd\)\?'disabled'/);
+  assert.match(html,/data-next-duty data-contextactie data-hoofdactie/);
+  assert.match(html,/id="vnHoofd"[^>]*data-stand="magnaat-leven-keuze"[^>]*data-hoofdactie[^>]*data-contextactie/);
+  assert.match(lees('public/apps/magnaat-leven.js'),/data-vn-actie="' \+ \(n \+ 1\) \+ '" data-stand="magnaat-leven-keuze" data-contextactie aria-label="' \+ esc\(a\.label\)/);
+  for(const label of ['Bekijk nieuwe kansen','Zoek spelers','Bestuur de economie','Ontmoet bedrijven','Open lab']){
+    assert.match(html,new RegExp('<button[^>]*data-contextactie[^>]*>'+label+'</button>'));
+  }
+  assert.match(html,/data-start="'\+esc\(c\.id\)\+'" data-stand="magnaat-capability" aria-label="'\+label\+'"/);
+  assert.match(html,/const label='Start '\+esc\(c\.naam\)\+' in '\+esc\(c\.software\.naam\)/);
+  assert.match(html,/document\.addEventListener\('keydown',e=>\{/);
+  assert.match(html,/if\(e\.key!=='Escape'\)return/);
+  for(const laag of ['teamOverlay','partnerOverlay','taskOverlay'])assert.ok(html.includes("sluitLaag('#"+laag+"')"),laag);
+  for(const label of ['Sluit opdracht','Sluit bedrijfstraining','Sluit teamkamer'])assert.match(html,new RegExp('aria-label="'+label+'"'));
 });

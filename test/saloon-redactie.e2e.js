@@ -42,7 +42,8 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await editor.waitForFunction(() => document.querySelector('#a_stand')?.textContent.includes('Werkstand: eindredactie'));
     const lijst = await api('/api/supplier/redactie/artikelen', { status: 'eindredactie' }, zaak.token);
     const id = lijst.lijst[0].id;
-    assert.equal((await api('/api/krant/artikel', { code: 'BODE', id })).status, 404);
+    // de krant lezen vraagt een account (eigenaarsbesluit 19 oktober 2026): de lezer is het lid
+    assert.equal((await api('/api/krant/artikel', { code: 'BODE', id }, lid.token)).status, 404);
     await editor.locator('#a_pub').click(); await lijstKlaar();
     const lees = await context.newPage(); letOpFouten(lees, fouten);
     await lees.goto(srv.base + '/apps/wereld.html?embed=1');
@@ -55,7 +56,7 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await editor.locator('#a_inhoud').fill('Het plein gaat dinsdag open.');
     await editor.locator('#a_bewaar').click();
     await editor.waitForFunction(() => document.querySelector('#a_stand')?.textContent.includes('Werkstand: concept'));
-    assert.equal((await api('/api/krant/artikel', { code: 'BODE', id })).artikel.inhoud, 'Het plein gaat maandag open.');
+    assert.equal((await api('/api/krant/artikel', { code: 'BODE', id }, lid.token)).artikel.inhoud, 'Het plein gaat maandag open.');
     await editor.locator('#a_toelichting').fill('Correctie: de opening is op dinsdag.');
     await editor.locator('#a_pub').click(); await lijstKlaar();
     await lees.locator('[data-ververs]').click();

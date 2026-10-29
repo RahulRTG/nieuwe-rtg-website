@@ -264,6 +264,7 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
   assert.match(kaart.body.uitleg, /geen dossier mee/i);
 
   const l = (await bh('/api/foundation/school/leerling/aanmeld', { naam: 'Iris', geboren: '2016-03-02' })).body;
+  const journaalVoor = await bh('/api/foundation/school/journaal');
   const p = await bh('/api/foundation/school/overdracht/pakket', { leerlingId: l.leerling.id, doel: 'continuiteit', standaard: 'oso' });
   assert.equal(p.status, 200);
   assert.ok(p.body.velden.naam);
@@ -279,6 +280,11 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
   assert.equal(p.body.vorm.waarschuwing, null);
   assert.match(p.body.vorm.bron, /OSO_gegevensset\.xsd/, 'de bron noemt het schema niet');
   assert.match(p.body.uitleg, /niets verstuurd/i, 'het antwoord hoort te zeggen dat er niets de deur uit ging');
+  const nogmaals = await bh('/api/foundation/school/overdracht/pakket', { leerlingId: l.leerling.id, doel: 'continuiteit', standaard: 'oso' });
+  assert.equal(nogmaals.status, 200);
+  const journaalNa = await bh('/api/foundation/school/journaal');
+  assert.equal(journaalNa.body.aantal, journaalVoor.body.aantal + 2,
+    'iedere bewuste dossierpakket-inzage krijgt een eigen journaalregel');
 
   /* `naam` wordt hier nu ook geweigerd, en dat is winst: OSO kent geen element
      naam. Wie het toch stuurt, stuurt iets wat de standaard niet heeft. */

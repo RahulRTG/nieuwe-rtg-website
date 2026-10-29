@@ -24,6 +24,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, kantoorKoppelBody } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosdoel-'));
@@ -86,9 +87,14 @@ async function decor(base) {
   /* Vier uur die de vrijwilliger zelf doorgeeft. Ze staan hier in het decor
      omdat het bestuursscherm ze moet TONEN met een bevestigknop: een melding
      die de coordinator nergens ziet, is hetzelfde als geen melding. */
-  await post('/api/rtfos/portaal/vrijwilliger/uren', { code: vcode, uren: 4, datum: '2026-11-03' });
+  /* De vrijwilliger en de hulpvrager dragen elk hun eigen (gratis) account:
+     hun code koppelt dat account de eerste keer aan hun dossier
+     (eigenaarsbesluit 19 oktober 2026, kern/codekoppel.js). */
+  const vrij = await registreerGratis(base);
+  const hulp = await registreerGratis(base);
+  await post('/api/rtfos/portaal/vrijwilliger/uren', { code: vcode, uren: 4, datum: '2026-11-03' }, vrij.token);
 
-  return { vcode, dcode, stadNaam: stad.naam, token, memberToken: reg.token };
+  return { vcode, dcode, stadNaam: stad.naam, token, memberToken: reg.token, vrijToken: vrij.token, hulpToken: hulp.token };
 }
 
 // de vijf dingen die op geen van de drie schermen mogen staan
@@ -97,7 +103,7 @@ const GEHEIM = ['0644433322', 'saskia@example.org', 'te streng tegen', 'Peter de
 
 function lekken(tekst) { return GEHEIM.filter(g => tekst.includes(g)); }
 
-async function schermMet(base, pw, pad) {
+async function schermMet(base, pw, pad, lidToken) {
   const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
@@ -111,7 +117,7 @@ async function schermMet(base, pw, pad) {
     try { antwoorden.push(await res.text()); } catch (e) { /* afgebroken antwoord */ }
   });
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.evaluate(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
+  await page.evaluate((t) => { localStorage.setItem('rtg_cookieinfo_v1', '1'); if (t) localStorage.setItem('rtg_member_token', t); }, lidToken || '');
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   return { browser, page, fouten, antwoorden, verzoeken };
 }
@@ -122,7 +128,7 @@ test('het vrijwilligersscherm toont zijn planning en nergens zijn nummer of een 
   let s;
   try {
     const d = await decor(srv.base);
-    s = await schermMet(srv.base, pw, '/apps/foundation/os-vrijwilliger.html');
+    s = await schermMet(srv.base, pw, '/apps/foundation/os-vrijwilliger.html', d.vrijToken);
 
     // eerst een code die niet klopt: het scherm hoort te zeggen wat er mis is
     await s.page.fill('#code', 'RTFX-FOUTCODE');
@@ -160,7 +166,21 @@ test('het deelnemersscherm toont de stand in gewone taal en de knop om in te tre
   let s;
   try {
     const d = await decor(srv.base);
-    s = await schermMet(srv.base, pw, '/apps/foundation/os-deelnemer.html');
+    /* Zonder account: de code opent niets, de accountdeur staat in het scherm,
+       en de zin naar de beschermingsdeur staat er voor wie nu in nood is. */
+    const zonder = await schermMet(srv.base, pw, '/apps/foundation/os-deelnemer.html');
+    try {
+      assert.match(await zonder.page.evaluate(() => document.body.innerText), /beschermingsdeur/,
+        'zonder account verwijst het hulpvragerscherm niet naar de beschermingsdeur');
+      assert.equal(await zonder.page.getAttribute('a[href="onveilig.html"]', 'href'), 'onveilig.html');
+      await zonder.page.fill('#code', d.dcode);
+      await zonder.page.click('#open');
+      await zonder.page.getByRole('heading', { name: 'Maak gratis een account', exact: true }).waitFor({ timeout: 15000 });
+      assert.equal(zonder.verzoeken.filter(u => u.includes('/api/rtfos/portaal/deelnemer')).length, 0,
+        'zonder account ging de code toch naar de server');
+    } finally { await zonder.browser.close(); }
+
+    s = await schermMet(srv.base, pw, '/apps/foundation/os-deelnemer.html', d.hulpToken);
 
     await s.page.fill('#code', d.dcode);
     await s.page.click('#open');
@@ -200,7 +220,8 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
   let s;
   try {
     const d = await decor(srv.base);
-    s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere');
+    // de buurt-app vraagt een account (eigenaarsbesluit 19 oktober 2026): een gratis account is genoeg
+    s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere', (await registreerGratis(srv.base)).token);
     await s.page.locator('.wp-domain summary').click();
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
     await s.page.waitForSelector('body[data-rtg-world-dashboard-ready="true"]',

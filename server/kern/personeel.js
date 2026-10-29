@@ -6,6 +6,7 @@
    (geen activiteit, geen melding); alleen de backoffice leest en antwoordt. */
 
 const { maakInplanbaar } = require('./payroll/inplanbaar');
+const tijdzone = require('./tijdzone');
 const SHIFT_NAMES = ['Ochtend 07:00-15:00', 'Avond 15:00-23:00', 'Vrij'];
 
 function maakPersoneel({ db, accounts, afwezigOp }) {
@@ -45,15 +46,14 @@ function maakPersoneel({ db, accounts, afwezigOp }) {
     const sup = db.data.suppliers.find(x => x.code === code);
     const vast = (sup && sup.roosterVast) || {};
     const days = [];
-    const now = new Date();
+    const vandaag = tijdzone.datumIn(null, tijdzone.zaakZoneOfHuis(sup)); // het rooster loopt op de kalender van de zaak
     const dayNames = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
     for (let d = 0; d < 7; d++) {
-      const date = new Date(now.getTime() + d * 86400000);
-      const dstr = date.toISOString().slice(0, 10);
-      const doy = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+      const dstr = tijdzone.plusDagen(vandaag, d);
+      const doy = Math.round((Date.parse(dstr) - Date.UTC(Number(dstr.slice(0, 4)), 0, 0)) / 86400000);
       days.push({
         date: dstr,
-        label: (d === 0 ? 'Vandaag' : d === 1 ? 'Morgen' : dayNames[date.getDay()]),
+        label: (d === 0 ? 'Vandaag' : d === 1 ? 'Morgen' : dayNames[tijdzone.weekdagVan(dstr)]),
         staff: staff.map((m, i) => {
           // managers vaker overdag; iedereen om de paar dagen vrij
           const shift = (vast[dstr] && vast[dstr][m.id]) || SHIFT_NAMES[(m.id * 3 + doy + (m.role === 'manager' ? 0 : i)) % 3];

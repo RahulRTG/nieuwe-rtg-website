@@ -25,7 +25,9 @@ const cadans = require('../server/kern/horeca/cadans');
 const MIN = 60000;
 // een zaak zonder eigen bereidingstijden: de standaarden van keukenlaag.js gelden
 const ZAAK = () => ({ instel: {}, rekeningen: {} });
-const hhmm = (iso) => { const d = new Date(iso); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+// de klok van de zaak (het huis, Europe/Amsterdam), niet die van de container
+const tijdzone = require('../server/kern/tijdzone');
+const hhmm = (iso) => tijdzone.hhmmIn(new Date(iso));
 
 /* Een rekening met een gang eraan. `vrij` is het moment van vrijgeven; de
    standaardtijden zijn grill 12, warm 14, koud 6 (keukenlaag.js). */
@@ -133,7 +135,7 @@ test('een gerecht dat over zijn eigen norm heen loopt, staat in risico', () => {
 
 test('een gang die om 02:15 moet, is niet vijftien uur te laat', () => {
   // vrijgegeven om 23:50; de serveertijd 02:15 hoort bij de nacht erna
-  const avond = new Date(); avond.setHours(23, 50, 0, 0);
+  const avond = tijdzone.moment(tijdzone.datumIn(), 23 * 60 + 50);
   const h = ZAAK();
   h.rekeningen.r1 = rekening([{ naam: 'Bittergarnituur', station: 'frituur' }], avond.getTime(), '02:15');
   const [gang] = cadans.cadansVanRekening(h, h.rekeningen.r1, avond.getTime());

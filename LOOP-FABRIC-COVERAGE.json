@@ -12,8 +12,8 @@
   },
   "measured": {
     "capabilities": 228,
-    "routes": 5527,
-    "mutationContracts": 5398,
+    "routes": 5541,
+    "mutationContracts": 5412,
     "screens": 328
   },
   "classifications": [
@@ -888,6 +888,7 @@
       "server/betaal/naslag.js",
       "server/betaal/providerbewijs.js",
       "server/betaal/stripe-gehost.js",
+      "server/betaal/synthetisch.js",
       "server/betaal/uitbetaalgrendel.js",
       "server/betaal/uitbetaling.js",
       "server/betaal/webhook.js",
@@ -1158,6 +1159,7 @@
       "server/kern/bibliothecaris.js",
       "server/kern/bijles.js",
       "server/kern/boeken.js",
+      "server/kern/boerderij.js",
       "server/kern/borden.js",
       "server/kern/bureau/beveiliging.js",
       "server/kern/bureau/briefing.js",
@@ -1295,6 +1297,7 @@
       "server/kern/concern/verandering.js",
       "server/kern/concern/vestiging.js",
       "server/kern/concern/voorstel.js",
+      "server/kern/connect/horizon.js",
       "server/kern/connect/werkbij.js",
       "server/kern/connection-communication-actions.js",
       "server/kern/connection-communication-call.js",
@@ -2863,6 +2866,7 @@
       "server/routes/gemeente.js",
       "server/routes/gemoed.js",
       "server/routes/gewoonten.js",
+      "server/routes/gids.js",
       "server/routes/home.js",
       "server/routes/ik.js",
       "server/routes/instant-reality.js",
@@ -2928,6 +2932,7 @@
       "server/routes/link.js",
       "server/routes/livinglab/bewoner.js",
       "server/routes/livinglab/index.js",
+      "server/routes/livinglab/openbaar.js",
       "server/routes/livinglab/werk.js",
       "server/routes/loop-fabric.js",
       "server/routes/luchthaven.js",
@@ -3060,6 +3065,7 @@
       "server/routes/rtfkantoor/index.js",
       "server/routes/rtfleerling.js",
       "server/routes/rtfos/bescherming.js",
+      "server/routes/rtfos/doelgroepen.js",
       "server/routes/rtfos/index.js",
       "server/routes/rtfos/netwerk.js",
       "server/routes/rtfos/ruil.js",
@@ -3094,7 +3100,6 @@
       "server/routes/social/leden.js",
       "server/routes/social/naamlaag.js",
       "server/routes/social/pin.js",
-      "server/routes/social/snaps.js",
       "server/routes/spellen.js",
       "server/routes/sportclub.js",
       "server/routes/spraaktekst.js",
@@ -3284,6 +3289,7 @@
       "server/routes/vrijheid/tijd.js",
       "server/routes/wbw.js",
       "server/routes/webbrowser.js",
+      "server/routes/webmaker.js",
       "server/routes/webmerk.js",
       "server/routes/webmeting.js",
       "server/routes/welzijn.js",
@@ -3449,7 +3455,6 @@
       "server/foundation/accountplicht.js",
       "server/foundation/gezinscode.js",
       "server/foundation/gezinseigenaar.js",
-      "server/foundation/gezinshulp.js",
       "server/foundation/gezinsstroom.js",
       "server/foundation/gezinstoken.js",
       "server/foundation/gezondheidstoestemming.js",
@@ -3580,6 +3585,7 @@
       "server/kern/bureau/nu.js",
       "server/kern/cadeaubon.js",
       "server/kern/cadeaukaart-migratie.js",
+      "server/kern/care/zaak.js",
       "server/kern/carriereledger/regels.js",
       "server/kern/clamd.js",
       "server/kern/comm/collega.js",
@@ -3803,7 +3809,6 @@
       "server/kern/levensgraaf/bronnen-leven.js",
       "server/kern/levenslijn/index.js",
       "server/kern/leverancier.js",
-      "server/kern/leverancier/beschermdesoorten.js",
       "server/kern/leverancier/logboekzicht.js",
       "server/kern/library/feedback.js",
       "server/kern/library/loop-source.js",
@@ -3832,7 +3837,9 @@
       "server/kern/livinglab/observatoriumseinen.js",
       "server/kern/livinglab/opslag.js",
       "server/kern/livinglab/publicatie.js",
+      "server/kern/livinglab/spel.js",
       "server/kern/livinglab/studie.js",
+      "server/kern/livinglab/themas.js",
       "server/kern/livinglab/uitleen.js",
       "server/kern/livinglab/uitleenketen.js",
       "server/kern/livinglab/vraagbesluit.js",
@@ -4022,7 +4029,6 @@
       "server/kern/service/router.js",
       "server/kern/sessiestroom.js",
       "server/kern/sociaal.js",
-      "server/kern/sociaal/snaps.js",
       "server/kern/sociaal/vrienden/contact.js",
       "server/kern/sociaal/vrienden/verbinden.js",
       "server/kern/socialecommand/index.js",
@@ -4196,6 +4202,7 @@
       "server/lib/mutatiecontracten-connect2.js",
       "server/lib/mutatiecontracten-connect3.js",
       "server/lib/mutatiecontracten-connection-final.js",
+      "server/lib/mutatiecontracten-democratie-connector.js",
       "server/lib/mutatiecontracten-effect.js",
       "server/lib/mutatiecontracten-effectguard.js",
       "server/lib/mutatiecontracten-geld-b.js",
@@ -4241,6 +4248,7 @@
       "server/middleware/foundation-nog-gesloten.js",
       "server/middleware/foundation-productiepoort.js",
       "server/middleware/functiebeleid.js",
+      "server/middleware/idempotentie-eigen.js",
       "server/middleware/idempotentie.js",
       "server/middleware/isolatiepoort-drager.js",
       "server/middleware/isolatiepoort.js",
@@ -4296,6 +4304,7 @@
       "server/routes/connect.js",
       "server/routes/connection-policy.js",
       "server/routes/democratie/kantoor.js",
+      "server/routes/democratie/partij.js",
       "server/routes/doos-kloon.js",
       "server/routes/doos-wacht.js",
       "server/routes/economie.js",
@@ -4350,6 +4359,7 @@
       "server/routes/member/persoonlijk-care.js",
       "server/routes/member/privacy.js",
       "server/routes/member/rendezvous.js",
+      "server/routes/member/toestellen.js",
       "server/routes/member/tweefactor.js",
       "server/routes/member/vooruit.js",
       "server/routes/mobiliteit/vervoerbewijs.js",
@@ -4363,10 +4373,12 @@
       "server/routes/office/partneraanvragen.js",
       "server/routes/office/partnerpersoneel.js",
       "server/routes/office/partners/kantoorlijsten.js",
+      "server/routes/office/veiligheid.js",
       "server/routes/office/verificaties.js",
       "server/routes/office/voogdij.js",
       "server/routes/office/werk.js",
       "server/routes/overheid-bd.js",
+      "server/routes/pay-tegoed.js",
       "server/routes/pay-terug.js",
       "server/routes/pay.js",
       "server/routes/payroll-os-run.js",
@@ -4398,6 +4410,7 @@
       "server/routes/supplier/beveiliging.js",
       "server/routes/supplier/btw.js",
       "server/routes/supplier/doossleutels.js",
+      "server/routes/supplier/horeca/arrival-toegang.js",
       "server/routes/supplier/horeca/gezelschap.js",
       "server/routes/supplier/horeca/keuken-regie.js",
       "server/routes/supplier/horeca/rahul-doen.js",
@@ -4418,6 +4431,7 @@
       "server/routes/supplier/werving/sollchat.js",
       "server/routes/supplier/werving/sollicitaties.js",
       "server/routes/supplier/werving/talentmatch.js",
+      "server/routes/supplier/werving/uitnodiging-afnemers.js",
       "server/routes/supplier/werving/uitnodiging-na.js",
       "server/routes/supplier/werving/uitnodiging.js",
       "server/routes/techniek/functie.js",
@@ -4517,7 +4531,6 @@
       "server/kern/leren.js",
       "server/kern/leren/schrijven.js",
       "server/kern/levensdossier/velden.js",
-      "server/kern/leverancier/beschermdesoorten.js",
       "server/kern/library/feedback.js",
       "server/kern/library/index.js",
       "server/kern/library/journal.js",
@@ -4702,8 +4715,8 @@
       "server/kern/bestuursroutes.js",
       "server/kern/betaalopdracht/inzending.js",
       "server/kern/betaalopdracht/terugboeking.js",
+      "server/kern/betaalregie.js",
       "server/kern/betaalwaarheid/afhandeling.js",
-      "server/kern/betaalwaarheid/index.js",
       "server/kern/beveiliging/pda/patrouille.js",
       "server/kern/beveiliging/rooster/planning.js",
       "server/kern/bewijsvlak/constitution.js",
@@ -4807,6 +4820,7 @@
       "server/kern/lidacties/afrekenen.js",
       "server/kern/lidboard/index.js",
       "server/kern/lidboard/schakel.js",
+      "server/kern/lidboard/werkbeleid.js",
       "server/kern/living-world/loop-delivery.js",
       "server/kern/loop-fabric/delivery.js",
       "server/kern/magnaat-capabilities.js",
@@ -4878,6 +4892,7 @@
       "server/kern/vrijheid/index.js",
       "server/kern/vrijheid/jaarplan.js",
       "server/kern/vrijheid/rust.js",
+      "server/kern/wallet.js",
       "server/kern/webauthn-acties.js",
       "server/kern/webmaker-versies.js",
       "server/kern/webmaker.js",
@@ -5209,6 +5224,7 @@
       "server/kern/context.js",
       "server/kern/creator.js",
       "server/kern/defensie/index.js",
+      "server/kern/democratie/partijen.js",
       "server/kern/dienstidentiteit.js",
       "server/kern/document-capability.js",
       "server/kern/document-contracten.js",
@@ -5222,7 +5238,6 @@
       "server/kern/factuur.js",
       "server/kern/festival/artiest.js",
       "server/kern/festival/dienst.js",
-      "server/kern/festival/groep.js",
       "server/kern/festival/index.js",
       "server/kern/festival/model.js",
       "server/kern/festival/norm.js",
@@ -5855,7 +5870,6 @@
       "server/routes/supplier/horeca/rahul-doen.js",
       "server/routes/supplier/horeca/rahul.js",
       "server/routes/supplier/kamers/huishouding.js",
-      "server/routes/supplier/kassa/afrekenen.js",
       "server/routes/supplier/ketenchat.js",
       "server/routes/supplier/keuken.js",
       "server/routes/supplier/moedertaal.js",
@@ -5993,6 +6007,7 @@
       "server/db/tx/namen.js",
       "server/db/tx/pgachter.js",
       "server/eigenaar.js",
+      "server/foundation.js",
       "server/foundation/accountplicht.js",
       "server/foundation/basis.js",
       "server/foundation/gasten/gezinsagenda.js",
@@ -6524,6 +6539,7 @@
       "server/kern/livinglab/mensen.js",
       "server/kern/livinglab/observatoriumseinen.js",
       "server/kern/livinglab/plan.js",
+      "server/kern/livinglab/spel.js",
       "server/kern/livinglab/studie.js",
       "server/kern/livinglab/uitleen.js",
       "server/kern/livinglab/uitleenketen.js",
@@ -6536,6 +6552,7 @@
       "server/kern/magnaat-capabilities-routes.js",
       "server/kern/magnaat-capabilities.js",
       "server/kern/magnaat-controle.js",
+      "server/kern/magnaat-economische-motor/besluiten.js",
       "server/kern/magnaat-kantoorregels/tabel-breed.js",
       "server/kern/magnaat-kantoorregels/tabel-hdi.js",
       "server/kern/magnaat-kantoorregels/tabel-lid.js",
@@ -6583,6 +6600,7 @@
       "server/kern/mobiliteit/hiernaam.js",
       "server/kern/mobiliteit/index.js",
       "server/kern/mobiliteit/kaartje-beeld.js",
+      "server/kern/mobiliteit/kaartje.js",
       "server/kern/mobiliteit/keten.js",
       "server/kern/mobiliteit/matching.js",
       "server/kern/mobiliteit/modulecatalogus.js",
@@ -7349,6 +7367,7 @@
       "server/routes/geld.js",
       "server/routes/geldrahul.js",
       "server/routes/gemoed.js",
+      "server/routes/gids.js",
       "server/routes/isolatie.js",
       "server/routes/journaal.js",
       "server/routes/journalistiek.js",
@@ -7363,6 +7382,7 @@
       "server/routes/kantoren/bank-rekeningen.js",
       "server/routes/kantoren/bank-tweedehand.js",
       "server/routes/kantoren/beleidsafdwingen.js",
+      "server/routes/kantoren/betaalproviders.js",
       "server/routes/kantoren/connect.js",
       "server/routes/kantoren/geld.js",
       "server/routes/kantoren/geld/commercie.js",
@@ -7473,6 +7493,7 @@
       "server/routes/rtfos/governance.js",
       "server/routes/rtfos/index.js",
       "server/routes/rtfos/netwerk.js",
+      "server/routes/rtfos/portalen.js",
       "server/routes/rtfos/ruil.js",
       "server/routes/rtfos/uitvoering.js",
       "server/routes/rtfos/voordeur.js",
@@ -7598,6 +7619,7 @@
       "server/routes/veiligheid.js",
       "server/routes/veiligheid/codewoord.js",
       "server/routes/vrijheid/tijd.js",
+      "server/routes/wbw.js",
       "server/routes/webbrowser.js",
       "server/routes/webmaker.js",
       "server/routes/webmeting.js",
@@ -8015,10 +8037,10 @@
       "behaviourEvidence": {
         "routeCount": 472,
         "mutationRoutes": 471,
-        "declaredMutationSemantics": 171,
+        "declaredMutationSemantics": 173,
         "sourceFileCount": 42,
         "kernelDependencyCount": 154,
-        "screenCount": 26,
+        "screenCount": 27,
         "sourceFiles": [
           "server/routes/borden.js",
           "server/routes/democratie/index.js",
@@ -8079,7 +8101,7 @@
           "public/apps/lifestyle.html",
           "public/apps/living-os.html"
         ],
-        "screensOmitted": 14,
+        "screensOmitted": 15,
         "signals": [
           "decision",
           "feedback",
@@ -8176,7 +8198,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 1,
         "kernelDependencyCount": 3,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/social/leden.js"
         ],
@@ -8188,6 +8210,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/media.html"
         ],
         "screensOmitted": 0,
@@ -8261,14 +8284,16 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/social/snaps.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "ai"
@@ -9049,7 +9074,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/service.js"
         ],
@@ -9057,7 +9082,8 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
-          "public/apps/rtg.html"
+          "public/apps/rtg.html",
+          "public/apps/service-bel.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -9343,10 +9369,10 @@
       "behaviourEvidence": {
         "routeCount": 84,
         "mutationRoutes": 84,
-        "declaredMutationSemantics": 34,
+        "declaredMutationSemantics": 35,
         "sourceFileCount": 3,
         "kernelDependencyCount": 0,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/bureau-lus.js",
           "server/routes/member/bureau.js",
@@ -9356,6 +9382,7 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/concierge.html",
           "public/apps/lifestyle.html",
           "public/apps/living-os.html"
         ],
@@ -9789,10 +9816,10 @@
       "behaviourEvidence": {
         "routeCount": 264,
         "mutationRoutes": 263,
-        "declaredMutationSemantics": 107,
+        "declaredMutationSemantics": 108,
         "sourceFileCount": 26,
         "kernelDependencyCount": 80,
-        "screenCount": 28,
+        "screenCount": 29,
         "sourceFiles": [
           "server/routes/baby.js",
           "server/routes/connect.js",
@@ -9840,6 +9867,7 @@
         ],
         "kernelDependenciesOmitted": 56,
         "screens": [
+          "public/apps/app.html",
           "public/apps/connect.html",
           "public/apps/foundation/arena.html",
           "public/apps/foundation/babyboek.html",
@@ -9850,10 +9878,9 @@
           "public/apps/foundation/geld-later.html",
           "public/apps/foundation/geloofbieb.html",
           "public/apps/foundation/gevoel.html",
-          "public/apps/foundation/index.html",
-          "public/apps/foundation/leerpaspoort.html"
+          "public/apps/foundation/index.html"
         ],
-        "screensOmitted": 16,
+        "screensOmitted": 17,
         "signals": [
           "decision",
           "feedback",
@@ -10047,9 +10074,9 @@
         "/api/democratie/partij"
       ],
       "behaviourEvidence": {
-        "routeCount": 6,
-        "mutationRoutes": 6,
-        "declaredMutationSemantics": 6,
+        "routeCount": 7,
+        "mutationRoutes": 7,
+        "declaredMutationSemantics": 7,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
         "screenCount": 0,
@@ -10062,6 +10089,7 @@
         "screens": [],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "version",
           "ai"
         ]
@@ -10075,8 +10103,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
@@ -10147,7 +10179,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
         "kernelDependencyCount": 3,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/afhaalcode.js",
           "server/routes/member/boeken.js",
@@ -10160,7 +10192,9 @@
           "server/kern/util.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10254,7 +10288,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/kopen/tickets.js"
         ],
@@ -10263,7 +10297,9 @@
           "server/kern/lidacties/ritreferentie.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10353,7 +10389,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/voertuigen/huur.js"
         ],
@@ -10362,7 +10398,9 @@
           "server/kern/util.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10455,7 +10493,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/voertuigen/charter.js"
         ],
@@ -10464,7 +10502,9 @@
           "server/kern/util.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -10557,7 +10597,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/handel/vastgoed.js"
         ],
@@ -10566,7 +10606,9 @@
           "server/kern/vastgoed-keyless-toegang.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "feedback",
@@ -10897,14 +10939,16 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/handel/winkel.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "transaction",
@@ -10992,7 +11036,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 2,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/handel/winkel.js",
           "server/routes/supplier/groothandel.js"
@@ -11000,7 +11044,9 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "transaction",
@@ -11631,7 +11677,7 @@
       "behaviourEvidence": {
         "routeCount": 20,
         "mutationRoutes": 20,
-        "declaredMutationSemantics": 9,
+        "declaredMutationSemantics": 10,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
         "screenCount": 4,
@@ -11765,7 +11811,6 @@
         "screensOmitted": 0,
         "signals": [
           "decision",
-          "feedback",
           "booking",
           "transaction",
           "failure",
@@ -11787,9 +11832,7 @@
         "decisions": [
           "SOURCE_EVENT_CANDIDATE"
         ],
-        "claimsContests": [
-          "SOURCE_EVENT_CANDIDATE"
-        ],
+        "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
         ],
@@ -13428,6 +13471,7 @@
         ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "booking",
           "transaction",
           "failure",
@@ -13444,8 +13488,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
@@ -15750,12 +15798,12 @@
         "/api/partner"
       ],
       "behaviourEvidence": {
-        "routeCount": 1027,
-        "mutationRoutes": 1026,
-        "declaredMutationSemantics": 319,
-        "sourceFileCount": 204,
+        "routeCount": 1028,
+        "mutationRoutes": 1027,
+        "declaredMutationSemantics": 326,
+        "sourceFileCount": 205,
         "kernelDependencyCount": 2732,
-        "screenCount": 41,
+        "screenCount": 40,
         "sourceFiles": [
           "server/routes/agenda.js",
           "server/routes/alpine.js",
@@ -15774,7 +15822,7 @@
           "server/routes/kantoorpakket-samen.js",
           "server/routes/kantoorpakket.js"
         ],
-        "sourceFilesOmitted": 188,
+        "sourceFilesOmitted": 189,
         "kernelDependencies": [
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
@@ -15816,7 +15864,7 @@
           "public/apps/horeca-pda.html",
           "public/apps/horeca.html"
         ],
-        "screensOmitted": 29,
+        "screensOmitted": 28,
         "signals": [
           "decision",
           "feedback",
@@ -16218,7 +16266,7 @@
       "behaviourEvidence": {
         "routeCount": 11,
         "mutationRoutes": 11,
-        "declaredMutationSemantics": 0,
+        "declaredMutationSemantics": 1,
         "sourceFileCount": 3,
         "kernelDependencyCount": 1,
         "screenCount": 0,
@@ -16642,7 +16690,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
         "kernelDependencyCount": 2,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/supplier/werving/sollchat.js",
           "server/routes/supplier/werving/sollicitaties.js"
@@ -16653,7 +16701,9 @@
           "server/kern/werk-opslag.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/leverancier.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -16744,9 +16794,9 @@
         "/api/office"
       ],
       "behaviourEvidence": {
-        "routeCount": 687,
-        "mutationRoutes": 667,
-        "declaredMutationSemantics": 392,
+        "routeCount": 692,
+        "mutationRoutes": 672,
+        "declaredMutationSemantics": 403,
         "sourceFileCount": 114,
         "kernelDependencyCount": 157,
         "screenCount": 21,
@@ -17006,7 +17056,7 @@
       "behaviourEvidence": {
         "routeCount": 370,
         "mutationRoutes": 342,
-        "declaredMutationSemantics": 141,
+        "declaredMutationSemantics": 142,
         "sourceFileCount": 84,
         "kernelDependencyCount": 102,
         "screenCount": 26,
@@ -17152,7 +17202,7 @@
       "behaviourEvidence": {
         "routeCount": 217,
         "mutationRoutes": 216,
-        "declaredMutationSemantics": 91,
+        "declaredMutationSemantics": 92,
         "sourceFileCount": 57,
         "kernelDependencyCount": 88,
         "screenCount": 0,
@@ -17542,7 +17592,7 @@
         "declaredMutationSemantics": 23,
         "sourceFileCount": 8,
         "kernelDependencyCount": 41,
-        "screenCount": 2,
+        "screenCount": 4,
         "sourceFiles": [
           "server/opzet/connectwebhook.js",
           "server/opzet/kaartwebhooks.js",
@@ -17582,8 +17632,10 @@
         ],
         "kernelDependenciesOmitted": 17,
         "screens": [
+          "public/apps/app.html",
           "public/apps/geld.html",
-          "public/apps/isolatie.html"
+          "public/apps/isolatie.html",
+          "public/apps/pay.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -18791,7 +18843,7 @@
       "behaviourEvidence": {
         "routeCount": 54,
         "mutationRoutes": 54,
-        "declaredMutationSemantics": 18,
+        "declaredMutationSemantics": 19,
         "sourceFileCount": 4,
         "kernelDependencyCount": 4,
         "screenCount": 0,
@@ -19994,7 +20046,7 @@
         "declaredMutationSemantics": 6,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/persoonlijk-care.js"
         ],
@@ -20004,6 +20056,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/foundation/gezondheid-welzijn.html",
           "public/apps/foundation/zorg.html"
         ],
@@ -20012,7 +20065,8 @@
           "decision",
           "booking",
           "transaction",
-          "failure"
+          "failure",
+          "ai"
         ]
       },
       "classification": "HUMAN_REVIEW_REQUIRED",
@@ -20086,7 +20140,7 @@
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
         "kernelDependencyCount": 13,
-        "screenCount": 4,
+        "screenCount": 5,
         "sourceFiles": [
           "server/routes/agenda.js",
           "server/routes/member/handel/uitjes.js"
@@ -20110,6 +20164,7 @@
         "kernelDependenciesOmitted": 0,
         "screens": [
           "public/apps/agenda.html",
+          "public/apps/app.html",
           "public/apps/isolatie.html",
           "public/apps/living-os.html",
           "public/apps/rtg.html"
@@ -21254,7 +21309,7 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
         "kernelDependencyCount": 25,
-        "screenCount": 9,
+        "screenCount": 10,
         "sourceFiles": [
           "server/routes/member/persoonlijk-concept.js",
           "server/routes/member/persoonlijk-rahul.js",
@@ -21289,6 +21344,7 @@
         ],
         "kernelDependenciesOmitted": 1,
         "screens": [
+          "public/apps/app.html",
           "public/apps/camera.html",
           "public/apps/gemeente.html",
           "public/apps/living-os.html",
@@ -21494,7 +21550,7 @@
       "behaviourEvidence": {
         "routeCount": 84,
         "mutationRoutes": 84,
-        "declaredMutationSemantics": 30,
+        "declaredMutationSemantics": 31,
         "sourceFileCount": 6,
         "kernelDependencyCount": 15,
         "screenCount": 2,
@@ -21824,14 +21880,16 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/voertuigen/verkoop.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking"
@@ -22149,13 +22207,14 @@
         "/api/rtfkantoor"
       ],
       "behaviourEvidence": {
-        "routeCount": 22,
-        "mutationRoutes": 22,
-        "declaredMutationSemantics": 5,
-        "sourceFileCount": 1,
+        "routeCount": 24,
+        "mutationRoutes": 24,
+        "declaredMutationSemantics": 7,
+        "sourceFileCount": 2,
         "kernelDependencyCount": 0,
         "screenCount": 2,
         "sourceFiles": [
+          "server/routes/rtfkantoor/codedeuren.js",
           "server/routes/rtfkantoor/index.js"
         ],
         "sourceFilesOmitted": 0,
@@ -22252,9 +22311,9 @@
         "/api/rtfos"
       ],
       "behaviourEvidence": {
-        "routeCount": 202,
-        "mutationRoutes": 202,
-        "declaredMutationSemantics": 57,
+        "routeCount": 205,
+        "mutationRoutes": 205,
+        "declaredMutationSemantics": 60,
         "sourceFileCount": 9,
         "kernelDependencyCount": 0,
         "screenCount": 14,
@@ -22562,11 +22621,12 @@
         "routeCount": 101,
         "mutationRoutes": 101,
         "declaredMutationSemantics": 17,
-        "sourceFileCount": 4,
+        "sourceFileCount": 5,
         "kernelDependencyCount": 14,
         "screenCount": 3,
         "sourceFiles": [
           "server/routes/livinglab/bewoner.js",
+          "server/routes/livinglab/bewonerpas.js",
           "server/routes/livinglab/index.js",
           "server/routes/livinglab/openbaar.js",
           "server/routes/livinglab/werk.js"
@@ -22691,11 +22751,12 @@
         "routeCount": 17,
         "mutationRoutes": 17,
         "declaredMutationSemantics": 3,
-        "sourceFileCount": 1,
+        "sourceFileCount": 2,
         "kernelDependencyCount": 0,
         "screenCount": 1,
         "sourceFiles": [
-          "server/routes/livinglab/bewoner.js"
+          "server/routes/livinglab/bewoner.js",
+          "server/routes/livinglab/bewonerpas.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
@@ -23825,21 +23886,24 @@
         "/api/asset"
       ],
       "behaviourEvidence": {
-        "routeCount": 7,
-        "mutationRoutes": 7,
-        "declaredMutationSemantics": 1,
+        "routeCount": 9,
+        "mutationRoutes": 9,
+        "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk-assets.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "transaction",
           "ai"
         ]
@@ -23849,8 +23913,12 @@
       "loop": {
         "occurrences": [],
         "observations": [],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [],
         "verification": [],
@@ -24456,7 +24524,7 @@
       "behaviourEvidence": {
         "routeCount": 33,
         "mutationRoutes": 33,
-        "declaredMutationSemantics": 24,
+        "declaredMutationSemantics": 25,
         "sourceFileCount": 2,
         "kernelDependencyCount": 1,
         "screenCount": 3,
@@ -25535,6 +25603,7 @@
         ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "ai"
         ]
       },
@@ -25543,8 +25612,12 @@
       "loop": {
         "occurrences": [],
         "observations": [],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [],
         "verification": [],
@@ -25612,7 +25685,7 @@
         "declaredMutationSemantics": 12,
         "sourceFileCount": 2,
         "kernelDependencyCount": 1,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/pay-tegoed.js",
           "server/routes/pay.js"
@@ -25623,7 +25696,8 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
-          "public/apps/isolatie.html"
+          "public/apps/isolatie.html",
+          "public/apps/pay.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -25712,16 +25786,19 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/pay-tegoed.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/pay.html"
+        ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "failure",
           "ai"
         ]
@@ -25731,8 +25808,12 @@
       "loop": {
         "occurrences": [],
         "observations": [],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [],
         "verification": [],
@@ -26231,7 +26312,7 @@
         "declaredMutationSemantics": 6,
         "sourceFileCount": 6,
         "kernelDependencyCount": 10,
-        "screenCount": 2,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/auth/account.js",
           "server/routes/auth/herstel.js",
@@ -26255,7 +26336,9 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/passkeys.html",
           "public/apps/personeel.html",
+          "public/apps/reisuitnodiging.html",
           "public/apps/rtg.html"
         ],
         "screensOmitted": 0,
@@ -26783,7 +26866,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/link.js"
         ],
@@ -26792,7 +26875,9 @@
           "server/kern/link/wie.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/pay.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -26983,7 +27068,7 @@
       "behaviourEvidence": {
         "routeCount": 15,
         "mutationRoutes": 15,
-        "declaredMutationSemantics": 5,
+        "declaredMutationSemantics": 6,
         "sourceFileCount": 2,
         "kernelDependencyCount": 3,
         "screenCount": 0,
@@ -27085,7 +27170,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
         "kernelDependencyCount": 142,
-        "screenCount": 2,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/ik-workspace-rechten.js",
           "server/routes/ik.js",
@@ -27121,8 +27206,10 @@
         ],
         "kernelDependenciesOmitted": 118,
         "screens": [
+          "public/apps/app.html",
           "public/apps/geld.html",
-          "public/apps/ik.html"
+          "public/apps/ik.html",
+          "public/apps/reizen.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -27454,7 +27541,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 3,
         "kernelDependencyCount": 16,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/assistent.js",
           "server/routes/member/salon.js",
@@ -27481,6 +27568,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/geld.html",
           "public/apps/salon.html"
         ],
@@ -27789,7 +27877,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 25,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk.js"
         ],
@@ -27821,7 +27909,9 @@
           "server/kern/stuur/taakbeeld.js"
         ],
         "kernelDependenciesOmitted": 1,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -28227,7 +28317,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 1,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/gids.js"
         ],
@@ -28235,18 +28325,26 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/hangar.html",
+          "public/apps/reisboek.html",
           "public/apps/rtg.html"
         ],
         "screensOmitted": 0,
-        "signals": []
+        "signals": [
+          "decision"
+        ]
       },
       "classification": "NO_LEARNING_VALUE",
       "classificationReason": "Deze capability is een read model, transport- of presentatielaag en bezit geen semantische leeruitkomst.",
       "loop": {
         "occurrences": [],
         "observations": [],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [],
         "verification": [],
@@ -28299,7 +28397,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
         "kernelDependencyCount": 2,
-        "screenCount": 3,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/member/handel/uitjes.js",
           "server/routes/member/salon.js"
@@ -28311,6 +28409,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/bestellen.html",
           "public/apps/mall.html",
           "public/apps/salon.html"
@@ -28411,7 +28510,7 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
         "kernelDependencyCount": 9,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/boeken.js",
           "server/routes/member/partnerkanaal.js",
@@ -28431,6 +28530,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/hotels.html",
           "public/apps/mall.html"
         ],
@@ -28640,7 +28740,7 @@
         "declaredMutationSemantics": 23,
         "sourceFileCount": 2,
         "kernelDependencyCount": 0,
-        "screenCount": 4,
+        "screenCount": 5,
         "sourceFiles": [
           "server/routes/reis-opgave.js",
           "server/routes/reis.js"
@@ -28652,6 +28752,7 @@
           "public/apps/living-os.html",
           "public/apps/reisboek.html",
           "public/apps/reisbureau.html",
+          "public/apps/reisuitnodiging.html",
           "public/apps/reizen.html"
         ],
         "screensOmitted": 0,
@@ -28743,7 +28844,7 @@
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
         "kernelDependencyCount": 17,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/kopen/tickets.js",
           "server/routes/member/onderweg.js"
@@ -28769,7 +28870,9 @@
           "server/kern/werkvormen.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -28876,7 +28979,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
         "kernelDependencyCount": 3,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/member/handel/uitjes.js",
           "server/routes/member/kopen/tickets.js",
@@ -28891,6 +28994,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/leven.html",
           "public/apps/uitgaan.html"
         ],
@@ -28995,7 +29099,7 @@
         "declaredMutationSemantics": 5,
         "sourceFileCount": 4,
         "kernelDependencyCount": 2,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/handel/winkel.js",
           "server/routes/member/pakket.js",
@@ -29009,6 +29113,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/app.html",
           "public/apps/pakketten.html"
         ],
         "screensOmitted": 0,
@@ -29213,7 +29318,7 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
         "kernelDependencyCount": 47,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/opzet/webhooks.js",
           "server/routes/member/betalen-munt.js"
@@ -29246,7 +29351,9 @@
           "server/kern/kosten/soorten.js"
         ],
         "kernelDependenciesOmitted": 23,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -30172,7 +30279,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 2,
         "kernelDependencyCount": 16,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/kantoren/stad.js",
           "server/routes/stad.js"
@@ -30198,6 +30305,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/stad.html",
           "public/apps/stadsdoos.html"
         ],
         "screensOmitted": 0,
@@ -30299,14 +30407,16 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/boeken.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "booking",
@@ -30399,16 +30509,19 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk-assets.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "transaction",
           "ai"
         ]
@@ -30418,8 +30531,12 @@
       "loop": {
         "occurrences": [],
         "observations": [],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [],
         "verification": [],
@@ -30480,6 +30597,7 @@
         ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "ai"
         ]
       },
@@ -30492,8 +30610,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
@@ -30638,7 +30760,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 25,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk.js"
         ],
@@ -30670,7 +30792,9 @@
           "server/kern/stuur/taakbeeld.js"
         ],
         "kernelDependenciesOmitted": 1,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -30757,7 +30881,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/terplaatse.js",
           "server/routes/voorspel.js"
@@ -30765,7 +30889,9 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "transaction",
@@ -30854,14 +30980,16 @@
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/persoonlijk-spar.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/app.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "ai"
@@ -31151,6 +31279,7 @@
         "screens": [],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "event",
           "ai"
         ]
@@ -31164,8 +31293,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
@@ -31258,7 +31391,6 @@
         "screensOmitted": 0,
         "signals": [
           "decision",
-          "feedback",
           "booking",
           "transaction",
           "failure",
@@ -31282,9 +31414,7 @@
         "decisions": [
           "SOURCE_EVENT_CANDIDATE"
         ],
-        "claimsContests": [
-          "SOURCE_EVENT_CANDIDATE"
-        ],
+        "claimsContests": [],
         "changes": [
           "SOURCE_OWNED_CHANGE_REQUIRED"
         ],
@@ -31391,6 +31521,7 @@
         ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "feedback",
           "transaction",
           "failure",
@@ -31408,8 +31539,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [
           "SOURCE_EVENT_CANDIDATE"
         ],
@@ -31479,7 +31614,7 @@
       "behaviourEvidence": {
         "routeCount": 17,
         "mutationRoutes": 17,
-        "declaredMutationSemantics": 11,
+        "declaredMutationSemantics": 15,
         "sourceFileCount": 1,
         "kernelDependencyCount": 15,
         "screenCount": 2,

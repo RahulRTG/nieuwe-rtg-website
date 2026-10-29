@@ -36,6 +36,8 @@ module.exports = [
     reden: 'de gezinsdeur van het genootschap gebruikt dezelfde gezinsPoort (verifieerProfiel, gasten eruit) als Foundation Connect; een kopie zou een tweede definitie van een gezinslid onder een verklaarde poortnaam zijn' },
   { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
     reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
+  { van: 'ingang:spellen', naar: 'ingang:spelprojectie', soort: 'ORKESTRATIE',
+    reden: 'De spelrouter registreert de bestaande tv-ingangen via een beperkt contract: alleen koppelen, schermstand en foutafhandeling. De schermmodule krijgt geen leden- of gezinsauthenticatie en geen spelmutaties; tokencontrole, no-store en rate limits blijven ongewijzigd.' },
   { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
     reden: 'De ik-route registreert de persoonlijke presentatievoorkeuren als onderdeel van de eigen accountinstellingen; de beeldmodule bewaakt zelf lid- en gezinsprofielauthenticatie en eigendom van privébestanden.' },
   /* DE LEDENGIDS RAAKT DE AANWEZIGHEID AAN (besluit van de eigenaar, 25 september
@@ -210,6 +212,8 @@ module.exports = [
     reden: 'config/productie-media.js gebruikt de S3-runtimeparser om de productieopstelling te keuren; dezelfde configuratieregels horen niet in twee parsers uiteen te lopen' },
   { van: 'motor:middleware', naar: 'motor:config', soort: 'BELEID',
     reden: 'foundation-productiepoort.js handhaaft het ene commitgebonden Foundation-vrijgavebesluit uit config/foundation-vrijgave; de requestpoort mag dat besluit niet opnieuw interpreteren' },
+  { van: 'domein:rtfos', naar: 'domein:codekoppel', soort: 'DOMEINRELATIE',
+    reden: 'rtfos/index.js bouwt de bestaande accountgebonden codekoppeling eenmaal voor afmaak-, doelgroep- en portaalroutes. De koppeling bezit haar opslag via eigencollectie; routes krijgen geen db of save meer. Object- en accountgrenzen worden getoetst in toegang-portalen, toegang-buurt en toegang-partnerkanaal.' },
   { van: 'domein:rtfos', naar: 'domein:codelevenscyclus', soort: 'DOMEINRELATIE',
     reden: 'rtfos/basis.js levert opslag en onderwerpbinding aan de gedeelde lifecycle die hash, verval, gebruikslimiet, rotatie en intrekking van persoonsportaalcodes bezit' },
   { van: 'domein:spellen', naar: 'domein:betaalwaarheid', soort: 'DOMEINRELATIE',

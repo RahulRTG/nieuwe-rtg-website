@@ -262,6 +262,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="mall" class="rtg-stijl rtg-shop-flow rtg-shop-discover rtg-mall-living" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-rtg-edge-2-context="auto" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -293,12 +294,12 @@
     </header>
 
     <nav class="mall-departments" id="mallDepartments" aria-label="Afdelingen">
-      <button type="button" data-department="all" aria-pressed="true">Voor u</button>
-      <button type="button" data-department="software">Software</button>
-      <button type="button" data-department="experience">Experience</button>
-      <button type="button" data-department="hardware">Hardware</button>
-      <button type="button" data-department="home">Huis &amp; leven</button>
-      <button type="button" data-department="services">Diensten</button>
+      <button type="button" data-department="all" data-stand="mall-department" aria-pressed="true">Voor u</button>
+      <button type="button" data-department="software" data-stand="mall-department">Software</button>
+      <button type="button" data-department="experience" data-stand="mall-department">Experience</button>
+      <button type="button" data-department="hardware" data-stand="mall-department">Hardware</button>
+      <button type="button" data-department="home" data-stand="mall-department">Huis &amp; leven</button>
+      <button type="button" data-department="services" data-stand="mall-department">Diensten</button>
     </nav>
 
     <div class="mall-stage" id="mallStage">
@@ -320,9 +321,9 @@
         <div class="mall-stage__worldlinks" id="mallStageWorlds" aria-label="Wereldverbindingen"></div>
         <div class="mall-stage__price" id="mallStagePrice"></div>
         <div class="mall-stage__actions">
-          <button type="button" class="mall-action mall-action--primary" id="mallPrimary">Bekijk</button>
-          <button type="button" class="mall-action" id="mallCompare">Vergelijk</button>
-          <button type="button" class="mall-action" id="mallSave">Bewaar</button>
+          <button type="button" class="mall-action mall-action--primary" id="mallPrimary" data-contextactie>Bekijk</button>
+          <button type="button" class="mall-action" id="mallCompare" data-contextactie>Vergelijk</button>
+          <button type="button" class="mall-action" id="mallSave" data-contextactie>Bewaar</button>
         </div>
       </article>
     </div>
@@ -355,7 +356,7 @@
       <div id="mallCompareItems"></div>
     </section>
 
-    <button type="button" class="mall-complete-trigger" id="mallCompleteTrigger" aria-expanded="false">Open de volledige Mall</button>
+    <button type="button" class="mall-complete-trigger" id="mallCompleteTrigger" aria-expanded="false" aria-controls="vast">Open de volledige Mall</button>
     <p class="mall-live__source" id="mallSourceState">De etalage wordt rechtstreeks opgebouwd uit RTG-bronnen.</p>
   </section>
   <section class="shop-hero" aria-labelledby="shopKop">
@@ -417,17 +418,17 @@
 </div>
 </main>
 
-<section class="blad" id="blad" aria-label="Boutique">
+<section class="blad" id="blad" role="dialog" aria-modal="true" aria-label="Boutique">
   <div class="blad-kop">
-    <button class="terug" id="bladTerug">← Mall</button>
+    <button class="terug" id="bladTerug" aria-label="Sluit boutique">← Mall</button>
     <div><div class="ey s-z2auej" id="bladStad"></div><h1 id="bladNaam" class="s-1ik90f3"></h1></div>
   </div>
   <div class="art" id="bladArt"></div>
 </section>
 
-<section class="blad" id="lezer" aria-label="Reisgids lezen">
+<section class="blad" id="lezer" role="dialog" aria-modal="true" aria-label="Reisgids lezen">
   <div class="blad-kop">
-    <button class="terug" id="lezerTerug">← Bibliotheek</button>
+    <button class="terug" id="lezerTerug" aria-label="Sluit reisgids">← Bibliotheek</button>
     <div><div class="ey s-z2auej" id="lezerMeta"></div><h1 id="lezerTitel" class="s-1ik90f3"></h1></div>
   </div>
   <div id="lezerTekst" class="s-o73w9v"></div>
@@ -618,9 +619,9 @@ async function tekenTreffers(){
         ? 'Niets dat hieraan voldoet. "Nu open" en "Op voorraad" komen uit wat de zaken zelf bijhouden; een zaak zonder vastgelegde openingstijden staat er bewust niet bij.'
         : 'Niets gevonden. Probeer een ander woord, of zet de plek op Overal; er staan '+d.totaalVoorFilter+' dingen in de Mall.')+'</div>';
   $('#trefBlader').innerHTML = d.paginas > 1
-    ? '<button class="knop stil" id="tVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+    ? '<button class="knop stil" id="tVorig" data-stand="mall-search"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
       '<span class="bladtel">pagina '+d.pagina+' van '+d.paginas+'</span>'+
-      '<button class="knop stil" id="tVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+      '<button class="knop stil" id="tVolgend" data-stand="mall-search"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
     : '';
   koppelBewaar($('#treffers'));
   const v = $('#tVorig'), n = $('#tVolgend');
@@ -663,7 +664,7 @@ function tekenBiebKop(){
       '<span class="tag">Vertel wat u zoekt of wilt leren; de bibliothecaris zoekt dwars door de App-, Reis- en RTF-afdeling en raadt echte titels aan.</span>'+
       '<div class="rij knoprij">'+
         '<input class="veld s-1cv8ghr" id="bibVraag" maxlength="300" placeholder="Bijv. ik wil leren fotograferen, of: we gaan naar Londen">'+
-        '<button class="knop" id="bibGo">Vraag advies</button>'+
+        '<button class="knop" id="bibGo" data-contextactie>Vraag advies</button>'+
       '</div>'+
       '<div id="bibUit" class="s-1wi44k7" aria-live="polite"></div>'+
     '</div></div>';
@@ -695,7 +696,7 @@ async function laadRtfbieb(){
       '<select id="rfCat" class="veld s-jv81uh" aria-label="Categorie"><option value="">Alle categorieën</option>'+
         d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('')+'</select>'+
       '<input id="rfZoek" class="veld s-1cv76ip" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
-      '<button class="knop stil" id="rfMijn" type="button">Mijn RTF-apps</button>'+
+      '<button class="knop stil" id="rfMijn" type="button" data-stand="rtf-bibliotheek">Mijn RTF-apps</button>'+
     '</div>'+
     '<div id="rfGrid"></div><div class="rij s-h7lf83" id="rfBlader"></div></div>';
   $('#rfCat').addEventListener('change', () => { RF.categorie = $('#rfCat').value; RF.pagina = 1; RF.mijn = false; tekenRtf(); });
@@ -739,9 +740,9 @@ async function tekenRtf(){
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => rtfKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
-        ? '<button class="knop stil" id="rfVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        ? '<button class="knop stil" id="rfVorig" data-stand="rtf-bibliotheek"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
-          '<button class="knop stil" id="rfVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+          '<button class="knop stil" id="rfVolgend" data-stand="rtf-bibliotheek"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
       const vorig = $('#rfVorig'), volgend = $('#rfVolgend');
       if (vorig) vorig.addEventListener('click', () => { RF.pagina--; tekenRtf(); });
@@ -776,7 +777,7 @@ async function laadAppbieb(){
       '<select id="abCat" class="veld s-jv81uh" aria-label="Categorie"><option value="">Alle categorieën</option>'+
         d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+' ('+c.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
       '<input id="abZoek" class="veld s-1cv76ip" placeholder="Zoek op naam" maxlength="60" aria-label="Zoeken">'+
-      '<button class="knop stil" id="abMijn" type="button">Mijn apps</button>'+
+      '<button class="knop stil" id="abMijn" type="button" data-stand="app-bibliotheek">Mijn apps</button>'+
     '</div>'+
     '<div id="abGrid"></div><div class="rij s-h7lf83" id="abBlader"></div></div>';
   $('#abCat').addEventListener('change', () => { AB.categorie = $('#abCat').value; AB.pagina = 1; AB.mijn = false; tekenApps(); });
@@ -817,9 +818,9 @@ async function tekenApps(){
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => appKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
-        ? '<button class="knop stil" id="abVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        ? '<button class="knop stil" id="abVorig" data-stand="app-bibliotheek"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
-          '<button class="knop stil" id="abVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+          '<button class="knop stil" id="abVolgend" data-stand="app-bibliotheek"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
       const vorig = $('#abVorig'), volgend = $('#abVolgend');
       if (vorig) vorig.addEventListener('click', () => { AB.pagina--; tekenApps(); });
@@ -857,8 +858,8 @@ async function laadAppstore(){
     '<span class="n">Elke app leeft in haar eigen cel · gekeurd door een mens van RTG · jij bepaalt wat ze mogen</span></div>'+
     '<div class="rij as-mb">'+
       '<input id="asZoek" class="veld as-breed" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
-      '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
-      '<button class="knop stil" id="asGesch" type="button" aria-expanded="false">Mijn geschiedenis</button>'+
+      '<button class="knop stil" id="asMijn" type="button" data-stand="app-store">Mijn apps van derden</button>'+
+      '<button class="knop stil" id="asGesch" type="button" aria-expanded="false" aria-controls="asTijd">Mijn geschiedenis</button>'+
       '<a class="knop stil as-link" href="/apps/appstore-dossier.html">Wat geen app kan vragen</a>'+
     '</div><div id="asTijd" hidden class="as-mb"></div>'+
     '<div id="asGrid"></div><div class="rij as-midden" id="asBlader"></div></div>';
@@ -1019,9 +1020,9 @@ async function tekenStore(){
           ? 'Je hebt nog geen apps van derden. Blader hierboven en kies zelf wat je een app geeft.'
           : 'Er staat nog geen app van een derde in de store. Elke app hier is door een mens van RTG bekeken voordat hij verschijnt; zolang er geen doorheen is, blijft dit leeg.')+'</div>';
     if (d && d.paginas > 1) {
-      blader.innerHTML = '<button class="knop stil" id="asVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+      blader.innerHTML = '<button class="knop stil" id="asVorig" data-stand="app-store"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
         '<span class="bladtel">pagina '+d.pagina+' van '+d.paginas+' · '+d.totaal+' apps</span>'+
-        '<button class="knop stil" id="asVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>';
+        '<button class="knop stil" id="asVolgend" data-stand="app-store"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>';
       const v = $('#asVorig'), n = $('#asVolgend');
       if (v) v.addEventListener('click', () => { AS.pagina--; tekenStore(); });
       if (n) n.addEventListener('click', () => { AS.pagina++; tekenStore(); });
@@ -1242,7 +1243,7 @@ async function laadReisbieb(){
       '<select id="rbRegio" class="veld s-jv6rvf" aria-label="Werelddeel"><option value="">Alle werelddelen</option>'+
         d.regios.map(r => '<option value="'+esc(r.id)+'">'+esc(r.label)+' ('+r.aantal+')</option>').join('')+'</select>'+
       '<input id="rbZoek" class="veld s-1cv76ip" placeholder="Zoek een bestemming of een woord uit de gids" maxlength="60" aria-label="Zoeken">'+
-      '<button class="knop stil" id="rbMijn" type="button">Mijn reisgidsen</button>'+
+      '<button class="knop stil" id="rbMijn" type="button" data-stand="reis-bibliotheek">Mijn reisgidsen</button>'+
     '</div>'+
     '<div id="rbGrid"></div><div class="rij s-h7lf83" id="rbBlader"></div></div>';
   $('#rbBestemming').addEventListener('change', () => { RB.bestemming = $('#rbBestemming').value; RB.pagina = 1; RB.mijn = false; tekenReis(); });
@@ -1259,7 +1260,7 @@ function reisKaart(a, geinstalleerd){
     '<div class="rij s-1wxyff2">'+
       '<b class="s-19ic06h">Inbegrepen</b>'+
       '<span class="s-1dzu8ds"></span>'+
-      '<button class="knop stil rblees" data-id="'+esc(a.id)+'">Lezen</button>'+
+      '<button class="knop stil rblees" data-id="'+esc(a.id)+'" data-open="reisgids" aria-controls="lezer">Lezen</button>'+
       (geinstalleerd
         ? '<button class="knop stil rbweg" data-id="'+esc(a.id)+'">Verwijder</button>'
         : '<button class="knop rbin" data-id="'+esc(a.id)+'">In mijn kast</button>')+
@@ -1294,9 +1295,9 @@ async function tekenReis(){
       grid.innerHTML = d.items.length ? '<div class="boutieks">'+d.items.map(a => reisKaart(a, mijnIds.includes(a.id))).join('')+'</div>'
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
-        ? '<button class="knop stil" id="rbVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        ? '<button class="knop stil" id="rbVorig" data-stand="reis-bibliotheek"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
           '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' gidsen</span>'+
-          '<button class="knop stil" id="rbVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+          '<button class="knop stil" id="rbVolgend" data-stand="reis-bibliotheek"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
       const vorig = $('#rbVorig'), volgend = $('#rbVolgend');
       if (vorig) vorig.addEventListener('click', () => { RB.pagina--; tekenReis(); });
@@ -1500,7 +1501,8 @@ function vraagOfferte(code){
   const z = DZAKEN[code]; if (!z) return;
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
-  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="ofTerug">← Terug</button>'+
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', 'Offerte aanvragen');
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="ofTerug" aria-label="Sluit offerte">← Terug</button>'+
     '<div><div class="ey s-z2auej">'+esc(z.naam)+'</div><h1 class="s-1ik90f3">Offerte aanvragen</h1></div></div>'+
     '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties" for="ofTekst">Omschrijf de klus</label>'+
@@ -1523,7 +1525,8 @@ function boekDienst(code, dienstId){
   const z = DZAKEN[code]; const d = z && z.diensten.find(x => x.id === dienstId); if (!d) return;
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
-  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="dbTerug">← Terug</button>'+
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', 'Dienst boeken');
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="dbTerug" aria-label="Sluit boeking">← Terug</button>'+
     '<div><div class="ey s-z2auej">'+esc(z.naam)+'</div><h1 class="s-1ik90f3">'+esc(d.naam)+'</h1></div></div>'+
     '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties" for="dbDatum">Datum</label><input class="veld h-mb50" id="dbDatum" type="date">'+
@@ -1656,7 +1659,8 @@ function tekenFarm(prod){
 function koopFarm(code, productId, naam){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
-  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="kfTerug">← Terug</button>'+
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', 'Product bestellen');
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="kfTerug" aria-label="Sluit bestelling">← Terug</button>'+
     '<div><div class="ey s-z2auej">Van het land</div><h1 class="s-1ik90f3">'+esc(naam)+'</h1></div></div>'+
     '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties">Naam voor de levering</label><input class="veld h-mb50" id="kfNaam" maxlength="60">'+
@@ -1691,7 +1695,8 @@ function tekenEigen(prod){
 function koopEigen(slug, naam){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
-  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="koopTerug">← Terug</button>'+
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', 'Product bestellen');
+  wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="koopTerug" aria-label="Sluit bestelling">← Terug</button>'+
     '<div><div class="ey s-z2auej">Bestellen</div><h1 class="s-1ik90f3">'+esc(naam)+'</h1></div></div>'+
     '<div class="art s-hlytrm"><div class="kaart">'+
       '<label class="opties">Naam voor de levering</label><input class="veld h-mb50" id="koopNaam" maxlength="60">'+
@@ -1736,6 +1741,13 @@ function tekenArt(arts){
 }
 $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('open'));
 $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('open'));
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const open = Array.from(document.querySelectorAll('.blad.open')).at(-1);
+  if (!open) return;
+  if (open.id === 'blad' || open.id === 'lezer') open.classList.remove('open');
+  else open.remove();
+});
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>

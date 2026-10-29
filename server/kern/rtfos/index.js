@@ -151,6 +151,7 @@ module.exports = (state) => {
 
   return { rtfos: {
     ik, auditlog,
+    codekoppeling: require('../codekoppel')({ db, save }),
     boom: steden.boom, stad: steden.stad, stadMaak: steden.stadMaak, stadStatus: steden.stadStatus,
     vlagZet: steden.vlagZet, limietZet: steden.limietZet, zetelZet: steden.zetelZet,
     zetelWeg: steden.zetelWeg, kernteamZet: steden.kernteamZet,
@@ -159,7 +160,7 @@ module.exports = (state) => {
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
     bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak,
     vrijwilligerportaal, deelnemerportaal, publiek,
-    veld, donateur,
+    veld, donateur, codeRoteren: require('./coderoteer')(ctx, { partners, gemeente, ondernemers }),
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN
   } };
 };

@@ -1,6 +1,6 @@
-/* DE VIER SESSIES DIE EEN BROWSERPROEF NODIG HEEFT, op een plek.
+/* DE SESSIES DIE EEN BROWSERPROEF NODIG HEEFT, op een plek.
 
-   Een lid, een zaak, het kantoor en een gezin -- elk langs de ECHTE route over
+   Een lid, een zaak, het personeel op de PDA, het kantoor en een gezin -- elk langs de ECHTE route over
    de server, nooit een nagebouwd token. Dat laatste is de reden dat dit bestand
    bestaat en niet ergens inline staat: een nagebouwde sessie meet je eigen
    aanname en niet de deur.
@@ -17,6 +17,15 @@
    `overgeslagen` met de reden erbij. Een proef die een kapotte inlog als "niets
    gevonden" telt, laat een stuk huis er gezond uitzien. */
 'use strict';
+const { zetSignatureKlaar } = require('./wereld-signature');
+
+/* Een geldhandeling vraagt eenmalig om een identiteitsdocument. De centrale
+   browserpersona moet ook die echte productpoort hebben doorlopen; anders
+   opent de eerste betaalproef terecht het onboardinggesprek en kan dezelfde
+   proef de overige zichtbare bediening niet meer afzonderlijk aanraken.
+   Dit is een minimale wegwerpafbeelding en geen nagemaakte verificatiestatus:
+   /api/verify/upload zet haar via de gewone route op `pending`. */
+const PROEF_IDENTITEIT = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
 
 /* De sleutel in localStorage per rol, plus hoe je aan zo'n sessie komt. De
    sleutelnaam hoort hierbij: wie een token haalt maar op de verkeerde sleutel
@@ -31,7 +40,9 @@ const ROLLEN = {
       const r = await post(basis + '/api/auth/register', { name: 'Proeflid',
         email: 'pf' + u + '@voorbeeld.nl', phone: '06' + u.slice(0, 8),
         password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
-      return r && r.token ? r.token : null;
+      if (!r || !r.token) return null;
+      await rondLidAf(basis, r.token, 'Proeflid');
+      return r.token;
     }
   },
   zaak: {
@@ -43,6 +54,23 @@ const ROLLEN = {
       const man = (rooster && rooster.staff || []).find((x) => x.role === 'manager');
       if (!man) return null;
       const r = await post(basis + '/api/supplier/login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' });
+      return r && r.token ? r.token : null;
+    }
+  },
+  /* Het personeel op de PDA (rtg_pda_token): de manager van de vervoerder
+     TRANSIT, langs dezelfde rooster- en pin-inlog als `zaak`. OV-routes
+     (/apps/ovroutes.html) draait op die sessie en op geen andere. De naam is
+     die van de werkrol in de sleutelbos (/api/account/rollen), zodat een
+     ingang met `werkrol: 'personeel'` deze persona krijgt (appwerkt.js). */
+  personeel: {
+    sleutel: 'rtg_pda_token',
+    uitleg: 'de manager van een vervoerder op de personeels-PDA',
+    start: '/apps/personeel.html',
+    async haal(basis) {
+      const rooster = await post(basis + '/api/supplier/roster', { code: 'TRANSIT' });
+      const man = (rooster && rooster.staff || []).find((x) => x.role === 'manager');
+      if (!man) return null;
+      const r = await post(basis + '/api/supplier/login', { code: 'TRANSIT', staffId: man.id, pin: '1234' });
       return r && r.token ? r.token : null;
     }
   },
@@ -80,7 +108,103 @@ async function post(url, lijf) {
   return r.json().catch(() => null);
 }
 
-/* Haalt de gevraagde rollen op (standaard alle vier) tegen een draaiende
+async function postAls(url, lijf, token) {
+  const r = await fetch(url, { method: 'POST', headers: {
+    'Content-Type': 'application/json', Authorization: 'Bearer ' + token
+  }, body: JSON.stringify(lijf) });
+  return { status: r.status, data: await r.json().catch(() => null) };
+}
+
+/* Een browserproef die een gewone, bestaande functie meet hoort niet achter
+   de eenmalige ledenovereenkomst te blijven staan. Rond de proefsessie daarom
+   via exact dezelfde publieke onboardingroutes af als een mens. Dit vervangt
+   de verspreide `status: klaar`-mocks: de deur is werkelijk open, inclusief
+   de actuele contractversie en server-side ondertekening. */
+async function rondLidAf(basis, token, naam = 'Proeflid') {
+  let antwoord = await postAls(basis + '/api/onboarding/status', {}, token);
+  if (antwoord.status >= 400 || !antwoord.data) throw new Error('onboarding/status gaf HTTP ' + antwoord.status);
+  let status = antwoord.data;
+  const waarden = { geboortedatum: '1985-05-05', naam, email: 'proeflid@voorbeeld.nl',
+    telefoon: '0612345678', adres: 'Proefstraat 1', postcode: '1000 AA',
+    woonplaats: 'Amsterdam', land: 'Nederland', nationaliteit: 'Nederlands' };
+  const velden = {};
+  for (const veld of status.velden || []) {
+    if (!veld.ingevuld && veld.type !== 'kyc' && waarden[veld.id]) velden[veld.id] = waarden[veld.id];
+  }
+  if (Object.keys(velden).length) {
+    antwoord = await postAls(basis + '/api/onboarding/opslaan', { velden }, token);
+    if (antwoord.status >= 400 || !antwoord.data) throw new Error('onboarding/opslaan gaf HTTP ' + antwoord.status);
+    status = antwoord.data;
+  }
+  if (!status.klaar) {
+    antwoord = await postAls(basis + '/api/onboarding/teken', {
+      naam, akkoord: true, contractVersion: status.contract && status.contract.versie
+    }, token);
+    if (antwoord.status >= 400 || !antwoord.data) throw new Error('onboarding/teken gaf HTTP ' + antwoord.status);
+    status = antwoord.data;
+  }
+  if (!status.klaar) throw new Error('de echte onboardingroute rondde de proefsessie niet af');
+  antwoord = await postAls(basis + '/api/verify/upload', { image: PROEF_IDENTITEIT }, token);
+  if (antwoord.status >= 400 || !antwoord.data || antwoord.data.status !== 'pending') {
+    throw new Error('verify/upload activeerde de betaalpoort niet: HTTP ' + antwoord.status);
+  }
+  return status;
+}
+
+/* Een Lifestyle-lid ontstaat hier niet door een tier in een testsessie te
+   stoppen. Dit hulpje loopt de bestaande menselijke productroute af: gratis
+   account, aanvraag, besluit door een kantoormens op naam, opnieuw inloggen en
+   identiteitscontrole. APPWERKT kan zo de premium-apps meten zonder de
+   toegangspoort die het juist moet bewijzen te omzeilen. */
+async function haalLifestyleLid(basis, kantoorToken) {
+  if (!kantoorToken) return { ok: false,
+    reden: 'geen kantoorsessie op naam; Lifestyle mag niet via de gedeelde kantoorcode worden toegekend' };
+  let uit;
+  try {
+    uit = await zetSignatureKlaar({
+      post: (pad, lijf, token) => postAls(basis + pad, lijf, token),
+      tokens: { 'kantoor-op-naam': kantoorToken }
+    });
+  } catch (e) {
+    return { ok: false, reden: String(e && e.message || e), stappen: [] };
+  }
+  if (!uit || !uit.klaar || !uit.token) return { ok: false,
+    reden: uit && uit.reden || 'de menselijke Lifestyle-goedkeuring leverde geen sessie op',
+    stappen: uit && uit.stappen || [] };
+  return { ok: true, token: uit.token, userId: uit.userId, tier: uit.tier, stappen: uit.stappen || [] };
+}
+
+/* Bellen en Snaps zijn geen lege dialoog: hun eigen bediening bestaat uit de
+   mensen met wie het lid verbonden is. Browserkwalificaties krijgen daarom
+   op verzoek TWEE aparte echte proefleden met EEN echte verbinding, langs
+   dezelfde vind-, verzoek- en aanvaardroutes als De Salon. De gewone
+   ledensessie blijft bewust onaangeraakt: een sociale fixture mag de meting
+   van Bestellen of een andere app niet van extra objecten voorzien. */
+async function verbindProeflid(basis) {
+  const eerste = await ROLLEN.lid.haal(basis);
+  if (!eerste) return { ok: false, reden: 'eerste proeflid kon niet worden gemaakt' };
+  const tweede = await ROLLEN.lid.haal(basis);
+  if (!tweede) return { ok: false, reden: 'tweede proeflid kon niet worden gemaakt' };
+  const [a, b] = await Promise.all([
+    postAls(basis + '/api/member/connections', {}, eerste),
+    postAls(basis + '/api/member/connections', {}, tweede)
+  ]);
+  const codenaam = b.data && (b.data.codename || (b.data.me && b.data.me.codename));
+  const sleutelA = a.data && (typeof a.data.me === 'string' ? a.data.me : a.data.me && a.data.me.key);
+  if (!codenaam || !sleutelA) return { ok: false, reden: 'proefleden kregen geen sociale identiteit' };
+  const vondst = await postAls(basis + '/api/member/find', { q: codenaam }, eerste);
+  const doel = ((vondst.data && vondst.data.results) || []).find((x) => x.codename === codenaam);
+  if (!doel || !doel.key) return { ok: false, reden: 'tweede proeflid was niet vindbaar' };
+  const verzoek = await postAls(basis + '/api/member/connect', { key: doel.key }, eerste);
+  if (verzoek.status >= 400) return { ok: false, reden: 'verbindingsverzoek gaf HTTP ' + verzoek.status };
+  const antwoord = await postAls(basis + '/api/member/connect/respond', { key: sleutelA, action: 'accept' }, tweede);
+  if (antwoord.status >= 400 || !antwoord.data || antwoord.data.status !== 'verbonden') {
+    return { ok: false, reden: 'verbinding aanvaarden gaf HTTP ' + antwoord.status };
+  }
+  return { ok: true, codenaam, token: eerste, contactToken: tweede };
+}
+
+/* Haalt de gevraagde rollen op (standaard allemaal) tegen een draaiende
    server. Geeft { sessies, overgeslagen }: sessies is wat er in localStorage
    moet, overgeslagen zegt per mislukte rol waarom. */
 async function haalSessies(basis, welke) {
@@ -108,4 +232,4 @@ function opslagVoor(sessies) {
   return uit;
 }
 
-module.exports = { ROLLEN, haalSessies, opslagVoor };
+module.exports = { ROLLEN, haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid, rondLidAf };

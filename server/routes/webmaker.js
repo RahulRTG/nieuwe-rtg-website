@@ -87,6 +87,11 @@ module.exports = (kern) => {
        zei aan te nemen. */
     if (!/^data:image\/(jpeg|png|webp);base64,/.test(dataUrl)) return res.status(400).json({ error: 'Kies een afbeelding (jpg, png of webp).' });
     if (dataUrl.length > FOTO_MAX_BYTES * 1.4) return res.status(400).json({ error: 'De foto is te groot (max ~2 MB).' });
+    // een herhaalde upload is dezelfde foto (kern/webmaker-fotos.js, fotoHerhaling)
+    const idem = req.body.idem ? String(req.body.idem).slice(0, 80) : null;
+    const vinger = idem ? require('crypto').createHash('sha256').update(dataUrl).digest('hex').slice(0, 24) : null;
+    const eerder = idem && webmaker.fotoHerhaling(req.session.key, idem, vinger);
+    if (eerder) return stuur(res, eerder);
     // eerst door de Ontsmetter: besmette bestanden komen er niet in
     const veilig = antivirus && antivirus.veiligeFoto ? antivirus.veiligeFoto(dataUrl, { bron: 'site-foto', door: req.session.key }) : { ok: true };
     if (!veilig.ok) return res.status(400).json({ error: veilig.error || 'De foto is geweigerd door de beveiliging.' });
@@ -94,7 +99,9 @@ module.exports = (kern) => {
     let url = null;
     try { url = media && media.bewaarPubliek ? await media.bewaarPubliek(dataUrl, FOTO_MAX_BYTES) : null; } catch (e) { url = null; }
     if (!url) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
-    stuur(res, webmaker.fotoBewaar(req.session.key, url));
+    const r = webmaker.fotoBewaar(req.session.key, url);
+    if (idem && r && r.ok) webmaker.fotoHerhaling(req.session.key, idem, vinger, url);
+    stuur(res, r);
   });
   app.post('/api/site/foto-weg', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.fotoWeg(req.session.key, String((req.body || {}).url || ''))); });
 

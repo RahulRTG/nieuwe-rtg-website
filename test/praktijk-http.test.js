@@ -2,9 +2,11 @@
 const test=require('node:test'), assert=require('node:assert/strict'), crypto=require('node:crypto');
 const fs=require('node:fs'), os=require('node:os'), path=require('node:path');
 const {startServer,stopHard}=require('./helper');
-let server,base,w,beheer,ander,lidId,lidToken;
+const {registreerGratis}=require('../scripts/lib/gratisaccount');
+let server,base,w,beheer,ander,lidId,lidToken,klant;
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-praktijk-http-'));
-const api=async(p,b={})=>{const r=await fetch(base+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});return {status:r.status,body:await r.json()};};
+// Een gastlink is een extra sleutel bij een account (eigenaarsbesluit 19 oktober 2026): de klant heeft een gratis account.
+const api=async(p,b={},tok=p.startsWith('/api/werk-gast/')&&klant?klant.token:null)=>{const r=await fetch(base+p,{method:'POST',headers:{'Content-Type':'application/json',...(tok?{Authorization:'Bearer '+tok}:{})},body:JSON.stringify(b)});return {status:r.status,body:await r.json()};};
 const werk=(p,b={})=>api('/api/bedrijf'+p,{werkruimte:w,beheerToken:beheer,...b});
 const PRAKTIJK = {
   beeld: '/api/bedrijf/praktijk/beeld', inrichten: '/api/bedrijf/praktijk/inrichten',
@@ -14,6 +16,7 @@ const PRAKTIJK = {
 const doe=(p,b={})=>api(PRAKTIJK[p],{werkruimte:w,beheerToken:beheer,idem:crypto.randomUUID(),...b});
 test.before(async()=>{
   server=await startServer({env:{RTG_DATA_DIR:tmp,SMTP_URL:'',PAYMENT_ENABLED:'false'}});base=server.base;
+  klant=await registreerGratis(base);assert.ok(klant,'een gratis klantaccount');
   let r=await api('/api/bedrijf/werkruimte/maak',{naam:'Bakker en buurthulp',idem:crypto.randomUUID()});
   assert.equal(r.status,200,JSON.stringify(r));w=r.body.werkruimte;beheer=r.body.beheerToken;
   ander=(await api('/api/bedrijf/werkruimte/maak',{naam:'Andere organisatie',idem:crypto.randomUUID()})).body;
@@ -35,10 +38,11 @@ test('echte routes: inrichting, meerdere activiteiten, dubbele vraag en scope',a
   const wrong=await api('/api/bedrijf/praktijk/stap',{werkruimte:ander.werkruimte,beheerToken:ander.beheerToken,idem:crypto.randomUUID(),projectId:id,versie,stap:'akkoord',toelichting:'Nee'});
   assert.equal(wrong.status,404);
 });
-test('voorstel en gastakkoord: geen account vereist, geen dubbele beslissing, intrekking is direct',async()=>{
+test('voorstel en gastakkoord: een gratis account plus de link, geen dubbele beslissing, intrekking is direct',async()=>{
   let r=await doe('stap',{projectId:id,versie,stap:'voorstel',toelichting:'Taart voor 12 personen, afhalen',bedragMinor:4200});assert.equal(r.status,200,JSON.stringify(r));versie=r.body.versie;
   const b={projectId:id,versie,idem:crypto.randomUUID()};r=await doe('delen',b);assert.equal(r.status,200,JSON.stringify(r));sleutel=r.body.link.split('#gast=')[1];
   assert.equal((await doe('delen',b)).status,409,'geheim wordt niet opnieuw uit cache getoond');
+  assert.equal((await api('/api/werk-gast/beeld',{sleutel},null)).status,401,'de link alleen is geen toegang');
   const view=await api('/api/werk-gast/beeld',{sleutel});assert.equal(view.status,200,JSON.stringify(view));assert.equal(view.body.magAntwoorden,true);
   assert.equal(JSON.stringify(view.body).includes('Klant A'),false);assert.equal(view.body.klanten,undefined);
   assert.equal((await api('/api/werk-gast/beeld',{sleutel:sleutel+'x'})).status,404);
@@ -69,6 +73,7 @@ test('werkelijke uitvoer en afronding behouden bestaande bronobjecten',async()=>
 test('bevestigd werk blijft na een harde herstart terugkomen',async()=>{
   await stopHard(server.child);
   server=await startServer({env:{RTG_DATA_DIR:tmp,SMTP_URL:'',PAYMENT_ENABLED:'false'}});base=server.base;
+  klant=await registreerGratis(base);assert.ok(klant,'een gratis klantaccount');
   const r=await doe('beeld');assert.equal(r.status,200,JSON.stringify(r));
   const x=r.body.werk.find(x=>x.id===id);assert.equal(x.stand,'afgerond');assert.equal(x.administratie.verwijzing,'Kassabon 2026-005');
   assert.equal((await api('/api/werk-gast/beeld',{sleutel})).status,404,'intrekking overleeft herstart');

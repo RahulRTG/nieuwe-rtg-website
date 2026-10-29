@@ -75,6 +75,7 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header class="kop">
@@ -146,6 +147,8 @@
       const aan = s.kanalen.includes(k.id);
       const b = maak('button', 'kanaal');
       b.type = 'button';
+      b.setAttribute('data-hoofdactie', '');
+      b.setAttribute('data-stand', 'post-' + s.id + '-' + k.id);
       b.setAttribute('aria-pressed', aan ? 'true' : 'false');
       b.setAttribute('aria-label', k.naam + ' voor ' + s.naam + ': ' + (aan ? 'staat aan' : 'staat uit'));
       b.appendChild(maak('i'));
@@ -173,6 +176,8 @@
     const aantalAan = (stand.soorten || []).filter(s => s.aan).length;
     const knop = maak('button', 'knop rood');
     knop.type = 'button';
+    knop.id = 'allePostUit';
+    knop.setAttribute('data-hoofdactie', '');
     knop.textContent = 'Zet alle post van RTG uit';
     knop.disabled = !aantalAan;
     knop.addEventListener('click', async () => {

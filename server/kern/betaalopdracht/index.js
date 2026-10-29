@@ -37,7 +37,7 @@
      ./rij        de verzameling -- wie is aan de beurt, wat staat er open */
 'use strict';
 
-const { STATUS, OVERGANG, AF, OPEN, DEFINITIEF,
+const { STATUS, OVERGANG, AF, OPEN, DEFINITIEF, MISLUKT_RAIL,
   BACKOFF_MS, MAX_POGINGEN, RAM_MAX } = require('./status');
 
 module.exports = function maakBetaalopdrachten(opties) {
@@ -45,7 +45,6 @@ module.exports = function maakBetaalopdrachten(opties) {
   const maxPogingen = Number.isFinite(opties && opties.maxPogingen) ? opties.maxPogingen : MAX_POGINGEN;
   const backoffMs = (opties && Array.isArray(opties.backoffMs) && opties.backoffMs.length) ? opties.backoffMs : BACKOFF_MS;
 
-  function rij() { if (!Array.isArray(d().betaalOpdrachten)) d().betaalOpdrachten = []; return d().betaalOpdrachten; }
   const wacht = n => backoffMs[Math.min(Math.max(0, n - 1), backoffMs.length - 1)];
   const klacht = (bericht, gegevens) => { if (log && log.warn) log.warn(bericht, gegevens); else console.warn('[betaalopdracht] ' + bericht, gegevens || ''); };
 
@@ -147,8 +146,8 @@ module.exports = function maakBetaalopdrachten(opties) {
     return true;
   }
 
-  const ctx = { rij, save, nu, klacht, publiek, zet, wacht, maxPogingen,
-    STATUS, AF, OPEN, DEFINITIEF, ramMax: RAM_MAX, railInzenden, terugboeken, verwerkAfwikkeling };
+  const ctx = { d, save, nu, klacht, publiek, zet, wacht, maxPogingen,
+    STATUS, AF, OPEN, DEFINITIEF, MISLUKT_RAIL, ramMax: RAM_MAX, railInzenden, terugboeken, verwerkAfwikkeling };
   const derij = require('./rij')(ctx);
   ctx.plaats = derij.plaats;
   ctx.vind = derij.vind;

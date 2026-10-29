@@ -10,6 +10,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+// de codeportalen vragen een account (eigenaarsbesluit 19 oktober 2026): een gratis account per server
+require('./portaalaccount').zetPortaalAccount();
 
 let BASE, office, raadcode, projectId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-stadsraad-'));

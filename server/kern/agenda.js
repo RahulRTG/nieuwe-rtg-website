@@ -9,15 +9,16 @@
 
 const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 const { afspraakVoorBron } = require('./agenda-idempotentie');
+const tijdzone = require('./tijdzone');
 
 function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
   /* De agenda van een lid is werk van een lid: bevestigd is vastgelegd. Zie
      server/lib/duurzaam.js en GELDLAT.md; de aanroepplek staat met reden op de
      lijst van check.js regel 47. */
-  const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda' });
+  const vastleggen = require('../lib/duurzaam')({ bijeen, save: save.bind(null, ['agendas']), inBundel, bron: 'agenda' });
   const id = () => 'ag' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
-  const vandaagStr = () => new Date().toISOString().slice(0, 10);
+  const vandaagStr = () => tijdzone.datumIn();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const { agendaWortel: store, agendaItems, agendaLees } = require('./agenda-opslag')({ db });
 
@@ -80,23 +81,23 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
 
   /* ---- de natuurlijke-taal-parser (werkt zonder Claude) ---- */
   function datumUit(q) {
-    const t = new Date(); t.setHours(12, 0, 0, 0);
-    const plus = n => { const d = new Date(t); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+    const vandaag = tijdzone.datumIn(); // "morgen" is morgen bij het lid, niet in de container
+    const plus = n => tijdzone.plusDagen(vandaag, n);
     if (/\bvandaag\b/.test(q)) return plus(0);
     if (/\bovermorgen\b/.test(q)) return plus(2);
     if (/\bmorgen\b/.test(q)) return plus(1);
     // weekdag -> eerstvolgende
     for (let d = 0; d < 7; d++) if (new RegExp('\\b' + DAGEN[d] + '\\b').test(q)) {
-      let add = (d - t.getDay() + 7) % 7; if (add === 0) add = 7; return plus(add);
+      let add = (d - tijdzone.weekdagVan(vandaag) + 7) % 7; if (add === 0) add = 7; return plus(add);
     }
     // DD-MM of DD/MM (dit jaar, of volgend jaar als het al voorbij is)
     const m = q.match(/\b(\d{1,2})[-/](\d{1,2})(?:[-/](\d{2,4}))?\b/);
     if (m) {
       const dag = +m[1], maand = +m[2];
-      let jaar = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : t.getFullYear();
+      let jaar = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : Number(vandaag.slice(0, 4));
       if (dag >= 1 && dag <= 31 && maand >= 1 && maand <= 12) {
         let ds = jaar + '-' + String(maand).padStart(2, '0') + '-' + String(dag).padStart(2, '0');
-        if (!m[3] && ds < t.toISOString().slice(0, 10)) ds = (jaar + 1) + '-' + String(maand).padStart(2, '0') + '-' + String(dag).padStart(2, '0');
+        if (!m[3] && ds < vandaag) ds = (jaar + 1) + '-' + String(maand).padStart(2, '0') + '-' + String(dag).padStart(2, '0');
         return ds;
       }
     }

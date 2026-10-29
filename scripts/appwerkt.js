@@ -64,9 +64,11 @@
      NIET_GETEST              deze ronde niet aangeraakt, met de reden
 
    WAT DIT SCRIPT NIET ZIET, en dat staat er even groot bij: het vult geen
-   formulieren in, het tikt niets aan met een onomkeerbare naam (betalen,
-   verwijderen, versturen, uitloggen -- die staan per rij in `overgeslagen`), en
-   het klikt hooguit veertien knoppen per scherm. Een groene rij betekent dus
+   formulieren in. Het raakt sinds de volledige-bedieningsnorm wel iedere
+   zichtbare knop, inclusief risicovolle bediening, maar uitsluitend op de
+   lokale wegwerpserver; browserbevestigingen worden afgebroken, muterende
+   verzoeken van zo'n UI-tik worden als `risicoFixtures` verantwoord en de
+   risicovolle namen staan per rij in `risicovolAangeraakt`. Een groene rij betekent dus
    "de ingang opent en de bediening breekt niet", en nadrukkelijk niet "de
    functie werkt". Dat verschil is de hele reden dat de andere vijf bewijzen er
    met naam bij staan.
@@ -76,7 +78,7 @@
    overheen ("intercepts pointer events"), 4x is de knop niet zichtbaar op het
    moment van tikken, 1x staat hij buiten beeld. Wat daarvan een overlay is die
    een mens eerst wegtikt en wat een werkelijk onbereikbare knop, weet deze
-   proef niet -- dus raakt hij minder dan de helft, dan heet de rij NIET_GETEST
+   proef niet -- dus raakt hij niet alle bediening, dan heet de rij NIET_GETEST
    met de uitsplitsing erbij. `knoppenNietKlikbaar` en
    `schermenGrotendeelsOngemeten` staan in het register zodat dat een getal is
    en geen voetnoot.
@@ -124,13 +126,21 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const reg = require('./lib/wereldregister');
-const { haalSessies, opslagVoor } = require('./lib/proefsessies');
+const { haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid } = require('./lib/proefsessies');
+const { haalSchoolsessies, maakSchoolContext } = require('./lib/schoolproefsessies');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
+/* Het raakvlak per bewijs (scripts/lib/bewijsraakvlak.js): EEN wereld per ronde, zodat
+   elk bestand een keer wordt gelezen en gehasht, en de hashes in het register
+   dezelfde inhoud dragen als waartegen elk bewijs vers werd verklaard. */
+const raakvlakken = require('./lib/bewijsraakvlak');
+let raakvlakWereld = null;
+const RAAKVLAKWERELD = () => (raakvlakWereld = raakvlakWereld || raakvlakken.maakWereld());
 const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+const { isBrowserruis } = require('./lib/browserruis');
 /* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
    geen eigen register. */
 const toezegklassen = require('./lib/toezegklassen');
@@ -142,18 +152,53 @@ const stil = process.argv.includes('--stil');
 const alleenInventaris = process.argv.includes('--inventaris');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
-/* Hoogstens zoveel tikken per scherm. Het oordeel eist dat de proef minstens
-   de helft van de eigen knoppen raakt, dus een plafond van 14 maakte elk scherm
-   met meer dan 28 eigen knoppen per definitie onbewijsbaar (routedossier.html
-   heeft er 55). Met 40 kan dat tot 80; wat daarboven zit blijft NIET_GETEST,
-   met de telling erbij. */
-const MAXKLIK = 40;
+/* De grootste gemeten schermen bevatten ruim 200 unieke handelingen. Een
+   volledige testwereld kan daar extra contextbediening aan toevoegen die een
+   geisoleerde appmeting niet ziet. Iedere vervolgactie kan bovendien twee of
+   meer reeds bewezen openers nodig hebben. De grens van 1024 eindigde in de
+   integrale ronde precies voor de laatste drie geldige vervolgacties, hoewel
+   er geen onklikbare bediening was. 2048 blijft een harde, eindige
+   veiligheidsgrens; normale schermen stoppen nog steeds meteen zodra alle
+   bekende bediening is aangeraakt. */
+const MAXKLIK = 2048;
+/* Een echte openerketen in RTG is kort. Per nog onaangeraakte eindtak krijgt
+   de meter 32 herhaalde standstappen, met 128 als harde bovengrens. Een vaste
+   grens van 32 stopte Magnaat na de eerste van meerdere geldige eindtakken:
+   de restlijst verschoof per ronde, terwijl iedere tak afzonderlijk bereikbaar
+   was. De adaptieve grens blijft eindig en verlaagt nooit de 100%-bewijsgrens. */
+const MAXHERSTELZONDERNIEUW = 32;
+const MAXHERSTELTOTAAL = 128;
+function herstelgrens(resterend) {
+  return Math.min(MAXHERSTELTOTAAL, MAXHERSTELZONDERNIEUW * Math.max(1, Number(resterend) || 0));
+}
+const BEDIENINGSSELECTOR = 'button,[role=button],[data-tab],[data-stand],input[type=button],input[type=submit],input[type=reset]';
 
-/* Knoppen die iets doen wat je niet wilt uitlokken op een proefserver met een
-   echte sessie. Ze worden NIET stil overgeslagen: elke rij noemt ze bij naam,
-   zodat zichtbaar blijft welk deel van de bediening ongemeten is. Dit is de
-   lijst die de testwereld uit BETROUWBAARHEID.md overbodig moet maken. */
-const ONOMKEERBAAR = /uitlog|log uit|sign ?out|verwijder|delete|wis alles|betaal|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot/i;
+/* Gedeelde bediening bewijst het scherm niet. Naast de generieke Edge en
+   Command hebben gemigreerde Design-Systemschermen hun eigen .ds-edge en
+   is de gedeelde Rahul KOMPAS-tab met zijn Command-werkblad geen appbediening.
+   opent [data-ds-zoek] dezelfde globale sprong als .rtgsprong-greep. Als de
+   appmeter die eerst aantikt, blijft de sprong over de app liggen en lijken
+   alle volgende appknoppen onbereikbaar. Deze oppervlakken hebben eigen
+   browsercontracten; APPWERKT telt en bedient uitsluitend het actieve scherm. */
+const GEDEELDE_SCHIL = '.rtg-edge-chrome, .rnd-toets, .ios-thuis, .rtg-edge-2-edge-reveal, #rtgCommand, .ds-edge, [data-ds-zoek], #osMenuBtn, .rtgsprong, .rtgsprong-greep, .rtg-rahul-tab, .rtg-rahul-page, .wd-people, .wd-favorites, .wd-library, .wd-greeting, .wd-announcement';
+
+/* Risicovolle namen worden als laatste bediend op de lokale wegwerpserver en
+   afzonderlijk verantwoord. Een browserbevestiging wordt afgebroken en een
+   muterend verzoek wordt voor die ene UI-tik gefixttured; de knop zelf is dan
+   wel echt geraakt, terwijl verwijdering of betaling niet buiten de daarvoor
+   bedoelde voltooi- en financiële proef wordt uitgevoerd. */
+const RISICOVOL = /uitlog|log uit|sign ?out|verlaat|leave|verwijder|delete|wis alles|betaal|uit\s+rtg\s+pay-saldo|afreken|bestel|verstuur|verzend|annuleer|opzegg|sluit account|export|download|nieuwe pin|noodslot|opbergen|weggooien|ster erop|sluimeren/i;
+/* Alleen deze servermutaties zouden de gedeelde testpersona, haar hele account
+   of de UI-fixture voor alternatieve betaalwegen wijzigen. Een echte betaling
+   laat terecht de andere betaalbuttons verdwijnen; APPWERKT zou ze dan nooit
+   allemaal kunnen aanraken. Daarom worden `/api/pay` en `/api/pay/saldo`
+   uitsluitend tijdens die ene echte UI-tik gefixttured. De afzonderlijke
+   financiële proeven blijven het zakelijke gevolg, concurrency en herstel
+   bewijzen. De drie RTMail-mutaties veranderen dezelfde enige berichtfixture;
+   ook zij worden per echte UI-tik gefixttured, zodat opbergen, ster, sluimeren
+   en weggooien allemaal bediend kunnen worden. De RTMail-voltooi- en
+   regressieproeven bewijzen hun werkelijke zakelijke effect. */
+const VERNIETIGENDE_ROUTE = /^\/api\/(?:logout|privacy\/delete|risico|pay(?:\/saldo)?|member\/rtmail\/(?:verplaats|ster|sluimer))$/;
 
 /* De DRIE toegangspoorten in dit huis, als selector. Geen woordenlijst en geen
    tekstherkenning: dit zijn de mechanismen zelf.
@@ -169,7 +214,7 @@ const ONOMKEERBAAR = /uitlog|log uit|sign ?out|verwijder|delete|wis alles|betaal
    met opzet en na het openen van de deur. Een meter die dat niet kent, meldt
    een deur als een defect en verliest zijn geloofwaardigheid bij de eerste
    ronde. */
-const POORTEN = ['#poort.zien', 'html.rtf-toegang-dicht', '#rtf-toegang-slot',
+const POORTEN = ['#poort.zien:not([data-poort-soort="locatie"])', 'html.rtf-toegang-dicht', '#rtf-toegang-slot',
   'html.rtf-school-dicht', '#rtf-school-slot'];
 
 /* Welke persona hoort bij welke wereld? Dit is de kern van bewijs 1: een ingang
@@ -198,7 +243,9 @@ function rijen() {
         /* Een ingang met een werkrol toont de wereld alleen aan wie die rol in
            zijn sleutelbos heeft (app-main-24a3.js); dat is dan aan wie hij
            beloofd wordt, en dus de persona die erdoor moet kunnen. */
-        persona: (bron && bron.werkrol) || PERSONA_VAN_WERELD[map.naam] || 'lid',
+        persona: (bron && bron.werkrol) ||
+          (soort === 'link' && reg.PREMIUM.has(sleutel) ? 'lifestyle' : null) ||
+          PERSONA_VAN_WERELD[map.naam] || 'lid',
         ingang: url || ('(' + soort + ' in de app, geen eigen adres)'),
         soort,
         pad: url ? url.split('#')[0].split('?')[0] : null
@@ -206,6 +253,23 @@ function rijen() {
     }
   }
   return filter ? uit.filter((r) => (r.ingang || '').includes(filter) || r.app.toLowerCase().includes(filter.toLowerCase())) : uit;
+}
+
+/* Een interne tab heeft geen los publiek adres, maar kan WEL een meetbare
+   ingang hebben. Het bestaande appcontract benoemt dan het echte scherm en de
+   echte hash-navigatie. Alleen een declaratieve hash mag hier rechtstreeks
+   worden geopend; natuurlijke-taalstappen voor OS-kiezers moeten door een
+   expliciet gedeclareerde bedieningsadapter worden uitgevoerd. Alleen proza
+   blijft eerlijk ongemeten: de meter leidt daar nooit zelf een route uit af. */
+function meetIngang(rij, contract = CONTRACT) {
+  if (rij && rij.pad) return { pad: rij.pad, bestemming: rij.pad, via: null };
+  const c = rij && contract && contract[rij.functie];
+  if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') || typeof c.via !== 'string') return null;
+  if (c.via.startsWith('#')) return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via,
+    ...(typeof c.bereik === 'string' && c.bereik ? { bereik: c.bereik } : {}) };
+  const a = c.adapter;
+  if (!a || a.type !== 'rahul-opdracht' || !a.opdracht || !a.verwacht || !a.bereik || !a.titel) return null;
+  return { pad: c.ingang, bestemming: c.ingang, via: c.via, adapter: { ...a } };
 }
 
 /* ---- de vijf bewijzen die een testwereld nodig hebben ---- */
@@ -238,11 +302,23 @@ async function meet() {
   const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
   const pw = laadBrowser({ eigenDriver: false });
   if (!pw) { console.error('Geen browser beschikbaar; dit script meet in een echte browser.'); process.exit(2); }
-  const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
+  const { startServer, kantoorAlsPersoon } = require(path.join(WORTEL, 'test', 'helper.js'));
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
 
   const { sessies, overgeslagen } = await haalSessies(base);
+  const kantoormens = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+  const lifestyle = await haalLifestyleLid(base, kantoormens);
+  if (lifestyle.ok) sessies.lifestyle = {
+    sleutel: 'rtg_member_token', waarde: lifestyle.token,
+    start: '/apps/app.html?pas=lifestyle',
+    uitleg: 'een door een kantoormens op naam goedgekeurd en geverifieerd Lifestyle-lid'
+  };
+  else overgeslagen.push({ rol: 'lifestyle', reden: lifestyle.reden });
+  const contact = await verbindProeflid(base);
+  if (!contact.ok) overgeslagen.push({ rol: 'lid-contact', reden: contact.reden });
+  const school = await haalSchoolsessies(base, sessies);
+  if (!school) overgeslagen.push({ rol: 'schoolproef', reden: 'de echte les- en leerlingensessies konden niet worden gemaakt' });
   log('sessies: ' + Object.keys(sessies).join(', ') + (overgeslagen.length ? ' -- overgeslagen: ' + overgeslagen.map((o) => o.rol).join(', ') : ''));
 
   const lijst = rijen();
@@ -269,6 +345,16 @@ async function meet() {
          plek te staan, ook als er hier maar een rol in gaat. */
       persoonlijk[rol] = await maakContext(browser, opslagVoor({ [rol]: sessies[rol] }));
     }
+    /* De drie expliciete Rahul-adapters draaien op een eigen echt lid. De
+       verbinding die Bellen en Snaps nodig hebben mag de staat van de gewone
+       lidmeting niet wijzigen; anders verandert bijvoorbeeld de knopnoemer
+       van Bestellen door deze fixture. */
+    if (contact.ok) persoonlijk.adapterLid = await maakContext(browser,
+      opslagVoor({ lid: { ...sessies.lid, waarde: contact.token } }));
+    if (school) {
+      persoonlijk['link:rtfbord'] = await maakSchoolContext(browser, school.bord, maakContext);
+      persoonlijk['link:rtfschrift'] = await maakSchoolContext(browser, school.schrift, maakContext);
+    }
     while (true) {
       const i = n++; if (i >= lijst.length) break;
       const rij = lijst[i];
@@ -287,12 +373,16 @@ async function meet() {
 }
 
 async function maakContext(browser, opslag) {
-  const ctx = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 1280, height: 900 } });
-  /* De intake is niet wat hier gemeten wordt: een vers lid staat voor de
-     ledenovereenkomst, en die tekent een mens een keer in zijn leven. Zelfde
-     ingreep als in scripts/tikken.js en de schermtoetsen. */
-  await ctx.route('**/api/onboarding/status', (r) => r.fulfill({ status: 200,
-    contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
+  /* Bedienbaarheid meet of een mens een functie kan gebruiken, niet of een
+     cinematografische overgang exact binnen een drukke CI-tik klaar is. De
+     gereduceerde-bewegingsstand is bovendien een ondersteunde
+     toegankelijkheidsstand. Zonder deze vaste voorkeur verschoof een knop na
+     het markeren maar voor de klik en onderschepte de body de invoer; dezelfde
+     bronstand wisselde daardoor tussen 11/72 en 39/70 aangetikte knoppen. */
+  const ctx = await browser.newContext({ serviceWorkers: 'block', reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
+  /* haalSessies() rondt de echte onboarding en actuele overeenkomst via de
+     server af. Hier staat dus geen `klaar:true`-mock meer: interne ledenapp-
+     standen worden gemeten met dezelfde geactiveerde identiteit als een mens. */
   /* DE PERSONA SPREEKT NEDERLANDS. Zonder rtg_lang volgde het scherm de taal
      van de headless browser (en-US), dus mat deze proef de Engelse schil van
      een Nederlands huis -- gezien op 24 september 2026. */
@@ -302,12 +392,14 @@ async function maakContext(browser, opslag) {
 }
 
 async function meetRij(rij, base, persoonlijk, rollen) {
-  const r = { ...rij, bewijzen: {}, gevonden: 0, geklikt: 0, overgeslagen: [], nietKlikbaar: [], waarnemingen: [] };
+  const r = { ...rij, bewijzen: {}, gevonden: 0, geklikt: 0, overgeslagen: [], risicovolAangeraakt: [], risicoFixtures: [], nietKlikbaar: [], waarnemingen: [] };
   delete r.soort; delete r.pad;
 
-  /* tab: en os: hebben geen eigen adres -- ze zijn een stand of een kiezer
-     binnen de app. Meten kan dus niet vanaf een URL, en dat is geen defect. */
-  if (!rij.pad) {
+  const meet = meetIngang(rij);
+  /* Een OS-kiezer met alleen een menselijke bedieningsbeschrijving heeft nog
+     geen uitvoerbare adapter. Hash-tabs hebben die inmiddels wel via hun
+     bestaande appcontract en worden hieronder als echte appstand geopend. */
+  if (!meet) {
     const reden = rij.soort === 'tab'
       ? 'een stand binnen de ledenapp, geen eigen adres: alleen te meten door de app te bedienen'
       : 'een kiezer in de app: het adres ontstaat pas na een keuze';
@@ -315,11 +407,12 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     vulOngemeten(r);
     return r;
   }
+  if (meet.via) r.via = meet.via;
 
-  const bestand = path.join(WORTEL, 'public', rij.pad.replace(/^\//, ''));
+  const bestand = path.join(WORTEL, 'public', meet.bestemming.replace(/^\//, ''));
   if (!fs.existsSync(bestand)) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
-      reden: 'de wereld wijst naar ' + rij.pad + ' en dat bestand bestaat niet', bewijs: null };
+      reden: 'de wereld wijst naar ' + meet.bestemming + ' en dat bestand bestaat niet', bewijs: null };
     for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST', reden: 'er is geen scherm om te bedienen', bewijs: null };
     vulOngemeten(r);
     return r;
@@ -327,10 +420,12 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 
   /* Een BEVINDING en geen oordeel: meet de proef met een andere persona dan het
      register als doelgroep noemt? Beide bronnen staan erbij (./lib/bestemming.js). */
-  r.personaAfwijking = personaAfwijking(rij.persona, rij.pad, SCHERMREGISTER());
+  r.personaAfwijking = personaAfwijking(rij.persona, meet.bestemming, SCHERMREGISTER());
 
   // ---- bewijs 1: bereikbaar voor de persona van deze wereld ----
-  const eigen = persoonlijk[rij.persona];
+  const eigen = persoonlijk[rij.functie] || (meet.adapter && rij.persona === 'lid' && persoonlijk.adapterLid
+    ? persoonlijk.adapterLid
+    : persoonlijk[rij.persona]);
   if (!eigen) {
     r.bewijzen.bereikbaar = { status: 'NIET_GETEST',
       reden: 'inloggen als ' + rij.persona + ' lukte niet; niet gemeten mag nooit als in orde langskomen', bewijs: null };
@@ -338,7 +433,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     vulOngemeten(r);
     return r;
   }
-  const eersteBezoek = await bezoek(eigen, base, rij.pad);
+  const eersteBezoek = await bezoek(eigen, base, meet);
   r.waarnemingen.push('als ' + rij.persona + ': ' + eersteBezoek.samenvatting);
   if (eersteBezoek.rem.length) r.waarnemingen.push('proef: bij het laden ' + eersteBezoek.rem.length + 'x de rem (429) geraakt, door het gedeelde adres van de meting');
 
@@ -349,7 +444,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     let opener = null;
     for (const rol of rollen) {
       if (rol === rij.persona) continue;
-      const proef = await bezoek(persoonlijk[rol], base, rij.pad);
+      const proef = await bezoek(persoonlijk[rol], base, meet);
       if (!proef.poort && !proef.crash.length) { opener = rol; break; }
     }
     /* TWEE HEEL VERSCHILLENDE UITKOMSTEN, en ze door elkaar halen maakt dit
@@ -370,20 +465,20 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     r.bewijzen.bereikbaar = opener
       ? { status: 'GEBLOKKEERD_DOOR_DEFECT',
         reden: 'de wereld toont deze ingang aan een ' + rij.persona + ', maar de deur gaat alleen open voor een ' + opener + ': ' + eersteBezoek.poortTekst,
-        bewijs: rij.pad }
+        bewijs: meet.pad }
       : { status: 'NIET_GETEST',
         reden: 'er staat een deur die geen van de vier bekende sessies (lid, zaak, kantoor, gezin) opent; welke rol er wel doorheen komt, weet deze proef niet: ' + eersteBezoek.poortTekst,
-        bewijs: rij.pad };
+        bewijs: meet.pad };
     for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST', reden: 'achter een dichte deur valt de bediening niet te meten', bewijs: null };
     vulOngemeten(r);
     return r;
   }
   if (eersteBezoek.crash.length) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
-      reden: 'het scherm gooit bij het laden: ' + eersteBezoek.crash[0], bewijs: rij.pad };
+      reden: 'het scherm gooit bij het laden: ' + eersteBezoek.crash[0], bewijs: meet.pad };
   } else if (eersteBezoek.config.length) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG',
-      reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: rij.pad };
+      reden: 'de server zegt zelf dat er iets in de omgeving ontbreekt: ' + eersteBezoek.config[0], bewijs: meet.pad };
   } else {
     /* OPENDE ZONDER POORT EN ZONDER FOUT -- maar OP DE BEDOELDE BESTEMMING?
        Een deur kan ook een doorverwijzing zijn: vier kantoorschermen stuurden
@@ -392,19 +487,19 @@ async function meetRij(rij, base, persoonlijk, rollen) {
        op url-gelijkheid. De andere sessies worden alleen bezocht als de
        bestemming niet klopte: dan is de vraag of de ingang verkeerd geadresseerd
        is (de bestaande uitkomst) of gewoon niet bereikt. */
-    const landing = eersteBezoek.eind || rij.pad;
-    let o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen: [] });
+    const landing = eersteBezoek.eind || meet.bestemming;
+    let o = beoordeelBestemming({ ingang: meet.bestemming, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen: [] });
     if (o.status !== 'BEWEZEN' && o.bestemming.uitkomst === 'andere-capability') {
       const anderen = [];
       for (const rol of rollen) {
         if (rol === rij.persona || !persoonlijk[rol]) continue;
-        const b = await bezoek(persoonlijk[rol], base, rij.pad);
-        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || rij.pad });
+        const b = await bezoek(persoonlijk[rol], base, meet);
+        if (!b.poort && !b.crash.length) anderen.push({ persona: rol, landing: b.eind || meet.bestemming });
       }
-      o = beoordeelBestemming({ ingang: rij.pad, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
+      o = beoordeelBestemming({ ingang: meet.bestemming, landing, register: SCHERMREGISTER(), persona: rij.persona, anderen });
     }
     r.bestemming = o.bestemming;
-    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: rij.pad };
+    r.bewijzen.bereikbaar = { status: o.status, reden: o.reden, bewijs: meet.pad };
     if (o.status !== 'BEWEZEN') {
       for (const b of ['bedienbaar', 'menselijk']) r.bewijzen[b] = { status: 'NIET_GETEST',
         reden: 'de proef kwam niet op de bedoelde bestemming; de bediening van een ander scherm zegt niets over deze app', bewijs: null };
@@ -414,13 +509,18 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   }
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
-  const bediening = await bedien(eigen, base, rij.pad);
+  const bediening = await bedien(eigen, base, meet);
   r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
+  r.aangeraakt = bediening.aangeraakt;
+  r.herhaaldAangeraakt = bediening.herhaaldAangeraakt;
   r.schil = bediening.schil;
   r.bedekt = bediening.bedekt;
   r.overgeslagen = bediening.overgeslagen;
+  r.risicovolAangeraakt = bediening.risicovolAangeraakt;
+  r.risicoFixtures = bediening.risicoFixtures;
   r.nietKlikbaar = bediening.nietKlikbaar;
+  r.onaangeraakt = bediening.onaangeraakt;
   r.onderschept = bediening.onderschept;
   if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
   if (bediening.rem.length) r.waarnemingen.push('proef: ' + bediening.rem.length + 'x de rem (429) geraakt, door het gedeelde adres van de meting');
@@ -436,7 +536,9 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' eigen knoppen aangetikt zonder fout'
     + (bediening.schil ? ' (plus ' + bediening.schil + ' van de gedeelde schil, die hier niet telt)' : '')
     + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
-    + (bediening.overgeslagen.length ? ', ' + bediening.overgeslagen.length + ' overgeslagen omdat ze onomkeerbaar zijn' : '');
+    + (bediening.risicovolAangeraakt.length ? ', ' + bediening.risicovolAangeraakt.length + ' risicovolle bediening(en) aangeraakt op de wegwerpserver' : '')
+    + (bediening.onaangeraakt.length ? ', onaangeraakt: ' + bediening.onaangeraakt.slice(0, 8).map((n) => '"' + n + '"').join(', ')
+      + (bediening.onaangeraakt.length > 8 ? ' en ' + (bediening.onaangeraakt.length - 8) + ' meer' : '') : '');
   if (bediening.geklikt === 0 && !bediening.gevonden) {
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen eigen knop zonder bestemming gevonden' + (bediening.schil ? ' (alleen ' + bediening.schil + ' van de gedeelde schil)' : '') + '; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
@@ -447,15 +549,14 @@ async function meetRij(rij, base, persoonlijk, rollen) {
       bewijs: bediening.bedekt.slice(0, 5).join(' | ') };
   } else if (bediening.config.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG', reden: bediening.config[0], bewijs: null };
-  } else if (bediening.gevonden > 0 && bediening.geklikt * 2 < bediening.gevonden) {
-    /* EEN SCHERM WAAR HET MEESTE ONAANGERAAKT BLEEF, IS NIET BEWEZEN. Op
-       vluchten.html bleken 8 van de 23 knoppen bedekt door iets anders
-       ("intercepts pointer events"), 4 onzichtbaar op het moment van tikken en
-       1 buiten beeld. Wat daarvan een overlay is die een mens eerst wegtikt en
-       wat een werkelijk onbereikbare knop, kan deze proef niet uitmaken -- en
-       juist daarom mag hij er geen groen vinkje van maken. */
+  } else if (!volledigeBediening(bediening)) {
+    /* EEN SCHERM WAAR EEN UNIEKE KNOP ONAANGERAAKT BLEEF, IS NIET BEWEZEN.
+       De eindnorm is volledige bediening: iedere toepasselijke knop wordt in
+       de browser aangeraakt, risicovolle acties op de lokale wegwerpserver.
+       Een herstelroute, overlap of meetlimiet mag niet achter een percentage
+       verdwijnen. */
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST',
-      reden: uitsplitsing + ' -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd', bewijs: null };
+      reden: uitsplitsing + ' -- de proef raakte niet alle unieke bediening, dus dit scherm is niet volledig beproefd', bewijs: null };
   } else {
     r.bewijzen.bedienbaar = { status: 'BEWEZEN', reden: uitsplitsing, bewijs: null };
   }
@@ -474,7 +575,7 @@ function vulOngemeten(r) {
   for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak(r);
   /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
      door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
-  r.samengesteld = stelSamen(r);
+  r.samengesteld = stelSamen(r, { wereld: RAAKVLAKWERELD() });
   /* De vier randvoorwaarden uit de opdracht die hier niet gemeten worden, maar
      die wel een plek in de rij verdienen -- weglaten leest als "in orde". */
   r.mobiel = { status: 'NIET_GETEST', reden: 'deze ronde meet op bureaubreedte; de telefoonkant staat in TIKKEN.json en ADAPTIEF.md' };
@@ -501,13 +602,107 @@ function eindstand(r) {
 }
 
 /* ---- een bezoek: laden en kijken wat er gebeurt ---- */
-async function bezoek(ctx, base, pad) {
+function ingangOpties(ingang) {
+  return typeof ingang === 'string' ? { pad: ingang, bestemming: ingang, via: null } : ingang;
+}
+
+/* Voer alleen adapters uit die het appcontract expliciet verklaart. Dit loopt
+   dezelfde zichtbare Edge/Rahul-route als een lid; geen private browserfunctie,
+   verzonnen URL of directe openOsApp-aanroep. Het verwachte scherm en zijn
+   titel zijn deel van het contract, zodat een opdracht die stil niets opent de
+   meting laat falen. */
+async function voerIngangAdapterUit(page, meet) {
+  if (!meet.adapter) return meet;
+  await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
+    null, { timeout: 12000 });
+  const mond = page.locator('.rtg-adaptive-item[aria-label="Praat met Rahul"]:visible').first();
+  await mond.waitFor({ state: 'visible', timeout: 10000 });
+  await mond.click();
+  const vraag = page.locator('input[placeholder^="Vraag Rahul"]:visible').first();
+  await vraag.waitFor({ state: 'visible', timeout: 10000 });
+  await vraag.fill(meet.adapter.opdracht);
+  await vraag.press('Enter');
+  await page.waitForSelector(meet.adapter.verwacht, { state: 'visible', timeout: 10000 });
+  const titel = ((await page.textContent(meet.adapter.verwacht + ' #osBelTitel').catch(() => '')) || '').trim();
+  if (titel !== meet.adapter.titel) throw new Error('bedieningsadapter verwachtte titel "' + meet.adapter.titel + '", zag "' + titel + '"');
+  return meet;
+}
+
+async function wachtOpOnboarding(page) {
+  /* Iedere schone heropening bouwt app.html opnieuw op. De onboardinglaag is
+     dan kort zichtbaar terwijl de echte serverstatus wordt gelezen, ook als
+     dezelfde proefsessie al volledig is afgerond. Alleen bij de eerste ingang
+     wachten maakte de volle parallelle ronde afhankelijk van machinesnelheid:
+     Assets was los 8/8, maar werd onder belasting door #onbGate geblokkeerd.
+     Een scherm zonder deze laag voldoet direct aan `hidden`. */
+  await page.waitForSelector('#onbGate', { state: 'hidden', timeout: 12000 }).catch(() => {});
+}
+
+async function wachtOpInteractielaag(page) {
+  /* De Social Control Plane-opener wordt eerder getekend dan de runtime haar
+     dialoog en klikhandler monteert. Een vaste pauze was onder volle belasting
+     te kort: de knop werd technisch geklikt maar kon nog niets openen. Wacht
+     op de bijbehorende, waarneembare laag. Pagina's zonder deze opener zijn
+     onmiddellijk klaar. */
+  await page.waitForFunction(() => {
+    const opener = document.querySelector('.rtg-intel-command');
+    return !opener || !!document.querySelector('.rtg-intel-scrim [role="dialog"]');
+  }, null, { timeout: 12000 }).catch(() => {});
+}
+
+async function wachtOpAppGereed(page) {
+  /* Een app die haar eigen hoofdvlak als busy markeert, publiceert daarmee dat
+     de eerste bruikbare stand nog onderweg is. Navigatie wacht bijvoorbeeld op
+     een expliciet locatiebesluit. Zonder dit signaal keek een schone replay al
+     rond terwijl de vertrekkeuze nog niet bestond en bleven geldige opties
+     onaangeraakt. Pagina's zonder zo'n busy hoofdvlak voldoen onmiddellijk. */
+  await page.waitForFunction(() => !document.querySelector('main[aria-busy="true"]'),
+    null, { timeout: 15000 }).catch(() => {});
+}
+
+async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
+  if (!ontbrekendeMerken.length) return false;
+  return page.waitForFunction(({ bediening, ontbrekend }) => {
+    const merk = (el) => {
+      const label = (el.getAttribute('aria-label') || '').trim();
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+        .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
+      let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      if (bron.startsWith('control:')) bron = '';
+      return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
+    };
+    const zichtbaar = (el) => {
+      if (!el || el.hidden || el.disabled || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      if (el.closest('details:not([open])') && !el.closest('summary')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 1 && r.height > 1;
+    };
+    return [...document.querySelectorAll(bediening)]
+      .some((el) => zichtbaar(el) && ontbrekend.includes(merk(el)));
+  }, { bediening: BEDIENINGSSELECTOR, ontbrekend: ontbrekendeMerken }, { timeout: 3000 })
+    .then(() => true).catch(() => false);
+}
+
+async function openIngang(page, base, ingang) {
+  const meet = ingangOpties(ingang);
+  await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await wachtOpOnboarding(page);
+  await wachtOpInteractielaag(page);
+  await wachtOpAppGereed(page);
+  await voerIngangAdapterUit(page, meet);
+  return meet;
+}
+
+async function bezoek(ctx, base, ingang) {
+  const meet = ingangOpties(ingang);
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [], rem = [];
   luister(page, base, { crash, config, serverfout, rem });
   let eind = '', poort = false, poortTekst = '', tekst = 0;
   try {
-    await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await openIngang(page, base, meet);
     await page.waitForTimeout(2600);
     eind = page.url().replace(base, '');
     const p = await page.evaluate((sel) => {
@@ -541,6 +736,75 @@ function klikReden(log) {
   return 'reden niet gemeld';
 }
 
+/* Sommige schermen tekenen hun hoofdactie opnieuw zodra de serverstand
+   binnenkomt. Playwright kan dan precies het oude element hebben gevonden:
+   de knop bestaat in de schone stand, maar verdwijnt tussen zoeken en tikken.
+   Net als bij een bedekking toetsen we zo'n bediening precies eenmaal opnieuw
+   vanaf de gedeclareerde ingang. Een knop die daar verborgen blijft, faalt
+   nog steeds; dit maakt een werkelijk onzichtbare bediening dus niet groen. */
+function redenVoorSchoneTegenproef(waarom) {
+  return /intercepts pointer events|element is outside of the viewport|element is not visible|element is not stable|pagina antwoordde niet binnen de limiet/i
+    .test(String(waarom || ''));
+}
+
+/* Een bewegende Edge-capsule kan zichtbaar en focusbaar zijn, maar tijdens
+   haar korte compositorovergang niet lang genoeg geometrisch stilstaan voor
+   Playwrights muiscontrole. Dat is geen reden om de bediening over te slaan:
+   toetsenbordactivatie is een volwaardige gebruikersroute en tegelijk een
+   toegankelijkheidsbewijs. Gebruik deze terugval uitsluitend voor de
+   expliciete stabiliteitsfout; onzichtbare of bedekte bediening blijft falen. */
+async function tikAlsGebruiker(page, toetsenbordEerst = false) {
+  const activeerMetToetsenbord = async () => {
+    const focusbaar = await page.evaluate(() => {
+      const el = document.querySelector('[data-appwerkt="1"]');
+      if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return false;
+      if (el.hidden || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      el.focus({ preventScroll: true });
+      return document.activeElement === el;
+    }).catch(() => false);
+    if (!focusbaar) return false;
+    await page.keyboard.press('Enter');
+    return true;
+  };
+  /* Modale en Edge-lagen bewegen tijdens hun compositorovergang. Hun
+     toetsenbordroute is een gewone, toegankelijke gebruikersroute en blijft
+     stabiel terwijl een muisklik op geometrische rust moet wachten. */
+  if (toetsenbordEerst && await activeerMetToetsenbord()) return 'toetsenbord';
+  try {
+    /* De volle meting draait meerdere echte browsers tegelijk. Een zichtbare
+       control die onder die normale kwalificatielast iets langer nodig heeft
+       om geometrisch stabiel te worden, is nog geen productdefect. Vijf
+       seconden blijft een harde, korte grens, maar voorkomt dat dezelfde
+       sociale navigatie geïsoleerd 25/25 en parallel willekeurig 22/25 meet.
+       Op de volledige seriële kwalificatie bleef de drukke hoofddraad bij
+       vier wisselende controls incidenteel net boven vijf seconden; tien
+       seconden blijft begrensd en bewaart de echte muisroute. */
+    await page.click('[data-appwerkt="1"]', { timeout: 10000, noWaitAfter: true });
+    return 'muis';
+  } catch (e) {
+    const reden = klikReden(String(e.message || e));
+    /* Als Playwright nog uitsluitend op stabiele geometrie wachtte, is geen
+       klik verstuurd. Probeer dan dezelfde zichtbare, focusbare bediening via
+       Enter. Dit omvat een drukke hoofddraad die binnen de muislimiet geen
+       stabiliteitsantwoord gaf. Zodra de log zegt dat de klik al is
+       verstuurd, volgt nooit een tweede activatie. */
+    if (!/element is not stable|pagina antwoordde niet binnen de limiet/i.test(reden)) throw e;
+    if (!await activeerMetToetsenbord()) throw e;
+    return 'toetsenbord';
+  }
+}
+
+/* De productnorm voor bewijs 2 staat op één plek. Een percentage, een
+   afgeronde verhouding of een overgeslagen risicoknop mag nooit als volledige
+   bediening worden gepresenteerd. */
+function volledigeBediening(bediening) {
+  return Number.isInteger(bediening && bediening.gevonden) && bediening.gevonden > 0 &&
+    Number.isInteger(bediening.geklikt) && bediening.geklikt === bediening.gevonden &&
+    Array.isArray(bediening.overgeslagen) && bediening.overgeslagen.length === 0;
+}
+
 /* Het element dat de klik opving, uit de log van Playwright: "<a ...>…</a> from
    <div id="x" ...>…</div> subtree intercepts pointer events" -> div#x. Bij een
    subtree telt de WORTEL (die ligt over de knop), niet het kind. */
@@ -554,12 +818,124 @@ function onderschepper(log) {
   return tag.toLowerCase() + (id ? '#' + id : '') + klas.map((c) => '.' + c).join('');
 }
 
-async function bedien(ctx, base, pad) {
+async function bedien(ctx, base, ingang) {
+  const meet = ingangOpties(ingang);
+  const pad = meet.pad;
+  const ingangPad = String(meet.bestemming || pad).split('#')[0].split('?')[0];
+  const opIngang = () => {
+    try { return new URL(page.url()).pathname === ingangPad; }
+    catch (e) { return false; }
+  };
+  const bereik = meet.bereik || (meet.adapter && meet.adapter.bereik);
   const page = await ctx.newPage();
-  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [];
+  const crash = [], config = [], serverfout = [], rem = [], weigering = [], gezegd = [], taalWissel = [], bedekt = [], wachtend = [];
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
-  const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
+  const gehad = new Set();
+  const gevondenMerken = new Set();
+  const gevondenNamen = new Map();
+  const aangetiktMerken = new Set();
+  const misluktMerken = new Set();
+  const onbewezenMerken = () => [...gevondenMerken]
+    .filter((merk) => !aangetiktMerken.has(merk) && !misluktMerken.has(merk));
+  /* Onthoud via welke werkelijk aangetikte bediening een nieuwe bediening
+     voor het eerst zichtbaar werd. Een brede app kan tientallen geldige
+     openers hebben. Zonder deze herkomst liep herstel ze in DOM-volgorde
+     opnieuw af, ook wanneer al was waargenomen dat precies opener B naar de
+     nog onaangeraakte actie leidde. De kaart bewaart alleen stabiele
+     bedieningsmerken en voert zelf niets uit. */
+  const openerVoorMerk = new Map();
+  const zouCyclusMaken = (kind, opener) => {
+    let huidig = opener;
+    const gezien = new Set();
+    while (huidig && !gezien.has(huidig)) {
+      if (huidig === kind) return true;
+      gezien.add(huidig);
+      huidig = openerVoorMerk.get(huidig);
+    }
+    return false;
+  };
+  const voorkeursopeners = () => {
+    const uit = new Set();
+    const voegToe = (merk) => {
+      const opener = openerVoorMerk.get(merk);
+      if (!opener || uit.has(opener)) return;
+      uit.add(opener);
+      voegToe(opener);
+    };
+    for (const merk of onbewezenMerken()) voegToe(merk);
+    return uit;
+  };
+  const telStand = (stand) => {
+    for (const merk of (stand && stand.merken) || []) gevondenMerken.add(merk);
+    for (const bediening of (stand && stand.bedieningen) || []) {
+      if (!gevondenNamen.has(bediening.merk)) gevondenNamen.set(bediening.merk, bediening.tekst);
+    }
+    gevonden = gevondenMerken.size;
+    schil = Math.max(schil, (stand && stand.schil) || 0);
+  };
+  let heropeningen = 0;
+  /* Tijdens een verklaarde A -> B-herstelroute moet B in de huidige stand
+     worden herhaald voordat we opnieuw naar de ingang springen. Buiten zo'n
+     route gaan we juist eerst schoon terug, zodat een blijvende contextopener
+     geen gewone beginacties gevangen houdt. */
+  let herstelketenActief = false;
+  let herstelZonderNieuw = 0;
+  /* Als een tik nieuwe bediening in de huidige appstand onthult, blijft die
+     stand één ronde voorrang houden. Anders opende de meter boven zo'n nieuw
+     paneel meteen opnieuw het Edge-actiedek en verdween de vervolgactie nog
+     voordat zij kon worden aangetikt. */
+  let behoudHuidigeStand = false;
+  /* Een bevestigende of annulerende dialoogactie kan de laag sluiten terwijl
+     daar nog eerder ontdekte bediening over is. Heropen in dat geval eerst
+     dezelfde expliciete dialoogroute, voordat knoppen op het hoofdscherm de
+     bronstand verder wijzigen. */
+  let heropenGeslotenDialoog = false;
+  let actieveDialoogOpener = null;
+  const opnieuwGeprobeerd = new Set();
+  /* Een opener mag eenmaal per zichtbare stand en bewijsvoortgang worden
+     herhaald. De stand hoort bij de sleutel: zo kan de meter A -> B opnieuw
+     doorlopen om een volgende keuze achter twee lagen te bereiken, zonder in
+     A -> B -> A te blijven draaien wanneer de pagina geen voortgang oplevert. */
+  const herhaald = new Set(), herhaaldAangeraakt = [];
+  const overgeslagen = [], risicovolAangeraakt = [], risicoFixtures = [], nietKlikbaar = [], onderschept = [], instrument = [];
+  /* APPWERKT bewijst dat de zichtbare bediening reageert; de mutatie-,
+     voltooi- en financiële proeven bewijzen het zakelijke gevolg. Dat
+     onderscheid is ook een veiligheidsgrens. Een echte tik op bijvoorbeeld
+     Uitloggen trok vroeger de server-side proefsessie in die nog door andere
+     apps werd gebruikt. De eerste volledige 100%-ronde maakte daardoor na
+     twintig apps zijn eigen volgende metingen ongeldig.
+
+     Laat de browser de risicovolle knop daarom werkelijk bedienen, inclusief
+     alle lokale handlers, dialoog en navigatie, maar vang uitsluitend gedurende
+     die ene tik een muterend verzoek aan DE LOKALE WEGWERPSERVER af. GET/HEAD
+     blijven echt, externe adressen blijven ongemoeid en iedere fixture wordt
+     met methode en pad verantwoord. Dit is geen productie-mock en maakt geen
+     zakelijk bewijs groen: die gevolgen blijven uitsluitend uit de aparte
+     contractproeven komen. */
+  let actieveRisicoklik = null;
+  const basisHerkomst = new URL(base).origin;
+  await page.route('**/*', async (route) => {
+    const verzoek = route.request();
+    const methode = verzoek.method().toUpperCase();
+    let url;
+    try { url = new URL(verzoek.url()); } catch (e) { return route.continue(); }
+    if (!actieveRisicoklik || url.origin !== basisHerkomst || /^(GET|HEAD|OPTIONS)$/.test(methode) ||
+        !VERNIETIGENDE_ROUTE.test(url.pathname)) {
+      return route.continue();
+    }
+    const bewijs = { knop: actieveRisicoklik, methode, pad: url.pathname };
+    if (!risicoFixtures.some((x) => x.knop === bewijs.knop && x.methode === bewijs.methode && x.pad === bewijs.pad)) {
+      risicoFixtures.push(bewijs);
+    }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      ok: true, success: true, status: 'appwerkt-proef', id: 'appwerkt-proef', reference: 'appwerkt-proef'
+    }) });
+  });
+  page.on('dialog', async (dialoog) => {
+    instrument.push('de proef raakte bediening met een browserbevestiging en brak de onomkeerbare bevestiging af');
+    await dialoog.dismiss().catch(() => {});
+  });
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
@@ -571,8 +947,33 @@ async function bedien(ctx, base, pad) {
     await page.waitForFunction(() => document.body && document.body.getAttribute('data-rtg-adaptive-ready') === 'true',
       null, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(400);
-    bedekt.push(...await bedektDoorSchil(page));
-    luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
+    /* De ledenapp tekent eerst de verplichte onboardinglaag en verbergt die
+       pas nadat haar status bekend is. Onder parallelle belasting kon de
+       vaste laadpauze verlopen terwijl #onbGate nog boven interne tabbladen
+       lag; de meter beschuldigde daarna Assets, Betalen en Reizen van de deur
+       die hij zelf te vroeg had gemeten. Wacht op het waarneembare product-
+       gedrag. Een scherm zonder zo'n laag voldoet meteen aan `hidden`. */
+    await wachtOpOnboarding(page);
+    await wachtOpInteractielaag(page);
+    await wachtOpAppGereed(page);
+    luister(page, base, { crash, config, serverfout, rem, weigering, wachtend });   // pas NA het laden: laadfouten horen bij bewijs 1
+    if (meet.adapter) await voerIngangAdapterUit(page, meet);
+    /* Een interne module tekent haar inhoud vaak pas na meerdere API-antwoorden.
+       De vaste algemene laadpauze was onder parallelle belasting soms eerder
+       voorbij dan bijvoorbeeld Zorg, waardoor dezelfde bronstand wisselde
+       tussen 0 en 28 zichtbare moduleknoppen. Wacht bij een expliciet bereik
+       op ten minste een eigen zichtbare bediening; een werkelijk lege module
+       blijft na de begrensde wacht eerlijk op nul staan. */
+    if (bereik) await page.waitForFunction(({ selector, bediening }) => {
+      const root = document.querySelector(selector);
+      if (!root) return false;
+      return [...root.querySelectorAll(bediening)].some((el) => {
+        if (el.hidden || el.disabled || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 1 && r.height > 1 && getComputedStyle(el).visibility !== 'hidden';
+      });
+    }, { selector: bereik, bediening: BEDIENINGSSELECTOR }, { timeout: 8000 }).catch(() => {});
+    bedekt.push(...await bedektDoorSchil(page, bereik));
     /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een
        andere taal dan nl na een tik, met de knop erbij. */
     page.on('request', (q) => {
@@ -580,10 +981,46 @@ async function bedien(ctx, base, pad) {
       let naar = null; try { naar = JSON.parse(q.postData() || '{}').naar; } catch (e) {}
       if (naar && naar !== 'nl' && laatste && !taalWissel.some((w) => w.knop === laatste && w.naar === naar)) taalWissel.push({ knop: laatste, naar });
     });
-    const gehad = new Set();
+    const kijk = (magHerhalen = false, alleenStructuur = false) =>
+      kijkRonde(page, gehad, bereik, herhaald, magHerhalen, alleenStructuur, gevondenMerken, voorkeursopeners());
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
+      /* Werk eerst het zichtbare scherm af. Adaptive Edge vervangt vaste
+         appbalken door werkende klonen in zijn Acties-blad, maar gewone
+         paginabediening hoort niet achter dat blad te verdwijnen voordat zij
+         is gebruikt. Open Edge daarom pas wanneer de huidige appstand geen
+         nieuwe eigen bediening meer heeft. De universele
+         Home/Rahul/Menu-knoppen blijven buiten deze appmeting. */
+      let vooraf = null;
+      if (!behoudHuidigeStand && !heropenGeslotenDialoog) {
+        vooraf = await kijk().catch(() => null);
+        if (!vooraf || vooraf.klaar) {
+          await openAppBedieningInEdge(page, aangetiktMerken,
+            onbewezenMerken().length === 0);
+          vooraf = null;
+        }
+      }
+      behoudHuidigeStand = false;
       let k;
-      try { k = await kijkRonde(page, gehad); }
+      try {
+        if (heropenGeslotenDialoog) {
+          heropenGeslotenDialoog = false;
+          /* Sommige dialogen verversen na Opslaan hun onderliggende bron en
+             monteren de opener in de volgende rendercyclus opnieuw. Wacht op
+             de publieke dialoogsemantiek in plaats van in die korte tussenstand
+             door te gaan naar een muterende hoofdschermactie. */
+          await page.waitForFunction(() => [...document.querySelectorAll('[aria-haspopup="dialog"]')]
+            .some((el) => !el.disabled && (!el.checkVisibility || el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))),
+          null, { timeout: 1500 }).catch(() => {});
+          k = actieveDialoogOpener
+            ? await markeerBekendeDialoogopener(page, actieveDialoogOpener, gehad.size)
+            : null;
+          if (!k) k = await kijk(true, true);
+          /* Als de opener niet meer bestaat, ga eerlijk verder met de
+             zichtbare stand. De ontbrekende bediening blijft dan in de
+             restlijst staan. */
+          if (k.klaar) k = await kijk();
+        } else k = vooraf || await kijk();
+      }
       catch (e) {
         /* Een tik kan navigeren, en dan is de context van de pagina weg op het
            moment dat de volgende ronde kijkt ("Execution context was
@@ -593,20 +1030,224 @@ async function bedien(ctx, base, pad) {
            beschuldiging uitschrijft is erger dan geen instrument. */
         if (!/Execution context was destroyed|Target closed|Navigation|frame was detached/i.test(String(e.message || e))) throw e;
         instrument.push('de proef verloor de pagina door een navigatie en opende hem opnieuw');
-        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad); }
+        try { await openIngang(page, base, meet); await page.waitForTimeout(1200); k = await kijk(); }
         catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
       }
-      gevonden = Math.max(gevonden, k.zichtbaar || 0);
-      schil = Math.max(schil, k.schil || 0);
-      if (k.klaar) break;
-      gehad.add(k.merk);
-      if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
+      telStand(k);
+      if (k.klaar) {
+        /* Een echte bediening kan het hele scherm van stand laten wisselen.
+           De meter had dan bijvoorbeeld 49 knoppen GEZIEN, tikte een tab aan,
+           zag in de nieuwe stand alleen de al aangetikte tab terug en stopte
+           op 12/49. De overige 37 waren niet onbereikbaar: de proef had ze
+           zelf uit beeld geschakeld.
+
+           Open daarom de gedeclareerde ingang opnieuw zolang een schone
+           beginstand nog eerder geziene maar niet aangetikte bediening kan
+           bevatten. `laatsteHeropenStand` voorkomt een lus als die resterende
+           bediening alleen via een al beproefde tussenstand bereikbaar is;
+           MAXKLIK begrenst zowel tikken als herstelpogingen. Dit verlaagt de
+           bewijsgrens niet: elke extra knop wordt nog steeds echt aangetikt en
+           op browser- en serverfouten beoordeeld. */
+        if (onbewezenMerken().length) {
+          try {
+            /* `gehad` betekent dat de meter een bediening heeft geselecteerd;
+               het is geen bewijs dat de tik ook is gelukt. Een dynamische
+               Edge-herbouw kan precies tussen selectie en tik vallen. Maak
+               uitsluitend zulke nog onbewezen, niet-defecte bediening opnieuw
+               selecteerbaar. Anders stopte de brede ronde op 1929/1930 terwijl
+               de gerichte tegenproef dezelfde knop wel degelijk bediende. */
+            for (const merk of onbewezenMerken()) gehad.delete(merk);
+            /* Een reeds ingezette openerketen vervolgen we in de huidige
+               stand. Zo blijft A -> B -> dialoog bereikbaar. Dit pad wordt
+               uitsluitend gezet door een expliciet herhaalde standopener en
+               valt terug naar de schone ingang zodra het geen vervolg heeft. */
+            if (herstelketenActief) {
+              k = await kijk(true);
+              telStand(k);
+              if (k.klaar) herstelketenActief = false;
+            }
+            /* Staat het app-actiedek al open, probeer dan eerst zijn expliciete
+               route- of dialoogopener. Anders zou `openIngang` het dek sluiten
+               voordat de herhaalroute naar bekende, nog onaangeraakte
+               dialoogbediening kan beginnen. */
+            if (k.klaar) {
+              k = await kijk(true, true);
+              telStand(k);
+            }
+            /* Eerst terug naar de schone ingang. Een dynamisch scherm kan na
+               een keuze tientallen eerder gevonden knoppen verbergen. In de
+               oude volgorde herhaalde de proef dan iedere bekende opener in de
+               gemuteerde stand voordat zij terugging; Mall bereikte daardoor
+               MAXKLIK terwijl 45 gewone beginknoppen onaangeraakt bleven.
+
+               De schone ingang is de kortste route naar zulke bediening. Pas
+               wanneer daar niets nieuws staat, herhalen we een verklaarde
+               opener om A -> B -> resterende keuze opnieuw te bereiken. De
+               bewijsgrens verandert niet: iedere unieke knop wordt nog steeds
+               werkelijk aangetikt. */
+            if (k.klaar && heropeningen < MAXKLIK) {
+              heropeningen++;
+              await openIngang(page, base, meet);
+              const ontbrekend = onbewezenMerken();
+              /* Sommige apps tekenen hun gewone paginabediening pas na het
+                 antwoord op hun eerste gegevensvraag. Geef een reeds geziene,
+                 nog onaangeraakte knop daarom voorrang boven het opnieuw
+                 openen van Adaptive Edge. Komt geen bekende bediening terug,
+                 dan is de expliciete Edge-route de juiste herstelweg. */
+              const paginaTerug = await wachtOpBekendeBediening(page, ontbrekend);
+              if (!paginaTerug) {
+                await openAppBedieningInEdge(page, aangetiktMerken, true);
+                /* Adaptive Edge bouwt haar appklonen na `openView` in een
+                   rendercyclus. Tachtig milliseconden was op een onbelaste
+                   machine vaak genoeg, maar liet de integrale proef soms
+                   kijken vóór de bekende ontbrekende kloon bestond en daarna
+                   voortijdig stoppen. Wacht op exact een reeds waargenomen
+                   ontbrekend merk; onbekende of niet-zichtbare bediening
+                   wordt hiermee nooit groen gemaakt. */
+                await wachtOpBekendeBediening(page, ontbrekend);
+              }
+              herstelketenActief = false;
+              instrument.push('de proef heropende de ingang om bediening uit de oorspronkelijke stand afzonderlijk te toetsen');
+            }
+            if (k.klaar) {
+              k = await kijk();
+              telStand(k);
+            }
+            if (k.klaar) {
+              k = await kijk(true);
+              telStand(k);
+            }
+            if (k.klaar) break;
+          } catch (e) {
+            instrument.push('heropenen van de oorspronkelijke stand lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80));
+            break;
+          }
+        }
+        else {
+          /* Alles wat NU bekend is, is aangetikt. Dat bewijst nog niet dat
+             alle appstanden zijn bezocht: RTMail tekent Nieuw bericht pas
+             achter Alle post, RTDocs zijn documentbediening pas achter Alle
+             docs. Herhaal daarom iedere expliciete stand- of dialoogopener
+             begrensd eenmaal om nog onbekende bediening te ontdekken. Gewone
+             contextacties doen hier niet mee; die opnieuw uitvoeren zou
+             zakelijke handelingen herhalen zonder een nieuwe schermroute te
+             bewijzen. */
+          k = await kijk(true, true);
+          telStand(k);
+          if (k.klaar) break;
+        }
+      }
+      /* `kijkRonde` inventariseert de hele huidige stand. Neem het nulpunt
+         pas daarna: alleen bediening die NA de klik verschijnt hoort bij de
+         opener. Een nulpunt vóór `kijkRonde` zou alle overige beginknoppen
+         ten onrechte kinderen van de eerste klik maken en herstelcycli
+         veroorzaken. */
+      const bekendVoorKlik = new Set(gevondenMerken);
+      if (k.herhaling) {
+        herhaald.add(k.herhaalSleutel);
+        herstelketenActief = true;
+        herstelZonderNieuw++;
+        const grens = herstelgrens(onbewezenMerken().length);
+        if (herstelZonderNieuw > grens) {
+          instrument.push('de proef stopte een openercyclus na ' + grens +
+            ' herstelstappen zonder nieuwe unieke bediening; de resterende bediening blijft eerlijk onaangeraakt');
+          break;
+        }
+        if (!instrument.some((x) => /toestandsafhankelijke openerketen/.test(x))) {
+          instrument.push('de proef volgde een toestandsafhankelijke openerketen naar resterende bediening');
+        }
+      } else {
+        gehad.add(k.merk);
+        herstelketenActief = false;
+        herstelZonderNieuw = 0;
+      }
       laatste = k.tekst || '(naamloos)';
+      const isRisicovol = RISICOVOL.test(laatste);
+      if (isRisicovol && !risicovolAangeraakt.includes(laatste)) risicovolAangeraakt.push(laatste);
       try {
-        await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
+        /* Een gewone paginaactie hoort niet onder een nog uitgeklapt appdeck
+           te worden aangetikt. Sluit uitsluitend de publieke Adaptive Edge-
+           toestand; de knop zelf blijft een normale, niet-geforceerde browser-
+           klik. Edge-acties blijven vanzelf in het open deck staan. */
+        if (!k.edgeApp) {
+          const edgeGesloten = await page.evaluate(() => {
+            if (document.body.dataset.rtgAdaptiveState !== 'expanded' ||
+                !window.RTGAdaptiveEdge || !window.RTGAdaptiveEdge.setState) return false;
+            window.RTGAdaptiveEdge.setState('dock'); return true;
+          }).catch(() => false);
+          if (edgeGesloten) await page.waitForTimeout(100);
+        }
+        actieveRisicoklik = isRisicovol ? laatste : null;
+        const bestandskeuze = k.bestandskiezer
+          ? page.waitForEvent('filechooser', { timeout: 2500 }).catch(() => null)
+          : null;
+        const invoerwijze = await tikAlsGebruiker(page, k.modaal || k.edgeApp);
+        if (invoerwijze === 'toetsenbord') {
+          instrument.push('een bewegende maar zichtbare bediening is via de toegankelijke Enter-route geactiveerd');
+        }
+        if (k.dialoogOpener) actieveDialoogOpener = k.merk;
+        /* De systeemkiezer is zelf het waarneembare gevolg van Upload. Maak
+           hem leeg zoals een gebruiker die annuleert; anders verwerkt een
+           volgende Escape zowel de native kiezer als de RTG-dialoog en blijven
+           de dialoogacties daarachter onterecht onaangeraakt. */
+        if (bestandskeuze) {
+          const chooser = await bestandskeuze;
+          if (chooser) await chooser.setFiles([]);
+        }
+        if (k.herhaling) {
+          if (!herhaaldAangeraakt.includes(k.tekst || '(naamloos)')) herhaaldAangeraakt.push(k.tekst || '(naamloos)');
+        } else {
+          aangetiktMerken.add(k.merk);
+          geklikt = aangetiktMerken.size;
+        }
+        /* Een scherm mag zijn asynchrone overgang met aria-busy kenbaar
+           maken. Wacht dan op de werkelijke nieuwe inhoud in plaats van op
+           machinesnelheid te gokken. RTMAIL gebruikt dit bij bericht ->
+           gesprek; dezelfde standaard werkt voor iedere app. */
+        await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'),
+          null, { timeout: 5000 }).catch(() => {});
         await page.waitForTimeout(600);
-        geklikt++;
-        await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
+        /* Face ID bevestigt pas na 1,1 seconde en verstuurt de betaling dus
+           later dan de gewone klikpauze. Houd de tijdelijke routefixture vast
+           zolang de echte betaaloverlay open staat. Zonder deze wacht liep
+           `/api/pay/saldo` alsnog door, verdween de factuur en bleven twee
+           alternatieve betaalbuttons ten onrechte onaangeraakt. */
+        if (isRisicovol) {
+          await page.waitForSelector('#paywait.open', { state: 'hidden', timeout: 3000 }).catch(() => {});
+        }
+        actieveRisicoklik = null;
+        await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
+        const resterendUitDezeModal = k.modaal && Array.isArray(k.merken) &&
+          k.merken.some((merk) => gevondenMerken.has(merk) &&
+            !aangetiktMerken.has(merk) && !misluktMerken.has(merk));
+        if (resterendUitDezeModal) {
+          /* Een bevestigende actie kan zichzelf uitschakelen terwijl de
+             opslag loopt en de dialoog pas daarna sluiten. Wacht op die
+             waarneembare uitkomst; een vaste klikpauze keek bij de
+             beeldbewerker nog naar de oude, open stand en verloor vervolgens
+             Upload en Annuleren. Bij een fout wordt de knop weer actief en
+             blijft de fouttekst in de gewone serverbeoordeling zichtbaar. */
+          await page.waitForFunction(() => {
+            const geraakt = document.querySelector('[data-appwerkt="1"]');
+            return !geraakt || !geraakt.disabled;
+          }, null, { timeout: 4000 }).catch(() => {});
+          const nogModaal = await page.evaluate(() => [...document.querySelectorAll('dialog[open], [role="dialog"]')]
+            .some((el) => !el.hidden && (!el.checkVisibility || el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))));
+          heropenGeslotenDialoog = !nogModaal;
+        }
+        /* Een app-eigen knop kan navigeren (Terug, Open volledig, enzovoort).
+           De tik bewijst die knop, maar de bediening op het bestemmingsscherm
+           hoort niet in de noemer van de bronapp. Voorheen keek `vervolg`
+           eerst rond en pas onderaan de iteratie naar de URL; Commerce erfde
+           daardoor 70 Mall-knoppen die het nooit kon bedienen. Keer meteen
+           terug naar de gedeclareerde ingang en inventariseer pas daar verder.
+           Hashwissels binnen dezelfde ingang blijven wel onderdeel van de app. */
+        if (!opIngang()) {
+          await openIngang(page, base, meet);
+          await page.waitForTimeout(1500);
+          instrument.push('de proef raakte een navigatieknop en opende de app opnieuw zonder bediening van het bestemmingsscherm mee te tellen');
+          continue;
+        }
         /* EN DAN DICHT, zoals een mens doet. Een tik opent vaak een laag (het
            paneel van Rahul, de sprong, de taalkeuze); bleef die open, dan lag hij
            over elke volgende knop en telde de proef zijn eigen lade als
@@ -614,15 +1255,101 @@ async function bedien(ctx, base, pad) {
            allemaal onder zo'n gedeelde laag). Escape is de gewone weg dicht; wat
            daarna nog over een knop ligt, sluit niet met Escape of bedekt hem
            echt -- en dat is wel een bevinding. */
-        await page.keyboard.press('Escape').catch(() => {});
-        await page.waitForTimeout(250);
+        /* Een app-eigen opener kan een dialoog, blad of vervolgstand tonen met
+           de bediening die de gebruiker werkelijk nodig heeft. Meteen Escape
+           sturen sloot die inhoud voordat de volgende meetronde haar ooit kon
+           zien (Instellingen: 7/19 ondanks vijf goed werkende panelen).
+
+           Kijk daarom eerst of de tik nieuwe, nog niet beproefde bediening
+           zichtbaar maakte. Zolang die er is blijft de stand open en loopt de
+           volgende ronde er echt doorheen. Alleen een eindstand zonder nieuwe
+           bediening sluiten we met de gewone Escape-route. De bestaande
+           schone-tegenproef blijft een achtergebleven, niet-sluitende laag
+           begrenzen; de bewijsdrempel wordt niet verlaagd. */
+        let vervolg = null;
+        try { vervolg = await kijk(); } catch (e) { vervolg = null; }
+        if (vervolg) {
+          telStand(vervolg);
+          for (const merk of vervolg.merken || []) {
+            if (k.routeOpener && !bekendVoorKlik.has(merk) && merk !== k.merk &&
+                !openerVoorMerk.has(merk) && !zouCyclusMaken(merk, k.merk)) {
+              openerVoorMerk.set(merk, k.merk);
+            }
+          }
+          behoudHuidigeStand = !vervolg.klaar;
+        }
+        /* Na een herhaalde opener kan de dialoog uitsluitend bediening tonen
+           die al eerder is gezien. `vervolg.klaar` betekent dan niet dat het
+           herstelpad klaar is: bekende, nog onaangeraakte paneelacties kunnen
+           achter een reeds beproefde tab zitten. Escape sloot het echte Social
+           Control Plane hier direct na OPEN COMMAND. Laat de laag in precies
+           die begrensde situatie staan; de volgende ronde herhaalt expliciete
+           standnavigatie en MAXKLIK blijft de bovengrens. */
+        const herstelpadOpen = k.herhaling && onbewezenMerken().length > 0;
+        if ((!vervolg || vervolg.klaar) && !herstelpadOpen) {
+          await page.keyboard.press('Escape').catch(() => {});
+          await page.waitForTimeout(250);
+        }
       } catch (e) {
+        actieveRisicoklik = null;
         /* De reden van een time-out staat in de LOG van Playwright ("intercepts
            pointer events", "element is not visible"), niet in de boodschap.
            Zonder die reden is "niet aan te tikken" een dood getal: een knop
            onder een balk is iets anders dan een knop die er niet is. */
         const log = String(e.message || e);
         const waarom = klikReden(log);
+        /* Playwright wacht na een echte ankertik ook op het antwoord van de
+           bestemmingspagina. Een zware OS-ingang kan die kliklimiet
+           overschrijden terwijl de browser al aantoonbaar van de gemeten app
+           is vertrokken. Dat is wél bewijs voor de navigatieknop en géén
+           bewijs over de bestemming. Accepteer daarom uitsluitend de
+           waarneembare URL-overgang, open de gedeclareerde ingang opnieuw en
+           tel nooit een time-out die op dezelfde URL bleef. */
+        const navigeerdeOndanksWacht = k.routeOpener && !opIngang();
+        if (navigeerdeOndanksWacht) {
+          if (k.herhaling) {
+            if (!herhaaldAangeraakt.includes(k.tekst || '(naamloos)')) herhaaldAangeraakt.push(k.tekst || '(naamloos)');
+          } else {
+            aangetiktMerken.add(k.merk);
+            geklikt = aangetiktMerken.size;
+          }
+          instrument.push('de proef zag de URL na een trage navigatieklik veranderen en opende de app opnieuw zonder de bestemming mee te meten');
+          try { await openIngang(page, base, meet); await page.waitForTimeout(1200); } catch (x) {}
+          continue;
+        }
+        /* Een eerdere geslaagde bediening kan een laag achterlaten die niet met
+           Escape sluit. De volgende, op zichzelf geldige knop wordt dan door
+           die PROEFSTAND onderschept. Toets zo'n knop eenmaal opnieuw vanaf de
+           gedeclareerde, schone ingang. Pas wanneer dezelfde bediening daar
+           opnieuw niet bereikbaar is, telt zij als werkelijk niet klikbaar.
+
+           `gehad.delete()` is hier essentieel: kijkRonde selecteert op de
+           stabiele handtekening van de bediening. De Set begrenst dit tot een
+           enkele tegenproef per knop, zodat een echte overlap nooit in een
+           heropeningslus verdwijnt. */
+        if (k.herhaling) {
+          instrument.push('een herhaalde opener was vanuit de schone stand niet opnieuw te bedienen: ' +
+            (k.tekst || '(naamloos)') + ' (' + waarom + ')');
+          await page.keyboard.press('Escape').catch(() => {});
+          await page.waitForTimeout(250).catch(() => {});
+          continue;
+        }
+        const opnieuwVanafSchoon = redenVoorSchoneTegenproef(waarom) &&
+          !opnieuwGeprobeerd.has(k.merk);
+        if (opnieuwVanafSchoon) {
+          opnieuwGeprobeerd.add(k.merk);
+          gehad.delete(k.merk);
+          try {
+            await openIngang(page, base, meet);
+            await page.waitForTimeout(1200);
+            instrument.push('de proef toetste een verdwenen of geblokkeerde bediening opnieuw vanaf de schone ingang');
+            continue;
+          } catch (x) {
+            gehad.add(k.merk);
+            instrument.push('schoon hertesten van de geblokkeerde bediening lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80));
+          }
+        }
+        misluktMerken.add(k.merk);
         nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
         /* WIE ligt erover. "intercepts pointer events" alleen zegt niet of het
            een lade is die een mens eerst dichttikt of een balk die de knop
@@ -645,16 +1372,112 @@ async function bedien(ctx, base, pad) {
         await page.keyboard.press('Escape').catch(() => {});
         await page.waitForTimeout(250).catch(() => {});
       }
-      if (page.url().replace(base, '').split('#')[0] !== pad) {
-        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { break; }
+      if (!opIngang()) {
+        try { await openIngang(page, base, meet); await page.waitForTimeout(1500); } catch (e) { break; }
       }
     }
   } catch (e) {
     instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
   }
-  await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
+  await beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend);
   await page.close();
-  return { geklikt, gevonden, schil, bedekt, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  const onaangeraakt = [...gevondenMerken].filter((merk) => !aangetiktMerken.has(merk))
+    .map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
+  const aangeraakt = [...aangetiktMerken].map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
+  return { geklikt, gevonden, aangeraakt, herhaaldAangeraakt, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+}
+
+async function openAppBedieningInEdge(page, gehad, herstel) {
+  try {
+    const geopend = await page.evaluate(({ alGehad, herstel }) => {
+      const merk = (el) => {
+        const label = (el.getAttribute('aria-label') || '').trim();
+        const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+          .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
+        let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+        if (bron.startsWith('control:')) bron = '';
+        return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
+      };
+      const oppervlak = [...document.querySelectorAll('[data-rtg-adaptive-surface-owner="app"] button,'
+        + '[data-rtg-adaptive-surface-owner="app"] [role="button"],'
+        + '[data-rtg-adaptive-surface-owner="app"] input[type="button"],'
+        + '[data-rtg-adaptive-surface-owner="app"] input[type="submit"]')]
+        .some((el) => !el.disabled && !alGehad.includes(merk(el)));
+      if (!window.RTGAdaptiveEdge) return false;
+      /* Een geleend live-oppervlak staat in dock juist zichtbaar; expanded
+         verbergt het ten gunste van het actiedek. Werk dit oppervlak daarom
+         eerst af en open pas daarna de gekloonde appnavigatie. */
+      if (oppervlak && window.RTGAdaptiveEdge.setState) {
+        window.RTGAdaptiveEdge.setState('dock');
+        return true;
+      }
+      const over = [...document.querySelectorAll('[data-rtg-adaptive-control="app"]')]
+        .some((el) => !el.disabled && !alGehad.includes(merk(el)));
+      /* Een dynamische appgroep kan verschijnen terwijl de Edge dicht is. De
+         Edge rendert haar klonen pas bij openen; alleen naar bestaande klonen
+         kijken zou dus een kip-ei-situatie maken. Dit zijn exact de bestaande
+         bronwortels van Adaptive Edge, zonder universele Edge-bediening. */
+      const bron = [...document.querySelectorAll('.wd-output button,.connection-edge button,.wos-dock button,'
+        + '.wos-rail button,.rtgdeel-balk button,.rv-tabs button,body>nav.balk button,.wd-page>nav.balk button,'
+        + '.rtg-edge-owned-bar button,.rtm-nav button,.mv-navigatie button,.roomrail button,.rolechoice button,.rtd-dossieracties button,'
+        + '.rtd-besluitacties button,.rtg-v4-route-actions button')]
+        .some((el) => !el.disabled && !alGehad.includes(merk(el)));
+      const herhaalbaar = herstel && [...document.querySelectorAll('[data-rtg-adaptive-control="app"]')]
+        .some((el) => !el.disabled && alGehad.includes(merk(el)) && el.getAttribute('aria-haspopup') === 'dialog');
+      /* Een app in de bestaande DesktopFrame heeft haar bronknoppen in het
+         same-origin iframe. Na iedere contextactie klapt het Edge-deck dicht;
+         een zoekopdracht in het hostdocument ziet die bron dan terecht niet.
+         De publieke FrameHost-status is in die situatie de heropenroute. Zonder
+         deze route ontdekte de meter bijvoorbeeld alle Pay-secties, maar kon
+         hij na de eerste sectiekeuze de overige echte Edge-knoppen niet meer
+         bereiken. */
+      const desktopOpen = !!(window.RTGDesktopFrame && window.RTGDesktopFrame.isOpen &&
+        window.RTGDesktopFrame.isOpen());
+      if ((!over && !bron && !herhaalbaar && !desktopOpen) || !window.RTGAdaptiveEdge.openView) {
+        if (document.body.dataset.rtgAdaptiveState === 'expanded' && window.RTGAdaptiveEdge.setState) {
+          window.RTGAdaptiveEdge.setState('dock');
+          return true;
+        }
+        return false;
+      }
+      window.RTGAdaptiveEdge.openView('now');
+      return true;
+    }, { alGehad: [...gehad], herstel: !!herstel });
+    if (geopend) await page.waitForTimeout(80);
+  } catch (e) {}
+}
+
+/* Een dialoog kan meerdere afsluitende acties hebben (Sluiten, Annuleren,
+   Opslaan). Na de eerste sluiting is de opener dezelfde zichtbare
+   gebruikersroute, maar de algemene standzoeker kan tijdens de renderovergang
+   een andere appstand als actief zien. Markeer daarom uitsluitend de eerder
+   werkelijk gebruikte, nog zichtbare opener opnieuw. De uiteindelijke tik
+   blijft de gewone Playwright-klik in `bedien`; er is geen DOM-click of
+   geforceerde interactie. */
+async function markeerBekendeDialoogopener(page, openerMerk, voortgang) {
+  return page.evaluate(({ openerMerk, voortgang }) => {
+    const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
+    const merk = (el) => {
+      const label = (el.getAttribute('aria-label') || '').trim();
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+        .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
+      let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      if (bron.startsWith('control:')) bron = '';
+      return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
+    };
+    const doel = [...document.querySelectorAll('[aria-haspopup="dialog"]')]
+      .find((el) => zie(el) && merk(el) === openerMerk);
+    if (!doel) return null;
+    document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
+    doel.setAttribute('data-appwerkt', '1');
+    return { klaar: false, merk: openerMerk, herhaling: true,
+      herhaalSleutel: 'dialoog§' + voortgang + '§' + openerMerk,
+      dialoogOpener: true, edgeApp: doel.matches('[data-rtg-adaptive-control="app"]'),
+      tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
+  }, { openerMerk, voortgang });
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -674,12 +1497,47 @@ async function bedien(ctx, base, pad) {
 /* Staat de zin van een weigering op het scherm, dan heeft de gebruiker gezien
    waarom (gezegd); anders is het een defect: de server weigerde en niemand
    vertelde het hem. */
-async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
+/* Een vervolgvraag telt alleen met de bijbehorende netwerkrespons en zichtbare
+   bediening. Een willekeurige (of achtergebleven) dialoog is geen bewijs. */
+const poortVerkeer = new WeakMap();
+async function gegevensVraagGetoond(page, w) {
+  if (w.s !== 428 || !w.poort) return false;
+  const verkeer = poortVerkeer.get(page) || [];
+  const i = verkeer.indexOf(w.poort);
+  const volgende = verkeer[i + 1];
+  if (i < 0 || !volgende || volgende.pad !== '/api/gegevens/start' || volgende.s !== 200 || volgende.methode !== 'POST' || volgende.volgorde <= w.poort.volgorde) return false;
+  const [poort, vraag] = await Promise.all([w.poort.data, volgende.data]);
+  if (!poort || !vraag || !poort.soort || volgende.soort !== poort.soort || !vraag.id || !vraag.tekst ||
+      !Array.isArray(poort.ontbreekt) || !poort.ontbreekt.some(v => v.veld === vraag.veld)) return false;
+  return page.evaluate(({ tekst, veld }) => {
+    const zichtbaar = el => {
+      if (!el || !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) || el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      const r = el.getBoundingClientRect();
+      const boven = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return r.width > 0 && r.height > 0 && boven && (boven === el || el.contains(boven));
+    };
+    return [...document.querySelectorAll('.rp-waas .rp-kaart[role="dialog"]')].some(d => {
+      const v = d.querySelector('.rp-vraag'), stop = d.querySelector('.rp-stop');
+      if (!zichtbaar(v) || v.innerText.trim() !== tekst.trim() || !zichtbaar(stop) || stop.disabled) return false;
+      if (veld === 'identiteit') return true; // de bestaande verificatiestap heeft geen invoerveld
+      const invoer = d.querySelector('.rp-in'), door = d.querySelector('.rp-door');
+      return zichtbaar(invoer) && !invoer.disabled && zichtbaar(door) && !door.disabled;
+    });
+  }, { tekst: vraag.tekst, veld: vraag.veld }).catch(() => false);
+}
+
+async function beoordeelWeigeringen(page, weigering, gezegd, serverfout, wachtend = []) {
+  /* Playwright wacht niet op een async response-listener. Lees daarom eerst
+     alle reeds ontvangen foutantwoorden uit voordat het scherm wordt bekeken;
+     anders kon de meter een zichtbare foutzin pas na het sluiten van haar
+     formulier administreren en onterecht een productdefect melden. */
+  if (wachtend.length) await Promise.allSettled(wachtend.splice(0));
   while (weigering.length) {
     const w = weigering.shift();
     let tekst = '';
     try { tekst = await page.evaluate(() => document.body ? document.body.innerText : ''); } catch (e) { tekst = ''; }
     if (tekst.includes(w.zin)) gezegd.push(w.s + ' ' + w.pad + ': ' + w.zin);
+    else if (await gegevensVraagGetoond(page, w)) gezegd.push(w.s + ' ' + w.pad + ': bijbehorende gegevensvraag zichtbaar en bedienbaar');
     else serverfout.push(w.s + ' ' + w.pad + ' -- de server weigerde ("' + w.zin.slice(0, 80) + '") maar het scherm toonde de reden niet');
   }
 }
@@ -700,10 +1558,9 @@ async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
    meteen daarna: de knop stond dan nog op zijn oude plek, onder de balk. Zo
    meldde de meting op os-portaal.html vier "bedekte" tegels die na de animatie
    vrij lagen (0 van 45 meetpunten). `behavior: 'instant'` gaat boven de CSS. */
-async function bedektDoorSchil(page) {
+async function bedektDoorSchil(page, bereik) {
   try {
-    return await page.evaluate(() => {
-      const SCHIL = '.rtg-edge-chrome, .rnd-toets, .rtg-edge-2-edge-reveal';
+    return await page.evaluate(({ SCHIL, bereik, bediening }) => {
       /* Een knop in een dichtgeklapte <details> ziet niemand: een regel die de
          inhoud van <details> een vaste display geeft, geeft hem toch een vak.
          Zo meldde deze meting op 18 oktober 2026 de standen van rtg.html als
@@ -713,7 +1570,17 @@ async function bedektDoorSchil(page) {
         if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
         const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
       const uit = [];
-      const knoppen = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+      const wortel = bereik ? document.querySelector(bereik) : document;
+      if (!wortel) return [];
+      /* scrollIntoView kan ook een overflow:hidden-vlak programmatisch
+         verschuiven. Op het digitale bord schoof zo de tekenwerkbalk onder de
+         bovenbalk en maakte de overlapmeting haar eigen bedieningsfout. Bewaar
+         daarom alle werkelijk scrollbare vlakken en zet ze exact terug. */
+      const scrollStand = [document.scrollingElement, ...document.querySelectorAll('*')]
+        .filter((el, i, a) => el && a.indexOf(el) === i &&
+          (el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth))
+        .map(el => ({ el, top: el.scrollTop, left: el.scrollLeft }));
+      const knoppen = Array.from(wortel.querySelectorAll(bediening))
         .filter(zie).filter((el) => !el.closest(SCHIL) && !el.closest('#rtg-lang-modal'));
       for (const el of knoppen) {
         el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
@@ -728,27 +1595,45 @@ async function bedektDoorSchil(page) {
           if (s) { onderSchil++; door = door || (t.tagName.toLowerCase() + '.' + Array.from(t.classList).slice(0, 2).join('.')); }
         }
         if (punten && onderSchil === punten) {
-          uit.push((el.innerText || el.getAttribute('aria-label') || el.title || '(naamloos)').trim().replace(/\s+/g, ' ').slice(0, 30) + ' onder ' + door);
+          uit.push((el.innerText || el.value || el.getAttribute('aria-label') || el.title || '(naamloos)').trim().replace(/\s+/g, ' ').slice(0, 30) + ' onder ' + door);
         }
       }
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      for (const s of scrollStand) { s.el.scrollTop = s.top; s.el.scrollLeft = s.left; }
       return uit;
-    });
+    }, { SCHIL: GEDEELDE_SCHIL, bereik, bediening: BEDIENINGSSELECTOR });
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad) {
-  return page.evaluate((alGehad) => {
+async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false, bekend = new Set(), voorkeur = new Set()) {
+  return page.evaluate(({ alGehad, alHerhaald, alBekend, alVoorkeur, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
       if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
       const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
-    const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
-      (el.innerText || el.title || '').trim().slice(0, 40)].join('|');
+    const merk = (el) => {
+      const label = (el.getAttribute('aria-label') || '').trim();
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+        .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
+      let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      if (bron.startsWith('control:')) bron = '';
+      return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
+    };
     /* De taalkeuze wordt niet aangetikt: een taal kiezen verandert de persona
        voor ELK volgend scherm (en liet elk scherm daarna vertalingen vragen).
        Dat is een instelling, geen functie van het scherm onder de meting. */
-    const kandidaten = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+    const wortel = bereik ? document.querySelector(bereik) : document;
+    if (!wortel) return { klaar: true, zichtbaar: 0, merken: [], bedieningen: [], schil: 0 };
+    /* Een open modale dialoog maakt de achtergrond tijdelijk onbedienbaar,
+       ook al geeft offsetParent daar nog maten voor terug. Meet in die stand
+       uitsluitend de top-layer dialoog. Zonder dit onderscheid telde de
+       meter zowel paneel als achtergrond in dezelfde noemer en maakte hij
+       zijn eigen bewijsgrens onhaalbaar. */
+    const modaal = [...document.querySelectorAll('dialog[open], [role="dialog"]')]
+      .find((el) => zie(el) && wortel.contains(el));
+    const actiefWortel = modaal || wortel;
+    const kandidaten = Array.from(actiefWortel.querySelectorAll(bediening))
       .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'))
       .filter((el) => !el.closest('#rtg-lang-modal'));
     /* DE SCHIL IS NIET DIT SCHERM. De Edge (.rtg-edge-chrome) en de toetsknop
@@ -761,20 +1646,158 @@ async function kijkRonde(page, gehad) {
        rijen NIET_GETEST, geen enkele boven de 14 tikken). De .rnd-toets staat
        bovendien met opzet buiten beeld tot hij focus krijgt; zijn "outside of
        the viewport" was de proef, niet het scherm. */
-    const SCHIL = '.rtg-edge-chrome, .rnd-toets';
-    const alle = kandidaten.filter((el) => !el.closest(SCHIL));
+    /* Command/Spatial is net als Edge een gedeelde werkruimte rond het actieve
+       scherm. Op app.html staan #rtgCommand en #shell tegelijk in de DOM. De
+       18 Command-acties achter het actieve OS-blad werden daardoor als knoppen
+       van bijvoorbeeld Assets geteld en vervolgens terecht door #shell
+       onderschept. Command heeft eigen browsertoetsen; deze rij kwalificeert
+       alleen de actieve app. */
+    const alle = kandidaten.filter((el) => !el.closest(SCHIL) ||
+      el.matches('[data-rtg-adaptive-control="app"]') ||
+      el.closest('[data-rtg-adaptive-surface-owner="app"]'));
+    /* Als Edge een bronknop overneemt, bestaan bron en kloon kort tegelijk.
+       Ze zijn dezelfde handeling en tellen eenmaal; kies voor de echte tik de
+       zichtbare Edge-versie, anders pakt DOM-volgorde alsnog de bedekte bron. */
+    const perMerk = new Map();
+    alle.forEach((el) => {
+      const sleutel = merk(el), huidig = perMerk.get(sleutel);
+      if (!huidig || el.matches('[data-rtg-adaptive-control="app"]') ||
+          el.closest('[data-rtg-adaptive-surface-owner="app"]')) perMerk.set(sleutel, el);
+    });
+    const eigen = [...perMerk.values()];
     /* En een knop telt EEN keer: vier kaarten met "Bekijken" zijn een handeling,
        en de proef tikt er ook maar een aan (hetzelfde merk). In de noemer
        stonden ze vier keer. */
-    const zichtbaar = new Set(alle.map(merk)).size;
+    const merken = [...perMerk.keys()];
+    const bedieningen = eigen.map((el) => ({
+      merk: merk(el),
+      tekst: (el.innerText || el.value || el.getAttribute('aria-label') || el.title || '').trim().replace(/\s+/g, ' ').slice(0, 80)
+    }));
+    const zichtbaar = merken.length;
     const schil = kandidaten.length - alle.length;
     document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
-    const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
-    if (!nieuwe.length) return { klaar: true, zichtbaar, schil };
-    nieuwe[0].setAttribute('data-appwerkt', '1');
-    return { klaar: false, zichtbaar, schil, merk: merk(nieuwe[0]),
-      tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
-  }, [...gehad]);
+    /* In een app-eigen dialoog staat de sluitknop vaak als eerste in de DOM.
+       Die als eerste aantikken maakt alle inhoud onzichtbaar en laat de meter
+       daarna zonder replaypad achter. Een mens opent het paneel juist om de
+       inhoud te gebruiken en sluit het daarna. Houd uitsluitend expliciete
+       sluitbediening daarom achteraan; zij wordt nog steeds echt beproefd. */
+    const sluiter = (el) => el.matches('[data-dialog-result]') ||
+      /^(?:sluit(?:en)?|close|annuleer|annuleren|cancel)(?:\b|$)|^[×✕]$/i.test(
+        (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim());
+    /* Ook app-eigen openers zijn echte standnavigatie. Sport gebruikt
+       data-open voor Mijn tickets -> Wedstrijddag en RTMAIL data-i voor de
+       inbox -> berichtweergave. Bij een schone replay moeten deze routes vóór
+       willekeurige taakacties terugkeren, anders blijven bedieningselementen
+       achter hun tweede scherm ten onrechte onaangeraakt. */
+    const standNavigatie = (el) => el.matches('[role="tab"],[data-tab],[data-stand],[data-open],[data-i],[aria-controls],'
+      + '[data-rtd-open],[data-rtd-diep],[data-rtm-open],[data-rtm-diep],[data-rtm-compose],'
+      + '[data-mv-nav],[data-mv-diep],[data-saloon-edge],[data-rtg-adaptive-route],'
+      + '#paginabar button,#blokkies button,'
+      + '[data-rtg-adaptive-control="app"]');
+    const dialoogOpener = (el) => el.matches('[aria-haspopup="dialog"]');
+    /* Een primaire lege-toestandactie kan door een latere mutatie verdwijnen.
+       Raak haar daarom aan zodra zij zichtbaar is. Dit is dezelfde semantische
+       hoofdactie die de interface al voor de gebruiker declareert. */
+    const hoofdactie = (el) => el.matches('[data-hoofdactie]');
+    const hoofdopener = (el) => hoofdactie(el) && dialoogOpener(el);
+    const contextactie = (el) => el.matches('[data-contextactie]');
+    const edgeApp = (el) => el.matches('[data-rtg-adaptive-control="app"]') ||
+      !!el.closest('[data-rtg-adaptive-surface-owner="app"]');
+    const risico = new RegExp(risicovol, 'i');
+    const risicoRang = (el) => {
+      const tekst = (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim();
+      if (/uitlog|log uit|sign ?out/i.test(tekst)) return 3;
+      if (/verlaat|leave|verwijder|delete|wis alles|sluit account/i.test(tekst) ||
+          el.matches('[data-bweg],[data-blweg]')) return 2;
+      /* Een bestandskiezer neemt de browserfocus over. Bedien eerst alle
+         overige acties in hetzelfde paneel en open de kiezer pas als laatste,
+         zodat zijn systeemlaag geen nog onbeproefde knoppen laat verdwijnen. */
+      if (/upload|bestand kiezen/i.test(tekst)) return 1;
+      return risico.test(tekst) ? 1 : 0;
+    };
+    const isBestandskiezer = (el) => /upload|bestand kiezen/i.test(
+      (el.getAttribute('aria-label') || el.innerText || el.value || el.title || '').trim());
+    const nieuwe = eigen.filter((el) => !alGehad.includes(merk(el)))
+      .sort((a, b) => Number(!alBekend.includes(merk(a))) - Number(!alBekend.includes(merk(b))) ||
+        /* Een bediening die al in een eerdere geldige stand is gezien, maar
+           nog niet is aangeraakt, gaat vóór een nieuwe verkenningsroute. Zo
+           wordt een kortlevende vervolgactie afgewerkt zodra haar stand
+           terugkomt, in plaats van opnieuw te verdwijnen achter een andere
+           tab of opener. */
+        Number(!hoofdactie(a)) - Number(!hoofdactie(b)) ||
+        /* Een primaire schermactie kan na een Edge- of taakactie verdwijnen.
+           Raak haar daarom vóór de overige appklonen aan. De kliklus klapt een
+           eventueel open Edge-deck eerst via zijn publieke toestand dicht, dus
+           dit verandert een echte gebruikersklik niet in een geforceerde tik. */
+        Number(!edgeApp(a)) - Number(!edgeApp(b)) ||
+        /* Eerst de hoofdstanden bereikbaar maken. Een scherm als Magnaat kan
+           honderden dynamische taakacties tekenen; als contextacties altijd
+           voorgaan, komen de vier vaste hoofdnavigatieknoppen pas na de harde
+           herstelgrens aan bod. Dat meet veel bijzaken en mist juist de
+           routes waarmee een mens de app bedient. Iedere taakactie blijft in
+           de noemer en wordt daarna nog steeds werkelijk aangetikt. */
+        Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+        Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
+        Number(sluiter(a)) - Number(sluiter(b)) ||
+        risicoRang(a) - risicoRang(b) ||
+        Number(!contextactie(a)) - Number(!contextactie(b)));
+    let doel = nieuwe[0], herhaling = false, herhaalSleutel = null;
+    if (!doel && magHerhalen) {
+      const stand = merken.slice().sort().join('¦');
+      const herhaalStand = new Set(alHerhaald);
+      doel = eigen.filter((el) => alGehad.includes(merk(el)) &&
+          (standNavigatie(el) || dialoogOpener(el) || (!alleenStructuur && contextactie(el))) &&
+          !herhaalStand.has(alGehad.length + '§' + stand + '§' + merk(el)))
+        /* Nieuwe dialooginhoud wordt hierboven altijd voor de sluitknop
+           aangeraakt. Is in een modale stand niets nieuws meer over, dan doet
+           een mens het omgekeerde: sluit de afgewerkte laag en gaat verder op
+           het scherm eronder. Een reeds gebruikte taakactie opnieuw kiezen
+           kan dezelfde overlay steeds heropenen (Magnaat: actieve opdracht)
+           en voegt geen uniek bedieningsbewijs toe. Buiten een modal blijven
+           openers vooraan om A -> B -> resterende keuze te kunnen replayen. */
+        .sort((a, b) => modaal
+          /* Als een reeds geziene tab een nog onaangeraakte paneelactie kan
+             onthullen, moet die route voor de sluitknop worden herhaald. Dit
+             is expliciete standnavigatie, geen willekeurige taakactie. Zonder
+             deze rangorde zag het Social Control Plane AAN en ANALYSEER
+             CONTEXT wel, maar sloot het deck voordat hun tab terugkwam. */
+          ? Number(!alVoorkeur.includes(merk(a))) - Number(!alVoorkeur.includes(merk(b))) ||
+            Number(!hoofdopener(a)) - Number(!hoofdopener(b)) ||
+            Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+            Number(sluiter(a)) - Number(sluiter(b)) ||
+            risicoRang(a) - risicoRang(b) ||
+            Number(!contextactie(a)) - Number(!contextactie(b))
+          : /* Buiten een modal is een reeds gebruikte dialoogopener de
+               kortste verklaarde route naar bekende, nog onaangeraakte
+               dialooginhoud. Heropen die vóór algemene tab- en
+               wereldnavigatie; anders kon Saloon alle globale standen
+               doorlopen terwijl Upload en Opslaan achter dezelfde geldige
+               foto-opener bleven wachten. */
+            /* Een expliciet gedeclareerde hoofdopener is de kortste publieke
+               route terug naar kortlevende dialoogbediening. RTDocs heeft
+               naast de veegactiedeur veel document- en werkdialogen. Zonder
+               deze rangorde doorliep de integrale proef eerst al die andere
+               openers en bereikte zij de laatste twee geldige veegacties pas
+               na MAXKLIK. De opener blijft een gewone browserklik; alleen de
+               volgorde van reeds bewezen herstelroutes wordt specifieker. */
+            Number(!alVoorkeur.includes(merk(a))) - Number(!alVoorkeur.includes(merk(b))) ||
+            Number(!hoofdopener(a)) - Number(!hoofdopener(b)) ||
+            Number(!dialoogOpener(a)) - Number(!dialoogOpener(b)) ||
+            Number(!standNavigatie(a)) - Number(!standNavigatie(b)) ||
+            Number(sluiter(a)) - Number(sluiter(b)) ||
+            risicoRang(a) - risicoRang(b) ||
+            Number(!contextactie(a)) - Number(!contextactie(b)))[0];
+      herhaling = !!doel;
+      if (doel) herhaalSleutel = alGehad.length + '§' + stand + '§' + merk(doel);
+    }
+    if (!doel) return { klaar: true, zichtbaar, merken, bedieningen, schil };
+    doel.setAttribute('data-appwerkt', '1');
+    return { klaar: false, zichtbaar, merken, bedieningen, schil, merk: merk(doel), herhaling, herhaalSleutel,
+      edgeApp: edgeApp(doel), modaal: !!modaal, bestandskiezer: isBestandskiezer(doel),
+      dialoogOpener: dialoogOpener(doel), routeOpener: standNavigatie(doel) || dialoogOpener(doel),
+      tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
+  }, { alGehad: [...gehad], alHerhaald: [...herhaald], alBekend: [...bekend], alVoorkeur: [...voorkeur], magHerhalen, alleenStructuur, SCHIL: GEDEELDE_SCHIL, bereik,
+    bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });
 }
 
 /* Een 503 die zichzelf uitlegt is CONFIG en geen DEFECT. Dit huis schrijft die
@@ -788,11 +1811,25 @@ function weigerZin(lijf) {
 }
 
 function luister(page, base, bak) {
-  page.on('pageerror', (e) => bak.crash.push('JS: ' + String(e.message || e).slice(0, 180)));
-  page.on('response', async (res) => {
+  const verkeer = [], verzoeken = new WeakMap();
+  let volgorde = 0;
+  page.on('request', q => verzoeken.set(q, ++volgorde));
+  poortVerkeer.set(page, verkeer);
+  page.on('pageerror', (e) => {
+    if (!isBrowserruis(e)) bak.crash.push('JS: ' + String(e.message || e).slice(0, 180));
+  });
+  page.on('response', (res) => {
+    const werk = (async () => {
     const s = res.status();
-    if (s < 400) return;
     const pad = res.url().replace(base, '').slice(0, 80);
+    let poort = null;
+    if (s === 428 || pad === '/api/gegevens/start') {
+      let aanvraag = {}; try { aanvraag = JSON.parse(res.request().postData() || '{}'); } catch (e) {}
+      poort = { s, pad, volgorde: verzoeken.get(res.request()) || 0, methode: res.request().method(), soort: aanvraag.soort,
+        data: res.text().then(t => { try { return JSON.parse(t); } catch (e) { return null; } }, () => null) };
+      verkeer.push(poort);
+    }
+    if (s < 400) return;
     if (s === 401 || s === 403 || s === 404) return;   // een deur is geen defect; bewijs 6 gaat daarover
     // de zin eerst uit het HELE antwoord: afgekapt op 200 tekens is het geen JSON meer
     let vol = '';
@@ -805,13 +1842,38 @@ function luister(page, base, bak) {
     /* Een weigering MET een zin (400/409/422/428 en {"error": "..."}) is pas een
        defect als de gebruiker niet te zien krijgt waarom. Of hij hem ziet, kijkt
        bedien() na de tik op het scherm na. */
-    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol) });
+    else if ([400, 409, 422, 428].includes(s) && bak.weigering && weigerZin(vol)) bak.weigering.push({ s, pad, zin: weigerZin(vol), ...(poort ? { poort } : {}) });
     else bak.serverfout.push(s + ' ' + pad + (lijf ? ' -- ' + lijf.slice(0, 100) : ''));
+    })();
+    if (bak.wachtend) bak.wachtend.push(werk);
   });
 }
 
 /* ---- schrijven ---- */
+/* De bewijzen die deze browserronde ZELF meet, krijgen hun raakvlak hier, op
+   het stempel van de ronde. Een samengesteld bewijs kreeg het al bij de bron;
+   menselijk heeft dan twee helften, en beide moeten vers blijven. */
+const EIGEN_BEWIJZEN = ['bereikbaar', 'bedienbaar', 'menselijk'];
+function legRaakvlakken(regels, st) {
+  const w = RAAKVLAKWERELD();
+  const grof = require('./lib/stempel').versheid;
+  for (const r of regels) {
+    for (const naam of EIGEN_BEWIJZEN) {
+      const b = r.bewijzen[naam];
+      if (!b || b.status === 'GEEN_FIXTURE') continue;
+      if ((r.samengesteld || []).includes(naam) && naam !== 'menselijk') continue;
+      const v = raakvlakken.versheidVoor(w, { ingang: r.ingang, soort: 'browser' }, grof)(st);
+      if (!v.raakvlak) continue;   // niet vers op de eigen commit: dan is er geen raakvlak om te bewaren
+      b.raakvlak = ((r.samengesteld || []).includes(naam) ? (b.raakvlak || []) : []).concat([v.raakvlak]);
+    }
+  }
+  return raakvlakken.hashes(w);
+}
+
+let laatsteHashes = null;
 function bouw(meting) {
+  const st = stempel();
+  const hashes = laatsteHashes = legRaakvlakken(meting.regels, st);
   const telling = {};
   for (const r of meting.regels) telling[r.status] = (telling[r.status] || 0) + 1;
   const perBewijs = {};
@@ -825,8 +1887,7 @@ function bouw(meting) {
   return {
     uitleg: 'Doet de functie het? Per onderdeel uit MAPPEN, met de persona aan wie de wereld hem toont, gemeten in een echte browser met een echte sessie. Drie van de acht bewijzen uit BETROUWBAARHEID.md worden hier gemeten; de andere vijf staan er met de reden waarom ze nog niet te meten zijn.',
     hoe: 'node scripts/appwerkt.js  (--controle zakt als het aantal defecten groeit)',
-    grens: 'Een BEWEZEN rij betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het betekent NIET dat de functie werkt -- daarvoor zijn de vijf bewijzen nodig die hier GEEN_FIXTURE zijn. Er worden geen formulieren ingevuld en geen onomkeerbare knoppen aangetikt; die staan per rij in `overgeslagen`. ' +
-      'EN: een groot deel van wat er zichtbaar staat is niet aan te tikken -- er ligt iets overheen, of het is weg op het moment van tikken. Raakt de proef minder dan de helft van een scherm, dan is die rij NIET_GETEST en geen BEWEZEN; zie knoppenNietKlikbaar en schermenGrotendeelsOngemeten.',
+    grens: 'Een BEWEZEN rij betekent: de ingang opent voor zijn persona en 100% van de unieke toepasselijke knopbediening is in de browser aangeraakt zonder fout. Risicovolle bediening wordt alleen op de lokale wegwerpserver geraakt; browserbevestigingen worden afgebroken en de volledige zakelijke uitkomst hoort bij de voltooi-, herstel- en financiële proeven. Het betekent dus niet op zichzelf dat de hele functie werkt. Een onaangeraakte, bedekte of onbereikbare knop houdt de rij NIET_GETEST of maakt haar defect.',
     standen: {
       BEWEZEN: 'gemeten en in orde',
       GEBLOKKEERD_DOOR_DEFECT: 'gemeten en stuk; hier moet code voor worden gerepareerd',
@@ -834,7 +1895,13 @@ function bouw(meting) {
       GEEN_FIXTURE: 'niet te meten zonder testwereld, met de reden erbij',
       NIET_GETEST: 'deze ronde niet aangeraakt, met de reden erbij'
     },
-    stempel: stempel(),
+    stempel: st,
+    /* Het raakvlak (scripts/lib/bewijsraakvlak.js, BETROUWBAARHEID.md par. 4i):
+       de sha256 per bestand staat in APPWERKT-RAAKVLAK.json, met hetzelfde
+       stempel, zodat dit register leesbaar blijft. Hier staat de verwijzing met
+       de samengestelde hash over die hashes; elk bewijs draagt zijn eigen
+       samengestelde hash in `raakvlak`. */
+    raakvlak: raakvlakken.verwijzing(st, hashes),
     sessiesOvergeslagen: meting.sessiesOvergeslagen,
     /* DE MACHINE STAAT ERBIJ. Deze proef tikt met een tijdslimiet, en op een
        machine die drie keer meer werk heeft dan kernen loopt een gezonde tik
@@ -856,10 +1923,11 @@ function bouw(meting) {
       onderscheppers: Object.fromEntries(Object.entries(meting.regels.reduce((t, r) => {
         for (const o of r.onderschept || []) t[o.door] = (t[o.door] || 0) + 1; return t; }, {}))
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))),
-      /* De eerlijkste maat voor hoe dun bewijs 2 is: op hoeveel schermen bleef
-         meer dan de helft van wat er stond onaangeraakt? */
+      /* Iedere openstaande knop houdt bewijs 2 open. De historische sleutel
+         blijft voor registercompatibiliteit bestaan, maar draagt nu de
+         strengere volledige-bedieningsbetekenis. */
       schermenGrotendeelsOngemeten: meting.regels.filter((r) => (r.gevonden || 0) > 0
-        && (r.geklikt || 0) * 2 < (r.gevonden || 0)).length,
+        && (r.geklikt || 0) < (r.gevonden || 0)).length,
       deurenZonderPersona: meting.regels.filter((r) => r.bewijzen.bereikbaar
         && r.bewijzen.bereikbaar.status === 'NIET_GETEST'
         && /er staat een deur/.test(r.bewijzen.bereikbaar.reden || '')).length },
@@ -938,7 +2006,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { onderschepper, klikReden, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {
@@ -984,7 +2052,10 @@ if (require.main === module) (async () => {
     process.exit(0);
   }
   const uit = bouw(await meet());
-  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+  if (magSchrijven(eisSchoneBoom('appwerkt'), DOEL)) {
+    fs.writeFileSync(DOEL, JSON.stringify(uit, null, 1) + '\n');
+    fs.writeFileSync(raakvlakken.REGISTER_PAD, JSON.stringify(raakvlakken.register(uit.stempel, laatsteHashes), null, 1) + '\n');
+  }
   log('\nAPPWERKT: ' + uit.gemeten.onderdelen + ' onderdelen, ' + uit.gemeten.defecten + ' defect');
   for (const d of uit.defecten) log('  ✗ ' + d.wereld + ' / ' + d.app + ': ' + d.reden);
   process.exit(0);

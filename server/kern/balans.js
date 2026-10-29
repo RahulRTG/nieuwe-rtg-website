@@ -5,17 +5,19 @@
    gerust mag negeren. Het beeld komt uit wat er al is (de agenda, het
    grootboek, de klokuren van het personeel); er wordt niets nieuws over
    het lid vastgelegd. */
+const tijdzone = require('./tijdzone');
+const klok = require('../lib/klok'); // RTG_KLOK, zodat de week rond middernacht te beproeven is
 const DAG = 86400000;
 
 /* puur: het weekbeeld uit agenda-items (komende 7 dagen) en
    grootboekrijen (afgelopen 14 dagen) */
-function weekBeeld({ agenda = [], rijen = [], nu = new Date() }) {
-  const dagen = [...Array(7)].map((_, i) => new Date(nu.getTime() + i * DAG).toISOString().slice(0, 10));
+function weekBeeld({ agenda = [], rijen = [], nu = klok.datum() }) {
+  const dagen = [...Array(7)].map((_, i) => tijdzone.plusDagen(tijdzone.datumIn(nu), i));
   const items = agenda.filter(i => !i.gedaan && dagen.includes(i.datum));
   const perDag = dagen.map(d => items.filter(i => i.datum === d).length);
   const sinds = new Date(nu.getTime() - 14 * DAG).toISOString();
   const eet = rijen.filter(r => r.at >= sinds && /^partner:/.test(r.naar || ''));
-  const laat = eet.filter(r => { const u = new Date(r.at).getHours(); return u >= 23 || u < 5; }).length;
+  const laat = eet.filter(r => { const u = tijdzone.uurIn(r.at); return u >= 23 || u < 5; }).length;
   return {
     dagen, perDag,
     vrijeDagen: perDag.filter(n => n === 0).length,
@@ -50,7 +52,7 @@ function seintjeVoorBalans(balansResultaat) {
 function maakBalans({ db, zorgVan, klokVan }) {
   const boek = () => Array.isArray(db.data.payBoekingen) ? db.data.payBoekingen : [];
 
-  function balansVoorLid(codenaam, key, nu = new Date()) {
+  function balansVoorLid(codenaam, key, nu = klok.datum()) {
     const agenda = ((db.data.agendas || {})['lid:' + key] || []);
     const rijen = boek().filter(r => r.van === 'lid:' + codenaam).slice(0, 400);
     const beeld = weekBeeld({ agenda, rijen, nu });

@@ -26,7 +26,7 @@ module.exports = (ctx) => {
        loopt de dienst gewoon: hij start hem zelf, en wie er is, weet dat beter
        dan een register. Wel zegt de PDA het erbij (DAT, nooit waarom), zodat
        een vergeten ziekmelding niet stil blijft staan. */
-    const ip = actor && actor.staffId != null ? inplanbaar(s.code, actor.staffId, nu().slice(0, 10)) : { plan: true };
+    const ip = actor && actor.staffId != null ? inplanbaar(s.code, actor.staffId, require('../tijdzone').datumIn(nu())) : { plan: true };
     return { status: 200, ok: true, aan: true, voertuigId: vid, lijn: { id: lijn.id, naam: lijn.naam, soort: lijn.soort },
       ...(ip.plan ? {} : { afwezigWaarschuwing: 'Je staat vandaag als afwezig gemeld. De dienst loopt; ben je er weer, laat je afmelding dan intrekken.' }) };
   }
@@ -108,36 +108,21 @@ module.exports = (ctx) => {
     const frequentieMin = Math.min(Math.max(Math.round(Number(data.frequentieMin) || 15), 1), 240);
     const basis = Math.min(Math.max(Math.round(Number(data.tarief && data.tarief.basis) || 180), 0), 10000);
     const perKm = Math.min(Math.max(Math.round(Number(data.tarief && data.tarief.perKm) || 20), 0), 2000);
+    /* DE HERHAALSLEUTEL staat bij de lijn en overleeft een herstart: dezelfde
+       tik geeft dezelfde nieuwe lijn, dezelfde sleutel voor een andere een 409. */
+    const idem = !data.id && data.idem ? String(data.idem).slice(0, 80) : null;
+    const al = idem ? s.lijnen.find(x => x.idem === idem) : null;
+    if (al) return al.naam === naam && al.soort === soort
+      ? { status: 200, ok: true, herhaald: true, lijn: { id: al.id, naam: al.naam, soort: al.soort, haltes: al.haltes } }
+      : { status: 409, error: 'Deze herhaalsleutel hoort bij een andere lijn.' };
     let l = data.id ? lijnVan(s, String(data.id)) : null;
-    if (!l) { l = { id: id('L') }; s.lijnen.push(l); }
+    if (!l) { l = { id: id('L') }; if (idem) l.idem = idem; s.lijnen.push(l); }
     Object.assign(l, { naam, soort, frequentieMin, tarief: { basis, perKm }, haltes });
     save();
     return { status: 200, ok: true, lijn: { id: l.id, naam: l.naam, soort: l.soort, haltes: l.haltes } };
   }
 
-  /* ---- het zaakoverzicht: live vloot, reizigers en omzet vandaag ---- */
-  function overzicht(s) {
-    ensureOv();
-    const vandaag = nu().slice(0, 10);
-    const ritten = db.data.ovRitten.filter(r => r.code === s.code && String(r.in.at).slice(0, 10) === vandaag);
-    const operaties = (db.data.ovOperaties || []).filter(o => ['gereed-voor-boeken', 'in-regie', 'gereed', 'onderweg'].includes(o.status));
-    const operatieBeeld = {
-      actief: operaties.length,
-      segmenten: operaties.reduce((n, o) => n + (o.segmenten || []).length, 0),
-      personen: operaties.reduce((n, o) => n + (o.personen || 0), 0),
-      aandacht: operaties.reduce((n, o) => n + (o.segmenten || []).filter(x => ['aangevraagd', 'offerte'].includes(x.status)).length, 0),
-      // bewust alleen operationele totalen: geen naam, route, rollen of hoofdgast
-      modi: Object.entries(operaties.flatMap(o => o.segmenten || []).reduce((a, x) => { a[x.modus] = (a[x.modus] || 0) + 1; return a; }, {}))
-        .map(([modus, aantal]) => ({ modus, aantal }))
-    };
-    return { status: 200,
-      voertuigen: db.data.ovVoertuigen.filter(v => v.code === s.code && versVoertuig(v))
-        .map(v => ({ id: v.id, naam: v.naam, lijnId: v.lijnId, soort: v.soort, lat: v.lat, lng: v.lng, door: v.door })),
-      reizigersVandaag: ritten.length, aanBoord: ritten.filter(r => r.status === 'in').length,
-      omzetVandaag: ritten.reduce((n, r) => n + (r.prijs || 0), 0),
-      lijnen: (s.lijnen || []).map(l => ({ id: l.id, naam: l.naam, soort: l.soort, icoon: SOORTEN[l.soort],
-        reizigers: ritten.filter(r => r.lijnId === l.id).length })), operaties: operatieBeeld };
-  }
+  const overzicht = require('./overzicht')({ data: () => db.data, ensureOv, nu, versVoertuig, SOORTEN });
 
   return { ovDienst: dienst, ovPos: pos, ovCodeIn: codeIn, ovStand: stand,
     ovLijnenBeheer: lijnenBeheer, ovLijnZet: lijnZet, ovOverzicht: overzicht };

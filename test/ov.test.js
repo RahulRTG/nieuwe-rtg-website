@@ -207,3 +207,38 @@ test('8. de dienst overleeft een herlaadbeurt: de stand zegt of hij loopt', asyn
   const na = await api('/api/staff/ov/stand', {}, tok);
   assert.equal(na.body.aan, false, 'na afmelden loopt er weer niets');
 });
+
+test('9. een dubbeltik op "Bewaren" bij een nieuwe lijn maakt er een, geen twee', async () => {
+  /* De voltooiproef (scripts/lib/voltooi/ovroutes.js) zag twee gelijke lijnen
+     op de OV-kaart na een dubbeltik. De verklaring in
+     server/lib/idemsleutels-travelos.js maakt een woordelijk gelijke herhaling
+     binnen het venster tot een herhaling. */
+  const roster = await api('/api/supplier/roster', { code: 'TRANSIT' });
+  const m = roster.body.staff.find(x => x.role === 'manager');
+  const baas = (await api('/api/supplier/login', { code: 'TRANSIT', staffId: m.id, pin: '1234' })).body.token;
+  const lijf = { naam: 'Lijn 12 Dubbel', soort: 'tram', frequentieMin: 10,
+    haltes: [{ naam: 'Portal Nou', lat: 38.912, lng: 1.428 }, { naam: 'Figueretes', lat: 38.902, lng: 1.42 }] };
+  const [a, b] = await Promise.all([api('/api/staff/ov/lijn/zet', lijf, baas), api('/api/staff/ov/lijn/zet', lijf, baas)]);
+  assert.equal(a.status, 200);
+  assert.equal(b.status, 200);
+  const lijnen = (await api('/api/staff/ov/lijnen', {}, baas)).body.lijnen.filter(l => l.naam === 'Lijn 12 Dubbel');
+  assert.equal(lijnen.length, 1, 'een lijn, niet ' + lijnen.length);
+});
+
+test('10. de herhaalsleutel staat bij de lijn: dezelfde tik is dezelfde lijn, een andere lijn onder die sleutel een 409', async () => {
+  const roster = await api('/api/supplier/roster', { code: 'TRANSIT' });
+  const m = roster.body.staff.find(x => x.role === 'manager');
+  const baas = (await api('/api/supplier/login', { code: 'TRANSIT', staffId: m.id, pin: '1234' })).body.token;
+  const lijf = { naam: 'Lijn 14 Sleutel', soort: 'bus', idem: 'lijn-sleutel-1',
+    haltes: [{ naam: 'A', lat: 38.912, lng: 1.428 }, { naam: 'B', lat: 38.902, lng: 1.42 }] };
+  const een = await api('/api/staff/ov/lijn/zet', lijf, baas);
+  // Deze route bewaart haar eigen sleutel; de tijdelijke antwoordkas doet niet mee.
+  assert.equal(require('../server/middleware/idempotentie-eigen').doetHetZelf('/api/staff/ov/lijn/zet'), true);
+  const twee = await api('/api/staff/ov/lijn/zet', lijf, baas);
+  assert.equal(twee.status, 200);
+  assert.equal(twee.body.lijn.id, een.body.lijn.id, 'dezelfde lijn');
+  const ander = await api('/api/staff/ov/lijn/zet', Object.assign({}, lijf, { naam: 'Lijn 15 Anders' }), baas);
+  assert.equal(ander.status, 409);
+  const lijnen = (await api('/api/staff/ov/lijnen', {}, baas)).body.lijnen.filter(l => /Sleutel|Anders/.test(l.naam));
+  assert.equal(lijnen.length, 1);
+});

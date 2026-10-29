@@ -120,12 +120,12 @@ Object.assign(kern, require('../kern/labfonds')({ db, save, crypto, anthropic, l
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun
    takenlijst; wie binnenkomt kiest eerst een huis. */
-Object.assign(kern, require('../kern/werkplek')({ db, save, crypto }));
+Object.assign(kern, require('../kern/werkplek')({ db, save, bewerkCollectie: hulp.bewerkCollectie, crypto }));
 /* Aanmeldingen (kern/aanmeldingen.js): de aanmelding per pas is geheel
    geautomatiseerd (berichten, onboarding, rondleiding, RTF, veiligheid, privacy);
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
    Lifestyle/Business toe. */
-Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, accounts,
+Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, accounts, bewerkCollectie: hulp.bewerkCollectie,
   // laat gebonden: geld-regie en meldingen (naar gast, C5) staan er pas later
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
   meldLid: (...a) => kern.meldLid && kern.meldLid(...a) }));

@@ -82,7 +82,7 @@ test('een eigen Service- en Bureauzaak krijgen context via de bestaande deuren',
   assert.equal(s.context.grantsAuthority, false);
   assert.equal(s.actions.every(x => x.executable === false), true);
 
-  const bureau = await api('/api/member/bureau/zaak/open', { titel: 'Privétransfer', domein: 'vervoer' }, accountA);
+  const bureau = await api('/api/member/bureau/zaak/open', { idem: 'zaak-fixture-85', titel: 'Privétransfer', domein: 'vervoer' }, accountA);
   const bureauView = await api('/api/bedrijf/zaakregie', { werkruimte, lidToken: lidA.token,
     domain: 'bureau', id: bureau.body.zaak.id }, accountA);
   assert.equal(bureauView.status, 200, JSON.stringify(bureauView.body));

@@ -30,6 +30,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, kantoorKoppelBody } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosscherm-'));
@@ -165,8 +166,11 @@ test('het gemeentenportaal toont cijfers en geen enkele persoon',
       try { antwoorden.push(await res.text()); } catch (e) { /* afgebroken antwoord */ }
     });
 
+    /* De medewerker van de gemeente draagt een (gratis) account; de code koppelt
+       het aan het dossier (eigenaarsbesluit 19 oktober 2026). */
+    const medewerker = await registreerGratis(srv.base);
     await page.goto(srv.base + '/apps/foundation/os-portaal.html', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
+    await page.evaluate((t) => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_member_token', t); }, medewerker.token);
     await page.goto(srv.base + '/apps/foundation/os-portaal.html', { waitUntil: 'domcontentloaded' });
 
     // eerst een code die niet bestaat: de tekst hoort te zeggen wat er mis is

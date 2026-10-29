@@ -31,7 +31,7 @@ module.exports = (m) => ({
     twin: m.twin.twin, twinRuimte: m.twin.twinRuimte, twinRuimteWeg: m.twin.twinRuimteWeg,
     twinInstallatie: m.twin.twinInstallatie, twinInstallatieWeg: m.twin.twinInstallatieWeg,
     twinBeurt: m.twin.twinBeurt,
-    cases: m.cases.cases, caseOpen: m.cases.caseOpen,
+    cases: m.cases.cases, caseOpen: m.cases.caseOpen, caseOpenBedoeling: m.cases.caseOpenBedoeling,
     caseBeslis: m.cases.caseBeslis, caseIntrek: m.cases.caseIntrek,
     KAMERS: m.kamers.BUREAU_KAMERS,
     DOMEINEN: m.delegatie.DELEGATIE_DOMEINEN,

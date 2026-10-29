@@ -25,7 +25,7 @@
 
    Opslag in de eigen collectie rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
 
-const { idVanKey } = require('../lib/lidsleutel');
+const accountOpSleutel = require('../lib/account-op-sleutel');
 const klok = require('../lib/klok');
 
 const KOPPEL_TTL_MS = 2 * 60 * 1000;      // een koppelcode leeft twee minuten
@@ -80,11 +80,7 @@ function maakRtgid({ db, save, bewerkCollectie, crypto, accounts, schoon, leefti
     } catch (e) { herstel(s, voor); throw e; }
   }
 
-  function accountVanKey(key) {
-    const id = idVanKey(key);
-    if (id == null) return null;
-    try { return accounts.getUserById(id); } catch (e) { return null; }
-  }
+  const accountVanKey = key => accountOpSleutel(accounts, key);
   const codenaamUit = key => ((typeof gidsHaal === 'function' ? gidsHaal(key) : null) || {}).codename || 'lid';
 
   /* Wat een dienst te horen krijgt en waar dat op rust, staat apart in

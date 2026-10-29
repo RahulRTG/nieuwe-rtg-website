@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="premium.css">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="foundation.os-portaal" class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -46,6 +47,7 @@
   <h1>Portaal voor partners, gemeenten en ondernemers</h1>
 </header>
 <main id="main">
+  <div id="accountDeur"></div>
   <div class="kaart">
     <div class="sec">Uw code</div>
     <div class="rij">
@@ -73,6 +75,7 @@
   <div id="uit"></div>
 </main>
 
+<script src="/shared/accountdeur.js"></script>
 <script>
 /* Drie portalen, een deur.
 
@@ -125,11 +128,16 @@ async function open() {
     return;
   }
   let r;
+  /* Een account en de code (eigenaarsbesluit 19 oktober 2026): de code koppelt
+     het account de eerste keer aan het dossier; de deur staat in dit scherm. */
+  await RTGAccountDeur.eis($('#accountDeur'), { waarom: 'Het portaal opent u met een RTG-account; een gratis account is genoeg. Uw code koppelt dat account aan uw dossier.' });
   try {
-    const res = await fetch('/api/rtfos/portaal/' + soort, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code })
+    const PAD = { partner: '/api/rtfos/portaal/partner', gemeente: '/api/rtfos/portaal/gemeente', ondernemer: '/api/rtfos/portaal/ondernemer' };
+    const res = await fetch(PAD[soort], {
+      method: 'POST', headers: RTGAccountDeur.kop({ 'Content-Type': 'application/json' }), body: JSON.stringify({ code })
     });
     r = await res.json().catch(() => ({}));
+    if (res.status === 401) RTGAccountDeur.vergeet();
     if (!res.ok) { fout(r.error || 'Er ging iets mis.'); return; }
   } catch (e) { fout('Geen verbinding met het RTF-kantoor.'); return; }
   if (soort === 'partner') toonPartner(r);

@@ -32,7 +32,21 @@
   }
 
   /* ---------- staat bijwerken vanuit server-antwoorden ---------- */
+  function geldigeKamerstaat(d) {
+    return d && d.kamer && typeof d.kamer.naam === 'string' &&
+      Number.isFinite(d.kamer.b) && Number.isFinite(d.kamer.d) && Array.isArray(d.kamer.meubels) &&
+      Array.isArray(d.leden) && d.leden.every(l => l && typeof l.codenaam === 'string' &&
+        [l.x,l.y,l.dx,l.dy].every(Number.isFinite));
+  }
+  function kamerFout(kamerId) {
+    kamerBeschikbaar=false;
+    $('#balk').hidden = true;
+    $('#poort').innerHTML = '<div class="ds-canvaslaag__vlak" role="status"><p>De kamergegevens zijn niet beschikbaar. Probeer opnieuw.</p><button class="ds-knop" id="residentieHerstel" type="button">Opnieuw proberen</button></div>';
+    $('#poort').hidden = false;
+    $('#residentieHerstel').onclick = () => betreed(kamerId || (S.kamer && S.kamer.id) || 'lobby');
+  }
   function neemStaat(d, hou) {
+    if (!geldigeKamerstaat(d)) { kamerFout(); throw new Error('De kamergegevens zijn niet beschikbaar. Probeer opnieuw.'); }
     if (d.ik) S.ik = d.ik;
     if ('paar' in d) S.paar = d.paar;
     S.kamer = d.kamer;
@@ -49,6 +63,10 @@
         zeg: was && was.zeg, zegTot: was ? was.zegTot : 0, emote: was && was.emote, emoteTot: was ? was.emoteTot : 0 });
     }
     maat();
+    // Zowel betreden als een geldige achtergrondpols herstelt dezelfde toestand.
+    kamerBeschikbaar=true;
+    $('#poort').hidden = true;
+    $('#balk').hidden = false;
   }
   const lid = naam => S.leden.get(naam);
 
@@ -56,10 +74,9 @@
     try {
       const d = await api('/api/residentie/betreed', { kamer: kamerId });
       neemStaat(d, false);
-      $('#balk').hidden = false;
     } catch (e) {
-      meld(e.message);
-      if (!S.kamer && kamerId !== 'lobby') betreed('lobby');
+      if (e.status === 404 && !S.kamer && kamerId !== 'lobby') return betreed('lobby');
+      kamerFout(kamerId);
     }
   }
 
@@ -97,7 +114,7 @@
   // de rustige pols: houdt de plek warm en vangt gemiste seintjes op
   setInterval(async () => {
     if (!S.kamer) return;
-    try { neemStaat(await api('/api/residentie/pols', {}), true); } catch (e) {}
+    try { neemStaat(await api('/api/residentie/pols', {}), true); } catch (e) { kamerFout(); }
   }, 25000);
   // weggaan hoeft niet netjes: wie het tabblad sluit, verdwijnt vanzelf
   // via de 90-seconden-pols aan de serverkant

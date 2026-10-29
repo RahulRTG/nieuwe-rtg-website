@@ -29,7 +29,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, id, schoon, nu, codenaamVan, pay, findSupplier,
     modAan, overeenkomstVoor, magVerkopen, notify, ensureKaartjes, kaartenVan, opslag } = ctx;
 
-  const dagenMs = d => d * 24 * 3600 * 1000;
+  const { dagenMs, aboStand, aboGeldtOp } = require('./geldigheid');
 
   /* Een abonnement kopen. Dezelfde drie poorten als een los kaartje, plus de
      module `subscriptions` -- want een abonnement is een doorlopende afspraak
@@ -38,6 +38,21 @@ module.exports = (ctx) => {
     ensureKaartjes();
     const zaak = findSupplier(schoon(body.vervoerder, 20));
     if (!zaak || zaak.type !== 'ov') return { status: 404, error: 'Onbekende OV-vervoerder.' };
+
+    /* MET EEN IDEM VOLGT HET ID UIT DE SLEUTEL, en een herhaling krijgt het
+       abonnement dat er al is -- ook na een crash tussen boeking en abonnement,
+       wanneer het geheugen van de idem-laag leeg is (zie ./kaartje.js). */
+    const herhaal = () => {
+      const al = body.idem ? opslag.bak('mobKaartjes').find(k => k.id === aankoopId) : null;
+      if (!al) return null;
+      return al.key === session.key && al.product === 'abonnement' && al.vervoerder === zaak.code
+        ? { ok: true, herhaald: true, abonnement: aboBeeld(al, true) }
+        : { status: 409, error: 'Deze herhaalsleutel hoort bij een andere aankoop.' };
+    };
+    const aankoopId = body.idem ? 'ab' + crypto.createHash('sha256')
+      .update(codenaamVan(session.key) + '\u0000' + schoon(body.idem, 60)).digest('hex').slice(0, 16) : id('ab');
+    const eerder = herhaal();
+    if (eerder) return eerder;
 
     const waar = { stad: schoon(body.stad, 40) || zaak.city || null, vervoerder: zaak.code,
       groep: session.tier, key: session.key };
@@ -73,15 +88,17 @@ module.exports = (ctx) => {
         idem: body.idem ? 'abolaad:' + schoon(body.idem, 60) : undefined });
       if (l.error) return { status: l.status || 402, error: l.error };
     }
-    /* De aankoop krijgt haar id VOOR de boeking, en de sleutel hangt eraan:
-       met een idem van de client is een herhaling dezelfde aankoop, zonder is
-       elke aankoop er een (zoals altijd), nu met een sleutel die de motor kent. */
-    const aankoopId = id('ab');
+    /* De aankoop kreeg haar id hierboven, VOOR de boeking, en de sleutel hangt
+       eraan: met een idem van de client is een herhaling dezelfde aankoop,
+       zonder is elke aankoop er een (zoals altijd). */
     const b = await pay.boekAsync({ van: rek, naar: 'partner:' + zaak.code, centen: prijs, soort: 'ovabo',
       oms: 'Abonnement ' + zaak.name + ' · ' + dagen + ' dagen', ref: aankoopId,
       economischeSleutel: maakSleutel('pay-handeling', body.idem
         ? ['ovabo', codenaam, schoon(body.idem, 60)] : ['ovabo', aankoopId]) });
     if (b.error) return { status: b.status || 400, error: b.error };
+    // een gelijktijdige herhaling kan tijdens het boeken al zijn afgerond
+    const intussen = herhaal();
+    if (intussen) return intussen;
 
     const start = new Date();
     const a = {
@@ -106,29 +123,6 @@ module.exports = (ctx) => {
   }
 
   const aboVan = key => kaartenVan(key).filter(k => k.product === 'abonnement');
-
-  /* De stand. Geen ritlimiet, dus alleen het venster en een eventuele volledige
-     terugbetaling tellen. */
-  function aboStand(a) {
-    if (a.terugbetaald && a.terugbetaald.volledig)
-      return { stand: 'terugbetaald', reden: 'het abonnement is beeindigd en terugbetaald' };
-    const nuMs = Date.now();
-    if (nuMs < new Date(a.geldigVan).getTime())
-      return { stand: 'nog-niet-geldig', reden: 'geldig vanaf ' + a.geldigVan.slice(0, 10) };
-    if (nuMs > new Date(a.geldigTot).getTime())
-      return { stand: 'verlopen', reden: 'verlopen op ' + a.geldigTot.slice(0, 10) };
-    const over = Math.ceil((new Date(a.geldigTot).getTime() - nuMs) / dagenMs(1));
-    return { stand: 'geldig', reden: 'nog ' + over + ' dag(en) geldig', dagenOver: over };
-  }
-
-  /* Geldt dit abonnement op DEZE lijn? De overeenkomst bepaalt dat, niet het
-     abonnement zelf -- en de lijnenlijst wordt bij de aankoop gekopieerd, zodat
-     een latere wijziging van het contract een lopend abonnement niet stilletjes
-     uitkleedt. */
-  function aboGeldtOp(a, lijnId) {
-    if (!lijnId) return true;
-    return (a.lijnen || []).includes(lijnId);
-  }
 
   function aboBeeld(a, eigen) {
     const st = aboStand(a);

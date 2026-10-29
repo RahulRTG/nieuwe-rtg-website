@@ -1,6 +1,7 @@
 /* DE ARRIVAL PASS als credential (livingos.invisible_arrival_pass).
 
-   De gast heeft geen account; zijn pass is een bearer. Daarom: de SERVER maakt
+   Sinds 19 oktober 2026 heeft iedereen een account; de pass is een bearer
+   NAAST de sessie en hoort bij een lid (`lid_hash`). Daarom: de SERVER maakt
    hem (AR.<32 hex>, 128 bits via ./bearercode.js v2); hij staat alleen als
    hash in `arrivalToegang` en kaal alleen in het antwoord op de aanvraag of een
    rotatie; hij vervalt op aankomst + 12 uur (een voorbije aankomst krijgt er
@@ -24,7 +25,6 @@ const HERSTEL_MS = 15 * 60000;
 const MAX_HERSTEL = 3;
 const MAX_PULSEN = 60;
 const BEWAAR_MS = 30 * 86400000;
-const DICHT = Object.freeze(['geweigerd', 'geannuleerd', 'no-show', 'afgerond']);
 const VORM = /^AR\.[0-9A-F]{32}$/i;
 
 module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOString() }) => {
@@ -33,6 +33,11 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
   const eigen = require('./eigencollectie')({ db, domein: 'kern/arrivalpas', bezit: { arrivalToegang: 'kaart' } });
   const ms = () => Date.parse(nu());
   const iso = t => new Date(t).toISOString();
+  /* Het lid aan wie de pass hoort, als hash: de pass is een tweede sleutel
+     naast de sessie, en een ander lid met dezelfde pass krijgt een 404. */
+  const lidHash = key => crypto.createHash('sha256').update('rtg-arrival-lid-v1|' + String(key)).digest('hex');
+  const ander = (rij, lid) => lid !== undefined && !(rij && rij.lid_hash && bearer.zelfdeHash(rij.lid_hash, lidHash(lid)));
+  const vreemd = { status: 404, error: 'Deze Arrival Pass is niet geldig.' };
   const aanvraagHash = raw => crypto.createHash('sha256').update('rtg-arrival-aanvraag-v1|' + String(raw)).digest('hex');
   const transactie = werk => bewerkCollectie('arrivalToegang', bron => {
     if (!bron || typeof bron !== 'object' || Array.isArray(bron)) throw new Error('arrivalToegang hoort een kaart te zijn');
@@ -78,25 +83,10 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
       if (!r || !(Date.parse(r.tot) >= grens)) delete bron[id];
   }
 
-  // een reservering die niet meer doorgaat maakt de pass nutteloos
-  function oordeel(rij, reserveringVan, { puls } = {}) {
-    if (!rij) return { status: 401, error: 'Deze Arrival Pass is niet geldig.' };
-    const t = rij.toegang, ow = (t && t.onderwerp) || {};
-    if (ow.id !== rij.id || ow.supplierCode !== rij.supplierCode || ow.reserveringId !== rij.reserveringId)
-      return { status: 401, error: 'Deze Arrival Pass is niet geldig.' };
-    const reden = bearer.reden(t, { doel: DOEL, scope: puls ? ['arrival.puls'] : ['arrival.pass.lezen'], negeerGebruik: !puls });
-    if (reden === 'verlopen') return { status: 410, error: 'Deze Arrival Pass is verlopen.' };
-    if (reden === 'ingetrokken') return { status: 410, error: 'Deze Arrival Pass is ingetrokken.' };
-    if (reden === 'opgebruikt') return { status: 429, error: 'Met deze pass is het maximale aantal statusupdates gedeeld.' };
-    if (reden) return { status: 401, error: 'Deze Arrival Pass is niet geldig.' };
-    const r = typeof reserveringVan === 'function' ? reserveringVan(rij.reserveringId) : null;
-    if (!r || r.supplierCode !== rij.supplierCode || DICHT.includes(r.status))
-      return { status: 410, error: 'Deze reservering gaat niet (meer) door; de pass is gesloten.', dicht: true };
-    return null;
-  }
+  const oordeel = require('./arrivalpas-oordeel')({ redenVan: bearer.reden, doel: DOEL });
 
   // de route maakt reserveringId vooraf; bij een herhaling geldt de opgeslagen
-  function aanvraag({ requestToken, supplierCode, reserveringId, datum, tijd }) {
+  function aanvraag({ lid, requestToken, supplierCode, reserveringId, datum, tijd }) {
     const ah = aanvraagHash(requestToken);
     const tot = aankomst(datum, tijd) + NA_AANKOMST_MS;
     if (!(tot > ms() + 6e4)) return { status: 400, error: 'Deze aankomst is voorbij.' };
@@ -105,7 +95,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
       for (const r of Object.values(bron)) if (bearer.zelfdeHash(r && r.aanvraag_hash, ah)) bestaand = r;
       if (bestaand) {
         const t = bestaand.toegang;
-        if (bestaand.supplierCode !== supplierCode || ms() > Date.parse(bestaand.aanvraag_tot) ||
+        if (bestaand.supplierCode !== supplierCode || ander(bestaand, lid) || ms() > Date.parse(bestaand.aanvraag_tot) ||
             (bestaand.herstel || 0) >= MAX_HERSTEL || !t || t.gebruik > 0 ||
             bearer.reden(t, { doel: DOEL, scope: SCOPE, negeerGebruik: true }))
           return { status: 409, error: 'Deze aanvraag is al verwerkt; de pass wordt maar een keer getoond.' };
@@ -115,7 +105,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
       }
       ruim(bron);
       const id = crypto.randomBytes(16).toString('hex');
-      const rij = bron[id] = { id, supplierCode, reserveringId, aanvraag_hash: ah,
+      const rij = bron[id] = { id, supplierCode, reserveringId, aanvraag_hash: ah, lid_hash: lid !== undefined ? lidHash(lid) : null,
         aanvraag_tot: iso(ms() + HERSTEL_MS), herstel: 0, tot: iso(tot), toegang: null, historie: [],
         prep_at: null, at: nu(), bijgewerkt_at: nu() };
       return { status: 200, nieuw: true, id, reserveringId, tot: rij.tot, code: nieuwePas(rij) };
@@ -131,8 +121,9 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
   }
 
   // lezen uit de werkkopie; een dichte pass legt de route vast met sluitDicht()
-  function lees(raw, reserveringVan) {
+  function lees(raw, reserveringVan, lid) {
     const rij = zoek(eigen.kijk('arrivalToegang'), raw);
+    if (rij && ander(rij, lid)) return vreemd;
     const fout = oordeel(rij, reserveringVan);
     return fout ? Object.assign({ rij }, fout) : { status: 200, rij };
   }
@@ -150,9 +141,10 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
 
   /* Een puls: gebruik en de eenmalige voorbereidingsclaim in EEN transactie,
      zodat twee instances nooit allebei een missie maken. */
-  function puls(raw, soort, reserveringVan) {
+  function puls(raw, soort, reserveringVan, lid) {
     return transactie(bron => {
       const rij = zoek(bron, raw);
+      if (rij && ander(rij, lid)) return vreemd;
       const fout = oordeel(rij, reserveringVan, { puls: true });
       if (fout) {
         if (fout.dicht) bearer.intrekken(rij.toegang, 'systeem', 'reservering gaat niet door');
@@ -166,9 +158,10 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
     });
   }
 
-  function roteer(raw, reserveringVan) {
+  function roteer(raw, reserveringVan, lid) {
     return transactie(bron => {
       const rij = zoek(bron, raw);
+      if (rij && ander(rij, lid)) return vreemd;
       const fout = oordeel(rij, reserveringVan);
       if (fout) return fout;
       return { status: 200, id: rij.id, supplierCode: rij.supplierCode, code: nieuwePas(rij) };
@@ -176,10 +169,11 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
   }
 
   // de houder trekt in; een tweede keer verandert niets meer
-  function intrek(raw) {
+  function intrek(raw, lid) {
     return transactie(bron => {
       const rij = zoek(bron, raw);
       if (!rij) return { status: 401, error: 'Deze Arrival Pass is niet geldig.' };
+      if (ander(rij, lid)) return vreemd;
       if (!rij.toegang.ingetrokken_at) {
         bearer.intrekken(rij.toegang, 'houder', 'door de gast ingetrokken');
         rij.bijgewerkt_at = nu();

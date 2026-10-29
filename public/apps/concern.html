@@ -81,6 +81,7 @@
 </style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
 <body data-rtg-context-bron="concern" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
@@ -323,7 +324,7 @@ async function herlaad(){
 async function vulRechtsvormen(){
   const sel=$('#nRv'); if(!sel) return;
   try{
-    const r=await (await fetch('/api/onderneming/rechtsvormen')).json();
+    const r=await (await fetch('/api/onderneming/rechtsvormen',{headers:{Authorization:'Bearer '+(localStorage.getItem('rtg_member_token')||'')}})).json();
     const land=(($('#nLand')||{}).value||'NL').toUpperCase();
     sel.innerHTML='<option value="">Weet ik nog niet</option>'+
       (r.rechtsvormen||[]).filter(v=>!v.land||v.land===land)

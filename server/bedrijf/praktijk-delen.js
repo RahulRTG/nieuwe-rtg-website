@@ -49,19 +49,19 @@ module.exports = ({ crypto, rid, nu, log, db, rechtenVan }) => {
       titel: t.titel, datum: t.deadline, stand: t.externeAfspraak.stand,
       herkomst: t.externeAfspraak.herkomst === 'rtg-aanvraag' ? 'via RTG aangevraagd' : 'handmatig vastgelegd' })),
     versie: x.versie, verloopt: d.verloopt, magAntwoorden: x.stand === 'voorstel' && d.versie === x.versie });
-  function besluit(g, b) {
+  function besluit(g, b, account) {
     const { w, d, p, x } = g;
     if (d.gebruik !== 0 || x.stand !== 'voorstel' || d.versie !== x.versie || b.versie !== x.versie)
       return V.fout('Dit voorstel is gewijzigd of al beantwoord. Vraag het actuele voorstel op.', 409);
     if (!['akkoord', 'afwijzen'].includes(b.keuze)) return V.fout('Kies akkoord of afwijzen.');
     x.stand = b.keuze === 'akkoord' ? 'bevestigd' : 'afgewezen';
-    x.akkoord = { bron: 'gastlink', keuze: b.keuze, at: nu(), linkId: d.id };
+    x.akkoord = { bron: 'gastlink', keuze: b.keuze, at: nu(), linkId: d.id, account: account || null };
     const kans = V.pak(w.kansen, p.praktijkRef);
     kans.fase = b.keuze === 'akkoord' ? 'gewonnen' : 'verloren';
     kans.historie.push({ van: 'offerte', naar: kans.fase, door: 'gastlink:' + d.id, at: nu() });
     d.gebruik++;
     x.versie++;
-    log(w, { id: 'gastlink:' + d.id, naam: 'Ontvanger van gastlink' }, 'praktijk-' + b.keuze, p.id);
+    log(w, { id: 'gastlink:' + d.id, naam: account || 'Ontvanger van gastlink' }, 'praktijk-' + b.keuze, p.id);
     return { ok: true, stand: x.stand };
   }
   return { delen, gast, gastBeeld, besluit };

@@ -20,7 +20,7 @@ const R = require('./lus-regels');
 
 module.exports = (ctx) => {
   const { db, save, liveCodename, notify, lees, stap, openCase, KANTOOR_STATUSSEN, SOORTEN, bezitZet } = ctx;
-  const levens = require('../levensdossier')({ db }).voor('bureau');
+  const levens = ctx.levens || require('../levensdossier')({ db }).voor('bureau');
 
   function bureauDesk() {
     const uit = [];

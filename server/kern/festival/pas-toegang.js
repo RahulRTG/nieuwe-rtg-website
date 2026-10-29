@@ -27,7 +27,7 @@ const PLAFOND = 10000;
 const DAG = 86400000;
 
 module.exports = (ctx) => {
-  const { db, save, bewerkCollectie, crypto } = ctx;
+  const { festivalCollectieLezen, save, bewerkCollectie, crypto } = ctx;
   const nu = ctx.pasKlok || (() => new Date().toISOString());
   const bearer = require('../bearercode')({ crypto, namespace: 'festivalos.toegangspas', nu });
   const afdruk = s => crypto.createHash('sha256').update('rtg-festivalpas-drager-v1|' + String(s || '')).digest('hex');
@@ -46,7 +46,7 @@ module.exports = (ctx) => {
     };
     if (typeof bewerkCollectie === 'function') return bewerkCollectie('festivals', doe);
     // de collectie is van ./model.js; zonder collectie is er ook geen pas
-    const bron = db.data.festivals && typeof db.data.festivals === 'object' ? db.data.festivals : {};
+    const bron = festivalCollectieLezen();
     const voor = JSON.stringify(bron);
     try {
       const uit = doe(bron);

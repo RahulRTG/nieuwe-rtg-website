@@ -40,7 +40,7 @@
         var title;
         if (o.compact) { title = U.el('p', 'wd-capability-subject', s); root.appendChild(title); }
         else { title = ui.row(s, '', app.icon).querySelector('strong'); delete title.dataset.userContent; }
-        title.dataset.i18n = 'desktopApp.' + app.id + '.section' + i; title.dataset.i18nSource = s;
+        U.key(title, 'desktopApp.' + app.id + '.section' + i, s);
       });
       if (!app.sections.length) root.appendChild(ui.copy('p', 'wd-widget-empty', 'empty'));
       if (!o.compact) root.appendChild(ui.open('browse'));

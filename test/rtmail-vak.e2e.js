@@ -117,8 +117,9 @@ test('postvak op het scherm: mappen, opbergen, ster, zoeken en het gesprek',
       assert.equal(await page.locator('#b-' + id).count(), 1, 'regel wijst naar bericht ' + id + ' op deze pagina');
     }
     await page.click('[data-hulp="risico"]');
-    await page.waitForSelector('.hulpblok b', { timeout: 10000 });
-    assert.match(await page.textContent('.hulpblok'), /geen score/, 'het risico komt met redenen, niet met een cijfer');
+    const risico = page.locator('[data-hulp-uit="risico"] .hulpblok');
+    await risico.waitFor({ state: 'visible', timeout: 10000 });
+    assert.match(await risico.textContent(), /geen score/, 'het risico komt met redenen, niet met een cijfer');
 
     await page.click('#terug');
     await page.waitForSelector('.mapbalk', { timeout: 10000 });

@@ -429,3 +429,47 @@ test('12. de teruggave bij een storing rekent een abonnement op DAGbasis af', as
   const nog = await api('/api/staff/mob/kaart/controle', { code: await toonCode(ab.id, lidE), lijnId: 'L1' }, pda);
   assert.equal(nog.status, 200, 'de reiziger mag er nog steeds mee reizen');
 });
+
+test('13. dezelfde herhaalsleutel na een crash geeft hetzelfde kaartje, geen tweede en geen technische weigering', async () => {
+  /* De idem-poort is een geheugenlaag en is na een crash leeg. Met een vers
+     aankoop-id weigerde de geldlaag de herhaling met "Deze economische sleutel
+     hoort al bij een andere boeking" (scripts/lib/voltooi/ov.js). */
+  const lidF = await lid();
+  const lijf = { vervoerder: 'TRANSIT', lijnId: 'L1', van: 'h-stad', naar: 'h-tal', product: 'enkel', idem: 'crash-1' };
+  const eerst = await api('/api/mob/kaart/koop', lijf, lidF);
+  assert.equal(eerst.status, 200, eerst.body.error || '');
+  stop(srv && srv.child);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
+  base = srv.base;
+  const weer = await api('/api/mob/kaart/koop', lijf, lidF);
+  assert.equal(weer.status, 200, 'geen weigering: ' + (weer.body.error || ''));
+  assert.equal(weer.body.kaartje.id, eerst.body.kaartje.id, 'hetzelfde kaartje');
+  const mijn = (await api('/api/mob/kaart/mijn', {}, lidF)).body.kaartjes;
+  assert.equal(mijn.length, 1, 'en er is er een, niet twee');
+});
+
+test('14. dezelfde herhaalsleutel voor een ander traject is een 409, en er wordt niets betaald', async () => {
+  /* De centrale antwoordkas gaf hier stil het EERSTE kaartje terug. De koop
+     staat nu in EIGEN (middleware/idempotentie-eigen.js) en de kern beslist:
+     het id volgt uit de sleutel, en een ander product onder die sleutel is een
+     andere aankoop. */
+  const lidG = await lid();
+  const lijf = { vervoerder: 'TRANSIT', lijnId: 'L1', van: 'h-stad', naar: 'h-tal', product: 'enkel', idem: 'zelfde-1' };
+  const eerst = await api('/api/mob/kaart/koop', lijf, lidG);
+  assert.equal(eerst.status, 200, eerst.body.error || '');
+  const boekingen = () => {
+    const { DatabaseSync } = require('node:sqlite');
+    const db = new DatabaseSync(path.join(TMP, 'store.db'), { readOnly: true });
+    try {
+      const rij = db.prepare("SELECT val FROM kv WHERE key = 'payBoekingen' AND deleted = 0").get();
+      const v = rij ? JSON.parse(require('../server/kluis').ontsleutel(rij.val)) : [];
+      return JSON.stringify(v).split('ovkaart').length - 1;
+    } finally { db.close(); }
+  };
+  const voor = boekingen();
+  const ander = await api('/api/mob/kaart/koop', Object.assign({}, lijf, { naar: 'h-mar' }), lidG);
+  assert.equal(ander.status, 409, JSON.stringify(ander.body).slice(0, 200));
+  assert.match(ander.body.error, /andere aankoop/);
+  assert.equal(boekingen(), voor, 'er is niets bij geboekt');
+  assert.equal((await api('/api/mob/kaart/mijn', {}, lidG)).body.kaartjes.length, 1);
+});

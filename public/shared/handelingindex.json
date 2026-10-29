@@ -1418,6 +1418,12 @@
       "url": "/apps/navigatie.html"
     },
     {
+      "label": "Wijzig vertrekpunt",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
       "label": "Zeker",
       "app": "Navigatie",
       "wereld": "TravelOS",
@@ -1706,43 +1712,7 @@
       "url": "/apps/rtg.html"
     },
     {
-      "label": "Alleen aandacht",
-      "app": "Partner Network",
-      "wereld": "WorkOS",
-      "url": "/apps/partner-network.html"
-    },
-    {
-      "label": "Filters",
-      "app": "Partner Network",
-      "wereld": "WorkOS",
-      "url": "/apps/partner-network.html"
-    },
-    {
-      "label": "Gereed voor controle",
-      "app": "Partner Network",
-      "wereld": "WorkOS",
-      "url": "/apps/partner-network.html"
-    },
-    {
-      "label": "Maak capaciteitsvoorstel",
-      "app": "Partner Network",
-      "wereld": "WorkOS",
-      "url": "/apps/partner-network.html"
-    },
-    {
-      "label": "Open levend contract",
-      "app": "Partner Network",
-      "wereld": "WorkOS",
-      "url": "/apps/partner-network.html"
-    },
-    {
-      "label": "Simuleer belofte",
-      "app": "Partner Network",
-      "wereld": "WorkOS",
-      "url": "/apps/partner-network.html"
-    },
-    {
-      "label": "Verstoring",
+      "label": "Versturen",
       "app": "Partner Network",
       "wereld": "WorkOS",
       "url": "/apps/partner-network.html"

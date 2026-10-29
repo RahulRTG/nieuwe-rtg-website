@@ -163,3 +163,59 @@ test('8. een lid annuleert zijn eigen, nog niet bevestigde bestelling en de voor
   assert.equal((await api(base, '/api/groothandel/annuleer', { ref: twee.body.order.ref }, lid)).status, 409,
     'na bevestiging is annuleren niet meer aan het lid');
 });
+
+/* 9. De voltooiproef van de stand Bestellen (scripts/lib/voltooi-stand/
+   bestellen.js, 19 oktober 2026): een dubbele tik op "Bezorgen" of een
+   herhaling na een crash maakte een tweede bestelling en hield de voorraad twee
+   keer vast, en een dubbele tik van de groothandel op "Volgende stap" sloeg een
+   stap over. Met de herhaalsleutel van de stand en de stand die het scherm van
+   de groothandel zag, gebeurt het een keer -- ook als het domein opnieuw op
+   dezelfde gegevens wordt gebouwd, zoals na een herstart. */
+test('9. een herhaalsleutel is een bestelling, en "volgende stap" slaat geen stap over', () => {
+  const maak = (data) => {
+    const db = { data };
+    const mod = maakGroothandel({ db, save() {}, crypto, findSupplier: c => db.data.suppliers.find(s => s.code === c),
+      notify() {}, notifySupplier() {}, sseToSupplier() {}, sseToCustomer() {}, sseToOffice() {}, anthropic: null });
+    mod.ghDefaults(db.data.suppliers[0]);
+    return mod;
+  };
+  const gh = { code: 'GH', name: 'Groothandel', type: 'groothandel', caps: ['groothandel'],
+    groothandel: { functies: { consument: true, bezorgen: true, afhalen: true }, producten: [
+      { id: 'p1', naam: 'Tonijn', categorie: 'Vlees & vis', eenheid: 'kg', inkoopPrijs: 20, consumentPrijs: 30, voorraad: 10, minBestel: 2, actief: true }] } };
+  const data = { suppliers: [gh], groothandelOrders: [] };
+  const koper = { soort: 'lid', id: 'lid-1', naam: 'Codenaam' };
+  const eerst = maak(data).ghPlaatsBestelling('GH', koper, [{ productId: 'p1', aantal: 2 }], { idem: 'bs-1' });
+  assert.equal(eerst.status, 200, JSON.stringify(eerst));
+  const na = maak(JSON.parse(JSON.stringify(data)));
+  const nogEens = na.ghPlaatsBestelling('GH', koper, [{ productId: 'p1', aantal: 2 }], { idem: 'bs-1' });
+  assert.equal(nogEens.order.ref, eerst.order.ref, 'dezelfde bestelling');
+  assert.equal(na.ghMijnBestellingen(koper).length, 1);
+  const a = na.ghOrderVerder('GH', eerst.order.ref, 'verder', null, 'aangevraagd');
+  const b = na.ghOrderVerder('GH', eerst.order.ref, 'verder', null, 'aangevraagd');
+  assert.equal(a.status2 || a.status, 'bevestigd');
+  assert.equal(b.status, 409, 'de tweede tik op dezelfde stand slaat geen stap over');
+});
+
+test('orderlijsten scheiden kopers en leveranciers zonder een schrijfpoort', () => {
+  const orders = [
+    { ref: 'eigen', groothandelCode: 'A', klant: { soort: 'lid', id: '1', naam: 'Een' }, status: 'aangevraagd', subtotaal: 10 },
+    { ref: 'ander', groothandelCode: 'B', klant: { soort: 'lid', id: '2', naam: 'Twee' }, status: 'aangevraagd', subtotaal: 20 },
+    { ref: 'zelfde-id-ander-type', groothandelCode: 'A', klant: { soort: 'partner', id: '1', naam: 'Zaak' }, status: 'geleverd', subtotaal: 30 },
+    { ref: 'geannuleerd', groothandelCode: 'A', klant: { soort: 'lid', id: '1', naam: 'Een' }, status: 'geannuleerd', subtotaal: 40 }
+  ];
+  const voor = JSON.stringify(orders);
+  const beeld = require('../server/kern/groothandel/orderbeeld')({
+    orders: () => orders, klantSoortVan: koper => koper.soort,
+    GH_KLAAR: { geleverd: true, geannuleerd: true }
+  });
+  const eigen = beeld.mijnBestellingen({ soort: 'lid', id: '1' });
+  assert.deepEqual(eigen.map(o => o.ref), ['eigen', 'geannuleerd']);
+  assert.ok(eigen.every(o => !Object.hasOwn(o.klant, 'id')), 'het klantbeeld geeft geen interne klant-id terug');
+  const leverancier = beeld.inkomend('A');
+  assert.deepEqual(leverancier.open.map(o => o.ref), ['eigen']);
+  assert.deepEqual(leverancier.afgerond.map(o => o.ref), ['zelfde-id-ander-type', 'geannuleerd']);
+  assert.equal(leverancier.omzet, 30, 'alleen geleverd telt als omzet');
+  assert.equal(leverancier.open[0].klant.id, '1');
+  assert.deepEqual(beeld.inkomend('onbekend'), { open: [], afgerond: [], omzet: 0 });
+  assert.equal(JSON.stringify(orders), voor, 'lezen verandert geen order');
+});

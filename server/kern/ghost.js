@@ -11,6 +11,7 @@
    model (zelfde dag = zelfde weer) en heet daarom overal 'weerbeeld (demo)';
    in productie schuift hier een echte weerfeed in via dezelfde functie.
    maakGhost(state) volgt het vaste kern-patroon. */
+const tijdzone = require('./tijdzone');
 
 const UREN_VOORUIT = 12;
 const DREMPEL = 60;          // vanaf deze kans (%) komt er een advies
@@ -74,7 +75,7 @@ function maakGhost({ db, findSupplier, boekingenVanZaak, haversine }) {
     for (const r of db.data.rides || []) {
       if (r.supplierCode !== code) continue;
       const t = r.plannedFor || r.at; if (!t) continue;
-      if (new Date(t).getHours() === uur) n++;
+      if (tijdzone.uurIn(t) === uur) n++;
     }
     return Math.min(15, n * 3);
   }
@@ -82,7 +83,7 @@ function maakGhost({ db, findSupplier, boekingenVanZaak, haversine }) {
   /* ---- de simulatie zelf ---- */
   function simuleer(s) {
     const nu = new Date();
-    const datum = nu.toISOString().slice(0, 10);
+    const datum = tijdzone.datumIn(nu);
     const stad = s.city || null;
     const punten = knooppunten(stad);
     const vloot = (s.fleet || []).filter(v => v.active !== false);
@@ -90,7 +91,7 @@ function maakGhost({ db, findSupplier, boekingenVanZaak, haversine }) {
     const uurbeeld = [];   // altijd een beeld, ook als geen enkel uur de drempel haalt
     for (let stap = 1; stap <= UREN_VOORUIT; stap++) {
       const wanneer = new Date(nu.getTime() + stap * 3600 * 1000);
-      const uur = wanneer.getHours();
+      const uur = tijdzone.uurIn(wanneer);
       const w = weerVoor(datum, uur);
       const weerDruk = w.regenkans >= 60 ? 14 : 0;   // regen = iedereen de weg op
       let piek = 0, piekPunt = null;

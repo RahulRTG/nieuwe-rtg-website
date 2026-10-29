@@ -52,28 +52,7 @@ const DIENSTKLOKVELDEN = Object.freeze(['inklokAt', 'uitklokAt', 'plekIn']);
    zichtbare regel van de lijst, en een collega telde aan wat er verdween hoeveel
    er gebeurde dat hij niet mocht zien. Nu heeft elke klasse een eigen grens:
    de gewone regels samen, de beschermde per medewerker. */
-const LOGBOEK_PER_KLASSE = 80;
-function bewaarLogboek(lijst) {
-  /* De beschermde regels per EIGENAAR (staffId): ook iemands eigen beschermde
-     regel, die hij wel ziet, mag niet verdwijnen doordat een collega veel klokt. */
-  const tel = new Map();
-  return (Array.isArray(lijst) ? lijst : []).filter((r) => {
-    const bak = isKlokregel(r) ? 'b:' + (r && r.staffId != null ? r.staffId : '-') : 'g';
-    const n = (tel.get(bak) || 0) + 1;
-    tel.set(bak, n);
-    return n <= LOGBOEK_PER_KLASSE;
-  });
-}
-
-const isKlokSoort = (soort) => Object.prototype.hasOwnProperty.call(KLOKSOORTEN, soort);
-
-function isKlokregel(regel) {
-  // een regel waarvan de vorm onbekend is, kan niets bewijzen: niet uitleveren
-  if (!regel || typeof regel !== 'object') return true;
-  if (regel.soort != null && isKlokSoort(regel.soort)) return true;
-  const tekst = String(regel.text || '');
-  return OUDE_KLOKTEKST.some((re) => re.test(tekst));
-}
+const { LOGBOEK_PER_KLASSE, bewaarLogboek, isKlokSoort, isKlokregel } = require('../../lib/logboekretentie');
 
 // alleen een manager; zonder actor is er niemand om het aan te geven
 const magKlokZien = (actor) => !!(actor && actor.manager === true);

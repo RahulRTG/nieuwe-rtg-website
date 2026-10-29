@@ -24,6 +24,7 @@ module.exports = (kern) => {
     if (!werkplek.magIn(code, key, baas)) {
       return res.status(403).json({ error: 'Deze werkplek is niet van u. Vraag de eigenaar om toegang tot dit bedrijf.' });
     }
+    req.werkplekActor = key;
     req.werkplekCode = code;
     req.werkplekBaas = baas;
     /* Het huis is hier de tenant, en de sleutelhouder het gezag. De actor
@@ -63,8 +64,10 @@ module.exports = (kern) => {
   app.post('/api/werkplek/mens-weg', huisAuth, (req, res) => veilig(res, () => werkplek.mensWeg(req.werkplekCode, String(req.body.id || ''))));
 
   // de takenlijst van het huis
-  app.post('/api/werkplek/taak', huisAuth, (req, res) => veilig(res, () =>
-    werkplek.taakMaak(req.werkplekCode, req.body.tekst, req.body.afdeling)));
+  app.post('/api/werkplek/taak', huisAuth, async (req, res) => {
+    try { stuur(res, await werkplek.taakMaakBedoeling(req.werkplekCode, req.werkplekActor, req.body || {})); }
+    catch (e) { console.error('[werkplek]', e); res.status(500).json({ error: 'Opslag niet bevestigd. Herhaal met dezelfde opdrachtsleutel.' }); }
+  });
   app.post('/api/werkplek/taak-zet', huisAuth, (req, res) => veilig(res, () => werkplek.taakZet(req.werkplekCode, String(req.body.taakId || ''), req.body.af)));
 
   // sleutels: alleen de eigenaar

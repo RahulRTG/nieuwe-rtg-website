@@ -2,10 +2,11 @@
    domein/producent, de jaargang, het aantal, de waarde en het drinkvenster; het
    overzicht wijst aan wat 'nu op dronk' is en wat u nog kunt laten liggen, plus
    de kelderwaarde. Een fles schenken telt af. Gemount via index.js. */
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { save, rid, nu, schoon, getal, L } = ctx;
   const KLEUREN = ['rood', 'wit', 'rose', 'mousserend', 'versterkt'];
-  const jaar = () => new Date().getFullYear();
+  const jaar = () => tijdzone.jaarIn();
 
   function celZet(key, b) {
     const naam = schoon(b.naam, 80);

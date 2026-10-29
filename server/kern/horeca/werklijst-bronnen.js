@@ -14,14 +14,12 @@
 'use strict';
 
 const cadans = require('./cadans');
+const tijdzone = require('../tijdzone');
 
 const PASMARGE = cadans.PASMARGE;
 const MIN = 60000;
 const minutenSinds = (at, nuMs) => at ? Math.max(0, Math.round((nuMs - Date.parse(at)) / MIN)) : 0;
-const hhmm = (ms) => {
-  const d = new Date(ms);
-  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-};
+const hhmm = (ms) => tijdzone.hhmmIn(new Date(ms));
 
 module.exports = ({ horeca, schoon, verzoeklaag }) => {
   const pas = require('./pas')({ horeca, schoon });

@@ -35,11 +35,11 @@
    de suite (routes/member/bureau.js). */
 'use strict';
 
-module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, notifySupplier, bezitZet, levensgraaf }) => {
+module.exports = ({ db, save, bewerkCollectie, crypto, anthropic, liveCodename, notify, notifySupplier, bezitZet, levensgraaf }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => require('../tijdzone').datumIn();
 
   /* De graaf en de tower zijn geen eigendom van dit kantoor meer: ze staan in
      kern/levensgraaf en gelden voor elke pas, ook de gratis. Wat hier blijft is
@@ -58,6 +58,16 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, notifySup
     inAanbouw: kamersMod.inAanbouw });
   const casesMod = require('./cases')({ db, save, nu, rid, schoon, liveCodename, notify,
     beoordeel: delegatieMod.beoordeel, deelopdrachten: orkMod.deelopdrachten, bezitZet });
+  // Alleen de API-opdracht krijgt een duurzame bedoeling. Interne callers
+  // houden hun bestaande synchrone caseOpen-contract.
+  casesMod.caseOpenBedoeling = require('./cases-bedoeling')({ db, bewerkCollectie, schoon,
+    maakCases: levens => {
+      const d = require('./delegatie')({ levens, save: () => {}, nu });
+      const ork = require('./orkestratie')({ graaf: graafMod.graaf,
+        cases: k => casesMod.cases(k), beoordeel: d.beoordeel, rid, inAanbouw: kamersMod.inAanbouw });
+      return require('./cases')({ levens, save: () => {}, nu, rid, schoon,
+        liveCodename, notify, beoordeel: d.beoordeel, deelopdrachten: ork.deelopdrachten, bezitZet });
+    } });
   /* De concierge-lus (CONCIERGE.md) op dezelfde zaken: geen tweede wachtrij,
      een tweede werkwijze. ./lus-regels.js rekent, ./lus.js en ./lus-wens.js
      werken met de wens en het voorstel, ./lus-uitvoering.js met wat vaststaat. */

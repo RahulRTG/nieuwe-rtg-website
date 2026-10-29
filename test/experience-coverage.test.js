@@ -10,6 +10,12 @@ const ROOT = path.join(__dirname,'..');
 const contract = JSON.parse(fs.readFileSync(path.join(ROOT,'experience-architecture/coverage-contract.json')));
 const signatures = JSON.parse(fs.readFileSync(path.join(ROOT,'experience-architecture/signatures.json')));
 
+test('EXPERIENCEWERKT.json is exact uit de actuele inventaris afgeleid', () => {
+  const stored = fs.readFileSync(path.join(ROOT,'EXPERIENCEWERKT.json'),'utf8');
+  const report = coverage.build(ROOT,{contract,signatures});
+  assert.equal(stored,coverage.serializeRegistry(report));
+});
+
 test('register is volledig afgeleid uit alle logische apps en alle fysieke schermen', () => {
   const apps = coverage.appInventory(ROOT);
   const screens = coverage.screenInventory(ROOT);

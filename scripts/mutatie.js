@@ -604,6 +604,13 @@ const EIGEN_MODULE = new Map([
   ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
   ['team-room-voorzijde.test.js', ['public/apps/personeel.html']],
   ['winkel-voorzijde.test.js', ['public/apps/mall.html']],
+  /* Deze twee bedieningstoetsen lezen hun onderwerp via samengestelde
+     readFileSync-paden. De statische zoeker kan die paden niet volledig
+     afleiden; bind daarom alle werkelijk beoordeelde bronnen expliciet. */
+  ['sitemaker-context.test.js', ['public/apps/sitemaker.html']],
+  ['app-main-bediening.test.js', ['public/apps/app-main/app-main-32a.js',
+    'public/shared/focus.js', 'public/apps/app-main/app-main-09a.js',
+    'public/apps/app-main/app-main-13.js', 'public/apps/app-main/app-main-34b.js']],
   /* De stand van Sport: de toets voert de stukken van het inline-script van
      sport.html uit (heeftTabel, tekenStand, laadStand); de module is de pagina. */
   ['sport-stand-onvolledig.test.js', ['public/apps/sport.html']],

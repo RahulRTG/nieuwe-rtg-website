@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**64 bundels, 500 delen, 1 zonder onderwerp.**
+**64 bundels, 500 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -918,12 +918,12 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 296 regels in de delen, waarvan 1 zonder onderwerp
+`public/shared/uitvoer/` -- 2 delen, 297 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `uitvoer-01.js` | Uitvoer: uw gegevens meenemen uit elke app |
-| `uitvoer-02.js` | -- |
+| `uitvoer-02.js` | Uitvoer, deel 2: toegankelijke bediening, exportdialoog en statusfeedback |
 
 ## `shared/verbinding.js`
 

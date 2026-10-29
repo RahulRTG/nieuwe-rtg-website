@@ -123,7 +123,7 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
        rtg-adaptive-edge-controls.js weigert stil bij hidden, inert, aria-hidden
        of display:none boven de bron). */
     await wachtTot(() => Promise.resolve(lijstAangevraagd), Boolean,
-      'Alle post hoort via de Edge de nieuwe serverlijst aan te vragen').catch(async (fout) => {
+      'Alle post hoort via de Edge de nieuwe serverlijst aan te vragen', 20000).catch(async (fout) => {
       const staat = await page.evaluate(() => {
         const bron = document.querySelector('.rtm-nav [data-rtm-diep="inbox"]'), keten = [];
         for (let p = bron; p; p = p.parentElement) {

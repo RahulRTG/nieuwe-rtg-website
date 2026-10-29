@@ -78,7 +78,7 @@ test('de liegronde gebruikt ook een expliciete contractingang voor interne tabs'
   assert.deepEqual(meetAdres({ functie: 'link:x', pad: '/apps/x.html' }),
     { ingang: { pad: '/apps/x.html', bestemming: '/apps/x.html', via: null }, pad: '/apps/x.html' });
   assert.deepEqual(meetAdres({ functie: 'tab:assets', pad: null }),
-    { ingang: { pad: '/apps/app.html#tab=assets', bestemming: '/apps/app.html', via: '#tab=assets' }, pad: '/apps/app.html' });
+    { ingang: { pad: '/apps/app.html#tab=assets', bestemming: '/apps/app.html', via: '#tab=assets', bereik: '[data-view="assets"]' }, pad: '/apps/app.html' });
   const werk = meetAdres({ functie: 'os:werk', pad: null });
   assert.equal(werk.pad, '/apps/app.html');
   assert.equal(werk.ingang.adapter.opdracht, 'open werk', 'de expliciete adapter wordt doorgegeven; proza wordt niet geraden');

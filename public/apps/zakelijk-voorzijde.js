@@ -75,6 +75,7 @@
       const b = maak('button', 'ds-chip', naam); b.type = 'button';
       b.setAttribute('aria-pressed', String(dagen.includes(i)));
       b.addEventListener('click', () => {
+        beleidBewerking++;
         dagen = dagen.includes(i) ? dagen.filter(d => d !== i) : dagen.concat([i]).sort();
         tekenDagen();
       });
@@ -118,10 +119,22 @@
      verbinding konden de opstartaanvraag en de tab-aanvraag NA een zojuist
      opgeslagen beleid binnenkomen en de zichtbare keuze terugzetten. */
   let beleidVraag = 0;
+  let beleidBewerking = 0;
+  /* Een verse serverlezing mag een invoer die de werkgever intussen begon
+     nooit terugzetten. De tab start bewust een achtergrondlezing; op een
+     trage machine kon die NA de eerste toetsaanslag binnenkomen en vlak voor
+     Bewaren de drempel weer leegmaken. De vraagvolgorde beschermt tegen oude
+     lezingen onderling, deze teller beschermt de gebruiker tegen elke lezing
+     die vóór diens laatste bewerking begon. */
+  document.querySelectorAll('#tBeleid input, #tBeleid select').forEach(el => {
+    el.addEventListener('input', () => { beleidBewerking++; });
+    el.addEventListener('change', () => { beleidBewerking++; });
+  });
   async function haalBeleid() {
     const vraag = ++beleidVraag;
+    const bewerking = beleidBewerking;
     const r = await api('beleid', {});
-    if (vraag !== beleidVraag) return;
+    if (vraag !== beleidVraag || bewerking !== beleidBewerking) return;
     if (r.status !== 200) { $('#bStand').textContent = r.body.error || 'Geen toegang.'; return; }
     vulBeleid(r.body.beleid);
     $('#bStand').textContent = r.body.beleid && r.body.beleid.gewijzigd

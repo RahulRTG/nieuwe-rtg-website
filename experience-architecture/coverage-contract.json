@@ -44,6 +44,15 @@
     "humanReviewMustBeHuman": true,
     "sameCandidateCommitRequired": true,
     "automaticApprovalForbidden": true,
-    "interactionInventoryRequired": true
+    "interactionInventoryRequired": true,
+    "inventoryCompletenessAuditRequired": true,
+    "proofCoverageDoesNotImplyProductQuality": true,
+    "legacyDesignScreensAllowed": 0,
+    "legacyDesignExceptionOutcome": "BLOCKED",
+    "independentQualificationRunsRequired": 2,
+    "qualificationRunsRequireCleanState": true,
+    "qualificationRunsRequireIndependentEvidenceBuild": true,
+    "criticalBlockersCannotBeAveraged": true,
+    "criticalBlockerDomains": ["financial-safety", "authorization", "contract-signature"]
   }
 }

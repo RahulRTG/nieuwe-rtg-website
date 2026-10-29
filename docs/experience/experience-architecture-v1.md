@@ -64,3 +64,34 @@ kandidaatcommit, configuratiehash, methode en artefact. Menselijke kwaliteit
 vereist daarnaast een menselijke reviewer. De uiteindelijke vrijgavepoort moet
 APPWERKT en EXPERIENCEWERKT op dezelfde kandidaatcommit samenstellen; dit eerste
 architectuurpakket verklaart de huidige ervaring uitdrukkelijk nog niet groen.
+
+## Vier afzonderlijke vrijgavegrenzen
+
+**Volledige bewijsdekking is geen automatische productgoedkeuring.** De poort
+eist bewijs voor iedere geïnventariseerde regel én een afzonderlijke controle
+dat de inventaris zelf compleet is. Een ontbrekend scenario kan daardoor niet
+een kunstmatige 100%-score opleveren. De menselijke taakbeoordeling en het
+uiteindelijke productoordeel blijven afzonderlijke vereisten.
+
+**De actieve ontwerp-erfenis blokkeert Premium Ready.** De bestaande norm meet
+op deze bronstand 159 app-pagina's die de gedeelde tokenlaag nog niet insluiten.
+Dat getal is een ondergrens voor migratiewerk, geen bewering dat alle overige
+pagina's al volledig zijn gemigreerd. Voor de eindvrijgave is de norm nul:
+ieder actief scherm gebruikt het geldende Design System. Een tijdelijke
+uitzondering blijft `BLOCKED` en kan niet door een gemiddelde score worden
+gecompenseerd.
+
+**De twee eindruns zijn werkelijk onafhankelijk.** Beide draaien op dezelfde
+onveranderde kandidaatcommit, maar run 2 begint met een schone testtoestand en
+bouwt zijn bewijsresultaat opnieuw op. Geen database, cache, browserprofiel,
+gegenereerd register of ander resultaat uit run 1 mag de tweede uitslag dragen.
+
+**Kritieke risico's zijn fail-closed.** Financiële veiligheid, autorisatie en
+de binding van een handtekening aan de exacte contractversie zijn afzonderlijke
+vrijgaveblokkades. Eén open of verlopen kritisch bewijs houdt de kandidaat
+tegen, ongeacht het aantal geslaagde visuele of functionele controles.
+
+De integrale runs zijn het eindbewijs. Een fout die daar nog bovenkomt gaat
+terug naar een gericht herstelpakket; de volledige run wordt niet herhaald als
+diagnostisch zoekmiddel voordat die oorzaak en haar getroffen bereik zijn
+afgesloten.

@@ -86,24 +86,26 @@ test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenb
     'de normale scrollroute houdt de gemarkeerde bediening buiten vaste Edge-lagen');
   assert.match(bron, /gedeeldeLaagOpen[\s\S]{0,900}keyboard\.press\('Escape'\)[\s\S]{0,900}rtg-edge-status-panel\[aria-hidden=/,
     'een reeds beproefde gedeelde Edge-laag sluit via haar gewone Escape-route voor de app verdergaat');
-  assert.match(bron, /tikAlsGebruiker\(page, k\.modaal \|\| k\.edgeApp\)/,
+  assert.match(bron, /tikAlsGebruiker\(page, k\.modaal \|\| k\.edgeApp, k\.merk, bereik\)/,
     'bewegende modale en Edge-bediening gebruikt de volwaardige focus- en Enter-route');
+  assert.match(bron, /bediening werd opnieuw getekend voor activering[\s\S]{0,500}markeerOpnieuwGetekendeBediening[\s\S]{0,500}page\.click\('\[data-appwerkt="1"\]'/,
+    'een vóór activering opnieuw gemonteerde bediening wordt op dezelfde stabiele identiteit opnieuw gemarkeerd en echt geklikt');
 });
 
 test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtbare status wijzigt', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
   const stabieleMerken = bron.match(/return bron \? \[el\.tagName, bron\]\.join\('\|'\)/g) || [];
-  assert.equal(stabieleMerken.length, 4,
+  assert.equal(stabieleMerken.length, 5,
     'inventarisatie, replay en controle moeten dezelfde stabiele bronidentiteit gebruiken');
 });
 
 test('een Edge-kloon en haar bronbediening delen één toegankelijke identiteit', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
-  assert.equal((bron.match(/label \|\| el\.title \|\| el\.innerText \|\| el\.value/g) || []).length, 4,
+  assert.equal((bron.match(/label \|\| el\.title \|\| el\.innerText \|\| el\.value/g) || []).length, 5,
     'bron en kloon moeten dezelfde naamvolgorde gebruiken');
-  assert.equal((bron.match(/if \(bron\.startsWith\('control:'\)\) bron = '';/g) || []).length, 4,
+  assert.equal((bron.match(/if \(bron\.startsWith\('control:'\)\) bron = '';/g) || []).length, 5,
     'de technische control-prefix mag geen tweede zakelijke handeling maken');
-  assert.equal((bron.match(/replace\(\/\^\(\[\^\\p\{L\}\\p\{N\}\]\+\)\\s\+\/u, '\$1'\)/g) || []).length, 4,
+  assert.equal((bron.match(/replace\(\/\^\(\[\^\\p\{L\}\\p\{N\}\]\+\)\\s\+\/u, '\$1'\)/g) || []).length, 5,
     'witruimte na een visueel pictogram mag bron en Edge-kloon niet verdubbelen');
 });
 

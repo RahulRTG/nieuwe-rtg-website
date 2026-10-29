@@ -706,6 +706,44 @@ async function wachtOpBekendeBediening(page, ontbrekendeMerken) {
     .then(() => true).catch(() => false);
 }
 
+/* Een dynamische app mag een zichtbare bediening opnieuw monteren wanneer een
+   gegevensantwoord binnenkomt. De stabiele bedieningsidentiteit blijft dan
+   gelijk, maar het tijdelijke `data-appwerkt`-attribuut zat op het oude DOM-
+   element. Markeer uitsluitend dezelfde, opnieuw zichtbare bediening en laat
+   Playwright haar daarna via de gewone gebruikersroute activeren. Dit is geen
+   DOM-click en geen versoepeling: ontbrekend, verborgen of uitgeschakeld blijft
+   falen. De terugval wordt alleen gebruikt wanneer de eerste klik aantoonbaar
+   nog niet was verstuurd (`waiting for locator`). */
+async function markeerOpnieuwGetekendeBediening(page, doelMerk, bereik) {
+  return page.evaluate(({ doelMerk, bereik, bediening }) => {
+    const zichtbaar = (el) => {
+      if (!el || el.hidden || el.disabled || el.getAttribute('aria-disabled') === 'true' ||
+          el.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+      if (el.closest('details:not([open])') && !el.closest('summary')) return false;
+      if (typeof el.checkVisibility === 'function' &&
+          !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 1 && r.height > 1;
+    };
+    const merk = (el) => {
+      const label = (el.getAttribute('aria-label') || '').trim();
+      const naam = (label || el.title || el.innerText || el.value || '').replace(/\s+/g, ' ').trim()
+        .replace(/^([^\p{L}\p{N}]+)\s+/u, '$1');
+      let bron = el.id || el.getAttribute('data-rtg-adaptive-source') || '';
+      if (bron.startsWith('control:')) bron = '';
+      return bron ? [el.tagName, bron].join('|') : [el.tagName, '', naam.slice(0, 60)].join('|');
+    };
+    const wortel = bereik ? document.querySelector(bereik) : document;
+    if (!wortel) return false;
+    const doel = [...wortel.querySelectorAll(bediening)]
+      .find((el) => zichtbaar(el) && merk(el) === doelMerk);
+    if (!doel) return false;
+    document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
+    doel.setAttribute('data-appwerkt', '1');
+    return true;
+  }, { doelMerk, bereik, bediening: BEDIENINGSSELECTOR }).catch(() => false);
+}
+
 async function openIngang(page, base, ingang) {
   const meet = ingangOpties(ingang);
   await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -782,7 +820,7 @@ function redenVoorSchoneTegenproef(waarom) {
    toetsenbordactivatie is een volwaardige gebruikersroute en tegelijk een
    toegankelijkheidsbewijs. Gebruik deze terugval uitsluitend voor de
    expliciete stabiliteitsfout; onzichtbare of bedekte bediening blijft falen. */
-async function tikAlsGebruiker(page, toetsenbordEerst = false) {
+async function tikAlsGebruiker(page, toetsenbordEerst = false, doelMerk = null, bereik = null) {
   const activeerMetToetsenbord = async () => {
     const focusbaar = await page.evaluate(() => {
       const el = document.querySelector('[data-appwerkt="1"]');
@@ -825,6 +863,15 @@ async function tikAlsGebruiker(page, toetsenbordEerst = false) {
     return 'muis';
   } catch (e) {
     const reden = klikReden(String(e.message || e));
+    /* Bij `waiting for locator` is nog geen muis- of toetsenbordactie
+       verstuurd. Een opnieuw gemonteerd element met dezelfde stabiele
+       identiteit mag daarom eenmaal opnieuw worden gemarkeerd en daarna nog
+       steeds via Playwrights echte klikroute worden bediend. */
+    if (reden === 'bediening werd opnieuw getekend voor activering' && doelMerk &&
+        await markeerOpnieuwGetekendeBediening(page, doelMerk, bereik)) {
+      await page.click('[data-appwerkt="1"]', { timeout: 10000, noWaitAfter: true });
+      return 'muis-na-hertekening';
+    }
     /* Als Playwright nog uitsluitend op stabiele geometrie wachtte, is geen
        klik verstuurd. Probeer dan dezelfde zichtbare, focusbare bediening via
        Enter. Dit omvat een drukke hoofddraad die binnen de muislimiet geen
@@ -1239,7 +1286,7 @@ async function bedien(ctx, base, ingang) {
         const bestandskeuze = k.bestandskiezer
           ? page.waitForEvent('filechooser', { timeout: 2500 }).catch(() => null)
           : null;
-        const invoerwijze = await tikAlsGebruiker(page, k.modaal || k.edgeApp);
+        const invoerwijze = await tikAlsGebruiker(page, k.modaal || k.edgeApp, k.merk, bereik);
         if (invoerwijze === 'toetsenbord') {
           instrument.push('een bewegende maar zichtbare bediening is via de toegankelijke Enter-route geactiveerd');
         }

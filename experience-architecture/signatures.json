@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "description": "Dunne declaratieve overlay voor Experience Signatures. De app- en scherminventaris komt uitsluitend uit MAPPEN en public/apps; ontbrekende vermeldingen blijven fail-closed NOT_TESTED.",
+  "apps": {},
+  "screens": {}
+}

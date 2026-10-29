@@ -40,6 +40,9 @@ jobs:
       - if: matrix.width == 390
         name: Living Experience contract en daadwerkelijke pilotproeven
         run: npm run experience:prove
+      - if: matrix.width == 390
+        name: Volledige Experience-inventaris en bewijscontract
+        run: npm run experience:coverage:check
       - name: Bewaar rapport en schermafbeeldingen
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9

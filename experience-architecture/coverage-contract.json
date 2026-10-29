@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "name": "RTG 100% Experience Proof",
+  "statusVocabulary": ["PROVEN", "NOT_TESTED", "STALE", "FAILED", "BLOCKED", "NOT_APPLICABLE"],
+  "dimensions": [
+    {"id":"identity","label":"Identiteit","description":"Wereld- en appsignatuur zijn herkenbaar en consistent."},
+    {"id":"composition","label":"Compositie","description":"Rust, hiërarchie, fotografie en ruimte ondersteunen de taak."},
+    {"id":"continuity","label":"Continuïteit","description":"Navigatie, context, herstel en beweging vormen één begrijpelijke route."},
+    {"id":"restraint","label":"Terughoudendheid","description":"Zichtbare complexiteit blijft beperkt terwijl alle functies bereikbaar blijven."},
+    {"id":"adaptability","label":"Adaptiviteit","description":"De ervaring past bij apparaat, beschikbare ruimte, netwerk en voorkeuren."},
+    {"id":"accessibility","label":"Toegankelijkheid","description":"Toetsenbord, zoom, contrast, beweging en schermlezer zijn aantoonbaar bruikbaar."},
+    {"id":"fluidity","label":"Vloeiendheid","description":"Reactiesnelheid, frames en visuele stabiliteit halen de afgesproken budgetten."},
+    {"id":"human-quality","label":"Menselijke kwaliteit","description":"Echte mensen kunnen de afgesproken taak begrijpen, uitvoeren en herstellen."}
+  ],
+  "states": ["loading", "empty", "normal", "unavailable", "changed", "offline", "uncertain", "error"],
+  "devices": ["mobile-small", "mobile-large", "tablet", "desktop"],
+  "networks": ["offline", "constrained", "normal"],
+  "accessibilityChecks": ["keyboard", "focus", "zoom-200", "contrast", "screen-reader", "reduced-motion", "touch-targets"],
+  "fluidityChecks": ["input-latency", "navigation-latency", "missed-frames", "layout-stability"],
+  "continuityChecks": ["destination", "back-forward", "context-preservation", "error-recovery"],
+  "interactionChecks": ["visible", "understandable", "consistent", "operable"],
+  "inventoryBaselines": {"logicalApps":114,"screens":316},
+  "profiles": {
+    "interface": {
+      "dimensions": ["identity", "composition", "continuity", "restraint", "adaptability", "accessibility", "fluidity", "human-quality"]
+    },
+    "redirect": {
+      "dimensions": ["identity", "continuity", "accessibility", "fluidity"],
+      "notApplicable": {
+        "composition": {"decision":"EXP-REDIRECT-001","reason":"Een technische redirect rendert geen blijvende compositie; het bestemmingsscherm wordt afzonderlijk volledig beoordeeld."},
+        "restraint": {"decision":"EXP-REDIRECT-001","reason":"Een technische redirect bevat geen blijvende bediening; de bediening van het bestemmingsscherm wordt afzonderlijk beoordeeld."},
+        "adaptability": {"decision":"EXP-REDIRECT-001","reason":"Een technische redirect heeft geen eigen responsieve oppervlakte; het bestemmingsscherm wordt afzonderlijk beoordeeld."},
+        "human-quality": {"decision":"EXP-REDIRECT-001","reason":"De menselijke taak hoort bij het afzonderlijk geïnventariseerde bestemmingsscherm; de redirect bewijst uitsluitend veilige en begrijpelijke overdracht."}
+      }
+    }
+  },
+  "release": {
+    "allDiscoveredAppsRequired": true,
+    "allDiscoveredScreensRequired": true,
+    "missingSignature": "NOT_TESTED",
+    "missingEvidence": "NOT_TESTED",
+    "changedEvidence": "STALE",
+    "notApplicableRequiresDecisionAndReason": true,
+    "humanReviewMustBeHuman": true,
+    "sameCandidateCommitRequired": true,
+    "automaticApprovalForbidden": true,
+    "interactionInventoryRequired": true
+  }
+}

@@ -102,7 +102,11 @@ const LADDER = [
       /dekkingsvloer\.js$/, /dekking\.js$/, /performance-debt\.js$/, /beproeving-ci-bewijs\.js$/] },
   { id: 'scherm', naam: 'Scherm, toegankelijkheid en browser', wat: 'de schermsuite, de a11y-scan en het oordeel erover',
     patronen: [/e2e\.js$/, /a11y\.js$/, /a11y-oordeel\.js$/, /schermen\.js$/, /schermmutatie\.js$/,
-      /desktop-audit\.js$/] },
+      /desktop-audit\.js$/,
+      /* EXPERIENCEWERKT inventariseert alle apps, schermen en toepasselijke
+         ervaringsdimensies. Het is de fail-closed schermpoort vóór visuele,
+         toegankelijkheids-, prestatie- en menselijke kwalificatie. */
+      /experience-coverage\.js$/] },
   { id: 'gegevens', naam: 'Migratie en gegevensintegriteit', wat: 'schemamigraties, bewaartermijnen, de container die opkomt',
     patronen: [/rust-migraties\.js$/, /containerproef\.js$/, /kvwis\.js$/, /normbasis\.js$/, /norm\.js$/] },
   { id: 'releasebewijs', naam: 'Releasebewijs', wat: 'de bronboom gehasht, de stuklijst, de herkomst, de poort ervoor',

@@ -75,6 +75,7 @@
       const b = maak('button', 'ds-chip', naam); b.type = 'button';
       b.setAttribute('aria-pressed', String(dagen.includes(i)));
       b.addEventListener('click', () => {
+        beleidBewerking++;
         dagen = dagen.includes(i) ? dagen.filter(d => d !== i) : dagen.concat([i]).sort();
         tekenDagen();
       });
@@ -118,10 +119,19 @@
      verbinding konden de opstartaanvraag en de tab-aanvraag NA een zojuist
      opgeslagen beleid binnenkomen en de zichtbare keuze terugzetten. */
   let beleidVraag = 0;
+  let beleidBewerking = 0;
+  /* Een serverlezing mag invoer die intussen begon niet terugzetten. De
+     vraagvolgorde beschermt lezingen onderling; deze teller beschermt de
+     gebruiker tegen een lezing die vóór diens laatste bewerking begon. */
+  document.querySelectorAll('#tBeleid input, #tBeleid select').forEach(el => {
+    el.addEventListener('input', () => { beleidBewerking++; });
+    el.addEventListener('change', () => { beleidBewerking++; });
+  });
   async function haalBeleid() {
     const vraag = ++beleidVraag;
+    const bewerking = beleidBewerking;
     const r = await api('beleid', {});
-    if (vraag !== beleidVraag) return;
+    if (vraag !== beleidVraag || bewerking !== beleidBewerking) return;
     if (r.status !== 200) { $('#bStand').textContent = r.body.error || 'Geen toegang.'; return; }
     vulBeleid(r.body.beleid);
     $('#bStand').textContent = r.body.beleid && r.body.beleid.gewijzigd

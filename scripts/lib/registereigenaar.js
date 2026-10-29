@@ -232,6 +232,7 @@ const EIGENAAR = {
      roepen dezelfde paden aan) en het besluit (wie is eigenaar per capability)
      zijn twee bestanden, en alleen de eerste heeft een schrijver. */
   'SCHERMFUNCTIE.json': { schrijver: 'scripts/schermfunctie.js' },
+  'EXPERIENCEWERKT.json': { schrijver: 'scripts/experience-coverage.js' },
   'SCHERMEIGENAAR.json': { handmatig: true, lezer: 'test/schermeigenaar.test.js',
     waarom: 'het eigenaarsregister is een BESLUIT per capability en per overlappend paar; de toets houdt het ' +
       'tegen een verse meting van scripts/schermfunctie.js, en wie het uit die meting genereert laat de toets ' +

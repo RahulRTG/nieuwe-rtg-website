@@ -104,8 +104,10 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'een app-link in DesktopFrame blijft een herhaalbare route naar zijn bediening');
   assert.match(APPWERKT, /\[data-rtg-adaptive-route\]/,
     'APPWERKT kan een DesktopFrame-sectie opnieuw openen voor een resterende actie');
-  assert.match(APPWERKT, /if \(!k\.edgeApp\)[\s\S]{0,400}RTGAdaptiveEdge\.setState\('dock'\)/,
+  assert.match(APPWERKT, /if \(!k\.edgeApp\)[\s\S]{0,400}sluitAppdeck\(page\)/,
     'een gewone paginaactie sluit eerst een nog uitgeklapt appdeck');
+  assert.match(APPWERKT, /async function sluitAppdeck[\s\S]{0,500}RTGAdaptiveEdge\.setState\('dock'\)/,
+    'de gedeelde sluitroute gebruikt de publieke Adaptive Edge-toestand');
   assert.match(APPWERKT, /behoudHuidigeStand = !vervolg\.klaar/,
     'nieuwe vervolgbediening blijft zichtbaar voordat het Edge-deck opnieuw opent');
   assert.match(APPWERKT, /data-bweg[\s\S]{0,300}upload\|bestand kiezen/,

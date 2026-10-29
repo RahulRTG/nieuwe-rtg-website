@@ -178,6 +178,11 @@ test('Cercle declareert zijn terugroute als herstelbare schermstand', () => {
     'de kantoorroute moet na dynamische Cercle-acties opnieuw bedienbaar blijven');
   assert.match(edge, /app:!!embed\|\|root\.matches\(APP\)/,
     'bediening uit een embedded appheader moet app-eigendom houden in Adaptive Edge');
+  assert.match(edge, /if\(src\.frame\)b\.dataset\.rtgAdaptiveFrame='true'/,
+    'dezelfde bediening moet haar frameherkomst behouden zodat een bronapp geen bestemmingsbediening erft');
+  const meter = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(meter, /frameBediening \|\| el\.getAttribute\('data-rtg-adaptive-frame'\) !== 'true'/,
+    'alleen een expliciete frame-adapter mag paneelbediening aan de gemeten app toeschrijven');
 });
 
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {

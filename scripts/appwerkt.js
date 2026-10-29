@@ -883,6 +883,15 @@ async function tikAlsGebruiker(page, toetsenbordEerst = false, doelMerk = null, 
   }
 }
 
+async function sluitAppdeck(page) {
+  const gesloten = await page.evaluate(() => {
+    if (document.body.dataset.rtgAdaptiveState !== 'expanded' ||
+        !window.RTGAdaptiveEdge || !window.RTGAdaptiveEdge.setState) return false;
+    window.RTGAdaptiveEdge.setState('dock'); return true;
+  }).catch(() => false);
+  if (gesloten) await page.waitForTimeout(100);
+}
+
 /* De productnorm voor bewijs 2 staat op één plek. Een percentage, een
    afgeronde verhouding of een overgeslagen risicoknop mag nooit als volledige
    bediening worden gepresenteerd. */
@@ -1068,8 +1077,8 @@ async function bedien(ctx, base, ingang) {
       let naar = null; try { naar = JSON.parse(q.postData() || '{}').naar; } catch (e) {}
       if (naar && naar !== 'nl' && laatste && !taalWissel.some((w) => w.knop === laatste && w.naar === naar)) taalWissel.push({ knop: laatste, naar });
     });
-    const kijk = (magHerhalen = false, alleenStructuur = false) =>
-      kijkRonde(page, gehad, bereik, herhaald, magHerhalen, alleenStructuur, gevondenMerken, voorkeursopeners());
+  const kijk = (magHerhalen = false, alleenStructuur = false) =>
+      kijkRonde(page, gehad, bereik, herhaald, magHerhalen, alleenStructuur, gevondenMerken, voorkeursopeners(), !!meet.adapter);
     for (let ronde = 0; ronde < MAXKLIK; ronde++) {
       /* Werk eerst het zichtbare scherm af. Adaptive Edge vervangt vaste
          appbalken door werkende klonen in zijn Acties-blad, maar gewone
@@ -1257,6 +1266,7 @@ async function bedien(ctx, base, ingang) {
            toestand; de knop zelf blijft een normale, niet-geforceerde browser-
            klik. Edge-acties blijven vanzelf in het open deck staan. */
         if (!k.edgeApp) {
+          await sluitAppdeck(page);
           /* De systeemstatus, functiebibliotheek en Rahul-laag zijn normale
              Edge-schermen. Nadat hun eigen bediening is beproefd kan zo'n
              laag nog openstaan en een latere paginaactie afdekken. Een mens
@@ -1275,12 +1285,6 @@ async function bedien(ctx, base, ingang) {
             null, { timeout: 2500 }).catch(() => {});
             instrument.push('de proef sloot een eerder beproefde Edge-laag via Escape voordat zij de pagina verder bediende');
           }
-          const edgeGesloten = await page.evaluate(() => {
-            if (document.body.dataset.rtgAdaptiveState !== 'expanded' ||
-                !window.RTGAdaptiveEdge || !window.RTGAdaptiveEdge.setState) return false;
-            window.RTGAdaptiveEdge.setState('dock'); return true;
-          }).catch(() => false);
-          if (edgeGesloten) await page.waitForTimeout(100);
         }
         actieveRisicoklik = isRisicovol ? laatste : null;
         const bestandskeuze = k.bestandskiezer
@@ -1712,8 +1716,8 @@ async function bedektDoorSchil(page, bereik) {
   } catch (e) { return []; }
 }
 
-async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false, bekend = new Set(), voorkeur = new Set()) {
-  return page.evaluate(({ alGehad, alHerhaald, alBekend, alVoorkeur, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol }) => {
+async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen = false, alleenStructuur = false, bekend = new Set(), voorkeur = new Set(), frameBediening = false) {
+  return page.evaluate(({ alGehad, alHerhaald, alBekend, alVoorkeur, magHerhalen, alleenStructuur, SCHIL, bereik, bediening, risicovol, frameBediening }) => {
     const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
       if (el.closest('details:not([open])') && !el.closest('summary')) return false;
       if (typeof el.checkVisibility === 'function' &&
@@ -1760,9 +1764,14 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
        van bijvoorbeeld Assets geteld en vervolgens terecht door #shell
        onderschept. Command heeft eigen browsertoetsen; deze rij kwalificeert
        alleen de actieve app. */
-    const alle = kandidaten.filter((el) => !el.closest(SCHIL) ||
+    const alle = kandidaten.filter((el) => (!el.closest(SCHIL) ||
       el.matches('[data-rtg-adaptive-control="app"]') ||
-      el.closest('[data-rtg-adaptive-surface-owner="app"]'));
+      el.closest('[data-rtg-adaptive-surface-owner="app"]')) &&
+      /* Een expliciete adapter opent de gemeten app zelf in het actieve
+         Command-paneel. Zonder adapter is zo'n paneel een bestemming die pas
+         tijdens de bronapp werd geopend; zijn knoppen horen bij die andere
+         app en dus niet in de noemer van deze rij. */
+      (frameBediening || el.getAttribute('data-rtg-adaptive-frame') !== 'true'));
     /* Als Edge een bronknop overneemt, bestaan bron en kloon kort tegelijk.
        Ze zijn dezelfde handeling en tellen eenmaal; kies voor de echte tik de
        zichtbare Edge-versie, anders pakt DOM-volgorde alsnog de bedekte bron. */
@@ -1905,7 +1914,7 @@ async function kijkRonde(page, gehad, bereik, herhaald = new Set(), magHerhalen 
       dialoogOpener: dialoogOpener(doel), routeOpener: standNavigatie(doel) || dialoogOpener(doel),
       tekst: (doel.innerText || doel.value || doel.getAttribute('aria-label') || doel.title || '').trim().slice(0, 40) };
   }, { alGehad: [...gehad], alHerhaald: [...herhaald], alBekend: [...bekend], alVoorkeur: [...voorkeur], magHerhalen, alleenStructuur, SCHIL: GEDEELDE_SCHIL, bereik,
-    bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source });
+    bediening: BEDIENINGSSELECTOR, risicovol: RISICOVOL.source, frameBediening });
 }
 
 /* Een 503 die zichzelf uitlegt is CONFIG en geen DEFECT. Dit huis schrijft die

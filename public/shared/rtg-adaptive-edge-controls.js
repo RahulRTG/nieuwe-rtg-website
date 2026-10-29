@@ -21,11 +21,7 @@
         var tab=root.matches('.wos-dock,.wos-rail')&&el.getAttribute('data-tab');
         var action=el.getAttribute('data-rtg-action-key');
         if(lbl(el)&&avail(el,root)&&(!tab||!tabs.has(tab))&&(!action||!actions.has(action))&&!out.some(function(x){return x.el===el})){
-          /* Bediening uit een same-origin appframe blijft bediening van die
-             app. Zonder dit eigendom werd een iframe-header wel gekloond,
-             maar als algemene Edge-schil behandeld. Na een toestandswissel
-             kon Edge de eigen Terug-route dan niet gericht terughalen. */
-          out.push({el:el,root:root,app:!!embed||root.matches(APP)||el.matches('.rtguitvoer-knop')});if(tab)tabs.add(tab);if(action)actions.add(action);
+          out.push({el:el,root:root,frame:!!embed,app:!!embed||root.matches(APP)||el.matches('.rtguitvoer-knop')});if(tab)tabs.add(tab);if(action)actions.add(action);
         }
       });
     });
@@ -85,24 +81,21 @@
     try {
       if (frame && frame.contentDocument && frame.contentDocument.body)
         srcs = srcs.concat(srcButtons(frame.contentDocument, true, items));
-    } catch (e) {}
-    srcs.forEach(function (src) {
-      var el=src.el,b=d.createElement('button');b.type='button';
-      var action=el.dataset.rtgActionKey
-      b.className='rtg-adaptive-sheet-action';b.textContent=lbl(el);
-      if(src.app)b.dataset.rtgAdaptiveControl='app';
-      if(action)b.dataset.rtgActionKey=action
-      b.dataset.rtgAdaptiveSource=el.id||el.dataset.rtgAdaptiveSource||(el.href?'route:'+el.href:'control:'+lbl(el));
-      if(el.tagName==='A'&&el.getAttribute('href'))b.dataset.rtgAdaptiveRoute='true';
-      if(el.dataset.tab)b.dataset.rtgAdaptiveTab=el.dataset.tab;
-      b.disabled=el.disabled||el.getAttribute('aria-disabled')==='true';
-      ['aria-current','aria-pressed','aria-haspopup'].forEach(function(name){if(el.hasAttribute(name))b.setAttribute(name,el.getAttribute(name))});
-      if(el.hasAttribute('aria-selected'))b.setAttribute('aria-pressed',el.getAttribute('aria-selected'));
-      b.addEventListener('click',function(){
-        if(!avail(el,src.root)||el.disabled||el.getAttribute('aria-disabled')==='true')return;
-        el.click();close();
-      });
-      c.appendChild(b)
+    }catch(e){}
+    srcs.forEach(function(src){
+    var el=src.el,b=d.createElement('button'),action=el.dataset.rtgActionKey;
+    b.type='button';b.className='rtg-adaptive-sheet-action';b.textContent=lbl(el);
+    if(src.app)b.dataset.rtgAdaptiveControl='app';if(src.frame)b.dataset.rtgAdaptiveFrame='true';if(action)b.dataset.rtgActionKey=action;
+    b.dataset.rtgAdaptiveSource=el.id||el.dataset.rtgAdaptiveSource||(el.href?'route:'+el.href:'control:'+lbl(el));
+    if(el.tagName==='A'&&el.getAttribute('href'))b.dataset.rtgAdaptiveRoute='true';
+    if(el.dataset.tab)b.dataset.rtgAdaptiveTab=el.dataset.tab;
+    b.disabled=el.disabled||el.getAttribute('aria-disabled')==='true';
+    ['aria-current','aria-pressed','aria-haspopup'].forEach(function(n){if(el.hasAttribute(n))b.setAttribute(n,el.getAttribute(n))});
+    if(el.hasAttribute('aria-selected'))b.setAttribute('aria-pressed',el.getAttribute('aria-selected'));
+    b.addEventListener('click',function(){
+    if(!avail(el,src.root)||el.disabled||el.getAttribute('aria-disabled')==='true')return;
+    el.click();close();
+    });c.appendChild(b)
     });
     if (focus) c.querySelectorAll('[data-cap]').forEach(function (b) {
       if (b.dataset.cap === focus) b.focus({ preventScroll: true });

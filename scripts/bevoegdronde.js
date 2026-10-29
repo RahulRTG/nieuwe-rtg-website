@@ -146,10 +146,11 @@ function laadRegisters({ lees, vers } = {}) {
    de hele kernworkflow voltooien en minstens één gemarkeerde vreemde actor
    moet aantoonbaar buiten blijven. De schakels zelf zijn leidend; een groene
    samenvatting kan een open of ontbrekende schakel niet overstemmen. */
-function scenarioOordeel(rij, reg) {
+function scenarioOordeel(rij, reg, { contract = CONTRACT } = {}) {
   if (reg.voltooiVervallen.length) return { status: 'NIET_GETEST',
     reden: 'appkruisproef vervallen: ' + reg.voltooiVervallen.join('; ') };
-  const bewijs = reg.voltooi.get(rij.functie);
+  const bronFunctie = contract?.[rij.functie]?.bevoegdVia || rij.functie;
+  const bewijs = reg.voltooi.get(bronFunctie);
   if (!bewijs || bewijs.nietBeproefd) return { status: 'NIET_GETEST',
     reden: bewijs?.nietBeproefd || 'geen expliciete appkruisproef in VOLTOOIPROEF.json' };
   const schakels = Array.isArray(bewijs.schakels) ? bewijs.schakels : [];
@@ -166,7 +167,9 @@ function scenarioOordeel(rij, reg) {
   if (t.schakels !== schakels.length || t.gesloten !== schakels.length || t.open !== 0 || t.stuk !== 0)
     return { status: 'NIET_GETEST', reden: 'de samenvatting van de appkruisproef spreekt de schakels tegen' };
   return { status: 'BEWEZEN', scenario: true, tegenproeven: vreemd.length,
-    reden: 'volledige bevoegde kernworkflow en ' + vreemd.length + ' expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json' };
+    bronFunctie,
+    reden: 'volledige bevoegde kernworkflow en ' + vreemd.length + ' expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json' +
+      (bronFunctie === rij.functie ? '' : '; gedeelde bevoegdheidsgrens gemeten via ' + bronFunctie) };
 }
 
 function combineerOordelen(route, scenario) {
@@ -179,6 +182,74 @@ function combineerOordelen(route, scenario) {
   if (scenario.status === 'BEWEZEN') return { ...scenario,
     reden: scenario.reden + '; de generieke routeprojectie bleef open: ' + route.reden };
   return { ...route, reden: route.reden + '; appkruisproef: ' + scenario.reden };
+}
+
+/* Camera heeft een andere bevoegdheidsvorm dan een opgeslagen object: het
+   beeld hoort het toestel nooit te verlaten. Alleen een vrije spraakvraag gaat
+   naar de persoonlijke Rahul-sessie. De browserproef hieronder meet beide
+   kanten en bewaart de ruwe waarnemingen in hetzelfde BEVOEGD-register. */
+function cameraOordeel(p = {}) {
+  if (p.anoniem === 200 || p.bZietGeheim === true || (p.apiTijdensFoto || []).length)
+    return { status: 'GEBLOKKEERD_DOOR_DEFECT', context: 'lokale-media-met-sessieassistent',
+      reden: p.bZietGeheim ? 'een ander lid zag het camerageheim uit de sessie van A' :
+        (p.anoniem === 200 ? 'de persoonlijke Rahul-route liet een anonieme vraag binnen' :
+          'de lokale foto stuurde API-verzoeken: ' + p.apiTijdensFoto.join(', ')), cameraProef: p };
+  if (!p.beeld || !p.fotoLokaal || p.aOnthoud !== 200 || p.aWeet !== 200 || p.bWeet !== 200 ||
+      p.anoniem !== 401 || p.aZietGeheim !== true || p.bZietGeheim !== false)
+    return { status: 'NIET_GETEST', context: 'lokale-media-met-sessieassistent',
+      reden: 'de camerakruisproef was niet volledig uitvoerbaar: lokaal beeld, lokale foto en twee geldige gescheiden Rahul-sessies zijn alle drie verplicht', cameraProef: p };
+  return { status: 'BEWEZEN', context: 'lokale-media-met-sessieassistent', routes: 1,
+    reden: 'de nepcamera leverde beeld en een lokale blob zonder API-verzoek; A las zijn eigen camerageheim terug, B niet, en anoniem kreeg 401 op dezelfde sessiegebonden Rahul-route', cameraProef: p };
+}
+
+async function meetCameraContext(base, browser) {
+  const registreer = async (merk) => {
+    const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+    const r = await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Camera ' + merk, email: 'camera-' + merk + u + '@voorbeeld.nl',
+        phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' }) });
+    const j = await r.json().catch(() => ({}));
+    return j.token;
+  };
+  const post = async (lijf, token) => {
+    const r = await fetch(base + '/api/fluister', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' },
+      token ? { authorization: 'Bearer ' + token } : {}), body: JSON.stringify(lijf) });
+    return { status: r.status, data: await r.json().catch(() => ({})) };
+  };
+  const A = await registreer('a'), B = await registreer('b');
+  if (!A || !B) return cameraOordeel({ reden: 'geen twee ledensessies' });
+  const geheim = 'camerageheim-' + crypto.randomBytes(6).toString('hex');
+  const apiTijdensFoto = [];
+  let ctx;
+  try {
+    ctx = await browser.newContext({ permissions: ['camera'], serviceWorkers: 'block' });
+    await ctx.addInitScript((token) => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, A);
+    const page = await ctx.newPage();
+    page.on('request', (q) => { const u = new URL(q.url()); if (u.pathname.startsWith('/api/')) apiTijdensFoto.push(q.method() + ' ' + u.pathname); });
+    await page.goto(base + '/apps/camera.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForFunction(() => { const v = document.querySelector('video'); return !!(v && v.videoWidth > 0); }, null, { timeout: 20000 });
+    const beeld = await page.evaluate(() => { const v = document.querySelector('video'); return v.videoWidth > 0 && v.videoHeight > 0; });
+    /* De gedeelde appschil haalt bij het openen onder meer agenda, inbox en
+       voorkeuren op. Dat is geen fototransport. Eerst laten we die opstart
+       uitlopen en zetten pas vlak voor de sluiter de netwerkwaarneming op nul. */
+    await page.waitForTimeout(500);
+    apiTijdensFoto.length = 0;
+    await page.click('#sluiter');
+    await page.waitForFunction(() => { const i = document.querySelector('#duimBeeld'); return !!(i && /^blob:/.test(i.src)); }, null, { timeout: 10000 });
+    await page.waitForTimeout(250);
+    const fotoLokaal = await page.evaluate(() => /^blob:/.test(document.querySelector('#duimBeeld').src));
+    const onthoud = await post({ q: 'onthoud dat ' + geheim + ' bij mijn camera hoort' }, A);
+    const weetA = await post({ q: 'wat weet je over mij?' }, A);
+    const weetB = await post({ q: 'wat weet je over mij?' }, B);
+    const anoniem = await post({ q: 'wat weet je over mij?' });
+    return cameraOordeel({ beeld, fotoLokaal, apiTijdensFoto, aOnthoud: onthoud.status, aWeet: weetA.status,
+      bWeet: weetB.status, anoniem: anoniem.status,
+      aZietGeheim: JSON.stringify(weetA.data).includes(geheim), bZietGeheim: JSON.stringify(weetB.data).includes(geheim) });
+  } catch (e) {
+    return cameraOordeel({ apiTijdensFoto, fout: e && e.message });
+  } finally {
+    if (ctx) await ctx.close().catch(() => {});
+  }
 }
 
 /* `afgebakend` is de vierde gang van de IDOR-proef (scripts/lib/afbakening.js):
@@ -286,7 +357,22 @@ function ledenOordeel(rij, reg, { schermroutes, lees, contract = CONTRACT } = {}
     if (!onder.size) paden.push(v + '*');
     else for (const p of onder) paden.push(p);
   }
-  if (!paden.length) return { status: 'NIET_GETEST', reden: 'het scherm roept zelf geen route aan; er is niets te kruisen' };
+  if (!paden.length) {
+    const c = contract?.[rij.functie] || {};
+    if (c.bevoegdContext === 'publieke-inhoud' && rij.ingang && rij.ingang.endsWith('.html') &&
+        Array.isArray(c.bestanden) && c.bestanden.length > 0) {
+      return { status: 'BEWEZEN', routes: 0, context: 'publieke-inhoud',
+        reden: 'expliciet contract voor publieke statische inhoud; de gemeten ingang roept geen API aan en ontsluit daardoor geen account-, object- of organisatiedata' };
+    }
+    if (c.bevoegdContext === 'lokale-navigatie' && c.adapter?.type === 'rahul-opdracht' &&
+        Array.isArray(c.bevoegdBestemmingen) && c.bevoegdBestemmingen.length > 0 &&
+        c.bevoegdBestemmingen.every((p) => /^\/apps\/[^?#]+\.html\?[^#]+$/.test(p))) {
+      return { status: 'BEWEZEN', routes: 0, context: 'lokale-navigatie',
+        bestemmingen: c.bevoegdBestemmingen.length,
+        reden: 'expliciet contract voor lokale navigatie; de gemeten kiezer roept geen API aan, draagt geen domeingegevens en verwijst uitsluitend naar ' + c.bevoegdBestemmingen.length + ' lokale app-ingangen met een eigen bevoegdheidsgrens' };
+    }
+    return { status: 'NIET_GETEST', reden: 'het scherm roept zelf geen route aan; er is niets te kruisen' };
+  }
   const oordelen = [...new Set(paden)].sort().map((p) => (p.endsWith('*')
     ? { stand: 'open', reden: p + ': de registers kennen geen route onder dit voorvoegsel' } : padOordeel(p, reg)));
   const gebroken = oordelen.filter((o) => o.stand === 'gebroken');
@@ -393,6 +479,7 @@ async function meet() {
   const regels = [];
   const gezin = lijst.filter((r) => r.persona === 'gezin');
   let gezinUit = new Map();
+  const contextUit = new Map();
   if (gezin.length) {
     const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
     const pw = laadBrowser({ eigenDriver: false });
@@ -400,8 +487,11 @@ async function meet() {
     const { startServer, stopNet } = require(path.join(WORTEL, 'test', 'helper.js'));
     const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bevoegdronde-'));
     const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-    const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    try { gezinUit = await meetGezinnen(gezin, base, browser, maakContext, meetIngang); }
+    const browser = await pw.chromium.launch({ args: ['--no-sandbox', '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] });
+    try {
+      gezinUit = await meetGezinnen(gezin, base, browser, maakContext, meetIngang);
+      contextUit.set('link:camera', await meetCameraContext(base, browser));
+    }
     finally {
       await browser.close();
       /* Eerst de server zijn write-behind en journaal laten sluiten, pas daarna
@@ -417,6 +507,7 @@ async function meet() {
     if (r.persona === 'lid') route = ledenOordeel(r, reg);
     else if (r.persona === 'gezin') route = gezinUit.get(r.functie);
     else route = { status: 'NIET_GETEST', reden: 'de generieke ronde heeft geen kruisproef voor de persona ' + r.persona };
+    if (contextUit.has(r.functie)) route = combineerOordelen(route, contextUit.get(r.functie));
     regels.push(Object.assign(basis, combineerOordelen(route, scenarioOordeel(r, reg))));
   }
   regels.sort((a, b) => a.functie.localeCompare(b.functie));
@@ -433,7 +524,7 @@ async function meet() {
 }
 
 module.exports = { beoordeelIdorRij, padOordeel, ledenOordeel, paarOordeel, gezinOordeel,
-  scenarioOordeel, combineerOordelen, laadRegisters, DOEL };
+  scenarioOordeel, combineerOordelen, cameraOordeel, laadRegisters, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

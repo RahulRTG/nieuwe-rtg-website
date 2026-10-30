@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-30T12:50:32.690Z",
-    "commit": "39f5705b6e",
+    "op": "2026-10-30T13:08:40.855Z",
+    "commit": "0afc8afa15",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.1"
   },
@@ -11,8 +11,7 @@
   "grens": "alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt. Een scherm dat niets aan de backend vraagt, is NIET_GETEST en niet BEWEZEN.",
   "sessiesOvergeslagen": [],
   "telling": {
-    "BEWEZEN": 112,
-    "NIET_GETEST": 2
+    "BEWEZEN": 114
   },
   "regels": [
     {
@@ -1040,8 +1039,8 @@
       "app": "RTFoundation",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "landde op /apps/app.html in plaats van /apps/app.html?pas=rtg; het scherm zelf is niet beproefd",
+      "status": "BEWEZEN",
+      "reden": "28 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 28,
       "klachten": []
     },
@@ -1060,8 +1059,8 @@
       "app": "Videobellen",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "NIET_GETEST",
-      "reden": "landde op /apps/app.html in plaats van /apps/app.html?pas=rtg; het scherm zelf is niet beproefd",
+      "status": "BEWEZEN",
+      "reden": "28 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
       "gelogen": 28,
       "klachten": []
     },

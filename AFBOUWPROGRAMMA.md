@@ -1754,3 +1754,31 @@ versoepeld. **27/27** liegronde- en appcontracttests slagen zonder skips
 (`/tmp/rtg-truth-query-contract.log`). Het oude waarheidsresultaat wordt niet
 handmatig opgewaardeerd: het geraakte instrument moet opnieuw meten. Deze
 wijziging raakt de eerder gemeten voltooiings-, rol- en objectproeven niet.
+
+#### APPWERKT-samenstelling op `0afc8afa15` (30 oktober)
+
+De ononderbroken lokale browserronde is afgerond: **112/114** rijen met alle
+acht bewijzen, **1.960/1.960** geïnventariseerde knoppen aangeraakt, nul niet
+klikbare knoppen. De twee resterende defectoordelen zijn van de meter: voor
+RTFoundation en Videobellen wordt `/apps/app.html?pas=rtg` ten onrechte als
+letterlijke bestandsnaam gecontroleerd. Hun daadwerkelijke query-ingang en
+bronbinding moeten behouden blijven; alleen de fysieke bestandscontrole moet
+het documentpad gebruiken. De volledige uitslag blijft bewaard, zonder de twee
+rijen handmatig groen te maken. Log: `/tmp/rtg-appwerkt-0afc8afa.log`.
+
+De nieuwe LIEGRONDE sluit **114/114** binnen de lege-antwoordproef. BEVOEGD
+sluit **114/114** binnen de eigen appcontracten. Onafhankelijke herafleiding
+bevestigt de bronhashes en scenarioaansluiting. De verdeling is 99 expliciete
+workflow-/tegenactorscenario's, drie routeprojecties, negen gezinsapps met
+19 gescheiden ruwe paren, één cameraproef en twee statische/lokale contracten.
+De open brede routeprojecties van die 99 scenario's worden daarmee niet
+volledig gekwalificeerd. Lege-backendgedrag is evenmin bewijs van semantisch
+juiste antwoorden gedurende alle bedrijfsprocessen.
+
+Een reparatie aan de gedeelde APPWERKT-meter laat bestaande browserbewijzen
+volgens hun huidige bronhashes vervallen. Eerst worden de twee geraakte
+ingangen gericht getoetst. De oude 112 resultaten krijgen geen nieuwe
+meetcommit. Een nieuwe integrale browserafleiding wordt pas op een volgende
+stabiele meetstand uitgevoerd; de overige platform- en Experience-poorten
+blijven afzonderlijk open. De twee onafhankelijke volledige eindruns zijn nog
+niet gestart.

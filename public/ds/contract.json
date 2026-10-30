@@ -227,6 +227,10 @@
     "public/apps/chauffeur.html": "test/chauffeur-ds.e2e.js",
     "public/apps/ghost.html": "test/ghost-ds.e2e.js",
     "public/apps/voertuig.html": "test/voertuig-ds.e2e.js",
-    "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js"
+    "public/ds/voorbeeld.html": "test/ontwerpvoorbeeld.e2e.js",
+    "public/apps/juridisch.html": "test/juridisch-ds.e2e.js",
+    "public/apps/juridisch/privacy.html": "test/juridisch-ds.e2e.js",
+    "public/apps/juridisch/voorwaarden.html": "test/juridisch-ds.e2e.js",
+    "public/apps/juridisch/partnervoorwaarden.html": "test/juridisch-ds.e2e.js"
   }
 }

@@ -1,7 +1,78 @@
 {
   "version": 1,
   "description": "Dunne declaratieve overlay voor Experience Signatures. De app- en scherminventaris komt uitsluitend uit MAPPEN en public/apps; ontbrekende vermeldingen blijven fail-closed NOT_TESTED.",
-  "apps": {},
+  "apps": {
+    "app:map-instellingen:link:juridisch": {
+      "identity": "LivingOS · Juridische documenten. Rustige documentcompositie op Heritage-papier, Bodoni voor de hiërarchie en Inter voor langdurig lezen. De tekst is de inhoud; fotografie en decoratieve beweging voegen hier geen betekenis toe.",
+      "composition": "Bestaande DS-kop, lijst en lezer binnen collectie/detail. Eén documenttitel, vaste leesbreedte, herkenbare hoofdstukken en dezelfde Edge, Rahul en Spotlight. Geen eigen stylesheet of tweede navigatieschil.",
+      "motion": "Behoud documentcontext bij openen, terugkeren en herladen. Centrale overgangen respecteren reduced motion. Paginascroll blijft de leespositie beheren; geen genest scrollvlak voor het document. Deze declaratie vervangt geen focus- of continuïteitsbewijs.",
+      "interactionDensity": "quiet",
+      "additionalStates": [
+        "first-visit-cookie-notice",
+        "reloaded",
+        "price-source-unavailable"
+      ],
+      "humanTasks": [
+        "Zoek het passende document zonder Rahul, lees de relevante passage en keer terug naar de documentkeuze. Beoordeel rust, vindbaarheid en begrijpelijkheid.",
+        "Lees een lang hoofdstuk met toetsenbord, schermlezer en tekstvergroting; controleer dat de Edge geen tekst of bediening onbereikbaar maakt."
+      ],
+      "purpose": "De bezoeker kiest een van de drie bestaande juridische publicaties en kan naar dezelfde documentkeuze terugkeren. De presentatie verleent geen rechten en verandert geen juridische of financiële afspraken.",
+      "interactions": [
+        {
+          "id": "home",
+          "label": "naar de app"
+        },
+        {
+          "id": "voorwaarden",
+          "label": "Algemene voorwaarden"
+        },
+        {
+          "id": "privacy",
+          "label": "Privacybeleid"
+        },
+        {
+          "id": "partnervoorwaarden",
+          "label": "Partnervoorwaarden"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ]
+    }
+  },
   "screens": {
     "/apps/hotels.html": {
       "identity": "TravelOS · Verblijven. Een fotografische collectie van verblijven, met rustige redactionele hiërarchie, Bodoni voor de plaats en Inter voor de handeling. Wereldaccenten en materialen komen uitsluitend uit Heritage en public/ds. Sfeerbeelden zijn geen bewijs van een echte accommodatie of bevestigde partner.",
@@ -192,6 +263,278 @@
         "Stel bij een bevestigd verblijf een servicevraag met toelichting; onderscheid verzonden, ontvangen, toegezegd en mislukt, en herstel van een onderbroken verzoek.",
         "Gebruik tijdens een bevoegd ingecheckt verblijf de kamer- of entreesleutel; herken geweigerde of verlopen toegang en kan uitleggen wanneer de sleutel niet beschikbaar hoort te zijn.",
         "Voer de belangrijkste stappen uit met toetsenbord of schermlezer, tekstvergroting en reduced motion. Beoordeel rust, oriëntatie, leesbaarheid en herstel op mobiel en desktop."
+      ]
+    },
+    "/apps/juridisch.html": {
+      "identity": "LivingOS · Juridische documenten. Rustige documentcompositie op Heritage-papier, Bodoni voor de hiërarchie en Inter voor langdurig lezen. De tekst is de inhoud; fotografie en decoratieve beweging voegen hier geen betekenis toe.",
+      "composition": "Bestaande DS-kop, lijst en lezer binnen collectie/detail. Eén documenttitel, vaste leesbreedte, herkenbare hoofdstukken en dezelfde Edge, Rahul en Spotlight. Geen eigen stylesheet of tweede navigatieschil.",
+      "motion": "Behoud documentcontext bij openen, terugkeren en herladen. Centrale overgangen respecteren reduced motion. Paginascroll blijft de leespositie beheren; geen genest scrollvlak voor het document. Deze declaratie vervangt geen focus- of continuïteitsbewijs.",
+      "interactionDensity": "quiet",
+      "additionalStates": [
+        "first-visit-cookie-notice",
+        "reloaded",
+        "price-source-unavailable"
+      ],
+      "humanTasks": [
+        "Zoek het passende document zonder Rahul, lees de relevante passage en keer terug naar de documentkeuze. Beoordeel rust, vindbaarheid en begrijpelijkheid.",
+        "Lees een lang hoofdstuk met toetsenbord, schermlezer en tekstvergroting; controleer dat de Edge geen tekst of bediening onbereikbaar maakt."
+      ],
+      "purpose": "De bezoeker kiest een van de drie bestaande juridische publicaties en kan naar dezelfde documentkeuze terugkeren. De presentatie verleent geen rechten en verandert geen juridische of financiële afspraken.",
+      "interactions": [
+        {
+          "id": "home",
+          "label": "naar de app"
+        },
+        {
+          "id": "voorwaarden",
+          "label": "Algemene voorwaarden"
+        },
+        {
+          "id": "privacy",
+          "label": "Privacybeleid"
+        },
+        {
+          "id": "partnervoorwaarden",
+          "label": "Partnervoorwaarden"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ]
+    },
+    "/apps/juridisch/voorwaarden.html": {
+      "identity": "LivingOS · Juridische documenten. Rustige documentcompositie op Heritage-papier, Bodoni voor de hiërarchie en Inter voor langdurig lezen. De tekst is de inhoud; fotografie en decoratieve beweging voegen hier geen betekenis toe.",
+      "composition": "Bestaande DS-kop, lijst en lezer binnen collectie/detail. Eén documenttitel, vaste leesbreedte, herkenbare hoofdstukken en dezelfde Edge, Rahul en Spotlight. Geen eigen stylesheet of tweede navigatieschil.",
+      "motion": "Behoud documentcontext bij openen, terugkeren en herladen. Centrale overgangen respecteren reduced motion. Paginascroll blijft de leespositie beheren; geen genest scrollvlak voor het document. Deze declaratie vervangt geen focus- of continuïteitsbewijs.",
+      "interactionDensity": "quiet",
+      "additionalStates": [
+        "first-visit-cookie-notice",
+        "reloaded",
+        "price-source-unavailable"
+      ],
+      "humanTasks": [
+        "Zoek het passende document zonder Rahul, lees de relevante passage en keer terug naar de documentkeuze. Beoordeel rust, vindbaarheid en begrijpelijkheid.",
+        "Lees een lang hoofdstuk met toetsenbord, schermlezer en tekstvergroting; controleer dat de Edge geen tekst of bediening onbereikbaar maakt."
+      ],
+      "purpose": "Algemene voorwaarden volledig lezen, hoofdstukken herkennen, de bestaande verwijzingen volgen en terugkeren naar Juridisch. De bestaande prijs- en tariefprojecties blijven intact waar aanwezig. De ontwerpkwalificatie is geen juridische inhoudstoets.",
+      "interactions": [
+        {
+          "id": "document-index",
+          "label": "Juridisch"
+        },
+        {
+          "id": "privacy",
+          "label": "Privacybeleid"
+        },
+        {
+          "id": "partnervoorwaarden",
+          "label": "Partnervoorwaarden"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ]
+    },
+    "/apps/juridisch/privacy.html": {
+      "identity": "LivingOS · Juridische documenten. Rustige documentcompositie op Heritage-papier, Bodoni voor de hiërarchie en Inter voor langdurig lezen. De tekst is de inhoud; fotografie en decoratieve beweging voegen hier geen betekenis toe.",
+      "composition": "Bestaande DS-kop, lijst en lezer binnen collectie/detail. Eén documenttitel, vaste leesbreedte, herkenbare hoofdstukken en dezelfde Edge, Rahul en Spotlight. Geen eigen stylesheet of tweede navigatieschil.",
+      "motion": "Behoud documentcontext bij openen, terugkeren en herladen. Centrale overgangen respecteren reduced motion. Paginascroll blijft de leespositie beheren; geen genest scrollvlak voor het document. Deze declaratie vervangt geen focus- of continuïteitsbewijs.",
+      "interactionDensity": "quiet",
+      "additionalStates": [
+        "first-visit-cookie-notice",
+        "reloaded",
+        "price-source-unavailable"
+      ],
+      "humanTasks": [
+        "Zoek het passende document zonder Rahul, lees de relevante passage en keer terug naar de documentkeuze. Beoordeel rust, vindbaarheid en begrijpelijkheid.",
+        "Lees een lang hoofdstuk met toetsenbord, schermlezer en tekstvergroting; controleer dat de Edge geen tekst of bediening onbereikbaar maakt."
+      ],
+      "purpose": "Privacybeleid volledig lezen, hoofdstukken herkennen, de bestaande verwijzingen volgen en terugkeren naar Juridisch. De bestaande prijs- en tariefprojecties blijven intact waar aanwezig. De ontwerpkwalificatie is geen juridische inhoudstoets.",
+      "interactions": [
+        {
+          "id": "document-index",
+          "label": "Juridisch"
+        },
+        {
+          "id": "voorwaarden",
+          "label": "Algemene voorwaarden"
+        },
+        {
+          "id": "partnervoorwaarden",
+          "label": "Partnervoorwaarden"
+        },
+        {
+          "id": "security-contact",
+          "label": "security.txt"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ]
+    },
+    "/apps/juridisch/partnervoorwaarden.html": {
+      "identity": "LivingOS · Juridische documenten. Rustige documentcompositie op Heritage-papier, Bodoni voor de hiërarchie en Inter voor langdurig lezen. De tekst is de inhoud; fotografie en decoratieve beweging voegen hier geen betekenis toe.",
+      "composition": "Bestaande DS-kop, lijst en lezer binnen collectie/detail. Eén documenttitel, vaste leesbreedte, herkenbare hoofdstukken en dezelfde Edge, Rahul en Spotlight. Geen eigen stylesheet of tweede navigatieschil.",
+      "motion": "Behoud documentcontext bij openen, terugkeren en herladen. Centrale overgangen respecteren reduced motion. Paginascroll blijft de leespositie beheren; geen genest scrollvlak voor het document. Deze declaratie vervangt geen focus- of continuïteitsbewijs.",
+      "interactionDensity": "quiet",
+      "additionalStates": [
+        "first-visit-cookie-notice",
+        "reloaded",
+        "price-source-unavailable"
+      ],
+      "humanTasks": [
+        "Zoek het passende document zonder Rahul, lees de relevante passage en keer terug naar de documentkeuze. Beoordeel rust, vindbaarheid en begrijpelijkheid.",
+        "Lees een lang hoofdstuk met toetsenbord, schermlezer en tekstvergroting; controleer dat de Edge geen tekst of bediening onbereikbaar maakt."
+      ],
+      "purpose": "Partnervoorwaarden volledig lezen, hoofdstukken herkennen, de bestaande verwijzingen volgen en terugkeren naar Juridisch. De bestaande prijs- en tariefprojecties blijven intact waar aanwezig. De ontwerpkwalificatie is geen juridische inhoudstoets.",
+      "interactions": [
+        {
+          "id": "document-index",
+          "label": "Juridisch"
+        },
+        {
+          "id": "voorwaarden",
+          "label": "Algemene voorwaarden"
+        },
+        {
+          "id": "privacy",
+          "label": "Privacybeleid"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
       ]
     }
   }

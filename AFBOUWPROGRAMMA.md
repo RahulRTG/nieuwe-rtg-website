@@ -1837,3 +1837,46 @@ commitgebonden resultaten. Nieuwe bronwijzigingen krijgen geen terugwerkend
 groen. Actuele integrale samenstelling, alle Experience-dimensies, menselijke
 beoordeling, staging/herstel en twee schone eindruns blijven open. Geen merge
 of productie-uitrol uitgevoerd.
+
+#### Consolidatie documentfamilie — 30 oktober
+
+Juridisch en de drie gepubliceerde documenten gebruiken nu de bestaande
+DS-shell, lijst en lezer. Vier eigen stijlblokken (13.924 tekens) zijn verwijderd;
+de gedeelde lezer krijgt uitsluitend een paginavariant voor documentritme.
+Documenttekst en de twee scripts voor actuele prijzen/tarieven zijn behouden.
+Geen nieuwe dependency, controller, opslag of autorisatiepad is toegevoegd.
+De statische DS-inventaris telt nu 34 gemigreerde routes, tegenover 30 vóór dit
+pakket. De 330 bestanden in die inventaris zijn niet dezelfde noemer als de
+316 Experience-schermen; migratie is geen schermkwalificatie.
+
+De gerichte browser- en inhoudscontroles slagen 11/11, zonder skips, op de
+werkstand gebaseerd op `2bfbe1b2a1`. Log: `/tmp/rtg-legal-ds-final.log`.
+Ze toetsen 390/820/1440 px, geladen DS, één titel/Edge, automatische
+toegankelijkheid, 200% tekst, natuurlijke Tabvolgorde, documentterugkeer,
+herladen, actuele prijsgegevens en de cookiemelding bij het eerste bezoek.
+De bestaande VOLTOOIPROEF voor Juridisch sluit daarnaast de documenttaak,
+publicatie na herladen/herstart en herstel na een echte servercrash.
+Log: `/tmp/rtg-legal-completion-current.log`. Dit scenario levert geen
+vreemde-actorbewijs of menselijke Experience-beoordeling.
+
+Onafhankelijke codecontrole bevestigt behouden documentinhoud en prijsscripts.
+De aanvullende controles uit die review zijn uitgevoerd. Eén fout in de nieuwe
+test verwees naar `business` in plaats van het bestaande `business-lite`; de
+test is gecorrigeerd naar de werkelijke API en veldbinding, zonder productprijs
+of kwaliteitsgrens te wijzigen. De eerste mislukte run blijft bewaard in
+`/tmp/rtg-legal-ds-browser-expanded.log`.
+
+Open afsluitpunten: APPWERKT telt eigen knoppen; deze documentinterface werkt
+via links. De gerichte hermeting bevestigt bereikbaarheid, maar geeft bij nul
+eigen knoppen terecht `NIET_GETEST` voor bedienbaarheid. De drie documentlinks
+zijn wel werkelijk getoetst door de taakproef. Een expliciete, afzonderlijk
+geteste aansluiting voor linkbediening ontbreekt nog; het taakbewijs wordt
+niet automatisch opgewaardeerd. Log: `/tmp/rtg-legal-appwerkt-scoped.log`.
+Geen historisch register is door de gerichte runner overschreven.
+De nieuwe Experience-signaturen zijn
+contractdeclaraties, geen groene kwalificaties. Er zijn nog gedeelde
+stijlinjecties; alleen de route-eigen CSS en legacy-stijlbladkoppelingen zijn
+hier geconsolideerd. De globale DS-poort blijft geblokkeerd door de bestaande
+31-byte groei in `public/apps/browser.html` (`scroll-margin-block-start:8rem`).
+Die norm is niet verruimd en de focusverbetering niet verwijderd. De ratel kan
+pas na een inhoudelijke oplossing opnieuw worden vastgelegd.

@@ -10,7 +10,7 @@
       "route": "/apps/werk.html",
       "file": "organisatie.png",
       "sourceHash": "aedbab48cbfce438cda57b3d235e13d1f451b98b04239cb38fe64f06a795ca66",
-      "imageHash": "741b11ae3934a2060f1b184536f24faef2fea57565dcf9411c6456434f07e00e"
+      "imageHash": "bb698463da2e37f9bd98a7b1263ae1f6213521e3c4a2ed233cc2b88933aa0855"
     },
     {
       "id": "partner",
@@ -23,8 +23,8 @@
       "id": "gebruiker",
       "route": "/apps/app.html",
       "file": "gebruiker.png",
-      "sourceHash": "0d76f79c653f28c39dec559cdfd50d4884dba2d97538bc67f39dbb9bfed4f46a",
-      "imageHash": "1f8846a49c1566cfda1116c80ea47b2fe3e5c579e1e1c5b85526e33bb902e9af"
+      "sourceHash": "4a6f0e24a82eae12dbba591316eff84c01b6ca33197924910176bd61c932a88b",
+      "imageHash": "0e15bfec8392b89c3257d77aa842612384f83f2413bb54907230128805abc4b3"
     }
   ]
 }

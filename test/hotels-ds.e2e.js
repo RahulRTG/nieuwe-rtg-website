@@ -37,8 +37,7 @@ async function open(breedte, hoogte, taal = 'nl') {
     localStorage.setItem('rtg_member_token', t); }, [token, taal]);
   const page = await ctx.newPage();
   const fouten = letOpFouten(page, []);
-  const documents=[], navigations=[], pageErrors=[];
-  page.on('pageerror',error=>pageErrors.push(error.message));
+  const documents=[], navigations=[], pageErrors=letOpFouten(page,[],{eigenZeef:true});
   page.on('framenavigated',frame=>{if(frame===page.mainFrame())navigations.push(frame.url());});
   page.on('response',response=>{if(response.request().isNavigationRequest()&&response.frame()===page.mainFrame())documents.push({url:response.url(),status:response.status()});});
   const response=await page.goto(srv.base + '/apps/hotels.html', { waitUntil: 'domcontentloaded' });

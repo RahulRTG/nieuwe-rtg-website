@@ -304,6 +304,24 @@ test('browservoltooiproef bewaart fysieke OS-ingang en vervalt bij gedeelde UI, 
   assert.equal(nu().stand, 'VERVALLEN', 'verwijderde bestemming vervalt ook');
 }));
 
+test('APPWERKT-querybinding wordt als echte browserbron geproduceerd en hercontroleerd', () => metRepo(({map,sha}) => {
+  const {browserRaakvlakInvoer} = require('../scripts/appwerkt');
+  const row = {functie:'tab:a',ingang:'(tab binnen de app)'};
+  const input = browserRaakvlakInvoer(row,{'tab:a':{ingang:'/apps/a.html?pas=rtg',via:'#tab=a'}});
+  const w = wereld(map), stamp = {op:'nu',commit:sha,boomVuil:false,instrument:'scripts/instr.js',node:process.version};
+  const measured = R.versheidVoor(w,input,grofSpion())(stamp);
+  assert.equal(measured.vers,true,measured.reden);
+  assert.equal(measured.raakvlak.browserIngang,'/apps/a.html?pas=rtg');
+  const hashes = R.hashes(w);
+  const check = () => R.controleer(wereld(map),measured.raakvlak,hashes,row.ingang,grofSpion());
+  assert.equal(check().stand,'VERS');
+  schrijf(map,'public/apps/a.html',BESTANDEN['public/apps/a.html']+'<button>Nieuwe taak</button>');
+  assert.equal(check().stand,'VERVALLEN','het querycontract blijft aan het echte document gebonden');
+  schrijf(map,'public/apps/a.html',BESTANDEN['public/apps/a.html']);
+  schrijf(map,'scripts/lib/hulp.js','module.exports = 3;\n');
+  assert.equal(check().stand,'VERVALLEN','gewijzigde meterlogica mag geen oud browserbewijs gebruiken');
+}));
+
 test('browservoltooiproef vervalt bij ontbrekende of andere runtime en verwijderd pakketcontract', () => metRepo(({ map, sha }) => {
   const invoer = { ingang: '/apps/a.html', soort: 'browser', kanaal: 'browser',
     scenario: 'scripts/lib/voltooi/a.js', routeInstrument: 'scripts/lib/voltooi/a.js' };

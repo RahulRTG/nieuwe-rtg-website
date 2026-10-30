@@ -1806,3 +1806,34 @@ op een schone vastgelegde codeversie.
 Scopeprecisering APPWERKT: 1.960 aangeraakte knoppen zijn de aangetroffen
 bediening van de 112 bezochte apps. De twee query-ingangen vielen vóór
 browserontdekking uit; hun bediening zit niet in die noemer.
+
+#### Resultaten gerichte afsluiting (30 oktober)
+
+- Hotels: **6/6** echte Chromium-browsertests op schone broncommit
+  `af9ae5f8efceafb41d406824faf4720fa399535d`, nul skips. De bestaande
+  Experience-runner produceert één getypeerd bestemmingsbewijs
+  `PROVEN_IN_SCOPE`; het geheel blijft `INCOMPLETE`. Artefacten:
+  `artifacts/experience/hotels-destination.{json,log,coverage.json}` en
+  `artifacts/experience/report.json`. Dit is geen volledige schermkwalificatie.
+- APPWERKT query-ingangen: op `4dcfe71fdc` bereikt de echte geselecteerde runner
+  RTFoundation en Videobellen en raakt **5/5** respectievelijk **1/1** eigen
+  knoppen. Het testcontract bewaakt dat APPWERKT en RAAKVLAK bytegelijk blijven.
+  Log `/tmp/rtg-appwerkt-query-browser.log`. Deze proef kwalificeert de twee
+  gemeten bereikbaarheid-/bedienbaarheidscontracten, geen nieuwe 114/114-afleiding.
+- **18/18** gerichte query-/bestemmingscontroles en **30/30** bestaande
+  bronafhankelijkheidscontroles slagen. Een aanvullende regressie verbindt de
+  werkelijke virtuele query-ingang met `versheidVoor → controleer` in een
+  afzonderlijke testrepository: vers bij de oorspronkelijke bron, vervallen
+  bij gewijzigd document of meterhelper. Die gerichte proef slaagt ook.
+- Drie bestaande Experience-integratieproeven slagen tegen de lokale server.
+  De eerste sandboxpoging kon loopback niet openen (`EPERM`); na uitvoering
+  met lokale loopbacktoestemming slagen 3/3, zonder code- of normwijziging.
+- Onafhankelijke technische lezing vindt geen bewijsversoepeling. Metingen
+  voor eindkwalificatie blijven afzonderlijke processen; `meet()` heeft nog
+  gedeelde procescache en mag niet als twee onafhankelijke runs worden gebruikt.
+
+De oudere 112/114-uitslag en het Hotels-deelbewijs blijven historische,
+commitgebonden resultaten. Nieuwe bronwijzigingen krijgen geen terugwerkend
+groen. Actuele integrale samenstelling, alle Experience-dimensies, menselijke
+beoordeling, staging/herstel en twee schone eindruns blijven open. Geen merge
+of productie-uitrol uitgevoerd.

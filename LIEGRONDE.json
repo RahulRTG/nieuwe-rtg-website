@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-29T13:39:47.506Z",
-    "commit": "c802e26e0a",
+    "op": "2026-10-30T07:57:18.947Z",
+    "commit": "8f3d8bcbd7",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.1"
   },
@@ -1148,10 +1148,10 @@
       "functie": "tab:zorg",
       "app": "zorg",
       "ingang": "(tab in de app, geen eigen adres)",
-      "persona": "gezin",
+      "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 1,
+      "reden": "14 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 14,
       "klachten": []
     }
   ]

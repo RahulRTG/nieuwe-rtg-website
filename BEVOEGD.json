@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-29T13:50:26.445Z",
-    "commit": "336bd3e96e",
+    "op": "2026-10-30T08:24:52.767Z",
+    "commit": "8f3d8bcbd7",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 5,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v26.12.1"
   },
@@ -14,34 +14,34 @@
     "registers": [
       {
         "register": "IDOR.json",
-        "sha256": "5010883772dd901fabda11b476a854d81b631865ef0d3ba8d9f4e1515807d9d5",
+        "sha256": "8a8abd565f392c7913b7214772e8a25cd68243a139c333f967c94b98e78192fb",
         "stempel": {
-          "op": "2026-10-29T12:40:54.790Z",
-          "commit": "32d187c9d5",
+          "op": "2026-10-30T08:06:32.920Z",
+          "commit": "8f3d8bcbd7",
           "boomVuil": false,
-          "boomAnders": 0,
+          "boomAnders": 3,
           "instrument": "scripts/idorproef.js",
           "node": "v26.12.1"
         }
       },
       {
         "register": "ROLPROEF.json",
-        "sha256": "7d11f69854b4f487523be50d004cfddf1d5a37b3e7338f8214f82d06b12c6272",
+        "sha256": "a63b8e1b1685c55e8f94e0dde6efc55cc81d1432c8012ea5094ce2f37ee3d1bf",
         "stempel": {
-          "op": "2026-10-29T12:41:50.004Z",
-          "commit": "59d358de44",
+          "op": "2026-10-30T08:10:11.974Z",
+          "commit": "8f3d8bcbd7",
           "boomVuil": false,
-          "boomAnders": 0,
+          "boomAnders": 4,
           "instrument": "scripts/rolproef-route.js",
           "node": "v26.12.1"
         }
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "033aa487b47343b25dc00c3755da30d6b7ba327e9cd883a786b6e7c8bad9449c",
+        "sha256": "9ff28b7132084a0779c70b74c8ae12765f790d7aacdbc615df5994884647de49",
         "stempel": {
-          "op": "2026-10-29T12:43:07.383Z",
-          "commit": "be20691c88",
+          "op": "2026-10-30T07:11:01.511Z",
+          "commit": "8f3d8bcbd7",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -329,7 +329,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/VDP627/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/TFQ5PE/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -1456,12 +1456,12 @@
       "functie": "tab:zorg",
       "app": "zorg",
       "ingang": "(tab in de app, geen eigen adres)",
-      "persona": "gezin",
+      "persona": "lid",
       "status": "BEWEZEN",
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "tab:zorg",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 16 van de 16 routes niet gemeten, o.a. /api/care: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/care/annuleer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/care/betaal: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
     }
   ]
 }

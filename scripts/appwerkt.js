@@ -1265,6 +1265,16 @@ async function bedien(ctx, base, ingang) {
             await wachtOpDefinitiefBedieningsbeeld(page);
             k = await kijk();
             telStand(k);
+            /* De afsluitinventaris kan een bediening terugvinden die in een
+               eerdere, bewegende render al geselecteerd (`gehad`) maar nog
+               niet met succes aangetikt was. `kijkRonde` moet die dan opnieuw
+               mogen selecteren. Alleen daadwerkelijk onbewezen merken worden
+               vrijgegeven; geslaagde bediening wordt nooit herhaald. */
+            if (k.klaar && onbewezenMerken().length) {
+              for (const merk of onbewezenMerken()) gehad.delete(merk);
+              k = await kijk();
+              telStand(k);
+            }
           }
           if (k.klaar) break;
         }

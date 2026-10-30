@@ -116,6 +116,8 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'de appmeting begint pas nadat de bestaande World Desktop-laag haar eindtoestand publiceert');
   assert.match(APPWERKT, /wachtOpDefinitiefBedieningsbeeld\(page\)[\s\S]{0,120}k = await kijk\(\)[\s\S]{0,80}telStand\(k\)/,
     'na twee browserbeelden wordt nieuw geprojecteerde bediening opnieuw geïnventariseerd en niet genegeerd');
+  assert.match(APPWERKT, /k\.klaar && onbewezenMerken\(\)\.length[\s\S]{0,180}gehad\.delete\(merk\)[\s\S]{0,120}k = await kijk\(\)/,
+    'wel gevonden maar nog niet aangetikte Edge-bediening wordt opnieuw selecteerbaar');
   assert.match(APPWERKT, /data-bweg[\s\S]{0,300}upload\|bestand kiezen/,
     'verwijderen en de systeembestandskiezer komen na gewone paneelbediening');
   assert.match(APPWERKT, /Number\(!hoofdopener\(a\)\)[\s\S]{0,160}Number\(!dialoogOpener\(a\)\)[\s\S]{0,160}Number\(!standNavigatie\(a\)\)/,

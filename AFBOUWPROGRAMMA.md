@@ -1782,3 +1782,27 @@ meetcommit. Een nieuwe integrale browserafleiding wordt pas op een volgende
 stabiele meetstand uitgevoerd; de overige platform- en Experience-poorten
 blijven afzonderlijk open. De twee onafhankelijke volledige eindruns zijn nog
 niet gestart.
+
+#### Gerichte Experience-uitvoering — Hotels (30 oktober)
+
+De bestaande Experience-subprocessuitvoering is hergebruikt voor één getypeerd
+bestemmingsbewijs: Hotels, aangemeld RTG-lid, normale toestand, Chromium op
+390 × 844. De runner controleert de werkelijke bestemming, zichtbare en niet
+bedekte kop, collectie, ingelogde eigenaar, documentantwoorden en browserfouten.
+Een geldige uitvoering kan uitsluitend `PROVEN_IN_SCOPE` opleveren; de volledige
+bestemmingsvoorwaarde blijft geblokkeerd zolang andere verplichte configuraties
+ontbreken. Import van lokale artefacten levert geen nieuw uitvoeringsgezag op.
+Menselijke kwaliteit blijft expliciet onbewezen.
+
+De Hotels-signatuur benoemt bestaande handelingen en aanvullende toestanden;
+die declaratie is geen kwalificatie. Hotels en de logische app Verblijven
+(`/apps/residentie.html`) krijgen geen bewijs van elkaar. De uitgebreide
+Edge-inhoud en volledigheid van dynamische bediening blijven te controleren.
+De eerste 63 gerichte artefact-, dekkings- en uitvoeringscontroles slagen lokaal;
+de oorspronkelijke registeractualiteitsfout is door herafleiding opgelost,
+zonder een bewijsstatus op te waarderen. De echte browseruitvoering volgt pas
+op een schone vastgelegde codeversie.
+
+Scopeprecisering APPWERKT: 1.960 aangeraakte knoppen zijn de aangetroffen
+bediening van de 112 bezochte apps. De twee query-ingangen vielen vóór
+browserontdekking uit; hun bediening zit niet in die noemer.

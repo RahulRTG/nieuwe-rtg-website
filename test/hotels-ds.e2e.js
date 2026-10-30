@@ -24,7 +24,7 @@ const { decodeer, PAD } = require('../server/middleware/stijlbundel-rij');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const BEELDEN = process.env.RTG_DS_BEELDEN || '';
-let srv, browser, token;
+let srv, browser, token, memberEmail;
 
 async function post(url, data, auth = token) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -32,15 +32,19 @@ async function post(url, data, auth = token) {
   const body = await r.json(); assert.equal(r.status, 200, url + ': ' + JSON.stringify(body)); return body;
 }
 async function open(breedte, hoogte, taal = 'nl') {
-  const ctx = await browser.newContext({ viewport: { width: breedte, height: hoogte }, serviceWorkers: 'block', reducedMotion: 'reduce' });
+  const ctx = await browser.newContext({ viewport: { width: breedte, height: hoogte }, serviceWorkers: 'block', reducedMotion: 'reduce', locale:'nl-NL', deviceScaleFactor:1, isMobile:false, hasTouch:false });
   await ctx.addInitScript(([t, l]) => { localStorage.setItem('rtg_lang', l); localStorage.setItem('rtg_cookieinfo_v1', '1');
     localStorage.setItem('rtg_member_token', t); }, [token, taal]);
   const page = await ctx.newPage();
   const fouten = letOpFouten(page, []);
-  await page.goto(srv.base + '/apps/hotels.html', { waitUntil: 'domcontentloaded' });
+  const documents=[], navigations=[], pageErrors=[];
+  page.on('pageerror',error=>pageErrors.push(error.message));
+  page.on('framenavigated',frame=>{if(frame===page.mainFrame())navigations.push(frame.url());});
+  page.on('response',response=>{if(response.request().isNavigationRequest()&&response.frame()===page.mainFrame())documents.push({url:response.url(),status:response.status()});});
+  const response=await page.goto(srv.base + '/apps/hotels.html', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]');
   await page.waitForSelector('#inhoud .ds-kaart, #inhoud .ds-status__titel');
-  return { ctx, page, fouten };
+  return { ctx, page, fouten, documents, navigations, pageErrors, response };
 }
 async function beeld(page, naam) {
   if (!BEELDEN) return;
@@ -64,10 +68,15 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
-  token = (await post('/api/auth/register', { name: 'Verblijf Lid', email: 'verblijf-' + now + '@e.test',
+  memberEmail='verblijf-' + now + '@e.test';
+  token = (await post('/api/auth/register', { name: 'Verblijf Lid', email: memberEmail,
     phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+
+
+test('Hotels destination: aangemeld lid bereikt de Travel-collectie', {skip}, t =>
+  require('./hotels-destination-helper')(t,{open,browser,base:srv.base,email:memberEmail}));
 
 test('alleen het Design System: geen erfenisblad, geen tweede greep, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);

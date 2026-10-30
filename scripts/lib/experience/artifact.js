@@ -62,6 +62,10 @@ function integrity(record, source, candidate, dimension, context = {}) {
 }
 function assessment(...args) {
   const result = integrity(...args);
+  if (result === 'VALID') {
+    const scope = require('./execution').scoped(args[0],args[4]?.root);
+    if (scope) return {status:'BLOCKED',integrity:'VALID',scopedStatus:'PROVEN_IN_SCOPE',scope,reason:'REQUIRED_CONFIGURATION_COVERAGE_INCOMPLETE'};
+  }
   if (result === 'VALID') return {status:'BLOCKED',integrity:'VALID',reason:'AUTHORITATIVE_EXECUTION_AND_TYPED_REQUIREMENT_BINDING_MISSING'};
   return {status:result,integrity:result,reason:args[3] === 'human-quality' ? 'AUTHORITATIVE_HUMAN_CONFIRMATION_MISSING' : 'ARTIFACT_NOT_QUALIFIED'};
 }

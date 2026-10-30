@@ -6,10 +6,13 @@ const fs=require('node:fs'), path=require('node:path'), cp=require('node:child_p
 const {compile}=require('./lib/experience/compiler');
 const {fingerprint,outcome,state,sha,candidate}=require('./lib/experience/evidence');
 const {render}=require('./lib/experience/observatory');
+const {execute,select}=require('./lib/experience/execution');
+const {build}=require('./lib/experience/coverage');
 const root=path.resolve(__dirname,'..'), out=path.join(root,'artifacts/experience');
 if (['--prove','--check','--gate'].filter(arg=>process.argv.includes(arg)).length > 1) {
   console.error('BLOCKED: kies één Experience-pilotmodus'); process.exit(2);
 }
+if(process.argv.some(arg=>arg.startsWith('--proof'))&&!process.argv.includes('--prove')){console.error('BLOCKED: --proof vereist --prove');process.exit(2);}
 const qualifying=process.argv.includes('--prove')||process.argv.includes('--gate');
 const clean=candidate(root);
 if(qualifying&&!clean.ok){console.error('BLOCKED: '+clean.reason);process.exit(2);}
@@ -23,20 +26,17 @@ if (process.argv.includes('--check')) {
 }
 fs.mkdirSync(out,{recursive:true});
 const sourceHash=fingerprint(root), proofs=journeys.flatMap(j=>j.proofs.map(p=>({...p,journey:j.id})));
+let selected;
+try {selected=select(proofs,process.argv.slice(2));} catch(error) {console.error('BLOCKED: '+error.message);process.exit(2);}
 const dirty=!clean.ok;
 let commit='unknown'; try {commit=cp.execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();} catch(e) {}
+const typedEvidence=[];
 if (process.argv.includes('--prove') && graph.valid) {
-  for (const p of proofs) {
+  for (const p of selected) {
     console.log('Experience proof: '+p.id+' ('+p.test+')');
-    const run=cp.spawnSync(process.execPath,['--test','--test-concurrency=1','--test-reporter=tap',p.test],
-      {cwd:root,env:process.env,encoding:'utf8',timeout:240000,maxBuffer:8*1024*1024});
-    const log=(run.stdout||'')+'\n'+(run.stderr||'')+(run.error?'\n'+run.error.message:'');
-    const passed=outcome(run.status,run.stdout||''), number=n=>Number(((run.stdout||'').match(new RegExp('^# '+n+' (\\d+)$','m'))||[])[1])||0;
-    const after=candidate(root);
-    const record={version:1,test:p.test,at:new Date().toISOString(),sourceHash,sourceChanged:fingerprint(root)!==sourceHash,
-      commit,worktreeDirty:dirty||!after.ok||after.commit!==commit,exitCode:run.status,passed,tests:number('tests'),skipped:number('skipped'),logHash:sha(log)};
-    fs.writeFileSync(path.join(out,p.id+'.log'),log);
-    fs.writeFileSync(path.join(out,p.id+'.json'),JSON.stringify(record,null,2)+'\n');
+    const {record,coverage}=execute(root,p);
+    if(coverage) typedEvidence.push(coverage);
+    const passed=record.passed;
     console.log(p.id+': '+(passed?'passed':'FAILED')+' ('+record.tests+' tests)');
   }
 }
@@ -50,10 +50,20 @@ const rows=proofs.map(p=>{
   }
   return {...p,...record,state:result,log:record?p.id+'.log':null};
 });
+const scopedProofs=typedEvidence.flatMap(evidence=>build(root,{evidence,commit}).screens
+  .flatMap(screen=>screen.dimensions.flatMap(d=>d.scopedProofs||[])));
+const typedRequired=require('../experience-architecture/coverage-contract.json').executedProofs||[];
+const typedComplete=typedRequired.every(binding=>scopedProofs.some(p=>p.scope.id===binding.scope));
+const selectionStatus=graph.valid&&selected.every(p=>rows.some(row=>row.id===p.id&&row.state==='PROVEN'))&&
+  typedRequired.filter(b=>selected.some(p=>p.id===b.proof)).every(b=>scopedProofs.some(p=>p.scope.id===b.scope))?'PROVEN_IN_SCOPE':'INCOMPLETE';
 const report={version:1,at:new Date().toISOString(),commit,worktreeDirty:dirty,sourceHash,graph,proofs:rows,
-  status:!graph.valid?'FAILED':rows.every(p=>p.state==='PROVEN')?'PROVEN_IN_SCOPE':'INCOMPLETE',
+  status:!graph.valid?'FAILED':selected.length===proofs.length&&rows.every(p=>p.state==='PROVEN')&&typedComplete?'PROVEN_IN_SCOPE':'INCOMPLETE',
+  selection:{proofs:selected.map(p=>p.id),status:selectionStatus},
+  scopedProofs,typedEvidenceBlockers:typedEvidence.filter(e=>!e.records.length).map(e=>e.reason),
+  typedProofLifecycle:'Alleen --prove bouwt uitvoeringsgezag op. Imports en --gate zijn geen nieuwe uitvoering.',
   humanReview:'NOT_TESTED',releaseApproved:false};
 fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 fs.writeFileSync(path.join(out,'index.html'),render(report));
+console.log('Experience selectie: '+selectionStatus+'; geheel: '+report.status);
 console.log('Experience: '+report.status+'; '+path.join(out,'index.html'));
-if (qualifying) { const after=candidate(root); process.exitCode=after.ok&&after.commit===commit&&report.status==='PROVEN_IN_SCOPE'?0:1; }
+if (qualifying) { const after=candidate(root); process.exitCode=after.ok&&after.commit===commit&&(process.argv.some(arg=>arg.startsWith('--proof='))?selectionStatus:report.status)==='PROVEN_IN_SCOPE'?0:1; }

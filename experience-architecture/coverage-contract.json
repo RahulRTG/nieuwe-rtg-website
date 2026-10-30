@@ -54,5 +54,49 @@
     "qualificationRunsRequireIndependentEvidenceBuild": true,
     "criticalBlockersCannotBeAveraged": true,
     "criticalBlockerDomains": ["financial-safety", "authorization", "contract-signature"]
-  }
+  },
+  "executedProofs": [
+    {
+      "proof": "hotels-destination",
+      "instrument": "test/hotels-ds.e2e.js",
+      "subjectType": "screen",
+      "subjectId": "screen:/apps/hotels.html",
+      "dimension": "continuity",
+      "requirement": "destination",
+      "method": "browser",
+      "scope": "hotels-member-normal-chromium-390x844",
+      "check": "Hotels destination: aangemeld lid bereikt de Travel-collectie",
+      "configuration": {
+        "browser": "chromium",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "deviceScaleFactor": 1,
+        "touch": false,
+        "reducedMotion": true,
+        "locale": "nl-NL",
+        "serviceWorkers": "block",
+        "persona": "rtg-member",
+        "state": "normal",
+        "network": "local-test-server"
+      },
+      "expected": {
+        "path": "/apps/hotels.html",
+        "sameOrigin": true,
+        "world": "travel",
+        "title": "RTG Verblijven",
+        "heading": "Waar wilt u thuiskomen?",
+        "mainVisible": true,
+        "headingVisible": true,
+        "headingUnobscured": true,
+        "catalogueVisible": true,
+        "ownerAuthenticated": true,
+        "redirects": 0,
+        "documentErrors": 0,
+        "pageErrors": 0
+      },
+      "limits": "Alleen de ingelogde lid-ingang in normal-toestand op deze Chromium-viewport; geen alle-device destination, autorisatie, menselijke kwaliteit of schermvrijgave."
+    }
+  ]
 }

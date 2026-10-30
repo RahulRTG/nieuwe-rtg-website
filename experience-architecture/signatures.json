@@ -2,5 +2,197 @@
   "version": 1,
   "description": "Dunne declaratieve overlay voor Experience Signatures. De app- en scherminventaris komt uitsluitend uit MAPPEN en public/apps; ontbrekende vermeldingen blijven fail-closed NOT_TESTED.",
   "apps": {},
-  "screens": {}
+  "screens": {
+    "/apps/hotels.html": {
+      "identity": "TravelOS · Verblijven. Een fotografische collectie van verblijven, met rustige redactionele hiërarchie, Bodoni voor de plaats en Inter voor de handeling. Wereldaccenten en materialen komen uitsluitend uit Heritage en public/ds. Sfeerbeelden zijn geen bewijs van een echte accommodatie of bevestigde partner.",
+      "purpose": "Een verblijf zoeken, een kamer en reisgegevens kiezen, bewust een aanvraag indienen en de eigen voortgang of servicevraag volgen. Aangevraagd is niet bevestigd; een digitale sleutel is alleen beschikbaar tijdens een bevoegd ingecheckt verblijf. Alle essentiële taken blijven zonder Rahul uitvoerbaar.",
+      "composition": "Collectie voor zoeken; Detail en Taak in het bestaande verblijfsblad; Status voor Mijn reizen en ontbrekende beschikbaarheid; Gesprek voor Ter plaatse. Eén centrale Edge, bestaande Spotlight en Rahul. Fotografie ondersteunt oriëntatie; invoer, prijs, aanvraagstatus en herstel blijven duidelijk leesbaar. Geen tweede navigatieschil of eigen stijllaag.",
+      "motion": "Gebruik uitsluitend de bestaande centrale motion- en overgangscontracten. Een verblijfsblad sluit terug naar de collectie met herstel van focus. Tabwisselingen behouden hun expliciete view-context; terug/vooruit mag geen aanvraag herhalen. Reduced motion behoudt dezelfde informatie en bediening zonder schaal- of glijbeweging. Dit zijn te bewijzen contracten, geen claim dat de huidige route alle overgangen al correct uitvoert.",
+      "interactionDensity": "balanced",
+      "interactions": [
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "travel-home",
+          "label": "RTG TravelOS"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "tab-search",
+          "label": "Verblijven"
+        },
+        {
+          "id": "tab-mine",
+          "label": "Mijn reizen"
+        },
+        {
+          "id": "tab-service",
+          "label": "Ter plaatse"
+        },
+        {
+          "id": "travel-flight",
+          "label": "Vlucht"
+        },
+        {
+          "id": "travel-stay",
+          "label": "Verblijf"
+        },
+        {
+          "id": "travel-arrival",
+          "label": "Aankomst"
+        },
+        {
+          "id": "sign-in",
+          "label": "Naar de app"
+        },
+        {
+          "id": "destination",
+          "label": "Bestemming"
+        },
+        {
+          "id": "search-submit",
+          "label": "Uw reis zoeken met Enter"
+        },
+        {
+          "id": "filter-all",
+          "label": "Alle"
+        },
+        {
+          "id": "filter-type",
+          "label": "Soort verblijf kiezen"
+        },
+        {
+          "id": "open-stay",
+          "label": "Bekijk dit verblijf: naam van het verblijf"
+        },
+        {
+          "id": "detail-back",
+          "label": "Terug"
+        },
+        {
+          "id": "room",
+          "label": "Kamer kiezen met naam, omschrijving en prijs"
+        },
+        {
+          "id": "arrival-date",
+          "label": "Aankomst"
+        },
+        {
+          "id": "departure-date",
+          "label": "Vertrek"
+        },
+        {
+          "id": "guest-count",
+          "label": "Gasten"
+        },
+        {
+          "id": "request",
+          "label": "Verblijf aanvragen"
+        },
+        {
+          "id": "find-stay",
+          "label": "Vind een verblijf"
+        },
+        {
+          "id": "route",
+          "label": "Route"
+        },
+        {
+          "id": "transfer",
+          "label": "Transfer"
+        },
+        {
+          "id": "host",
+          "label": "Gastheer"
+        },
+        {
+          "id": "room-key",
+          "label": "Open mijn sleutel"
+        },
+        {
+          "id": "entrance-key",
+          "label": "Open entree"
+        },
+        {
+          "id": "cancel-request",
+          "label": "Aanvraag annuleren"
+        },
+        {
+          "id": "cancel-confirm",
+          "label": "Annulering bevestigen"
+        },
+        {
+          "id": "cancel-dismiss",
+          "label": "Annulering afbreken"
+        },
+        {
+          "id": "service-breakfast",
+          "label": "Ontbijt"
+        },
+        {
+          "id": "service-housekeeping",
+          "label": "Housekeeping"
+        },
+        {
+          "id": "service-roomservice",
+          "label": "Roomservice"
+        },
+        {
+          "id": "service-late-checkout",
+          "label": "Late check-out"
+        },
+        {
+          "id": "service-note",
+          "label": "Toelichting"
+        },
+        {
+          "id": "service-send",
+          "label": "Vraag iets aan"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        }
+      ],
+      "additionalStates": [
+        "unauthenticated",
+        "request-detail",
+        "requested",
+        "confirmed",
+        "checked-in",
+        "completed",
+        "cancelled"
+      ],
+      "humanTasks": [
+        "Zoek en filter een verblijf, open een detail en keer zonder onverwachte context- of focuswijziging terug. Leg uit welke beelden sfeerbeelden zijn en welke informatie de keuze draagt.",
+        "Kies kamer, aankomst, vertrek en aantal gasten; controleer prijs en voorwaarden; dien bewust een aanvraag in. Leg uit waarom Aangevraagd geen boekingsbevestiging is.",
+        "Vind een eigen aanvraag onder Mijn reizen, beoordeel de status en annuleer of breek de annulering af zonder onbedoelde tweede handeling.",
+        "Open Route, Transfer of Gastheer vanuit een passend verblijf en keer terug naar dezelfde activiteit; beoordeel de bereikbaarheid via Edge en Spotlight zonder AI te gebruiken.",
+        "Stel bij een bevestigd verblijf een servicevraag met toelichting; onderscheid verzonden, ontvangen, toegezegd en mislukt, en herstel van een onderbroken verzoek.",
+        "Gebruik tijdens een bevoegd ingecheckt verblijf de kamer- of entreesleutel; herken geweigerde of verlopen toegang en kan uitleggen wanneer de sleutel niet beschikbaar hoort te zijn.",
+        "Voer de belangrijkste stappen uit met toetsenbord of schermlezer, tekstvergroting en reduced motion. Beoordeel rust, oriëntatie, leesbaarheid en herstel op mobiel en desktop."
+      ]
+    }
+  }
 }

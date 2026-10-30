@@ -133,7 +133,8 @@ function dimensionRows(root, contract, profileName, subject, kind, signature, ev
     for (const value of ['FAILED','BLOCKED','STALE','NOT_TESTED']) if (statuses.has(value)) { status = value; break; }
     if (signature.status !== 'DECLARED') status = signature.status === 'BLOCKED' ? 'BLOCKED' : 'NOT_TESTED';
     return {id:dimension,applicable:true,status,requirementCount:records.length,provenCount:records.filter(row=>row.status==='PROVEN').length,
-      ...(records.some(row=>row.integrity==='VALID') ? {reason:'AUTHORITATIVE_EXECUTION_AND_TYPED_REQUIREMENT_BINDING_MISSING'} : {})};
+      ...(records.some(row=>row.integrity==='VALID') ? {reason:records.find(row=>row.integrity==='VALID').reason} : {}),
+      ...(records.some(row=>row.scopedStatus) ? {scopedProofs:records.filter(row=>row.scopedStatus).map(row=>({requirement:row.requirement,status:row.scopedStatus,scope:row.scope}))} : {})};
   });
 }
 

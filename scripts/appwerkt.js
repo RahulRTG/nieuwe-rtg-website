@@ -140,7 +140,7 @@ const raakvlakken = require('./lib/bewijsraakvlak');
 let raakvlakWereld = null;
 const RAAKVLAKWERELD = () => (raakvlakWereld = raakvlakWereld || raakvlakken.maakWereld());
 const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
-const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+const { beoordeel: beoordeelBestemming, personaAfwijking, schermpad } = require('./lib/bestemming');
 const { isBrowserruis } = require('./lib/browserruis');
 /* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
    geen eigen register. */
@@ -278,7 +278,12 @@ function rijen() {
    expliciet gedeclareerde bedieningsadapter worden uitgevoerd. Alleen proza
    blijft eerlijk ongemeten: de meter leidt daar nooit zelf een route uit af. */
 function meetIngang(rij, contract = CONTRACT) {
-  if (rij && rij.pad) return { pad: rij.pad, bestemming: rij.pad, via: null };
+  if (rij && rij.pad) {
+    // Het fysieke pad uit MAPPEN is niet de querycontext van de aangeboden ingang.
+    const ingang = typeof rij.ingang === 'string' && rij.ingang.startsWith('/') &&
+      schermpad(rij.ingang) === schermpad(rij.pad) ? rij.ingang.split('#')[0] : rij.pad;
+    return { pad: ingang, bestemming: ingang, via: null };
+  }
   const c = rij && contract && contract[rij.functie];
   if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') || typeof c.via !== 'string') return null;
   if (c.via.startsWith('#')) return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via,
@@ -314,7 +319,13 @@ const ONGEMETEN = {
 };
 
 /* ---- de meting ---- */
-async function meet() {
+/* Dezelfde browserronde kan gericht worden aangeroepen zonder registers te
+   schrijven. Alleen de CLI hieronder bouwt en bewaart APPWERKT/RAAKVLAK. */
+async function meet(lijst = rijen()) {
+  if (!Array.isArray(lijst) || !lijst.length || lijst.some((r) => !r || typeof r.functie !== 'string') ||
+      new Set(lijst.map((r) => r.functie)).size !== lijst.length) {
+    throw new TypeError('meet vereist een niet-lege lijst unieke onderdelen');
+  }
   const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
   const pw = laadBrowser({ eigenDriver: false });
   if (!pw) { console.error('Geen browser beschikbaar; dit script meet in een echte browser.'); process.exit(2); }
@@ -340,7 +351,6 @@ async function meet() {
   if (!school) overgeslagen.push({ rol: 'schoolproef', reden: 'de echte les- en leerlingensessies konden niet worden gemaakt' });
   log('sessies: ' + Object.keys(sessies).join(', ') + (overgeslagen.length ? ' -- overgeslagen: ' + overgeslagen.map((o) => o.rol).join(', ') : ''));
 
-  const lijst = rijen();
   log(lijst.length + ' onderdelen uit MAPPEN');
   const kernen = (os.cpus() || []).length || 1;
   const last = () => Math.round(os.loadavg()[0] / kernen * 100) / 100;
@@ -430,7 +440,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   }
   if (meet.via) r.via = meet.via;
 
-  const bestand = path.join(WORTEL, 'public', meet.bestemming.replace(/^\//, ''));
+  const bestand = path.join(WORTEL, 'public', schermpad(meet.bestemming));
   if (!fs.existsSync(bestand)) {
     r.bewijzen.bereikbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
       reden: 'de wereld wijst naar ' + meet.bestemming + ' en dat bestand bestaat niet', bewijs: null };
@@ -2034,6 +2044,13 @@ function luister(page, base, bak) {
    het stempel van de ronde. Een samengesteld bewijs kreeg het al bij de bron;
    menselijk heeft dan twee helften, en beide moeten vers blijven. */
 const EIGEN_BEWIJZEN = ['bereikbaar', 'bedienbaar', 'menselijk'];
+function browserRaakvlakInvoer(r, contract = CONTRACT) {
+  // Een virtuele OS-/tabrij bewaart zijn menselijke ingang, maar bindt het
+  // gemeten browserbewijs aan het echte document plus zijn contractquery.
+  const ingang = String(r.ingang || '').startsWith('/') ? r.ingang
+    : meetIngang(r, contract)?.bestemming || r.ingang;
+  return { ingang, soort: 'browser', kanaal: 'browser' };
+}
 function legRaakvlakken(regels, st) {
   const w = RAAKVLAKWERELD();
   const grof = require('./lib/stempel').versheid;
@@ -2042,7 +2059,7 @@ function legRaakvlakken(regels, st) {
       const b = r.bewijzen[naam];
       if (!b || b.status === 'GEEN_FIXTURE') continue;
       if ((r.samengesteld || []).includes(naam) && naam !== 'menselijk') continue;
-      const v = raakvlakken.versheidVoor(w, { ingang: r.ingang, soort: 'browser' }, grof)(st);
+      const v = raakvlakken.versheidVoor(w, browserRaakvlakInvoer(r), grof)(st);
       if (!v.raakvlak) continue;   // niet vers op de eigen commit: dan is er geen raakvlak om te bewaren
       b.raakvlak = ((r.samengesteld || []).includes(naam) ? (b.raakvlak || []) : []).concat([v.raakvlak]);
     }
@@ -2186,7 +2203,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meetIngang, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, bereidAppwerktDatamapVoor, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meet, meetRij, meetIngang, browserRaakvlakInvoer, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, bereidAppwerktDatamapVoor, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

@@ -53,6 +53,11 @@ function contractMetadata(naam, waarde) {
       assert.equal(typeof waarde[veld], 'string', 'adapter.' + veld + ' moet tekst zijn');
     return true;
   }
+  if (naam === 'persona') {
+    assert.match(waarde, /^(lid|gezin|lifestyle|ondernemer|personeel|leverancier|kantoor)$/,
+      'persona moet een bestaande APPWERKT-testpersona zijn');
+    return true;
+  }
   return ['belofte', 'ingang', 'via', 'bereik', 'bestanden'].includes(naam);
 }
 

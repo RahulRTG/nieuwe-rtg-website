@@ -1008,6 +1008,12 @@ async function bedien(ctx, base, ingang) {
      geen gewone beginacties gevangen houdt. */
   let herstelketenActief = false;
   let herstelZonderNieuw = 0;
+  /* Een bekende bediening kan tijdens de laatste inventarisatie tijdelijk
+     buiten de huidige appstand vallen (bijvoorbeeld doordat de Desktop-laag
+     haar net naar de Edge verplaatst). Beperk nieuwe herstelrondes apart van
+     openerketens, zodat we haar nog kunnen terugvinden zonder ooit eindeloos
+     te blijven herladen. */
+  let onzichtbaarHerstel = 0;
   /* Als een tik nieuwe bediening in de huidige appstand onthult, blijft die
      stand één ronde voorrang houden. Anders opende de meter boven zo'n nieuw
      paneel meteen opnieuw het Edge-actiedek en verdween de vervolgactie nog
@@ -1244,6 +1250,11 @@ async function bedien(ctx, base, ingang) {
               k = await kijk(true);
               telStand(k);
             }
+            if (k.klaar && onbewezenMerken().length &&
+                onzichtbaarHerstel < herstelgrens(onbewezenMerken().length)) {
+              onzichtbaarHerstel++;
+              continue;
+            }
             if (k.klaar) break;
           } catch (e) {
             instrument.push('heropenen van de oorspronkelijke stand lukte niet: ' + String(e.message || e).split('\n')[0].slice(0, 80));
@@ -1275,6 +1286,11 @@ async function bedien(ctx, base, ingang) {
               k = await kijk();
               telStand(k);
             }
+          }
+          if (k.klaar && onbewezenMerken().length &&
+              onzichtbaarHerstel < herstelgrens(onbewezenMerken().length)) {
+            onzichtbaarHerstel++;
+            continue;
           }
           if (k.klaar) break;
         }
@@ -1355,6 +1371,7 @@ async function bedien(ctx, base, ingang) {
           aangetiktMerken.add(k.merk);
           geklikt = aangetiktMerken.size;
         }
+        onzichtbaarHerstel = 0;
         /* Een scherm mag zijn asynchrone overgang met aria-busy kenbaar
            maken. Wacht dan op de werkelijke nieuwe inhoud in plaats van op
            machinesnelheid te gokken. RTMAIL gebruikt dit bij bericht ->

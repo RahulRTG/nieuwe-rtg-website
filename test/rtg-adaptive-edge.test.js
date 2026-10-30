@@ -118,6 +118,8 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'na twee browserbeelden wordt nieuw geprojecteerde bediening opnieuw geïnventariseerd en niet genegeerd');
   assert.match(APPWERKT, /k\.klaar && onbewezenMerken\(\)\.length[\s\S]{0,180}gehad\.delete\(merk\)[\s\S]{0,120}k = await kijk\(\)/,
     'wel gevonden maar nog niet aangetikte Edge-bediening wordt opnieuw selecteerbaar');
+  assert.match(APPWERKT, /onzichtbaarHerstel < herstelgrens\(onbewezenMerken\(\)\.length\)[\s\S]{0,100}onzichtbaarHerstel\+\+[\s\S]{0,40}continue/,
+    'een tijdelijk onzichtbare bekende bediening krijgt begrensde herstelrondes voordat de appmeting stopt');
   assert.match(APPWERKT, /data-bweg[\s\S]{0,300}upload\|bestand kiezen/,
     'verwijderen en de systeembestandskiezer komen na gewone paneelbediening');
   assert.match(APPWERKT, /Number\(!hoofdopener\(a\)\)[\s\S]{0,160}Number\(!dialoogOpener\(a\)\)[\s\S]{0,160}Number\(!standNavigatie\(a\)\)/,

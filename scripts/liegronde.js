@@ -120,6 +120,20 @@ function meetAdres(rij) {
   return { ingang: meetbaar, pad: meetbaar.bestemming };
 }
 
+/* Vergelijk het contract dat werkelijk geopend moest worden. Een query in
+   het contract (bijvoorbeeld de pas) is betekenisvol en mag niet verdwijnen
+   uit de waarneming. Gewone documentcontracten en tab-adapters houden hun
+   bestaande fysieke documentgrens. Een vreemde origin is nooit die pagina. */
+function gemetenLanding(url, pad, base) {
+  const werkelijk = new URL(url);
+  const verwacht = new URL(pad, base);
+  if (werkelijk.origin !== verwacht.origin || !/^https?:$/.test(werkelijk.protocol)) {
+    throw new Error('landing buiten de eigen proeforigin');
+  }
+  return werkelijk.pathname + (verwacht.search ? werkelijk.search : '') +
+    (verwacht.hash ? werkelijk.hash : '');
+}
+
 async function meetRij(rij, base, contexten, opties = {}) {
   const uit = { functie: rij.functie, app: rij.app, ingang: rij.ingang, persona: rij.persona };
   const adres = meetAdres(rij);
@@ -149,7 +163,7 @@ async function meetRij(rij, base, contexten, opties = {}) {
     if (statisch) {
       await openIngang(page, base, adres.ingang);
       await page.waitForTimeout(2500);
-      m.landing = new URL(page.url()).pathname;
+      m.landing = gemetenLanding(page.url(), adres.pad, base);
       m.deur = await page.evaluate((sel) => sel.find((s) => document.querySelector(s)) || null, POORTEN);
       const tekst = await zichtbareTekst(page);
       m.klachten.push(...vindKlachten({ tekst, statisch, fouten }));
@@ -229,7 +243,7 @@ async function meet() {
   }
 }
 
-module.exports = { oordeel, isZekerheid, meetAdres, SPAAR, ADAPTER_SPAAR, DOEL };
+module.exports = { oordeel, isZekerheid, meetAdres, gemetenLanding, SPAAR, ADAPTER_SPAAR, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

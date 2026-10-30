@@ -1695,3 +1695,62 @@ voorzijdes die de oude app verbergen en extra vaste navigatie tekenen. De
 volgende echte consolidatie moet zo'n volledige route omvatten en vervangen
 stijlcode verwijderen; alleen de voorzijde mooier maken voldoet niet. Er zijn
 nog geen Experience Signatures of menselijke kwalificaties ingevuld.
+
+#### Actuele deelkwalificatie op `39f5705b6e` (30 oktober)
+
+De broncode blijft gedurende de voltooiingsmeting vast. De bestaande registers
+worden opnieuw door hun eigen instrumenten geschreven; oude uitslagen worden
+niet administratief opgewaardeerd. Node: **26.12.1**, lokale wegwerpservers,
+synthetische accounts. Dit is nog geen bevroren vrijgavekandidaat.
+
+- `ROLPROEF.json`: **4.514 routes, 9.369 pogingen**, nul open ACL's,
+  privacylekken, onbesliste resultaten of blijvende wijzigingen. De 92 niet te
+  kruisen en 836 niet beproefbare routes vallen niet onder dit bewijs.
+- `IDOR.json`: geen nieuwe doorbraak of lek en geen verlies van eerder bewezen
+  routestatus. De hoofdgang houdt **898 onbereikbare gevallen** en twee bekende
+  fixture-409's zichtbaar. Gangtellingen mogen niet als volledige objectdekking
+  worden gepresenteerd; financiële routes vragen hun eigen bereikbare proeven.
+- Een andere agent vergeleek beide nieuwe registers onafhankelijk met de
+  HEAD-versies, rekende alle rolrijen opnieuw na en controleerde bronversheid.
+  Geen nieuwe regressie in die vergelijking; geen platformbrede groenverklaring.
+- De bestaande `directpay-workers.pg.test.js` en
+  `office-bank-open-workers.pg.test.js` slagen samen **10/10**, nul skips.
+  Twee werkelijke workers, een eigen tijdelijke PostgreSQL 16-cluster op
+  loopback, synthetisch geld, retries, conflicterende inhoud en procescrashes
+  rond de commit. De cluster is na afloop gestopt. Geen productiegegevens,
+  echte betaling, externe betaalrail of productiecapaciteit beproefd.
+
+Logs: `/tmp/rtg-role-39f5705.log`, `/tmp/rtg-idor-39f5705.log` en
+`/tmp/rtg-financial-workers-39f5705.log`. Tijdelijke logs zijn lokale
+bewijsbronnen en vervangen geen overdraagbaar einddossier op de definitieve
+kandidaat. De operationele vrijgavepoort meldt op deze commit **ONBEWEZEN**:
+de volledige suite, schermsuite, releasepoort en stagingrepetitie zijn hier
+nog niet integraal gekwalificeerd.
+
+De read-only Hotels-contractvoorbereiding vond een belangrijke inventarisgrens:
+`/apps/hotels.html` is een zelfstandig Travel-scherm met eigenaar
+`verblijf.hotel`, maar de logische MAPPEN-functie Verblijven verwijst naar
+`/apps/residentie.html`. De 67 Residence-interacties zijn geen Hotels-bewijs.
+Een Hotels-schermsignature mag worden gedeclareerd; een appsignature mag geen
+app-ID verzinnen, Residence overschrijven of diens bewijs lenen. Dit is geen
+aanleiding om de afgesproken appcatalogus stilzwijgend uit te breiden.
+
+De volledige `VOLTOOIPROEF` is vervolgens ononderbroken afgerond op dezelfde
+broncommit: **114 scenario's, 342/342 taak-/opslag-/herstelbewijzen gesloten,
+114/114 antwoord- of schermstapbewijzen menselijk**, nul open. De expliciete
+vreemde-actorproeven sluiten voor 107 scenario's; zeven hebben die niet en
+vragen de afzonderlijke bevoegdheidsbron. Dit is geen menselijke Experience-
+beoordeling en nog geen APPWERKT-8/8-totaal. Het volledige log staat in
+`/tmp/rtg-completion-39f5705.log`; het bestaande `VOLTOOIPROEF.json` bevat de
+stappen en meetstempel.
+
+De aansluitende waarheidsronde vond 112 bewezen ingangen en twee niet gemeten
+querycontracten. Eén meetoorzaak: de observer verwijderde `?pas=rtg` uit de
+landing terwijl het verwachte contract deze query behield. De kleine correctie
+bewaart een expliciet gecontracteerde query, laat fysieke document-/tabcontracten
+intact en weigert een vreemde origin. Verkeerde, ontbrekende, extra of dubbele
+pasparameters krijgen geen passend bewijs. De bestaande beslisregel is niet
+versoepeld. **27/27** liegronde- en appcontracttests slagen zonder skips
+(`/tmp/rtg-truth-query-contract.log`). Het oude waarheidsresultaat wordt niet
+handmatig opgewaardeerd: het geraakte instrument moet opnieuw meten. Deze
+wijziging raakt de eerder gemeten voltooiings-, rol- en objectproeven niet.

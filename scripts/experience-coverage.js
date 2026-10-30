@@ -3,7 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const child = require('node:child_process');
+const {candidate} = require('./lib/experience/evidence');
 const {build,validate,serializeRegistry} = require('./lib/experience/coverage');
 
 const ROOT = path.join(__dirname,'..');
@@ -11,9 +11,14 @@ const TARGET = path.join(ROOT,'EXPERIENCEWERKT.json');
 const contract = JSON.parse(fs.readFileSync(path.join(ROOT,'experience-architecture/coverage-contract.json'),'utf8'));
 const signatures = JSON.parse(fs.readFileSync(path.join(ROOT,'experience-architecture/signatures.json'),'utf8'));
 const args = new Set(process.argv.slice(2));
+if (['--write','--check','--gate'].filter(arg=>args.has(arg)).length > 1) {
+  console.error('BLOCKED: kies één Experience-coverage-modus'); process.exit(2);
+}
 const evidencePath = process.env.RTG_EXPERIENCE_EVIDENCE;
 const evidence = evidencePath && fs.existsSync(evidencePath) ? JSON.parse(fs.readFileSync(evidencePath,'utf8')) : {version:1,records:[]};
-const candidateCommit = args.has('--gate') ? child.execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim() : null;
+const clean = args.has('--gate') ? candidate(ROOT) : null;
+if (clean && !clean.ok) { console.error('BLOCKED: ' + clean.reason); process.exit(2); }
+const candidateCommit = clean ? clean.commit : null;
 const report = build(ROOT,{contract,signatures,evidence,commit:candidateCommit});
 const errors = validate(ROOT,report,contract,signatures);
 const text = serializeRegistry(report);
@@ -32,6 +37,8 @@ if (args.has('--write')) {
   }
   console.log('OK: Experience-register klopt met 100% van de inventaris (' + report.summary.logicalApps.total + ' apps, ' + report.summary.screens.total + ' schermen).');
 } else if (args.has('--gate')) {
+  const after = candidate(ROOT);
+  if (!after.ok || after.commit !== candidateCommit) { console.error('BLOCKED: kandidaat wijzigde tijdens de controle'); process.exit(2); }
   console.log(JSON.stringify(report.summary));
   if (report.status !== 'PROVEN') {
     console.error('NIET OK: Premium Ready is fail-closed; ontbrekend, vervallen, geblokkeerd of niet-menselijk bewijs telt niet als geslaagd.');

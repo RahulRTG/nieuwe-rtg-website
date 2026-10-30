@@ -131,6 +131,23 @@ test('3. elke koppeling haalt de meting: de app staat in MAPPEN en de proef raak
     for (const [naam, b] of Object.entries(c)) {
       if (contractMetadata(naam, b)) continue;
       assert.ok(fs.existsSync(path.join(WORTEL, b.instrument)), b.instrument + ' bestaat niet');
+      if (b.kanaal === 'browser') {
+        const scenario = require(path.join(WORTEL, b.instrument));
+        assert.equal(b.soort, 'voltooiproef');
+        assert.equal(scenario.functie, functie, 'een browserbron hoort bij dezelfde app');
+        assert.equal(scenario.kanaal, 'browser');
+        assert.equal(b.scherm.ingang, link ? bron.url : c.ingang);
+        assert.equal(scenario.ingang, b.scherm.ingang);
+        assert.ok(typeof b.scherm.toestand === 'string' && b.scherm.toestand.trim());
+        assert.ok(Array.isArray(b.scherm.bestemmingen));
+        for (const adres of [b.scherm.ingang, ...b.scherm.bestemmingen]) {
+          assert.ok(adres.startsWith('/apps/') && !adres.includes('..'));
+          assert.ok(fs.existsSync(path.join(WORTEL, 'public', adres.split('?')[0])), adres + ' bestaat niet');
+        }
+        // Dit is de contractstructuur; echte bezoeken, zichtbaarheid en actuele
+        // resultaten worden afzonderlijk fail-closed door bewijsVoor getoetst.
+        continue;
+      }
       const proef = B.proefRoutes(b.instrument);
       const raak = B.gedeeld(proef, ing);
       assert.ok(raak.length > 0, functie + ': ' + b.instrument + ' raakt geen route van ' + (link ? bron.url : c.bestanden.join(', ')));

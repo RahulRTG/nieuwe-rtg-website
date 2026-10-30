@@ -2,7 +2,8 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const crypto = require('node:crypto');
+const {fingerprint,sha} = require('./evidence');
+const artifact = require('./artifact');
 const identity = require('../../../public/shared/rtg-world-identity');
 const {files} = require('./compiler');
 const {MAPPEN} = require('../wereldregister');
@@ -11,33 +12,18 @@ const {rijen, meetIngang} = require('../../appwerkt');
 const DIMENSION_ORDER = ['identity','composition','continuity','restraint','adaptability','accessibility','fluidity','human-quality'];
 
 function json(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
-function sha(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
 function routeFor(file, root) { return '/' + path.relative(path.join(root, 'public'), file).replace(/\\/g, '/'); }
+function physicalRoute(destination) {
+  if (typeof destination !== 'string' || !destination.startsWith('/') || destination.startsWith('//') || destination.includes('\\')) return null;
+  try { return new URL(destination, 'https://rtg.invalid').pathname; } catch (_) { return null; }
+}
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(k => [k, stable(value[k])]));
   return value;
 }
 function sourceHash(root, contract, signatures) {
-  const hash = crypto.createHash('sha256');
-  const names = [
-    'public/shared/rtg-world-identity.js',
-    'SCHERMEIGENAAR.json',
-    'APPWERKT.json',
-    'scripts/lib/wereldregister.js',
-    'scripts/lib/appcontract.js',
-    'scripts/appwerkt.js',
-    'scripts/lib/experience/coverage.js',
-    'scripts/experience-coverage.js',
-    'experience-architecture/coverage-contract.json',
-    'experience-architecture/signatures.json'
-  ];
-  for (const name of names) { hash.update(name); hash.update('\0'); hash.update(fs.readFileSync(path.join(root,name))); hash.update('\0'); }
-  for (const file of files(path.join(root,'public/apps')).filter(f => f.endsWith('.html'))) {
-    hash.update(path.relative(root,file)); hash.update('\0'); hash.update(fs.readFileSync(file)); hash.update('\0');
-  }
-  hash.update(JSON.stringify(stable(contract))); hash.update(JSON.stringify(stable(signatures)));
-  return hash.digest('hex');
+  return sha(fingerprint(root) + JSON.stringify(stable(contract)) + JSON.stringify(stable(signatures)));
 }
 
 function appInventory(root = path.join(__dirname,'..','..','..')) {
@@ -125,18 +111,9 @@ function requirements(contract, profile, dimension, signature) {
   return [];
 }
 
-function evidenceStatus(record, source, candidate, dimension) {
-  if (!record) return 'NOT_TESTED';
-  if (!['PROVEN','FAILED','BLOCKED'].includes(record.status)) return 'BLOCKED';
-  if (record.sourceHash !== source || !record.commit || record.commit !== candidate) return 'STALE';
-  if (!record.configurationHash || !record.artifact || !record.method) return 'BLOCKED';
-  if (dimension === 'human-quality') {
-    if (record.method !== 'human-user-test' || record.reviewer?.type !== 'human' || !record.reviewer.id) return 'BLOCKED';
-  }
-  return record.status;
-}
+const evidenceStatus = artifact.status;
 
-function dimensionRows(contract, profileName, subject, kind, signature, evidence, source, candidate) {
+function dimensionRows(root, contract, profileName, subject, kind, signature, evidence, source, candidate) {
   const profile = contract.profiles[profileName];
   return DIMENSION_ORDER.map(dimension => {
     if (!profile.dimensions.includes(dimension)) {
@@ -145,14 +122,18 @@ function dimensionRows(contract, profileName, subject, kind, signature, evidence
     }
     const required = requirements(contract, profileName, dimension, signature);
     const records = required.map(requirement => {
-      const record = (evidence.records || []).find(item => item.subjectType === kind && item.subjectId === subject.id && item.dimension === dimension && item.requirement === requirement);
-      return {requirement,status:evidenceStatus(record,source,candidate,dimension)};
+      const matches = (evidence.records || []).filter(item => item && item.subjectType === kind && item.subjectId === subject.id && item.dimension === dimension && item.requirement === requirement);
+      if (matches.some(record => !artifact.same(record,matches[0]))) return {requirement,status:'BLOCKED'};
+      const configurationHash = evidence.configuration && sha(JSON.stringify(stable(evidence.configuration)));
+      return {requirement,...artifact.assessment(matches[0],source,candidate,dimension,
+        {root,subjectType:kind,subjectId:subject.id,requirement,configurationHash})};
     });
     const statuses = new Set(records.map(row => row.status));
     let status = 'PROVEN';
     for (const value of ['FAILED','BLOCKED','STALE','NOT_TESTED']) if (statuses.has(value)) { status = value; break; }
     if (signature.status !== 'DECLARED') status = signature.status === 'BLOCKED' ? 'BLOCKED' : 'NOT_TESTED';
-    return {id:dimension,applicable:true,status,requirementCount:records.length,provenCount:records.filter(row=>row.status==='PROVEN').length};
+    return {id:dimension,applicable:true,status,requirementCount:records.length,provenCount:records.filter(row=>row.status==='PROVEN').length,
+      ...(records.some(row=>row.integrity==='VALID') ? {reason:'AUTHORITATIVE_EXECUTION_AND_TYPED_REQUIREMENT_BINDING_MISSING'} : {})};
   });
 }
 
@@ -167,9 +148,12 @@ function build(root, options = {}) {
   const screenByRoute = new Map(screens.map(screen => [screen.route,screen]));
   const logicalApps = apps.map(app => {
     const signature = signatureFor(signatures,'app',app);
-    return {...app,screenIds:screenByRoute.has(app.destination) ? [screenByRoute.get(app.destination).id] : [],signature,
+    // Het document is fysiek één scherm; query en fragment blijven hieronder
+    // onverkort in destination/entry en dus in het afzonderlijke appcontract.
+    const screen = screenByRoute.get(physicalRoute(app.destination));
+    return {...app,screenIds:screen ? [screen.id] : [],signature,
       scope:{profile:'interface',states:'coverage-contract#states + signature.additionalStates',devices:'coverage-contract#devices + signature.additionalDevices'},
-      dimensions:dimensionRows(contract,'interface',app,'app',signature,evidence,source,candidate)};
+      dimensions:dimensionRows(root,contract,'interface',app,'app',signature,evidence,source,candidate)};
   });
   const appIdsByRoute = new Map();
   for (const app of logicalApps) for (const screenId of app.screenIds) {
@@ -179,7 +163,7 @@ function build(root, options = {}) {
     const signature = signatureFor(signatures,'screen',screen);
     return {...screen,logicalAppIds:appIdsByRoute.get(screen.id) || [],signature,
       scope:{profile:screen.profile,states:'coverage-contract#states + signature.additionalStates',devices:'coverage-contract#devices + signature.additionalDevices'},
-      dimensions:dimensionRows(contract,screen.profile,screen,'screen',signature,evidence,source,candidate)};
+      dimensions:dimensionRows(root,contract,screen.profile,screen,'screen',signature,evidence,source,candidate)};
   });
   const all = logicalApps.concat(screenRows);
   const applicable = all.flatMap(subject => subject.dimensions.filter(d => d.applicable));
@@ -221,7 +205,7 @@ function registryView(report) {
   const compact = subject => {
     const dimensions = {};
     for (const row of subject.dimensions) dimensions[row.id] = row.applicable
-      ? {status:row.status,required:row.requirementCount,proven:row.provenCount}
+      ? {status:row.status,required:row.requirementCount,proven:row.provenCount,...(row.reason?{reason:row.reason}:{})}
       : {status:row.status,decision:row.decision,reason:row.reason};
     const {dimensions:ignored,...base} = subject;
     return {...base,dimensions};

@@ -27,7 +27,7 @@ for(const [name,change,code] of [
   ['ontbrekende test',j=>j.proofs[0].test='test/absent.js','TEST_MISSING']
 ])test('compiler weigert '+name,()=>assert.ok(contract(change).errors.some(e=>e.code===code)));
 test('bewijs ontbreekt, verloopt, verandert of wordt overgeslagen en wordt nooit stil groen',()=>{
-  const now=Date.parse('2026-09-29T12:00:00Z'),r={version:1,test:'test/x.js',at:new Date(now).toISOString(),sourceHash:'a',logHash:'b',tests:4,skipped:0,exitCode:0,passed:true};
+  const now=Date.parse('2026-09-29T12:00:00Z'),r={version:1,test:'test/x.js',at:new Date(now).toISOString(),sourceHash:'a',logHash:'b',tests:4,skipped:0,exitCode:0,passed:true,worktreeDirty:false};
   assert.equal(state(null,'a','test/x.js',now),'NOT_TESTED');
   assert.equal(state(r,'a','test/x.js',now),'PROVEN');
   assert.equal(state(r,'changed','test/x.js',now),'STALE');

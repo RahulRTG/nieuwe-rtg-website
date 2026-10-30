@@ -73,6 +73,10 @@ const bundels = {
   'shared/appmenu.js': 'shared/appmenu',
   'shared/rtghorloge.js': 'shared/rtghorloge',
   'apps/residentie.js': 'apps/residentie',
+  // Zakelijk vervoer deelt één gesloten schermstaat tussen goedkeuringen,
+  // reisbeleid en maandoverzicht. De browser houdt daarom hetzelfde ene
+  // bestand; de bron volgt de bestaande grens vóór het reisbeleid.
+  'apps/zakelijk-voorzijde.js': 'apps/zakelijk-voorzijde',
   'apps/leverancier.js': 'apps/leverancier',
   'apps/app-main.js': 'apps/app-main',
   'apps/personeel.js': 'apps/personeel',

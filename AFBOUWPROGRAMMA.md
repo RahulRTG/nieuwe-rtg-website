@@ -1569,3 +1569,129 @@ Status blijft **ORANJE**. Open blijven de 102 appbevoegdheidsbewijzen, vier
 voltooifixtures, vijf zelfstandige waarheidsgetrouwheidsingangen, vier rode
 architectuurnormen, de adversarial rolvloer, twee volledige kandidaat-runs en
 operationele staging-, herstel- en vrijgavekwalificatie. Geen merge of uitrol.
+
+### Definitieve afbouw — vier browsercontracten en broncoherentie (30 oktober)
+
+De eigenaarsopdracht omvat het volledige Deep Green- en Experience-plan:
+APPWERKT, Experience Signatures en schermen, consolidatie van de bestaande
+Design System-/Heritage-/Cinematic-uitvoering, Edge/Rahul/Spotlight, eigen
+wereld- en appidentiteit, gecontroleerde verwijdering van legacy-stijlen,
+toegankelijkheid, prestaties, veiligheid, menselijke en operationele proeven
+en twee onafhankelijke eindruns op één kandidaat. Geen nieuw parallel register
+of platform; productie blijft ongewijzigd zonder afzonderlijke vrijgave.
+
+**Nulmeting, niet herhaald bewijs:** het opgeslagen APPWERKT-resultaat van
+30 oktober 07:06 UTC op `336d8b60f5`, Node 26.12.1, meldde 110/114 volledig
+bewezen apps en vier ontbrekende fixtures. De huidige reparaties vertrekken
+van `2fa713559727e15b4743f8e837a9580050290140`. Wijzigingen aan meetinstrument
+en gedeelde browserbron maken betrokken oud bewijs ongeldig. Daarom wordt
+114/114 niet uit vier losse groene tests afgeleid.
+
+De vier ontbrekende taken gebruiken nu het browserkanaal van de BESTAANDE
+VOLTOOIPROEF en dezelfde APPWERKT-bronbinding:
+
+- Juridisch: documenten openen, inhoud lezen en terugkeren, ook na herladen,
+  nette serverherstart en crash. Geen kunstmatige mutatie van openbare tekst.
+- Camera: echte browserframes met synthetische camerabron, lokale JPEG-export
+  en decodevergelijking, export na nieuw browsercontext en serverherstel,
+  annulering, geweigerde toestemming en een herstelbare camerafout. Geen claim
+  over fysieke camera's of onbeproefde externe overdrachtsvormen.
+- RTFoundation-keuze: vijf leeftijdscontexten via de canonieke RTG-ingang,
+  zichtbare bediening, terug/vooruit, bewaarde keuze, herstart en crash.
+- Videobellen: twee afzonderlijke leden via Rahul en Edge, voortlopende
+  gedecodeerde video EN ontvangen audio in beide richtingen, dezelfde peer na
+  signalingherstart/-crash, gesloten verbindingen en tracks na ophangen,
+  geen herleving na herladen en een bewust nieuw gesprek. Synthetische media
+  bewijzen geen fysieke microfoon, luidspreker, TURN of echt mobiel apparaat.
+
+De browserbinding weigert verkeerde ingangen, ontbrekende bestemmingen of
+zichtbare toestanden, paginafouten, te weinig schakels, tegenstrijdige tellingen
+en niet-uitgevoerde herstelproeven. De runner stopt de afhankelijke keten bij
+de eerste mislukte stap en bewaart die oorspronkelijke fout. Browserversie,
+Node-versie en platform worden vastgelegd. Door onvolledig aantoonbare
+dynamische afhankelijkheden blijft de bronafdruk voorlopig conservatief breed;
+dit is geen claim van voltooide fijnmazige bewijsvernieuwing.
+
+De RTFoundation-proef ontdekte een productfout in de bestaande Heritage-
+overgang: `pageswap` probeerde een ontbrekend of ongeldig doeladres te lezen.
+De animatie wordt nu alleen in die situatie overgeslagen; echte navigatie
+blijft functioneren. Gerichte historie-, normale, geannuleerde en reduced-
+motion-proeven bewaken dit. De Experience-inventaris koppelt een query-ingang
+aan het fysieke document en behoudt query en fragment in de eigen appcontext.
+
+**Gericht uitgevoerd op de werkstand, geen kandidaatkwalificatie:**
+129/129 contract-/bewijs-/lifecycle-/Heritage-unittests, RTFoundation 1/1,
+Heritage-browser 3/3, Videobellen met audio 1/1 en bundelbrowserregressies
+13/13, zonder skips. Camera- en Juridisch-taken en de negatieve bel-/Clips-
+proeven slaagden eveneens gericht. Bewijslogboeken:
+`/tmp/rtg-completion-contract-final.log`, `/tmp/rtg-rtf-repaired.log`,
+`/tmp/rtg-heritage-history-browser.log`, `/tmp/rtg-video-audio-final.log`,
+`/tmp/rtg-bundle-browser-final.log` en `/tmp/rtg-four-completion.log`.
+Het laatste log bevat ook de oorspronkelijke twee failures; de gerichte
+herstelruns vervangen die niet stilzwijgend in de auditgeschiedenis.
+
+De preflight vond vier reeds in HEAD aanwezige bundelproblemen. De bestaande
+generator herstelt de verouderde app-main-uitvoer uit de nieuwere Zorg-bron;
+drie te grote bronstukken zijn langs bestaande verantwoordelijkheden gesplitst.
+Zakelijk- en Uitvoer-browserbundels bleven byte-identiek. Geen nieuwe dependency,
+controller, stijlarchitectuur of normuitzondering. De vervangen monolithische
+bronstukken zijn opgedeeld, niet als parallelle implementatie behouden.
+
+**Restlijst blijft blokkerend:** volledige actuele VOLTOOIPROEF/APPWERKT-
+samenstelling; Experience-contracten en 286 gerapporteerde schermmigraties
+(nog actueel te bevestigen); echte Experience-artefactvalidatie en complete
+bronafdruk; menselijke beoordelingen; kritieke financiële/autoriteitsketens;
+PWA, echte apparaten, staging, monitoring, back-upherstel, rollback en twee
+onafhankelijke eindruns. De Experience-nulstand blijft 0/114 apps, 0/316
+schermen en 0/3.368 dimensiecellen. Die 3.368 zijn GEEN individuele
+proefvoorwaarden: het bestaande register bevat 53.206 vereiste combinaties
+vóór app-specifieke interacties. De oude vergelijking met 3.368 uitgevoerde
+tests mag dus geen voltooiingsclaim worden.
+
+Onafhankelijke bronreview vond dat de Experience-coveragelezer nog losse
+artefactnamen accepteert en DS-stijlen/beeldassets niet volledig hasht.
+Die gaten worden binnen de bestaande motor gesloten vóór bewijzen worden
+gevuld. Ontbrekende menselijke en externe controles blijven expliciet open;
+een AI-beoordeling sluit die niet. Status: **ORANJE, geen vrijgave**.
+
+Afsluitcontrole van hetzelfde werkpakket: de vier browsercontracten sluiten nu
+ook via `scripts/voltooiproef.js --alleen=...`, met herstartepoch per stap. De
+onafhankelijke review vond dat RTF de na-herstartcontroles ten onrechte onder
+herstelbaar boekte. Dat is gecorrigeerd én de gedeelde browserpoort vereist nu
+een werkelijk geslaagde controle ná de relevante herstart/crash. De logs
+`/tmp/rtg-browser-contract-{juridisch,camera,rtfoundation-keuze,videobellen}.log`
+zijn gerichte werkstandmetingen; ze schrijven geen gedeeltelijk register.
+
+De Experience-bewijslezer controleert nu echte artefactbytes, hashes,
+configuratie, kandidaat, proeflog en exact gebonden waarnemingsdiagnostic.
+Afbeeldingen, fonts, SVG, DS-CSS en gedeelde scripts vallen onder dezelfde
+conservatieve bronhash. Tegenstrijdige dubbele bewijsrecords worden geweigerd.
+De kandidaatpoort weigert ongecommitte Experience-invoer. Een integer lokaal
+artefact betekent echter uitsluitend `VALID` voor inhoudscontrole: het krijgt
+nog steeds `BLOCKED` voor kwalificatie zolang de koppeling aan de bestaande
+vertrouwde bewijsuitvoering en getypepte apparaat-/methodevoorwaarden ontbreekt.
+Menselijke zelfdeclaraties blijven eveneens geblokkeerd. Dit pakket bouwt
+geen tweede bewijsmotor en claimt geen ervaringskwalificatie.
+
+PR #702 is afzonderlijk alleen gelezen: nog open op
+`8da28119e7bad72ed43dc93362d41468349d3809`, alle teruggegeven controles afgerond
+met succes of expliciet overgeslagen. Dit is de bestaande Experience-branch,
+niet de huidige `codex/deep-green-unified`-werkstand. Geen merge, push of
+productie-uitrol uitgevoerd als onderdeel van deze controle.
+
+De gezamenlijke afsluitset op Node 26.12.1 slaagt **191/191**, zonder failures
+of skips (`/tmp/rtg-afbouw-source-final.log`). De bestaande preflight sluit
+zonder fouten na herleiding van de bestaande kaarten, taalbewijzen en echte
+websitebeelden (`/tmp/rtg-fixture-preflight-closed.log`). Haar waarschuwing over
+318 vervallen APPWERKT-bewijzen blijft zichtbaar; dat is reden voor actuele
+samenstelling op de vastgelegde bron, geen reden om de waarschuwing uit te zetten.
+
+De aansluitende read-only DS-inventaris bevestigt **30/316** DS-routes. De
+286 overige routes zijn **268 interfaces plus 18 redirects**; redirects worden
+gekwalificeerd op overdracht, niet kunstmatig opnieuw vormgegeven. Er zijn
+zeven bestaande schermpatronen en 21 gedeelde DS-componenten. Hotels is al een
+gemigreerde referentie. RTDocs en Magnaat laden nog eigen stijlbronnen en
+voorzijdes die de oude app verbergen en extra vaste navigatie tekenen. De
+volgende echte consolidatie moet zo'n volledige route omvatten en vervangen
+stijlcode verwijderen; alleen de voorzijde mooier maken voldoet niet. Er zijn
+nog geen Experience Signatures of menselijke kwalificaties ingevuld.

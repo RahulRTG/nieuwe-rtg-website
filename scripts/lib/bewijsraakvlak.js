@@ -116,13 +116,15 @@ const BRONREGISTERS = {
    require-sluiting van het instrument en het packagecontract. */
 const SERVERRONDE_INSTRUMENTEN = new Set([
   'scripts/idorproef.js',
-  'scripts/rolproef-route.js',
-  /* De voltooiproef bedient geen product-UI: ieder scenario spreekt de lokale
-     API aan, herstart de server en leest de duurzame uitkomst terug. De hele
-     instrumentsluiting bevat alle scenario's, zodat een wijziging in ook maar
-     één scenario de samengestelde bronronde opnieuw laat kwalificeren. */
-  'scripts/voltooiproef.js'
+  'scripts/rolproef-route.js'
 ]);
+// VOLTOOIPROEF kan API- én browserbewijzen bevatten: nooit server-only afleiden.
+const GEMENGDE_VOLTOOIRONDE = 'scripts/voltooiproef.js';
+const BROWSERPAKKETTEN = ['package.json', 'package-lock.json'];
+
+function browserBestand(p) {
+  return p.startsWith('public/') || p.startsWith('server/') || p === 'index.html' || BROWSERPAKKETTEN.includes(p);
+}
 
 const sha256 = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 const blobId = (buf) => crypto.createHash('sha1').update('blob ' + buf.length + '\0').update(buf).digest('hex');
@@ -664,6 +666,15 @@ function raakvlak(w, invoer) {
      alleen de code die bepaalt WELKE routes het scherm aanroept. */
   const schermKant = invoer.soort === 'api' ? sch.geladen : sch.bestanden;
   for (const f of [...schermKant, ...server.bestanden, ...keten]) if (!g.bestanden.has(f)) eigen.add(f);
+  if (invoer.kanaal === 'browser') {
+    // Navigatie over meerdere documenten en dynamische UI is nog niet volledig
+    // statisch te volgen. Tot dat bewezen kan: alle public- en serverbronnen,
+    // inclusief bestemmingen en gedeelde assets. API-scenario's blijven smal.
+    const lijst = w.lijst();
+    if (!lijst) return { bepaald: false, reden: 'browserbronlijst ontbreekt' };
+    for (const f of lijst) if (browserBestand(f))
+      if (!g.bestanden.has(f)) eigen.add(f);
+  }
   const alle = new Set([...g.bestanden, ...eigen, ...ins.bestanden]);
   for (const f of alle) w.gebruikt.add(f);
   return { bepaald: true, alle, eigen: [...eigen].sort(), instrumentBestanden: [...ins.bestanden].sort(),
@@ -679,7 +690,7 @@ function samen(lijst, hashOf) {
 /* Wat er sinds `commit` in dit raakvlak veranderde: per bestand de inhoud op
    die commit (blob-id) tegen nu. Plus: een serverbestand dat er toen wel en nu
    niet meer is. */
-function verschil(w, alle, commit) {
+function verschil(w, alle, commit, browser = false) {
   const boom = w.boomOp(commit);
   if (!boom) return { bekend: false, reden: 'commit ' + commit + ' is hier niet te lezen' };
   const oorzaak = [];
@@ -690,10 +701,11 @@ function verschil(w, alle, commit) {
   }
   /* Verwijderd onder server/: wie het met fs of een berekende require las, is
      niet te zien, dus telt het voor elk bewijs. Eén keer per commit. */
-  const sleutel = 'weg:' + commit;
+  const sleutel = 'weg:' + commit + ':' + browser;
   if (!w.cache.has(sleutel)) {
     const lijst = w.lijst() || new Set();
-    w.cache.set(sleutel, [...boom.keys()].filter((p) => p.startsWith('server/') && !lijst.has(p)).map((p) => p + ' (verwijderd sinds de meting)'));
+    w.cache.set(sleutel, [...boom.keys()].filter((p) => (p.startsWith('server/') ||
+      (browser && browserBestand(p))) && !lijst.has(p)).map((p) => p + ' (verwijderd sinds de meting)'));
   }
   oorzaak.push(...w.cache.get(sleutel));
   return { bekend: true, oorzaak };
@@ -707,6 +719,15 @@ function stempelGebrek(st) {
   return null;
 }
 
+/* Browserbewijs hoort bij precies de runtime waarmee de browser- en
+   herstartinstrumentatie draaide. Een testdatum of losse omgevingsnaam is
+   geen runtimebinding; `node` staat al in het bestaande meetstempel. */
+function browserRuntimeGebrek(st) {
+  if (typeof st?.node !== 'string' || !st.node) return 'browsermeting zonder Node-runtime in het bestaande stempel';
+  if (st.node !== process.version) return 'browsermeting draaide op ' + st.node + ', huidige Node-runtime is ' + process.version;
+  return null;
+}
+
 /* Versheid voor een register dat de volledige servergrens heeft beproefd.
    Dit is bewust ruimer dan een route- of appraakvlak: een verandering in welk
    serverbestand dan ook laat de ronde opnieuw lopen. Alleen frontend- en
@@ -715,7 +736,12 @@ function stempelGebrek(st) {
 function serverRondeVersheid(w, st, grof) {
   const gebrek = stempelGebrek(st);
   if (gebrek) return { vers: false, reden: gebrek };
-  if (!SERVERRONDE_INSTRUMENTEN.has(st.instrument)) {
+  const gemengd = st.instrument === GEMENGDE_VOLTOOIRONDE;
+  if (gemengd) {
+    const runtimeGebrek = browserRuntimeGebrek(st);
+    if (runtimeGebrek) return { vers: false, reden: runtimeGebrek };
+  }
+  if (!SERVERRONDE_INSTRUMENTEN.has(st.instrument) && !gemengd) {
     return grof(st);
   }
   const ins = instrumentDeel(w, st.instrument);
@@ -726,15 +752,15 @@ function serverRondeVersheid(w, st, grof) {
       '), dus de grove regel: ' + v.reden };
   }
   const alle = new Set(ins.bestanden);
-  for (const p of lijst) if (p.startsWith('server/')) alle.add(p);
-  for (const p of ['package.json', 'package-lock.json']) if (lijst.has(p)) alle.add(p);
-  const d = verschil(w, alle, st.commit);
+  for (const p of lijst) if (p.startsWith('server/') || (gemengd && (p.startsWith('public/') || p === 'index.html'))) alle.add(p);
+  for (const p of BROWSERPAKKETTEN) if (lijst.has(p)) alle.add(p);
+  const d = verschil(w, alle, st.commit, gemengd);
   if (!d.bekend) return { vers: false, reden: d.reden };
   if (d.oorzaak.length) return { vers: false, oorzaak: d.oorzaak,
     reden: 'serverronde gemeten op ' + st.commit + '; sindsdien ' + d.oorzaak.length +
       ' relevant(e) bestand(en) gewijzigd, eerst ' + d.oorzaak[0] };
   return { vers: true, reden: 'serverronde gemeten op ' + st.commit + '; geen van de ' + alle.size +
-    ' server-, package- of instrumentbestanden is sindsdien gewijzigd' };
+    (gemengd ? ' browser-, server-, package- of instrumentbestanden' : ' server-, package- of instrumentbestanden') + ' is sindsdien gewijzigd' };
 }
 
 /* Registerinhoud wordt na de codecommit geschreven. Daarom binden we de exact
@@ -760,7 +786,7 @@ function bronGebrek(w, instrument, bronnen, grof) {
     if (stempelGebrek(st) || st?.instrument !== bronInstrument ||
       !b.stempel || ['op', 'commit', 'instrument', 'boomVuil'].some(k => b.stempel[k] !== st[k]))
       return { reden: register + ': geen geldig overeenkomend bronstempel', oorzaak: [register] };
-    if (SERVERRONDE_INSTRUMENTEN.has(bronInstrument)) {
+    if (SERVERRONDE_INSTRUMENTEN.has(bronInstrument) || bronInstrument === GEMENGDE_VOLTOOIRONDE) {
       const v = serverRondeVersheid(w, st, grof);
       if (!v.vers) return { reden: register + ': ' + v.reden,
         oorzaak: v.oorzaak?.length ? v.oorzaak : [register] };
@@ -789,9 +815,14 @@ function versheidVoor(w, invoer, grof) {
     const gebrek = stempelGebrek(st);
     if (gebrek) return { vers: false, reden: gebrek };
     const ins = Object.assign({ instrument: st.instrument }, invoer);
+    if (ins.kanaal === 'browser') {
+      const runtimeGebrek = browserRuntimeGebrek(st);
+      if (runtimeGebrek) return { vers: false, reden: runtimeGebrek };
+    }
     const gebrekBron = bronGebrek(w, ins.instrument, bronnen, grof);
     if (gebrekBron) return { vers: false, ...gebrekBron };
     const bronVeld = BRONREGISTERS[ins.instrument] ? { bronnen } : {};
+    const browserVeld = ins.kanaal === 'browser' ? { kanaal: 'browser', browserIngang: ins.ingang, node: st.node } : {};
     const r = raakvlak(w, ins);
     if (!r.bepaald) {
       let v = grof(st);
@@ -799,9 +830,9 @@ function versheidVoor(w, invoer, grof) {
       for (const b of bronnen || []) if (v.vers) v = grof(b.stempel);
       return Object.assign({}, v, { reden: 'raakvlak onbepaald (' + r.reden + '), dus de grove regel: ' + v.reden,
         raakvlak: { commit: st.commit, instrument: ins.instrument, scenario: ins.scenario || null,
-          routeInstrument: ins.routeInstrument || null, soort: ins.soort || 'browser', onbepaald: r.reden, ...bronVeld } });
+          routeInstrument: ins.routeInstrument || null, soort: ins.soort || 'browser', onbepaald: r.reden, ...bronVeld, ...browserVeld } });
     }
-    const d = verschil(w, r.alle, st.commit);
+    const d = verschil(w, r.alle, st.commit, ins.kanaal === 'browser');
     if (!d.bekend) return { vers: false, reden: 'gemeten op commit ' + st.commit + ', die hier niet meer bestaat' };
     if (d.oorzaak.length) {
       return { vers: false, oorzaak: d.oorzaak,
@@ -812,7 +843,7 @@ function versheidVoor(w, invoer, grof) {
         r.eigen.length + ' eigen, ' + r.instrumentBestanden.length + ' van het instrument, ' + r.gedeeld + ' gedeeld)',
       raakvlak: { commit: st.commit, instrument: ins.instrument, scenario: ins.scenario || null,
         routeInstrument: ins.routeInstrument || null, soort: ins.soort || 'browser', telt: r.alle.size, eigen: r.eigen.length,
-        samen: samen(r.alle, w.sha), ...bronVeld } };
+        samen: samen(r.alle, w.sha), ...bronVeld, ...browserVeld } };
   };
 }
 
@@ -834,6 +865,10 @@ function hashes(w) {
                  (`vers` zegt hoe) */
 function controleer(w, rec, opgeslagen, ingang, grof) {
   if (!rec || typeof rec !== 'object') return { stand: 'GROF', vers: false, reden: 'geen raakvlak vastgelegd' };
+  if (rec.kanaal === 'browser') {
+    const runtimeGebrek = browserRuntimeGebrek(rec);
+    if (runtimeGebrek) return { stand: 'VERVALLEN', vers: false, oorzaak: [], reden: runtimeGebrek };
+  }
   const st = { op: 'vastgelegd', commit: rec.commit, instrument: rec.instrument, boomVuil: false };
   const gebrekBron = bronGebrek(w, rec.instrument, rec.bronnen, grof);
   if (gebrekBron) return { stand: 'VERVALLEN', vers: false, ...gebrekBron };
@@ -843,11 +878,12 @@ function controleer(w, rec, opgeslagen, ingang, grof) {
     return { stand: 'GROF', vers: !!v.vers, reden: waarom + '; de grove regel: ' + v.reden };
   };
   if (rec.onbepaald) return grofUit('raakvlak onbepaald bij de meting (' + rec.onbepaald + ')');
-  const r = raakvlak(w, { ingang, instrument: rec.instrument, scenario: rec.scenario || undefined,
+  const r = raakvlak(w, { ingang: rec.kanaal === 'browser' ? rec.browserIngang : ingang,
+    kanaal: rec.kanaal, instrument: rec.instrument, scenario: rec.scenario || undefined,
     routeInstrument: rec.routeInstrument || undefined, soort: rec.soort || 'browser' });
   if (!r.bepaald) return grofUit('raakvlak nu onbepaald (' + r.reden + ')');
   const H = opgeslagen || {};
-  const d = verschil(w, r.alle, rec.commit);
+  const d = verschil(w, r.alle, rec.commit, rec.kanaal === 'browser');
   if (!d.bekend) return { stand: 'VERVALLEN', vers: false, oorzaak: [], reden: 'gemeten op commit ' + rec.commit + ', die hier niet meer bestaat' };
   /* Eerst wat er veranderde. Een bestand dat sinds de meting UIT het raakvlak
      viel, hoeft hier niet apart te staan: dat kan alleen doordat een bestand

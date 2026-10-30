@@ -46,6 +46,18 @@ test('een nieuw scherm vergroot automatisch de noemer en blijft zonder signature
   assert.equal(second.status,'NOT_TESTED');
 });
 
+test('query- en fragmentcontexten delen een fysiek scherm zonder hun eigen bewijsidentiteit te verliezen', () => {
+  const destinations = ['/apps/app.html?pas=rtg', '/apps/app.html?pas=business#tab=zorg', 'https://vreemd.invalid/apps/app.html', '//vreemd.invalid/apps/app.html'];
+  const apps = destinations.map((destination, i) => ({ id:'app:context:'+i, destination, entry:destination }));
+  const screen = { id:'screen:/apps/app.html', route:'/apps/app.html', world:'living', profile:'interface' };
+  const report = coverage.build(ROOT,{contract,signatures:{version:1,apps:{},screens:{}},apps,screens:[screen],sourceHash:'source',commit:'candidate'});
+  assert.deepEqual(report.logicalApps.map(row=>row.screenIds), [[screen.id],[screen.id],[],[]]);
+  assert.deepEqual(report.logicalApps.map(row=>row.destination), destinations);
+  assert.deepEqual(report.logicalApps.map(row=>row.entry), destinations);
+  assert.deepEqual(report.screens[0].logicalAppIds, ['app:context:0','app:context:1']);
+  assert.equal(report.logicalApps.every(row=>row.signature.status==='NOT_TESTED'), true);
+});
+
 test('niet-toepasselijk vereist een expliciet besluit en een reden', () => {
   const broken = structuredClone(contract);
   broken.profiles.redirect.notApplicable.composition = {decision:'',reason:''};
@@ -54,7 +66,7 @@ test('niet-toepasselijk vereist een expliciet besluit en een reden', () => {
 });
 
 test('bewijs met andere bron of kandidaat is STALE', () => {
-  const record = {status:'PROVEN',sourceHash:'old',commit:'candidate',configurationHash:'cfg',artifact:'proof',method:'browser'};
+  const record = {status:'PROVEN',worktreeDirty:false,sourceHash:'old',commit:'candidate',configurationHash:'cfg',artifact:'proof',method:'browser'};
   assert.equal(coverage.evidenceStatus(record,'new','candidate','identity'),'STALE');
   assert.equal(coverage.evidenceStatus({...record,sourceHash:'new',commit:'other'},'new','candidate','identity'),'STALE');
 });
@@ -62,10 +74,10 @@ test('bewijs met andere bron of kandidaat is STALE', () => {
 test('AI-oordeel kan menselijke kwaliteit niet bewijzen', () => {
   const base = {status:'PROVEN',sourceHash:'source',commit:'candidate',configurationHash:'cfg',artifact:'proof'};
   assert.equal(coverage.evidenceStatus({...base,method:'ai-review',reviewer:{type:'ai',id:'model'}},'source','candidate','human-quality'),'BLOCKED');
-  assert.equal(coverage.evidenceStatus({...base,method:'human-user-test',reviewer:{type:'human',id:'reviewer-1'}},'source','candidate','human-quality'),'PROVEN');
+  assert.equal(coverage.evidenceStatus({...base,method:'human-user-test',reviewer:{type:'human',id:'reviewer-1'}},'source','candidate','human-quality'),'BLOCKED');
 });
 
-test('alle vereiste combinaties moeten afzonderlijk bewezen zijn', () => {
+test('metadata voor alle combinaties vervangt nooit echte bewijsartefacten', () => {
   const app = {id:'app:test',function:'link:test',name:'Test',world:'LivingOS',persona:'lid',destination:'/apps/test.html',entry:'/apps/test.html'};
   const screen = {id:'screen:/apps/test.html',route:'/apps/test.html',world:'living',profile:'interface'};
   const declared = {identity:'test',purpose:'testdoel',composition:'rustige taakcompositie',motion:'continu',interactionDensity:'quiet',interactions:[{id:'save',label:'Opslaan'}],humanTasks:['Rond de testtaak af']};
@@ -77,7 +89,8 @@ test('alle vereiste combinaties moeten afzonderlijk bewezen zijn', () => {
     records.push({subjectType:subject.id.startsWith('app:')?'app':'screen',subjectId:subject.id,dimension:dimension.id,requirement,status:'PROVEN',sourceHash:'source',commit:'candidate',configurationHash:'cfg',artifact:'proof/'+subject.id+'/'+dimension.id+'/'+requirement,method:dimension.id==='human-quality'?'human-user-test':'browser',...(dimension.id==='human-quality'?{reviewer:{type:'human',id:'reviewer-1'}}:{})});
   }
   const proven = coverage.build(ROOT,{contract,signatures:sig,evidence:{version:1,records},apps:[app],screens:[screen],sourceHash:'source',commit:'candidate'});
-  assert.equal(proven.status,'PROVEN');
+  assert.equal(proven.status,'NOT_TESTED');
+  assert.ok(proven.logicalApps[0].dimensions.every(d=>d.status==='BLOCKED'));
   records.pop();
   const incomplete = coverage.build(ROOT,{contract,signatures:sig,evidence:{version:1,records},apps:[app],screens:[screen],sourceHash:'source',commit:'candidate'});
   assert.equal(incomplete.status,'NOT_TESTED');

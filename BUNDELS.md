@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**64 bundels, 500 delen, 0 zonder onderwerp.**
+**65 bundels, 504 delen, 3 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 103 delen, 10119 regels in de delen
+`public/apps/app-main/` -- 104 delen, 10131 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -44,8 +44,9 @@ omlaag.
 | `app-main-10a.js` | DE BELSIGNALEN VAN DE LIVE-VERBINDING (uit app-main-10.js geknipt op de 10 kB): ICE die vooruit liep, en de eerste he... |
 | `app-main-11.js` | DE LIVE-VERBINDING EN DE DOORGIFTE NAAR DE DYNAMISCHE EDGE |
 | `app-main-12.js` | DE MELDINGENLIJST, DE BEL EN HET ONGELEZEN-MERK |
-| `app-main-12a.js` | De opbouw van het beginscherm: het vangnet, de melding als er iets leeg blijft, en de volgorde eerst-beeld-dan-gegevens |
-| `app-main-12b.js` | De tickets van het lid: het aanbod en wat hij al heeft |
+| `app-main-12a-voor.js` | De opbouw van het beginscherm: het vangnet, de melding als er iets leeg blijft, en de volgorde eerst-beeld-dan-gegevens |
+| `app-main-12a.js` | -- |
+| `app-main-12b.js` | tickets: activiteiten, tours en musea |
 | `app-main-13.js` | het ticketkanaal: partners, activiteiten en hun tijden |
 | `app-main-14.js` | het zorgaanbod: klinieken, behandelingen en het medische onderscheid |
 | `app-main-14a.js` | verzorging: de kapper, de barbier en de nagelstudio |
@@ -574,6 +575,15 @@ omlaag.
 | `werkplek-bureaus-01.js` | De ontwerptak van een huis: het atelier, de ontwerpstudio, het hardwarelab, het architectenbureau, de redactie en de... |
 | `werkplek-bureaus-02.js` | De plank van dit huis: wat er nu echt in de verkoop staat |
 
+## `apps/zakelijk-voorzijde.js`
+
+`public/apps/zakelijk-voorzijde/` -- 2 delen, 178 regels in de delen, waarvan 1 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `zakelijk-voorzijde-01.js` | -- |
+| `zakelijk-voorzijde-02.js` | het reisbeleid |
+
 ## `shared/appmenu.js`
 
 `public/shared/appmenu/` -- 6 delen, 645 regels in de delen
@@ -918,12 +928,13 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 295 regels in de delen
+`public/shared/uitvoer/` -- 3 delen, 300 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
 | `uitvoer-01.js` | Uitvoer: uw gegevens meenemen uit elke app |
-| `uitvoer-02.js` | Uitvoer: bediening, dialoog en feedback |
+| `uitvoer-01b.js` | Uitvoer: bediening, dialoog en feedback |
+| `uitvoer-02.js` | -- |
 
 ## `shared/verbinding.js`
 

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # Bouw de Rust-motor los van de kleine Node-runtime-image. Cargo gebruikt het
 # vastgezette Cargo.lock; de uiteindelijke container krijgt alleen de binary.
-FROM rust:1.99-slim@sha256:2752b332db73fdbb7dc576f06c82ed1f312005784ef913d7e04a28f5f55dc581 AS motor-builder
+FROM rust:1.99-slim@sha256:b8e062b1c3a80183df83d9ba187cadd2b5ab84bc78d453dbfeb2fccd5f982247 AS motor-builder
 WORKDIR /src/motor
 COPY motor/Cargo.toml motor/Cargo.lock ./
 COPY motor/src ./src

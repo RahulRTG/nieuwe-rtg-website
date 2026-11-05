@@ -1832,12 +1832,12 @@ function overleverTelling(uitslag) {
 
 /* EEN PURE TOETS. Groen zonder mutatie is een voorwaarde: staat hij al rood, dan
    bewijst "hij zakt" niets (LAT.md regel 3 -- een meter zonder invoer meet niet). */
-function proefPuur(naam, posities) {
+function proefPuur(naam, posities, forceer) {
   if (NIET_MUTEREN.has(naam)) return { soort: 'puur', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
   if (GEEN_BRONMUTATIE.has(naam)) return { soort: 'puur', staat: 'geen bronmutatie mogelijk', reden: GEEN_BRONMUTATIE.get(naam) };
   const diep = posities || 1;
   const bestand = path.join(TEST, naam);
-  const nul = draaiToets(bestand);
+  const nul = draaiToets(bestand, null, null, forceer);
   /* Eerst de nulmeting, en een die niet AFKOMT is een eigen uitslag. Zonder deze
      regel zou de motor negen keer vier minuten wachten op een toets die toch niet
      te meten is, en dan draait niemand hem ooit af. */
@@ -1866,7 +1866,7 @@ function proefPuur(naam, posities) {
             : spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' }).status === 0;
           if (!geldig) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
-          const na = draaiToets(bestand, null, WACHT_MUTATIE);
+          const na = draaiToets(bestand, null, WACHT_MUTATIE, forceer);
           const schade = bijwerkingVan(voor, bronStand(p));
           if (schade.length) {
             herstelBron(voor, schade);
@@ -2147,6 +2147,7 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
+  const forceer = args.includes('--force-exit');
   const gerichtArg = args.find(a => a.startsWith('--gericht='));
   const gericht = gerichtArg ? laadGericht(gerichtArg.slice(10)) : null;
 
@@ -2260,7 +2261,7 @@ if (require.main === module) {
 
   if (alleen !== 'server') {
     console.log('  --- A: pure toetsen, bronmutatie (eerste plek per operator) ---');
-    doe(puur, (n) => proefPuur(n, 1));
+    doe(puur, (n) => proefPuur(n, 1, forceer));
     vastleggen();
     /* DE DIEPE RONDE, alleen over de overlevers. Een overlever kan twee dingen
        betekenen -- de toets legt het gedrag niet vast, of de motor heeft geen code
@@ -2277,7 +2278,7 @@ if (require.main === module) {
          meting is er dus gewoon te betalen. */
       console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, elke plek per operator ---');
       for (const naam of overlevers) {
-        const r = proefPuur(naam, 1000);
+        const r = proefPuur(naam, 1000, forceer);
         uitslag[naam] = r;
         bewaar();
         console.log('        ' + naam.padEnd(42) + r.staat +

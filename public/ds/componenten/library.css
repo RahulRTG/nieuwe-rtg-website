@@ -1,0 +1,51 @@
+/* Foundation Library: dezelfde Studio, publicatieafspraken en private Reader.
+   Op smalle werkvlakken blijven alle drie panelen via de bestaande tabs bereikbaar. */
+@layer rtg.component {
+  .ds-library-kop { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-4) var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-library-kop > span { min-inline-size: 0; }
+  .ds-library-kop h1 { margin: 0; font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 500; }
+  .ds-library-status { flex: 1 1 16rem; max-inline-size: var(--ds-breedte-lees); margin-inline-start: auto; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); overflow-wrap: anywhere; }
+  .ds-library-status[data-fout="true"] { color: var(--ds-inkt); font-weight: 600; border-inline-start: 3px solid var(--ds-accent); padding-inline-start: var(--ds-ruimte-3); }
+  .ds-library-tabs { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); padding: var(--ds-ruimte-3) var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-library-tabs .ds-knop { flex: 1 1 8rem; min-inline-size: var(--ds-doel); padding-block: var(--ds-ruimte-2); overflow-wrap: anywhere; }
+  .ds-library-tabs .on { border-color: var(--ds-accent); box-shadow: inset 0 0 0 1px var(--ds-accent); }
+  .ds-library-layout { display: grid; grid-template-columns: minmax(0, 1fr); padding-block-end: calc(var(--ds-edge-hoogte) + env(safe-area-inset-bottom) + var(--ds-ruimte-6)); }
+  .ds-library-paneel { display: none; min-inline-size: 0; padding: var(--ds-ruimte-6) var(--ds-goot); overflow-wrap: anywhere; }
+  .ds-library-paneel.mobile { display: block; }
+  .ds-library-rail, .ds-library-side { background: var(--ds-oppervlak); }
+  .ds-library-paneel h2 { margin-block: var(--ds-ruimte-1) var(--ds-ruimte-3); font: 500 var(--ds-maat-titel)/1.15 var(--ds-letter-display); }
+  .ds-library-paneel h3 { margin-block: var(--ds-ruimte-6) var(--ds-ruimte-3); font-size: var(--ds-maat-tekst); font-weight: 600; }
+  .ds-library-label { display: block; margin-block-end: var(--ds-ruimte-2); font-size: var(--ds-maat-meta); color: var(--ds-inkt-zacht); }
+  .ds-library-meta { font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-library-intro { margin-block: 0 var(--ds-ruimte-6); color: var(--ds-inkt-zacht); }
+  .ds-library-invoer { display: block; min-inline-size: 0; max-inline-size: 100%; margin-block-end: var(--ds-ruimte-3); }
+  .ds-library-knop { min-inline-size: var(--ds-doel); max-inline-size: 100%; padding-block: var(--ds-ruimte-2); overflow-wrap: anywhere; }
+  .ds-library-rij { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-2); }
+  .ds-library-rij > .ds-library-label { flex-basis: 100%; margin: 0; }
+  .ds-library-groei { flex: 1 1 12rem; margin: 0; }
+  .ds-library-werk { display: block; inline-size: 100%; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-3); text-align: start; font: inherit; background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); cursor: pointer; overflow-wrap: anywhere; }
+  .ds-library-werk + .ds-library-werk { margin-block-start: var(--ds-ruimte-2); }
+  .ds-library-werk b, .ds-library-werk small { display: block; }
+  .ds-library-werk small { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-library-werk:hover, .ds-library-werk.on, .ds-library-onderdeel.on { border-color: var(--ds-accent); }
+  .ds-library-leeg { padding: var(--ds-ruimte-6); border: 1px dashed var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); color: var(--ds-inkt-zacht); }
+  .ds-library-onderdeel { margin-block-end: var(--ds-ruimte-3); padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); background: var(--ds-oppervlak); }
+  .ds-library-onderdeelkop { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-ruimte-2); }
+  .ds-library-onderdeelkop b { flex: 1 1 10rem; }
+  .ds-library-editie, .ds-library-feedback { padding: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-3); background: var(--ds-oppervlak); border-inline-start: 2px solid var(--ds-accent); }
+  .ds-library-papier { max-inline-size: var(--ds-breedte-lees); margin-inline: auto; padding: var(--ds-ruimte-6); min-block-size: 24rem; background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-inhoud); }
+  .ds-library-papier article { font-family: var(--ds-letter-display); font-size: var(--ds-maat-tekst); line-height: 1.85; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ds-library-leesbediening { max-inline-size: var(--ds-breedte-lees); margin-inline: auto; margin-block-end: var(--ds-ruimte-6); }
+  .ds-library-leesbediening .ds-library-rij { margin-block: var(--ds-ruimte-3); }
+  .ds-library-akkoord { display: flex; align-items: flex-start; gap: var(--ds-ruimte-3); min-block-size: var(--ds-doel); padding-block: var(--ds-ruimte-3); font-size: var(--ds-maat-klein); cursor: pointer; }
+  .ds-library-akkoord input { flex: none; inline-size: 1.5rem; block-size: 1.5rem; margin: 0; accent-color: var(--ds-accent); }
+  .ds-library-layout .hide { display: none; }
+  @container ds (min-width: 64rem) {
+    .ds-library-tabs { display: none; }
+    .ds-library-layout { grid-template-columns: minmax(12rem, 1fr) minmax(0, 2.5fr) minmax(14rem, 1.15fr); }
+    .ds-library-paneel { display: block; }
+    .ds-library-rail { border-inline-end: 1px solid var(--ds-lijnkleur); }
+    .ds-library-side { border-inline-start: 1px solid var(--ds-lijnkleur); }
+  }
+  @media (prefers-reduced-motion: reduce) { .ds-library .ds-knop { transition: none; } }
+}

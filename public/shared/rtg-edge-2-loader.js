@@ -3,7 +3,7 @@
   if (!d.body || w.__RTGEdge2Loader) return;
   w.__RTGEdge2Loader = true;
 
-  var b = d.body, h = d.head || d.documentElement;
+  var b = d.body;
   b.setAttribute('data-rtg-edge-2', '');
   if (!b.hasAttribute('data-rtg-edge-2-context')) b.setAttribute('data-rtg-edge-2-context', 'none');
   if (!b.hasAttribute('data-rtg-edge-2-state')) b.setAttribute('data-rtg-edge-2-state', 'overview');
@@ -184,16 +184,20 @@
   }
   function script(pad, naam, klaar) {
     if (w[naam]) { klaar(true); return; }
-    var s = bron('script', 'src', pad), nieuw = !s;
-    if (!s) { s = d.createElement('script'); s.src = pad; s.async = true; }
-    wacht(s, naam, klaar);
-    if (nieuw) h.appendChild(s);
+    var bestaandScript = bron('script', 'src', pad);
+    if (bestaandScript) { wacht(bestaandScript, naam, klaar); return; }
+    var edgeScriptNode = document.createElement('script');
+    edgeScriptNode.src = pad; edgeScriptNode.async = true;
+    wacht(edgeScriptNode, naam, klaar);
+    document.head.appendChild(edgeScriptNode);
   }
   function blad(pad, klaar) {
-    var css = bron('link[rel~="stylesheet"]', 'href', pad), nieuw = !css;
-    if (!css) { css = d.createElement('link'); css.id = 'rtg-edge-2-css'; css.rel = 'stylesheet'; css.href = pad; }
-    wacht(css, '', klaar);
-    if (nieuw) h.appendChild(css);
+    var bestaandBlad = bron('link[rel~="stylesheet"]', 'href', pad);
+    if (bestaandBlad) { wacht(bestaandBlad, '', klaar); return; }
+    var edgeStyleNode = document.createElement('link');
+    edgeStyleNode.id = 'rtg-edge-2-css'; edgeStyleNode.rel = 'stylesheet'; edgeStyleNode.href = pad;
+    wacht(edgeStyleNode, '', klaar);
+    document.head.appendChild(edgeStyleNode);
   }
   var over = 4, mislukt = false;
   function afhankelijk(ok) {

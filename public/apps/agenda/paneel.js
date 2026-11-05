@@ -61,9 +61,9 @@
       var d = (open && open.deelnemers) || [];
       $('#afDeelnemers').innerHTML = d.length ? d.map(function (x) {
         var st = x.status === 'ja' ? 'komt' : x.status === 'nee' ? 'komt niet' : 'nog geen antwoord';
-        return '<div class="deeln"><span>' + esc(x.codenaam) + '</span><span class="st' +
-          (x.status === 'ja' ? ' ja' : '') + '">' + st + '</span></div>';
-      }).join('') : '<p class="stil h-mt40">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
+        return '<div class="deeln ds-dag-deeln"><span>' + esc(x.codenaam) + '</span><span class="st' +
+          (x.status === 'ja' ? ' ja' : '') + ' ds-dag-st">' + st + '</span></div>';
+      }).join('') : '<p class="stil h-mt40 ds-dag-stil">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
     }
 
     $('#afDicht').addEventListener('click', dicht);

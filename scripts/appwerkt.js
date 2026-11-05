@@ -278,13 +278,14 @@ function rijen() {
    expliciet gedeclareerde bedieningsadapter worden uitgevoerd. Alleen proza
    blijft eerlijk ongemeten: de meter leidt daar nooit zelf een route uit af. */
 function meetIngang(rij, contract = CONTRACT) {
+  const c = rij && contract && contract[rij.functie];
   if (rij && rij.pad) {
     // Het fysieke pad uit MAPPEN is niet de querycontext van de aangeboden ingang.
     const ingang = typeof rij.ingang === 'string' && rij.ingang.startsWith('/') &&
       schermpad(rij.ingang) === schermpad(rij.pad) ? rij.ingang.split('#')[0] : rij.pad;
-    return { pad: ingang, bestemming: ingang, via: null };
+    return { pad: ingang, bestemming: ingang, via: null,
+      ...(c && c.navigatielinks !== undefined ? { navigatielinks: c.navigatielinks } : {}) };
   }
-  const c = rij && contract && contract[rij.functie];
   if (!c || typeof c.ingang !== 'string' || !c.ingang.startsWith('/') || typeof c.via !== 'string') return null;
   if (c.via.startsWith('#')) return { pad: c.ingang + c.via, bestemming: c.ingang, via: c.via,
     ...(typeof c.bereik === 'string' && c.bereik ? { bereik: c.bereik } : {}) };
@@ -551,6 +552,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.risicovolAangeraakt = bediening.risicovolAangeraakt;
   r.risicoFixtures = bediening.risicoFixtures;
   r.nietKlikbaar = bediening.nietKlikbaar;
+  if (bediening.navigatie) r.navigatie = bediening.navigatie;
   r.onaangeraakt = bediening.onaangeraakt;
   r.onderschept = bediening.onderschept;
   if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
@@ -558,7 +560,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   r.rem = bediening.rem.length + eersteBezoek.rem.length;
   r.gezegd = bediening.gezegd;
   r.taalWissel = bediening.taalWissel;
-  const stuk = [...bediening.crash, ...bediening.serverfout];
+  const stuk = [...bediening.crash, ...bediening.serverfout, ...(bediening.navigatie?.fouten || [])];
   /* De uitsplitsing staat ALTIJD in de reden, ook bij een geslaagde rij: "3
      knoppen aangetikt zonder fout" leest als een bewijs, maar zonder de noemer
      weet niemand of dat alles was of het topje. */
@@ -568,12 +570,13 @@ async function meetRij(rij, base, persoonlijk, rollen) {
     + (bediening.schil ? ' (plus ' + bediening.schil + ' van de gedeelde schil, die hier niet telt)' : '')
     + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
     + (bediening.risicovolAangeraakt.length ? ', ' + bediening.risicovolAangeraakt.length + ' risicovolle bediening(en) aangeraakt op de wegwerpserver' : '')
+    + (bediening.navigatie ? '; ' + bediening.navigatie.geklikt + ' van ' + bediening.navigatie.gevonden + ' eigen navigatielinks met zichtbare bestemming gecontroleerd' : '')
     + (bediening.onaangeraakt.length ? ', onaangeraakt: ' + bediening.onaangeraakt.slice(0, 8).map((n) => '"' + n + '"').join(', ')
       + (bediening.onaangeraakt.length > 8 ? ' en ' + (bediening.onaangeraakt.length - 8) + ' meer' : '') : '');
-  if (bediening.geklikt === 0 && !bediening.gevonden) {
+  if (bediening.geklikt === 0 && !bediening.gevonden && !bediening.navigatie) {
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen eigen knop zonder bestemming gevonden' + (bediening.schil ? ' (alleen ' + bediening.schil + ' van de gedeelde schil)' : '') + '; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
-    r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0], bewijs: bediening.crash.concat(bediening.serverfout).slice(0, 5).join(' | ') };
+    r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0], bewijs: stuk.slice(0, 5).join(' | ') };
   } else if (bediening.bedekt.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT',
       reden: bediening.bedekt.length + ' eigen knop(pen) volledig bedekt door de gedeelde schil; een muis komt er niet bij',
@@ -587,7 +590,8 @@ async function meetRij(rij, base, persoonlijk, rollen) {
        Een herstelroute, overlap of meetlimiet mag niet achter een percentage
        verdwijnen. */
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST',
-      reden: uitsplitsing + ' -- de proef raakte niet alle unieke bediening, dus dit scherm is niet volledig beproefd', bewijs: null };
+      reden: uitsplitsing + ' -- de proef raakte niet alle unieke bediening, dus dit scherm is niet volledig beproefd' +
+        (bediening.navigatie?.onbewezen.length ? ': ' + bediening.navigatie.onbewezen.join('; ') : ''), bewijs: null };
   } else {
     r.bewijzen.bedienbaar = { status: 'BEWEZEN', reden: uitsplitsing, bewijs: null };
   }
@@ -937,9 +941,23 @@ async function sluitAppdeck(page) {
    afgeronde verhouding of een overgeslagen risicoknop mag nooit als volledige
    bediening worden gepresenteerd. */
 function volledigeBediening(bediening) {
-  return Number.isInteger(bediening && bediening.gevonden) && bediening.gevonden > 0 &&
+  const links = bediening && bediening.navigatie;
+  const linksVolledig = links === undefined || (!!links &&
+    Number.isInteger(links.gevonden) && links.gevonden > 0 &&
+    Number.isInteger(links.geklikt) && links.geklikt === links.gevonden &&
+    Array.isArray(links.aangeraakt) && links.aangeraakt.length === links.geklikt &&
+    links.aangeraakt.every(l => l && typeof l.merk === 'string' && l.merk.trim() &&
+      typeof l.naam === 'string' && l.naam.trim() && l.status === 200 &&
+      typeof l.titel === 'string' && l.titel.trim() &&
+      typeof l.bestemming === 'string' && /^\/apps\/[\w/-]+\.html(?:\?[^#\s]+)?$/.test(l.bestemming)) &&
+    new Set(links.aangeraakt.map(l => l.merk)).size === links.geklikt &&
+    Array.isArray(links.onbewezen) && links.onbewezen.length === 0 &&
+    Array.isArray(links.fouten) && links.fouten.length === 0);
+  return Number.isInteger(bediening && bediening.gevonden) && bediening.gevonden >= 0 &&
+    (bediening.gevonden > 0 || (!!links && links.gevonden > 0)) &&
     Number.isInteger(bediening.geklikt) && bediening.geklikt === bediening.gevonden &&
-    Array.isArray(bediening.overgeslagen) && bediening.overgeslagen.length === 0;
+    Array.isArray(bediening.overgeslagen) && bediening.overgeslagen.length === 0 &&
+    linksVolledig;
 }
 
 /* Het element dat de klik opving, uit de log van Playwright: "<a ...>…</a> from
@@ -953,6 +971,167 @@ function onderschepper(log) {
   const id = (/\sid="([^"]+)"/.exec(el) || [])[1];
   const klas = ((/\sclass="([^"]+)"/.exec(el) || [])[1] || '').trim().split(/\s+/).filter(Boolean).slice(0, 2);
   return tag.toLowerCase() + (id ? '#' + id : '') + klas.map((c) => '.' + c).join('');
+}
+
+/* Een expliciet linkcontract is geen uitslag en geen vervanger van een
+   voltooiingsscenario. De bestaande browsermeter krijgt hiermee één extra
+   bedieningsvorm: alle eigen ankers in main, ieder met een echte lokale
+   bestemming en zichtbaar inhoudsvlak. Knoppen blijven afzonderlijk geteld.
+   Geen recursieve crawler: de bediening OP de bestemming is haar eigen proef. */
+function controleerNavigatielinks(contract) {
+  if (!Array.isArray(contract) || !contract.length) return 'navigatielinks mist een niet-lege bestemmingslijst';
+  const gezien = new Set();
+  for (const doel of contract) {
+    if (!doel || Object.keys(doel).some(k => !['bestemming', 'inhoud', 'titel'].includes(k)) ||
+        typeof doel.bestemming !== 'string' || !/^\/apps\/[\w/-]+\.html(?:\?[^#\s]+)?$/.test(doel.bestemming) ||
+        new URL(doel.bestemming, 'http://rtg.invalid').pathname !== doel.bestemming.split('?')[0] ||
+        typeof doel.inhoud !== 'string' || !doel.inhoud.trim() || typeof doel.titel !== 'string' || !doel.titel.trim())
+      return 'navigatielinks vereist een lokale appbestemming, inhoudselector en exacte documenttitel';
+    if (gezien.has(doel.bestemming)) return 'navigatielinks bevat een dubbele bestemming';
+    gezien.add(doel.bestemming);
+  }
+  return null;
+}
+
+async function bedienNavigatie(ctx, base, meet) {
+  const uit = { gevonden: 0, geklikt: 0, aangeraakt: [], onbewezen: [], fouten: [] };
+  const gebrek = controleerNavigatielinks(meet.navigatielinks);
+  if (gebrek) { uit.onbewezen.push(gebrek); return uit; }
+  const origin = new URL(base).origin;
+  const doelen = new Map(meet.navigatielinks.map(d => [d.bestemming, d]));
+  const lokaal = href => {
+    try { const u = new URL(href, base); return u.origin === origin && !u.username && !u.password ? u.pathname + u.search + u.hash : null; }
+    catch { return null; }
+  };
+  const toegestaan = href => {
+    const adres = lokaal(href);
+    return adres && [meet.pad, ...doelen.keys()].some(d =>
+      // De app-shell mag haar actuele pas invullen, net als bij meetIngang.
+      // Een expliciet gedeclareerde query blijft daarentegen verplicht.
+      adres === d || (!d.includes('?') && adres.split('?')[0] === d));
+  };
+  const page = await ctx.newPage(), wachtend = [];
+  luister(page, base, { crash: uit.fouten, serverfout: uit.fouten, config: uit.onbewezen, rem: uit.onbewezen, wachtend });
+  const navigaties = [];
+  const guard = async route => {
+    const q = route.request();
+    if (!q.isNavigationRequest()) return route.fallback();
+    let p; try { p = q.frame().page(); } catch { return route.fallback(); }
+    // Een andere gelijktijdige app behoudt haar eigen onderscheppers. Direct
+    // continue() zou de volgende contextregel onbedoeld kunnen passeren.
+    if (p !== page && await p.opener() !== page) return route.fallback();
+    if (p !== page || !toegestaan(q.url())) {
+      uit.onbewezen.push('onverklaarde navigatie geblokkeerd: ' + q.url());
+      return route.abort();
+    }
+    // Playwright routeert de vervolgstap van een HTTP-redirect niet opnieuw.
+    // continue() kon daardoor een niet-toegestane bestemming toch bezoeken.
+    // Deze proef vereist een directe documentrespons op het klikadres; aliases
+    // hebben hun eigen redirectproef. Geen preflight+herhaling en geen final-
+    // body op het verkeerde adres: dat zou klik, URL en geschiedenis vervalsen.
+    let response;
+    try {
+      response = await route.fetch({ maxRedirects: 0, maxRetries: 0, timeout: 15000 });
+      if (response.status() >= 300 && response.status() < 400) {
+        const location = response.headers().location;
+        let doel = ''; try { if (location) doel = new URL(location, q.url()).href; } catch {}
+        uit.onbewezen.push((doel && toegestaan(doel) ? 'redirect vereist afzonderlijk bewijs: ' : 'onverklaarde redirect geblokkeerd: ') + q.url() + ' → ' + (doel || '(ongeldige of ontbrekende Location)'));
+        return await route.abort();
+      }
+      return await route.fulfill({ response });
+    } catch (e) {
+      uit.onbewezen.push('documentrespons niet veilig ontvangen: ' + String(e.message || e).split('\n')[0]);
+      await route.abort().catch(() => {});
+    } finally { if (response) await response.dispose(); }
+  };
+  await ctx.route('**/*', guard);
+  page.on('dialog', dialog => { uit.onbewezen.push('link opent een onverwachte bevestiging'); dialog.dismiss().catch(() => {}); });
+  page.on('popup', popup => { uit.onbewezen.push('link opent een onverwacht venster'); popup.close().catch(() => {}); });
+  page.on('response', res => {
+    if (res.request().isNavigationRequest() && res.request().frame() === page.mainFrame())
+      navigaties.push({ url: res.url(), status: res.status() });
+  });
+  const inventaris = async () => {
+    const response = await page.goto(base + meet.pad, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    if (!response || response.status() !== 200 || lokaal(page.url()) !== meet.pad) throw new Error('linkingang niet met HTTP 200 op het eigen adres bereikt');
+    await page.locator('main').waitFor({ state: 'visible', timeout: 10000 });
+    await wachtOpDefinitiefBedieningsbeeld(page);
+    return page.evaluate(SCHIL => {
+      const main = document.querySelectorAll('main');
+      if (main.length !== 1) throw new Error('navigatiecontract vereist precies één hoofdvlak');
+      const voorkomens = new Map();
+      return [...main[0].querySelectorAll('a')].filter(el => !el.closest(SCHIL)).map((el, i) => {
+        const href = el.href || '', naam = (el.getAttribute('aria-label') || el.innerText || '').replace(/\s+/g, ' ').trim();
+        // Ook gelijke labels met andere bestemmingen en meerdere exemplaren
+        // naar dezelfde bestemming blijven afzonderlijke echte klikdoelen.
+        const basis = href + '|' + naam, nr = (voorkomens.get(basis) || 0) + 1;
+        voorkomens.set(basis, nr); el.setAttribute('data-appwerkt-link', String(i));
+        return { merk: basis + '|' + nr, href, naam, nr: i, target: el.target, download: el.hasAttribute('download') };
+      });
+    }, GEDEELDE_SCHIL);
+  };
+  try {
+    const links = await inventaris();
+    uit.gevonden = links.length;
+    if (!links.length) uit.onbewezen.push('geen eigen navigatielink aangetroffen');
+    for (const bestemming of doelen.keys()) if (!links.some(l => lokaal(l.href) === bestemming))
+      uit.onbewezen.push('gedeclareerde bestemming ontbreekt in het hoofdvlak: ' + bestemming);
+    for (const link of links) {
+      const doel = doelen.get(lokaal(link.href));
+      if (!doel || !link.naam || link.download || (link.target && link.target !== '_self')) {
+        uit.onbewezen.push('niet meetbare of onverklaarde link: ' + (link.naam || '(naamloos)') + ' → ' + link.href);
+        continue;
+      }
+      try {
+        const opnieuw = await inventaris();
+        if (JSON.stringify(opnieuw) !== JSON.stringify(links)) throw new Error('linkinventaris wijzigde tussen klikken; noemer is onvolledig');
+        const startFout = uit.fouten.length, startOpen = uit.onbewezen.length;
+        const n = navigaties.length, anchor = page.locator('[data-appwerkt-link="' + link.nr + '"]');
+        await anchor.scrollIntoViewIfNeeded();
+        await anchor.click({ timeout: 5000 });
+        await page.waitForURL(url => toegestaan(url.href) && url.pathname === doel.bestemming.split('?')[0], { timeout: 10000 });
+        await page.locator(doel.inhoud).waitFor({ state: 'visible', timeout: 10000 });
+        // Een app mag na de sessieresolutie haar titel zetten. Wacht op het
+        // exacte gecontracteerde resultaat, nooit op een willekeurige titel
+        // of vaste tijd. De controle na het renderen blijft beslissend.
+        try { await page.waitForFunction(titel => document.title === titel, doel.titel, { timeout: 5000 }); }
+        catch { throw new Error('documenttitel verschilt van het bestemmingscontract: verwacht ' + JSON.stringify(doel.titel) + ', ontvangen ' + JSON.stringify(await page.title())); }
+        await wachtOpDefinitiefBedieningsbeeld(page);
+        const bestemming = lokaal(page.url());
+        if (!toegestaan(page.url()) || new URL(page.url()).pathname !== doel.bestemming.split('?')[0] ||
+            (doel.bestemming.includes('?') && bestemming !== doel.bestemming)) throw new Error('link kwam niet op de gedeclareerde bestemming');
+        const titel = await page.title();
+        if (titel !== doel.titel) throw new Error('documenttitel verschilt van het bestemmingscontract: verwacht ' + JSON.stringify(doel.titel) + ', ontvangen ' + JSON.stringify(titel));
+        const respons = navigaties.slice(n).findLast(r => r.url === page.url() || lokaal(r.url)?.split('?')[0] === doel.bestemming.split('?')[0]);
+        if (!respons || respons.status !== 200) throw new Error('bestemming mist een geslaagde documentrespons');
+        const zichtbaar = await page.locator(doel.inhoud).evaluate(el => {
+          el.scrollIntoView({ block: 'center', behavior: 'instant' });
+          const r = el.getBoundingClientRect(), boven = document.elementFromPoint(r.x + r.width / 2, Math.max(0, Math.min(innerHeight - 1, r.y + r.height / 2)));
+          const verborgen = el.closest('[hidden],[inert],[aria-hidden="true"]'), stijl = getComputedStyle(el);
+          const naam = n => n ? { tag: n.tagName, id: n.id, klasse: n.getAttribute('class') } : null;
+          return { geldig: !!el.textContent.trim() && !verborgen && el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) &&
+            r.width > 0 && r.height > 0 && !!boven && (el === boven || el.contains(boven)),
+            element: naam(el), rechthoek: r.toJSON(), punt: { x: r.x + r.width / 2, y: Math.max(0, Math.min(innerHeight - 1, r.y + r.height / 2)) },
+            boven: naam(boven), verborgenDoor: naam(verborgen), tekstlengte: el.textContent.trim().length,
+            weergave: { display: stijl.display, visibility: stijl.visibility, opacity: stijl.opacity } };
+        });
+        if (!zichtbaar.geldig) throw new Error('bestemmingsinhoud is leeg, verborgen of bedekt: ' + JSON.stringify({ selector: doel.inhoud, bestemming, ...zichtbaar }));
+        await Promise.allSettled(wachtend.splice(0));
+        if (uit.fouten.length !== startFout || uit.onbewezen.length !== startOpen) throw new Error('bestemming heeft een fout of onbesliste toestand');
+        uit.geklikt++; uit.aangeraakt.push({ merk: link.merk, naam: link.naam, bestemming, status: respons.status, titel });
+      } catch (e) { uit.onbewezen.push(link.naam + ': ' + String(e.message || e).split('\n')[0]); }
+    }
+    // Ook de laatste klik kan blijvend nieuwe bediening aan de ingang
+    // toevoegen. Zonder deze herlezing zou haar oude noemer groen blijven.
+    if (JSON.stringify(await inventaris()) !== JSON.stringify(links))
+      uit.onbewezen.push('linkinventaris wijzigde na de laatste klik; noemer is onvolledig');
+  } catch (e) { uit.onbewezen.push(String(e.message || e).split('\n')[0]); }
+  finally {
+    await Promise.allSettled(wachtend.splice(0));
+    await ctx.unroute('**/*', guard);
+    await page.close();
+  }
+  return uit;
 }
 
 async function bedien(ctx, base, ingang) {
@@ -1569,7 +1748,9 @@ async function bedien(ctx, base, ingang) {
   const onaangeraakt = [...gevondenMerken].filter((merk) => !aangetiktMerken.has(merk))
     .map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
   const aangeraakt = [...aangetiktMerken].map((merk) => gevondenNamen.get(merk) || merk).filter(Boolean);
-  return { geklikt, gevonden, aangeraakt, herhaaldAangeraakt, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  const navigatie = meet.navigatielinks === undefined ? null : await bedienNavigatie(ctx, base, meet);
+  return { geklikt, gevonden, aangeraakt, herhaaldAangeraakt, onaangeraakt, schil, bedekt, overgeslagen, risicovolAangeraakt, risicoFixtures, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel,
+    ...(navigatie ? { navigatie } : {}) };
 }
 
 async function openAppBedieningInEdge(page, gehad, herstel) {
@@ -2203,7 +2384,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meet, meetRij, meetIngang, browserRaakvlakInvoer, maakContext, openIngang, bezoek, bedien, bedektDoorSchil, bereidAppwerktDatamapVoor, POORTEN,
+module.exports = { luister, beoordeelWeigeringen, onderschepper, klikReden, redenVoorSchoneTegenproef, herstelgrens, volledigeBediening, weigerZin, rijen, meet, meetRij, meetIngang, browserRaakvlakInvoer, maakContext, openIngang, bezoek, bedien, bedienNavigatie, controleerNavigatielinks, bedektDoorSchil, bereidAppwerktDatamapVoor, POORTEN,
   metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {

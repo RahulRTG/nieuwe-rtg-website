@@ -41,10 +41,10 @@
         body.appendChild(beeld);
         R.api('/api/bestanden/haal', { id: p.bestand }).then(function (uit) {
           if (!uit || !uit.dataUrl) return;
-          var img = d.createElement('img');
-          img.src = uit.dataUrl; img.alt = p.tekst || 'Gedeeld beeld';
-          img.loading = 'lazy';
-          beeld.textContent = ''; beeld.appendChild(img);
+          var gedeeldReisBeeld = document.createElement('img');
+          gedeeldReisBeeld.src = uit.dataUrl; gedeeldReisBeeld.alt = p.tekst || 'Gedeeld beeld';
+          gedeeldReisBeeld.loading = 'lazy';
+          beeld.textContent = ''; beeld.appendChild(gedeeldReisBeeld);
         }).catch(function () {
           /* Niet zwijgen als het niet lukt: een leeg vlak leest als "er is
              niets", en er is wel iets -- u mag er alleen niet bij. */

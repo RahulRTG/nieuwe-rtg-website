@@ -2,6 +2,7 @@
   if(w.RTGEdge)return;
   var I=w.RTGEdgeIcons||{},C=w.RTGEdgeWorlds||{},L=w.RTGEdgeLibrary,A=null,aiWatcher=null;
   function s(i){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(I[i]||I.spark||'')+'</svg>';}
+  function laad(p){var edgeSystemScriptNode=document.createElement('script');edgeSystemScriptNode.src=p;document.head.appendChild(edgeSystemScriptNode);return edgeSystemScriptNode}
   function esc(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function alles(e){return e.cfg.all||e.cfg.tools||[];}
   function functie(e,id){return alles(e).find(function(x){return x[0]===id;});}
@@ -30,7 +31,7 @@
       teken(); bind(); neemAI();
       d.body.classList.add('rtg-edge-host');
       d.body.setAttribute('data-rtg-edge-ready', 'true');
-      if(!d.getElementById('rtg-edge-2-loader-js')){var v2=d.createElement('script');v2.id='rtg-edge-2-loader-js';v2.src='/shared/rtg-edge-2-loader.js';v2.async=true;(d.head||d.documentElement).appendChild(v2);}
+      if(!d.getElementById('rtg-edge-2-loader-js')){var v2=laad('/shared/rtg-edge-2-loader.js');v2.id='rtg-edge-2-loader-js';v2.async=true;}
       L.refresh(A); return api;
     } catch (fout) {
       if (root.parentNode) root.parentNode.removeChild(root);
@@ -58,7 +59,7 @@
       a.onclick = function (ev) {
         ev.preventDefault();
         if (A.onTool) A.onTool(a.dataset.tool, a.getAttribute('href'));
-        else location.href = A.cfg.workspace + (A.cfg.workspace.indexOf('?') >= 0 ? '&' : '?') + 'open=' + encodeURIComponent(a.dataset.tool);
+        else location.assign(A.cfg.workspace + (A.cfg.workspace.indexOf('?') >= 0 ? '&' : '?') + 'open=' + encodeURIComponent(a.dataset.tool));
         sluitLagen();
       };
     });
@@ -78,7 +79,7 @@
     };
     r.querySelector('[data-go="back"]').onclick = function () { history.back(); };
     r.querySelector('[data-go="next"]').onclick = function () { history.forward(); };
-    r.querySelector('.rtg-edge-layout').onclick = function () { if (!e.workspace) { location.href = e.cfg.workspace; return; } setLayout(e.layout === 1 ? 2 : e.layout === 2 ? 4 : 1); };
+    r.querySelector('.rtg-edge-layout').onclick = function () { if (!e.workspace) { location.assign(e.cfg.workspace); return; } setLayout(e.layout === 1 ? 2 : e.layout === 2 ? 4 : 1); };
     r.querySelector('.rtg-edge-action [data-rtg-edge-primary]').onclick = voerActie;
     r.querySelector('.rtg-edge-worlds-trigger').onclick=function(){openIndex(false);r.querySelector('.rtg-edge-worlds a').focus()};
     r.querySelector('.rtg-edge-actions-trigger').onclick=function(){var b=r.querySelector('.rtg-edge-2-context-button');b?b.click():voerActie()};
@@ -98,7 +99,7 @@
     if (!A) return;
     if (A.onAction) { A.onAction(A.ctx); return; }
     var f = functie(A, A.ctx.tool);
-    if (f) location.href = f[3]; else location.href = A.cfg.home;
+    location.assign(f ? f[3] : A.cfg.home);
   }
   function sluitLagen() {
     if (!A) return;
@@ -114,7 +115,7 @@
   function neemAI() {
     if (!A) return;
     var mond = A.root.querySelector('.rtg-edge-mouth');
-    if(!w.RTGMond){var ms=d.querySelector('script[src="/shared/mond.js"]'),nieuw=!ms;if(!ms){ms=d.createElement('script');ms.src='/shared/mond.js'}ms.addEventListener('load',neemAI,{once:true});if(nieuw)d.head.appendChild(ms);return}
+    if(!w.RTGMond){var ms=d.querySelector('script[src="/shared/mond.js"]');if(!ms)ms=laad('/shared/mond.js');ms.addEventListener('load',neemAI,{once:true});return}
     if (mond && !mond.querySelector('canvas')) { var c = d.createElement('canvas'); c.width = 440; c.height = 200; c.setAttribute('aria-hidden', 'true'); c.style.cssText = 'width:64px;height:30px;display:block;background:transparent!important'; mond.textContent = ''; mond.appendChild(c); w.RTGMond.maak(c); }
     var p = A.root.querySelector('.rtg-edge-ai-panel'), x = d.querySelector('.mgz-blok') || d.querySelector('.lo-rahul');
     if (x && !p.contains(x)) { p.textContent = ''; p.appendChild(x); x.style.display = ''; }

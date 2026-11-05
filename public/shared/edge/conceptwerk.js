@@ -40,23 +40,14 @@
   'use strict';
   // het concept waar het lid het laatst aan werkte, in dit venster
   var actief = null;
-  var STIJL = '.rtg-conceptwerk{margin:14px 0 4px;border:1px solid rgba(192,165,68,.32);padding:16px;background:rgba(192,165,68,.04)}' +
-    'section.rtg-conceptwerk header{background:none;padding:0;border:0;display:flex;justify-content:space-between;gap:12px;font:600 11px/1.4 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase}' +
-    '.rtg-conceptwerk header em{font-style:normal;opacity:.8}.rtg-conceptwerk h3{margin:8px 0 12px;font:500 19px/1.3 "Bodoni Moda",serif}' +
-    '.rtg-conceptwerk-velden{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}' +
-    '.rtg-conceptwerk label{display:grid;gap:4px;min-width:0;font:500 12px/1.4 Inter,sans-serif}' +
-    /* het veld zelf volgt de huisstijl (shared/rtg-ui.css); hier alleen de maat */
-    'section.rtg-conceptwerk label input{box-sizing:border-box;width:100%;min-width:0;min-height:36px;margin:0}' +
-    'section.rtg-conceptwerk label input[aria-invalid="true"]{border-color:#C23A5E}.rtg-conceptwerk small.fout{min-height:1em;font-size:12px}' +
-    '.rtg-conceptwerk p{margin:8px 0 0;font:14px/1.5 Inter,sans-serif}.rtg-conceptwerk .rahul{font-weight:600}' +
-    '.rtg-conceptwerk .grens{display:block;margin-top:10px;font-size:12px;opacity:.85}.rtg-conceptwerk[aria-busy="true"] .rahul{opacity:.6}';
-
-  function stijl(d) {
-    if (!d || !d.head || d.getElementById('rtgConceptwerkStijl')) return;
-    var s = d.createElement('style');
-    s.id = 'rtgConceptwerkStijl';
-    s.textContent = STIJL;
-    d.head.appendChild(s);
+  function laadStijl(d, pad) {
+    /* Alleen het echte native document mag een bron laden. De documentparameter
+       blijft nodig voor de bestaande componenttests, maar is geen alternatieve
+       loader of tweede presentatie-eigenaar. */
+    if (!d || typeof document === 'undefined' || d !== document || !document.head ||
+        document.documentElement.hasAttribute('data-ds') || document.getElementById('rtgDsRuntimeCss')) return;
+    var s = document.createElement('link'); s.id = 'rtgDsRuntimeCss'; s.rel = 'stylesheet'; s.href = pad;
+    document.head.appendChild(s);
   }
   function el(d, tag, cls, tekst) {
     var e = d.createElement(tag);
@@ -76,9 +67,9 @@
 
   function maak(concept, d, opties) {
     opties = opties || {};
-    stijl(d);
+    laadStijl(d, '/ds/rtg-ds.css');
     var huidig = concept, wachtrij = null, bezig = false, invoer = {};
-    var kaart = el(d, 'section', 'rtg-conceptwerk');
+    var kaart = el(d, 'section', 'rtg-conceptwerk ds-conceptwerk');
     var kop = el(d, 'header');
     kop.appendChild(el(d, 'span', null, concept.kop || 'Concept'));
     kop.appendChild(el(d, 'em', null, 'Niet ingediend'));

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <script src="/shared/stroom.js"></script>
@@ -8,134 +8,122 @@
 <title>RTG Horeca: hotel</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/zaakscherm.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/glyf.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/workos-premium.css" rel="stylesheet">
-<link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
-<style>
-  /* Dit scherm had geen eigen stijlblok, en dan heeft
-     scripts/inlinestijl-omzet.js nergens om zijn klassen neer te zetten: vijf
-     horeca-schermen kwamen daardoor als "omzetting mislukt" terug in plaats van
-     als bewezen of afgekeurd (TAKEN.md 4.51). */
 
-  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
-     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
-     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
-  .i-12sbxv{flex:0 1 8rem}
-  .i-12sbaw{flex:0 1 7rem}
-  .i-12sa0x{flex:0 1 5rem}
-  .i-1trhhu{flex:0 1 11rem}
-  .i-1trguu{flex:0 1 10rem}
-  .i-12sckv{flex:0 1 9rem}
-</style>
+
+
+
+
+<script src="/shared/glyf.js" defer></script>
+
+
+<script src="/shared/horeca-enterprise.js" defer></script>
+<script src="/shared/appmenu.js" defer></script>
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet"><script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body class="ds-scherm ds-horeca" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
-  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
-  <span><span class="ey">RTG Horeca</span><h1>Gastrekening en roomservice</h1></span>
-  <span class="h-flex1"></span>
+  <a class="terug ds-knop ds-knop--klein" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey ds-horeca-label">RTG Horeca</span><h1>Gastrekening en roomservice</h1></span>
+  <span class="h-flex1 ds-horeca-groei"></span>
 </header>
 <main id="main">
-  <div class="kpis">
-    <div class="kpi"><b id="hAantal">-</b><span>open gastrekeningen</span></div>
-    <div class="kpi"><b id="hOpenTotaal">-</b><span>samen openstaand</span></div>
+  <div class="kpis ds-horeca-kpis">
+    <div class="kpi ds-horeca-kpi"><b id="hAantal">-</b><span>open gastrekeningen</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="hOpenTotaal">-</b><span>samen openstaand</span></div>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Open gastrekeningen</div>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Open gastrekeningen</div>
     <div id="hLijst"></div>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Kamer openen</div>
-    <div class="rij">
-      <input class="i-12sbaw veld" id="hKamer" maxlength="20" placeholder="Kamer" aria-label="Kamernummer">
-      <input class="veld" id="hGast" maxlength="60" placeholder="Naam van de gast" aria-label="Gastnaam">
-      <input class="i-12sa0x veld" id="hGasten" type="number" min="1" max="20" value="2" aria-label="Aantal gasten">
-      <input class="i-12sbxv veld" id="hVan" maxlength="10" placeholder="Van" aria-label="Aankomstdatum">
-      <input class="i-12sbxv veld" id="hTot" maxlength="10" placeholder="Tot" aria-label="Vertrekdatum">
-      <input class="i-12sbxv veld" id="hNachtprijs" type="number" min="0" step="0.01" placeholder="Nachtprijs" aria-label="Nachtprijs">
-      <input class="i-1trhhu veld" id="hBelasting" type="number" min="0" step="0.01" placeholder="Toeristenbelasting p.p." aria-label="Toeristenbelasting per persoon">
-      <button class="knop p" id="hOpen" type="button">Openen</button>
-      <button class="knop" id="hToon" type="button">Toon</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Kamer openen</div>
+    <div class="rij ds-horeca-rij">
+      <input class="i-12sbaw veld ds-invoer" id="hKamer" maxlength="20" placeholder="Kamer" aria-label="Kamernummer">
+      <input class="veld ds-invoer" id="hGast" maxlength="60" placeholder="Naam van de gast" aria-label="Gastnaam">
+      <input class="i-12sa0x veld ds-invoer" id="hGasten" type="number" min="1" max="20" value="2" aria-label="Aantal gasten">
+      <input class="i-12sbxv veld ds-invoer" id="hVan" maxlength="10" placeholder="Van" aria-label="Aankomstdatum">
+      <input class="i-12sbxv veld ds-invoer" id="hTot" maxlength="10" placeholder="Tot" aria-label="Vertrekdatum">
+      <input class="i-12sbxv veld ds-invoer" id="hNachtprijs" type="number" min="0" step="0.01" placeholder="Nachtprijs" aria-label="Nachtprijs">
+      <input class="i-1trhhu veld ds-invoer" id="hBelasting" type="number" min="0" step="0.01" placeholder="Toeristenbelasting p.p." aria-label="Toeristenbelasting per persoon">
+      <button class="knop ds-knop ds-knop--klein p" id="hOpen" type="button">Openen</button>
+      <button class="knop ds-knop ds-knop--klein" id="hToon" type="button">Toon</button>
     </div>
-    <p class="stil h-mt40">De toeristenbelasting is een eigen regel en zit niet in de kamerprijs: een gast hoort te zien wat hij aan wie betaalt.</p>
+    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">De toeristenbelasting is een eigen regel en zit niet in de kamerprijs: een gast hoort te zien wat hij aan wie betaalt.</p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">De rekening</div>
-    <div id="hDetail"><p class="stil">Kies een kamer.</p></div>
-    <div class="rij h-mt60">
-      <select class="i-1trguu veld" id="hSoort" aria-label="Soort boeking"></select>
-      <input class="veld" id="hOmschrijving" maxlength="100" placeholder="Omschrijving" aria-label="Omschrijving">
-      <input class="i-12sbxv veld" id="hBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">
-      <button class="knop p" id="hBoek" type="button">Op de rekening</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">De rekening</div>
+    <div id="hDetail"><p class="stil ds-horeca-meta">Kies een kamer.</p></div>
+    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+      <select class="i-1trguu veld ds-invoer" id="hSoort" aria-label="Soort boeking"></select>
+      <input class="veld ds-invoer" id="hOmschrijving" maxlength="100" placeholder="Omschrijving" aria-label="Omschrijving">
+      <input class="i-12sbxv veld ds-invoer" id="hBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">
+      <button class="knop ds-knop ds-knop--klein p" id="hBoek" type="button">Op de rekening</button>
     </div>
-    <div class="rij h-mt60">
-      <select class="i-12sbxv veld" id="hWijze" aria-label="Betaalwijze">
+    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+      <select class="i-12sbxv veld ds-invoer" id="hWijze" aria-label="Betaalwijze">
         <option value="pin">Pin</option><option value="contant">Contant</option>
         <option value="online">Online</option><option value="rekening">Op rekening</option>
       </select>
-      <button class="knop p" id="hAfrekenen" type="button">Afrekenen</button>
+      <button class="knop ds-knop ds-knop--klein p" id="hAfrekenen" type="button">Afrekenen</button>
     </div>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Nachtrun</div>
-    <div class="rij">
-      <input class="i-1trhhu veld" id="hNachtDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de nachtrun">
-      <button class="knop p" id="hNacht" type="button">Draaien</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Nachtrun</div>
+    <div class="rij ds-horeca-rij">
+      <input class="i-1trhhu veld ds-invoer" id="hNachtDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de nachtrun">
+      <button class="knop ds-knop ds-knop--klein p" id="hNacht" type="button">Draaien</button>
     </div>
-    <p class="stil h-mt40" id="hNachtUit"></p>
-    <p class="stil">De nachtrun is idempotent op de datum: twee keer draaien boekt niet twee nachten.</p>
+    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand" id="hNachtUit"></p>
+    <p class="stil ds-horeca-meta">De nachtrun is idempotent op de datum: twee keer draaien boekt niet twee nachten.</p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Borg</div>
-    <div class="rij">
-      <input class="i-1trguu veld" id="hBorgBedrag" type="number" min="0" step="0.01" placeholder="Afgesproken borg" aria-label="Borgbedrag">
-      <button class="knop" id="hBorg" type="button">Noteren</button>
-      <input class="i-12sckv veld" id="hBorgIn" type="number" min="0" step="0.01" placeholder="In te houden" aria-label="In te houden bedrag">
-      <input class="veld" id="hBorgReden" maxlength="160" placeholder="Reden van inhouding" aria-label="Reden van inhouding">
-      <button class="knop" id="hBorgTerug" type="button">Afhandelen</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Borg</div>
+    <div class="rij ds-horeca-rij">
+      <input class="i-1trguu veld ds-invoer" id="hBorgBedrag" type="number" min="0" step="0.01" placeholder="Afgesproken borg" aria-label="Borgbedrag">
+      <button class="knop ds-knop ds-knop--klein" id="hBorg" type="button">Noteren</button>
+      <input class="i-12sckv veld ds-invoer" id="hBorgIn" type="number" min="0" step="0.01" placeholder="In te houden" aria-label="In te houden bedrag">
+      <input class="veld ds-invoer" id="hBorgReden" maxlength="160" placeholder="Reden van inhouding" aria-label="Reden van inhouding">
+      <button class="knop ds-knop ds-knop--klein" id="hBorgTerug" type="button">Afhandelen</button>
     </div>
-    <p class="stil h-mt40" id="hBorgUit"></p>
-    <p class="stil">Dit is een aantekening van de afspraak. Er wordt niets vastgezet bij de bank van de gast; dat kan alleen een betaaldienst.</p>
+    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand" id="hBorgUit"></p>
+    <p class="stil ds-horeca-meta">Dit is een aantekening van de afspraak. Er wordt niets vastgezet bij de bank van de gast; dat kan alleen een betaaldienst.</p>
   </div>
 
-  <div class="kaart">
-    <div class="kop" id="sKop">Roomservice</div>
-    <div class="rij">
-      <input class="i-12sbaw veld" id="sKamer" maxlength="20" placeholder="Kamer" aria-label="Kamer voor roomservice">
-      <input class="i-12sa0x veld" id="sGasten" type="number" min="1" max="20" value="1" aria-label="Aantal personen">
-      <button class="knop p" id="sOpen" type="button">Bestelling openen</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop" id="sKop">Roomservice</div>
+    <div class="rij ds-horeca-rij">
+      <input class="i-12sbaw veld ds-invoer" id="sKamer" maxlength="20" placeholder="Kamer" aria-label="Kamer voor roomservice">
+      <input class="i-12sa0x veld ds-invoer" id="sGasten" type="number" min="1" max="20" value="1" aria-label="Aantal personen">
+      <button class="knop ds-knop ds-knop--klein p" id="sOpen" type="button">Bestelling openen</button>
     </div>
-    <div class="h-mt60" id="sLijst"></div>
-    <div class="h-mt40" id="sDetail"></div>
-    <div class="rij h-mt60">
-      <input class="veld" id="sNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Gerecht">
-      <input class="i-12sbaw veld" id="sPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs">
-      <input class="i-12sa0x veld" id="sAantal" type="number" min="1" max="99" value="1" aria-label="Aantal">
-      <input class="i-12sckv veld" id="sAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie">
-      <button class="knop p" id="sRegel" type="button">Zet erop</button>
+    <div class="h-mt60 ds-horeca-afstand" id="sLijst"></div>
+    <div class="h-mt40 ds-horeca-afstand" id="sDetail"></div>
+    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="sNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Gerecht">
+      <input class="i-12sbaw veld ds-invoer" id="sPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs">
+      <input class="i-12sa0x veld ds-invoer" id="sAantal" type="number" min="1" max="99" value="1" aria-label="Aantal">
+      <input class="i-12sckv veld ds-invoer" id="sAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie">
+      <button class="knop ds-knop ds-knop--klein p" id="sRegel" type="button">Zet erop</button>
     </div>
-    <div class="rij h-mt60">
-      <input class="i-12sbxv veld" id="sServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Gewenste serveertijd">
-      <button class="knop" id="sVrij" type="button">Naar de keuken</button>
-      <button class="knop p" id="sOpKamer" type="button">Op de kamer boeken</button>
+    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+      <input class="i-12sbxv veld ds-invoer" id="sServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Gewenste serveertijd">
+      <button class="knop ds-knop ds-knop--klein" id="sVrij" type="button">Naar de keuken</button>
+      <button class="knop ds-knop ds-knop--klein p" id="sOpKamer" type="button">Op de kamer boeken</button>
     </div>
-    <p class="stil h-mt40">Op de kamer boeken kan alleen als daar een open gastrekening staat. Anders verdwijnt een rekening in een kamer die leegstaat, en dat merkt niemand tot de dagafsluiting.</p>
+    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">Op de kamer boeken kan alleen als daar een open gastrekening staat. Anders verdwijnt een rekening in een kamer die leegstaat, en dat merkt niemand tot de dagafsluiting.</p>
   </div>
 </main>
-<div class="melding" id="melding" role="status"></div>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/hotel-folio.js"></script>

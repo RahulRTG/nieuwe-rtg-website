@@ -12,7 +12,6 @@
   function run() {
     var view = window.RTGRealityEngine;
     if (!view) return;
-    view.addStylesheet();
     document.documentElement.classList.add('rtg-intelligence');
     view.mountGraph();
     view.mountTelemetry();

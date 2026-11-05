@@ -18,20 +18,20 @@
     dag.textContent = 'Vandaag · ' + lijst.length + (lijst.length === 1 ? ' besluit vraagt aandacht' : ' besluiten vragen aandacht');
     var vak = root.querySelector('#drAgenda');
     if (!lijst.length) {
-      vak.innerHTML = '<div class="dr-leeg"><h2>De agenda is rustig.</h2><p>Er ligt geen echt voorstel op menselijke beoordeling te wachten.</p><button class="dr-primair" type="button" data-dr-nieuw aria-haspopup="dialog" aria-controls="drIntake">Leg een besluit voor</button></div>';
+      vak.innerHTML = '<div class="dr-leeg ds-werkdocument-leeg"><h2>De agenda is rustig.</h2><p>Er ligt geen echt voorstel op menselijke beoordeling te wachten.</p><button class="ds-knop ds-knop--klein dr-primair ds-werkdocument-primair" type="button" data-dr-nieuw aria-haspopup="dialog" aria-controls="drIntake">Leg een besluit voor</button></div>';
       return null;
     }
     var focus = lijst.find(function (x) { return String(x.id) === String(gekozen || ''); }) || lijst[0], c = compleet(focus);
     var klaar = c.aantal === c.totaal;
-    var html = '<article class="dr-focus"><div class="dr-focusbody"><div class="dr-focusmeta"><span class="dr-label ' + (klaar ? 'klaar' : 'wacht') + '">' + (klaar ? 'Besluitrijp' : 'Nog niet compleet') + '</span><span>' + U.veilig(focus.type || 'operations') + ' · ' + U.veilig(focus.aanvragerLabel || 'aanvrager onbekend') + '</span></div>' +
-      '<h2>' + U.veilig(focus.titel) + '</h2><p>' + U.veilig(focus.reden) + '</p><div class="dr-focusvoet"><small>' + U.veilig(datum(focus.deadline)) + '<br>' + c.aantal + ' van ' + c.totaal + ' kerngegevens compleet</small><button class="dr-primair" type="button" data-dr-kies="' + U.veilig(focus.id) + '">Open volledige afweging →</button></div></div>' +
-      '<div class="dr-focusstats"><div class="dr-focusstat"><small>Impact</small><b>' + Number(focus.impact || 0) + ' / 5</b></div><div class="dr-focusstat"><small>Risico</small><b>' + Number(focus.risico || 0) + ' / 5</b></div><div class="dr-focusstat"><small>Financieel</small><b>' + geld(focus.bedrag) + '</b></div></div></article>';
+    var html = '<article class="dr-focus ds-werkdocument-focus"><div class="dr-focusbody ds-werkdocument-focusbody"><div class="dr-focusmeta ds-werkdocument-focusmeta"><span class="dr-label ds-werkdocument-label ' + (klaar ? 'klaar' : 'wacht') + '">' + (klaar ? 'Besluitrijp' : 'Nog niet compleet') + '</span><span>' + U.veilig(focus.type || 'operations') + ' · ' + U.veilig(focus.aanvragerLabel || 'aanvrager onbekend') + '</span></div>' +
+      '<h2>' + U.veilig(focus.titel) + '</h2><p>' + U.veilig(focus.reden) + '</p><div class="dr-focusvoet ds-werkdocument-focusvoet"><small>' + U.veilig(datum(focus.deadline)) + '<br>' + c.aantal + ' van ' + c.totaal + ' kerngegevens compleet</small><button class="ds-knop ds-knop--klein dr-primair ds-werkdocument-primair" type="button" data-dr-kies="' + U.veilig(focus.id) + '">Open volledige afweging →</button></div></div>' +
+      '<div class="dr-focusstats ds-werkdocument-focusstats"><div class="dr-focusstat ds-werkdocument-focusstat"><small>Impact</small><b>' + Number(focus.impact || 0) + ' / 5</b></div><div class="dr-focusstat ds-werkdocument-focusstat"><small>Risico</small><b>' + Number(focus.risico || 0) + ' / 5</b></div><div class="dr-focusstat ds-werkdocument-focusstat"><small>Financieel</small><b>' + geld(focus.bedrag) + '</b></div></div></article>';
     var daarna = lijst.filter(function (x) { return x.id !== focus.id; });
-    html += '<div class="dr-sectiekop"><h2>Daarna</h2><button type="button" data-dr-open="archief">Open besluitregister</button></div><div class="dr-lijst">';
+    html += '<div class="dr-sectiekop ds-werkdocument-sectiekop"><h2>Daarna</h2><button type="button" data-dr-open="archief" class="ds-knop ds-knop--klein">Open besluitregister</button></div><div class="dr-lijst ds-werkdocument-lijst">';
     html += daarna.length ? daarna.map(function (x, i) {
       var v = compleet(x), gereed = v.aantal === v.totaal;
-      return '<button class="dr-rij" type="button" data-dr-kies="' + U.veilig(x.id) + '"><span class="dr-nummer">' + String(i + 2).padStart(2, '0') + '</span><span><b>' + U.veilig(x.titel) + '</b><small>' + U.veilig(x.type || 'operations') + ' · ' + U.veilig(x.aanvragerLabel || 'aanvrager onbekend') + '</small></span><span class="dr-rijstatus"><strong>' + (gereed ? 'Afwegen' : 'Wacht') + '</strong><small>' + v.aantal + ' van ' + v.totaal + ' compleet</small></span></button>';
-    }).join('') : '<div class="dr-leeg">Hierna staat geen ander besluit te wachten.</div>';
+      return '<button class="ds-knop ds-knop--klein dr-rij ds-werkdocument-rij" type="button" data-dr-kies="' + U.veilig(x.id) + '"><span class="dr-nummer ds-werkdocument-nummer">' + String(i + 2).padStart(2, '0') + '</span><span><b>' + U.veilig(x.titel) + '</b><small>' + U.veilig(x.type || 'operations') + ' · ' + U.veilig(x.aanvragerLabel || 'aanvrager onbekend') + '</small></span><span class="dr-rijstatus ds-werkdocument-rijstatus"><strong>' + (gereed ? 'Afwegen' : 'Wacht') + '</strong><small>' + v.aantal + ' van ' + v.totaal + ' compleet</small></span></button>';
+    }).join('') : '<div class="dr-leeg ds-werkdocument-leeg">Hierna staat geen ander besluit te wachten.</div>';
     vak.innerHTML = html + '</div>';
     return focus.id;
   }

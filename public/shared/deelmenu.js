@@ -22,32 +22,15 @@
   'use strict';
   // opnieuw laden mag; de herscan hieronder hergebruikt deze module
 
-  var css = '.rtgdeel-balk{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;padding:0 0 .1rem;' +
-      'border-bottom:1px solid var(--line,var(--lijn,#2A2724));}' +
-    '.rtgdeel-balk button{background:none;border:0;cursor:pointer;padding:.55rem .8rem .6rem;margin-bottom:-1px;' +
-      'font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;' +
-      /* --rtg-muted en --rtg-txt VOOR --muted en --txt, en dat is geen smaak.
-         Die eerste twee volgen het thema (donkere inkt op champagne, lichte op
-         onyx); --muted is een vaste grijstoon en --txt een vaste lichte. Op de
-         donkere thema's haalde de niet-actieve tab daarmee 4,07:1 waar 4,5 moet
-         (11,5px halfvet is geen grote tekst), en op champagne stond de actieve
-         tab licht op licht. Gemeten over alle schermen: 70 keer, op elk scherm
-         dat deze balk draagt. */
-      'color:var(--rtg-muted,var(--muted,var(--zacht,#8A8680)));border-bottom:2px solid transparent;white-space:nowrap;' +
-      /* EEN LABEL DAT NIET PAST, WIJKT NIET UIT MAAR DUWT. De balk wikkelt wel
-         (flex-wrap), maar wikkelen verdeelt KNOPPEN over regels en helpt niet
-         tegen een knop die in zijn eentje breder is dan de kolom. Met nowrap
-         erbij groeide zo'n knop gewoon door: op /apps/foundation/veilig.html
-         heet een kopje "Geen bereik? Noodbericht via satelliet", en dat werd
-         op 390px een knop van 333px in een kolom van 317 -- zes pixels buiten
-         het scherm, op een pagina die niet zijwaarts scrolt. De volledige naam
-         blijft staan voor wie hem voorleest; alleen het beeld kort af. */
-      'max-width:100%;overflow:hidden;text-overflow:ellipsis;}' +
-    '.rtgdeel-balk button:hover{color:var(--rtg-txt,var(--txt,#F7F5F1));}' +
-    '.rtgdeel-balk button[aria-current="true"]{color:var(--rtg-txt,var(--txt,#F7F5F1));' +
-      'border-bottom-color:var(--gold,var(--goud,#857007));}' +
-    '.rtgdeel-weg{display:none!important;}' +
-    '@media print{.rtgdeel-balk{display:none;}}';
+  function laadDeelmenuStijl(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var deelmenuStijlLink = document.createElement('link');
+    deelmenuStijlLink.id = 'rtgDsRuntimeCss';
+    deelmenuStijlLink.rel = 'stylesheet';
+    deelmenuStijlLink.href = pad;
+    document.head.appendChild(deelmenuStijlLink);
+  }
 
   function slug(t) {
     return String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'deel';
@@ -118,6 +101,22 @@
      balk die er staat van ons is, en herscan() moet de vorige ronde kunnen
      loslaten. null betekent: er staat geen menu. */
   var menu = null;
+
+  /* De menu-owner beheert uitsluitend zijn eigen tijdelijke zichtbaarheid.
+     De oorspronkelijke inlinewaarde wordt per node hersteld; het domein-
+     `hidden`-attribuut wordt nooit gelezen als toestemming of verwijderd. */
+  var menuWeergave = new WeakMap();
+  function zetMenuZichtbaar(el, aan) {
+    el.classList.toggle('rtgdeel-weg', !aan);
+    el.classList.toggle('ds-deelmenu-weg', !aan);
+    if (!aan) {
+      if (!menuWeergave.has(el)) menuWeergave.set(el, el.style.display || '');
+      el.style.display = 'none';
+    } else if (menuWeergave.has(el)) {
+      el.style.display = menuWeergave.get(el);
+      menuWeergave.delete(el);
+    }
+  }
 
   function bouw(main) {
 
@@ -211,11 +210,12 @@
     if (delen.length < drempel) return;
 
     var balk = document.createElement('nav');
-    balk.className = 'rtgdeel-balk';
+    balk.className = 'rtgdeel-balk ds-tabs ds-deelmenu';
     balk.setAttribute('aria-label', 'Delen van deze app');
     delen.forEach(function (d) {
       var b = document.createElement('button');
       b.type = 'button';
+      b.className = 'ds-tab ds-deelmenu-knop';
       b.textContent = d.naam;
       /* De wacht kan de hele balk na een app-render opnieuw opbouwen. Deze
          identiteit blijft over die vervanging gelijk en zegt tegelijk dat de
@@ -227,11 +227,7 @@
       d.knop = b;
       balk.appendChild(b);
     });
-    if (!document.getElementById('rtgdeel-stijl')) {
-      var st = document.createElement('style');
-      st.id = 'rtgdeel-stijl'; st.textContent = css;
-      document.head.appendChild(st);
-    }
+    laadDeelmenuStijl('/ds/rtg-ds.css');
     // de balk komt na het vaste deel (KPI's, intro), voor het eerste deel
     main.insertBefore(balk, delen[0].leden[0]);
 
@@ -241,12 +237,13 @@
       delen.forEach(function (d) {
         var aan = d.id === doel;
         d.knop.setAttribute('aria-current', aan ? 'true' : 'false');
-        // een eigen klasse, geen hidden-attribuut: paginastijlen met een
-        // eigen display (flex, grid) zouden van het attribuut winnen
-        d.leden.forEach(function (el) { el.classList.toggle('rtgdeel-weg', !aan); });
+        // Geen hidden-attribuut: dat blijft uitsluitend van het domein.
+        d.leden.forEach(function (el) { zetMenuZichtbaar(el, aan); });
         // de eigen koppen van een deel zijn dubbelop naast de menuknop; ook
         // de tweede, anders staat het label van de knop er nog eens onder
-        d.koppen.forEach(function (el) { el.classList.add('rtgdeel-weg'); });
+        d.koppen.forEach(function (el) {
+          zetMenuZichtbaar(el, false);
+        });
       });
       try { localStorage.setItem(SLEUTEL, doel); } catch (e) {}
       if (!stil) {
@@ -307,8 +304,8 @@
        nooit de onze is, dus herbouwde de wacht elke 120 ms opnieuw. */
     var oud = main.querySelectorAll('.rtgdeel-balk');
     for (var b = 0; b < oud.length; b++) oud[b].remove();
-    var weg = main.querySelectorAll('.rtgdeel-weg');
-    for (var i = 0; i < weg.length; i++) weg[i].classList.remove('rtgdeel-weg');
+    var weg = main.querySelectorAll('.rtgdeel-weg,.ds-deelmenu-weg');
+    for (var i = 0; i < weg.length; i++) zetMenuZichtbaar(weg[i], true);
     return start();
   }
 

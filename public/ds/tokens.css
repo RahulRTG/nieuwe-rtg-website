@@ -55,6 +55,7 @@
     --ds-accent: var(--ds-p-bordeaux);
     --ds-accent-hover: var(--ds-p-bordeaux-helder);
     --ds-accent-inkt: var(--ds-p-wit);
+    --ds-status-fout: var(--ds-p-bordeaux-op-donker);
     --ds-metaal: var(--ds-p-goud);
     --ds-cover-grond: var(--ds-p-zwart);
     --ds-cover-inkt: var(--ds-p-wit);
@@ -66,6 +67,21 @@
     --ds-water: var(--ds-p-water);
     --ds-lippen-licht: var(--ds-p-champagne-licht);
     --ds-lippen-diep: var(--ds-p-brons);
+
+    /* Bestaande publicatiekleuren van ledenwebsites (webblok.css), nu hier
+       beheerd. Auteurkeuzes blijven documentdata; geen RTG-wereldthema. */
+    --ds-webblok-grond: var(--ds-p-zwart);
+    --ds-webblok-inkt: #F4F1EC;
+    --ds-webblok-inkt-zacht: #B5B3AF;
+    --ds-webblok-lijn: rgba(255, 255, 255, .12);
+    --ds-webblok-kaart: #151312;
+    --ds-webblok-licht-grond: #F5F1EA;
+    --ds-webblok-licht-inkt: #20160F;
+    --ds-webblok-licht-inkt-zacht: #4E4640;
+    --ds-webblok-licht-lijn: rgba(32, 22, 15, .14);
+    --ds-webblok-licht-kaart: #FBF8F2;
+    --ds-webblok-accent: var(--ds-p-bordeaux);
+    --ds-webblok-knop-inkt: var(--ds-p-wit);
 
     --ds-schaduw-systeem: var(--ds-p-schaduw-systeem);
     --ds-schaduw-inhoud: var(--ds-p-schaduw-inhoud);
@@ -114,6 +130,9 @@
     --ds-duur-vol: 280ms;
     --ds-duur: var(--ds-duur-vol);
     --ds-curve: cubic-bezier(.2, .7, .2, 1);
+    /* Bestaande Foundation-ademoefening: functionele vierseconden-cadans. */
+    --ds-duur-adem: 4000ms;
+    --ds-curve-adem: ease-in-out;
   }
 
   /* Nadruk (ONTWERPSYSTEEM.md par. 7, Luxury Without Complexity): wat een

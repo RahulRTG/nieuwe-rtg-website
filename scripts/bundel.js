@@ -24,6 +24,11 @@ const PUB = path.join(__dirname, '..', 'public');
 // gesorteerd samengevoegd (vandaar de NN- prefix), en rauw aaneengeplakt zodat
 // het resultaat exact de oorspronkelijke bron is.
 const bundels = {
+  // Bestaande owners houden hun ene browserbestand en gesloten scope. Bron
+  // volgt de grens tussen weergave/laden en bediening, byte voor byte gelijk.
+  'apps/voertuig.js': 'apps/voertuig',
+  'shared/randen.js': 'shared/randen',
+  'shared/rahul-tab/style-base.js': 'shared/rahul-tab/style-base',
   // Gedeelde scope behouden; de bron volgt de bestaande grens tussen
   // toegang/projectie en presentatie/editor. De uitvoer blijft byte-identiek.
   'apps/magnaat-leven.js': 'apps/magnaat-leven',
@@ -35,6 +40,7 @@ const bundels = {
   'shared/rtg-edge-smart-menu.js': 'shared/rtg-edge-smart-menu',
   'apps/boardroom.js': 'apps/boardroom',
   'apps/foundation/samen.js': 'apps/foundation/samen',
+  'apps/foundation/mediawijs.js': 'apps/foundation/mediawijs',
   'apps/rtg-protect.js': 'apps/rtg-protect',
   'apps/werkplek-bureaus.js': 'apps/werkplek-bureaus',
   'apps/defensie.js': 'apps/defensie',
@@ -107,6 +113,7 @@ const bundels = {
   // daarmee over de 10 KB-lat; opgeknipt precies langs die grens
   'shared/uitvoer.js': 'shared/uitvoer',
   'apps/notities/app.js': 'apps/notities/app',
+  'apps/bestanden/app.js': 'apps/bestanden/app',
   // LibraryOS Studio + Reader delen één gesloten UI-staat; de browser krijgt
   // één bestand, de bron blijft langs de Reader-naad onder de modulegrens.
   'apps/library/app.js': 'apps/library/app',

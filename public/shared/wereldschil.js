@@ -30,6 +30,7 @@
 (function (w, d) {
   'use strict';
   if (w.RTGWereldSchil) return;
+  var ds = d.documentElement.hasAttribute('data-ds');
 
   var HAND_SLEUTEL = 'rtg_hand';
   var wereld = w.RTGWereld;
@@ -61,13 +62,17 @@
      draagt geen wereldnaam, zodat je hem niet in elke wereld opnieuw hoeft te
      zetten. Een voorkeur over je eigen hand is niet per app anders. */
   function leesHand() {
+    if (w.RTGHand && typeof w.RTGHand.is === 'function') return w.RTGHand.is();
     try { return localStorage.getItem(HAND_SLEUTEL) === 'rechts' ? 'rechts' : 'links'; }
     catch (e) { return 'links'; }
   }
   function zetHand(hand) {
     var h = hand === 'rechts' ? 'rechts' : 'links';
-    d.documentElement.setAttribute('data-hand', h);
-    try { localStorage.setItem(HAND_SLEUTEL, h); } catch (e) {}
+    if (w.RTGHand && typeof w.RTGHand.zet === 'function') h = w.RTGHand.zet(h);
+    else {
+      d.documentElement.setAttribute('data-hand', h);
+      try { localStorage.setItem(HAND_SLEUTEL, h); } catch (e) {}
+    }
     meetRuimte();
     return h;
   }
@@ -104,19 +109,26 @@
     return vak;
   }
 
+  function veiligAdres(href) {
+    var adres = String(href || '').trim();
+    return /^(?:[a-z0-9][a-z0-9._-]*\.html|\/apps\/[a-z0-9/_-]+\.html)(?:[?#][a-z0-9_=&%+.,:@/-]*)?$/i.test(adres) ? adres : null;
+  }
+
   /* --------------------------------------------------------------- de balk */
   var balk = null, paneel = null, naastAan = false, splitsKnop = null;
 
   function bouw() {
     balk = d.createElement('nav');
-    balk.className = 'ws-balk';
+    balk.className = 'ws-balk' + (ds ? ' ds-wereldnav' : '');
     balk.setAttribute('aria-label', wereld.naam ? ('Navigatie ' + wereld.naam) : 'Hoofdnavigatie');
 
     var actief = actieveBestemming();
     wereld.bestemmingen.forEach(function (b) {
+      var adres = veiligAdres(b.href);
+      if (!adres) return;
       var a = d.createElement('a');
-      a.className = 'ws-doel';
-      a.href = b.href;
+      a.className = 'ws-doel' + (ds ? ' ds-knop ds-knop--klein' : '');
+      a.setAttribute('href', adres);
       if (b.id === actief) a.setAttribute('aria-current', 'page');
       glyfIn(a, b.glyf);
       var lab = d.createElement('span');
@@ -129,18 +141,18 @@
         if (!naastAan) return;
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
         e.preventDefault();
-        openNaast(b.href, b.naam);
+        openNaast(adres, b.naam);
         wapen(false);
       });
       balk.appendChild(a);
     });
 
     var voet = d.createElement('div');
-    voet.className = 'ws-voet';
+    voet.className = 'ws-voet' + (ds ? ' ds-wereldnav-voet' : '');
 
     splitsKnop = d.createElement('button');
     splitsKnop.type = 'button';
-    splitsKnop.className = 'ws-splits';
+    splitsKnop.className = 'ws-splits' + (ds ? ' ds-knop ds-knop--klein' : '');
     splitsKnop.setAttribute('aria-pressed', 'false');
     splitsKnop.title = 'Open de volgende bestemming in een tweede paneel';
     glyfIn(splitsKnop, 'paneel');
@@ -153,7 +165,7 @@
 
     var handKnop = d.createElement('button');
     handKnop.type = 'button';
-    handKnop.className = 'ws-hand';
+    handKnop.className = 'ws-hand' + (ds ? ' ds-knop ds-knop--klein' : '');
     handKnop.title = 'Zet de balk aan de andere kant';
     glyfIn(handKnop, 'navigatie');
     var hl = d.createElement('span'); hl.textContent = 'Kant'; handKnop.appendChild(hl);
@@ -164,7 +176,8 @@
     voet.appendChild(handKnop);
 
     balk.appendChild(voet);
-    d.body.appendChild(balk);
+    var plek = ds && d.querySelector('.ds-foundation-balk');
+    (plek || d.body).appendChild(balk);
     d.body.setAttribute('data-ws', wereld.sleutel || '');
   }
 
@@ -177,28 +190,29 @@
   function openNaast(href, naam) {
     sluitNaast();
     paneel = d.createElement('aside');
-    paneel.className = 'ws-paneel';
+    paneel.className = 'ws-paneel' + (ds ? ' ds-wereldnav-paneel' : '');
     paneel.setAttribute('aria-label', 'Tweede paneel: ' + naam);
 
     var kop = d.createElement('div');
-    kop.className = 'ws-paneel-kop';
+    kop.className = 'ws-paneel-kop' + (ds ? ' ds-wereldnav-kop' : '');
     var t = d.createElement('b'); t.textContent = naam; kop.appendChild(t);
     var x = d.createElement('button');
-    x.type = 'button'; x.className = 'ws-paneel-dicht';
+    x.type = 'button'; x.className = 'ws-paneel-dicht' + (ds ? ' ds-knop ds-knop--klein' : '');
     x.setAttribute('aria-label', 'Sluit het tweede paneel');
     x.textContent = '×';
     x.addEventListener('click', sluitNaast);
     kop.appendChild(x);
     paneel.appendChild(kop);
 
-    var f = d.createElement('iframe');
-    if (window.RTGMedia && window.RTGMedia.kader) window.RTGMedia.kader(f);  // camera/microfoon doorgeven
+    var f = document.createElement('iframe');
     f.src = href;
+    if (window.RTGMedia && window.RTGMedia.kader) window.RTGMedia.kader(f);  // camera/microfoon doorgeven
     f.title = naam;
     paneel.appendChild(f);
 
     d.body.appendChild(paneel);
     d.body.setAttribute('data-ws-split', '');
+    if (ds) d.body.classList.add('ds-wereldnav-split');
     if (splitsKnop) splitsKnop.setAttribute('aria-pressed', 'true');
     meetRuimte();
   }
@@ -206,6 +220,7 @@
   function sluitNaast() {
     if (paneel) { paneel.remove(); paneel = null; }
     d.body.removeAttribute('data-ws-split');
+    if (ds) d.body.classList.remove('ds-wereldnav-split');
     wapen(false);
     meetRuimte();
   }

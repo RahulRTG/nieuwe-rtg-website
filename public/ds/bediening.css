@@ -1,0 +1,25 @@
+/* Canonieke bediening binnen rtg-ds.css. Iedere host gebruikt dezelfde
+   componenten; de controller laadt deze bestaande DS-root waar nodig. */
+@layer rtg.reset, rtg.tokens, rtg.thema, rtg.component, rtg.scherm;
+@import url("tokens.css");
+@import url("thema/living.css");
+@import url("thema/travel.css");
+@import url("thema/work.css");
+@import url("thema/foundation.css");
+@import url("componenten/rahul.css");
+@import url("componenten/samen.css");
+@import url("componenten/handenvrij.css");
+@import url("componenten/conceptwerk.css");
+@import url("componenten/appmenu.css");
+@import url("componenten/randen.css");
+@import url("componenten/instellingen.css");
+@import url("componenten/basis.css");
+@import url("componenten/sprong.css");
+@import url("componenten/taalkeuze.css");
+@import url("componenten/overdracht.css");
+@import url("componenten/sneltoets.css");
+@import url("componenten/cookie.css");
+@import url("componenten/poortgesprek.css");
+@import url("componenten/plek.css");
+@import url("componenten/kantoorgesprek.css");
+@import url("componenten/magnaatproef.css");

@@ -13,13 +13,14 @@
   var $ = function (s) { return document.querySelector(s); };
   var TOKEN = null;
   try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
-  var HUIDIG = null;
+  var HUIDIG = null, ronde = 0, bezig = false;
+  function zelfdeActor() { try { return !!TOKEN && localStorage.getItem('rtg_sup_token') === TOKEN; } catch (e) { return false; } }
 
   function api(pad, lijf) {
     return fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (TOKEN || '') },
       body: JSON.stringify(lijf || {}) }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok) { var f = new Error(d.error || 'Er ging iets mis.'); f.status = r.status; throw f; }
+        if (!r.ok || !d || d.ok === false || d.error) { var f = new Error(d && d.error || 'Er ging iets mis.'); f.status = r.status; throw f; }
         return d;
       });
     });
@@ -41,23 +42,23 @@
     vragen.textContent = ''; rest.textContent = '';
     var intenties = lijst.filter(function (x) { return x.soort === 'intentie'; });
     var anders = lijst.filter(function (x) { return x.soort !== 'intentie'; });
-    if (!intenties.length) vragen.appendChild(maak('p', 'pn-uitleg', 'Er wacht op dit moment geen vraag op uw reactie.'));
+    if (!intenties.length) vragen.appendChild(maak('p', 'pn-uitleg ds-partner-uitleg', 'Er wacht op dit moment geen vraag op uw reactie.'));
     intenties.forEach(function (x) {
-      var s = maak('section', 'pn-intent');
+      var s = maak('section', 'pn-intent ds-partner-intent');
       s.appendChild(maak('h2', null, x.titel));
       var d = maak('div');
       if (x.plek) d.appendChild(maak('span', null, x.plek));
       if (x.wanneer) d.appendChild(maak('span', null, x.wanneer));
       s.appendChild(d);
-      var b = maak('button', null, 'Reageer');
+      var b = maak('button', 'ds-knop ds-knop--klein ds-knop--primair', 'Reageer');
       b.type = 'button';
       b.addEventListener('click', function () { openReageer(x); });
       var f = maak('footer'); f.appendChild(b); s.appendChild(f);
       vragen.appendChild(s);
     });
-    if (!anders.length) rest.appendChild(maak('p', 'pn-uitleg', 'Niets dat vandaag om aandacht vraagt.'));
+    if (!anders.length) rest.appendChild(maak('p', 'pn-uitleg ds-partner-uitleg', 'Niets dat vandaag om aandacht vraagt.'));
     anders.forEach(function (x) {
-      var e = maak('div', 'pn-event');
+      var e = maak('div', 'pn-event ds-partner-event');
       e.appendChild(maak('em', null, x.soort === 'klus' ? 'KLUS' : 'ONDERDEEL'));
       var p = maak('p'); p.appendChild(maak('b', null, x.titel)); p.appendChild(maak('small', null, 'Bron: ' + x.bron));
       e.appendChild(p);
@@ -79,11 +80,13 @@
     }
     api('/api/supplier/netwerk/overzicht').then(function (d) {
       if (!(d && d.getallen && Array.isArray(d.aandacht) && Array.isArray(d.nietGebouwd))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
+      if (!zelfdeActor()) return;
       $('#pnZaak').textContent = d.zaak.naam;
       $('#pnStand').textContent = 'Elk getal met zijn bron';
       tekenGetallen(d.getallen); tekenAandacht(d.aandacht); tekenNietGebouwd(d.nietGebouwd);
       meld('');
     }).catch(function (e) {
+      if (!zelfdeActor()) return;
       if (e.status === 401) { try { localStorage.removeItem('rtg_sup_token'); } catch (x) {} location.href = '/apps/app.html'; return; }
       meld(e.message);
     });
@@ -91,16 +94,29 @@
 
   /* Reageren gaat langs de route van de Mall (kern/mall/aanvragen.js): een zaak
      heeft per vraag een reactie, en wie zich bedenkt wijzigt die. */
-  function openReageer(x) { HUIDIG = x; $('#pnReageerWat').textContent = x.titel; $('#pnReageerForm').reset(); $('#pnReageer').showModal(); }
+  function openReageer(x) {
+    if (!zelfdeActor() || $('#pnReageer').open) return;
+    HUIDIG = x; ronde++; bezig = false;
+    $('#pnReageerVerstuur').disabled = false;
+    $('#pnReageerFout').textContent = '';
+    $('#pnReageerWat').textContent = x.titel;
+    $('#pnReageerForm').reset(); $('#pnReageer').showModal();
+  }
   $('#pnReageerForm').addEventListener('submit', function (ev) {
     if (ev.submitter && ev.submitter.value === 'cancel') return;
     ev.preventDefault();
-    var fd = new FormData(ev.target), knop = $('#pnReageerVerstuur');
-    knop.disabled = true;
-    api('/api/supplier/mall/aanvraag/reageer', { id: HUIDIG.id, versie: HUIDIG.versie, tekst: String(fd.get('tekst') || ''), prijs: Number(fd.get('prijs')) || undefined })
-      .then(function () { $('#pnReageer').close(); meld('Uw reactie staat bij het lid.'); laad(); })
-      .catch(function (e) { meld(e.message); })
-      .then(function () { knop.disabled = false; });
+    if (bezig || !zelfdeActor() || !HUIDIG || !$('#pnReageer').open) return;
+    var fd = new FormData(ev.target), knop = $('#pnReageerVerstuur'), poging = ronde, vraag = HUIDIG;
+    function actueel() { return poging === ronde && zelfdeActor() && $('#pnReageer').open; }
+    bezig = true; knop.disabled = true; $('#pnReageerFout').textContent = '';
+    api('/api/supplier/mall/aanvraag/reageer', { id: vraag.id, versie: vraag.versie, tekst: String(fd.get('tekst') || ''), prijs: Number(fd.get('prijs')) || undefined })
+      .then(function (d) {
+        if (!actueel()) return;
+        if (!d || d.ok !== true || !d.aanvraag || d.aanvraag.id !== vraag.id) throw new Error('De reactie is niet bevestigd. Controleer uw aanvraag voordat u opnieuw probeert.');
+        $('#pnReageer').close(); meld('Uw reactie staat bij het lid.'); laad();
+      })
+      .catch(function (e) { if (actueel()) $('#pnReageerFout').textContent = e.message; })
+      .then(function () { if (poging === ronde) { bezig = false; knop.disabled = false; } });
   });
 
   /* De rail springt naar de kolom; focus gaat mee voor de schermlezer. */
@@ -109,9 +125,11 @@
     knop.addEventListener('click', function () {
       var doel = document.querySelector(ZONES[knop.dataset.zone]); if (!doel) return;
       document.querySelectorAll('[data-zone]').forEach(function (x) { x.classList.toggle('actief', x === knop); x.setAttribute('aria-current', x === knop ? 'true' : 'false'); });
-      doel.setAttribute('tabindex', '-1'); doel.scrollIntoView({ behavior: 'smooth', block: 'start' }); doel.focus({ preventScroll: true });
+      doel.setAttribute('tabindex', '-1'); doel.scrollIntoView({ behavior: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); doel.focus({ preventScroll: true });
     });
   });
-  document.querySelectorAll('[data-link]').forEach(function (b) { b.addEventListener('click', function () { location.href = b.dataset.link; }); });
+  document.querySelectorAll('[data-link="/apps/app.html"]').forEach(function (b) {
+    b.addEventListener('click', function () { location.href = '/apps/app.html'; });
+  });
   laad();
 })();

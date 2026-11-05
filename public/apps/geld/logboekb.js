@@ -113,7 +113,6 @@
 
   function start() {
     var D = Deel();
-    D.stijl();
     D.S.open = null;
     var vak = $('#lbWrap');
     vak.addEventListener('click', klik);

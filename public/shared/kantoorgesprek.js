@@ -29,35 +29,23 @@
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  var CSS =
-    '.kg{max-width:26rem;margin:3rem auto;padding:0 1.2rem;font-family:Inter,system-ui,sans-serif;}' +
-    '.kg h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:600;font-size:1.35rem;margin:0 0 1.2rem;}' +
-    '.kg h2[hidden]{display:none;}' +
-    '.kg-zegt{font-size:.95rem;line-height:1.55;margin:0 0 1rem;min-height:3rem;}' +
-    /* De tokens van de kantoorschermen zelf, niet die van mij: daar is de
-       hoofdknop goud met zwarte letters, en de randen volgen --line. Zo buigt
-       dit mee met de dagkleur en het seizoen, net als de rest van de pagina.
-       Met een eigen bordeaux knop stond hier een vreemde in het scherm. */
-    '.kg-in{width:100%;background:var(--card2,var(--bg,#0C0C0B));border:1px solid var(--line,rgba(255,255,255,.18));' +
-    'border-radius:0;color:var(--txt,#F4F1EC);font:inherit;font-size:.95rem;padding:.7rem .8rem;}' +
-    '.kg-in:focus{outline:none;border-color:var(--gold,#D0AC57);}' +
-    '.kg-rij{display:flex;gap:.6rem;margin-top:.8rem;}' +
-    '.kg-rij button{flex:1;border:none;cursor:pointer;font:inherit;font-weight:700;font-size:.95rem;' +
-    'border-radius:0;padding:.7rem 1rem;background:var(--gold,#D0AC57);color:#000;}' +
-    '.kg-rij button:disabled{opacity:.45;cursor:default;}' +
-    '.kg-fout{font-size:.86rem;line-height:1.5;color:var(--burgundy-on-dark,#C23A5E);margin:.8rem 0 0;min-height:1.2rem;}';
-
   /* EEN STILLE SLEUTEL PROBEER JE EEN KEER PER PAGINA: anders draaien scherm en
      deur rond (backoffice.js herlaadde eens 42 keer in vier seconden). Een
      sleutel die niet hielp, helpt de tweede keer ook niet. */
   var sleutelGebruikt = false;
 
   var stijlGezet = false;
+  function laadKantoorGesprekStijl(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    var kantoorGesprekStijl = document.createElement('link');
+    kantoorGesprekStijl.rel = 'stylesheet';
+    kantoorGesprekStijl.href = pad;
+    document.head.appendChild(kantoorGesprekStijl);
+  }
   function stijl() {
     if (stijlGezet) return;
     stijlGezet = true;
-    var s = document.createElement('style'); s.textContent = CSS;
-    (document.head || document.documentElement).appendChild(s);
+    laadKantoorGesprekStijl('/ds/componenten/kantoorgesprek.css');
   }
 
   function post(pad, lijf) {
@@ -72,9 +60,15 @@
     var klaar = function () { return w.RTGKantoorDeur || null; };
     if (w.RTGKantoorDeur) return Promise.resolve(klaar());
     return new Promise(function (ok) {
-      var t = document.createElement('script'); t.src = '/shared/kantoordeur.js';
-      t.onload = t.onerror = function () { ok(klaar()); }; document.head.appendChild(t);
+      laadKantoorGesprekScript('/shared/kantoordeur.js', function () { ok(klaar()); });
     });
+  }
+
+  function laadKantoorGesprekScript(pad, klaar) {
+    var kantoorGesprekScript = document.createElement('script');
+    kantoorGesprekScript.src = pad;
+    kantoorGesprekScript.onload = kantoorGesprekScript.onerror = klaar;
+    document.head.appendChild(kantoorGesprekScript);
   }
 
   // het lid-token van dit toestel; null als er niemand als lid is ingelogd
@@ -94,7 +88,7 @@
     stijl();
     var id = null;
     doel.innerHTML =
-      '<div class="kg"><h2>Kantoor-inlog</h2>' +
+      '<div class="kg ds-kantoorgesprek"><h2>Kantoor-inlog</h2>' +
       '<p class="kg-zegt" aria-live="polite">Een moment...</p>' +
       '<input class="kg-in" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Antwoord">' +
       '<div class="kg-rij"><button type="button">Verder</button></div>' +

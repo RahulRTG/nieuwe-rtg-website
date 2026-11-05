@@ -117,7 +117,19 @@ const CONTRACT = {
   'link:juridisch': Object.assign({
     belofte: 'iedere bezoeker kan de juridische uitleg lezen zonder dat het scherm persoonlijke gegevens of een bevoegde handeling ontsluit',
     bevoegdContext: 'publieke-inhoud',
-    bestanden: ['public/apps/juridisch.html']
+    bestanden: ['public/apps/juridisch.html'],
+    // Een documentkeuze gebruikt echte links, geen kunstmatige knoppen. Deze
+    // verklaring begrenst de bestemmingen; APPWERKT inventariseert daarnaast
+    // ALLE eigen links in main en laat onbekende of ontbrekende links open.
+    navigatielinks: [
+      // Deze rij wordt als RTG-lid gemeten: de bestaande app neemt de sessiepas
+      // aan en opent Command boven de oude shell. Meet de zichtbare hoofdtaak,
+      // niet de bewust bedekte host of de statische HTML-titel/inlogdeur.
+      { bestemming: '/apps/app.html', inhoud: '#rtgCommand[data-stand="open"] .cmd-leeg .cmd-belofte', titel: 'RTG Pass' },
+      { bestemming: '/apps/juridisch/voorwaarden.html', inhoud: 'main h1', titel: 'Algemene voorwaarden, Rahul Travel Group' },
+      { bestemming: '/apps/juridisch/privacy.html', inhoud: 'main h1', titel: 'Privacybeleid, Rahul Travel Group' },
+      { bestemming: '/apps/juridisch/partnervoorwaarden.html', inhoud: 'main h1', titel: 'Partnervoorwaarden, Rahul Travel Group' }
+    ]
   }, voltooi('juridisch', 'zichtbare documenttaak; publicatiecontinuïteit zonder kunstmatige API- of persoonsgegevensopslag', {
     ingang: '/apps/juridisch.html', toestand: '#hoofd .intro h1',
     bestemmingen: ['/apps/juridisch/voorwaarden.html', '/apps/juridisch/privacy.html', '/apps/juridisch/partnervoorwaarden.html']

@@ -6,6 +6,14 @@
 
   var actief = null, teller = 0, OPSLAG = 'rtg.edge.recent.v1';
 
+  /* Catalogus, wereldconfiguratie en sessieopslag zijn invoer. De Edge opent
+     uitsluitend een interne app-route; protocol-relative adressen, scripts en
+     padtraversal krijgen ook via "recent bezocht" geen navigatierecht. */
+  function intern(pad) {
+    return typeof pad === 'string' &&
+      /^\/apps\/(?!\.{1,2}(?:\/|[?#]|$))(?!.*\/\.{1,2}(?:\/|[?#]|$))[A-Za-z0-9_.\/-]+(?:[?#][^\s]*)?$/.test(pad) ? pad : null;
+  }
+
   function tekst(el) {
     var label = el.getAttribute('aria-label') || (el.querySelector('b') && el.querySelector('b').textContent) || el.textContent || '';
     return label.replace(/\s+/g, ' ').trim();
@@ -28,9 +36,10 @@
   function recent() {
     var nu = location.pathname + location.search + location.hash, vorige = '';
     try { vorige = sessionStorage.getItem(OPSLAG) || ''; sessionStorage.setItem(OPSLAG, nu); } catch (fout) {}
-    if (!vorige || vorige === nu || vorige.charAt(0) !== '/') {
+    vorige = intern(vorige);
+    if (!vorige || vorige === nu) {
       var cfg = w.RTGEdge && w.RTGEdge.active && w.RTGEdge.active.cfg;
-      vorige = cfg ? cfg.huis || cfg.home : '/apps/app.html';
+      vorige = intern(cfg && (cfg.huis || cfg.home)) || '/apps/app.html';
     }
     return vorige;
   }
@@ -65,14 +74,16 @@
     if (blad) {
       var cfgBlad = blad !== 'geen' && w.RTGEdgeWorlds && w.RTGEdgeWorlds[blad];
       (cfgBlad ? cfgBlad.tools.slice(0, 3) : []).forEach(function (t) {
+        var doel = intern(t[3]);
+        if (!doel) return;
         var k = d.createElement('button');
         k.type = 'button'; k.className = 'rtg-edge-here-action';
         k.innerHTML = icoon(t[2]) + '<span></span><em aria-hidden="true">›</em>';
         k.querySelector('span').textContent = t[1];
         k.addEventListener('click', function () {
           sluit(rt);
-          if (w.RTGCommand && w.RTGCommand.actief && w.RTGCommand.actief()) w.RTGCommand.open(t[3], t[1]);
-          else location.href = t[3];
+          if (w.RTGCommand && w.RTGCommand.actief && w.RTGCommand.actief()) w.RTGCommand.open(doel, t[1]);
+          else location.href = '/apps/' + doel.slice('/apps/'.length);
         });
         nav.appendChild(k);
       });
@@ -94,8 +105,9 @@
       werk.addEventListener('click', function () { openWerkbladen(rt); });
       nav.appendChild(werk);
     }
-    var terug = d.createElement('a');
-    terug.className = 'rtg-edge-here-action'; terug.href = recent();
+    var terug = document.createElement('a');
+    var recentPad = recent();
+    terug.className = 'rtg-edge-here-action'; terug.href = '/apps/' + recentPad.slice('/apps/'.length);
     terug.innerHTML = icoon('replay') + '<span>Recent bezocht</span><em aria-hidden="true">›</em>';
     nav.appendChild(terug);
   }
@@ -164,18 +176,20 @@
          catalogus ook niet. Zonder poort blijft het zoals het was. */
       var poort = typeof w.RTGAppCatalogusPoort === 'function' ? w.RTGAppCatalogusPoort : null;
       data.apps.forEach(function (app) {
-        if (!app || !Object.prototype.hasOwnProperty.call(namen, app.world) || typeof app.name !== 'string' || typeof app.url !== 'string' || !/^\/apps\/(?:[\w-]+\/)*[\w-]+\.html(?:[?#][^\s]*)?$/.test(app.url) || gezien.has(app.url)) return;
+        var appPad = app && intern(app.url);
+        if (!app || !Object.prototype.hasOwnProperty.call(namen, app.world) || typeof app.name !== 'string' || !appPad || !/^\/apps\/(?:[\w-]+\/)*[\w-]+\.html(?:[?#][^\s]*)?$/.test(appPad) || gezien.has(appPad)) return;
         if (poort && poort(app.url) === false) return;
-        gezien.add(app.url);
+        gezien.add(appPad);
         if (!groepen[app.world]) {
           var groep = d.createElement('section'), kop = d.createElement('h3');
           groep.className = 'rtg-edge-group'; kop.textContent = namen[app.world]; groep.appendChild(kop);
           lijst.appendChild(groep); groepen[app.world] = groep;
         }
-        var a = d.createElement('a'), nr = d.createElement('span'), naam = d.createElement('b'), pijl = d.createElement('em');
-        a.href = app.url; a.dataset.search = (namen[app.world] + ' ' + app.name).toLowerCase();
-        a.dataset.catalogApp = app.id; nr.textContent = String(gezien.size).padStart(2, '0');
-        naam.textContent = app.name; pijl.textContent = '→'; a.append(nr, naam, pijl); groepen[app.world].appendChild(a);
+        var appLink = document.createElement('a');
+        var nr = d.createElement('span'), naam = d.createElement('b'), pijl = d.createElement('em');
+        appLink.href = '/apps/' + appPad.slice('/apps/'.length); appLink.dataset.search = (namen[app.world] + ' ' + app.name).toLowerCase();
+        appLink.dataset.catalogApp = app.id; nr.textContent = String(gezien.size).padStart(2, '0');
+        naam.textContent = app.name; pijl.textContent = '→'; appLink.append(nr, naam, pijl); groepen[app.world].appendChild(appLink);
       });
       melding.remove();
       var input = host.querySelector('.rtg-edge-find input');

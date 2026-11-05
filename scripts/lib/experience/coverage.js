@@ -3,16 +3,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {fingerprint,sha} = require('./evidence');
-const artifact = require('./artifact');
-const identity = require('../../../public/shared/rtg-world-identity');
-const {files} = require('./compiler');
-const {MAPPEN} = require('../wereldregister');
-const {rijen, meetIngang} = require('../../appwerkt');
+const {appInventory,interactionInventory,screenInventory,signatureFor}=require('./subjects');
+const {requirements,dimensionRows,evidenceStatus,DIMENSION_ORDER}=require('./dimensions');
 
-const DIMENSION_ORDER = ['identity','composition','continuity','restraint','adaptability','accessibility','fluidity','human-quality'];
 
 function json(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
-function routeFor(file, root) { return '/' + path.relative(path.join(root, 'public'), file).replace(/\\/g, '/'); }
 function physicalRoute(destination) {
   if (typeof destination !== 'string' || !destination.startsWith('/') || destination.startsWith('//') || destination.includes('\\')) return null;
   try { return new URL(destination, 'https://rtg.invalid').pathname; } catch (_) { return null; }
@@ -24,118 +19,6 @@ function stable(value) {
 }
 function sourceHash(root, contract, signatures) {
   return sha(fingerprint(root) + JSON.stringify(stable(contract)) + JSON.stringify(stable(signatures)));
-}
-
-function appInventory(root = path.join(__dirname,'..','..','..')) {
-  const rows = rijen();
-  const measured = json(path.join(root,'APPWERKT.json')).regels || [];
-  return rows.map(row => {
-    const map = MAPPEN.find(entry => entry.naam === row.wereld && entry.items.includes(row.functie));
-    const destination = meetIngang(row);
-    const observation = measured.find(item => item.functie === row.functie && item.wereld === row.wereld);
-    return {
-      id: 'app:' + (map ? map.sleutel : 'unknown') + ':' + row.functie,
-      function: row.functie,
-      name: row.app,
-      world: row.wereld,
-      persona: row.persona,
-      destination: destination ? destination.bestemming : null,
-      entry: destination ? destination.pad : null,
-      interactionInventory: observation ? {
-        source:'APPWERKT.json',
-        found:observation.gevonden,
-        touched:(observation.aangeraakt || []).slice(),
-        untouched:(observation.onaangeraakt || []).slice()
-      } : null
-    };
-  }).sort((a,b) => a.id.localeCompare(b.id));
-}
-
-function screenInventory(root) {
-  const owners = json(path.join(root,'SCHERMEIGENAAR.json')).schermen;
-  return files(path.join(root,'public/apps')).filter(file => file.endsWith('.html')).map(file => {
-    const route = routeFor(file, root);
-    const world = identity.classify(route);
-    const owner = owners[route.replace(/^\//,'')] || null;
-    return {id:'screen:' + route, route, world, profile:world === 'redirect' ? 'redirect' : 'interface',owner};
-  }).sort((a,b) => a.route.localeCompare(b.route));
-}
-
-function signatureErrors(value) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return ['signature is geen object'];
-  const required = ['identity','purpose','composition','motion','interactionDensity','interactions','humanTasks'];
-  const errors = required.filter(key => value[key] === undefined).map(key => 'mist ' + key);
-  for (const key of ['identity','purpose','composition','motion']) if (value[key] !== undefined && (typeof value[key] !== 'string' || !value[key].trim())) errors.push(key + ' is leeg');
-  if (value.interactionDensity !== undefined && !['quiet','balanced','dense'].includes(value.interactionDensity)) errors.push('interactionDensity is ongeldig');
-  if (value.interactions !== undefined && (!Array.isArray(value.interactions) || value.interactions.some(action=>!action || typeof action.id!=='string' || !action.id.trim() || typeof action.label!=='string' || !action.label.trim()))) errors.push('interactions is ongeldig');
-  if (Array.isArray(value.interactions) && new Set(value.interactions.map(action=>action&&action.id)).size !== value.interactions.length) errors.push('interactions bevat dubbele ids');
-  if (Array.isArray(value.interactions) && !value.interactions.length && (!value.noInteractions || !value.noInteractions.decision || !value.noInteractions.reason)) errors.push('lege interactions mist gemotiveerd noInteractions-besluit');
-  if (value.humanTasks !== undefined && (!Array.isArray(value.humanTasks) || !value.humanTasks.length || value.humanTasks.some(task=>typeof task!=='string'||!task.trim()))) errors.push('humanTasks is leeg of ongeldig');
-  for (const key of ['additionalStates','additionalDevices']) if (value[key] !== undefined && (!Array.isArray(value[key]) || value[key].some(item=>typeof item!=='string'||!item.trim()))) errors.push(key + ' is ongeldig');
-  return errors;
-}
-
-function signatureFor(signatures, kind, subject) {
-  const source = kind === 'app' ? signatures.apps : signatures.screens;
-  const key = kind === 'app' ? subject.id : subject.route;
-  const declared = source && source[key];
-  if (!declared) return {status:'NOT_TESTED',source:null,reason:'Experience Signature ontbreekt'};
-  const errors = signatureErrors(declared);
-  if (kind === 'app' && subject.interactionInventory) {
-    const actions = declared.interactions || [];
-    const labels = new Set(actions.map(action=>action.label));
-    const missing = subject.interactionInventory.touched.filter(label=>!labels.has(label));
-    if (actions.length < subject.interactionInventory.found) errors.push('signature bevat minder interacties dan APPWERKT vond');
-    if (missing.length) errors.push('signature mist APPWERKT-interacties: ' + missing.join(', '));
-    if (subject.interactionInventory.untouched.length) errors.push('APPWERKT heeft nog onaangeraakte interacties');
-  }
-  if (errors.length) return {status:'BLOCKED',source:'experience-architecture/signatures.json',reason:errors.join('; '),value:declared};
-  return {status:'DECLARED',source:'experience-architecture/signatures.json',value:declared};
-}
-
-function requirements(contract, profile, dimension, signature) {
-  /* Een signature mag de grondwet uitbreiden, nooit de noemer verkleinen. */
-  const states = [...new Set(contract.states.concat(signature?.value?.additionalStates || []))];
-  const devices = [...new Set(contract.devices.concat(signature?.value?.additionalDevices || []))];
-  const interactions = (signature?.value?.interactions || []).map(action => action.id);
-  if (dimension === 'identity') return ['signature'];
-  if (dimension === 'composition' || dimension === 'restraint') return states.flatMap(state => devices.map(device => state + '@' + device)).concat(interactions.map(id=>'interaction:'+id));
-  if (dimension === 'continuity') return contract.continuityChecks.slice().concat(interactions.map(id=>'interaction:'+id));
-  if (dimension === 'adaptability') return devices.flatMap(device => contract.networks.map(network => device + '@' + network));
-  if (dimension === 'accessibility') return devices.flatMap(device => contract.accessibilityChecks.map(check => device + '@' + check)).concat(interactions.map(id=>'interaction:'+id));
-  if (dimension === 'fluidity') return devices.flatMap(device => contract.fluidityChecks.map(check => device + '@' + check)).concat(interactions.map(id=>'interaction:'+id));
-  if (dimension === 'human-quality') {
-    const tasks = signature?.value?.humanTasks || [];
-    return (tasks.length ? tasks.flatMap((task,index)=>['task:'+index+'@mobile','task:'+index+'@desktop']) : ['signature:human-task@mobile','signature:human-task@desktop']).concat(interactions.map(id=>'interaction:'+id));
-  }
-  return [];
-}
-
-const evidenceStatus = artifact.status;
-
-function dimensionRows(root, contract, profileName, subject, kind, signature, evidence, source, candidate) {
-  const profile = contract.profiles[profileName];
-  return DIMENSION_ORDER.map(dimension => {
-    if (!profile.dimensions.includes(dimension)) {
-      const decision = profile.notApplicable && profile.notApplicable[dimension];
-      return {id:dimension,applicable:false,status:'NOT_APPLICABLE',decision:decision?.decision || null,reason:decision?.reason || null,requirementCount:0,provenCount:0};
-    }
-    const required = requirements(contract, profileName, dimension, signature);
-    const records = required.map(requirement => {
-      const matches = (evidence.records || []).filter(item => item && item.subjectType === kind && item.subjectId === subject.id && item.dimension === dimension && item.requirement === requirement);
-      if (matches.some(record => !artifact.same(record,matches[0]))) return {requirement,status:'BLOCKED'};
-      const configurationHash = evidence.configuration && sha(JSON.stringify(stable(evidence.configuration)));
-      return {requirement,...artifact.assessment(matches[0],source,candidate,dimension,
-        {root,subjectType:kind,subjectId:subject.id,requirement,configurationHash})};
-    });
-    const statuses = new Set(records.map(row => row.status));
-    let status = 'PROVEN';
-    for (const value of ['FAILED','BLOCKED','STALE','NOT_TESTED']) if (statuses.has(value)) { status = value; break; }
-    if (signature.status !== 'DECLARED') status = signature.status === 'BLOCKED' ? 'BLOCKED' : 'NOT_TESTED';
-    return {id:dimension,applicable:true,status,requirementCount:records.length,provenCount:records.filter(row=>row.status==='PROVEN').length,
-      ...(records.some(row=>row.integrity==='VALID') ? {reason:records.find(row=>row.integrity==='VALID').reason} : {}),
-      ...(records.some(row=>row.scopedStatus) ? {scopedProofs:records.filter(row=>row.scopedStatus).map(row=>({requirement:row.requirement,status:row.scopedStatus,scope:row.scope}))} : {})};
-  });
 }
 
 function build(root, options = {}) {
@@ -171,13 +54,18 @@ function build(root, options = {}) {
   const proven = applicable.filter(d => d.status === 'PROVEN').length;
   const completeApps = logicalApps.filter(row => row.signature.status === 'DECLARED' && row.dimensions.filter(d=>d.applicable).every(d=>d.status==='PROVEN')).length;
   const completeScreens = screenRows.filter(row => row.signature.status === 'DECLARED' && row.dimensions.filter(d=>d.applicable).every(d=>d.status==='PROVEN')).length;
+  const qualificationGates = (contract.release.requiredQualificationGates || []).map(gate => ({
+    id:gate.id,label:gate.label,status:'NOT_TESTED',requires:gate.requires
+  }));
+  const qualificationComplete = qualificationGates.length > 0 && qualificationGates.every(gate => gate.status === 'PROVEN');
   return {
     schemaVersion:1,
     generatedFrom:['MAPPEN','public/apps/**/*.html','experience-architecture/coverage-contract.json','experience-architecture/signatures.json'],
     sourceHash:source,
     candidateCommit:candidate,
-    status:completeApps === logicalApps.length && completeScreens === screenRows.length ? 'PROVEN' : 'NOT_TESTED',
+    status:completeApps === logicalApps.length && completeScreens === screenRows.length && qualificationComplete ? 'PROVEN' : 'NOT_TESTED',
     summary:{logicalApps:{proven:completeApps,total:logicalApps.length},screens:{proven:completeScreens,total:screenRows.length},dimensions:{proven,total:applicable.length}},
+    releaseReadiness:{status:qualificationComplete?'PROVEN':'NOT_TESTED',qualificationGates,experienceBudgets:contract.release.experienceBudgets},
     logicalApps,
     screens:screenRows
   };
@@ -191,6 +79,13 @@ function validate(root, report, contract, signatures) {
   if (routes.size !== report.screens.length) errors.push('DUPLICATE_SCREEN');
   if (report.logicalApps.length < contract.inventoryBaselines.logicalApps) errors.push('APP_INVENTORY_BELOW_BASELINE:' + report.logicalApps.length);
   if (report.screens.length < contract.inventoryBaselines.screens) errors.push('SCREEN_INVENTORY_BELOW_BASELINE:' + report.screens.length);
+  const gates = contract.release.requiredQualificationGates || [];
+  if (gates.length !== 8 || new Set(gates.map(gate=>gate.id)).size !== gates.length) errors.push('INVALID_QUALIFICATION_GATES');
+  for (const gate of gates) if (!gate.id || !gate.label || !gate.requires) errors.push('INCOMPLETE_QUALIFICATION_GATE:' + (gate.id || 'unknown'));
+  const budgets = contract.release.experienceBudgets || {};
+  for (const key of ['lcpP75MsMax','inpP75MsMax','clsP75Max','interactiveTargetPxMin','unexplainedVisualRegressionsMax','humanCriticalFindingsMax']) {
+    if (!Number.isFinite(budgets[key])) errors.push('MISSING_EXPERIENCE_BUDGET:' + key);
+  }
   for (const row of report.logicalApps) if (!row.screenIds.length) errors.push('APP_WITHOUT_SCREEN:' + row.id);
   for (const row of report.screens) if (!row.owner || !row.owner.rol || (!row.owner.capability && !(row.owner.rol === 'alias' && row.owner.naar))) errors.push('SCREEN_WITHOUT_OWNER:' + row.id);
   for (const key of Object.keys(signatures.apps || {})) if (!appIds.has(key)) errors.push('UNKNOWN_APP_SIGNATURE:' + key);
@@ -206,7 +101,8 @@ function registryView(report) {
   const compact = subject => {
     const dimensions = {};
     for (const row of subject.dimensions) dimensions[row.id] = row.applicable
-      ? {status:row.status,required:row.requirementCount,proven:row.provenCount,...(row.reason?{reason:row.reason}:{})}
+      ? {status:row.status,required:row.requirementCount,proven:row.provenCount,...(row.reason?{reason:row.reason}:{}),
+        ...(row.configurationCoverage?{configurationCoverage:row.configurationCoverage}:{})}
       : {status:row.status,decision:row.decision,reason:row.reason};
     const {dimensions:ignored,...base} = subject;
     return {...base,dimensions};
@@ -231,4 +127,4 @@ function serializeRegistry(report) {
   return lines.join('\n') + '\n';
 }
 
-module.exports = {build,validate,registryView,serializeRegistry,appInventory,screenInventory,requirements,evidenceStatus,sourceHash,DIMENSION_ORDER,stable,sha};
+module.exports = {build,validate,registryView,serializeRegistry,appInventory,interactionInventory,screenInventory,requirements,evidenceStatus,sourceHash,DIMENSION_ORDER,stable,sha};

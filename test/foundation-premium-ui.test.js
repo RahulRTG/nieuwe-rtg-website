@@ -14,9 +14,25 @@ const js = fs.readFileSync(path.join(HUIS, 'premium.js'), 'utf8');
 const hub = fs.readFileSync(path.join(HUIS, 'index.html'), 'utf8');
 const sw = fs.readFileSync(path.join(HUIS, 'sw.js'), 'utf8');
 
+function gedeeldeVorm(html) {
+  if (!/<html[^>]*\bdata-ds(?:[\s>]|=)/.test(html)) return /href="premium\.css"/.test(html);
+  return /href="\/fonts\/fonts\.css"/.test(html) && /href="\/ds\/rtg-ds\.css"/.test(html)
+    && /src="\/ds\/shell\.js"/.test(html) && /class="[^"\n]*\bds-foundation\b/.test(html)
+    && !/<style\b|href="(?:premium|stijl)\.css"|href="\/shared\/[^"\n]*\.css"/.test(html);
+}
+
+test('een DS-vlag alleen vervangt geen volledige Foundation-presentatie', () => {
+  const ds = fs.readFileSync(path.join(HUIS, 'studie.html'), 'utf8');
+  assert.equal(gedeeldeVorm(ds), true);
+  for (const mist of ['/fonts/fonts.css', '/ds/rtg-ds.css', '/ds/shell.js'])
+    assert.equal(gedeeldeVorm(ds.replace(mist, '/ontbreekt')), false, mist);
+  assert.equal(gedeeldeVorm(ds.replace('</head>', '<link href="premium.css" rel="stylesheet"></head>')), false);
+  assert.equal(gedeeldeVorm(ds.replace('</head>', '<style>body{}</style></head>')), false);
+});
+
 test('elk Foundation-scherm draagt de gedeelde premiumlaag', () => {
   assert.ok(htmlBestanden.length >= 70, 'de toets hoort het volledige Foundation-huis te bewaken');
-  const zonderCss = htmlBestanden.filter((naam) => !/href="premium\.css"/.test(fs.readFileSync(path.join(HUIS, naam), 'utf8')));
+  const zonderCss = htmlBestanden.filter((naam) => !gedeeldeVorm(fs.readFileSync(path.join(HUIS, naam), 'utf8')));
   const zonderJs = htmlBestanden.filter((naam) => !/src="premium\.js"/.test(fs.readFileSync(path.join(HUIS, naam), 'utf8')));
   assert.deepEqual(zonderCss, [], 'zonder gedeelde vorm: ' + zonderCss.join(', '));
   assert.deepEqual(zonderJs, [], 'zonder gedeeld gedrag: ' + zonderJs.join(', '));

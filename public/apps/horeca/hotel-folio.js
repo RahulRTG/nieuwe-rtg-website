@@ -27,11 +27,11 @@
       $('hOpenTotaal').textContent = K.euro(d.openTotaal);
       $('hAantal').textContent = d.aantal;
       $('hLijst').innerHTML = (d.folios || []).map(function (f) {
-        return '<div class="item"><span><b>Kamer ' + esc(f.kamer) + '</b> <span class="stil">· ' +
+        return '<div class="item ds-horeca-item"><span><b>Kamer ' + esc(f.kamer) + '</b> <span class="stil ds-horeca-meta">· ' +
           esc(f.gastnaam || 'zonder naam') + ' · ' + f.nachten + ' nacht(en) geboekt</span></span>' +
-          '<span class="rij"><span class="stil">' + K.euro(f.openstaand) + ' open</span>' +
+          '<span class="rij ds-horeca-rij"><span class="stil ds-horeca-meta">' + K.euro(f.openstaand) + ' open</span>' +
           K.knop('Openen', { kamer: f.kamer }) + '</span></div>';
-      }).join('') || '<p class="stil">Er staat geen gastrekening open.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er staat geen gastrekening open.</p>';
       K.bind($('hLijst'), 'kamer', function (b) { $('hKamer').value = b.dataset.kamer; toon(); });
     });
   }
@@ -41,7 +41,7 @@
     if (!kamer) return;
     K.api('/folio', { kamer: kamer }).then(function (r) {
       var d = r.body;
-      if (d.error) { $('hDetail').innerHTML = '<p class="stil">' + esc(d.error) + '</p>'; return; }
+      if (d.error) { $('hDetail').innerHTML = '<p class="stil ds-horeca-meta">' + esc(d.error) + '</p>'; return; }
       var f = d.folio;
       var perSoort = {};
       (f.regels || []).forEach(function (x) { perSoort[x.soort] = (perSoort[x.soort] || 0) + x.centen; });
@@ -49,10 +49,10 @@
         return '<option value="' + esc(s) + '">' + esc(s) + '</option>';
       }).join('');
       $('hDetail').innerHTML = (f.regels || []).map(function (x) {
-        return K.rij('<span class="tag">' + esc(x.soort) + '</span> ' + esc(x.omschrijving) +
-          ' <span class="stil">· ' + esc(x.at.slice(0, 10)) + ' · ' + esc(x.door) + '</span>', K.euro(x.centen));
+        return K.rij('<span class="tag ds-horeca-tag">' + esc(x.soort) + '</span> ' + esc(x.omschrijving) +
+          ' <span class="stil ds-horeca-meta">· ' + esc(x.at.slice(0, 10)) + ' · ' + esc(x.door) + '</span>', K.euro(x.centen));
       }).join('') + Object.keys(perSoort).map(function (s) {
-        return K.rij('<span class="stil">samen ' + esc(s) + '</span>', K.euro(perSoort[s]));
+        return K.rij('<span class="stil ds-horeca-meta">samen ' + esc(s) + '</span>', K.euro(perSoort[s]));
       }).join('') +
         K.rij('<b>Totaal</b>', '<b>' + K.euro(f.totaal) + '</b>') +
         K.rij('Betaald', K.euro(f.betaald)) +

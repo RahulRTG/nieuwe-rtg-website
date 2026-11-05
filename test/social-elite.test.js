@@ -75,7 +75,7 @@ test('de suiteschil gebruikt echte routes en laat appbediening voorgaan op besch
   const salon = lees('public/apps/salon.html');
   const genootschap = lees('public/apps/genootschap.html');
 
-  assert.match(suite, /persoon\.href = '\/apps\/salon\.html#ik'/,
+  assert.match(suite, /persoon\.setAttribute\('href', '\/apps\/salon\.html#ik'\)/,
     'de profielzegel opent de bestaande Salon-profielruimte');
   assert.doesNotMatch(suite, /\/apps\/profiel\.html/,
     'de schil verzint geen profielpagina die niet bestaat');
@@ -194,6 +194,11 @@ test('Reality Engine is in elke Social-ruimte dezelfde werkende systeemlaag', ()
   assert.match(js, /role="tablist"/);
   assert.match(js, /Waarop dit antwoord rust/);
   assert.match(js, /Automatische verzending bestaat niet/);
+  assert.match(lees('public/shared/social-intelligence.js'),
+    /laadSocialIntelligenceStijl\('\/shared\/social-intelligence\.css'\)/,
+    'de vaste fallback is statisch herleidbaar en blijft bij dezelfde stylesheet');
+  assert.doesNotMatch(lees('public/shared/social-intelligence-runtime.js'), /addStylesheet/,
+    'de runtime claimt geen tweede stijleigenaar');
   assert.doesNotMatch(js, /on(?:click|keydown|submit)\s*=/i,
     'de gedeelde laag gebruikt geen inline event handlers');
   for (const bestand of ['social-intelligence.js', 'social-intelligence-deck.js',

@@ -8,8 +8,8 @@ const docs=[['/apps/juridisch/voorwaarden.html','Algemene voorwaarden'],['/apps/
 let srv,browser;
 test.before(async()=>{if(skip)return;srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});browser=await pw.chromium.launch(browserOpties(pw));});
 test.after(async()=>{if(browser)await browser.close();if(srv)await stop(srv.child);});
-async function context(width){
-  const ctx=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block',reducedMotion:'reduce',locale:'nl-NL'});
+async function context(width,height=900){
+  const ctx=await browser.newContext({viewport:{width,height},serviceWorkers:'block',reducedMotion:'reduce',locale:'nl-NL',deviceScaleFactor:1,isMobile:false,hasTouch:false});
   await ctx.addInitScript(()=>{localStorage.setItem('rtg_cookieinfo_v1','1');localStorage.setItem('rtg_lang','nl');});
   return ctx;
 }
@@ -18,6 +18,35 @@ async function open(page,route){
   assert.equal(response.status(),200);
   await page.locator('.ds-edge__balk [data-ds-edge="rahul"]').waitFor({state:'visible'});
   await page.evaluate(()=>document.fonts.ready);
+  return response;
+}
+async function geenOverloop(page,label){
+  const meting=await page.evaluate(()=>{
+    const root=document.documentElement,viewport={width:innerWidth,height:innerHeight};
+    const past=root.scrollWidth<=viewport.width+1;
+    if(past)return {past};
+    const nodes=[...document.querySelectorAll('body,body *')].flatMap(el=>{
+      const r=el.getBoundingClientRect();
+      if(!r.width||!r.height||!(r.right>innerWidth+1||r.left<-1||el.scrollWidth>el.clientWidth+1))return [];
+      const s=getComputedStyle(el);
+      return [{tag:el.tagName,id:el.id,class:el.getAttribute('class'),
+        bounds:{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right},
+        clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,font:s.font,fontSize:s.fontSize,
+        display:s.display,position:s.position,minInlineSize:s.minInlineSize,maxInlineSize:s.maxInlineSize,
+        gridColumns:s.gridTemplateColumns,overflowX:s.overflowX,whiteSpace:s.whiteSpace,
+        overflowWrap:s.overflowWrap,wordBreak:s.wordBreak,text:el.children.length?undefined:el.textContent.trim().slice(0,100)}];
+    });
+    return {past,url:location.href,viewport,documentWidth:root.scrollWidth,rootFont:getComputedStyle(root).fontSize,
+      scrollX:window.scrollX,overflowNodes:nodes.length,nodes:nodes.slice(0,40)};
+  });
+  assert.equal(meting.past,true,label+'\n'+JSON.stringify(meting,null,2));
+}
+const experienceContract=require('../experience-architecture/coverage-contract.json');
+const deviceConfigurations=experienceContract.configurationCoverage['continuity:destination'].deviceConfigurations;
+for(const device of experienceContract.devices){
+  const {viewport}=deviceConfigurations[device];
+  test(`Juridisch destination normal: ${device}`,{skip},t=>
+    require('./juridisch-destination-helper')(t,{context,open,browser,base:srv.base,device,viewport}));
 }
 for(const width of [390,820,1440])test('juridische documentfamilie: centrale DS, leesbaar en bruikbaar op '+width+' px',{skip},async()=>{
   const ctx=await context(width),page=await ctx.newPage(),errors=letOpFouten(page,[]);
@@ -32,12 +61,12 @@ for(const width of [390,820,1440])test('juridische documentfamilie: centrale DS,
       for(const href of sheets){const u=new URL(href);const paths=u.pathname===PAD?decodeer(u.searchParams.get('f')):[u.pathname];
         for(const file of paths){active.push(file);assert.ok(file.startsWith('/ds/')||file.startsWith('/fonts/'),route+' laadt erfenis: '+file);}}
       assert.ok(active.includes('/ds/rtg-ds.css'),'centrale DS moet daadwerkelijk geladen zijn');
-      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'geen horizontale overloop');
+      await geenOverloop(page,route+' geen horizontale overloop');
       const audit=await page.evaluate('(function(){'+BRON+'\nreturn window.__a11yKeur()})()');
       assert.deepEqual(audit.overtredingen,[],route+' structurele toegankelijkheid');
       assert.deepEqual(audit.contrast,[],route+' oplosbaar tekstcontrast');
       await page.evaluate(()=>document.documentElement.style.fontSize='200%');
-      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,route+' tekstvergroting behoudt de breedte');
+      await geenOverloop(page,route+' tekstvergroting behoudt de breedte');
     }
     assert.deepEqual(errors,[]);
   }finally{await ctx.close();}
@@ -80,7 +109,7 @@ test('juridische documenten openen met toetsenbord, herladen en terugkeren zonde
       assert.equal(await page.locator('.docs a').count(),3);
     }
     await page.evaluate(()=>document.documentElement.style.fontSize='200%');
-    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'tekstvergroting behoudt de breedte');
+    await geenOverloop(page,'tekstvergroting behoudt de breedte');
     assert.deepEqual(errors,[]);
   }finally{await ctx.close();}
 });

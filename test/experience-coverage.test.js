@@ -33,6 +33,20 @@ test('register is volledig afgeleid uit alle logische apps en alle fysieke scher
   assert.equal(Object.keys(stored.logicalApps[0].dimensions).length,contract.dimensions.length);
   assert.equal(stored.logicalApps[0].dimensions.identity.status,'NOT_TESTED');
   assert.equal(JSON.parse(coverage.serializeRegistry(report)).screens.length,screens.length);
+  assert.equal(report.releaseReadiness.qualificationGates.length,8);
+  assert.equal(report.releaseReadiness.status,'NOT_TESTED');
+  assert.equal(report.status,'NOT_TESTED','schermbewijs alleen mag de operationele vrijgavepoorten niet omzeilen');
+});
+
+test('de acht Deep Green-vrijgavepoorten en Experience-budgetten zijn fail-closed', () => {
+  const report = coverage.build(ROOT,{contract,signatures,apps:[],screens:[],sourceHash:'source',commit:'candidate'});
+  assert.deepEqual(report.releaseReadiness.qualificationGates.map(gate=>gate.id),[
+    'evidence-dependency-integrity','negative-contracts','data-migration-compatibility','concurrency-load',
+    'external-dependencies','experience-budgets','operational-incident','independent-reproducibility'
+  ]);
+  assert.equal(report.releaseReadiness.qualificationGates.every(gate=>gate.status==='NOT_TESTED'),true);
+  assert.deepEqual(report.releaseReadiness.experienceBudgets,contract.release.experienceBudgets);
+  assert.equal(report.status,'NOT_TESTED');
 });
 
 test('een nieuw scherm vergroot automatisch de noemer en blijft zonder signature rood', () => {
@@ -109,4 +123,69 @@ test('een app-signature mag door APPWERKT gevonden bediening niet verbergen', ()
   const report = coverage.build(ROOT,{contract,signatures:{version:1,apps:{'app:test':bad},screens:{}},apps:[app],screens:[screen],sourceHash:'source',commit:'candidate'});
   assert.equal(report.logicalApps[0].signature.status,'BLOCKED');
   assert.match(report.logicalApps[0].signature.reason,/APPWERKT-interacties/);
+});
+
+test('een app-signature hergebruikt de volledige APPWERKT-noemer zonder haar te kopieren', () => {
+  const app={id:'app:test',function:'link:test',name:'Test',world:'LivingOS',persona:'lid',destination:'/apps/test.html',entry:'/apps/test.html',
+    interactionInventory:{source:'APPWERKT.json',found:2,touched:['Opslaan','Open detail'],untouched:[]}};
+  const signature={identity:'eigen identiteit',purpose:'testdoel',composition:'rustige taakcompositie',motion:'continu',
+    interactionDensity:'quiet',interactions:{source:'APPWERKT'},humanTasks:['Rond de taak af']};
+  const options={contract,signatures:{version:1,apps:{'app:test':signature},screens:{}},apps:[app],screens:[],sourceHash:'source',commit:'candidate'};
+  const first=coverage.build(ROOT,options),resolved=first.logicalApps[0].signature;
+  assert.equal(resolved.status,'DECLARED');
+  assert.deepEqual(resolved.derivedFrom,['interactions:APPWERKT.json']);
+  assert.deepEqual(resolved.value.interactions,[
+    {id:'appwerkt-001',label:'Opslaan'},{id:'appwerkt-002',label:'Open detail'}
+  ]);
+  const before=first.logicalApps[0].dimensions.find(row=>row.id==='accessibility').requirementCount;
+  app.interactionInventory={source:'APPWERKT.json',found:3,touched:['Opslaan','Open detail','Verwijderen'],untouched:[]};
+  const second=coverage.build(ROOT,options);
+  assert.equal(second.logicalApps[0].signature.status,'DECLARED');
+  assert.equal(second.logicalApps[0].dimensions.find(row=>row.id==='accessibility').requirementCount,before+1,
+    'nieuwe bediening vergroot automatisch de Experience-noemer');
+  app.interactionInventory.untouched=['Niet aangeraakt'];
+  assert.equal(coverage.build(ROOT,options).logicalApps[0].signature.status,'BLOCKED');
+});
+
+test('alleen een bestaande app mag doel en bediening uit bestaande bronnen afleiden', () => {
+  const app={id:'app:map-instellingen:link:juridisch',function:'link:juridisch',name:'Juridisch',world:'Instellingen',persona:'lid',
+    destination:'/apps/juridisch.html',entry:'/apps/juridisch.html',interactionInventory:{source:'APPWERKT.json',found:1,touched:['CONTROLEREN'],untouched:[]}};
+  const signature={identity:'juridisch',purpose:{source:'appcontract'},composition:'rustig document',motion:'continu',
+    interactionDensity:'quiet',interactions:{source:'APPWERKT'},humanTasks:['Lees een document']};
+  const report=coverage.build(ROOT,{contract,signatures:{version:1,apps:{[app.id]:signature},screens:{}},apps:[app],screens:[],sourceHash:'source',commit:'candidate'});
+  assert.equal(report.logicalApps[0].signature.status,'DECLARED');
+  assert.equal(report.logicalApps[0].signature.value.purpose,
+    'iedere bezoeker kan de juridische uitleg lezen zonder dat het scherm persoonlijke gegevens of een bevoegde handeling ontsluit');
+  assert.deepEqual(report.logicalApps[0].signature.derivedFrom,['purpose:appcontract','interactions:APPWERKT.json']);
+  const screen={id:'screen:/apps/test.html',route:'/apps/test.html',world:'living',profile:'interface'};
+  const blocked=coverage.build(ROOT,{contract,signatures:{version:1,apps:{},screens:{'/apps/test.html':signature}},apps:[],screens:[screen],sourceHash:'source',commit:'candidate'});
+  assert.equal(blocked.screens[0].signature.status,'BLOCKED','een scherm mag geen appcontract of APPWERKT-appnoemer lenen');
+});
+
+test('Experience telt navigatielinks naast knoppen, zonder kwalificatie te erven', () => {
+  const observation={gevonden:1,aangeraakt:['Opslaan'],onaangeraakt:[],navigatie:{gevonden:2,geklikt:2,
+    aangeraakt:[{naam:'Privacybeleid'},{naam:'Algemene voorwaarden'}],onbewezen:[],fouten:[]}};
+  const before=JSON.stringify(observation),inventory=coverage.interactionInventory(observation);
+  assert.equal(inventory.found,3);
+  assert.deepEqual(inventory.touched,['Opslaan','Privacybeleid','Algemene voorwaarden']);
+  assert.deepEqual(inventory.untouched,[]);
+  const app={id:'app:test',function:'link:test',name:'Test',world:'LivingOS',destination:'/apps/test.html',interactionInventory:inventory};
+  const signature={identity:'test',purpose:'documentkeuze',composition:'rustig',motion:'continu',interactionDensity:'quiet',
+    interactions:[{id:'save',label:'Opslaan'}],humanTasks:['Lees het document']};
+  const options={apps:[app],screens:[],contract,signatures:{apps:{'app:test':signature}},sourceHash:'source',commit:'candidate'};
+  assert.equal(coverage.build(ROOT,options).logicalApps[0].signature.status,'BLOCKED','ontbrekende links mogen niet verdwijnen');
+  signature.interactions.push({id:'privacy',label:'Privacybeleid'},{id:'terms',label:'Algemene voorwaarden'});
+  const report=coverage.build(ROOT,options);
+  assert.equal(report.logicalApps[0].signature.status,'DECLARED');
+  assert.equal(report.summary.logicalApps.proven,0,'bediening is geen menselijke of volledige Experience-kwalificatie');
+  assert.equal(JSON.stringify(observation),before,'bronregister wordt niet veranderd');
+});
+
+test('onvolledige, mislukte of ongeldige linkinventaris blijft open in Experience', () => {
+  for(const navigatie of [null,{gevonden:1},
+    {gevonden:2,geklikt:1,aangeraakt:[{naam:'Privacy'}],onbewezen:[],fouten:[]},
+    {gevonden:1,geklikt:1,aangeraakt:[{naam:'Privacy'}],onbewezen:[],fouten:['HTTP 500']},
+    {gevonden:1,geklikt:1,aangeraakt:[],onbewezen:[],fouten:[]}]) {
+    assert.ok(coverage.interactionInventory({gevonden:0,aangeraakt:[],onaangeraakt:[],navigatie}).untouched.length>0);
+  }
 });

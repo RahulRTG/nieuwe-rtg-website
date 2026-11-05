@@ -1727,7 +1727,20 @@ async function edgeCatalogus(page) {
 }
 
 async function edgeActies(page) {
-  await page.waitForSelector('body[data-rtg-adaptive-ready="true"]', { state: 'attached' });
+  await page.waitForSelector('body[data-rtg-adaptive-ready="true"], html[data-ds] .ds-edge__balk', { state: 'attached' });
+  /* Volledige DS-schermen hebben hun eigen centrale Edge en laden de oude
+     Adaptive Edge bewust niet. De proef gebruikt in beide presentaties
+     dezelfde gebruikershandeling: Acties openen en de zichtbare bediening
+     lezen. Zo blijft de helper één contract, zonder een legacy-Edge terug op
+     een gemigreerd scherm te eisen. */
+  if (await page.locator('html[data-ds] .ds-edge__balk [data-ds-edge="acties"]').isVisible() &&
+      !await page.locator('body[data-rtg-adaptive-ready="true"]').count()) {
+    const blad = page.locator('#dsEdgeBlad:not([hidden])');
+    if (!await blad.isVisible()) await page.locator('.ds-edge__balk [data-ds-edge="acties"]').click();
+    await blad.waitFor({ state: 'visible' });
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    return blad.innerText();
+  }
   // Het ene oppervlak verandert van vorm: een open sheet vervangt de balk.
   // Chat/mail lenen hun echte invoer aan de surface; haar mond opent dezelfde
   // acties. Nooit op de bewust verborgen oude balk blijven wachten.
@@ -1757,10 +1770,16 @@ async function edgeActies(page) {
   // voert die render uit, het tweede bewijst dat de zichtbare kopie stabiel is.
   // Zo raakt een onmiddellijke Playwright-klik niet een zojuist vervangen knop.
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  return page.locator('.rtg-adaptive-controls').innerText();
 }
 
 async function edgeBediening(page, naam) {
   await edgeActies(page);
+  const dsBlad = page.locator('#dsEdgeBlad:not([hidden])');
+  if (await dsBlad.isVisible()) {
+    await dsBlad.getByRole('button', { name: naam, exact: true }).click();
+    return;
+  }
   await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();
 }
 

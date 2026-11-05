@@ -20,6 +20,20 @@
   "continuityChecks": ["destination", "back-forward", "context-preservation", "error-recovery"],
   "interactionChecks": ["visible", "understandable", "consistent", "operable"],
   "inventoryBaselines": {"logicalApps":114,"screens":316},
+  "configurationCoverage": {
+    "continuity:destination": {
+      "version": 1,
+      "states": "all",
+      "devices": "all",
+      "networks": "all",
+      "deviceConfigurations": {
+        "mobile-small": {"browser":"chromium","viewport":{"width":320,"height":568},"deviceScaleFactor":1,"touch":false},
+        "mobile-large": {"browser":"chromium","viewport":{"width":430,"height":932},"deviceScaleFactor":1,"touch":false},
+        "tablet": {"browser":"chromium","viewport":{"width":820,"height":1180},"deviceScaleFactor":1,"touch":false},
+        "desktop": {"browser":"chromium","viewport":{"width":1440,"height":900},"deviceScaleFactor":1,"touch":false}
+      }
+    }
+  },
   "profiles": {
     "interface": {
       "dimensions": ["identity", "composition", "continuity", "restraint", "adaptability", "accessibility", "fluidity", "human-quality"]
@@ -53,7 +67,25 @@
     "qualificationRunsRequireCleanState": true,
     "qualificationRunsRequireIndependentEvidenceBuild": true,
     "criticalBlockersCannotBeAveraged": true,
-    "criticalBlockerDomains": ["financial-safety", "authorization", "contract-signature"]
+    "criticalBlockerDomains": ["financial-safety", "authorization", "contract-signature"],
+    "requiredQualificationGates": [
+      {"id":"evidence-dependency-integrity","label":"Bewijsafhankelijkheden","requires":"commit, source fingerprint, test configuration, dependency scope and validity state"},
+      {"id":"negative-contracts","label":"Negatieve bewijzen","requires":"forbidden authorization, financial, offline and AI actions fail closed"},
+      {"id":"data-migration-compatibility","label":"Datamigratie en compatibiliteit","requires":"supported upgrade, interrupted migration, old client, rollback and restored-data proofs"},
+      {"id":"concurrency-load","label":"Gelijktijdigheid en belasting","requires":"bounded latency, errors, queues, memory and recovery under production-like concurrency"},
+      {"id":"external-dependencies","label":"Externe afhankelijkheden","requires":"each provider is production-proven, explicitly simulated or safely disabled"},
+      {"id":"experience-budgets","label":"Meetbare Experience-budgetten","requires":"objective performance, stability, accessibility and task-completion budgets"},
+      {"id":"operational-incident","label":"Operationele noodprocedure","requires":"detection, alert, impact assessment, recovery or rollback, data check and incident record"},
+      {"id":"independent-reproducibility","label":"Bewijsintegriteit en reproduceerbaarheid","requires":"two clean independent evidence builds on the same immutable candidate"}
+    ],
+    "experienceBudgets": {
+      "lcpP75MsMax": 2500,
+      "inpP75MsMax": 200,
+      "clsP75Max": 0.1,
+      "interactiveTargetPxMin": 44,
+      "unexplainedVisualRegressionsMax": 0,
+      "humanCriticalFindingsMax": 0
+    }
   },
   "executedProofs": [
     {
@@ -97,6 +129,47 @@
         "pageErrors": 0
       },
       "limits": "Alleen de ingelogde lid-ingang in normal-toestand op deze Chromium-viewport; geen alle-device destination, autorisatie, menselijke kwaliteit of schermvrijgave."
+    },
+    {
+      "proof": "hotels-destination",
+      "instrument": "test/hotels-ds.e2e.js",
+      "type": "hotels-normal-destination-v1",
+      "subjectType": "screen",
+      "subjectId": "screen:/apps/hotels.html",
+      "dimension": "continuity",
+      "requirement": "destination",
+      "method": "browser",
+      "scope": "hotels-member-normal-chromium",
+      "check": "Hotels destination normal",
+      "devices": "all",
+      "configuration": {"persona":"rtg-member","state":"normal","network":"normal","reducedMotion":true,"locale":"nl-NL","serviceWorkers":"block"},
+      "expected": {
+        "path":"/apps/hotels.html","sameOrigin":true,"world":"travel","title":"RTG Verblijven",
+        "heading":"Waar wilt u thuiskomen?","mainVisible":true,"headingVisible":true,"headingUnobscured":true,
+        "catalogueVisible":true,"ownerAuthenticated":true,"redirects":0,"documentErrors":0,"pageErrors":0,
+        "networkOnline":true,"documentStatus":200,"ownerStatus":200
+      },
+      "limits": "Per bestaand apparaatprofiel één normale ingelogde collectie bij een nieuwe lokale Chromium-context zonder netwerkvertraging of offline-instelling. De browser meet online-status, documentantwoord en de echte ingelogde eigenaar. Geen constrained/offline-netwerk, andere toestand, fysieke apparaten, volledige matrix of menselijke kwalificatie."
+    },
+    {
+      "proof":"juridisch-destination","instrument":"test/juridisch-ds.e2e.js",
+      "type":"juridisch-public-normal-destination-v1",
+      "subjectType":"screen","subjectId":"screen:/apps/juridisch.html",
+      "dimension":"continuity","requirement":"destination","method":"browser",
+      "scope":"juridisch-public-normal-chromium","check":"Juridisch destination normal","devices":"all",
+      "configuration":{"persona":"anonymous","state":"normal","network":"normal","reducedMotion":true,"locale":"nl-NL","serviceWorkers":"block"},
+      "expected":{
+        "path":"/apps/juridisch.html","sameOrigin":true,"world":"living","title":"Juridisch","heading":"Juridisch",
+        "mainVisible":true,"headingVisible":true,"headingUnobscured":true,
+        "documentLinks":[
+          {"url":"/apps/juridisch/voorwaarden.html","title":"Algemene voorwaarden"},
+          {"url":"/apps/juridisch/privacy.html","title":"Privacybeleid"},
+          {"url":"/apps/juridisch/partnervoorwaarden.html","title":"Partnervoorwaarden"}
+        ],
+        "linksReachable":true,"cookieNoticePresent":false,"networkOnline":true,"documentStatus":200,
+        "redirects":0,"documentErrors":0,"pageErrors":0
+      },
+      "limits":"Alleen de publieke overzichtsroute met drie bestaande documentlinks, afgehandelde cookiemelding en nieuwe anonieme Chromium-context per contractprofiel, op de lokale server zonder netwerkvertraging of offline-modus. Geen authenticatie, empty-state, eerste bezoek, inhoudelijke juridische zekerheid, prijs-API, alle-documentenmatrix, fysieke apparaten of menselijke kwalificatie."
     }
   ]
 }

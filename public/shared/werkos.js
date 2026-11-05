@@ -11,215 +11,12 @@
   'use strict';
   const $ = (s, r) => (r || document).querySelector(s);
 
-  const CSS = `
-  body.wos .tabbar{display:none !important;}
-  body.wos.wos-aan .content{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6.5rem) !important;}
-  body.wos #shell{background:var(--rtg-grond,var(--rtg-bg));}
-  body.wos .topbar{
-    position:relative;z-index:5;background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 92%,transparent);
-    border-bottom-color:var(--rtg-line);box-shadow:none;
-    backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
-  }
-
-  /* Functies komen na het echte werk van het thuisscherm. De kop markeert de
-     overgang; hij doet niet alsof een losse app een merk of een wereld is. */
-  .wos-navkop{margin:2.4rem 0 0;padding:1rem 0 .75rem;border-top:1px solid var(--rtg-line);}
-  .wos-navkop span{display:block;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rtg-soft);font-weight:650;}
-  .wos-navkop p{margin:.28rem 0 0;font-size:.82rem;line-height:1.5;color:var(--rtg-muted);}
-
-  /* Een register in plaats van een kaarten-dashboard. Geen doosjes om namen:
-     alleen glyph, naam, vaste referentie en haarlijnen. */
-  .wos-grid{display:grid;grid-template-columns:1fr 1fr;margin:0 0 2.25rem;border-top:1px solid var(--rtg-line);}
-  .wos-app{
-    position:relative;min-width:0;min-height:56px;padding:.65rem .9rem;
-    display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:.75rem;
-    border:0;border-bottom:1px solid var(--rtg-line);background:transparent;color:var(--rtg-txt);
-    font-family:var(--rtg-interface,Inter,system-ui,sans-serif);text-align:left;cursor:pointer;
-    transition:background var(--rtg-tijd-kort,120ms) var(--rtg-veer,ease);
-  }
-  .wos-app:nth-child(odd){border-right:1px solid var(--rtg-line);}
-  .wos-app::after{content:"WOS-" attr(data-index);font-size:.5rem;letter-spacing:.12em;color:var(--rtg-soft);font-variant-numeric:tabular-nums;}
-  .wos-app:hover{background:rgba(255,255,255,.028);}
-  .wos-app:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:-2px;}
-  .wos-app:active{background:rgba(255,255,255,.045);}
-  .wos-tegel{width:34px;height:34px;display:flex;align-items:center;justify-content:flex-start;color:var(--rtg-muted);}
-  .wos-tegel svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:var(--rtg-stroke,1.6);stroke-linecap:round;stroke-linejoin:round;}
-  .wos-naam{min-width:0;font-size:.78rem;line-height:1.35;color:var(--rtg-txt);font-weight:550;overflow-wrap:anywhere;}
-  .wos-grid + h2{margin-top:1.8rem;}
-
-  body.wos.wos-thuis .content{background:transparent;}
-  @media (min-width:700px){
-    body.wos.wos-thuis .view.active{min-height:calc(100dvh - 10.5rem);display:flex;flex-direction:column;}
-    body.wos.wos-thuis .wos-navkop{margin-top:auto;}
-    body.wos.wos-thuis .wos-app{min-height:64px;}
-  }
-  @media (max-width:620px){
-    .wos-grid{grid-template-columns:1fr;}
-    .wos-app:nth-child(odd){border-right:0;}
-    .wos-navkop{margin-top:2rem;}
-  }
-` +
-/* WerkOS-commandobalk, Command Center en tabletindeling. */
-`  /* De onderbalk is een onyx commandobalk, geen los merkobject. */
-  .wos-dock{
-    position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .8rem);
-    z-index:60;display:none;align-items:stretch;padding:0;
-    background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 94%,transparent);
-    border:1px solid var(--rtg-line);border-top-color:var(--gold-rand,var(--rtg-goud));
-    box-shadow:none;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  }
-  body.wos.wos-aan .wos-dock,body.wos.wos-bord-aan .wos-dock{display:flex;}
-  .wos-dock button{
-    position:relative;width:48px;height:48px;display:flex;align-items:center;justify-content:center;
-    border:0;border-left:1px solid var(--rtg-line);border-radius:0;background:transparent;color:var(--rtg-muted);
-    cursor:pointer;transition:color var(--rtg-tijd-kort,120ms) var(--rtg-veer,ease),background var(--rtg-tijd-kort,120ms) var(--rtg-veer,ease);
-  }
-  .wos-dock button:first-child{border-left:0;}
-  .wos-dock button:hover{background:rgba(255,255,255,.035);color:var(--rtg-txt);}
-  .wos-dock button:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:-3px;}
-  .wos-dock button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:var(--rtg-stroke,1.6);stroke-linecap:round;stroke-linejoin:round;}
-  .wos-dock button.actief{color:var(--gold-tekst,var(--rtg-goud));background:rgba(255,255,255,.025);}
-  .wos-dock button.actief::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;background:var(--gold-basis,#857007);}
-  @media (hover:hover) and (min-width:700px){
-    .wos-dock button::before{
-      content:attr(data-label);position:absolute;left:50%;bottom:calc(100% + 9px);transform:translate(-50%,3px);opacity:0;
-      pointer-events:none;white-space:nowrap;background:var(--onyx-basis,#0C0C0B);border:1px solid var(--rtg-line);
-      padding:.32rem .48rem;color:var(--rtg-txt);font-size:.55rem;letter-spacing:.04em;transition:opacity .12s,transform .12s;
-    }
-    .wos-dock button:hover::before{opacity:1;transform:translate(-50%,0);}
-  }
-
-  /* Command Center gebruikt op desktop het hele werkvlak: commando links,
-     resultaten in het midden en context rechts. */
-  .wos-zoek{
-    position:fixed;inset:0;z-index:90;display:none;align-items:stretch;justify-content:center;
-    padding:clamp(1rem,3vw,2.4rem);background:rgba(5,5,5,.88);
-    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  }
-  .wos-zoek.open{display:flex;}
-  body.wos-command-open{overflow:hidden;}
-  .wos-zoek-paneel{
-    width:min(1180px,100%);height:100%;min-height:0;display:grid;grid-template-rows:76px minmax(0,1fr) 44px;
-    border:1px solid var(--rtg-line);border-top-color:var(--gold-rand,var(--rtg-goud));
-    background:var(--onyx-glans,var(--onyx-basis,#0C0C0B));box-shadow:none;overflow:hidden;
-  }
-  .wos-zoek-kop{display:flex;align-items:center;padding:0 1.2rem;border-bottom:1px solid var(--rtg-line);background:transparent;}
-  .wos-zoek-kop b{font-family:var(--rtg-display,'Bodoni Moda',serif);font-size:1.35rem;font-weight:500;color:var(--rtg-txt);}
-  .wos-zoek-kop span{display:block;margin-top:.15rem;font-size:.5rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-soft);font-weight:650;}
-  .wos-zoek-sluit{margin-left:auto;width:34px;height:34px;border:1px solid var(--rtg-line);border-radius:0;background:transparent;color:var(--rtg-muted);cursor:pointer;}
-  .wos-zoek-sluit:hover{color:var(--rtg-txt);border-color:var(--gold-rand,var(--rtg-line));}
-  .wos-zoek-sluit:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:2px;}
-  .wos-zoek-body{min-height:0;display:grid;grid-template-columns:190px minmax(0,1fr) 260px;}
-  .wos-zoek-rail{padding:1.25rem 1rem;border-right:1px solid var(--rtg-line);}
-  .wos-zoek-rail>span,.wos-context>span{display:block;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-soft);}
-  .wos-zoek-rail ol{list-style:none;margin:1.1rem 0 0;padding:0;border-top:1px solid var(--rtg-line);counter-reset:stap;}
-  .wos-zoek-rail li{counter-increment:stap;padding:.72rem 0;border-bottom:1px solid var(--rtg-line);color:var(--rtg-muted);font-size:.68rem;}
-  .wos-zoek-rail li::before{content:"0" counter(stap);display:inline-block;width:2.2rem;color:var(--rtg-soft);font-size:.48rem;letter-spacing:.1em;}
-  .wos-zoek-rail li:first-child{color:var(--rtg-txt);box-shadow:inset 2px 0 var(--gold-basis,#857007);padding-left:.55rem;}
-  .wos-zoek-kern{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);}
-  .wos-zoek-veld{position:relative;margin:1.05rem;border-bottom:1px solid var(--rtg-line);padding-bottom:1.05rem;}
-  .wos-zoek-veld::before{content:"/";position:absolute;left:.9rem;top:calc(50% - .5rem);transform:translateY(-50%);color:var(--gold-tekst,var(--rtg-goud));font-family:var(--rtg-display,'Bodoni Moda',serif);font-size:1.08rem;}
-  .wos-zoek-paneel input{width:100%;padding:.84rem 1rem .84rem 2.05rem;border:1px solid var(--rtg-line);border-radius:0;background:rgba(255,255,255,.025);color:var(--rtg-txt);font-size:.86rem;outline:none;font-family:inherit;}
-  .wos-zoek-paneel input::placeholder{color:var(--rtg-soft);}
-  .wos-zoek-paneel input:focus{border-color:var(--gold-rand,var(--rtg-line));box-shadow:inset 2px 0 var(--gold-basis,#857007);}
-  .wos-zoek-lijst{min-height:0;height:100%;padding:0 1.05rem 1rem;display:grid;grid-auto-rows:minmax(58px,1fr);overflow-y:auto;}
-  .wos-zoek-lijst button{width:100%;min-height:58px;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:.72rem;padding:.55rem .55rem;text-align:left;cursor:pointer;border:0;border-bottom:1px solid var(--rtg-line);border-radius:0;background:transparent;color:var(--rtg-txt);font-size:.78rem;font-family:inherit;}
-  .wos-zoek-lijst button:hover,.wos-zoek-lijst button.is-selected{background:rgba(255,255,255,.035);box-shadow:inset 2px 0 var(--gold-basis,#857007);}
-  .wos-zoek-lijst button:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:-2px;}
-  .wos-zoek-lijst .zi{width:34px;height:34px;display:flex;align-items:center;justify-content:flex-start;color:var(--rtg-muted);}
-  .wos-zoek-lijst .zi svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:var(--rtg-stroke,1.6);}
-  .wos-zoek-code{margin-left:auto;font-size:.48rem;letter-spacing:.12em;color:var(--rtg-soft);font-variant-numeric:tabular-nums;}
-  .wos-zoek-leeg{padding:1.3rem .55rem;color:var(--rtg-muted);font-size:.72rem;}
-  .wos-context{position:relative;padding:1.25rem;border-left:1px solid var(--rtg-line);}
-  .wos-context b{display:block;margin-top:1.2rem;font:500 1.45rem/1.08 var(--rtg-display,'Bodoni Moda',serif);color:var(--rtg-txt);}
-  .wos-context p{margin:.65rem 0 0;color:var(--rtg-muted);font-size:.72rem;line-height:1.6;}
-  .wos-context code{position:absolute;left:1.25rem;right:1.25rem;bottom:1.25rem;padding-top:.75rem;border-top:1px solid var(--rtg-line);color:var(--rtg-soft);font:500 .5rem var(--rtg-interface,Inter,sans-serif);letter-spacing:.14em;text-transform:uppercase;}
-  .wos-zoek-voet{display:flex;align-items:center;gap:1rem;padding:0 1.15rem;border-top:1px solid var(--rtg-line);font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-soft);}
-  .wos-zoek-voet span:last-child{margin-left:auto;}
-  .wos-zoek-voet kbd{font-family:inherit;color:var(--rtg-txt);border:1px solid var(--rtg-line);border-radius:0;padding:.08rem .24rem;margin-right:.28rem;background:transparent;}
-  @media (max-width:820px){.wos-zoek-body{grid-template-columns:1fr}.wos-zoek-rail,.wos-context{display:none}}
-  @media (min-width:901px){
-    body.wos.wos-aan .topbar,body.wos.wos-aan .content,body.wos.wos-bord-aan header,body.wos.wos-bord-aan #app{margin-left:176px;}
-    body.wos.wos-aan .wos-dock,body.wos.wos-bord-aan .wos-dock{left:calc(50% + 88px);}
-  }
-  @media (min-width:621px) and (max-width:900px){
-    body.wos .wos-rail{width:64px;}body.wos .wos-rail-kop{font-size:0;height:42px;padding:0;}body.wos .wos-rail-kop::after{content:"WOS";height:42px;display:grid;place-items:center;font-size:.46rem;letter-spacing:.12em;color:var(--rtg-soft);}
-    body.wos .wos-rail button{grid-template-columns:1fr;padding:.55rem;justify-items:center;}body.wos .wos-rail button span{display:none;}
-    body.wos.wos-aan .topbar,body.wos.wos-aan .content,body.wos.wos-bord-aan header,body.wos.wos-bord-aan #app{margin-left:64px;}
-    body.wos.wos-aan .wos-dock,body.wos.wos-bord-aan .wos-dock{left:calc(50% + 32px);}
-    body.wos .wos-top-huidig{min-width:130px;}
-  }
-` +
-/* WerkOS op mobiel: compacte rail, context en bereikbare bediening. */
-`  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
-     De contextbalk krijgt een eigen rij, de rail blijft een compacte
-     glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */
-  @media (max-width:620px){
-    body.wos.wos-aan:not(.wos-thuis) .wos-pill{display:flex;}
-    body.wos .wos-rail{width:50px;}
-    body.wos .wos-rail-kop{font-size:0;height:36px;padding:0;}
-    body.wos .wos-rail-kop::after{content:"W";height:36px;display:grid;place-items:center;font:500 .75rem var(--rtg-display,'Bodoni Moda',serif);color:var(--gold-tekst,var(--rtg-goud));}
-    body.wos .wos-rail button{grid-template-columns:1fr;padding:.5rem;justify-items:center;min-height:48px;}
-    body.wos .wos-rail button span{display:none;}
-    body.wos.wos-aan .topbar,body.wos.wos-aan .content,body.wos.wos-bord-aan header,body.wos.wos-bord-aan #app{margin-left:50px;}
-    body.wos.wos-aan .topbar{padding-top:calc(env(safe-area-inset-top,0px) + 4.15rem);}
-    body.wos.wos-bord-aan header{padding-top:calc(env(safe-area-inset-top,0px) + 4rem);}
-    .wos-dock{left:calc(50% + 25px);bottom:calc(env(safe-area-inset-bottom,0px) + .65rem);max-width:calc(100vw - 62px);overflow:hidden;}
-    .wos-dock button{width:44px;height:44px;}
-    body.wos .wos-top-context{position:fixed;z-index:55;top:calc(env(safe-area-inset-top,0px) + .55rem);right:.55rem;left:.55rem;transform:none;height:42px;}
-    body.wos .wos-top-context button{width:42px;flex:0 0 42px;}
-    body.wos .wos-top-huidig{display:flex;min-width:0;flex:1;overflow:hidden;}
-    body.wos .wos-top-huidig b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .wos-zoek{padding:.65rem;}
-    .wos-zoek-paneel{height:100%;grid-template-rows:64px minmax(0,1fr) 40px;}
-    .wos-zoek-voet{gap:.55rem;}
-    .wos-zoek-voet span:nth-child(2){display:none;}
-  }
-  @media (max-width:360px){.wos-dock button:nth-child(n+5):not(:last-child){display:none;}}
-` +
-/* WerkOS-beweging, vaste rail en contextschil. */
-`  /* Beweging bevestigt alleen een wissel van werkvlak. */
-  @media (prefers-reduced-motion:no-preference){
-    body.wos-aan .view.active{animation:wosOpen var(--rtg-tijd-normaal,180ms) var(--rtg-veer,ease);}
-    @keyframes wosOpen{from{transform:translateY(4px);opacity:.72;}to{transform:none;opacity:1;}}
-    body.wos .content.wos-veeg-terug{transition:transform .18s var(--rtg-veer,ease),opacity .18s ease;}
-    body.wos .content.wos-veeg-weg{transition:transform .15s ease-in,opacity .15s ease-in;transform:translateY(-18px);opacity:0;}
-  }
-  .wos-pill{
-    position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .2rem);
-    z-index:61;width:116px;height:18px;background:none;border:0;padding:0;cursor:pointer;
-    display:none;align-items:center;justify-content:center;touch-action:none;
-  }
-  .wos-pill::after{content:"";width:86px;height:2px;background:var(--rtg-soft);}
-  .wos-pill:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:2px;}
-  body.wos-thuis .wos-pill,body:not(.wos-aan) .wos-pill{display:none;}
-
-  /* De vaste WerkOS-schil: links alle werkvlakken, boven de huidige context
-     en onder de snelle commando's. Elke balk bedient het geopende scherm. */
-  .wos-rail{
-    position:fixed;z-index:50;left:0;top:var(--wos-top-h,64px);bottom:0;width:176px;display:none;
-    border-right:1px solid var(--rtg-line);background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 97%,transparent);
-    overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);
-  }
-  body.wos.wos-aan .wos-rail,body.wos.wos-bord-aan .wos-rail{display:block;}
-  .wos-rail-kop{padding:1rem .85rem .7rem;border-bottom:1px solid var(--rtg-line);font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-soft);}
-  .wos-rail button{position:relative;width:100%;min-height:52px;display:grid;grid-template-columns:28px minmax(0,1fr);align-items:center;gap:.55rem;padding:.55rem .75rem;border:0;border-bottom:1px solid var(--rtg-line);border-radius:0;background:transparent;color:var(--rtg-muted);font:500 .68rem/1.3 var(--rtg-interface,Inter,sans-serif);text-align:left;cursor:pointer;}
-  .wos-rail button:hover{background:rgba(255,255,255,.03);color:var(--rtg-txt);}
-  .wos-rail button:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:-2px;}
-  .wos-rail button.actief{color:var(--rtg-txt);background:rgba(255,255,255,.025);box-shadow:inset 2px 0 var(--gold-basis,#857007);}
-  .wos-rail button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:var(--rtg-stroke,1.6);stroke-linecap:round;stroke-linejoin:round;}
-  .wos-top-context{position:absolute;left:50%;transform:translateX(-50%);display:none;align-items:stretch;height:38px;border:1px solid var(--rtg-line);background:rgba(5,5,5,.26);}
-  body.wos.wos-aan .wos-top-context,body.wos.wos-bord-aan .wos-top-context{display:flex;}
-  .wos-top-context button{width:38px;border:0;border-radius:0;background:transparent;color:var(--rtg-muted);display:grid;place-items:center;cursor:pointer;}
-  .wos-top-context button+button,.wos-top-context .wos-top-huidig+button{border-left:1px solid var(--rtg-line);}
-  .wos-top-context button:hover{background:rgba(255,255,255,.035);color:var(--rtg-txt);}
-  .wos-top-context button:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:-2px;}
-  .wos-top-context svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:var(--rtg-stroke,1.6);stroke-linecap:round;stroke-linejoin:round;}
-  .wos-top-huidig{min-width:170px;padding:.42rem .75rem;display:flex;flex-direction:column;justify-content:center;}
-  .wos-top-huidig span{font-size:.47rem;letter-spacing:.13em;text-transform:uppercase;color:var(--rtg-soft);}
-  .wos-top-huidig b{margin-top:.08rem;font:550 .66rem var(--rtg-interface,Inter,sans-serif);color:var(--rtg-txt);}
-  `;
-
+  /* Presentatie: /ds/componenten/werkos.css, statisch geladen door iedere host. */
+/* WerkOS-commandobalk, Command Center en tabletindeling wonen in
+   /ds/componenten/werkos.css; dit bundeldeel blijft als expliciete historische naad. */
+/* WerkOS mobiel woont in /ds/componenten/werkos.css; dit bundeldeel blijft als
+   expliciete historische naad voor de bestaande bundelregistratie. */
+/* WerkOS-beweging, rail en contextpresentatie: /ds/componenten/werkos.css. */
   const HUIS_SVG = '<svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>';
   const ZOEK_SVG = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
 
@@ -234,10 +31,7 @@
     const thuisView = document.querySelector('.view[data-view="' + thuisTab + '"]');
     if (!tabbar || !app || !thuisView) return;
 
-    const stijl = document.createElement('style');
-    stijl.textContent = CSS;
-    document.head.appendChild(stijl);
-    document.body.classList.add('wos');
+    document.body.classList.add('ds-werkos', 'wos');
 
     const knop = t => tabbar.querySelector('button[data-tab="' + t + '"]');
     const zichtbaar = b => !!b && b.style.display !== 'none';
@@ -276,8 +70,10 @@
     const topZoek = document.createElement('button'); topZoek.type = 'button'; topZoek.innerHTML = ZOEK_SVG;
     topZoek.setAttribute('aria-label', 'Command Center openen'); topZoek.addEventListener('click', zoekOpen);
     topContext.appendChild(topHome); topContext.appendChild(topHuidig); topContext.appendChild(topZoek);
+    /* De contextbalk hoort bij de werkruimte. Buiten een mogelijk
+       getransformeerde appkop blijft `position: fixed` echt viewportvast. */
+    document.body.appendChild(topContext);
     if (topbar) {
-      topbar.appendChild(topContext);
       const meetTop = () => document.body.style.setProperty('--wos-top-h', Math.ceil(topbar.getBoundingClientRect().height) + 'px');
       meetTop(); if (window.ResizeObserver) new ResizeObserver(meetTop).observe(topbar);
     }
@@ -530,40 +326,7 @@
   /* Backoffice-commandolaag: kiezen scrolt naar het juiste paneel. */
   function bord(opts) {
     opts = opts || {};
-    document.body.classList.add('wos', 'wos-bord-aan');
-    const stijl = document.createElement('style');
-    stijl.textContent = CSS + `
-    .wos-bord{
-      position:fixed;inset:0;z-index:80;display:none;height:100dvh;box-sizing:border-box;overflow-y:auto;
-      background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 96%,transparent);
-      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-      padding:clamp(1.4rem,4vh,2.7rem) 1.4rem;
-    }
-    .wos-bord.open{display:block;}
-    .wos-bord-kader{width:min(1120px,100%);min-height:100%;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr);}
-    .wos-bord-kop{position:relative;margin-bottom:1.2rem;padding:1.2rem 3.6rem 1.25rem 0;border-top:1px solid var(--gold-rand,var(--rtg-line));border-bottom:1px solid var(--rtg-line);background:transparent;}
-    .wos-bord-kicker{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-soft);font-weight:650;}
-    .wos-bord-titel{margin-top:.52rem;font-family:var(--rtg-display,'Bodoni Moda',serif);font-size:clamp(1.65rem,3.5vw,2.7rem);font-weight:500;line-height:1.02;letter-spacing:-.02em;color:var(--rtg-txt);}
-    .wos-bord-sub{margin-top:.5rem;max-width:34rem;font-size:.72rem;line-height:1.58;color:var(--rtg-muted);}
-    .wos-bord-sluit{position:absolute;right:0;top:1rem;width:34px;height:34px;border:1px solid var(--rtg-line);border-radius:0;background:transparent;color:var(--rtg-muted);cursor:pointer;}
-    .wos-bord-sluit:hover{border-color:var(--gold-rand,var(--rtg-line));color:var(--rtg-txt);}
-    .wos-bord-sluit:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:2px;}
-    .wos-bord .wos-grid{width:100%;min-height:0;margin:0;align-self:stretch;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(68px,1fr);}
-    .wos-bord .wos-app{min-height:68px;}
-    .wos-flits{outline:1px solid var(--gold-tekst,var(--rtg-goud)) !important;outline-offset:3px;transition:outline-color .6s;}
-    .wos-bord-knop{
-      display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;
-      min-height:32px;border:0;border-bottom:1px solid var(--rtg-line);border-radius:0;
-      background:transparent;color:var(--rtg-muted);
-      padding:.48rem .78rem;font-size:.62rem;font-family:inherit;letter-spacing:.11em;text-transform:uppercase;
-      box-shadow:none;transition:border-color .12s,color .12s,background .12s;
-    }
-    .wos-bord-knop:hover{border-color:var(--gold-rand,var(--rtg-line));background:rgba(255,255,255,.025);color:var(--rtg-txt);}
-    .wos-bord-knop:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:2px;}
-    .wos-bord-knop svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:var(--rtg-stroke,1.6);}
-    @media (max-width:620px){.wos-bord{height:auto;min-height:100dvh;padding:1.2rem .9rem 2rem}.wos-bord-kader{min-height:auto}.wos-bord-kop{padding:1.1rem 3rem 1.1rem 0}.wos-bord .wos-grid{grid-template-columns:1fr;grid-auto-rows:minmax(68px,auto)}}
-    `;
-    document.head.appendChild(stijl);
+    document.body.classList.add('ds-werkos', 'wos', 'wos-bord-aan');
 
     const scrim = document.createElement('div');
     scrim.className = 'wos-bord';

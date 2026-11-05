@@ -20,6 +20,11 @@
 (function (w, d) {
   'use strict';
   if (w.RTGZaakCommand) return;
+  if (d && d.documentElement && !d.documentElement.hasAttribute('data-ds') && !d.getElementById('rtgDsRuntimeCss')) {
+    var link = d.createElement('link');
+    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+    d.head.appendChild(link);
+  }
 
   var esc = function (t) {
     return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
@@ -36,50 +41,7 @@
   var NIVEAU = { auto: 'vanzelf', assist: 'met hulp', hand: 'zelf doen' };
   function nv(n) { return '<span class="zc-nv zc-' + esc(n) + '">' + esc(NIVEAU[n] || n) + '</span>'; }
 
-  var CSS =
-    '.zc{font-family:Inter,system-ui,sans-serif;color:var(--txt,#F4F1EC);}' +
-    '.zc h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.05rem;margin:0 0 .3rem;}' +
-    '.zc .zc-rail{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;}' +
-    '.zc .zc-rail button{background:transparent;border:1px solid var(--line,rgba(255,255,255,.16));border-radius:0;' +
-      'color:inherit;font:inherit;font-size:.8rem;padding:.4rem .9rem;cursor:pointer;}' +
-    '.zc .zc-rail button[aria-current]{background:var(--card2,rgba(255,255,255,.06));border-color:var(--gold,#A98F1C);}' +
-    '.zc .zc-kaart{background:var(--card,rgba(255,255,255,.04));border:1px solid var(--line,rgba(255,255,255,.16));' +
-      'border-radius:0;padding:.9rem 1rem;margin-bottom:.7rem;}' +
-    '.zc .zc-meta{font-size:.76rem;color:var(--soft,rgba(244,241,236,.55));line-height:1.5;}' +
-    '.zc .zc-rij{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-top:.6rem;}' +
-    '.zc .zc-knop{background:transparent;border:1px solid var(--line,rgba(255,255,255,.16));border-radius:0;' +
-      'color:inherit;font:inherit;font-size:.8rem;padding:.4rem .85rem;cursor:pointer;}' +
-    '.zc .zc-knop.vol{background:var(--gold,#A98F1C);border-color:var(--gold,#A98F1C);color:#1C1608;font-weight:600;}' +
-    '.zc .zc-knop:disabled{opacity:.45;cursor:default;}' +
-    '.zc .zc-veld{background:var(--card2,rgba(255,255,255,.06));border:1px solid var(--line,rgba(255,255,255,.16));' +
-      'border-radius:0;color:inherit;font:inherit;font-size:.85rem;padding:.45rem .7rem;}' +
-    '.zc .zc-tegels{display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:.6rem;margin-bottom:.9rem;}' +
-    '.zc .zc-tegel{background:var(--card,rgba(255,255,255,.04));border:1px solid var(--line,rgba(255,255,255,.16));' +
-      'border-radius:0;padding:.7rem .8rem;}' +
-    '.zc .zc-tegel b{display:block;font-family:"Bodoni Moda",Georgia,serif;font-size:1.5rem;font-variant-numeric:tabular-nums;}' +
-    '.zc .zc-tegel span{display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;' +
-      'color:var(--soft,rgba(244,241,236,.55));}' +
-    '.zc .zc-sig{border-left:3px solid var(--line,rgba(255,255,255,.16));padding-left:.7rem;margin:.55rem 0;}' +
-    '.zc .zc-sig.rood{border-left-color:#C23A5E;} .zc .zc-sig.amber{border-left-color:#C99A2E;}' +
-    '.zc .zc-nv{display:inline-block;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;' +
-      'border:1px solid var(--line,rgba(255,255,255,.16));border-radius:0;padding:.05rem .45rem;}' +
-    '.zc .zc-auto{border-color:#4C9A75;color:var(--rtg-p-groen,#4C9A75);} .zc .zc-assist{border-color:#C99A2E;color:#C99A2E;}' +
-    '.zc .zc-hand{border-color:#C23A5E;color:#C23A5E;}' +
-    '.zc .zc-leeg{color:var(--soft,rgba(244,241,236,.55));padding:1.6rem 0;font-size:.88rem;}' +
-    /* de duimstand: één kolom, grotere raakvlakken, geen tabelwerk */
-    '.zc.zc-klein .zc-tegels{grid-template-columns:1fr 1fr;}' +
-    '.zc.zc-klein .zc-knop{padding:.6rem 1rem;font-size:.85rem;}' +
-    '.zc.zc-klein .zc-rail button{padding:.55rem 1rem;font-size:.85rem;}';
-
-  var stijlGezet = false;
-  function stijl() {
-    if (stijlGezet) return;
-    stijlGezet = true;
-    var s = d.createElement('style'); s.textContent = CSS;
-    (d.head || d.documentElement).appendChild(s);
-  }
-
-  w.RTGZaakCommand = { esc: esc, tijd: tijd, nv: nv, stijl: stijl, delen: {} };
+  w.RTGZaakCommand = { esc: esc, tijd: tijd, nv: nv, delen: {} };
 })(window, document);
 /* De Regie van de zaak, deel 2: de werkplekken zelf.
 
@@ -97,7 +59,6 @@
   var esc = Z.esc, tijd = Z.tijd, nv = Z.nv;
 
   function toon(el, opties) {
-    Z.stijl();
     var o = opties || {};
     var api = o.api;                      // (pad, body) -> Promise
     var compact = !!o.compact;
@@ -112,7 +73,7 @@
       ? [['nu', 'Nu'], ['lijst', 'Lijst'], ['zoek', 'Zoeken']]
       : [['nu', 'Nu'], ['lijst', 'Uitzonderingen'], ['recht', 'Rechtzetten'], ['zoek', 'Zoeken'], ['regels', 'Instellingen']];
 
-    el.className = 'zc' + (compact ? ' zc-klein' : '');
+    el.className = 'zc ds-zaakcommand' + (compact ? ' zc-klein' : '');
     el.innerHTML = '<div class="zc-rail"></div><div class="zc-vak"><div class="zc-leeg">Laden…</div></div>';
     var rail = el.querySelector('.zc-rail'), vak = el.querySelector('.zc-vak');
 
@@ -223,8 +184,8 @@
             (z.besluit ? '<p class="zc-meta">Besluit: ' + esc(z.besluit.keuze) + ' -- ' + esc(z.besluit.reden) + '</p>'
               : '<div class="zc-rij">' +
                 (z.eigenaar ? '' : '<button class="zc-knop" data-neem="' + esc(z.id) + '">Ik pak hem op</button>') +
-                (S.mag ? '<input class="zc-veld" data-k="' + esc(z.id) + '" placeholder="besluit" style="min-width:8rem;">' +
-                  '<input class="zc-veld" data-r="' + esc(z.id) + '" placeholder="waarom" style="flex:1;min-width:9rem;">' +
+                (S.mag ? '<input class="zc-veld zc-veld-besluit" data-k="' + esc(z.id) + '" placeholder="besluit">' +
+                  '<input class="zc-veld zc-veld-reden" data-r="' + esc(z.id) + '" placeholder="waarom">' +
                   '<button class="zc-knop vol" data-bes="' + esc(z.id) + '">Klaar</button>' : '') +
                 '</div>') +
             '</div>';
@@ -293,7 +254,7 @@
     T.zoek = function () {
       vak.innerHTML = '<div class="zc-kaart"><h3>Zoek in uw zaak</h3>' +
         '<p class="zc-meta">Bestelnummer, tafel, kamer, naam of status. Alleen wat van uw zaak is.</p>' +
-        '<div class="zc-rij"><input class="zc-veld" id="zcQ" placeholder="zoeken…" style="flex:1;min-width:10rem;" value="' + esc(S.zoekterm) + '">' +
+        '<div class="zc-rij"><input class="zc-veld zc-veld-zoek" id="zcQ" placeholder="zoeken…" value="' + esc(S.zoekterm) + '">' +
         '<button class="zc-knop vol" id="zcGa">Zoek</button></div></div><div id="zcUit"></div>';
       var inp = vak.querySelector('#zcQ');
       var doe = function () {
@@ -321,8 +282,8 @@
       return d.groepen.map(function (g) {
         return '<div class="zc-kaart"><h3>' + esc(g.label) + ' <span class="zc-meta">· ' + g.totaal + '</span></h3>' +
           g.rijen.map(function (r) {
-            return '<div class="zc-sig"><button class="zc-knop" data-t="' + esc(r.type) + '" data-i="' + esc(r.id) + '" ' +
-              'style="border:none;padding:0;text-align:left;"><b>' + esc(r.titel) + '</b></button>' +
+            return '<div class="zc-sig"><button class="zc-knop zc-linkknop" data-t="' + esc(r.type) + '" data-i="' + esc(r.id) + '">' +
+              '<b>' + esc(r.titel) + '</b></button>' +
               (r.sub ? '<div class="zc-meta">' + esc(r.sub) + '</div>' : '') + '</div>';
           }).join('') + '</div>';
       }).join('');
@@ -363,7 +324,7 @@
       if (!d.afhankelijkheden.length) u += '<p class="zc-meta">Niets van uw zaak verwijst hiernaar.</p>';
       u += d.afhankelijkheden.map(function (g) {
         return '<div class="zc-sig"><b>' + esc(g.label) + '</b> <span class="zc-meta">' + g.totaal + '</span><div class="zc-meta">' +
-          g.rijen.map(function (x) { return '<button class="zc-knop" data-t="' + esc(x.type) + '" data-i="' + esc(x.id) + '" style="border:none;padding:0;font-size:.78rem;">' + esc(x.titel) + '</button>'; }).join(' · ') +
+          g.rijen.map(function (x) { return '<button class="zc-knop zc-linkknop zc-linkknop-klein" data-t="' + esc(x.type) + '" data-i="' + esc(x.id) + '">' + esc(x.titel) + '</button>'; }).join(' · ') +
           '</div></div>';
       }).join('');
       if (d.afhankelijkhedenOnvolledig) u += '<p class="zc-meta">Let op: een lijst was groter dan de scangrens; dit overzicht is niet volledig.</p>';
@@ -472,8 +433,8 @@
             return '<div class="zc-kaart"><h3>' + esc(g.wat) + '</h3>' +
               '<p class="zc-meta">' + esc(g.id) + ' · versie ' + g.versie + (g.sinds ? ' · sinds ' + esc(tijd(g.sinds)) + ' door ' + esc(g.door) : ' · startwaarde') + '</p>' +
               '<div class="zc-rij"><b>' + esc(String(g.waarde)) + '</b><span class="zc-meta">' + esc(g.eenheid) + '</span>' +
-              '<input class="zc-veld" data-n="' + esc(g.id) + '" placeholder="nieuw" style="width:6rem;">' +
-              '<input class="zc-veld" data-w="' + esc(g.id) + '" placeholder="waarom" style="flex:1;min-width:8rem;">' +
+              '<input class="zc-veld zc-veld-waarde" data-n="' + esc(g.id) + '" placeholder="nieuw">' +
+              '<input class="zc-veld zc-veld-regelreden" data-w="' + esc(g.id) + '" placeholder="waarom">' +
               '<button class="zc-knop vol" data-zet="' + esc(g.id) + '">Zetten</button>' +
               (g.versies > 1 ? '<button class="zc-knop" data-terug2="' + esc(g.id) + '">Eén terug</button>' : '') + '</div></div>';
           }).join('');

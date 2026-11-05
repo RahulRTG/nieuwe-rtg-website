@@ -161,16 +161,14 @@ test('de ronde vertelt ook hoeveel er gekeken is', () => {
 
    Deze toets kijkt naar de STIJLREGEL en niet naar een browser, want dat is de
    plek waar het fout ging en de plek waar het terug kan sluipen. */
-test('de cookiebalk haalt de 24 pixels, ook bij het eerste bezoek', () => {
-  const bron = require('fs').readFileSync(require('path').join(__dirname, '../public/shared/cookie.js'), 'utf8');
-  const regel = (bron.match(/#rtg-cookie a,#rtg-cookie button\{[^}]*\}/) || [''])[0];
-  assert.ok(regel, 'de stijlregel voor de klikbare woorden is er niet meer');
-  assert.match(regel, new RegExp('min-height:' + GRENS + 'px'),
-    'de klikbare woorden in de cookiebalk zijn lager dan WCAG 2.5.8 vraagt');
-  assert.match(regel, new RegExp('min-width:' + GRENS + 'px'),
-    'de klikbare woorden in de cookiebalk zijn smaller dan WCAG 2.5.8 vraagt');
-  /* EN NIET TERUG NAAR border-bottom: die zit op de rand van het vakje, dus met
-     een raakvlak van 24px komt de streep los van de tekst te hangen. */
-  assert.ok(!/border-bottom:\s*1px/.test(regel),
+test('de centrale cookiebalk haalt de 44 pixels, ook bij het eerste bezoek', () => {
+  const css = require('fs').readFileSync(require('path').join(__dirname, '../public/ds/componenten/cookie.css'), 'utf8');
+  const regel = (css.match(/\.ds-cookie :is\(a,button\)\s*\{[^}]*\}/) || [''])[0];
+  assert.ok(regel, 'de centrale stijlregel voor de klikbare woorden is er niet meer');
+  assert.match(regel, /min-block-size:\s*var\(--ds-doel\)/,
+    'de cookiebalk gebruikt het centrale aanraakdoel niet');
+  assert.match(regel, /min-inline-size:\s*var\(--ds-doel\)/,
+    'de cookiebalk gebruikt het centrale aanraakdoel niet');
+  assert.ok(!/border-block-end:\s*1px/.test(regel),
     'de onderlijn zit weer op de rand van het vakje; dan hangt hij los van het woord');
 });

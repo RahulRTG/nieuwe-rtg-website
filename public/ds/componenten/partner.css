@@ -1,0 +1,41 @@
+/* Het bestaande partneroverzicht: vragen, beloften en aandacht met bronvermelding.
+   Eén presentatie; getallen, reactie en zaakselectie blijven bij hun runtime. */
+@layer rtg.component {
+  .ds-partner-shell { display: flex; flex-wrap: wrap; align-items: stretch; min-block-size: 80dvh; padding-block-end: calc(var(--ds-edge-hoogte) + env(safe-area-inset-bottom) + var(--ds-ruimte-6)); }
+  .ds-partner-shell > main { flex: 999 1 30rem; min-inline-size: 0; max-inline-size: 100%; }
+  .ds-partner-rail { flex: 1 1 12rem; min-inline-size: 0; max-inline-size: 100%; display: flex; flex-direction: column; gap: var(--ds-ruimte-4); padding: var(--ds-ruimte-4); border-inline-end: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak-sterk); }
+  .ds-partner-rail nav { display: grid; gap: var(--ds-ruimte-2); }
+  .ds-partner-rail footer { margin-block-start: auto; }
+  .ds-partner-rail .ds-knop { inline-size: 100%; justify-content: flex-start; min-inline-size: var(--ds-doel); }
+  .ds-partner-rail i { font-style: normal; }
+  .ds-partner-rail .actief { background: var(--ds-accent); color: var(--ds-accent-inkt); border-color: var(--ds-accent); }
+  .ds-partner-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-3); padding-block: calc(env(safe-area-inset-top) + var(--ds-ruimte-6)) var(--ds-ruimte-6); padding-inline: var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-partner-top > div { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); }
+  .ds-partner-top > section { font-size: var(--ds-maat-meta); color: var(--ds-inkt-zacht); }
+  .ds-partner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--ds-ruimte-4); padding: var(--ds-goot); }
+  .ds-partner-column { min-inline-size: 0; overflow-wrap: anywhere; padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); background: var(--ds-oppervlak-sterk); scroll-margin-block-start: var(--ds-ruimte-6); }
+  .ds-partner-column > header { color: var(--ds-metaal); font-size: var(--ds-maat-meta); letter-spacing: .1em; }
+  .ds-partner-kpi { display: grid; gap: var(--ds-ruimte-2); margin-block: var(--ds-ruimte-6); padding-block-end: var(--ds-ruimte-4); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-partner-kpi > span { font-size: var(--ds-maat-klein); }
+  .ds-partner-kpi strong { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 400; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .ds-partner-kpi small, .ds-partner-uitleg, .ds-partner-learning small, .ds-partner-event small { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.6; overflow-wrap: anywhere; }
+  .ds-partner-intent { padding: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+  .ds-partner-intent h2 { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 400; overflow-wrap: anywhere; }
+  .ds-partner-intent > div { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); font-size: var(--ds-maat-klein); }
+  .ds-partner-intent footer { margin-block-start: var(--ds-ruimte-4); }
+  .ds-partner-event { padding-block: var(--ds-ruimte-4); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-partner-event em { font-style: normal; color: var(--ds-metaal); font-size: var(--ds-maat-meta); }
+  .ds-partner-event small { display: block; }
+  .ds-partner-learning { margin-block-start: var(--ds-ruimte-6); }
+  .ds-partner-learning ul { padding-inline-start: var(--ds-ruimte-6); }
+  .ds-partner-learning li { margin-block: var(--ds-ruimte-3); }
+  .ds-partner-melding { margin: var(--ds-goot); padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); overflow-wrap: anywhere; }
+  .ds-partner-melding a { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); color: var(--ds-accent); }
+  .ds-partner-dialoog { max-block-size: calc(100dvh - 2 * var(--ds-goot)); overflow-y: auto; }
+  .ds-partner-dialoog form { display: grid; gap: var(--ds-ruimte-4); }
+  .ds-partner-dialoog h2 { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 400; overflow-wrap: anywhere; }
+  .ds-partner-dialoog footer { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+  @container ds (max-width: 70rem) { .ds-partner-grid { grid-template-columns: minmax(0, 1fr); } }
+  @container ds (max-width: 40rem) { .ds-partner-rail { border-inline-end: 0; border-block-end: 1px solid var(--ds-lijnkleur); } .ds-partner-rail nav { grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); } }
+  @media (prefers-reduced-motion: reduce) { .ds-partner .ds-knop { transition: none; } }
+}

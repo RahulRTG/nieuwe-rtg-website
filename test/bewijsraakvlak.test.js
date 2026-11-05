@@ -322,6 +322,22 @@ test('APPWERKT-querybinding wordt als echte browserbron geproduceerd en hercontr
   assert.equal(check().stand,'VERVALLEN','gewijzigde meterlogica mag geen oud browserbewijs gebruiken');
 }));
 
+test('APPWERKT-linkbediening blijft aan de daadwerkelijk bezochte bestemmingsbron gebonden', () => metRepo(({map,sha}) => {
+  const {browserRaakvlakInvoer} = require('../scripts/appwerkt');
+  const row = {functie:'link:a',ingang:'/apps/a.html'};
+  const w = wereld(map), stamp = {op:'nu',commit:sha,boomVuil:false,instrument:'scripts/instr.js',node:process.version};
+  const measured = R.versheidVoor(w,browserRaakvlakInvoer(row),grofSpion())(stamp);
+  assert.equal(measured.vers,true,measured.reden);
+  const hashes = R.hashes(w);
+  const check = () => R.controleer(wereld(map),measured.raakvlak,hashes,row.ingang,grofSpion());
+  assert.equal(check().stand,'VERS');
+  schrijf(map,'public/apps/b.html',BESTANDEN['public/apps/b.html']+'<h1>Andere bestemming</h1>');
+  assert.equal(check().stand,'VERVALLEN','een echte ankertik bewijst ook de bestemming, niet uitsluitend de ingang');
+  schrijf(map,'public/apps/b.html',BESTANDEN['public/apps/b.html']);
+  fs.unlinkSync(path.join(map,'public/apps/b.html'));
+  assert.equal(check().stand,'VERVALLEN','verwijderde linkbestemming mag geen oud bedieningsbewijs behouden');
+}));
+
 test('browservoltooiproef vervalt bij ontbrekende of andere runtime en verwijderd pakketcontract', () => metRepo(({ map, sha }) => {
   const invoer = { ingang: '/apps/a.html', soort: 'browser', kanaal: 'browser',
     scenario: 'scripts/lib/voltooi/a.js', routeInstrument: 'scripts/lib/voltooi/a.js' };

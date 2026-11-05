@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**65 bundels, 504 delen, 3 zonder onderwerp.**
+**68 bundels, 507 delen, 5 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -341,11 +341,12 @@ omlaag.
 
 ## `apps/library/app.js`
 
-`public/apps/library/app/` -- 2 delen, 34 regels in de delen
+`public/apps/library/app/` -- 3 delen, 35 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `app-01.js` | LibraryOS, het scherm: Studio (werken, knooppunten, publiceren, vrijgeven en feedback) |
+| `app-01b.js` | Dezelfde Library-owner: expliciete rechten, publicatie en inhoudelijke feedback |
 | `app-02.js` | LibraryOS, de private Reader: een editie openen en lezen, feedback sturen, en de mobiele weergave |
 
 ## `apps/magnaat-leven.js`
@@ -566,6 +567,15 @@ omlaag.
 | `techniek-03d-sso.js` | SSO-CLIENTGEHEIMEN (B16, B22): alleen de STAND, nooit het geheim; roteren vraagt een verse passkey (RTGZwaar) |
 | `techniek-04.js` | De laatste stand van het statusbord, zodat "meenemen" uit het EIGEN model leest en niet uit de kaartjes op het scherm |
 
+## `apps/voertuig.js`
+
+`public/apps/voertuig/` -- 2 delen, 219 regels in de delen, waarvan 1 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `01-weergave.js` | RTG Voertuig -- EEN voertuig uit de vloot, met een adres |
+| `02-ophalen.js` | -- |
+
 ## `apps/werkplek-bureaus.js`
 
 `public/apps/werkplek-bureaus/` -- 2 delen, 223 regels in de delen
@@ -586,7 +596,7 @@ omlaag.
 
 ## `shared/appmenu.js`
 
-`public/shared/appmenu/` -- 6 delen, 645 regels in de delen
+`public/shared/appmenu/` -- 6 delen, 685 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -599,7 +609,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 11 delen, 953 regels in de delen
+`public/shared/basis/` -- 11 delen, 956 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -617,7 +627,7 @@ omlaag.
 
 ## `shared/bediening.js`
 
-`public/shared/bediening/` -- 2 delen, 202 regels in de delen
+`public/shared/bediening/` -- 2 delen, 229 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -635,7 +645,7 @@ omlaag.
 
 ## `shared/bureaupda.js`
 
-`public/shared/bureaupda/` -- 2 delen, 268 regels in de delen
+`public/shared/bureaupda/` -- 2 delen, 248 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -653,7 +663,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 192 regels in de delen
+`public/shared/cookie/` -- 2 delen, 203 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -715,17 +725,17 @@ omlaag.
 
 ## `shared/handenvrij-balk.js`
 
-`public/shared/handenvrij-balk/` -- 3 delen, 315 regels in de delen
+`public/shared/handenvrij-balk/` -- 3 delen, 293 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `handenvrij-balk-01.js` | Muisvrij bedienen, deel 2: de balk |
-| `handenvrij-balk-01b.js` | Muisvrij bedienen, deel 2a: WAAR DE BALK VAN GEMAAKT IS |
+| `handenvrij-balk-01b.js` | Gecontroleerde legacy-fallback totdat de host zelf is gemigreerd |
 | `handenvrij-balk-02.js` | Alles wat geen navigatie is, gaat hiernaartoe: onveranderd naar Rahul, met de eigen inlog |
 
 ## `shared/handenvrij-bureau.js`
 
-`public/shared/handenvrij-bureau/` -- 2 delen, 256 regels in de delen
+`public/shared/handenvrij-bureau/` -- 2 delen, 260 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -734,7 +744,7 @@ omlaag.
 
 ## `shared/handenvrij-scherm.js`
 
-`public/shared/handenvrij-scherm/` -- 2 delen, 215 regels in de delen
+`public/shared/handenvrij-scherm/` -- 2 delen, 219 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -743,7 +753,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1946 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1958 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -759,7 +769,7 @@ omlaag.
 
 ## `shared/ios.js`
 
-`public/shared/ios/` -- 5 delen, 789 regels in de delen
+`public/shared/ios/` -- 5 delen, 794 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -810,18 +820,14 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 9 delen, 814 regels in de delen
+`public/shared/metgezel/` -- 5 delen, 301 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `metgezel-00.js` | De metgezel: Rahul + Samen, op elke app-pagina |
-| `metgezel-01.js` | De bedieningsknoppen; de gedeelde scope begint in metgezel-00.js |
-| `metgezel-01b.js` | de stijl en de bouwstenen van de metgezel |
-| `metgezel-01b2.js` | Afgesplitst van metgezel-01b.js, dat over de 10 KB ging |
-| `metgezel-01c.js` | HET BLOK VAN RAHUL: het antwoord boven, de balk eronder, en de ruimte die de pagina ervoor vrijhoudt |
-| `metgezel-01d.js` | RAHUL STAAT NERGENS OVERHEEN -- OOK NIET OVER EEN VASTE LAAG |
-| `metgezel-02.js` | Rahul heeft een melding: de lippen verkleuren en bewegen |
-| `metgezel-03.js` | Lege-toestand-nudge: elke plek met data-rahul-leeg="opdracht" opent Rahul met die opdracht al ingevuld |
+| `metgezel-01.js` | Canonieke DS-presentatie op gemigreerde hosts; de oorspronkelijke actieve regels blijven uitsluitend op oudere hosts... |
+| `metgezel-01b.js` | Oudere hosts hebben unlayered resets; behoud hun oorspronkelijke vorm |
+| `metgezel-03.js` | Samen: meekijken en samen doen (alleen leden) |
 | `metgezel-03b.js` | Live Samen-meldingen en de waarschuwing bij een onbeveiligd app-adres |
 
 ## `shared/mond.js`
@@ -843,6 +849,15 @@ omlaag.
 | `qr-01.js` | RTG QR: een eigen QR-code-codec (encode + decode), i.p.v |
 | `qr-02.js` | de zigzag: de bits in de QR-matrix leggen |
 
+## `shared/rahul-tab/style-base.js`
+
+`public/shared/rahul-tab/style-base/` -- 2 delen, 44 regels in de delen, waarvan 1 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `01-tab-kop.js` | Rahul-presentatie: DS gebruikt canonieke componenten, legacy behoudt zijn bestaande visuele contract totdat de host m... |
+| `02-werkruimte.js` | -- |
+
 ## `shared/rahulpoort.js`
 
 `public/shared/rahulpoort/` -- 2 delen, 281 regels in de delen
@@ -851,6 +866,15 @@ omlaag.
 |---|---|
 | `rahulpoort-01.js` | DE RAHUL-POORT -- inloggen als een gesprek, ook op de werkschermen |
 | `rahulpoort-02.js` | het gesprek in stappen |
+
+## `shared/randen.js`
+
+`public/shared/randen/` -- 2 delen, 227 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `01-laden.js` | De bovenrand opent bestaande instellingen met haal of toetsenbord |
+| `02-bediening.js` | wat er te openen valt |
 
 ## `shared/rtg-edge-smart-menu.js`
 
@@ -898,7 +922,7 @@ omlaag.
 
 ## `shared/sprong.js`
 
-`public/shared/sprong/` -- 3 delen, 336 regels in de delen
+`public/shared/sprong/` -- 3 delen, 331 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -928,7 +952,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 3 delen, 300 regels in de delen, waarvan 1 zonder onderwerp
+`public/shared/uitvoer/` -- 3 delen, 306 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|

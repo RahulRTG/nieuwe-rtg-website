@@ -17,6 +17,14 @@ function opKleur(hex) {
   return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.05) ? '#FFFFFF' : '#0C0C0B';
 }
 
+/* De deur blijft lazy, maar de loader heeft één vaste browserverantwoordelijkheid
+   en alleen lokale letterlijke callsites. */
+function laadFoundationDeur(pad, klaar, fout) {
+  var script = document.createElement('script');
+  script.onload = klaar; script.onerror = fout; script.src = pad;
+  document.head.appendChild(script);
+}
+
 /* de sessie van de hulppas: lezen, actief en bewaren */
   function schrijf(s) {
     var old = lees();
@@ -55,11 +63,7 @@ function opKleur(hex) {
       }
       if (window.RTGDeur) return toon();
       // de deur wordt zelden gebruikt, dus pas laden als hij nodig is
-      var s = document.createElement('script');
-      s.src = '/shared/deur.js';
-      s.onload = toon;
-      s.onerror = function () { location.href = 'index.html'; };
-      document.head.appendChild(s);
+      laadFoundationDeur('/shared/deur.js', toon, function () { location.href = 'index.html'; });
     },
     // gebruik boven aan een tool-pagina: geen sessie -> de deur, met de weg erin
     eisProfiel: function () {
@@ -85,28 +89,7 @@ function opKleur(hex) {
     api: api,
     toegang: controleerToegang,
     // herbruikbare AI-coach-chat. opts: { kind, chat, input, knop, wacht }
-    coach: function (opts) {
-      var s = lees(); if (!s) return;
-      var gesprek = [];
-      var NM = { vrouw: 'Rahul', man: 'Rahul', nonbinair: 'Rahul' };
-      function buddyKeuze() { try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { return 'vrouw'; } }
-      // de leeftijdsgroep stuurt taal en niveau van de AI; van het profiel, anders de app-ingang
-      function groepVan() { try { return (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || ''; } catch (e) { return ''; } }
-      function esc2(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
-      function verstuur() {
-        var t = (opts.input.value || '').trim(); if (!t) return;
-        opts.input.value = '';
-        opts.chat.insertAdjacentHTML('beforeend', '<div class="b ik">' + esc2(t) + '</div>');
-        gesprek.push({ role: 'user', content: t });
-        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = opts.wacht || ((NM[buddyKeuze()] || 'Rahul') + ' denkt mee...');
-        opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
-        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddyKeuze(), groep: groepVan() })
-          .then(function (d) { w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight; })
-          .catch(function () { w.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.'; });
-      }
-      opts.knop.addEventListener('click', verstuur);
-      opts.input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); verstuur(); } });
-    },
+    coach: coach,
     // Balk bovenin met "ingelezen als", een belletje voor berichten en (voor de
     // beheerder) een knop naar Gezin beheren. plaats: een element om in te vullen.
     balk: function (el, opties) {
@@ -127,6 +110,7 @@ function opKleur(hex) {
         '<a href="#" id="sbUit">Gezin uitloggen</a>' +
         '</div>' +
         '<div class="sb-berichten" id="sbBerichten" hidden></div>';
+      sessieVorm(el);
       injectCss();
       /* De balk wordt NA het laden getekend, dus de vuller van glyf.js is al
          langsgeweest. Hier nog een keer, alleen over dit stukje DOM. */

@@ -1,0 +1,58 @@
+@layer rtg.component {
+  @property --levend-top {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+  }
+
+  @property --levend-onder {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+  }
+
+  @property --levend-basis {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: black;
+  }
+
+  /* De levende was is een eigen onderste schilderlaag. Daardoor hoeft hij
+     niet met een prioriteitsmarkering te vechten tegen de achtergrond van een bestaande
+     host: de hostgrond wordt eerst geschilderd, deze negatieve stapellaag
+     daarna, en de werkelijke inhoud erboven. */
+  [data-levendegrond] { isolation: isolate; }
+
+  [data-levendegrond]::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(150% 80% at 50% -8%, var(--levend-top), transparent 60%),
+      radial-gradient(132% 72% at 50% 116%, var(--levend-onder), transparent 62%),
+      var(--levend-basis);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root {
+      transition:
+        --levend-top 3s linear,
+        --levend-onder 3s linear,
+        --levend-basis 3s linear;
+    }
+
+    body,
+    [data-levendegrond],
+    [data-levend-thema],
+    .card,
+    .os-tegel,
+    .tkc,
+    .topbar,
+    .tabbar,
+    .os-aibalk {
+      transition: background-color .8s ease, color .8s ease, border-color .8s ease;
+    }
+  }
+}

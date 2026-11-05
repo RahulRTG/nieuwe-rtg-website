@@ -6,7 +6,7 @@
   K.dag = function (host, anker, items, acties, vandaag) {
     var day = items.filter(function (x) { return x.datum === anker; });
     K.lijst(host, anker, day, acties, vandaag);
-    if (!day.length) host.innerHTML = '<p class="stil">' + C.text('emptyDay') + '</p>';
+    if (!day.length) host.innerHTML = '<p class="stil ds-dag-stil">' + C.text('emptyDay') + '</p>';
     return C.date(anker, { weekday: 'long', day: 'numeric', month: 'long' });
   };
   w.RTGAgendaEditorial = function (stand, select, retry) {

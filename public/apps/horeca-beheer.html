@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <script src="/shared/stroom.js"></script>
@@ -8,205 +8,199 @@
 <title>RTG Horeca: beheer</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/zaakscherm.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
+
+
+
+
+
 <script src="/shared/glyf.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/workos-premium.css" rel="stylesheet">
-<link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-1trhhui:not(#_#_#_){flex:0 1 11rem}
-</style>
+
+
+<script src="/shared/horeca-enterprise.js" defer></script>
+<script src="/shared/appmenu.js" defer></script>
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet"><script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body class="ds-scherm ds-horeca" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
-  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
-  <span><span class="ey">RTG Horeca</span><h1>Dag, personeel en signalen</h1></span>
-  <span class="h-flex1"></span>
-  <button class="knop" id="mVerversNu" type="button">Ververs</button>
+  <a class="terug ds-knop ds-knop--klein" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey ds-horeca-label">RTG Horeca</span><h1>Dag, personeel en signalen</h1></span>
+  <span class="h-flex1 ds-horeca-groei"></span>
+  <button class="knop ds-knop ds-knop--klein" id="mVerversNu" type="button">Ververs</button>
 </header>
 <main id="main">
-  <div class="kpis">
-    <div class="kpi"><b id="mOmzet">-</b><span>omzet</span></div>
-    <div class="kpi"><b id="mBonnen">-</b><span>bonnen</span></div>
-    <div class="kpi"><b id="mGasten">-</b><span>gasten</span></div>
-    <div class="kpi"><b id="mGemiddeld">-</b><span>per bon</span></div>
+  <div class="kpis ds-horeca-kpis">
+    <div class="kpi ds-horeca-kpi"><b id="mOmzet">-</b><span>omzet</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="mBonnen">-</b><span>bonnen</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="mGasten">-</b><span>gasten</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="mGemiddeld">-</b><span>per bon</span></div>
   </div>
 
-  <section class="kaart hm-control" aria-labelledby="hmTitel">
-    <div class="hm-head"><div><div class="kop" id="hmTitel">Rahul Mission Control</div><p class="stil">Uw besluit, slim verdeeld naar de PDA van uitsluitend ingeklokte medewerkers.</p></div><span class="hm-live"><i></i><b id="hmLive">0</b> live</span></div>
-    <div class="hm-grid">
-      <div class="hm-command">
+  <section class="kaart ds-kaart ds-horeca-kaart hm-control ds-horeca-control" aria-labelledby="hmTitel">
+    <div class="hm-head ds-horeca-head"><div><div class="kop ds-horeca-kop" id="hmTitel">Rahul Mission Control</div><p class="stil ds-horeca-meta">Uw besluit, slim verdeeld naar de PDA van uitsluitend ingeklokte medewerkers.</p></div><span class="hm-live ds-horeca-live"><i></i><b id="hmLive">0</b> live</span></div>
+    <div class="hm-grid ds-horeca-grid">
+      <div class="hm-command ds-horeca-command">
         <label for="hmVraag">Wat moet het team nu weten of doen?</label>
-        <textarea class="veld" id="hmVraag" rows="3" placeholder="Bijvoorbeeld: laat iemand van de zaal over tien minuten alle tafels persoonlijk drinken aanbieden."></textarea>
-        <button class="knop p" id="hmDenk" type="button">Laat Rahul voorbereiden</button>
-        <div id="hmVoorstel" class="hm-proposal"><p>Rahul maakt eerst een voorstel. Er gaat niets naar het team zonder uw bevestiging.</p></div>
+        <textarea class="veld ds-invoer" id="hmVraag" rows="3" placeholder="Bijvoorbeeld: laat iemand van de zaal over tien minuten alle tafels persoonlijk drinken aanbieden."></textarea>
+        <button class="knop ds-knop ds-knop--klein p" id="hmDenk" type="button">Laat Rahul voorbereiden</button>
+        <div id="hmVoorstel" class="hm-proposal ds-horeca-proposal"><p>Rahul maakt eerst een voorstel. Er gaat niets naar het team zonder uw bevestiging.</p></div>
       </div>
-      <div><div class="hm-label">Ingeklokt en inzetbaar</div><div id="hmTeam" class="hm-team"></div></div>
+      <div><div class="hm-label ds-horeca-label">Ingeklokt en inzetbaar</div><div id="hmTeam" class="hm-team ds-horeca-team"></div></div>
     </div>
-    <div class="hm-label hm-space">Actieve missies</div><div id="hmMissies" class="hm-missions"></div>
+    <div class="hm-label ds-horeca-label hm-space ds-horeca-space">Actieve missies</div><div id="hmMissies" class="hm-missions ds-horeca-missions"></div>
   </section>
 
-  <section class="kaart" aria-labelledby="simTitel">
-    <div class="kop" id="simTitel">Magnaat · Hospitality Universe</div>
-    <p class="stil">Maak een tijdelijke anonieme testwereld van de huidige omvang. Namen, contactgegevens, gerechten en bedragen reizen niet mee.</p>
-    <div class="rij"><button class="knop p" id="simMaak" type="button">Maak veilige simulatiecode</button><input class="veld" id="simCode" maxlength="8" placeholder="Simulatiecode" aria-label="Simulatiecode"><button class="knop" id="simLees" type="button">Lees voorstellen</button></div>
-    <div id="simUit" class="z-mt60"><p class="stil">De simulatie kan uitsluitend voorstellen terugsturen. Live publiceren blijft een apart managerbesluit.</p></div>
+  <section class="kaart ds-kaart ds-horeca-kaart" aria-labelledby="simTitel">
+    <div class="kop ds-horeca-kop" id="simTitel">Magnaat · Hospitality Universe</div>
+    <p class="stil ds-horeca-meta">Maak een tijdelijke anonieme testwereld van de huidige omvang. Namen, contactgegevens, gerechten en bedragen reizen niet mee.</p>
+    <div class="rij ds-horeca-rij"><button class="knop ds-knop ds-knop--klein p" id="simMaak" type="button">Maak veilige simulatiecode</button><input class="veld ds-invoer" id="simCode" maxlength="8" placeholder="Simulatiecode" aria-label="Simulatiecode"><button class="knop ds-knop ds-knop--klein" id="simLees" type="button">Lees voorstellen</button></div>
+    <div id="simUit" class="z-mt60 ds-horeca-afstand"><p class="stil ds-horeca-meta">De simulatie kan uitsluitend voorstellen terugsturen. Live publiceren blijft een apart managerbesluit.</p></div>
   </section>
 
-  <div class="kaart">
-    <div class="kop">De dag over alle kanalen</div>
-    <div class="rij">
-      <input class="veld z-b11" id="mDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum">
-      <button class="knop" id="mDagToon" type="button">Toon</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">De dag over alle kanalen</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer z-b11" id="mDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum">
+      <button class="knop ds-knop ds-knop--klein" id="mDagToon" type="button">Toon</button>
     </div>
-    <div id="mKanalen" class="z-mt60"></div>
-    <div class="kop z-mt80">Per betaalwijze</div>
+    <div id="mKanalen" class="z-mt60 ds-horeca-afstand"></div>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Per betaalwijze</div>
     <div id="mWijzen"></div>
-    <div class="kop z-mt80">Wat apart staat</div>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Wat apart staat</div>
     <div id="mApart"></div>
-    <p class="stil z-mt40" id="mLet"></p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="mLet"></p>
   </div>
 
   <!-- DE MEETLAT VAN HORECA.md, met wat er werkelijk gemeten is. Twaalf regels,
        en de kunst zit in wat er NIET staat: een nul die uit het ontbreken van
        gegevens komt is geen resultaat maar een lege avond. -->
-  <div class="kaart" id="mMeetKaart">
-    <div class="kop">De meetlat van deze dienst (<span id="mMeetTelling">-</span>)</div>
-    <div class="rij">
-      <input class="veld z-b11" id="mMeetDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de dienstmeting">
-      <button class="knop" id="mMeetToon" type="button">Meet</button>
+  <div class="kaart ds-kaart ds-horeca-kaart" id="mMeetKaart">
+    <div class="kop ds-horeca-kop">De meetlat van deze dienst (<span id="mMeetTelling">-</span>)</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer z-b11" id="mMeetDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de dienstmeting">
+      <button class="knop ds-knop ds-knop--klein" id="mMeetToon" type="button">Meet</button>
     </div>
-    <div id="mMeetlat" class="z-mt60"></div>
-    <p class="stil z-mt40" id="mMeetLet"></p>
+    <div id="mMeetlat" class="z-mt60 ds-horeca-afstand"></div>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="mMeetLet"></p>
   </div>
 
   <!-- WAT RAHUL DEED, EN WAT HIJ VOORSTELT. Een actiebon die niemand leest, is
        geen bon maar een logregel. Deze staat daarom op het scherm van de
        manager en niet in een bestand. -->
-  <div class="kaart" id="mRahulKaart">
-    <div class="kop">Rahul: wat er is gedaan en wat wacht (<span id="mRahulTelling">-</span>)</div>
-    <div class="rij">
-      <input class="veld z-b14" id="mRahulGrens" type="number" min="0" max="100000" placeholder="Kortingsgrens in centen" aria-label="Kortingsgrens van Rahul in centen">
-      <button class="knop" id="mRahulGrensZet" type="button">Grens zetten</button>
-      <button class="knop stil" id="mRahulGrensWeg" type="button">Grens weghalen</button>
+  <div class="kaart ds-kaart ds-horeca-kaart" id="mRahulKaart">
+    <div class="kop ds-horeca-kop">Rahul: wat er is gedaan en wat wacht (<span id="mRahulTelling">-</span>)</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer z-b14" id="mRahulGrens" type="number" min="0" max="100000" placeholder="Kortingsgrens in centen" aria-label="Kortingsgrens van Rahul in centen">
+      <button class="knop ds-knop ds-knop--klein" id="mRahulGrensZet" type="button">Grens zetten</button>
+      <button class="knop ds-knop ds-knop--klein stil ds-horeca-meta" id="mRahulGrensWeg" type="button">Grens weghalen</button>
     </div>
-    <p class="stil z-mt40" id="mRahulGrensUit"></p>
-    <div id="mRahulBonnen" class="z-mt60"></div>
-    <p class="stil z-mt40" id="mRahulLet"></p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="mRahulGrensUit"></p>
+    <div id="mRahulBonnen" class="z-mt60 ds-horeca-afstand"></div>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="mRahulLet"></p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Signalen (<span id="mSignaalTelling">-</span>)</div>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Signalen (<span id="mSignaalTelling">-</span>)</div>
     <div id="mSignalen"></div>
-    <p class="stil z-mt40" id="mSignaalLet"></p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="mSignaalLet"></p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Fooienpot</div>
-    <div class="rij">
-      <input class="veld z-b11" id="pDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de pot">
-      <input class="veld z-b10" id="pExtra" type="number" min="0" step="0.01" placeholder="Contante fooi erbij" aria-label="Contante fooi">
-      <button class="knop p" id="pVerdeel" type="button">Verdelen</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Fooienpot</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer z-b11" id="pDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de pot">
+      <input class="veld ds-invoer z-b10" id="pExtra" type="number" min="0" step="0.01" placeholder="Contante fooi erbij" aria-label="Contante fooi">
+      <button class="knop ds-knop ds-knop--klein p" id="pVerdeel" type="button">Verdelen</button>
     </div>
-    <div class="rij z-mt60">
-      <input class="veld" id="pNaam1" maxlength="60" placeholder="Naam" aria-label="Naam 1">
-      <input class="veld z-b6" id="pUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 1">
-      <input class="veld z-b6" id="pWeging1" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 1">
+    <div class="rij ds-horeca-rij z-mt60 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="pNaam1" maxlength="60" placeholder="Naam" aria-label="Naam 1">
+      <input class="veld ds-invoer z-b6" id="pUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 1">
+      <input class="veld ds-invoer z-b6" id="pWeging1" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 1">
     </div>
-    <div class="rij z-mt40">
-      <input class="veld" id="pNaam2" maxlength="60" placeholder="Naam" aria-label="Naam 2">
-      <input class="veld z-b6" id="pUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 2">
-      <input class="veld z-b6" id="pWeging2" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 2">
+    <div class="rij ds-horeca-rij z-mt40 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="pNaam2" maxlength="60" placeholder="Naam" aria-label="Naam 2">
+      <input class="veld ds-invoer z-b6" id="pUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 2">
+      <input class="veld ds-invoer z-b6" id="pWeging2" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 2">
     </div>
-    <div class="rij z-mt40">
-      <input class="veld" id="pNaam3" maxlength="60" placeholder="Naam" aria-label="Naam 3">
-      <input class="veld z-b6" id="pUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 3">
-      <input class="veld z-b6" id="pWeging3" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 3">
+    <div class="rij ds-horeca-rij z-mt40 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="pNaam3" maxlength="60" placeholder="Naam" aria-label="Naam 3">
+      <input class="veld ds-invoer z-b6" id="pUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 3">
+      <input class="veld ds-invoer z-b6" id="pWeging3" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 3">
     </div>
-    <div id="pVerdeling" class="z-mt60"></div>
-    <p class="stil z-mt40" id="pPotLet"></p>
-    <div class="kop z-mt80">Eerdere potten</div>
+    <div id="pVerdeling" class="z-mt60 ds-horeca-afstand"></div>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="pPotLet"></p>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Eerdere potten</div>
     <div id="pPotten"></div>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Loonkosten tegenover omzet</div>
-    <div class="rij">
-      <input class="veld z-b11" id="lDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de diensten">
-      <button class="knop p" id="pLoon" type="button">Berekenen</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Loonkosten tegenover omzet</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer z-b11" id="lDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de diensten">
+      <button class="knop ds-knop ds-knop--klein p" id="pLoon" type="button">Berekenen</button>
     </div>
-    <div class="rij z-mt60">
-      <input class="veld" id="lNaam1" maxlength="60" placeholder="Naam" aria-label="Dienst 1 naam">
-      <input class="veld z-b6" id="lUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 1 uren">
-      <input class="veld z-b7" id="lUurloon1" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 1 uurloon">
-      <select class="veld z-b8" id="lAfdeling1" aria-label="Dienst 1 afdeling">
+    <div class="rij ds-horeca-rij z-mt60 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="lNaam1" maxlength="60" placeholder="Naam" aria-label="Dienst 1 naam">
+      <input class="veld ds-invoer z-b6" id="lUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 1 uren">
+      <input class="veld ds-invoer z-b7" id="lUurloon1" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 1 uurloon">
+      <select class="veld ds-invoer z-b8" id="lAfdeling1" aria-label="Dienst 1 afdeling">
         <option value="zaal">Zaal</option><option value="keuken">Keuken</option>
         <option value="bar">Bar</option><option value="afwas">Afwas</option>
       </select>
     </div>
-    <div class="rij z-mt40">
-      <input class="veld" id="lNaam2" maxlength="60" placeholder="Naam" aria-label="Dienst 2 naam">
-      <input class="veld z-b6" id="lUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 2 uren">
-      <input class="veld z-b7" id="lUurloon2" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 2 uurloon">
-      <select class="veld z-b8" id="lAfdeling2" aria-label="Dienst 2 afdeling">
+    <div class="rij ds-horeca-rij z-mt40 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="lNaam2" maxlength="60" placeholder="Naam" aria-label="Dienst 2 naam">
+      <input class="veld ds-invoer z-b6" id="lUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 2 uren">
+      <input class="veld ds-invoer z-b7" id="lUurloon2" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 2 uurloon">
+      <select class="veld ds-invoer z-b8" id="lAfdeling2" aria-label="Dienst 2 afdeling">
         <option value="keuken">Keuken</option><option value="zaal">Zaal</option>
         <option value="bar">Bar</option><option value="afwas">Afwas</option>
       </select>
     </div>
-    <div class="rij z-mt40">
-      <input class="veld" id="lNaam3" maxlength="60" placeholder="Naam" aria-label="Dienst 3 naam">
-      <input class="veld z-b6" id="lUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 3 uren">
-      <input class="veld z-b7" id="lUurloon3" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 3 uurloon">
-      <select class="veld z-b8" id="lAfdeling3" aria-label="Dienst 3 afdeling">
+    <div class="rij ds-horeca-rij z-mt40 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="lNaam3" maxlength="60" placeholder="Naam" aria-label="Dienst 3 naam">
+      <input class="veld ds-invoer z-b6" id="lUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 3 uren">
+      <input class="veld ds-invoer z-b7" id="lUurloon3" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 3 uurloon">
+      <select class="veld ds-invoer z-b8" id="lAfdeling3" aria-label="Dienst 3 afdeling">
         <option value="bar">Bar</option><option value="zaal">Zaal</option>
         <option value="keuken">Keuken</option><option value="afwas">Afwas</option>
       </select>
     </div>
-    <div id="lUit" class="z-mt60"></div>
-    <p class="stil z-mt40" id="lLet"></p>
+    <div id="lUit" class="z-mt60 ds-horeca-afstand"></div>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="lLet"></p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">De pols van nu</div>
-    <p class="stil">Drie bronnen, apart gehouden. Wat wij meten kun je niet bijstellen; dat komt uit je eigen keuken en je eigen tafels.</p>
-    <div class="kop z-mt80">Wat wij meten</div>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">De pols van nu</div>
+    <p class="stil ds-horeca-meta">Drie bronnen, apart gehouden. Wat wij meten kun je niet bijstellen; dat komt uit je eigen keuken en je eigen tafels.</p>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Wat wij meten</div>
     <div id="poGemeten"></div>
-    <div id="poNiet" class="z-mt40"></div>
-    <div class="kop z-mt80">Wat jij invult</div>
+    <div id="poNiet" class="z-mt40 ds-horeca-afstand"></div>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Wat jij invult</div>
     <div id="poZaak"></div>
-    <div class="rij z-mt60">
-      <button class="knop p" id="poZet" type="button">Opslaan</button>
-      <button class="knop" id="poVervers" type="button">Ververs</button>
+    <div class="rij ds-horeca-rij z-mt60 ds-horeca-afstand">
+      <button class="knop ds-knop ds-knop--klein p" id="poZet" type="button">Opslaan</button>
+      <button class="knop ds-knop ds-knop--klein" id="poVervers" type="button">Ververs</button>
     </div>
-    <div class="kop z-mt80">Wat gasten melden</div>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Wat gasten melden</div>
     <div id="poGasten"></div>
-    <p class="stil z-mt40" id="poLet"></p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="poLet"></p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Gastprofielen (<span id="gAantal">-</span>, waarvan <span id="gAllergie">-</span> met allergie)</div>
-    <div class="rij">
-      <button class="knop" id="gToon" type="button">Toon</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Gastprofielen (<span id="gAantal">-</span>, waarvan <span id="gAllergie">-</span> met allergie)</div>
+    <div class="rij ds-horeca-rij">
+      <button class="knop ds-knop ds-knop--klein" id="gToon" type="button">Toon</button>
     </div>
-    <div id="gLijst" class="z-mt60"></div>
-    <p class="stil z-mt40">Een gastprofiel bewaart wat nodig is om iemand goed te helpen. Er staat geen waarde-per-gast-score in; die maakt van gastvrijheid een rangorde.</p>
+    <div id="gLijst" class="z-mt60 ds-horeca-afstand"></div>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand">Een gastprofiel bewaart wat nodig is om iemand goed te helpen. Er staat geen waarde-per-gast-score in; die maakt van gastvrijheid een rangorde.</p>
   </div>
 </main>
-<div class="melding" id="melding" role="status"></div>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/beheer-dag.js"></script>

@@ -74,7 +74,7 @@
     vak.appendChild(maak('p', 'ds-label', 'LOPENDE RIT'));
     vak.appendChild(maak('h3', 'ds-kaart__titel', (opdracht.van && opdracht.van.label ? opdracht.van.label : 'Vertrek') + ' → ' + (opdracht.naar && opdracht.naar.label ? opdracht.naar.label : 'Bestemming')));
     vak.appendChild(maak('p', 'ds-detail__status', [opdracht.status, opdracht.ref, Number.isFinite(opdracht.prijs) ? R.eur(opdracht.prijs) : ''].filter(Boolean).join(' · ')));
-    if (opdracht.ref) { var a = maak('a', 'ds-knop ds-knop--stil', 'VOLG DEZE RIT →'); a.href = '/apps/rit.html?rit=' + encodeURIComponent(opdracht.ref); vak.appendChild(a); }
+    if (opdracht.ref) { var lopendeRitLink = document.createElement('a'); lopendeRitLink.className = 'ds-knop ds-knop--stil'; lopendeRitLink.textContent = 'VOLG DEZE RIT →'; lopendeRitLink.href = '/apps/rit.html?rit=' + encodeURIComponent(opdracht.ref); vak.appendChild(lopendeRitLink); }
   };
   R.laadLopendeRit = function () {
     if (!R.token) return Promise.resolve();

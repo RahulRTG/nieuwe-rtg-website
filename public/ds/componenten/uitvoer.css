@@ -1,0 +1,44 @@
+/* Meenemen gebruikt de bestaande knop en dialoog. Alleen de positionering
+   van de bestaande exportlaag hoort hier; de uitvoerlogica blijft gedeeld. */
+@layer rtg.component {
+  .ds-uitvoer-knop {
+    margin-inline-start: var(--ds-ruimte-2);
+    align-self: center;
+  }
+  .ds-uitvoer-laag {
+    position: fixed;
+    inset: 0;
+    z-index: 9991;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: var(--ds-glas);
+  }
+  .ds-uitvoer-laag[hidden] { display: none; }
+  .ds-uitvoer-blad {
+    inline-size: min(26rem, 100%);
+    max-block-size: calc(100dvh - env(safe-area-inset-top));
+    overflow-y: auto;
+    padding-block: var(--ds-ruimte-6);
+    padding-inline: var(--ds-ruimte-6);
+    padding-block-end: calc(var(--ds-ruimte-6) + env(safe-area-inset-bottom));
+  }
+  .ds-uitvoer-titel {
+    margin-block: 0 var(--ds-ruimte-2);
+    margin-inline: 0;
+    font-family: var(--ds-letter-display);
+    font-size: var(--ds-maat-kop);
+    font-weight: 500;
+  }
+  .ds-uitvoer-tekst {
+    margin-block: 0 var(--ds-ruimte-4);
+    margin-inline: 0;
+    font-family: var(--ds-letter-tekst);
+    font-size: var(--ds-maat-klein);
+    line-height: 1.6;
+    color: var(--ds-inkt-zacht);
+    overflow-wrap: anywhere;
+  }
+  .ds-uitvoer-rij { display: flex; gap: var(--ds-ruimte-2); flex-wrap: wrap; }
+  .ds-uitvoer-rij .ds-knop { flex: 1 1 6rem; }
+}

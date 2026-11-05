@@ -23,23 +23,6 @@
      alleen daarvoor een eigen stukje stijl, met een id-wacht zodat het maar
      een keer in het document komt. Goud is een gevulde dag, groen een lege:
      dezelfde omkering als het origineel, want hier is leeg het doel. */
-  function stijl() {
-    if (d.getElementById('blStijl')) return;
-    var st = d.createElement('style');
-    st.id = 'blStijl';
-    st.textContent =
-      '#paneel .bl-week{display:flex;gap:.4rem;align-items:flex-end;margin-top:.5rem;}' +
-      '#paneel .bl-dag{flex:1;text-align:center;}' +
-      '#paneel .bl-staaf{margin:0 auto;width:.9rem;border-radius:0;background:var(--rtg-goud,#C9A24B);min-height:4px;}' +
-      '#paneel .bl-staaf.leeg{background:var(--rtg-groen,#69B891);height:4px;}' +
-      '#paneel .bl-lbl{font-size:.6rem;color:var(--rtg-soft);margin-top:.3rem;}' +
-      '#paneel .bl-advies{display:flex;gap:.6rem;align-items:flex-start;margin-top:.6rem;font-size:.84rem;line-height:1.55;}' +
-      '#paneel .bl-knoppen{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;}' +
-      '#paneel .bl-rrij{display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:.8rem;margin-top:.4rem;}' +
-      '#paneel .bl-rrij .knop{padding:.25rem .6rem;font-size:.72rem;}' +
-      '#paneel .bl-rrij .knop.stilrand{color:var(--rtg-soft);}';
-    d.head.appendChild(st);
-  }
 
   function weekHtml(b) {
     /* De hoogste dag bepaalt de schaal; minstens 1, anders deelt een lege
@@ -67,14 +50,17 @@
   /* De kluis erbij halen, een keer. Mislukt het laden (heel oude browser,
      geen OPFS), dan blijft de lijst leeg en zegt bewaren dat eerlijk; de
      rest van de stand merkt er niets van. */
+  function laadScript(pad, klaar) {
+    var s = document.createElement('script');
+    s.src = pad;
+    s.onload = klaar; s.onerror = klaar;
+    document.head.appendChild(s);
+  }
   var kluisBelofte = null;
   function kluis() {
     if (w.Toestelkluis) return Promise.resolve();
     if (!kluisBelofte) kluisBelofte = new Promise(function (klaar) {
-      var s = d.createElement('script');
-      s.src = '/shared/toestelkluis.js';
-      s.onload = klaar; s.onerror = klaar;
-      d.head.appendChild(s);
+      laadScript('/shared/toestelkluis.js', klaar);
     });
     return kluisBelofte;
   }
@@ -104,5 +90,5 @@
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};
-  Deel.balans = { DAGL: DAGL, stijl: stijl, weekHtml: weekHtml, vraag: vraag, kluis: kluis, recepten: recepten, bewaar: bewaar };
+  Deel.balans = { DAGL: DAGL, weekHtml: weekHtml, vraag: vraag, kluis: kluis, recepten: recepten, bewaar: bewaar };
 })(window, document);

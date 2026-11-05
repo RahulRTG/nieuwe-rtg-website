@@ -11,10 +11,12 @@ const root = path.join(__dirname,'..');
 test('APPWERKT bereikt en bedient de twee expliciete OS-query-ingangen', {timeout:600000}, async t => {
   const registers = ['APPWERKT.json','APPWERKT-RAAKVLAK.json'];
   const before = registers.map(file=>fs.readFileSync(path.join(root,file)));
+  t.after(() => registers.forEach((file,i)=>assert.deepEqual(fs.readFileSync(path.join(root,file)),before[i],
+    file+' mag ook bij een mislukte gerichte meting niet worden herschreven')));
   const selected = rijen().filter(row=>['os:rtf','os:videobellen'].includes(row.functie));
-  assert.equal(selected.length,2);
+  assert.deepEqual(selected.map(row=>row.functie).sort(),['os:rtf','os:videobellen']);
   const measured = await meet(selected);
-  assert.equal(measured.regels.length,2);
+  assert.deepEqual(measured.regels.map(row=>row.functie).sort(),['os:rtf','os:videobellen']);
   for (const row of measured.regels) {
     t.diagnostic(JSON.stringify({functie:row.functie,gevonden:row.gevonden,geklikt:row.geklikt,
       bereikbaar:row.bewijzen.bereikbaar,bedienbaar:row.bewijzen.bedienbaar,waarnemingen:row.waarnemingen}));
@@ -25,5 +27,4 @@ test('APPWERKT bereikt en bedient de twee expliciete OS-query-ingangen', {timeou
     assert.deepEqual(row.onaangeraakt,[]);
     assert.deepEqual(row.nietKlikbaar,[]);
   }
-  registers.forEach((file,i)=>assert.deepEqual(fs.readFileSync(path.join(root,file)),before[i],file+' mag niet door de gerichte runner worden herschreven'));
 });

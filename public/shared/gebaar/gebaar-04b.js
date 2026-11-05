@@ -51,7 +51,7 @@
   var KLAAR = {
     openen: function (href, naam) {
       return { naam: naam || T('gebaar.openen', 'Openen', 'Open'), teken: 'openen',
-        doe: function () { if (href) location.href = href; } };
+        doe: function () { if (href) location.assign(href); } };
     },
     delen: function (o) {
       return { naam: T('gebaar.delen', 'Delen', 'Share'), teken: 'delen',
@@ -201,4 +201,3 @@
     wereldregister: wereldregister,
     sluit: function () { sluitAlles(true); sluitBlad(); }
   };
-

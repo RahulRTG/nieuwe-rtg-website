@@ -14,7 +14,6 @@
   var esc = Z.esc, tijd = Z.tijd, nv = Z.nv;
 
   function toon(el, opties) {
-    Z.stijl();
     var o = opties || {};
     var api = o.api;                      // (pad, body) -> Promise
     var compact = !!o.compact;
@@ -29,7 +28,7 @@
       ? [['nu', 'Nu'], ['lijst', 'Lijst'], ['zoek', 'Zoeken']]
       : [['nu', 'Nu'], ['lijst', 'Uitzonderingen'], ['recht', 'Rechtzetten'], ['zoek', 'Zoeken'], ['regels', 'Instellingen']];
 
-    el.className = 'zc' + (compact ? ' zc-klein' : '');
+    el.className = 'zc ds-zaakcommand' + (compact ? ' zc-klein' : '');
     el.innerHTML = '<div class="zc-rail"></div><div class="zc-vak"><div class="zc-leeg">Laden…</div></div>';
     var rail = el.querySelector('.zc-rail'), vak = el.querySelector('.zc-vak');
 
@@ -140,8 +139,8 @@
             (z.besluit ? '<p class="zc-meta">Besluit: ' + esc(z.besluit.keuze) + ' -- ' + esc(z.besluit.reden) + '</p>'
               : '<div class="zc-rij">' +
                 (z.eigenaar ? '' : '<button class="zc-knop" data-neem="' + esc(z.id) + '">Ik pak hem op</button>') +
-                (S.mag ? '<input class="zc-veld" data-k="' + esc(z.id) + '" placeholder="besluit" style="min-width:8rem;">' +
-                  '<input class="zc-veld" data-r="' + esc(z.id) + '" placeholder="waarom" style="flex:1;min-width:9rem;">' +
+                (S.mag ? '<input class="zc-veld zc-veld-besluit" data-k="' + esc(z.id) + '" placeholder="besluit">' +
+                  '<input class="zc-veld zc-veld-reden" data-r="' + esc(z.id) + '" placeholder="waarom">' +
                   '<button class="zc-knop vol" data-bes="' + esc(z.id) + '">Klaar</button>' : '') +
                 '</div>') +
             '</div>';

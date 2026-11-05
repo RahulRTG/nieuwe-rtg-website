@@ -5,26 +5,40 @@
   if (!window.Sessie || !Sessie.actief()) return;
   var s = Sessie.huidig();
   if (!s || !s.token) return;
+  document.body.classList.add('ds-samen-host');
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  /* De knop staat in de bovenbalk en dekt de inhoud niet af. */
-  var css = '.rsm-knop{background:var(--paneel,#151312);color:var(--txt,#eee);border:1px solid var(--goud,#857007);border-radius:0;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
-    '.rsm-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
-    '.rsm-sheet[hidden]{display:none;}.rsm-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;}' +
-    // WCAG 2.5.8 als MAAT, niet als uitkomst van padding: zie samen-02.js
-    '.rsm-x{background:transparent;border:1px solid #444;border-radius:0;color:inherit;padding:.15rem .5rem;cursor:pointer;min-width:24px;min-height:24px;display:grid;place-items:center;}' +
-    '.rsm-uit{font-size:.83rem;color:var(--zacht,#bbb);line-height:1.55;}' +
-    '.rsm-rij{display:flex;gap:.4rem;}.rsm-rij input{flex:1;background:var(--paneel2,#0C0C0B);border:1px solid #333;border-radius:0;color:inherit;font:inherit;font-size:.85rem;padding:.5rem .7rem;}' +
-    '.rsm-go{background:var(--goud,#857007);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font-weight:700;cursor:pointer;}' +
-    '.rsm-stil{background:transparent;color:inherit;border:1px solid #444;border-radius:0;padding:.5rem .8rem;font:inherit;font-size:.82rem;cursor:pointer;}' +
-    '.rsm-chat{font-size:.82rem;color:var(--zacht,#bbb);max-height:24vh;overflow-y:auto;line-height:1.5;}' +
-    '.rsm-code{font-family:ui-monospace,monospace;letter-spacing:.2em;color:var(--goud2,#c7ab2b);font-weight:700;}' +
-    // de balk draagt er nu twee knoppen bij; op een smal scherm mag hij wikkelen
-    '.sb-balk{flex-wrap:wrap;row-gap:.4rem;}' +
-    '.rsm-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:4rem;z-index:37;background:var(--paneel2,#0C0C0B);border:1px solid var(--goud,#857007);border-radius:0;padding:.6rem .9rem;font:400 .84rem Inter,system-ui,sans-serif;color:var(--txt,#eee);display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}';
-  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
-  var maakEl = function (h) { var d = document.createElement('div'); d.innerHTML = h; return d.firstChild; };
-
+  /* De vorm komt uitsluitend uit public/ds/componenten/samen.css. */
+  var maakEl = function (h) { var d = document.createElement('div'); d.innerHTML = h; var el = d.firstChild; vorm(el); return el; };
+  /* De gezins-Samen gebruikt dezelfde DS-bouwstenen, niet het ledentransport. */
+  function vorm(root) {
+    var klassen = { 'rsm-knop': 'ds-samen-secundair', 'rsm-rahul': 'ds-samen-doe',
+      'rsm-sheet': 'ds-samen-venster ds-samen-venster--foundation', 'rsm-rsheet': 'ds-samen-venster ds-samen-venster--foundation',
+      'rsm-kop': 'ds-samen-kop ds-samen-kop--vast', 'rsm-x': 'ds-samen-sluit',
+      'rsm-uit': 'ds-samen-uitleg', 'rsm-ruit': 'ds-samen-uitleg', 'rsm-rij': 'ds-samen-rij',
+      'rsm-go': 'ds-samen-doe', 'rsm-stil': 'ds-samen-secundair', 'rsm-chat': 'ds-samen-chat',
+      'rsm-code': 'ds-samen-code', 'rsm-banner': 'ds-samen-banner' };
+    Object.keys(klassen).forEach(function (naam) {
+      var nodes = Array.from(root.querySelectorAll('.' + naam));
+      if (root.classList.contains(naam)) nodes.unshift(root);
+      nodes.forEach(function (n) { klassen[naam].split(' ').forEach(function (k) { n.classList.add(k); }); });
+    });
+    root.querySelectorAll('[data-start]').forEach(function (n) { n.classList.add('ds-samen-doe--breed'); n.removeAttribute('style'); });
+    root.querySelectorAll('[data-mee] input').forEach(function (n) { n.classList.add('ds-samen-codeinvoer'); n.removeAttribute('style'); });
+  }
+  function sluitPaneel(paneel, ingang) {
+    paneel.hidden = true; ingang.hidden = false;
+    if (ingang.isConnected) ingang.focus();
+  }
+  function paneelToets(paneel, ingang) {
+    paneel.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      e.preventDefault(); e.stopPropagation();
+      if (paneel === sheet) deelCode = null;
+      sluitPaneel(paneel, ingang);
+    });
+  }
+/* De bestaande gezinskamer; dezelfde IIFE als samen-01.js. */
   var KAMERKEY = 'rtf_samen_kamer';
   var kamer = null, deelCode = null;
   try { kamer = localStorage.getItem(KAMERKEY); } catch (e) {}
@@ -65,8 +79,10 @@
   })();
   document.body.appendChild(sheet);
   var vak = sheet.querySelector('.rsm-vak');
-  knop.addEventListener('click', function () { sheet.hidden = false; knop.hidden = true; teken(); });
-  sheet.querySelector('.rsm-x').addEventListener('click', function () { deelCode = null; sheet.hidden = true; knop.hidden = false; });
+  knop.addEventListener('click', function () { sheet.hidden = false; knop.hidden = true; teken(); sheet.querySelector('.rsm-x').focus(); });
+  sheet.querySelector('.rsm-x').addEventListener('click', function () { deelCode = null; sluitPaneel(sheet, knop); });
+
+  paneelToets(sheet, knop);
 
   function meldHier() {
     if (!kamer) return;
@@ -81,6 +97,7 @@
       vak.innerHTML = '<div class="rsm-uit">Samen kijken en doen met je gezin en je bevestigde vrienden. Start een kamer en deel de code, of doe mee met een code.</div>' +
         '<button class="rsm-go" data-start data-stand="samen-actief" type="button" style="width:100%;">Start een samen-kamer</button>' +
         '<form class="rsm-rij" data-mee><input placeholder="Code van gezin of vriend" maxlength="48" style="text-transform:uppercase;" aria-label="Samen-code"><button class="rsm-go" type="submit">Doe mee</button></form>';
+      vorm(vak);
       vak.querySelector('[data-start]').addEventListener('click', function () {
         api('maak', { idem: veiligeIdem('rtf-samen-maak') }).then(function (d) {
           zetKamer(d.kamer.id); deelCode = d.deelcode; meldHier(); teken();
@@ -106,6 +123,7 @@
         '<div class="rsm-rij"><button class="rsm-stil h-flex1" data-hier type="button" data-contextactie>Kom hierheen</button>' +
         (k.benGastheer ? '<button class="rsm-stil" data-code type="button" data-contextactie>Nieuwe deelcode</button><button class="rsm-stil" data-sluit type="button" data-contextactie>Sluit</button>' : '') +
         '<button class="rsm-stil" data-weg type="button" data-contextactie>Verlaat</button></div>';
+      vorm(vak);
       var chatEl = vak.querySelector('[data-chat]'); chatEl.scrollTop = chatEl.scrollHeight;
       vak.querySelector('[data-zeg]').addEventListener('submit', function (ev) {
         ev.preventDefault(); var i2 = ev.target.querySelector('input'); var t = i2.value.trim(); if (!t) return; i2.value = '';
@@ -130,14 +148,21 @@
   }
 /* De Samen-meldingen en de rustige poller voor pagina- en chatupdates. */
   var bannerEl = null;
+  function veiligSamenPad(waarde) {
+    var p = String(waarde || '');
+    if (!p || p.length > 200 || p !== p.trim() || /[?#\\\u0000-\u001f]/.test(p)) return '';
+    if (!/^\/(?:apps|site)\//.test(p) || /(?:^|\/)\.{1,2}(?:\/|$)/.test(p)) return '';
+    return p;
+  }
   function banner(tekst, pad) {
+    pad = veiligSamenPad(pad);
     if (bannerEl) bannerEl.remove();
     bannerEl = maakEl('<div class="rsm-banner"><span>' + esc(tekst) + '</span>' +
       (pad ? '<button class="rsm-go" type="button">Ga mee →</button>' : '') +
       '<button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>');
     document.body.appendChild(bannerEl);
     if (pad) bannerEl.querySelector('.rsm-go').addEventListener('click',
-      function () { location.href = pad; });
+      function () { window.location.assign(pad); });
     bannerEl.querySelector('.rsm-x').addEventListener('click', function () {
       bannerEl.remove(); bannerEl = null;
     });
@@ -171,29 +196,9 @@
      kost (alles hier is gratis) en wijst bij zware onderwerpen liefdevol
      naar een vertrouwde grote. ---- */
   /* Ook Rahul staat in de balk, niet zwevend in de hoek. Zie samen-01.js. */
-  var rCss = '.rsm-rahul{background:var(--goud,#857007);color:#000;border:none;border-radius:0;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
-    '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
-    '.rsm-rsheet[hidden]{display:none;}.rsm-ruit{font-size:.84rem;color:var(--zacht,#bbb);line-height:1.55;max-height:38vh;overflow-y:auto;white-space:pre-wrap;}';
-  /* HET SLUITKRUISJE DRAAGT ZIJN RAAKVLAK ALS MAAT, en rCss definieert het zelf.
-
-     Twee gebreken in een: `.rsm-x` had geen eigen afmeting -- alleen padding en
-     het kruisje, dus de maat kwam uit het lettertype dat toevallig laadde. En
-     het Rahul-paneel gebruikt die klasse in zijn EIGEN markup maar liet hem
-     definieren door het stijlblok van Samen; een knop die zijn maat leent uit
-     een ander blok, is een knop zonder maat zodra dat blok er niet is.
-
-     CI mat hem op 3 september 2026 op 11x15 -- kleiner dan de padding alleen
-     (16px horizontaal), dus toen gold de regel niet eens. Nu staat WCAG 2.5.8
-     er als min-width/min-height, in BEIDE blokken: dezelfde regel herhaald in
-     plaats van geleend, want het is de maat die telt en niet de plek.
-
-     Wat hiermee NIET verklaard is: waarom CI dit op deze tak zag en op main
-     niet, terwijl het bestand byte-identiek was. De maat is onvoorwaardelijk
-     juist; de trigger is niet gevonden. */
-  rCss += '.rsm-x{background:transparent;border:1px solid #444;border-radius:0;color:inherit;padding:.15rem .5rem;cursor:pointer;min-width:24px;min-height:24px;display:grid;place-items:center;}';
-  var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
+  /* Rahul gebruikt dezelfde centrale Samen-component als de kamer. */
   var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul" aria-haspopup="dialog" data-stand="rahul-venster">✶ Rahul</button>');
-  var rSheet = maakEl('<section class="rsm-rsheet" aria-label="Vraag Rahul" hidden>' +
+  var rSheet = maakEl('<section class="rsm-rsheet" role="dialog" aria-modal="false" aria-label="Vraag Rahul" hidden>' +
     '<div class="rsm-kop"><span>✶ Vraag het Rahul</span><button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="rsm-ruit" aria-live="polite"></div>' +
     '<form class="rsm-rij"><input placeholder="Wat wil je weten?" maxlength="300" autocomplete="off" aria-label="Je vraag"><button class="rsm-go" type="submit" aria-label="Versturen" data-contextactie>→</button></form></section>');
@@ -208,18 +213,32 @@
   })();
   document.body.appendChild(rSheet);
   var rUit = rSheet.querySelector('.rsm-ruit'), rForm = rSheet.querySelector('form'), rInp = rForm.querySelector('input');
+  var rBezig = false, rStuur = rForm.querySelector('button');
+  function rZelfdeProfiel() { var nu = Sessie.huidig(); return !!(nu && nu.code === s.code && nu.token === s.token &&
+    (nu.profiel && nu.profiel.id) === (s.profiel && s.profiel.id)); }
   rFab.addEventListener('click', function () {
     rSheet.hidden = false; rFab.hidden = true; rInp.focus();
     if (!rUit.textContent) rUit.textContent = 'Hoi! Vraag me wat je wilt: over de apps, over leren, of gewoon iets dat je bezighoudt. Alles hier is gratis en veilig.';
   });
-  rSheet.querySelector('.rsm-x').addEventListener('click', function () { rSheet.hidden = true; rFab.hidden = false; });
+  rSheet.querySelector('.rsm-x').addEventListener('click', function () { sluitPaneel(rSheet, rFab); });
+  paneelToets(rSheet, rFab);
   rForm.addEventListener('submit', function (ev) {
-    ev.preventDefault(); var q = rInp.value.trim(); if (!q) return; rInp.value = '';
+    ev.preventDefault(); var q = rInp.value.trim(); if (!q || rBezig || !rZelfdeProfiel()) return; rInp.value = '';
+    rBezig = true; rStuur.disabled = true;
     rUit.textContent = 'Rahul denkt na…';
     fetch('/api/rtf/rahul', { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code: s.code, token: s.token, q: q }) })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { rUit.textContent = (d && (d.antwoord || d.error)) || 'Ik kwam er even niet uit; probeer het nog eens.'; })
-      .catch(function () { rUit.textContent = 'Even geen verbinding; probeer het zo nog een keer.'; });
+      .then(function (r) { return r.json().then(function (d) {
+        if (!r.ok || !d || d.error || d.ok === false || typeof d.antwoord !== 'string' || !d.antwoord.trim()) throw new Error(d && d.error || 'Geen antwoord');
+        return d;
+      }); })
+      .then(function (d) {
+        if (!rZelfdeProfiel()) { rUit.textContent = 'Je profiel is gewijzigd. Open deze ruimte opnieuw.'; return; }
+        rUit.textContent = (d && (d.antwoord || d.error)) || 'Ik kwam er even niet uit; probeer het nog eens.'; })
+      .catch(function () {
+        if (!rZelfdeProfiel()) { rUit.textContent = 'Je profiel is gewijzigd. Open deze ruimte opnieuw.'; return; }
+        rUit.textContent = 'Even geen verbinding; probeer het zo nog een keer.';
+        if (!rInp.value) rInp.value = q;
+      }).finally(function () { rBezig = false; rStuur.disabled = false; });
   });
 })();

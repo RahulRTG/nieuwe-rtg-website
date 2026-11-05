@@ -28,7 +28,7 @@
     if (!knop) {
       knop = document.createElement('button');
       knop.type = 'button';
-      knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast';
+      knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast' + knopStijl + (ds ? ' ds-uitvoer-knop' : '');
       knop.setAttribute('aria-haspopup', 'dialog');
       /* Deze knop bestaat alleen zolang het scherm werkelijk uitvoerbare
          gegevens heeft. Bedien hem daarom als kortlevende hoofdactie voordat
@@ -42,9 +42,9 @@
   }
 
   function start() {
-    var st = document.createElement('style');
-    st.textContent = css;
-    document.head.appendChild(st);
+    // Ook oudere hosts krijgen dezelfde canonieke component; alleen het laden
+    // verschilt zolang zij nog geen expliciete data-ds-markering dragen.
+    laadUitvoerPresentatie('/ds/rtg-ds.css');
     herzie();
     if (!window.MutationObserver) return;
     var kijker = new MutationObserver(function () { clearTimeout(tik); tik = setTimeout(herzie, 300); });

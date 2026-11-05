@@ -144,16 +144,20 @@ test('een app-pagina draagt geen woordmerk meer in zijn chrome',
     for (const pad of steek) {
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
       /* Een scherm op het RTG Design System (TRAVELOS-MIGRATIE.md) heeft geen
-         iOS-laag en geen home-indicator: daar staat de ds-Edge. Het woordmerk
-         en de eyebrow blijven uit de chrome, net als op de andere schermen. */
+         iOS-laag en geen home-indicator: daar staat de ds-Edge. Het vaste
+         RTG-woordmerk blijft uit de chrome. De wereld-eyebrow hoort juist bij
+         de inhoudelijke DS-kop en bewaart de eigen identiteit van de app. */
       if (await page.locator('html[data-ds]').count()) {
         await page.waitForSelector('.ds-edge__balk');
         const ds = await page.evaluate(() => ({
           merk: document.querySelectorAll('.os-merk, .os-merk-logo, .osbar, .os-kick, img[alt="RTG"]').length,
-          eyInKop: document.querySelectorAll('body > header .ey, body > header .ds-label').length,
+          identiteit: Array.from(document.querySelectorAll('body .ey, body .ds-label'))
+            .map((el) => String(el.textContent || '').trim()).filter(Boolean),
           edge: document.querySelectorAll('.ds-edge').length
         }));
-        assert.deepEqual(ds, { merk: 0, eyInKop: 0, edge: 1 }, pad + ': chrome van het Design System');
+        assert.equal(ds.merk, 0, pad + ': het vaste woordmerk staat nog in de DS-chrome');
+        assert.ok(ds.identiteit.length > 0, pad + ': de inhoudelijke wereld- of appsignatuur ontbreekt');
+        assert.equal(ds.edge, 1, pad + ': er staat niet precies een DS-Edge');
         continue;
       }
       await wachtOpRust(page);

@@ -1,0 +1,24 @@
+/* De bestaande wereldschil: zelfde bestemmingen, handvoorkeur en tweede
+   paneel. Op DS is de navigatie inhoud; uitsluitend Edge blijft onder vast. */
+@layer rtg.component {
+  .ds-wereldnav { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-2); padding-block: var(--ds-ruimte-4); }
+  .ds-wereldnav .ds-knop { min-inline-size: var(--ds-doel); max-inline-size: 100%; white-space: normal; }
+  .ds-wereldnav [aria-current] { border-color: var(--ds-accent); box-shadow: inset 0 0 0 1px var(--ds-accent); }
+  .ds-wereldnav-voet { display: none; }
+  .ds-wereldnav-paneel { display: none; }
+  @media (min-width: 900px) {
+    .ds-wereldnav-voet { display: flex; gap: var(--ds-ruimte-2); margin-inline-start: auto; }
+    .ds-wereldnav-voet [aria-pressed="true"] { border-color: var(--ds-accent); }
+    .ds-wereldnav:where([data-hand="rechts"] *) { justify-content: flex-end; }
+    .ds-wereldnav-voet:where([data-hand="rechts"] *) { margin-inline-start: 0; margin-inline-end: auto; order: -1; }
+  }
+  @media (min-width: 1200px) {
+    .ds-wereldnav-split { padding-inline-end: clamp(22rem, 42vw, 38rem); }
+    .ds-wereldnav-paneel { display: flex; flex-direction: column; position: fixed; inset-block: var(--ds-ruimte-3) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6)); inset-inline-end: var(--ds-ruimte-3); inline-size: clamp(21rem, 40vw, 37rem); z-index: 10; background: var(--ds-grond); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); overflow: hidden; }
+    .ds-wereldnav-split:where([data-hand="rechts"] *) { padding-inline-end: 0; padding-inline-start: clamp(22rem, 42vw, 38rem); }
+    .ds-wereldnav-paneel:where([data-hand="rechts"] *) { inset-inline-end: auto; inset-inline-start: var(--ds-ruimte-3); }
+    .ds-wereldnav-kop { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-3); border-block-end: 1px solid var(--ds-lijnkleur); }
+    .ds-wereldnav-kop > b { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; }
+    .ds-wereldnav-paneel > iframe { flex: 1; min-block-size: 0; inline-size: 100%; border: 0; background: var(--ds-grond); }
+  }
+}

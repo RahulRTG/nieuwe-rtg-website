@@ -47,15 +47,15 @@
     if (getekend === sleutel) return;
     getekend = sleutel;
     v.hidden = false;
-    v.innerHTML = '<input type="text" id="vNaam" maxlength="40" value="' + esc(bezig.naam) + '" ' +
+    v.innerHTML = '<input class="ds-invoer" type="text" id="vNaam" maxlength="40" value="' + esc(bezig.naam) + '" ' +
       'placeholder="Naam van de wijk" aria-label="Naam van de wijk">' +
-      '<div class="v-vakjes">' + ((D.tafels || []).length
+      '<div class="v-vakjes ds-horeca-werkvakjes">' + ((D.tafels || []).length
         ? (D.tafels || []).map(function (t) {
             return '<label><input type="checkbox" value="' + esc(t) + '"' +
               (bezig.tafels.indexOf(t) >= 0 ? ' checked' : '') + '>' + esc(t) + '</label>';
           }).join('')
-        : '<p class="v-voet">Deze zaak heeft nog geen tafels; die staan in de zaakinstellingen.</p>') +
-      '</div><div class="v-acties">' +
+        : '<p class="v-voet ds-horeca-werkvoet">Deze zaak heeft nog geen tafels; die staan in de zaakinstellingen.</p>') +
+      '</div><div class="v-acties ds-horeca-werkacties">' +
       K.knop('Bewaren', { bewaar: '1' }, true) + K.knop('Annuleren', { af: '1' }) +
       (bezig.id ? K.knop('Wijk weghalen (tafels blijven)', { weg: bezig.id }) : '') +
       '</div>';
@@ -93,10 +93,10 @@
 
     var lijst = $('vIndeelLijst');
     lijst.innerHTML = (d.wijken || []).map(function (w) {
-      return '<div class="item"><span>' + esc(w.naam) + '<span class="stil"> · ' +
+      return '<div class="item ds-horeca-item"><span>' + esc(w.naam) + '<span class="stil ds-horeca-meta"> · ' +
         w.tafels.length + ' tafel(s)</span></span><span>' +
         K.knop('Wijzigen', { wijzig: w.id }) + '</span></div>';
-    }).join('') || '<p class="v-leeg">Nog geen wijken ingedeeld.</p>';
+    }).join('') || '<p class="v-leeg ds-horeca-werkleeg">Nog geen wijken ingedeeld.</p>';
     K.bind(lijst, 'wijzig', function (b) {
       var w = (D.wijken || []).filter(function (x) { return x.id === b.dataset.wijzig; })[0];
       if (!w) return;

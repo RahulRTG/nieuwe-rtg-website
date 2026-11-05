@@ -96,7 +96,8 @@
   function bZet(v) {
     try { localStorage.setItem(BKEY, String(Math.max(0, Math.min(100, +v)))); } catch (e) {}
     bCache = Math.max(0, Math.min(100, +v));
-    bPas(); vorige = ''; bMerk();
+    bPas(); vorige = '';
+    try { w.dispatchEvent(new Event('rtg-beweging')); } catch (e) {}
   }
 
   // de zoekbalk-parameters veranderen niet zolang de pagina staat: één keer
@@ -142,7 +143,6 @@
     }
     return { top: top, onder: onder, basis: basis, hue: hue };
   }
-
   // ---- toepassen ----
   var STIJL_ID = 'levendegrond-stijl';
   /* Onzichtbaar zachte overgangen. We registreren de kleur-custom-properties als
@@ -153,32 +153,16 @@
      - de levende was schuift heel traag: een lange, lineaire smoothing (~3s)
      - de thematokens wisselen in een keer: een korte, zachte kruisvervaging
      Wie bewegingsarm wil (prefers-reduced-motion) krijgt gewoon directe wissels. */
-  var LEVEND_KLEUR = ['--levend-top', '--levend-onder', '--levend-basis'];
+  function laadLevendekleurStijl(pad) {
+    if (document.getElementById(STIJL_ID)) return;
+    var levendekleurStijlLink = document.createElement('link');
+    levendekleurStijlLink.id = STIJL_ID;
+    levendekleurStijlLink.rel = 'stylesheet';
+    levendekleurStijlLink.href = pad;
+    document.head.appendChild(levendekleurStijlLink);
+  }
   function zorgStijl() {
-    if (d.getElementById(STIJL_ID)) return;
-    var st = d.createElement('style'); st.id = STIJL_ID;
-    // alleen de levende was-kleuren registreren als <color> (die zet deze motor
-    // zelf, niemand leunt op een var()-terugval); de thematokens NIET registreren,
-    // anders zou hun initiele waarde de var(--card,#fallback) overal overrulen.
-    var reg = LEVEND_KLEUR.map(function (n) {
-      var init = n === '--levend-basis' ? '#0C0C0B' : 'transparent';
-      return '@property ' + n + '{syntax:"<color>";inherits:true;initial-value:' + init + ';}';
-    }).join('');
-    var levendTrans = LEVEND_KLEUR.map(function (n) { return n + ' 3s linear'; }).join(',');
-    st.textContent = reg +
-      '[data-levendegrond]{background:' +
-        'radial-gradient(150% 80% at 50% -8%, var(--levend-top), transparent 60%),' +
-        'radial-gradient(132% 72% at 50% 116%, var(--levend-onder), transparent 62%),' +
-        'var(--levend-basis) !important;}' +
-      '@media (prefers-reduced-motion: no-preference){' +
-        // de levende drift: elke minieme tint-sprong wordt over 3s uitgesmeerd, dus
-        // je ziet de kleur nooit "verspringen" -- hij glijdt onmerkbaar
-        ':root{transition:' + levendTrans + ';}' +
-        // de themawissel (wit <-> donker <-> standaard): een zachte kruisvervaging
-        // van de grote vlakken en de kaarten (achtergrond + tekst + randen), veilig
-        // via gewone properties -- geen @property, dus var(--token,#fallback) blijft heel
-        'body,[data-levendegrond],[data-levend-thema],.card,.os-tegel,.tkc,.topbar,.tabbar,.os-aibalk{transition:background-color .8s ease,color .8s ease,border-color .8s ease;}}';
-    (d.head || d.documentElement).appendChild(st);
+    laadLevendekleurStijl('/ds/levendekleur.css');
   }
 
   function rtfWereld() { try { return /\/apps\/foundation\//.test(w.location.pathname); } catch (e) { return false; } }

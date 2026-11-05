@@ -9,7 +9,7 @@ const html = lees('public/apps/foundation/samen-thuis.html');
 const gedrag = lees('public/apps/foundation/samen-thuis.js');
 const beeld = lees('public/apps/foundation/samen-thuis-weergave.js');
 const samen = lees('public/apps/foundation/samen.js');
-const samenBron = lees('public/apps/foundation/samen/samen-01.js');
+const samenBron = require('../scripts/bundel').bundel('apps/foundation/samen.js').toString('utf8');
 
 test('de Samen-laag is als benoemde, niet-modale dialoog herkenbaar', () => {
   const dialoog = /<section class="rsm-sheet" role="dialog" aria-modal="false" aria-label="Samen" hidden>/;

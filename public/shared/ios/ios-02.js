@@ -147,9 +147,8 @@
     }
 
     var rij = el('div', 'ios-nav-rij');
-    // de acties krijgen hun ondergrens van de component zelf, want niet elk
-    // scherm dat ios.js laadt laadt ook ios.css (zie navStijlEenmalig)
-    navStijlEenmalig();
+    // De centrale iOS-component geeft ook legacy-schermen zonder ios.css een
+    // bereikbare ondergrens; deze gedragsowner injecteert geen eigen vorm.
     var actieVak = el('div', 'ios-nav-acties');
     var extra = el('div', 'ios-nav-extra');
 

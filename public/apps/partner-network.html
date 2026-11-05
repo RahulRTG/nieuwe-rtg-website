@@ -1,35 +1,37 @@
-<!doctype html><html lang="nl"><head>
-<script src="/shared/id.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Partner Network · RTG</title><meta name="theme-color" content="#0c0c0b"><link rel="icon" href="/icon.svg"><link href="/fonts/fonts.css" rel="stylesheet"><link href="/shared/partner-network.css" rel="stylesheet"><link href="/shared/workos-premium.css" rel="stylesheet">
+<!doctype html><html lang="nl" data-ds="1"><head>
+<script src="/shared/id.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Partner Network · RTG</title><meta name="theme-color" content="#0c0c0b"><link rel="icon" href="/icon.svg">
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
-<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
-</head><body data-workos-premium data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard"><div class="pn-shell">
+
+
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet"><script src="/ds/shell.js"></script>
+</head><body class="ds-scherm ds-partner" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard"><div class="pn-shell ds-partner-shell">
 <!-- Elk getal op dit scherm komt van /api/supplier/netwerk/overzicht, met zijn bron erbij.
      Staat er "niet gemeten", dan is er geen bron en dus ook geen nul (kern/partnernetwerk.js). -->
-<aside class="pn-rail"><nav><button class="actief" data-zone="intenties"><i>✦</i><span>Vragen</span></button><button data-zone="beloften"><i>◇</i><span>Beloften</span></button><button data-zone="aandacht"><i>↗</i><span>Aandacht</span></button></nav><footer><button data-link="/apps/app.html"><i>⌂</i><span>RTG</span></button></footer></aside>
-<main><header class="pn-top"><div><span class="actief" id="pnZaak">Partner Network</span></div><section><span id="pnStand">Laden…</span></section></header>
-<p class="pn-melding" id="pnMelding" role="status" aria-live="polite" hidden></p>
-<div class="pn-grid">
-<article class="pn-column pn-opportunities" id="kolomIntenties"><header><span>01 · VRAGEN VAN LEDEN</span></header>
-<div class="pn-kpi"><span>Wachten op uw reactie</span><strong data-getal="intentiesOpen">…</strong><small data-bron="intentiesOpen"></small></div>
-<div class="pn-kpi"><span>Beantwoord</span><strong data-getal="intentiesBeantwoord">…</strong><small data-bron="intentiesBeantwoord"></small></div>
-<div class="pn-kpi"><span>Uw responstijd (mediaan, minuten)</span><strong data-getal="responstijdMin">…</strong><small data-bron="responstijdMin"></small></div>
+<aside class="pn-rail ds-partner-rail"><nav><button class="ds-knop ds-knop--klein actief" data-zone="intenties"><i>✦</i><span>Vragen</span></button><button data-zone="beloften" class="ds-knop ds-knop--klein"><i>◇</i><span>Beloften</span></button><button data-zone="aandacht" class="ds-knop ds-knop--klein"><i>↗</i><span>Aandacht</span></button></nav><footer><button data-link="/apps/app.html" class="ds-knop ds-knop--klein"><i>⌂</i><span>RTG</span></button></footer></aside>
+<main><header data-rtg-menu-host class="pn-top ds-partner-top"><div><span class="actief" id="pnZaak">Partner Network</span></div><section><span id="pnStand">Laden…</span></section></header>
+<p class="pn-melding ds-partner-melding" id="pnMelding" role="status" aria-live="polite" hidden></p>
+<div class="pn-grid ds-partner-grid">
+<article class="pn-column ds-partner-column pn-opportunities ds-partner-opportunities" id="kolomIntenties"><header><span>01 · VRAGEN VAN LEDEN</span></header>
+<div class="pn-kpi ds-partner-kpi"><span>Wachten op uw reactie</span><strong data-getal="intentiesOpen">…</strong><small data-bron="intentiesOpen"></small></div>
+<div class="pn-kpi ds-partner-kpi"><span>Beantwoord</span><strong data-getal="intentiesBeantwoord">…</strong><small data-bron="intentiesBeantwoord"></small></div>
+<div class="pn-kpi ds-partner-kpi"><span>Uw responstijd (mediaan, minuten)</span><strong data-getal="responstijdMin">…</strong><small data-bron="responstijdMin"></small></div>
 <div id="pnIntenties"></div>
-<p class="pn-uitleg">U ziet een vraag op codenaam, nooit een klantprofiel.</p>
+<p class="pn-uitleg ds-partner-uitleg">U ziet een vraag op codenaam, nooit een klantprofiel.</p>
 </article>
-<article class="pn-column pn-network" id="kolomBeloften"><header><span>02 · BELOFTEN</span></header>
-<div class="pn-kpi"><span>Uw onderdelen in conciërge-cases</span><strong data-getal="onderdelenOpen">…</strong><small data-bron="onderdelenOpen"></small></div>
-<div class="pn-kpi"><span>Daarvan vandaag</span><strong data-getal="onderdelenVandaag">…</strong><small data-bron="onderdelenVandaag"></small></div>
-<div class="pn-kpi"><span>Samenwerkingsvoorstellen aan u</span><strong data-getal="samenwerkingIn">…</strong><small data-bron="samenwerkingIn"></small></div>
-<div class="pn-kpi"><span>Uw voorstellen aan anderen</span><strong data-getal="samenwerkingUit">…</strong><small data-bron="samenwerkingUit"></small></div>
-<div class="pn-kpi"><span>Kamers in de verkoop</span><strong data-getal="kamersInVerkoop">…</strong><small data-bron="kamersInVerkoop"></small></div>
-<div class="pn-kpi"><span>Kamers totaal</span><strong data-getal="kamersTotaal">…</strong><small data-bron="kamersTotaal"></small></div>
+<article class="pn-column ds-partner-column pn-network ds-partner-network" id="kolomBeloften"><header><span>02 · BELOFTEN</span></header>
+<div class="pn-kpi ds-partner-kpi"><span>Uw onderdelen in conciërge-cases</span><strong data-getal="onderdelenOpen">…</strong><small data-bron="onderdelenOpen"></small></div>
+<div class="pn-kpi ds-partner-kpi"><span>Daarvan vandaag</span><strong data-getal="onderdelenVandaag">…</strong><small data-bron="onderdelenVandaag"></small></div>
+<div class="pn-kpi ds-partner-kpi"><span>Samenwerkingsvoorstellen aan u</span><strong data-getal="samenwerkingIn">…</strong><small data-bron="samenwerkingIn"></small></div>
+<div class="pn-kpi ds-partner-kpi"><span>Uw voorstellen aan anderen</span><strong data-getal="samenwerkingUit">…</strong><small data-bron="samenwerkingUit"></small></div>
+<div class="pn-kpi ds-partner-kpi"><span>Kamers in de verkoop</span><strong data-getal="kamersInVerkoop">…</strong><small data-bron="kamersInVerkoop"></small></div>
+<div class="pn-kpi ds-partner-kpi"><span>Kamers totaal</span><strong data-getal="kamersTotaal">…</strong><small data-bron="kamersTotaal"></small></div>
 </article>
-<article class="pn-column pn-control" id="kolomAandacht"><header><span>03 · AANDACHT</span></header>
-<div class="pn-kpi"><span>Open klussen</span><strong data-getal="klussenOpen">…</strong><small data-bron="klussenOpen"></small></div>
+<article class="pn-column ds-partner-column pn-control ds-partner-control" id="kolomAandacht"><header><span>03 · AANDACHT</span></header>
+<div class="pn-kpi ds-partner-kpi"><span>Open klussen</span><strong data-getal="klussenOpen">…</strong><small data-bron="klussenOpen"></small></div>
 <div id="pnAandacht"></div>
-<section class="pn-learning"><header><b>Nog niet gebouwd</b></header><ul id="pnNietGebouwd"></ul></section>
+<section class="pn-learning ds-partner-learning"><header><b>Nog niet gebouwd</b></header><ul id="pnNietGebouwd"></ul></section>
 </article>
 </div></main>
-<dialog id="pnReageer"><form method="dialog" id="pnReageerForm"><span>REACTIE OP EEN VRAAG</span><h2 id="pnReageerWat"></h2><label>Uw antwoord<textarea name="tekst" required minlength="3" maxlength="400"></textarea></label><label>Prijs in euro (optioneel)<input name="prijs" type="number" min="0" step="1"></label><footer><button value="cancel" formnovalidate>Sluiten</button><button value="ok" id="pnReageerVerstuur">Versturen</button></footer></form></dialog>
+<dialog id="pnReageer" class="ds-dialoog ds-partner-dialoog" aria-labelledby="pnReageerWat"><form method="dialog" id="pnReageerForm"><span>REACTIE OP EEN VRAAG</span><h2 id="pnReageerWat"></h2><p id="pnReageerFout" role="alert"></p><label class="ds-veldlabel">Uw antwoord<textarea name="tekst" required minlength="3" maxlength="400" class="ds-invoer ds-invoer--tekst"></textarea></label><label class="ds-veldlabel">Prijs in euro (optioneel)<input name="prijs" type="number" min="0" step="1" class="ds-invoer"></label><footer><button value="cancel" formnovalidate class="ds-knop ds-knop--klein">Sluiten</button><button value="ok" id="pnReageerVerstuur" class="ds-knop ds-knop--klein">Versturen</button></footer></form></dialog>
 </div><script src="/apps/partner-network.js"></script><script src="/shared/basis.js" defer></script><script src="/shared/metgezel.js" defer></script></body></html>

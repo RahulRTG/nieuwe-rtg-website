@@ -35,6 +35,16 @@
     return node;
   }
 
+  /* Een springlink verwijst uitsluitend naar een werkelijk DOM-doel. De
+     helper houdt fragmentnavigatie op één begrensd contract en voorkomt dat
+     presentatiecode willekeurige URL's uit samengestelde tekst kan bouwen. */
+  function spring(anchor, target) {
+    if (!anchor || !target) return anchor;
+    if (!target.id) target.id = 'rtg-inhoud';
+    anchor.setAttribute('href', '#' + target.id);
+    return anchor;
+  }
+
   function ensureSectionMasthead(doc, body, route, name) {
     if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
     var main = doc.querySelector('main,[data-rtg-screen-root="content"]');

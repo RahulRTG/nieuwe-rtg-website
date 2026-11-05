@@ -45,6 +45,23 @@ test('Adaptive Edge heeft vier toestanden en zeven swipebare decks', () => {
   });
 });
 
+test('Adaptive Edge navigeert uitsluitend naar begrensde interne app-routes', () => {
+  const calls = [];
+  const win = { location: { assign(route) { calls.push(route); } } };
+  for (const route of ['/apps/app.html', '/apps/werkruimte.html?gebied=reizen#plan']) {
+    assert.equal(kern.internalRoute(route), route);
+    assert.equal(kern.navigate(win, route), true);
+  }
+  for (const route of ['https://example.test/apps/app.html', '//example.test/apps/app.html',
+    '/apps/../site/404.html', '/site/404.html', 'javascript:alert(1)', '/apps/app.html\nscript']) {
+    assert.equal(kern.internalRoute(route), null, route);
+    assert.equal(kern.navigate(win, route), false, route);
+  }
+  assert.deepEqual(calls, ['/apps/app.html', '/apps/werkruimte.html?gebied=reizen#plan']);
+  assert.doesNotMatch(VIEW, /location\.href\s*=/);
+  assert.doesNotMatch(SERVICES, /location\.href\s*=/);
+});
+
 /* HET BLAD HEEFT GEEN EIGEN LIJST MEER (EDGE.md par. 11, ronde 2 stap 17 en 18).
    Er stond een tweede register naast RTGAdaptief met zeven vaste
    snelkoppelingen; die zijn weg (besluit K-bladlijst) en het register met hen.
@@ -142,6 +159,10 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'annuleren sluit een dialoog pas nadat de overige bediening is aangeraakt');
   assert.match(PERSONAL_IMAGES, /button\.setAttribute\('aria-haspopup', 'dialog'\)/,
     'de beeldbewerker is als heropenbare dialoog herkenbaar voor gebruiker en meter');
+  assert.match(PERSONAL_IMAGES, /if \(!img \|\| img\.tagName !== 'IMG'\) return false;[\s\S]{0,100}img\.setAttribute\('src', String\(source \|\| ''\)\)/,
+    'de centrale beeldbron schrijft uitsluitend op echte afbeeldingselementen');
+  assert.doesNotMatch(PERSONAL_IMAGES, /img\.src\s*=/,
+    'persoonlijke beelden omzeilen de centrale afbeeldingsgrens niet');
   assert.match(PERSONAL_IMAGE_EDITOR, /save\.dataset\.dialogResult = 'save'/,
     'Opslaan publiceert dat het de beeldbewerker bij succes afsluit');
   assert.match(MAGNAAT, /padding-bottom:calc\((?:2|3)rem \+ var\(--rtg-adaptive-inset,0px\)\)/,
@@ -318,9 +339,9 @@ test('de definitieve editorial laag is centraal; de oude lagen blijven alleen al
      Command, werkruimte) en geen contrastbrug (18 oktober 2026). */
   assert.match(heritage, /@import url\('\.\/rtg-editorial-system\.css'\)/);
   assert.doesNotMatch(heritage, /rtg-cinematic-system\.css/);
-  assert.match(basisBron, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
+  assert.match(basisBron, /voegBasisStijlToe\('\/shared\/rtg-editorial-v4\.css', 'rtgEditorialV4Css'\)/);
   assert.match(basisBron, /laadEditorialBlad\(\)/);
-  assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
+  assert.match(basis, /laadBasisController\('\/shared\/rtg-editorial-v4\.js', 'RTGEditorialV4'\)/);
 });
 
 test('www bepaalt de vaste kaders van app, header en Edge in editorial v4', () => {

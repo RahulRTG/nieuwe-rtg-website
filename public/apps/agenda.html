@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -11,183 +11,65 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Agenda">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
-  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
-    backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
-    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
-  header h1{font-size:1.15rem;}
-  header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
-  main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
-  .knop:hover{border-color:var(--gold);}
-  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  .knop:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font:inherit;font-size:.85rem;padding:.45rem .6rem;}
 
-  /* De agenda houdt zijn eigen weergave-schakelaar (maand / week / lijst), maar
-     draagt hem in de stijl van het deelmenu: geen randje om een knop, maar een
-     rustige tab met kleine kapitalen en een gouden streep onder de actieve. Zo
-     is het huis er een. De pijlen en "Vandaag" blijven handelingen, en dus
-     echte knoppen. Op id, want de kit tekent .knop als een pil en die regel is
-     specifieker dan een kale klasse hier. */
-  #wMaand,#wWeek,#wLijst{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
-    padding:.5rem .45rem .4rem;font-size:.72rem;font-weight:600;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--muted);}
-  #wMaand:hover,#wWeek:hover,#wLijst:hover{color:var(--txt);border-bottom-color:transparent;}
-  #wMaand.aan,#wWeek.aan,#wLijst.aan{color:var(--txt);border-bottom-color:var(--gold);}
 
-  /* de balk boven de kalender: maand, pijlen, weergave */
-  .stuur{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;}
-  .stuur h2{font-size:1.25rem;min-width:11rem;}
-  .stuur .rek{flex:1;}
 
-  /* Rahul plant mee, in gewone taal */
-  .rahulbalk{display:flex;gap:.5rem;margin-bottom:1rem;}
-  .rahulbalk input{flex:1;}
 
-  /* de maand: een echt raster; buiten de maand gedimd, vandaag met goud */
-  .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
-    border:1px solid var(--line);border-radius:0;overflow:hidden;}
-  .mkop{background:var(--card2);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--soft);padding:.35rem .4rem;text-align:center;}
-  .mdag{background:var(--card);min-height:6rem;padding:.28rem .32rem;cursor:pointer;text-align:left;
-    border:0;color:inherit;font:inherit;display:block;width:100%;}
-  .mdag:hover{background:var(--card2);}
-  .mdag.buiten{opacity:.45;}
-  .dnr{display:inline-block;font-size:.68rem;color:var(--muted);min-width:1.35rem;text-align:center;
-    border-radius:0;padding:.05rem 0;margin-bottom:.15rem;}
-  .mdag.vandaag .dnr{background:var(--gold);color:#0C0C0B;font-weight:700;}
-  .chip{display:block;font-size:.63rem;line-height:1.35;border-left:2px solid var(--burgundy);
-    padding:.08rem .32rem;margin:.14rem 0;background:var(--card2);border-radius:0;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt);}
-  .chip.eco{border-left-color:var(--gold);}
-  .chip.uit{border-left-style:dashed;color:var(--muted);}
-  .chip.nee{opacity:.5;text-decoration:line-through;}
-  .chip b{font-weight:600;}
-  .meer{font-size:.6rem;color:var(--soft);}
-
-  /* de week: zeven kolommen met de afspraken op volgorde */
-  .wgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
-    border:1px solid var(--line);border-radius:0;overflow:hidden;}
-  .wdag{background:var(--card);min-height:11rem;padding:.3rem .35rem;}
-  .wdag .chip{font-size:.7rem;padding:.2rem .4rem;cursor:pointer;}
-
-  /* de lijst: gegroepeerd per dag, met de uitnodigingen erin */
-  .ldag{margin-bottom:1rem;}
-  .ldag h3{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.35rem;}
-  .litem{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;
-    margin-bottom:.45rem;display:flex;gap:.7rem;align-items:center;cursor:pointer;}
-  .litem .tijd{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.78rem;min-width:5.4rem;}
-  .litem .wat{flex:1;min-width:0;}
-  .litem .wat b{display:block;font-weight:600;font-size:.9rem;}
-  .litem .wat small{color:var(--soft);font-size:.72rem;}
-  .litem.eco{border-left:3px solid var(--gold);}
-  .litem .bron{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
-
-  /* het afspraak-paneel */
-  .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
-    align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
-  .scrim.open{display:flex;}
-  .paneel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;
-    width:min(560px,100%);margin:auto 0;}
-  .paneel h3{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin-bottom:.6rem;}
-  .paneel label{display:block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--soft);margin:.6rem 0 .2rem;}
-  .paneel input,.paneel select,.paneel textarea{width:100%;background:var(--card2);border:1px solid var(--line);
-    border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.5rem .65rem;}
-  .paneel .twee{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
-  .deeln{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding:.35rem 0;
-    display:flex;justify-content:space-between;gap:.6rem;}
-  .deeln .st{color:var(--soft);font-size:.7rem;}
-  .deeln .st.ja{color:var(--rtg-leesgoud,var(--gold));}
-  .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
-    opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
-  .melding.zie{opacity:1;}
-  @media (max-width:760px){
-    .mdag{min-height:4.6rem;}
-    .chip{font-size:.56rem;}
-    .stuur h2{min-width:8rem;font-size:1.05rem;}
-  }
-  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
 
 
 
-<link href="/shared/rtg-daily.css" rel="stylesheet">
-<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-7myv37:not(#_#_#_){margin-left:auto}
-.s-9vyt3z:not(#_#_#_){margin:0.5rem 0}
-</style>
+
+
+
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/appmenu.js" defer></script>
+
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl rtg-daily rtg-living-flow" data-kantoor-tool="agenda" data-rtg-world="living" data-rtg-edge-2-context="native-header,duimbalk" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-daily="agenda" data-rtg-editorial-room="agenda" data-rtg-layout="standard">
+<body class="ds-scherm ds-dagkamer rtg-stijl rtg-daily rtg-living-flow" data-kantoor-tool="agenda" data-rtg-world="living" data-rtg-edge-2-context="native-header,duimbalk" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-daily="agenda" data-rtg-editorial-room="agenda" data-rtg-layout="standard">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
-<header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
+<header class="ds-kop ds-dag-kop" data-rtg-menu-host>
+  <a class="terug ds-knop" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
   <span><span class="ey" data-i18n="dailyField.livingBrand">RTG · LivingOS</span><h1 data-i18n="dailyField.yourCalendar">Uw agenda</h1></span>
-  <span class="rij s-7myv37">
-    <button class="knop" id="icsBtn" aria-label="Agenda exporteren" data-i18n-aria="daily.exportAgenda" data-rtg-edge-bar type="button" title="Exporteer als .ics; opent in elke agenda ter wereld" data-i18n="dailyField.export" data-i18n-title="dailyField.exportHint">Exporteer</button>
+  <span class="rij s-7myv37 ds-dag-rij ds-dag-auto">
+    <button class="knop ds-knop" id="icsBtn" aria-label="Agenda exporteren" data-i18n-aria="daily.exportAgenda" data-rtg-edge-bar data-ds-actie="Agenda exporteren" type="button" title="Exporteer als .ics; opent in elke agenda ter wereld" data-i18n="dailyField.export" data-i18n-title="dailyField.exportHint">Exporteer</button>
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="nieuwBtn" data-rtg-edge-bar type="button" data-hoofdactie data-i18n="dailyField.newAppointment">+ Afspraak</button></div>
-<main>
+<div class="rtg-duimbalk"><button class="knop vol ds-knop" id="nieuwBtn" data-rtg-edge-bar data-ds-actie="Nieuwe afspraak" type="button" data-hoofdactie data-i18n="dailyField.newAppointment">+ Afspraak</button></div>
+<main class="ds-dag-main">
 <section id="dailyIntro" aria-label="Agenda" data-i18n-aria="dailyField.agenda"></section>
-  <div class="daily-content">
+  <div class="daily-content ds-dag-daily-content">
   <div id="agendaStatus" class="rtg-operation-status" role="status" aria-live="polite"></div>
-  <div class="stuur">
-    <button class="knop" id="vorige" data-rtg-edge-bar type="button" aria-label="Vorige" data-i18n-aria="dailyField.previous">&#8249;</button>
-    <button class="knop" id="volgendeK" data-rtg-edge-bar type="button" aria-label="Volgende" data-i18n-aria="dailyField.next">&#8250;</button>
+  <div class="stuur ds-dag-stuur">
+    <button class="knop ds-knop" id="vorige" data-rtg-edge-bar data-ds-actie type="button" aria-label="Vorige" data-i18n-aria="dailyField.previous">&#8249;</button>
+    <button class="knop ds-knop" id="volgendeK" data-rtg-edge-bar data-ds-actie type="button" aria-label="Volgende" data-i18n-aria="dailyField.next">&#8250;</button>
     <h2 id="periode"></h2>
-    <span class="rek"></span>
-    <button class="knop" id="vandaagBtn" data-rtg-edge-bar type="button" data-i18n="dailyField.today">Vandaag</button>
-    <button class="knop" id="wDag" data-i18n="daily.dayView" type="button" data-rtg-edge-bar>Dag</button>
-    <button class="knop" id="wMaand" data-rtg-edge-bar type="button" data-i18n="dailyField.month">Maand</button>
-    <button class="knop" id="wWeek" data-rtg-edge-bar type="button" data-i18n="dailyField.week">Week</button>
-    <button class="knop" id="wLijst" data-rtg-edge-bar type="button" data-i18n="dailyField.list">Lijst</button>
+    <span class="rek ds-dag-rek"></span>
+    <button class="knop ds-knop" id="vandaagBtn" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.today">Vandaag</button>
+    <button class="knop ds-knop" id="wDag" data-i18n="daily.dayView" type="button" data-rtg-edge-bar data-ds-actie>Dag</button>
+    <button class="knop ds-knop" id="wMaand" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.month">Maand</button>
+    <button class="knop ds-knop" id="wWeek" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.week">Week</button>
+    <button class="knop ds-knop" id="wLijst" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.list">Lijst</button>
   </div>
-  <div id="dailyWeek" class="daily-week"></div>
-  <div id="kal" data-rtg-scroll="agenda-calendar" aria-live="polite"></div>
-  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="nieuwBtn"><span data-i18n="daily.agendaAction">Plan een afspraak</span> <span aria-hidden="true">→</span></button></div>
-  <details class="daily-planner"><summary data-i18n="daily.planner">Plan met Rahul in uw eigen woorden</summary>
-  <div class="rahulbalk">
-    <input class="veld" id="rahulIn" maxlength="300" placeholder='Zeg het gewoon: "lunch met de notaris vrijdag om 12:30"'
+  <div id="dailyWeek" class="daily-week ds-dag-daily-week"></div>
+  <div id="kal" class="ds-dag-kal" data-rtg-scroll="agenda-calendar" aria-live="polite"></div>
+  <div class="daily-foot ds-dag-daily-foot"><button type="button" class="daily-action ds-knop ds-dag-actie" data-daily-target="nieuwBtn"><span data-i18n="daily.agendaAction">Plan een afspraak</span> <span aria-hidden="true">→</span></button></div>
+  <details class="daily-planner ds-dag-daily-planner"><summary data-i18n="daily.planner">Plan met Rahul in uw eigen woorden</summary>
+  <div class="rahulbalk ds-dag-rahulbalk">
+    <input class="ds-invoer veld ds-invoer" id="rahulIn" maxlength="300" placeholder='Zeg het gewoon: "lunch met de notaris vrijdag om 12:30"'
       aria-label="Plan in gewone taal" data-i18n-aria="dailyField.planLabel" data-i18n-ph="dailyField.planPrompt">
-    <button class="knop" id="rahulBtn" type="button" data-i18n="dailyField.plan">Plan</button>
+    <button class="knop ds-knop" id="rahulBtn" type="button" data-i18n="dailyField.plan">Plan</button>
   </div>
   </details>
-  <p class="stil h-mt80" data-i18n="dailyField.agendaHelp">Goud is wat uit RTG zelf komt (boekingen); dat leest de agenda alleen.
+  <p class="stil h-mt80 ds-dag-stil" data-i18n="dailyField.agendaHelp">Goud is wat uit RTG zelf komt (boekingen); dat leest de agenda alleen.
     Gestippeld is een uitnodiging die nog op uw ja of nee wacht. Herinneringen komen als seintje op het toestel.</p>
   </div>
 </main>
@@ -195,62 +77,62 @@
 
 
 <!-- de afspraak -->
-<div class="scrim" id="afScrim" role="dialog" aria-label="Afspraak" data-i18n-aria="dailyField.appointment">
-  <div class="paneel">
+<div class="scrim ds-dag-scrim" id="afScrim" role="dialog" aria-label="Afspraak" data-i18n-aria="dailyField.appointment">
+  <div class="paneel ds-dag-paneel">
     <h3 id="afKop" data-i18n="dailyField.appointment">Afspraak</h3>
     <div id="uitnodigingBlok" style="display:none;">
-      <p class="stil" id="uitnodigingTekst"></p>
-      <div class="rij s-9vyt3z">
-        <button class="knop vol" id="afJa" type="button" data-i18n="dailyField.attend">Ik kom</button>
-        <button class="knop" id="afNee" type="button" data-i18n="dailyField.decline">Ik kom niet</button>
+      <p class="stil ds-dag-stil" id="uitnodigingTekst"></p>
+      <div class="rij s-9vyt3z ds-dag-rij ds-dag-marge">
+        <button class="knop vol ds-knop" id="afJa" type="button" data-i18n="dailyField.attend">Ik kom</button>
+        <button class="knop ds-knop" id="afNee" type="button" data-i18n="dailyField.decline">Ik kom niet</button>
       </div>
     </div>
     <div id="afVelden">
       <label for="afTitel" data-i18n="dailyField.title">Titel</label>
-      <input id="afTitel" required maxlength="120">
-      <div class="twee">
-        <span><label for="afDatum" data-i18n="dailyField.date">Datum</label><input id="afDatum" type="date" required></span>
-        <span><label for="afPlek" data-i18n="dailyField.place">Plek</label><input id="afPlek" maxlength="120" placeholder="mag leeg" data-i18n-ph="dailyField.optional"></span>
+      <input class="ds-invoer" id="afTitel" required maxlength="120">
+      <div class="twee ds-dag-twee">
+        <span><label for="afDatum" data-i18n="dailyField.date">Datum</label><input class="ds-invoer" id="afDatum" type="date" required></span>
+        <span><label for="afPlek" data-i18n="dailyField.place">Plek</label><input class="ds-invoer" id="afPlek" maxlength="120" placeholder="mag leeg" data-i18n-ph="dailyField.optional"></span>
       </div>
-      <div class="twee">
-        <span><label for="afTijd" data-i18n="dailyField.from">Van</label><input id="afTijd" type="time"></span>
-        <span><label for="afEind" data-i18n="dailyField.until">Tot</label><input id="afEind" type="time"></span>
+      <div class="twee ds-dag-twee">
+        <span><label for="afTijd" data-i18n="dailyField.from">Van</label><input class="ds-invoer" id="afTijd" type="time"></span>
+        <span><label for="afEind" data-i18n="dailyField.until">Tot</label><input class="ds-invoer" id="afEind" type="time"></span>
       </div>
-      <div class="twee">
+      <div class="twee ds-dag-twee">
         <span><label for="afHerhaal" data-i18n="dailyField.recurrence">Herhaling</label>
-          <select id="afHerhaal">
+          <select class="ds-invoer" id="afHerhaal">
             <option value="geen" data-i18n="dailyField.never">Niet</option><option value="dag" data-i18n="dailyField.daily">Elke dag</option>
             <option value="week" data-i18n="dailyField.weekly">Elke week</option><option value="maand" data-i18n="dailyField.monthly">Elke maand</option>
             <option value="jaar" data-i18n="dailyField.yearly">Elk jaar</option>
           </select></span>
-        <span><label for="afHerhaalTot" data-i18n="dailyField.repeatUntil">Herhalen tot</label><input id="afHerhaalTot" type="date"></span>
+        <span><label for="afHerhaalTot" data-i18n="dailyField.repeatUntil">Herhalen tot</label><input class="ds-invoer" id="afHerhaalTot" type="date"></span>
       </div>
       <label for="afHerinner" data-i18n="dailyField.reminder">Herinnering</label>
-      <select id="afHerinner">
+      <select class="ds-invoer" id="afHerinner">
         <option value="" data-i18n="dailyField.none">Geen</option><option value="0" data-i18n="dailyField.atTime">Op het moment zelf</option>
         <option value="5" data-i18n="dailyField.before5">5 minuten vooraf</option><option value="15" data-i18n="dailyField.before15">15 minuten vooraf</option>
         <option value="30" data-i18n="dailyField.before30">30 minuten vooraf</option><option value="60" data-i18n="dailyField.beforeHour">Een uur vooraf</option>
         <option value="1440" data-i18n="dailyField.beforeDay">Een dag vooraf</option>
       </select>
       <label for="afNotitie" data-i18n="dailyField.note">Notitie</label>
-      <textarea id="afNotitie" rows="2" maxlength="300"></textarea>
+      <textarea class="ds-invoer" id="afNotitie" rows="2" maxlength="300"></textarea>
       <div id="deelBlok" style="display:none;">
         <label for="afCode" data-i18n="dailyField.inviteCodename">Uitnodigen op codenaam</label>
-        <div class="rij"><input class="h-flex1" id="afCode" maxlength="60" placeholder="Codenaam van het lid" data-i18n-ph="dailyField.memberCodename">
-          <button class="knop" id="afNodig" type="button" data-i18n="dailyField.invite">Nodig uit</button></div>
+        <div class="rij ds-dag-rij"><input class="ds-invoer h-flex1" id="afCode" maxlength="60" placeholder="Codenaam van het lid" data-i18n-ph="dailyField.memberCodename">
+          <button class="knop ds-knop" id="afNodig" type="button" data-i18n="dailyField.invite">Nodig uit</button></div>
         <div id="afDeelnemers"></div>
       </div>
     </div>
-    <div class="rij h-mt90">
-      <button class="knop vol" id="afBewaar" type="button" data-rtg-morph-action data-rtg-action-state="idle"><span data-rtg-action-copy><span data-rtg-action-copy-for="idle" data-i18n="dailyField.save">Bewaar</span><span data-rtg-action-copy-for="pending" data-i18n="dailyField.saving">Bewaren…</span><span data-rtg-action-copy-for="success" data-i18n="dailyField.saved">Bewaard ✓</span><span data-rtg-action-copy-for="error" data-i18n="dailyField.retry">Opnieuw</span></span></button>
-      <button class="knop" id="afMeet" type="button" style="display:none;" data-i18n="dailyField.meeting">Vergaderruimte</button>
-      <button class="knop" id="afWeg" type="button" style="display:none;" data-i18n="dailyField.delete">Verwijder</button>
-      <span class="rek h-flex1"></span>
-      <button class="knop" id="afDicht" type="button" data-i18n="dailyField.close">Sluit</button>
+    <div class="rij h-mt90 ds-dag-rij">
+      <button class="knop vol ds-knop" id="afBewaar" type="button" data-rtg-morph-action data-rtg-action-state="idle"><span data-rtg-action-copy><span data-rtg-action-copy-for="idle" data-i18n="dailyField.save">Bewaar</span><span data-rtg-action-copy-for="pending" data-i18n="dailyField.saving">Bewaren…</span><span data-rtg-action-copy-for="success" data-i18n="dailyField.saved">Bewaard ✓</span><span data-rtg-action-copy-for="error" data-i18n="dailyField.retry">Opnieuw</span></span></button>
+      <button class="knop ds-knop" id="afMeet" type="button" style="display:none;" data-i18n="dailyField.meeting">Vergaderruimte</button>
+      <button class="knop ds-knop" id="afWeg" type="button" style="display:none;" data-i18n="dailyField.delete">Verwijder</button>
+      <span class="rek h-flex1 ds-dag-rek"></span>
+      <button class="knop ds-knop" id="afDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
   </div>
 </div>
-<div class="melding" id="melding" role="status"></div>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <script src="/shared/rtg-daily-copy.js"></script>
 <script src="/shared/rtg-daily-fields.js"></script>
 <script src="/shared/rtg-daily.js"></script>

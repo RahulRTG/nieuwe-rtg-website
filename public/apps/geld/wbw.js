@@ -19,41 +19,6 @@
      id-wacht zodat het maar een keer in het document komt. De kleuren zijn
      de rtg-tokens van dit scherm, niet de losse hexwaarden van de oude
      pagina: een stand hoort bij zijn app te kleuren. */
-  function stijl() {
-    if (d.getElementById('wbStijl')) return;
-    var st = d.createElement('style');
-    st.id = 'wbStijl';
-    st.textContent =
-      '#paneel .wb-rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.6rem;}' +
-      '#paneel .wb-rij input{flex:1;min-width:8rem;width:auto;}' +
-      '#paneel .wb-lijstknop{display:flex;align-items:baseline;gap:.7rem;width:100%;text-align:left;' +
-        'background:none;border:1px solid var(--rtg-line);border-radius:0;padding:.9rem 1rem;' +
-        'margin:.55rem 0;color:var(--rtg-txt);font:inherit;cursor:pointer;}' +
-      '#paneel .wb-lijstknop .naam{font-weight:600;}' +
-      '#paneel .wb-sub{font-size:.72rem;color:var(--rtg-soft);}' +
-      '#paneel .wb-rek{flex:1;}' +
-      '#paneel .wb-bedrag{font-variant-numeric:tabular-nums;font-weight:600;}' +
-      '#paneel .wb-plus{color:var(--rtg-groen,#4C9A75);}' +
-      '#paneel .wb-min{color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));}' +
-      '#paneel .wb-naam{font-family:"Bodoni Moda",serif;font-size:1.3rem;font-weight:600;margin:.9rem 0 .1rem;}' +
-      '#paneel .wb-balk{display:flex;align-items:center;gap:.7rem;padding:.35rem 0;font-size:.85rem;}' +
-      '#paneel .wb-balk .naam{min-width:9rem;}' +
-      /* de staaf groeit vanaf het midden: tegoed naar rechts, schuld naar
-         links, zodat de verhouding in een oogopslag leesbaar is */
-      '#paneel .wb-staaf{flex:1;height:8px;border-radius:0;background:var(--rtg-card2,#1B1817);' +
-        'position:relative;overflow:hidden;}' +
-      '#paneel .wb-staaf i{position:absolute;top:0;bottom:0;left:50%;}' +
-      '#paneel .wb-staaf i.p{background:var(--rtg-groen,#4C9A75);}' +
-      '#paneel .wb-staaf i.m{background:var(--rtg-rood,#DE6E92);transform:translateX(-100%);}' +
-      '#paneel .wb-vink{display:flex;align-items:center;gap:.5rem;font-size:.85rem;padding:.3rem 0;}' +
-      '#paneel .wb-vink input{width:auto;flex:0 0 auto;min-width:0;}' +
-      '#paneel .wb-log{font-size:.82rem;line-height:1.6;}' +
-      '#paneel .wb-log .r{display:flex;gap:.6rem;border-top:1px solid var(--rtg-line);' +
-        'padding:.4rem 0;align-items:baseline;}' +
-      '#paneel .wb-log .r:first-child{border-top:none;}' +
-      '#paneel .wb-log .wie{color:var(--rtg-goud,#C9A24B);font-weight:600;white-space:nowrap;}';
-    d.head.appendChild(st);
-  }
 
   /* De idem-sleutel voor verrekenen: een dubbeltik moet een herhaling zijn,
      geen tweede betaling. De gedeelde id-helper (shared/id.js) laadt niet op
@@ -131,6 +96,6 @@
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};
-  Deel.wbw = { S: S, stijl: stijl, idem: idem, toon: toon, tekenLijstjes: tekenLijstjes,
+  Deel.wbw = { S: S, idem: idem, toon: toon, tekenLijstjes: tekenLijstjes,
     tekenVrienden: tekenVrienden, tekenGroep: tekenGroep };
 })(window, document);

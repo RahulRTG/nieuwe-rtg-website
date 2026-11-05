@@ -536,6 +536,613 @@
           "label": "Prima"
         }
       ]
+    },
+    "/apps/boeken.html": {
+      "identity": "RTG Boeken · een persoonlijke leesplank. De huisbibliotheek en eigen tekstbestanden uit de kluis blijven herkenbaar verschillende bronnen. Titel, auteur en leesplek dragen de compositie; geen omslagfotografie, leesscore of reeks. Het huidige scherm gebruikt het Travel-thema van de centrale DS; deze signatuur wijzigt de wereldindeling niet.",
+      "purpose": "Een lid opent een boek of eigen .txt-bestand, leest met een passende lettermaat en gaat later verder vanaf de bewaarde leesplek. De server bewaart die plek, de lettermaat blijft op dit toestel. Meenemen exporteert de plank met voortgang, niet de boektekst. Lezen vereist geen Rahul-opdracht.",
+      "composition": "Collectie met tekstkaarten voor De huisbibliotheek en Uit je kluis; Detail met titel, auteur, drie leesknoppen en één focusbaar tekstvlak. Voortgang heeft een tekst naast de native progress-meter. Een lege kluis is iets anders dan een mislukt verzoek. De melding over een niet bewaarde leesplek hoort leesbaar te blijven bij terugkeer naar de plank.",
+      "motion": "De bron herstelt scrollTop in het tekstvlak na één animation frame; dit is positieherstel, geen decoratieve animatie. Behoud dat herstel ook met reduced motion en laat lettervergroting geen onbedoelde sprong veroorzaken. Scrollen werkt lokaal; opslag is 600 ms uitgesteld en wordt achter elkaar afgehandeld, met direct doorschrijven bij Plank. Meet later invoervertraging, openen van een lange tekst, frames tijdens lezen en stabiliteit bij letterwissel volgens het centrale fluidity-contract. Deze bronafspraken bewijzen geen latency, focusherstel of offline bewaring.",
+      "interactionDensity": "quiet",
+      "interactions": [
+        {
+          "id": "desktop",
+          "label": "Terug naar het bureaublad"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "open-library-book",
+          "label": "Boektitel, auteur, onderwerp en leesvoortgang"
+        },
+        {
+          "id": "open-vault-text",
+          "label": "Bestandsnaam · uit je Bestanden-kluis"
+        },
+        {
+          "id": "read-text",
+          "label": "De tekst van het boek"
+        },
+        {
+          "id": "smaller-text",
+          "label": "Kleinere letters"
+        },
+        {
+          "id": "larger-text",
+          "label": "Grotere letters"
+        },
+        {
+          "id": "back-to-shelf",
+          "label": "Plank"
+        },
+        {
+          "id": "export-open",
+          "label": "Meenemen"
+        },
+        {
+          "id": "export-csv",
+          "label": "CSV"
+        },
+        {
+          "id": "export-json",
+          "label": "JSON"
+        },
+        {
+          "id": "export-close",
+          "label": "Sluiten"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-send",
+          "label": "Verstuur"
+        },
+        {
+          "id": "edge-close-rahul",
+          "label": "Sluit Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ],
+      "additionalStates": [
+        "member-session-required",
+        "library-shelf",
+        "vault-text",
+        "reader",
+        "bookmark-pending",
+        "bookmark-save-failed",
+        "reopened"
+      ],
+      "humanTasks": [
+        "Kies zonder Rahul een boek uit de huisbibliotheek en een eigen tekstbestand. Leg uit welke inhoud van RTG komt, welke uit uw kluis komt en waarom een lege kluis geen laadfout betekent.",
+        "Lees met toetsenbord in het tekstvlak, verander de lettermaat en ga vlak na scrollen terug naar Plank. Open hetzelfde boek opnieuw en beoordeel leesplek, focus en de begrijpelijkheid van een mislukte bewaring.",
+        "Neem de plank mee als CSV of JSON en controleer dat titel, bron en leespercentage meegaan, maar de boektekst niet. Sluit de uitvoer en hervat de gekozen leesactiviteit.",
+        "Lees een lange tekst op mobiel en desktop met tekstvergroting, schermlezer en reduced motion. Beoordeel of de tekst, leesknoppen en opslagmelding bereikbaar blijven bij een trage of weggevallen verbinding."
+      ]
+    },
+    "/apps/ghost.html": {
+      "identity": "Ghost Driver · vooruitblik voor de vervoerder. Een zakelijke drukteverwachting met uren, kansen, knooppunten en uitlegbare oorzaken. De rustige meters en waarschuwingen gebruiken de Travel-werklaag van de DS; ze zijn geen live routekaart of rijopdracht. Het beschikbare weerbeeld draagt expliciet het demo-karakter.",
+      "purpose": "De aangemelde zaak leest waar de komende uren opstopping wordt verwacht en vergelijkt advies met de getoonde simulatie. De gebruiker kan de waarschuwingen of het uurbeeld meenemen. Dit scherm plant geen chauffeur in, wijzigt geen rit en voert het advies niet uit.",
+      "composition": "Collectie met twee inhoudspanelen: uurbeeld met tekst en native progress-meters plus modeltoelichting; daarnaast waarschuwingen met oorzaken, Advies, Zonder ingrijpen, Met advies en Winst. Ook zonder waarschuwing blijft het uurbeeld inhoud. Zonder sessie en bij 401 staat de zaak-inlogdeur; bij geweigerde toegang staat de serverreden met een weg naar de zaak-app. Laden, netwerkfalen, tijdelijk serverfalen en onvolledige voorspellingen hebben een eigen DS-status. Alleen de herstelbare fout biedt Opnieuw proberen; ontbrekende gegevens zijn geen lege voorspelling. Geen sfeerbeeld op deze operationele uitleg.",
+      "motion": "De route haalt één vooruitblik op en tekent de uren en waarschuwingen; er is geen lokale poll, afteller of bewegende kaart. Opnieuw proberen vraagt één nieuwe vooruitblik, blokkeert herhaald activeren tijdens laden en laat uitvoer pas toe na een volledig antwoord. Reduced motion behoudt de kansen, oorzaken en simulatievergelijking zonder geanimeerde meters. Beoordeel later laadtijd, focus bij herstel en stabiliteit wanneer beide panelen verschijnen, en bediening van Meenemen volgens de centrale fluidity-checks. De herstelervaring en prestatiewaarden blijven te kwalificeren.",
+      "interactionDensity": "quiet",
+      "interactions": [
+        {
+          "id": "supplier-home",
+          "label": "Terug naar de zaak-app"
+        },
+        {
+          "id": "supplier-account",
+          "label": "Uw zaak-app"
+        },
+        {
+          "id": "sign-in",
+          "label": "Naar de zaak-app"
+        },
+        {
+          "id": "retry-forecast",
+          "label": "Opnieuw proberen"
+        },
+        {
+          "id": "export-open",
+          "label": "Meenemen"
+        },
+        {
+          "id": "export-csv",
+          "label": "CSV"
+        },
+        {
+          "id": "export-json",
+          "label": "JSON"
+        },
+        {
+          "id": "export-close",
+          "label": "Sluiten"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-send",
+          "label": "Verstuur"
+        },
+        {
+          "id": "edge-close-rahul",
+          "label": "Sluit Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ],
+      "additionalStates": [
+        "supplier-session-required",
+        "supplier-access-denied",
+        "supplier-capability-unavailable",
+        "forecast-loading",
+        "forecast-network-failure",
+        "forecast-server-unavailable",
+        "forecast-incomplete",
+        "forecast-retry-pending",
+        "forecast-with-warnings",
+        "forecast-without-warnings",
+        "demo-weather"
+      ],
+      "humanTasks": [
+        "Open de vooruitblik met de juiste zaak-inlog. Zoek het drukste uur en een knooppunt, leg kans en oorzaak uit en onderscheid de voorspelling van gemeten verkeer en het demo-weerbeeld.",
+        "Vergelijk Zonder ingrijpen, Met advies en Winst voor een waarschuwing. Leg uit welke beslissing u zelf neemt en waarom dit scherm geen rit of bestuurder heeft gewijzigd.",
+        "Lees een vooruitblik zonder waarschuwingen en neem het uurbeeld mee; neem bij waarschuwingen juist die lijst mee. Controleer tijd, kans en toelichting in de uitvoer en keer terug naar de zaak-app.",
+        "Beoordeel de uurmeters met schermlezer, tekstvergroting en reduced motion op mobiel en desktop. Onderbreek de verbinding, herken het verschil met een verlopen sessie en geweigerde toegang, en gebruik Opnieuw proberen. Beoordeel focus en status tijdens herstel; ontbrekende of onvolledige gegevens mogen niet als een voorspelling zonder opstopping worden gelezen."
+      ]
+    },
+    "/apps/voertuig.html": {
+      "identity": "RTG Voertuig · het dossier van één duurzaam voertuig uit de eigen vervoerdersvloot. Naam, inzetbaarheid, papieren en bestuurder zijn de identiteit; dit is geen tijdelijke live GPS-positie. De Travel-werklaag gebruikt tekst voor blokkades en vervaldata, zodat kleur geen voorwaarde is om de stand te begrijpen.",
+      "purpose": "Een bevoegde vervoerder of medewerker kiest een voertuig, leest de door de server bepaalde inzetbaarheid en documentredenen, en kan waar toegestaan een bestuurder uit het team bewaren. Een onbekend voertuigadres onthult niet of het object bij een andere vervoerder bestaat. Het scherm keurt zelf geen papieren goed en wijst geen rit toe.",
+      "composition": "Collectie van eigen voertuigen naast het detail met status, Papieren, Bestuurder en Wat dit voertuig kan. De keuze is herkenbaar met aria-pressed en blijft de actuele voertuigidentiteit na Ververs. Bestuurder kiezen verschijnt alleen wanneer de server een team levert. Geen voertuig gekozen, geen vloot en geen toegankelijke sessie vragen verschillende uitleg. Een mislukte of onvolledige vlootlading verbergt het vorige detail en geeft herstel via Ververs; de melding zegt alleen Bijgewerkt na een geslaagde lading. Geen nulwaarden als vervanging van ontbrekende gegevens.",
+      "motion": "Voertuigkeuze vervangt detailinhoud en zet het voertuig in de querystring; er is geen animatie of live positievolging nodig. Reduced motion behoudt geselecteerd voertuig en alle statusinformatie. De eerste lading, Ververs en herladen na Bewaar gebruiken dezelfde laadrij; Ververs is tijdens laden geblokkeerd. De actuele selectie bepaalt welk detail na de lading opent. Meet later keuze- en bewaarlatency, stabiliteit van het detail en focus bij fout en herstel met het centrale fluidity-contract. Deze bronafspraken zijn geen gemeten prestatie- of gebruikskwalificatie.",
+      "interactionDensity": "balanced",
+      "interactions": [
+        {
+          "id": "desktop",
+          "label": "Terug naar het bureaublad"
+        },
+        {
+          "id": "supplier-account",
+          "label": "Uw zaak-app"
+        },
+        {
+          "id": "refresh",
+          "label": "Ververs"
+        },
+        {
+          "id": "select-vehicle",
+          "label": "Voertuignaam · inzetbaar of niet inzetbaar"
+        },
+        {
+          "id": "team-driver",
+          "label": "Bestuurder uit het team"
+        },
+        {
+          "id": "save-driver",
+          "label": "Bewaar"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-send",
+          "label": "Verstuur"
+        },
+        {
+          "id": "edge-close-rahul",
+          "label": "Sluit Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ],
+      "additionalStates": [
+        "supplier-session-required",
+        "no-selection",
+        "outside-current-fleet",
+        "deployment-blocked",
+        "document-expiring",
+        "no-required-documents",
+        "team-driver-editable",
+        "driver-absent",
+        "driver-save-rejected",
+        "fleet-load-pending",
+        "fleet-load-failed",
+        "fleet-response-incomplete",
+        "refresh-selection-preserved",
+        "selected-vehicle-unavailable-after-refresh"
+      ],
+      "humanTasks": [
+        "Open een voertuig via de vloot en via ?voertuig=, en verklaar naam, inzetbaarheid en elke blokkadereden. Maak onderscheid tussen ontbrekende einddatum, bijna verlopen papier en een categorie zonder verplichte papieren.",
+        "Kies waar toegestaan een teamlid, bewaar de bestuurder en ververs. Controleer voertuigidentiteit, opgeslagen bestuurder en de afwezigheidswaarschuwing; concludeer daaruit geen rittoewijzing of reden van afwezigheid.",
+        "Open een onbekend of niet toegankelijk voertuigadres en bezoek het scherm zonder sessie. Leg uit waarom dit geen lege vloot is en waarom het scherm het bestaan bij een andere vervoerder niet prijsgeeft.",
+        "Wissel voertuigen met toetsenbord en schermlezer, vergroot tekst en gebruik reduced motion op mobiel en desktop. Ververs na het kiezen van een andere wagen, ook vanuit een URL zonder voertuig-id. Onderbreek de verbinding en controleer dat geen Bijgewerkt of oude voertuigstand als actueel verschijnt. Herstel via Ververs en beoordeel dezelfde selectie, focus en querycontext; beoordeel ook herstel na een afgewezen of onderbroken bewaring."
+      ]
+    },
+    "/apps/hangar.html": {
+      "identity": "Hangar · de persoonlijke vloot en haar vluchtlogboek. Roepnaam, registratie, thuishaven en geregistreerde vlieguren dragen het dossier. Het vaste jetbeeld is sfeerbeeld en bewijst geen eigendom, beschikbaarheid of geboekte charter. Bodoni, leesbare gegevensvelden en het Travel-thema blijven onderdelen van de centrale DS.",
+      "purpose": "Een toegelaten lid houdt toestellen en hun vluchten bij, leest laatst bekende positie en vlieguren uit het dossier en kan de vluchtcoördinator een vraag stellen. Een vlucht loggen is administratie, geen reservering of operationele vluchtvrijgave. Toegang tot Lifestyle wordt door mensen bij RTG verleend, niet door deze pagina of Rahul.",
+      "composition": "Collectie met vlootoverzicht en toestelkaarten, Taak voor Toestel toevoegen en Gesprek met de vluchtcoördinator. Een toestel opent Detail met gegevens en een eigen Taak voor Vlucht loggen plus vluchtlijst. Een lege vloot of vluchtlijst krijgt eigen tekst; een onvolledig serverantwoord blijft een laadfout. Meenemen volgt het geopende toestel wanneer dat een vluchtlogboek heeft.",
+      "motion": "De huidige detailweergave vervangt de inhoud en zet de pagina bovenaan. Het gewenste terugpad herstelt herkenbaar de vlootkeuze; reduced motion mag dat niet afhankelijk maken van glijden of schalen. Toestelkaarten laden hun sfeerbeeld lazy; meet later beeldstabiliteit, openen van een toestel en het opnieuw laden na loggen of verwijderen. De bron gebruikt een afzonderlijke async vraag voor de coördinator. Geen bewezen prestatiewaarden of focusherstel worden uit deze declaratie afgeleid.",
+      "interactionDensity": "balanced",
+      "interactions": [
+        {
+          "id": "lifestyle-home",
+          "label": "Terug naar het Lifestyle-kantoor"
+        },
+        {
+          "id": "account",
+          "label": "Uw account"
+        },
+        {
+          "id": "sign-in",
+          "label": "Naar de app"
+        },
+        {
+          "id": "access-rules",
+          "label": "Lees de toegangsregels in Het Huis"
+        },
+        {
+          "id": "open-aircraft",
+          "label": "Open toestel {naam}"
+        },
+        {
+          "id": "aircraft-name",
+          "label": "Naam of roepnaam"
+        },
+        {
+          "id": "aircraft-type",
+          "label": "Type"
+        },
+        {
+          "id": "aircraft-registration",
+          "label": "Registratie"
+        },
+        {
+          "id": "aircraft-base",
+          "label": "Thuishaven"
+        },
+        {
+          "id": "aircraft-seats",
+          "label": "Stoelen"
+        },
+        {
+          "id": "add-aircraft",
+          "label": "+ toestel"
+        },
+        {
+          "id": "coordinator-question",
+          "label": "Uw vraag"
+        },
+        {
+          "id": "coordinator-send",
+          "label": "Vraag"
+        },
+        {
+          "id": "back-to-fleet",
+          "label": "← alle toestellen"
+        },
+        {
+          "id": "remove-aircraft",
+          "label": "Verwijderen"
+        },
+        {
+          "id": "remove-aircraft-confirmation",
+          "label": "Dit toestel en het logboek verwijderen?"
+        },
+        {
+          "id": "flight-from",
+          "label": "Van"
+        },
+        {
+          "id": "flight-to",
+          "label": "Naar"
+        },
+        {
+          "id": "flight-date",
+          "label": "Datum"
+        },
+        {
+          "id": "flight-time",
+          "label": "Tijd"
+        },
+        {
+          "id": "flight-hours",
+          "label": "Uren"
+        },
+        {
+          "id": "flight-crew",
+          "label": "Bemanning"
+        },
+        {
+          "id": "log-flight",
+          "label": "+ vlucht"
+        },
+        {
+          "id": "remove-flight",
+          "label": "Vlucht verwijderen"
+        },
+        {
+          "id": "export-open",
+          "label": "Meenemen"
+        },
+        {
+          "id": "export-csv",
+          "label": "CSV"
+        },
+        {
+          "id": "export-json",
+          "label": "JSON"
+        },
+        {
+          "id": "export-close",
+          "label": "Sluiten"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-send",
+          "label": "Verstuur"
+        },
+        {
+          "id": "edge-close-rahul",
+          "label": "Sluit Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ],
+      "additionalStates": [
+        "member-session-required",
+        "pass-access-denied",
+        "empty-fleet",
+        "aircraft-detail",
+        "empty-flight-log",
+        "unknown-position",
+        "aircraft-removal-confirmation",
+        "coordinator-pending",
+        "incomplete-response"
+      ],
+      "humanTasks": [
+        "Voeg zonder Rahul een toestel met registratie, thuishaven en stoelen toe, open het dossier en verklaar wat positie en vlieguren zeggen. Herken het jetbeeld als sfeerbeeld, niet als foto van het geregistreerde toestel.",
+        "Log een vlucht met route, datum, tijd, uren en bemanning; vind de registratie terug en neem het logboek mee. Leg uit waarom hiermee geen vlucht is geboekt of vrijgegeven.",
+        "Verwijder een vlucht en beoordeel het resultaat. Start vervolgens het verwijderen van een toestel, lees dat het logboek meegaat en breek de bevestiging af; beoordeel bij een bewuste bevestiging ook de terugkeer naar de vloot.",
+        "Stel de vluchtcoördinator een vraag, herken wachten en een fout, en voer dezelfde administratieve kerntaak via de velden uit. Controleer dat een geweigerde Lifestyle-toegang geen automatische toelating belooft.",
+        "Open en sluit een toestel met toetsenbord, schermlezer, tekstvergroting en reduced motion op mobiel en desktop. Beoordeel focus, inhoudspositie, trage beeldlading en herstel wanneer een bewaring geen bevestiging oplevert."
+      ]
+    },
+    "/apps/routedekking.html": {
+      "identity": "Routedekking · een intern kantooroverzicht van getoetste API-routes. Methode, pad, domein en meetmoment zijn de inhoud; het is geen reizigersroutekaart. De DS-werklaag toont stand met woord en teken, zonder dat kleur of een decoratief beeld het oordeel moet dragen. Het huidige scherm draagt het Travel-thema en behoudt zijn kantoordeur.",
+      "purpose": "Een kantoorbevoegde vergelijkt het bewijsstuk van de laatste volledige testronde met de routes die deze server nu registreert, zoekt ontbrekende aanrakingen en opent het Routedossier voor de aparte vraag naar bewaking. Aangeroepen is geen bewijs van veiligheid, complete productwerking of menselijke kwaliteit. Vanuit dit scherm wordt geen test of normwijziging uitgevoerd.",
+      "composition": "Collectie met drie tabpanelen: De stand voor aantallen, commit en uitleg; Per domein voor verdeling; Alle routes voor zoekterm, domeinfilter, alleen zonder toets en een gepagineerde lijst. Methode en pad blijven afzonderlijk leesbaar; padtekst gebruikt links-naar-rechts isolatie, ook in een taal die rechts-naar-links leest. Niet gemeten en achterhaald zijn eigen toestanden met hersteltekst.",
+      "motion": "Tabwisselen toont bestaande panelen zonder nieuw verzoek. Zoeken, domein, gatenfilter en paginering vragen maximaal 50 rijen per pagina op. Een antwoord hoort bij de zoekstand die het heeft opgevraagd: een tragere oudere reactie mag de actuele rijen, aantallen, paginering of foutstatus niet vervangen. Reduced motion behoudt alle selectie en status zonder overgangsanimatie. Meet later invoer- en navigatielatency, focusbehoud en layoutstabiliteit van lange paden volgens het centrale fluidity-contract. Deze volgorderegel en paginering zijn geen gemeten prestatiewaarborg.",
+      "interactionDensity": "dense",
+      "interactions": [
+        {
+          "id": "office-home",
+          "label": "RTG Kantoor"
+        },
+        {
+          "id": "staff-account",
+          "label": "Uw personeelsaccount"
+        },
+        {
+          "id": "office",
+          "label": "Kantoor"
+        },
+        {
+          "id": "coverage",
+          "label": "Routedekking"
+        },
+        {
+          "id": "route-dossier",
+          "label": "Routedossier"
+        },
+        {
+          "id": "tab-status",
+          "label": "De stand"
+        },
+        {
+          "id": "tab-domain",
+          "label": "Per domein"
+        },
+        {
+          "id": "tab-routes",
+          "label": "Alle routes"
+        },
+        {
+          "id": "search-text",
+          "label": "Zoek"
+        },
+        {
+          "id": "domain-filter",
+          "label": "Filter op domein"
+        },
+        {
+          "id": "uncovered-only",
+          "label": "alleen zonder toets"
+        },
+        {
+          "id": "search",
+          "label": "Zoeken"
+        },
+        {
+          "id": "previous-page",
+          "label": "← Vorige"
+        },
+        {
+          "id": "next-page",
+          "label": "Volgende →"
+        },
+        {
+          "id": "spotlight",
+          "label": "Spring naar een functie"
+        },
+        {
+          "id": "edge-home",
+          "label": "Home"
+        },
+        {
+          "id": "edge-worlds",
+          "label": "Werelden"
+        },
+        {
+          "id": "edge-rahul",
+          "label": "Vraag Rahul"
+        },
+        {
+          "id": "edge-send",
+          "label": "Verstuur"
+        },
+        {
+          "id": "edge-close-rahul",
+          "label": "Sluit Rahul"
+        },
+        {
+          "id": "edge-actions",
+          "label": "Acties"
+        },
+        {
+          "id": "edge-menu",
+          "label": "Menu"
+        },
+        {
+          "id": "cookie-privacy",
+          "label": "Privacy"
+        },
+        {
+          "id": "cookie-dismiss",
+          "label": "Prima"
+        }
+      ],
+      "additionalStates": [
+        "office-sign-in-redirect",
+        "measurement-missing",
+        "measurement-stale",
+        "all-current-routes-touched",
+        "unmeasurable-route-pattern",
+        "search-without-results",
+        "search-response-pending",
+        "older-search-response-ignored"
+      ],
+      "humanTasks": [
+        "Lees De stand, het meetmoment en de commit. Leg het verschil uit tussen niet gemeten, achterhaald en alle huidige routes aangeroepen, zonder daaruit productkwaliteit of veiligheid af te leiden.",
+        "Zoek zonder Rahul een methode of pad, beperk tot een domein en tot alleen zonder toets, en blader verder en terug. Wijzig de zoekstand tijdens een trage aanvraag. Controleer dat rijen, totaalaantal, foutmelding en pagina bij de actuele vraag blijven horen wanneer het oudere antwoord later aankomt.",
+        "Vergelijk beproefd met de zichtbare bewakerinformatie en open Routedossier voor nadere beoordeling. Leg uit waarom in de handler of bewaker onbekend iets anders zegt dan wel of geen toets.",
+        "Gebruik de tabpanelen en filters met toetsenbord, schermlezer, tekstvergroting en reduced motion op mobiel en desktop; lees ook een lang pad in een rechts-naar-links taal. Herken een verlopen kantoorsessie of netwerkfout zonder de vorige meetstand voor verse gegevens aan te zien."
+      ]
     }
   }
 }

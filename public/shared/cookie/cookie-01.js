@@ -1,89 +1,24 @@
-/* Cookiemelding voor de site en de apps. RTG gebruikt alleen functionele
-   opslag (ingelogd blijven, voorkeuren), geen tracking en geen cookies van
-   derden; daarom is dit een eerlijke melding met een knop, geen
-   toestemmingsmuur. Eén keer bevestigen is genoeg (localStorage). */
+/* Functionele-opslagmelding. De controller bezit alleen gedrag; vormgeving
+   komt voor iedere host uit public/ds/componenten/cookie.css. */
 (function () {
+  'use strict';
   var SLEUTEL = 'rtg_cookieinfo_v1';
-  /* Een Work OS-surface deelt dezelfde herkomst en dezelfde opslag met de
-     buitenschil. Eén melding buiten de surface is daarom volledig; iedere
-     iframe opnieuw laten melden gaf dubbele regels boven op de onderbalk. */
   try { if (window.self !== window.top) return; } catch (e) { return; }
   try { if (localStorage.getItem(SLEUTEL)) return; } catch (e) { return; }
 
+  var ds = document.documentElement.hasAttribute('data-ds');
   var en = false;
   try { en = (window.RTGi18n && RTGi18n.lang === 'en') || /^en/.test(navigator.language || ''); } catch (e) {}
-  /* HEEL MINIMAAL, en dat is hier ook het eerlijkste.
-     Dit was een kaart: een omkaderd vlak van 440px met een slagschaduw, drie
-     regels tekst en een witte pilknop. Op de poort nam dat een kwart van het
-     scherm en trok het meer aandacht dan de kennismaking met Rahul zelf --
-     terwijl de mededeling is dat we juist NIETS doen. Een toestemmingsmuur
-     hoort groot te zijn; een mededeling niet.
-     Wat er overblijft is een regel: de zin, en twee woorden om op te klikken.
-     Geen kader, geen schaduw, geen knopvlak. */
   var T = en
     ? { txt: 'Functional storage only', ok: 'Fine', privacy: 'Privacy' }
     : { txt: 'Alleen functionele opslag', ok: 'Prima', privacy: 'Privacy' };
 
-  var stijl = document.createElement('style');
-  stijl.textContent =
-    '#rtg-cookie{position:fixed;left:50%;bottom:max(0.6rem,env(safe-area-inset-bottom));transform:translateX(-50%);' +
-      'z-index:9999;width:max-content;max-width:min(92vw,34rem);display:flex;align-items:baseline;justify-content:center;' +
-      /* EEN EIGEN VLAK, en dat is een besluit van 24 augustus 2026. Hier stond
-         background:none, en daardoor was haar grond onvoorspelbaar: op salon en
-         sociaal ligt er een lichte balk achter een bijna zwarte pagina, en geen
-         enkele inktkleur haalt beide. Vier meetpogingen liepen daarop stuk. Een
-         mededeling die de wet vraagt, hoort niet af te hangen van wat er
-         toevallig achter ligt. Het vlak is dekkend en volgt het materiaal (zie
-         kiesInkt in deel 02); een dunne bovenlijn geeft hem zijn rand, en verder
-         niets -- geen hoek, geen schaduw, geen knopvorm om de twee woorden. */
-      'gap:0.5rem;flex-wrap:wrap;border:0;border-top:1px solid var(--rtg-cookie-lijn);' +
-      'background:var(--rtg-cookie-vlak);box-shadow:none;padding:0.55rem 0.9rem;' +
-      'font-family:var(--rtg-interface,Inter,system-ui,sans-serif);font-size:0.7rem;line-height:1.4;' +
-      'letter-spacing:0.01em;text-align:center;}' +
-    /* DE MELDING DRAAGT background:none EN ERFT DUS DE PAGINAGROND, en daarom
-       kan hier geen enkele vaste kleur staan. Tot 22 augustus 2026 stond er een
-       lichte ivoortint: op een licht thema gaf dat 1,03:1 -- onzichtbare tekst
-       onder een juridische mededeling, en precies daar waar hij het meest telt.
-       De huistokens waren de eerste reparatie en bleken niet genoeg: op de drie
-       juridische pagina's en op /site/404.html wordt rtg-themas.css helemaal
-       niet geladen, dus vielen --rtg-soft en --rtg-txt terug op hun donkere
-       basiswaarde boven een lichte grond. light-dark() hangt niet aan een
-       stylesheet maar aan color-scheme, en die staat wel overal goed: dark voor
-       elk thema (rtg-themas.css regel 15), light voor champagne, en licht als
-       standaard op een pagina zonder thema -- wat die pagina's ook zijn.
-       Gemeten: 6,51:1 licht en 8,97:1 donker. */
-    '#rtg-cookie span{color:var(--rtg-cookie-zacht);}' +
-    /* De twee klikbare woorden dragen alleen een onderlijn, geen vlak -- maar ze
-       waren daardoor 17px hoog en 22px breed, en TOEGANKELIJK.md eist 24x24 op
-       telefoonformaat (WCAG 2.5.8). Dat werd door niets gemeten: deze balk
-       verdwijnt zodra iemand een keer heeft bevestigd (regel 11 hierboven), en
-       de raakvlakronde draait INGELOGD -- dus zag hij een banner die er niet
-       meer was. De nulstand in A11Y-INGELOGD.json klopte, en klopte alleen voor
-       de tweede bezoeker.
-
-       De onderlijn zit daarom niet meer op de rand van het vakje (die zou met
-       een hoger vakje mee omlaag zakken en van het woord loskomen) maar op de
-       TEKST zelf, zodat het raakvlak kan groeien zonder dat het beeld verandert. */
-    '#rtg-cookie a,#rtg-cookie button{background:none;border:0;margin:0;cursor:pointer;' +
-      'font:inherit;color:var(--rtg-cookie-inkt);' +
-      'display:inline-flex;align-items:center;justify-content:center;' +
-      'min-height:24px;min-width:24px;padding:0 0.15rem;' +
-      'text-decoration:underline;text-decoration-color:rgba(244,240,233,0.28);' +
-      'text-underline-offset:3px;}' +
-    '#rtg-cookie a:hover,#rtg-cookie button:hover,' +
-    '#rtg-cookie a:focus-visible,#rtg-cookie button:focus-visible{color:var(--gold-tekst,#C0A544);' +
-      'text-decoration-color:var(--gold-tekst,#C0A544);}' +
-    /* Work OS heeft een vaste onderbalk; de melding staat erboven en laat alle
-       softwarebediening bereikbaar. */
-    'body[data-rtg-schil="standaard"] #rtg-cookie{bottom:calc(66px + env(safe-area-inset-bottom,0px));}' +
-    /* de ruimte die de balk zelf inneemt, onder de inhoud gelegd */
-    'body{padding-bottom:calc(var(--rtg-eigen-voet,0px) + var(--rtg-cookieruimte,0px) + var(--ws-ruimte,0px));}';
-  document.head.appendChild(stijl);
-
   var el = document.createElement('div');
   el.id = 'rtg-cookie';
+  el.className = 'ds-cookie' + (ds ? '' : ' ds-cookie--overlay');
   el.setAttribute('role', 'region');
   el.setAttribute('aria-label', en ? 'Cookie notice' : 'Cookiemelding');
+
   var p = document.createElement('span');
   p.textContent = T.txt;
   var a = document.createElement('a');
@@ -92,28 +27,30 @@
   var knop = document.createElement('button');
   knop.type = 'button';
   knop.textContent = T.ok;
-  /* EEN VASTE BALK MOET ZIJN EIGEN RUIMTE RESERVEREN.
+  /* Ongelayerde CSS van een nog niet gemigreerde host wint volgens de cascade
+     van een centrale componentlaag. Bewaak daar tijdelijk alleen de harde
+     toegankelijkheidsvloer; de waarde blijft het centrale DS-token. */
+  if (!ds) {
+    a.style.setProperty('min-inline-size', 'var(--ds-doel)');
+    a.style.setProperty('min-block-size', 'var(--ds-doel)');
+    knop.style.setProperty('min-inline-size', 'var(--ds-doel)');
+    knop.style.setProperty('min-block-size', 'var(--ds-doel)');
+  }
+  el.appendChild(p);
+  el.appendChild(a);
+  el.appendChild(knop);
 
-     Deze melding staat position:fixed onderaan en nam nergens ruimte in. Op
-     elke pagina van het huis lag hij daarmee over de laatste regels heen:
-     op foundation/vrienden.html stond "Functional storage only · Privacy ·
-     Fine" dwars door de laatste zin van een verhaal, en op een telefoon is
-     dat precies de plek waar de inhoud ophoudt. Niemand merkt dat, want de
-     pagina scrollt gewoon door -- de onderste regels zijn alleen nooit
-     helemaal te lezen.
-
-     De hoogte staat niet vast (de tekst breekt op smalle schermen), dus hij
-     wordt gemeten en als variabele op <html> gezet. Weg is weg: bij het
-     wegklikken gaat de ruimte mee, anders staat er een lege strook onderaan
-     die niemand meer kan verklaren. */
   var RUIMTE = '--rtg-cookieruimte';
+  var BODEM = '--ds-cookie-bodem';
   function meetRuimte() {
-    if (!el.isConnected) return;
+    if (ds || !el.isConnected) return;
     var h = Math.ceil(el.getBoundingClientRect().height) + 12;
     document.documentElement.style.setProperty(RUIMTE, h + 'px');
   }
   function geefRuimteTerug() {
     document.documentElement.style.removeProperty(RUIMTE);
+    document.documentElement.style.removeProperty(BODEM);
+    if (document.body && document.body.classList) document.body.classList.remove('ds-cookie-host');
   }
 
   knop.addEventListener('click', function () {
@@ -121,17 +58,3 @@
     el.remove();
     geefRuimteTerug();
   });
-  el.appendChild(p); el.appendChild(a); el.appendChild(knop);
-  /* DE GROND METEN IN PLAATS VAN HEM AAN TE NEMEN. Deze melding draagt
-     background:none. Vier aannames sneuvelden: een vaste inkt (1,03:1 op licht),
-     de huistokens (bestaan niet op /site/404.html en de juridische pagina's),
-     light-dark() (er zijn pagina's met thema onyx EN een eigen lichte grond) en
-     de opklim langs de ouders (die geeft de body, terwijl een fixed melding over
-     iets anders hangt). Volgorde: het punt achter haarzelf, anders de opklim,
-     anders de buurtekst -- lichte tekst = donkere grond, zoals
-     shared/rahul-tab/inkt.js. Met een waarnemer erop, want de grond staat soms
-     pas na haar vast. */
-  function helderheid(rgb) {
-    var k = rgb.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
-    return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
-  }

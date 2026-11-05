@@ -27,12 +27,12 @@
      geen titelbalk, geen sluitknopje en geen dock. */
   function blad(inhoud, opties) {
     opties = opties || {};
-    var waas = el('div', 'ios-waas');
-    var vel = el('div', 'ios-blad');
+    var waas = el('div', 'ios-waas' + (isDs ? ' ds-ios-waas' : ''));
+    var vel = el('div', 'ios-blad' + (isDs ? ' ds-dialoog ds-ios-blad' : ''));
     vel.setAttribute('role', 'dialog');
     vel.setAttribute('aria-modal', 'true');
     if (opties.label) vel.setAttribute('aria-label', opties.label);
-    vel.appendChild(el('div', 'ios-greep'));
+    vel.appendChild(el('div', 'ios-greep' + (isDs ? ' ds-ios-greep' : '')));
     if (typeof inhoud === 'string') vel.appendChild(el('div', null, inhoud));
     else if (inhoud) vel.appendChild(inhoud);
 
@@ -69,11 +69,12 @@
   }
 
   /* --------------------------------------------------------- aanzetten */
-  body.setAttribute('data-ios', '');
-  body.removeAttribute('data-osbar');
+  // De DS-kop blijft bij zijn eigenaar; alleen het bestaande gedrag blijft.
+  if (isDs) body.classList.add('ds-ios-host');
+  else { body.setAttribute('data-ios', ''); body.removeAttribute('data-osbar'); }
 
   // het merk gaat ook buiten de kopbalk weg, maar dan met de smalle bezem
-  merkWegPagina();
+  if (!isDs) merkWegPagina();
 
   /* De kop is de eerste header van het scherm zelf. De desktopstandaard
      (shared/interface/world-desktop-surface.js) verhuist de kinderen van body
@@ -88,7 +89,7 @@
      als expliciete bron voor de iOS-laag. */
   var kop = d.querySelector('body > header:not(.rtg-v4-header)') ||
     d.querySelector('[data-rtg-screen-surface] > header:not(.rtg-v4-header)');
-  if (kop && !isThuis) {
+  if (kop && !isThuis && !isDs) {
     bouwBalk(kop);
     /* Pas inmeten als de balk er echt staat -- en na deze tik, want de
        menuknop van appmenu.js komt verderop in dit bestand pas binnen en
@@ -102,8 +103,6 @@
      andere) hoort GEEN home-indicator: die van het scherm eromheen is de
      echte, en twee pillen boven elkaar is een knop die de verkeerde app
      sluit. De randveeg blijft ook aan het buitenste scherm. */
-  var inPaneel = false;
-  try { inPaneel = w.self !== w.top; } catch (e) { inPaneel = true; }
   if (!isThuis && !inPaneel) { homeIndicator(); randveeg(); }
 
   w.RTGiOS = { blad: blad, thuis: naarThuis, THUIS: THUIS };

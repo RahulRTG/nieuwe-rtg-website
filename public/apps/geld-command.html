@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl" data-rtg-thema="bordeaux">
+<html lang="nl" data-ds="1">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -9,15 +9,14 @@
   <meta name="theme-color" content="#0C0C0B">
   <link rel="icon" href="/icon.svg">
   <link href="/fonts/fonts.css" rel="stylesheet">
-  <link href="/shared/rtg-ui.css" rel="stylesheet">
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+  <link href="/ds/rtg-ds.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
-  <main style="max-width:42rem;margin:0 auto;padding:clamp(4rem,14vh,9rem) 1.25rem;">
-    <p class="eyebrow">LivingOS · Geld</p>
-    <h1>Uw geldomgeving is verplaatst.</h1>
-    <p>Deze historische ingang bevat geen eigen saldi of statussen. RTG Geld leest die uitsluitend in de actuele geldomgeving.</p>
-    <p><a class="knop hoofd" href="/apps/geld.html">Open RTG Geld →</a></p>
+<body class="ds-scherm" data-ds-schermtype="status" data-ds-nadruk="gereedschap">
+  <main class="ds-status" id="hoofd">
+    <p class="ds-status__tekst">LivingOS · Geld</p>
+    <h1 class="ds-status__titel">Uw geldomgeving is verplaatst.</h1>
+    <p class="ds-status__tekst">Deze historische ingang bevat geen eigen saldi of statussen. RTG Geld leest die uitsluitend in de actuele geldomgeving.</p>
+    <p><a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/geld.html">Open RTG Geld →</a></p>
   </main>
 </body>
 </html>

@@ -18,14 +18,21 @@
      drie chatbalken onder elkaar; dat is precies het soort dubbeling waar een
      gedeelde laag juist voor is (LAT.md regel 4). */
   try { if (window.top !== window.self) return; } catch (e) { /* andere herkomst: dan is het zeker een frame */ return; }
+  /* Eén begrensde laadweg voor de vier bestaande gedeelde eigenaren. Iedere
+     callsite hieronder geeft een letterlijk intern pad; de helper verzint geen
+     modules en vormt dus geen tweede register of loaderarchitectuur. */
+  function laadScript(path, klaar, uitgesteld) {
+    var script = document.createElement('script');
+    if (klaar) script.addEventListener('load', klaar, { once: true });
+    script.src = path; if (uitgesteld) script.defer = true;
+    document.head.appendChild(script);
+  }
   /* De wauw-laag (shared/wauw.js) eerst: zachte overgangen, haptiek,
      delen, badge en wake lock. Voor de inlogcheck, zodat ook de poort
      hem heeft; net als handenvrij is het een script erbij in plaats
      van 120+ pagina's aanpassen, en zonder laag verandert er niets. */
   if (!window.RTGWauw) {
-    var wauwS = document.createElement('script');
-    wauwS.src = '/shared/wauw.js'; wauwS.defer = true;
-    document.head.appendChild(wauwS);
+    laadScript('/shared/wauw.js', null, true);
   }
   /* DE STROOM (shared/stroom.js): pas geladen als deze laag een live-stroom
      opent, en dat doet hij op bijna geen scherm. Sindsdien staat de sessie
@@ -34,17 +41,16 @@
   function metStroom(doe) {
     if (window.RTGStroom) return doe(window.RTGStroom);
     var s = document.querySelector('script[src="/shared/stroom.js"]');
-    if (!s) { s = document.createElement('script'); s.src = '/shared/stroom.js'; document.head.appendChild(s); }
-    s.addEventListener('load', function () { if (window.RTGStroom) doe(window.RTGStroom); }, { once: true });
+    var klaar = function () { if (window.RTGStroom) doe(window.RTGStroom); };
+    if (s) s.addEventListener('load', klaar, { once: true });
+    else laadScript('/shared/stroom.js', klaar, false);
   }
   var memTok = null, supTok = null;
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!memTok && !supTok) return;
   if (!window.__rahulTabStandaard) {
-    var rahulTabScript = document.createElement('script');
-    rahulTabScript.src = '/shared/rahul-tab.js?v=command7'; rahulTabScript.defer = true;
-    document.head.appendChild(rahulTabScript);
+    laadScript('/shared/rahul-tab.js?v=command7', null, true);
   }
 
   /* De muisvrije laag erbij (shared/handenvrij.js): de stuurbalk waar je in typt
@@ -54,9 +60,7 @@
      dan verandert er niets: alle knoppen blijven gewoon staan. */
   (function () {
     if (window.__handenvrij) return;
-    var s = document.createElement('script');
-    s.src = '/shared/handenvrij.js'; s.defer = true;
-    document.head.appendChild(s);
+    laadScript('/shared/handenvrij.js', null, true);
   })();
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };

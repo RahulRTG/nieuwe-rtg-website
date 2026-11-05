@@ -1,0 +1,24 @@
+/* Eén basis voor tijdgebonden tekst bij beeld. Een mediascherm mag de positie
+   gericht verfijnen; tekst, contrast en richting blijven van dit component. */
+@layer rtg.component {
+  .ds-ondertitelband {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: var(--ds-ruimte-4);
+    z-index: 3;
+    padding-inline: var(--ds-ruimte-4);
+    text-align: center;
+    pointer-events: none;
+  }
+  .ds-ondertitelband > span {
+    display: inline-block;
+    max-inline-size: 100%;
+    padding: var(--ds-ruimte-1) var(--ds-ruimte-2);
+    overflow-wrap: anywhere;
+    border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-glas);
+    color: var(--ds-cover-inkt);
+    font: 500 var(--ds-maat-tekst)/1.45 var(--ds-letter-tekst);
+    box-shadow: var(--ds-schaduw-inhoud);
+  }
+}

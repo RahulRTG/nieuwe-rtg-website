@@ -5,25 +5,23 @@
 
   function laadStijl(src){var script=document.createElement('script');script.src=src;script.async=false;document.head.appendChild(script)}
   laadStijl('/shared/rahul-tab/style-base.js');
-  laadStijl('/shared/rahul-tab/style-twin.js');
   laadStijl('/shared/edge/taakbeeld.js');
   laadStijl('/shared/edge/conceptwerk.js');
   laadStijl('/shared/rahul-tab/session.js');
   laadStijl('/shared/rahul-tab/approval.js');
   laadStijl('/shared/rahul-tab/helpers.js');
 
-  /* Alleen echte app-bovenbalken zijn geldige gastheren voor deze globale tab. */
   var selectors='.wk-tabs,.rv-tabs>div,.lo-tabs,.pn-tabs,.pn-top>div,.po-tabs,.ir-tabs,.ir-shell>main>header>div,.cmd-tabs,[data-tabs],[role="tablist"],main>header>div,.topbar,.appbar,body>header,.wd-page>header'.split(','),host=null;
   for(var i=0;i<selectors.length&&!host;i++)host=document.querySelector(selectors[i]);
   if(!host||document.getElementById('wkRahulTab')||host.querySelector('.rtg-rahul-tab'))return;
 
-  var tab=document.createElement('button');tab.type='button';tab.className='rtg-rahul-tab';tab.innerHTML='Rahul<small>KOMPAS</small>';host.appendChild(tab);
-  var page=document.createElement('section');page.className='rtg-rahul-page';page.hidden=true;page.setAttribute('aria-label','Rahul Command Workspace');
-  page.innerHTML='<header class="rtg-command-head"><button class="rtg-mouth" type="button" aria-label="Praat met Rahul">◡</button><span><b>Rahul</b><small>RTG KOMPAS · LOCAL-FIRST</small></span><span class="rtg-command-state" data-ai-state><i></i>Kompas controleert de veilige route</span><button class="rtg-command-close" type="button" aria-label="Terug naar werkblad">↙</button></header><main class="rtg-command-grid"><section class="rtg-command-context"><span class="rtg-command-ey">LIVE CONTEXT</span><h2 data-greeting>Uw werkruimte is begrepen.</h2><p class="rtg-command-lead" data-context></p><div class="rtg-command-fact"><span>ACTIEVE OMGEVING</span><b data-app></b><small data-selection>Geen selectie gemeten</small></div><div class="rtg-command-rule"><i></i><span>Rahul bereidt voor. Geld, publicatie, toegang en definitieve toezegging vragen menselijk akkoord.</span></div></section><section class="rtg-command-chat"><span class="rtg-command-ey">COMMAND CONVERSATION</span><h1>Van bedoeling<br>naar resultaat.</h1><div class="rtg-command-suggest"></div><div class="rtg-command-log" role="log" aria-live="polite"></div><form class="rtg-command-form"><input aria-label="Vraag Rahul" placeholder="Beschrijf het resultaat dat u wilt…" maxlength="500"><button type="submit" aria-label="Verstuur naar Rahul">→</button></form></section><section class="rtg-command-decisions"><span class="rtg-command-ey">DECISION INBOX</span><h2>Alleen wat u nodig heeft.</h2><div class="rtg-decision"><i>✓</i><p><b>Automatisch uitgevoerd</b><small data-done>Geen uitvoering in deze sessie</small></p><em>LOGBOEK</em></div><div class="rtg-decision"><i>→</i><p><b>Ter controle</b><small>Context en voorstel worden eerst zichtbaar</small></p><em>VEILIG</em></div><div class="rtg-decision"><i>!</i><p><b>Uw beslissing</b><small data-approval>Geen open voorstel</small><button type="button" data-approve hidden>Controleer en bevestig</button></p><em>MENS</em></div><div class="rtg-automation"><header><span>AUTONOMOUS OPERATIONS</span><em>VOORBEREIDEN</em></header><p>Rahul mag binnen uw rol zoeken, vergelijken en voorbereiden. Onomkeerbare stappen blijven geblokkeerd.</p><button type="button" data-policy>Bekijk grenzen</button></div></section></main>';
+  var tab=document.createElement('button');tab.type='button';tab.className='rtg-rahul-tab ds-rahul-tab';tab.innerHTML='Rahul<small>KOMPAS</small>';host.appendChild(tab);
+  if(document.querySelector('html[data-ds]'))tab.dataset.dsActie='Rahul openen';
+  var page=document.createElement('section');page.className='rtg-rahul-page ds-rahul';page.hidden=true;page.setAttribute('aria-label','Rahul Command Workspace');
+  page.innerHTML='<header class="rtg-command-head"><button class="rtg-mouth" type="button" aria-label="Praat met Rahul">◡</button><span><b>Rahul</b><small>RTG KOMPAS · LOCAL-FIRST</small></span><span class="rtg-command-state" data-ai-state><i></i>Nog geen actuele route gecontroleerd</span><button class="rtg-command-close" type="button" aria-label="Terug naar werkblad">↙</button></header><div class="rtg-command-grid"><section class="rtg-command-context"><span class="rtg-command-ey">LIVE CONTEXT</span><h2 data-greeting>Uw werkruimte is begrepen.</h2><p class="rtg-command-lead" data-context></p><div class="rtg-command-fact"><span>ACTIEVE OMGEVING</span><b data-app></b><small data-selection>Geen selectie gemeten</small></div><div class="rtg-command-rule"><i></i><span>Rahul bereidt voor. Geld, publicatie, toegang en definitieve toezegging vragen menselijk akkoord.</span></div></section><section class="rtg-command-chat"><span class="rtg-command-ey">COMMAND CONVERSATION</span><h1>Van bedoeling<br>naar resultaat.</h1><div class="rtg-command-suggest"></div><div class="rtg-command-log" role="log" aria-live="polite"></div><form class="rtg-command-form"><input aria-label="Vraag Rahul" placeholder="Beschrijf het resultaat dat u wilt…" maxlength="500"><button type="submit" aria-label="Verstuur naar Rahul">→</button></form></section><section class="rtg-command-decisions"><span class="rtg-command-ey">DECISION INBOX</span><h2>Alleen wat u nodig heeft.</h2><div class="rtg-decision"><i>✓</i><p><b>Automatisch uitgevoerd</b><small data-done>Geen uitvoering in deze sessie</small></p><em>LOGBOEK</em></div><div class="rtg-decision"><i>→</i><p><b>Ter controle</b><small>Context en voorstel worden eerst zichtbaar</small></p><em>VEILIG</em></div><div class="rtg-decision"><i>!</i><p><b>Uw beslissing</b><small data-approval>Geen open voorstel</small><button type="button" data-approve hidden>Controleer en bevestig</button></p><em>MENS</em></div><div class="rtg-automation"><header><span>AUTONOMOUS OPERATIONS</span><em>VOORBEREIDEN</em></header><p>Rahul mag binnen uw rol zoeken, vergelijken en voorbereiden. Onomkeerbare stappen blijven geblokkeerd.</p><button type="button" data-policy>Bekijk grenzen</button></div></section></div>';
   document.body.appendChild(page);
   window.__rahulTabDialoog={tab:tab,page:page};
   laadStijl('/shared/rahul-tab/dialog.js');
-  // de inkt van de tab hangt af van de balk waar hij in hangt; zie dat bestand
   laadStijl('/shared/rahul-tab/inkt.js');
 
 
@@ -35,11 +33,65 @@
   function render(bewaar){log.innerHTML=historie.map(window.RTGRahulTabHelpers.bericht).join('');log.scrollTop=log.scrollHeight;if(bewaar!==false&&sessieStore&&sessieOwner)sessieStore.write(sessieOwner,historie)}
   function voeg(rol,waarde,noot){historie.push({rol:rol,tekst:waarde,noot:noot||void 0});historie=historie.slice(-12);render()}
   function beslissingen(){return approval||(approval=RTGRahulApproval.create({win:window,page:page,sync:synchroniseer,owner:function(){return sessieOwner},add:voeg}))}
-  async function synchroniseer(){if(!window.RTGRahulSession)return false;if(!sessieStore)sessieStore=RTGRahulSession.create(window);var s=await sessieStore.read();if(s.owner!==sessieOwner){sessieOwner=s.owner;historie=s.history;if(approval)approval.clear();render(false)}return!!s.owner}
+  async function synchroniseer(){if(!window.RTGRahulSession)return false;if(!sessieStore)sessieStore=RTGRahulSession.create(window);var s=await sessieStore.read();if(s.owner!==sessieOwner){if(sessieOwner)RTGRahulTabHelpers.wis(page);sessieOwner=s.owner;historie=s.history;if(approval)approval.clear();render(false)}return!!s.owner}
   async function open(ja){if(ja)await synchroniseer();page.hidden=!ja;tab.classList.toggle('actief',ja);if(ja){page.scrollTop=0;vorige=document.querySelector('.rtg-rahul-tab~.actief,.wk-tabs>.actief,.lo-tabs>.actief,.po-tabs>.actief')||vorige;var c=context();page.querySelector('[data-app]').textContent=c.app;page.querySelector('[data-selection]').textContent=c.selectie||c.deel||'Geen selectie gemeten';page.querySelector('[data-context]').textContent='Ik zie '+c.deel+' in '+c.app+'. Ik combineer alleen gegevens waarvoor uw huidige rol toegang heeft.';page.querySelector('[data-greeting]').textContent=c.deel+' staat klaar.';voorstellen(c);if(window.RTGLiveTwin)RTGLiveTwin.context(c);if(!historie.length)voeg('rahul','Vertel het gewenste resultaat; ik toon de stappen, uitzonderingen en beslissingen.');setTimeout(function(){try{input.focus({preventScroll:true})}catch(e){input.focus()}page.scrollTop=0},120)}else if(vorige)vorige.classList.add('actief')}
-  async function vraag(){if(bezig)return;await synchroniseer();var q=input.value.trim();if(!q)return;var eigenaar=sessieOwner;input.value='';voeg('user',q);bezig=true;if(window.RTGKompas)RTGKompas.denkt(true);if(window.RTGLiveTwin)RTGLiveTwin.denkt(true);voeg('rahul','Context en grenzen controleren…');var token='',supplier='';try{token=localStorage.getItem('rtg_member_token')||'';supplier=localStorage.getItem('rtg_sup_token')||''}catch(e){}var pad=token?'/api/fluister':'/api/supplier/ai',auth=token||supplier;try{if(!auth)throw new Error('geen sessie');var c=context();var r=await fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+auth},body:JSON.stringify({q:q,context:c})});var d=await r.json();await synchroniseer();if(sessieOwner!==eigenaar)return;historie.pop();if(window.RTGKompas)RTGKompas.toon(d);if(window.RTGLiveTwin)RTGLiveTwin.toon(d);var st=page.querySelector('[data-ai-state]'),g=window.RTGKompas&&RTGKompas.regel&&RTGKompas.regel(d);if(st&&d){var t=g||(d.aiBeschikbaar===false?'Handmatige werkmodus · alles blijft bruikbaar':d.modus==='lokaal'?(d.verwerking==='eigen-netwerk'?'RTG Kompas · lokaal in eigen omgeving':'RTG Kompas · eigen modelserver van RTG'):d.modus==='hybride'?'RTG Kompas · externe uitwijk zichtbaar':d.aiBeschikbaar===true?'AI ondersteund · menselijke autoriteit':'');if(t)st.innerHTML='<i></i>'+t}voeg('rahul',(d&&(d.antwoord||d.reply||d.error))||'Ik kon dit nog niet afronden.',window.RTGRahulTabHelpers.noot(d));if(token)RTGRahulTabHelpers.werk(d,page,token);beslissingen().show(d,auth,!!token,sessieOwner);if(d&&d.gedaan)page.querySelector('[data-done]').textContent='Laatste opdracht uitgevoerd en vastgelegd'}catch(e){await synchroniseer();if(sessieOwner===eigenaar){historie.pop();voeg('rahul','Vrije hulp is nu niet bereikbaar. Uw werkblad, navigatie en alle handmatige functies blijven gewoon beschikbaar.')}}finally{if(window.RTGKompas)RTGKompas.denkt(false);if(window.RTGLiveTwin)RTGLiveTwin.denkt(false);bezig=false}}
+  async function vraag(voorstel){
+    if(bezig)return false;
+    bezig=true;
+    try{
+      await synchroniseer();
+      var q=typeof voorstel==='string'?voorstel.trim():input.value.trim();
+      if(!q)return false;
+      /* Leg het actieve werkstuk vast voordat begin() de vorige presentatie
+         intrekt. Zo reist de veilige objectverwijzing mee met deze vraag,
+         terwijl een oud concept of voorstel niet uitvoerbaar zichtbaar blijft. */
+      var c=JSON.parse(JSON.stringify(context()));
+      RTGRahulTabHelpers.begin(page,beslissingen());
+      var eigenaar=sessieOwner;
+      if(typeof voorstel!=='string')input.value='';
+      voeg('user',q);
+      if(window.RTGKompas)RTGKompas.denkt(true);
+      voeg('rahul','Context en grenzen controleren…');
+      var token='',supplier='';
+      try{token=localStorage.getItem('rtg_member_token')||'';supplier=localStorage.getItem('rtg_sup_token')||''}catch(e){}
+      var pad=token?'/api/fluister':'/api/supplier/ai',auth=token||supplier;
+      try{
+        if(!auth)throw new Error('geen sessie');
+        if(window.RTGLiveTwin){RTGLiveTwin.context(c);RTGLiveTwin.denkt(true)}
+        var r=await fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+auth},body:JSON.stringify({q:q,context:c})});
+        var d=await r.json();
+        await synchroniseer();
+        if(sessieOwner!==eigenaar)return true;
+        if(!r.ok||!d||d.error||d.ok===false)throw new Error('Antwoord niet geslaagd');
+        historie.pop();
+        if(!RTGRahulTabHelpers.actueel(c,voeg)){beslissingen().clear();return true}
+        if(window.RTGKompas)RTGKompas.toon(d);
+        if(window.RTGLiveTwin)RTGLiveTwin.toon(d,c);
+        var st=page.querySelector('[data-ai-state]'),g=window.RTGKompas&&RTGKompas.regel&&RTGKompas.regel(d);
+        if(st&&d){var t=g||(d.aiBeschikbaar===false?'Handmatige werkmodus · alles blijft bruikbaar':d.modus==='lokaal'?(d.verwerking==='eigen-netwerk'?'RTG Kompas · lokaal in eigen omgeving':'RTG Kompas · eigen modelserver van RTG'):d.modus==='hybride'?'RTG Kompas · externe uitwijk zichtbaar':d.aiBeschikbaar===true?'AI ondersteund · menselijke autoriteit':'');if(t)st.innerHTML='<i></i>'+t}
+        voeg('rahul',(d&&(d.antwoord||d.reply||d.error))||'Ik kon dit nog niet afronden.',window.RTGRahulTabHelpers.noot(d));
+        if(token)RTGRahulTabHelpers.werk(d,page,token);
+        beslissingen().show(d,auth,!!token,sessieOwner,c);
+        if(d&&d.gedaan)page.querySelector('[data-done]').textContent='Laatste opdracht uitgevoerd en vastgelegd';
+      }catch(e){
+        await synchroniseer();
+        if(sessieOwner===eigenaar){historie.pop();voeg('rahul','Vrije hulp is nu niet bereikbaar. Uw werkblad, navigatie en alle handmatige functies blijven gewoon beschikbaar.')}
+      }
+      return true;
+    }finally{
+      if(window.RTGKompas)RTGKompas.denkt(false);
+      if(window.RTGLiveTwin)RTGLiveTwin.denkt(false);
+      bezig=false;
+    }
+  }
+
   tab.onclick=function(){if(window.RTGRahulTabHelpers)open(true)};page.querySelector('.rtg-command-close').onclick=function(){open(false)};page.querySelector('.rtg-mouth').onclick=function(){try{input.focus({preventScroll:true})}catch(e){input.focus()}};page.querySelector('form').onsubmit=function(e){e.preventDefault();vraag()};page.querySelector('[data-approve]').onclick=function(){beslissingen().confirm()};page.querySelector('[data-policy]').onclick=function(){voeg('rahul','Actieve grens: ik mag binnen uw rol lezen, vergelijken en voorbereiden. Betalen, publiceren, toegang wijzigen en definitief toezeggen vereisen afzonderlijk menselijk akkoord.')};
-  window.RTGMetgezel=window.RTGMetgezel||{};window.RTGMetgezel.rahul=function(q){if(!window.RTGRahulTabHelpers)return;open(true);if(q){input.value=q;vraag()}};
+  window.RTGMetgezel=window.RTGMetgezel||{};
+  window.RTGMetgezel.rahul=async function(q){
+    if(!window.RTGRahulTabHelpers||!window.RTGRahulSession||!window.RTGRahulApproval)return false;
+    if(q&&bezig)return false;
+    try{await open(true);return q?await vraag(q):true}catch(e){return false}
+  };
   window.__rahulTabCommand={page:page,context:context,voeg:voeg,stel:function(q){input.value=q;vraag()}};
   window.addEventListener('storage',function(e){if(/^rtg_(member|sup|pda|office)_token$/.test(e.key||''))synchroniseer()});
   laadStijl('/shared/rahul-tab/kompas.js');

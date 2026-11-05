@@ -23,17 +23,15 @@
   'use strict';
   if (window.RTGSneltoets) return;
 
-  var css = '.rtgsnel{position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;' +
-      'background:rgba(0,0,0,.6);}' +
-    '.rtgsnel[hidden]{display:none;}' +
-    '.rtgsnel-kaart{background:var(--paneel,#151412);border:1px solid var(--line,var(--lijn,#2A2724));' +
-      'border-radius:0;padding:1.3rem 1.5rem;min-width:min(22rem,92vw);' +
-      'font-family:Inter,system-ui,sans-serif;color:var(--txt,#F7F5F1);}' +
-    '.rtgsnel-kaart h2{font-family:var(--serif),Georgia,serif;font-weight:500;font-size:1.15rem;margin:0 0 .8rem;}' +
-    '.rtgsnel-kaart dl{display:grid;grid-template-columns:auto 1fr;gap:.5rem .9rem;margin:0;font-size:.9rem;}' +
-    '.rtgsnel-kaart dt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;' +
-      'color:var(--gold,var(--goud,#857007));}' +
-    '.rtgsnel-kaart dd{margin:0;color:var(--muted,var(--zacht,#8A8680));}';
+  function laadSneltoetsPresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var sneltoetsStijlLink = document.createElement('link');
+    sneltoetsStijlLink.setAttribute('id', 'rtgDsRuntimeCss');
+    sneltoetsStijlLink.rel = 'stylesheet';
+    sneltoetsStijlLink.href = pad;
+    document.head.appendChild(sneltoetsStijlLink);
+  }
 
   /* De rij voor "n" draagt het LABEL van de nieuw-knop, en dat label komt uit
      de pagina -- soms door een ander getypt. Veel schoonmakers hier gooien <
@@ -70,25 +68,41 @@
       eerste('input[placeholder*="oek" i]') || eerste('#zoek, #zoekveld, [data-zoek]');
   }
 
-  var blad = null;
+  var blad = null, ingang = null;
+  var ds = document.documentElement.hasAttribute('data-ds');
+  function sluit() {
+    if (!blad) return;
+    if (ds && blad.open) blad.close();
+    blad.hidden = true;
+    if (ds && ingang && ingang.isConnected) ingang.focus();
+    ingang = null;
+  }
   function overzicht(rijen) {
     if (!blad) {
-      var st = document.createElement('style'); st.id = 'rtgsnel-stijl'; st.textContent = css;
-      document.head.appendChild(st);
-      blad = document.createElement('div');
-      blad.className = 'rtgsnel';
+      laadSneltoetsPresentatie('/ds/rtg-ds.css');
+      blad = document.createElement(ds ? 'dialog' : 'div');
+      blad.className = 'rtgsnel ds-sneltoets' + (ds ? ' ds-dialoog' : ' ds-sneltoets--overlay');
       blad.hidden = true;
       blad.setAttribute('role', 'dialog');
       // ook dit blad dekt het scherm af, dus het valt onder vensterOpen()
       blad.setAttribute('aria-modal', 'true');
       blad.setAttribute('aria-label', 'Sneltoetsen');
-      blad.addEventListener('click', function () { blad.hidden = true; });
+      blad.addEventListener('click', function (e) { if (!ds || e.target === blad) sluit(); });
+      if (ds) {
+        blad.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
+        blad.addEventListener('close', function () { if (!blad.open) blad.hidden = true; });
+      }
       document.body.appendChild(blad);
     }
-    blad.innerHTML = '<div class="rtgsnel-kaart"><h2>Sneltoetsen</h2><dl>' +
+    blad.innerHTML = '<div class="rtgsnel-kaart ds-sneltoets__kaart"><h2>Sneltoetsen</h2><dl>' +
       rijen.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') +
-      '</dl></div>';
+      '</dl>' + (ds ? '<div class="ds-dialoog__acties"><button type="button" class="ds-knop" autofocus>Sluiten</button></div>' : '') + '</div>';
+    if (ds) {
+      ingang = document.activeElement;
+      blad.querySelector('button').addEventListener('click', sluit);
+    }
     blad.hidden = false;
+    if (ds && !blad.open) blad.showModal();
   }
 
   function inVeld(el) {
@@ -104,6 +118,9 @@
      offsetParent kan hier niet als zichtbaarheidstoets dienen: een overlay
      staat position:fixed en heeft er per definitie geen. */
   function vensterOpen() {
+    // Een native modale dialoog heeft geen extra aria-modal nodig. Dat is
+    // onder meer het contract van Hotels, Reisboek en de chauffeurdialoog.
+    if (document.querySelector('dialog:modal')) return true;
     var l = document.querySelectorAll('[aria-modal="true"]');
     for (var i = 0; i < l.length; i++) if (!l[i].hidden && l[i].offsetWidth > 0) return true;
     return false;
@@ -113,7 +130,9 @@
     document.addEventListener('keydown', function (e) {
       if (e.ctrlKey || e.metaKey || e.altKey) return;      // dan is de toets van de browser
       if (e.key === 'Escape') {
-        if (blad && !blad.hidden) { blad.hidden = true; e.preventDefault(); }
+        // Native DS-modaliteit verwerkt uitsluitend Escape voor de bovenste
+        // dialoog via cancel; een onderliggend blad sluit niet per ongeluk mee.
+        if (blad && !blad.hidden && !ds) { sluit(); e.preventDefault(); }
         return;
       }
       if (inVeld(document.activeElement)) return;          // typen gaat voor

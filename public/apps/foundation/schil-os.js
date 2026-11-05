@@ -87,23 +87,28 @@
   w.RTGWereld = gekozen;
 
   try {
-    if (!d.querySelector('link[href="/shared/wereldschil.css"]')) {
-      var blad = d.createElement('link');
-      blad.rel = 'stylesheet';
-      blad.href = '/shared/wereldschil.css';
-      (d.head || d.documentElement).appendChild(blad);
+    /* wereldschil.js bouwt op DS dezelfde navigatie met de canonieke
+       ds-wereldnav-klassen. Alleen de oude schermen hebben daarom het oude
+       presentatieblad nodig; gedrag, handvoorkeur en split view blijven voor
+       beide architecturen uit dezelfde wereldschil.js komen. */
+    if (!document.documentElement.hasAttribute('data-ds') &&
+        !d.querySelector('link[href="/shared/wereldschil.css"]')) {
+      const foundationWereldschilBlad = document.createElement('link');
+      foundationWereldschilBlad.rel = 'stylesheet';
+      foundationWereldschilBlad.href = '/shared/wereldschil.css';
+      document.head.appendChild(foundationWereldschilBlad);
     }
     if (!d.querySelector('script[src="/shared/wereldschil.js"]')) {
-      var s = d.createElement('script');
-      s.src = '/shared/wereldschil.js';
-      (d.head || d.documentElement).appendChild(s);
+      const foundationWereldschilScript = document.createElement('script');
+      foundationWereldschilScript.src = '/shared/wereldschil.js';
+      document.head.appendChild(foundationWereldschilScript);
     }
     /* De pictogrammen komen uit shared/glyf.js; deze schermen dragen de
        sessielaag niet, dus die haalt hij hier zelf op. */
     if (!d.querySelector('script[src="/shared/glyf.js"]')) {
-      var g = d.createElement('script');
-      g.src = '/shared/glyf.js';
-      (d.head || d.documentElement).appendChild(g);
+      const foundationGlyfScript = document.createElement('script');
+      foundationGlyfScript.src = '/shared/glyf.js';
+      document.head.appendChild(foundationGlyfScript);
     }
   } catch (e) {}
 })(window, document);

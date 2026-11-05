@@ -16,45 +16,22 @@
 (function (w, d) {
   'use strict';
   if (w.RTGBediening) return;
-
   var T = function (k, nl) { return (w.RTGi18n && w.RTGi18n.t) ? w.RTGi18n.t(k, nl) : nl; };
-  function stijl() {
-    if (d.getElementById('bdnCss')) return;
-    var s = d.createElement('style'); s.id = 'bdnCss';
-    s.textContent =
-      '.bdn-scrim{position:fixed;inset:0;z-index:9995;display:none;align-items:flex-end;justify-content:center;' +
-        'background:rgba(6,5,5,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}' +
-      '.bdn-scrim.open{display:flex;}' +
-      '.bdn-blad{width:min(430px,100%);max-height:86vh;overflow-y:auto;' +
-        'background:linear-gradient(180deg,#151312,#0C0C0B);color:#F4F1EC;' +
-        'border:1px solid var(--line,rgba(255,255,255,.14));border-bottom:none;' +
-        'border-radius:0;padding:1rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
-        'font-family:Inter,system-ui,sans-serif;box-shadow:0 -18px 50px rgba(0,0,0,.5);}' +
-      '@media (min-width:640px){.bdn-scrim{align-items:center;}' +
-        '.bdn-blad{border-radius:0;border-bottom:1px solid var(--line,rgba(255,255,255,.14));}}' +
-      '.bdn-kop{display:flex;align-items:center;justify-content:space-between;margin-bottom:.2rem;}' +
-      '.bdn-kop b{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.18rem;letter-spacing:-.01em;}' +
-      '.bdn-x{background:none;border:none;color:#8A8680;font-size:1rem;cursor:pointer;padding:.3rem .1rem;}' +
-      '.bdn-x:hover{color:#F4F1EC;}' +
-      '.bdn-uit{color:#8A8680;font-size:.73rem;line-height:1.5;margin:0 0 .7rem;}' +
-      '.bdn-rij{display:flex;align-items:center;justify-content:space-between;gap:.8rem;' +
-        'padding:.72rem 0;border-top:1px solid var(--line,rgba(255,255,255,.1));}' +
-      '.bdn-rij > span{font-size:.86rem;}' +
-      '.bdn-rij small{display:block;color:#8A8680;font-size:.7rem;line-height:1.45;margin-top:.12rem;}' +
-      '.bdn-do{flex:0 0 auto;display:flex;gap:.35rem;align-items:center;}' +
-      '.bdn-do button{background:rgba(255,255,255,.05);border:1px solid var(--line,rgba(255,255,255,.14));' +
-        'color:#F4F1EC;border-radius:0;padding:.4rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;}' +
-      '.bdn-do button:hover,.bdn-do button.actief{border-color:var(--gold,#A98F1C);}' +
-      '.bdn-do button.actief{color:var(--gold,#A98F1C);}' +
-      '.bdn-stip{width:22px;height:22px;border-radius:0;padding:0;border:2px solid transparent;}' +
-      '@media print{.bdn-scrim{display:none !important;}}';
-    (d.head || d.documentElement).appendChild(s);
+  function laadBedieningStijl(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var bedieningStijlLink = document.createElement('link');
+    bedieningStijlLink.id = 'rtgDsRuntimeCss';
+    bedieningStijlLink.rel = 'stylesheet';
+    bedieningStijlLink.href = pad;
+    document.head.appendChild(bedieningStijlLink);
   }
+  function stijl() { laadBedieningStijl('/ds/rtg-ds.css'); }
 
   // deel 2 zet de rijen, het paneel en de ingang; zie bediening-02.js
   /* Deel 2 van het bedieningspaneel: de rijen, het blad en de ingang.
      Deel 1 (bediening-01.js) opent de module en levert stijl(). */
-  var scrim = null, blad = null;
+  var scrim = null, blad = null, terugFocus = null;
 
   function rij(label, sub) {
     var r = d.createElement('div'); r.className = 'bdn-rij';
@@ -78,9 +55,13 @@
   function vulTaal() {
     if (!w.RTGi18n || !w.RTGi18n.openModal) return;
     var doe = rij(T('bdn.taal', 'Taal'), T('bdn.taal.sub', 'Typ of zeg in welke taal u dit scherm wilt lezen.'));
-    doe.appendChild(knopje((w.RTGi18n.lang || 'nl').toUpperCase(), false, function () {
+    var taalKnop = knopje((w.RTGi18n.lang || 'nl').toUpperCase(), false, function () {
       sluit(); w.RTGi18n.openModal();
-    }));
+    });
+    // Een taalcode is een identificatie, geen vertaalbare zin ("EN" is ook
+    // het Nederlandse woord "en"). De huidige taal blijft herkenbaar.
+    taalKnop.setAttribute('translate', 'no');
+    doe.appendChild(taalKnop);
   }
 
   function vulThema() {
@@ -89,11 +70,13 @@
     w.RTGRosThema.themas.forEach(function (t) {
       var b = d.createElement('button');
       b.type = 'button'; b.className = 'bdn-stip' + (w.RTGRosThema.huidig() === t.id ? ' actief' : '');
-      b.style.background = t.stip; b.title = t.naam; b.setAttribute('aria-label', T('bdn.thema', 'Weergave') + ': ' + t.naam);
+      b.textContent = t.naam;
+      b.title = t.naam; b.setAttribute('aria-label', T('bdn.thema', 'Weergave') + ': ' + t.naam);
+      b.setAttribute('aria-pressed', String(w.RTGRosThema.huidig() === t.id));
       b.addEventListener('click', function () {
         w.RTGRosThema.zet(t.id);
-        doe.querySelectorAll('.bdn-stip').forEach(function (x) { x.classList.remove('actief'); });
-        b.classList.add('actief');
+        doe.querySelectorAll('.bdn-stip').forEach(function (x) { x.classList.remove('actief'); x.setAttribute('aria-pressed', 'false'); });
+        b.classList.add('actief'); b.setAttribute('aria-pressed', 'true');
       });
       doe.appendChild(b);
     });
@@ -102,11 +85,14 @@
   function vulBeweging() {
     if (!w.RTGBeweging || !w.RTGBeweging.standen) return;
     var doe = rij(T('bdn.beweging', 'Beweging'), T('bdn.beweging.sub', 'Hoeveel het scherm mag leven. Stil is het rustigst.'));
-    var teken = function () {
+    var teken = function (focusWaarde) {
       doe.textContent = '';
       w.RTGBeweging.standen.forEach(function (s) {
-        doe.appendChild(knopje(T('bdn.bw.' + s.n.toLowerCase(), s.n), Math.abs(w.RTGBeweging.waarde() - s.w) <= 8,
-          function () { w.RTGBeweging.zet(s.w); teken(); }));
+        var aan = Math.abs(w.RTGBeweging.waarde() - s.w) <= 8;
+        var b = knopje(T('bdn.bw.' + s.n.toLowerCase(), s.n), aan,
+          function () { w.RTGBeweging.zet(s.w); teken(s.w); });
+        b.setAttribute('aria-pressed', String(aan)); doe.appendChild(b);
+        if (focusWaarde === s.w) b.focus();
       });
     };
     teken();
@@ -135,18 +121,14 @@
     var doe = rij(T('bdn.vol.kop', 'Vul het scherm'),
       T('bdn.vol.sub', 'De app rekt op tot de randen van uw beeldscherm. Uw keuze geldt voor alle apps.'));
     var k = knopje(T('bdn.vol.aan', 'Rand tot rand'), w.RTGVol.aan(), function () {
+      if (!w.RTGVol.mogelijk()) return;
       w.RTGVol.wissel();
       k.classList.toggle('actief', w.RTGVol.aan());
+      k.setAttribute('aria-pressed', String(w.RTGVol.aan()));
     });
+    k.setAttribute('aria-pressed', String(w.RTGVol.aan()));
     doe.appendChild(k);
   }
-
-  /* Hier zat "Widgets": kaarten uit de app naast het scherm neerzetten, op de
-     lege ruimte links en rechts van het venster. Dat is een bureaublad met
-     losse widgets eromheen, en dat kent een telefoon niet -- daar staat de app
-     schermvullend en verder niets. De laag (shared/bureau.js) is weg, dus deze
-     rij ook. */
-  function vulWidgets() { /* niets meer: het bureaublad bestaat niet meer */ }
 
   function vulUitleg() {
     if (!w.RTGGids || !w.RTGGids.open) return;
@@ -156,12 +138,14 @@
 
   /* ---- het paneel ---- */
   function bouwBlad() {
-    if (scrim) return;
+    if (scrim && scrim.isConnected) return;
     stijl();
-    scrim = d.createElement('div'); scrim.className = 'bdn-scrim';
+    scrim = d.createElement('dialog'); scrim.className = 'bdn-scrim ds-instellingen';
     blad = d.createElement('section');
-    blad.className = 'bdn-blad'; blad.setAttribute('role', 'dialog');
-    blad.setAttribute('aria-modal', 'true'); blad.setAttribute('aria-label', T('bdn.kop', 'Instellingen'));
+    blad.className = 'bdn-blad ds-dialoog';
+    var dialoog = scrim;
+    dialoog.setAttribute('role', 'dialog'); dialoog.setAttribute('aria-modal', 'true');
+    dialoog.setAttribute('aria-label', T('bdn.kop', 'Instellingen'));
     var kop = d.createElement('div'); kop.className = 'bdn-kop';
     var titel = d.createElement('b'); titel.textContent = T('bdn.kop', 'Instellingen');
     var x = d.createElement('button');
@@ -173,15 +157,31 @@
     var uit = d.createElement('p'); uit.className = 'bdn-uit';
     uit.textContent = T('bdn.uit', 'Alles wat u aan dit scherm kunt instellen, bij elkaar. Uw keuzes blijven op dit toestel.');
     blad.appendChild(uit);
-    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulVol(); vulWidgets(); vulUitleg();
+    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulVol(); vulUitleg();
     scrim.appendChild(blad);
     scrim.addEventListener('click', function (e) { if (e.target === scrim) sluit(); });
-    d.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
+    scrim.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
     d.body.appendChild(scrim);
   }
 
-  function open() { bouwBlad(); scrim.classList.add('open'); var f = blad.querySelector('button'); if (f) f.focus(); }
-  function sluit() { if (scrim) scrim.classList.remove('open'); }
+  function open() {
+    if (scrim && scrim.isConnected && scrim.classList.contains('open')) return;
+    // Lees bij een nieuwe opening de actuele keuzes bij dezelfde eigenaren.
+    // Geen tweede voorkeurcache; een open paneel behoudt zijn focus/toestand.
+    if (scrim) { scrim.remove(); scrim = null; blad = null; }
+    bouwBlad();
+    terugFocus = d.activeElement;
+    scrim.classList.add('open');
+    scrim.showModal(); // De browser beheert modaliteit, focus en inert.
+    var f = blad.querySelector('button'); if (f) f.focus();
+  }
+  function sluit() {
+    if (!scrim || !scrim.classList.contains('open')) return;
+    scrim.classList.remove('open');
+    if (scrim.open) scrim.close();
+    if (terugFocus && terugFocus.isConnected) terugFocus.focus({ preventScroll: true });
+    terugFocus = null;
+  }
 
 
   /* Geen eigen ingang meer. Het paneel wordt opgeroepen zoals een

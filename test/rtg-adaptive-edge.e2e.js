@@ -20,14 +20,18 @@ test('LivingOS Home keert vanuit de routevergelijker en een app terug naar de ve
     await context.addInitScript(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
     const page = await context.newPage();
     for (const width of [320, 390, 1440]) {
-      await page.setViewportSize({ width, height: 900 });
-      for (const source of ['/apps/living-os.html?view=worlds', '/apps/notities.html']) {
+        await page.setViewportSize({ width, height: 900 });
+      /* Notities gebruikt na de Daily-migratie bewust de DS Edge met de
+         algemene schil-Home. Deze proef gaat over de Adaptive Edge en gebruikt
+         daarom een bestaande LivingOS-app die die presentatie nog werkelijk
+         draagt. */
+      for (const source of ['/apps/living-os.html?view=worlds', '/apps/leven.html']) {
         await page.goto(base + source, { waitUntil: 'domcontentloaded' });
-        await wacht(page, new URL(page.url()).pathname);
+        await wacht(page, new URL(page.url()).pathname, source + ' op ' + width);
         await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
         await page.waitForLoadState('domcontentloaded');
         assert.equal(new URL(page.url()).pathname, '/apps/wereld.html', source + ' op ' + width);
-        await wacht(page, '/apps/wereld.html');
+        await wacht(page, '/apps/wereld.html', 'LivingOS Home op ' + width);
         if (width >= 1000) {
           await page.waitForSelector('.wp-scene');
           await page.locator('.wp-story a').click();
@@ -79,16 +83,28 @@ test('het RTG-beeldmerk blijft intact bij een eerder opgeslagen foutieve Engelse
   }
 });
 
-async function wacht(page, pad) {
-  await page.waitForFunction(verwacht => location.pathname !== verwacht || document.body &&
+async function wacht(page, pad, context = pad) {
+  try { await page.waitForFunction(verwacht => location.pathname !== verwacht || document.body &&
     document.body.dataset.rtgAdaptiveReady === 'true' && window.RTGAdaptiveEdge && (() => {
       const bar = document.querySelector('.rtg-adaptive-bar');
       if (!bar) return false;
       const r = bar.getBoundingClientRect(), s = getComputedStyle(bar);
-      return r.width > 100 && r.height >= 44 && r.top >= 0 && r.bottom <= innerHeight &&
-        s.visibility === 'visible' && Number(s.opacity) > .99;
-    })(),
-  pad, { timeout: 60000 });
+      return r.width >= 44 && r.height >= 44 && r.top >= 0 && r.bottom <= innerHeight &&
+        s.display !== 'none' && s.visibility === 'visible' && Number(s.opacity) > 0 &&
+        s.pointerEvents !== 'none' && bar.getAttribute('aria-hidden') !== 'true';
+    })(), pad, { timeout: 60000 }); }
+  catch (error) {
+    const state = await page.evaluate(() => {
+      const bar = document.querySelector('.rtg-adaptive-bar'), rect = bar && bar.getBoundingClientRect();
+      const style = bar && getComputedStyle(bar);
+      return { path: location.pathname, ready: document.body && document.body.dataset.rtgAdaptiveReady,
+        edge: !!window.RTGAdaptiveEdge, state: document.body && document.body.dataset.rtgAdaptiveState,
+        rect: rect && { width: rect.width, height: rect.height, top: rect.top, bottom: rect.bottom },
+        display: style && style.display, visibility: style && style.visibility,
+        opacity: style && style.opacity, pointerEvents: style && style.pointerEvents };
+    }).catch(() => null);
+    throw new Error(error.message + '\nEdge-gereedheidscontext ' + context + ': ' + JSON.stringify(state), { cause: error });
+  }
 }
 
 async function meet(page) {

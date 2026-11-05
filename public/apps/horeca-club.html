@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <script src="/shared/stroom.js"></script>
@@ -8,122 +8,102 @@
 <title>RTG Horeca: club</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/zaakscherm.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/glyf.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/workos-premium.css" rel="stylesheet">
-<link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
-<style>
-  /* Dit scherm had geen eigen stijlblok, en dan heeft
-     scripts/inlinestijl-omzet.js nergens om zijn klassen neer te zetten: vijf
-     horeca-schermen kwamen daardoor als "omzetting mislukt" terug in plaats van
-     als bewezen of afgekeurd (TAKEN.md 4.51). */
 
-  /* Uit inline style-attributen gehaald door scripts/inlinestijl-omzet.js (TAKEN.md 4.51). Bewezen gelijk met
-     scripts/inlinestijl-proef.js: elk element, elke aangeraakte eigenschap,
-     berekend in een echte browser. Letterlijk wat er stond -- geen ontwerpbesluit. */
-  .i-12sbxv{flex:0 1 8rem}
-  .i-12sa0x{flex:0 1 5rem}
-  .i-1trguu{flex:0 1 10rem}
-</style>
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-12sbaw3:not(#_#_#_){flex:0 1 7rem}
-.s-12sckv5:not(#_#_#_){flex:0 1 9rem}
-.s-1trhhui:not(#_#_#_){flex:0 1 11rem}
-</style>
+
+
+
+
+<script src="/shared/glyf.js" defer></script>
+
+
+<script src="/shared/horeca-enterprise.js" defer></script>
+<script src="/shared/appmenu.js" defer></script>
+
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet"><script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body class="ds-scherm ds-horeca" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
-  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
-  <span><span class="ey">RTG Horeca</span><h1>Clubtegoed, tafels en de deur</h1></span>
-  <span class="h-flex1"></span>
+  <a class="terug ds-knop ds-knop--klein" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey ds-horeca-label">RTG Horeca</span><h1>Clubtegoed, tafels en de deur</h1></span>
+  <span class="h-flex1 ds-horeca-groei"></span>
 </header>
 <main id="main">
-  <div class="kpis">
-    <div class="kpi"><b id="dBinnen">-</b><span>binnen</span></div>
-    <div class="kpi"><b id="dVrij">-</b><span>nog vrij</span></div>
-    <div class="kpi"><b id="dVerwacht">-</b><span>verwacht van de lijst</span></div>
+  <div class="kpis ds-horeca-kpis">
+    <div class="kpi ds-horeca-kpi"><b id="dBinnen">-</b><span>binnen</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="dVrij">-</b><span>nog vrij</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="dVerwacht">-</b><span>verwacht van de lijst</span></div>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Polsband</div>
-    <div class="rij">
-      <input class="i-1trguu veld" id="cNummer" maxlength="40" placeholder="Bandnummer" aria-label="Bandnummer">
-      <input class="i-12sbxv veld" id="cBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">
-      <button class="knop p" id="cBandOp" type="button">Opwaarderen</button>
-      <button class="knop" id="cBandBetaal" type="button">Afboeken</button>
-      <button class="knop" id="cBandTerug" type="button">Restsaldo terug</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Polsband</div>
+    <div class="rij ds-horeca-rij">
+      <input class="i-1trguu veld ds-invoer" id="cNummer" maxlength="40" placeholder="Bandnummer" aria-label="Bandnummer">
+      <input class="i-12sbxv veld ds-invoer" id="cBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">
+      <button class="knop ds-knop ds-knop--klein p" id="cBandOp" type="button">Opwaarderen</button>
+      <button class="knop ds-knop ds-knop--klein" id="cBandBetaal" type="button">Afboeken</button>
+      <button class="knop ds-knop ds-knop--klein" id="cBandTerug" type="button">Restsaldo terug</button>
     </div>
-    <p class="stil z-mt40" id="cBandUit"></p>
-    <p class="stil">Op een band staat een nummer en een saldo, geen naam. Restsaldo hoort terug naar de gast; het is geen omzet van de club.</p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="cBandUit"></p>
+    <p class="stil ds-horeca-meta">Op een band staat een nummer en een saldo, geen naam. Restsaldo hoort terug naar de gast; het is geen omzet van de club.</p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Tafels met minimum spend</div>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Tafels met minimum spend</div>
     <div id="cTafels"></div>
-    <div class="rij z-mt60">
-      <input class="i-12sbxv veld" id="cTafel" maxlength="30" placeholder="Tafel" aria-label="Tafel">
-      <input class="veld" id="cTafelGast" maxlength="60" placeholder="Op naam van" aria-label="Naam van de gast">
-      <input class="i-12sa0x veld" id="cTafelPersonen" type="number" min="1" max="60" value="6" aria-label="Aantal personen">
-      <input class="i-12sbxv veld" id="cTafelMin" type="number" min="0" step="0.01" placeholder="Minimum" aria-label="Minimumbedrag">
-      <input class="i-1trguu veld" id="cTafelRek" maxlength="40" placeholder="Rekeningnummer" aria-label="Rekeningnummer">
-      <button class="knop p" id="cTafelZet" type="button">Vastleggen</button>
-      <button class="knop" id="cTafelToon" type="button">Toon</button>
+    <div class="rij ds-horeca-rij z-mt60 ds-horeca-afstand">
+      <input class="i-12sbxv veld ds-invoer" id="cTafel" maxlength="30" placeholder="Tafel" aria-label="Tafel">
+      <input class="veld ds-invoer" id="cTafelGast" maxlength="60" placeholder="Op naam van" aria-label="Naam van de gast">
+      <input class="i-12sa0x veld ds-invoer" id="cTafelPersonen" type="number" min="1" max="60" value="6" aria-label="Aantal personen">
+      <input class="i-12sbxv veld ds-invoer" id="cTafelMin" type="number" min="0" step="0.01" placeholder="Minimum" aria-label="Minimumbedrag">
+      <input class="i-1trguu veld ds-invoer" id="cTafelRek" maxlength="40" placeholder="Rekeningnummer" aria-label="Rekeningnummer">
+      <button class="knop ds-knop ds-knop--klein p" id="cTafelZet" type="button">Vastleggen</button>
+      <button class="knop ds-knop ds-knop--klein" id="cTafelToon" type="button">Toon</button>
     </div>
-    <p class="stil z-mt40" id="cTafelLet"></p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="cTafelLet"></p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">De deur</div>
-    <div class="rij">
-      <input class="veld s-12sbaw3" id="dCapaciteit" type="number" min="1" max="20000" value="300" aria-label="Capaciteit">
-      <input class="i-12sa0x veld" id="dPersonen" type="number" min="1" max="50" value="1" aria-label="Aantal personen">
-      <label class="stil"><input type="checkbox" id="dLeeftijd" checked> Leeftijd gecontroleerd</label>
-      <button class="knop p" id="dIn" type="button">Naar binnen</button>
-      <button class="knop" id="dUit" type="button">Naar buiten</button>
-      <button class="knop" id="dTerug" type="button">Herbetreding</button>
-      <button class="knop" id="dStand" type="button">Stand</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">De deur</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer s-12sbaw3" id="dCapaciteit" type="number" min="1" max="20000" value="300" aria-label="Capaciteit">
+      <input class="i-12sa0x veld ds-invoer" id="dPersonen" type="number" min="1" max="50" value="1" aria-label="Aantal personen">
+      <label class="stil ds-horeca-meta"><input type="checkbox" id="dLeeftijd" checked> Leeftijd gecontroleerd</label>
+      <button class="knop ds-knop ds-knop--klein p" id="dIn" type="button">Naar binnen</button>
+      <button class="knop ds-knop ds-knop--klein" id="dUit" type="button">Naar buiten</button>
+      <button class="knop ds-knop ds-knop--klein" id="dTerug" type="button">Herbetreding</button>
+      <button class="knop ds-knop ds-knop--klein" id="dStand" type="button">Stand</button>
     </div>
-    <p class="stil z-mt40" id="dDeurUit"></p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand" id="dDeurUit"></p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Gastenlijst en promoters</div>
-    <div class="rij">
-      <input class="veld s-1trhhui" id="dDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum">
-      <input class="veld s-12sckv5" id="dPromoter" maxlength="40" placeholder="Promoter" aria-label="Promoter">
-      <input class="i-12sa0x veld" id="dGastPersonen" type="number" min="1" max="20" value="1" aria-label="Personen per naam">
-      <input class="i-12sbxv veld" id="dKorting" maxlength="40" placeholder="Korting" aria-label="Korting">
-      <button class="knop" id="dGastToon" type="button">Toon</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Gastenlijst en promoters</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer s-1trhhui" id="dDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum">
+      <input class="veld ds-invoer s-12sckv5" id="dPromoter" maxlength="40" placeholder="Promoter" aria-label="Promoter">
+      <input class="i-12sa0x veld ds-invoer" id="dGastPersonen" type="number" min="1" max="20" value="1" aria-label="Personen per naam">
+      <input class="i-12sbxv veld ds-invoer" id="dKorting" maxlength="40" placeholder="Korting" aria-label="Korting">
+      <button class="knop ds-knop ds-knop--klein" id="dGastToon" type="button">Toon</button>
     </div>
-    <div class="rij z-mt60">
-      <input class="veld" id="dNamen" maxlength="400" placeholder="Namen, komma's ertussen" aria-label="Namen voor de gastenlijst">
-      <button class="knop p" id="dGastZet" type="button">Op de lijst</button>
+    <div class="rij ds-horeca-rij z-mt60 ds-horeca-afstand">
+      <input class="veld ds-invoer" id="dNamen" maxlength="400" placeholder="Namen, komma's ertussen" aria-label="Namen voor de gastenlijst">
+      <button class="knop ds-knop ds-knop--klein p" id="dGastZet" type="button">Op de lijst</button>
     </div>
-    <div id="dLijst" class="z-mt60"></div>
-    <div class="kop z-mt80">Aanvragen van leden (<span id="dTeBeslissen">0</span>)</div>
+    <div id="dLijst" class="z-mt60 ds-horeca-afstand"></div>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Aanvragen van leden (<span id="dTeBeslissen">0</span>)</div>
     <div id="dAanvragen"></div>
-    <p class="stil z-mt40">Een lid dat via de app een plek vraagt, staat er als aanvraag op en komt de deur niet door tot jij hier ja zegt.</p>
-    <div class="kop z-mt80">Per promoter</div>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand">Een lid dat via de app een plek vraagt, staat er als aanvraag op en komt de deur niet door tot jij hier ja zegt.</p>
+    <div class="kop ds-horeca-kop z-mt80 ds-horeca-afstand">Per promoter</div>
     <div id="dPromoters"></div>
-    <p class="stil z-mt40">Per promoter telt wat er is aangemeld EN wat er echt binnen is. Alleen dat eerste zegt niets.</p>
+    <p class="stil ds-horeca-meta z-mt40 ds-horeca-afstand">Per promoter telt wat er is aangemeld EN wat er echt binnen is. Alleen dat eerste zegt niets.</p>
   </div>
 </main>
-<div class="melding" id="melding" role="status"></div>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/club-band.js"></script>

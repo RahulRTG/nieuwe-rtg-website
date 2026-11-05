@@ -1,0 +1,11 @@
+/* Presentatie van de bestaande RTGGlyf-teksticonen. De glyfbron blijft eigenaar
+   van de tekening; dit component volgt de omliggende tekst, ook bij tekstzoom. */
+@layer rtg.component {
+  .ds-icoon {
+    display: inline-block;
+    inline-size: 1.15em;
+    block-size: 1.15em;
+    flex: none;
+    vertical-align: middle;
+  }
+}

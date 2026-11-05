@@ -1,0 +1,43 @@
+/* Vier dagelijkse kamers delen één bestaande eigenaar en toestandscontract. */
+@layer rtg.component {
+ .ds-dagkamer { padding-block-end: calc((var(--ds-edge-hoogte) + var(--ds-ruimte-8)) + env(safe-area-inset-bottom)); }
+ .ds-dag-main { inline-size: 100%; max-inline-size: 65rem; margin-inline: auto; min-inline-size: 0; }
+ .ds-dag-kop.ds-kop { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+ .ds-dag-kop.ds-kop > * { min-inline-size: 0; max-inline-size: 100%; overflow-wrap: anywhere; }
+ .ds-dag-kop.ds-kop > [data-rtg-edge-bar] { display: flex; flex-wrap: wrap; flex: 1 1 100%; gap: var(--ds-ruimte-2); }
+ .ds-dag-kop h1 { font-size: var(--ds-maat-kop); }
+ .ds-dag-daily-hero, .ds-dag-daily-copy, .ds-dag-daily-message, .ds-dag-daily-content { padding: var(--ds-goot); min-inline-size: 0; }
+ .ds-dag-daily-hero { position: relative; isolation: isolate; }
+ .ds-dag-daily-heading h1 { font-family: var(--ds-letter-display); font-size: var(--ds-maat-display); line-height: 1.15; overflow-wrap: anywhere; margin-block: var(--ds-ruimte-4); }
+ .ds-dag-daily-eyebrow, .ds-dag-kop, .ds-dag-profiel-label { font-size: var(--ds-maat-meta); color: var(--ds-inkt-zacht); }
+ .ds-dag-daily-photo { inline-size: 100%; max-block-size: 24rem; object-fit: cover; display: block; border-radius: var(--ds-radius-inhoud); }
+ .ds-dag-daily-caption, .ds-dag-daily-note { font-style: italic; color: var(--ds-inkt-zacht); }
+ .ds-dag-daily-copy > p { max-inline-size: 54ch; line-height: 1.7; margin-block: var(--ds-ruimte-4); }
+ .ds-dag-actie { display: flex; justify-content: space-between; inline-size: 100%; gap: var(--ds-ruimte-4); }
+ .ds-dag-secundair { margin-block-start: var(--ds-ruimte-3); }
+ .ds-dagkamer[data-daily-state="guest"] .ds-dag-daily-content,
+ .ds-dagkamer[data-daily-state="loading"] .ds-dag-daily-content,
+ .ds-dagkamer[data-daily-state="error"] .ds-dag-daily-content,
+ .ds-dagkamer[data-rtg-daily="notities"][data-daily-state="empty"] .ds-dag-daily-content,
+ .ds-dagkamer[data-rtg-daily="bestanden"][data-daily-state="empty"] .ds-dag-daily-content { display: none; }
+ .ds-dag-rij, .ds-dag-voet, .ds-dag-acts, .ds-dag-tabs, .ds-dag-trend, .ds-dag-taakrij, .ds-dag-rrij, .ds-dag-versierij { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); min-inline-size: 0; }
+ .ds-dag-stil, .ds-dag-meta, .ds-dag-leeg, .ds-dag-klaar { color: var(--ds-inkt-zacht); overflow-wrap: anywhere; }
+ .ds-dag-twee { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,12rem),1fr)); gap: var(--ds-ruimte-3); }
+ .ds-dag-auto { margin-inline-start: auto; }
+ .ds-dag-breed { inline-size: 100%; margin-block-end: var(--ds-ruimte-3); }
+ .ds-dag-verdeel { justify-content: space-between; }
+ .ds-dag-link { color: inherit; }
+ .ds-dag-marge { margin-block: var(--ds-ruimte-3); }
+ .ds-dag-ruimte { padding: var(--ds-ruimte-4); }
+ .ds-dag-accent { border-color: var(--ds-accent); }
+ .ds-dag-scrim, .ds-dag-file-detail { position: fixed; inset: 0; z-index: 8950; background: var(--ds-glas); display: none; overflow: auto; padding: var(--ds-goot); padding-block-end: calc((var(--ds-edge-hoogte) + var(--ds-ruimte-8)) + env(safe-area-inset-bottom)); }
+ .ds-dag-scrim.open, .ds-dag-file-detail.open { display: flex; align-items: flex-start; justify-content: center; }
+ .ds-dag-notitie { inline-size: 100%; max-inline-size: 100%; block-size: 100dvh; max-block-size: 100dvh; margin: 0; border: 0; background: transparent; }
+ .ds-dag-notitie::backdrop { background: var(--ds-glas); }
+ .ds-dag-paneel { inline-size: min(100%,35rem); min-inline-size: 0; margin-block: auto; padding: var(--ds-goot); background: var(--ds-oppervlak); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+ .ds-dag-paneel label { display: block; margin-block: var(--ds-ruimte-3) var(--ds-ruimte-1); }
+ .ds-dag-paneel input, .ds-dag-paneel select, .ds-dag-paneel textarea { max-inline-size: 100%; min-inline-size: 0; }
+ .ds-dag-paneel textarea, .ds-dag-titel, .ds-dag-gewoon { inline-size: 100%; }
+ .ds-dagkamer .ds-knop.aan { border-color: var(--ds-accent); }
+ @media (prefers-reduced-motion: reduce) { .ds-dagkamer { scroll-behavior: auto; } }
+}

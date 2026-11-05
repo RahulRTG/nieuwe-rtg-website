@@ -8,10 +8,17 @@
     head.appendChild(title); head.appendChild(U.button('collapse', collapse, 'wd-text-button'));
     head.appendChild(U.button('close', close, 'wd-text-button')); o.surface.appendChild(head);
     var notice = U.el('p', 'wd-frame-notice'); notice.setAttribute('role', 'status'); o.surface.appendChild(notice);
-    var direct = U.copy(U.el('a', 'wd-direct'), 'direct'); direct.hidden = true; o.surface.appendChild(direct);
+    var direct = null;
+    function directNaar(url, verborgen) {
+      var directLink = document.createElement('a'); directLink.className = 'wd-direct'; directLink.href = url;
+      U.copy(directLink, 'direct'); directLink.hidden = verborgen;
+      if (direct) direct.replaceWith(directLink); else o.surface.appendChild(directLink);
+      direct = directLink;
+    }
+    directNaar('#', true);
     var retry = U.button('retry', function () { if (!current) return; var x = current; x.ready = false;
       clearTimeout(x.timer); U.copy(notice, 'frameLoading'); retry.hidden = true; direct.hidden = true;
-      x.frame.src = x.url; x.timer = setTimeout(function () { failed(x); }, 15000); }, 'wd-frame-retry');
+      x.frame.contentWindow.location.replace(x.url); x.timer = setTimeout(function () { failed(x); }, 15000); }, 'wd-frame-retry');
     retry.hidden = true; o.surface.appendChild(retry);
     function refreshEdge() {
       var id = w.RTGWorldIdentity, scope = active(), url = scope && scope.win.location.href;
@@ -55,7 +62,7 @@
         if (o.paths.has(win.location.pathname) && actual !== x.url) {
           x.url = actual; x.currentTitle = doc.title; x.frame.title = doc.title;
           x.frame.dataset.desktopApp = actual;
-          if (current === x) { title.textContent = doc.title; direct.href = actual; }
+          if (current === x) { title.textContent = doc.title; directNaar(actual, true); }
         }
         doc.body.classList.add('rtg-edge-embed');
         if (w.RTGAdaptiveEdgeClaim) w.RTGAdaptiveEdgeClaim.claim(doc, win);
@@ -70,7 +77,7 @@
     }
     function failed(x) {
       if (current !== x) return; U.copy(notice, 'frameError'); notice.hidden = false;
-      direct.href = x.url; direct.hidden = false; retry.hidden = false;
+      directNaar(x.url, false); retry.hidden = false;
     }
     function open(url, name, source) {
       // Every target must belong to the actual route manifest, not to design metadata.
@@ -81,12 +88,13 @@
       if (!current) scroll = w.scrollY;
       returnFocus = source || d.activeElement;
       if (!x) {
-        var frame = U.el('iframe', 'wd-app-frame'); frame.title = name; frame.dataset.desktopApp = url;
+        var frame = document.createElement('iframe'); frame.src = url;
+        frame.className = 'wd-app-frame'; frame.title = name; frame.dataset.desktopApp = url;
         x = { frame: frame, url: url, ready: false, dirty: false }; entries.push(x);
         frame.addEventListener('load', function () { ready(x); }); frame.addEventListener('error', function () { failed(x); });
-        frame.src = url; o.surface.appendChild(frame); x.timer = setTimeout(function () { failed(x); }, 15000);
+        o.surface.appendChild(frame); x.timer = setTimeout(function () { failed(x); }, 15000);
       }
-      current = x; title.textContent = x.currentTitle || name; direct.href = url; direct.hidden = true; retry.hidden = true;
+      current = x; title.textContent = x.currentTitle || name; directNaar(url, true); retry.hidden = true;
       U.copy(notice, 'frameLoading'); notice.hidden = x.ready;
       entries.forEach(function (entry) { entry.frame.hidden = entry !== x; });
       o.home.hidden = true; o.favorites.hidden = false; o.surface.hidden = false; o.root.classList.add('wd-expanded');

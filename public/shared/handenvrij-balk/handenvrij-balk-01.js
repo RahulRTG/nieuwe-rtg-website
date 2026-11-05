@@ -32,14 +32,14 @@
 
 
   var balk = document.createElement('div');
-  balk.className = 'hv-balk hv-weg';
-  balk.innerHTML = '<form><input type="text" maxlength="300" autocomplete="off" spellcheck="false"' +
+  balk.className = 'ds-handenvrij__balk hv-balk hv-weg';
+  balk.innerHTML = '<form class="ds-handenvrij__formulier"><input class="ds-handenvrij__veld" type="text" maxlength="300" autocomplete="off" spellcheck="false"' +
     ' aria-label="Zeg of typ wat er moet gebeuren" placeholder="Zeg of typ het">' +
-    '<button class="hv-k hv-go" type="submit" aria-label="Versturen">→</button></form>' +
-    '<button class="hv-k" type="button" data-mond aria-pressed="false" hidden>Mond</button>' +
-    '<button class="hv-k" type="button" data-stem aria-pressed="true">Stem</button>';
+    '<button class="ds-handenvrij__knop ds-handenvrij__verstuur hv-k hv-go" type="submit" aria-label="Versturen">→</button></form>' +
+    '<button class="ds-handenvrij__knop hv-k" type="button" data-mond aria-pressed="false" hidden>Mond</button>' +
+    '<button class="ds-handenvrij__knop hv-k" type="button" data-stem aria-pressed="true">Stem</button>';
   var chat = document.createElement('div');
-  chat.className = 'hv-chat'; chat.hidden = true;
+  chat.className = 'ds-handenvrij__chat hv-chat'; chat.hidden = true;
   chat.setAttribute('role', 'log'); chat.setAttribute('aria-live', 'polite');
   chat.setAttribute('aria-label', 'Gesprek met Rahul');
 
@@ -70,7 +70,7 @@
   function klaar() {
     if (balk.parentNode || !document.body) return;
     document.body.appendChild(chat); document.body.appendChild(balk);
-    document.body.classList.add('hv-ruimte', 'hv-opgeruimd');
+    document.body.classList.add('ds-handenvrij', 'hv-ruimte', 'hv-opgeruimd');
     knStem.setAttribute('aria-pressed', String(stemAan));
     root.RTGRahul = root.RTGRahul || {};
     if (!root.RTGRahul.open) { root.RTGRahul.open = haalOp; root.RTGRahul.sluit = legWeg; }

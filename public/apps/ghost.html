@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -35,6 +35,13 @@
     <h2 class="ds-status__titel">Eerst uw zaak-inlog</h2>
     <p class="ds-status__tekst">Log eerst in op de zaak-app; de Ghost Driver rijdt op de inlog van uw zaak.</p>
     <a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/leverancier.html">Naar de zaak-app</a>
+  </section>
+
+  <section class="ds-status ds-status--binnen" id="vStatus" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <h2 class="ds-status__titel" id="vStatusTitel"></h2>
+    <p class="ds-status__tekst" id="vStatusTekst"></p>
+    <button class="ds-knop ds-knop--primair ds-status__actie" id="ghostHerstel" type="button" data-ds-actie="Opnieuw proberen" hidden>Opnieuw proberen</button>
+    <a class="ds-knop ds-status__actie" id="ghostZaak" href="/apps/leverancier.html" hidden>Naar de zaak-app</a>
   </section>
 
   <div class="ds-panelen ds-panelen--twee" id="vGhost" hidden>

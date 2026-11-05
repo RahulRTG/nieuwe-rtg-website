@@ -96,7 +96,8 @@
   function bZet(v) {
     try { localStorage.setItem(BKEY, String(Math.max(0, Math.min(100, +v)))); } catch (e) {}
     bCache = Math.max(0, Math.min(100, +v));
-    bPas(); vorige = ''; bMerk();
+    bPas(); vorige = '';
+    try { w.dispatchEvent(new Event('rtg-beweging')); } catch (e) {}
   }
 
   // de zoekbalk-parameters veranderen niet zolang de pagina staat: één keer
@@ -142,4 +143,3 @@
     }
     return { top: top, onder: onder, basis: basis, hue: hue };
   }
-

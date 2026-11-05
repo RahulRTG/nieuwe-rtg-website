@@ -77,6 +77,14 @@ test.after(async () => { if (browser) await browser.close(); if (srv) await stop
 test('Hotels destination: aangemeld lid bereikt de Travel-collectie', {skip}, t =>
   require('./hotels-destination-helper')(t,{open,browser,base:srv.base,email:memberEmail}));
 
+const experienceContract=require('../experience-architecture/coverage-contract.json');
+const deviceConfigurations=experienceContract.configurationCoverage['continuity:destination'].deviceConfigurations;
+for(const device of experienceContract.devices){
+  const {viewport}=deviceConfigurations[device];
+  test(`Hotels destination normal: ${device}`,{skip},t=>
+    require('./hotels-destination-helper')(t,{open,browser,base:srv.base,email:memberEmail,device,viewport}));
+}
+
 test('alleen het Design System: geen erfenisblad, geen tweede greep, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);
   const lijst = await bladen(page);

@@ -8,27 +8,17 @@
      CollegaChat.badges();              // vult [data-dmbadge="<id>"] met ongelezen */
 (function (w) {
   'use strict';
+  var doc = w.document;
+  if (doc && doc.documentElement && !doc.documentElement.hasAttribute('data-ds') && !doc.getElementById('rtgDsRuntimeCss')) {
+    var link = doc.createElement('link');
+    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+    doc.head.appendChild(link);
+  }
   let API = null, T = (k, nl) => nl, toast = () => {}, mij = () => null;
   let openMet = null; // { staffId, naam } zolang het paneel open staat
+  let focusVoorOpen = null;
 
   function esc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
-  function stijl(){
-    if (document.getElementById('ccStijl')) return;
-    const s = document.createElement('style');
-    s.id = 'ccStijl';
-    s.textContent = '#ccPaneel{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;}' +
-      '#ccKaart{background:#151312;border:1px solid rgba(255,255,255,0.12);border-radius:0;width:100%;max-width:560px;height:min(70vh,560px);display:flex;flex-direction:column;color:#F4F1EC;font-family:Inter,sans-serif;}' +
-      '#ccKop{display:flex;align-items:center;gap:0.6rem;padding:0.9rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:600;font-size:0.9rem;}' +
-      '#ccKop button{margin-left:auto;background:none;border:none;color:#F4F1EC;font-size:1.2rem;cursor:pointer;padding:0.2rem 0.5rem;}' +
-      '#ccLijst{flex:1;overflow-y:auto;padding:0.8rem 1rem;display:flex;flex-direction:column;gap:0.45rem;}' +
-      '.cc-msg{max-width:82%;padding:0.5rem 0.8rem;border-radius:0;font-size:0.84rem;line-height:1.45;background:#221E1C;align-self:flex-start;}' +
-      '.cc-msg.mijn{background:#2E2A3F;align-self:flex-end;}' +
-      '.cc-msg time{display:block;font-size:0.62rem;opacity:0.55;margin-top:0.2rem;}' +
-      '#ccVoet{display:flex;gap:0.5rem;padding:0.7rem 1rem;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 0.7rem);border-top:1px solid rgba(255,255,255,0.08);}' +
-      '#ccVoet input{flex:1;background:#221E1C;border:1px solid rgba(255,255,255,0.12);border-radius:0;padding:0.6rem 1rem;color:#F4F1EC;font-size:0.85rem;outline:none;}' +
-      '#ccVoet button{background:#B99A5F;border:none;border-radius:0;padding:0.6rem 1.1rem;font:600 0.82rem Inter,sans-serif;color:#141210;cursor:pointer;}';
-    document.head.appendChild(s);
-  }
   function tijd(iso){
     const d = new Date(iso);
     return isNaN(d) ? '' : String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
@@ -39,7 +29,7 @@
     const me = mij() || {};
     el.innerHTML = messages.length ? messages.map(m =>
       '<div class="cc-msg' + (m.van === me.staffId ? ' mijn' : '') + '">' + esc(m.text) + '<time>' + tijd(m.at) + '</time></div>'
-    ).join('') : '<div style="font-size:0.8rem;opacity:0.6;text-align:center;margin-top:1.25rem;">' + T('cc.leeg', 'Nog geen berichten. Zeg hallo.') + '</div>';
+    ).join('') : '<div class="cc-leeg">' + T('cc.leeg', 'Nog geen berichten. Zeg hallo.') + '</div>';
     el.scrollTop = el.scrollHeight;
   }
   function sluit(){
@@ -47,20 +37,26 @@
     if (el) el.remove();
     openMet = null;
     badges();
+    const terug = focusVoorOpen;
+    focusVoorOpen = null;
+    if (terug && terug.isConnected && typeof terug.focus === 'function') terug.focus();
   }
 
   async function open(staffId, naam){
-    stijl();
     sluit();
+    focusVoorOpen = document.activeElement;
     openMet = { staffId: Number(staffId), naam };
     const el = document.createElement('div');
     el.id = 'ccPaneel';
-    el.innerHTML = '<div id="ccKaart"><div id="ccKop">' + esc(naam) + '<button id="ccDicht" aria-label="' + T('cc.dicht', 'Sluiten') + '">✕</button></div>' +
+    el.className = 'ds-collegachat';
+    el.innerHTML = '<div id="ccKaart" role="dialog" aria-modal="true" aria-label="' + esc(T('cc.gesprek', 'Gesprek met') + ' ' + naam) + '"><div id="ccKop">' + esc(naam) + '<button id="ccDicht" type="button" aria-label="' + T('cc.dicht', 'Sluiten') + '">✕</button></div>' +
       '<div id="ccLijst"></div>' +
-      '<div id="ccVoet"><input id="ccInput" placeholder="' + T('cc.ph', 'Bericht aan') + ' ' + esc(naam) + '"><button id="ccStuur">' + T('cc.stuur', 'Stuur') + '</button></div></div>';
+      '<div id="ccVoet"><input id="ccInput" aria-label="' + T('cc.ph', 'Bericht aan') + ' ' + esc(naam) + '" placeholder="' + T('cc.ph', 'Bericht aan') + ' ' + esc(naam) + '"><button id="ccStuur" type="button">' + T('cc.stuur', 'Stuur') + '</button></div></div>';
     document.body.appendChild(el);
     el.addEventListener('click', e => { if (e.target === el) sluit(); });
+    el.addEventListener('keydown', e => { if (e.key === 'Escape') sluit(); });
     el.querySelector('#ccDicht').addEventListener('click', sluit);
+    el.querySelector('#ccInput').focus();
     const stuur = async () => {
       const inp = el.querySelector('#ccInput');
       const text = (inp.value || '').trim();
@@ -96,7 +92,7 @@
       for (const c of d.collegas || []) {
         document.querySelectorAll('[data-dmbadge="' + c.id + '"]').forEach(el => {
           el.textContent = c.ongelezen ? String(c.ongelezen) : '';
-          el.style.display = c.ongelezen ? '' : 'none';
+          el.hidden = !c.ongelezen;
         });
       }
     } catch (e) {}

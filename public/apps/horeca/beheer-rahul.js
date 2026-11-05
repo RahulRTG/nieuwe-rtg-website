@@ -32,22 +32,22 @@
   }
 
   function bon(b) {
-    return '<div class="item"><span>' +
-      '<b>' + esc(b.wat) + '</b> <span class="stil">· ' + esc(klokje(b.at)) +
+    return '<div class="item ds-horeca-item"><span>' +
+      '<b>' + esc(b.wat) + '</b> <span class="stil ds-horeca-meta">· ' + esc(klokje(b.at)) +
       (b.door ? ' · ' + esc(b.door) : '') + '</span>' +
-      '<div class="stil">' + esc(WOORD[b.stand] || b.stand) + ' &mdash; ' + esc(b.reden) + '</div>' +
-      (b.waarom ? '<div class="stil">Aanleiding: ' + esc(b.waarom) + '</div>' : '') +
-      (b.uitkomst ? '<div class="stil">' + esc(b.uitkomst) + '</div>' : '') +
-      (b.bevestigdDoor ? '<div class="stil">Bevestigd door ' + esc(b.bevestigdDoor) + '.</div>' : '') +
+      '<div class="stil ds-horeca-meta">' + esc(WOORD[b.stand] || b.stand) + ' &mdash; ' + esc(b.reden) + '</div>' +
+      (b.waarom ? '<div class="stil ds-horeca-meta">Aanleiding: ' + esc(b.waarom) + '</div>' : '') +
+      (b.uitkomst ? '<div class="stil ds-horeca-meta">' + esc(b.uitkomst) + '</div>' : '') +
+      (b.bevestigdDoor ? '<div class="stil ds-horeca-meta">Bevestigd door ' + esc(b.bevestigdDoor) + '.</div>' : '') +
       '</span><span>' +
-      (b.stand === 'wacht' ? '<button class="knop p" data-bevestig="' + esc(b.id) + '">Bevestigen</button>' : '') +
+      (b.stand === 'wacht' ? '<button class="knop ds-knop ds-knop--klein p" data-bevestig="' + esc(b.id) + '">Bevestigen</button>' : '') +
       '</span></div>';
   }
 
   function teken(d) {
     $('mRahulTelling').textContent = d.aantal + (d.wacht ? ', ' + d.wacht + ' wacht' : '');
     $('mRahulBonnen').innerHTML = d.bonnen.length ? d.bonnen.map(bon).join('')
-      : '<p class="stil">Rahul heeft in deze zaak nog niets gedaan of voorgesteld.</p>';
+      : '<p class="stil ds-horeca-meta">Rahul heeft in deze zaak nog niets gedaan of voorgesteld.</p>';
     $('mRahulLet').textContent = d.let || '';
     K.bind($('mRahulBonnen'), 'bevestig', function (b) {
       api('/rahul/bevestig', { bonId: b.getAttribute('data-bevestig') }).then(function (r) {

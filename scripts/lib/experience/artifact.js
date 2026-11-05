@@ -55,7 +55,8 @@ function integrity(record, source, candidate, dimension, context = {}) {
     const observations = log.split(/\r?\n/).filter(line=>/^\s*# RTG_EXPERIENCE_OBSERVATION(?: |$)/.test(line))
       .map(line=>JSON.parse(line.replace(/^\s*# RTG_EXPERIENCE_OBSERVATION\s*/,'')));
     const relevant = observations.filter(value => value && value.subjectType === artifact.subjectType &&
-      value.subjectId === artifact.subjectId && value.dimension === artifact.dimension && value.requirement === artifact.requirement);
+      value.subjectId === artifact.subjectId && value.dimension === artifact.dimension && value.requirement === artifact.requirement &&
+      value.configurationHash === artifact.configurationHash);
     if (relevant.length !== 1 || !same(relevant[0],observation(artifact))) return 'BLOCKED';
     return record.status === 'PROVEN' ? 'VALID' : record.status;
   } catch (_) { return 'BLOCKED'; }

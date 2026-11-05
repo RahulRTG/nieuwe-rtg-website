@@ -20,18 +20,20 @@
          catalogus ook niet. Zonder poort blijft het zoals het was. */
       var poort = typeof w.RTGAppCatalogusPoort === 'function' ? w.RTGAppCatalogusPoort : null;
       data.apps.forEach(function (app) {
-        if (!app || !Object.prototype.hasOwnProperty.call(namen, app.world) || typeof app.name !== 'string' || typeof app.url !== 'string' || !/^\/apps\/(?:[\w-]+\/)*[\w-]+\.html(?:[?#][^\s]*)?$/.test(app.url) || gezien.has(app.url)) return;
+        var appPad = app && intern(app.url);
+        if (!app || !Object.prototype.hasOwnProperty.call(namen, app.world) || typeof app.name !== 'string' || !appPad || !/^\/apps\/(?:[\w-]+\/)*[\w-]+\.html(?:[?#][^\s]*)?$/.test(appPad) || gezien.has(appPad)) return;
         if (poort && poort(app.url) === false) return;
-        gezien.add(app.url);
+        gezien.add(appPad);
         if (!groepen[app.world]) {
           var groep = d.createElement('section'), kop = d.createElement('h3');
           groep.className = 'rtg-edge-group'; kop.textContent = namen[app.world]; groep.appendChild(kop);
           lijst.appendChild(groep); groepen[app.world] = groep;
         }
-        var a = d.createElement('a'), nr = d.createElement('span'), naam = d.createElement('b'), pijl = d.createElement('em');
-        a.href = app.url; a.dataset.search = (namen[app.world] + ' ' + app.name).toLowerCase();
-        a.dataset.catalogApp = app.id; nr.textContent = String(gezien.size).padStart(2, '0');
-        naam.textContent = app.name; pijl.textContent = '→'; a.append(nr, naam, pijl); groepen[app.world].appendChild(a);
+        var appLink = document.createElement('a');
+        var nr = d.createElement('span'), naam = d.createElement('b'), pijl = d.createElement('em');
+        appLink.href = '/apps/' + appPad.slice('/apps/'.length); appLink.dataset.search = (namen[app.world] + ' ' + app.name).toLowerCase();
+        appLink.dataset.catalogApp = app.id; nr.textContent = String(gezien.size).padStart(2, '0');
+        naam.textContent = app.name; pijl.textContent = '→'; appLink.append(nr, naam, pijl); groepen[app.world].appendChild(appLink);
       });
       melding.remove();
       var input = host.querySelector('.rtg-edge-find input');

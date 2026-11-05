@@ -1,0 +1,72 @@
+/* Bestaande Foundation-oefeningen: gevoel, ademritme en situatiekeuzes.
+   Gesprekken, toegang en toestemming blijven bij hun bestaande owners. */
+@layer rtg.component {
+  .ds-foundation-gevoelens {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-ruimte-3);
+  }
+  .ds-foundation-gezicht {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ds-ruimte-2);
+    min-inline-size: 0;
+    padding: var(--ds-ruimte-4);
+    color: var(--ds-accent);
+    background: var(--ds-oppervlak-zacht);
+    border: 2px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    white-space: normal;
+  }
+  .ds-foundation-gezicht svg { inline-size: 100%; max-inline-size: 5.5rem; block-size: auto; }
+  .ds-foundation-gezicht b { max-inline-size: 100%; color: var(--ds-inkt); font: inherit; overflow-wrap: anywhere; }
+  .ds-foundation-gezicht.gekozen { border-color: var(--ds-accent); box-shadow: inset 0 0 0 1px var(--ds-accent); }
+  .ds-foundation-dagboekdag { inline-size: 4rem; padding: var(--ds-ruimte-2); }
+  .ds-foundation-antwoord { overflow-wrap: anywhere; }
+  .ds-foundation-antwoord .zin { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); }
+  .ds-foundation-antwoord ul { padding-inline-start: var(--ds-ruimte-6); }
+  .ds-foundation-adem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ds-ruimte-3);
+  }
+  .ds-foundation-adembol {
+    display: grid;
+    place-items: center;
+    inline-size: min(9rem, 100%);
+    aspect-ratio: 1;
+    border: 2px solid var(--ds-accent);
+    border-radius: var(--ds-radius-cirkel);
+    background: var(--ds-oppervlak-zacht);
+    color: var(--ds-inkt);
+    transform: scale(.62);
+    transition: transform var(--ds-duur-adem) var(--ds-curve-adem);
+  }
+  .ds-foundation-adembol.uit { transform: scale(1); }
+  .ds-foundation-stap { display: flex; align-items: flex-start; gap: var(--ds-ruimte-3); }
+  .ds-foundation-stap p { margin: 0; min-inline-size: 0; }
+  .ds-foundation-stapnummer {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2rem;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: var(--ds-radius-cirkel);
+    background: var(--ds-accent);
+    color: var(--ds-accent-inkt);
+    font-weight: 700;
+  }
+  .ds-foundation-keuze { min-inline-size: 0; max-inline-size: 100%; justify-content: flex-start; text-align: start; white-space: normal; overflow-wrap: anywhere; }
+  /* De uitslag staat ook uitgeschreven in #uitleg; kleur is nooit het bewijs. */
+  .ds-foundation-keuze.goed { border: 2px solid var(--ds-accent); }
+  .ds-foundation-keuze.matig { border: 2px dashed var(--ds-accent); }
+  .ds-foundation-keuze.mis { border: 3px double var(--ds-inkt); }
+  @container ds (min-width: 34rem) {
+    .ds-foundation-gevoelens { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ds-foundation-adembol { transition: none; }
+  }
+}

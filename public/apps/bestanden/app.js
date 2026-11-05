@@ -58,11 +58,11 @@
   function pad() {
     var stap = [], m = (stand.mappen || []).find(function (x) { return x.id === hier; });
     while (m) { stap.unshift(m); m = (stand.mappen || []).find(function (x) { return x.id === m.ouder; }); }
-    var h = '<button type="button" data-ga="">Kluis</button>';
+    var h = '<button class="ds-knop" type="button" data-ga="">Kluis</button>';
     stap.forEach(function (s, i) {
       h += ' <span aria-hidden="true">/</span> ' + (i === stap.length - 1
         ? '<span class="hier">' + esc(s.naam) + '</span>'
-        : '<button type="button" data-ga="' + s.id + '">' + esc(s.naam) + '</button>');
+        : '<button class="ds-knop" type="button" data-ga="' + s.id + '">' + esc(s.naam) + '</button>');
     });
     $('#pad').innerHTML = h;
     Array.prototype.forEach.call($('#pad').querySelectorAll('[data-ga]'), function (el) {
@@ -72,14 +72,14 @@
   function rijtje(it) {
     var meta = [maat(it.bytes)];
     if (it.gewijzigd) meta.push('<span translate="no">' + esc(window.RTGDailyCopy.date(it.gewijzigd)) + '</span>');
-    if (it.ster) meta.push('<span class="goud">ster</span>');
+    if (it.ster) meta.push('<span class="goud ds-dag-goud">ster</span>');
     if (it.versies) meta.push(it.versies + (it.versies === 1 ? ' versie' : ' versies'));
     if ((it.gedeeldMet || []).length) meta.push('gedeeld met ' + it.gedeeldMet.length);
     if (!it.vanMij) meta.push('gedeeld met u');
-    if (it.weg) meta.push('<span class="goud">in de prullenbak</span>');
-    return '<div class="item' + (it.weg ? ' weg' : '') + '" data-open="' + it.id + '" role="button" tabindex="0">' +
-      '<span class="ext" aria-hidden="true">' + esc(extVan(it.naam, it.mime)) + '</span>' +
-      '<span class="wat"><b data-user-content>' + esc(it.naam) + '</b><span>' + meta.join(' · ') + '</span></span></div>';
+    if (it.weg) meta.push('<span class="goud ds-dag-goud">in de prullenbak</span>');
+    return '<div class="item' + (it.weg ? ' weg' : '') + ' ds-dag-item" data-open="' + it.id + '" role="button" tabindex="0">' +
+      '<span class="ext ds-dag-ext" aria-hidden="true">' + esc(extVan(it.naam, it.mime)) + '</span>' +
+      '<span class="wat ds-dag-wat"><b data-user-content>' + esc(it.naam) + '</b><span>' + meta.join(' · ') + '</span></span></div>';
   }
   function teken() {
     if (!stand) return;
@@ -100,18 +100,18 @@
     var mappen = bak || q ? [] : (stand.mappen || []).filter(function (m) { return (m.ouder || null) === (hier || null); });
     $('#dailyFolders').hidden = !mappen.length;
     $('#mappen').innerHTML = mappen.map(function (m) {
-      return '<span class="mapkaart" data-map="' + m.id + '" role="button" tabindex="0">' +
-        '<span class="mp" aria-hidden="true"></span><span data-user-content>' + esc(m.naam) + '</span>' + '</span>';
+      return '<span class="mapkaart ds-dag-mapkaart" data-map="' + m.id + '" role="button" tabindex="0">' +
+        '<span class="mp ds-dag-mp" aria-hidden="true"></span><span data-user-content>' + esc(m.naam) + '</span>' + '</span>';
     }).join('');
     Array.prototype.forEach.call(document.querySelectorAll('[data-map]'), function (el) {
       el.addEventListener('click', function () { hier = el.dataset.map; teken(); });
     });
     var eigen = (stand.items || []).filter(zeef).sort(orde);
-    $('#lijst').innerHTML = eigen.map(rijtje).join('') || '<p class="stil">' +
+    $('#lijst').innerHTML = eigen.map(rijtje).join('') || '<p class="stil ds-dag-stil">' +
       (bak ? 'De prullenbak is leeg.' : window.RTGDailyCopy.text(q ? 'noResults' : 'noFiles')) + '</p>';
     if (bak && eigen.length) {
-      $('#lijst').innerHTML += '<div class="rij h-mt50">' +
-        '<button class="knop" id="leegAlles" type="button">Prullenbak leegmaken</button></div>';
+      $('#lijst').innerHTML += '<div class="rij h-mt50 ds-dag-rij">' +
+        '<button class="knop ds-knop" id="leegAlles" type="button">Prullenbak leegmaken</button></div>';
       var la = $('#leegAlles');
       if (la) la.addEventListener('click', function () {
         if (!confirm('Alles in de prullenbak voorgoed weggooien?')) return;
@@ -126,9 +126,9 @@
     window.RTGDaily.render('bestanden', first ? 'empty' : 'ready', { retry: laad });
     $('#officeKop').style.display = office.length ? '' : 'none';
     $('#officeLijst').innerHTML = office.map(function (d) {
-      return '<a class="item s-1m37x9n" href="/apps/office.html">' +
-        '<span class="ext" aria-hidden="true">' + esc(d.soort) + '</span>' +
-        '<span class="wat"><b data-user-content>' + esc(d.titel) + '</b><span>RTG Office · ' + esc(String(d.gewijzigd || '').slice(0, 10)) + '</span></span></a>';
+      return '<a class="item s-1m37x9n ds-dag-item ds-dag-link" href="/apps/office.html">' +
+        '<span class="ext ds-dag-ext" aria-hidden="true">' + esc(d.soort) + '</span>' +
+        '<span class="wat ds-dag-wat"><b data-user-content>' + esc(d.titel) + '</b><span>RTG Office · ' + esc(String(d.gewijzigd || '').slice(0, 10)) + '</span></span></a>';
     }).join('');
     $('#quotumTekst').textContent = maat(stand.gebruik) + ' van ' + maat(stand.quotum) + ' gebruikt';
     $('#quotumBalk').style.width = Math.min(100, 100 * stand.gebruik / stand.quotum) + '%';
@@ -136,7 +136,6 @@
       el.addEventListener('click', function () { window.RTGBestandenPaneel.open(el.dataset.open); });
     });
   }
-
   /* ---- uploaden: kiezen of slepen; groot gaat in stukken ---- */
   function stuur(file, bid) {
     return window.RTGBestandUpload(file, api, { id: bid, map: hier });

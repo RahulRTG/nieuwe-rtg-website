@@ -24,9 +24,10 @@ test('de vier werelden gebruiken dezelfde verdiepende stijl op hun echte routes'
     if (html.includes('/ds/shell.js')) {
       assert.ok(html.includes('/ds/rtg-ds.css'), route + ' laadt het Design System');
       assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + klasse.split('-')[1] + '"'), route + ' houdt zijn wereld');
+      if(route==='public/apps/agenda.html'){assert.doesNotMatch(html,/\/shared\/rtg-daily(?:-rooms)?\.css/);assert.ok(lees('public/ds/rtg-ds.css').includes('componenten/dagkalender.css'));assert.ok(html.includes('/apps/agenda/kalender.js'));}
       continue;
     }
-    const stijl = route === 'public/apps/agenda.html' ? 'rtg-daily-rooms.css' : 'rtg-deep-flows-2026.css';
+    const stijl = 'rtg-deep-flows-2026.css';
     assert.ok(html.includes('/shared/' + stijl), route + ' laadt zijn huidige gedeelde stijl');
     assert.match(html, new RegExp(`class="[^"]*${klasse}`));
   }

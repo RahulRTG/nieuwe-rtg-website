@@ -60,8 +60,11 @@
     'html.rtg-in-frame body>header .ios-terug,html.rtg-in-frame body>header .terug,' +
     'html.rtg-in-frame body>header>a[href^="/apps/app.html"]' +
     '{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;}';
-  var st = document.createElement('style'); st.textContent = css;
-  (document.head || document.documentElement).appendChild(st);
+  if (ds) document.documentElement.classList.add('ds-basis');
+  else {
+    var st = document.createElement('style'); st.textContent = css;
+    (document.head || document.documentElement).appendChild(st);
+  }
 
   /* de gedeelde rustlaag: één ingetogen stijl die overal dezelfde kalmte legt
      (zachte, trage overgangen + een rustige focusrand). Als apart bestand zodat
@@ -95,7 +98,11 @@
   }
 
   function toost(t) {
-    var m = document.createElement('div'); m.className = 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;
+    var actueleDs = document.documentElement.hasAttribute('data-ds');
+    // Verbinding bezit op DS al de blijvende netwerkstatus. Basis blijft een
+    // terugval voor schermen die die owner niet laden, zonder dubbele melding.
+    if (actueleDs && window.RTGNet) return;
+    var m = document.createElement('div'); m.className = actueleDs ? 'ds-melding toon' : 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;
     document.body.appendChild(m);
     setTimeout(function () { if (m.parentNode) m.parentNode.removeChild(m); }, 3500);
   }

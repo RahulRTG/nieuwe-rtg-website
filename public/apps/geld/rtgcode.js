@@ -93,23 +93,26 @@
      bedient de camera en rtgcode.js duidt wat er gescand is. Elk bestand zet
      zijn eigen globale; wie er al staat (of ooit alsnog vast in geld.html
      komt) wordt overgeslagen, dus dit kan geen tweede kopie opleveren. */
-  var SCAN = [
-    ['/shared/media.js', 'RTGMedia'],
-    ['/shared/qrscan.js', 'RTGQRScan'],
-    ['/shared/scanner.js', 'RTGScanner'],
-    ['/shared/rtgcode.js', 'RTGCode']
-  ];
   function laad(pad) {
     return new Promise(function (ok, nee) {
-      var s = d.createElement('script');
+      var s = document.createElement('script');
       s.src = pad;
       s.onload = function () { ok(); };
       s.onerror = function () { nee(new Error('Kon ' + pad + ' niet laden.')); };
-      d.head.appendChild(s);
+      document.head.appendChild(s);
     });
   }
   function scanKlaar() {
-    return Promise.all(SCAN.map(function (p) { return w[p[1]] ? null : laad(p[0]); }));
+    /* Expliciete, vaste eigenaars: de laadgraaf en een reviewer kunnen nu
+       aantonen welke vier scripts deze stand bijlaadt. Een array met pad en
+       global maakte dezelfde runtime veilig, maar verborg die relatie voor
+       statische bewijsvoering. */
+    return Promise.all([
+      w.RTGMedia ? null : laad('/shared/media.js'),
+      w.RTGQRScan ? null : laad('/shared/qrscan.js'),
+      w.RTGScanner ? null : laad('/shared/scanner.js'),
+      w.RTGCode ? null : laad('/shared/rtgcode.js')
+    ]);
   }
 
   Deel.rtgcode = { plaats: plaats, scanKlaar: scanKlaar };

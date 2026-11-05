@@ -96,7 +96,6 @@
   }
 
   function start() {
-    M.stijl();
     M.stand = null;
     var wrap = $('#mcWrap');
     wrap.addEventListener('click', klik);

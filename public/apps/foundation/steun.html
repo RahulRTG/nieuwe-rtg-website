@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -9,77 +9,54 @@
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
-<link rel="stylesheet" href="stijl.css">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="palet.js"></script>
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
-  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
-  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
-  .blok{padding:1.2rem;margin-bottom:1.2rem;}
-  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
-  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
-  .moods{display:flex;gap:.5rem;flex-wrap:wrap;}
-  .moods button{flex:1;min-width:4rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.7rem .3rem;font-size:1.6rem;transition:border-color .12s,transform .12s;}
-  .moods button:hover{border-color:var(--goud);transform:translateY(-2px);}
-  .moods button.aan{border-color:var(--goud);background:#241f16;}
-  .moods .lb{display:block;font-size:.66rem;color:var(--zacht);margin-top:.25rem;}
-  .reactie{margin-top:.9rem;line-height:1.55;font-size:.95rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.8rem 1rem;}
-  .verloop{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.8rem;}
-  .verloop span{font-size:1.1rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.2rem .4rem;}
-  .knoprij{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem;}
-  .noodkaart{background:#1a1512;border:1px solid var(--rood);border-radius:0;padding:1rem 1.1rem;line-height:1.55;font-size:.92rem;}
-  .noodkaart b{color:#e9a;}
-  .privaat{font-size:.8rem;color:var(--zacht);margin-top:.6rem;}
-</style>
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/ios.css" rel="stylesheet">
-<link rel="stylesheet" href="premium.css">
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
-<div id="balk"></div>
-<div class="wrap" role="main">
-  <h1>Steun voor jou</h1>
-  <div class="intro">Jij zorgt voor iedereen, maar jij telt ook. Neem hier even een moment voor jezelf: kijk hoe het met je gaat, praat je hart even leeg, en weet waar je terecht kunt.</div>
+<body class="ds-scherm ds-foundation" data-ds-schermtype="taak" data-ds-nadruk="gereedschap" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<div id="balk" class="ds-foundation-balk" role="banner"></div>
+<main class="wrap ds-taak ds-foundation-inhoud" id="main">
+  <h1 class="ds-titel ds-titel--scherm">Steun voor jou</h1>
+  <div class="intro ds-lead">Jij zorgt voor iedereen, maar jij telt ook. Neem hier even een moment voor jezelf: kijk hoe het met je gaat, praat je hart even leeg, en weet waar je terecht kunt.</div>
 
-  <div class="kaart blok">
-    <h2>Hoe gaat het echt met jou?</h2>
-    <div class="h">Tik aan wat past. Dit blijft privé op je eigen toestel; niemand anders ziet het.</div>
-    <div class="moods" id="moods">
-      <button data-m="4"><div></div><span class="lb">goed</span></button>
-      <button data-m="3"><div></div><span class="lb">oké</span></button>
-      <button data-m="2"><div></div><span class="lb">gaat wel</span></button>
-      <button data-m="1"><div></div><span class="lb">zwaar</span></button>
-      <button data-m="0"><div></div><span class="lb">moeilijk</span></button>
+  <div class="kaart blok ds-kaart ds-foundation-blok">
+    <h2 class="ds-titel ds-titel--sectie">Hoe gaat het echt met jou?</h2>
+    <div class="h ds-meta">Tik aan wat past. Dit blijft privé op je eigen toestel; niemand anders ziet het.</div>
+    <div class="moods ds-foundation-stemming" id="moods">
+      <button class="ds-knop ds-knop--stil" aria-pressed="false" data-m="4"><div></div><span class="lb">goed</span></button>
+      <button class="ds-knop ds-knop--stil" aria-pressed="false" data-m="3"><div></div><span class="lb">oké</span></button>
+      <button class="ds-knop ds-knop--stil" aria-pressed="false" data-m="2"><div></div><span class="lb">gaat wel</span></button>
+      <button class="ds-knop ds-knop--stil" aria-pressed="false" data-m="1"><div></div><span class="lb">zwaar</span></button>
+      <button class="ds-knop ds-knop--stil" aria-pressed="false" data-m="0"><div></div><span class="lb">moeilijk</span></button>
     </div>
-    <div class="reactie" id="reactie" hidden></div>
-    <div class="verloop" id="verloop"></div>
-    <div class="privaat" id="privaat"></div>
+    <div class="reactie ds-foundation-reactie" id="reactie" hidden></div>
+    <div class="verloop ds-foundation-verloop" id="verloop"></div>
+    <div class="privaat ds-meta" id="privaat"></div>
   </div>
 
-  <div class="kaart blok">
-    <h2>Even je hart luchten</h2>
-    <div class="h">Nora is een luisterend oor. Geen therapeut, wel altijd rustig en zonder oordeel. Wat je typt wordt niet bewaard.</div>
-    <div class="chat" id="chat"><div class="b ai">Hoi, fijn dat je er even voor jezelf bent. Vertel me hoe het met je gaat; ik luister. Je hoeft niks moois te maken van je woorden.</div></div>
-    <div class="rijveld">
-      <textarea class="veld" id="vraag" rows="1" placeholder="Typ wat er in je omgaat..." maxlength="1000"></textarea>
-      <button class="knop" id="stuur">Deel</button>
+  <div class="kaart blok ds-kaart ds-foundation-blok">
+    <h2 class="ds-titel ds-titel--sectie">Even je hart luchten</h2>
+    <div class="h ds-meta">Nora is een luisterend oor. Geen therapeut, wel altijd rustig en zonder oordeel. Wat je typt wordt niet bewaard.</div>
+    <div role="log" aria-live="polite" aria-label="Gesprek met de coach" class="chat ds-gesprek__stroom ds-foundation-chat" id="chat"><div class="b ai ds-gesprek__bericht">Hoi, fijn dat je er even voor jezelf bent. Vertel me hoe het met je gaat; ik luister. Je hoeft niks moois te maken van je woorden.</div></div>
+    <div class="rijveld ds-vraagrij ds-foundation-vraag">
+      <textarea aria-label="Je vraag" class="veld ds-invoer ds-invoer--tekst" id="vraag" rows="1" placeholder="Typ wat er in je omgaat..." maxlength="1000"></textarea>
+      <button class="knop ds-knop ds-knop--primair" id="stuur">Deel</button>
     </div>
-    <div class="knoprij h-mt80"><a class="knop grijs klein" href="rust.html">Even ademen</a></div>
+    <div class="knoprij h-mt80 ds-foundation-acties ds-foundation-afstand"><a class="knop grijs klein ds-knop ds-knop--stil ds-knop--klein" href="rust.html">Even ademen</a></div>
   </div>
 
-  <div class="kaart blok">
-    <h2>Wanneer het te veel wordt</h2>
-    <div class="noodkaart">
+  <div class="kaart blok ds-kaart ds-foundation-blok">
+    <h2 class="ds-titel ds-titel--sectie">Wanneer het te veel wordt</h2>
+    <div class="noodkaart ds-foundation-regel">
       <p>Je hoeft het niet alleen te dragen. Praat met je <b>huisarts</b>; die helpt of verwijst je door, ook bij stress en somberheid.</p>
-      <p class="h-mt60">Even iemand nodig? Bel of chat gratis en anoniem met <b>MIND Korrelatie</b> (mindkorrelatie.nl).</p>
-      <p class="h-mt60">Zie je het echt niet meer zitten? Bel dag en nacht, gratis: <b>113 Zelfmoordpreventie, 0800-0113</b>. Bij direct gevaar: <b>112</b>.</p>
+      <p class="h-mt60 ds-foundation-afstand">Even iemand nodig? Bel of chat gratis en anoniem met <b>MIND Korrelatie</b> (mindkorrelatie.nl).</p>
+      <p class="h-mt60 ds-foundation-afstand">Zie je het echt niet meer zitten? Bel dag en nacht, gratis: <b>113 Zelfmoordpreventie, 0800-0113</b>. Bij direct gevaar: <b>112</b>.</p>
     </div>
   </div>
-</div>
+</main>
 
 <script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
@@ -122,7 +99,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 $('#moods').querySelectorAll('button').forEach(b=>{
   b.onclick=()=>{
     const m=Number(b.dataset.m);
-    $('#moods').querySelectorAll('button').forEach(x=>x.classList.toggle('aan',x===b));
+    $('#moods').querySelectorAll('button').forEach(x=>{ x.classList.toggle('aan',x===b); x.setAttribute('aria-pressed', String(x===b)); });
     $('#reactie').textContent = REACTIES[m]; $('#reactie').hidden=false;
     let log=[]; try{ log=JSON.parse(localStorage.getItem(MKEY)||'[]'); }catch(e){}
     log.push({ m, d:new Date().toISOString().slice(0,10) }); log=log.slice(-60);
@@ -143,7 +120,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
-<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>

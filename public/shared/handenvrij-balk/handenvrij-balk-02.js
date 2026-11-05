@@ -69,13 +69,17 @@
     naStand: null, camera: null         // vult handenvrij-scherm.js / -oog.js in
   };
   root.__handenvrijKamer = kamer;
-  ['/shared/handenvrij-chat.js', '/shared/handenvrij-geld.js', '/shared/handenvrij-mond.js',
-    '/shared/handenvrij-scherm.js', '/shared/handenvrij-oog.js',
-    '/shared/handenvrij-bureau.js'].forEach(function (src) {
-    var el = document.createElement('script');
-    el.src = src; el.defer = true;
-    document.head.appendChild(el);
-  });
+  function laadHandenvrijOnderdeel(src) {
+    var handenvrijScriptNode = document.createElement('script');
+    handenvrijScriptNode.src = src; handenvrijScriptNode.defer = true;
+    document.head.appendChild(handenvrijScriptNode);
+  }
+  laadHandenvrijOnderdeel('/shared/handenvrij-chat.js');
+  laadHandenvrijOnderdeel('/shared/handenvrij-geld.js');
+  laadHandenvrijOnderdeel('/shared/handenvrij-mond.js');
+  laadHandenvrijOnderdeel('/shared/handenvrij-scherm.js');
+  laadHandenvrijOnderdeel('/shared/handenvrij-oog.js');
+  laadHandenvrijOnderdeel('/shared/handenvrij-bureau.js');
 
   // wat een pagina zelf aanmeldt, gaat voor op wat we uit de DOM oprapen
   api.plek = function (naam, doen) { if (naam && typeof doen === 'function') eigen.push({ naam: String(naam), doen: doen }); };

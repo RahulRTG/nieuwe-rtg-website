@@ -32,6 +32,10 @@ const WORTEL = path.join(__dirname, '..');
 // Metadata verklaart de benodigde context; zij levert zelf geen bewijs.
 // Nieuwe concrete contexten vragen een expliciet contract en consumentproef.
 function contractMetadata(naam, waarde) {
+  if (naam === 'navigatielinks') {
+    assert.equal(require('../scripts/appwerkt').controleerNavigatielinks(waarde), null, 'navigatielinks moet een begrensd bestemmingscontract zijn');
+    return true;
+  }
   if (naam === 'bevoegdContext') {
     assert.equal(typeof waarde, 'string', 'bevoegdContext moet een contextnaam zijn');
     assert.ok(['gezin', 'school:docent', 'school:leerling', 'publieke-inhoud', 'lokale-navigatie',

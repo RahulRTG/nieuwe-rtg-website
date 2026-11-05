@@ -1,0 +1,83 @@
+/* Presentatie van de bestaande standalone wereldwerkruimte. De runtime,
+   catalogus, widgets, iframe en domein-DOM houden hun bestaande eigenaar. */
+@layer rtg.component {
+  .ds-wereldwerkruimte .wd-shell { position: relative; z-index: 1; min-inline-size: 0; }
+  .ds-wereldwerkruimte .wd-page { position: relative; min-inline-size: 0; container: ds / inline-size; }
+  .ds-wereldwerkruimte .wd-home { min-inline-size: 0; }
+  .ds-wereldwerkruimte .wd-page[data-rtg-canvas-surface] {
+    display: flex; flex-direction: column; min-block-size: 0;
+    block-size: max(35rem,calc(100dvh - 15rem)); overflow: hidden;
+  }
+  .ds-wereldwerkruimte .wd-page[data-rtg-canvas-surface]>:is(main,[data-rtg-native-canvas],[data-rtg-screen-root]) {
+    flex: 1; min-block-size: 0; overflow: auto; overscroll-behavior: contain;
+  }
+  .ds-wereldwerkruimte .wd-greeting { margin: 0; }
+  .ds-wereldwerkruimte .wd-greeting h1 { margin: 0; font: 400 var(--ds-maat-kop)/1.2 var(--ds-letter-display); }
+  .ds-wereldwerkruimte .wd-greeting :is(time,p) { display: none; }
+  .ds-wereldwerkruimte .wd-muted, .ds-wereldwerkruimte .wd-widget-empty,
+  .ds-wereldwerkruimte .wd-capability-subject, .ds-wereldwerkruimte .wd-widget-updated {
+    color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); overflow-wrap: anywhere;
+  }
+  .ds-wereldwerkruimte :is(.wd-people,.wd-favorites,.wd-library) { min-inline-size: 0; }
+  .ds-wereldwerkruimte :is(.wd-people h3,.wd-favorites>h2,.wd-library-heading h2) {
+    margin-block: 0 var(--ds-ruimte-4); font: 500 var(--ds-maat-tekst)/1.4 var(--ds-letter-tekst);
+  }
+  .ds-wereldwerkruimte .wd-people .rtg-module-head-tools { display: none; }
+  .ds-wereldwerkruimte .wd-people h4 { margin-block: var(--ds-ruimte-6) var(--ds-ruimte-2); }
+  .ds-wereldwerkruimte .wd-person { display: flex; align-items: center; gap: var(--ds-ruimte-3); min-block-size: var(--ds-doel); padding-block: var(--ds-ruimte-3); color: var(--ds-inkt); text-decoration: none; overflow-wrap: anywhere; }
+  .ds-wereldwerkruimte .wd-person :is(strong,.wd-muted) { display: block; }
+  .ds-wereldwerkruimte .wd-avatar { display: grid; place-items: center; flex: 0 0 2.25rem; inline-size: 2.25rem; block-size: 2.25rem; border-radius: var(--ds-radius-cirkel); background: var(--ds-oppervlak-zacht); }
+  .ds-wereldwerkruimte :is(.wd-text-button,.wd-primary,.wd-frame-retry,.wd-pages button,.wd-filters button,.wd-filters select,.wd-search) {
+    min-block-size: var(--ds-doel); min-inline-size: 0; max-inline-size: 100%; padding: var(--ds-ruimte-2) var(--ds-ruimte-3);
+    border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); background: var(--ds-oppervlak); color: var(--ds-inkt); font: inherit;
+  }
+  .ds-wereldwerkruimte :is(.wd-text-button,.wd-primary,.wd-frame-retry,.wd-pages button,.wd-filters button) { cursor: pointer; }
+  .ds-wereldwerkruimte .wd-primary { display: block; inline-size: 100%; margin-block: var(--ds-ruimte-3); }
+  .ds-wereldwerkruimte :is(.wd-pages button,.wd-date-nav button):disabled { opacity: .5; cursor: default; }
+  .ds-wereldwerkruimte .wd-library-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-4); margin-block-end: var(--ds-ruimte-4); }
+  .ds-wereldwerkruimte .wd-app-controls { max-inline-size: 100%; font-size: var(--ds-maat-klein); }
+  .ds-wereldwerkruimte .wd-app-controls>summary { min-block-size: var(--ds-doel); cursor: pointer; }
+  .ds-wereldwerkruimte .wd-app-controls[open] { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+  .ds-wereldwerkruimte .wd-search-label { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); }
+  .ds-wereldwerkruimte .wd-search { display: block; inline-size: 13rem; }
+  .ds-wereldwerkruimte .wd-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-2); }
+  .ds-wereldwerkruimte .wd-filters button[aria-pressed="true"] { border-color: var(--ds-accent); color: var(--ds-accent); }
+  .ds-wereldwerkruimte .wd-catalog { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--ds-ruimte-4); }
+  .ds-wereldwerkruimte .wd-library[data-view="list"] .wd-catalog { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ds-wereldwerkruimte .wd-app-photo { position: relative; overflow: hidden; aspect-ratio: 1.6; border-radius: var(--ds-radius-beeld); }
+  .ds-wereldwerkruimte .wd-app-photo>img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .ds-wereldwerkruimte .wd-app-shortcut .wd-widget-content { display: none; }
+  .ds-wereldwerkruimte .wd-app-shortcut .wd-widget-pin { inset-block-start: var(--ds-ruimte-2); inset-inline-start: var(--ds-ruimte-2); inset-inline-end: auto; }
+  .ds-wereldwerkruimte .wd-pages { display: flex; align-items: center; justify-content: center; gap: var(--ds-ruimte-4); }
+  .ds-wereldwerkruimte .wd-focus { min-inline-size: 0; overflow: hidden; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); background: var(--ds-oppervlak); }
+  .ds-wereldwerkruimte .wd-focus-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-4); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-wereldwerkruimte .wd-focus-head h2 { margin: 0; margin-inline-end: auto; font: 500 var(--ds-maat-kop)/1.2 var(--ds-letter-display); }
+  .ds-wereldwerkruimte .wd-app-frame { display: block; inline-size: 100%; block-size: max(28rem,calc(100dvh - 14rem)); border: 0; background: var(--ds-grond); }
+  .ds-wereldwerkruimte :is(.wd-frame-notice,.wd-direct,.wd-frame-retry) { margin: var(--ds-ruimte-4); }
+  .ds-wereldwerkruimte .wd-direct { display: inline-block; color: var(--ds-accent); }
+  .ds-wereldwerkruimte :is(.wd-announcement,.wd-access) { padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak); }
+  .ds-wereldwerkruimte .wp-tabs { display: none; }
+  .ds-wereldwerkruimte .wp-atmosphere { position: absolute; inset-block-start: 0; inset-inline: 0; block-size: 11rem; overflow: hidden; pointer-events: none; z-index: 0; mask-image: linear-gradient(var(--ds-inkt),transparent); }
+  .ds-wereldwerkruimte .wp-atmosphere>img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+  @media (min-width: 1000px) {
+    .ds-wereldwerkruimte .wd-shell { display: grid; grid-template-columns: minmax(10rem,1fr) minmax(0,3fr) minmax(12rem,1.25fr); align-items: start; gap: var(--ds-ruimte-6); margin: var(--ds-ruimte-6); margin-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); }
+    .ds-wereldwerkruimte .wd-people { grid-column: 1; grid-row: 1 / 5; padding-inline-end: var(--ds-ruimte-4); border-inline-end: 1px solid var(--ds-lijnkleur); }
+    .ds-wereldwerkruimte .wd-favorites { grid-column: 3; grid-row: 1 / 3; padding-inline-start: var(--ds-ruimte-4); border-inline-start: 1px solid var(--ds-lijnkleur); }
+    .ds-wereldwerkruimte .wd-greeting { grid-column: 2; grid-row: 1; }
+    .ds-wereldwerkruimte :is(.wd-home,.wd-focus,.wd-access) { grid-column: 2; grid-row: 2; }
+    .ds-wereldwerkruimte :is(.wd-library,.wd-announcement) { grid-column: 2 / -1; border-block-start: 1px solid var(--ds-lijnkleur); padding-block-start: var(--ds-ruimte-4); }
+  }
+  @media (max-width: 999px) {
+    /* De bestaande responsive-owner toont mobiel uitsluitend het domein. */
+    .ds-wereldwerkruimte .wd-shell, .ds-wereldwerkruimte .wd-page { display: contents; }
+    .ds-wereldwerkruimte .wd-page[data-rtg-canvas-surface] {
+      display: flex; position: fixed; inset-inline: 0;
+      inset-block: env(safe-area-inset-top,0px) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-3) + env(safe-area-inset-bottom,0px));
+      block-size: auto;
+    }
+    .ds-wereldwerkruimte .wd-shell>:is(.wd-greeting,.wd-people,.wd-favorites,.wd-library), .ds-wereldwerkruimte .wp-atmosphere { display: none; }
+    .ds-wereldwerkruimte .wd-focus { position: fixed; inset-block: var(--ds-ruimte-3) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6)); inset-inline: var(--ds-ruimte-2); z-index: 2; display: flex; flex-direction: column; }
+    .ds-wereldwerkruimte .wd-app-frame { flex: 1; min-block-size: 0; block-size: 100%; }
+    .ds-wereldwerkruimte .wd-focus-head h2 { font-size: var(--ds-maat-tekst); }
+  }
+}

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <script src="/shared/stroom.js"></script>
@@ -8,82 +8,75 @@
 <title>RTG Horeca: expeditie</title>
 <link rel="icon" href="/icon.svg">
 <meta name="theme-color" content="#0C0C0B">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/zaakscherm.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
+
+
+
+
+
 <script src="/shared/glyf.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/workos-premium.css" rel="stylesheet">
-<link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-12sanwk:not(#_#_#_){flex:0 1 6rem}
-.s-12sbaw3:not(#_#_#_){flex:0 1 7rem}
-</style>
+
+
+<script src="/shared/horeca-enterprise.js" defer></script>
+<script src="/shared/appmenu.js" defer></script>
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet"><script src="/ds/shell.js"></script>
 </head>
-<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
+<body class="ds-scherm ds-horeca" data-workos-premium data-workos-home="/apps/horeca.html" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-layout="standard">
 <header>
-  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
-  <span><span class="ey">RTG Horeca</span><h1>Expeditie en keukenregie</h1></span>
-  <span class="h-flex1"></span>
-  <button class="knop" id="eVerversNu" type="button">Ververs</button>
+  <a class="terug ds-knop ds-knop--klein" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey ds-horeca-label">RTG Horeca</span><h1>Expeditie en keukenregie</h1></span>
+  <span class="h-flex1 ds-horeca-groei"></span>
+  <button class="knop ds-knop ds-knop--klein" id="eVerversNu" type="button">Ververs</button>
 </header>
 <main id="main">
-  <div class="kpis">
-    <div class="kpi"><b id="eOpen">-</b><span>op het bord</span></div>
-    <div class="kpi"><b id="eLaat">-</b><span>te laat</span></div>
-    <div class="kpi"><b id="eGereed">-</b><span>tafels gereed</span></div>
-    <div class="kpi"><b id="eWacht">-</b><span>wachttijd</span></div>
+  <div class="kpis ds-horeca-kpis">
+    <div class="kpi ds-horeca-kpi"><b id="eOpen">-</b><span>op het bord</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="eLaat">-</b><span>te laat</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="eGereed">-</b><span>tafels gereed</span></div>
+    <div class="kpi ds-horeca-kpi"><b id="eWacht">-</b><span>wachttijd</span></div>
   </div>
 
   <!-- BOVEN "aan de pas", want dit is het enige op dit scherm waar tijd
        doorheen loopt: eten dat klaar staat wordt koud. Wat nog in de keuken
        ligt, loopt niet weg. -->
-  <div class="kaart">
-    <div class="kop">Klaar om te dragen (<span id="ePasAantal">0</span><span id="ePasVrijVak" hidden>, waarvan <span id="ePasVrij">0</span> nog van niemand</span>)</div>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Klaar om te dragen (<span id="ePasAantal">0</span><span id="ePasVrijVak" hidden>, waarvan <span id="ePasVrij">0</span> nog van niemand</span>)</div>
     <div id="ePas"></div>
-    <p class="stil h-mt50">Alleen complete gangen: een gang gaat samen de deur uit. Oppakken is geen uitgeven &mdash; de borden blijven op &quot;klaar&quot; staan tot een mens ze uitgeeft.</p>
+    <p class="stil ds-horeca-meta h-mt50 ds-horeca-afstand">Alleen complete gangen: een gang gaat samen de deur uit. Oppakken is geen uitgeven &mdash; de borden blijven op &quot;klaar&quot; staan tot een mens ze uitgeeft.</p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Aan de pas</div>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Aan de pas</div>
     <div id="eRegie"></div>
-    <p class="stil h-mt50">Staat-koud is het aantal minuten dat het eerste bord van een tafel al klaar staat terwijl de rest nog loopt. Uitgeven blijft een handeling van een mens: er wordt hier niets automatisch afgevinkt.</p>
+    <p class="stil ds-horeca-meta h-mt50 ds-horeca-afstand">Staat-koud is het aantal minuten dat het eerste bord van een tafel al klaar staat terwijl de rest nog loopt. Uitgeven blijft een handeling van een mens: er wordt hier niets automatisch afgevinkt.</p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Drukterem</div>
-    <div class="rij">
-      <input class="veld s-12sanwk" id="eKokken" type="number" min="1" max="60" value="3" aria-label="Aantal koks">
-      <button class="knop" id="eDruk" type="button">Herbereken</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Drukterem</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer s-12sanwk" id="eKokken" type="number" min="1" max="60" value="3" aria-label="Aantal koks">
+      <button class="knop ds-knop ds-knop--klein" id="eDruk" type="button">Herbereken</button>
     </div>
-    <p class="stil h-mt40" id="eDrukUit"></p>
-    <p class="stil" id="eWaarschuwing"></p>
-    <p class="stil">Dit is een advies met de rekensom erbij. Het systeem zet zelf niets dicht: een systeem dat op de drukste avond van het jaar de bestellingen dichtzet, sluit de omzet af. Dat besluit hoort bij de chef.</p>
+    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand" id="eDrukUit"></p>
+    <p class="stil ds-horeca-meta" id="eWaarschuwing"></p>
+    <p class="stil ds-horeca-meta">Dit is een advies met de rekensom erbij. Het systeem zet zelf niets dicht: een systeem dat op de drukste avond van het jaar de bestellingen dichtzet, sluit de omzet af. Dat besluit hoort bij de chef.</p>
   </div>
 
-  <div class="kaart">
-    <div class="kop">Bereidingstijd vastleggen</div>
-    <div class="rij">
-      <input class="veld" id="eGerecht" maxlength="80" placeholder="Gerecht" aria-label="Gerecht">
-      <input class="veld s-12sbaw3" id="eMinuten" type="number" min="1" max="180" placeholder="Minuten" aria-label="Minuten">
-      <button class="knop p" id="eTijd" type="button">Vastleggen</button>
+  <div class="kaart ds-kaart ds-horeca-kaart">
+    <div class="kop ds-horeca-kop">Bereidingstijd vastleggen</div>
+    <div class="rij ds-horeca-rij">
+      <input class="veld ds-invoer" id="eGerecht" maxlength="80" placeholder="Gerecht" aria-label="Gerecht">
+      <input class="veld ds-invoer s-12sbaw3" id="eMinuten" type="number" min="1" max="180" placeholder="Minuten" aria-label="Minuten">
+      <button class="knop ds-knop ds-knop--klein p" id="eTijd" type="button">Vastleggen</button>
     </div>
-    <p class="stil h-mt40">Zonder eigen tijd rekent het bord met een standaard per station. Wat hier staat, maakt het vertragingssignaal pas scherp.</p>
+    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">Zonder eigen tijd rekent het bord met een standaard per station. Wat hier staat, maakt het vertragingssignaal pas scherp.</p>
   </div>
 </main>
-<div class="melding" id="melding" role="status"></div>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/expeditie.js"></script>

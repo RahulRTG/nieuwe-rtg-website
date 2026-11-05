@@ -14,9 +14,10 @@ function fixture(t,change={}) {
   t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
   const put=(name,body)=>{const file=path.join(root,name);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,body);};
   const local=structuredClone(contract),binding=local.executedProofs[0];
+  local.executedProofs=[binding]; // deze protocollen bewaken uitsluitend het bestaande 390×844-type
   if(change.binding)change.binding(binding);
   put('experience-architecture/coverage-contract.json',JSON.stringify(local));
-  put('experience-architecture/signatures.json',JSON.stringify({version:1,apps:{},screens:{}}));
+  put('experience-architecture/signatures.json',JSON.stringify({version:1,apps:{},screens:change.signature?{'/apps/hotels.html':change.signature}:{}}));
   put('test/hotels-ds.e2e.js','// protocolfixture; geen browserproef\n');
   let post=false;
   t.mock.method(evidence,'candidate',()=>({ok:!(post&&change.dirty),commit:post&&change.commit?'other':'candidate'}));
@@ -53,11 +54,15 @@ test('uitvoerder bezit alleen haar eigen exacte deelbewijs; import verkrijgt noo
   assert.equal(f.assess(imported).reason,'AUTHORITATIVE_EXECUTION_AND_TYPED_REQUIREMENT_BINDING_MISSING');
   record.method='visual';assert.equal(f.assess(record).scopedStatus,undefined);
 });
-test('coverage neemt de deelcel op zonder requirement, dimensie of scherm groen te maken',t=>{
-  const f=fixture(t),r=f.run(),record=r.coverage.records[0];
+test('coverage neemt de deelcel met geldige signature op zonder requirement, dimensie of scherm groen te maken',t=>{
+  const signature=require('../experience-architecture/signatures.json').screens['/apps/hotels.html'];
+  const f=fixture(t,{signature}),r=f.run(),record=r.coverage.records[0];
   const report=coverage.build(f.root,{apps:[],screens:[{id:'screen:/apps/hotels.html',route:'/apps/hotels.html',profile:'interface',world:'travel'}],
     evidence:r.coverage,sourceHash:record.sourceHash,commit:record.commit});
   const continuity=report.screens[0].dimensions.find(d=>d.id==='continuity');
+  assert.equal(report.screens[0].signature.status,'DECLARED');
+  assert.equal(continuity.configurationCoverage[0].requiredCellCount,180);
+  assert.equal(continuity.configurationCoverage[0].mappedCellCount,0,'normal-deelcel is nog geen gebonden matrixcel');
   assert.equal(continuity.scopedProofs.length,1);assert.equal(continuity.scopedProofs[0].status,'PROVEN_IN_SCOPE');
   assert.equal(continuity.provenCount,0);assert.notEqual(continuity.status,'PROVEN');
   assert.equal(report.summary.screens.proven,0);assert.notEqual(report.status,'PROVEN');

@@ -65,14 +65,29 @@
     return k;
   }
 
-  (async () => {
-    if (!token) { $('#vPoort').hidden = false; return; }
-    const r = await fetch('/api/supplier/ghost', { method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
-      .then(async x => ({ status: x.status, body: await x.json().catch(() => ({})) }));
-    if (r.status !== 200) { $('#vPoort').hidden = false; return; }
-    const d = r.body;
-    GHOST = d;
+  function status(titel, tekst, opnieuw = false, zaak = false) {
+    $('#vStatusTitel').textContent = titel;
+    $('#vStatusTekst').textContent = tekst;
+    $('#ghostHerstel').hidden = !opnieuw;
+    $('#ghostZaak').hidden = !zaak;
+    $('#vStatus').hidden = false;
+  }
+
+  /* Ontbrekende voorspellingen zijn onbekend, nooit "rustig rijden". Alleen
+     de velden die dit scherm gebruikt worden gecontroleerd; de server rekent. */
+  function volledig(d) {
+    return d && Number.isFinite(d.horizonUren) && typeof d.stad === 'string' &&
+      Number.isFinite(d.drempel) && typeof d.toelichting === 'string' &&
+      Array.isArray(d.knooppunten) && d.knooppunten.every(p => typeof p === 'string') &&
+      Array.isArray(d.uurbeeld) && d.uurbeeld.length > 0 &&
+      d.uurbeeld.every(u => u && typeof u.tijd === 'string' && Number.isFinite(u.kans)) &&
+      Array.isArray(d.waarschuwingen) && d.waarschuwingen.every(w => w &&
+        typeof w.tijd === 'string' && typeof w.knooppunt === 'string' && Number.isFinite(w.kans) &&
+        typeof w.advies === 'string' && (!w.oorzaken || Array.isArray(w.oorzaken)) && w.simulatie &&
+        ['zonderAdvies', 'metAdvies', 'winst'].every(k => typeof w.simulatie[k] === 'string'));
+  }
+
+  function toon(d) {
     $('#uitleg').textContent = 'De Ghost Driver rijdt de komende ' + d.horizonUren + ' uur alvast door ' + d.stad +
       ' en meldt uren van tevoren waar het vast dreigt te lopen.';
     const kn = d.knooppunten.slice(0, 8);
@@ -92,6 +107,56 @@
       lijst.appendChild(maak('p', 'ds-meta', 'De komende ' + d.horizonUren + ' uur ziet de spookrit nergens een opstopping aankomen. Rustig rijden.'));
     }
     for (const w of d.waarschuwingen) lijst.appendChild(waarschuwing(w));
+    GHOST = d;
+    $('#vStatus').hidden = true;
     $('#vGhost').hidden = false;
-  })();
+  }
+
+  let bezig = false;
+  async function laad() {
+    if (bezig) return;
+    GHOST = null;
+    $('#vGhost').hidden = true;
+    $('#vPoort').hidden = true;
+    $('#vStatus').hidden = true;
+    if (!token) { $('#vPoort').hidden = false; return; }
+    bezig = true;
+    $('#ghostHerstel').disabled = true;
+    status('De spookrit kijkt vooruit…', 'De verkeersverwachting wordt opgehaald.');
+    try {
+      let r;
+      try {
+        r = await fetch('/api/supplier/ghost', { method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' });
+      } catch (e) {
+        status('Geen verbinding met de Ghost Driver', 'De verkeersverwachting kon niet worden opgehaald. Controleer uw verbinding en probeer opnieuw.', true);
+        return;
+      }
+      if (r.status === 401) {
+        $('#vStatus').hidden = true;
+        $('#vPoort').hidden = false;
+        return;
+      }
+      const d = await r.json().catch(() => null);
+      if (r.status === 403 || r.status === 402) {
+        status(r.status === 403 ? 'Geen toegang met deze zaak-inlog' : 'Ghost Driver niet beschikbaar voor uw zaak',
+          (d && typeof d.error === 'string' && d.error) || 'Bekijk uw toegang in de zaak-app.', false, true);
+        return;
+      }
+      if (r.status !== 200) {
+        status('Ghost Driver tijdelijk niet beschikbaar', 'De verkeersverwachting kon niet worden geladen. Probeer het straks opnieuw.', true);
+        return;
+      }
+      if (!volledig(d)) {
+        status('De verkeersverwachting is niet compleet', 'Er zijn nog geen bruikbare verkeersgegevens ontvangen. Probeer opnieuw.', true);
+        return;
+      }
+      toon(d);
+    } finally {
+      bezig = false;
+      $('#ghostHerstel').disabled = false;
+    }
+  }
+  $('#ghostHerstel').addEventListener('click', laad);
+  laad();
 })();

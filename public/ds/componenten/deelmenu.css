@@ -1,0 +1,30 @@
+/* De bestaande RTGDeel-owner kiest de sectie; DS presenteert zijn navigatie.
+   Labels blijven volledig leesbaar, ook op mobiel met vergrote tekst. */
+@layer rtg.component {
+  .ds-deelmenu {
+    flex-wrap: wrap;
+    gap: var(--ds-ruimte-2);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    margin-block: var(--ds-ruimte-3) var(--ds-ruimte-4);
+  }
+  .ds-deelmenu-knop {
+    min-block-size: var(--ds-doel);
+    min-inline-size: var(--ds-doel);
+    max-inline-size: 100%;
+    padding-inline: var(--ds-ruimte-3);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: start;
+    line-height: 1.45;
+  }
+  .ds-deelmenu-knop:hover,
+  .ds-deelmenu-knop[aria-current="true"] { color: var(--ds-inkt); }
+  .ds-deelmenu-knop[aria-current="true"] { border-block-end-color: var(--ds-metaal); }
+  @media print { .ds-deelmenu { display: none; } }
+}
+@layer rtg.scherm {
+  /* Geen hidden-attribuut overschrijven: dat blijft van de app/autorisatie.
+     De schermlaag verbergt ook secties die als DS-component flex/grid zijn. */
+  .ds-scherm .ds-deelmenu-weg { display: none; }
+}

@@ -52,7 +52,8 @@ test('echte DS-splitsing sluit legacy-injectie uit maar houdt de bronratel zicht
   assert.equal(os.telInjectie(base), 1, 'bronratel telt ook uitgesloten legacycode');
   assert.equal(os.telInjectie(twin), 1);
   assert.equal(os.scriptLaadAnalyse(lees('public/shared/handenvrij-chat.js'), { ds: true }).injecties, 0);
-  assert.equal(os.scriptLaadAnalyse(lees('public/shared/handenvrij-chat.js'), { ds: false }).injecties, 1);
+  assert.equal(os.scriptLaadAnalyse(lees('public/shared/handenvrij-chat.js'), { ds: false }).injecties, 0,
+    'handenvrij-chat gebruikt ook buiten de DS-detectie uitsluitend de centrale presentatie');
   assert.ok(!os.lokaleScriptVerwijzingen(lees('public/shared/metgezel.js')).some(x => x.startsWith('/shared/metgezel/')), 'bundelparts zijn geen extra runtimeimports');
 });
 
@@ -157,6 +158,8 @@ test('DS-context geldt uitsluitend met expliciet html-attribuut', () => {
   assert.equal(os.dsVoorScript('<script src="/shared/na.js" defer></script><script src="/ds/shell.js"></script>', '/shared/na.js'), false);
   assert.equal(os.dsVoorScript(html.replace('src="/ds/shell.js"', 'type="text/plain" src="/ds/shell.js"'), '/shared/na.js'), false);
   assert.equal(os.dsVoorScript('<!--<script src="/ds/shell.js"></script>--><script src="/shared/na.js"></script>', '/shared/na.js'), false);
+  assert.equal(os.dsVoorScript('<!-- <!-- --><html data-ds><script src="/shared/na.js"></script>', '/shared/na.js'), false);
+  assert.equal(os.dsVoorScript('<!-- ongesloten <html data-ds><script src="/shared/na.js"></script>', '/shared/na.js'), false);
   assert.equal(os.dsVoorScript('<script>const voorbeeld=\'<script src="/ds/shell.js">\';</script><script src="/shared/na.js"></script>', '/shared/na.js'), false);
   assert.equal(os.dsVoorScript('<script src="/shared/defer.js" data-naam="defer"></script><script src="/ds/shell.js"></script>', '/shared/defer.js'), false);
 });

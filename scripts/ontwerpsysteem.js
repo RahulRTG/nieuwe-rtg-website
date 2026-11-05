@@ -994,11 +994,30 @@ function htmlAttributen(tag) {
     .map(a => [a[1].toLowerCase(), a[2] ?? a[3] ?? a[4] ?? '']);
 }
 
+function zonderHtmlCommentaar(html) {
+  const bron = String(html || '');
+  let schoon = '', vanaf = 0;
+  while (true) {
+    const begin = bron.indexOf('<!--', vanaf);
+    if (begin < 0) return schoon + bron.slice(vanaf);
+    schoon += bron.slice(vanaf, begin);
+    let diepte = 1, cursor = begin + 4;
+    while (diepte) {
+      const open = bron.indexOf('<!--', cursor);
+      const dicht = bron.indexOf('-->', cursor);
+      if (dicht < 0) return schoon;
+      if (open >= 0 && open < dicht) { diepte++; cursor = open + 4; }
+      else { diepte--; cursor = dicht + 3; }
+    }
+    vanaf = cursor;
+  }
+}
+
 function dsVoorScript(html, href) {
   // De documentbron bezit de grens. De shell mag een legacydocument niet
   // tijdens uitvoering promoveren; zo blijft statische kwalificatie gelijk
   // aan het gedrag dat de browser werkelijk start.
-  html = stukken(html.replace(/<!--[\s\S]*?-->/g, '')).filter(b => b.soort === null).map(b => b.tekst).join('');
+  html = stukken(zonderHtmlCommentaar(html)).filter(b => b.soort === null).map(b => b.tekst).join('');
   return /<html\b[^>]*\bdata-ds(?:\s|=|>)/i.test(html);
 }
 

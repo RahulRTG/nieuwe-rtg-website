@@ -1412,6 +1412,21 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* Presentatiecontracten lezen vooral letterlijke DOM-, CSS- en eigenaarregels.
+     De generieke rekenoperatoren raakten die contracten niet. Op 5 november
+     2026 zijn daarom elf gerichte handmutaties uitgevoerd en teruggezet; elke
+     genoemde wijziging liet uitsluitend de bijbehorende toets rood worden. */
+  ['borden-presentatie.test.js', 'CSS-contract; alle min-block-size: var(--ds-doel) vervangen door 1px laat de toets zakken'],
+  ['deelmenu-ds.test.js', 'DOM-contract; ds-deelmenu-knop in de bron hernoemen laat de toets zakken'],
+  ['focus-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  ['instellingen-actuele-ds.test.js', 'DOM-contract; ds-instellingen in de bron hernoemen laat de lifecycletoets zakken'],
+  ['leverancier-overlays-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
+  ['public-platform-owner.test.js', 'DOM-contract; document.createElement img vervangen door video laat de mediatoets zakken'],
+  ['rahulpoort-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  ['scanknop-presentatie.test.js', 'CSS-contract; alle safe-area-inset-top-verwijzingen hernoemen laat de toets zakken'],
+  ['teamcall-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
+  ['werkos-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
+  ['zaakcommand-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
   /* De crashherkenning van de meetronde (scripts/lib/valom.js) is een regex en
      een `||`; geen van de vier operatoren komt erin voor (0 pogingen, 28
      september 2026). Met de hand gemeten: `fout || ''` -> `fout && ''` laat

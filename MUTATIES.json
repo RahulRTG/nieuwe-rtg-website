@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-11-05T15:50:41.949Z",
-    "commit": "5f64681f98",
+    "op": "2026-11-05T16:37:40.006Z",
+    "commit": "a7e7149600",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
     "node": "v26.12.1"
   },
@@ -2646,13 +2646,8 @@
     },
     "borden-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/borden.js"
-      ],
-      "geprobeerd": 35,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle min-block-size: var(--ds-doel) vervangen door 1px laat de toets zakken"
     },
     "borden.test.js": {
       "soort": "server",
@@ -4223,13 +4218,8 @@
     },
     "deelmenu-ds.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/bundel.js"
-      ],
-      "geprobeerd": 4,
-      "posities": 1000,
-      "dekking": "dun"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "DOM-contract; ds-deelmenu-knop in de bron hernoemen laat de toets zakken"
     },
     "deelmenu.e2e.js": {
       "soort": "server",
@@ -5864,13 +5854,8 @@
     },
     "focus-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/focus.js"
-      ],
-      "geprobeerd": 63,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken"
     },
     "fonds.test.js": {
       "soort": "server",
@@ -8436,13 +8421,8 @@
     },
     "instellingen-actuele-ds.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/bundel.js"
-      ],
-      "geprobeerd": 4,
-      "posities": 1000,
-      "dekking": "dun"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "DOM-contract; ds-instellingen in de bron hernoemen laat de lifecycletoets zakken"
     },
     "instellingsweg.test.js": {
       "soort": "server",
@@ -9973,13 +9953,8 @@
     },
     "leverancier-overlays-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/apps/leverancier.js"
-      ],
-      "geprobeerd": 2364,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken"
     },
     "leverancier-service-ds.e2e.js": {
       "soort": "server",
@@ -15052,15 +15027,8 @@
     },
     "public-platform-owner.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/interface/world-desktop-copy.js",
-        "public/site/platform-elements.js",
-        "public/site/platform-detail.js"
-      ],
-      "geprobeerd": 40,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "DOM-contract; document.createElement img vervangen door video laat de mediatoets zakken"
     },
     "publieke-adressen.test.js": {
       "soort": "server",
@@ -15245,13 +15213,8 @@
     },
     "rahulpoort-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/rahulpoort.js"
-      ],
-      "geprobeerd": 40,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken"
     },
     "rahulscherm.e2e.js": {
       "soort": "server",
@@ -17475,13 +17438,8 @@
     },
     "scanknop-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/scanknop.js"
-      ],
-      "geprobeerd": 17,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle safe-area-inset-top-verwijzingen hernoemen laat de toets zakken"
     },
     "scanner.e2e.js": {
       "soort": "server",
@@ -19921,13 +19879,8 @@
     },
     "teamcall-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/teamcall.js"
-      ],
-      "geprobeerd": 87,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken"
     },
     "techniek-functies.test.js": {
       "soort": "server",
@@ -22608,13 +22561,8 @@
     },
     "werkos-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/werkos.js"
-      ],
-      "geprobeerd": 112,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken"
     },
     "werkos-schil.e2e.js": {
       "soort": "puur",
@@ -23272,13 +23220,8 @@
     },
     "zaakcommand-presentatie.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/zaakcommand.js"
-      ],
-      "geprobeerd": 84,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken"
     },
     "zaakcommand-routes.test.js": {
       "soort": "server",

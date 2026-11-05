@@ -1427,6 +1427,21 @@ const GEEN_BRONMUTATIE = new Map([
   ['teamcall-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
   ['werkos-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
   ['zaakcommand-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  /* Statische scherm- en broncontracten zonder rechtstreeks requirepad. Ook
+     deze zijn op 5 november 2026 gericht gemuteerd en na iedere proef hersteld. */
+  ['aankomst-chauffeur-voorzijde.test.js', 'HTML-contract; data-ds-schermtype taak hernoemen laat de toets zakken'],
+  ['beginscherm.test.js', 'routecontract; wallet.js in geld.html hernoemen laat de toets zakken'],
+  ['canvas.test.js', 'browsercontract; var MAX van 3 naar 4 laat de canvastoets zakken'],
+  ['clipdeler.test.js', 'exportcontract; RTGClipDeler.start op null zetten laat de toets zakken'],
+  ['command-router.test.js', 'routercontract; RTGAppDirectoryCommand hernoemen laat de toets zakken'],
+  ['decision-room.test.js', 'HTML-contract; data-dr-paneel agenda hernoemen laat de toets zakken'],
+  ['eten-uitgaan-voorzijde.test.js', 'wereldcontract; rtg-night-discover in foodcourt hernoemen laat de toets zakken'],
+  ['foundation-geld-later.test.js', 'tekstcontract; de Vandaag-belofte verwijderen laat de toets zakken'],
+  ['foundation-gezondheid-welzijn.test.js', 'tekstcontract; de Stap-voor-stap-belofte verwijderen laat de toets zakken'],
+  ['foundation-hulp-zorg.test.js', 'tekstcontract; de meebewegende-hulpbelofte verwijderen laat de toets zakken'],
+  ['foundation-leren-groei.test.js', 'tekstcontract; Vandaag een stap verder verwijderen laat de toets zakken'],
+  ['foundation-meedoen-ontdekken.test.js', 'tekstcontract; de welkom-belofte verwijderen laat de toets zakken'],
+  ['foundation-samen-thuis.test.js', 'tekstcontract; Samen begint met overzicht verwijderen laat de toets zakken'],
   /* De crashherkenning van de meetronde (scripts/lib/valom.js) is een regex en
      een `||`; geen van de vier operatoren komt erin voor (0 pogingen, 28
      september 2026). Met de hand gemeten: `fout || ''` -> `fout && ''` laat

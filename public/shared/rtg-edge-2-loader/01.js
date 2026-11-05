@@ -1,3 +1,4 @@
+// Edge bij vensters en werkruimtes.
     for (var i = 0; i < lijst.length; i++) if (zichtbaarVenster(lijst[i])) { open = true; break; }
     if (b.hasAttribute(VENSTER_ATTR) === open) return;
     if (open) b.setAttribute(VENSTER_ATTR, 'true'); else b.removeAttribute(VENSTER_ATTR);
@@ -101,7 +102,6 @@
       } catch (fout) {}
     });
   }
-  /* Vorm en contextkern downloaden samen; de uitvoerder volgt pas na beide. */
   blad('/shared/rtg-edge-2.css', afhankelijk);
   script('/shared/rtg-edge-2-context.js', 'RTGEdge2Context', afhankelijk);
   script('/shared/rtg-edge-command.js', 'RTGEdgeCommand', afhankelijk);

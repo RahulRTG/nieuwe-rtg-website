@@ -928,12 +928,12 @@ omlaag.
 
 ## `shared/rtg-edge-2-loader.js`
 
-`public/shared/rtg-edge-2-loader/` -- 2 delen, 229 regels in de delen
+`public/shared/rtg-edge-2-loader/` -- 2 delen, 228 regels in de delen
 
 | deel | onderwerp |
 |---|---|
-| `00.js` | Initialiseert Edge binnen de bestaande universele applicatieschil |
-| `01.js` | Synchroniseert Edge met zichtbare vensters en actieve werkruimtes |
+| `00.js` | Edge in de applicatieschil |
+| `01.js` | Edge bij vensters en werkruimtes |
 
 ## `shared/rtg-edge-smart-menu.js`
 

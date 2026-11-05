@@ -1,3 +1,4 @@
+// Edge in de applicatieschil.
 (function (w, d) {
   'use strict';
   if (!d.body || w.__RTGEdge2Loader) return;

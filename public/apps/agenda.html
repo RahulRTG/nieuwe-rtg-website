@@ -80,7 +80,7 @@
 <div class="scrim ds-dag-scrim" id="afScrim" role="dialog" aria-label="Afspraak" data-i18n-aria="dailyField.appointment">
   <div class="paneel ds-dag-paneel">
     <h3 id="afKop" data-i18n="dailyField.appointment">Afspraak</h3>
-    <div id="uitnodigingBlok" style="display:none;">
+    <div id="uitnodigingBlok" hidden>
       <p class="stil ds-dag-stil" id="uitnodigingTekst"></p>
       <div class="rij s-9vyt3z ds-dag-rij ds-dag-marge">
         <button class="knop vol ds-knop" id="afJa" type="button" data-i18n="dailyField.attend">Ik kom</button>
@@ -116,7 +116,7 @@
       </select>
       <label for="afNotitie" data-i18n="dailyField.note">Notitie</label>
       <textarea class="ds-invoer" id="afNotitie" rows="2" maxlength="300"></textarea>
-      <div id="deelBlok" style="display:none;">
+      <div id="deelBlok" hidden>
         <label for="afCode" data-i18n="dailyField.inviteCodename">Uitnodigen op codenaam</label>
         <div class="rij ds-dag-rij"><input class="ds-invoer ds-dag-rek" id="afCode" maxlength="60" placeholder="Codenaam van het lid" data-i18n-ph="dailyField.memberCodename">
           <button class="knop ds-knop" id="afNodig" type="button" data-i18n="dailyField.invite">Nodig uit</button></div>
@@ -125,8 +125,8 @@
     </div>
     <div class="rij ds-dag-marge ds-dag-rij">
       <button class="knop vol ds-knop" id="afBewaar" type="button" data-rtg-morph-action data-rtg-action-state="idle"><span data-rtg-action-copy><span data-rtg-action-copy-for="idle" data-i18n="dailyField.save">Bewaar</span><span data-rtg-action-copy-for="pending" data-i18n="dailyField.saving">Bewaren…</span><span data-rtg-action-copy-for="success" data-i18n="dailyField.saved">Bewaard ✓</span><span data-rtg-action-copy-for="error" data-i18n="dailyField.retry">Opnieuw</span></span></button>
-      <button class="knop ds-knop" id="afMeet" type="button" style="display:none;" data-i18n="dailyField.meeting">Vergaderruimte</button>
-      <button class="knop ds-knop" id="afWeg" type="button" style="display:none;" data-i18n="dailyField.delete">Verwijder</button>
+      <button class="knop ds-knop" id="afMeet" type="button" hidden data-i18n="dailyField.meeting">Vergaderruimte</button>
+      <button class="knop ds-knop" id="afWeg" type="button" hidden data-i18n="dailyField.delete">Verwijder</button>
       <span class="rek ds-dag-rek ds-dag-rek"></span>
       <button class="knop ds-knop" id="afDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
@@ -150,7 +150,6 @@
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>

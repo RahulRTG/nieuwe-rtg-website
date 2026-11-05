@@ -55,8 +55,8 @@
   function teken() {
     if (!kamer) {
       vak.innerHTML = '<div class="rsm-uit">Samen kijken en doen met je gezin en je bevestigde vrienden. Start een kamer en deel de code, of doe mee met een code.</div>' +
-        '<button class="rsm-go" data-start data-stand="samen-actief" type="button" style="width:100%;">Start een samen-kamer</button>' +
-        '<form class="rsm-rij" data-mee><input placeholder="Code van gezin of vriend" maxlength="48" style="text-transform:uppercase;" aria-label="Samen-code"><button class="rsm-go" type="submit">Doe mee</button></form>';
+        '<button class="rsm-go ds-samen-doe--breed" data-start data-stand="samen-actief" type="button">Start een samen-kamer</button>' +
+        '<form class="rsm-rij" data-mee><input class="ds-samen-codeinvoer" placeholder="Code van gezin of vriend" maxlength="48" aria-label="Samen-code"><button class="rsm-go" type="submit">Doe mee</button></form>';
       vorm(vak);
       vak.querySelector('[data-start]').addEventListener('click', function () {
         api('maak', { idem: veiligeIdem('rtf-samen-maak') }).then(function (d) {

@@ -11,7 +11,9 @@
   /* Op DS-schermen is de Edge de ene zichtbare systeemdeur. Appmenu blijft
      als actie-eigenaar bestaan, maar zijn tweede hamburger neemt geen ruimte
      of focus meer in zodra de Edge werkelijk is gemonteerd. */
-  .ds-edge-aan:has(.ds-edge__balk) #osMenuBtn { display: none; }
+  .ds-edge-aan:has(.ds-edge__balk) #osMenuBtn,
+  .ds-edge-aan:has(.ds-edge__balk) .rtg-duimbalk,
+  .ds-edge-aan:has(.ds-edge__balk) .ios-thuis { display: none; }
   .ds-edge {
     position: fixed;
     inset-inline: var(--ds-ruimte-3);

@@ -1,4 +1,3 @@
-// Synchroniseert Edge met zichtbare vensters en actieve werkruimtes.
     for (var i = 0; i < lijst.length; i++) if (zichtbaarVenster(lijst[i])) { open = true; break; }
     if (b.hasAttribute(VENSTER_ATTR) === open) return;
     if (open) b.setAttribute(VENSTER_ATTR, 'true'); else b.removeAttribute(VENSTER_ATTR);
@@ -67,20 +66,20 @@
   }
   function script(pad, naam, klaar) {
     if (w[naam]) { klaar(true); return; }
-    var bestaandScript = bron('script', 'src', pad);
-    if (bestaandScript) { wacht(bestaandScript, naam, klaar); return; }
-    var edgeScriptNode = document.createElement('script');
-    edgeScriptNode.src = pad; edgeScriptNode.async = true;
-    wacht(edgeScriptNode, naam, klaar);
-    document.head.appendChild(edgeScriptNode);
+    var oud=bron('script','src',pad);
+    if (oud) { wacht(oud, naam, klaar); return; }
+    var el=d.createElement('script');
+    el.src = pad; el.async = true;
+    wacht(el, naam, klaar);
+    d.head.appendChild(el);
   }
   function blad(pad, klaar) {
-    var bestaandBlad = bron('link[rel~="stylesheet"]', 'href', pad);
-    if (bestaandBlad) { wacht(bestaandBlad, '', klaar); return; }
-    var edgeStyleNode = document.createElement('link');
-    edgeStyleNode.id = 'rtg-edge-2-css'; edgeStyleNode.rel = 'stylesheet'; edgeStyleNode.href = pad;
-    wacht(edgeStyleNode, '', klaar);
-    document.head.appendChild(edgeStyleNode);
+    var oud=bron('link[rel~="stylesheet"]','href',pad);
+    if (oud) { wacht(oud, '', klaar); return; }
+    var el=d.createElement('link');
+    el.id = 'rtg-edge-2-css'; el.rel = 'stylesheet'; el.href = pad;
+    wacht(el, '', klaar);
+    d.head.appendChild(el);
   }
   var over = 4, mislukt = false;
   function afhankelijk(ok) {

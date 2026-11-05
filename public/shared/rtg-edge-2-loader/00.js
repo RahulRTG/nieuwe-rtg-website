@@ -1,10 +1,9 @@
-// Initialiseert Edge binnen de bestaande universele applicatieschil.
 (function (w, d) {
   'use strict';
   if (!d.body || w.__RTGEdge2Loader) return;
   w.__RTGEdge2Loader = true;
 
-  var b = d.body;
+  var b=d.body;
   b.setAttribute('data-rtg-edge-2', '');
   if (!b.hasAttribute('data-rtg-edge-2-context')) b.setAttribute('data-rtg-edge-2-context', 'none');
   if (!b.hasAttribute('data-rtg-edge-2-state')) b.setAttribute('data-rtg-edge-2-state', 'overview');

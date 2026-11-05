@@ -2,7 +2,7 @@
   "gemetenOp": "2026-11-05",
   "bestanden": {
     "html": 328,
-    "clientJs": 827,
+    "clientJs": 825,
     "serverJs": 4638,
     "bundelsGeteldDelenOvergeslagen": 77
   },
@@ -20,7 +20,7 @@
     "client": {
       "unieke": 5472,
       "voorkomens": 6941,
-      "parsefouten": 2
+      "parsefouten": 0
     },
     "server": {
       "unieke": 14182,
@@ -297,7 +297,7 @@
       "public/shared/teamcall.js": 0,
       "public/shared/verbinding.js": 3
     },
-    "parsefouten": 2,
+    "parsefouten": 0,
     "schaduwHuisbreed": 28788,
     "waaromSchaduw": "Er is nog geen berichtencatalogus en geen t(sleutel)-runtime, dus een nieuw scherm MOET vandaag hardcoden. Dit getal blokkeren zou alle bouw stilleggen. Het gaat bijten zodra de runtime er is."
   },
@@ -317,8 +317,8 @@
     "Afgeleide registers (handelingindex.json, sprongindex.json) tellen niet mee: ze zijn gegenereerd uit de schermen en zouden dubbeltelling zijn."
   ],
   "stempel": {
-    "op": "2026-11-05T10:13:34.309Z",
-    "commit": "f1f1f52a2d",
+    "op": "2026-11-05T10:33:28.965Z",
+    "commit": "13fac5ad31",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/tekstoppervlak.js",

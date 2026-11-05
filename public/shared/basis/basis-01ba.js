@@ -1,4 +1,5 @@
-/* Beheert de toegankelijke titel en acties van het gekozen basispaneel. */\n       gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
+// Beheert de toegankelijke titel en acties van het gekozen basispaneel.
+       gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
        zicht maar blijven in de toegankelijkheidsboom (zelfde techniek als
        .vis-verborgen). De ACTIEknoppen in de balk (zoeken, uploaden, nieuw)
        blijven gewoon staan: dat is bediening, geen chrome. */

@@ -1,4 +1,5 @@
-/* Initialiseert de gedeelde Rahul-tab voor contextuele ondersteuning. */\n(function(){
+// Initialiseert de gedeelde Rahul-tab voor contextuele ondersteuning.
+(function(){
   'use strict';
   if(window.__rahulTabStandaard)return;
   window.__rahulTabStandaard=true;
@@ -34,7 +35,8 @@
   function voeg(rol,waarde,noot){historie.push({rol:rol,tekst:waarde,noot:noot||void 0});historie=historie.slice(-12);render()}
   function beslissingen(){return approval||(approval=RTGRahulApproval.create({win:window,page:page,sync:synchroniseer,owner:function(){return sessieOwner},add:voeg}))}
   async function synchroniseer(){if(!window.RTGRahulSession)return false;if(!sessieStore)sessieStore=RTGRahulSession.create(window);var s=await sessieStore.read();if(s.owner!==sessieOwner){if(sessieOwner)RTGRahulTabHelpers.wis(page);sessieOwner=s.owner;historie=s.history;if(approval)approval.clear();render(false)}return!!s.owner}
-/* Opent Rahul met de actuele appcontext en herstelt de vorige focus. */\n  async function open(ja){if(ja)await synchroniseer();page.hidden=!ja;tab.classList.toggle('actief',ja);if(ja){page.scrollTop=0;vorige=document.querySelector('.rtg-rahul-tab~.actief,.wk-tabs>.actief,.lo-tabs>.actief,.po-tabs>.actief')||vorige;var c=context();page.querySelector('[data-app]').textContent=c.app;page.querySelector('[data-selection]').textContent=c.selectie||c.deel||'Geen selectie gemeten';page.querySelector('[data-context]').textContent='Ik zie '+c.deel+' in '+c.app+'. Ik combineer alleen gegevens waarvoor uw huidige rol toegang heeft.';page.querySelector('[data-greeting]').textContent=c.deel+' staat klaar.';voorstellen(c);if(window.RTGLiveTwin)RTGLiveTwin.context(c);if(!historie.length)voeg('rahul','Vertel het gewenste resultaat; ik toon de stappen, uitzonderingen en beslissingen.');setTimeout(function(){try{input.focus({preventScroll:true})}catch(e){input.focus()}page.scrollTop=0},120)}else if(vorige)vorige.classList.add('actief')}
+// Opent Rahul met de actuele appcontext en herstelt de vorige focus.
+  async function open(ja){if(ja)await synchroniseer();page.hidden=!ja;tab.classList.toggle('actief',ja);if(ja){page.scrollTop=0;vorige=document.querySelector('.rtg-rahul-tab~.actief,.wk-tabs>.actief,.lo-tabs>.actief,.po-tabs>.actief')||vorige;var c=context();page.querySelector('[data-app]').textContent=c.app;page.querySelector('[data-selection]').textContent=c.selectie||c.deel||'Geen selectie gemeten';page.querySelector('[data-context]').textContent='Ik zie '+c.deel+' in '+c.app+'. Ik combineer alleen gegevens waarvoor uw huidige rol toegang heeft.';page.querySelector('[data-greeting]').textContent=c.deel+' staat klaar.';voorstellen(c);if(window.RTGLiveTwin)RTGLiveTwin.context(c);if(!historie.length)voeg('rahul','Vertel het gewenste resultaat; ik toon de stappen, uitzonderingen en beslissingen.');setTimeout(function(){try{input.focus({preventScroll:true})}catch(e){input.focus()}page.scrollTop=0},120)}else if(vorige)vorige.classList.add('actief')}
   async function vraag(voorstel){
     if(bezig)return false;
     bezig=true;

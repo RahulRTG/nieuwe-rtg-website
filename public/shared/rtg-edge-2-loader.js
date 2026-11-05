@@ -1,4 +1,5 @@
-/* Initialiseert Edge binnen de bestaande universele applicatieschil. */\n(function (w, d) {
+// Initialiseert Edge binnen de bestaande universele applicatieschil.
+(function (w, d) {
   'use strict';
   if (!d.body || w.__RTGEdge2Loader) return;
   w.__RTGEdge2Loader = true;
@@ -116,7 +117,8 @@
   function stemVensterAf() {
     var lijst = d.querySelectorAll('dialog[open],[role="dialog"][aria-modal="true"]');
     var open = false;
-/* Synchroniseert Edge met zichtbare vensters en actieve werkruimtes. */\n    for (var i = 0; i < lijst.length; i++) if (zichtbaarVenster(lijst[i])) { open = true; break; }
+// Synchroniseert Edge met zichtbare vensters en actieve werkruimtes.
+    for (var i = 0; i < lijst.length; i++) if (zichtbaarVenster(lijst[i])) { open = true; break; }
     if (b.hasAttribute(VENSTER_ATTR) === open) return;
     if (open) b.setAttribute(VENSTER_ATTR, 'true'); else b.removeAttribute(VENSTER_ATTR);
   }

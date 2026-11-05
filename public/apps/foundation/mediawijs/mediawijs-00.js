@@ -1,4 +1,5 @@
-/* Initialiseert de Mediawijs-ervaring voor het actieve profiel. */\n(function foundationPage() {
+// Initialiseert de Mediawijs-ervaring voor het actieve profiel.
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisProfiel()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });

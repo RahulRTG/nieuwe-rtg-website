@@ -119,7 +119,8 @@
 
   function bouw() {
     balk = d.createElement('nav');
-/* Bouwt de gedeelde wereldnavigatie met toegankelijke bediening. */\n    balk.className = 'ws-balk' + (ds ? ' ds-wereldnav' : '');
+// Bouwt de gedeelde wereldnavigatie met toegankelijke bediening.
+    balk.className = 'ws-balk' + (ds ? ' ds-wereldnav' : '');
     balk.setAttribute('aria-label', wereld.naam ? ('Navigatie ' + wereld.naam) : 'Hoofdnavigatie');
 
     var actief = actieveBestemming();

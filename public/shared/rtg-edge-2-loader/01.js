@@ -1,4 +1,5 @@
-/* Synchroniseert Edge met zichtbare vensters en actieve werkruimtes. */\n    for (var i = 0; i < lijst.length; i++) if (zichtbaarVenster(lijst[i])) { open = true; break; }
+// Synchroniseert Edge met zichtbare vensters en actieve werkruimtes.
+    for (var i = 0; i < lijst.length; i++) if (zichtbaarVenster(lijst[i])) { open = true; break; }
     if (b.hasAttribute(VENSTER_ATTR) === open) return;
     if (open) b.setAttribute(VENSTER_ATTR, 'true'); else b.removeAttribute(VENSTER_ATTR);
   }

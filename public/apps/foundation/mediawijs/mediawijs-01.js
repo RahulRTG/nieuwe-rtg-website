@@ -1,4 +1,5 @@
-/* Beheert de voortgang en score van de Mediawijs-ervaring. */\nlet volgorde = [], index = 0, gedaan = 0, punten = 0, beantwoord = false;
+// Beheert de voortgang en score van de Mediawijs-ervaring.
+let volgorde = [], index = 0, gedaan = 0, punten = 0, beantwoord = false;
 
 function start() {
   volgorde = SITUATIES.map((s, i) => i).sort(() => Math.random() - 0.5);

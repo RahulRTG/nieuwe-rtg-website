@@ -1,4 +1,5 @@
-/* Initialiseert de gedeelde Rahul-tab voor contextuele ondersteuning. */\n(function(){
+// Initialiseert de gedeelde Rahul-tab voor contextuele ondersteuning.
+(function(){
   'use strict';
   if(window.__rahulTabStandaard)return;
   window.__rahulTabStandaard=true;

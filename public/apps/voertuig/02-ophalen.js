@@ -1,4 +1,5 @@
-/* Laadt het gekozen voertuig en behandelt ontbrekende voertuiggegevens. */\n  function geenVoertuig(tekst) {
+// Laadt het gekozen voertuig en behandelt ontbrekende voertuiggegevens.
+  function geenVoertuig(tekst) {
     $('#dit').hidden = true;
     $('#geen').hidden = false;
     document.body.dataset.dsSchermtype = 'collectie';

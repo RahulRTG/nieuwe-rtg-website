@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 104 delen, 10131 regels in de delen
+`public/apps/app-main/` -- 104 delen, 10132 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -206,7 +206,7 @@ omlaag.
 
 ## `apps/foundation/mediawijs.js`
 
-`public/apps/foundation/mediawijs/` -- 2 delen, 154 regels in de delen
+`public/apps/foundation/mediawijs/` -- 2 delen, 156 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -239,7 +239,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9855 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9856 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -475,7 +475,7 @@ omlaag.
 
 ## `apps/reizen-veilig.js`
 
-`public/apps/reizen-veilig/` -- 2 delen, 75 regels in de delen
+`public/apps/reizen-veilig/` -- 2 delen, 77 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -599,7 +599,7 @@ omlaag.
 
 ## `apps/voertuig.js`
 
-`public/apps/voertuig/` -- 2 delen, 218 regels in de delen
+`public/apps/voertuig/` -- 2 delen, 219 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -617,7 +617,7 @@ omlaag.
 
 ## `apps/zakelijk-voorzijde.js`
 
-`public/apps/zakelijk-voorzijde/` -- 2 delen, 178 regels in de delen
+`public/apps/zakelijk-voorzijde/` -- 2 delen, 179 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -639,7 +639,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 13 delen, 955 regels in de delen
+`public/shared/basis/` -- 13 delen, 956 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -695,7 +695,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 107 regels in de delen
+`public/shared/cookie/` -- 2 delen, 108 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -801,7 +801,7 @@ omlaag.
 
 ## `shared/interface/world-desktop-frame.js`
 
-`public/shared/interface/world-desktop-frame/` -- 2 delen, 148 regels in de delen
+`public/shared/interface/world-desktop-frame/` -- 2 delen, 149 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -892,7 +892,7 @@ omlaag.
 
 ## `shared/rahul-tab.js`
 
-`public/shared/rahul-tab-entry/` -- 2 delen, 99 regels in de delen
+`public/shared/rahul-tab-entry/` -- 2 delen, 101 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -901,7 +901,7 @@ omlaag.
 
 ## `shared/rahul-tab/style-base.js`
 
-`public/shared/rahul-tab/style-base/` -- 2 delen, 44 regels in de delen
+`public/shared/rahul-tab/style-base/` -- 2 delen, 45 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -928,7 +928,7 @@ omlaag.
 
 ## `shared/rtg-edge-2-loader.js`
 
-`public/shared/rtg-edge-2-loader/` -- 2 delen, 227 regels in de delen
+`public/shared/rtg-edge-2-loader/` -- 2 delen, 229 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -937,7 +937,7 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 3 delen, 314 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 3 delen, 315 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -1012,7 +1012,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 3 delen, 294 regels in de delen
+`public/shared/uitvoer/` -- 3 delen, 295 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -1031,7 +1031,7 @@ omlaag.
 
 ## `shared/wereldschil.js`
 
-`public/shared/wereldschil/` -- 2 delen, 258 regels in de delen
+`public/shared/wereldschil/` -- 2 delen, 259 regels in de delen
 
 | deel | onderwerp |
 |---|---|

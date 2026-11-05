@@ -1,4 +1,5 @@
-/* Initialiseert de gedeelde bediening van Reizen Veilig. */\n(function(){
+// Initialiseert de gedeelde bediening van Reizen Veilig.
+(function(){
   'use strict';
   var $=function(s){return document.querySelector(s)}, panes=[],actief=-1,meldAdaptief=function(){};
   var apps={reisbureau:['Reisbureau','/apps/reisbureau.html'],move:['Haal ik het?','/apps/move.html'],overzicht:['Vandaag',null],reisblad:['Reizen',null],vervoer:['Gaan','/apps/ov.html'],reizen:['Mijn reizen','/apps/reizen.html'],veilig:['RTG Veilig','/apps/veilig.html#wacht'],navigatie:['Navigatie','/apps/navigatie.html'],instellingen:['Instellingen','/apps/veilig.html#rust']};

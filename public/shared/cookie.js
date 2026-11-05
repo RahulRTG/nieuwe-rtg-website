@@ -58,7 +58,8 @@
     el.remove();
     geefRuimteTerug();
   });
-/* Positioneert de toestemmingsbediening veilig boven vaste schermlagen. */\n  function vasteOnderbalk() {
+// Positioneert de toestemmingsbediening veilig boven vaste schermlagen.
+  function vasteOnderbalk() {
     if (ds || !document.elementsFromPoint) return;
     var r = el.getBoundingClientRect();
     if (!r.width || !r.height) return;

@@ -9010,7 +9010,8 @@
      handtekening garant dat het paspoort is gezien; de partner leert enkel het
      bewezen feit (18+, lid, welke pas), nooit de naam. De controle wordt ook op
      de server gelogd als officiele ID-check. */
-/* Verbindt leveranciersoverlays met de bestaande presentatiebasis. */\n  function leverancierOverlayPresentatie() {
+// Verbindt leveranciersoverlays met de bestaande presentatiebasis.
+  function leverancierOverlayPresentatie() {
     if (document.documentElement.hasAttribute('data-ds') || document.getElementById('rtgDsRuntimeCss')) return;
     const link = document.createElement('link');
     link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';

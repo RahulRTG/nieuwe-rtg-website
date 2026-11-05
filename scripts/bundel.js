@@ -24,6 +24,13 @@ const PUB = path.join(__dirname, '..', 'public');
 // gesorteerd samengevoegd (vandaar de NN- prefix), en rauw aaneengeplakt zodat
 // het resultaat exact de oorspronkelijke bron is.
 const bundels = {
+  // Grote browserowners blijven één bestand aan de clientkant; hun bron volgt
+  // de bestaande gesloten scope in leesbare delen onder de 10 kB-grens.
+  'apps/reizen-veilig.js': 'apps/reizen-veilig',
+  'shared/interface/world-desktop-frame.js': 'shared/interface/world-desktop-frame',
+  'shared/rahul-tab.js': 'shared/rahul-tab-entry',
+  'shared/rtg-edge-2-loader.js': 'shared/rtg-edge-2-loader',
+  'shared/wereldschil.js': 'shared/wereldschil',
   // Bestaande owners houden hun ene browserbestand en gesloten scope. Bron
   // volgt de grens tussen weergave/laden en bediening, byte voor byte gelijk.
   'apps/voertuig.js': 'apps/voertuig',

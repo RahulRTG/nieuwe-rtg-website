@@ -4,7 +4,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
-const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,keurLidGoed}=require('./helper');
+const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,keurLidGoed,letOpFouten}=require('./helper');
 const {registreerGratis}=require('../scripts/lib/gratisaccount');
 const pw=laadPlaywright(),skip=geenBrowser(pw);let srv,browser,tmp,gezin;
 test.before(async()=>{
@@ -27,7 +27,7 @@ test('verbinding: offline/herstel, bereikbare bediening en bestaande meldingprio
  const errors=[],requests=[];let page;
  try{
   await ctx.addInitScript(s=>{localStorage.setItem('rtf_sessie',JSON.stringify({code:s.code,token:s.token,profiel:s.profiel}));localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');},gezin);
-  page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));
+  page=await ctx.newPage();letOpFouten(page,errors);
   await page.route('**/api/doos/status',async route=>{requests.push(route.request().method());await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({doos:true})});});
   await page.goto(srv.base+'/apps/foundation/studie.html',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>window.RTGNet&&window.Satelliet&&!document.documentElement.classList.contains('rtf-toegang-dicht')&&document.body.dataset.rtgDesktopState==='ready');

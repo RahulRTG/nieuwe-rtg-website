@@ -29,7 +29,7 @@
 <header>
   <a class="terug ds-knop ds-knop--klein" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
   <span><span class="ey ds-horeca-label">RTG Horeca</span><h1>HACCP-registratie</h1></span>
-  <span class="h-flex1 ds-horeca-groei"></span>
+  <span class="ds-horeca-groei ds-horeca-groei"></span>
 </header>
 <main id="main">
   <div class="kpis ds-horeca-kpis">
@@ -48,7 +48,7 @@
       <input class="i-12sbxv veld ds-invoer" id="aFrequentie" maxlength="30" value="dagelijks" aria-label="Frequentie">
       <button class="knop ds-knop ds-knop--klein p" id="aPuntZet" type="button">Meetpunt erbij</button>
     </div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">Zonder grens is een meting geen controle; daarom weigert de server een meetpunt zonder onder- of bovengrens.</p>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand">Zonder grens is een meting geen controle; daarom weigert de server een meetpunt zonder onder- of bovengrens.</p>
   </div>
 
   <div class="kaart ds-kaart ds-horeca-kaart">
@@ -59,7 +59,7 @@
       <input class="veld ds-invoer" id="aActie" maxlength="200" placeholder="Actie (verplicht bij een afwijking)" aria-label="Genomen actie">
       <button class="knop ds-knop ds-knop--klein p" id="aMeting" type="button">Vastleggen</button>
     </div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand" id="aGemist"></p>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand" id="aGemist"></p>
     <p class="stil ds-horeca-meta">Een waarde buiten de grens vraagt om wat u hebt gedaan: weggegooid, teruggekoeld, monteur gebeld. Een logboek vol rode cijfers zonder actie is precies wat een inspecteur een boete waard vindt.</p>
   </div>
 
@@ -70,20 +70,20 @@
       <input class="i-12sckv veld ds-invoer" id="aTot" maxlength="10" placeholder="Tot" aria-label="Tot datum">
       <button class="knop ds-knop ds-knop--klein" id="aToon" type="button">Toon</button>
     </div>
-    <div class="h-mt60 ds-horeca-afstand" id="aLog"></div>
-    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+    <div class="ds-horeca-afstand ds-horeca-afstand" id="aLog"></div>
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <input class="i-12sbaw veld ds-invoer" id="aCorId" maxlength="10" placeholder="Meting" aria-label="Meting om te corrigeren">
       <input class="i-12sckv veld ds-invoer" id="aCorWaarde" type="number" step="0.1" placeholder="Juiste waarde" aria-label="Juiste waarde">
       <input class="veld ds-invoer" id="aCorReden" maxlength="160" placeholder="Waarom" aria-label="Reden van de correctie">
       <button class="knop ds-knop ds-knop--klein" id="aCorrigeer" type="button">Corrigeren</button>
     </div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">Corrigeren mag; gladstrijken niet. De oude waarde blijft staan met wie hem wijzigde en waarom.</p>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand">Corrigeren mag; gladstrijken niet. De oude waarde blijft staan met wie hem wijzigde en waarom.</p>
   </div>
 
   <div class="kaart ds-kaart ds-horeca-kaart">
     <div class="kop ds-horeca-kop">Batches en houdbaarheid</div>
     <div id="bBatches"></div>
-    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <input class="veld ds-invoer" id="bNaam" maxlength="60" placeholder="Product" aria-label="Product">
       <input class="i-12sckv veld ds-invoer" id="bTht" maxlength="10" placeholder="THT" aria-label="Houdbaarheidsdatum">
       <input class="i-12sckv veld ds-invoer" id="bBatchNr" maxlength="40" placeholder="Batchnummer" aria-label="Batchnummer">
@@ -91,10 +91,10 @@
       <input class="i-12sbxv veld ds-invoer" id="bHoeveel" maxlength="20" placeholder="Hoeveelheid" aria-label="Hoeveelheid">
       <button class="knop ds-knop ds-knop--klein p" id="bBatchZet" type="button">Batch erbij</button>
     </div>
-    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <input class="veld ds-invoer" id="bWegReden" maxlength="120" placeholder="Reden om een batch eraf te boeken" aria-label="Reden">
     </div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand" id="bBatchLet"></p>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand" id="bBatchLet"></p>
   </div>
 
   <div class="kaart ds-kaart ds-horeca-kaart">
@@ -107,15 +107,15 @@
       </select>
       <button class="knop ds-knop ds-knop--klein" id="bLijstZet" type="button">Lijst vastleggen</button>
     </div>
-    <div class="rij ds-horeca-rij h-mt50 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <textarea class="veld ds-invoer" id="bLijstVragen" rows="3" maxlength="1200" placeholder="Een vraag per regel" aria-label="Vragen, een per regel"></textarea>
     </div>
-    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <select class="i-1trjet veld ds-invoer" id="bLijstKeuze" aria-label="Welke lijst afvinken"></select>
       <button class="knop ds-knop ds-knop--klein p" id="bAfvinken" type="button">Afvinken</button>
     </div>
-    <div class="h-mt50 ds-horeca-afstand" id="bVragen"></div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand" id="bAfUit"></p>
+    <div class="ds-horeca-afstand ds-horeca-afstand" id="bVragen"></div>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand" id="bAfUit"></p>
     <p class="stil ds-horeca-meta">Er is geen knop "alles akkoord". Elke vraag krijgt een eigen antwoord, en bij elk punt dat niet akkoord is, hoort een opmerking.</p>
   </div>
 </main>

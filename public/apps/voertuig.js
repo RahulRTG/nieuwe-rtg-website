@@ -146,7 +146,6 @@
       ? 'Deze vloot is van de vervoerder waarmee u bent aangemeld; voertuigen van een andere vervoerder staan hier niet.'
       : 'Er staat geen voertuig op naam van deze vervoerder.';
   }
-
   function geenVoertuig(tekst) {
     $('#dit').hidden = true;
     $('#geen').hidden = false;

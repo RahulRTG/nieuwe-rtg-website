@@ -4,7 +4,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, keurLidGoed } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, keurLidGoed, letOpFouten } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const { land, matrix } = require('./lib/foundation-coach-browser');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
@@ -45,7 +45,7 @@ for (const scherm of schermen) {
   try {
     const page = await ctx.newPage(), errors = [];
     // De verwachte 503 wordt apart op de wire en in de UI bewezen.
-    page.on('pageerror', e => errors.push(e.message));
+    letOpFouten(page, errors);
     await land(page, route, srv.base); await matrix(page, route);
     /* Eén route bewijst de gedeelde sessiebalk met Escape. Op ieder van de
        drie routes vlak daarna nogmaals Escape gebruiken zou bewust de
@@ -119,7 +119,7 @@ test('Foundation legacy-host gebruikt dezelfde Samen-presentatie zonder runtime-
   const ctx = await context();
   try {
     const page = await ctx.newPage(), errors = [];
-    page.on('pageerror', e => errors.push(e.message));
+    letOpFouten(page, errors);
     const response = await page.goto(srv.base + '/apps/foundation/beheer.html', { waitUntil: 'load' });
     assert.equal(response.status(), 200);
     await page.waitForFunction(() => window.Sessie?.actief() && !document.documentElement.classList.contains('rtf-toegang-dicht') && !!document.querySelector('.rsm-knop'));

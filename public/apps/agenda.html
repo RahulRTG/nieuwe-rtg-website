@@ -69,7 +69,7 @@
     <button class="knop ds-knop" id="rahulBtn" type="button" data-i18n="dailyField.plan">Plan</button>
   </div>
   </details>
-  <p class="stil h-mt80 ds-dag-stil" data-i18n="dailyField.agendaHelp">Goud is wat uit RTG zelf komt (boekingen); dat leest de agenda alleen.
+  <p class="stil ds-dag-marge ds-dag-stil" data-i18n="dailyField.agendaHelp">Goud is wat uit RTG zelf komt (boekingen); dat leest de agenda alleen.
     Gestippeld is een uitnodiging die nog op uw ja of nee wacht. Herinneringen komen als seintje op het toestel.</p>
   </div>
 </main>
@@ -118,16 +118,16 @@
       <textarea class="ds-invoer" id="afNotitie" rows="2" maxlength="300"></textarea>
       <div id="deelBlok" style="display:none;">
         <label for="afCode" data-i18n="dailyField.inviteCodename">Uitnodigen op codenaam</label>
-        <div class="rij ds-dag-rij"><input class="ds-invoer h-flex1" id="afCode" maxlength="60" placeholder="Codenaam van het lid" data-i18n-ph="dailyField.memberCodename">
+        <div class="rij ds-dag-rij"><input class="ds-invoer ds-dag-rek" id="afCode" maxlength="60" placeholder="Codenaam van het lid" data-i18n-ph="dailyField.memberCodename">
           <button class="knop ds-knop" id="afNodig" type="button" data-i18n="dailyField.invite">Nodig uit</button></div>
         <div id="afDeelnemers"></div>
       </div>
     </div>
-    <div class="rij h-mt90 ds-dag-rij">
+    <div class="rij ds-dag-marge ds-dag-rij">
       <button class="knop vol ds-knop" id="afBewaar" type="button" data-rtg-morph-action data-rtg-action-state="idle"><span data-rtg-action-copy><span data-rtg-action-copy-for="idle" data-i18n="dailyField.save">Bewaar</span><span data-rtg-action-copy-for="pending" data-i18n="dailyField.saving">Bewaren…</span><span data-rtg-action-copy-for="success" data-i18n="dailyField.saved">Bewaard ✓</span><span data-rtg-action-copy-for="error" data-i18n="dailyField.retry">Opnieuw</span></span></button>
       <button class="knop ds-knop" id="afMeet" type="button" style="display:none;" data-i18n="dailyField.meeting">Vergaderruimte</button>
       <button class="knop ds-knop" id="afWeg" type="button" style="display:none;" data-i18n="dailyField.delete">Verwijder</button>
-      <span class="rek h-flex1 ds-dag-rek"></span>
+      <span class="rek ds-dag-rek ds-dag-rek"></span>
       <button class="knop ds-knop" id="afDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
   </div>

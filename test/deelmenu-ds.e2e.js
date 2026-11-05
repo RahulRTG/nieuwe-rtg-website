@@ -3,7 +3,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { geenOverloop } = require('./lib/ds-toets');
 const { bundel } = require('../scripts/bundel');
 const pw = laadPlaywright();
@@ -19,7 +19,7 @@ test('DS deelmenu blijft volledig leesbaar en bedienbaar; wisselen en herscan ve
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block', reducedMotion: 'reduce' });
     const page = await ctx.newPage(), fouten = [];
-    page.on('pageerror', e => fouten.push(e.message));
+    letOpFouten(page, fouten);
     await page.route('**' + pad, r => r.fulfill({ status: 200, contentType: 'text/html', body:
       '<!doctype html><html lang="nl" data-ds><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
       '<link rel="stylesheet" href="/fonts/fonts.css"><link rel="stylesheet" href="/ds/rtg-ds.css"></head>' +

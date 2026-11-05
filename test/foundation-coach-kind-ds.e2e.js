@@ -3,7 +3,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stopHard, laadPlaywright, browserOpties, geenBrowser, keurLidGoed } = require('./helper');
+const { startServer, stopHard, laadPlaywright, browserOpties, geenBrowser, keurLidGoed, letOpFouten } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const { land, matrix } = require('./lib/foundation-coach-browser');
 const { post, context, paneel, klikAntwoord, coach, jongDagboek, eigenDagboek } = require('./lib/foundation-kind-browser');
@@ -45,7 +45,7 @@ async function bezoek(sessie, scherm, werk, metMatrix = true) {
   const route = scherm.split('/').at(-1).replace(/\.html$/, '');
   const ctx = await context(browser, sessie);
   try {
-    const page = await ctx.newPage(), fouten = []; page.on('pageerror', e => fouten.push(e.message));
+    const page = await ctx.newPage(), fouten = []; letOpFouten(page, fouten);
     await land(page, route, srv.base); if (metMatrix) await matrix(page, route);
     await werk(page); assert.deepEqual(fouten, [], 'geen JavaScript-fouten');
   } finally { await ctx.close(); }

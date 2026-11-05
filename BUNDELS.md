@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**68 bundels, 507 delen, 5 zonder onderwerp.**
+**75 bundels, 527 delen, 19 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -139,6 +139,15 @@ omlaag.
 | `backoffice-04.js` | De tijdlijn is schaalvast: de server bladert en zoekt door de volledige historie; het scherm toont altijd 25 regels p... |
 | `backoffice-05.js` | de backoffice: RENDEZ-VOUS -- THE TABLE |
 
+## `apps/bestanden/app.js`
+
+`public/apps/bestanden/app/` -- 2 delen, 184 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `01-overzicht.js` | Documents presentation and transport; lifecycle meaning belongs to the server |
+| `02-upload-bediening.js` | uploaden: kiezen of slepen; groot gaat in stukken |
+
 ## `apps/boardroom.js`
 
 `public/apps/boardroom/` -- 2 delen, 290 regels in de delen
@@ -195,30 +204,42 @@ omlaag.
 | `gezin-rt-02.js` | WebRTC bellen |
 | `gezin-rt-03.js` | Gezin-RT, deel 3: HET GESPREKSSCHERM zelf -- de stijl en de opbouw van de overlay, plus de tekstbaan erin (shared/mee... |
 
+## `apps/foundation/mediawijs.js`
+
+`public/apps/foundation/mediawijs/` -- 2 delen, 154 regels in de delen, waarvan 2 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `mediawijs-00.js` | -- |
+| `mediawijs-01.js` | -- |
+
 ## `apps/foundation/samen.js`
 
-`public/apps/foundation/samen/` -- 3 delen, 225 regels in de delen
+`public/apps/foundation/samen/` -- 4 delen, 244 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `samen-01.js` | Rustig samenkijken voor gezin en bevestigde vrienden |
+| `samen-01a.js` | De bestaande gezinskamer; dezelfde IIFE als samen-01.js |
 | `samen-01b.js` | De Samen-meldingen en de rustige poller voor pagina- en chatupdates |
 | `samen-02.js` | Rahul voor het gezin: de kindveilige vraagbaak op elke RTF-pagina |
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 442 regels in de delen
+`public/apps/foundation/sessie/` -- 6 delen, 485 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `sessie-00.js` | Sessie: het gezin-account en het gekozen profiel, net als bij een streamingdienst |
+| `sessie-00b.js` | Presentatie van dezelfde serverdeur |
+| `sessie-00c.js` | Dezelfde coach-owner, in dezelfde sessiebundel |
 | `sessie-01.js` | WELKE LETTER PAST OP DEZE CIRKEL |
 | `sessie-02.js` | de ongelezen-teller |
 | `sessie-03.js` | De wereldschil van de RTFoundation: welke bestemmingen er zijn, en welk scherm onder welke valt |
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9910 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9855 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -328,7 +349,7 @@ omlaag.
 | `leverancier-75.js` | De Salon is verplicht: de profielkaart met compleetheidsmeter |
 | `leverancier-76.js` | een foto uploaden bij de zaak |
 | `leverancier-77.js` | de paskamerverzoeken van een retailzaak |
-| `leverancier-78.js` | de stijl van het zegelvenster |
+| `leverancier-78.js` | -- |
 | `leverancier-79.js` | de aanwezigheidsteller op nul zetten |
 | `leverancier-80.js` | de AI-draad van de zaak |
 | `leverancier-80a.js` | Talent Exchange: alleen anonieme, expliciete interesse |
@@ -371,7 +392,7 @@ omlaag.
 
 ## `apps/notities/app.js`
 
-`public/apps/notities/app/` -- 2 delen, 224 regels in de delen
+`public/apps/notities/app/` -- 2 delen, 253 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -451,6 +472,15 @@ omlaag.
 | `personeel-23.js` | het team van vandaag |
 | `personeel-24.js` | het alarm: trillen en tonen |
 | `personeel-25.js` | de ketenchat tussen zaken |
+
+## `apps/reizen-veilig.js`
+
+`public/apps/reizen-veilig/` -- 2 delen, 75 regels in de delen, waarvan 2 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `00.js` | -- |
+| `01.js` | -- |
 
 ## `apps/residentie.js`
 
@@ -569,7 +599,7 @@ omlaag.
 
 ## `apps/voertuig.js`
 
-`public/apps/voertuig/` -- 2 delen, 219 regels in de delen, waarvan 1 zonder onderwerp
+`public/apps/voertuig/` -- 2 delen, 218 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -596,7 +626,7 @@ omlaag.
 
 ## `shared/appmenu.js`
 
-`public/shared/appmenu/` -- 6 delen, 685 regels in de delen
+`public/shared/appmenu/` -- 6 delen, 628 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -609,11 +639,12 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 11 delen, 956 regels in de delen
+`public/shared/basis/` -- 13 delen, 955 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
 | `basis-01.js` | De gedeelde basis-laag: het vangnet dat elke app-pagina op 9+-niveau houdt |
+| `basis-01a-00-thema.js` | 0. het thema, VOOR al het andere |
 | `basis-01a-motion.js` | Heritage Motion vult alleen declaratieve status en toegankelijkheid aan |
 | `basis-01aa-continue.js` | De Continue Key verrijkt uitsluitend de al gemarkeerde Edge-hoofdactie |
 | `basis-01ab-heritage-order.js` | Routes mogen functionele CSS bijladen, maar Heritage blijft het laatste materiaalblad |
@@ -621,13 +652,14 @@ omlaag.
 | `basis-01ad-intelligence.js` | De centrale controllers laden één keer, ook als een route een adapter vóór basis nodig heeft |
 | `basis-01ae-sessie.js` | De sessie van dit scherm, voor de app-gids (eigenaarsbesluit 19 oktober 2026: gebruiken vraagt een account; server/ke... |
 | `basis-01b.js` | Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van de consolidatieronde; de bundelvolgorde is... |
+| `basis-01ba.js` | -- |
 | `basis-01c.js` | de toegankelijkheidshelpers van de gedeelde laag |
 | `basis-02.js` | 5. het lopende werk: de gangreserve-laag van het huis |
 | `basis-02b.js` | Vervolg van basis-02: de hulplaag van de app-gids, plus de afsluiting van start() en van de omhulling |
 
 ## `shared/bediening.js`
 
-`public/shared/bediening/` -- 2 delen, 229 regels in de delen
+`public/shared/bediening/` -- 2 delen, 202 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -636,7 +668,7 @@ omlaag.
 
 ## `shared/borden.js`
 
-`public/shared/borden/` -- 2 delen, 169 regels in de delen
+`public/shared/borden/` -- 2 delen, 145 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -663,16 +695,16 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 203 regels in de delen
+`public/shared/cookie/` -- 2 delen, 107 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
-| `cookie-01.js` | Cookiemelding voor de site en de apps |
-| `cookie-02.js` | De stapel achter de melding zelf; haarzelf en haar kinderen overslaan |
+| `cookie-01.js` | Functionele-opslagmelding |
+| `cookie-02.js` | -- |
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 383 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 380 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -691,7 +723,7 @@ omlaag.
 
 ## `shared/gebaar.js`
 
-`public/shared/gebaar/` -- 8 delen, 1100 regels in de delen
+`public/shared/gebaar/` -- 8 delen, 1109 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -725,7 +757,7 @@ omlaag.
 
 ## `shared/handenvrij-balk.js`
 
-`public/shared/handenvrij-balk/` -- 3 delen, 293 regels in de delen
+`public/shared/handenvrij-balk/` -- 3 delen, 242 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -735,7 +767,7 @@ omlaag.
 
 ## `shared/handenvrij-bureau.js`
 
-`public/shared/handenvrij-bureau/` -- 2 delen, 260 regels in de delen
+`public/shared/handenvrij-bureau/` -- 2 delen, 220 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -744,7 +776,7 @@ omlaag.
 
 ## `shared/handenvrij-scherm.js`
 
-`public/shared/handenvrij-scherm/` -- 2 delen, 219 regels in de delen
+`public/shared/handenvrij-scherm/` -- 2 delen, 192 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -753,7 +785,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1958 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1865 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -767,9 +799,18 @@ omlaag.
 | `i18n-02.js` | spreken: de eigen stem invullen en meteen laten herkennen |
 | `i18n-03.js` | De keuze mag nooit de pagina gijzelen: klik ernaast = huidige taal houden |
 
+## `shared/interface/world-desktop-frame.js`
+
+`public/shared/interface/world-desktop-frame/` -- 2 delen, 148 regels in de delen, waarvan 1 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `00.js` | Same-origin legacy app surface |
+| `01.js` | -- |
+
 ## `shared/ios.js`
 
-`public/shared/ios/` -- 5 delen, 794 regels in de delen
+`public/shared/ios/` -- 5 delen, 744 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -802,7 +843,7 @@ omlaag.
 
 ## `shared/levendekleur.js`
 
-`public/shared/levendekleur/` -- 2 delen, 280 regels in de delen
+`public/shared/levendekleur/` -- 2 delen, 264 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -820,13 +861,13 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 5 delen, 301 regels in de delen
+`public/shared/metgezel/` -- 5 delen, 265 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `metgezel-00.js` | De metgezel: Rahul + Samen, op elke app-pagina |
-| `metgezel-01.js` | Canonieke DS-presentatie op gemigreerde hosts; de oorspronkelijke actieve regels blijven uitsluitend op oudere hosts... |
-| `metgezel-01b.js` | Oudere hosts hebben unlayered resets; behoud hun oorspronkelijke vorm |
+| `metgezel-01.js` | Samen-presentatie komt op iedere host uit de centrale DS-component |
+| `metgezel-01b.js` | Bestaande DOM- en sleepbouwstenen; presentatie komt uit het DS |
 | `metgezel-03.js` | Samen: meekijken en samen doen (alleen leden) |
 | `metgezel-03b.js` | Live Samen-meldingen en de waarschuwing bij een onbeveiligd app-adres |
 
@@ -849,6 +890,15 @@ omlaag.
 | `qr-01.js` | RTG QR: een eigen QR-code-codec (encode + decode), i.p.v |
 | `qr-02.js` | de zigzag: de bits in de QR-matrix leggen |
 
+## `shared/rahul-tab.js`
+
+`public/shared/rahul-tab-entry/` -- 2 delen, 99 regels in de delen, waarvan 2 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `00.js` | -- |
+| `01.js` | -- |
+
 ## `shared/rahul-tab/style-base.js`
 
 `public/shared/rahul-tab/style-base/` -- 2 delen, 44 regels in de delen, waarvan 1 zonder onderwerp
@@ -860,7 +910,7 @@ omlaag.
 
 ## `shared/rahulpoort.js`
 
-`public/shared/rahulpoort/` -- 2 delen, 281 regels in de delen
+`public/shared/rahulpoort/` -- 2 delen, 239 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -869,25 +919,35 @@ omlaag.
 
 ## `shared/randen.js`
 
-`public/shared/randen/` -- 2 delen, 227 regels in de delen
+`public/shared/randen/` -- 2 delen, 215 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `01-laden.js` | De bovenrand opent bestaande instellingen met haal of toetsenbord |
 | `02-bediening.js` | wat er te openen valt |
 
+## `shared/rtg-edge-2-loader.js`
+
+`public/shared/rtg-edge-2-loader/` -- 2 delen, 227 regels in de delen, waarvan 2 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `00.js` | -- |
+| `01.js` | -- |
+
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 300 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 3 delen, 314 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
 | `rtg-edge-smart-menu-00.js` | Twee gezichten, één hamburger: lokale context en heel RTG blijven in het bestaande Edge-menu |
 | `rtg-edge-smart-menu-01.js` | Dezelfde appcatalogus als de widgets: mobiel mag geen apps verliezen |
+| `rtg-edge-smart-menu-02.js` | -- |
 
 ## `shared/rtg-editorial-v4.js`
 
-`public/shared/rtg-editorial-v4/` -- 2 delen, 243 regels in de delen
+`public/shared/rtg-editorial-v4/` -- 2 delen, 251 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -922,7 +982,7 @@ omlaag.
 
 ## `shared/sprong.js`
 
-`public/shared/sprong/` -- 3 delen, 331 regels in de delen
+`public/shared/sprong/` -- 3 delen, 307 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -942,17 +1002,17 @@ omlaag.
 
 ## `shared/teamcall.js`
 
-`public/shared/teamcall/` -- 3 delen, 314 regels in de delen
+`public/shared/teamcall/` -- 3 delen, 269 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `teamcall-01.js` | De teamcall: echt (video)bellen op de werkvloer via WebRTC |
-| `teamcall-01b.js` | TeamCall, deel 1b: DE VORMGEVING van de gespreksoverlay |
+| `teamcall-01b.js` | TeamCall-presentatie staat in het bestaande Design System |
 | `teamcall-02.js` | de publieke knoppen |
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 3 delen, 306 regels in de delen, waarvan 1 zonder onderwerp
+`public/shared/uitvoer/` -- 3 delen, 294 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -962,30 +1022,39 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 346 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 373 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `verbinding-01.js` | Gedeelde verbindingslaag voor alle apps |
-| `verbinding-02.js` | het satelliet-noodbericht |
+| `verbinding-02.js` | Gedeelde presentatie binnen dezelfde verbindingsowner |
+
+## `shared/wereldschil.js`
+
+`public/shared/wereldschil/` -- 2 delen, 258 regels in de delen, waarvan 1 zonder onderwerp
+
+| deel | onderwerp |
+|---|---|
+| `00.js` | DE WERELDSCHIL: het gedrag |
+| `01.js` | -- |
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 7 delen, 692 regels in de delen
+`public/shared/werkos/` -- 7 delen, 455 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `werkos-01.js` | RTG Werk-OS |
-| `werkos-01b.js` | WerkOS-commandobalk, Command Center en tabletindeling |
-| `werkos-01bb.js` | WerkOS op mobiel: compacte rail, context en bereikbare bediening |
-| `werkos-01c.js` | WerkOS-beweging, vaste rail en contextschil |
+| `werkos-01b.js` | WerkOS-commandobalk, Command Center en tabletindeling wonen in /ds/componenten/werkos.css; dit bundeldeel blijft als... |
+| `werkos-01bb.js` | WerkOS mobiel woont in /ds/componenten/werkos.css; dit bundeldeel blijft als expliciete historische naad voor de best... |
+| `werkos-01c.js` | WerkOS-beweging, rail en contextpresentatie: /ds/componenten/werkos.css |
 | `werkos-02.js` | Command Center |
 | `werkos-03.js` | bouwen en spiegelen |
 | `werkos-04.js` | DE BORDSCHIL: het vlak dat over de app komt met de werkvlakken erin |
 
 ## `shared/zaakcommand.js`
 
-`public/shared/zaakcommand/` -- 4 delen, 502 regels in de delen
+`public/shared/zaakcommand/` -- 4 delen, 463 regels in de delen
 
 | deel | onderwerp |
 |---|---|

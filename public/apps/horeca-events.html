@@ -29,7 +29,7 @@
 <header>
   <a class="terug ds-knop ds-knop--klein" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
   <span><span class="ey ds-horeca-label">RTG Horeca</span><h1>Offerte, verbruik en nacalculatie</h1></span>
-  <span class="h-flex1 ds-horeca-groei"></span>
+  <span class="ds-horeca-groei ds-horeca-groei"></span>
 </header>
 <main id="main">
   <div class="kaart ds-kaart ds-horeca-kaart">
@@ -46,26 +46,26 @@
       <input class="veld ds-invoer" id="vContact" maxlength="80" placeholder="Contactpersoon" aria-label="Contactpersoon">
       <input class="i-12sckv veld ds-invoer" id="vRuimte" maxlength="60" placeholder="Ruimte" aria-label="Ruimte">
     </div>
-    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <input class="veld ds-invoer" id="vPost1" maxlength="100" placeholder="Post 1" aria-label="Post 1">
       <input class="i-12sanw veld ds-invoer" id="vAantal1" type="number" min="1" value="50" aria-label="Aantal post 1">
       <input class="i-12sbaw veld ds-invoer" id="vPrijs1" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 1">
     </div>
-    <div class="rij ds-horeca-rij h-mt40 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <input class="veld ds-invoer" id="vPost2" maxlength="100" placeholder="Post 2" aria-label="Post 2">
       <input class="i-12sanw veld ds-invoer" id="vAantal2" type="number" min="1" value="1" aria-label="Aantal post 2">
       <input class="i-12sbaw veld ds-invoer" id="vPrijs2" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 2">
     </div>
-    <div class="rij ds-horeca-rij h-mt40 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <input class="veld ds-invoer" id="vPost3" maxlength="100" placeholder="Post 3" aria-label="Post 3">
       <input class="i-12sanw veld ds-invoer" id="vAantal3" type="number" min="1" value="1" aria-label="Aantal post 3">
       <input class="i-12sbaw veld ds-invoer" id="vPrijs3" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 3">
     </div>
-    <div class="rij ds-horeca-rij h-mt60 ds-horeca-afstand">
+    <div class="rij ds-horeca-rij ds-horeca-afstand ds-horeca-afstand">
       <button class="knop ds-knop ds-knop--klein p" id="vOfferte" type="button">Nieuwe offerte</button>
       <button class="knop ds-knop ds-knop--klein" id="vPosten" type="button">Posten wijzigen</button>
     </div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">Posten wijzigen na een akkoord maakt een nieuwe versie die opnieuw bevestigd moet worden. Anders staat er aan het eind een bedrag op de factuur dat niemand heeft gezien.</p>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand">Posten wijzigen na een akkoord maakt een nieuwe versie die opnieuw bevestigd moet worden. Anders staat er aan het eind een bedrag op de factuur dat niemand heeft gezien.</p>
   </div>
 
   <div class="kaart ds-kaart ds-horeca-kaart">
@@ -80,7 +80,7 @@
       <input class="i-12sbxv veld ds-invoer" id="vAanbedrag" type="number" min="0" step="0.01" placeholder="Aanbetaling" aria-label="Aanbetaling">
       <button class="knop ds-knop ds-knop--klein" id="vAanbetaling" type="button">Boeken</button>
     </div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">Een offerte is pas een opdracht na een akkoord met een naam erbij. Een keuken die kookt voor 350 gasten omdat iemand aan de telefoon ja zei, is precies hoe het misgaat.</p>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand">Een offerte is pas een opdracht na een akkoord met een naam erbij. Een keuken die kookt voor 350 gasten omdat iemand aan de telefoon ja zei, is precies hoe het misgaat.</p>
   </div>
 
   <div class="kaart ds-kaart ds-horeca-kaart">
@@ -97,8 +97,8 @@
       <button class="knop ds-knop ds-knop--klein p" id="vKosten" type="button">Kosten erbij</button>
       <button class="knop ds-knop ds-knop--klein" id="vNa" type="button">Nacalculatie</button>
     </div>
-    <div class="h-mt60 ds-horeca-afstand" id="vNaUit"></div>
-    <p class="stil ds-horeca-meta h-mt40 ds-horeca-afstand">Zonder ingevoerde kosten blijft de marge leeg in plaats van 100%. Een nacalculatie zonder kosten is geen nacalculatie.</p>
+    <div class="ds-horeca-afstand ds-horeca-afstand" id="vNaUit"></div>
+    <p class="stil ds-horeca-meta ds-horeca-afstand ds-horeca-afstand">Zonder ingevoerde kosten blijft de marge leeg in plaats van 100%. Een nacalculatie zonder kosten is geen nacalculatie.</p>
   </div>
 </main>
 <div class="melding ds-melding" id="melding" role="status"></div>

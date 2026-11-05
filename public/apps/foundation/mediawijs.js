@@ -86,7 +86,6 @@ const SITUATIES = [
     regel: 'Niemand heeft ooit je wachtwoord nodig. Geen vriend, geen beheerder, geen helpdesk.'
   }
 ];
-
 let volgorde = [], index = 0, gedaan = 0, punten = 0, beantwoord = false;
 
 function start() {

@@ -72,20 +72,20 @@
   </div>
   <div class="meter ds-dag-meter" aria-hidden="true"><i id="quotumBalk"></i></div>
 </div>
-  <p class="stil h-mt80 ds-dag-stil" data-i18n="daily.fileHelp">Verwijderde bestanden blijven dertig dagen in de prullenbak en tellen mee voor uw opslagruimte. Als u een bestand deelt op codenaam, kan de ander het bekijken en nieuwe versies toevoegen.</p>
+  <p class="stil ds-dag-marge ds-dag-stil" data-i18n="daily.fileHelp">Verwijderde bestanden blijven dertig dagen in de prullenbak en tellen mee voor uw opslagruimte. Als u een bestand deelt op codenaam, kan de ander het bekijken en nieuwe versies toevoegen.</p>
   </div>
 </main>
 
 <div class="file-detail ds-dag-file-detail" id="bkScrim" role="dialog" aria-modal="false" aria-label="Bestand" data-i18n-aria="dailyField.file">
   <div class="paneel ds-dag-paneel">
     <input class="ds-invoer titel ds-dag-titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam" data-i18n-aria="dailyField.filename">
-    <p class="stil h-mt40 ds-dag-stil" id="bkMeta"></p>
+    <p class="stil ds-dag-marge ds-dag-stil" id="bkMeta"></p>
     <div id="bkKijk" style="display:none;"></div>
     <label for="bkMap" data-i18n="dailyField.inFolder">In map</label>
     <select class="ds-invoer veld ds-invoer" id="bkMap" style="width:100%;"></select>
     <div id="bkDeelWrap">
       <label for="bkCode" data-i18n="dailyField.shareFile">Delen op codenaam (kijken en nieuwe versies)</label>
-      <div class="rij ds-dag-rij"><input class="ds-invoer veld h-flex1 ds-invoer" id="bkCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
+      <div class="rij ds-dag-rij"><input class="ds-invoer veld ds-dag-rek ds-invoer" id="bkCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
         <button class="knop ds-knop" id="bkDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
       <p class="stil ds-dag-stil" id="bkGedeeld"></p>
     </div>
@@ -93,16 +93,16 @@
       <label data-i18n="dailyField.versions">Versies</label>
       <div id="bkVersies"></div>
     </div>
-    <div class="rij h-mt90 ds-dag-rij">
+    <div class="rij ds-dag-marge ds-dag-rij">
       <button class="knop vol ds-knop" id="bkBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
       <button class="knop ds-knop" id="bkHaal" type="button" data-i18n="dailyField.download">Download</button>
       <button class="knop ds-knop" id="bkNieuwVersie" type="button" data-i18n="dailyField.newVersion">Nieuwe versie</button>
       <button class="knop ds-knop" id="bkSter" type="button" data-i18n="dailyField.star">Ster</button>
       <button class="knop ds-knop" id="bkWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
-      <span class="h-flex1"></span>
+      <span class="ds-dag-rek"></span>
       <button class="knop ds-knop" id="bkDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
-    <div class="rij h-mt50 ds-dag-rij">
+    <div class="rij ds-dag-marge ds-dag-rij">
       <button class="knop ds-knop" id="bkHerstel" type="button" style="display:none;" data-i18n="dailyField.restore">Herstel</button>
       <input class="ds-invoer" type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen" data-i18n-aria="dailyField.chooseVersion">
     </div>

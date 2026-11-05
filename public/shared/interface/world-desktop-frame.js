@@ -89,6 +89,7 @@
       returnFocus = source || d.activeElement;
       if (!x) {
         var frame = document.createElement('iframe'); frame.src = url;
+        if (w.RTGMedia && w.RTGMedia.kader) w.RTGMedia.kader(frame);
         frame.className = 'wd-app-frame'; frame.title = name; frame.dataset.desktopApp = url;
         x = { frame: frame, url: url, ready: false, dirty: false }; entries.push(x);
         frame.addEventListener('load', function () { ready(x); }); frame.addEventListener('error', function () { failed(x); });

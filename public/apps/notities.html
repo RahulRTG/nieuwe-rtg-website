@@ -52,7 +52,7 @@
   <div id="gedeeldKop" class="kop ds-dag-kop" style="display:none;" data-i18n="dailyField.sharedEditing">Met mij gedeeld · samen bewerken</div>
   <div id="gedeeldBord"></div>
   <div class="daily-foot ds-dag-daily-foot"><button type="button" class="daily-action ds-knop ds-dag-actie" data-daily-target="nieuwNotitie"><span data-i18n="daily.newNote">Nieuwe notitie</span> <span aria-hidden="true">→</span></button></div>
-  <p class="stil h-mt80 ds-dag-stil" data-i18n="dailyField.noteHelp">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
+  <p class="stil ds-dag-marge ds-dag-stil" data-i18n="dailyField.noteHelp">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
     in RTG Agenda; daar komt ook het seintje vandaan. Delen op codenaam is samen werken: de ander kan afvinken
     en aanvullen.</p>
   </div>
@@ -65,8 +65,8 @@
     <div id="ntTekstWrap"><textarea class="ds-invoer" id="ntTekst" rows="7" maxlength="4000" placeholder="Schrijf hier." data-i18n-ph="dailyField.writeHere"></textarea></div>
     <div id="ntLijstWrap" style="display:none;">
       <div id="ntTaken"></div>
-      <div class="rij h-mt50 ds-dag-rij">
-        <input class="ds-invoer gewoon h-flex1 ds-dag-gewoon" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe" data-i18n-ph="dailyField.newItem">
+      <div class="rij ds-dag-marge ds-dag-rij">
+        <input class="ds-invoer gewoon ds-dag-rek ds-dag-gewoon" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe" data-i18n-ph="dailyField.newItem">
       </div>
     </div>
     <div class="twee ds-dag-twee">
@@ -75,16 +75,16 @@
     </div>
     <div id="ntDeelWrap">
       <label for="ntCode" data-i18n="dailyField.shareNote">Delen op codenaam (samen bewerken)</label>
-      <div class="rij ds-dag-rij"><input class="ds-invoer gewoon h-flex1 ds-dag-gewoon" id="ntCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
+      <div class="rij ds-dag-rij"><input class="ds-invoer gewoon ds-dag-rek ds-dag-gewoon" id="ntCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
         <button class="knop ds-knop" id="ntDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
       <p class="stil ds-dag-stil" id="ntGedeeld"></p>
     </div>
-    <div class="rij h-mt90 ds-dag-rij">
+    <div class="rij ds-dag-marge ds-dag-rij">
       <button class="knop vol ds-knop" id="ntBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
       <button class="knop ds-knop" id="ntVast" type="button" data-i18n="dailyField.pin">Vastpinnen</button>
       <button class="knop ds-knop" id="ntArchief" type="button" data-i18n="dailyField.archiveAction">Archiveer</button>
       <button class="knop ds-knop" id="ntWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
-      <span class="h-flex1"></span>
+      <span class="ds-dag-rek"></span>
       <button class="knop ds-knop" id="ntDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
   </div>

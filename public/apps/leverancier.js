@@ -9010,6 +9010,12 @@
      handtekening garant dat het paspoort is gezien; de partner leert enkel het
      bewezen feit (18+, lid, welke pas), nooit de naam. De controle wordt ook op
      de server gelogd als officiele ID-check. */
+  function leverancierOverlayPresentatie() {
+    if (document.documentElement.hasAttribute('data-ds') || document.getElementById('rtgDsRuntimeCss')) return;
+    const link = document.createElement('link');
+    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+    document.head.appendChild(link);
+  }
   function idResultaat(r){
     const geldig = r && r.geldig, claims = (geldig && r.claims) || {};
     const LBL = { leeftijd18: '18 jaar of ouder', leeftijd21: '21 jaar of ouder', lid: 'Geldig RTG-lid', pas: 'Pas', foundation: 'RTFoundation', zakelijk: 'Zakelijk lid' };
@@ -9074,12 +9080,6 @@
     document.getElementById('awSluit').addEventListener('click', () => ov.remove());
     ov.querySelectorAll('[data-awplus]').forEach(b => b.addEventListener('click', () => awPas(b.dataset.awplus, 1)));
     ov.querySelectorAll('[data-awmin]').forEach(b => b.addEventListener('click', () => awPas(b.dataset.awmin, -1)));
-  function leverancierOverlayPresentatie() {
-    if (document.documentElement.hasAttribute('data-ds') || document.getElementById('rtgDsRuntimeCss')) return;
-    const link = document.createElement('link');
-    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
-    document.head.appendChild(link);
-  }
 /* de aanwezigheidsteller op nul zetten */
     document.getElementById('awLeeg').addEventListener('click', async () => {
       if (!confirm(T('aw.leegvraag','De teller op nul zetten?'))) return;

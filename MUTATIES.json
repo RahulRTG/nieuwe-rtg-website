@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-11-05T16:37:40.006Z",
-    "commit": "a7e7149600",
+    "op": "2026-11-05T16:40:10.347Z",
+    "commit": "65e7579a6e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
@@ -40,7 +40,8 @@
     },
     "aankomst-chauffeur-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "HTML-contract; data-ds-schermtype taak hernoemen laat de toets zakken"
     },
     "aanmeldbesluit.test.js": {
       "soort": "server",
@@ -1820,7 +1821,8 @@
     },
     "beginscherm.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "routecontract; wallet.js in geld.html hernoemen laat de toets zakken"
     },
     "begroting.test.js": {
       "soort": "puur",
@@ -2973,7 +2975,8 @@
     },
     "canvas.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "browsercontract; var MAX van 3 naar 4 laat de canvastoets zakken"
     },
     "capabilities.test.js": {
       "soort": "puur",
@@ -3152,7 +3155,8 @@
     },
     "clipdeler.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "exportcontract; RTGClipDeler.start op null zetten laat de toets zakken"
     },
     "clips-deel.e2e.js": {
       "soort": "server",
@@ -3428,7 +3432,8 @@
     },
     "command-router.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "routercontract; RTGAppDirectoryCommand hernoemen laat de toets zakken"
     },
     "command-routes-bestuur.test.js": {
       "soort": "server",
@@ -4206,7 +4211,8 @@
     },
     "decision-room.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "HTML-contract; data-dr-paneel agenda hernoemen laat de toets zakken"
     },
     "deelindex.test.js": {
       "soort": "puur",
@@ -5249,7 +5255,8 @@
     },
     "eten-uitgaan-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "wereldcontract; rtg-night-discover in foodcourt hernoemen laat de toets zakken"
     },
     "eten.test.js": {
       "soort": "puur",
@@ -5908,7 +5915,8 @@
     },
     "foundation-geld-later.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract; de Vandaag-belofte verwijderen laat de toets zakken"
     },
     "foundation-gezinstoken-productie.test.js": {
       "soort": "server",
@@ -5919,11 +5927,13 @@
     },
     "foundation-gezondheid-welzijn.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract; de Stap-voor-stap-belofte verwijderen laat de toets zakken"
     },
     "foundation-hulp-zorg.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract; de meebewegende-hulpbelofte verwijderen laat de toets zakken"
     },
     "foundation-kind-ds.test.js": {
       "soort": "puur",
@@ -5932,7 +5942,8 @@
     },
     "foundation-leren-groei.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract; Vandaag een stap verder verwijderen laat de toets zakken"
     },
     "foundation-lescredential-server.test.js": {
       "soort": "server",
@@ -5990,7 +6001,8 @@
     },
     "foundation-meedoen-ontdekken.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract; de welkom-belofte verwijderen laat de toets zakken"
     },
     "foundation-persoonscodes.pg.test.js": {
       "soort": "puur",
@@ -6035,7 +6047,8 @@
     },
     "foundation-samen-thuis.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract; Samen begint met overzicht verwijderen laat de toets zakken"
     },
     "foundation-schil-os.test.js": {
       "soort": "puur",

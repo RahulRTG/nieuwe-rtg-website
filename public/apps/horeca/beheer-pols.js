@@ -35,7 +35,7 @@
 
     $('poZaak').innerHTML = INVULBAAR.map(function (o) {
       var nu = (d.zaakZegt || []).filter(function (z) { return z.onderwerp === o.sleutel; })[0];
-      return '<div class="rij ds-horeca-rij h-mt40 ds-horeca-afstand"><label for="po_' + esc(o.sleutel) + '" class="s-1trhhui">' +
+      return '<div class="rij ds-horeca-rij ds-horeca-afstand"><label for="po_' + esc(o.sleutel) + '" class="s-1trhhui">' +
         esc(o.naam) + '</label><select class="veld ds-invoer" id="po_' + esc(o.sleutel) + '" aria-label="' + esc(o.naam) + '">' +
         '<option value="">(niets zeggen)</option>' +
         o.standen.map(function (s) {

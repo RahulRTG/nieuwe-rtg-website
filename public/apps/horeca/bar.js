@@ -46,7 +46,7 @@
       '<em>' + esc(r.stoel || 'de tafel') + '</em>' +
       (r.allergie ? '<span class="b-allergie ds-horeca-werkallergie">' + esc(r.allergie) + '</span>' : '') +
       (r.notitie ? '<em>' + esc(r.notitie) + '</em>' : '') +
-      '<span class="h-flex1 ds-horeca-groei"></span>' +
+      '<span class="ds-horeca-groei"></span>' +
       (naar ? '<button class="knop ds-knop ds-knop--klein' + (r.stand === 'besteld' ? '' : ' p') + '" data-zet="' + esc(r.regelId) +
         '" data-rek="' + esc(g.rekeningId) + '" data-naar="' + naar + '">' + KNOP[r.stand] + '</button>'
         : '<em>staat klaar</em>') + '</li>';

@@ -140,7 +140,7 @@
       return '<div class="v-leen ds-horeca-werkleen"><b>' + esc(l.tafel) + '</b><small>' +
         esc(l.naam) + ' draagt hem' + (l.vanNaam ? ', van ' + esc(l.vanNaam) : '') +
         (l.wijkNaam ? ' uit ' + esc(l.wijkNaam) : '') + ' · ' + l.staat + ' min' + weg(l) + '</small>' +
-        '<span class="h-flex1 ds-horeca-groei"></span>' +
+        '<span class="ds-horeca-groei"></span>' +
         ((l.naarMij || l.vanMij || d.magIndelen) ? K.knop('Terug', { terug: l.tafel }) : '') +
         '</div>';
     }).join('') : '<p class="v-leeg ds-horeca-werkleeg">Geen enkele tafel staat bij iemand anders. Een halve wijk ' +

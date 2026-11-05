@@ -119,7 +119,7 @@
               (b.allergie ? ' <span class="allergie ds-horeca-allergie">' + esc(b.allergie) + '</span>' : '') +
               '</span></div>';
           }).join('') +
-          '<div class="rij ds-horeca-rij h-mt40 ds-horeca-afstand">' + knoppen + '</div></div>';
+          '<div class="rij ds-horeca-rij ds-horeca-afstand">' + knoppen + '</div></div>';
       }).join('') || '<p class="stil ds-horeca-meta">Er staat niets compleet klaar.</p>';
 
       var doe = function (attr, pad, woord) {

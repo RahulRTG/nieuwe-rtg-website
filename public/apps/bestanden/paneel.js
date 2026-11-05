@@ -72,7 +72,7 @@
       if (!open || open.id !== id || r.body.error || !(r.body.versies || []).length) return;
       $('#bkVersieWrap').style.display = '';
       $('#bkVersies').innerHTML = r.body.versies.map(function (v) {
-        return '<div class="versierij ds-dag-versierij"><span class="h-flex1">' + esc(String(v.op || '').slice(0, 16).replace('T', ' ')) +
+        return '<div class="versierij ds-dag-versierij"><span class="ds-dag-rek">' + esc(String(v.op || '').slice(0, 16).replace('T', ' ')) +
           ' · ' + B().maat(v.bytes) + (v.door ? ' · door ' + esc(v.door) : '') + '</span>' +
           '<button class="knop ds-knop" data-vh="' + v.n + '" type="button">Bekijk</button>' +
           '<button class="knop ds-knop" data-vt="' + v.n + '" type="button">Zet terug</button></div>';

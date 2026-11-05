@@ -63,7 +63,7 @@
         var st = x.status === 'ja' ? 'komt' : x.status === 'nee' ? 'komt niet' : 'nog geen antwoord';
         return '<div class="deeln ds-dag-deeln"><span>' + esc(x.codenaam) + '</span><span class="st' +
           (x.status === 'ja' ? ' ja' : '') + ' ds-dag-st">' + st + '</span></div>';
-      }).join('') : '<p class="stil h-mt40 ds-dag-stil">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
+      }).join('') : '<p class="stil ds-dag-stil ds-dag-marge">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
     }
 
     $('#afDicht').addEventListener('click', dicht);

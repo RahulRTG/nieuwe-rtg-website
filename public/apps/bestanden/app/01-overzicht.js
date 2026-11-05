@@ -110,7 +110,7 @@
     $('#lijst').innerHTML = eigen.map(rijtje).join('') || '<p class="stil ds-dag-stil">' +
       (bak ? 'De prullenbak is leeg.' : window.RTGDailyCopy.text(q ? 'noResults' : 'noFiles')) + '</p>';
     if (bak && eigen.length) {
-      $('#lijst').innerHTML += '<div class="rij h-mt50 ds-dag-rij">' +
+      $('#lijst').innerHTML += '<div class="rij ds-dag-rij ds-dag-marge">' +
         '<button class="knop ds-knop" id="leegAlles" type="button">Prullenbak leegmaken</button></div>';
       var la = $('#leegAlles');
       if (la) la.addEventListener('click', function () {

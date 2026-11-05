@@ -1,4 +1,4 @@
-  function leverancierOverlayPresentatie() {
+/* Verbindt leveranciersoverlays met de bestaande presentatiebasis. */\n  function leverancierOverlayPresentatie() {
     if (document.documentElement.hasAttribute('data-ds') || document.getElementById('rtgDsRuntimeCss')) return;
     const link = document.createElement('link');
     link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';

@@ -35,7 +35,7 @@ function fixture(t,change={}) {
     if(change.observation)change.observation(observation);
     const config='# RTG_EXPERIENCE_CONFIGURATION '+JSON.stringify(configuration)+'\n';
     const diagnostic='# RTG_EXPERIENCE_OBSERVATION '+JSON.stringify(observation)+'\n';
-    const stdout='TAP version 13\nok 1 - '+binding.check+'\n# tests 1\n# pass 1\n# fail 0\n# cancelled 0\n# skipped '+(change.skip?1:0)+'\n# todo 0\n'+config+(change.missing?'':diagnostic)+(change.duplicate?diagnostic:'');
+    const stdout='TAP version 13\nok 1 - '+binding.check+'\n# tests 1\n# pass 1\n# fail 0\n# cancelled 0\n# skipped '+(change.skipped?1:0)+'\n# todo 0\n'+config+(change.missing?'':diagnostic)+(change.duplicate?diagnostic:'');
     post=true;return {stdout,stderr:'',status:change.exit?1:0};
   });
   const run=()=>execution.execute(root,{id:'hotels-destination',test:'test/hotels-ds.e2e.js'});
@@ -68,7 +68,7 @@ test('coverage neemt de deelcel met geldige signature op zonder requirement, dim
   assert.equal(report.summary.screens.proven,0);assert.notEqual(report.status,'PROVEN');
 });
 for(const [name,change] of [
-  ['geen diagnostic',{missing:true}],['dubbele diagnostic',{duplicate:true}],['failure',{exit:true}],['skip',{skip:true}],
+  ['geen diagnostic',{missing:true}],['dubbele diagnostic',{duplicate:true}],['failure',{exit:true}],['skip',{skipped:true}],
   ['vuile kandidaat na proef',{dirty:true}],['gewijzigde commit',{commit:true}],['gewijzigde bron',{source:true}],
   ['verkeerde viewport',{configuration:c=>{c.viewport={width:1440,height:900};}}],
   ['geen gemeten browserversie',{configuration:c=>{delete c.browserVersion;}}],

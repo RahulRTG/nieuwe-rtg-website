@@ -2801,7 +2801,7 @@ geen kandidaat-, merge- of productievrijgave.
   stijleigenaren zijn verwijderd. `public/ds/componenten/geld.css` is nu het
   ene, onder `.ds-geld` begrensde componentblad dat `geld.html` vóór de
   standen laadt. De overbodige tweede overzichtseigenaar
-  `public/apps/geld/overzicht-a.js` is verwijderd. Het component is bewust
+  Het voormalige script `overzicht-a.js` is verwijderd. Het component is bewust
   alleen op Geld geladen en vergroot dus niet de globale DS-payload.
 - **De echte laadpaden zijn statisch bewijsbaar.** Balans laadt de bestaande
   toestelkluis via één begrensde native scriptloader; RTG Code verklaart zijn

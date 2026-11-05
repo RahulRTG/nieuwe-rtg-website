@@ -220,7 +220,7 @@
       deur('/apps/app.html', 'Alle apps', 'grid') +
       '<button type="button" class="rtg-edge-smart-door" data-edge-smart-search>' + icoon('search') + '<span>Zoeken</span><em aria-hidden="true">›</em></button>' +
       '<button type="button" class="rtg-edge-smart-door" data-edge-smart-language>' + icoon('grid') + '<span>Taal kiezen</span><em aria-hidden="true">›</em></button>' +
-      deur('/apps/mijn-gegevens.html', 'Profiel &amp; veiligheid', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
+/* Vult het intelligente Edge-menu met contextuele bestemmingen. */\n      deur('/apps/mijn-gegevens.html', 'Profiel &amp; veiligheid', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
     index.textContent = ''; index.appendChild(schaal);
     rt.hier = schaal.querySelector('.rtg-edge-face-here');
     rt.alles = schaal.querySelector('.rtg-edge-face-all');

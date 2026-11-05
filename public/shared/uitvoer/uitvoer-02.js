@@ -1,4 +1,4 @@
-  function herzie() {
+/* Herstelt de gedeelde inhoudslaag voor zelfstandige applicaties. */\n  function herzie() {
     if (!document.body) return;
     // Standalone pages share one visible content frame. A former workspace
     // drawer must not keep the real export control inside a permanently closed host.

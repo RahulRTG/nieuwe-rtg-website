@@ -19,8 +19,8 @@ for(const ds of [true,false])test('bestaande overdracht, bedragen, escaping en s
  nodes.find(n=>n.tagName==='button').listeners.click();assert.equal(e.doc.body.children.length,0);
 });
 test('HTTP-fout, payloadfout en oude actor publiceren geen overdracht',async()=>{
- for(const [status,data]of [[503,{ok:true,overdracht}],[200,{ok:false,overdracht}],[200,{ok:'true',overdracht}],[200,{ok:true,error:'nee',overdracht}]]){const e=omgeving();await e.klaar(status,data);assert.equal(e.doc.body.children.length,0);assert.equal(e.doc.head.children.length,0);}
- const e=omgeving();e.token('actor-B');await e.klaar(200,{ok:true,overdracht});assert.equal(e.doc.body.children.length,0);
+ for(const [status,data]of [[503,{ok:true,overdracht}],[200,{ok:false,overdracht}],[200,{ok:'true',overdracht}],[200,{ok:true,error:'nee',overdracht}]]){const e=omgeving();await e.klaar(status,data);assert.equal(e.doc.body.children[0],undefined);assert.equal(e.doc.head.children.length,0);}
+ const e=omgeving();e.token('actor-B');await e.klaar(200,{ok:true,overdracht});assert.equal(e.doc.body.children[0],undefined);
  const f=omgeving({loading:true});f.token('actor-B');f.doc.DOMContentLoaded();assert.equal(f.calls.length,0);
 });
 test('DS-marker na ophalen maar vóór antwoord behoudt de bestaande dynamische stijlgrens',async()=>{

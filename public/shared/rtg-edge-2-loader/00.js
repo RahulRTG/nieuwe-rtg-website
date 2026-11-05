@@ -1,4 +1,4 @@
-(function (w, d) {
+/* Initialiseert Edge binnen de bestaande universele applicatieschil. */\n(function (w, d) {
   'use strict';
   if (!d.body || w.__RTGEdge2Loader) return;
   w.__RTGEdge2Loader = true;

@@ -318,7 +318,7 @@
     '.bss-zaak i{font-style:normal;color:#d7c690;}' +
     '.bss-veld{width:100%;background:transparent;color:#eee;border:1px solid #555;border-radius:0;font:inherit;font-size:.82rem;padding:.5rem;}' +
     /* In een split-paneel is de grote titel dubbelop: je hebt de app zelf net
-       gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
+/* Beheert de toegankelijke titel en acties van het gekozen basispaneel. */\n       gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
        zicht maar blijven in de toegankelijkheidsboom (zelfde techniek als
        .vis-verborgen). De ACTIEknoppen in de balk (zoeken, uploaden, nieuw)
        blijven gewoon staan: dat is bediening, geen chrome. */

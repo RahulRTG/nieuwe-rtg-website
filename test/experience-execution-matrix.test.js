@@ -71,7 +71,7 @@ for(const [name,batch] of [
 });
 
 for(const [name,change] of [
-  ['procesfailure',{fail:true}],['skip',{skip:true}],['gewijzigde bron',{source:true}],
+  ['procesfailure',{fail:true}],['skip',{skipped:true}],['gewijzigde bron',{source:true}],
   ['andere commit',{commit:true}],['vuile kandidaat na proces',{dirty:true}],['vuile kandidaat vóór receiptuitgifte',{finalDirty:true}]
 ]) test('vijf geldige diagnostics krijgen geen receipts bij '+name,t=>{
   const f=fixture(t),run=f.run(change);

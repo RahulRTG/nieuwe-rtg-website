@@ -54,7 +54,7 @@ function fixture(t,name='hotels') {
       checks:[{id:cell.check,observed:structuredClone(cell.row.expected),expected:structuredClone(cell.row.expected),passed:true}],result:'passed'}));
     const batch={configurations,observations,checks:expected.map(cell=>cell.check)};
     if(change.batch)change.batch(batch);
-    const count=batch.checks.length,failed=change.fail?1:0,skipped=change.skip?1:0;
+    const count=batch.checks.length,failed=change.fail?1:0,skipped=change.skipped?1:0;
     const named=batch.checks.map((name,i)=>(failed&&i===0?'not ok ':'ok ')+(i+1)+' - '+name+(skipped&&i===0?' # SKIP fixture':'')).join('\n');
     const diagnostics=batch.configurations.map(c=>'# RTG_EXPERIENCE_CONFIGURATION '+JSON.stringify(c))
       .concat(batch.observations.map(o=>'# RTG_EXPERIENCE_OBSERVATION '+JSON.stringify(o))).join('\n');

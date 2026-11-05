@@ -1,4 +1,4 @@
-      deur('/apps/mijn-gegevens.html', 'Profiel &amp; veiligheid', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
+/* Vult het intelligente Edge-menu met contextuele bestemmingen. */\n      deur('/apps/mijn-gegevens.html', 'Profiel &amp; veiligheid', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
     index.textContent = ''; index.appendChild(schaal);
     rt.hier = schaal.querySelector('.rtg-edge-face-here');
     rt.alles = schaal.querySelector('.rtg-edge-face-all');

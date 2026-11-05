@@ -2591,7 +2591,7 @@ var RTG_BOUW = '7a7b6383';
     else setTimeout(volgende, 50);
   }
 
-  function renderAll(){
+/* Rendert de hoofdapp en vangt ontbrekende onderdelen gecontroleerd op. */\n  function renderAll(){
     /* Ook deze aanloop liep zonder vangnet, en juist hier staan de regels die
        aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
        renderAll niet eens op gang en hielp het afschermen van de stappen

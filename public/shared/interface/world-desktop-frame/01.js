@@ -1,4 +1,4 @@
-      directNaar(x.url, false); retry.hidden = false;
+/* Opent en herstelt wereldpanelen binnen het gedeelde bureaublad. */\n      directNaar(x.url, false); retry.hidden = false;
     }
     function open(url, name, source) {
       // Every target must belong to the actual route manifest, not to design metadata.

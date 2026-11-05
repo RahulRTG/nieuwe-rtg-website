@@ -515,7 +515,13 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
   });
   if (process.platform !== 'win32' && r.pid) {
     try { process.kill(-r.pid, 'SIGKILL'); }
-    catch (e) { if (e.code !== 'ESRCH') throw e; }
+    catch (e) {
+      // Een force-exit kan de groepsleider al hebben opgeruimd en de losse
+      // groepskill op macOS vervolgens als EPERM teruggeven. De kindrunner is
+      // dan aantoonbaar afgelopen; ESRCH en EPERM betekenen hier beide dat er
+      // niets meer door deze ouder kan worden opgeruimd.
+      if (!['ESRCH', 'EPERM'].includes(e.code)) throw e;
+    }
   }
   const uit = String(r.stdout || '');
   if (logPrefix) {

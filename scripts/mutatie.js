@@ -2033,15 +2033,15 @@ function proefServerScherp(naam) {
   return { staat: na.gezakt > 0 ? 'gezakt' : 'overleefd', gezakt: na.gezakt };
 }
 
-function proefServer(naam) {
+function proefServer(naam, forceer) {
   if (NIET_MUTEREN.has(naam)) return { soort: 'server', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
   const bestand = path.join(TEST, naam);
-  const nul = draaiToets(bestand);
+  const nul = draaiToets(bestand, null, null, forceer);
   if (nul.tijdout) return { soort: 'server', staat: 'te langzaam' };
   if (nul.gezakt > 0) return { soort: 'server', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
   if (!nul.toetsen) return { soort: 'server', staat: 'geen toetsen gedraaid' };
   if (nul.alGeslagen) return { soort: 'server', staat: 'slaat zichzelf over', overgeslagen: nul.overgeslagen };
-  const na = draaiToets(bestand, { RTG_LIEG: '/api/' }, WACHT_MUTATIE);
+  const na = draaiToets(bestand, { RTG_LIEG: '/api/' }, WACHT_MUTATIE, forceer);
   if (na.tijdout) return Object.assign(tijdoutMaarMeetbaar(bestand, { RTG_LIEG: '/api/' }, 'server'),
     { operator: 'liegpoort /api/' });
   return na.gezakt > 0
@@ -2289,7 +2289,7 @@ if (require.main === module) {
   }
   if (alleen !== 'puur') {
     console.log('  --- B: servertoetsen, liegpoort ---');
-    doe(server, proefServer);
+    doe(server, n => proefServer(n, forceer));
     vastleggen();
 
     /* FASE C, DE SCHERPE RONDE. Fase B laat ALLES liegen, ook de deur waardoor

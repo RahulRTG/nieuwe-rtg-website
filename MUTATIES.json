@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-11-05T12:48:11.411Z",
-    "commit": "9ceeb91777",
+    "op": "2026-11-05T13:50:28.476Z",
+    "commit": "e420163982",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -196,8 +196,11 @@
     },
     "accounts-requestcommit.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/kluis.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 13
     },
     "accounts-transactie.test.js": {
       "soort": "puur",
@@ -428,8 +431,11 @@
     },
     "afhaalcode.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "afhaalcode.test.js": {
       "soort": "server",
@@ -651,8 +657,11 @@
     },
     "algpin-herstel.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "algpin-herstel.test.js": {
       "soort": "server",
@@ -1175,8 +1184,11 @@
     },
     "arrivalpas.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "arrivalpas.test.js": {
       "soort": "server",
@@ -2505,8 +2517,11 @@
     },
     "boarding-pass.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "boardlog-keten.test.js": {
       "soort": "puur",
@@ -3031,8 +3046,11 @@
     },
     "chaos.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 5
     },
     "chaos.test.js": {
       "soort": "puur",
@@ -3190,8 +3208,11 @@
     },
     "codedeuren-claim.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "codegrens.test.js": {
       "soort": "puur",
@@ -3902,8 +3923,11 @@
     },
     "contactpin-live.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/kern/sociaal.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 4
     },
     "contactpin.e2e.js": {
       "soort": "server",
@@ -4406,8 +4430,7 @@
     },
     "directpay-workers.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "geen module gevonden"
     },
     "directpay.test.js": {
       "soort": "server",
@@ -5192,8 +5215,11 @@
     },
     "eten-kortingscode.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/redis.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 13
     },
     "eten-kortingscode.test.js": {
       "soort": "puur",
@@ -5892,8 +5918,11 @@
     },
     "foundation-lescredential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "foundation-lescredential.test.js": {
       "soort": "puur",
@@ -5940,8 +5969,11 @@
     },
     "foundation-persoonscodes.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "foundation-persoonscodes.test.js": {
       "soort": "server",
@@ -7059,8 +7091,11 @@
     },
     "giftcard-credential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "giftcard-credential.test.js": {
       "soort": "puur",
@@ -7799,8 +7834,11 @@
     },
     "horecabon-credential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "horecabon-credential.test.js": {
       "soort": "puur",
@@ -8923,8 +8961,11 @@
     },
     "kascode-credential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "kascode-credential.test.js": {
       "soort": "puur",
@@ -10110,8 +10151,11 @@
     },
     "linkcap-credential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "linkcap-credential.test.js": {
       "soort": "puur",
@@ -12878,8 +12922,7 @@
     },
     "onboarding-workers.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "geen module gevonden"
     },
     "onboarding.test.js": {
       "soort": "server",
@@ -13957,8 +14000,11 @@
     },
     "payout-terugboeking.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "payout-terugboeking.sqlite.test.js": {
       "soort": "puur",
@@ -14204,8 +14250,11 @@
     },
     "personeelsuitnodiging.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "personeelzicht-routes.test.js": {
       "soort": "server",
@@ -14265,13 +14314,19 @@
     },
     "pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 5
     },
     "pgaccounts.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pgaccounts.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "pgsync-voorrang.test.js": {
       "soort": "puur",
@@ -14544,8 +14599,11 @@
     },
     "postgres-requestcommit.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "postgres-requestcommit.test.js": {
       "soort": "puur",
@@ -15789,8 +15847,11 @@
     },
     "restdeuren.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "resync-licht.test.js": {
       "soort": "puur",
@@ -16155,8 +16216,11 @@
     },
     "rtf-samen-credential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "rtf-samen-credential.test.js": {
       "soort": "puur",
@@ -16770,8 +16834,11 @@
     },
     "rtgid-credential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "rtgid-credential.test.js": {
       "soort": "server",
@@ -17049,8 +17116,11 @@
     },
     "salon-claimcode.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "salon-claimcode.test.js": {
       "soort": "puur",
@@ -18487,8 +18557,11 @@
     },
     "spelprojectie.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "spelprojectie.test.js": {
       "soort": "puur",
@@ -19801,8 +19874,11 @@
     },
     "tegoedbon-credential.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "tegoedbon-credential.test.js": {
       "soort": "puur",
@@ -19980,8 +20056,11 @@
     },
     "ticketcodes.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "tickettoegang.test.js": {
       "soort": "server",
@@ -20641,8 +20720,7 @@
     },
     "txledger.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "geen module gevonden"
     },
     "uitbetaalgrendel.test.js": {
       "soort": "puur",
@@ -23076,8 +23154,11 @@
     },
     "zaakdoos-sleutel.pg.test.js": {
       "soort": "puur",
-      "staat": "slaat zichzelf over",
-      "overgeslagen": 1
+      "staat": "gezakt",
+      "module": "server/pg/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zaakdoos.test.js": {
       "soort": "server",

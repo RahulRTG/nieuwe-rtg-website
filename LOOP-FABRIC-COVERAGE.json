@@ -21309,7 +21309,7 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
         "kernelDependencyCount": 25,
-        "screenCount": 10,
+        "screenCount": 9,
         "sourceFiles": [
           "server/routes/member/persoonlijk-concept.js",
           "server/routes/member/persoonlijk-rahul.js",
@@ -21352,7 +21352,6 @@
           "public/apps/muziek.html",
           "public/apps/overheid.html",
           "public/apps/reizen.html",
-          "public/apps/rtg.html",
           "public/apps/uitgaan.html"
         ],
         "screensOmitted": 0,

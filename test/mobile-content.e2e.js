@@ -47,10 +47,16 @@ async function context(browser, width, signedIn = true) {
   }, {token:signedIn ? token : null, session, supToken:signedIn ? supToken : null});
   return ctx;
 }
-async function open(page, route, base) {
-  await page.goto((base || srv.base) + route, {waitUntil:'domcontentloaded'});
-  await h.wachtOpSchil(page);
-  await page.evaluate(() => document.fonts.ready);
+async function open(page, route, base, stand) {
+  const vorig = /^https?:/.test(page.url()) ? new URL(page.url()).host : null;
+  if (stand) { stand.weg = true; stand.host = vorig; }
+  try {
+    await page.goto((base || srv.base) + route, {waitUntil:'domcontentloaded'});
+    await h.wachtOpSchil(page);
+    await page.evaluate(() => document.fonts.ready);
+  } finally {
+    if (stand) { stand.weg = false; stand.host = null; }
+  }
 }
 async function painted(page, selector) {
   const target = page.locator(selector).first();
@@ -86,9 +92,9 @@ async function shot(page, name) {
    geteld (stand.afgebroken). Buiten dat venster blijven ze een fout, en dan zegt
    netwerkStand() welk adres het was. */
 const AFGEBROKEN = 'TypeError: Load failed';
-const afgebroken = (m, host) => m === AFGEBROKEN || h.afbrekingsTekst(m, host);
+const afgebroken = (m, host) => m === AFGEBROKEN || (host && h.afbrekingsTekst(m, host));
 const bak = (errors, stand, host) => ({ push(m) {
-  if (stand.weg && afgebroken(m, host)) stand.afgebroken++; else errors.push(m);
+  if (stand.weg && afgebroken(m, stand.host || host)) stand.afgebroken++; else errors.push(m);
 } });
 const lopend = new WeakMap(), mislukt = new WeakMap();
 function netwerk(p) {
@@ -119,12 +125,13 @@ for (const engine of engines) {
     const browser = await pw[engine].launch(engine === 'chromium' ? h.browserOpties(pw) : {});
     try {
       const ctx = await context(browser,width), page = await ctx.newPage(), errors = [];
-      h.letOpFouten(page,errors,{eigenZeef:true});
+      const stand = {weg:false, afgebroken:0, host:null};
+      h.letOpFouten(page,bak(errors,stand,null),{eigenZeef:true});
       for (const [route,heading,stage] of [
         ['werk','.wk-briefing h1','.wk-stage'], ['horeca','.hq-stage h2','.hq-stage'],
         ['partner-network','.pn-network .pn-kpi strong','.pn-grid']
       ]) {
-        await open(page,'/apps/'+route+'.html', route === 'partner-network' ? srvZaak.base : undefined);
+        await open(page,'/apps/'+route+'.html', route === 'partner-network' ? srvZaak.base : undefined, stand);
         await painted(page,heading);
         if (route === 'partner-network') await page.waitForFunction(() => document.querySelector('#pnStand').textContent === 'Elk getal met zijn bron');
         const geometry = await page.locator(stage).evaluate(el => ({height:el.clientHeight, content:el.scrollHeight}));
@@ -147,7 +154,7 @@ for (const engine of engines) {
           await shot(page,engine+'-'+width+'-project-action');
         }
       }
-      await open(page,'/apps/werk.html');
+      await open(page,'/apps/werk.html', undefined, stand);
       await page.waitForSelector('.wk-briefing');
       await page.waitForFunction(() => document.documentElement.scrollHeight > innerHeight);
       await page.evaluate(() => scrollTo(0,document.documentElement.scrollHeight));

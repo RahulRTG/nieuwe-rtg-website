@@ -843,7 +843,7 @@ omlaag.
 
 ## `shared/levendekleur.js`
 
-`public/shared/levendekleur/` -- 2 delen, 264 regels in de delen
+`public/shared/levendekleur/` -- 2 delen, 263 regels in de delen
 
 | deel | onderwerp |
 |---|---|

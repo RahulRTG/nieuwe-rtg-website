@@ -49,8 +49,7 @@ async function context(browser, width, signedIn = true) {
 }
 async function open(page, route, base) {
   await page.goto((base || srv.base) + route, {waitUntil:'domcontentloaded'});
-  await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
-  await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+  await h.wachtOpSchil(page);
   await page.evaluate(() => document.fonts.ready);
 }
 async function painted(page, selector) {

@@ -1726,8 +1726,22 @@ async function edgeCatalogus(page) {
   }
 }
 
+/* EEN SCHILCONTRACT VOOR OUDE EN GEMIGREERDE SCHERMEN.
+
+   Een DS-scherm bouwt bewust geen world-desktop-runtime meer. Wachten op het
+   oude data-rtg-desktop-state zou daar dus dertig seconden wachten op iets dat
+   juist niet mag ontstaan. Beide presentaties zijn gereed zodra hun eigen ene
+   Edge er staat; dit hulpje bewaakt die producttoestand zonder een legacy-schil
+   op een gemigreerd scherm terug te eisen. */
+async function wachtOpSchil(page, opties) {
+  await page.waitForSelector(
+    'body[data-rtg-desktop-state="ready"][data-rtg-adaptive-ready="true"], html[data-ds] .ds-edge__balk',
+    { state: 'attached', ...(opties || {}) }
+  );
+}
+
 async function edgeActies(page) {
-  await page.waitForSelector('body[data-rtg-adaptive-ready="true"], html[data-ds] .ds-edge__balk', { state: 'attached' });
+  await wachtOpSchil(page);
   /* Volledige DS-schermen hebben hun eigen centrale Edge en laden de oude
      Adaptive Edge bewust niet. De proef gebruikt in beide presentaties
      dezelfde gebruikershandeling: Acties openen en de zichtbare bediening
@@ -1872,7 +1886,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { startBrowser, testMotor, testMotoren, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeRahul, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { startBrowser, testMotor, testMotoren, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeRahul, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde, wachtOpSchil,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

@@ -117,7 +117,16 @@ test('Directpay: twee workers, conflicterende retries en echte procescrashes', {
     await t.test('ingetrokken sessie kan op andere worker geen betaling lezen of maken', async () => {
       const token = (await api(a, 'login', { tier: 'business' }, null)).body.token;
       assert.ok(token);
-      assert.equal((await api(b, 'betaal/mijn', {}, token)).status, 200, 'sessie werkt vóór intrekking op worker B');
+      /* De logincommit is al bevestigd, maar de andere worker ontvangt de
+         gedeelde sessie via PostgreSQL NOTIFY. Dat signaal mag na het HTTP-
+         antwoord landen; wacht daarom op de waarneembare toestand in plaats
+         van op processcheduling. De intrekking hieronder blijft juist zonder
+         wachtruimte fail-closed getoetst. */
+      const zichtbaar = await tot(async () => {
+        const r = await api(b, 'betaal/mijn', {}, token);
+        return r.status === 200 ? r : null;
+      }, 'verse sessie is zichtbaar op worker B');
+      assert.equal(zichtbaar.status, 200, 'sessie werkt vóór intrekking op worker B');
       fs.writeFileSync(sessieBarrier, 'houd automatische invalidatie vast');
       try {
       assert.equal((await api(a, 'logout', {}, token)).status, 200);

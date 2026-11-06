@@ -32,6 +32,21 @@ function fixture(ds = true) {
   return { Node, body, document, window };
 }
 
+test('de wereldloader laat een gemigreerd DS-scherm volledig aan de DS-schil', () => {
+  let geladen = 0;
+  const document = {
+    readyState: 'complete',
+    documentElement: { hasAttribute: naam => naam === 'data-ds' },
+    body: { dataset: { rtgWorld: 'work' } },
+    createElement() { geladen++; throw new Error('DS mag geen legacy-runtime laden'); }
+  };
+  const window = { self: null, top: null, location: { search: '' } };
+  window.self = window.top = window;
+  vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams });
+  assert.equal(geladen, 0);
+  assert.equal(document.body.dataset.rtgDesktopState, undefined);
+});
+
 test('DS-domein verhuist met dezelfde nodes en invoer; gedeelde bediening blijft buiten het verbergbare vlak', () => {
   const f = fixture(), main = new f.Node('main'), input = new f.Node('input');
   input.value = 'onbewaard concept'; input.onclick = () => 'zelfde listener'; main.appendChild(input);

@@ -11,7 +11,11 @@
     });
   }
   function start() {
-    if (started || w.self !== w.top || new URLSearchParams(w.location.search).get('embed') === '1' || d.body.dataset.publicPlatform) return;
+    /* Een gemigreerd DS-scherm bezit al zijn eigen inhoudsschil en DS Edge.
+       De scripttag blijft tijdens de gecontroleerde migratie bestaan voor oude
+       documenten, maar mag op data-ds nooit alsnog een tweede wd-shell bouwen. */
+    if (started || w.self !== w.top || new URLSearchParams(w.location.search).get('embed') === '1' ||
+      d.body.dataset.publicPlatform || d.documentElement.hasAttribute('data-ds')) return;
     if (!d.body.dataset.rtgWorld || d.body.dataset.rtgWorld === 'redirect') return;
     started = true;
     var projection = d.body.hasAttribute('data-rtg-projectie');

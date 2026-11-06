@@ -23,7 +23,7 @@ test('FocusUI gebruikt op DS en bestaande hosts dezelfde toegankelijke kaarttoes
           '<label>Concept<input id="concept" value="blijft staan"></label><p id="status" data-fxtel>2</p><p id="privaat" hidden>Niet bevoegd</p></section>' +
           '<section class="kaart"><h2>Reisplan</h2><p>Plan</p></section><section class="kaart"><h2>Betaling</h2><p>Betaal</p></section>' +
           '</main><script src="/shared/focus.js" data-app="focus-proef-' + (ds ? 'ds' : 'oud') + '" data-kaart=".kaart" data-kop="h2"></script></body></html>' }));
-        await page.goto(srv.base + pad, { waitUntil: 'load' });
+        await page.goto(srv.base + pad, { waitUntil: 'domcontentloaded' });
         await page.waitForSelector('.ds-focus-kop');
         await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue('--ds-doel').trim() !== '');
         assert.equal(await page.locator('#rtgDsRuntimeCss').count(), ds ? 0 : 1);

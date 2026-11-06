@@ -13,7 +13,7 @@ function geleverd(src){
  return {status:()=>status,headers:()=>headers,text:async()=>body,door};
 }
 const request={get:async src=>geleverd(src)};
-function pagina(urls){let n=0;return {request,evaluate:async()=>++n===1?['http://rtg.test/ds/rtg-ds.css']:urls,locator:sel=>({count:async()=>sel==='html[data-ds]'?1:0})};}
+function pagina(urls){let n=0;return {request,evaluate:async()=>++n===1?['http://rtg.test/ds/rtg-ds.css']:urls,locator:sel=>({count:async()=>sel==='html[data-ds]'?1:0,waitFor:async()=>{}})};}
 test('gedeelde decoder ontsluit scripts en verwijdert dubbele manifestpaden',async()=>{
  assert.deepEqual(await scriptsVan({request,evaluate:async()=>[bundel(['/shared/basis.js','/shared/randen.js']),'http://rtg.test/shared/basis.js']}),['/shared/basis.js','/shared/randen.js']);
 });
@@ -54,11 +54,11 @@ test('gebundelde Randen zonder expliciete schermowner wordt afgewezen',async()=>
 });
 test('expliciete Randen blijft afgewezen bij ontbrekende canonieke presentatie',async()=>{
  const page=pagina([bundel(['/shared/basis.js','/shared/randen.js'])]);page.url=()=> 'http://rtg.test/apps/browser.html';
- page.locator=sel=>({count:async()=>sel==='.rnd-toets.ds-randen-toets'?1:0});
+ page.locator=sel=>({count:async()=>sel==='.rnd-toets.ds-randen-toets'?1:0,waitFor:async()=>{}});
  await assert.rejects(()=>alleenDs(page),/canonieke presentatie/);
 });
 test('expliciete Randen vereist één owner zonder oude stijl of basisloader',async()=>{
- function host(fout){let n=0;return {request,url:()=> 'http://rtg.test/apps/browser.html',evaluate:async()=>++n===1?['http://rtg.test/ds/rtg-ds.css','http://rtg.test/ds/componenten/randen.css']:[bundel(['/shared/basis.js','/shared/randen.js'])],locator:sel=>({count:async()=>sel==='html[data-ds]'?1:sel==='.rnd-toets.ds-randen-toets'?(fout==='dubbel'?2:1):sel==='#rtgRandenJs,#rndCss'&&fout==='legacy'?1:0})};}
+ function host(fout){let n=0;return {request,url:()=> 'http://rtg.test/apps/browser.html',evaluate:async()=>++n===1?['http://rtg.test/ds/rtg-ds.css','http://rtg.test/ds/componenten/randen.css']:[bundel(['/shared/basis.js','/shared/randen.js'])],locator:sel=>({count:async()=>sel==='html[data-ds]'?1:sel==='.rnd-toets.ds-randen-toets'?(fout==='dubbel'?2:1):sel==='#rtgRandenJs,#rndCss'&&fout==='legacy'?1:0,waitFor:async()=>{}})};}
  await alleenDs(host());
  await assert.rejects(()=>alleenDs(host('dubbel')),/canonieke Randen-ingang/);
  await assert.rejects(()=>alleenDs(host('legacy')),/tweede of legacy Randen-owner/);

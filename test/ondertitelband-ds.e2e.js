@@ -17,7 +17,7 @@ test('ondertitelband volgt tijd en blijft leesbaar op DS en bestaande mediahosts
           (ds ? '<link rel="stylesheet" href="/ds/rtg-ds.css">' : '<style>#vlak{position:relative;width:100%;height:320px;background:black}</style>') +
           '</head><body class="' + (ds ? 'ds-scherm' : '') + '"><main><div id="vlak" style="position:relative;height:320px"><video id="video"></video></div></main>' +
           '<script src="/shared/ondertitelband.js"></script><script>RTGOndertitelband.zet(vlak,video,[{van:1,tot:3,tekst:"Welkom bij RTG"}]);video.currentTime=2;video.dispatchEvent(new Event("timeupdate"));</script></body></html>' }));
-        await page.goto(srv.base + pad, { waitUntil: 'load' });
+        await page.goto(srv.base + pad, { waitUntil: 'domcontentloaded' });
         const band = page.locator('.ds-ondertitelband'); await band.waitFor();
         await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue('--ds-doel').trim() !== '');
         assert.equal(await page.locator('#rtgDsRuntimeCss').count(), ds ? 0 : 1);

@@ -26,7 +26,7 @@ test('Uitstap blijft onmiddellijk beschikbaar in de echte modalvolgorde, op de b
       '<script src="/shared/uitstap.js"></script></body></html>' }));
     let gevlucht = 0;
     await page.route('https://www.google.nl/**', r => { gevlucht++; return r.fulfill({ status: 200, contentType: 'text/html', body: '<title>Neutrale proef</title><p>Neutrale proefpagina</p>' }); });
-    await page.goto(server.base + pad, { waitUntil: 'load' });
+    await page.goto(server.base + pad, { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => { window.__vlucht = document.getElementById('rtg-uitstap'); localStorage.setItem('vluchtconcept', 'behouden'); return document.fonts.ready; });
     const exit = page.locator('#rtg-uitstap');
     assert.equal(await exit.getAttribute('style'), null, 'DS injecteert geen oude knopstijl');
@@ -88,7 +88,7 @@ test('Uitstap blijft onmiddellijk beschikbaar in de echte modalvolgorde, op de b
     const history = await page.evaluate(() => window.history.length);
     await exit.click(); await page.waitForURL('https://www.google.nl/**');
     assert.equal(gevlucht, 1); assert.equal(await page.evaluate(() => window.history.length), history, 'replace stapelt geen nieuwe geschiedenis');
-    await page.goto(server.base + pad, { waitUntil: 'load' });
+    await page.goto(server.base + pad, { waitUntil: 'domcontentloaded' });
     assert.equal(await page.evaluate(() => localStorage.getItem('vluchtconcept')), 'behouden');
     // Een bestaande overlay mag Escape stoppen; capture behoudt de vluchttoets.
     await page.locator('#eerste').evaluate(e => { e.showModal(); e.addEventListener('keydown', ev => ev.stopPropagation()); });

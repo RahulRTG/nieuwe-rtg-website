@@ -22,12 +22,12 @@ async function paneel(page, selector, naam) {
   if (!await page.locator(selector).isVisible()) await page.locator('.rtgdeel-balk').getByRole('button', { name: naam, exact: true }).click();
   await page.locator(selector).waitFor({ state: 'visible' });
 }
-async function klikAntwoord(page, selector, pad, status = 200) {
+async function klikAntwoord(page, selector, pad, status = 200, leesBody = true) {
   /* Lees de body zodra het response-event verschijnt. Een geldige mutatie kan
      daarna bewust herladen; wachten tot locator.click ook die navigatie heeft
      afgewacht maakt de oude responsebody in Chromium niet meer beschikbaar. */
   const wacht = page.waitForResponse(r => new URL(r.url()).pathname === pad && r.request().method() === 'POST')
-    .then(async r => ({ status: r.status(), body: await r.json(), request: r.request().postDataJSON() }));
+    .then(async r => ({ status: r.status(), body: leesBody ? await r.json() : null, request: r.request().postDataJSON() }));
   await page.locator(selector).click({ noWaitAfter: true });
   const r = await wacht; assert.equal(r.status, status, pad); return { body: r.body, request: r.request };
 }
@@ -89,8 +89,10 @@ async function eigenDagboek(page, base, kind) {
   // onder zware parallelle broncontroles precies tussen de antwoord- en
   // eventwacht vallen; deze marker bestaat uitsluitend in het oude document.
   await page.evaluate(() => { window.__rtgVoorDagboekHerlaad = true; });
-  const gewist = await klikAntwoord(page, '#toestemIntrek', '/api/rtf/welzijn/toestemming');
-  assert.equal(gewist.body.gewist, true);
+  /* Deze actie herlaadt bewust zodra de server heeft geantwoord. De duurzame
+     readback hieronder is het zakelijke bewijs; de responsebody na navigatie
+     proberen te lezen maakt de browserproef onnodig afhankelijk van timing. */
+  await klikAntwoord(page, '#toestemIntrek', '/api/rtf/welzijn/toestemming', 200, false);
   await page.waitForFunction(() => !window.__rtgVoorDagboekHerlaad && document.readyState !== 'loading');
   const na = await dagboek(base, kind); assert.equal(na.toestemming, false); assert.deepEqual(na.stemmingen, []);
 }

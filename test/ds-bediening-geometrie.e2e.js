@@ -48,7 +48,7 @@ for (const donker of [false, true]) test('DS bediening: ' + (donker ? 'donkere c
     // Alleen het proefdocument is een fixture. Alle CSS, fonts en glyfcode
     // worden ongewijzigd door de echte RTG-server geleverd.
     await page.route('**/__ds-bediening-proef', r => r.fulfill({ contentType: 'text/html', body: html }));
-    await page.goto(srv.base + '/__ds-bediening-proef', { waitUntil: 'load' });
+    await page.goto(srv.base + '/__ds-bediening-proef', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!window.RTGGlyf && getComputedStyle(document.querySelector('.ds-knop')).display === 'inline-flex');
     await page.evaluate(async donker => {
       document.body.classList.toggle('ds-scherm--cover', donker);

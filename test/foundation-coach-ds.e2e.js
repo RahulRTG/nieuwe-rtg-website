@@ -66,7 +66,7 @@ for (const scherm of schermen) {
       await page.locator('[data-m="3"]').click(); assert.equal(await page.locator('[data-m="3"]').getAttribute('aria-pressed'), 'true');
       assert.match(await page.locator('#reactie').textContent(), /oké is echt goed genoeg/);
       const before = await page.evaluate(() => JSON.parse(localStorage.getItem('rtf_stemming_' + Sessie.huidig().profiel.id)));
-      await page.reload({ waitUntil: 'load' }); await page.waitForFunction(() => !document.documentElement.classList.contains('rtf-toegang-dicht'));
+      await page.reload({ waitUntil: 'domcontentloaded' }); await page.waitForFunction(() => !document.documentElement.classList.contains('rtf-toegang-dicht'));
       assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('rtf_stemming_' + Sessie.huidig().profiel.id)).length), before.length);
       assert.match(await page.locator('#privaat').textContent(), /ingecheckt/);
     }
@@ -120,7 +120,7 @@ test('Foundation legacy-host gebruikt dezelfde Samen-presentatie zonder runtime-
   try {
     const page = await ctx.newPage(), errors = [];
     letOpFouten(page, errors);
-    const response = await page.goto(srv.base + '/apps/foundation/beheer.html', { waitUntil: 'load' });
+    const response = await page.goto(srv.base + '/apps/foundation/beheer.html', { waitUntil: 'domcontentloaded' });
     assert.equal(response.status(), 200);
     await page.waitForFunction(() => window.Sessie?.actief() && !document.documentElement.classList.contains('rtf-toegang-dicht') && !!document.querySelector('.rsm-knop'));
     assert.equal(await page.locator('style').evaluateAll(nodes => nodes.filter(n => /\.rsm-(?:sheet|rsheet|knop)|\.sb-balk\{/.test(n.textContent)).length), 0);

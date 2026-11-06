@@ -233,6 +233,10 @@ const EIGENAAR = {
      zijn twee bestanden, en alleen de eerste heeft een schrijver. */
   'SCHERMFUNCTIE.json': { schrijver: 'scripts/schermfunctie.js' },
   'EXPERIENCEWERKT.json': { schrijver: 'scripts/experience-coverage.js' },
+  'APPWERKT.json': { schrijver: 'scripts/appwerkt.js',
+    waarom: 'scripts/appwerkt.js bezit en schrijft de volledige browsermeting. scripts/appwerkt-samenstellen.js ' +
+      'ververst uitsluitend de bewijshelften uit reeds bestaande, verse registers en bewaart de echte browserwaarneming; ' +
+      'beide gebruiken hetzelfde contract en hetzelfde register zodat er geen tweede APPWERKT-waarheid ontstaat.' },
   'SCHERMEIGENAAR.json': { handmatig: true, lezer: 'test/schermeigenaar.test.js',
     waarom: 'het eigenaarsregister is een BESLUIT per capability en per overlappend paar; de toets houdt het ' +
       'tegen een verse meting van scripts/schermfunctie.js, en wie het uit die meting genereert laat de toets ' +

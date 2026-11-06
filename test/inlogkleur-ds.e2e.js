@@ -19,7 +19,7 @@ test('inlogkleur gebruikt op DS en bestaande hosts dezelfde centrale component',
           (ds ? '<link rel="stylesheet" href="/ds/rtg-ds.css">' : '<style>#gate{min-height:100vh;color:white}</style>') +
           '</head><body class="' + (ds ? 'ds-scherm' : '') + '"><main id="gate" data-inlogkleur><h1>Welkom</h1><input aria-label="Code" value="blijft staan"></main>' +
           '<script src="/shared/inlogkleur.js"></script></body></html>' }));
-        await page.goto(srv.base + pad + '?uur=18.5&dag=200&seizoen=zomer', { waitUntil: 'load' });
+        await page.goto(srv.base + pad + '?uur=18.5&dag=200&seizoen=zomer', { waitUntil: 'domcontentloaded' });
         await page.waitForFunction(() => document.getElementById('gate').classList.contains('ds-inlogkleur') &&
           getComputedStyle(document.documentElement).getPropertyValue('--inlog-basis').trim() !== '' &&
           getComputedStyle(document.documentElement).getPropertyValue('--ds-doel').trim() !== '');

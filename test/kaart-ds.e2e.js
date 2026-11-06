@@ -19,7 +19,7 @@ test('kaartuitwijk gebruikt op DS en legacy-host dezelfde toegankelijke dialoog'
           '<!doctype html><html lang="nl"' + (ds ? ' data-ds="1"' : '') + '><head><meta name="viewport" content="width=device-width,initial-scale=1">' +
           (ds ? '<link rel="stylesheet" href="/ds/rtg-ds.css">' : '') + '</head><body><main><a id="plek" href="geo:0,0?q=Herengracht+1+Amsterdam">Open locatie</a>' +
           '<input aria-label="Achtergrondconcept" value="blijft staan"></main><script src="/shared/kaart.js"></script></body></html>' }));
-        await page.goto(srv.base + pad, { waitUntil: 'load' });
+        await page.goto(srv.base + pad, { waitUntil: 'domcontentloaded' });
         const ingang = page.locator('#plek'); await ingang.click();
         const dialoog = page.getByRole('dialog', { name: 'Locatie', exact: true }); await dialoog.waitFor();
         if (ds) assert.equal(await page.locator('#rtgDsRuntimeCss').count(), 0);

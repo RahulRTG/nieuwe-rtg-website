@@ -29,7 +29,7 @@ test('DS deelmenu blijft volledig leesbaar en bedienbaar; wisselen en herscan ve
         (i === 1 ? '<p id="privaat" hidden>Niet bevoegd</p>' : '') + '</section>').join('') +
       '</main><script src="/shared/deelmenu.js"></script></body></html>' }));
     await page.route('**/shared/deelmenu.js', r => r.fulfill({ status: 200, contentType: 'text/javascript', body: bundel('shared/deelmenu.js').toString('utf8') }));
-    assert.equal((await page.goto(server.base + pad, { waitUntil: 'load' })).status(), 200);
+    assert.equal((await page.goto(server.base + pad, { waitUntil: 'domcontentloaded' })).status(), 200);
     await page.evaluate(() => document.fonts.ready);
     await page.waitForSelector('.ds-deelmenu-knop');
     assert.equal(await page.locator('#rtgdeel-stijl').count(), 0);
@@ -81,7 +81,7 @@ test('DS deelmenu blijft volledig leesbaar en bedienbaar; wisselen en herscan ve
         '<section class="kaart" data-deel="' + i + '"><h2>' + l + '</h2>' +
         (i === 1 ? '<p id="privaat-legacy" hidden>Niet bevoegd</p>' : '<p>Inhoud ' + i + '</p>') + '</section>').join('') +
       '</main><script src="/shared/deelmenu.js"></script></body></html>' }));
-    await page.goto(server.base + legacyPad, { waitUntil: 'load' });
+    await page.goto(server.base + legacyPad, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.ds-deelmenu-knop');
     await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue('--ds-doel').trim() !== '');
     assert.equal(await page.locator('#rtgDsRuntimeCss').getAttribute('href'), '/ds/rtg-ds.css');

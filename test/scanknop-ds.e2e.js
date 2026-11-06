@@ -14,7 +14,7 @@ test('scanner houdt zonder cameramodule een toegankelijke handmatige uitweg', { 
       await page.route('**' + pad, route => route.fulfill({ contentType: 'text/html', body:
         '<!doctype html><html lang="nl"><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/ds/rtg-ds.css"></head>' +
         '<body><button id="open">Open scanner</button><script src="/shared/scanknop.js"></script><script>document.getElementById("open").onclick=()=>RTGScanknop.open({titel:"Code scannen",onCode:x=>{window.uit=x.tekst}})</script></body></html>' }));
-      await page.goto(srv.base + pad, { waitUntil: 'load' }); await page.locator('#open').click();
+      await page.goto(srv.base + pad, { waitUntil: 'domcontentloaded' }); await page.locator('#open').click();
       const dialoog = page.getByRole('dialog', { name: 'Code scannen', exact: true }); await dialoog.waitFor();
       assert.equal(await dialoog.getAttribute('aria-modal'), 'true');
       const hand = dialoog.locator('.rtg-scan-hand'); await hand.waitFor({ state: 'visible' });

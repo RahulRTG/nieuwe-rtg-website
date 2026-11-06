@@ -50,4 +50,3 @@
     '.bss-zaak{font-size:.78rem;color:#bbb;line-height:1.5;border-left:2px solid #444;padding-left:.55rem;display:flex;flex-direction:column;gap:.35rem;}' +
     '.bss-zaak i{font-style:normal;color:#d7c690;}' +
     '.bss-veld{width:100%;background:transparent;color:#eee;border:1px solid #555;border-radius:0;font:inherit;font-size:.82rem;padding:.5rem;}' +
-    /* In een split-paneel is de grote titel dubbelop: je hebt de app zelf net

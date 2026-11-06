@@ -1,6 +1,10 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const bron=fs.readFileSync(path.join(__dirname,'../public/shared/basis/basis-01b.js'),'utf8');
+/* Dit gedrag loopt over de fysieke 10 kB-naad tussen 01b en 01ba. De browser
+   ontvangt hun rauwe som als basis.js; de proef moet daarom dezelfde logische
+   bron uitvoeren en geen half JavaScript-fragment. */
+const bron=['basis-01b.js','basis-01ba.js'].map(naam=>
+ fs.readFileSync(path.join(__dirname,'../public/shared/basis',naam),'utf8')).join('');
 function basis(ds){
  const events={},nodes=[],timers=[];
  const target={appendChild(n){nodes.push(n);n.parentNode=this;},removeChild(n){nodes.splice(nodes.indexOf(n),1);}};

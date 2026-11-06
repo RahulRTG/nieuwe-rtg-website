@@ -1,3 +1,4 @@
+    /* In een split-paneel is de grote titel dubbelop: je hebt de app zelf net
 // Beheert de toegankelijke titel en acties van het gekozen basispaneel.
        gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
        zicht maar blijven in de toegankelijkheidsboom (zelfde techniek als

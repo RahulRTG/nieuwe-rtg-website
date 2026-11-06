@@ -35,7 +35,15 @@ test('de vier werelden gebruiken dezelfde verdiepende stijl op hun echte routes'
 
 test('LivingOS en TravelOS houden de vervolgstappen onder de duim', () => {
   const agenda = lees('public/apps/agenda.html');
-  assert.match(agenda, /\/shared\/randen\.js/);
+  /* Agenda staat nu op het centrale DS. shell.js projecteert dezelfde
+     blikveldcontracten in /ds/edge.js en /ds/edge-modi.js; de oude randen.js
+     ernaast zou juist een tweede Edge-controller introduceren. */
+  assert.match(agenda, /\/ds\/shell\.js/);
+  assert.doesNotMatch(agenda, /\/shared\/randen\.js/);
+  const shell = lees('public/ds/shell.js');
+  assert.match(shell, /laadScript\('\/shared\/edge\/blikveld\.js'\)/);
+  assert.match(shell, /laadScript\('\/ds\/edge\.js'\)/);
+  assert.match(shell, /laadScript\('\/ds\/edge-modi\.js'\)/);
   assert.doesNotMatch(agenda, /class="rtg-deep-nav"/, 'Agenda krijgt geen tweede navigatie naast de Edge');
   const sprongen = JSON.parse(lees('public/shared/sprongindex.json'));
   assert.ok(JSON.stringify(sprongen).includes('"url":"/apps/attenties.html"'),

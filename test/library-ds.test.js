@@ -5,7 +5,7 @@ const html=read('public/apps/library.html');
 const bron=()=>require('../scripts/bundel').bundel('apps/library/app.js').toString();
 
 test('Library blijft Foundation met één inhoudsdoel, dezelfde bediening en uitsluitend DS-presentatie',()=>{
- assert.match(html,/<html lang="nl" data-ds>/);assert.match(html,/data-rtg-world="foundation"/);
+ assert.match(html,/<html lang="nl" data-ds(?:="1")?>/);assert.match(html,/data-rtg-world="foundation"/);
  assert.match(html,/data-ds-schermtype="detail" data-ds-nadruk="gereedschap"/);
  assert.deepEqual([...html.matchAll(/<link[^>]*href="([^"]+\.css)"/g)].map(x=>x[1]),['/fonts/fonts.css','/ds/rtg-ds.css']);
  assert.doesNotMatch(html,/<style\b|\bstyle=/);assert.equal(fs.existsSync(path.join(__dirname,'../public/apps/library/style.css')),false);

@@ -652,7 +652,7 @@ omlaag.
 | `basis-01ad-intelligence.js` | De centrale controllers laden één keer, ook als een route een adapter vóór basis nodig heeft |
 | `basis-01ae-sessie.js` | De sessie van dit scherm, voor de app-gids (eigenaarsbesluit 19 oktober 2026: gebruiken vraagt een account; server/ke... |
 | `basis-01b.js` | Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van de consolidatieronde; de bundelvolgorde is... |
-| `basis-01ba.js` | Beheert de toegankelijke titel en acties van het gekozen basispaneel |
+| `basis-01ba.js` | In een split-paneel is de grote titel dubbelop: je hebt de app zelf net // Beheert de toegankelijke titel en acties v... |
 | `basis-01c.js` | de toegankelijkheidshelpers van de gedeelde laag |
 | `basis-02.js` | 5. het lopende werk: de gangreserve-laag van het huis |
 | `basis-02b.js` | Vervolg van basis-02: de hulplaag van de app-gids, plus de afsluiting van start() en van de omhulling |

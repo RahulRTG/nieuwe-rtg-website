@@ -233,7 +233,14 @@ const DEMO = testomgeving.actief(process.env);
    de echte drie-processenrace rechtstreeks worden beproefd zonder drie keer
    het volledige platform met alle achtergrondmodules op te starten. */
 const zetEigenaarsAccount = require('./opzet/demo-eigenaar')({
-  accounts, eigenaar, db, save, demoLidInhoud, env: process.env
+  accounts, eigenaar, save, demoLidInhoud, env: process.env,
+  rollenVoor(id) {
+    if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
+    const sleutel = 'user-' + id;
+    if (!Array.isArray(db.data.accountRollen[sleutel])) db.data.accountRollen[sleutel] = [];
+    return db.data.accountRollen[sleutel];
+  },
+  zaakVoor(code) { return (db.data.suppliers || []).find(s => s.code === code); }
 });
 // bij het laden; in Postgres-modus nogmaals na de gedeelde pull (zie onder)
 if (DEMO) zetEigenaarsAccount();

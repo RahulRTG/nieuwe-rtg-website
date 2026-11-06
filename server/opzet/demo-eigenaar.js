@@ -11,7 +11,9 @@
    opent zelf nooit een productiedeur. */
 'use strict';
 
-module.exports = function maakDemoEigenaar({ accounts, eigenaar, db, save, demoLidInhoud, env }) {
+module.exports = function maakDemoEigenaar({
+  accounts, eigenaar, rollenVoor, zaakVoor, save, demoLidInhoud, env
+}) {
   const omgeving = env || process.env;
 
   function zetEens() {
@@ -39,14 +41,12 @@ module.exports = function maakDemoEigenaar({ accounts, eigenaar, db, save, demoL
     accounts.setPasswordZaai(u.id, wachtwoord);
     accounts.setVerification(u.id, 'verified');
 
-    if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
-    const sleutelbos = db.data.accountRollen['user-' + u.id] =
-      Array.isArray(db.data.accountRollen['user-' + u.id]) ? db.data.accountRollen['user-' + u.id] : [];
+    const sleutelbos = rollenVoor(u.id);
     if (!sleutelbos.some(r => r.rol === 'kantoor'))
       sleutelbos.push({ rol: 'kantoor', at: new Date().toISOString() });
     if (!sleutelbos.some(r => r.rol === 'zaak')) {
       const code = String(omgeving.DEMO_SUPPLIER || 'KIKUNOI').toUpperCase();
-      const zaak = (db.data.suppliers || []).find(s => s.code === code);
+      const zaak = zaakVoor(code);
       sleutelbos.push({ rol: 'zaak', code, zaakNaam: zaak ? zaak.name : code, naam: 'Beheer', at: new Date().toISOString() });
     }
     save();

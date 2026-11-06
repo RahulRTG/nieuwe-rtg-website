@@ -32,9 +32,15 @@ const wortel = process.env.RTG_TOETS_WORTEL;
 const accounts = require(path.join(wortel, 'server/accounts'));
 const eigenaar = require(path.join(wortel, 'server/eigenaar'));
 accounts.init();
-const db = { data: { accountRollen: {}, suppliers: [] } };
+const rollen = {};
 const zet = require(path.join(wortel, 'server/opzet/demo-eigenaar'))({
-  accounts, eigenaar, db, save() {}, env: process.env,
+  accounts, eigenaar, save() {}, env: process.env,
+  rollenVoor(id) {
+    const sleutel = 'user-' + id;
+    if (!Array.isArray(rollen[sleutel])) rollen[sleutel] = [];
+    return rollen[sleutel];
+  },
+  zaakVoor() { return null; },
   demoLidInhoud: () => ({ invoices: [], trip: null, creatorCredit: 0, creatorLikes: 0 })
 });
 process.stdout.write('READY\\n');

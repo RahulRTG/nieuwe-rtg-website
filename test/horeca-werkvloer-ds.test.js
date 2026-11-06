@@ -8,7 +8,7 @@ const tick = () => new Promise(resolve => setImmediate(resolve));
 test('Bar en Vloer vervangen presentatie en behouden fonts, deur en alle bestaande owners', () => {
   for (const name of ['bar', 'vloer']) {
     const html = read('public/apps/horeca-' + name + '.html');
-    assert.match(html, /<html lang="nl" data-ds>/);
+    assert.match(html, /<html lang="nl" data-ds(?:="1")?(?:\s|>)/);
     assert.match(html, /data-rtg-world="work"/);
     assert.match(html, /data-ds-nadruk="gereedschap"/);
     assert.deepEqual([...html.matchAll(/<link[^>]*href="([^"]+\.css)"/g)].map(m => m[1]), ['/fonts/fonts.css', '/ds/rtg-ds.css']);

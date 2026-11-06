@@ -120,10 +120,13 @@ test('9. de echte app-pagina: bundelen bewaart de portal-cascade en alle scripts
   const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app.html'), 'utf8');
   const uit = herschrijfHtml(bron);
   const b = bundelHrefs(uit);
-  assert.equal(b.length, 2, 'de basisschil en de portal staan aan weerszijden van inline stijlen');
+  assert.equal(b.length, 3, 'de basisschil, werkruimte en portal houden hun cascadegrenzen');
   assert.ok(b[0].length >= 5, 'met minstens vijf bladen erin: ' + b[0].join(', '));
-  assert.deepEqual(b[1], ['/shared/ios.css', '/apps/access/portal.css', '/shared/rtg-communication-surface.css'],
-    'de portal blijft na de inline stijlen, met dezelfde volgorde');
+  assert.deepEqual(b[1], ['/shared/interface/second-screen.css', '/shared/interface/workspace-components.css',
+    '/shared/interface/second-screen-personal.css'], 'de werkruimte blijft een eigen cascadegroep');
+  assert.deepEqual(b[2], ['/shared/ios.css', '/apps/access/portal.css', '/shared/rtg-communication-surface.css',
+    '/ds/tokens.css', '/ds/componenten/cookie.css', '/ds/componenten/samen.css', '/ds/componenten/handenvrij.css'],
+  'de portal en centrale DS-componenten blijven na de inline stijlen, met dezelfde volgorde');
   const portalBundel = uit.lastIndexOf('/stijlbundel.css?');
   assert.ok(portalBundel > uit.lastIndexOf('</style>'), 'de late portalregels mogen niet vóór de inline regels komen');
   assert.ok(portalBundel < uit.indexOf('id="rtgHeritageCss"'), 'de heritage-laag blijft als laatste geladen');

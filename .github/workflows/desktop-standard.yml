@@ -17,7 +17,11 @@ jobs:
       matrix:
         width: [1440, 390]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # De mobiele scherf installeert bewust zowel Chromium als WebKit. Op een
+    # koude GitHub-run kan alleen die gecontroleerde installatie al ruim twintig
+    # minuten kosten; de kwaliteitsproeven mogen daardoor niet onuitgevoerd
+    # worden geannuleerd.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

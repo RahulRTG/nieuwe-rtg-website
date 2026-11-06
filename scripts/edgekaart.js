@@ -220,9 +220,9 @@ const KAART = [
   ['rtg-edge-smart-menu/rtg-edge-smart-menu-00.js', 'edge-casco', 'wereld:b voortzetting:sb onderbalk:l', [
     ['beslist', 'wereld:b', 'het blad gaat voor de casco', "var cfgBlad = blad !== 'geen' && w.RTGEdgeWorlds && w.RTGEdgeWorlds[blad];"],
     ['bewaart', 'voortzetting:s', 'recent bij elke lezing', 'sessionStorage.setItem(OPSLAG, nu);'],
-    ['beslist', 'voortzetting:b', 'geen vorige: de publieke ingang', "vorige = cfg ? cfg.huis || cfg.home : '/apps/app.html';"],
+    ['beslist', 'voortzetting:b', 'geen vorige: de publieke ingang', "vorige = intern(cfg && (cfg.huis || cfg.home)) || '/apps/app.html';"],
     ['leest', 'onderbalk:l', 'appbalken als lokale acties', "root.querySelectorAll('.rtg-edge-appslot .rtg-edge-owned-bar a[href]"]]],
-  ['rtg-edge-smart-menu/rtg-edge-smart-menu-01.js', 'edge-casco', 'wereld:l', [
+  ['rtg-edge-smart-menu/rtg-edge-smart-menu-02.js', 'edge-casco', 'wereld:l', [
     ['beslist', 'wereld:l', 'Heel RTG thuis, Hier elders', "gezicht(rt, wereldHome() ? 'all' : 'here', false);"],
     ['schrijft', '-', 'menuknop wijst naar de index', "menu.setAttribute('aria-controls', index.id);"]]],
   ['rtg-edge-2.js', 'edge-2', 'zichtbaarheidsstand:sb onderbalk:s', [
@@ -258,7 +258,7 @@ const KAART = [
   ['basis/basis-01ac-edge.js', 'laden', 'wereld:l', [
     ['beslist', 'wereld:l', 'randen.js alleen bij een wereld', "indexOf(b.getAttribute('data-rtg-world')) < 0) return;"]]],
   ['basis/basis-01ad-intelligence.js', 'laden', '', [
-    ['beslist', '-', 'laadt controllers die ontbreken', 'if (ds || window[bron[1]] || document.querySelector(']]],
+    ['beslist', '-', 'laadt controllers die ontbreken', 'if (window[global] || document.querySelector(\'script[src="\' + pad + \'"]\')) return;']]],
   ['basis/basis-01aa-continue.js', 'laden', '', [
     ['beslist', '-', 'laadt de Continue Key', "if (!ds && !window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&"]]],
   ['command.js', 'schil', 'bevoegdheid:b identiteit:l', [
@@ -637,8 +637,9 @@ function meet(p, s, bron = s) {
 /* ------------------------------------------------------- DE DODE KANALEN
    Over heel public/ plus de landing in de wortel. public/dist is een geminifieerde
    kopie, en een bundel (scripts/bundel.js) is byte voor byte de som van zijn
-   delen: die zouden elke naam twee keer tellen, en de delen zijn wat de kaart
-   hierboven noemt. */
+   delen: die zouden elke naam twee keer tellen. De wandeling leest daarom de
+   onderhoudbare delen; de verklaring mag het ene browserbestand blijven
+   benoemen en normaliseert die delen hieronder naar die runtime-owner. */
 function bestanden(dir, uit) {
   for (const e of fs.readdirSync(path.join(WORTEL, dir), { withFileTypes: true })) {
     const p = dir + '/' + e.name;
@@ -651,6 +652,14 @@ function bestanden(dir, uit) {
 function wandeling() {
   const bundel = new Set(Object.keys(bundels).map(k => 'public/' + k));
   return bestanden('public', ['index.html']).filter(p => !bundel.has(p)).sort().map(p => [p, kaal(p, lees(p) || '')]);
+}
+const BUNDELBRONNEN = Object.entries(bundels).map(([uit, bron]) => ({
+  uit: 'public/' + uit,
+  voorvoegsel: 'public/' + bron + '/'
+}));
+function runtimePad(p) {
+  const eigenaar = BUNDELBRONNEN.find((rij) => p.startsWith(rij.voorvoegsel));
+  return eigenaar ? eigenaar.uit : p;
 }
 function kanalen(lijst = wandeling()) {
   const zenders = {}, luisteraars = {}, dynamisch = [];
@@ -711,14 +720,17 @@ const ATTR = { wereld: 'data-rtg-world', zichtbaarheidsstand: 'data-rtg-edge-2-s
 
 function afgeleid(lijst = wandeling()) {
   const fouten = [], gevonden = { registerAction: [], wereld: [], zichtbaarheidsstand: [] }, uitgezonderd = [];
-  const schrijver = (vol, naam) => KAART.some(([p, , v]) => pad(p) === vol &&
+  const schrijver = (vol, naam) => KAART.some(([p, , v]) => pad(p) === runtimePad(vol) &&
     v.split(' ').some(t => t.split(':')[0] === naam && (t.split(':')[1] || '').includes('s')));
   const benut = new Set();
   for (const [p, code] of lijst) {
     if (code.includes('registerAction')) for (const m of code.matchAll(/([\w$.]+)\s*\.\s*registerAction\s*\(/g)) {
       const ontv = m[1], ander = ANDERE_REGISTERS.find(a => a.pad === p && a.ontvanger === ontv);
       if (ander) benut.add(ander);
-      else if (ONTVANGERS.includes(ontv) || /(^|\.)RTGAdaptiveEdge$/.test(ontv)) { if (!gevonden.registerAction.includes(p)) gevonden.registerAction.push(p); }
+      else if (ONTVANGERS.includes(ontv) || /(^|\.)RTGAdaptiveEdge$/.test(ontv)) {
+        const eigenaar = runtimePad(p);
+        if (!gevonden.registerAction.includes(eigenaar)) gevonden.registerAction.push(eigenaar);
+      }
       else fouten.push(p + ': registerAction op een onbekende ontvanger `' + ontv + '`; zet hem in ONTVANGERS of, met reden, in ANDERE_REGISTERS');
     }
     /* Alleen lezen waar een van de namen als TEKST staat (tussen aanhalingstekens,
@@ -730,7 +742,8 @@ function afgeleid(lijst = wandeling()) {
     for (const naam of Object.keys(ATTR)) {
       if (!attr.includes(ATTR[naam])) continue;
       if (naam === 'wereld' && ZONDER_LADER.includes(p)) { uitgezonderd.push(p); continue; }
-      gevonden[naam].push(p);
+      const eigenaar = runtimePad(p);
+      if (!gevonden[naam].includes(eigenaar)) gevonden[naam].push(eigenaar);
     }
   }
   /* 1: gelijk, in beide richtingen. Op de kaart telt alleen een schrijver van

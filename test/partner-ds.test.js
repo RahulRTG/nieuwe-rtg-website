@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8'),html=read('public/apps/partner-network.html'),js=read('public/apps/partner-network.js'),css=read('public/ds/componenten/partner.css');
 test('Partner behoudt werkidentiteit, alle meetvakken en native reactieformulier onder één DS-presentatie',()=>{
- assert.match(html,/<html lang="nl" data-ds>/);assert.match(html,/class="ds-scherm ds-partner"/);assert.match(html,/data-rtg-world="work"/);
+ assert.match(html,/<html lang="nl" data-ds(?:="1")?(?:\s|>)/);assert.match(html,/class="ds-scherm ds-partner"/);assert.match(html,/data-rtg-world="work"/);
  assert.deepEqual([...html.matchAll(/<link[^>]*href="([^"]+\.css)"/g)].map(m=>m[1]),['/fonts/fonts.css','/ds/rtg-ds.css']);
  assert.match(html,/<dialog id="pnReageer" class="ds-dialoog ds-partner-dialoog" aria-labelledby="pnReageerWat">/);
  for(const id of ['pnZaak','pnStand','pnMelding','pnIntenties','pnAandacht','pnNietGebouwd','pnReageerForm','pnReageerVerstuur'])assert.equal([...html.matchAll(new RegExp('id="'+id+'"','g'))].length,1,id);

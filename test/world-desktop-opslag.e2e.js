@@ -28,11 +28,16 @@ test('iedere bewuste widgetkeuze krijgt een nieuwe sleutel; herproberen behoudt 
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
     const lijst = page.waitForResponse(r => r.url().endsWith('/api/ik/workspace'));
-    await page.goto(srv.base + '/apps/wonen.html'); await lijst;
+    /* wonen.html bezit inmiddels bewust de centrale DS-schil en start daarom
+       geen tweede desktop-runtime. Het bestaande LivingOS-beginscherm blijft
+       de zichtbare werkruimtehost en bewijst hier diens opslagcontract. */
+    await page.goto(srv.base + '/apps/rtg.html'); await lijst;
     await page.waitForFunction(() => document.body.dataset.rtgDesktopState === 'ready');
     await page.locator('.wd-app-controls > summary').click(); await page.locator('#wdSearch').fill('notities');
-    const pin = page.locator('.wd-library [data-widget="notities"] .wd-widget-pin'), keys = [];
+    const card = page.locator('.wd-library [data-widget="notities"]');
+    const pin = card.locator('.wd-widget-pin'), keys = [];
     for (const gekozen of [false, true, false]) {
+      await card.hover(); // de rustige desktop toont de secundaire pinactie op intentie
       const [r] = await Promise.all([
         page.waitForResponse(r => r.url().endsWith('/api/ik/workspace/zet')),
         pin.click()
@@ -52,7 +57,7 @@ test('iedere bewuste widgetkeuze krijgt een nieuwe sleutel; herproberen behoudt 
       if (verlies) { verlies = false; await route.fetch(); await route.abort('failed'); }
       else await route.continue();
     });
-    await pin.click();
+    await card.hover(); await pin.click();
     await page.locator('.wd-favorites [role="status"]').filter({ hasText: 'kon niet worden bewaard' }).waitFor();
     await lees(true); // De server verwerkte de opdracht; alleen het antwoord ging verloren.
     const retry = page.locator('.wd-favorites').getByRole('button', { name: 'Probeer opnieuw', exact: true });

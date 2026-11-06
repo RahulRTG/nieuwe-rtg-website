@@ -3,14 +3,14 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 test('vier bestaande dagelijkse eigenaren houden identiteit, bronnen en één DS-presentatie',()=>{
  for(const [naam,wereld,ids] of [['notities','living',['ntScrim','ntBewaar','ntTitel','nieuwNotitie']],['bestanden','work',['bkScrim','bkBewaar','bestandkiezer','nieuwMap']],['agenda','living',['afScrim','afBewaar','wMaand','wWeek','wLijst','dailyWeek']],['pulse','living',['pulseContent','dailyIntro']]]){
-  const s=read('public/apps/'+naam+'.html');assert.match(s,/<html lang="nl" data-ds(?: |>)/);assert.ok(s.includes('data-rtg-world="'+wereld+'"'));assert.doesNotMatch(s,/<style\b/);
+  const s=read('public/apps/'+naam+'.html');assert.match(s,/<html lang="nl" data-ds(?:="1")?(?:\s|>)/);assert.ok(s.includes('data-rtg-world="'+wereld+'"'));assert.doesNotMatch(s,/<style\b/);
   assert.deepEqual([...s.matchAll(/<link[^>]*href="([^\"]+\.css)"/g)].map(m=>m[1]),['/fonts/fonts.css','/ds/rtg-ds.css']);
   for(const id of ids)assert.ok(s.includes('id="'+id+'"'),naam+':'+id);
-  for(const owner of ['rtg-daily-copy','rtg-daily-fields','rtg-daily','uitvoer','basis','randen','appmenu'])assert.ok(s.includes('/shared/'+owner+'.js'),naam+':'+owner);
+  for(const owner of ['rtg-daily-copy','rtg-daily-fields','rtg-daily','uitvoer','basis','appmenu'])assert.ok(s.includes('/shared/'+owner+'.js'),naam+':'+owner);
  }
  for(const naam of ['notities','agenda','bestanden','pulse'])assert.ok(fs.existsSync(path.join(__dirname,'../public/images/daily/'+naam+'.webp')),naam+' fotografische bron');
  assert.match(read('public/ds/componenten/dagkamer.css'),/\.ds-dag-kop\.ds-kop \{ display: flex; flex-wrap: wrap/);
- const agenda=read('public/apps/agenda.html');for(const s of ['kalender','editorial','paneel','app'])assert.ok(agenda.includes('/apps/agenda/'+s+'.js'));assert.ok(agenda.includes('/shared/rtg-route-memory.js'));
+ const agenda=read('public/apps/agenda.html');for(const s of ['kalender','editorial','paneel','app'])assert.ok(agenda.includes('/apps/agenda/'+s+'.js'));assert.ok(agenda.includes('/shared/rtg-route-memory.js'));assert.ok(agenda.includes('/ds/shell.js'));assert.doesNotMatch(agenda,/\/shared\/randen\.js/);
  const tokens=read('public/ds/tokens.css');for(const n of ['dagkamer','daginhoud','dagkalender']){const css=read('public/ds/componenten/'+n+'.css');assert.ok(Buffer.byteLength(css)<10240);assert.doesNotMatch(css,/!important|#[\da-f]{3,8}\b|(?:padding|margin|border)-(?:left|right)\s*:/i);for(const m of css.matchAll(/var\((--ds-[\w-]+)/g))assert.ok(tokens.includes(m[1]+':'),m[1]);}
 });
 test('echte daily-owner blijft bronstatus, ontsnapping, retry en bestaande doelen gebruiken',()=>{

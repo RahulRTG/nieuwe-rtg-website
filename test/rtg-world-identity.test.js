@@ -115,9 +115,9 @@ test('classificatie normaliseert adressen en toepassen bewaakt het centrale mani
 test('basis laadt de routekaart vroeg en het heritage-blad laat en uniek', () => {
   const bron = fs.readFileSync(path.join(WORTEL, 'public', 'shared', 'basis', 'basis-01.js'), 'utf8');
   assert.equal((bron.match(/\.src = '\/shared\/rtg-world-identity\.js'/g) || []).length, 1);
-  assert.equal((bron.match(/\.href = '\/shared\/rtg-heritage\.css'/g) || []).length, 1);
+  assert.equal((bron.match(/voegBasisStijlToe\('\/shared\/rtg-heritage\.css', 'rtgHeritageCss'\)/g) || []).length, 1);
   assert.ok(bron.includes("getElementById('rtgWorldIdentityJs')"));
-  assert.ok(bron.includes("getElementById('rtgHeritageCss')"));
+  assert.ok(bron.includes('document.getElementById(id)'), 'de gedeelde stijllader ontdubbelt ieder centraal blad op id');
   assert.ok(bron.indexOf('/shared/rtg-world-identity.js') < bron.indexOf('/shared/i18n.js'),
     'wereldidentiteit hoort voor de overige gedeelde lagen te starten');
   /* Op een scherm van het RTG Design System (html[data-ds]) laadt het

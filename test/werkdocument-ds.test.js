@@ -4,7 +4,7 @@ const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 test('Room-presentaties delen één DS-component; gegevenshuizen en runtime blijven afzonderlijk',()=>{
  for(const [naam,prefix,root] of [['project-room','pr','projectRoom'],['decision-room','dr','decisionRoom']]){
   const html=read('public/apps/'+naam+'.html');
-  assert.match(html,/<html lang="nl" data-ds>/);assert.match(html,/class="ds-scherm ds-werkdocument"/);
+  assert.match(html,/<html lang="nl" data-ds="1">/);assert.match(html,/class="ds-scherm ds-werkdocument"/);
   assert.deepEqual([...html.matchAll(/<link[^>]*href="([^"]+\.css)"/g)].map(x=>x[1]),['/fonts/fonts.css','/ds/rtg-ds.css']);
   assert.match(html,new RegExp('id="'+root+'"'));assert.match(html,/data-rtg-world="work"/);
   for(const h of ['rtg','rtf','gedeeld'])assert.ok(html.includes('data-'+prefix+'-huis="'+h+'"'));

@@ -29,13 +29,14 @@ test('randen.js is geldige JS en levert RTGRanden', () => {
   assert.match(bron, /w\.RTGRanden = \{/);
 });
 
-test('elke pagina met het bedieningspaneel laadt ook de randen', () => {
+test('elk bedieningspaneel heeft de legacy-rand of de centrale DS-schil als eigenaar', () => {
   const mist = [];
   for (const p of paginas()) {
     const html = lees(p);
-    if (html.includes('shared/bediening.js') && !html.includes('shared/randen.js')) mist.push(p);
+    const dsSchil = /<html[^>]*\bdata-ds(?:="1")?(?:\s|>)/.test(html) && html.includes('/ds/shell.js');
+    if (html.includes('shared/bediening.js') && !html.includes('shared/randen.js') && !dsSchil) mist.push(p);
   }
-  assert.deepStrictEqual(mist, [], 'zonder randen.js valt het paneel niet te openen');
+  assert.deepStrictEqual(mist, [], 'zonder legacy-rand of DS-schil valt het paneel niet te openen');
 });
 
 test('het bedieningspaneel bouwt geen eigen zwevende ingang', () => {
@@ -61,7 +62,7 @@ test('de Rahul-laag ligt boven de werkschillen van de apps', () => {
     /* Het antwoordvenster (.mgz-sheet) zweeft niet meer: het zit in .mgz-blok
        en staat daar gewoon in de stroom. Het BLOK is dus het element dat boven
        de app-schillen moet liggen, en dat is nu wat we hier toetsen. */
-    ['public/shared/metgezel/metgezel-01.js', ['.mgz-knop', '.mgz-blok', '.mgz-banner']]
+    ['public/ds/componenten/samen.css', ['.ds-samen-knop', '.ds-samen-host .mgz-blok', '.ds-samen-banner']]
   ]) {
     const bron = lees(bestand);
     for (const k of klassen) {

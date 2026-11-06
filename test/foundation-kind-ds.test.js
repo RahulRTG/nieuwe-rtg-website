@@ -41,7 +41,7 @@ test('four Foundation routes use DS while retaining their distinct session gates
 test('published feelings, parenting advice and online scenarios remain byte-identical through the presentation migration', () => {
   const cases = [
     ['gevoel','GEVOELENS','function teken','8dba67d4e96d975f617aac0b2ca0bc5adc8331518d9f10d4162732197ce226a3'],
-    ['mediawijs','SITUATIES','let volgorde','efcf439d81403796399a17d67aea00586d28a7ded6f52e828995c87bf0137e79'],
+    ['mediawijs','SITUATIES','\n];','51cb8032a7e5458c08cf15171e5538377aa58caf6500cb9cfdedd7893ab29c1b'],
     ['opvoeden','ONDERWERPEN','const ob =','90a48f4a83b9e1e029fe2a3c20679ee7635adbdb33c0807fd0b03eaa3e68dcdd']
   ];
   for (const [n, begin, end, expected] of cases) {

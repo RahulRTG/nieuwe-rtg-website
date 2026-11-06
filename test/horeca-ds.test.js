@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const names=['haccp','club','events','hotel','expeditie','bezorg','beheer'];
 test('zeven operationele schermen delen DS en behouden alle domeinowners',()=>{
- for(const name of names){const html=read('public/apps/horeca-'+name+'.html');assert.match(html,/<html lang="nl" data-ds>/);assert.match(html,/class="ds-scherm ds-horeca"/);assert.match(html,/data-rtg-world="work"/);assert.doesNotMatch(html,/<style\b/);assert.deepEqual([...html.matchAll(/<link[^>]*href="([^"]+\.css)"/g)].map(m=>m[1]),['/fonts/fonts.css','/ds/rtg-ds.css']);
+ for(const name of names){const html=read('public/apps/horeca-'+name+'.html');assert.match(html,/<html lang="nl" data-ds(?:="1")?(?:\s|>)/);assert.match(html,/class="ds-scherm ds-horeca"/);assert.match(html,/data-rtg-world="work"/);assert.doesNotMatch(html,/<style\b/);assert.deepEqual([...html.matchAll(/<link[^>]*href="([^"]+\.css)"/g)].map(m=>m[1]),['/fonts/fonts.css','/ds/rtg-ds.css']);
  for(const src of ['horeca-enterprise','workos-premium','basis','randen','deur'])assert.ok(html.includes('/shared/'+src+'.js'),name+src);assert.ok(html.includes('/apps/horeca/kern.js'));assert.equal((html.match(/src="\/shared\/appmenu\.js"/g)||[]).length,1);assert.ok(html.indexOf('/shared/appmenu.js')>html.indexOf('/shared/horeca-enterprise.js'));assert.match(html,/<script src="\/shared\/appmenu\.js" defer><\/script>/);assert.match(html,/id="main"/);assert.match(html,/id="melding"/);
  }
  const css=read('public/ds/componenten/horeca.css'),tokens=read('public/ds/tokens.css');for(const m of css.matchAll(/var\((--ds-[\w-]+)/g))assert.ok(tokens.includes(m[1]+':'),m[1]);

@@ -3915,7 +3915,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
    bedrijfsaanmelding wordt goedgekeurd -- zou het de tabel in groepjes verdelen.
 
    De functie weigert daarom al buiten Magnaat Test. Deze regel is de tweede
-   grendel: hij houdt de AANROEP bij de vijf plekken waar de seed staat, zodat
+   grendel: hij houdt de AANROEP bij de benoemde plekken waar de seed staat, zodat
    een route die morgen "even snel" een account aanmaakt er niet bij kan zonder
    dat iemand het ziet. test/zaaihash.test.js bewaakt dat deze regel blijft. */
 {
@@ -3925,6 +3925,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     'server/accounts/users.js',        // de twee ledenvarianten
     'server/accounts/staff.js',        // de personeelsvariant
     'server/server.js',                // de eigenaar, het testpersoneel en Nora
+    'server/opzet/demo-eigenaar.js',   // de uit server.js geknipte demo-eigenaarbootstrap
     'server/kern/staffseed-papieren.js' // de papieren van datzelfde personeel
   ]);
   const buiten = [];

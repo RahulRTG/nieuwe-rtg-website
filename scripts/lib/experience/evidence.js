@@ -5,6 +5,10 @@ const {execFileSync} = require('node:child_process');
 const {exactStempel} = require('../stempel');
 const SOURCE_PATHS = ['server','public','experience','experience-architecture','scripts','test','.github/workflows',
   'package.json','package-lock.json','.nvmrc','.node-version','Dockerfile','index.html','SCHERMEIGENAAR.json','APPWERKT.json'];
+// Gegenereerde runtime-uitvoer is geen Experience-bron. public/dist wordt per
+// platform opnieuw gebouwd en mag de bronvingerafdruk daarom niet laten
+// verschillen tussen een schone ontwikkelboom en GitHub Actions.
+const GENERATED_PATHS = new Set(['public/dist','server/data','server/uploads']);
 function candidate(root) {
   const stamp = exactStempel({}, {wortel:root});
   if (!stamp.commit || stamp.boomVuil !== false) return {ok:false,reason:'Kandidaat heeft ongecommitte code of onbekende Git-toestand',commit:stamp.commit};
@@ -27,7 +31,7 @@ function fingerprint(root) {
     if (stat.isDirectory()) {
       hash.update('DIRECTORY\0');
       for (const child of fs.readdirSync(file).sort()) {
-        if (['node_modules','.git'].includes(child) || ['server/data','server/uploads'].includes(name+'/'+child)) continue;
+        if (['node_modules','.git'].includes(child) || GENERATED_PATHS.has(name+'/'+child)) continue;
         add(name+'/'+child);
       }
     } else if (stat.isFile()) { hash.update('FILE\0'); hash.update(fs.readFileSync(file)); hash.update('\0'); }

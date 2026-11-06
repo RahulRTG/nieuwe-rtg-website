@@ -75,6 +75,16 @@ test('bronhash omvat assets en runtime, zonder outputcyclus',t=>{
   const before=fingerprint(f.root);f.write('EXPERIENCEWERKT.json','generated');f.write('artifacts/experience/new.json','generated');
   assert.equal(fingerprint(f.root),before);
 });
+test('bronhash negeert platformafhankelijke builduitvoer in public/dist',t=>{
+  const f=fixture(t);
+  f.write('public/source.js','bron');
+  const before=fingerprint(f.root);
+  f.write('public/dist/bundel.js','macOS-bouw');
+  const first=fingerprint(f.root);
+  f.write('public/dist/bundel.js','Linux-bouw');
+  assert.equal(first,before);
+  assert.equal(fingerprint(f.root),before);
+});
 test('pilotbewijs van andere commit is niet actueel kandidaatbewijs',()=>{
   const now=Date.now(), record={version:1,test:'test/a.js',at:new Date(now).toISOString(),sourceHash:'src',logHash:'log',tests:1,skipped:0,passed:true,exitCode:0,worktreeDirty:false,commit:'old'};
   assert.equal(state(record,'src','test/a.js',now,'new'),'STALE');

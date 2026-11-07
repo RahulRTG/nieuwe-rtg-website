@@ -21,12 +21,10 @@
   function gereed() {
     if (!d.body) return;
     d.body.dataset.dsReady = 'true';
-    /* Wereldschermen krijgen hun bestaande gereedsignaal pas nadat catalogus,
-       panelen en Workspace Runtime werkelijk staan. Alleen zelfstandige
-       DS-schermen zonder die runtime gebruiken het compatibele signaal hier. */
-    var heeftWerkruimte = d.body.dataset.rtgWorld &&
-      d.querySelector('script[src="/shared/rtg-world-desktop.js"]');
-    if (!heeftWerkruimte) d.body.dataset.rtgDesktopState = 'ready';
+    /* Het scriptlabel voor de oude World Desktop-runtime kan tijdens de
+       migratie nog in een DS-document staan. Die runtime slaat DS-schermen
+       bewust over; de ene DS-Edge levert daarom zelf het gereedsignaal. */
+    d.body.dataset.rtgDesktopState = 'ready';
   }
 
   function knop(naam, label, icoon, extra) {

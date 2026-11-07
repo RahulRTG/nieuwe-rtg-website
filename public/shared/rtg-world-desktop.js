@@ -11,12 +11,10 @@
     });
   }
   function start() {
-    /* De bestaande Workspace Runtime ondersteunt het DS zelf: hij verhuist de
-       live inhoud naar één wd-shell en laat de DS-Edge eigenaar van de globale
-       bediening. Een data-ds-scherm hier uitsluiten verwijdert dus Spatial,
-       panelen en sessiecontinuïteit in plaats van legacy-presentatie. */
+    /* Een data-ds-scherm bezit al zijn centrale presentatie en Edge. De oude
+       World Desktop-runtime mag daar geen tweede shell omheen bouwen. */
     if (started || w.self !== w.top || new URLSearchParams(w.location.search).get('embed') === '1' ||
-      d.body.dataset.publicPlatform) return;
+      d.body.dataset.publicPlatform || d.documentElement.hasAttribute('data-ds')) return;
     if (!d.body.dataset.rtgWorld || d.body.dataset.rtgWorld === 'redirect') return;
     started = true;
     var projection = d.body.hasAttribute('data-rtg-projectie');

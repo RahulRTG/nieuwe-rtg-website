@@ -57,8 +57,6 @@ async function main() {
           row.projection = await page.evaluate(() => document.body.hasAttribute('data-rtg-projectie'));
           if (route === '/apps/reisuitnodiging.html') {
             await require('./lib/desktop-guest')(page, row, errors);
-          } else if (row.public && await page.evaluate(() => document.body.dataset.page === 'rtg-landing')) {
-            await require('./lib/desktop-start')(page, row, errors);
           } else if (row.ds) {
             await require('./lib/desktop-ds')(page, row, errors);
           } else if (row.projection) {

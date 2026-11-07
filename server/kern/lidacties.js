@@ -11,6 +11,7 @@
 const { orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe } = require('../db');
 
 const subsidie = require('./commercie/subsidie');
+const tijdzone = require('./tijdzone');
 
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
@@ -40,7 +41,8 @@ function koopTicketVoor(session, body) {
   if (!act) return { status: 404, error: 'Deze activiteit bestaat niet (meer).' };
   const datum = String(body.datum || '');
   const tijd = String(body.tijd || '');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < new Date().toISOString().slice(0, 10))
+  const vandaagBijZaak = tijdzone.datumIn(null, tijdzone.zaakZoneOfHuis(s));
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < vandaagBijZaak)
     return { status: 400, error: 'Kies een datum vanaf vandaag.' };
   if (!(act.tijden || []).includes(tijd)) return { status: 400, error: 'Kies een tijdslot van deze activiteit.' };
   /* De sluitdag van de zaak (kern/activiteitendicht.js): een gesloten dag is

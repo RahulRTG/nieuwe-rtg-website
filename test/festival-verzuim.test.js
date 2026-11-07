@@ -12,6 +12,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 test('een dienst aan een afwezig teamlid: wel ingepland, met waarschuwing, en zichtbaar afwezig', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-festverzuim-'));
@@ -26,7 +27,7 @@ test('een dienst aan een afwezig teamlid: wel ingepland, met waarschuwing, en zi
   };
   try {
     const baas = await login('ESVEDRA', true), mw = await login('ESVEDRA', false), ander = await login('MACE', false);
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = tijdzone.datumIn();
     const fid = (await api('festival/nieuw', { naam: 'Verzuimfest' }, baas.tok)).body.festival.id;
     const eid = (await api('festival/editie', { festival: fid, jaar: 2027 }, baas.tok)).body.editie.id;
     const dag = (await api('festival/dag', { festival: fid, editie: eid, datum: vandaag, open: '00:00', sluit: '23:59' }, baas.tok)).body.dag.id;

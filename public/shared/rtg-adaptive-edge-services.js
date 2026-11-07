@@ -35,7 +35,9 @@
   }
   function navigate(rt, api, path) {
     if (!path) return false;
-    api.setState('dock'); rt.win.location.href = path; return true;
+    var core = w.RTGAdaptiveEdgeCore;
+    if (!core || !core.internalRoute(path)) return false;
+    api.setState('dock'); return core.navigate(rt.win, path);
   }
   function modes(rt) {
     if (!rt || !rt.modes) return;

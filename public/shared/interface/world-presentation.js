@@ -3,14 +3,20 @@
   'use strict';
   var U, world, P;
   var content = {
-    living: ['LIVING · VANDAAG', 'Dichtbij begint hier.', 'Ontdek uw omgeving', '/apps/navigatie.html', 'Uit uw Saloon', 'Een nieuw perspectief op dichtbij', '/apps/wereld.html', '/images/editorial/moment-family-support.webp'],
-    work: ['WORK · VANDAAG', 'Maak ruimte voor focus.', 'Open uw werkruimte', '/apps/werkruimte.html', 'Uw werkruimte', 'Ruimte voor uw plannen', '/apps/werkruimte.html', '/images/world-homes/work.webp'],
-    travel: ['TRAVEL · ONTDEKKEN', 'De ruimte om te ontdekken.', 'Bekijk uw reis', '/apps/reizen.html#reisoverzicht', 'Uw reis in het kort', 'Alles op één plek', '/apps/reisboek.html', '/images/world-homes/living-coast.webp'],
-    foundation: ['FOUNDATION · SAMEN', 'Ruimte om verder te komen.', 'Ontdek wat bij u past', '/apps/foundation/meedoen-ontdekken.html', 'In uw buurt', 'Samen aan de slag', '/apps/foundation/meedoen-ontdekken.html', '/images/world-homes/foundation.webp']
+    living: ['LIVING · VANDAAG', 'Dichtbij begint hier.', 'Ontdek uw omgeving', '/apps/navigatie.html', 'Uit uw Saloon', 'Een nieuw perspectief op dichtbij', '/apps/wereld.html', '/images/editorial/moment-family-support.webp', '/images/world-homes/living-warm.jpg'],
+    work: ['WORK · VANDAAG', 'Maak ruimte voor focus.', 'Open uw werkruimte', '/apps/werkruimte.html', 'Uw werkruimte', 'Ruimte voor uw plannen', '/apps/werkruimte.html', '/images/world-homes/work.webp', '/images/world-homes/work-warm.jpg'],
+    travel: ['TRAVEL · ONTDEKKEN', 'De ruimte om te ontdekken.', 'Bekijk uw reis', '/apps/reizen.html#reisoverzicht', 'Uw reis in het kort', 'Alles op één plek', '/apps/reisboek.html', '/images/world-homes/living-coast.webp', '/images/world-homes/travel-warm.jpg'],
+    foundation: ['FOUNDATION · SAMEN', 'Ruimte om verder te komen.', 'Ontdek wat bij u past', '/apps/foundation/meedoen-ontdekken.html', 'In uw buurt', 'Samen aan de slag', '/apps/foundation/meedoen-ontdekken.html', '/images/world-homes/foundation.webp', '/images/world-homes/foundation-warm.jpg']
   };
+  function localLink(anchor, path) {
+    if (!(path === '#reisoverzicht' || /^\/apps\/[a-z0-9/_-]+\.html(?:#[a-z0-9_-]+)?$/i.test(path))) throw new Error('Ongeldige wereldroute');
+    anchor.setAttribute('href', path); return anchor;
+  }
   function photo(src, key, label, cls) {
     var box = U.el('div', cls), img = U.el('img'), base = d.querySelector('meta[name="rtg-asset-base"]');
-    img.src = new URL(src.slice(1), new URL(((base && base.content) || '/').replace(/\/?$/, '/'), d.baseURI)).href; img.alt = ''; img.width = 1536; img.height = 768;
+    if (!/^\/images\/[a-z0-9/_-]+\.(?:jpe?g|webp|png|avif)$/i.test(src)) throw new Error('Ongeldige wereldafbeelding');
+    img.setAttribute('src', new URL(src.slice(1), new URL(((base && base.content) || '/').replace(/\/?$/, '/'), d.baseURI)).href);
+    img.alt = ''; img.width = 1536; img.height = 768;
     box.appendChild(img); if (P) P.register(img, key, label); return box;
   }
   function tabs(root, home, people, favorites) {
@@ -31,12 +37,12 @@
     details.append(summary, native); details.id = 'reisoverzicht';
     if (d.body.classList.contains('saloon-leest')) details.open = true;
     var scene = U.el('section', 'wp-scene'), heading = U.el('div', 'wp-heading'), overline = U.el('p', 'wp-overline', c[0]), title = U.el('h2', '', c[1]);
-    var link = U.el('a', 'wp-action', c[2] + ' ↗'); link.href = c[3];
+    var link = localLink(U.el('a', 'wp-action', c[2] + ' ↗'), c[3]);
     if (world === 'travel') link.onclick = function () { details.open = true; };
-    heading.append(overline, title); scene.append(heading, photo('/images/world-homes/' + world + '-warm.jpg', 'hoofd', 'Hoofdfoto', 'wp-photo'), link);
+    heading.append(overline, title); scene.append(heading, photo(c[8], 'hoofd', 'Hoofdfoto', 'wp-photo'), link);
     if (world === 'foundation') scene.appendChild(U.copy(U.el('p', 'wp-free'), 'free'));
-    var story = U.el('section', 'wp-story'), label = U.el('p', 'wp-overline', c[4]), a = U.el('a', '', c[5] + ' ↗'); a.href = c[6];
-    if (world === 'living') { a.href = '#reisoverzicht'; a.onclick = function () { details.open = true; }; }
+    var story = U.el('section', 'wp-story'), label = U.el('p', 'wp-overline', c[4]), a = localLink(U.el('a', '', c[5] + ' ↗'), c[6]);
+    if (world === 'living') { localLink(a, '#reisoverzicht'); a.onclick = function () { details.open = true; }; }
     story.append(label, photo(c[7], 'beeld-00000001', 'Verhaalbeeld', 'wd-app-photo'), a);
     home.append(scene); root.append(story, details); home.dataset.warmHome = 'true';
     function revealTarget() {
@@ -79,6 +85,9 @@
     U = w.RTGDesktopUI; world = d.body.dataset.rtgWorld; P = w.RTGPersonalImages;
     if (!content[world]) return;
     var atmosphere = photo('/images/world-homes/' + world + '-sfeer.jpg', 'sfeer', 'Sfeerbeeld', 'wp-atmosphere'); d.body.appendChild(atmosphere);
+    // De Edge opent dezelfde beeldbediening wanneer de mobiele schil het sfeerbeeld verbergt.
+    var imageAction = atmosphere.querySelector('.pi-change');
+    if (d.body.classList.contains('ds-wereldwerkruimte') && imageAction) imageAction.setAttribute('data-ds-actie', 'Beelden aanpassen');
     tabs(o.root, o.home, o.people, o.favorites);
     var scene = d.body.dataset.worldHome && !d.body.dataset.publicPlatform ? homeScene(o.home, o.root) : null;
     responsive(o, scene);

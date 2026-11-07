@@ -62,16 +62,22 @@
   const careSoort = { spa: 'Spa', wellness: 'Wellness', kliniek: 'Kliniek' };
   async function laadCare(){
     if (!API.live) return;
-    try { careOv = await API.call('/api/care', {}); } catch(e){ careOv = null; }
-    let mijn = [];
-    try { mijn = (await API.call('/api/care/mijn', {})).boekingen || []; } catch(e){}
-    try { carePak = (await API.call('/api/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
-    try { carePakMijn = (await API.call('/api/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
-    renderCareMijn(mijn);
-    renderCareIntakes();
-    renderCarePakketten();
-    renderCareAanbod();
-    laadVerzorging(); // de kapper en de barbier, apart gehouden van de zorg
+    const view = document.querySelector('.view[data-view="zorg"]');
+    if (view) view.setAttribute('aria-busy', 'true');
+    try {
+      try { careOv = await API.call('/api/care', {}); } catch(e){ careOv = null; }
+      let mijn = [];
+      try { mijn = (await API.call('/api/care/mijn', {})).boekingen || []; } catch(e){}
+      try { carePak = (await API.call('/api/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
+      try { carePakMijn = (await API.call('/api/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
+      renderCareMijn(mijn);
+      renderCareIntakes();
+      renderCarePakketten();
+      renderCareAanbod();
+      await laadVerzorging(); // de kapper en de barbier, apart gehouden van de zorg
+    } finally {
+      if (view) view.removeAttribute('aria-busy');
+    }
   }
   function renderCareMijn(mijn){
     const el = $('#careMijn'); if (!el) return;

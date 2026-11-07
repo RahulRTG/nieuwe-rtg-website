@@ -25,6 +25,14 @@
    /shared/kostenketen.js en hangt zichzelf aan hetzelfde object. */
 (function (w, d) {
   'use strict';
+  if (d && d.documentElement) {
+    d.documentElement.classList.add('ds-kostenbeeld');
+    if (!d.documentElement.hasAttribute('data-ds') && !d.getElementById('rtgDsRuntimeCss')) {
+      var link = d.createElement('link');
+      link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+      d.head.appendChild(link);
+    }
+  }
   var K = w.RTGKosten = w.RTGKosten || {};
 
   K.esc = function (t) {
@@ -66,38 +74,8 @@
       K.esc(g || 'onbekend') + '</span>';
   };
 
-  K.stijl = function () {
-    if (d.getElementById('ksStijl')) return;
-    var st = d.createElement('style');
-    st.id = 'ksStijl';
-    st.textContent =
-      /* Het hoofdvlak is geen kaart. Een kaart is alleen een kaart als het ding
-         een zelfstandig object is (ONTWERP.md par. 7); dit is de toestand van
-         het scherm zelf, dus een vlak met een signaalrail ervoor. */
-      /* ALLEEN BOVEN EN ONDER, en dat is geen detail: dit vlak draagt ook
-         .rtg-rail, en die zet zijn eigen padding-left om de inhoud ACHTER de
-         signaallijn te laten beginnen. Een kant-en-klare `padding: a 0 b`
-         overschrijft die stilletjes met nul, en dan loopt het bedrag door de
-         rail heen -- op een schermafdruk was de euro van "EUR 476,94"
-         letterlijk half weg. */
-      '.ks-hoofd{padding-top:1.1rem;padding-bottom:1.3rem;}' +
-      '.ks-zin{font-size:1.02rem;line-height:1.5;margin:.5rem 0 .1rem;}' +
-      '.ks-kpi{margin:.5rem 0 .2rem;}' +
-      '.ks-onder{font-size:.8rem;color:var(--rtg-soft,#8A8680);line-height:1.6;}' +
-      '.ks-reden{font-size:.86rem;color:var(--rtg-soft,#8A8680);line-height:1.6;margin-top:.5rem;}' +
-      '.ks-rij{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;}' +
-      '.ks-rij .rek{margin-left:auto;text-align:right;}' +
-      '.ks-wat{min-width:8rem;}' +
-      '.ks-hoeveel{font-size:.76rem;color:var(--rtg-soft,#8A8680);}' +
-      '.ks-waarom{background:none;border:0;padding:.3rem 0;color:var(--rtg-soft,#8A8680);' +
-        'font:inherit;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;}' +
-      '.ks-waarom:hover,.ks-waarom:focus-visible{color:var(--gold-tekst,#C0A544);}' +
-      '.ks-keten{margin:.2rem 0 .8rem;padding:.6rem 0 .2rem;font-size:.82rem;line-height:1.6;}' +
-      '.ks-stap{padding:.35rem 0 .35rem .9rem;border-left:2px solid var(--rtg-line,#2A2724);}' +
-      '.ks-stap b{font-weight:600;}' +
-      '.ks-stap small{display:block;color:var(--rtg-soft,#8A8680);font-size:.76rem;}';
-    d.head.appendChild(st);
-  };
+  /* Behoud de bestaande aanroep voor afnemers; presentatie staat in DS. */
+  K.stijl = function () { return null; };
 
   /* HET HOOFDVLAK: een toestand, een zin, hooguit EEN bedrag. Dat bedrag is de
      enige plek op dit scherm waar Bodoni mag staan (ONTWERP.md par. 1: een

@@ -342,7 +342,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
       uitweg: document.querySelector('#rtf-school-slot [data-school-uitweg]')?.getAttribute('href'),
       afgeschermd: [...document.body.children]
         .filter(el => el.id !== 'rtf-school-slot')
-        .every(el => getComputedStyle(el).visibility === 'hidden')
+        .every(el => el.inert && el.getAttribute('aria-hidden') === 'true')
     }));
     if (schooldeur.pad !== '/apps/foundation/bord.html') stuk.push('bord: de Schoolpasdeur verloor het gevraagde adres');
     if (!/tijdelijke Schoolpas|docentenruimte|dertig minuten/i.test(schooldeur.tekst)) stuk.push('bord: de Schoolpasdeur legt doel en verloop niet uit');

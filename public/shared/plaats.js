@@ -38,7 +38,7 @@
   var SLECHT_M = 250;        // een peiling die slechter is dan dit laten we lopen
   var R = 6371000;
 
-  var doel = null, hekken = [], binnen = {}, stopVolgen = null, bezig = false;
+  var doel = null, hekken = [], binnen = {}, stopVolgen = null, bezig = false, generatie = 0, actor = null;
   /* Wie er meeluistert op een hek-overgang. De motor MELDT alleen; wat er daarna
      gebeurt is aan de laag erboven (shared/plaatsnadering.js zet er bijvoorbeeld
      de aankomstpuls van een Arrival Pass mee). Zo blijft deze motor een motor:
@@ -82,14 +82,14 @@
     return was ? d <= (hek.straalM + MARGE_M) : d <= hek.straalM;
   }
 
+  function lid() { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } }
   function api(pad, body) {
-    var token = null;
-    try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
+    var token = actor;
     return fetch('/api/plaats/' + pad, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(body || {})
-    }).then(function (r) { return r.json().catch(function () { return {}; }); });
+    }).then(function (r) { return r.ok ? r.json().catch(function () { return {}; }) : {}; }).catch(function () { return {}; });
   }
 
   /* Een peiling verwerken. Let op wat hier NIET gebeurt: er gaat geen lat of lng
@@ -97,6 +97,7 @@
      positie mee voor de zekerheid" -- de server weigert dat verzoek met een
      fout, en dat is met opzet zo (server/kern/plaats/venster.js). */
   function peiling(plek) {
+    if (!actor || lid() !== actor) { stop(); return; }
     if (!doel || !hekken.length) return;
     if (plek.nauwkeurig != null && plek.nauwkeurig > SLECHT_M) return;
     for (var i = 0; i < hekken.length; i++) {
@@ -122,25 +123,47 @@
   function start(welkDoel, opties) {
     opties = opties || {};
     if (bezig) stop();
-    if (!window.RTGPlek) return Promise.resolve({ ok: false, reden: 'geen plek.js' });
+    // Deze gedeelde scripts samen leveren: een oude Plek zonder versiecontract
+    // kan geen veilige toestemming voor uitgestelde hekken garanderen.
+    var plek = window.RTGPlek;
+    if (!plek || typeof plek.toestemmingVersie !== 'function') return Promise.resolve({ ok: false, reden: 'de actuele plekmodule ontbreekt' });
+    var toestemming = plek.toestemmingVersie();
+    var ronde = ++generatie; actor = lid();
+    if (!actor) return Promise.resolve({ ok: false, reden: 'geen sessie' });
     doel = String(welkDoel || '');
     bezig = true;
+    function ingetrokken() {
+      if (ronde !== generatie) return;
+      stop();
+      if (typeof opties.bijIntrekken === 'function') opties.bijIntrekken();
+    }
+    function toestemmingGeldig() {
+      if (ronde !== generatie) return false;
+      if (window.RTGPlek !== plek || plek.toestemmingVersie() !== toestemming) { ingetrokken(); return false; }
+      return true;
+    }
     return api('hekken', { doel: doel }).then(function (r) {
+      if (!toestemmingGeldig()) return { ok: false, reden: 'gestopt of toestemming gewijzigd' };
+      if (lid() !== actor) { stop(); return { ok: false, reden: 'andere sessie' }; }
       if (!r || !Array.isArray(r.hekken) || !r.hekken.length) {
         bezig = false; doel = null;
         return { ok: false, reden: r && r.error ? r.error : 'geen hekken voor dit doel' };
       }
       hekken = r.hekken; binnen = {};
-      stopVolgen = window.RTGPlek.volg(peiling, { waarom: opties.waarom ||
-        'Om te kunnen merken wanneer je ergens aankomt of weggaat. Je locatie blijft op je toestel; RTG krijgt alleen te horen welk gebied je passeert.' });
+      var sluit = plek.volg(function (p) { if (toestemmingGeldig()) peiling(p); }, { waarom: opties.waarom ||
+        'Om te kunnen merken wanneer je ergens aankomt of weggaat. Je locatie blijft op je toestel; RTG krijgt alleen te horen welk gebied je passeert.',
+        bijIntrekken: ingetrokken });
+      if (!toestemmingGeldig()) { if (sluit) sluit(); return { ok: false, reden: 'gestopt' }; }
+      stopVolgen = sluit;
       /* Het toestel blijft niet peilen als niemand kijkt -- dezelfde regel als
          in shared/plek.js, en hier extra van belang omdat dit lang kan lopen. */
-      window.addEventListener('pagehide', stop);
+
       return { ok: true, doel: doel, hekken: hekken.length, afgekapt: r.afgekapt || 0 };
     });
   }
 
   function stop() {
+    generatie++; actor = null;
     if (stopVolgen) { try { stopVolgen(); } catch (e) {} stopVolgen = null; }
     hekken = []; binnen = {}; doel = null; bezig = false;
     // de luisteraars blijven staan: een scherm dat opnieuw start, luistert nog
@@ -160,6 +183,7 @@
     return function af() { luisteraars = luisteraars.filter(function (x) { return x !== cb; }); };
   }
 
+  window.addEventListener('pagehide', stop);
   window.RTGPlaats = { start: start, stop: stop, stand: stand, opWissel: opWissel,
     // voor toetsen en voor wie de rekenregel wil narekenen zonder een browser
     _staatIn: staatIn, _inVlak: inVlak, _meters: meters, MARGE_M: MARGE_M, SLECHT_M: SLECHT_M };

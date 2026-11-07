@@ -1,0 +1,41 @@
+/* Zaak Command houdt de regie en serverautorisatie in shared/zaakcommand.js.
+   Dit component draagt dezelfde werkplekken in manager- en duimstand. */
+@layer rtg.component {
+  .ds-zaakcommand { color: var(--ds-inkt); font-family: var(--ds-letter-tekst); }
+  .ds-zaakcommand h3 { margin: 0 0 var(--ds-ruimte-1); font-family: var(--ds-letter-display); font-size: var(--ds-maat-tekst); font-weight: 500; }
+  .ds-zaakcommand .zc-rail { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); margin-block-end: var(--ds-ruimte-4); }
+  .ds-zaakcommand :is(.zc-rail button,.zc-knop) { min-block-size: var(--ds-doel); color: inherit; background: transparent; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); font: inherit; font-size: var(--ds-maat-klein); cursor: pointer; }
+  .ds-zaakcommand .zc-rail button { padding: var(--ds-ruimte-2) var(--ds-ruimte-3); }
+  .ds-zaakcommand .zc-knop { padding: var(--ds-ruimte-2) var(--ds-ruimte-3); }
+  .ds-zaakcommand .zc-rail button[aria-current] { background: var(--ds-oppervlak-sterk); border-color: var(--ds-metaal); }
+  .ds-zaakcommand :is(.zc-kaart,.zc-tegel) { background: var(--ds-oppervlak); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+  .ds-zaakcommand .zc-kaart { margin-block-end: var(--ds-ruimte-3); padding: var(--ds-ruimte-3) var(--ds-ruimte-4); }
+  .ds-zaakcommand .zc-meta { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); line-height: 1.5; }
+  .ds-zaakcommand .zc-rij { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-2); margin-block-start: var(--ds-ruimte-2); }
+  .ds-zaakcommand .zc-knop.vol { color: var(--ds-accent-inkt); background: var(--ds-accent); border-color: var(--ds-accent); font-weight: 600; }
+  .ds-zaakcommand .zc-knop:disabled { cursor: default; opacity: .45; }
+  .ds-zaakcommand .zc-veld { min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); color: inherit; background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); font: inherit; font-size: var(--ds-maat-klein); }
+  .ds-zaakcommand .zc-veld-besluit { min-inline-size: 8rem; }
+  .ds-zaakcommand .zc-veld-reden { flex: 1; min-inline-size: 9rem; }
+  .ds-zaakcommand .zc-veld-zoek { flex: 1; min-inline-size: 10rem; }
+  .ds-zaakcommand .zc-veld-waarde { inline-size: 6rem; }
+  .ds-zaakcommand .zc-veld-regelreden { flex: 1; min-inline-size: 8rem; }
+  .ds-zaakcommand .zc-tegels { display: grid; grid-template-columns: repeat(auto-fill,minmax(9.5rem,1fr)); gap: var(--ds-ruimte-2); margin-block-end: var(--ds-ruimte-3); }
+  .ds-zaakcommand .zc-tegel { padding: var(--ds-ruimte-3); }
+  .ds-zaakcommand .zc-tegel b { display: block; font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-variant-numeric: tabular-nums; }
+  .ds-zaakcommand .zc-tegel span { display: block; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); letter-spacing: .12em; text-transform: uppercase; }
+  .ds-zaakcommand .zc-sig { margin-block: var(--ds-ruimte-2); padding-inline-start: var(--ds-ruimte-3); border-inline-start: 3px solid var(--ds-lijnkleur); }
+  .ds-zaakcommand .zc-sig.rood { border-inline-start-color: var(--ds-status-fout); }
+  .ds-zaakcommand .zc-sig.amber { border-inline-start-color: var(--ds-metaal); }
+  .ds-zaakcommand .zc-nv { display: inline-block; padding: var(--ds-ruimte-1) var(--ds-ruimte-2); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); font-size: var(--ds-maat-meta); letter-spacing: .08em; text-transform: uppercase; }
+  .ds-zaakcommand .zc-auto { color: var(--ds-inkt-zacht); border-color: var(--ds-inkt-zacht); }
+  .ds-zaakcommand .zc-assist { color: var(--ds-metaal); border-color: var(--ds-metaal); }
+  .ds-zaakcommand .zc-hand { color: var(--ds-status-fout); border-color: var(--ds-status-fout); }
+  .ds-zaakcommand .zc-leeg { padding-block: var(--ds-ruimte-6); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-zaakcommand :is(.zc-rail button,.zc-knop,.zc-veld):focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 3px; }
+  .ds-zaakcommand .zc-linkknop { border: 0; padding: 0; text-align: start; }
+  .ds-zaakcommand .zc-linkknop-klein { font-size: var(--ds-maat-meta); }
+  .ds-zaakcommand.zc-klein .zc-tegels { grid-template-columns: 1fr 1fr; }
+  .ds-zaakcommand.zc-klein :is(.zc-knop,.zc-rail button) { padding: var(--ds-ruimte-3) var(--ds-ruimte-4); font-size: var(--ds-maat-klein); }
+  @media (prefers-reduced-motion: reduce) { .ds-zaakcommand, .ds-zaakcommand * { scroll-behavior: auto; } }
+}

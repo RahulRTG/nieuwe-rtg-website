@@ -140,9 +140,9 @@
   $('#icsBtn').addEventListener('click', function () {
     api('ics').then(function (r) {
       if (!r.body.ics) return meld('Kon de agenda niet exporteren.');
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([r.body.ics], { type: 'text/calendar;charset=utf-8' }));
-      a.download = 'rtg-agenda.ics'; a.click(); URL.revokeObjectURL(a.href);
+      var agendaExportLink = document.createElement('a');
+      agendaExportLink.href = URL.createObjectURL(new Blob([r.body.ics], { type: 'text/calendar;charset=utf-8' }));
+      agendaExportLink.download = 'rtg-agenda.ics'; agendaExportLink.click(); URL.revokeObjectURL(agendaExportLink.href);
       meld('Geëxporteerd: rtg-agenda.ics');
     });
   });

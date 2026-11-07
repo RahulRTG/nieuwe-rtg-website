@@ -10,7 +10,7 @@
       return Number.isNaN(x.getTime()) ? '' : new Intl.DateTimeFormat(d.documentElement.lang || 'nl', opt || { day: 'numeric', month: 'short' }).format(x); }
     function row(title, sub, glyph) { var n = U.el('div', 'wd-data-row'); n.appendChild(U.icon(glyph || app.icon));
       var body = U.el('div'); body.appendChild(text('strong', '', title)); if (sub) body.appendChild(text('span', 'wd-muted', sub)); n.appendChild(body); root.appendChild(n); return n; }
-    function photo(url) { if (o.compact) return; var f = U.el('figure', 'wd-widget-photo'), im = U.el('img'); im.src = url; im.alt = ''; im.loading = 'lazy';
+    function photo(url) { if (o.compact) return; var f = U.el('figure', 'wd-widget-photo'), im = document.createElement('img'); im.src = url; im.alt = ''; im.loading = 'lazy';
       f.appendChild(im); f.appendChild(copy('figcaption', '', 'atmosphere')); root.appendChild(f); }
     function empty(key) { root.dataset.contentState = 'empty'; root.appendChild(copy('p', 'wd-widget-empty', key || 'empty')); }
     function array(j, key) { if (!Array.isArray(j[key])) throw new Error('invalid-widget-data'); return j[key]; }

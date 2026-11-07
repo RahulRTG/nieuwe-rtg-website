@@ -26,9 +26,18 @@
     try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tekst).catch(function () {}); } catch (e) {}
     return gedaan;
   }
+  function appAdres(waarde) {
+    try {
+      var doel = new URL(String(waarde || ''), location.href);
+      if (doel.origin !== location.origin || doel.pathname.indexOf('/apps/') !== 0) return null;
+      return doel.pathname.slice('/apps/'.length) + doel.search + doel.hash;
+    } catch (e) { return null; }
+  }
   var KLAAR = {
     openen: function (href) {
-      return { naam: T('gebaar.openen', 'Openen', 'Open'), doe: function () { if (href) location.href = href; } };
+      return { naam: T('gebaar.openen', 'Openen', 'Open'), doe: function () {
+        var doel = appAdres(href); if (doel != null) location.href = '/apps/' + doel;
+      } };
     },
     delen: function (o) {
       return { naam: T('gebaar.delen', 'Delen', 'Share'), doe: function () {

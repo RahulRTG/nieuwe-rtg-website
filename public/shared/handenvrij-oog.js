@@ -27,10 +27,10 @@
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   if (!memTok) return;                        // alleen voor leden
 
-  var css = '.hv-oog{display:flex;gap:.4rem;flex-wrap:wrap;margin:.2rem 0 .4rem;}' +
-    '.hv-oog .hv-sk{flex:0 0 auto;}' +
-    '.hv-foto{max-width:min(220px,60%);border-radius:0;border:1px solid #2f2c29;display:block;margin:.2rem 0;}';
-  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  // Presentatie komt op iedere host uit de centrale DS-component.
+  /* Presentatie: public/ds/componenten/handenvrij.css. */
+
+
 
   /* Een foto ophalen via een verborgen bestandsveld. `camera` bepaalt of de
      telefoon meteen de camera opent of eerst de bibliotheek toont. */
@@ -39,7 +39,7 @@
       var inp = document.createElement('input');
       inp.type = 'file'; inp.accept = 'image/*';
       if (camera) inp.setAttribute('capture', 'environment');
-      inp.style.display = 'none';
+      inp.hidden = true;
       inp.addEventListener('change', function () {
         var f = inp.files && inp.files[0];
         inp.remove();
@@ -60,17 +60,18 @@
       var lezer = new FileReader();
       lezer.onerror = mis;
       lezer.onload = function () {
-        var img = new Image();
-        img.onerror = mis;
-        img.onload = function () {
+        var verkleinBeeld = new Image();
+        verkleinBeeld.onerror = mis;
+        verkleinBeeld.onload = verwerk;
+        verkleinBeeld.src = lezer.result;
+        function verwerk() {
           var max = 1280;
-          var s = Math.min(1, max / Math.max(img.width, img.height));
+          var s = Math.min(1, max / Math.max(verkleinBeeld.width, verkleinBeeld.height));
           var c = document.createElement('canvas');
-          c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          c.width = Math.round(verkleinBeeld.width * s); c.height = Math.round(verkleinBeeld.height * s);
+          c.getContext('2d').drawImage(verkleinBeeld, 0, 0, c.width, c.height);
           klaar(c.toDataURL('image/jpeg', 0.82));
-        };
-        img.src = lezer.result;
+        }
       };
       lezer.readAsDataURL(file);
     });
@@ -89,10 +90,10 @@
     var rij = kamer.beurt ? kamer.beurt('member', 'Kijk hier eens naar.') : null;
     kamer.geenZak = false;
     if (!rij) return;
-    var img = document.createElement('img');
-    img.className = 'hv-foto'; img.src = dataUrl; img.alt = 'De foto die je net maakte';
+    var berichtBeeld = document.createElement('img');
+    berichtBeeld.className = 'ds-handenvrij__foto hv-foto'; berichtBeeld.src = dataUrl; berichtBeeld.alt = 'De foto die je net maakte';
     var bel = rij.querySelector('.hv-bel');
-    if (bel) bel.insertBefore(img, bel.firstChild);
+    if (bel) bel.insertBefore(berichtBeeld, bel.firstChild);
   }
   async function kijk() {
     var foto = await vraagFoto(true);
@@ -119,10 +120,10 @@
     var rij = kamer.beurt('rahul', 'Waar wil je hem hebben? ' + (d.noot || ''));
     if (!rij) return;
     var vak = document.createElement('div');
-    vak.className = 'hv-oog';
+    vak.className = 'ds-handenvrij__fotoacties hv-oog';
     plekken.forEach(function (p) {
       var b = document.createElement('button');
-      b.className = 'hv-sk'; b.type = 'button'; b.textContent = p.naam;
+      b.className = 'ds-handenvrij__schermknop hv-sk'; b.type = 'button'; b.textContent = p.naam;
       b.title = p.uitleg;
       b.addEventListener('click', async function () {
         b.disabled = true;
@@ -142,7 +143,7 @@
     if (greep.querySelector('[data-kijk]')) return true;
     var mk = function (naam, label, titel, doen) {
       var b = document.createElement('button');
-      b.className = 'hv-sk'; b.type = 'button'; b.textContent = label;
+      b.className = 'ds-handenvrij__schermknop hv-sk'; b.type = 'button'; b.textContent = label;
       b.title = titel; b.setAttribute(naam, '');
       b.addEventListener('click', doen);
       return b;

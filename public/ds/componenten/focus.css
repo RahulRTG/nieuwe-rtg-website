@@ -1,0 +1,57 @@
+/* FocusUI bepaalt welke kaartinhoud open is; deze component presenteert die
+   bestaande toestand. De eigenaar zet inhoud bij sluiten tijdelijk inline
+   uit, zodat oude ongelegerde kaartregels de gesloten toestand niet kunnen
+   doorbreken. Daardoor is hier geen prioriteitsescalatie of tweede
+   toestandslaag nodig. */
+@layer rtg.component {
+  .ds-focus-kaart.ds-focus-dicht { padding-block-end: var(--ds-ruimte-3); }
+  .ds-focus-kop {
+    min-block-size: var(--ds-doel);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--ds-ruimte-2);
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    user-select: none;
+  }
+  .ds-focus-kop:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  .ds-focus-pijl {
+    float: none;
+    display: inline-flex;
+    flex: none;
+    inline-size: 1em;
+    block-size: 1em;
+    margin-inline-start: auto;
+    align-items: center;
+    justify-content: center;
+    opacity: .62;
+    font-size: var(--ds-maat-klein);
+    line-height: 1;
+    transition: opacity var(--ds-duur) var(--ds-curve);
+  }
+  .ds-focus-dicht .ds-focus-pijl { opacity: .9; }
+  .ds-focus-badge {
+    display: none;
+    min-inline-size: var(--ds-doel);
+    min-block-size: var(--ds-doel);
+    margin-inline-start: 0;
+    padding-inline: var(--ds-ruimte-2);
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--ds-radius-capsule);
+    background: var(--ds-accent);
+    color: var(--ds-accent-inkt);
+    font-size: var(--ds-maat-klein);
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: middle;
+  }
+  .ds-focus-kaart.ds-focus-dicht.ds-focus-melding > .ds-focus-kop .ds-focus-badge { display: inline-flex; }
+  .ds-focus-kaart.ds-focus-dicht.ds-focus-melding {
+    border-color: var(--ds-accent);
+    box-shadow: inset 0 0 0 1px var(--ds-accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .ds-focus-pijl { transition: none; } }
+}

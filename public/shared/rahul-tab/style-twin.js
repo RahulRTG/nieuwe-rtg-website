@@ -1,6 +1,9 @@
 /* Visuele laag voor RTG Live Twin, Proof Rail en One Control. */
 (function(){
   'use strict';
+  // Volledige DS-hosts hebben de canonieke laag al; geen tweede presentatie.
+  if (document.documentElement.hasAttribute('data-ds')) return;
+  if (!document.querySelector('.rtg-rahul-page') && !window.__rahulTabDialoog) return;
   if(document.getElementById('rtgRahulTabTwinStijl'))return;
   var css=document.createElement('style');css.id='rtgRahulTabTwinStijl';
   css.textContent=

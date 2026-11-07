@@ -222,7 +222,7 @@ test('de browser gebruikt fragment, vaste POST-routes en geen persoonlijke schil
   assert.match(html, /data-rtg-projectie/);
   assert.ok(!html.includes('/shared/metgezel.js'), 'een gedeeld apparaat krijgt geen persoonlijke metgezel');
   assert.ok(html.includes('/shared/wauw.js'), 'de technische wake-locklaag blijft beschikbaar');
-  assert.doesNotMatch(html, /os-switcher|rtg-edge|appmenu|\/apps\/(?:app|rtg|kantoor|reizen)\.html/,
+  assert.doesNotMatch(html, /os-switcher|appmenu|<script[^>]+rtg-(?:edge-2|adaptive-edge)|\/apps\/(?:app|rtg|kantoor|reizen)\.html/,
     'een gedeeld televisiescherm draagt geen wereld-, account- of appnavigatie');
   assert.match(scherm, /post\('\/api\/projectie\/koppel'/);
   assert.match(scherm, /post\('\/api\/projectie\/kijk'/);

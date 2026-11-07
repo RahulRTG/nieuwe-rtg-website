@@ -15,6 +15,13 @@
   var RUSTIG = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var RES_UUR = 42; // de volle veer: 42 uur, als bij een echt uurwerk
   var KEY = 'rtg_gangreserve';
+  function laadUurwerkStijl(pad) {
+    if (document.getElementById('rtgUurwerkCss')) return;
+    var uurwerkStijl = document.createElement('link');
+    uurwerkStijl.id = 'rtgUurwerkCss'; uurwerkStijl.rel = 'stylesheet'; uurwerkStijl.href = pad;
+    document.head.appendChild(uurwerkStijl);
+  }
+  laadUurwerkStijl('/ds/uurwerk.css');
 
   /* ---- de veer: lezen (met het leeglopen sinds het vorige bezoek) ---- */
   function lees() {
@@ -54,52 +61,10 @@
   document.addEventListener('touchend', function () { opKroon = false; }, true);
   document.addEventListener('touchcancel', function () { opKroon = false; }, true);
 
-  /* ---- de horlogetaal: de taal van de klok als stille laag op ELKE pagina.
-     Geen herbouw per app, maar vaste kleine details: tekstselectie in het
-     gedempte goud, dunne haarlijn-scrollbalken, echte tabelcijfers voor alle
-     getallen (niets danst meer), elke hr als haarlijn, en een minuutbaan-klasse
-     (rtg-minuutbaan) die een kop de streepband van de wijzerplaat geeft. ---- */
-  function bouwTaal() {
-    if (document.getElementById('rtg-horlogetaal')) return;
-    var st = document.createElement('style');
-    st.id = 'rtg-horlogetaal';
-    st.textContent =
-      '::selection{background:color-mix(in srgb, var(--gold,#C9A24B) 32%, transparent);}' +
-      'body{font-variant-numeric:tabular-nums;}' +
-      'hr{border:none;height:1px;background:color-mix(in srgb, var(--gold,#C9A24B) 25%, transparent);}' +
-      '*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb, var(--gold,#C9A24B) 40%, transparent) transparent;}' +
-      '::-webkit-scrollbar{width:6px;height:6px;}' +
-      '::-webkit-scrollbar-track{background:transparent;}' +
-      '::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--gold,#C9A24B) 38%, transparent);border-radius:0;}' +
-      // de minuutbaan: zestig fijne strepen met een gouden accent op de vijf,
-      // zoals de streepband van de RTG-klok; voor sectiekoppen en scheidingen
-      '.rtg-minuutbaan{position:relative;padding-bottom:0.55rem;}' +
-      '.rtg-minuutbaan::after{content:"";position:absolute;left:0;bottom:0;width:7.5rem;max-width:60%;height:5px;' +
-      'background-image:repeating-linear-gradient(90deg, color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent) 0 1px, transparent 1px 25px),' +
-      'repeating-linear-gradient(90deg, color-mix(in srgb, var(--gold,#C9A24B) 30%, transparent) 0 1px, transparent 1px 5px);' +
-      'background-size:100% 5px, 100% 3px;background-position:left bottom, left bottom;background-repeat:no-repeat;}';
-    document.head.appendChild(st);
-  }
-
   /* ---- het haarlijntje: alleen op pagina's zonder het horloge zelf ---- */
   var lijn = null, punt = null;
   function bouwLijn() {
     if (document.querySelector('[data-rtg-klok="ring"]')) return;
-    var st = document.createElement('style');
-    st.id = 'rtg-uurwerk-stijl';
-    st.textContent = '#rtgGanglijn{position:fixed;top:0;left:0;height:2px;z-index:9991;pointer-events:none;opacity:0.55;' +
-      'background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--gold,#C9A24B) 70%, transparent));}' +
-      '#rtgGanglijn i{position:absolute;right:-2px;top:-1.5px;width:5px;height:5px;border-radius:50%;' +
-      'background:var(--gold,#C9A24B);box-shadow:0 0 6px var(--gold,#C9A24B);' +
-      // de klop als CSS-animatie: de browser componeert hem zelf (en pauzeert
-      // hem buiten beeld), JavaScript hoeft er niet 60x/s voor wakker te zijn
-      'animation:rtgKlop 0.333s ease-in-out infinite;}' +
-      '#rtgGanglijn i.actief{animation-duration:0.222s;}' +
-      '@keyframes rtgKlop{0%,100%{opacity:0.55;transform:scale(0.8);}50%{opacity:1;transform:scale(1.3);}}' +
-      // wie minder beweging wil ziet een stilstaand puntje (expliciet, want de
-      // globale reduced-motion-regel zou een infinite-animatie laten flikkeren)
-      '@media (prefers-reduced-motion: reduce){#rtgGanglijn i{animation:none;}}';
-    document.head.appendChild(st);
     lijn = document.createElement('div');
     lijn.id = 'rtgGanglijn';
     lijn.setAttribute('aria-hidden', 'true');
@@ -142,7 +107,6 @@
     if (!document.hidden) teken(actief);
   }
   function start() {
-    bouwTaal();
     bouwLijn();
     vorige = performance.now();
     gang();

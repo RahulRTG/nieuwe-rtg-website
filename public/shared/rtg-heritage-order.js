@@ -13,13 +13,11 @@
   var waarnemer = null;
 
   function heritageLink(doc) {
-    return doc && (doc.getElementById('rtgHeritageCss') ||
-      doc.querySelector('link[href^="/shared/rtg-heritage.css"]'));
+    return doc && doc.getElementById('rtgHeritageCss');
   }
 
   function editorialLink(doc) {
-    return doc && (doc.getElementById('rtgEditorialV4Css') ||
-      doc.querySelector('link[href^="/shared/rtg-editorial-v4.css"]'));
+    return doc && doc.getElementById('rtgEditorialV4Css');
   }
 
   function laatsteStijl(head) {

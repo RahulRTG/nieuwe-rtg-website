@@ -21,7 +21,10 @@
     }).catch(function () { return { status: 0, body: { error: window.RTGDailyCopy.value('failed') } }; });
   };
   var meldT; var meld = function (t) {
-    var m = $('#melding'); m.textContent = t; m.classList.add('zie');
+    var binnen = $('#ntScrim').open, m = $(binnen ? '#ntMelding' : '#melding');
+    m.textContent = t;
+    if (binnen) { clearTimeout(meldT); return; }
+    m.classList.add('zie');
     clearTimeout(meldT); meldT = setTimeout(function () { m.classList.remove('zie'); }, 3200);
   };
 
@@ -60,20 +63,20 @@
   function kaart(n) {
     var lijf = n.soort === 'lijst'
       ? (n.items || []).slice(0, 6).map(function (x, i) {
-          return '<span class="taak' + (x.af ? ' af' : '') + '">' +
+          return '<span class="taak' + (x.af ? ' af' : '') + ' ds-dag-taak">' +
             '<input type="checkbox" data-vink="' + n.id + ':' + i + '"' + (x.af ? ' checked' : '') +
             ' aria-label="' + esc(x.t) + '"> <span data-user-content>' + esc(x.t) + '</span></span>';
-        }).join('') + ((n.items || []).length > 6 ? '<span class="meta">nog ' + (n.items.length - 6) + ' punten</span>' : '')
+        }).join('') + ((n.items || []).length > 6 ? '<span class="meta ds-dag-meta">nog ' + (n.items.length - 6) + ' punten</span>' : '')
       : '<p data-user-content>' + esc(n.tekst || '') + '</p>';
     var meta = n.gewijzigd ? ['<span translate="no">' + esc(window.RTGDailyCopy.date(n.gewijzigd)) + '</span>'] : [];
-    if (n.vast) meta.push('<span class="goud">vastgepind</span>');
-    if (n.herinnerOp) meta.push('<span class="goud">herinnering ' + esc(n.herinnerOp) + (n.herinnerTijd ? ' ' + n.herinnerTijd : '') + '</span>');
+    if (n.vast) meta.push('<span class="goud ds-dag-goud">vastgepind</span>');
+    if (n.herinnerOp) meta.push('<span class="goud ds-dag-goud">herinnering ' + esc(n.herinnerOp) + (n.herinnerTijd ? ' ' + n.herinnerTijd : '') + '</span>');
     if (n.door) meta.push('van ' + esc(n.door));
     if ((n.gedeeldMet || []).length) meta.push('gedeeld met ' + n.gedeeldMet.length);
     if (n.archief) meta.push('archief');
-    return '<div class="nkaart' + (n.vast ? ' vast' : '') + '" data-open="' + n.id + '" role="button" tabindex="0">' +
+    return '<div class="nkaart' + (n.vast ? ' vast' : '') + ' ds-dag-nkaart" data-open="' + n.id + '" role="button" tabindex="0">' +
       '<h3 data-user-content>' + esc(n.titel || '(zonder titel)') + '</h3>' + lijf +
-      (meta.length ? '<span class="meta">' + meta.join(' · ') + '</span>' : '') + '</div>';
+      (meta.length ? '<span class="meta ds-dag-meta">' + meta.join(' · ') + '</span>' : '') + '</div>';
   }
   function teken() {
     if (!stand) return;
@@ -88,7 +91,7 @@
     var first = !archief && !q && !(stand.eigen || []).length && !(stand.gedeeld || []).length;
     window.RTGDaily.render('notities', first ? 'empty' : 'ready', { retry: laad });
     $('#bord').innerHTML = eigen.map(kaart).join('') ||
-      '<p class="stil">' + (q ? window.RTGDailyCopy.text('noResults') : archief ? 'Het archief is leeg.' : window.RTGDailyCopy.text('emptyNotes')) + '</p>';
+      '<p class="stil ds-dag-stil">' + (q ? window.RTGDailyCopy.text('noResults') : archief ? 'Het archief is leeg.' : window.RTGDailyCopy.text('emptyNotes')) + '</p>';
     var gedeeld = archief ? [] : (stand.gedeeld || []).filter(zeef);
     $('#gedeeldKop').style.display = gedeeld.length ? '' : 'none';
     $('#gedeeldBord').innerHTML = gedeeld.map(kaart).join('');
@@ -114,19 +117,27 @@
   });
 
   /* ---- de editor ---- */
+  var terugFocus = null;
+  function openEditor() {
+    var laag = $('#ntScrim');
+    if (laag.open) return;
+    terugFocus = document.activeElement; $('#ntMelding').textContent = '';
+    laag.classList.add('open'); laag.showModal(); $('#ntTitel').focus();
+  }
   function alle() { return (stand.eigen || []).concat(stand.gedeeld || []); }
   function toon(id) {
+    if ($('#ntScrim').open || saving) return;
     open = alle().find(function (n) { return n.id === id; });
     if (!open) return;
     open = JSON.parse(JSON.stringify(open));
     vul();
-    $('#ntScrim').classList.add('open');
+    openEditor();
   }
   function nieuw(soort) {
+    if ($('#ntScrim').open || saving) return;
     open = { soort: soort, titel: '', tekst: '', items: [], vanMij: true };
     vul();
-    $('#ntScrim').classList.add('open');
-    $('#ntTitel').focus();
+    openEditor();
   }
   function vul() {
     $('#ntTitel').value = open.titel || '';
@@ -148,8 +159,8 @@
   }
   function tekenTaken() {
     $('#ntTaken').innerHTML = (open.items || []).map(function (x, i) {
-      return '<div class="taakrij"><input type="checkbox" data-i="' + i + '"' + (x.af ? ' checked' : '') +
-        ' aria-label="Afvinken"><input class="t' + (x.af ? ' af' : '') + '" data-t="' + i + '" value="' + esc(x.t) + '" maxlength="200">' +
+      return '<div class="taakrij ds-dag-taakrij"><input type="checkbox" data-i="' + i + '"' + (x.af ? ' checked' : '') +
+        ' aria-label="Afvinken"><input class="t ds-invoer' + (x.af ? ' af' : '') + '" data-t="' + i + '" value="' + esc(x.t) + '" maxlength="200">' +
         '<button class="weg" data-w="' + i + '" aria-label="Punt weghalen" title="Punt weghalen">&#10005;</button></div>';
     }).join('');
     Array.prototype.forEach.call($('#ntTaken').querySelectorAll('[data-i]'), function (el) {
@@ -171,7 +182,7 @@
   });
   var saving = false;
   function bewaar(extra) {
-    if (saving) return Promise.resolve(null);
+    if (saving || !open) return Promise.resolve(null);
     saving = true;
     var b = Object.assign({ id: open.id, soort: open.soort, titel: $('#ntTitel').value,
       tekst: $('#ntTekst').value, items: open.items,
@@ -182,22 +193,35 @@
     }).finally(function () { saving = false; });
   }
   $('#ntBewaar').addEventListener('click', function () {
-    bewaar().then(function (id) { if (id) { meld('Bewaard.'); dicht(); laad(); } });
+    var doel = open; bewaar().then(function (id) { if (id) { if (open === doel) { meld('Bewaard.'); dicht(); } laad(); } });
   });
   $('#ntVast').addEventListener('click', function () {
-    bewaar({ vast: !open.vast }).then(function (id) { if (id) { dicht(); laad(); } });
+    if (!open) return;
+    var doel = open; bewaar({ vast: !open.vast }).then(function (id) { if (id) { if (open === doel) dicht(); laad(); } });
   });
   $('#ntArchief').addEventListener('click', function () {
-    bewaar({ archief: !open.archief }).then(function (id) { if (id) { meld(open.archief ? 'Terug op het bord.' : 'Gearchiveerd; niets is weg.'); dicht(); laad(); } });
+    if (!open) return;
+    var doel = open; bewaar({ archief: !open.archief }).then(function (id) { if (id) { if (open === doel) { meld(doel.archief ? 'Terug op het bord.' : 'Gearchiveerd; niets is weg.'); dicht(); } laad(); } });
   });
   $('#ntWeg').addEventListener('click', function () {
+    if (!open) return;
     if (!confirm(open.vanMij ? 'Deze notitie verwijderen?' : 'Uzelf van deze gedeelde notitie halen?')) return;
-    api('weg', { id: open.id }).then(function (r) { if (r.status !== 200 || r.body.error) return meld(r.body.error || window.RTGDailyCopy.value('failed')); dicht(); laad(); });
+    var doel = open; api('weg', { id: open.id }).then(function (r) {
+      if (r.status !== 200 || r.body.error) {
+        // Een late fout hoort niet in een inmiddels geopende andere notitie.
+        if (!open || open === doel) meld(r.body.error || window.RTGDailyCopy.value('failed'));
+        return;
+      }
+      if (open === doel) dicht();
+      laad();
+    });
   });
   $('#ntDeel').addEventListener('click', function () {
+    if (!open) return;
     var code = $('#ntCode').value.trim();
     if (!code || !open.id) return;
-    api('deel', { id: open.id, codenaam: code }).then(function (r) {
+    var doel = open; api('deel', { id: open.id, codenaam: code }).then(function (r) {
+      if (open !== doel) return;
       if (r.status !== 200 || r.body.error) return meld(r.body.error || window.RTGDailyCopy.value('failed'));
       $('#ntCode').value = '';
       open.gedeeldMet = r.body.gedeeldMet || [];
@@ -205,7 +229,12 @@
       meld('Gedeeld; jullie werken nu samen in deze notitie.');
     });
   });
-  function dicht() { $('#ntScrim').classList.remove('open'); open = null; }
+  function dicht() {
+    var laag = $('#ntScrim'); laag.classList.remove('open'); if (laag.open) laag.close(); open = null;
+    if (terugFocus && terugFocus.isConnected) terugFocus.focus({ preventScroll: true });
+    terugFocus = null;
+  }
+  $('#ntScrim').addEventListener('cancel', function (e) { e.preventDefault(); dicht(); });
   $('#ntDicht').addEventListener('click', dicht);
   $('#nieuwNotitie').addEventListener('click', function () { nieuw('notitie'); });
   $('#nieuwLijst').addEventListener('click', function () { nieuw('lijst'); });

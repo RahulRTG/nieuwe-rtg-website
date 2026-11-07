@@ -107,6 +107,7 @@ function teken(a) {
 
 document.querySelectorAll('[data-pulse]').forEach(function (b) {
   b.addEventListener('click', function () {
+    if (b.dataset.pulse === 'stop' && window.RTGPlaatsNadering) window.RTGPlaatsNadering.stop();
     api('/api/arrival/pulse', { pass: P, pulse: b.dataset.pulse }).then(function (j) { teken(j.pass); })
       .catch(function (e) { meld(e.message); });
   });

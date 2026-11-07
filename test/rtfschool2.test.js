@@ -9,6 +9,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-school2-'));
@@ -22,8 +23,7 @@ const office = (pad, body, token) => fetch(BASE + '/api' + pad, { method: 'POST'
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) });
 const json = r => r.json();
-const plus = n => { const d = new Date(Date.now() + n * 86400000);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const plus = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 let g, klas, kindId, kindToken, sleutel;
 

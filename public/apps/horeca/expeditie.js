@@ -28,21 +28,21 @@
       $('eRegie').innerHTML = (d.tafels || []).map(function (t) {
         var stand = t.gereed ? 'gereed'
           : (t.staatKoud ? t.staatKoud + ' min koud' : t.klaar + ' van ' + t.totaal + ' klaar');
-        return '<div class="bon"><b>' + esc(t.tafel || t.kanaal) + '</b>' +
-          ' <span class="tag">gang ' + t.gang + '</span>' +
-          (t.serveerOm ? ' <span class="tag">serveren ' + esc(t.serveerOm) + '</span>' : '') +
-          ' <span class="tag' + (t.gereed ? ' aan' : (t.staatKoud ? ' laat' : '')) + '">' + stand + '</span>' +
-          (t.allergieen.length ? '<div><span class="allergie">Allergie: ' + t.allergieen.map(esc).join(', ') + '</span></div>' : '') +
+        return '<div class="bon ds-horeca-bon"><b>' + esc(t.tafel || t.kanaal) + '</b>' +
+          ' <span class="tag ds-horeca-tag">gang ' + t.gang + '</span>' +
+          (t.serveerOm ? ' <span class="tag ds-horeca-tag">serveren ' + esc(t.serveerOm) + '</span>' : '') +
+          ' <span class="tag ds-horeca-tag' + (t.gereed ? ' aan' : (t.staatKoud ? ' laat' : '')) + '">' + stand + '</span>' +
+          (t.allergieen.length ? '<div><span class="allergie ds-horeca-allergie">Allergie: ' + t.allergieen.map(esc).join(', ') + '</span></div>' : '') +
           (t.regels || []).map(function (g) {
-            return '<div class="item"><span>' + g.aantal + '× ' + esc(g.naam) +
-              ' <span class="tag">' + esc(g.station) + '</span>' +
-              ' <span class="tag' + (g.urgentie === 'op tijd' ? '' : ' laat') + '">' +
+            return '<div class="item ds-horeca-item"><span>' + g.aantal + '× ' + esc(g.naam) +
+              ' <span class="tag ds-horeca-tag">' + esc(g.station) + '</span>' +
+              ' <span class="tag ds-horeca-tag' + (g.urgentie === 'op tijd' ? '' : ' laat') + '">' +
               g.loopt + ' van ' + g.norm + ' min</span></span>' +
               (g.stand === 'klaar'
                 ? K.knop('Uitgeven', { uit: g.regelId, rek: g.rekeningId }, true)
-                : '<span class="stil">' + esc(g.stand) + '</span>') + '</div>';
+                : '<span class="stil ds-horeca-meta">' + esc(g.stand) + '</span>') + '</div>';
           }).join('') + '</div>';
-      }).join('') || '<p class="stil">Niets onderhanden. De keuken ziet alleen wat de zaal heeft vrijgegeven.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Niets onderhanden. De keuken ziet alleen wat de zaal heeft vrijgegeven.</p>';
       K.bind($('eRegie'), 'uit', function (b) {
         K.api('/keuken/stand', { rekeningId: b.dataset.rek, regelId: b.dataset.uit, stand: 'uitgegeven' })
           .then(function (r2) {
@@ -96,31 +96,31 @@
         /* Wie hem heeft, staat als TEKST op de kaart en niet alleen als kleur.
            En de minuten staan erbij: dat is een feit waar een collega op mag
            handelen, in plaats van een tijdslimiet die het systeem zelf trekt. */
-        var wie = !c ? '<span class="tag">nog van niemand</span>'
-          : '<span class="tag' + (g.vanMij ? ' aan' : '') + '">' +
+        var wie = !c ? '<span class="tag ds-horeca-tag">nog van niemand</span>'
+          : '<span class="tag ds-horeca-tag' + (g.vanMij ? ' aan' : '') + '">' +
             (g.vanMij ? 'jij hebt hem' : esc(c.naam) + ' heeft hem') + ', ' + c.minuten + ' min' +
             (c.overgenomenVan ? ' (overgenomen van ' + esc(c.overgenomenVan) + ')' : '') + '</span>';
         var knoppen = (!c ? K.knop('Ik pak hem op', { pak: g.rekeningId, gang: g.gang }, true)
           : g.vanMij ? K.knop('Loslaten', { los: g.rekeningId, gang: g.gang })
           : K.knop('Neem over', { over: g.rekeningId, gang: g.gang })) +
           ' ' + K.knop('Gang uitgeven', { gangUit: g.rekeningId, gang: g.gang }, !!g.vanMij);
-        return '<div class="bon"><b>' + esc(g.tafel) + '</b>' +
-          ' <span class="tag">gang ' + g.gang + '</span>' +
-          ' <span class="tag">' + g.borden + ' bord(en)</span>' +
-          (g.serveerOm ? ' <span class="tag">serveren ' + esc(g.serveerOm) + '</span>' : '') +
-          ' <span class="tag' + (g.gereedSinds >= 3 ? ' laat' : '') + '">staat ' + g.gereedSinds + ' min</span> ' + wie +
-          (g.allergieen.length ? '<div><span class="allergie">Allergie: ' + g.allergieen.map(esc).join(', ') + '</span></div>' : '') +
+        return '<div class="bon ds-horeca-bon"><b>' + esc(g.tafel) + '</b>' +
+          ' <span class="tag ds-horeca-tag">gang ' + g.gang + '</span>' +
+          ' <span class="tag ds-horeca-tag">' + g.borden + ' bord(en)</span>' +
+          (g.serveerOm ? ' <span class="tag ds-horeca-tag">serveren ' + esc(g.serveerOm) + '</span>' : '') +
+          ' <span class="tag ds-horeca-tag' + (g.gereedSinds >= 3 ? ' laat' : '') + '">staat ' + g.gereedSinds + ' min</span> ' + wie +
+          (g.allergieen.length ? '<div><span class="allergie ds-horeca-allergie">Allergie: ' + g.allergieen.map(esc).join(', ') + '</span></div>' : '') +
           (g.regels || []).map(function (b) {
-            return '<div class="item"><span>' + b.aantal + '× ' + esc(b.naam) +
-              ' <span class="tag">' + esc(b.station) + '</span>' +
+            return '<div class="item ds-horeca-item"><span>' + b.aantal + '× ' + esc(b.naam) +
+              ' <span class="tag ds-horeca-tag">' + esc(b.station) + '</span>' +
               /* Waar dit bord heen moet. Een runner met vier borden leest een
                  naam; "gastNr 3" zegt hem niets. */
-              (b.stoel ? ' <span class="tag aan">' + esc(b.stoel) + '</span>' : '') +
-              (b.allergie ? ' <span class="allergie">' + esc(b.allergie) + '</span>' : '') +
+              (b.stoel ? ' <span class="tag ds-horeca-tag aan">' + esc(b.stoel) + '</span>' : '') +
+              (b.allergie ? ' <span class="allergie ds-horeca-allergie">' + esc(b.allergie) + '</span>' : '') +
               '</span></div>';
           }).join('') +
-          '<div class="rij h-mt40">' + knoppen + '</div></div>';
-      }).join('') || '<p class="stil">Er staat niets compleet klaar.</p>';
+          '<div class="rij ds-horeca-rij ds-horeca-afstand">' + knoppen + '</div></div>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er staat niets compleet klaar.</p>';
 
       var doe = function (attr, pad, woord) {
         K.bind($('ePas'), attr, function (b) {

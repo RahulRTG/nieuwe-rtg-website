@@ -29,9 +29,9 @@
         doe: function () { w.RTGMetgezel.rahul(); } });
     }
 
-    if (w.RTGVol && w.RTGVol.wissel) {
-      uit.push({ label: T('os.cc.vol', 'Volledig scherm'), icoon: 'vol',
-        doe: function () { w.RTGVol.wissel(); } });
+    if (w.RTGVol && w.RTGVol.wissel && w.RTGVol.mogelijk && w.RTGVol.mogelijk()) {
+      uit.push({ label: T('bdn.vol.aan', 'Rand tot rand'), icoon: 'vol',
+        doe: function () { if (w.RTGVol.mogelijk()) w.RTGVol.wissel(); } });
     }
 
     /* Delen kan alleen als de browser het aanbiedt (en dat is buiten https
@@ -49,4 +49,3 @@
     }
     return uit;
   }
-

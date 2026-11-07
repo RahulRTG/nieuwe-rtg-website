@@ -7,6 +7,7 @@
   var inKader = false;
   try { inKader = w.self !== w.top; } catch (e) { inKader = true; }
   var isEmbed = inKader || new URLSearchParams(w.location.search).get('embed') === '1';
+  var isDs = d.documentElement.hasAttribute('data-ds');
 
   function bron(tag, attribuut, pad) {
     var lijst = d.querySelectorAll(tag + '[' + attribuut + ']');
@@ -17,35 +18,45 @@
     return null;
   }
   function blad(pad, klaar) {
-    var link = bron('link[rel~="stylesheet"]', 'href', pad), nieuw = !link, gedaan = false;
-    if (!link) { link = d.createElement('link'); link.rel = 'stylesheet'; link.href = pad; }
+    if (document.documentElement.hasAttribute('data-ds')) return klaar(false);
+    var bestaandBlad = bron('link[rel~="stylesheet"]', 'href', pad), gedaan = false;
     function af(ok) {
       if (gedaan) return; gedaan = true;
-      if (ok) link.setAttribute('data-rtg-geladen', 'true');
+      if (ok && bestaandBlad) bestaandBlad.setAttribute('data-rtg-geladen', 'true');
       klaar(ok);
     }
-    link.addEventListener('load', function () { af(true); }, { once: true });
-    link.addEventListener('error', function () { af(false); }, { once: true });
-    if (link.getAttribute('data-rtg-geladen') === 'true' || link.sheet) af(true);
-    if (nieuw) (d.head || d.documentElement).appendChild(link);
-  }
-  function laad(pad, naam, klaar) {
-    if (w[naam]) { klaar(true); return; }
-    var script = bron('script', 'src', pad), nieuw = !script, gedaan = false;
-    if (!script) script = d.createElement('script');
-    function af(ok) {
-      if (gedaan) return; gedaan = true;
-      if (ok) script.setAttribute('data-rtg-geladen', 'true');
-      klaar(ok && !!w[naam]);
-    }
-    script.addEventListener('load', function () { af(true); }, { once: true });
-    script.addEventListener('error', function () { af(false); }, { once: true });
-    if (!nieuw) {
-      if (script.getAttribute('data-rtg-geladen') === 'true') af(true);
+    if (bestaandBlad) {
+      bestaandBlad.addEventListener('load', function () { af(true); }, { once: true });
+      bestaandBlad.addEventListener('error', function () { af(false); }, { once: true });
+      if (bestaandBlad.getAttribute('data-rtg-geladen') === 'true' || bestaandBlad.sheet) af(true);
       return;
     }
-    script.src = pad; script.async = true;
-    (d.head || d.documentElement).appendChild(script);
+    var randStyleNode = document.createElement('link');
+    randStyleNode.rel = 'stylesheet'; randStyleNode.href = pad;
+    randStyleNode.addEventListener('load', function () { bestaandBlad = randStyleNode; af(true); }, { once: true });
+    randStyleNode.addEventListener('error', function () { af(false); }, { once: true });
+    document.head.appendChild(randStyleNode);
+  }
+  function laad(pad, naam, klaar) {
+    if (document.documentElement.hasAttribute('data-ds')) return klaar(false);
+    if (w[naam]) { klaar(true); return; }
+    var bestaandScript = bron('script', 'src', pad), gedaan = false;
+    function af(ok) {
+      if (gedaan) return; gedaan = true;
+      if (ok && bestaandScript) bestaandScript.setAttribute('data-rtg-geladen', 'true');
+      klaar(ok && !!w[naam]);
+    }
+    if (bestaandScript) {
+      bestaandScript.addEventListener('load', function () { af(true); }, { once: true });
+      bestaandScript.addEventListener('error', function () { af(false); }, { once: true });
+      if (bestaandScript.getAttribute('data-rtg-geladen') === 'true') af(true);
+      return;
+    }
+    var randScriptNode = document.createElement('script');
+    randScriptNode.src = pad; randScriptNode.async = true;
+    randScriptNode.addEventListener('load', function () { bestaandScript = randScriptNode; af(true); }, { once: true });
+    randScriptNode.addEventListener('error', function () { af(false); }, { once: true });
+    document.head.appendChild(randScriptNode);
   }
 
   /* Elk zelfstandig scherm uit de vier werelden bereikt deze ene ingang via
@@ -53,6 +64,7 @@
      HTML-kopieen van de boven- en onderbalk. Een embed of projectiescherm houdt
      uitsluitend de chrome van zijn bovenliggende zelfstandige scherm. */
   function startPlatformEdge() {
+    if (document.documentElement.hasAttribute('data-ds')) return false;
     var pad = w.location.pathname, wereld = null;
     if (pad.indexOf('/apps/foundation/') === 0 || (pad === '/apps/office.html' && new URLSearchParams(w.location.search).get('werk') === 'rtf')) wereld = 'foundation';
     else if (['/apps/leven.html','/apps/geld.html','/apps/maison.html','/apps/table.html','/apps/garderobe.html','/apps/veilig.html'].includes(pad)) wereld = 'living';
@@ -92,12 +104,13 @@
     return true;
   }
   if (startPlatformEdge() && isEmbed) return;
+  if (isDs && isEmbed) return;
+  if (!isDs) blad('/ds/componenten/randen.css', function () {});
 
   var RAND = 24;   // hoe dicht bij de rand een haal mag beginnen
   var HAAL = 40;   // hoeveel pixels de goede kant op voordat hij opengaat
 
   var T = function (k, nl) { return (w.RTGi18n && w.RTGi18n.t) ? w.RTGi18n.t(k, nl) : nl; };
-
   /* ---- wat er te openen valt ----
      Niets hiervan bouwen we zelf; we wijzen alleen aan wat er al is. */
   function openBoven() {
@@ -111,29 +124,9 @@
   }
 
 
-  /* ---- de dunne hint tijdens het slepen ---- */
-  function stijl() {
-    if (d.getElementById('rndCss')) return;
-    var s = d.createElement('style'); s.id = 'rndCss';
-    s.textContent =
-      '.rnd-hint{position:fixed;left:50%;transform:translateX(-50%);z-index:9994;height:4px;border-radius:0;' +
-        'background:var(--gold,#A98F1C);opacity:0;transition:opacity .12s,width .08s;pointer-events:none;width:44px;}' +
-      '.rnd-hint.boven{top:calc(env(safe-area-inset-top,0px) + 6px);}' +
-      '.rnd-hint.aan{opacity:.85;}' +
-      /* Alleen zichtbaar voor wie er met Tab naartoe gaat -- zoals de skip-link.
-         Vaste kleuren, niet uit de paginavariabelen: zwart op goud haalt
-         4,02:1 (AA vraagt 4,5), wit op bordeaux 10,2. */
-      '.rnd-toets{position:fixed;left:.6rem;top:-4rem;z-index:9996;background:#7F1634;color:#FFFFFF;' +
-        'border:none;border-radius:0;padding:.5rem .9rem;font:700 .8rem Inter,system-ui,sans-serif;' +
-        'cursor:pointer;transition:top .15s;}' +
-      '.rnd-toets:focus{top:0;}' +
-      '@media print{.rnd-hint,.rnd-toets{display:none;}}';
-    (d.head || d.documentElement).appendChild(s);
-  }
-
   function hint(waar) {
     var el = d.createElement('div');
-    el.className = 'rnd-hint ' + waar;
+    el.className = 'rnd-hint ' + waar + ' ds-randen-hint';
     el.setAttribute('aria-hidden', 'true');
     d.body.appendChild(el);
     return el;
@@ -141,7 +134,7 @@
 
   function toetsknop(tekst, doe) {
     var b = d.createElement('button');
-    b.type = 'button'; b.className = 'rnd-toets';
+    b.type = 'button'; b.className = 'rnd-toets ds-randen-toets';
     b.textContent = tekst;
     b.addEventListener('click', doe);
     return b;
@@ -150,10 +143,11 @@
   /* ---- het gebaar ---- */
   function start() {
     if (!d.body) return;
+    // De shell kan DS activeren terwijl deze bestaande ingang op DOM-ready
+    // wacht. Gebruik bij opbouw dezelfde actuele keuze als de stijlguard.
+    isDs = d.documentElement.hasAttribute('data-ds');
     var boven = kanBoven();
     if (!boven) return;
-    stijl();
-
     var hBoven = hint('boven');
     d.body.appendChild(toetsknop(T('rnd.bov', 'Instellingen openen'), openBoven));
 

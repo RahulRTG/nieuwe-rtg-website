@@ -104,6 +104,7 @@
     edge.appendChild(blad);
     edge.appendChild(balk);
     d.body.appendChild(edge);
+    d.documentElement.classList.add('ds-edge-aan');
     d.addEventListener('keydown', function (ev) {
       if (ev.key !== 'Escape') return;
       if (!blad.hidden) sluitBlad();

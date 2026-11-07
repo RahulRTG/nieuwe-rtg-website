@@ -71,29 +71,29 @@
     } else if (!w.van) {
       acties = K.knop('Ik neem hem', { neem: w.id }, true);
     }
-    return '<article class="v-wijk' + (w.nu ? ' over' : (w.van ? '' : ' los')) + '">' +
-      '<div class="v-wijkkop"><span class="v-naam">' + esc(w.naam) + '</span>' +
-      '<span class="v-druk">' + w.taken + ' open</span></div>' +
-      '<p class="v-som">' + (w.nu ? '<b>' + w.nu + ' daarvan staan over een grens.</b> ' : '') +
+    return '<article class="v-wijk ds-horeca-werkkaart' + (w.nu ? ' over' : (w.van ? '' : ' los')) + '">' +
+      '<div class="v-wijkkop ds-horeca-kaartrij"><span class="v-naam ds-horeca-werknaam">' + esc(w.naam) + '</span>' +
+      '<span class="v-druk ds-horeca-werkaantal">' + w.taken + ' open</span></div>' +
+      '<p class="v-som ds-horeca-werksom">' + (w.nu ? '<b>' + w.nu + ' daarvan staan over een grens.</b> ' : '') +
       draagt(w) + watUitstaat(w) +
       (bod ? ' ' + (bod.tafels ? esc(bod.tafels.join(', ')) : 'De hele wijk') + ' aangeboden aan ' +
         esc(bod.naarNaam || 'een collega') + '; staat ' + bod.staat + ' min.' : '') +
       '</p>' +
-      '<p class="v-tafels">' + (w.tafels.length
+      '<p class="v-tafels ds-horeca-werktafels">' + (w.tafels.length
         ? w.tafels.length + ' tafel(s): ' + esc(w.tafels.join(', '))
         : 'Nog geen tafels in deze wijk.') + '</p>' +
-      (acties ? '<div class="v-acties">' + acties + '</div>' : '') +
+      (acties ? '<div class="v-acties ds-horeca-werkacties">' + acties + '</div>' : '') +
       '</article>';
   }
 
   function zonderKaart(z) {
     if (!z || (!z.tafels.length && !z.taken)) return '';
-    return '<article class="v-wijk' + (z.nu ? ' over' : ' los') + '">' +
-      '<div class="v-wijkkop"><span class="v-naam">Zonder wijk</span>' +
-      '<span class="v-druk">' + z.taken + ' open</span></div>' +
-      '<p class="v-som">' + (z.nu ? '<b>' + z.nu + ' daarvan staan over een grens.</b> ' : '') +
+    return '<article class="v-wijk ds-horeca-werkkaart' + (z.nu ? ' over' : ' los') + '">' +
+      '<div class="v-wijkkop ds-horeca-kaartrij"><span class="v-naam ds-horeca-werknaam">Zonder wijk</span>' +
+      '<span class="v-druk ds-horeca-werkaantal">' + z.taken + ' open</span></div>' +
+      '<p class="v-som ds-horeca-werksom">' + (z.nu ? '<b>' + z.nu + ' daarvan staan over een grens.</b> ' : '') +
       'Deze tafels zitten in geen enkele wijk en zijn dus van iedereen.</p>' +
-      '<p class="v-tafels">' + (z.tafels.length ? esc(z.tafels.join(', ')) : 'Geen tafels.') + '</p>' +
+      '<p class="v-tafels ds-horeca-werktafels">' + (z.tafels.length ? esc(z.tafels.join(', ')) : 'Geen tafels.') + '</p>' +
       '</article>';
   }
 
@@ -108,7 +108,7 @@
     $('vUitleg').textContent = d.let || '';
 
     $('vWijken').innerHTML = (wijken.map(wijkKaart).join('') + zonderKaart(d.zonderWijk)) ||
-      '<p class="v-leeg">Er zijn nog geen wijken. Zolang die er niet zijn is elke tafel ' +
+      '<p class="v-leeg ds-horeca-werkleeg">Er zijn nog geen wijken. Zolang die er niet zijn is elke tafel ' +
       'van iedereen -- dat werkt, maar op een drukke avond weet dan niemand wie waar heen loopt.</p>';
 
     K.bind($('main'), 'neem', function (b) { doe('/wijk/neem', { wijkId: b.dataset.neem }); });

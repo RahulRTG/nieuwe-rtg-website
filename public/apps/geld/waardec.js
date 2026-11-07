@@ -63,7 +63,6 @@
   }
 
   function start() {
-    if (D.stijl) D.stijl();
     if (T.laadPortefeuille) T.laadPortefeuille();
     if (T.laadGraaf) T.laadGraaf();
     if (T.laadTerug) T.laadTerug();

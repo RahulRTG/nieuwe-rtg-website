@@ -78,7 +78,7 @@
     var nav = $('[data-ds-opsnav]'); if (!nav) return;
     if (ingebed()) { nav.hidden = true; return; }
     OPS.forEach(function (o) {
-      var a = maak('a', 'ds-chip', o[0]); a.href = o[1];
+      var a = maak('a', 'ds-chip', o[0]); a.setAttribute('href', o[1]);
       if (o[1] === w.location.pathname) a.setAttribute('aria-current', 'page');
       nav.appendChild(a);
     });
@@ -91,7 +91,10 @@
     var weg = maak('p', 'ds-status__tekst', 'Deze app werkt met uw personeelsinlog. Ga naar de personeels-app en meld u daar aan; uw werkgever geeft u de code.');
     var gids = maak('div');
     var a = maak('a', 'ds-knop ds-knop--primair ds-status__actie', 'Ga naar de personeels-app');
-    a.href = naar || '/apps/personeel.html';
+    /* Dit gedeelde scherm verleent geen vrije springroute. De bestaande
+       aanroepers openen uitsluitend de personeels-app; onbekende invoer valt
+       dicht op diezelfde veilige deur. */
+    a.setAttribute('href', naar === '/apps/personeel.html' ? naar : '/apps/personeel.html');
     leeg(doel); doel.append(gids, weg, a);
     fetch('/api/gids/app', { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pad: w.location.pathname }) })

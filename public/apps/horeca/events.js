@@ -24,13 +24,13 @@
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('vLijst').innerHTML = (d.events || []).map(function (e) {
-        return '<div class="item"><span><b>' + esc(e.naam) + '</b> <span class="stil">· ' +
+        return '<div class="item ds-horeca-item"><span><b>' + esc(e.naam) + '</b> <span class="stil ds-horeca-meta">· ' +
           esc(e.datum || 'geen datum') + ' · ' + e.gasten + ' gasten · versie ' + e.versie + '</span>' +
-          ' <span class="tag' + (e.status === 'bevestigd' ? ' aan' : '') + '">' + esc(e.status) + '</span></span>' +
-          '<span class="rij"><span class="stil">' + K.euro(e.totaalCenten) +
+          ' <span class="tag ds-horeca-tag' + (e.status === 'bevestigd' ? ' aan' : '') + '">' + esc(e.status) + '</span></span>' +
+          '<span class="rij ds-horeca-rij"><span class="stil ds-horeca-meta">' + K.euro(e.totaalCenten) +
           (e.aanbetaald ? ' · ' + K.euro(e.aanbetaald) + ' aanbetaald' : '') + '</span>' +
           K.knop('Openen', { ev: e.id }) + '</span></div>';
-      }).join('') || '<p class="stil">Er staat nog geen event.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er staat nog geen event.</p>';
       K.bind($('vLijst'), 'ev', function (b) { huidig = b.dataset.ev; toon(); });
     });
   }
@@ -42,14 +42,14 @@
       if (d.error) return K.meld(d.error);
       $('vNaUit').innerHTML =
         K.rij('Opbrengst (de bevestigde posten)', K.euro(d.opbrengstCenten)) +
-        K.rij('Kosten' + (d.perSoort ? ' <span class="stil">· ' + Object.keys(d.perSoort).map(function (s) {
+        K.rij('Kosten' + (d.perSoort ? ' <span class="stil ds-horeca-meta">· ' + Object.keys(d.perSoort).map(function (s) {
           return s + ' ' + K.euro(d.perSoort[s]);
         }).join(', ') + '</span>' : ''), K.euro(d.kostenCenten)) +
         (d.compleet
           ? K.rij('<b>Marge</b>', '<b>' + K.euro(d.margeCenten) + ' (' + d.margeProcent + '%)</b>') +
             K.rij('Per gast', K.euro(d.perGast)) +
             K.rij('Gewerkte uren', d.gewerkteUren + ' uur')
-          : '<p class="stil">' + esc(d.let) + '</p>');
+          : '<p class="stil ds-horeca-meta">' + esc(d.let) + '</p>');
     });
   }
 

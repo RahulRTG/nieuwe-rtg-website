@@ -229,109 +229,19 @@ accounts.init();
    werelden hebben daarom geen demo-stand. Alleen de afzonderlijke Magnaat-
    testomgeving mag synthetische accounts en gegevens laden. */
 const DEMO = testomgeving.actief(process.env);
-// Het eigenaarsaccount (Rahul Imran Ismail), zodat Rahul/Imran ook via de
-// echte accountlogin werkt. Bestaat het account al (een oudere lokale
-// database), dan krijgt het hier de juiste naam; de kluis blijft de bron.
-// Sync-varianten: de seed draait voor 'listen', dus blokkeren kan geen kwaad
-// en zodra de poort opengaat bestaan de accounts gegarandeerd (geen race in tests).
-/* Waarom dit een FUNCTIE is en niet gewoon een blok.
-
-   In Postgres-modus is deze bootstrap tweemaal nodig. Hij draait hier, bij het
-   laden -- en daarna haalt accounts.startPostgres() de gedeelde users-tabel op
-   en zet die er met "Postgres wint" overheen. Dat is de juiste regel voor echte
-   data, maar hij draaide zo ook de demo-bootstrap terug. Gevolg: de eigenaar kon
-   op een gedeelde database niet inloggen met het demo-wachtwoord, de boardroom
-   bleef dicht, en De Beproeving kon haar schakelkast niet op "alles aan" zetten.
-   Twee volledige 100M-runs hebben daardoor tegen de standaard-functiestand
-   gemeten terwijl er "alles aan" in het rapport stond.
-
-   Het commentaar hierboven redeneerde over de volgorde ten opzichte van
-   'listen'. Dat klopte -- tot de Postgres-spiegel eronder kwam. */
-function zetEigenaarsAccountEens() {
-  const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
-  /* EN HET WACHTWOORD OOK ALS HET ACCOUNT AL BESTOND. Dat gebeurde niet, en
-     daarmee was de demo-stand een garantie die alleen gold op een verse
-     database -- precies wanneer je hem niet nodig hebt. Op een gedeelde
-     Postgres kwam de rij ergens anders vandaan en was het wachtwoord
-     onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
-     Dit staat achter DEMO en draait dus nooit in productie. */
-  const bijwerken = (rij) => {
-    let x = rij;
-    if (accounts.realNameOf(x) !== 'Rahul Imran Ismail') x = accounts.renameUser(x.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
-    accounts.setPasswordZaai(x.id, DEMO_WACHTWOORD);
-    accounts.setVerification(x.id, 'verified');
-    return x;
-  };
-  let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
-  if (!u) {
-    /* Nog geen account op het eigenaarsadres. Op een verse database maken we er
-       een; op een database die al demoleden bevat draagt de seed-persona de
-       naam Rahul al, en verhuizen we die naar het eigenaarsadres. Anders zou
-       de inlognaam botsen en bleef de eigenaar buiten de boardroom staan. */
-    const bestaand = accounts.findByLogin('Rahul');
-    if (bestaand) {
-      u = accounts.renameUser(bestaand.id, { username: 'Rahul', realName: 'Rahul Imran Ismail', email: eigenaar.OWNER_EMAIL });
-      accounts.setPasswordZaai(u.id, DEMO_WACHTWOORD);
-      accounts.setVerification(u.id, 'verified');
-    } else {
-      u = accounts.createUserZaai({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
-      accounts.saveMemberState(u.id, demoLidInhoud());
-      accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
-    }
-  } else {
-    if (accounts.realNameOf(u) !== 'Rahul Imran Ismail') u = accounts.renameUser(u.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
-    /* EN HET WACHTWOORD OOK ALS HET ACCOUNT AL BESTOND. Dat gebeurde niet, en
-       daarmee was de demo-stand een garantie die alleen gold op een verse
-       database -- precies wanneer je hem niet nodig hebt. Op een gedeelde
-       Postgres kwam de rij ergens anders vandaan en was het wachtwoord
-       onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
-       Dit staat achter DEMO en draait dus nooit in productie. */
-    accounts.setPasswordZaai(u.id, DEMO_WACHTWOORD);
-    accounts.setVerification(u.id, 'verified');
-  }
-  /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
-     account. De kantoor- en zaak-rol staan er standaard aan gekoppeld, dus
-     na de leden-inlog is elke werkplek een rolkeuze, geen tweede inlog. */
-  if (u) {
+/* De idempotente demo-bootstrap staat op zijn eigen opstartnaad. Daardoor kan
+   de echte drie-processenrace rechtstreeks worden beproefd zonder drie keer
+   het volledige platform met alle achtergrondmodules op te starten. */
+const zetEigenaarsAccount = require('./opzet/demo-eigenaar')({
+  accounts, eigenaar, save, demoLidInhoud, env: process.env,
+  rollenVoor(id) {
     if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
-    const sleutelbos = db.data.accountRollen['user-' + u.id] =
-      Array.isArray(db.data.accountRollen['user-' + u.id]) ? db.data.accountRollen['user-' + u.id] : [];
-    if (!sleutelbos.some(r => r.rol === 'kantoor')) sleutelbos.push({ rol: 'kantoor', at: new Date().toISOString() });
-    if (!sleutelbos.some(r => r.rol === 'zaak')) {
-      const zc = (process.env.DEMO_SUPPLIER || 'KIKUNOI').toUpperCase();
-      const zaak = (db.data.suppliers || []).find(s => s.code === zc);
-      sleutelbos.push({ rol: 'zaak', code: zc, zaakNaam: zaak ? zaak.name : zc, naam: 'Beheer', at: new Date().toISOString() });
-    }
-    save();
-  }
-}
-
-/* EEN VERLOREN RACE IS GEEN FOUT, ook hier niet.
-
-   De vloot start leden, kantoor en rtf als aparte processen op dezelfde
-   accountsdatabase. Alle drie kijken ze of het eigenaarsaccount bestaat, alle
-   drie zien ze van niet, en alle drie maken ze het aan -- waarna twee van de
-   drie fataal omvallen op UNIQUE constraint failed: users.username. Dat was de
-   tweede helft van de flake in test/vloot.test.js; de eerste helft zat in
-   server/migraties/index.js en is daar met een slot opgelost.
-
-   Hier past geen slot maar een herlezing: de bedoeling van deze functie is
-   IDEMPOTENT -- zorg dat de eigenaar bestaat -- dus een botsing op de unieke
-   sleutel betekent dat een ander proces het al heeft gedaan. Dan kijken we
-   opnieuw, en die tweede ronde vindt het account en loopt door. Elke andere
-   fout blijft staan zoals hij is.
-
-   Een keer opnieuw en niet in een lus: na de botsing BESTAAT de rij (SQLite
-   commit synchroon), dus ziet de tweede ronde hem nog steeds niet, dan is er
-   iets anders aan de hand dan drukte. */
-function zetEigenaarsAccount() {
-  try { return zetEigenaarsAccountEens(); }
-  catch (e) {
-    const bericht = String((e && e.message) || e);
-    if (!/UNIQUE constraint failed: users\./.test(bericht)) throw e;
-    return zetEigenaarsAccountEens();
-  }
-}
+    const sleutel = 'user-' + id;
+    if (!Array.isArray(db.data.accountRollen[sleutel])) db.data.accountRollen[sleutel] = [];
+    return db.data.accountRollen[sleutel];
+  },
+  zaakVoor(code) { return (db.data.suppliers || []).find(s => s.code === code); }
+});
 // bij het laden; in Postgres-modus nogmaals na de gedeelde pull (zie onder)
 if (DEMO) zetEigenaarsAccount();
 /* GEEN EIGENAAR IN PRODUCTIE: ZEG HET, EN ZEG HET LUID.

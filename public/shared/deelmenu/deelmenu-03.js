@@ -33,8 +33,8 @@
        nooit de onze is, dus herbouwde de wacht elke 120 ms opnieuw. */
     var oud = main.querySelectorAll('.rtgdeel-balk');
     for (var b = 0; b < oud.length; b++) oud[b].remove();
-    var weg = main.querySelectorAll('.rtgdeel-weg');
-    for (var i = 0; i < weg.length; i++) weg[i].classList.remove('rtgdeel-weg');
+    var weg = main.querySelectorAll('.rtgdeel-weg,.ds-deelmenu-weg');
+    for (var i = 0; i < weg.length; i++) zetMenuZichtbaar(weg[i], true);
     return start();
   }
 

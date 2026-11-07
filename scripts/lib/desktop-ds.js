@@ -10,7 +10,12 @@
 'use strict';
 module.exports = async function dsScherm(page, row, errors) {
   const voorbeeld = await page.evaluate(() => location.pathname.startsWith('/ds/'));
-  await page.waitForSelector(voorbeeld ? '.ds-toestel .ds-edge__balk' : '.ds-edge__balk [data-ds-edge="rahul"]', { timeout: 12000 });
+  await page.waitForFunction(({ voorbeeld }) => {
+    const zichtbaar = selector => [...document.querySelectorAll(selector)].some(e =>
+      e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
+    return zichtbaar(voorbeeld ? '.ds-toestel .ds-edge__balk' : '.ds-edge__balk [data-ds-edge="rahul"]') ||
+      zichtbaar('.ds-foundation-toegang');
+  }, { voorbeeld }, { timeout: 12000 });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => [...document.querySelectorAll('img')].filter(i => i.loading !== 'lazy' || i.getClientRects().length)
     .every(i => i.complete), null, { timeout: 12000 });
@@ -20,6 +25,9 @@ module.exports = async function dsScherm(page, row, errors) {
       world: document.body.dataset.rtgWorld,
       systeem: getComputedStyle(document.documentElement).getPropertyValue('--ds-schermhoogte').trim(),
       edges: zichtbaar('.ds-edge__balk'), oudeEdges: zichtbaar('.rtg-adaptive-bar,.wd-shell'),
+      toegang: zichtbaar('.ds-foundation-toegang'),
+      toegangRect: (() => { const e = document.querySelector('.ds-foundation-toegang'); if (!e) return null;
+        const r = e.getBoundingClientRect(); return { x:r.x, y:r.y, w:r.width, h:r.height, right:r.right, bottom:r.bottom }; })(),
       kapotteBeelden: [...document.querySelectorAll('img')].filter(i => i.complete && i.getClientRects().length && !i.naturalWidth).length,
       overflow: document.documentElement.scrollWidth > innerWidth + 1
     };
@@ -27,7 +35,9 @@ module.exports = async function dsScherm(page, row, errors) {
   const s = row.state; row.failures = [];
   if (row.http !== 200) row.failures.push('http-' + row.http);
   if (!s.systeem) row.failures.push('design-system-not-loaded');
-  if (!s.edges) row.failures.push('missing-ds-edge');
+  if (!s.edges && !s.toegang) row.failures.push('missing-ds-edge');
+  if (s.toegang && (!s.toegangRect || s.toegangRect.w < 280 || s.toegangRect.h < 180 ||
+    s.toegangRect.x < 0 || s.toegangRect.right > await page.evaluate(() => innerWidth) + 1)) row.failures.push('invalid-foundation-access-gate');
   if (s.oudeEdges) row.failures.push('legacy-shell-on-ds-screen');
   if (s.kapotteBeelden) row.failures.push('broken-image');
   if (s.overflow) row.failures.push('horizontal-overflow');

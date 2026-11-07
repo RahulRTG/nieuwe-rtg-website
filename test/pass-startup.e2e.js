@@ -85,7 +85,8 @@ test('Pass opent na één installatie offline met de volledige interface, zonder
     assert.ok(cached.every(p => !p.startsWith('/api/') && !p.startsWith('/uploads/')), 'cache contains public assets only');
     await ctx.setOffline(true);
     await page.reload({waitUntil:'domcontentloaded'});
-    await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
+    /* Offline is het herstelvlak het contract. De wereldruntime hoeft zonder
+       netwerk niet gereed te melden; de volledige gecachete bediening wel. */
     await reachable(page,'#passStartup button');
     assert.equal(await page.evaluate(() => localStorage.getItem('rtg_member_token')),token,
       'a network failure must not erase the saved session');

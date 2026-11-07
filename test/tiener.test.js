@@ -8,6 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tiener-'));
@@ -25,10 +26,7 @@ function tn(actie, body, sess) {
   });
 }
 const json = r => r.json();
-const overDagen = n => {
-  const d = new Date(Date.now() + n * 86400000);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-};
+const overDagen = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' }, wachtPad: '/api/foundation/health' }));

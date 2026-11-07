@@ -1,0 +1,223 @@
+/* Persoonlijke beelden binnen de zelfstandige DS-werkruimte. De bestaande
+   beeldeditor bezit de dialoog, uitsnede, opslag en accountgrenzen; dit blad
+   vormt zijn bestaande markup. Beeldknoppen blijven ook zonder hover zichtbaar. */
+@layer rtg.component {
+  .ds-wereldwerkruimte .pi-change {
+    position: absolute;
+    inset-block-start: var(--ds-ruimte-3);
+    inset-inline-end: var(--ds-ruimte-3);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-ruimte-2);
+    min-inline-size: var(--ds-doel);
+    min-block-size: var(--ds-doel);
+    max-inline-size: calc(100% - 2 * var(--ds-ruimte-3));
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-3);
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-knop);
+    background: var(--ds-cover-grond);
+    color: var(--ds-cover-inkt);
+    font: 400 var(--ds-maat-meta)/1.4 var(--ds-letter-tekst);
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .ds-wereldwerkruimte .pi-change:focus-visible {
+    outline: 2px solid var(--ds-cover-inkt);
+    outline-offset: 3px;
+  }
+  .ds-wereldwerkruimte .pi-change:hover { border-color: var(--ds-cover-metaal); }
+  .ds-wereldwerkruimte .wp-edit-images {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-ruimte-2);
+    min-block-size: var(--ds-doel);
+    font: inherit;
+  }
+
+  /* Zonder display-regel op de dialoog zelf behoudt een gesloten native
+     dialog zijn eigen verberg- en focusgedrag. */
+  .ds-wereldwerkruimte .pi-editor {
+    box-sizing: border-box;
+    inline-size: min(66rem, calc(100% - 2 * var(--ds-ruimte-8)));
+    max-inline-size: calc(100% - 2 * var(--ds-ruimte-8));
+    max-block-size: calc(var(--ds-schermhoogte) - 2 * var(--ds-ruimte-8));
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-systeem);
+    background: var(--ds-oppervlak);
+    color: var(--ds-inkt);
+    font: 400 var(--ds-maat-klein)/1.5 var(--ds-letter-tekst);
+    box-shadow: var(--ds-schaduw-systeem);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: calc(var(--ds-doel) + 2 * var(--ds-ruimte-4));
+  }
+  .ds-wereldwerkruimte .pi-editor::backdrop { background: var(--ds-glas); }
+  .ds-wereldwerkruimte .pi-editor :is(button, select) {
+    min-inline-size: 0;
+    min-block-size: var(--ds-doel);
+    max-inline-size: 100%;
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-4);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-knop);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    font: inherit;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+  }
+  .ds-wereldwerkruimte .pi-editor button:hover:enabled { border-color: var(--ds-accent); }
+  .ds-wereldwerkruimte .pi-editor :is(button, select, input):disabled { opacity: .5; cursor: default; }
+  .ds-wereldwerkruimte .pi-editor :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  .ds-wereldwerkruimte .pi-head {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--ds-ruimte-3);
+    padding: var(--ds-ruimte-4) var(--ds-ruimte-6);
+    border-block-end: 1px solid var(--ds-lijnkleur);
+    background: var(--ds-oppervlak);
+  }
+  .ds-wereldwerkruimte .pi-head h2 {
+    margin: 0;
+    font: 400 var(--ds-maat-kop)/1.2 var(--ds-letter-display);
+    overflow-wrap: anywhere;
+  }
+  .ds-wereldwerkruimte .pi-content {
+    display: grid;
+    grid-template-columns: minmax(9rem, 11rem) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--ds-ruimte-6);
+    padding: var(--ds-ruimte-6);
+  }
+  .ds-wereldwerkruimte .pi-slots { inline-size: 100%; }
+  .ds-wereldwerkruimte .pi-main { min-inline-size: 0; }
+  .ds-wereldwerkruimte .pi-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ds-ruimte-2);
+    margin-block-end: var(--ds-ruimte-4);
+  }
+  .ds-wereldwerkruimte .pi-tools button[aria-pressed="true"] {
+    border-color: var(--ds-accent);
+    background: var(--ds-accent);
+    color: var(--ds-accent-inkt);
+  }
+
+  /* De twee verhoudingen volgen de bestaande desktop/mobile cropgegevens.
+     Het script blijft eigenaar van object-position, transform en de sleepas. */
+  .ds-wereldwerkruimte .pi-crop {
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: 2.26;
+    overflow: hidden;
+    border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-oppervlak-zacht);
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+  }
+  .ds-wereldwerkruimte .pi-crop:active { cursor: grabbing; }
+  .ds-wereldwerkruimte .pi-crop[data-preview="mobile"] {
+    aspect-ratio: 1.82;
+    max-inline-size: 27rem;
+    margin-inline: auto;
+  }
+  .ds-wereldwerkruimte .pi-crop > img {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+  }
+  .ds-wereldwerkruimte .pi-crop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, transparent 33%, color-mix(in srgb, var(--ds-cover-inkt) 45%, transparent) 33% 33.2%, transparent 33.2% 66%, color-mix(in srgb, var(--ds-cover-inkt) 45%, transparent) 66% 66.2%, transparent 66.2%),
+      linear-gradient(0deg, transparent 33%, color-mix(in srgb, var(--ds-cover-inkt) 45%, transparent) 33% 33.2%, transparent 33.2% 66%, color-mix(in srgb, var(--ds-cover-inkt) 45%, transparent) 66% 66.2%, transparent 66.2%);
+  }
+  .ds-wereldwerkruimte :is(.pi-note, .pi-status) {
+    margin-block: var(--ds-ruimte-3);
+    color: var(--ds-inkt-zacht);
+    font-size: var(--ds-maat-klein);
+    overflow-wrap: anywhere;
+  }
+  .ds-wereldwerkruimte .pi-status { min-block-size: 1.5em; }
+  .ds-wereldwerkruimte .pi-sliders {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-ruimte-4);
+    margin-block: var(--ds-ruimte-3) var(--ds-ruimte-6);
+  }
+  .ds-wereldwerkruimte .pi-sliders label { flex: 1 1 9rem; min-inline-size: 0; font-size: var(--ds-maat-meta); }
+  .ds-wereldwerkruimte .pi-sliders input {
+    display: block;
+    inline-size: 100%;
+    min-block-size: var(--ds-doel);
+    margin: 0;
+    accent-color: var(--ds-accent);
+  }
+  .ds-wereldwerkruimte .pi-gallery {
+    display: flex;
+    gap: var(--ds-ruimte-3);
+    max-inline-size: 100%;
+    overflow: auto;
+    margin-block: var(--ds-ruimte-4);
+    padding: var(--ds-ruimte-1);
+  }
+  .ds-wereldwerkruimte .pi-gallery button { flex: 0 0 7rem; padding: var(--ds-ruimte-1); font-size: var(--ds-maat-meta); }
+  .ds-wereldwerkruimte .pi-gallery img {
+    display: block;
+    inline-size: 100%;
+    block-size: 4.25rem;
+    object-fit: cover;
+    margin-block-end: var(--ds-ruimte-1);
+  }
+  .ds-wereldwerkruimte .pi-foot {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ds-ruimte-3);
+    padding: var(--ds-ruimte-4) var(--ds-ruimte-6);
+    border-block-start: 1px solid var(--ds-lijnkleur);
+    background: var(--ds-oppervlak);
+  }
+  .ds-wereldwerkruimte .pi-foot > span { flex: 1 1 10rem; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); }
+  .ds-wereldwerkruimte .pi-foot .pi-save { border-color: var(--ds-accent); background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-wereldwerkruimte .pi-foot .pi-save:hover:enabled { background: var(--ds-accent-hover); }
+  .ds-wereldwerkruimte[data-image-editor="open"] { overflow: hidden; }
+
+  @media (max-width: 699px) {
+    .ds-wereldwerkruimte .pi-editor {
+      inline-size: 100%;
+      max-inline-size: 100%;
+      block-size: var(--ds-schermhoogte);
+      max-block-size: var(--ds-schermhoogte);
+      margin: 0;
+      border: 0;
+      border-radius: var(--ds-radius-inhoud);
+    }
+    .ds-wereldwerkruimte .pi-head { padding-block-start: calc(var(--ds-ruimte-4) + env(safe-area-inset-top, 0px)); }
+    .ds-wereldwerkruimte .pi-content { grid-template-columns: minmax(0, 1fr); padding: var(--ds-ruimte-4); }
+    .ds-wereldwerkruimte .pi-foot { padding-block-end: calc(var(--ds-ruimte-4) + env(safe-area-inset-bottom, 0px)); }
+    .ds-wereldwerkruimte .pi-foot > span { flex-basis: 100%; }
+    .ds-wereldwerkruimte .pi-foot > button { flex: 1 1 0; }
+  }
+}

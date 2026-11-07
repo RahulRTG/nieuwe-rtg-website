@@ -102,7 +102,19 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
       const sr = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHERMROUTES.json'), 'utf8'));
       const bekend = new Set(sr.perScherm.map((x) => x.bestand));
       assert.ok(Array.isArray(c.bestanden) && c.bestanden.length, sc.functie + ': het contract wijst geen eigen delen aan');
-      for (const b of c.bestanden) assert.ok(bekend.has(b), sc.functie + ': ' + b + ' staat niet in SCHERMROUTES.json');
+      for (const b of c.bestanden) {
+        if (sc.kanaal !== 'browser') {
+          assert.ok(bekend.has(b), sc.functie + ': ' + b + ' staat niet in SCHERMROUTES.json');
+        } else {
+          const html = lees('public' + sc.ingang.split('?')[0]);
+          const bundels = require('../scripts/bundel').bundels;
+          const direct = html.includes('src="' + b.replace(/^public/, '') + '"');
+          const geladenDeel = Object.entries(bundels).some(([uit, map]) =>
+            b.startsWith('public/' + map + '/') && html.includes('src="/' + uit + '"'));
+          assert.ok(fs.existsSync(path.join(WORTEL, b)) && (direct || geladenDeel),
+            sc.functie + ': browserscenario wijst niet naar een werkelijk geladen bron: ' + b);
+        }
+      }
     }
     assert.ok(sc.belofte && sc.grens && typeof sc.loop === 'function', sc.bestand + ' mist belofte, grens of loop');
     for (const b of BEWIJZEN.concat(AFGELEID)) {
@@ -111,6 +123,14 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
       /* Minstens twee routes van de ingang, of ALLE als het scherm er minder
          heeft: een scherm met één route (het routedossier) kan geen tweede
          leveren, en dan moet het scenario juist die ene raken. */
+      if (sc.kanaal === 'browser') {
+        assert.equal(c[b].kanaal, 'browser');
+        assert.equal(c[b].scherm.ingang, sc.ingang);
+        assert.ok(c[b].scherm.toestand);
+        for (const pad of [sc.ingang, ...c[b].scherm.bestemmingen])
+          assert.ok(fs.existsSync(path.join(WORTEL, 'public', pad.split('?')[0])), 'browserbestemming ontbreekt: ' + pad);
+        continue; // De API-overlap hieronder blijft verplicht voor ieder API-scenario.
+      }
       const ingang = B.ingangVan(sc.functie.startsWith('link:') ? sc.ingang : null, c);
       const raak = B.gedeeld(B.proefRoutes(sc.bestand), ingang);
       const aantal = ingang.exact.size + ingang.voor.size;
@@ -177,6 +197,10 @@ test('3. het echte register is bruikbaar als bewijs en spreekt zichzelf niet teg
     if (m.nietBeproefd) {
       assert.equal(m.schakels.length, 0, f + '/' + AFGELEID + ': niet beproefd en toch schakels');
       assert.equal(m.sluit, false, f + '/' + AFGELEID + ': niet beproefd en toch gesloten');
+    } else if (a.kanaal === 'browser') {
+      assert.equal(m.kanaal, 'browser');
+      assert.ok(m.schakels.length >= 3, 'geen browsergroen zonder concrete menselijke bedieningschecks');
+      assert.equal(m.sluit, m.schakels.every(s => s.stand === 'gesloten') && !a.afgebroken);
     } else {
       assert.equal(m.schakels.length, 3, f + '/' + AFGELEID + ': drie afgeleide schakels');
       assert.ok(m.weigeringen >= 1, f + '/' + AFGELEID + ': gesloten zonder een enkele weigering');

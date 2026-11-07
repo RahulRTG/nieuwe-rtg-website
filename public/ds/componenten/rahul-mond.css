@@ -1,0 +1,17 @@
+/* Rahul-mond houdt de vraag- en uitvoeringslogica in shared/rahul-mond.js.
+   Dit component draagt alleen de compacte, oproepbare werkbalk en uitkomst. */
+@layer rtg.component {
+  .ds-rahul-mond.rmond { position: fixed; inset-inline-start: 50%; inset-block-end: calc(env(safe-area-inset-bottom,0px) + var(--ds-ruimte-3)); z-index: 9981; display: flex; align-items: center; gap: var(--ds-ruimte-2); inline-size: min(30rem,92vw); max-inline-size: calc(100vw - max(var(--ds-ruimte-4),env(safe-area-inset-left,0px)) - max(var(--ds-ruimte-4),env(safe-area-inset-right,0px))); padding: var(--ds-ruimte-1) var(--ds-ruimte-2) var(--ds-ruimte-1) var(--ds-ruimte-1); color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-cover-metaal); border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); transform: translateX(-50%); }
+  .ds-rahul-mond.rmond canvas { display: block; flex: 0 0 auto; inline-size: var(--ds-doel); block-size: var(--ds-doel); background: var(--ds-cover-grond); border-radius: var(--ds-radius-cirkel); cursor: pointer; }
+  .ds-rahul-mond.rmond canvas.rm-mond-fallback { background: var(--ds-accent); }
+  .ds-rahul-mond.rmond .rm-veld { flex: 1; min-inline-size: 0; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-1); color: var(--ds-cover-inkt); background: transparent; border: 0; outline: 0; font: inherit; font-size: var(--ds-maat-klein); }
+  .ds-rahul-mond.rmond .rm-veld::placeholder { color: var(--ds-inkt-zacht); }
+  .ds-rahul-mond.rmond .rm-go { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; inline-size: var(--ds-doel); block-size: var(--ds-doel); color: var(--ds-accent-inkt); background: var(--ds-accent); border: 0; border-radius: var(--ds-radius-cirkel); font-size: var(--ds-maat-tekst); line-height: 1; cursor: pointer; }
+  .ds-rahul-mond.rmond .rm-go:hover { background: var(--ds-accent-hover); }
+  .ds-rahul-mond.rmond.rm-weg, .ds-rahul-mond.rm-uit.rm-weg { display: none; }
+  .ds-rahul-mond.rm-uit { position: fixed; inset-inline-start: 50%; inset-block-end: calc(env(safe-area-inset-bottom,0px) + 4.2rem); z-index: 9982; inline-size: min(30rem,92vw); max-inline-size: calc(100vw - max(var(--ds-ruimte-4),env(safe-area-inset-left,0px)) - max(var(--ds-ruimte-4),env(safe-area-inset-right,0px))); max-block-size: 40vh; padding: var(--ds-ruimte-3) var(--ds-ruimte-4); overflow-y: auto; color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-cover-metaal); border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); font-size: var(--ds-maat-klein); line-height: 1.5; white-space: pre-wrap; transform: translateX(-50%); }
+  .ds-rahul-mond.rm-uit[hidden] { display: none; }
+  .ds-rahul-mond :is(canvas,.rm-veld,.rm-go):focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  @media print { .ds-rahul-mond.rmond, .ds-rahul-mond.rm-uit { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .ds-rahul-mond.rmond, .ds-rahul-mond.rm-uit { scroll-behavior: auto; } }
+}

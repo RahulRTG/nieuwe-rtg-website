@@ -1,5 +1,5 @@
 /* Foundation-shell: network-first met een offline vangnet. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-b6414227';
+const CACHE = 'rtf-premium-foundation-samen-ds-0d98e5c4';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
@@ -54,7 +54,7 @@ const SHELL = [
   '/apps/foundation/tellen.html', '/apps/foundation/kleuren.html', '/apps/foundation/memorie.html',
   '/apps/foundation/verhaaltje.html', '/apps/foundation/liedjes.html', '/apps/foundation/gevoel.html',
   '/apps/foundation/presenteren.html', '/apps/foundation/budget.html', '/apps/foundation/rechten.html',
-  '/apps/foundation/mediawijs.html',
+  '/apps/foundation/mediawijs.html', '/apps/foundation/mediawijs.js', '/apps/foundation/gevoel.js',
   // de levenspas aan de gezinskant, met de gedeelde schil eronder
   '/apps/foundation/mijnbanden.html', '/shared/levenspas.js', '/shared/levenspas.css',
 
@@ -88,8 +88,6 @@ const SHELL = [
   '/shared/rtg-operation.js', '/shared/rtg-side-sheet.js',
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
   '/shared/rtg-warm-details.css', '/shared/rtg-personal-images.css',
-  '/shared/rtg-world-widgets.css', '/shared/rtg-world-desktop.css',
-  '/shared/rtg-desktop-components.css', '/shared/rtg-world-palette.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
   '/shared/rtg-editorial-v4.css', '/shared/rtg-editorial-v4-model.js', '/shared/rtg-editorial-v4-header.js', '/shared/rtg-editorial-v4.js',
   '/shared/rtg-simple.css', '/shared/rtg-world-screen.css',
@@ -111,7 +109,7 @@ const SHELL = [
   '/images/worlds/heritage/foundation-meedoen-atelier-v1.jpg',
   '/fonts/aFTQ7PxzY382XsXX63LUYJSKSKjWXFBP.woff2',
   '/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2',
-  '/shared/rtg-school-shell.css', '/shared/rtg-school-session.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
+  '/shared/rtg-school-shell.css', '/shared/rtg-school-session.js', '/ds/tokens.css', '/ds/componenten/accountdeur.css', '/ds/componenten/samen.css', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
   '/manifests/foundation.webmanifest', '/icons/foundation.svg'
 ];
 

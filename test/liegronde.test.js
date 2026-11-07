@@ -17,11 +17,42 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { oordeel, meetAdres, SPAAR, ADAPTER_SPAAR } = require('../scripts/liegronde');
+const { oordeel, meetAdres, gemetenLanding, SPAAR, ADAPTER_SPAAR } = require('../scripts/liegronde');
 const B = require('../scripts/lib/bewijsbron');
 const { BRONSOORTEN, ALGEMEEN } = require('../scripts/lib/appcontract');
 
 const m = (o) => Object.assign({ pad: '/apps/x.html', landing: '/apps/x.html', deur: null, gelogen: ['POST /api/x'], klachten: [] }, o);
+
+test('querygebonden landingen bewaren de pas; een andere context wordt niet bewezen', () => {
+  const base = 'http://127.0.0.1:43123', pad = '/apps/app.html?pas=rtg';
+  const beoordeel = einde => oordeel(m({ pad, landing: gemetenLanding(base + einde, pad, base) }));
+  assert.equal(beoordeel(pad).status, 'BEWEZEN');
+  for (const einde of ['/apps/app.html', '/apps/app.html?pas=lifestyle',
+    pad + '&pas=lifestyle', pad + '&extra=1', '/apps/ander.html?pas=rtg']) {
+    assert.equal(beoordeel(einde).status, 'NIET_GETEST', einde);
+  }
+  const landing = gemetenLanding(base + pad, pad, base);
+  for (const fout of [{ gelogen: [] }, { deur: '#poort.zien' }, { klachten: ['JS-fout: uitval'] }]) {
+    assert.equal(oordeel(m({ pad, landing, ...fout })).status, 'NIET_GETEST');
+  }
+});
+
+test('landing buiten de eigen origin of zonder geldige URL wordt luid geweigerd', () => {
+  const base = 'http://127.0.0.1:43123', pad = '/apps/app.html?pas=rtg';
+  for (const url of ['https://127.0.0.1:43123' + pad, 'http://127.0.0.1:43124' + pad,
+    'http://voorbeeld.invalid:43123' + pad, 'about:blank', 'geen URL']) {
+    assert.throws(() => gemetenLanding(url, pad, base), undefined, url);
+  }
+});
+
+test('document- en tabcontracten behouden hun bestaande fysieke landing', () => {
+  const base = 'http://127.0.0.1:43123';
+  const tab = meetAdres({ functie: 'tab:assets', pad: null });
+  assert.equal(gemetenLanding(base + tab.ingang.pad, tab.pad, base), '/apps/app.html');
+  assert.equal(gemetenLanding(base + '/apps/app.html?pas=rtg#tab=assets', tab.pad, base), '/apps/app.html');
+  const werk = meetAdres({ functie: 'os:werk', pad: null });
+  assert.equal(gemetenLanding(base + '/apps/app.html?pas=business', werk.pad, base), werk.pad);
+});
 
 test('1. alleen een verzonnen zekerheid is een defect', () => {
   assert.equal(oordeel(m({ klachten: ['zekerheid zonder gegevens: "Betaald"'] })).status, 'GEBLOKKEERD_DOOR_DEFECT');
@@ -97,6 +128,15 @@ test('de Lifestyle-persona doorloopt echte menselijke goedkeuring voor de premiu
   for (const pad of ['/api/aanmelding/', '/api/office/verify']) {
     assert.ok(SPAAR.split(',').includes(pad), pad + ' moet echt blijven om de Lifestyle-persona langs de productroute te maken');
   }
+});
+
+test('de gewone proefpersoon rondt de echte onboarding en identiteitsdeur af', () => {
+  const spaar = SPAAR.split(',');
+  assert.ok(spaar.includes('/api/onboarding/'),
+    'status alleen is niet genoeg: opslaan en tekenen moeten de proefpersoon werkelijk afronden');
+  assert.ok(spaar.includes('/api/verify/upload'),
+    'de identiteitsupload is fixtureopbouw en moet de echte pending-status kunnen geven');
+  assert.ok(!spaar.includes('/api/'), 'functionele app-antwoorden mogen niet door deze fixturedeur ontsnappen');
 });
 
 test('de OS-adapter spaart alleen zijn toegangsschil en liegt zijn eigen werk leeg', () => {

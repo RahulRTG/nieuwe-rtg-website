@@ -25,8 +25,8 @@ const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&':
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
 
 function meld(t) {
-  const m = $('#melding'); m.textContent = t; m.style.opacity = '1';
-  clearTimeout(m._t); m._t = setTimeout(() => { m.style.opacity = '0'; }, 3000);
+  const m = $('#melding'); m.textContent = t; m.classList.add('toon');
+  clearTimeout(m._t); m._t = setTimeout(() => { m.classList.remove('toon'); }, 3000);
 }
 const api = (pad, body) => fetch('/api/supplier/service/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
@@ -70,23 +70,23 @@ async function laad() {
 function bevestigingBlok(bev) {
   const rijen = (bev.verzoeken || []);
   if (!rijen.length) return '';
-  return '<div class="kaart"><h2>Iemand van RTG vraagt toegang</h2>'
-    + rijen.map((v) => '<div class="zaakrij let" data-bev="' + esc(v.id) + '">'
-      + '<span class="wie">' + esc(v.mens) + ' &middot; zaak ' + esc(v.zaak) + '</span><br>'
+  return '<div class="ds-sectie kaart"><h2>Iemand van RTG vraagt toegang</h2>'
+    + rijen.map((v) => '<div class="ds-sectie ds-sectie--open zaakrij let" data-bev="' + esc(v.id) + '">'
+      + '<span class="ds-label wie">' + esc(v.mens) + ' &middot; zaak ' + esc(v.zaak) + '</span><br>'
       + esc(v.reden) + '<br>'
-      + '<span class="stil">Dit gaat open: ' + (v.capabilities || []).map(esc).join(', ') + '</span>'
-      + '<div class="rij"><button class="knop doe" data-ja="' + esc(v.id) + '">Bevestigen</button>'
-      + '<button class="knop" data-nee="' + esc(v.id) + '">Nee</button></div>'
-      + '<div class="stil">Of lees deze code voor: ' + esc(v.code || '?') + ' (' + esc(v.minuten) + ' minuten, een keer).</div>'
+      + '<span class="ds-meta stil">Dit gaat open: ' + (v.capabilities || []).map(esc).join(', ') + '</span>'
+      + '<div class="ds-handelingen rij"><button class="ds-knop ds-knop--primair knop doe" data-ja="' + esc(v.id) + '">Bevestigen</button>'
+      + '<button class="ds-knop ds-knop--stil knop" data-nee="' + esc(v.id) + '">Nee</button></div>'
+      + '<div class="ds-meta stil">Of lees deze code voor: ' + esc(v.code || '?') + ' (' + esc(v.minuten) + ' minuten, een keer).</div>'
       + '</div>').join('')
-    + '<p class="stil">' + esc(bev.let || '') + '</p></div>';
+    + '<p class="ds-meta stil">' + esc(bev.let || '') + '</p></div>';
 }
 
 /* De stand. ALLEEN als er iets te melden is -- zie de kop. */
 function standBlok(stand) {
   if (!stand || !(stand.raakt || []).length) return '';
-  return '<div class="kaart"><h2>Er speelt een storing</h2>'
-    + stand.raakt.map((r) => '<div class="zaakrij let"><span class="wie">Storing ' + esc(r.incident) + '</span><br>'
+  return '<div class="ds-sectie kaart"><h2>Er speelt een storing</h2>'
+    + stand.raakt.map((r) => '<div class="ds-sectie ds-sectie--open zaakrij let"><span class="ds-label wie">Storing ' + esc(r.incident) + '</span><br>'
       + esc(r.zin) + '</div>').join('')
     + '</div>';
 }
@@ -94,25 +94,25 @@ function standBlok(stand) {
 function meldBlok() {
   const onderwerpen = ((KEUZES && KEUZES.onderwerpen) || []).map((o) =>
     '<option value="' + esc(o.id) + '">' + esc(o.naam) + '</option>').join('');
-  return '<div class="kaart"><h2>Iets melden</h2>'
-    + '<div class="rij"><select class="veld" id="mOnderwerp" aria-label="Waar gaat het over">' + onderwerpen + '</select>'
-    + '<input class="veld breed" id="mTitel" placeholder="In een zin: wat is er aan de hand?" maxlength="200"></div>'
-    + '<div class="rij"><textarea class="veld" id="mTekst" placeholder="Wat u er verder over kwijt wilt (optioneel)" maxlength="4000"></textarea></div>'
+  return '<div class="ds-sectie kaart"><h2>Iets melden</h2>'
+    + '<div class="ds-handelingen rij"><select class="ds-invoer veld" id="mOnderwerp" aria-label="Waar gaat het over">' + onderwerpen + '</select>'
+    + '<input class="ds-invoer veld breed" id="mTitel" aria-label="Korte omschrijving" placeholder="In een zin: wat is er aan de hand?" maxlength="200"></div>'
+    + '<div class="ds-handelingen rij"><textarea class="ds-invoer ds-invoer--tekst veld" id="mTekst" aria-label="Aanvullende toelichting" placeholder="Wat u er verder over kwijt wilt (optioneel)" maxlength="4000"></textarea></div>'
     /* Wat de zaak aanlevert zijn TERMEN en geen prioriteit: de weging gebeurt op
        de server (kern/service/prioriteit.js). Zou de melder de prioriteit
        kiezen, dan meet de wachtrij binnen een half jaar welbespraaktheid. */
-    + '<div class="rij"><label class="stil"><input type="checkbox" id="mStil"> Hierdoor ligt werk stil</label>'
-    + '<label class="stil"><input type="checkbox" id="mGeld"> Er staat geld vast</label>'
-    + '<button class="knop doe" id="mStuur">Versturen</button></div></div>';
+    + '<div class="ds-handelingen rij"><label class="ds-meta stil"><input type="checkbox" id="mStil"> Hierdoor ligt werk stil</label>'
+    + '<label class="ds-meta stil"><input type="checkbox" id="mGeld"> Er staat geld vast</label>'
+    + '<button class="ds-knop ds-knop--primair knop doe" id="mStuur" data-ds-actie="Melding versturen">Versturen</button></div></div>';
 }
 
 function lijstBlok(mijn) {
   const rijen = (mijn.zaken || []);
-  if (!rijen.length) return '<div class="kaart"><h2>Uw meldingen</h2><p class="oms">U heeft niets lopen bij RTG.</p></div>';
-  return '<div class="kaart"><h2>Uw meldingen</h2>'
-    + rijen.map((z) => '<div class="zaakrij"><span class="wie">' + esc(z.id) + ' &middot; ' + esc(z.standNaam)
+  if (!rijen.length) return '<div class="ds-sectie kaart"><h2>Uw meldingen</h2><p class="ds-meta oms">U heeft niets lopen bij RTG.</p></div>';
+  return '<div class="ds-sectie kaart"><h2>Uw meldingen</h2>'
+    + rijen.map((z) => '<div class="ds-sectie ds-sectie--open zaakrij"><span class="ds-label wie">' + esc(z.id) + ' &middot; ' + esc(z.standNaam)
       + ' &middot; ' + esc(tijd(z.at)) + '</span><br>' + esc(z.titel)
-      + '<div class="rij"><button class="knop" data-open="' + esc(z.id) + '">Bekijken</button></div></div>').join('')
+      + '<div class="ds-handelingen rij"><button class="ds-knop ds-knop--stil knop" data-open="' + esc(z.id) + '">Bekijken</button></div></div>').join('')
     + '</div><div id="dossier"></div>';
 }
 
@@ -123,18 +123,18 @@ async function toonZaak(id) {
   const draad = (z.tijdlijn || []).map((r) => {
     if (r.wat === 'bericht') {
       const van = r.van === 'melder' ? 'u' : (r.van === 'mens' ? 'RTG' : r.van);
-      return '<div class="beurt ' + esc(r.van) + '"><span class="wie">' + esc(van) + ' &middot; ' + esc(tijd(r.at)) + '</span><br>' + esc(r.tekst) + '</div>';
+      return '<div class="ds-sectie ds-sectie--open beurt ' + esc(r.van) + '"><span class="ds-label wie">' + esc(van) + ' &middot; ' + esc(tijd(r.at)) + '</span><br>' + esc(r.tekst) + '</div>';
     }
-    if (r.wat === 'stand') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; ' + esc(r.naar) + (r.notitie ? ' &mdash; ' + esc(r.notitie) : '') + '</div>';
-    if (r.wat === 'koppeling') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; gekoppeld aan ' + esc(r.soort) + ' ' + esc(r.code) + '</div>';
-    if (r.wat === 'mensGevraagd') return '<div class="beurt stap">' + esc(tijd(r.at)) + ' &middot; u vroeg om een mens</div>';
+    if (r.wat === 'stand') return '<div class="ds-sectie ds-sectie--open beurt stap">' + esc(tijd(r.at)) + ' &middot; ' + esc(r.naar) + (r.notitie ? ' &mdash; ' + esc(r.notitie) : '') + '</div>';
+    if (r.wat === 'koppeling') return '<div class="ds-sectie ds-sectie--open beurt stap">' + esc(tijd(r.at)) + ' &middot; gekoppeld aan ' + esc(r.soort) + ' ' + esc(r.code) + '</div>';
+    if (r.wat === 'mensGevraagd') return '<div class="ds-sectie ds-sectie--open beurt stap">' + esc(tijd(r.at)) + ' &middot; u vroeg om een mens</div>';
     return '';
   }).join('');
-  $('#dossier').innerHTML = '<div class="kaart"><h2>' + esc(z.id) + ' &middot; ' + esc(z.standNaam) + '</h2>'
-    + '<p class="oms">' + esc(z.titel) + '</p>' + draad
-    + '<div class="rij"><textarea class="veld" id="aTekst" placeholder="Uw antwoord aan RTG" maxlength="4000"></textarea></div>'
-    + '<div class="rij"><button class="knop doe" id="aStuur">Versturen</button>'
-    + '<button class="knop" id="aMens">Ik wil een mens</button></div></div>';
+  $('#dossier').innerHTML = '<div class="ds-sectie kaart"><h2>' + esc(z.id) + ' &middot; ' + esc(z.standNaam) + '</h2>'
+    + '<p class="ds-meta oms">' + esc(z.titel) + '</p>' + draad
+    + '<div class="ds-handelingen rij"><textarea class="ds-invoer ds-invoer--tekst veld" id="aTekst" aria-label="Uw antwoord aan RTG" placeholder="Uw antwoord aan RTG" maxlength="4000"></textarea></div>'
+    + '<div class="ds-handelingen rij"><button class="ds-knop ds-knop--primair knop doe" id="aStuur">Versturen</button>'
+    + '<button class="ds-knop ds-knop--stil knop" id="aMens">Ik wil een mens</button></div></div>';
   $('#aStuur').onclick = () => poging(async () => {
     await api('bericht', { id: z.id, tekst: $('#aTekst').value }); meld('Verstuurd.'); await laad();
   });
@@ -168,7 +168,7 @@ function bindAlles() {
 
 function start() {
   if (!TOKEN) {
-    $('#blad').innerHTML = '<div class="kaart"><p class="oms">Meld u eerst aan op uw werkplek; dan weten wij wie u bent en hoeft u niets op te zoeken.</p></div>';
+    $('#blad').innerHTML = '<div class="ds-sectie kaart"><p class="ds-meta oms">Meld u eerst aan op uw werkplek; dan weten wij wie u bent en hoeft u niets op te zoeken.</p></div>';
     return;
   }
   poging(laad);

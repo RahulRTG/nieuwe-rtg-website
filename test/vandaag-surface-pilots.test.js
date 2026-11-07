@@ -30,9 +30,12 @@ test('oude production-cover modules en alle includes zijn volledig weg', () => {
 
 test('Agenda gebruikt de editorial kamer; Reisboek en Projecten behouden hun wereldpalet', () => {
   assert.match(AGENDA, /<body[^>]+data-rtg-world="living"[^>]+data-rtg-daily="agenda"/);
-  for (const asset of ['rtg-daily.css', 'rtg-daily-rooms.css', 'rtg-daily.js']) {
+  for (const asset of ['rtg-daily.js']) {
     assert.equal(AGENDA.split('/shared/' + asset).length - 1, 1, asset + ' wordt één keer geladen');
   }
+  assert.doesNotMatch(AGENDA,/\/shared\/rtg-daily(?:-rooms)?\.css/);
+  assert.equal(AGENDA.split('/ds/rtg-ds.css').length-1,1);
+  for(const deel of ['dagkamer','daginhoud','dagkalender'])assert.ok(lees('public/ds/rtg-ds.css').includes('componenten/'+deel+'.css'));
   assert.doesNotMatch(AGENDA, /data-rtg-world-dashboard=|rtg-vandaag-luxe\.(?:css|js)/);
   /* Reisboek staat op het RTG Design System (TRAVELOS-MIGRATIE.md): het
      wereldpalet komt daar uit het TravelOS-thema van /ds/rtg-ds.css, en het

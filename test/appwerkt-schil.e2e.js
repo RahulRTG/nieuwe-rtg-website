@@ -408,3 +408,109 @@ test('APPWERKT opent Bord en Schrift met hun echte tabgebonden Schoolpas',
     try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('APPWERKT opent Gezin met een echt uitgenodigd en gekoppeld proeflid',
+  { skip: geenBrowser(pw), timeout: 120000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies, opslagVoor, verbindGezinProeflid } = require('../scripts/lib/proefsessies');
+  const { rijen, meetIngang, maakContext, bezoek, bedien } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-gezin-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies, overgeslagen } = await haalSessies(base, ['lid']);
+    assert.deepEqual(overgeslagen, []);
+    const gekoppeld = await verbindGezinProeflid(base);
+    assert.equal(gekoppeld.ok, true, gekoppeld.reden);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await maakContext(browser, opslagVoor({
+      lid: { ...sessies.lid, waarde: gekoppeld.token }
+    }));
+    const rij = rijen().find((r) => r.functie === 'tab:gezin');
+    const meet = meetIngang(rij);
+    const gezien = await bezoek(ctx, base, meet);
+    assert.deepEqual(gezien.crash, [], 'de gekoppelde gezinsstand opent niet');
+    assert.equal(gezien.poort, false, 'het gekoppelde lid bleef achter een poort');
+    const bediening = await bedien(ctx, base, meet);
+    assert.ok(bediening.gevonden >= 1, 'de gekoppelde gezinsstand heeft geen eigen bediening');
+    assert.equal(bediening.geklikt, bediening.gevonden,
+      'niet alle gezinsbediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+    assert.deepEqual(bediening.crash.concat(bediening.serverfout), [],
+      'de gezinsbediening veroorzaakte fouten');
+    await ctx.close();
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('APPWERKT wacht op het echte Zorg-aanbod voordat het de tab bedient',
+  { skip: geenBrowser(pw), timeout: 120000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies, opslagVoor } = require('../scripts/lib/proefsessies');
+  const { rijen, meetIngang, maakContext, bezoek, bedien } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-zorg-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies, overgeslagen } = await haalSessies(base, ['lid']);
+    assert.deepEqual(overgeslagen, []);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await maakContext(browser, opslagVoor({ lid: sessies.lid }));
+    const rij = rijen().find((r) => r.functie === 'tab:zorg');
+    const meet = meetIngang(rij);
+    const gezien = await bezoek(ctx, base, meet);
+    assert.deepEqual(gezien.crash, [], 'de zorgstand opent niet');
+    assert.equal(gezien.poort, false, 'de zorgstand bleef achter een poort');
+    const bediening = await bedien(ctx, base, meet);
+    assert.ok(bediening.gevonden >= 1, 'het echte zorgaanbod leverde geen eigen bediening');
+    assert.equal(bediening.geklikt, bediening.gevonden,
+      'niet alle zorgbediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+    assert.deepEqual(bediening.crash.concat(bediening.serverfout), [],
+      'de zorgbediening veroorzaakte fouten');
+    await ctx.close();
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('APPWERKT kwalificeert Navigatie met het echte lokale kaartpakket',
+  /* Navigatie heeft meer dan twintig toestandsafhankelijke acties en opent bij
+     iedere replay opnieuw het echte SQLite-net. Geef de volledige klikroute
+     ruimte; de meter zelf behoudt al zijn begrensde wachttijden. */
+  { skip: geenBrowser(pw), timeout: 300000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies, opslagVoor } = require('../scripts/lib/proefsessies');
+  const { rijen, meetIngang, maakContext, bezoek, bedien,
+    bereidAppwerktDatamapVoor } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-navigatie-'));
+  bereidAppwerktDatamapVoor(data);
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies, overgeslagen } = await haalSessies(base, ['lid']);
+    assert.deepEqual(overgeslagen, []);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await maakContext(browser, opslagVoor({ lid: sessies.lid }));
+    const rij = rijen().find((r) => r.functie === 'link:navigatie');
+    const meet = meetIngang(rij);
+    const gezien = await bezoek(ctx, base, meet);
+    assert.deepEqual(gezien.crash, [], 'Navigatie opent niet met het kaartpakket');
+    assert.deepEqual(gezien.config, [], 'Navigatie meldt nog ontbrekende kaartconfiguratie');
+    const bediening = await bedien(ctx, base, meet);
+    assert.ok(bediening.gevonden >= 1, 'Navigatie heeft geen eigen bediening');
+    assert.equal(bediening.geklikt, bediening.gevonden,
+      'niet alle navigatiebediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+    assert.deepEqual(bediening.config, [], 'bediening raakte ontbrekende kaartconfiguratie');
+    assert.deepEqual(bediening.crash.concat(bediening.serverfout), [],
+      'Navigatie veroorzaakte fouten');
+    await ctx.close();
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
+  }
+});

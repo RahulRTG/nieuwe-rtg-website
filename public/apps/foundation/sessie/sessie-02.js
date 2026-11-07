@@ -28,42 +28,37 @@
         api('/gezin/bericht/gelezen', { code: s.code, token: s.token }).then(function () { var t = el.querySelector('#sbTel'); if (t) t.hidden = true; }).catch(function () {});
       }).catch(function () { box.innerHTML = '<div class="sb-leeg">Kon berichten niet laden.</div>'; });
   }
-  var cssGedaan = false;
+  /* Dezelfde balk met DS-vorm; oorspronkelijke ids blijven gedragshaken. */
+  function sessieVorm(el) {
+    el.classList.add('ds-foundation-balk');
+    var klassen = { 'sb-balk': 'ds-foundation-sessierij', 'sb-brand': 'ds-foundation-merk',
+      'sb-terug': 'ds-knop ds-knop--klein', 'sb-safe': 'ds-meta',
+      'sb-bel': 'ds-knop ds-knop--klein', 'sb-prof': 'ds-knop ds-knop--klein',
+      'sb-tel': 'ds-foundation-teller', 'sb-av': 'ds-foundation-avatar',
+      'sb-menu': 'ds-foundation-menu', 'sb-berichten': 'ds-foundation-berichten' };
+    Object.keys(klassen).forEach(function (naam) {
+      el.querySelectorAll('.' + naam).forEach(function (node) { klassen[naam].split(' ').forEach(function (k) { node.classList.add(k); }); });
+    });
+    el.querySelectorAll('.sb-menu a').forEach(function (a) { a.classList.add('ds-knop', 'ds-knop--stil'); });
+    var prof = el.querySelector('#sbProf'), bel = el.querySelector('#sbBel');
+    prof.setAttribute('aria-controls', 'sbMenu'); bel.setAttribute('aria-controls', 'sbBerichten');
+    prof.setAttribute('aria-expanded', 'false'); bel.setAttribute('aria-expanded', 'false');
+    el.addEventListener('click', function () {
+      prof.setAttribute('aria-expanded', String(!el.querySelector('#sbMenu').hidden));
+      bel.setAttribute('aria-expanded', String(!el.querySelector('#sbBerichten').hidden));
+    });
+    el.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var menu = el.querySelector('#sbMenu'), berichten = el.querySelector('#sbBerichten');
+      var bron = !menu.hidden ? prof : !berichten.hidden ? bel : null;
+      if (!bron) return;
+      e.preventDefault(); e.stopPropagation(); menu.hidden = true; berichten.hidden = true;
+      prof.setAttribute('aria-expanded', 'false'); bel.setAttribute('aria-expanded', 'false');
+      bron.focus();
+    });
+  }
   function injectCss() {
-    if (cssGedaan) return; cssGedaan = true;
-    var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
-      '.sb-brand{font-family:var(--serif);font-weight:600;background:transparent;color:#C39B4A;padding:0;white-space:nowrap;}.sb-brand b{color:#F4F0E7;font-weight:500;}' +
-      '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
-      '.sb-safe{margin-left:auto;display:inline-flex;align-items:center;gap:.35rem;color:var(--zacht);font-size:.62rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;}.sb-safe i{width:.42rem;height:.42rem;border-radius:50%;background:#63D587;box-shadow:0 0 0 3px rgba(99,213,135,.12);}' +
-      /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
-         envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
-         component en niet bij het toeval van zijn inhoud. */
-      '.sb-bel{background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
-        'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
-      '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
-      '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:0;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
-      '.sb-tel[hidden]{display:none;}' +
-      '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +
-      '.sb-av{width:1.8rem;height:1.8rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}' +
-      '.sb-nm{font-size:.9rem;font-weight:600;max-width:7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
-      /* Op een telefoon is je eigen naam naast je eigen avatar geen informatie
-         maar breedte: hij kostte 62 punten in een balk die er 390 heeft, en
-         duwde daarmee een andere actie naar de tweede rij. De avatar zegt
-         hetzelfde. Vanaf een tablet is er ruimte en staat hij er weer. */
-      '@media (max-width:640px){.sb-nm{display:none;}.sb-brand{font-size:.82rem}.sb-safe{font-size:0}.sb-safe i{display:block}}' +
-      '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
-      '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
-      '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:0;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--rtg-leesgoud,var(--goud));}' +
-      '.sb-berichten{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.5rem;width:min(92vw,22rem);max-height:70vh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
-      '.sb-leeg{color:var(--zacht);font-size:.85rem;padding:.8rem;text-align:center;}' +
-      '.sb-b{padding:.6rem .7rem;border-radius:0;background:var(--paneel2);margin-bottom:.4rem;}' +
-      '.sb-b.reis{border:1px solid var(--goud);}' +
-      '.sb-b.hulp{border:1px solid var(--rood);background:#2a1512;}' +
-      '.sb-hulplabel{color:#e88;font-weight:700;font-size:.78rem;margin-bottom:.25rem;}' +
-      '.sb-bkop{font-size:.78rem;color:var(--zacht);margin-bottom:.2rem;}.sb-bkop b{color:var(--txt);}' +
-      '.sb-btxt{font-size:.92rem;line-height:1.4;white-space:pre-wrap;}' +
-      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:#A6002F;color:#fff;font-weight:800;font-size:.82rem;text-decoration:none;padding:.4rem .75rem;border-radius:0;}';
-    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+    laadSessiePresentatie('/ds/rtg-ds.css');
   }
   w.Sessie = Sessie;
   /* Draait meteen wanneer sessie.js wordt gelezen, dus nog voordat de pagina

@@ -1569,3 +1569,1859 @@ Status blijft **ORANJE**. Open blijven de 102 appbevoegdheidsbewijzen, vier
 voltooifixtures, vijf zelfstandige waarheidsgetrouwheidsingangen, vier rode
 architectuurnormen, de adversarial rolvloer, twee volledige kandidaat-runs en
 operationele staging-, herstel- en vrijgavekwalificatie. Geen merge of uitrol.
+
+### Definitieve afbouw — vier browsercontracten en broncoherentie (30 oktober)
+
+De eigenaarsopdracht omvat het volledige Deep Green- en Experience-plan:
+APPWERKT, Experience Signatures en schermen, consolidatie van de bestaande
+Design System-/Heritage-/Cinematic-uitvoering, Edge/Rahul/Spotlight, eigen
+wereld- en appidentiteit, gecontroleerde verwijdering van legacy-stijlen,
+toegankelijkheid, prestaties, veiligheid, menselijke en operationele proeven
+en twee onafhankelijke eindruns op één kandidaat. Geen nieuw parallel register
+of platform; productie blijft ongewijzigd zonder afzonderlijke vrijgave.
+
+**Nulmeting, niet herhaald bewijs:** het opgeslagen APPWERKT-resultaat van
+30 oktober 07:06 UTC op `336d8b60f5`, Node 26.12.1, meldde 110/114 volledig
+bewezen apps en vier ontbrekende fixtures. De huidige reparaties vertrekken
+van `2fa713559727e15b4743f8e837a9580050290140`. Wijzigingen aan meetinstrument
+en gedeelde browserbron maken betrokken oud bewijs ongeldig. Daarom wordt
+114/114 niet uit vier losse groene tests afgeleid.
+
+De vier ontbrekende taken gebruiken nu het browserkanaal van de BESTAANDE
+VOLTOOIPROEF en dezelfde APPWERKT-bronbinding:
+
+- Juridisch: documenten openen, inhoud lezen en terugkeren, ook na herladen,
+  nette serverherstart en crash. Geen kunstmatige mutatie van openbare tekst.
+- Camera: echte browserframes met synthetische camerabron, lokale JPEG-export
+  en decodevergelijking, export na nieuw browsercontext en serverherstel,
+  annulering, geweigerde toestemming en een herstelbare camerafout. Geen claim
+  over fysieke camera's of onbeproefde externe overdrachtsvormen.
+- RTFoundation-keuze: vijf leeftijdscontexten via de canonieke RTG-ingang,
+  zichtbare bediening, terug/vooruit, bewaarde keuze, herstart en crash.
+- Videobellen: twee afzonderlijke leden via Rahul en Edge, voortlopende
+  gedecodeerde video EN ontvangen audio in beide richtingen, dezelfde peer na
+  signalingherstart/-crash, gesloten verbindingen en tracks na ophangen,
+  geen herleving na herladen en een bewust nieuw gesprek. Synthetische media
+  bewijzen geen fysieke microfoon, luidspreker, TURN of echt mobiel apparaat.
+
+De browserbinding weigert verkeerde ingangen, ontbrekende bestemmingen of
+zichtbare toestanden, paginafouten, te weinig schakels, tegenstrijdige tellingen
+en niet-uitgevoerde herstelproeven. De runner stopt de afhankelijke keten bij
+de eerste mislukte stap en bewaart die oorspronkelijke fout. Browserversie,
+Node-versie en platform worden vastgelegd. Door onvolledig aantoonbare
+dynamische afhankelijkheden blijft de bronafdruk voorlopig conservatief breed;
+dit is geen claim van voltooide fijnmazige bewijsvernieuwing.
+
+De RTFoundation-proef ontdekte een productfout in de bestaande Heritage-
+overgang: `pageswap` probeerde een ontbrekend of ongeldig doeladres te lezen.
+De animatie wordt nu alleen in die situatie overgeslagen; echte navigatie
+blijft functioneren. Gerichte historie-, normale, geannuleerde en reduced-
+motion-proeven bewaken dit. De Experience-inventaris koppelt een query-ingang
+aan het fysieke document en behoudt query en fragment in de eigen appcontext.
+
+**Gericht uitgevoerd op de werkstand, geen kandidaatkwalificatie:**
+129/129 contract-/bewijs-/lifecycle-/Heritage-unittests, RTFoundation 1/1,
+Heritage-browser 3/3, Videobellen met audio 1/1 en bundelbrowserregressies
+13/13, zonder skips. Camera- en Juridisch-taken en de negatieve bel-/Clips-
+proeven slaagden eveneens gericht. Bewijslogboeken:
+`/tmp/rtg-completion-contract-final.log`, `/tmp/rtg-rtf-repaired.log`,
+`/tmp/rtg-heritage-history-browser.log`, `/tmp/rtg-video-audio-final.log`,
+`/tmp/rtg-bundle-browser-final.log` en `/tmp/rtg-four-completion.log`.
+Het laatste log bevat ook de oorspronkelijke twee failures; de gerichte
+herstelruns vervangen die niet stilzwijgend in de auditgeschiedenis.
+
+De preflight vond vier reeds in HEAD aanwezige bundelproblemen. De bestaande
+generator herstelt de verouderde app-main-uitvoer uit de nieuwere Zorg-bron;
+drie te grote bronstukken zijn langs bestaande verantwoordelijkheden gesplitst.
+Zakelijk- en Uitvoer-browserbundels bleven byte-identiek. Geen nieuwe dependency,
+controller, stijlarchitectuur of normuitzondering. De vervangen monolithische
+bronstukken zijn opgedeeld, niet als parallelle implementatie behouden.
+
+**Restlijst blijft blokkerend:** volledige actuele VOLTOOIPROEF/APPWERKT-
+samenstelling; Experience-contracten en 286 gerapporteerde schermmigraties
+(nog actueel te bevestigen); echte Experience-artefactvalidatie en complete
+bronafdruk; menselijke beoordelingen; kritieke financiële/autoriteitsketens;
+PWA, echte apparaten, staging, monitoring, back-upherstel, rollback en twee
+onafhankelijke eindruns. De Experience-nulstand blijft 0/114 apps, 0/316
+schermen en 0/3.368 dimensiecellen. Die 3.368 zijn GEEN individuele
+proefvoorwaarden: het bestaande register bevat 53.206 vereiste combinaties
+vóór app-specifieke interacties. De oude vergelijking met 3.368 uitgevoerde
+tests mag dus geen voltooiingsclaim worden.
+
+Onafhankelijke bronreview vond dat de Experience-coveragelezer nog losse
+artefactnamen accepteert en DS-stijlen/beeldassets niet volledig hasht.
+Die gaten worden binnen de bestaande motor gesloten vóór bewijzen worden
+gevuld. Ontbrekende menselijke en externe controles blijven expliciet open;
+een AI-beoordeling sluit die niet. Status: **ORANJE, geen vrijgave**.
+
+Afsluitcontrole van hetzelfde werkpakket: de vier browsercontracten sluiten nu
+ook via `scripts/voltooiproef.js --alleen=...`, met herstartepoch per stap. De
+onafhankelijke review vond dat RTF de na-herstartcontroles ten onrechte onder
+herstelbaar boekte. Dat is gecorrigeerd én de gedeelde browserpoort vereist nu
+een werkelijk geslaagde controle ná de relevante herstart/crash. De logs
+`/tmp/rtg-browser-contract-{juridisch,camera,rtfoundation-keuze,videobellen}.log`
+zijn gerichte werkstandmetingen; ze schrijven geen gedeeltelijk register.
+
+De Experience-bewijslezer controleert nu echte artefactbytes, hashes,
+configuratie, kandidaat, proeflog en exact gebonden waarnemingsdiagnostic.
+Afbeeldingen, fonts, SVG, DS-CSS en gedeelde scripts vallen onder dezelfde
+conservatieve bronhash. Tegenstrijdige dubbele bewijsrecords worden geweigerd.
+De kandidaatpoort weigert ongecommitte Experience-invoer. Een integer lokaal
+artefact betekent echter uitsluitend `VALID` voor inhoudscontrole: het krijgt
+nog steeds `BLOCKED` voor kwalificatie zolang de koppeling aan de bestaande
+vertrouwde bewijsuitvoering en getypepte apparaat-/methodevoorwaarden ontbreekt.
+Menselijke zelfdeclaraties blijven eveneens geblokkeerd. Dit pakket bouwt
+geen tweede bewijsmotor en claimt geen ervaringskwalificatie.
+
+PR #702 is afzonderlijk alleen gelezen: nog open op
+`8da28119e7bad72ed43dc93362d41468349d3809`, alle teruggegeven controles afgerond
+met succes of expliciet overgeslagen. Dit is de bestaande Experience-branch,
+niet de huidige `codex/deep-green-unified`-werkstand. Geen merge, push of
+productie-uitrol uitgevoerd als onderdeel van deze controle.
+
+De gezamenlijke afsluitset op Node 26.12.1 slaagt **191/191**, zonder failures
+of skips (`/tmp/rtg-afbouw-source-final.log`). De bestaande preflight sluit
+zonder fouten na herleiding van de bestaande kaarten, taalbewijzen en echte
+websitebeelden (`/tmp/rtg-fixture-preflight-closed.log`). Haar waarschuwing over
+318 vervallen APPWERKT-bewijzen blijft zichtbaar; dat is reden voor actuele
+samenstelling op de vastgelegde bron, geen reden om de waarschuwing uit te zetten.
+
+De aansluitende read-only DS-inventaris bevestigt **30/316** DS-routes. De
+286 overige routes zijn **268 interfaces plus 18 redirects**; redirects worden
+gekwalificeerd op overdracht, niet kunstmatig opnieuw vormgegeven. Er zijn
+zeven bestaande schermpatronen en 21 gedeelde DS-componenten. Hotels is al een
+gemigreerde referentie. RTDocs en Magnaat laden nog eigen stijlbronnen en
+voorzijdes die de oude app verbergen en extra vaste navigatie tekenen. De
+volgende echte consolidatie moet zo'n volledige route omvatten en vervangen
+stijlcode verwijderen; alleen de voorzijde mooier maken voldoet niet. Er zijn
+nog geen Experience Signatures of menselijke kwalificaties ingevuld.
+
+#### Actuele deelkwalificatie op `39f5705b6e` (30 oktober)
+
+De broncode blijft gedurende de voltooiingsmeting vast. De bestaande registers
+worden opnieuw door hun eigen instrumenten geschreven; oude uitslagen worden
+niet administratief opgewaardeerd. Node: **26.12.1**, lokale wegwerpservers,
+synthetische accounts. Dit is nog geen bevroren vrijgavekandidaat.
+
+- `ROLPROEF.json`: **4.514 routes, 9.369 pogingen**, nul open ACL's,
+  privacylekken, onbesliste resultaten of blijvende wijzigingen. De 92 niet te
+  kruisen en 836 niet beproefbare routes vallen niet onder dit bewijs.
+- `IDOR.json`: geen nieuwe doorbraak of lek en geen verlies van eerder bewezen
+  routestatus. De hoofdgang houdt **898 onbereikbare gevallen** en twee bekende
+  fixture-409's zichtbaar. Gangtellingen mogen niet als volledige objectdekking
+  worden gepresenteerd; financiële routes vragen hun eigen bereikbare proeven.
+- Een andere agent vergeleek beide nieuwe registers onafhankelijk met de
+  HEAD-versies, rekende alle rolrijen opnieuw na en controleerde bronversheid.
+  Geen nieuwe regressie in die vergelijking; geen platformbrede groenverklaring.
+- De bestaande `directpay-workers.pg.test.js` en
+  `office-bank-open-workers.pg.test.js` slagen samen **10/10**, nul skips.
+  Twee werkelijke workers, een eigen tijdelijke PostgreSQL 16-cluster op
+  loopback, synthetisch geld, retries, conflicterende inhoud en procescrashes
+  rond de commit. De cluster is na afloop gestopt. Geen productiegegevens,
+  echte betaling, externe betaalrail of productiecapaciteit beproefd.
+
+Logs: `/tmp/rtg-role-39f5705.log`, `/tmp/rtg-idor-39f5705.log` en
+`/tmp/rtg-financial-workers-39f5705.log`. Tijdelijke logs zijn lokale
+bewijsbronnen en vervangen geen overdraagbaar einddossier op de definitieve
+kandidaat. De operationele vrijgavepoort meldt op deze commit **ONBEWEZEN**:
+de volledige suite, schermsuite, releasepoort en stagingrepetitie zijn hier
+nog niet integraal gekwalificeerd.
+
+De read-only Hotels-contractvoorbereiding vond een belangrijke inventarisgrens:
+`/apps/hotels.html` is een zelfstandig Travel-scherm met eigenaar
+`verblijf.hotel`, maar de logische MAPPEN-functie Verblijven verwijst naar
+`/apps/residentie.html`. De 67 Residence-interacties zijn geen Hotels-bewijs.
+Een Hotels-schermsignature mag worden gedeclareerd; een appsignature mag geen
+app-ID verzinnen, Residence overschrijven of diens bewijs lenen. Dit is geen
+aanleiding om de afgesproken appcatalogus stilzwijgend uit te breiden.
+
+De volledige `VOLTOOIPROEF` is vervolgens ononderbroken afgerond op dezelfde
+broncommit: **114 scenario's, 342/342 taak-/opslag-/herstelbewijzen gesloten,
+114/114 antwoord- of schermstapbewijzen menselijk**, nul open. De expliciete
+vreemde-actorproeven sluiten voor 107 scenario's; zeven hebben die niet en
+vragen de afzonderlijke bevoegdheidsbron. Dit is geen menselijke Experience-
+beoordeling en nog geen APPWERKT-8/8-totaal. Het volledige log staat in
+`/tmp/rtg-completion-39f5705.log`; het bestaande `VOLTOOIPROEF.json` bevat de
+stappen en meetstempel.
+
+De aansluitende waarheidsronde vond 112 bewezen ingangen en twee niet gemeten
+querycontracten. Eén meetoorzaak: de observer verwijderde `?pas=rtg` uit de
+landing terwijl het verwachte contract deze query behield. De kleine correctie
+bewaart een expliciet gecontracteerde query, laat fysieke document-/tabcontracten
+intact en weigert een vreemde origin. Verkeerde, ontbrekende, extra of dubbele
+pasparameters krijgen geen passend bewijs. De bestaande beslisregel is niet
+versoepeld. **27/27** liegronde- en appcontracttests slagen zonder skips
+(`/tmp/rtg-truth-query-contract.log`). Het oude waarheidsresultaat wordt niet
+handmatig opgewaardeerd: het geraakte instrument moet opnieuw meten. Deze
+wijziging raakt de eerder gemeten voltooiings-, rol- en objectproeven niet.
+
+#### APPWERKT-samenstelling op `0afc8afa15` (30 oktober)
+
+De ononderbroken lokale browserronde is afgerond: **112/114** rijen met alle
+acht bewijzen, **1.960/1.960** geïnventariseerde knoppen aangeraakt, nul niet
+klikbare knoppen. De twee resterende defectoordelen zijn van de meter: voor
+RTFoundation en Videobellen wordt `/apps/app.html?pas=rtg` ten onrechte als
+letterlijke bestandsnaam gecontroleerd. Hun daadwerkelijke query-ingang en
+bronbinding moeten behouden blijven; alleen de fysieke bestandscontrole moet
+het documentpad gebruiken. De volledige uitslag blijft bewaard, zonder de twee
+rijen handmatig groen te maken. Log: `/tmp/rtg-appwerkt-0afc8afa.log`.
+
+De nieuwe LIEGRONDE sluit **114/114** binnen de lege-antwoordproef. BEVOEGD
+sluit **114/114** binnen de eigen appcontracten. Onafhankelijke herafleiding
+bevestigt de bronhashes en scenarioaansluiting. De verdeling is 99 expliciete
+workflow-/tegenactorscenario's, drie routeprojecties, negen gezinsapps met
+19 gescheiden ruwe paren, één cameraproef en twee statische/lokale contracten.
+De open brede routeprojecties van die 99 scenario's worden daarmee niet
+volledig gekwalificeerd. Lege-backendgedrag is evenmin bewijs van semantisch
+juiste antwoorden gedurende alle bedrijfsprocessen.
+
+Een reparatie aan de gedeelde APPWERKT-meter laat bestaande browserbewijzen
+volgens hun huidige bronhashes vervallen. Eerst worden de twee geraakte
+ingangen gericht getoetst. De oude 112 resultaten krijgen geen nieuwe
+meetcommit. Een nieuwe integrale browserafleiding wordt pas op een volgende
+stabiele meetstand uitgevoerd; de overige platform- en Experience-poorten
+blijven afzonderlijk open. De twee onafhankelijke volledige eindruns zijn nog
+niet gestart.
+
+#### Gerichte Experience-uitvoering — Hotels (30 oktober)
+
+De bestaande Experience-subprocessuitvoering is hergebruikt voor één getypeerd
+bestemmingsbewijs: Hotels, aangemeld RTG-lid, normale toestand, Chromium op
+390 × 844. De runner controleert de werkelijke bestemming, zichtbare en niet
+bedekte kop, collectie, ingelogde eigenaar, documentantwoorden en browserfouten.
+Een geldige uitvoering kan uitsluitend `PROVEN_IN_SCOPE` opleveren; de volledige
+bestemmingsvoorwaarde blijft geblokkeerd zolang andere verplichte configuraties
+ontbreken. Import van lokale artefacten levert geen nieuw uitvoeringsgezag op.
+Menselijke kwaliteit blijft expliciet onbewezen.
+
+De Hotels-signatuur benoemt bestaande handelingen en aanvullende toestanden;
+die declaratie is geen kwalificatie. Hotels en de logische app Verblijven
+(`/apps/residentie.html`) krijgen geen bewijs van elkaar. De uitgebreide
+Edge-inhoud en volledigheid van dynamische bediening blijven te controleren.
+De eerste 63 gerichte artefact-, dekkings- en uitvoeringscontroles slagen lokaal;
+de oorspronkelijke registeractualiteitsfout is door herafleiding opgelost,
+zonder een bewijsstatus op te waarderen. De echte browseruitvoering volgt pas
+op een schone vastgelegde codeversie.
+
+Scopeprecisering APPWERKT: 1.960 aangeraakte knoppen zijn de aangetroffen
+bediening van de 112 bezochte apps. De twee query-ingangen vielen vóór
+browserontdekking uit; hun bediening zit niet in die noemer.
+
+#### Resultaten gerichte afsluiting (30 oktober)
+
+- Hotels: **6/6** echte Chromium-browsertests op schone broncommit
+  `af9ae5f8efceafb41d406824faf4720fa399535d`, nul skips. De bestaande
+  Experience-runner produceert één getypeerd bestemmingsbewijs
+  `PROVEN_IN_SCOPE`; het geheel blijft `INCOMPLETE`. Artefacten:
+  `artifacts/experience/hotels-destination.{json,log,coverage.json}` en
+  `artifacts/experience/report.json`. Dit is geen volledige schermkwalificatie.
+- APPWERKT query-ingangen: op `4dcfe71fdc` bereikt de echte geselecteerde runner
+  RTFoundation en Videobellen en raakt **5/5** respectievelijk **1/1** eigen
+  knoppen. Het testcontract bewaakt dat APPWERKT en RAAKVLAK bytegelijk blijven.
+  Log `/tmp/rtg-appwerkt-query-browser.log`. Deze proef kwalificeert de twee
+  gemeten bereikbaarheid-/bedienbaarheidscontracten, geen nieuwe 114/114-afleiding.
+- **18/18** gerichte query-/bestemmingscontroles en **30/30** bestaande
+  bronafhankelijkheidscontroles slagen. Een aanvullende regressie verbindt de
+  werkelijke virtuele query-ingang met `versheidVoor → controleer` in een
+  afzonderlijke testrepository: vers bij de oorspronkelijke bron, vervallen
+  bij gewijzigd document of meterhelper. Die gerichte proef slaagt ook.
+- Drie bestaande Experience-integratieproeven slagen tegen de lokale server.
+  De eerste sandboxpoging kon loopback niet openen (`EPERM`); na uitvoering
+  met lokale loopbacktoestemming slagen 3/3, zonder code- of normwijziging.
+- Onafhankelijke technische lezing vindt geen bewijsversoepeling. Metingen
+  voor eindkwalificatie blijven afzonderlijke processen; `meet()` heeft nog
+  gedeelde procescache en mag niet als twee onafhankelijke runs worden gebruikt.
+
+De oudere 112/114-uitslag en het Hotels-deelbewijs blijven historische,
+commitgebonden resultaten. Nieuwe bronwijzigingen krijgen geen terugwerkend
+groen. Actuele integrale samenstelling, alle Experience-dimensies, menselijke
+beoordeling, staging/herstel en twee schone eindruns blijven open. Geen merge
+of productie-uitrol uitgevoerd.
+
+#### Consolidatie documentfamilie — 30 oktober
+
+Juridisch en de drie gepubliceerde documenten gebruiken nu de bestaande
+DS-shell, lijst en lezer. Vier eigen stijlblokken (13.924 tekens) zijn verwijderd;
+de gedeelde lezer krijgt uitsluitend een paginavariant voor documentritme.
+Documenttekst en de twee scripts voor actuele prijzen/tarieven zijn behouden.
+Geen nieuwe dependency, controller, opslag of autorisatiepad is toegevoegd.
+De statische DS-inventaris telt nu 34 gemigreerde routes, tegenover 30 vóór dit
+pakket. De 330 bestanden in die inventaris zijn niet dezelfde noemer als de
+316 Experience-schermen; migratie is geen schermkwalificatie.
+
+De gerichte browser- en inhoudscontroles slagen 11/11, zonder skips, op de
+werkstand gebaseerd op `2bfbe1b2a1`. Log: `/tmp/rtg-legal-ds-final.log`.
+Ze toetsen 390/820/1440 px, geladen DS, één titel/Edge, automatische
+toegankelijkheid, 200% tekst, natuurlijke Tabvolgorde, documentterugkeer,
+herladen, actuele prijsgegevens en de cookiemelding bij het eerste bezoek.
+De bestaande VOLTOOIPROEF voor Juridisch sluit daarnaast de documenttaak,
+publicatie na herladen/herstart en herstel na een echte servercrash.
+Log: `/tmp/rtg-legal-completion-current.log`. Dit scenario levert geen
+vreemde-actorbewijs of menselijke Experience-beoordeling.
+
+Onafhankelijke codecontrole bevestigt behouden documentinhoud en prijsscripts.
+De aanvullende controles uit die review zijn uitgevoerd. Eén fout in de nieuwe
+test verwees naar `business` in plaats van het bestaande `business-lite`; de
+test is gecorrigeerd naar de werkelijke API en veldbinding, zonder productprijs
+of kwaliteitsgrens te wijzigen. De eerste mislukte run blijft bewaard in
+`/tmp/rtg-legal-ds-browser-expanded.log`.
+
+Open afsluitpunten: APPWERKT telt eigen knoppen; deze documentinterface werkt
+via links. De gerichte hermeting bevestigt bereikbaarheid, maar geeft bij nul
+eigen knoppen terecht `NIET_GETEST` voor bedienbaarheid. De drie documentlinks
+zijn wel werkelijk getoetst door de taakproef. Een expliciete, afzonderlijk
+geteste aansluiting voor linkbediening ontbreekt nog; het taakbewijs wordt
+niet automatisch opgewaardeerd. Log: `/tmp/rtg-legal-appwerkt-scoped.log`.
+Geen historisch register is door de gerichte runner overschreven.
+De nieuwe Experience-signaturen zijn
+contractdeclaraties, geen groene kwalificaties. Er zijn nog gedeelde
+stijlinjecties; alleen de route-eigen CSS en legacy-stijlbladkoppelingen zijn
+hier geconsolideerd. De globale DS-poort blijft geblokkeerd door de bestaande
+31-byte groei in `public/apps/browser.html` (`scroll-margin-block-start:8rem`).
+Die norm is niet verruimd en de focusverbetering niet verwijderd. De ratel kan
+pas na een inhoudelijke oplossing opnieuw worden vastgelegd.
+
+#### Uitvoeringsbesluit — bouwen vóór eindkwalificatie (30 oktober)
+
+De eigenaar wil eerst de afgesproken functionaliteit en consolidatie bouwen
+en integreren. De afzonderlijke menselijke pakketproeven worden uitgesteld;
+de eigenaar test daarna samen met de integrator tijdens de gezamenlijke
+eindkwalificatie. Ook de twee volledige onafhankelijke eindruns komen pas na
+een gesloten bouwrestlijst op één schone kandidaat. Een gedeeltelijk pakket
+of een historische registeruitslag wordt niet gebruikt als releasegroen.
+
+Tijdens de bouw blijven gerichte ontwikkelcontroles nodig voor het gewijzigde
+gedrag, broncontracten en veiligheidsgrenzen. Zij zijn geen volledige
+kwalificatiecampagne en blokkeren onafhankelijke bouwwerkzaamheden niet.
+Tests en scenario's worden met de implementatie meegebouwd; de volledige
+browser-, menselijke, operationele en platformkwalificatie volgt gezamenlijk.
+Geen productie-uitrol, merge of wijzigingen aan bewijsdrempels zijn hiermee
+goedgekeurd. APPWERKT en EXPERIENCEWERKT blijven de bestaande bewijsbronnen;
+deze afbouwadministratie beschrijft gebouwd/geïntegreerd en nog te kwalificeren.
+
+De volgende bouwbatch combineert drie niet-overlappende wijzigingen: expliciete
+documentlinkbediening in de bestaande APPWERKT-meter, de twee bestaande
+leverancierswerkbladen op public/ds en concrete Experience-signaturen voor vijf
+reeds gemigreerde schermen. Daarnaast gebruikt de terugvaltekst van vijftien
+oude doorverwijsadressen het bestaande DS-statuspatroon. De omleidingsscripts,
+query-overdracht en oorspronkelijke bestemmingen blijven behouden. Een
+gemigreerde redirect is geen nieuwe app en kwalificeert zijn bestemming niet.
+
+#### Bouwbatch — centrale patronen en herstelgedrag (30 oktober)
+
+- Vijftien aliasdocumenten gebruiken het bestaande DS-statuspatroon. De
+  bestemmingen, meta-refresh en omleidingsscripts zijn behouden. Vijftien
+  route-eigen stijlblokken (10.200 tekens) zijn verwijderd. De snelle
+  bron-/navigatiecontrole sluit 15/15; de voorbereide browserproef wacht op de
+  latere kwalificatie. Dit zegt niets over de doelapps zelf.
+- De leveranciersbladen Aanvragen en Service zijn op bestaande DS-elementen
+  aangesloten, met dezelfde IDs, tokens, API's en bestaande actiehandlers.
+  De aanvraagrenderer ondersteunt optioneel de bestaande DS-klassen; oudere
+  callers behouden hun gedrag. Nog niet gesloten: de bestaande `metgezel.js`
+  biedt leveranciers-Rahul via `/api/supplier/ai`, handenvrij en Samen, terwijl
+  de DS-shell niet al die functies vervangt. Het script is daarom behouden.
+  De twee routes zijn **in bouw**, niet volledig DS-gemigreerd of gekwalificeerd.
+  Hun resterende stijlinjectie is geen uitzondering op de norm. De gerichte
+  browserproef is voorbereid; loopbackstart gaf EPERM en de escalatie is
+  afgebroken. Er is voor deze proef geen geslaagde browseruitslag.
+- Ghost onderscheidt ontbrekende inlog, geweigerde toegang, netwerkfalen en
+  onvolledige voorspellingen; de gebruiker krijgt waar passend een herprobeeractie.
+  Voertuig bewaart de gekozen wagen tijdens verversen en meldt bij een mislukte
+  laadactie geen succes. De bijbehorende browserscenario's zijn meegebouwd,
+  niet als uitgevoerde kwalificatie geregistreerd.
+- Routedekking bewaart de nieuwste zoek-/paginakeuze wanneer oudere antwoorden
+  later binnenkomen. Drie gerichte controllerproeven sluiten; daadwerkelijke
+  browser-/Experience-kwalificatie blijft een afzonderlijke verplichting.
+- Vijf bestaande DS-schermen krijgen concrete Experience-signaturen: Boeken,
+  Ghost, Voertuig, Hangar en Routedekking. Dit zijn ontwerp- en taakcontracten,
+  geen menselijke beoordelingen of uitgevoerde ervaringsbewijzen.
+- APPWERKT krijgt expliciete linkbediening naast knopbediening. EXPERIENCEWERKT
+  neemt beide soorten bediening in zijn inventaris op, zonder een succesvolle
+  klik als volledig ervaringsbewijs te behandelen. Ontbrekende of ongeldige
+  navigatiegegevens blijven open. Historische APPWERKT-uitslagen worden hierdoor
+  niet opnieuw groen verklaard; de geselecteerde browserproeven zijn voorbereid
+  voor de kwalificatiefase.
+
+De bouwstand is geen releasekandidaat. De bestaande DS-ratelbevinding in
+`browser.html`, de leveranciersbegeleidingslaag, overige schermmigraties,
+actuele APPWERKT-afleiding, volledige Experience-bewijzen, menselijke taken en
+operationele kwalificatie blijven zichtbaar open. Geen merge of deployment.
+
+Bouwcontrole van deze werkstand: 19 gewijzigde/nieuwe JavaScript-bestanden
+parsen zonder syntaxfout; de bron-diff bevat geen whitespacefouten. De
+DS-controle meldt drie open punten: de bestaande groei in `browser.html` en
+de behouden metgezel-injectie op elk van de twee leveranciersroutes. Een
+ontbrekende letterlijke routemontage in de voorbereide browsertoets is
+gecorrigeerd naar expliciete routeconstanten; de toets is daarmee niet als
+uitgevoerd aangemerkt. De onafhankelijke bronreview van de redirects en
+zoekvolgordereparatie vindt geen nieuwe blocker binnen die beperkte scope.
+Een verlopen kantoorsessie blijft bij HTTP 401 naar de bestaande inlogdeur
+gaan; de zoekvolgorderegel vervangt die autorisatieafhandeling niet.
+
+
+#### Bouwbatch — één eigenaar per verantwoordelijkheid (30 oktober)
+
+De eigenaar vraagt de volledige code onderhoudbaar en uitbreidbaar te
+consolideren. Dat betekent één actieve implementatie per gedeelde
+verantwoordelijkheid, niet blind alle gelijknamige functies samenvoegen.
+Gegenereerde bundels blijven afgeleide distributieartefacten; bronparts zijn
+hun enige bewerkbron. Verschillende productcontracten houden hun verschillen.
+Geen nieuwe apps, registratiesysteem, dependency of uitvoeringscontroller is
+voor deze batch toegevoegd.
+
+Gebouwd en geïntegreerd in de werkboom vanaf `3b07587407ff9123dd8678dba0c63611d649d64b`:
+
+- **CSV-celveiligheid:** `server/lib/csvcel.js` vervangt dubbele
+  prefixneutralisatie en quote-escaping in facturen en Office. De publieke
+  factuurexports blijven behouden. Facturen houden numerieke waarden/selectieve
+  quotes; Office houdt tekstbehandeling/altijd quotes. Drie pure regressies
+  controleren 23 letterlijke gevallen, echte Office-export en afwijzing zonder
+  opslag of auditmutatie. De onafhankelijke review vergelijkt bovendien 5.000
+  deterministische invoerwaarden met beide oude uitvoercontracten.
+- **Metgezel:** de oude Rahul-controller stond achter de constante
+  `eigenRahul=true`. Die onbereikbare request-, render-, polling- en
+  observercode is verwijderd uit de bronparts. Exclusief bijbehorende
+  balk-/seintjesstijlen zijn na consumentencontrole verwijderd. Het geleverde
+  metgezelbestand is 28.747 bytes kleiner; dit is niet nogmaals opgeteld bij
+  de bronparts. Actieve Samen, Rahul-tab en handenvrij blijven behouden.
+  De eerdere formulering over leveranciers-Rahul in metgezel is hiermee
+  verfijnd: de actieve requestweg zit in Rahul-tab/handenvrij, de verwijderde
+  leveranciersaanroep in metgezel was al onbereikbaar.
+- **Edge → bestaande Rahul:** waar de bestaande publieke hook aanwezig is,
+  kiest de DS Edge geen tweede actor of transport. De hook meldt nu awaitbaar
+  of een vraag is overgenomen. Niet-gereedheid, bezetting en openfouten laten
+  de Edge-invoer behouden. De bestaande vraagfunctie reserveert de lopende
+  vraag vóór haar eerste await; een externe vraag overschrijft geen lokale
+  werkbladdraft. Negen gerichte controles draaien ook de werkelijke Rahul-tab
+  met de bestaande sessieopslag, inclusief leverancier/lid, gelijktijdige
+  ingangen, herstel en onderdrukking van een laat antwoord van de vorige actor.
+  De onafhankelijke P2-bevinding over een niet-waarneembare overdracht is
+  hiermee hersteld en opnieuw beoordeeld. Dit is geen complete autorisatie-
+  of browserkwalificatie.
+- **Wonen-familie:** Mijn thuis, Onderhoud en Woningdossier hergebruiken
+  bestaande DS-kaarten, velden, lijsten en dialoog. De exclusieve
+  `rtg-wonen-2026.css` is verwijderd: 7.520 bytes en vier `!important`.
+  IDs, API's, authenticatie, opslag en acties blijven behouden. Alle benodigde
+  gedeelde scripts blijven beschikbaar. De review vond dat `ios.js` de
+  header nog naar `ios-*` ombouwt; daarom blijft het bestaande `ios.css`
+  tijdelijk geladen. Die afhankelijkheid krijgt geen uitzondering of
+  groenstatus. Vier browserproeven staan klaar en zijn niet uitgevoerd.
+
+De drie Wonen-routes en twee leveranciersroutes blijven **in bouw**. De
+statische DS-poort noemt 21 bevindingen: de bestaande 31-byte browserratel,
+twee leveranciersafhankelijkheden en zes gedeelde presentatieafhankelijkheden
+op elk van de drie Wonen-routes. Dit zijn geen 21 onafhankelijke productbugs;
+ze sluiten grotendeels op dezelfde gedeelde presentaties aan. Geen norm is
+verruimd. De volgende gedeelde bouwsnede moet Rahul-tab/Samen/handenvrij en
+bestaande scherm-/desktopbediening onder het DS brengen met behoud van hun
+hooks, context en acties, voordat meer families op diezelfde blokkade landen.
+De eerdere voorraad van 49/316 statisch gemigreerde Experience-routes blijft
+49/316: vijftien redirects en 34 overige schermen. Dat is geen bewijs voor
+49 gekwalificeerde gebruikerservaringen.
+
+Gerichte ontwikkelbewijzen staan in `/tmp/rtg-consolidatie-bouwcontrole.log`,
+`/tmp/rtg-consolidation-independent.log`, `/tmp/rtg-rahul-rereview.log` en
+`/tmp/rtg-metgezel-css-cleanup.log`. Twee historische randen-bronasserties
+wezen naar de onbereikbare controller; hun vervanging toetst actieve
+open/sluit-/aansluitpaden. Overlap, focus, safe areas, tekstvergroting en
+compacte-standpersistentie zijn daardoor niet ineens bewezen en blijven
+expliciete eindproeven. De volledige suite, browserkwalificatie, menselijke
+beoordeling en operationele proeven zijn in deze bouwbatch niet uitgevoerd.
+
+De afhankelijkheidsmeting vóór deze consolidatie telde 63 opwaartse en 107
+primitief-naar-domeinkoppelingen (de oudere 105 is geen actuele stand), nul
+onverklaarde randen en 260 gedeelde kernnamen. Verklaard is niet hetzelfde
+als wenselijk; autorisatie- en auditverbindingen worden niet losgemaakt om
+alleen een teller te verlagen. De CSV-verplaatsing verlaagt onderhoudsduplicatie,
+maar er wordt geen daling van de koppelingsteller geclaimd.
+
+Nog te sluiten: de gedeelde presentatieafhankelijkheden, resterende
+scherm-/Experience-signaturen en migraties, actuele APPWERKT-afleiding,
+alle toepasselijke Experience-dimensies, volledige veiligheidsketens,
+menselijke/operationele kwalificatie en twee onafhankelijke eindruns op één
+schone kandidaat. De werkboom is geen releasekandidaat. Geen merge of uitrol.
+
+#### Doorlopende afbouw — gedeelde bediening en bewijsgrenzen (30 oktober, vervolg)
+
+Werkstand blijft de integratiewerkboom boven
+`3b07587407ff9123dd8678dba0c63611d649d64b`, Node `26.12.1` op macOS arm64.
+Dit zijn gerichte ontwikkelresultaten, geen kwalificatie van een schone
+kandidaat. De historische APPWERKT-afleiding noemt **112/114** op
+`0afc8afa15`; de laatste twee queryroute-meterreparaties bestaan al in de
+latere bron. Er wordt geen actuele 114/114-afleiding uit oudere resultaten
+geconstrueerd. EXPERIENCEWERKT blijft **0/114 apps, 0/316 routes en
+0/3.368 voorwaarden** met geldig integraal bewijs. De huidige wijzigingen
+vragen vernieuwing van de daadwerkelijk getroffen bewijzen.
+
+Afgebakende oorzaken afgesloten met gerichte regressies:
+
+- **Eén presentatie per host:** volledige DS-hosts gebruiken de canonieke
+  componenten voor Rahul, Samen, handenvrij, conceptwerk, de inlogdeur,
+  export en iOS-gebaren. De bestaande owners, API's en autorisatie blijven
+  leidend. Legacy-hosts behouden hun oorspronkelijke presentatie totdat hun
+  eigen migratie klaar is; die bron is niet globaal verdwenen. Rahul gebruikt
+  op DS een expliciete eigenaarstaat en geen geïnjecteerde verbergstijl.
+  De drie PDA's behouden na review hun bestaande Workspace Runtime en iOS-
+  gedrag. Hun oude lokale opmaak is vervangen, niet hun functionaliteit.
+- **Rahul-resultaat en akkoord blijven bij actor én selectie:** de request-
+  context is een onafhankelijke kopie. Een laat resultaat voor een ander
+  object krijgt geen concept, uitvoeringsclaim of goedkeuring. Actorwisseling
+  wist ook zichtbare oude concepten en invoer. Een nieuwe vraag trekt het oude
+  voorstel in vóór transport. HTTP-fouten en negatieve productantwoorden
+  worden niet als uitvoering gepubliceerd. De bestaande approval-owner
+  controleert dezelfde context vóór verzending en na het antwoord; een oude
+  bevestigingsronde mag een nieuw voorstel niet verwijderen. Onafhankelijke
+  review vond en hielp deze twee laatste gaten sluiten. Geen tweede agent,
+  uitvoeringsketen of serverautorisatiemodel toegevoegd.
+- **Werkelijke bediening:** leveranciersflows zijn in Chromium uitgevoerd
+  met echte geïsoleerde testserverdata: melding, antwoord, herladen, reactie,
+  status en accountdeur. Zes proeven slagen, inclusief Rahul op DS en twee
+  legacy-hosts. Een gevonden legacy-headerregel kneep de Rahul-ingang tot
+  40 px; de bestaande regel is hersteld naar 44 px. De drie PDA's doorlopen
+  aanmaak, conceptgeneratie, filtering, CSV/JSON-download, focus, Tab en
+  Escape op 390/820/1440 px. Dat bewijst deze taken, niet menselijke premium-
+  kwaliteit. De verdere canonieke wereldwerkruimtepresentatie wordt daarna
+  afzonderlijk gecontroleerd.
+- **APPWERKT-navigatieguard:** de onafhankelijke tegenproef vond dat een
+  ongeoorloofde redirect wel werd afgekeurd maar toch bezocht. Alleen de
+  daadwerkelijk aangeklikte documentrespons wordt nu zonder automatische
+  redirects opgehaald. Iedere 30x blijft expliciet onbewezen in dit directe
+  navigatiecontract; aliasgedrag heeft zijn eigen proef. De 15 browserproeven
+  slagen, inclusief externe bestemming, lus en meerstapsredirect, zonder
+  verboden bezoek. De aparte aliasdocumentproeven slagen 16/16 en
+  Ghost/Voertuig-herstel 5/5. Aliasproeven zijn geen domeinketenkwalificatie.
+
+De stijlscanner maakt nu onderscheid tussen bewezen DOM-laadpaden,
+mogelijk geladen bronnen en worker/precachevermeldingen. De bestaande
+AST-infrastructuur wordt gebruikt, zonder nieuwe parser of interpreter.
+Onzekerheid blokkeert migratiegroen. Onafhankelijke review vond ontbrekende
+tegenproeven voor gewijzigde DS-aliases, relatieve adressen en overschaduwde
+workerbindings; die zijn hersteld, inclusief overschreven DS-testmethoden.
+De bronratels blijven intact. De tussenmeting in
+`/tmp/rtg-ds-bronmeting-20261030.json` telt 330 HTML-bestanden over het hele
+publieke oppervlak, **niet** een nieuwe Experience-noemer. Met de aangescherpte
+laadgraaf kwalificeert zij voorlopig nul statisch schone routes: gedeelde
+laadfuncties zijn nog niet volledig herleid. Dit is geen vergelijkbare
+terugval van de oude 49/316 en ook geen groenverklaring. De 316 Experience-
+routes, hun redirects en menselijke bewijsverplichtingen blijven ongewijzigd.
+
+Meetbare bronopruiming tegenover deze HEAD, vóór de volgende browsermigratie:
+23 lokale stijlblokken verwijderd, samen 26.579 bytes. Daarnaast is de eerder
+genoemde exclusieve Wonen-CSS van 7.520 bytes verwijderd. Afgeleide bundels
+worden niet nogmaals als verwijderde broncode geteld. De gedeelde legacy-
+fallbacks hebben nog consumenten en blijven dus zichtbaar in de restlijst.
+
+`/tmp/rtg-gedeelde-consolidatie-20261030.log` bevat de gecombineerde gerichte
+ontwikkelcontrole: **120 geslaagd, 0 gefaald, 0 overgeslagen**. Dat resultaat
+dekt de genoemde geselecteerde tests; het is geen platformbrede run.
+De actuele PR #702-status is apart gelezen: head
+`8da28119e7bad72ed43dc93362d41468349d3809`, open en niet gemerged, 37
+succesvolle en vijf overgeslagen checks. Die CI hoort niet bij deze gewijzigde
+lokale werkstand; de overgeslagen controles zijn geen lokaal eindbewijs.
+
+Directe voortzetting: bestaande appmenu-owner toegankelijk onder DS afbouwen;
+canonieke presentatie van de bestaande zelfstandige wereldwerkruimte inclusief
+beeldeditor en widgets afronden; browserchrome met behoud van de gedeelde
+ledenwebsite-renderer consolideren; daarna de bronafhankelijke inventarissen
+eenmaal bijwerken. Geen oude werkruimte of besturing verwijderen om een
+stijlpoort te passeren. De onbesliste laadpaden, overige schermfamilies,
+menselijke taken, financiële/operationele poorten en twee onafhankelijke
+eindruns blijven open. Er is niets gemerged of uitgerold.
+
+#### Doorlopende afbouw — gedeelde eigenaren en werkelijke opslag (30 oktober, avond)
+
+Vervolg op dezelfde gewijzigde werkboom boven `3b07587407ff9123dd8678dba0c63611d649d64b`,
+Node `26.12.1`. Geen nieuwe kandidaat, merge of uitrol. Onderstaande controles
+zijn ontwikkelbewijs; APPWERKT en EXPERIENCEWERKT zijn hiermee niet opnieuw
+integraal gekwalificeerd. De historische APPWERKT-stand blijft 112/114;
+Experience blijft 0/114 apps, 0/316 routes en 0/3.368 voorwaarden.
+
+Gedeelde oorzaken die nu technisch zijn aangepakt:
+
+- **Instellingen en basis:** dezelfde RTGBediening-/RTGGids-eigenaren gebruiken
+  op DS native dialogen en centrale componenten. Oude basis-, springlink- en
+  instellingenstijlen worden op DS niet meer geïnjecteerd. Focus, tekstvergroting,
+  verbindingsmeldingen en bestaande toegankelijkheidsvoorkeuren blijven werken.
+  Heropening leest de actuele voorkeuren bij hun bestaande eigenaren; de oude
+  lege Widgets-helper is verwijderd. Twee instellingenbrowserproeven slagen,
+  inclusief legacy-CSS die bytegelijk blijft, 390/820/1440 px en 200% tekst.
+  Twee echte Wonen-basisproeven slagen, inclusief vertraagde en negatieve
+  gidsantwoorden. De mobiele werkruimte-springlink focust nu de werkelijke
+  inhoud; een `display:contents`-container kan zelf geen focus ontvangen.
+- **Waarheidsgetrouwe hulplaag:** HTTP-fouten, negatieve productantwoorden en
+  antwoorden voor een andere sessie geven geen onterechte bevestiging. De
+  oorspronkelijke sheet en actor blijven aan het verzoek gekoppeld. Drie
+  gerichte helperproeven slagen; actieklikken via de echte hulplaag worden
+  aanvullend gecontroleerd. Geen autorisatie- of servercontract gewijzigd.
+- **Taal en beweging:** de bestaande i18n-owner gebruikt `taalkeuze.css` en
+  een native DS-dialoog. Alle 114 registercodes blijven bij dezelfde matcher.
+  De oude globale reduced-motion-regel creëerde ongewenste overgangen op
+  flex-afmetingen en veroorzaakte tijdelijk ingeklapte werkruimteframes.
+  Die legacy-stijl wordt op DS niet meer geladen. Drie browserproeven slagen
+  voor DS, RTL, grote tekst, zoeken, snelle keuzes, een expliciete spraakfixture
+  en legacy. Dit is geen kwalificatie van een externe vertaal- of spraakdienst.
+- **Universele zoekingang:** Sprong behoudt zijn index, appmenu-handelingen en
+  API. Op DS komt de vorm uit `sprong.css`; native modaliteit sluit de
+  achtergrond af. Een laat catalogusantwoord na sluiten steelt geen focus.
+  Vier gerichte DS/bodyproeven en de tien bestaande legacy-browserproeven
+  slagen. Geen tweede zoekmotor of aparte bestemmingenlijst toegevoegd.
+- **Werkruimteopslag:** A → B → A zijn drie bewuste wijzigingen, geen retry
+  van de eerste A. Cards gebruikt de bestaande RTGIdem-sleutelgenerator;
+  People geeft die door via het bestaande contract. Een retry na verloren
+  antwoord behoudt sleutel en inhoud. Een gewijzigde sessie blokkeert vóór
+  verzending en vóór de succesweergave; `ok:false` en ongeldige antwoorden
+  leveren geen opslagclaim. Zes gerichte ownerproeven en de echte
+  opslag/teruglees-/antwoordverliesproef slagen. De mobiele beeldeditor is
+  via de bestaande Edge-actie weer vanuit gesloten toestand bereikbaar.
+- **Browserapp:** twee eigen stijlblokken vervangen door de centrale
+  browsercomponent. Zes gerichte proeven slagen; een oud gidsantwoord schrijft
+  niet meer naar een losgeraakt rooster. De gedeelde `webblok.css`-renderer
+  blijft een expliciet volgend pakket en is niet stil verwijderd.
+
+De centrale sequentiële browsercontrole op de geïntegreerde taalbron is
+vastgelegd in `/tmp/rtg-gedeelde-browser-vervolg.log`: 6 geslaagd, 1 gefaald,
+0 overgeslagen. Basis 2/2, taal 3/3 en de werkruimteproef over de zes betrokken
+routes slagen. De aparte appmenu-headercontrole faalt nog bij Studio en grote
+tekst; deze concrete geometriefout wordt gericht gesloten. Een geslaagde
+deelproef verandert dit samengestelde resultaat niet in groen.
+
+De bestaande DS-compiler controleert nu ook verplichte tokennamen. Een
+daadwerkelijk gevonden fout `--ds-radius-veld` is vervangen door het bestaande
+inhoudstoken. De tegenproeven controleren ontbrekende namen, commentaar,
+tekenreeksen en deels overeenkomende namen. Een expliciete fallback mag.
+Dit bewijst naamgeldigheid, geen cascadebereik of contrast. Samen met de
+begrensde laadgraafproeven: 21 geslaagd, 0 gefaald, 0 overgeslagen in
+`/tmp/rtg-ds-broncontract.log`. Onopgeloste laadpaden blijven fail-closed.
+
+Meetbare opruiming tegenover HEAD: **25 lokale stijlblokken, 34.474 bronbytes**
+verwijderd, over 21 gewijzigde HTML-bestanden. Daarnaast blijft de exclusieve
+Wonen-stijlbron van 7.520 bytes verwijderd. Bundeluitvoer wordt niet dubbel
+geteld. Gedeelde legacy-fallbacks met resterende consumenten zijn niet globaal
+verwijderd; minder DS-injecties is dus niet hetzelfde als nul legacy in RTG.
+
+Direct verder: appmenu-geometrie afronden; negatieve serviceactieproeven
+afronden; renders inspecteren; bronafhankelijke kaarten en cacheafdrukken
+eenmaal coherent bijwerken. Daarna de volgende gedeelde legacy-presentatie
+en onbesliste laadpaden sluiten. Alle overige schermfamilies, actuele
+APPWERKT-afleiding, menselijke Experience-proeven, financiële/operationele
+kwalificatie en twee onafhankelijke eindruns blijven zichtbaar open.
+
+#### Doorlopende afbouw — bereikbare bediening en behoud van werk (31 oktober)
+
+Vervolg op de gewijzigde werkboom boven
+`3b07587407ff9123dd8678dba0c63611d649d64b`, met Node `26.12.1` op Darwin arm64.
+Dit is nog geen bevroren kandidaat. De onderstaande gerichte browserproeven
+gebruiken eigen loopbackservers, geïsoleerde testgegevens en Chromium; zij zijn
+geen bewijs van staging, echte betalingen, menselijke beoordeling of alle apps.
+
+- **Juridisch:** de echte APPWERKT-meter opent de drie juridische documenten
+  en keert terug naar de werkelijk zichtbare Command-inhoud. De oude titel- en
+  shellverwachting beschreef het huidige product niet. Titel, toegestane URL,
+  succesvolle documentrespons en niet-afgedekte inhoud blijven verplicht;
+  foutieve redirects en overlays blijven rood. De echte navigatieproef sluit
+  4/4 links, één geslaagde test in `/tmp/rtg-juridisch-echte-route.log`.
+  Onafhankelijke review bevestigt deze beperkte navigatiescope.
+- **Hulp en overdracht:** de eerder open appmenu-geometrie is hersteld. De
+  bestaande eigenaren behouden hun diensten en acties, met gecontroleerde
+  negatieve HTTP-/productantwoorden en actorwisseling. De serviceproeven
+  slagen 16/16 (`/tmp/rtg-basis-service-browser.log`), overdracht 3/3
+  (`/tmp/rtg-overdracht-browser.log`). De eerste samengestelde 6/7-run blijft
+  historische rode informatie; een latere afzonderlijke proef heeft het
+  appmenu gecontroleerd, niet dat oude resultaat herschreven.
+- **Rahul-kop:** een volledige DS-host met zichtbare Edge gebruikt diens
+  bestaande Rahul-ingang. De headerfallback blijft voor hosts zonder Edge en
+  de berichtmodus; de actie heropent het bestaande werk en bewaart concepten.
+  Zeven browserproeven slagen (`/tmp/rtg-rahul-header-browser.log`), inclusief
+  echte leveranciersacties en twee legacy-hosts. Geen tweede Rahul-owner.
+- **Glyf, knoppen en focus:** de bestaande glyf krijgt centrale afmetingen,
+  kleine knoppen en chips behouden het DS-aanraakdoel. De coverfocus gebruikt
+  een contrasterende ring met donkere onderrand; een lichte dialoog boven een
+  cover behoudt zijn eigen contrast. De eerste contrastproef vond een echte
+  tekortkoming, waarna deze gericht is hersteld. Acht gecombineerde
+  bediening-/leveranciersproeven slagen zonder skips in
+  `/tmp/rtg-bediening-geometrie-browser.log`; de drie PDA-taken inclusief echte
+  downloads slagen in `/tmp/rtg-pda-icoon-browser.log`. Dit omvat
+  390/820/1440 px en waar aangegeven 200% tekst, geen claim over alle apparaten.
+- **Gepubliceerde webinhoud:** de bestaande renderer gebruikt nu
+  `componenten/webblok.css`; de dertien bloktypen, ontsmette makerskleuren,
+  beeldinhoud en bestaande berichtenroute blijven behouden. Formulieren
+  behouden dezelfde DOM, selectie, invoer en herhaalsleutel bij formaatwisseling.
+  Onafhankelijke tegenproeven vonden twee oude racecondities: overlappende
+  submits konden een nieuwe sleutel wissen, en een oud pagina-antwoord kon
+  nieuwere navigatie overschrijven. Beide zijn centraal hersteld met één
+  lopend verzoek per formulier en een navigatiegeneratie. Geen tweede
+  formulieropslag of router. Achttien gerichte pure browser-/webblokproeven
+  slagen; de onafhankelijke herreview herhaalde de zestien webblokproeven.
+  De browserherproef blijft vereist voor sluiting van dit pakket.
+- **Werkelijke canvas-owner:** de bestaande Heritage-canvasregistratie en
+  Workspace Runtime blijven actief. DS geeft hun bestaande werkvlak een
+  passende flex- en scrollpresentatie; de browser is niet uit het register
+  verwijderd om een controle te laten slagen. De eerste echte herproef vond
+  mobiele menu-overlap en een verzenddoel van 39,375 px. De menu-owner herkent
+  nu ook de verplaatste werkbalk en het formulier gebruikt het bestaande
+  DS-doel van 48 px. De rode 4/6-run staat in
+  `/tmp/rtg-webblok-canvas-browser-voor-herstel.log`; sluiting volgt uitsluitend
+  uit de gerichte herproef.
+
+De laadgraafscanner bewijst nu ook de echte serverkopvolgorde en begrensde
+native-documentaliases/ankerdownloads. Onbekende setters, prototypewijzigingen,
+bindingmutaties en niet-herleide loaders blijven blokkerend. De laatste
+scanner-/webblokselectie slaagt 35/35 in `/tmp/rtg-scanner-webblok-pure.log`;
+dat is geen vrijbrief om alle mogelijke legacybronnen als inactief te behandelen.
+De onafhankelijke bronreview vond juist nog echte oude stijlinjecties in
+cookie, sneltoets en volscherm. Deze worden als gedeelde productpakketten
+opgepakt, zonder verdere parseruitbreiding als vervanging voor consolidatie.
+
+De actuele integrale tellers worden hiermee niet verhoogd: APPWERKT blijft
+historisch 112/114 op zijn eigen bron; EXPERIENCEWERKT heeft nog 0/114 apps,
+0/316 routes en 0/3.368 dimensieverplichtingen volledig geldig. Een signature,
+verwijderd stijlblok of geslaagde ontwikkelproef is geen volledige kwalificatie.
+Menselijke taken, overige schermfamilies, operationele en financiële poorten,
+bewijsactualiteit en de twee onafhankelijke eindruns blijven open. Geen merge
+of uitrol uitgevoerd.
+
+#### Gesloten gedeelde ontwikkelpakketten — vervolg 31 oktober
+
+Nog steeds de gewijzigde werkboom boven `3b07587407ff9123dd8678dba0c63611d649d64b`;
+geen releasekandidaat. De eerder genoemde browserherproeven zijn nu uitgevoerd:
+
+- **Webblok en browsercanvas:** echte makersinhoud met dertien bloktypen,
+  navigatie/tabs, behouden formulierinvoer bij formaatwisseling en precies één
+  opgeslagen aanvraag bij antwoordverlies/herhaling zijn gericht bewezen.
+  Een HTTP 200 alleen betekent geen ontvangen aanvraag: de formulierowner
+  verlangt nu de bestaande positieve bevestiging met de juiste soort en
+  bestemming. Ongeldig JSON, `ok:false` en een onbekende bestemming houden
+  invoer en herhaalsleutel vast. De daadwerkelijke herhaalproef slaagt 1/1
+  in `/tmp/rtg-webblok-ontvangst-browser.log`. De eerdere samengestelde
+  7/10-run bevatte daarnaast twee inmiddels afzonderlijk herstelde
+  testfixturefouten en blijft als rood historisch resultaat geregistreerd.
+- **Opslagmelding:** de bestaande cookie-owner gebruikt op DS de centrale
+  component in de normale documentstroom. De melding blijft daardoor boven
+  het canvas bereikbaar zonder tweede hoogteberekening of oude stijlinjectie.
+  Twee browserproeven slagen voor de echte Browser-host en een expliciet als
+  zodanig gemarkeerde Wonen-componentfixture, bij 390/820/1440 px en 100/200%
+  tekst. De eerste fout was een Engelse browserlocale bij een Nederlandstalige
+  verwachting; de fixture kiest nu expliciet Nederlands. De samengestelde log
+  `/tmp/rtg-cookie-sneltoets-browser.log` is niet geheel groen: de toen nog
+  falende sneltoetsproef heeft een afzonderlijke geslaagde herproef.
+- **Sneltoetsen:** DS gebruikt een native dialoog met sluiten en focusherstel;
+  de bestaande toetsen pauzeren ook onder native dialogen zonder overbodige
+  ARIA-rollen. Een oud `close`-event verbergt geen inmiddels heropende dialoog.
+  De gerichte DS-browserproef slaagt 1/1 in `/tmp/rtg-sneltoets-browser.log`.
+  De twee geselecteerde bestaande legacy-browserproeven slagen 2/2 in
+  `/tmp/rtg-sneltoets-legacy-browser.log`; de overige premiumtests waren niet
+  geselecteerd en zijn hiermee niet opnieuw gekwalificeerd.
+- **Rand tot rand:** dezelfde `RTGVol`-owner, API en toestelvoorkeur bedienen
+  nu de bestaande DS-werkruimte. Het hoofdwerkvlak kan verbreden; ondersteuning
+  blijft bereikbaar. Er is geen remount bij schakelen, geen tweede controller
+  en geen verwarring met native browserfullscreen. De initiële DS-DOM-volgorde
+  zet hoofdinhoud/focus vóór ondersteuning, terwijl legacy zijn volgorde houdt.
+  Vier centrale browserproeven slagen in
+  `/tmp/rtg-volscherm-werkruimte-browser.log`: Wonen, Studio, een expliciete
+  standalone-componentfixture en de bestaande proef over zes domeinroutes.
+  Hetzelfde iframe, dezelfde hoofdinhoud en onbewaarde invoer blijven behouden,
+  ook na formaatwisseling. De eerste rode proef verwachtte zoeken in een lege
+  Notities-app; de correcte fixture maakt nu vooraf via de echte API een
+  notitie. Geen productcode aangepast om die fixture kunstmatig te laten slagen.
+- **Randen-loader:** actuele lokale DS-grenzen verhinderen dat vertraagde
+  legacy-callbacks alsnog een tweede visuele Edge laden. Legacy laden en
+  bestaande DS-randbediening blijven werken. De 34 gerichte bron-/scannerproeven
+  slagen in `/tmp/rtg-randen-broncontract.log`. Uitvoer en Sprong krijgen
+  dezelfde lokale actuele grens; hun oorspronkelijke CSS blijft bytegelijk.
+
+Opruiming blijft aantoonbaar: 25 verwijderde lokale stijlblokken, 34.474 bytes
+stijl-inhoud over 21 HTML-bestanden tegenover HEAD, plus de verwijderde
+exclusieve Wonen-stijlbron. Stijlen verplaatst naar centrale DS-componenten
+zijn consolidatie, geen claim dat alle CSS verdwenen is. Legacy-fallbacks voor
+werkelijke resterende consumenten blijven zichtbaar werk.
+
+De onafhankelijke bronreview en echte browserproeven vervangen geen menselijke
+schermlezertaak, beoordeling van filmische kwaliteit of integrale
+EXPERIENCEWERKT-kwalificatie. De integrale tellers blijven daarom ongewijzigd.
+Het gegevensgesprek is vervolgens gericht afgerond; zie de aanvullende
+bewijsafbakening hieronder.
+
+#### Gegevensgesprek en strengere laadgraafproef — 31 oktober
+
+- **Gegevensgesprek:** dezelfde `RTGGegevensPoort` gebruikt op DS een native
+  dialoog in de bestaande gesprekseigenaar. De negen DS-ingangen laden de
+  DS-markering vóór deze owner. Een geldige gegevensvraag staat boven het
+  bestaande Hotels-boekingsvenster; annuleren behoudt het boekingsconcept.
+  Antwoorden zijn gebonden aan hun gesprek. Dubbele invoer, oude antwoorden,
+  `ok:false`, verkeerde antwoordvormen en een losgekoppelde dialoog kunnen
+  geen verlate zakelijke herhaling veroorzaken. Legacy-CSS, bestaande API en
+  serverbevoegdheden blijven behouden. De laatste bron is 10.217 bytes.
+  De 21 gerichte pure proeven slagen in `/tmp/rtg-poortgesprek-pure.log`.
+- **Echte browserroute:** de laatste twee proeven slagen in
+  `/tmp/rtg-poort-definitieve-browser.log`. Hotels doorloopt zeven echte
+  428-gegevensvragen en daarna precies één aanvraag; zes annuleringen leveren
+  geen aanvraag op. Ongeldige telefooninvoer en de uitlegactie behouden invoer.
+  Foodcourt controleert de bestaande legacy-consument. De DS-beelden op
+  390/820/1440 px met 100/200% tekst zijn opgeslagen onder
+  `../output/wereldwerkruimte-review-20261030/gegevenspoort-*.png`.
+  Dit is lokale browser- en bronverificatie, geen menselijke UX-goedkeuring.
+- **Geen verborgen laadgraaf:** de bestaande DS-browserhelper leest nu ook
+  echte `/scriptbundel.js`-inhoud via de bestaande serverdecoder. Een geladen
+  bundelnaam telt niet langer als bewijs dat Basis aanwezig is, en verborgen
+  legacy-scripts worden daadwerkelijk beoordeeld. Zeven negatieve/positieve
+  helperproeven bewaken dit. De eerdere gerichte browserselectie slaagt 4/4
+  in `/tmp/rtg-poort-en-bundel-browser.log`, inclusief Webblok en de bestaande
+  werkruimteproef over zes domeinroutes.
+- **Vijf uitzonderingen verwijderd:** I18n, Cookie, Uitvoer, Sprong en
+  Poortgesprek staan niet meer in `contract.json.overgangsscripts`. Hun
+  DS-stijlinjectiepad is gesloten en wordt expliciet bewaakt. Plek, Basis,
+  Magnaat-sandbox en Plaatsnadering blijven open overgangseigenaren. Deze
+  reductie betreft actieve uitzonderingen; niet alle legacy-consumenten zijn
+  daarmee gemigreerd.
+
+De onafhankelijke bronreview controleerde ook losgekoppelde dialoog-DOM en
+verlate antwoorden. Actorwisseling zonder nieuw gesprek is hiermee niet als
+volledig scenario gekwalificeerd. De actuele PR #702 is nog open op
+`8da28119e7bad72ed43dc93362d41468349d3809`: 37 succesvolle en vijf overgeslagen
+checks volgens `/tmp/rtg-pr702-status-20261031.json`. Die andere bronstand
+kwalificeert deze gewijzigde werkboom niet. Geen merge of uitrol uitgevoerd.
+
+APPWERKT- en EXPERIENCEWERKT-integrale tellers blijven ongewijzigd. Na het
+bijwerken van afgeleide registers volgt de volgende gedeelde overgangseigenaar;
+de overige schermfamilies, menselijke beoordelingen, veiligheids-/operationele
+poorten en twee onafhankelijke eindruns blijven open.
+
+#### Locatie-intrekking, centrale bediening en bronherkomst — 31 oktober
+
+Werkstand: `codex/deep-green-unified`, HEAD
+`3b07587407ff9123dd8678dba0c63611d649d64b` plus de expliciet nog niet
+gecommitteerde consolidatiewijzigingen. Runtime van de onderstaande lokale
+proeven: Node 26.12.1. Dit is ontwikkelbewijs, geen bevroren releasebewijs.
+
+- **Toestemming sluit de hele bestaande locatieketen.** `RTGPlek` stopt
+  alle eigen vragen, get-verzoeken en watchers bij intrekking. Late callbacks,
+  watch-id nul, uit→aan en een opslagwijziging uit een andere tab kunnen oud
+  werk niet hervatten. Een lokale stop blijft lokaal. De bestaande Plaats- en
+  Nadering-eigenaren vergelijken dezelfde read-only toestemmingsversie vóór
+  en na hun awaits; geen tweede controller of opslag toegevoegd. De Stop
+  delen-knop annuleert de automatische poging voordat de handmatige puls
+  wordt verzonden. Oude pass-, venster- en hekkenantwoorden blijven inert.
+  De drie clientbestanden moeten samen worden geleverd: ontbrekende actuele
+  Plek-versie blokkeert veilig en start geen GPS.
+- **Onafhankelijke controle ontdekte en sloot twee aanvullende races.**
+  Eerst intrekking tijdens een passantwoord, daarna intrekking vóór de
+  watcher bestond. Positieve tegenproeven tonen dat een nieuwe bewuste start
+  en de normale aankomstpuls blijven werken. De centrale selectie slaagt
+  75/75 in `/tmp/rtg-gedeelde-eigenaars-pure.log` en omvat ook bundelherkomst,
+  de shell, Basis en de scriptbundel-browserhelper.
+- **Browserbewijs met echte lokale API-antwoorden.**
+  `/tmp/rtg-locatie-intrekking-browser-lokaal.log` bevat twaalf geslaagde
+  proeven en één foutieve testverwachting: de bestaande server noemt de
+  verwerkte stop `delen-gestopt`, niet `stop`. Alleen die verwachting is na
+  controle van het servercontract gecorrigeerd; de gerichte herhaling slaagt
+  1/1 in `/tmp/rtg-arrival-stop-herproef.log`. Hiermee zijn vier intrekkings-
+  scenario's, twee bestaande aankomstscenario's en zeven Plek-schermstanden
+  gericht bewezen. GPS is in de Arrival-races een bestuurbare toestelgrens;
+  de HTTP-antwoorden komen ongewijzigd van de echte testserver. Een unieke
+  antwoordmarkering en JSON-verwerkingsbarrière voorkomen dat een willekeurig
+  ander antwoord het negatieve bewijs kan laten slagen.
+- **Plek-presentatie hergebruikt centrale CSS.** Ook Plaatsnadering gebruikt
+  `componenten/plek.css`. De niet-modale vraag laat zoeken bereikbaar;
+  390/820/1440 px, 100/200% tekst en 390×480 px met 200% zijn gericht getest.
+  De korte schermhoogte veroorzaakte aanvankelijk overlap; een begrensde
+  scrollbare kaart herstelt de bediening. Magnaat-sandbox krijgt zijn
+  bestaande keurmerk via `componenten/magnaatproef.css`; de vroege
+  netwerkonderschepping en legacy-vorm blijven behouden.
+- **Negen overgangsuitzonderingen zijn nul geworden.** Plek, Basis,
+  Plaatsnadering en Magnaat-sandbox sluiten aan op de eerder gesloten vijf
+  eigenaren. `overgangsscripts` is leeg. Dit bewijst hun bewaakte DS-pad,
+  niet dat alle legacy-consumenten of schermen verdwenen zijn.
+- **Bronbestanden en browserowners blijven één implementatie.** Voertuig,
+  Randen en Rahul's bestaande basisstijl zijn via de bestaande bundelaar
+  bytegelijk gesplitst om de modulegrens te behouden. De drie nieuwe
+  deelbestandmeldingen worden uitsluitend aan het bestaande ownerbudget
+  toegerekend wanneer actuele bytes, metingen en unieke herkomst overeenkomen.
+  Ruwe tellingen blijven zichtbaar; extra injectie, mismatch of rechtstreeks
+  geladen parts blijven fout. Een berekend laadpad blijft daarnaast rood
+  in de afzonderlijke laadgraafcontrole. Geen norm is verhoogd.
+- **Geen dubbele herstelbouw voor APPWERKT.** De querypadcorrectie voor
+  RTFoundation/Videobellen bestond al. De bestaande runner controleert nu
+  uitsluitend deze twee ingangen: respectievelijk 5/5 en 1/1 eigen knoppen,
+  bereikbaar en bedienbaar, in `/tmp/rtg-appwerkt-os-query-browser.log`.
+  APPWERKT en zijn raakvlakregister blijven bytegelijk. Dit vervangt niet
+  de acht-dimensiekwalificatie, de volledige videoverbinding of de
+  kwalificatie van bestemmingsschermen.
+
+De strengere bronmeting rapporteerde na de herkomstcorrectie nog 163
+DS-contractfouten, waaronder 59 onbesliste laadgrafen. De negen verwijderde
+uitzonderingen en de gerichte browserresultaten mogen die restlijst niet
+verbergen. De statische teller is daarmee nog niet volledig gekwalificeerd.
+De daaropvolgende shell- en identiteitsloaderreparaties verminderen concrete
+berekende laadpaden; de volgende bronmeting moet de actuele rest bepalen.
+
+De historische APPWERKT-stand is 112/114 op `0afc8afa15`. De broncontrole
+markeert 912 bijbehorende bewijsdimensies als verlopen voor deze gewijzigde
+werkboom; 112/114 wordt dus **niet** als actuele kwalificatie gepresenteerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 volledig gekwalificeerde routes en
+0/3.368 volledig bewezen voorwaarden. De inventaris wordt niet verkleind.
+Menselijke taakproeven, resterende schermfamilies, financiële/operationele
+kwalificatie en twee onafhankelijke eindruns blijven open. Geen merge of
+productie-uitrol uitgevoerd.
+
+#### Redirects, werkdocumenten, Partner Network en Library — 31 oktober
+
+Deze aanvullende snede gebruikt dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b`
+plus de gewijzigde werkboom en Node 26.12.1. Het is lokaal ontwikkelbewijs;
+er is nog geen schone, bevroren kandidaat of menselijke Experience-goedkeuring.
+
+- **Alle twintig bestaande redirects zijn afzonderlijk gecontroleerd.** De
+  laatste vijf ingangen behouden hun oorspronkelijke bestemming, query- en
+  fragmentregels, meta-refresh en vervangende geschiedenis. Bron- en echte
+  browsercontrole slagen 22/22 in `/tmp/rtg-redirect-volledig-browser.log`.
+  De bestemmingspagina's in die proef zijn expliciete read-only fixtures;
+  de proef bewijst niet hun bedrijfsprocessen. Kantoorpda en Zorgbalie waren
+  al aliases in SCHERMEIGENAAR; de bestaande wereldclassificatie is daarop
+  aangesloten. De inventaris blijft **316 routes: 296 interfaces en 20
+  redirects**, zonder routes weg te laten. Daardoor leidt dezelfde compiler
+  nu 3.360 toepasselijke voorwaarden af in plaats van 3.368; de acht vervallen
+  voorwaarden horen uitsluitend bij de twee correct geclassificeerde aliases.
+  Dit levert geen enkel nieuw geslaagd bewijs op.
+- **Project Room en Decision Room delen één DS-presentatiecomponent.** De
+  bestaande controllers, RTG/RTF-huizen, API's en rollen blijven leidend.
+  Native dialogen behouden invoer bij serverfouten en tonen de fout binnen de
+  modal. De review vond die aanvankelijk onbereikbare foutmelding; die is
+  hersteld. Grote tekst liep in het besluitregister aanvankelijk over; tekst
+  mag nu binnen de beschikbare ruimte afbreken. Echte lokale API-fixtures
+  gebruiken een persoonlijke kantooruitnodiging en RTMail naar project en
+  voorstel, zonder besluit of betaling. De browserproeven slagen 2/2 in
+  `/tmp/rtg-werkdocument-herstel-browser.log`: zeven panelen op 390/820/1440 px
+  bij 100/200% tekst, huiswisseling, native modaliteit, toetsenbord, focusherstel,
+  echte 400-antwoorden en behoud van invoer. De latere menuregessie behoudt
+  beide groene Room-proeven in `/tmp/rtg-room-partner-menu-browser.log`.
+- **Gedeelde menuplaatsing is expliciet gemaakt.** De bestaande Appmenu-owner
+  gebruikt op DS een zichtbaar `header[data-rtg-menu-host]`; Room, Partner en
+  Library verklaren hun eigen host. Het menu zweeft daardoor niet over het
+  Room-merk. Onzichtbare hosts houden hun fallback; geen nieuwe controller.
+  De bestaande PDA-menuproef slaagt in de laatste genoemde browserselectie.
+  Native browserchrome mag focus krijgen; achterliggende appbediening niet.
+  De gedeelde testhelper controleert ook terugkeer naar hetzelfde dialoogveld
+  en hervatting van de Tab-cyclus, zonder productfocus te simuleren.
+- **Partner Network behoudt echte cijferbronnen en de bestaande reactie-API.**
+  Reacties vereisen het werkelijke `ok:true`-contract en dezelfde aanvraag-ID.
+  Fouten blijven in de dialoog, en een verlaat antwoord kan na actorwisseling
+  of een nieuwe opening geen ander concept sluiten. Layout op viewportbreedte
+  faalde in een smalle werkruimte met 200% tekst; intrinsieke flex-wrap maakt
+  de indeling nu ook zonder bruikbare containerquery veilig. De laatste
+  browserselectie slaagt 4/4 in `/tmp/rtg-partner-intrinsiek-browser.log`.
+  Login en overzicht zijn echt lokaal; de aanvullende vraag en negatieve
+  submitantwoorden zijn expliciete UI-fixtures. Dit is geen verzend- of
+  volledige partnerautorisatiekwalificatie.
+- **Library blijft FoundationOS en behoudt de volledige bestaande keten.**
+  Eén DS-component vervangt de exclusieve stylesheet. Alle drie panelen blijven
+  bereikbaar op mobiel en tablet; het eerdere tussenformaat kon Publicatie
+  verbergen. De bestaande controller is uitsluitend voor DS-klassen en
+  statuspresentatie aangepast en via de bestaande bundelaar gesplitst; de API
+  is behouden. `/tmp/rtg-library-ds-browser.log` slaagt 1/1 met zes formaat/
+  tekststanden, conceptbehoud, springlink, Foundation-identiteit en echte
+  Work → Edition 1 → lezen/notitie/feedback → correctie → Edition 2. De
+  HTTP-nacontrole bewijst behoud van de oorspronkelijke editie. Geen menselijke
+  beoordeling of productie-isolatie wordt hiermee geclaimd.
+- **Vervangen code is daadwerkelijk verwijderd.** De twee Room-stijlbladen
+  (28.177 bytes), Partner Network (18.027 bytes) en Library (4.396 bytes)
+  hebben geen actieve consument meer en zijn verwijderd: samen **50.600 bytes
+  exclusieve legacy-CSS**. Gedeelde legacy-bladen met overige consumenten blijven
+  staan en blijven open migratiewerk. De gerichte pure selectie slaagt 56/56
+  in `/tmp/rtg-schermfamilies-pure.log`.
+
+Beelden voor technische review staan onder
+`../output/werkdocument-review-20261031/` en `../output/library-review-20261031/`.
+Dit is geen menselijke vrijgave. De bronherkomstcontrole slaagde onafhankelijk
+87/87 in `/tmp/rtg-herkomst-onafhankelijk-herproef.log`; gecodeerde of niet
+herleidbare scriptpaden blijven fail-closed. De DS-laadgraaf bevat nog open
+gedeelde bewijsgrenzen. Nieuwe statische migratietellingen worden pas na een
+actuele bronmeting gerapporteerd. APPWERKT blijft opnieuw te kwalificeren;
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 actuele voorwaarden.
+Geen merge, productie-uitrol of volledige eindrun uitgevoerd.
+
+#### Gedeelde presentatieowners en Horeca — 31 oktober, vervolg
+
+De bron blijft HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom, lokaal onder Node 26.12.1. De volgende
+resultaten zijn gerichte ontwikkelproeven, geen nieuwe kandidaatkwalificatie.
+
+- **Appmenu, Randen en Bediening lezen de actuele DS-context.** Appmenu neemt
+  de oorspronkelijke context direct bij uitvoering vast; onzekere laadpaden
+  blijven door de bronanalyse geblokkeerd. De bronownerproeven slagen 105/105
+  (`/tmp/rtg-bronowners-definitief-pure.log`) en de gerichte browserselectie
+  7/7 (`/tmp/rtg-sharedowners-final-browser.log`). Randen is in zijn canonieke
+  bundelpart hersteld, niet uitsluitend in de gegenereerde bundel. De late
+  DS-regressie faalde eerst en slaagt daarna in de 26/26 selectie
+  (`/tmp/rtg-randen-bronparts-na.log`). Bediening behoudt een geopend venster
+  en gebruikt na sluiten/heropenen de actuele native DS-dialoog. De vier
+  Instellingen-browserproeven bewijzen behoud van invoer, focus en bestaande
+  instellingen; oude presentatie wordt bij de overgang verwijderd.
+- **Lettertypen en broncontrole zijn behouden.** Room en Partner laden de
+  bestaande eigen fonts. De browser controleert werkelijk geladen FontFaces;
+  alleen een geslaagde CSS-fontnaamcontrole zou onvoldoende zijn. De twee
+  Room-proeven en vier Instellingen-proeven slagen samen 6/6 in
+  `/tmp/rtg-instellingen-room-browser.log`. De actieve stylesheetgraaf mag
+  uitsluitend DS en eigen fonts bevatten, ook wanneer de server ze bundelt.
+  Basis is op de bestaande themagrens in bronparts verdeeld; de uitvoerbytes
+  zijn identiek (`/tmp/rtg-basis-modulegrens-bewijs.json`).
+- **Negen bestaande horecaschermen delen DS-presentatie.** HACCP, Club,
+  Events, Hotel, Expeditie, Bezorg en Beheer behouden hun enterpriseowner;
+  Bar en Vloer behouden hun operationele controllers. De profielcontrole
+  volgt het echte antwoordcontract en aanvaardt een managerrol alleen als
+  boolean. Het bestaande Appmenu wordt expliciet geladen waar de
+  iOS-uitschakeling anders ook het menu tegenhield. De familieproef slaagde
+  10/10 (`/tmp/rtg-horeca9-browser.log`), met echte lokale actor- en
+  werkstromen en formaat/tekstcontroles. De exclusieve, niet meer geladen
+  `horeca-enterprise-modules.css` is verwijderd: 4.316 bytes, bovenop de
+  eerder gemelde 50.600 bytes exclusieve legacy-CSS.
+- **Strengere Vloer-controle blijft zichtbaar.** De aanvullende proef klikt
+  werkelijk op het gekoppelde 44px-label buiten het kleine checkboxvakje en
+  herstelt de oorspronkelijke keuze. Zij vond een bedekkende toast. Alle
+  negen horecameldingen gebruiken nu de bestaande `ds-melding`; de dubbele
+  vormgeving is verwijderd, tekst en levensduur blijven bij dezelfde owner.
+  Gerichte meldingsproeven slagen 11/11. De daaropvolgende kleine-viewportproef
+  vond nog een raakvlak met de vaste Edge; bereikbaarheid via normaal scrollen
+  en toetsenbord is nog te sluiten. De oude 10/10 vervangt dit strengere
+  open bewijs niet.
+
+Notities, Agenda, Bestanden en Pulse zijn het volgende gedeelde bouwpakket;
+hun bronmigratie is in uitvoering en nog niet afgesloten. De Experience-
+pipeline ondersteunt nog geen volledige getypeerde configuratiematrix met
+onafhankelijke bewijsaggregatie. Een normale viewportproef mag daardoor niet
+alle voorgeschreven toestanden of apparaten groen verklaren. Dit blijft
+werk binnen de bestaande compiler en Observatory, zonder tweede register.
+
+APPWERKT moet op de gewijzigde bron opnieuw worden gekwalificeerd; de
+historische 112/114 is geen actuele uitslag. EXPERIENCEWERKT blijft 0/114
+apps, 0/316 routes en 0/3.360 volledig gekwalificeerde dimensieverplichtingen.
+De onderliggende toestand- en apparaatcontroles zijn uitgebreider dan deze
+dimensieteller. Menselijke proeven, veiligheids- en operationele kwalificatie
+en twee onafhankelijke volledige eindruns blijven open.
+
+#### Daily, invoercontinuïteit en configuratiematrix — 31 oktober, vervolg
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Geen kandidaat-, merge- of
+productievrijgave. Onderstaande resultaten zijn ontwikkelbewijs.
+
+- **Daily-presentatie geconsolideerd.** Notities, Agenda, Bestanden en Pulse
+  gebruiken bestaande domeinowners met drie centrale DS-componenten.
+  Beide uitsluitend door deze familie gebruikte oude stijlbestanden zijn na
+  consumentencontrole verwijderd: **12.460 bytes**. Met de eerder beschreven
+  vijf verwijderde bladen is dat 67.376 bytes exclusieve legacy-CSS in deze
+  afbouwreeks; dit is geen claim over netto platformomvang.
+  Bestanden is op de bestaande grens tussen overzicht en uploadbediening
+  in canonieke bronparts verdeeld, met één bestaande browserbundel.
+- **Gevulde toestanden en fouten zijn werkelijk beproefd.** De lokale
+  browser gebruikt een echt account en echte notities, upload, map,
+  afspraak, bericht en uitvoerfunctie. De selectie slaagt 9/9 inclusief
+  drie echte Notities-ownerproeven. Een vertraagde verwijderfout van A mag
+  niet verschijnen in editor B; een late succesvolle verwijdering ververst
+  wel het bord. Onafhankelijke review bevestigt deze begrenzing.
+  Weekacties blijven minimaal 44px en horizontaal bereikbaar binnen de
+  kalender, ook bij grote tekst. De gevulde mappennavigatie is eveneens
+  44px. Schermafbeeldingen staan in `../output/daily-review-20261031/`;
+  technische beeldcontrole is geen menselijke Experience-vrijgave.
+- **Vloer en Edge-vervolg gesloten binnen de geteste bediening.** De
+  strengere Vloer-labelproef slaagt 1/1 na gewoon gebruikersscrollen, zonder
+  forceclick, verborgen overlay of rechtstreekse statuswijziging
+  (`/tmp/rtg-vloer-label-eindresultaat.log`). De vaste Edge reserveert via
+  bestaande DS-CSS documentruimte voor toetsenbordscrollen; de drie Basis-
+  browserproeven slagen. Dit bewijst deze pointer- en focusgevallen, niet
+  ieder platformscherm.
+- **Meetmatrix kan niet meer door één normale weergave groen worden.**
+  De bestaande Experience-compiler leidt voor destination toestanden,
+  apparaten en netwerken af, met vier expliciete Chromium-profielen.
+  Ontbrekende configuraties blokkeren zowel requirement als dimensie.
+  Exacte configuratiehashes, afzonderlijke runbestanden en levende
+  procesreceipts verhinderen samenvoegen van losse runs of import als
+  uitvoeringsgezag. Pure integratie: 141/141 in
+  `/tmp/rtg-experience-multi-config-pure.log`. Hotels-browser: 10/10 in
+  `/tmp/rtg-hotels-multi-config-browser.log`, inclusief bestaande aanvraag.
+  Vier normale matrixcellen zijn maximaal 4/180; andere toestanden en
+  netwerken blijven open. Deze vuile ontwikkelwerkboom produceert daarmee
+  geen nieuwe kandidaatgebonden PROVEN-claim.
+
+Foundation Studie/Hulpwijzer/Steun en de gedeelde Connection-/Deelmenu-
+presentatie worden aansluitend afgewerkt. Bronreviews sloten twee echte
+coachproblemen: expliciete foutantwoorden worden niet als antwoord getoond,
+en late antwoorden van een vorig gezinsprofiel worden niet gepubliceerd.
+De browsercontrole vond daarnaast gedeelde sectiebediening en layoutgrenzen;
+die blijven open tot de gerichte tegenproeven slagen.
+
+APPWERKT blijft op deze bron opnieuw te kwalificeren; 112/114 is historisch.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Broninventaris, menselijke beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven afzonderlijke poorten.
+
+#### Foundation-kindroutes, Uitstap en Sprong — 4 november
+
+Bron: HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Vier Foundation-routes gebruiken de centrale presentatie.** Gevoel,
+  Pesten, Opvoeden en Mediawijs gebruiken de bestaande Foundation-, coach-,
+  sessie-, Samen- en wereldnavigatie-eigenaren. Acht eigen stijlblokken,
+  vierentwintig verwijzingen naar vervangen erfenisbladen en vier
+  Levendekleur-loaders zijn uit deze routes verwijderd. Gevoel en Mediawijs
+  hebben alleen hun bestaande routebediening in canonieke bronbestanden
+  gekregen; Mediawijs blijft één gegenereerde browserbundel.
+- **Bestaande profielraces zijn gesloten.** Gevoel bindt dagboek-, toestemmings-
+  en opslagantwoorden aan code, token en profiel. Alleen de nieuwste dagboekread
+  mag publiceren; opslag van keuze A kan keuze B niet als opgeslagen tonen.
+  Pesten serialiseert de gezinsmelding, controleert het werkelijke
+  serverontvangstbewijs en laat een nieuw of geweigerd concept staan. Gerichte
+  bronproeven slagen 15/15 voor deze twee eigenaars binnen de gecombineerde
+  Foundation-selectie.
+- **Echte Foundation-browserstroom slaagt 6/6.** De proef gebruikt echte
+  ouder- en kindsessies, oudertoestemming onder 16, eigen toestemming vanaf 16,
+  dagboekopslag en wissen, een werkelijk bericht in de ouderinbox, alle zes
+  opvoedonderwerpen, Mediawijs-keuzes en een echte leeftijdsweigering.
+  De vier routes zijn tevens gecontroleerd op 390/820/1440 px en 100/200%
+  tekst. Een eventwacht die onder zware parallelle broncontrole kon missen is
+  vervangen door observatie van het werkelijk herladen document.
+- **Uitstap blijft onmiddellijk bereikbaar.** Dezelfde bestaande vluchtknop
+  volgt de werkelijke bovenste native dialoog of Foundation-toegangsdeur,
+  zonder home-inertheid, sessie, opslag of navigatiecontract te wijzigen.
+  Zes gerichte proeven, waaronder een echte Chromium-proef met omgekeerde
+  dialoogvolgorde en 200% tekst, slagen.
+- **Sprong is veiliger en statisch bewijsbaar.** De bestaande DS-stijlgrens is
+  vóór eigen documentaliassen vastgelegd en blijft ook een later gezette
+  marker controleren. Beide gegenereerde indexen mogen uitsluitend interne
+  `/apps/`-routes openen; externe, script- en padtraversaladressen worden
+  geweigerd. De laadgraaf houdt onbekende routes fail-closed. De gerichte
+  Sprong- en indexselectie slaagt 12/12; de handelingindex is opnieuw uit de
+  actuele schermbediening gegenereerd.
+- **Statische waarheid blijft rood waar bewijs ontbreekt.** De actuele
+  broninventaris `/tmp/rtg-ds-actuele-consolidatie-20261104.json` bevat 88
+  DS-gemarkeerde documenten, 159 legacy-stijlbladen, 218 eigen stijlblokeigenaren
+  en 125 stijlinjecterende scripts. Nul documenten zijn volledig statisch
+  gekwalificeerd doordat de transitieve laadgraaf nog open paden bevat. De
+  productnoemer blijft 316 routes; de broninventaris telt daarnaast overige
+  HTML-documenten en verlaagt die noemer niet.
+
+APPWERKT-bewijs is door deze bronwijzigingen opnieuw te kwalificeren.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke beoordeling, operationele proeven en twee
+schone onafhankelijke eindruns blijven open.
+
+#### Gedeelde laadowners en begrensde navigatie — 4 november, vervolg
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit zijn gerichte bouwproeven,
+geen volledige herkwalificatie. De laadgraafmeting telt gepropageerde
+onzekerheden per document; de eigenaarstelling telt unieke actieve of mogelijke
+injectiebronnen die die documenten werkelijk bereiken.
+
+- **De bestaande iOS-laag heeft één presentatiegrens.** De vier canonieke
+  bronparts en hun ene browserbundel gebruiken een begrensde CSS-loader voor
+  de legacyfallback; runtime-stijlinjecties en berekende navigatie zijn
+  verwijderd. De gedeelde fallback staat in `public/ds/componenten/ios.css`.
+  Gerichte bronproeven slagen 61/61 en de iOS-browserproef 3/3. Hierdoor daalde
+  het aantal actieve of mogelijke injectie-eigenaren in de laadgraaf van 123
+  naar 72; dit verwijdert een gedeelde oorzaak in plaats van routes uit de
+  productnoemer te halen.
+- **World Desktop gebruikt begrensde productroutes en beelden.** De bestaande
+  presentatieowner verklaart lokale appbestemmingen en bestaande lokale
+  fotografie via twee expliciete helpers. Zes echte wereldroutes blijven in
+  één werkruimte bruikbaar. Bronselectie 43/43 en browserselectie 1/1 slagen.
+- **Metgezel en Gebaar delen controleerbare laadcontracten.** Metgezel gebruikt
+  één begrensde loader voor Wauw, Stroom, Rahul-tab en Handenvrij; zijn
+  waarheidsproef onderscheidt bronvermeldingen van uitgevoerde acties.
+  Gebaar gebruikt twee begrensde loaders en native documentnavigatie. De
+  gerichte Metgezel-selectie slaagt 28/28; Gebaar 57/57 en zijn vijf
+  muis-, touch-, toetsenbord-, herstel- en gebaarbrowserproeven 5/5. De
+  bestaande service-worker-vingerafdrukken zijn na bronwijzigingen via de
+  eigen generator vernieuwd.
+- **Editorial V4 bouwt geen willekeurige fragmentadressen meer.** Alle drie
+  springlinkpaden lopen door één helper die uitsluitend een bestaand DOM-doel
+  accepteert en zo nodig de vaste inhouds-ID zet. De actuele basis-tests zijn
+  aangepast aan de reeds aanwezige begrensde stylesheet- en controllerloaders;
+  de bewijsnorm bleef gelijk. Broncontracten slagen 63/63, de gerichte
+  browsertoegankelijkheidsproef 1/1 en de offline-vingerafdrukcontrole 6/6.
+- **Adaptive Edge gebruikt één begrensde routepoort.** Home- en contextacties
+  accepteren uitsluitend lokale `/apps/`-bestemmingen en lopen door dezelfde
+  corehelper. Externe protocollen, padtraversal en ongeldige adressen falen
+  dicht. De bronselectie slaagt 62/62 en de werkelijke LivingOS-browserselectie
+  10/10. De verouderde Notities-fixture is vervangen omdat Notities aantoonbaar
+  al de centrale DS-Edge gebruikt; het product is niet teruggezet naar de
+  oude Adaptive Edge om de toets passend te maken. De laadgraaf daalde hierdoor
+  van 10.366 naar 9.578 onzekerheden.
+- **Palet is geen tweede Spotlight meer.** `RTGPalet` is nu uitsluitend een
+  bevroren compatibiliteitsingang naar de bestaande Sprong-owner. De historische
+  Ctrl/Cmd+Spatie-sneltoets blijft werken, maar de tweede dialoog, eigen recents,
+  losse catalogus en eigen route-uitvoering zijn verwijderd. Bron- en
+  laadgraafselectie slagen 42/42. Een echte DS-browserproef bewijst 2/2 dat de
+  sneltoets dezelfde toegankelijke Sprong-dialoog opent, zonder `rosPalet` of
+  tweede owner. De offline-ID-controle blijft 6/6 groen.
+- **Beeldbronnen worden bewezen als beeld, niet als documentloader.** De
+  laadgraaf herkent uitsluitend een native, niet-ontsnapte `img`-bron; aliassen,
+  setters, gewijzigde DOM-bindings en onbekende ontvangers blijven door nieuwe
+  tegenproeven geblokkeerd. Handenvrij Oog, de persoonlijke beeldeditor en de
+  People-widget gebruiken aantoonbare elementidentiteiten. People kiest zijn
+  gevalideerde gespreksroute vóór het bouwen van de link en heeft niet langer
+  twee routeowners. Bronselectie 61/61 en de relevante Handenvrij-, beelden-
+  en World Desktop-browserstromen 5/5 slagen. De laadgraaf daalde via 8.529
+  naar 7.485 onzekerheden.
+- **Heritage-volgorde en Uurwerk hebben vaste eigenaren.** Heritage-order zoekt
+  uitsluitend de IDs die de bestaande basisloader en statische Heritage-routes
+  al vastleggen; twee URL-heuristieken zijn verwijderd. Uurwerk bewaart alleen
+  tijd en toestand in JavaScript en laadt één statisch presentatieblad; de twee
+  runtime-stijlinjecties zijn verwijderd. De bronselectie slaagt 41/41 en een
+  echte reduced-motion-browserproef 1/1. De offline schillen zijn met hun eigen
+  generator vernieuwd en de ID-controle blijft 6/6 groen. Dit bracht de
+  laadgraaf naar 6.565 onzekerheden en de actieve of mogelijke injectieowners
+  van 72 naar 71.
+- **De laadgraaf is meetbaar kleiner.** Vanaf de actuele meting van 29.187
+  gepropageerde onzekerheden daalde de reeks na iOS naar 13.312, na World
+  Desktop naar 12.529, na Metgezel naar 11.746, na Gebaar naar 11.056 en na
+  Editorial V4 naar 10.366, na Adaptive Edge naar 9.578 en na de
+  Palet-consolidatie naar 9.054, na Handenvrij Oog naar 8.529, na de gedeelde
+  beeld- en linkcontracten naar 7.485 en na Heritage/Uurwerk naar **6.565**.
+  De snapshots staan onder `/tmp/` met prefix
+  `rtg-ds-na-*-20261104.json`. Tussentijdse blootlegging van voorheen niet
+  bereikbare owners bleef zichtbaar; de reeks is dus geen cosmetische
+  noemerverlaging.
+
+De laadgraaf bevat nog 71 actieve of mogelijke injectie-eigenaren en 6.565
+gepropageerde onzekerheden. De volgende pakketten worden op gedeelde impact
+gekozen. APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd;
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Geen volledige eindrun, menselijke Experience-vrijgave,
+merge of productie-uitrol is uitgevoerd.
+
+#### RTG Geld — een presentatieowner en gesloten laadgraaf — 5 november
+
+Bron: HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Veertien Geld-standen delen één presentatiecontract.** De bestaande
+  standidentiteiten en productlogica zijn behouden, maar hun veertien runtime-
+  stijleigenaren zijn verwijderd. `public/ds/componenten/geld.css` is nu het
+  ene, onder `.ds-geld` begrensde componentblad dat `geld.html` vóór de
+  standen laadt. De overbodige tweede overzichtseigenaar
+  Het voormalige script `overzicht-a.js` is verwijderd. Het component is bewust
+  alleen op Geld geladen en vergroot dus niet de globale DS-payload.
+- **De echte laadpaden zijn statisch bewijsbaar.** Balans laadt de bestaande
+  toestelkluis via één begrensde native scriptloader; RTG Code verklaart zijn
+  vier letterlijke bestaande scriptbestemmingen; de CSV-export gebruikt een
+  aantoonbaar lokaal downloadanker. De laadgraaf accepteert zo'n anker nu ook
+  binnen hetzelfde lexicale `try`-blok, maar aliassen, setters, gewijzigde
+  DOM-bindings en escapes blijven fail-closed.
+- **Gerichte bron- en browserproeven zijn groen.** De Geld- en laadgraafselectie
+  slaagt 83/83. De echte Geld-browserproef opent vier hoofdingangen en twaalf
+  vertrouwde standen: 1/1. `git diff --check` is voor dit pakket schoon.
+- **Meetbare schuldreductie, zonder groenverklaring.** De gepropageerde
+  laadgraaf daalde in dit sluitstuk van 147 naar 139 onzekerheden. Geld zelf
+  daalde van zeven naar nul; de lexicale ankerverbetering sloot tevens één
+  bewezen downloadpad in Werk. Snapshot:
+  `/tmp/rtg-ds-na-geld-compleet-20261105.json`. De afzonderlijke
+  ontwerpsysteemcontrole blijft terecht rood met 159 bestaande
+  platformschendingen; Geld voegt daar geen nieuwe schending aan toe.
+
+APPWERKT blijft op deze gewijzigde bron opnieuw te kwalificeren.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke Experience-beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### WorkOS-communicatie, Zaakregie, Ondernemerpoort en Uurwerk — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit zijn gerichte bouwproeven,
+geen kandidaat-, merge- of productievrijgave.
+
+- **CollegaChat heeft één presentatie-eigenaar.** Dialoog, berichten en
+  ongelezenstatus blijven in de bestaande gedeelde gedragsmodule; beide
+  werkhosts gebruiken nu `ds-collegachat`. Het losse stylesheet is verwijderd.
+  Focus bij openen en sluiten, Escape, safe areas, reduced motion en 44px-
+  bediening slagen in de echte Chromiumproef. De functionele bericht- en
+  ongelezenproeven blijven groen.
+- **Zaak Command deelt één DS-contract voor manager en PDA.** De bestaande
+  serverautorisatie en vijf werkplekken zijn behouden. Het losse stylesheet en
+  zes inline-presentatieuitzonderingen zijn verwijderd; velden en linkknoppen
+  gebruiken expliciete componentklassen. De mobiele duimstand slaagt in een
+  echte browser en de gedeelde bron-/laadgraafselectie blijft groen.
+- **De Ondernemerpoort blijft dezelfde onboarding uitvoeren.** Band, modal en
+  toast gebruiken nu `ds-ondernemerpoort`; het losse stylesheet is verwijderd.
+  De servergestuurde stappen, grandfathered online-status en rondleidingen zijn
+  ongewijzigd. Focusherstel, Escape, modaliteit en 44px-bediening zijn in de
+  mobiele browser tegenbeproefd.
+- **Uurwerk behoort aan het Design System zonder een tweede runtime.** De
+  bestaande controller bewaart tijd, gangreserve en lokale toestand. Alleen
+  het statische presentatiestijlblad verhuisde naar `public/ds/uurwerk.css` en
+  gebruikt nu semantische tokens. Reduced motion en de decoratieve,
+  niet-interactieve ganglijn zijn in een echte browser bewezen.
+- **De actieve visuele schuld is kleiner.** De afdwingbare restlijst daalde in
+  dit pakket van 16 naar **12** expliciete legacy-stijlowners. Alle betrokken
+  gerichte bron-, architectuur-, functionele en browserselecties zijn groen;
+  `git diff --check` is schoon.
+
+Het commitgebonden Experience-register is opnieuw exact afgeleid uit 114 apps
+en 316 schermen. EXPERIENCEWERKT blijft terecht 0/114 apps, 0/316 schermen en
+0/3.360 dimensieverplichtingen omdat de volledige geautomatiseerde en
+menselijke kwalificatie nog niet is uitgevoerd. APPWERKT moet op de uiteindelijke
+kandidaat opnieuw worden gekwalificeerd; dit pakket is geen Deep Green-claim.
+
+#### Deep Green-vrijgavecontract, Spraak en Borden — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge-, bèta- of productievrijgave.
+
+- **Acht aanvullende vrijgavepoorten staan fail-closed in de bestaande
+  Experience-afleiding.** `coverage-contract.json` en `EXPERIENCEWERKT.json`
+  dragen nu bewijsafhankelijkheden, negatieve contracten, data- en
+  clientmigratie, productieachtige concurrency en belasting, externe
+  afhankelijkheden, meetbare Experience-budgetten, operationeel
+  incidentherstel en twee onafhankelijk opgebouwde bewijsruns. Zij beginnen
+  alle acht op `NOT_TESTED`. Daardoor kunnen volledige app- en schermtellers
+  de integrale status niet zelfstandig op groen zetten.
+- **De bestaande bewijsgrens blijft gezaghebbend.** Commit, volledige
+  bronvingerafdruk, testconfiguratie, artefacthash, proceslog, geldigheidsduur
+  en nul skips waren al verplicht en zijn niet vervangen. De globale
+  bronvingerafdruk blijft voorlopig bewust de veilige bovengrens: iedere
+  relevante bronwijziging laat oud bewijs verlopen. Selectieve vernieuwing
+  mag die reikwijdte pas verkleinen wanneer de afhankelijkheidsgraaf zelf is
+  bewezen; onzekerheid blijft breder meten.
+- **Experience-budgetten zijn machineleesbaar.** LCP p75 maximaal 2.500 ms,
+  INP p75 maximaal 200 ms, CLS p75 maximaal 0,1, minimaal 44 px interactieve
+  bediening, nul onverklaarde visuele regressies en nul kritieke menselijke
+  bevindingen zijn onderdeel van hetzelfde contract. Menselijke kwaliteit
+  blijft door de bestaande artefactpoort geblokkeerd totdat een
+  gezaghebbende menselijke beoordeling bestaat.
+- **Spraak gebruikt één centrale presentatie.** De vier bestaande hosts
+  houden hun ene gedragsowner; legacy-hosts laden begrensd de bestaande
+  DS-root en de knop krijgt `.ds-spraakknop`. Het verwijderde
+  `shared/spraak.css` is vervangen door `ds/componenten/spraak.css`, met
+  centrale focus- en doelmaten. De echte browserproef bewijst rusticoon,
+  luistertoestand, resultaat, herstel, toetsenbordfocus en minimaal 44 px op
+  zowel DS als legacy.
+- **Borden gebruikt eveneens één centrale presentatie.** Leden,
+  leveranciers en medewerkers houden dezelfde `BordenUI`-logica en API-
+  acties. `shared/borden.css` is verwijderd; het bestaande Design System
+  draagt nu werkbord, lijsten, kaarten, deadlines, teamleden en bediening.
+  De browserproef bewijst dezelfde DS-root, focus, 44 px-bediening en
+  foutvrije actie-uitvoering op beide hosttypen. De bestaande domeinproeven
+  voor maken, verplaatsen, groepen, rollen en Business Pass blijven groen.
+- **TeamCall consolideert zonder de verbinding opnieuw te bouwen.** Camera,
+  microfoon, WebRTC-peers, signaling, TURN/STUN-verkrijging, meelezen en de
+  gesprekslevenscyclus blijven bij de bestaande owner. Alleen
+  `shared/teamcall.css` is vervangen door `ds/componenten/teamcall.css`.
+  Overlay en wachtruimte krijgen centraal contrast, safe areas, focus en
+  48 px-bediening; een echte browserproef bewijst starten, microfoon uit,
+  ophangen, mediastop en foutvrije afbouw.
+- **Kostenbeeld houdt financiële waarheid en presentatie gescheiden.** De
+  centrale kostenkern, herkomstketen, autorisatie en centenafronding zijn
+  ongewijzigd. Drie lezers gebruiken nu `ds/componenten/kostenbeeld.css`; het
+  oude `shared/kostenbeeld.css` is verwijderd. De bestaande echte
+  klantproeven bewijzen voor lid en zaak nog steeds: geen verzonnen nul zonder
+  tarief, wel een herleidbaar bedrag met tarief, een openende herkomstketen,
+  de juiste aanspreekvorm en server-side bewaarde verbruiksgrenzen. Daarbij
+  bewijzen zij nu ook centrale DS-eigendom en minimaal 44 px bediening.
+- **Gerichte verificatie is groen.** Experience-integriteit, afleiding,
+  laadgraaf en Spraak slagen 126/126. Bordenpresentatie, domeincontract en
+  laadgraaf slagen 88/88. Spraak en Borden slagen in de browser elk 1/1;
+  TeamCallpresentatie en meelezen slagen 13/13 plus 1/1 in de browser.
+  Kostenbeeld en laadgraaf slagen 84/84; de twee echte kostenketens slagen
+  2/2 in de browser.
+  `EXPERIENCEWERKT.json` is opnieuw exact uit 114 apps, 316 schermen en het
+  actuele contract afgeleid. `git diff --check` is schoon.
+- **De actieve visuele restlijst daalde van 20 naar 16 owners.** De
+  ontwerpsysteemcontrole noemt uitsluitend die zestien bestaande owners;
+  de poort blijft daarom terecht open. Er is geen vrijstelling, lagere norm
+  of administratieve groenverklaring toegevoegd.
+
+APPWERKT is op deze gewijzigde bron verlopen en moet na de bouwfase opnieuw
+worden gekwalificeerd. EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en
+0/3.360 volledig bewezen dimensieverplichtingen; ook de acht nieuwe
+vrijgavepoorten zijn `NOT_TESTED`. Externe providers, migratie, belasting,
+menselijke beoordeling, incidentrepetitie en twee schone onafhankelijke
+eindruns blijven echte open voorwaarden.
+
+#### Focus-, Inlogkleur- en Ondertitelbandconsolidatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **FocusUI houdt één gedragsowner en één presentatieowner.** De bestaande
+  leergeschiedenis, privacyarme tellers en dynamische kaartherschikking zijn
+  behouden. Vier grote hosts gebruiken nu `ds-focus`; het losse
+  `shared/focus.css` met prioriteitsescalatie is verwijderd. De owner bewaart
+  en herstelt uitsluitend tijdens sluiten de oorspronkelijke displaywaarde.
+  Daardoor blijven oude ongelegerde kaartregels onder controle, later
+  toegevoegde inhoud gesloten en domein-`hidden` fail-closed.
+- **De levende inlogkleur blijft een rekenmotor.** Tijd, seizoen en dag
+  bepalen nog steeds uitsluitend de vier levende variabelen en het bestaande
+  onyx-vlak. De presentatie staat nu in `ds-inlogkleur`; vier hosts laden geen
+  afzonderlijk `inlogkleur.css` meer en er is geen nieuwe thema- of
+  stijllaag ontstaan.
+- **Media delen één ondertitelcontract.** Clips, Media, Salon, Theater en
+  Wereld gebruiken nu `ds-ondertitelband`. Tijdsprongen, einde, lege regels,
+  tekstveiligheid en paginaspecifieke positievarianten blijven intact; het
+  vervangen `shared/ondertitelband.css` is verwijderd.
+- **Gerichte bewijzen zijn groen.** FocusUI slaagt 88/88 statische owner- en
+  laadgraaftests plus 1/1 echte Chromiumproef op DS en bestaande hosts, met
+  toetsenbord, dynamische inhoud, 200% tekst en domeingrens. Inlogkleur
+  slaagt 85/85 inclusief 1/1 echte browserproef. Ondertitelband slaagt zijn
+  drie gedragsproeven, de gerichte laadgraafproef en 1/1 echte browserproef.
+- **De visuele erfenis is verder gekrompen.** De afdwingbare restlijst daalde
+  over deze drie pakketten van 24 naar **21** actieve legacy-stylesheetowners.
+  De controle blijft terecht rood zolang deze expliciete restlijst bestaat;
+  de norm of noemer is niet verlaagd.
+
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke Experience-beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### Scannerpresentatieconsolidatie — 5 november
+
+De bestaande `RTGScanknop` blijft eigenaar van camera, BarcodeDetector,
+eigen-QR-terugval en handmatige invoer. Alleen de presentatie is naar het
+bestaande `ds-scanknop`-component verplaatst. Vier echte hosts gebruiken de
+DS-root via de begrensde runtime-ingang; het losse `shared/scanknop.css` is
+verwijderd. De overlay verklaart modaliteit, bewaakt veilige schermranden en
+houdt iedere essentiële bediening minimaal 44 bij 44 pixels. Zonder camera of
+scannermodule blijft de handmatige route direct bruikbaar.
+
+De statische presentatie- en laadgraafselectie slaagt 84/84. De echte
+Chromiumproef slaagt 1/1 en bewijst de handmatige uitweg, toegankelijk
+dialoogcontract, minimale doelen, resultaat en gecontroleerd sluiten. De
+ontwerpsysteemrestlijst daalde daarmee van 21 naar **20** actieve
+legacy-stylesheetowners; de poort blijft terecht rood totdat ook die owners
+zijn geconsolideerd.
+
+#### Plek-, Gegevenspoort-, Overdracht- en Appmenuconsolidatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Drie gedeelde overlays gebruiken één presentatiecontract.** Plek,
+  Poortgesprek en Commerce Overdracht blijven hun bestaande toestemming,
+  opslag, lifecycle, autorisatie en uitvoeringscontract bezitten. Zij tekenen
+  op beide hosttypen dezelfde DS-componenten; de vervangen
+  `plek-legacy.css`, `poortgesprek-legacy.css` en `overdracht-legacy.css` zijn
+  verwijderd. De gerichte statische selecties slagen respectievelijk 127/127,
+  103/103 en 88/88. De echte browserproeven slagen 7/7, 1/1 en 3/3, inclusief
+  200% tekst, lage viewport, toestemming, HTTP 428/503, hervatten en
+  actorwisseling.
+- **Appmenu blijft de functie-owner; DS Edge is de ene zichtbare systeemdeur.**
+  De oude hamburger blijft alleen als bestaande controllerhook gemonteerd en
+  wordt verborgen zodra de canonieke DS Edge werkelijk aanwezig is. De Edge
+  leest de actuele `RTGAppMenu.functies()` en capability-gebonden
+  `systeemfuncties()` uit, dedupliceert labels en voert exact dezelfde knop-,
+  spring- of functiehandler uit. Daardoor blijven appfilters, Instellingen,
+  Rahul, delen, rand-tot-rand en uitloggen via de bestaande owners bereikbaar,
+  zonder tweede actieregister of controller.
+- **De integratie is op echte schermen en de volledige appinventaris
+  tegenbeproefd.** De contractselectie slaagt 32/32. De PDA-browserproef is
+  groen op Studio, Hardware en Architect bij 390, 820 en 1440 px en bij 100%
+  en 200% tekst. De brede appcensus slaagt 2/2 na 209 seconden en bevestigt dat
+  iedere app-pagina een veilige systeemdeur houdt en geen dubbele Appmenu/Edge
+  meer toont.
+- **De actieve visuele erfenis daalde verder.** De afdwingbare
+  ontwerpsysteemrestlijst ging door deze vier owners van 31 naar **27**. De
+  volledige ontwerpsysteemcontrole blijft terecht rood op die expliciete
+  resterende owners; er is geen drempel verlaagd en geen schending verborgen.
+
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke Experience-beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### Kaartuitwijkconsolidatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **De privacyvriendelijke geo-uitwijk houdt één presentatie.** De bestaande
+  `geo:`-parser, Android-systeemoverdracht, lokale kopieeractie en focusweg zijn
+  ongewijzigd. Volledige DS- en oudere hosts gebruiken dezelfde
+  `ds-kaartuitwijk` binnen het bestaande kaartcomponent. Een oudere host laadt
+  alleen de bestaande DS-root; `kaart-legacy.css` is verwijderd.
+- **De component gebruikt uitsluitend semantische DS-tokens.** Overlay,
+  dialoog, waarde, uitleg en beide 44px-acties hebben een begrensd contract in
+  `public/ds/componenten/kaart.css`; er is geen kaartprovider, tracker of
+  tweede modaliteitscontroller toegevoegd.
+- **Gerichte bewijzen zijn groen.** De negen parser-, laadgraaf- en
+  presentatieproeven slagen 9/9. De nieuwe echte Chromiumproef slaagt 1/1 op
+  zowel volledige DS als een oudere host bij 100% en 200% tekst, inclusief
+  focusherstel, viewportgrenzen, achterliggend concept en afwezigheid van
+  clientfouten. De afdwingbare visuele restlijst daalde van 25 naar **24**.
+
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke Experience-beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### Deelmenuconsolidatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Eén sectieowner gebruikt op iedere host hetzelfde DS-component.** De
+  bestaande `RTGDeel`-API, deep links, lokale stand, herscan en dynamische
+  appdetectie zijn behouden. Alle hosts gebruiken nu `ds-tabs` en
+  `ds-deelmenu`; oudere hosts laden alleen de bestaande DS-root. Het vervangen
+  `deelmenu-legacy.css` is verwijderd.
+- **Menuzichtbaarheid en domeinbevoegdheid blijven gescheiden.** Deelmenu
+  beheert alleen zijn tijdelijke eigen weergave en herstelt per bestaande node
+  exact de vorige inlinewaarde. Het verwijdert of verleent nooit het
+  domein-`hidden`-attribuut. Daardoor kunnen bestaande ongelegeerde
+  grid/flex-regels gesloten secties niet heropenen en blijven onbevoegde delen
+  fail-closed, zonder verboden prioriteitsregel of cascadelaaguitzondering.
+- **Gerichte bewijzen zijn groen.** De owner- en laadgraafselectie slaagt
+  86/86 en `shared/deelmenu.js` is bytegelijk aan zijn bronmodules. De echte
+  Chromiumproef is groen bij 390, 820 en 1440 px en 100%/200% tekst, en bevat
+  nu ook een oudere host met conflicterende `.kaart { display:grid }`-CSS.
+  Concept, node-identiteit, hash, domein-hidden en één menubalk blijven intact.
+- **De guardian bepaalde de geldige oplossing.** Een eerste ongelegerde
+  compatibiliteitsselector werd expliciet afgewezen en verwijderd; er is geen
+  uitzondering of lagere drempel toegevoegd. De afdwingbare restlijst daalde
+  van 26 naar **25** echte legacy-stijlowners.
+
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke Experience-beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### Bedieningconsolidatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Alle hosts gebruiken dezelfde instellingenowner en -presentatie.** De
+  bestaande `RTGBediening`-API, instellingseigenaren en focusherstel zijn
+  behouden. Zowel een volledige DS-host als een oudere host opent nu dezelfde
+  native dialoog met het bestaande `ds-instellingen`-component. Een oudere
+  host laadt uitsluitend de bestaande DS-root; het vervangen
+  `bediening-legacy.css` is verwijderd.
+- **De native lifecycle behoudt actuele toestand.** Een herhaalde openactie
+  bouwt alleen de gesloten weergave opnieuw op, zodat externe thema- en
+  bewegingskeuzes actueel zijn. Een reeds geopende dialoog behoudt identiteit,
+  focus en onopgeslagen achterliggende invoer. Taal, thema, beweging, draaien,
+  volledig scherm, rand-tot-rand en gids blijven bij hun bestaande eigenaar.
+- **Gerichte bewijzen zijn groen.** De owner-, bundel- en laadgraafselectie
+  slaagt 93/93; de vier echte Chromiumproeven slagen 4/4 bij mobiel, desktop,
+  100% en 200% tekst, inclusief native modaliteit, 44px-doelen, late
+  hostmarkering en conceptbehoud. `shared/bediening.js` is bytegelijk aan zijn
+  bronmodules en `git diff --check` is voor het pakket schoon.
+- **De architectuurmeter bepaalde de grens.** Een eerste dubbele
+  stylesheetdetectie werd als gegroeid injectiepad afgewezen en daarna bij de
+  bron vereenvoudigd. Er is geen uitzondering toegevoegd. De afdwingbare
+  restlijst daalde daardoor van 27 naar **26** echte legacy-stijlowners.
+
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke Experience-beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### Redirectgrens, Conceptwerk en Foundation-presentatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit zijn gerichte bouwproeven,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Twintig historische aliassen verklaren hun DS-grens.** De bestaande
+  redirectdocumenten dragen nu expliciet `data-ds=1`. Daardoor laadt de
+  gedeelde Sprong-owner op deze documenten geen legacy-presentatie meer. Hun
+  bestemmingen, redirects en terugvalgedrag zijn niet gewijzigd. De gerichte
+  bron- en echte browserselectie slaagt 107/107. De contractschendingen daalden
+  van 159 naar 139 en de statisch schone inventaris van 26 naar 46. Die twintig
+  documenten zijn redirects en tellen daarom niet als twintig nieuw
+  gekwalificeerde productschermen.
+- **Conceptwerk heeft een aantoonbare DS-grens.** De bestaande owner leest de
+  native documentmarkering rechtstreeks. DS-hosts sluiten daarmee
+  `conceptwerk-legacy.css` uit; oudere hosts behouden dezelfde fallback.
+  De gerichte selectie slaagt 85/85. De contractschendingen daalden van 139
+  naar 137, de gepropageerde erfenis van 11.526 naar 11.493 en de twee
+  leverancierflows werden statisch schoon. Snapshot:
+  `/tmp/rtg-ds-na-conceptwerk-grens-20261105.json`.
+- **Foundation houdt gedrag en verwijdert twee vervangen presentatielagen.**
+  `palet.js` blijft groep en seizoen verzorgen maar sluit `dagkleur.css` uit op
+  DS. Zowel de gezinsbundel als de professionele OS-schil blijven dezelfde
+  `wereldschil.js`, handvoorkeur, iconen en split view gebruiken, terwijl DS
+  het bestaande `wereldnavigatie.css` bezit en `wereldschil.css` uitsluit. De
+  bronbundel `foundation/sessie.js` is aantoonbaar gelijk aan zijn losse delen.
+  De gerichte bronselectie slaagt 103/103; de echte Studie-browserstroom
+  slaagt. De gepropageerde erfenis daalde van 11.493 naar 11.479 en de
+  laadgraaf bleef op 139 expliciete onzekerheden. Snapshot:
+  `/tmp/rtg-ds-na-foundation-presentatiegrens-20261105.json`.
+- **De blootgelegde browseroorzaken zijn gesloten.** De Samen- en Rahulvensters
+  reserveren op steunroutes nu het volledige 44px-raakvlak van de onmiddellijke
+  Uitstap; de veiligheidsactie kan de verzendknop niet meer bedekken. De
+  browserproef behandelt de afzonderlijk bewezen dubbele-Escape-uitstap niet
+  langer als twee toevallige venstersluitingen. Antwoordbodies worden vóór een
+  bewuste herlaadnavigatie gelezen. De gerichte statische selectie slaagt 24/24
+  en tien echte Foundation-, profiel-, Rahul-, Samen- en Uitstap-browserflows
+  slagen 10/10. De algemene bundelcontrole meldt nog de reeds bestaande
+  afwijking in `shared/zaakcommand.js`; de gewijzigde Foundation-bundel zelf is
+  coherent.
+
+De ontwerpsysteemcontrole blijft terecht rood met 137 bestaande schendingen.
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke beoordeling, operationele proeven en twee
+schone onafhankelijke eindruns blijven open.
+
+#### World Desktop-projectiegrens — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is een gericht bouwbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **De legacy-projectie blijft legacy; DS-routes erven haar Edge-presentatie
+  niet meer.** `rtg-world-desktop.js` legt bij scriptstart één onveranderlijke
+  DS-grens vast. Alleen de bestaande niet-DS-projectie laadt daardoor nog
+  `rtg-edge-system.css` en `rtg-adaptive-edge.css`; de gewone DS-werkruimte
+  behoudt dezelfde scripts en bestaande canonieke Edge-presentatie uit
+  `public/ds`.
+- **Het gedeelde effect is gemeten.** De gepropageerde erfenis daalde van
+  11.479 naar 11.417, het aantal statisch schone pagina's van 56 naar 87 en de
+  als gemigreerd herkende documenten van 48 naar 77. De laadgraaf bleef op
+  139 expliciete onzekerheden. Snapshot:
+  `/tmp/rtg-ds-na-world-desktop-projectiegrens-20261105.json`.
+- **Gedrag en terugval zijn bewezen.** De gerichte laadgraaf-, DS-,
+  projectie- en serverselectie slaagt 108/108. De echte Chromiumproef voor het
+  gedeelde 30-Seconden-scherm slaagt 1/1 en bewijst dat de bestaande
+  projectiepresentatie, schermcredential en privacygrens intact blijven.
+
+De ontwerpsysteemcontrole blijft terecht rood, maar daalde van 137 naar 106
+bestaande schendingen. APPWERKT en EXPERIENCEWERKT zijn op deze gewijzigde
+bron nog niet integraal opnieuw gekwalificeerd; menselijke beoordeling,
+operationele proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### Basis-, iOS-, Randen-, Kantoorgesprek- en URL-consolidatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **De centrale componenten hebben opnieuw één presentatieowner.** De dubbele
+  Sprongregels zijn uit Basis verwijderd. iOS gebruikt op legacy-hosts het
+  bestaande canonieke `shared/ios.css` en op DS-hosts uitsluitend het
+  DS-component. Randen genereert voortaan zowel de compatibiliteitsklasse als
+  de canonieke DS-klasse en heeft zijn dubbele `.rnd-*`-presentatie uit het
+  DS-blad verwijderd. Kantoorgesprek is onder `.ds-kantoorgesprek` begrensd en
+  gebruikt semantische tokens; het kreeg geen tweede token- of stijllader.
+  De losse bronbundels van iOS en Randen zijn na de wijziging aantoonbaar exact
+  opnieuw samengesteld.
+- **Browserbewijs is aan de echte testowners gebonden.** De Foundation-kind-
+  en Horecaroutes staan nu letterlijk in hun daadwerkelijke browserrunners in
+  plaats van in een helper die zelf geen browser opent. Het DS-voorbeeld draagt
+  zijn expliciete documentgrens. Hierdoor wordt ontbrekend bewijs niet langer
+  administratief aan een verkeerd bestand toegeschreven.
+- **Alle berekende adressen hebben een betekeniscontract.** Downloads gebruiken
+  een aantoonbaar eigen anker; appnavigatie is tot dezelfde origin en `/apps/`
+  begrensd; TravelOS-frames accepteren uitsluitend lokale appdocumenten;
+  telefoon en e-mail hebben hun eigen schema; beelden komen uit vaste lokale
+  collecties of uit de reeds gevalideerde persoonlijke beeldkluis. Living
+  World begrenst alle servergeleverde stappen en bronlinks opnieuw in de
+  client. De statische laadgraaf bevat daardoor voor geen enkele actieve
+  DS-route nog een onbesliste laadbron. De schonere graaf legde eerst drie
+  onderliggende bronnen bloot; ook die zijn via dezelfde productcontracten
+  gesloten, niet met een whitelist of een lagere bewijsnorm.
+- **De testbediening volgt de geconsolideerde Edge.** Volledige DS-schermen
+  gebruiken de centrale `.ds-edge__balk`; legacy-hosts houden Adaptive Edge.
+  De gedeelde browserhelper bedient nu beide bestaande presentaties via
+  dezelfde zichtbare actie, zonder een oude Edge op DS-schermen terug te
+  brengen. Agenda declareert haar twee contextacties expliciet als `Nieuwe
+  afspraak` en `Agenda exporteren`.
+- **Gerichte regressies zijn groen.** De statische bron-, laadgraaf-, agenda-,
+  sandbox-, Living World-, Reisprogramma- en registerselectie slaagt 118/118.
+  Veertig unieke echte browserflows slagen 40/40: Agenda, Hotels, Reisbureau,
+  Living World, Reisprogramma, Reizen en Reizen & Veilig, inclusief mobiel,
+  desktop, RTL, aanvragen, contextacties, eigen beeld, delen en ICS-export.
+  `git diff --check` is voor dit pakket schoon.
+- **De resterende schuld is exact.** De afdwingbare ontwerpsysteemcontrole is
+  over deze consolidatiereeks van 106 naar **37** schendingen gedaald. Die 37
+  bestaan uit 33 nog actieve legacy-stijlowners, drie gegroeide historische
+  stijlinjectieowners en de ene nog niet geconsolideerde `!important`-regel in
+  Levendekleur. Geen onbesliste DS-laadgraaf is meer onderdeel van die restlijst.
+  Snapshot: `/tmp/rtg-ds-na-urlcontracten-20261105.json`.
+
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. De menselijke beoordeling, operationele proeven en
+twee schone onafhankelijke eindruns blijven open; daarom is dit geen Deep
+Green-verklaring.
+
+#### Edge-, School-, Levendekleur- en Sneltoetsconsolidatie — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **World Desktop en Adaptive Edge bezitten hun presentatie statisch.** Het
+  gedeelde 30-Seconden-scherm verklaart de twee bestaande projectiebladen in
+  het document. De runtime laadt alleen gedrag en de Adaptive Edge-loader
+  gebruikt vaste stylesheetidentiteiten. Daardoor bestaan er geen gegroeide
+  stijlinjectieowners meer in dit pakket en blijft de projectiepresentatie
+  statisch herleidbaar.
+- **De schoolsessie gebruikt het bestaande accountdeurcontract.** Vijf
+  Foundation- en partnerschermen laden dezelfde tokens en accountdeur. De
+  schoolsessie gebruikt native `dialog`, `inert`, `aria-hidden`, focusherstel
+  en een begrensde MutationObserver voor laat toegevoegde documentdelen. Het
+  vervangen `shared/rtg-school-session.css` is verwijderd; de Foundation-
+  serviceworker bewaart de canonieke DS-bronnen en geen dubbele CSS-literals.
+- **De levende kleurlaag en DS-root zijn coherent.** `rtg-ds.css` importeert
+  nu elk DS-component exact eenmaal, inclusief Geld en Levendekleur. De enige
+  verboden `!important` is verwijderd. De levende achtergrond gebruikt een
+  geïsoleerde pseudo-laag, zodat wereldkleur onder de inhoud blijft zonder
+  de toegankelijkheids- of cascadegrens te omzeilen.
+- **Sneltoets heeft één presentatie voor DS en legacy.** Beide hosttypen
+  gebruiken het bestaande `ds-sneltoets`-component; oudere hosts krijgen
+  alleen de begrensde overlayvariant via de bestaande DS-root. Het vervangen
+  `shared/sneltoets-legacy.css` is verwijderd. De acties, focus, grote tekst,
+  modaliteit en onderdrukking tijdens een open venster zijn behouden.
+- **Gerichte bewijzen zijn groen.** De laadgraafselectie slaagt 82/82. De
+  schoolsessie- en Foundationselectie, inclusief echte browserflows, is groen;
+  de gerepareerde late-DOM-toestand is afzonderlijk tegenbeproefd. De
+  World Desktop-browserproef slaagt 1/1. Sneltoets slaagt 1/1 op de volledige
+  DS-host en 2/2 op bestaande premium legacy-appflows. `git diff --check` is
+  voor de betrokken bestanden schoon.
+- **De actieve visuele erfenis krimpt aantoonbaar.** De afdwingbare
+  ontwerpsysteemrestlijst daalde in deze reeks van 37 naar **31** bestaande
+  stylesheetowners. Er zijn geen resterende stijlinjectieratels en geen
+  verboden `!important`-regels in `public/ds`. De ene ontwerpsysteemtest die
+  de volledige werkboom bewaakt blijft daarom terecht rood totdat ook deze
+  31 expliciete owners geconsolideerd zijn; de interne contracttests zijn
+  groen.
+
+APPWERKT moet op deze gewijzigde bron opnieuw worden gekwalificeerd.
+EXPERIENCEWERKT blijft 0/114 apps, 0/316 routes en 0/3.360 volledig bewezen
+dimensieverplichtingen. Menselijke Experience-beoordeling, operationele
+proeven en twee schone onafhankelijke eindruns blijven open.
+
+#### Laatste actieve presentatieowners en APPWERKT-ingang — 5 november
+
+Bron: dezelfde HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **De resterende gedeelde presentatieowners zijn geconsolideerd.** Split,
+  taalkeuze, Rahul-mond, Rahulpoort, Uitvoer, Sprong, Conceptwerk,
+  Foundation-sessie, Deur, Leverancier-overlays, WerkOS en Volscherm gebruiken
+  op DS-hosts hun bestaande centrale component onder `public/ds/`. De
+  vervangen losse legacybladen zijn verwijderd. WerkOS plaatst zijn vaste
+  contextbalk buiten de getransformeerde topbalk, zodat zijn
+  viewportgeometrie ook werkelijk vast blijft.
+- **Volscherm behoudt gedrag zonder een nieuwe legacyowner.** Een DS-scherm
+  gebruikt uitsluitend `public/ds/componenten/volscherm.css`. Nog niet
+  gemigreerde hosts behouden tijdelijk hun reeds bestaande lokale
+  compatibiliteitsregel; die regel kan pas verdwijnen wanneer de betreffende
+  hosts zelf hun ongelayerde shell-CSS hebben verlaten. Er is geen nieuw
+  stylesheet of tweede controller toegevoegd.
+- **De afdwingbare architectuurpoort is nu schoon.** De controle meldt
+  `geen schendingen`, **87 formeel gemigreerde schermen** en 71 nog vast te
+  leggen verbeteringen. Dit betekent dat de actuele werkboom geen nieuwe of
+  actieve contractschending in de Design-System-laadgraaf bevat; het betekent
+  niet dat alle 316 schermen al gemigreerd of gekwalificeerd zijn.
+- **Gerichte regressies zijn groen.** De Volscherm-owner- en laadgraafselectie
+  slaagt 90/90. De echte browserproef slaagt 3/3 voor Wonen, Studio PDA en een
+  losse DS-main, inclusief mobiel, focus, onbewaarde invoer, appvensters,
+  herladen en toestelvoorkeur. WerkOS slaagt 2/2 in zijn echte desktop- en
+  mobiele shellproef; de Foundation-toegangsproef slaagt 2/2; Deur slaagt 2/2;
+  de Leverancier-ketens slagen 3/3. De bronbundels zijn coherent.
+- **De APPWERKT-rest deelt één bronoorzaak.** Het bewaarde register staat op
+  112/114. RTFoundation en Videobellen waren beide geblokkeerd doordat de
+  preflight `/apps/app.html?pas=rtg` als letterlijke bestandsnaam behandelde.
+  De actuele meter normaliseert querycontext naar het fysieke document en
+  behoudt de query voor de browser. De gerichte contract- en meterproeven
+  slagen 24/24, inclusief de negatieve proef voor een werkelijk ontbrekend
+  querydocument. De volledige 114-app-browsermeting is bewust nog niet opnieuw
+  gestart tijdens deze bouwfase; 114/114 wordt pas na die run geclaimd.
+
+EXPERIENCEWERKT is opnieuw deterministisch afgeleid en klopt met 100% van de
+inventaris: 114 apps en 316 schermen. De vrijgavestatus blijft terecht
+0/114 apps, 0/316 schermen en 0/3.360 volledig bewezen
+dimensieverplichtingen. De volgende gedeelde bouwoorzaak is het ontbreken van
+onderhoudsarme Experience Signatures: de motor mag APPWERKT-interacties en het
+bestaande appcontract hergebruiken, maar moet unieke wereld- en appidentiteit
+blijven afdwingen zonder 114 kopieen van dezelfde metadata te onderhouden.
+
+
+#### Experience-broncontract en Foundation Samen-owner — 5 november
+
+Bron: HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Experience kan canonieke productbronnen hergebruiken zonder groen te
+  erven.** Een app-signature kan haar bestaande productbelofte uit
+  `appcontract` en haar volledige bedieningsnoemer uit APPWERKT projecteren.
+  Identiteit, compositie, beweging, dichtheid en menselijke taken blijven
+  expliciet. Een ontbrekende, incomplete, onaangeraakte of ongeldige bron
+  blokkeert de signature; een scherm mag deze appbronnen niet lenen. De
+  gerichte Experience-contractsuite slaagt 54/54.
+- **Foundation Samen en gezins-Rahul hebben nog maar één presentatieowner.**
+  Alle 56 bestaande Foundation-hosts laden de centrale tokens en
+  `public/ds/componenten/samen.css` of de volledige DS-root. De bestaande
+  browsercontroller bezit geen CSS-literals of runtime-stijlinjectie meer.
+  Focusherstel, Escape, minimaal 44 x 44 px, conceptbehoud, profielcontinuiteit
+  en dubbele-verzendbescherming gelden nu ook op de oudere Foundation-hosts.
+- **De reductie is meetbaar en vastgerateld.** Het aantal door de
+  ontwerpinventaris gevonden injecterende bronbestanden daalde van 101 naar
+  **98**; de twee injecties van `foundation/samen.js` en het bereik over 49
+  legacy-schermen daalden naar **0**. De 71 reeds gerealiseerde
+  ontwerpnormverbeteringen zijn vastgelegd; de controle is daarna opnieuw
+  schoon. Dit verandert de formele schermmigratiestand nog niet: die blijft
+  87, omdat de overige presentatie van deze legacy-hosts nog niet volledig op
+  de centrale DS-laag staat.
+- **Gerichte regressies zijn groen.** De Foundation-, laadgraaf-, credential-,
+  offline- en componentselectie slaagt 120/120. De echte browserproef slaagt
+  4/4: drie volledige DS-routes plus de oudere Beheer-host, inclusief sessie,
+  Samen, Rahul, focusherstel, 44px-doelen, fout-/concepthestel en horizontale
+  stabiliteit. De Foundation-serviceworker bewaart de centrale Samen-component
+  voor offline herstel. Bundels zijn coherent en de betrokken diff is schoon.
+
+EXPERIENCEWERKT is opnieuw afgeleid en blijft eerlijk 0/114 apps, 0/316
+schermen en 0/3.360 bewezen dimensieverplichtingen. APPWERKT blijft op het
+bewaarde register 112/114 tot de volledige kandidaatmeting wordt uitgevoerd.
+
+
+#### Centrale Cookie-, Samen- en Handenvrijowners — 5 november
+
+Bron: HEAD `3b07587407ff9123dd8678dba0c63611d649d64b` plus de
+gewijzigde integratiewerkboom; Node 26.12.1. Dit is gericht ontwikkelbewijs,
+geen kandidaat-, merge- of productievrijgave.
+
+- **Cookie heeft een centrale owner op alle 255 hosts.** 60 hosts gebruiken de
+  volledige DS-root; 195 oudere hosts laden expliciet alleen tokens plus de
+  bestaande cookiecomponent. De controller injecteert geen CSS meer. De
+  tijdelijke legacyvariant bewaakt uitsluitend de centrale 48px-geometrie
+  inline omdat ongelayerde host-CSS anders boven een DS-cascadelaag wint; deze
+  overgangswaarborg blijft open tot de laatste legacyhost volledig is
+  gemigreerd. De werkelijke browserproef slaagt 3/3, inclusief 320 px, 200%
+  tekst, veilige ruimte, focus, opslag en herstel. De gerichte statische en
+  architectuurselectie slaagt 134/134.
+- **Samen en Handenvrij hebben eveneens een centrale owner.** Alle 261 directe
+  Metgezel-hosts laden de volledige DS-root of expliciet tokens, Samen en
+  Handenvrij. Zes Handenvrij-payloads en de Metgezel-payload zijn verwijderd;
+  de controllers, geldpoort, sessies en API-contracten zijn behouden. Een oude
+  Command-positieoverride die de balk op desktop buiten beeld zette, is bij de
+  bron verwijderd. De gerichte contract- en gedragsselectie slaagt 73/73; de
+  bestaande volledige Handenvrij-browserketen slaagt 1/1, inclusief typen,
+  navigatie, scrollen, gesprek, geldbevestiging en herstel.
+- **De reductie is gemeten en vastgerateld.** Het aantal injecterende
+  bronbestanden daalde binnen deze twee pakketten van 98 naar **85**. Cookie
+  ging van twee injecties en 195 geraakte hosts naar nul. De zeven actieve
+  Samen-/Handenvrijowners hebben ieder nul injecties en nul resterend
+  injectiebereik. De ontwerppoort meldt geen schendingen; formeel volledig
+  gemigreerde schermen blijven 87 omdat centrale componenten op een legacyhost
+  die host niet administratief tot volledig DS-scherm maken.
+- **De minimale DS-ingangen zijn nu expliciet.** `rtg-ds.css`,
+  `taalkeuze-standalone.css` en `uurwerk.css` zijn in het bestaande DS-contract
+  benoemd. De hoofdroot moet nog steeds ieder niet-zelfstandig DS-bestand exact
+  eenmaal laden; een vergeten of dubbel bestand blijft blokkerend.
+
+EXPERIENCEWERKT is na de bronwijzigingen opnieuw afgeleid en blijft eerlijk
+`INCOMPLETE`: 114 apps en 316 schermen zijn geinventariseerd, maar geen
+volledige Experience-kwalificatie wordt geclaimd. APPWERKT blijft op het
+bewaarde register 112/114 tot de volledige kandidaatmeting wordt uitgevoerd.

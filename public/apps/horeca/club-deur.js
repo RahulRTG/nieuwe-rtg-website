@@ -46,23 +46,23 @@
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('dLijst').innerHTML = (d.gasten || []).map(function (g) {
-        return K.rij(esc(g.naam) + ' <span class="stil">· ' + g.personen + ' pers.' +
+        return K.rij(esc(g.naam) + ' <span class="stil ds-horeca-meta">· ' + g.personen + ' pers.' +
           (g.promoter ? ' · ' + esc(g.promoter) : '') + (g.korting ? ' · ' + esc(g.korting) : '') + '</span>',
-        '<span class="tag' + (g.binnen ? ' aan' : '') + '">' + (g.binnen ? 'binnen' : 'verwacht') + '</span>');
-      }).join('') || '<p class="stil">Voor deze datum staat er niemand op de lijst.</p>';
+        '<span class="tag ds-horeca-tag' + (g.binnen ? ' aan' : '') + '">' + (g.binnen ? 'binnen' : 'verwacht') + '</span>');
+      }).join('') || '<p class="stil ds-horeca-meta">Voor deze datum staat er niemand op de lijst.</p>';
       $('dPromoters').innerHTML = Object.keys(d.perPromoter).map(function (p) {
         return K.rij(esc(p), d.perPromoter[p].binnen + ' van ' + d.perPromoter[p].aangemeld + ' binnen');
-      }).join('') || '<p class="stil">Nog geen promotercodes.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Nog geen promotercodes.</p>';
 
       /* DE AANVRAGEN VAN LEDEN. Zonder dit blok stond er wel een aanvraag in de
          opslag maar zag de portier hem nergens, en bleef hij eeuwig hangen --
          precies de halve belofte die iemand om half twee voor een dichte deur
          zet. Gevonden door de keten in een echte browser af te lopen. */
       $('dAanvragen').innerHTML = (d.aanvragen || []).map(function (g) {
-        return K.rij(esc(g.naam) + ' <span class="stil">· ' + g.personen + ' pers.' +
+        return K.rij(esc(g.naam) + ' <span class="stil ds-horeca-meta">· ' + g.personen + ' pers.' +
           (g.notitie ? ' · ' + esc(g.notitie) : '') + '</span>',
         K.knop('Op de lijst', { ja: g.id }, true) + ' ' + K.knop('Nee', { nee: g.id }));
-      }).join('') || '<p class="stil">Geen openstaande aanvragen van leden.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Geen openstaande aanvragen van leden.</p>';
       $('dTeBeslissen').textContent = d.teBeslissen || 0;
       K.bind($('dAanvragen'), 'ja', function (b) { beslis(b.getAttribute('data-ja'), 'ok'); });
       K.bind($('dAanvragen'), 'nee', function (b) { beslis(b.getAttribute('data-nee'), 'geweigerd'); });

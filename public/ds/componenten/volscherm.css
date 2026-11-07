@@ -1,0 +1,40 @@
+/* Rand tot rand gebruikt dezelfde schermen en werkruimte. De voorkeur staat
+   op html; verhuizen, opnieuw laden of een tweede controller is niet nodig. */
+@layer rtg.component {
+  @media (min-width: 520px) {
+    .ds-volscherm .ds-scherm:not(.ds-wereldwerkruimte) > main {
+      --ds-breedte-lees: 100%; --ds-breedte-max: 100%;
+      inline-size: 100%; max-inline-size: none; margin-inline: 0;
+      border: 0; border-radius: 0; box-shadow: none;
+    }
+  }
+  @media (min-width: 1000px) {
+    .ds-volscherm .ds-wereldwerkruimte > .wd-shell {
+      grid-template-columns: repeat(2,minmax(0,1fr)); margin-inline: 0;
+    }
+    .ds-volscherm .ds-wereldwerkruimte .wd-greeting {
+      grid-column: 1 / -1; grid-row: 1; padding-inline: var(--ds-ruimte-4);
+    }
+    .ds-volscherm .ds-wereldwerkruimte :is(.wd-home,.wd-focus,.wd-access) {
+      grid-column: 1 / -1; grid-row: 2; min-inline-size: 0;
+    }
+    .ds-volscherm .ds-wereldwerkruimte .wd-home > main {
+      --ds-breedte-lees: 100%; --ds-breedte-max: 100%;
+      inline-size: 100%; max-inline-size: none; margin-inline: 0;
+    }
+    .ds-volscherm .ds-wereldwerkruimte .wd-people {
+      grid-column: 1; grid-row: 3; padding-inline: var(--ds-ruimte-4);
+      border-inline-end: 0;
+    }
+    .ds-volscherm .ds-wereldwerkruimte .wd-favorites {
+      grid-column: 2; grid-row: 3; padding-inline: var(--ds-ruimte-4);
+      border-inline-start: 0;
+    }
+    .ds-volscherm .ds-wereldwerkruimte .wd-library {
+      grid-column: 1 / -1; grid-row: 4; padding-inline: var(--ds-ruimte-4);
+    }
+    .ds-volscherm .ds-wereldwerkruimte .wd-announcement {
+      grid-column: 1 / -1; grid-row: 5;
+    }
+  }
+}

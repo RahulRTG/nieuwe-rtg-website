@@ -10,8 +10,10 @@
     surface.dataset.rtgScreenSurface = '';
     surface.setAttribute('role', 'region');
     surface.setAttribute('aria-label', d.title || 'RTG');
+    var ds = d.documentElement.hasAttribute('data-ds');
+    var shared = '.ds-edge,.ds-melding,.ds-rahul,.ds-samen-venster,.ds-samen-banner,.ds-samen-ingang,.ds-handenvrij__balk,.ds-handenvrij__chat';
     var nodes = Array.from(d.body.children).filter(function (el) {
-      return !el.matches(overlays) && !el.className.toString().startsWith('rtg-edge-') && !el.className.toString().startsWith('rtg-adaptive-');
+      return !(ds && el.matches(shared)) && !el.matches(overlays) && !el.className.toString().startsWith('rtg-edge-') && !el.className.toString().startsWith('rtg-adaptive-');
     });
     d.body.insertBefore(surface, nodes[0] || null);
     nodes.forEach(function (el) { move(surface, el); });
@@ -34,20 +36,37 @@
     return parent.insertBefore(node, before || null);
   }
   function guard(root, home) {
-    var locked = false, oldHidden = false;
+    var locked = false, oldHidden = false, ds = d.documentElement.hasAttribute('data-ds');
     // The new people column precedes the original main. Keep bypass navigation
     // first in document order, including routes whose main appears after login.
     var skip = d.querySelector('.rtg-spring,a[href^="#"][class*="skip"]') || d.createElement('a');
     skip.classList.add('wd-skip'); skip.textContent = skip.textContent || 'Naar de inhoud';
+    if (ds) skip.classList.add('ds-basis__spring');
     if (!home.id) home.id = 'rtgWorldContent';
-    home.setAttribute('tabindex', '-1'); skip.href = '#' + home.id;
+    function bestemming() {
+      // De DS-wrapper is mobiel display:contents en kan geen focus dragen.
+      var target = locked ? d.getElementById('rtf-toegang-slot') :
+        ds && home.classList.contains('wd-page') ? home.querySelector('main,[role="main"]') || home : home;
+      if (target) {
+        if (!target.id) target.id = home.id + 'Main';
+        /* Fragmentnavigatie via het bestaande begrensde springlinkcontract;
+           setAttribute houdt dit aantoonbaar navigatie en nooit een loader. */
+        target.setAttribute('tabindex', '-1'); skip.setAttribute('href', '#' + target.id);
+      }
+      return target;
+    }
+    bestemming();
     d.body.prepend(skip);
     skip.addEventListener('click', function (e) {
       e.preventDefault();
-      var target = locked ? d.getElementById('rtf-toegang-slot') : home;
-      if (target) { target.setAttribute('tabindex', '-1'); target.focus(); target.scrollIntoView({block:'start'}); }
+      var target = bestemming();
+      if (target) { target.focus(); target.scrollIntoView({block:'start'}); }
     });
     function sync() {
+      // De bestaande netwerkowner deelt de inhoudsvloer, ook als zijn rail
+      // vóór de werkruimte ontstond of deze een wereld-main als home gebruikt.
+      var net = ds && d.querySelector('.ds-net');
+      if (net && (net.parentNode !== home || home.firstChild !== net)) move(home, net, home.firstChild);
       var command = d.getElementById('rtgCommand');
       if (command && home.classList.contains('wd-page') && command.parentNode !== home) home.appendChild(command);
       var gate = d.getElementById('rtf-toegang-slot');
@@ -55,6 +74,7 @@
         if (gate.tagName === 'DIALOG') {
           if (gate.open) gate.close();
           var panel = d.createElement('section'); panel.id = gate.id;
+          panel.className = gate.className;
           panel.setAttribute('role', 'alert');
           while (gate.firstChild) panel.appendChild(gate.firstChild);
           gate.replaceWith(panel); gate = panel;
@@ -72,6 +92,7 @@
         home.hidden = oldHidden; home.inert = false; locked = false;
         delete d.body.dataset.rtgDesktopAccess;
       }
+      bestemming();
     }
     var watch = new MutationObserver(sync);
     watch.observe(d.documentElement, { attributes:true, attributeFilter:['class'] });

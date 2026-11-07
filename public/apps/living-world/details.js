@@ -3,6 +3,17 @@
 w.LivingWorldDetail=function(o){
 var taal=function(){return document.documentElement.lang||undefined;};
 var el=o.el,labels=o.labels,view=o.view,host=o.host,act=o.act,actions=o.actions,card=o.card,section=o.section,info=o.info;
+  function internAdres(waarde){
+    try{
+      var doel=new URL(String(waarde||''),location.href);
+      if(doel.origin!==location.origin||doel.pathname.indexOf('/apps/')!==0)return '#';
+      return doel.pathname+doel.search+doel.hash;
+    }catch(e){return '#';}
+  }
+  function link(tekst,waarde){
+    var livingWorldLink=document.createElement('a');
+    livingWorldLink.textContent=tekst;livingWorldLink.href=internAdres(waarde);return livingWorldLink;
+  }
   function detail(row,type){
     var d=el('article','ds-detail__inhoud');d.dataset.lwDetail=type;d.appendChild(el('p','ds-label',(labels[row.status]||row.status)+' · '+row.author));
     d.appendChild(el('h2','ds-titel ds-titel--scherm',row.title));d.appendChild(el('p','ds-meta',row.summary||row.description||row.text||''));
@@ -15,7 +26,7 @@ var el=o.el,labels=o.labels,view=o.view,host=o.host,act=o.act,actions=o.actions,
       info(dl,'Uitrusting',row.equipment);info(dl,'Vervoer',row.transport);info(dl,'Gezelschap',row.crew);d.appendChild(dl);
       d.appendChild(el('p','ds-meta','Blueprintversie '+row.version+' · aanvragen worden persoonlijk behandeld'));
       if(row.derivedFrom)d.appendChild(el('p','ds-meta','Gebaseerd op '+row.derivedFrom.title+' · '+row.derivedFrom.author+' · versie '+row.derivedFrom.version));
-      if(row.media){var a=el('a','','Bekijk de verbonden media');a.href=row.media.url;d.appendChild(a);}
+      if(row.media)d.appendChild(link('Bekijk de verbonden media',row.media.url));
       if(row.mediaUnavailable)d.appendChild(el('p','ds-detail__status','De gekoppelde media is momenteel niet beschikbaar.'));
       if(row.mediaChanged)d.appendChild(el('p','ds-detail__status','De media is gewijzigd sinds deze blueprintversie.'));
       requirements(d,row);steps(d,row);
@@ -30,7 +41,7 @@ var el=o.el,labels=o.labels,view=o.view,host=o.host,act=o.act,actions=o.actions,
         d.appendChild(el('h3','ds-kaart__titel','Verbonden met mijn ervaring'));
         row.connections.forEach(function(c){var p=el('p','',c.title+(c.status?' · '+c.status:''));
           if(c.changed)p.appendChild(el('strong','',' · Gewijzigd bij de bron'));
-          if(c.url){var a=el('a','',' Open bron');a.href=c.url;p.appendChild(a);}d.appendChild(p);});
+          if(c.url)p.appendChild(link(' Open bron',c.url));d.appendChild(p);});
       }
       if(row.decision)d.appendChild(el('p','ds-detail__status','Besluit · '+row.decision.reason));
       if(row.issue&&row.status==='waiting')d.appendChild(el('p','ds-detail__status','Bij '+row.issue.owner+' in behandeling · '+row.issue.reason));
@@ -66,7 +77,7 @@ var el=o.el,labels=o.labels,view=o.view,host=o.host,act=o.act,actions=o.actions,
     if(primary){primary.dataset.lwPrimary='';primary.className='ds-knop ds-knop--primair ds-knop--klein';}
   }
   function requirements(d,row){if(row.requirements.length){d.appendChild(el('h3','ds-kaart__titel','Voorbereiding en vereisten'));var ul=el('ul','ds-meta');row.requirements.forEach(function(r){ul.appendChild(el('li','',r));});d.appendChild(ul);}}
-  function steps(d,row){if(row.steps.length){d.appendChild(el('h3','ds-kaart__titel','Uw weg naar deze ervaring'));row.steps.forEach(function(s){var p=el('p','ds-meta',s.text+' '),a=el('a','',s.label+' openen');a.href=s.url;p.appendChild(a);d.appendChild(p);});}}
+  function steps(d,row){if(row.steps.length){d.appendChild(el('h3','ds-kaart__titel','Uw weg naar deze ervaring'));row.steps.forEach(function(s){var p=el('p','ds-meta',s.text+' ');p.appendChild(link(s.label+' openen',s.url));d.appendChild(p);});}}
   function memory(rows){
     var box=el('section','ds-collectie__kop'),select=el('select','ds-invoer'),label=el('label','ds-veldlabel','World Memory · tijdvenster'),grid=el('div','ds-collectie__raster');
     [['all','Alles'],['now','Nu · actuele waarnemingen'],['today','Vandaag'],['month','Deze maand'],['then','Eerder'],['knowledge','Kennis']].forEach(function(x){var op=el('option','',x[1]);op.value=x[0];select.appendChild(op);});

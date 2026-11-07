@@ -27,13 +27,17 @@
     return element;
   }
 
-  function addStylesheet() {
+  function laadSocialIntelligenceStijl(pad) {
     if (document.querySelector('link[href="/shared/social-intelligence.css"]')) return;
-    var link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '/shared/social-intelligence.css';
-    document.head.appendChild(link);
+    var socialIntelligenceStijlLink = document.createElement('link');
+    socialIntelligenceStijlLink.rel = 'stylesheet';
+    socialIntelligenceStijlLink.href = pad;
+    document.head.appendChild(socialIntelligenceStijlLink);
   }
+  /* De productschermen declareren deze stijl in hun documentkop. Deze vaste
+     fallback houdt rechtstreeks hergebruik veilig zonder een tweede eigenaar
+     of een onbegrensde runtime-loader te introduceren. */
+  laadSocialIntelligenceStijl('/shared/social-intelligence.css');
 
   function graph() {
     var panel = make('aside', 'rtg-reality-graph');
@@ -135,7 +139,6 @@
 
   window.RTGRealityEngine = {
     contextName: contextName,
-    addStylesheet: addStylesheet,
     mountGraph: mountGraph,
     mountTelemetry: mountTelemetry,
     visibleSignals: visibleSignals

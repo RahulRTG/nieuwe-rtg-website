@@ -478,7 +478,7 @@
         "kernelModules": 62,
         "mutationContracts": 531,
         "routes": 535,
-        "screens": 46,
+        "screens": 45,
         "dataSchema": "geen centrale uitbreiding toegestaan",
         "newSharedPrimitive": "partitionerings- en querycontract vereist vóór brede aansluiting",
         "crossDomainDependencies": "uit",

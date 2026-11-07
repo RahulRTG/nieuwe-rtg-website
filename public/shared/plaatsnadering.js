@@ -1,37 +1,9 @@
-/* DE KNOP DIE NIET MEER MET DE HAND HOEFT (PLAATS.md fase 4).
-
-   Invisible Arrival had deze functie al, en goed: een tijdelijke pass met drie
-   knoppen -- "Ik vertrek nu", "Ik ben in de buurt", "Ik ben gearriveerd" --
-   waarmee een gast vrijwillig een status deelt, zodat de zaak de tafel kan
-   klaarzetten. Met eronder de belofte: *een status delen is vrijwillig, bevat
-   geen GPS en vervalt automatisch na uw bezoek.*
-
-   Fase 4 bouwt daar dus geen tweede functie naast. Hij haalt er het handwerk
-   uit: als jij dat wilt, meldt je toestel zelf dat je in de buurt bent. Precies
-   dezelfde puls die je met je duim zou geven, met precies hetzelfde gevolg.
-
-   EN DE BELOFTE BLIJFT LETTERLIJK WAAR. Er gaat nog steeds geen GPS naar de
-   pass en geen route naar de zaak: de hek-motor rekent op het toestel
-   (shared/plaats.js) en wat er vertrekt is de puls 'in-de-buurt'. De zaak leert
-   niet waar je bent, alleen dat je eraan komt -- dat is wat ze nodig heeft om
-   een tafel gereed te maken, en niets meer.
-
-   DE TWEE WERELDEN RAKEN ELKAAR ALLEEN HIER, OP HET TOESTEL. Een Arrival Pass is
-   anoniem (een accessToken, geen account); de plaatslaag werkt op codenamen. Op
-   de SERVER worden die twee nooit aan elkaar geknoopt, en dat is met opzet: het
-   arrival-domein leert geen codenaam en de plaatslaag leert geen pass. De enige
-   plek waar ze samenkomen is dit bestand, in de browser van de mens over wie het
-   gaat. Wie dit ooit naar de server wil verplaatsen "omdat het makkelijker is",
-   koppelt daarmee een anonieme pass aan een identiteit.
-
-   HET WERKWOORD BLIJFT KLAARZETTEN. De puls gaat pas als jij een keer ja hebt
-   gezegd, en de handknoppen blijven gewoon werken. Zeg je nee, dan verandert er
-   niets aan de pagina zoals hij was. */
+/* Arrival deelt uitsluitend een puls: GPS en pass blijven gescheiden. */
 (function () {
   'use strict';
   if (window.RTGPlaatsNadering) return;
 
-  var gevraagd = false, af = null, gemeld = false;
+  var gevraagd = false, poging = null, verborgen = false;
 
   function pasToken() {
     /* arrival.html bewaart { p, tot }: de pass en zijn vervaltijd. Een
@@ -48,7 +20,7 @@
     var h = { 'Content-Type': 'application/json' };
     if (token) h.Authorization = 'Bearer ' + token;
     return fetch(pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
-      .then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (r) { return r.ok ? r.json().catch(function () { return null; }) : null; })
       .catch(function () { return null; });
   }
 
@@ -56,9 +28,11 @@
      rustige kaart onderin met een duidelijke "nu niet". De tekst zegt wat de
      zaak ziet EN wat ze niet ziet, want dat is precies waar iemand ja of nee op
      hoort te zeggen. */
-  function bied(naam) {
+  function bied(naam, g) {
     return new Promise(function (klaar) {
-      var st = document.createElement('style');
+      var ds = document.documentElement.hasAttribute('data-ds'), gesloten = false, st = null;
+      if (!document.documentElement.hasAttribute('data-ds')) {
+      st = document.createElement('style');
       st.textContent =
         '.rtgnader{position:fixed;left:50%;transform:translateX(-50%);z-index:9983;' +
           'bottom:calc(env(safe-area-inset-bottom,0px) + 1.5rem);width:min(24rem,calc(100vw - 2rem));' +
@@ -72,27 +46,33 @@
         '.rtgnader .ja{background:var(--ds-accent,var(--gold,#857007));color:var(--ds-accent-inkt,#0C0C0B);}' +
         '.rtgnader .nee{background:none;color:var(--muted,#8A8680);font-weight:500;}';
       document.head.appendChild(st);
+      }
 
       var doos = document.createElement('div');
-      doos.className = 'rtgnader';
-      doos.setAttribute('role', 'dialog');
+      doos.className = 'rtgnader' + (ds ? ' ds-plek' : '');
+      doos.setAttribute('role', 'dialog'); doos.setAttribute('aria-modal', 'false');
       doos.setAttribute('aria-label', 'Zelf melden dat je in de buurt bent');
       var p = document.createElement('p');
       p.textContent = 'Zal ik het zelf melden als je in de buurt van ' + naam + ' komt? ' +
         'Dan kunnen ze je tafel op tijd gereedmaken. ' + naam + ' ziet alleen dat je eraan komt, ' +
         'niet waar je bent. Je locatie blijft op je toestel, en je kunt het altijd zelf blijven doen.';
       var rij = document.createElement('div'); rij.className = 'rij';
-      var ja = document.createElement('button'); ja.className = 'ja'; ja.type = 'button'; ja.textContent = 'Ja, meld het zelf';
-      var nee = document.createElement('button'); nee.className = 'nee'; nee.type = 'button'; nee.textContent = 'Nu niet';
+      var ja = document.createElement('button'); ja.className = 'ja' + (ds ? ' ds-knop ds-knop--primair' : ''); ja.type = 'button'; ja.textContent = 'Ja, meld het zelf';
+      var nee = document.createElement('button'); nee.className = 'nee' + (ds ? ' ds-knop ds-knop--stil' : ''); nee.type = 'button'; nee.textContent = 'Nu niet';
       rij.append(nee, ja);
       doos.append(p, rij);
       document.body.appendChild(doos);
 
       var vorigeFocus = document.activeElement;
       ja.focus();
+      if (g) g.sluit = function () { sluit(false); };
       function sluit(a) {
-        doos.remove(); st.remove();
-        try { if (vorigeFocus && vorigeFocus.focus && document.contains(vorigeFocus)) vorigeFocus.focus({ preventScroll: true }); } catch (e) {}
+        if (gesloten) return; gesloten = true;
+        a = !!a && doos.isConnected && (!g || geldig(g));
+        if (g) g.sluit = null;
+        var herstel = doos.contains(document.activeElement);
+        doos.remove(); if (st) st.remove();
+        try { if (herstel && vorigeFocus && vorigeFocus.focus && document.contains(vorigeFocus)) vorigeFocus.focus({ preventScroll: true }); } catch (e) {}
         klaar(a);
       }
       doos.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { ev.preventDefault(); sluit(false); } });
@@ -101,63 +81,71 @@
     });
   }
 
-  /* De pass ophalen om te weten OF er een bezoek op de rol staat en bij welke
-     zaak. Zonder pass is er geen reden, en zonder reden geen venster -- dat is
-     de regel van de laag en niet een beleefdheid. */
-  async function pas() {
-    var t = pasToken();
-    if (!t) return null;
-    // de pass is een tweede sleutel naast de sessie van het lid (19 oktober 2026)
-    var r = await api('/api/arrival/pass', { pass: t }, lid());
-    return (r && r.ok && r.pass) ? r.pass : null;
+  function stop() {
+    var g = poging; poging = null;
+    if (!g) return;
+    if (g.sluit) g.sluit();
+    if (g.af) g.af();
+    if (g.motor && window.RTGPlaats) window.RTGPlaats.stop();
   }
-
+  function geldig(g) {
+    var ok = poging === g && !verborgen && lid() === g.actor && pasToken() === g.token &&
+      window.RTGPlek === g.plek && g.plek.toestemmingVersie() === g.toestemming;
+    if (!ok && poging === g) stop();
+    return ok;
+  }
+  function bruikbaar(p, g) {
+    return p && p.zaak && typeof p.zaak.code === 'string' && p.zaak.code &&
+      Date.parse(p.vervaltAt) > Date.now() && (!g.zaak || p.zaak.code === g.zaak) &&
+      !['in-de-buurt', 'gearriveerd', 'delen-gestopt'].includes(p.pulse);
+  }
+  async function pas(g) {
+    if (!geldig(g)) return null;
+    var r = await api('/api/arrival/pass', { pass: g.token }, g.actor);
+    return geldig(g) && r && r.ok === true && !r.error && bruikbaar(r.pass, g) ? r.pass : null;
+  }
+  function gpsAan() { return window.RTGPlek && typeof window.RTGPlek.aan === 'function' && window.RTGPlek.aan() === true; }
+  async function meld(g, w) {
+    if (!gpsAan()) { if (poging === g) stop(); return; }
+    if (!geldig(g) || g.gemeld || g.bezig || w.doel !== 'nadering' || w.hek !== g.hek || w.wat !== 'binnen') return;
+    g.bezig = true;
+    var p = await pas(g);
+    if (!p || !geldig(g) || !gpsAan()) { if (poging === g) stop(); return; }
+    g.gemeld = true;
+    await api('/api/arrival/pulse', { pass: g.token, pulse: 'in-de-buurt' }, g.actor);
+    if (poging === g) stop();
+  }
   async function ronde() {
-    if (!window.RTGPlaats || !window.RTGPlek || !lid()) return;
-    var p = await pas();
-    if (!p || !p.zaak || !p.zaak.code) return;
-    // al gemeld of het delen gestopt: dan is er niets meer te doen
-    if (p.pulse === 'in-de-buurt' || p.pulse === 'gearriveerd' || p.pulse === 'delen-gestopt') return;
-    if (gevraagd || !document.body) return;
-    gevraagd = true;
-
-    var wil = await bied(p.zaak.naam || 'de zaak');
-    if (!wil) return;
-    /* Het venster hangt aan het bezoek en loopt af als het bezoek voorbij is:
-       de pass draagt zijn eigen vervaldatum, dus die rekenen we om in minuten.
-       Toestemming die langer duurt dan de reden ervoor, is toestemming zonder
-       reden. */
-    var minuten = 120;
-    if (p.vervaltAt) {
-      var over = Math.round((Date.parse(p.vervaltAt) - Date.now()) / 60000);
-      if (over > 0) minuten = over;
+    if (poging) { if (geldig(poging)) return; }
+    var plek = window.RTGPlek;
+    if (gevraagd || verborgen || !window.RTGPlaats || !plek || typeof plek.toestemmingVersie !== 'function' || !lid() || !pasToken()) return;
+    var g = { actor: lid(), token: pasToken(), zaak: null, motor: false,
+      plek: plek, toestemming: plek.toestemmingVersie() }; poging = g;
+    try {
+    var p = await pas(g);
+    if (!p || !geldig(g) || !document.body) { if (poging === g) stop(); return; }
+    g.zaak = p.zaak.code; g.hek = 'leverancier:' + g.zaak; gevraagd = true;
+    if (!await bied(p.zaak.naam || 'de zaak', g) || !geldig(g)) { if (poging === g) stop(); return; }
+    p = await pas(g);
+    if (!p || !geldig(g)) { if (poging === g) stop(); return; }
+    var minuten = Math.max(1, Math.ceil((Date.parse(p.vervaltAt) - Date.now()) / 60000));
+    var v = await api('/api/plaats/venster', { doel: 'nadering', bron: 'bezoek aan ' + g.zaak, hek: g.hek, minuten: minuten }, g.actor);
+    if (!geldig(g) || !v || v.status !== 200 || v.error || v.ok === false) { if (poging === g) stop(); return; }
+    g.af = window.RTGPlaats.opWissel(function (w) { meld(g, w); });
+    g.motor = true;
+    var resultaat = await window.RTGPlaats.start('nadering', {
+      waarom: 'Om zelf te kunnen melden dat je in de buurt bent, zodat je tafel op tijd klaarstaat. Je locatie blijft op je toestel.',
+      bijIntrekken: function () { if (poging === g) { g.motor = false; stop(); } }
+    });
+    if (!geldig(g) || !resultaat || resultaat.ok !== true) { if (poging === g) stop(); }
+    } catch (e) {
+      if (poging === g) { stop(); gevraagd = false; }
     }
-    var hekId = 'leverancier:' + p.zaak.code;
-    var v = await api('/api/plaats/venster',
-      { doel: 'nadering', bron: 'bezoek aan ' + p.zaak.code, hek: hekId, minuten: minuten }, lid());
-    if (!v || v.status !== 200) return;
-
-    af = window.RTGPlaats.opWissel(function (w) {
-      /* ALLEEN het hek van DEZE zaak, en alleen naar binnen. Elke andere
-         overgang is niet van dit bezoek, en een puls sturen over een zaak waar
-         je toevallig langsloopt zou de zaak iets vertellen over je route. */
-      if (gemeld || w.doel !== 'nadering' || w.hek !== hekId || w.wat !== 'binnen') return;
-      gemeld = true;
-      var t = pasToken();
-      if (t) api('/api/arrival/pulse', { pass: t, pulse: 'in-de-buurt' }, lid());
-    });
-    await window.RTGPlaats.start('nadering', {
-      waarom: 'Om zelf te kunnen melden dat je in de buurt bent, zodat je tafel op tijd klaarstaat. Je locatie blijft op je toestel.'
-    });
   }
-
   function begin() { ronde(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', begin);
   else begin();
-  window.addEventListener('pagehide', function () {
-    if (af) { af(); af = null; }
-    if (window.RTGPlaats) { try { window.RTGPlaats.stop(); } catch (e) {} }
-  });
-
-  window.RTGPlaatsNadering = { ronde: ronde, _bied: bied };
+  window.addEventListener('pagehide', function () { verborgen = true; stop(); });
+  window.addEventListener('storage', function () { if (poging) geldig(poging); });
+  window.RTGPlaatsNadering = { ronde: ronde, _bied: bied, stop: stop };
 })();

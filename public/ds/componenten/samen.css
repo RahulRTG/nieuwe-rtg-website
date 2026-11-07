@@ -1,0 +1,42 @@
+/* Eén Samen-presentatie voor DS en oudere hosts. mgz-* blijft gedragshaak;
+   de ds-* klassen bezitten de vorm. Geen eigen controller of transport. */
+@layer rtg.component {
+  .ds-samen-venster { position: static; inline-size: 100%; max-block-size: min(42vh, 22rem); overflow: auto; display: flex; flex-direction: column; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-4); background: var(--ds-oppervlak); color: var(--ds-inkt); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); box-sizing: border-box; }
+  .ds-samen-venster[hidden] { display: none; }
+  /* De gezinskamer behoudt haar eigen bestaande niet-modale owner. */
+  .ds-samen-venster--foundation { position: fixed; inset-inline-end: var(--ds-ruimte-3); inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6) + env(safe-area-inset-bottom, 0px)); inline-size: min(30rem, calc(100% - var(--ds-ruimte-6))); max-block-size: calc(100dvh - var(--ds-edge-hoogte) - var(--ds-ruimte-12) - env(safe-area-inset-bottom, 0px)); z-index: 30; }
+  /* De opt-in steunroutes dragen een onmiddellijke Uitstap. Reserveer zijn
+     werkelijke raakvlak onder de gezinsvensters; een veiligheidsactie mag
+     Rahul of Samen nooit bedekken. */
+  .ds-uitstap-actief .ds-samen-venster--foundation {
+    inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6) + env(safe-area-inset-bottom, 0px) + var(--ds-doel) + var(--ds-ruimte-3));
+    max-block-size: calc(100dvh - var(--ds-edge-hoogte) - var(--ds-ruimte-12) - env(safe-area-inset-bottom, 0px) - var(--ds-doel) - var(--ds-ruimte-3));
+  }
+  .ds-samen-kop { display: flex; align-items: center; justify-content: space-between; font-weight: 600; cursor: move; touch-action: none; user-select: none; }
+  .ds-samen-kop--vast { cursor: auto; touch-action: auto; user-select: auto; }
+  .ds-samen-venster.mgz-sleept { opacity: .96; }
+  .ds-samen-knop, .ds-samen-doe, .ds-samen-secundair, .ds-samen-sluit { min-block-size: var(--ds-doel); min-inline-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); font: inherit; font-size: var(--ds-maat-klein); cursor: pointer; }
+  .ds-samen-doe { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-samen-secundair, .ds-samen-sluit { background: var(--ds-oppervlak); color: var(--ds-inkt); }
+  .ds-samen-knop { position: fixed; inset-inline-end: var(--ds-ruimte-4); z-index: 9980; box-shadow: var(--ds-schaduw-systeem); cursor: grab; touch-action: none; }
+  .ds-samen-knop.mgz-sleept { cursor: grabbing; opacity: .9; }
+  .ds-samen-ingang { inset-block-end: 3.6rem; background: var(--ds-oppervlak); color: var(--ds-inkt); }
+  .ds-samen-uitleg { font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); line-height: 1.55; max-block-size: 40vh; overflow: auto; white-space: pre-wrap; }
+  .ds-samen-rij { display: flex; gap: var(--ds-ruimte-2); flex-wrap: wrap; }
+  .ds-samen-rij input { flex: 1; min-inline-size: 0; min-block-size: var(--ds-doel); background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); color: var(--ds-inkt); font: inherit; padding: var(--ds-ruimte-2) var(--ds-ruimte-3); }
+  .ds-samen-banner { position: fixed; inset-inline: var(--ds-ruimte-4); margin-inline: auto; inset-block-end: calc(6.4rem + env(safe-area-inset-bottom, 0px)); z-index: 9982; background: var(--ds-oppervlak); color: var(--ds-inkt); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); padding: var(--ds-ruimte-3); font-family: var(--ds-letter-tekst); font-size: var(--ds-maat-klein); display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); align-items: center; box-shadow: var(--ds-schaduw-systeem); max-inline-size: 30rem; }
+  .ds-samen-code { font-family: monospace; letter-spacing: .2em; color: var(--ds-accent); font-weight: 700; }
+  .ds-samen-doe--breed { inline-size: 100%; }
+  .ds-samen-codeinvoer { text-transform: uppercase; }
+  .ds-samen-chat { font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); max-block-size: 26vh; overflow: auto; line-height: 1.5; }
+  .ds-samen-host .sb-balk { flex-wrap: wrap; row-gap: var(--ds-ruimte-2); }
+  .ds-samen-host :is(.ds-samen-venster, .ds-samen-banner) :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  /* Historische consumers: Edge, command/bladhaak en palet. Geen nieuwe DOM. */
+  .ds-samen-host .mgz-blok { position: fixed; inset-inline: var(--ds-ruimte-4); margin-inline: auto; inset-block-end: calc(env(safe-area-inset-bottom, 0px) + var(--ds-ruimte-4)); max-inline-size: 30rem; z-index: 9980; display: flex; flex-direction: column; align-items: center; gap: var(--ds-ruimte-2); pointer-events: none; }
+  .ds-samen-host .mgz-blok > * { pointer-events: auto; }
+  .ds-samen-host .mgz-blok[hidden] { display: none; }
+  .ds-samen-host .mgz-ruimte { inline-size: 100%; flex-shrink: 0; pointer-events: none; }
+  .ds-samen-host .mgz-rahul { inset-block-end: var(--ds-ruimte-4); background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-samen-host .rahul-leeg-knop { display: inline-flex; align-items: center; gap: var(--ds-ruimte-2); min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-4); background: transparent; border: 1px solid var(--ds-accent); color: var(--ds-accent); border-radius: var(--ds-radius-knop); font-family: var(--ds-letter-tekst); font-size: var(--ds-maat-klein); cursor: pointer; }
+  .ds-samen-host .rahul-leeg-knop:hover { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+}

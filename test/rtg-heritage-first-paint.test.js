@@ -26,7 +26,7 @@ function waarde(tag, naam) {
   return m && m[1];
 }
 
-test('alle 298 echte schermen hebben hun centrale blad (Heritage of het Design System) vóór de eerste paint', () => {
+test('alle gemanifesteerde echte schermen hebben hun centrale blad (Heritage of het Design System) vóór de eerste paint', () => {
   let echte = 0;
   let redirects = 0;
   let ds = 0;
@@ -60,8 +60,9 @@ test('alle 298 echte schermen hebben hun centrale blad (Heritage of het Design S
       route + ' moet Heritage na zijn eigen schermstijl laden');
     assert.equal(uitrol.gewenst(bestand, bron), bron, route + ' is niet idempotent uitgerold');
   }
-  assert.equal(echte, 298);
-  assert.equal(redirects, 18);
+  const gemanifesteerd = Object.values(identiteit.MANIFEST).reduce((n, routes) => n + routes.length, 0);
+  assert.equal(echte, gemanifesteerd, 'ieder echt scherm staat in het wereldmanifest');
+  assert.equal(redirects, identiteit.REDIRECTS.length, 'iedere redirect staat in het redirectmanifest');
   assert.ok(ds >= 1, 'minstens een scherm staat op het Design System (TRAVELOS-MIGRATIE.md)');
 });
 

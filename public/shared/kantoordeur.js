@@ -36,12 +36,17 @@
     });
   }
 
+  function laadKantoorScript(pad, klaar) {
+    const kantoorScript = document.createElement('script');
+    kantoorScript.src = pad;
+    kantoorScript.onload = kantoorScript.onerror = klaar;
+    document.head.appendChild(kantoorScript);
+  }
+
   function laadPasskey() {
     if (global.RTGPasskey) return Promise.resolve(global.RTGPasskey);
     return new Promise(function (ok) {
-      var t = document.createElement('script'); t.src = '/shared/passkey.js';
-      t.onload = t.onerror = function () { ok(global.RTGPasskey || null); };
-      document.head.appendChild(t);
+      laadKantoorScript('/shared/passkey.js', function () { ok(global.RTGPasskey || null); });
     });
   }
 

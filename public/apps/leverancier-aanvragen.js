@@ -15,8 +15,8 @@ const euro = (n) => (n == null) ? '' : new Intl.NumberFormat('nl-NL', { style: '
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
 
 function meld(t) {
-  const m = $('#melding'); m.textContent = t; m.style.opacity = '1';
-  clearTimeout(m._t); m._t = setTimeout(() => { m.style.opacity = '0'; }, 2600);
+  const m = $('#melding'); m.textContent = t; m.classList.add('toon');
+  clearTimeout(m._t); m._t = setTimeout(() => { m.classList.remove('toon'); }, 2600);
 }
 const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
@@ -39,11 +39,11 @@ async function teken() {
     d = await api('/api/supplier/mall/aanvragen', {});
     const spiegel = await api('/api/supplier/mall', {});
     code = spiegel.zaak.code;
-  } catch (e) { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
+  } catch (e) { $('#lijst').innerHTML = '<div class="ds-status leeg">' + esc(e.message) + '</div>'; return; }
 
   $('#uitleg').textContent = d.opmerking;
   if (!d.aanvragen.length) {
-    $('#lijst').innerHTML = '<div class="leeg">Op dit moment staat er niets open dat bij uw vak en werkgebied past. ' +
+    $('#lijst').innerHTML = '<div class="ds-status leeg">Op dit moment staat er niets open dat bij uw vak en werkgebied past. ' +
       'Uw werkgebied staat op ' + esc((d.bereik && d.bereik.label) || 'onbekend') +
       ((d.bereik && d.bereik.aangenomen) ? ' (aangenomen op basis van uw genre; u kunt hem zelf instellen)' : '') + '.</div>';
     return;
@@ -51,29 +51,29 @@ async function teken() {
 
   $('#lijst').innerHTML = d.aanvragen.map((a) => {
     const mijn = mijnReactie(a, code);
-    return '<div class="kaart" data-aanvraag="' + esc(a.id) + '">' +
+    return '<div class="ds-sectie kaart" data-aanvraag="' + esc(a.id) + '">' +
       '<h3>' + esc(a.wat) + '</h3>' +
-      '<div class="meta">' + esc(a.statusLabel) + ' &middot; ' + esc(a.van) + ' &middot; ' + esc(a.plek || '') +
+      '<div class="ds-meta meta">' + esc(a.statusLabel) + ' &middot; ' + esc(a.van) + ' &middot; ' + esc(a.plek || '') +
         (a.wanneer ? ' &middot; ' + esc(a.wanneer) : '') +
         (a.budget ? ' &middot; budget ' + euro(a.budget) : '') +
         ' &middot; ' + a.aantalReacties + (a.aantalReacties === 1 ? ' reactie' : ' reacties') + '</div>' +
-      (mijn ? '<div class="mijn"><div class="oms">' + esc(mijn.tekst) + '</div>' +
-        (mijn.prijs ? '<div class="meta">' + euro(mijn.prijs) + '</div>' : '') +
-        (mijn.gekozen ? '<div class="meta goed">Gekozen. Behandel de aanvraag en leg uw antwoord vast.</div>'
-          : '<div class="meta">Uw reactie staat er; u kunt hem hieronder wijzigen.</div>') + '</div>' : '') +
-      '<div class="aanvraag-acties rij"></div>' +
+      (mijn ? '<div class="ds-sectie ds-sectie--open mijn"><div class="ds-meta oms">' + esc(mijn.tekst) + '</div>' +
+        (mijn.prijs ? '<div class="ds-meta meta">' + euro(mijn.prijs) + '</div>' : '') +
+        (mijn.gekozen ? '<div class="ds-meta meta goed">Gekozen. Behandel de aanvraag en leg uw antwoord vast.</div>'
+          : '<div class="ds-meta meta">Uw reactie staat er; u kunt hem hieronder wijzigen.</div>') + '</div>' : '') +
+      '<div class="ds-handelingen aanvraag-acties rij"></div>' +
       (a.resultaat ? '<p>Uw antwoord: ' + esc(a.resultaat.tekst) + '</p>' : '') +
-      ((a.acties || []).some(x => x.id === 'reageer') ? '<div class="rij">' +
-        '<input class="veld tekst groei" data-id="' + esc(a.id) + '" maxlength="400" ' +
-          'placeholder="Wat kunt u bieden?" value="' + esc(mijn ? mijn.tekst : '') + '">' +
-        '<input class="veld prijs smaller" data-id="' + esc(a.id) + '" type="number" min="0" ' +
+      ((a.acties || []).some(x => x.id === 'reageer') ? '<div class="ds-handelingen rij">' +
+        '<input class="ds-invoer veld tekst groei" data-id="' + esc(a.id) + '" maxlength="400" ' +
+          'aria-label="Wat kunt u bieden?" placeholder="Wat kunt u bieden?" value="' + esc(mijn ? mijn.tekst : '') + '">' +
+        '<input class="ds-invoer veld prijs smaller" data-id="' + esc(a.id) + '" type="number" min="0" ' +
           'placeholder="Prijs" value="' + (mijn && mijn.prijs ? mijn.prijs : '') + '" aria-label="Prijs in euro">' +
-        '<button class="knop reageer" data-id="' + esc(a.id) + '" type="button">' + (mijn ? 'Bijwerken' : 'Reageren') + '</button>' +
+        '<button class="ds-knop ds-knop--primair knop reageer" data-ds-actie="' + esc((mijn ? 'Bijwerken: ' : 'Reageren: ') + a.wat) + '" data-id="' + esc(a.id) + '" type="button">' + (mijn ? 'Bijwerken' : 'Reageren') + '</button>' +
       '</div>' : '') +
     '</div>';
   }).join('');
 
-  d.aanvragen.forEach(a => window.RTGAanvraagActies($('#lijst').querySelector('[data-aanvraag="' + a.id + '"] .aanvraag-acties'), a, { zaak: true, api, meld, ververs: teken }));
+  d.aanvragen.forEach(a => window.RTGAanvraagActies($('#lijst').querySelector('[data-aanvraag="' + a.id + '"] .aanvraag-acties'), a, { zaak: true, ds: true, api, meld, ververs: teken }));
   $('#lijst').querySelectorAll('.reageer').forEach((b) => b.addEventListener('click', async () => {
     const id = b.dataset.id;
     const tekst = $('.tekst[data-id="' + id + '"]').value.trim();
@@ -85,8 +85,8 @@ async function teken() {
 }
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="inlog"><h2>Log eerst in</h2>' +
-    '<p class="oms ruimer">Dit scherm is voor aangesloten zaken. Log in op het leveranciersportaal.</p>' +
+  $('#main').innerHTML = '<div class="ds-status inlog"><h2>Log eerst in</h2>' +
+    '<p class="ds-meta oms ruimer">Dit scherm is voor aangesloten zaken. Log in op het leveranciersportaal.</p>' +
     '<p class="ruimst"><a href="/apps/leverancier.html">Naar het portaal &rarr;</a></p></div>';
 } else {
   teken();

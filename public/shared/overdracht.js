@@ -21,6 +21,7 @@
    de bevestiging zoals het die altijd al deed. */
 (function (root) {
   'use strict';
+  const dsBijStart = typeof document !== 'undefined' && document?.documentElement?.hasAttribute('data-ds');
   if (!root || !root.document) return;
   if (root.__rtgOverdracht) return; root.__rtgOverdracht = true;
   var doc = root.document;
@@ -34,6 +35,9 @@
   var ID = idUitAdres();
   if (!ID) return;
 
+  function actueel() {
+    try { return localStorage.getItem('rtg_member_token') === TOKEN; } catch (e) { return false; }
+  }
   var TOKEN = null;
   try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
   if (!TOKEN) return;                 // zonder inlog is er geen mand en dus geen briefje
@@ -45,37 +49,21 @@
     try { return new Date(ms).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
   };
 
-  function stijl() {
-    if (doc.getElementById('rtg-ovd-stijl')) return;
-    var css =
-      '.ovd{position:relative;z-index:40;margin:0;padding:.85rem 1rem;background:#141211;' +
-        'border-bottom:1px solid var(--gold,#857007);color:#f2f0ec;' +
-        'font-family:Inter,system-ui,sans-serif;line-height:1.5;}' +
-      '.ovd-in{max-width:960px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:flex-start;}' +
-      '.ovd-kop{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold,#C9A24B);' +
-        'width:100%;display:flex;justify-content:space-between;gap:1rem;align-items:center;}' +
-      '.ovd-x{background:transparent;border:1px solid #3a3733;border-radius:0;color:#e8e6e2;' +
-        'padding:.15rem .55rem;cursor:pointer;font:inherit;letter-spacing:0;text-transform:none;}' +
-      '.ovd-x:hover{border-color:var(--gold,#857007);}' +
-      '.ovd-x:focus-visible{outline:2px solid #fff;outline-offset:2px;}' +
-      '.ovd-lijst{flex:1 1 22rem;margin:0;padding:0;list-style:none;font-size:.92rem;}' +
-      '.ovd-lijst li{display:flex;justify-content:space-between;gap:1rem;padding:.12rem 0;}' +
-      '.ovd-aantal{color:#bdb9b2;font-variant-numeric:tabular-nums;}' +
-      '.ovd-bedrag{font-variant-numeric:tabular-nums;white-space:nowrap;}' +
-      '.ovd-som{flex:0 0 auto;min-width:11rem;text-align:right;}' +
-      '.ovd-som b{display:block;font-size:1.15rem;font-weight:600;}' +
-      '.ovd-meta,.ovd-uitleg{font-size:.78rem;color:#b3afa8;width:100%;margin:.15rem 0 0;}' +
-      '.ovd-uitleg{border-top:1px solid #2a2724;padding-top:.5rem;margin-top:.4rem;}' +
-      '.ovd-terug{color:var(--gold,#C9A24B);text-decoration:underline;text-underline-offset:2px;}' +
-      '@media (prefers-reduced-motion:no-preference){.ovd{animation:ovd-in .35s ease-out;}' +
-        '@keyframes ovd-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}}';
-    var st = doc.createElement('style'); st.id = 'rtg-ovd-stijl'; st.textContent = css;
-    (doc.head || doc.documentElement).appendChild(st);
+  function laadOverdrachtPresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var overdrachtStijlLink = document.createElement('link');
+    overdrachtStijlLink.setAttribute('id', 'rtgDsRuntimeCss');
+    overdrachtStijlLink.rel = 'stylesheet';
+    overdrachtStijlLink.href = pad;
+    document.head.appendChild(overdrachtStijlLink);
   }
+
+  function stijl() { laadOverdrachtPresentatie('/ds/rtg-ds.css'); }
 
   var el = function (tag, klas, tekst) {
     var n = doc.createElement(tag);
-    if (klas) n.className = klas;
+    if (klas) n.className = klas + ' ' + klas.replace(/^ovd/, 'ds-overdracht');
     if (tekst != null) n.textContent = tekst;      // nooit innerHTML: de titels komen uit een domein
     return n;
   };
@@ -134,15 +122,16 @@
   }
 
   function haal() {
+    if (!actueel()) return;
     fetch('/api/commerce/overdracht/lees', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
       body: JSON.stringify({ id: ID })
-    }).then(function (r) { return r.json(); }).then(function (d) {
+    }).then(function (r) { if (!r.ok) throw new Error('Overdracht niet beschikbaar'); return r.json(); }).then(function (d) {
       /* STIL BIJ EEN FOUT. Een verlopen of vreemd briefje is geen storing van
          dit scherm: het domein eronder werkt gewoon. Een foutmelding bovenaan
          een boekingsscherm zou een probleem suggereren dat er niet is. */
-      if (d && d.ok && d.overdracht && (d.overdracht.regels || []).length) toon(d.overdracht);
+      if (actueel() && d && d.ok === true && !d.error && d.overdracht && (d.overdracht.regels || []).length) toon(d.overdracht);
     }).catch(function () {});
   }
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -10,116 +10,27 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="RTG Browser">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/webblok.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-/* De werkbalk draagt het adresveld en blijft dus bij het scherm (de Edge kan
-   een invoerveld niet overnemen). In de compacte stand schuift hij onder de
-   bovenstrook van de Edge uit; ios.css zet margin met !important op nul. */
-header.ios-nav{top:var(--edge-randboven,0px);margin-top:var(--edge-randboven,0px)!important}
-  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
-  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  /* de browser-chrome (adresbalk + knoppen), in de huisstijl */
-  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 92%,transparent));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:.4rem;padding:calc(env(safe-area-inset-top) + .55rem) .7rem .55rem;}
-  .nav{width:34px;height:34px;flex:0 0 auto;border-radius:0;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;display:grid;place-items:center;font-size:1rem;}
-  .nav:hover{border-color:var(--gold);}
-  .nav:disabled{opacity:.35;cursor:default;}
-  .nav.home{color:var(--rtg-leesgoud,var(--gold));}
-  form.balk{flex:1 1 auto;display:flex;align-items:center;gap:.4rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.3rem .5rem .3rem .8rem;}
-  form.balk:focus-within{border-color:var(--gold);}
-  form.balk .slot{color:var(--soft);font-size:.9rem;flex:0 0 auto;}
-  form.balk input{flex:1 1 auto;background:transparent;border:0;color:var(--txt);font:inherit;font-size:.9rem;outline:none;}
-  form.balk .ga{flex:0 0 auto;background:var(--burgundy);border:0;color:#fff;border-radius:0;padding:.28rem .7rem;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;}
-  main{min-height:calc(100dvh - 60px);}
-  /* de RTG-startpagina (het "internet" van RTG) */
-  .start{max-width:960px;margin:0 auto;padding:2.4rem 1.2rem 4rem;}
-  .start .merk{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));text-align:center;}
-  .start h1{font-size:clamp(2rem,6vw,3.4rem);text-align:center;margin:.3rem 0 .2rem;}
-  .start .lead{text-align:center;color:var(--muted);max-width:52ch;margin:0 auto 1.6rem;line-height:1.6;}
-  .zoekgroot{display:flex;max-width:560px;margin:0 auto 2.2rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:.4rem .5rem .4rem 1rem;align-items:center;gap:.5rem;}
-  .zoekgroot:focus-within{border-color:var(--gold);}
-  .zoekgroot input{flex:1;background:transparent;border:0;color:var(--txt);font:inherit;font-size:1rem;outline:none;}
-  .zoekgroot .suf{color:var(--rtg-leesgoud,var(--gold));font-weight:600;}
-  .zoekgroot button{background:var(--burgundy);border:0;color:#fff;border-radius:0;padding:.5rem 1.1rem;font:inherit;font-weight:600;cursor:pointer;}
-  .rooster{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;}
-  .kaart{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;cursor:pointer;color:var(--txt);}
-  .kaart:hover{border-color:var(--gold);}
-  .kaart .nm{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
-  .kaart .ad{color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;margin-top:.15rem;}
-  .kaart .mt{color:var(--soft);font-size:.72rem;margin-top:.5rem;}
-  .kop2{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 .7rem;}
-  .leeg{text-align:center;color:var(--soft);padding:2rem;}
-  /* de tabbalk: meerdere plekken tegelijk open, elk met eigen geschiedenis */
-  .tabstrip{display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;background:var(--bg);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;}
-  .tabstrip::-webkit-scrollbar{display:none;}
-  .tabstrip .tb{display:flex;align-items:center;gap:.4rem;flex:0 0 auto;max-width:180px;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.28rem .55rem;font-size:.75rem;color:var(--muted);cursor:pointer;}
-  .tabstrip .tb.aan{background:var(--card);color:var(--txt);border-color:var(--gold);}
-  .tabstrip .tb .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tabstrip .tb .x{border:0;background:transparent;color:var(--soft);cursor:pointer;font-size:.8rem;line-height:1;padding:0 .1rem;}
-  .tabstrip .tb .x:hover{color:var(--burgundy);}
-  .tabstrip .plus{flex:0 0 auto;border:1px solid var(--line);background:transparent;color:var(--soft);border-radius:0;width:26px;height:26px;cursor:pointer;}
-  .tabstrip .plus:hover{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  /* de actiebalk: de browser weet dat deze pagina een bedrijf is */
-  .zaakbalk{position:sticky;top:59px;z-index:15;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--line);padding:.55rem .9rem;}
-  .zaakbalk .zn{font-family:'Bodoni Moda',serif;font-size:1rem;}
-  .zaakbalk .zm{color:var(--soft);font-size:.75rem;}
-  .zaakbalk .zr{color:var(--rtg-leesgoud,var(--gold));font-size:.75rem;}
-  .zaakbalk .zk{margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap;}
-  .zaakbalk a.chip{display:inline-block;border:1px solid var(--line);border-radius:0;padding:.28rem .7rem;font-size:.75rem;color:var(--txt);text-decoration:none;background:var(--card2);}
-  .zaakbalk a.chip:hover{border-color:var(--gold);}
-  .zaakbalk a.chip.hoofd{background:var(--burgundy);border-color:transparent;color:#fff;font-weight:600;}
-  /* de melding dat een site machinevertaald is */
-  .vertaallint{padding:.4rem .9rem;background:var(--card2);border-bottom:1px solid var(--line);color:var(--soft);font-size:.72rem;}
-  /* de paginabalk van een site met meerdere pagina's */
-  .paginanav{display:flex;gap:.4rem;flex-wrap:wrap;padding:.55rem .9rem;background:var(--card);border-bottom:1px solid var(--line);}
-  .paginanav button{border:1px solid var(--line);border-radius:0;background:var(--card2);color:var(--muted);font:inherit;font-size:.75rem;padding:.28rem .7rem;cursor:pointer;}
-  .paginanav button:hover{border-color:var(--gold);}
-  .paginanav button.aan{background:var(--bg);color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);}
-  /* de site-weergave */
-  .sitewrap{padding:0;}
-  .foutpagina{max-width:520px;margin:5rem auto;text-align:center;padding:0 1.2rem;color:var(--muted);}
-  .foutpagina h2{font-family:'Bodoni Moda',serif;margin-bottom:.5rem;}
-  .foutpagina a,.inlog a{color:var(--rtg-leesgoud,var(--gold));cursor:pointer;}
-  .inlog{max-width:460px;margin:5rem auto;text-align:center;padding:0 1.2rem;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
-</style>
-<link href="/shared/ios.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-14jo6ez:not(#_#_#_){font-family:'Bodoni Moda',serif}
-.s-16gpxl2:not(#_#_#_){color:var(--muted);margin-top:0.5rem;line-height:1.6}
-</style>
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body data-rtg-context-bron="browser" class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
-<header>
-  <button class="nav" id="terugKnop" title="Terug" aria-label="Terug">‹</button>
-  <button class="nav" id="vooruitKnop" title="Vooruit" aria-label="Vooruit">›</button>
-  <button class="nav" id="herlaadKnop" title="Herladen" aria-label="Herladen">↻</button>
-  <button class="nav home" id="homeKnop" title="RTG Start" aria-label="RTG Start">⌂</button>
-  <button class="nav" id="bwKnop" title="Bladwijzer" aria-label="Bladwijzer" disabled>☆</button>
-  <form class="balk" id="balk">
-    <span class="slot" aria-hidden="true">rtg://</span>
-    <input id="adres" inputmode="url" autocomplete="off" spellcheck="false" placeholder="typ een adres, bijv. jouwzaak.rtg" aria-label="Adres">
-    <button class="ga" type="submit">Ga</button>
+<body data-rtg-context-bron="browser" class="ds-scherm ds-browser" data-ds-schermtype="canvas" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-edge-2-state="compact" data-rtg-edge-2-auto="false" data-rtg-layout="standard">
+<header class="ds-browser-balk">
+  <button class="nav ds-knop ds-knop--stil ds-browser-nav" id="terugKnop" title="Terug" aria-label="Terug">‹</button>
+  <button class="nav ds-knop ds-knop--stil ds-browser-nav" id="vooruitKnop" title="Vooruit" aria-label="Vooruit">›</button>
+  <button class="nav ds-knop ds-knop--stil ds-browser-nav" id="herlaadKnop" title="Herladen" aria-label="Herladen">↻</button>
+  <button class="nav ds-knop ds-knop--stil ds-browser-nav home" id="homeKnop" title="RTG Start" aria-label="RTG Start">⌂</button>
+  <button class="nav ds-knop ds-knop--stil ds-browser-nav" id="bwKnop" title="Bladwijzer" aria-label="Bladwijzer" disabled>☆</button>
+  <form class="balk ds-browser-adresbalk" id="balk">
+    <span class="slot ds-browser-slot" aria-hidden="true">rtg://</span>
+    <input class="ds-invoer ds-browser-invoer" id="adres" inputmode="url" autocomplete="off" spellcheck="false" placeholder="typ een adres, bijv. jouwzaak.rtg" aria-label="Adres">
+    <button class="ga ds-knop ds-knop--primair" type="submit">Ga</button>
   </form>
 </header>
-<div class="tabstrip" id="tabstrip"></div>
-<main id="hoofd"></main>
-<div class="melding" id="melding" role="status"></div>
+<div class="tabstrip ds-browser-tabs" id="tabstrip"></div>
+<main class="ds-browser-hoofd" id="hoofd"></main>
+<div class="melding ds-browser-melding" id="melding" role="status"></div>
 
 <script src="/shared/uitvoer.js"></script>
 <script>
@@ -147,14 +58,14 @@ function tabsBij(){
   TABS[TAB].hist=HIST; TABS[TAB].pos=POS;
   const st=$('#tabstrip'); st.textContent='';
   TABS.forEach((t,i)=>{
-    const b=document.createElement('span'); b.className='tb'+(i===TAB?' aan':''); b.setAttribute('role','button');
-    const tt=document.createElement('span'); tt.className='tt'; tt.textContent=tabLabel(t); b.appendChild(tt);
-    if(TABS.length>1){ const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title='Tab sluiten'; x.setAttribute('aria-label','Tab sluiten');
+    const b=document.createElement('span'); b.className='tb ds-browser-tab'+(i===TAB?' aan':''); b.setAttribute('role','button'); b.tabIndex=0; b.addEventListener('keydown',ev=>{if(ev.target===b&&(ev.key==='Enter'||ev.key===' ')){ev.preventDefault();wisselTab(i);}});
+    const tt=document.createElement('span'); tt.className='tt ds-browser-tabtitel'; tt.textContent=tabLabel(t); b.appendChild(tt);
+    if(TABS.length>1){ const x=document.createElement('button'); x.className='x ds-knop ds-knop--stil ds-browser-sluit'; x.textContent='×'; x.title='Tab sluiten'; x.setAttribute('aria-label','Tab sluiten');
       x.addEventListener('click',ev=>{ ev.stopPropagation(); sluitTab(i); }); b.appendChild(x); }
     b.addEventListener('click',()=>wisselTab(i));
     st.appendChild(b);
   });
-  const plus=document.createElement('button'); plus.className='plus'; plus.textContent='+'; plus.title='Nieuwe tab'; plus.setAttribute('aria-label','Nieuwe tab');
+  const plus=document.createElement('button'); plus.className='plus ds-knop ds-knop--stil ds-browser-plus'; plus.textContent='+'; plus.title='Nieuwe tab'; plus.setAttribute('aria-label','Nieuwe tab');
   plus.addEventListener('click',nieuwTab); st.appendChild(plus);
 }
 function laadTab(){
@@ -213,22 +124,23 @@ if(window.RTGUitvoer) RTGUitvoer.bron(function(){
     rijen:GIDS.map(function(it){ return [it.titel||'', (it.adres||'')+'.rtg', it.bezoeken||0]; }) };
 });
 async function toonStart(){
+  const navigatie=++NAV;
   HUIDIGE=null;
   const h=$('#hoofd');
-  h.innerHTML='<div class="start"><div class="merk">RTG · het web van het huis</div><h1>RTG Start</h1>'+
-    '<p class="lead">Het besloten web van Rahul Travel Group. Bezoek de sites die leden hier hebben gebouwd, of typ een adres in de balk.</p>'+
-    '<form class="zoekgroot rtg-duimeind" id="zoekGroot"><input id="zoekIn" placeholder="zoek een site of bedrijf, of typ een adres" aria-label="Zoeken"><span class="suf">.rtg</span><button type="submit" class="hoofd" data-hoofdactie>Zoek</button></form>'+
+  h.innerHTML='<div class="start ds-browser-start"><div class="merk ds-browser-merk">RTG · het web van het huis</div><h1>RTG Start</h1>'+
+    '<p class="lead ds-browser-lead">Het besloten web van Rahul Travel Group. Bezoek de sites die leden hier hebben gebouwd, of typ een adres in de balk.</p>'+
+    '<form class="zoekgroot ds-browser-zoeken rtg-duimeind" id="zoekGroot"><input class="ds-invoer ds-browser-invoer" id="zoekIn" placeholder="zoek een site of bedrijf, of typ een adres" aria-label="Zoeken"><span class="suf ds-browser-suffix">.rtg</span><button type="submit" class="hoofd ds-knop ds-knop--primair" data-hoofdactie>Zoek</button></form>'+
     '<div id="zoekUit"></div>'+
     '<div id="bwRij"></div>'+
-    '<div class="kop2">Sites van leden</div><div class="rooster" id="rooster"><div class="leeg">Laden…</div></div></div>';
+    '<div class="kop2 ds-browser-kop">Sites van leden</div><div class="rooster ds-browser-rooster" id="rooster"><div class="leeg ds-browser-leeg">Laden…</div></div></div>';
   // de eigen bladwijzers bovenaan de startpagina
   (function(){
     const l=bwLees(); if(!l.length)return;
     const w=$('#bwRij');
-    w.innerHTML='<div class="kop2">Bladwijzers</div>';
-    const r=document.createElement('div'); r.className='rooster'; r.style.marginBottom='1.6rem';
-    l.forEach(b=>{ const k=document.createElement('button');k.type='button';k.className='kaart';
-      k.innerHTML='<div class="nm">'+esc(b.titel)+'</div><div class="ad">'+esc(b.adres)+'.rtg</div>';
+    w.innerHTML='<div class="kop2 ds-browser-kop">Bladwijzers</div>';
+    const r=document.createElement('div'); r.className='rooster ds-browser-rooster'; r.classList.add('ds-browser-afstand');
+    l.forEach(b=>{ const k=document.createElement('button');k.type='button';k.className='kaart ds-kaart ds-browser-kaart';
+      k.innerHTML='<div class="nm ds-kaart__titel">'+esc(b.titel)+'</div><div class="ad ds-browser-adres">'+esc(b.adres)+'.rtg</div>';
       k.addEventListener('click',()=>ga({adres:b.adres})); r.appendChild(k); });
     w.appendChild(r);
   })();
@@ -238,50 +150,53 @@ async function toonStart(){
     e.preventDefault(); const q=$('#zoekIn').value.trim(); const a=slug(q);
     if(q.length<2){meld('Typ minstens twee tekens.');return;}
     if(GIDS.some(it=>it.adres===a)){ ga({adres:a}); return; }
-    const uit=$('#zoekUit'); uit.innerHTML='<div class="kop2">Zoeken…</div>';
+    const uit=$('#zoekUit'); uit.innerHTML='<div class="kop2 ds-browser-kop">Zoeken…</div>';
     try{
       const d=await api('/api/browser/zoek',{q});
       const sites=d.sites||[], zaken=d.zaken||[];
       uit.textContent='';
-      if(!sites.length&&!zaken.length){ uit.innerHTML='<div class="kop2">Resultaten</div><div class="leeg" style="padding:1rem;">Niets gevonden voor "'+esc(q)+'".</div>'; return; }
+      if(!sites.length&&!zaken.length){ uit.innerHTML='<div class="kop2 ds-browser-kop">Resultaten</div><div class="leeg ds-browser-leeg">Niets gevonden voor "'+esc(q)+'".</div>'; return; }
       if(sites.length){
-        const k=document.createElement('div');k.className='kop2';k.textContent='Sites';uit.appendChild(k);
-        const r=document.createElement('div');r.className='rooster';r.style.marginBottom='1.4rem';
-        sites.forEach(it=>{ const b=document.createElement('button');b.type='button';b.className='kaart';
-          b.innerHTML='<div class="nm">'+esc(it.titel)+'</div><div class="ad">'+esc(it.adres)+'.rtg</div>';
+        const k=document.createElement('div');k.className='kop2 ds-browser-kop';k.textContent='Sites';uit.appendChild(k);
+        const r=document.createElement('div');r.className='rooster ds-browser-rooster';r.classList.add('ds-browser-afstand');
+        sites.forEach(it=>{ const b=document.createElement('button');b.type='button';b.className='kaart ds-kaart ds-browser-kaart';
+          b.innerHTML='<div class="nm ds-kaart__titel">'+esc(it.titel)+'</div><div class="ad ds-browser-adres">'+esc(it.adres)+'.rtg</div>';
           b.addEventListener('click',()=>ga({adres:it.adres})); r.appendChild(b); });
         uit.appendChild(r);
       }
       if(zaken.length){
-        const k=document.createElement('div');k.className='kop2';k.textContent='Bedrijven';uit.appendChild(k);
-        const r=document.createElement('div');r.className='rooster';r.style.marginBottom='1.4rem';
-        zaken.forEach(z=>{ const b=document.createElement('button');b.type='button';b.className='kaart';
-          b.innerHTML='<div class="nm">'+esc(z.naam)+'</div><div class="ad">'+(z.adres?esc(z.adres)+'.rtg':esc(z.typeLabel||''))+'</div><div class="mt">'+esc([z.typeLabel,z.stad].filter(Boolean).join(' · '))+(z.adres?'':' · nog geen RTG-site')+'</div>';
+        const k=document.createElement('div');k.className='kop2 ds-browser-kop';k.textContent='Bedrijven';uit.appendChild(k);
+        const r=document.createElement('div');r.className='rooster ds-browser-rooster';r.classList.add('ds-browser-afstand');
+        zaken.forEach(z=>{ const b=document.createElement('button');b.type='button';b.className='kaart ds-kaart ds-browser-kaart';
+          b.innerHTML='<div class="nm ds-kaart__titel">'+esc(z.naam)+'</div><div class="ad ds-browser-adres">'+(z.adres?esc(z.adres)+'.rtg':esc(z.typeLabel||''))+'</div><div class="mt ds-browser-meta">'+esc([z.typeLabel,z.stad].filter(Boolean).join(' · '))+(z.adres?'':' · nog geen RTG-site')+'</div>';
           if(z.adres) b.addEventListener('click',()=>ga({adres:z.adres}));
           else b.addEventListener('click',()=>meld('Dit bedrijf heeft nog geen site op het RTG-web. Bekijk het in de leden-app.'));
           r.appendChild(b); });
         uit.appendChild(r);
       }
-    }catch(err){ uit.innerHTML='<div class="leeg">'+esc(err.message)+'</div>'; }
+    }catch(err){ uit.innerHTML='<div class="leeg ds-browser-leeg">'+esc(err.message)+'</div>'; }
   });
+  const r=$('#rooster');
   try{
     const d=await api('/api/browser/gids');
+    if(navigatie!==NAV||!r.isConnected)return;
     GIDS=d.lijst||[];
-    const r=$('#rooster'); r.textContent='';
-    if(!GIDS.length){ r.innerHTML='<div class="leeg">Nog geen sites online. Wees de eerste: open de Website-maker in de App Store.</div>'; return; }
+    r.textContent='';
+    if(!GIDS.length){ r.innerHTML='<div class="leeg ds-browser-leeg">Nog geen sites online. Wees de eerste: open de Website-maker in de App Store.</div>'; return; }
     GIDS.forEach(it=>{
-      const b=document.createElement('button'); b.type='button'; b.className='kaart';
-      b.innerHTML='<div class="nm">'+esc(it.titel)+'</div><div class="ad">'+esc(it.adres)+'.rtg</div><div class="mt">'+it.bezoeken+' bezoek'+(it.bezoeken===1?'':'en')+'</div>';
+      const b=document.createElement('button'); b.type='button'; b.className='kaart ds-kaart ds-browser-kaart';
+      b.innerHTML='<div class="nm ds-kaart__titel">'+esc(it.titel)+'</div><div class="ad ds-browser-adres">'+esc(it.adres)+'.rtg</div><div class="mt ds-browser-meta">'+it.bezoeken+' bezoek'+(it.bezoeken===1?'':'en')+'</div>';
       b.addEventListener('click',()=>ga({adres:it.adres}));
       r.appendChild(b);
     });
-  }catch(e){ $('#rooster').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; }
+  }catch(e){ if(navigatie!==NAV||!r.isConnected)return; r.innerHTML='<div class="leeg ds-browser-leeg">'+esc(e.message)+'</div>'; }
 }
 
 // ---- een site tonen (alleen-lezen). De browser kiest live de versie
 //      (telefoon/tablet/desktop) op basis van de vensterbreedte, en past
 //      per versie de eigen tekst, volgorde en zichtbaarheid toe. ----
 let HUIDIGE=null;
+let NAV=0;
 function versieNu(){ const w=Math.min(window.innerWidth,1080); return w<=640?'telefoon':(w<=1000?'tablet':'desktop'); }
 function toonBlok(blok,ver){ if(ver==='desktop')return blok; const ov=blok.varianten&&blok.varianten[ver]; return ov?Object.assign({},blok,ov):blok; }
 function ordenSite(site,ver){
@@ -298,7 +213,7 @@ function ordenSite(site,ver){
 const SOORTTEKST={vraag:'Uw vraag',offerte:'Waar wilt u een offerte voor',sollicitatie:'Vertel kort over uzelf',
   reservering:'Voor hoeveel personen, en wanneer',klacht:'Wat ging er mis',feedback:'Wat wilt u ons meegeven'};
 function tekenBlok(blok,ver){
-  const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='wb-blok'; const t=blok.type;
+  const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='wb-blok ds-webblok__blok'; const t=blok.type;
   const tekst=(el,v)=>{el.textContent=v||'';return el;};
   if(t==='hero'){ s.classList.add('b-hero'); s.appendChild(tekst(document.createElement('h1'),T.kop)); const p=document.createElement('div');p.className='sub';tekst(p,T.sub);s.appendChild(p); if(T.knop){const a=document.createElement('span');a.className='b-knop';tekst(a,T.knop);s.appendChild(a);} }
   else if(t==='kop'){ s.classList.add('b-kop'); s.appendChild(tekst(document.createElement('h2'),T.tekst)); }
@@ -309,46 +224,56 @@ function tekenBlok(blok,ver){
   else if(t==='galerij'){ s.classList.add('b-gal'); (blok.beelden||[]).forEach(src=>{const img=document.createElement('img');img.src=src;img.alt='';s.appendChild(img);}); }
   else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div');q.className='q';tekst(q,T.tekst);s.appendChild(q); const br=document.createElement('div');br.className='bron';tekst(br,T.bron);s.appendChild(br); }
   else if(t==='formulier'){ /* bericht aan de zaak achter deze site; landt daar als klus */
-    s.classList.add('b-tekst');
-    const h2=document.createElement('h2');h2.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.6rem;';tekst(h2,T.kop);s.appendChild(h2);
+    s.classList.add('b-tekst'); s._webblok=blok;
+    const adres=HUIDIGE.site.adres;
+    const h2=document.createElement('h2');h2.className='ds-webblok__formuliertitel';tekst(h2,T.kop);s.appendChild(h2);
     const f=document.createElement('form');
     const ta=document.createElement('textarea');ta.rows=4;ta.maxLength=500;ta.placeholder=(SOORTTEKST[blok.soort||'vraag']||'Uw bericht')+' aan '+(HUIDIGE&&HUIDIGE.zaak?HUIDIGE.zaak.naam:(HUIDIGE&&HUIDIGE.persoon?HUIDIGE.persoon.codenaam:'de maker'))+'…';
-    ta.style.cssText='width:100%;background:transparent;border:1px solid currentColor;border-radius:0;padding:.7rem;color:inherit;font:inherit;opacity:.9;';
-    const kn=document.createElement('button');kn.type='submit';kn.className='b-knop';tekst(kn,T.knop);kn.style.cssText='margin-top:.6rem;cursor:pointer;border:0;';
+    ta.className='ds-webblok__invoer';
+    const kn=document.createElement('button');kn.type='submit';kn.className='b-knop ds-webblok__verzend';tekst(kn,T.knop);
     f.appendChild(ta);f.appendChild(kn);
     /* Een herhaalsleutel per bericht, pas na succes een nieuwe: verstuurt het
        lid opnieuw na een afgebroken verbinding, dan komt het een keer aan. */
-    let idem='';
+    let idem='', bezig=false;
     f.addEventListener('submit',async ev=>{ev.preventDefault();
-      const tk=ta.value.trim(); if(tk.length<3){meld('Schrijf eerst een bericht.');return;}
+      if(bezig)return;
+      const invoer=ta.value, tk=invoer.trim(); if(tk.length<3){meld('Schrijf eerst een bericht.');return;}
       idem=idem||RTGId('web');
-      try{ const r=await api('/api/browser/bericht',{adres:HUIDIGE.site.adres,tekst:tk,soort:blok.soort||'vraag',idem}); ta.value=''; idem='';
+      const sleutel=idem, soort=blok.soort||'vraag';
+      bezig=true; kn.disabled=true; f.setAttribute('aria-busy','true');
+      try{ const r=await api('/api/browser/bericht',{adres,tekst:tk,soort,idem:sleutel});
+        if(!r||r.ok!==true||!['chat','werklijst'].includes(r.via)||r.soort!==soort)
+          throw new Error('De ontvangst is niet bevestigd. Uw tekst is bewaard; probeer opnieuw.');
+        if(idem===sleutel)idem='';
+        if(!s.isConnected)return;
+        if(ta.value===invoer)ta.value='';
         meld(r.via==='chat'?'Verstuurd als gesprek in de leden-app, op uw codenaam.':'Verstuurd. Het bedrijf ziet uw bericht in zijn werklijst, op uw codenaam.'); }
-      catch(e){ meld(e.message); }
+      catch(e){ if(s.isConnected)meld(e.message); }
+      finally{ bezig=false; kn.disabled=false; f.setAttribute('aria-busy','false'); }
     });
     s.appendChild(f);
   }
   else if(t==='faq'){ s.classList.add('b-tekst');
-    const h=document.createElement('h2');h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';tekst(h,T.kop);s.appendChild(h);
+    const h=document.createElement('h2');h.className='ds-webblok__rijtitel';tekst(h,T.kop);s.appendChild(h);
     (blok.vragen||[]).forEach(q=>{
-      const d=document.createElement('div');d.style.cssText='margin-bottom:.9rem;';
-      const v=document.createElement('div');v.style.fontWeight='600';tekst(v,q.v);
-      const a=document.createElement('div');a.style.opacity='.8';tekst(a,q.a);
+      const d=document.createElement('div');d.className='ds-webblok__vraag';
+      const v=document.createElement('div');v.className='ds-webblok__nadruk';tekst(v,q.v);
+      const a=document.createElement('div');a.className='ds-webblok__antwoord';tekst(a,q.a);
       d.appendChild(v);d.appendChild(a);s.appendChild(d);
     });
   }
   else if(t==='prijzen'){ s.classList.add('b-tekst');
-    const h=document.createElement('h2');h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';tekst(h,T.kop);s.appendChild(h);
+    const h=document.createElement('h2');h.className='ds-webblok__rijtitel';tekst(h,T.kop);s.appendChild(h);
     (blok.regels||[]).forEach(r=>{
-      const d=document.createElement('div');d.style.cssText='display:flex;gap:.8rem;align-items:baseline;border-bottom:1px solid currentColor;padding:.5rem 0;';
-      const n=document.createElement('div');n.style.flex='1';
-      const nm=document.createElement('div');nm.style.fontWeight='600';tekst(nm,r.naam);n.appendChild(nm);
-      if(r.wat){const w=document.createElement('div');w.style.cssText='opacity:.75;font-size:.9em;';tekst(w,r.wat);n.appendChild(w);}
-      const p=document.createElement('div');p.style.whiteSpace='nowrap';tekst(p,r.prijs);
+      const d=document.createElement('div');d.className='ds-webblok__prijsrij';
+      const n=document.createElement('div');n.className='ds-webblok__prijsnaam';
+      const nm=document.createElement('div');nm.className='ds-webblok__nadruk';tekst(nm,r.naam);n.appendChild(nm);
+      if(r.wat){const w=document.createElement('div');w.className='ds-webblok__prijsdetail';tekst(w,r.wat);n.appendChild(w);}
+      const p=document.createElement('div');p.className='ds-webblok__prijs';tekst(p,r.prijs);
       d.appendChild(n);d.appendChild(p);s.appendChild(d);
     });
   }
-  else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px'; }
+  else if(t==='ruimte'){ s.style.blockSize=(blok.hoogte||40)+'px'; }
   else if(t==='voettekst'){ s.classList.add('b-voet'); tekst(s,T.tekst); }
   return s;
 }
@@ -356,14 +281,39 @@ function schilder(){
   if(!HUIDIGE)return; const ver=versieNu(); const site=HUIDIGE.site;
   const doek=document.querySelector('#hoofd .doek'); if(!doek)return;
   if(doek.dataset.ver===ver)return;
-  doek.dataset.ver=ver; doek.textContent='';
-  ordenSite(site,ver).forEach(b=>{ if((b.verberg||[]).includes(ver))return; doek.appendChild(tekenBlok(b,ver)); });
+  const oud=Array.from(doek.children), nieuw=[], actief=document.activeElement;
+  const selectie=actief&&typeof actief.selectionStart==='number'?[actief.selectionStart,actief.selectionEnd,actief.selectionDirection]:null;
+  ordenSite(site,ver).forEach(b=>{
+    const verborgen=(b.verberg||[]).includes(ver);
+    let s=b.type==='formulier'&&oud.find(el=>el._webblok===b);
+    if(verborgen&&!s)return;
+    if(s){ const T=toonBlok(b,ver); s.querySelector('h2').textContent=T.kop||''; s.querySelector('button').textContent=T.knop||''; }
+    else s=tekenBlok(b,ver);
+    s.hidden=verborgen; nieuw.push(s);
+  });
+  // Hetzelfde formulier draagt invoer, focus en herhaalsleutel over de versies.
+  let anker=doek.firstChild;
+  nieuw.forEach(s=>{
+    if(s!==anker){
+      if(s.parentNode===doek&&typeof doek.moveBefore==='function')doek.moveBefore(s,anker);
+      else doek.insertBefore(s,anker);
+    }
+    anker=s.nextSibling;
+  });
+  oud.forEach(s=>{if(!nieuw.includes(s))s.remove();});
+  if(actief&&actief.isConnected&&doek.contains(actief)&&!actief.closest('[hidden]')){
+    if(document.activeElement!==actief)actief.focus({preventScroll:true});
+    if(selectie)actief.setSelectionRange(...selectie);
+  }
+  doek.dataset.ver=ver;
 }
 window.addEventListener('resize',()=>{ clearTimeout(window._rt); window._rt=setTimeout(schilder,120); });
 async function toonSite(adres,pad){
-  const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
+  const navigatie=++NAV;
+  const h=$('#hoofd'); h.innerHTML='<div class="leeg ds-browser-leeg">Laden…</div>';
   try{
     const d=await api('/api/browser/open',{adres,pad:pad||''});
+    if(navigatie!==NAV)return;
     let site=d.site;
     /* een site kan meerdere pagina's dragen: het pad achter het adres kiest er
        een; de voorpagina is het lege pad */
@@ -372,7 +322,7 @@ async function toonSite(adres,pad){
       const pg=paginas.find(p=>p.slug===pad);
       if(!pg){
         HUIDIGE=null;
-        h.innerHTML='<div class="foutpagina"><h2>Deze pagina bestaat niet</h2><p><b>'+esc(adres)+'.rtg/'+esc(pad)+'</b> is er niet. Ga naar de <a id="naarVoor">voorpagina</a>.</p></div>';
+        h.innerHTML='<div class="foutpagina ds-browser-fout"><h2>Deze pagina bestaat niet</h2><p><b>'+esc(adres)+'.rtg/'+esc(pad)+'</b> is er niet. Ga naar de <a id="naarVoor">voorpagina</a>.</p></div>';
         const v=$('#naarVoor'); if(v)v.addEventListener('click',()=>ga({adres}));
         return;
       }
@@ -380,64 +330,66 @@ async function toonSite(adres,pad){
     }
     HUIDIGE={site,zaak:d.zaak||null,persoon:d.persoon||null};
     document.title=site.titel+' · RTG Browser';
-    const wrap=document.createElement('div'); wrap.className='sitewrap';
+    const wrap=document.createElement('div'); wrap.className='sitewrap ds-browser-site';
     /* de site hoort bij een bedrijf: de browser toont wie dit is en wat je
        hier kunt -- reserveren, bestellen en chatten lopen via de leden-app,
        met dezelfde RTG-identiteit */
     if(d.zaak){
-      const z=d.zaak, balk=document.createElement('div'); balk.className='zaakbalk';
-      const nm=document.createElement('span');nm.className='zn';nm.textContent=z.naam;balk.appendChild(nm);
-      const mt=document.createElement('span');mt.className='zm';mt.textContent=[z.typeLabel,z.stad].filter(Boolean).join(' · ');balk.appendChild(mt);
-      if(z.rating){const rr=document.createElement('span');rr.className='zr';rr.textContent='★ '+z.rating.score+' ('+z.rating.aantal+')';balk.appendChild(rr);}
-      const kn=document.createElement('span');kn.className='zk';
+      const z=d.zaak, balk=document.createElement('div'); balk.className='zaakbalk ds-browser-zaak';
+      const nm=document.createElement('span');nm.className='zn ds-browser-zaaknaam';nm.textContent=z.naam;balk.appendChild(nm);
+      const mt=document.createElement('span');mt.className='zm ds-browser-meta';mt.textContent=[z.typeLabel,z.stad].filter(Boolean).join(' · ');balk.appendChild(mt);
+      if(z.rating){const rr=document.createElement('span');rr.className='zr ds-browser-rating';rr.textContent='★ '+z.rating.score+' ('+z.rating.aantal+')';balk.appendChild(rr);}
+      const kn=document.createElement('span');kn.className='zk ds-browser-acties';
       const LABELS={reserveren:'Reserveer',bestellen:'Bestel',boeken:'Boek',diensten:'Diensten',kamers:'Kamers',chat:'Chat'};
-      (z.acties||[]).forEach(a=>{ const c=document.createElement('a');c.className='chip';c.href='/apps/app.html';c.textContent=LABELS[a]||a;kn.appendChild(c); });
-      const open=document.createElement('a');open.className='chip hoofd';open.href='/apps/app.html';open.textContent='Open in de leden-app';kn.appendChild(open);
+      (z.acties||[]).forEach(a=>{ const c=document.createElement('a');c.className='chip ds-knop ds-knop--stil';c.href='/apps/app.html';c.textContent=LABELS[a]||a;kn.appendChild(c); });
+      const open=document.createElement('a');open.className='chip ds-knop ds-knop--stil hoofd';open.href='/apps/app.html';open.textContent='Open in de leden-app';kn.appendChild(open);
       balk.appendChild(kn); wrap.appendChild(balk);
     }
     /* iemands eigen plek: de browser toont de codenaam en biedt verbinden
        en chatten via de leden-app -- de browser begrijpt ook personen */
     if(!d.zaak&&d.persoon){
-      const balk=document.createElement('div'); balk.className='zaakbalk';
-      const nm=document.createElement('span');nm.className='zn';nm.textContent=d.persoon.codenaam;balk.appendChild(nm);
-      const mt=document.createElement('span');mt.className='zm';mt.textContent='Lid op het RTG-web';balk.appendChild(mt);
-      const kn=document.createElement('span');kn.className='zk';
-      const c=document.createElement('a');c.className='chip hoofd';c.href='/apps/app.html';c.textContent='Verbind & chat in de leden-app';kn.appendChild(c);
+      const balk=document.createElement('div'); balk.className='zaakbalk ds-browser-zaak';
+      const nm=document.createElement('span');nm.className='zn ds-browser-zaaknaam';nm.textContent=d.persoon.codenaam;balk.appendChild(nm);
+      const mt=document.createElement('span');mt.className='zm ds-browser-meta';mt.textContent='Lid op het RTG-web';balk.appendChild(mt);
+      const kn=document.createElement('span');kn.className='zk ds-browser-acties';
+      const c=document.createElement('a');c.className='chip ds-knop ds-knop--stil hoofd';c.href='/apps/app.html';c.textContent='Verbind & chat in de leden-app';kn.appendChild(c);
       balk.appendChild(kn); wrap.appendChild(balk);
     }
     /* eerlijk zijn over een vertaling: dit is niet wat de maker schreef */
     if(d.vertaald){
-      const l=document.createElement('div'); l.className='vertaallint';
+      const l=document.createElement('div'); l.className='vertaallint ds-browser-vertaling';
       const TAAL={nl:'het Nederlands',en:'het Engels',es:'het Spaans',de:'het Duits',fr:'het Frans',it:'het Italiaans'};
       l.textContent='Machinevertaald'+(d.vertaald.van?' uit '+(TAAL[d.vertaald.van]||d.vertaald.van):'')+'. Namen, prijzen en citaatbronnen blijven zoals de maker ze schreef.';
       wrap.appendChild(l);
     }
     // de paginabalk: Home plus de extra pagina's van de site
     if(paginas.length){
-      const nav=document.createElement('nav'); nav.className='paginanav'; nav.setAttribute('aria-label',"Pagina's van deze site");
-      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(aan)b.className='aan';
+      const nav=document.createElement('nav'); nav.className='paginanav ds-browser-paginas'; nav.setAttribute('aria-label',"Pagina's van deze site");
+      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.className='ds-knop ds-knop--stil'; b.textContent=naam; if(aan){b.classList.add('aan');b.disabled=true;b.setAttribute('aria-current','page');}
         b.addEventListener('click',()=>{ if(!aan) ga({adres,pad:doel}); }); nav.appendChild(b); };
       maak('Home','',!pad);
       paginas.forEach(p=>maak(p.naam,p.slug,pad===p.slug));
       wrap.appendChild(nav);
     }
-    const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver=''; doek.style.setProperty('--acc',site.accent||'#7F1634');
+    const doek=document.createElement('div'); doek.className='doek ds-webblok'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver='';
+    if(site.accent) doek.style.setProperty('--ds-webblok-accent',site.accent);
     // vrije kleuren van de maker toepassen (achtergrond, tekst, kaart); ontbreekt
     // er een, dan houdt het thema die kleur
     const kk=site.kleuren||{};
-    if(kk.bg) doek.style.setProperty('--dbg',kk.bg);
-    if(kk.card) doek.style.setProperty('--dcard',kk.card);
-    if(kk.txt){ doek.style.setProperty('--dtxt',kk.txt); doek.style.setProperty('--dmut','color-mix(in srgb,'+kk.txt+' 66%,transparent)'); doek.style.setProperty('--dline','color-mix(in srgb,'+kk.txt+' 16%,transparent)'); }
+    if(kk.bg) doek.style.setProperty('--ds-webblok-grond',kk.bg);
+    if(kk.card) doek.style.setProperty('--ds-webblok-kaart',kk.card);
+    if(kk.txt){ doek.style.setProperty('--ds-webblok-inkt',kk.txt); doek.style.setProperty('--ds-webblok-inkt-zacht','color-mix(in srgb,'+kk.txt+' 66%,transparent)'); doek.style.setProperty('--ds-webblok-lijn','color-mix(in srgb,'+kk.txt+' 16%,transparent)'); }
     wrap.appendChild(doek); h.textContent=''; h.appendChild(wrap);
     schilder(); window.scrollTo(0,0);
   }catch(e){
+    if(navigatie!==NAV)return;
     HUIDIGE=null;
-    h.innerHTML='<div class="foutpagina"><h2>Deze RTG-site bestaat niet</h2><p>Er staat niets op <b>'+esc(adres)+'.rtg</b>. Controleer het adres of ga terug naar <a id="naarStart">RTG Start</a>.</p></div>';
+    h.innerHTML='<div class="foutpagina ds-browser-fout"><h2>Deze RTG-site bestaat niet</h2><p>Er staat niets op <b>'+esc(adres)+'.rtg</b>. Controleer het adres of ga terug naar <a id="naarStart">RTG Start</a>.</p></div>';
     const b=$('#naarStart'); if(b) b.addEventListener('click',()=>ga('start'));
   }
 }
 
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 class="s-14jo6ez">Log in op de leden-app</h2><p class="s-16gpxl2">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog ds-browser-inlog"><h2 class="ds-browser-inlogtitel">Log in op de leden-app</h2><p class="ds-browser-lead">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p class="ds-browser-afstand"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
 else {
   const start=new URLSearchParams(location.search).get('adres');
   if(start){ const p=parseAdres(start); ga(p.adres.length>=2?{adres:p.adres,pad:p.pad}:'start'); } else ga('start');

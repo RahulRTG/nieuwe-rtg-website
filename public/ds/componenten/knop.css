@@ -9,7 +9,9 @@
     gap: var(--ds-ruimte-2);
     min-block-size: 52px;
     padding-inline: var(--ds-ruimte-6);
-    border: 1px solid transparent;
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border: 1px solid var(--ds-lijnkleur);
     border-radius: var(--ds-radius-knop);
     font-family: var(--ds-letter-tekst);
     font-size: var(--ds-maat-klein);
@@ -23,7 +25,7 @@
   .ds-knop--primair:hover { background: var(--ds-accent-hover); }
   .ds-knop--stil { background: transparent; color: var(--ds-inkt); border-color: var(--ds-lijnkleur); }
   .ds-knop--stil:hover { border-color: var(--ds-inkt); }
-  .ds-knop--klein { min-block-size: 40px; padding-inline: var(--ds-ruimte-4); }
+  .ds-knop--klein { min-block-size: var(--ds-doel); padding-inline: var(--ds-ruimte-4); }
   .ds-knop--capsule { border-radius: var(--ds-radius-capsule); }
   .ds-knop--op-beeld {
     min-block-size: 48px;

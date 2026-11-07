@@ -44,10 +44,10 @@
     var naar = VOLGENDE[r.stand];
     return '<li><span>' + esc(r.aantal + 'x ' + r.naam) + '</span>' +
       '<em>' + esc(r.stoel || 'de tafel') + '</em>' +
-      (r.allergie ? '<span class="b-allergie">' + esc(r.allergie) + '</span>' : '') +
+      (r.allergie ? '<span class="b-allergie ds-horeca-werkallergie">' + esc(r.allergie) + '</span>' : '') +
       (r.notitie ? '<em>' + esc(r.notitie) + '</em>' : '') +
-      '<span class="h-flex1"></span>' +
-      (naar ? '<button class="knop' + (r.stand === 'besteld' ? '' : ' p') + '" data-zet="' + esc(r.regelId) +
+      '<span class="ds-horeca-groei"></span>' +
+      (naar ? '<button class="knop ds-knop ds-knop--klein' + (r.stand === 'besteld' ? '' : ' p') + '" data-zet="' + esc(r.regelId) +
         '" data-rek="' + esc(g.rekeningId) + '" data-naar="' + naar + '">' + KNOP[r.stand] + '</button>'
         : '<em>staat klaar</em>') + '</li>';
   }
@@ -61,20 +61,20 @@
     $('bStapel').innerHTML = d.stapel.length ? d.stapel.map(function (x) {
       return '<div><b>' + x.aantal + 'x ' + esc(x.naam) + '</b><small>' +
         esc(x.tafels.join(', ')) + '</small></div>';
-    }).join('') : '<p class="b-leeg">Niets te maken.</p>';
+    }).join('') : '<p class="b-leeg ds-horeca-werkleeg">Niets te maken.</p>';
 
     $('bGolvenLijst').innerHTML = d.golven.length ? d.golven.map(function (g) {
-      return '<article class="b-golf' + (g.staat > 0 ? ' wacht' : '') + '">' +
-        '<div class="b-golfkop"><span class="b-tafel">' + esc(g.tafel) + '</span>' +
+      return '<article class="b-golf ds-horeca-werkkaart' + (g.staat > 0 ? ' wacht' : '') + '">' +
+        '<div class="b-golfkop ds-horeca-kaartrij"><span class="b-tafel ds-horeca-werknaam">' + esc(g.tafel) + '</span>' +
         (g.gang ? '<span>gang ' + g.gang + '</span>' : '') +
-        '<span class="b-min">' + g.sinds + ' min</span></div>' +
+        '<span class="b-min ds-horeca-werkaantal">' + g.sinds + ' min</span></div>' +
         (g.staat > 0
-          ? '<p class="b-voet z-mt30">Het eerste glas staat ' + g.staat +
+          ? '<p class="b-voet ds-horeca-werkvoet z-mt30 ds-horeca-kortvoet">Het eerste glas staat ' + g.staat +
             ' min te wachten op de rest van deze ronde.</p>'
-          : (g.compleet ? '<p class="b-voet z-mt30">Compleet; wacht op een drager (zie de pas).</p>' : '')) +
-        '<ul class="b-regels">' + g.regels.map(function (r) { return regel(g, r); }).join('') + '</ul>' +
+          : (g.compleet ? '<p class="b-voet ds-horeca-werkvoet z-mt30 ds-horeca-kortvoet">Compleet; wacht op een drager (zie de pas).</p>' : '')) +
+        '<ul class="b-regels ds-horeca-barregels">' + g.regels.map(function (r) { return regel(g, r); }).join('') + '</ul>' +
         '</article>';
-    }).join('') : '<p class="b-leeg">Geen open ronden. Wat de zaal niet heeft vrijgegeven, staat hier niet.</p>';
+    }).join('') : '<p class="b-leeg ds-horeca-werkleeg">Geen open ronden. Wat de zaal niet heeft vrijgegeven, staat hier niet.</p>';
 
     /* AANZETTEN EN KLAAR MELDEN GAAN VIA DE OFFLINE-LAAG, ook als er gewoon
        verbinding is. Dat is geen omweg maar de enige manier waarop het achter de

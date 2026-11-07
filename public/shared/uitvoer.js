@@ -107,23 +107,17 @@
     return { ok: true, aantal: d.rijen.length };
   }
 /* Uitvoer: bediening, dialoog en feedback. */
-  var LIJN = '1px solid var(--line,var(--lijn,#2A2724))';
-  /* Themakleur vóór de fallback: behoudt minimaal 4,5:1 contrast. */
-  var ZACHT = 'var(--rtg-muted,var(--muted,var(--zacht,#8A8680)))';
-  var css = '.rtguitvoer-knop.rtguitvoer-knop,.rtguitvoer-rij button{background:none;cursor:pointer;' +
-      'min-height:44px;padding:.5rem .9rem;white-space:nowrap;border:' + LIJN + ';color:' + ZACHT + ';' +
-      'font:600 .72rem Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}' +
-    '.rtguitvoer-knop.rtguitvoer-knop{margin-left:.5rem;align-self:center;color:var(--ds-inkt-zacht,' + ZACHT + ');}' +
-    '.rtguitvoer-knop:hover{color:var(--ds-inkt,var(--rtg-txt,var(--txt,#F7F5F1)));}' +
-    '.rtguitvoer-laag{position:fixed;inset:0;z-index:9991;display:flex;align-items:flex-end;' +
-      'justify-content:center;background:rgba(0,0,0,.6);}' +
-    '.rtguitvoer-laag[hidden]{display:none;}' +
-    '.rtguitvoer-blad{width:min(26rem,100%);background:var(--paneel,#151412);color:var(--txt,#F7F5F1);' +
-      'border:' + LIJN + ';padding:1.3rem 1.4rem calc(1.4rem + env(safe-area-inset-bottom));}' +
-    '.rtguitvoer-blad h2{font:500 1.15rem var(--serif),Georgia,serif;margin:0 0 .5rem;}' +
-    '.rtguitvoer-blad p{margin:0 0 1.1rem;font:.85rem/1.6 Inter,system-ui,sans-serif;color:' + ZACHT + ';}' +
-    '.rtguitvoer-rij{display:flex;gap:.5rem;flex-wrap:wrap;}' +
-    '.rtguitvoer-rij button{flex:1 1 6rem;}';
+  var ds = true;
+  var knopStijl = ' ds-knop ds-knop--stil';
+  function laadUitvoerPresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var uitvoerStijlLink = document.createElement('link');
+    uitvoerStijlLink.id = 'rtgDsRuntimeCss';
+    uitvoerStijlLink.rel = 'stylesheet';
+    uitvoerStijlLink.href = pad;
+    document.head.appendChild(uitvoerStijlLink);
+  }
 
   var knop = null, laag = null, melding = null, tik = 0, pogingen = 0, terugFocus = null;
   var gastKnop = null, gastLaag = null, gekozenKnop = null, gekozenLaag = null;
@@ -144,10 +138,10 @@
     if (laag) return;
     // alleen vaste tekst als markup; aantallen en uitkomst gaan met textContent
     document.body.insertAdjacentHTML('beforeend',
-      '<div class="rtguitvoer rtguitvoer-laag" hidden role="dialog" aria-modal="true" aria-label="Meenemen">' +
-      '<div class="rtguitvoer-blad"><h2>Meenemen</h2><p></p><div class="rtguitvoer-rij">' +
-      '<button type="button" data-vorm="csv">CSV</button><button type="button" data-vorm="json">JSON</button>' +
-      '<button type="button" class="rtguitvoer-sluit">Sluiten</button></div></div></div>');
+      '<div class="rtguitvoer rtguitvoer-laag' + (ds ? ' ds-uitvoer-laag' : '') + '" hidden role="dialog" aria-modal="true" aria-label="Meenemen">' +
+      '<div class="rtguitvoer-blad' + (ds ? ' ds-dialoog ds-uitvoer-blad' : '') + '"><h2' + (ds ? ' class="ds-uitvoer-titel"' : '') + '>Meenemen</h2><p' + (ds ? ' class="ds-uitvoer-tekst"' : '') + '></p><div class="rtguitvoer-rij' + (ds ? ' ds-uitvoer-rij' : '') + '">' +
+      '<button type="button" class="' + knopStijl.trim() + '" data-vorm="csv">CSV</button><button type="button" class="' + knopStijl.trim() + '" data-vorm="json">JSON</button>' +
+      '<button type="button" class="rtguitvoer-sluit' + knopStijl + '">Sluiten</button></div></div></div>');
     laag = document.body.lastElementChild;
     if (gastLaag && gastLaag.isConnected) gastLaag.appendChild(laag);
     melding = laag.querySelector('p');
@@ -220,6 +214,7 @@
   }
 
   // Reassess actual data and host visibility when the screen changes.
+// Herstelt de gedeelde inhoudslaag voor zelfstandige applicaties.
   function herzie() {
     if (!document.body) return;
     // Standalone pages share one visible content frame. A former workspace
@@ -250,8 +245,13 @@
     if (!knop) {
       knop = document.createElement('button');
       knop.type = 'button';
-      knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast';
+      knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast' + knopStijl + (ds ? ' ds-uitvoer-knop' : '');
       knop.setAttribute('aria-haspopup', 'dialog');
+      /* Deze knop bestaat alleen zolang het scherm werkelijk uitvoerbare
+         gegevens heeft. Bedien hem daarom als kortlevende hoofdactie voordat
+         een andere schermhandeling de bron opnieuw tekent. Dit is ook voor
+         toetsenbord- en Edge-regie de expliciete betekenis van de knop. */
+      knop.setAttribute('data-hoofdactie', '');
       knop.textContent = 'Meenemen';
       knop.addEventListener('click', toon);
     }
@@ -259,9 +259,9 @@
   }
 
   function start() {
-    var st = document.createElement('style');
-    st.textContent = css;
-    document.head.appendChild(st);
+    // Ook oudere hosts krijgen dezelfde canonieke component; alleen het laden
+    // verschilt zolang zij nog geen expliciete data-ds-markering dragen.
+    laadUitvoerPresentatie('/ds/rtg-ds.css');
     herzie();
     if (!window.MutationObserver) return;
     var kijker = new MutationObserver(function () { clearTimeout(tik); tik = setTimeout(herzie, 300); });

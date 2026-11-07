@@ -7,7 +7,11 @@
   var appBasis = document.querySelector('meta[name="rtg-app-base"]');
   var appUrl = new URL(appBasis ? appBasis.content : 'https://app.rahultravelgroup.com/', document.baseURI).href;
 
-  function naarApp(route) { return new URL(String(route || '').replace(/^\//, ''), appUrl).href; }
+  function naarApp(route) {
+    var pad = String(route || '');
+    if (!/^\/apps\/[A-Za-z0-9_./-]+\.html(?:[?#][^\s]*)?$/.test(pad)) return new URL('apps/app.html', appUrl).href;
+    return new URL(pad.replace(/^\//, ''), appUrl).href;
+  }
 
   function zetTekst(element, tekst) {
     if (element) element.textContent = tekst;
@@ -28,7 +32,7 @@
     vulLijst(kaart.querySelector('[data-app-truth-tools]'), wereld.tools.slice(0, 3).map(function (tool) { return tool.name; }));
     var link = kaart.querySelector('[data-app-truth-link]');
     if (link) {
-      link.href = naarApp(wereld.publicRoute);
+      link.setAttribute('href', naarApp(wereld.publicRoute));
       link.dataset.appPath = wereld.publicRoute;
       link.textContent = 'Open ' + wereld.name;
     }
@@ -74,7 +78,7 @@
         uitleg.textContent = app.summary;
         noot.textContent = app.note;
         vulLijst(acties, app.actions);
-        link.href = naarApp(app.route);
+        link.setAttribute('href', naarApp(app.route));
         link.dataset.appPath = app.route;
         link.textContent = 'Open ' + app.name;
         samenvatting.append(naam, hint);
@@ -118,7 +122,7 @@
     samenvatting.textContent = 'Bekijk alle ' + wereld.featureCount + ' apps';
     catalogus.append(samenvatting, maakAppgroepen(wereld));
     var link = document.createElement('a');
-    link.href = naarApp(wereld.publicRoute);
+    link.setAttribute('href', naarApp(wereld.publicRoute));
     link.textContent = 'Bekijk de huidige app';
     blok.append(titel, tekst, catalogus, link);
     kopie.appendChild(blok);
@@ -138,12 +142,12 @@
     vulLijst(element.querySelector('[data-app-truth-screen-actions]'), screen.actions);
     var image = element.querySelector('[data-app-truth-screen-image]');
     if (image) {
-      image.src = new URL(screen.image, middelenBasis).href;
+      image.setAttribute('src', new URL(screen.image, middelenBasis).href);
       image.alt = 'Echt scherm van ' + screen.name + ' in een afgeschermde testomgeving';
     }
     var link = element.querySelector('[data-app-truth-screen-link]');
     if (link) {
-      link.href = naarApp(screen.route);
+      link.setAttribute('href', naarApp(screen.route));
       link.dataset.appPath = screen.route;
       link.textContent = screen.action;
     }

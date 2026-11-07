@@ -49,8 +49,10 @@ test('de functiebibliotheek bevat alle routes, zonder dode knop of dubbele id',(
   const minima={work:16,travel:13,living:12,foundation:60};
   for(const [wereld,cfg] of Object.entries(catalogus)){
     assert.ok(cfg.all.length>=minima[wereld],wereld+' heeft de volledige catalogus');
+    for(const ingang of [cfg.home,cfg.huis,cfg.workspace]) assert.match(ingang,/^\/apps\//,wereld+': interne ingang');
     assert.equal(new Set(cfg.all.map(x=>x[0])).size,cfg.all.length,wereld+' heeft unieke functie-id’s');
     for(const item of cfg.all){
+      assert.match(item[3],/^\/apps\//,wereld+': interne functieroute');
       const route=new URL(item[3],'https://rtg.example').pathname;
       assert.ok(fs.existsSync(path.join(__dirname,'../public',route)),wereld+': '+item[3]);
       assert.ok(context.window.RTGEdgeIcons[item[2]],wereld+': icoon '+item[2]);
@@ -71,6 +73,10 @@ test('zoeken, sneltoetsen, status en breadcrumbs zijn echte bediening',()=>{
   assert.match(bibliotheek,/fetch\('\/api\/health'/);
   assert.match(bibliotheek,/health\.omgeving === 'magnaat-test'/);
   assert.match(bibliotheek,/Afgeschermde Magnaat-testomgeving/);
+  assert.match(bibliotheek,/w\.location\.assign\(e\.cfg\.home\)/,
+    'de home-breadcrumb gebruikt expliciete browsernavigatie');
+  assert.doesNotMatch(bibliotheek,/location\.href\s*=\s*e\.cfg\.home/,
+    'de breadcrumb mag geen dynamisch laadattribuut schrijven');
   assert.doesNotMatch(bibliotheek,/Demostand|health\.demo/);
 });
 

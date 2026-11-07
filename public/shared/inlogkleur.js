@@ -12,6 +12,16 @@
 (function (w, d) {
   'use strict';
 
+  function laadInlogkleurStijl() {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var inlogkleurStijlLink = document.createElement('link');
+    inlogkleurStijlLink.id = 'rtgDsRuntimeCss';
+    inlogkleurStijlLink.rel = 'stylesheet';
+    inlogkleurStijlLink.href = '/ds/rtg-ds.css';
+    document.head.appendChild(inlogkleurStijlLink);
+  }
+
   // ---- rekenhulp ----
   function dagVanJaar(dt) {
     var start = new Date(dt.getFullYear(), 0, 0);
@@ -102,10 +112,11 @@
     return { top: top, onder: onder, basis: basis, accent: accent, hue: hue, seizoen: seiz, uur: uur };
   }
 
-  // ---- toepassen: een gedeelde stijlregel + variabelen op :root ----
-  var STIJL_ID = 'inlogkleur-stijl';
+  // ---- toepassen: de presentatie staat centraal in inlogkleur.css; deze
+  // eigenaar berekent uitsluitend de vier levende kleurvariabelen ----
   function verf() {
     if (!d.querySelector('[data-inlogkleur]')) return;
+    laadInlogkleurStijl();
     var p = palet();
     var r = d.documentElement.style;
     r.setProperty('--inlog-top', p.top);
@@ -119,15 +130,9 @@
        onderdelen lezen --rtg-muted rechtstreeks. Het attribuut zet de hele
        donkere set, en die staat op EEN plek (shared/rtg-themas.css). */
     var vlakken = d.querySelectorAll('[data-inlogkleur]');
-    for (var i = 0; i < vlakken.length; i++) vlakken[i].setAttribute('data-rtg-vlak', 'onyx');
-    if (!d.getElementById(STIJL_ID)) {
-      var st = d.createElement('style');
-      st.id = STIJL_ID;
-      st.textContent = '[data-inlogkleur]{background:' +
-        'radial-gradient(155% 78% at 50% -6%, var(--inlog-top), transparent 60%),' +
-        'radial-gradient(135% 68% at 50% 116%, var(--inlog-onder), transparent 62%),' +
-        'var(--inlog-basis) !important;}';
-      (d.head || d.documentElement).appendChild(st);
+    for (var i = 0; i < vlakken.length; i++) {
+      vlakken[i].classList.add('ds-inlogkleur');
+      vlakken[i].setAttribute('data-rtg-vlak', 'onyx');
     }
   }
 

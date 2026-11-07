@@ -5,6 +5,16 @@
   if (w.RTGAccessExperience) return;
   var gepland = false, selector = '[data-inlogkleur],[data-rtg-toegang],#gate,#login,#inlog,#vLogin,#vPoort,#dlgLogin,#lrInlog';
 
+  function laadToegangLegacyStijl(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtg-toegang-stijl')) return;
+    var toegangLegacyStijlLink = document.createElement('link');
+    toegangLegacyStijlLink.id = 'rtg-toegang-stijl';
+    toegangLegacyStijlLink.rel = 'stylesheet';
+    toegangLegacyStijlLink.href = pad;
+    document.head.appendChild(toegangLegacyStijlLink);
+  }
+
   function soort(root) {
     var eigen = root.getAttribute('data-rtg-toegang');
     if (eigen && eigen !== '1') return eigen;
@@ -54,9 +64,7 @@
   }
   function plan() { if (gepland) return; gepland = true; (w.requestAnimationFrame || w.setTimeout)(scan); }
   function start() {
-    if (!d.querySelector('link[href^="/shared/toegang.css"]')) {
-      var css = d.createElement('link'); css.rel = 'stylesheet'; css.href = '/shared/toegang.css'; (d.head || d.documentElement).appendChild(css);
-    }
+    laadToegangLegacyStijl('/shared/toegang.css');
     scan(); if (w.MutationObserver) new MutationObserver(plan).observe(d.body, { childList: true, subtree: true });
   }
   w.RTGAccessExperience = { scan: scan, enhance: verrijk };

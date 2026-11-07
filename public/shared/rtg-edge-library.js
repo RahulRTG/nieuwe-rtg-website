@@ -83,7 +83,7 @@
   }
   function crumbs(e, open, actie) {
     var r = e.root;
-    r.querySelector('[data-crumb="home"]').onclick = function () { location.href = e.cfg.home; };
+    r.querySelector('[data-crumb="home"]').onclick = function () { w.location.assign(e.cfg.home); };
     r.querySelector('[data-crumb="scope"]').onclick = function () { open(true); };
     r.querySelector('[data-crumb="current"]').onclick = actie;
   }

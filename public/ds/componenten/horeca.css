@@ -1,0 +1,55 @@
+/* Operationele schil voor de zeven bestaande Horeca-enterprisemodules.
+   Geen eigen velden-/knoppenstelsel: ds-invoer, ds-knop en ds-kaart blijven leidend. */
+@layer rtg.component {
+ .ds-horeca-shell { display: flex; flex-wrap: wrap; align-items: stretch; padding-block-end: calc(var(--ds-edge-hoogte) + env(safe-area-inset-bottom) + var(--ds-ruimte-8)); }
+ .ds-horeca-rail { flex: 1 1 11rem; min-inline-size: 0; padding: var(--ds-ruimte-4); border-inline-end: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak-sterk); }
+ .ds-horeca-rail nav { display: grid; gap: var(--ds-ruimte-2); }
+ .ds-horeca-rail a, .ds-horeca-rail summary { display: flex; align-items: center; gap: var(--ds-ruimte-3); min-block-size: var(--ds-doel); padding-inline: var(--ds-ruimte-3); color: var(--ds-inkt); text-decoration: none; cursor: pointer; overflow-wrap: anywhere; }
+ .ds-horeca-rail i { font-style: normal; }
+ .ds-horeca-rail .actief { background: var(--ds-accent); color: var(--ds-accent-inkt); border-radius: var(--ds-radius-knop); }
+ .ds-horeca-main { flex: 999 1 38rem; min-inline-size: 0; max-inline-size: 100%; }
+ .ds-horeca-top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); padding-block: calc(env(safe-area-inset-top) + var(--ds-ruimte-4)) var(--ds-ruimte-4); padding-inline: var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur); }
+ .ds-horeca-top > div, .ds-horeca-top > section { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-3); min-inline-size: 0; }
+ .ds-horeca-top button { font: inherit; color: var(--ds-inkt); background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); min-block-size: var(--ds-doel); padding-inline: var(--ds-ruimte-3); border-radius: var(--ds-radius-knop); }
+ .ds-horeca-domein { font-weight: 600; overflow-wrap: anywhere; }
+ .ds-horeca-top small { display: block; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); }
+ .ds-horeca-role { color: var(--ds-metaal); font-size: var(--ds-maat-meta); overflow-wrap: anywhere; }
+ .ds-horeca-module-hero { padding-block: var(--ds-ruimte-8); padding-inline: var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur); }
+ .ds-horeca-module-hero > span, .ds-horeca-label { color: var(--ds-metaal); font-size: var(--ds-maat-meta); letter-spacing: .1em; }
+ .ds-horeca-module-hero h1 { font-family: var(--ds-letter-display); font-size: var(--ds-maat-display); font-weight: 400; line-height: 1.15; margin-block: var(--ds-ruimte-4); overflow-wrap: anywhere; }
+ .ds-horeca-module-hero p { max-inline-size: 65ch; color: var(--ds-inkt-zacht); }
+ .ds-horeca-module { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,26rem),1fr)); gap: var(--ds-ruimte-4); padding: var(--ds-goot); min-inline-size: 0; }
+ .ds-horeca-kaart { padding: var(--ds-ruimte-4); min-inline-size: 0; overflow-wrap: anywhere; }
+ .ds-horeca-kop { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); margin-block-end: var(--ds-ruimte-4); }
+ .ds-horeca-kpis { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,8rem),1fr)); gap: var(--ds-ruimte-3); grid-column: 1 / -1; }
+ .ds-horeca-kpi { display: grid; gap: var(--ds-ruimte-2); padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+ .ds-horeca-kpi b { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-variant-numeric: tabular-nums; }
+ .ds-horeca-meta, .ds-horeca-kpi span { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.6; }
+ .ds-horeca-rij { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); }
+ .ds-horeca-rij .ds-invoer { flex: 1 1 11rem; min-inline-size: 0; max-inline-size: 100%; }
+ .ds-horeca .ds-invoer { min-inline-size: 0; }
+ .ds-horeca textarea.ds-invoer { min-block-size: 7rem; padding-block: var(--ds-ruimte-3); border-radius: var(--ds-radius-inhoud); }
+ .ds-horeca .ds-knop { min-inline-size: var(--ds-doel); white-space: normal; }
+ .ds-horeca .ds-knop.p { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+ .ds-horeca-item { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--ds-ruimte-3); padding-block: var(--ds-ruimte-3); border-block-start: 1px solid var(--ds-lijnkleur); }
+ .ds-horeca-item small { display: block; color: var(--ds-inkt-zacht); }
+ .ds-horeca-tag { display: inline-block; padding: var(--ds-ruimte-1) var(--ds-ruimte-2); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); font-size: var(--ds-maat-meta); }
+ .ds-horeca-tag.laat, .ds-horeca-item.laat, .ds-horeca-allergie { color: var(--ds-accent); border-color: var(--ds-accent); }
+ .ds-horeca-tag.aan { color: var(--ds-accent); border-color: var(--ds-accent); }
+ .ds-horeca-bon { padding: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+ .ds-horeca-afstand { margin-block-start: var(--ds-ruimte-4); }
+ .ds-horeca-groei { flex: 1; }
+ .ds-horeca-wrap { flex-wrap: wrap; }
+ .ds-horeca-head, .ds-horeca-live { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+ .ds-horeca-grid, .ds-horeca-missions { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,18rem),1fr)); gap: var(--ds-ruimte-4); }
+ .ds-horeca-command, .ds-horeca-mission { padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+ .ds-horeca-command label, .ds-horeca-label { display: block; margin-block-end: var(--ds-ruimte-2); }
+ .ds-horeca-person, .ds-horeca-mission { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-3); margin-block: var(--ds-ruimte-3); }
+ .ds-horeca-person small, .ds-horeca-mission small, .ds-horeca-proposal strong { display: block; }
+ .ds-horeca-proposal, .ds-horeca-space { margin-block-start: var(--ds-ruimte-4); }
+ .ds-horeca-empty { color: var(--ds-inkt-zacht); }
+ .ds-horeca-ondernav { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); padding: var(--ds-goot); padding-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6)); }
+ .ds-horeca-ondernav a { display: flex; align-items: center; gap: var(--ds-ruimte-2); min-block-size: var(--ds-doel); color: var(--ds-inkt); text-decoration: none; }
+ .ds-horeca-ondernav svg { inline-size: 1.25rem; block-size: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.5; }
+ @media(prefers-reduced-motion:reduce) { .ds-horeca .ds-knop { transition: none; } }
+}

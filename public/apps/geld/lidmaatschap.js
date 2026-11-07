@@ -137,17 +137,6 @@
     else if (b.id === 'lmLaat') $('#lmGevolg').innerHTML = '';
   }
 
-  /* De stijl via createElement en niet als <style> in de html-string: zie
-     ./rtgcodeb.js -- een blok uit innerHTML krijgt geen CSP-nonce. */
-  function stijl() {
-    if (d.getElementById('lmStijl')) return;
-    var st = d.createElement('style');
-    st.id = 'lmStijl';
-    st.textContent = '.lm-rij{margin:.35rem 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}' +
-      '.lm-pas{margin:0 0 .4rem}';
-    d.head.appendChild(st);
-  }
-
   V.standen.push({
     id: 'lidmaatschap',
     naam: 'Lidmaatschap',
@@ -162,7 +151,6 @@
       '</div>',
     start: function () {
       ABO = null;
-      stijl();
       $('#lmWrap').addEventListener('click', klik);
       laad();
     }

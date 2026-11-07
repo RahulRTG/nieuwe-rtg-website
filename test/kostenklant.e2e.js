@@ -53,6 +53,8 @@ test('de stand Kosten: geen bedrag zonder tarief, wel met, en de keten opent',
 
     await page.goto(base + '/apps/geld.html#kosten', { waitUntil: 'networkidle' });
     await page.waitForSelector('#ksHoofd .rtg-status', { timeout: 15000 });
+    assert.match(await page.locator('html').getAttribute('class'), /ds-kostenbeeld/);
+    assert.equal(await page.locator('link[href="/ds/rtg-ds.css"]').count(), 1);
 
     /* 1. GEEN TARIEF, DUS GEEN BEDRAG. Er is nog geen enkel tarief ingevoerd in
        deze verse omgeving, dus de server rekent niets uit en de graad staat op
@@ -78,6 +80,10 @@ test('de stand Kosten: geen bedrag zonder tarief, wel met, en de keten opent',
 
     await page.reload({ waitUntil: 'networkidle' });
     await page.waitForSelector('#ksRegels .rij', { timeout: 15000 });
+    const waaromMaat = await page.locator('#ksRegels [data-waarom="verzoek"]').evaluate(el => {
+      const r = el.getBoundingClientRect(); return { width:r.width,height:r.height,outline:getComputedStyle(el).outlineStyle };
+    });
+    assert.ok(waaromMaat.height >= 44, JSON.stringify(waaromMaat));
     const metTarief = await page.textContent('#ksHoofd');
     assert.match(metTarief, /€/, 'met een tarief hoort er wel een bedrag te staan: ' + metTarief.slice(0, 200));
     assert.match(metTarief, /gemeten/, 'het bedrag hoort zijn bewijsgraad naast zich te dragen');
@@ -142,6 +148,8 @@ test('het zaakscherm: dezelfde eerlijkheid, op de sessie van de zaak',
        alleen hier opvallen. */
     await page.goto(base + '/apps/zaakkosten.html', { waitUntil: 'networkidle' });
     await page.waitForSelector('#ksHoofd .rtg-status', { timeout: 15000 });
+    assert.match(await page.locator('html').getAttribute('class'), /ds-kostenbeeld/);
+    assert.equal(await page.locator('link[href="/ds/rtg-ds.css"]').count(), 1);
     const kaal = await page.textContent('#ksHoofd');
     assert.match(kaal, /Niet vast te stellen/, 'de toestand hoort eerlijk te zijn: ' + kaal.slice(0, 200));
     assert.ok(!/€/.test(kaal), 'er staat een bedrag terwijl er geen tarief is: ' + kaal.slice(0, 200));

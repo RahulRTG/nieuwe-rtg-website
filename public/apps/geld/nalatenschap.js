@@ -17,23 +17,6 @@
      rij, de kleine wegknop, de halve formulierregels en het antwoordvak van
      de adviseur. Een keer injecteren, met id-wacht, want tien standen delen
      dit document. */
-  D.stijl = function () {
-    if (d.getElementById('nlStijl')) return;
-    var s = d.createElement('style');
-    s.id = 'nlStijl';
-    s.textContent =
-      '#paneel .nl-tx{flex:1;min-width:0;}' +
-      '#paneel .nl-tx .badge{margin-left:.35rem;}' +
-      '#paneel .nl-weg{background:none;border:0;color:var(--gold-tekst);font-size:.75rem;' +
-        'cursor:pointer;padding:0;text-decoration:underline;font-family:inherit;flex-shrink:0;}' +
-      '#paneel .nl-half{display:flex;gap:.4rem;margin-top:.4rem;}' +
-      '#paneel .nl-half>*{flex:1;min-width:0;}' +
-      '#paneel .nl-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +
-      '#paneel .nl-vraag input{flex:1;width:auto;}' +
-      '#paneel .nl-uit{border:1px solid var(--rtg-line);border-radius:0;padding:.6rem .8rem;' +
-        'margin-top:.6rem;font-size:.85rem;line-height:1.55;white-space:pre-wrap;}';
-    d.head.appendChild(s);
-  };
 
   function opties(l) {
     return (l || []).map(function (x) {

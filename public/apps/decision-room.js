@@ -10,7 +10,8 @@
   function alle(q) { return Array.prototype.slice.call(root.querySelectorAll(q)); }
   function gekozen() { return staat && (staat.goedkeuringen || []).find(function (x) { return String(x.id) === String(gekozenId); }); }
   function melding(tekst) {
-    var el = d.getElementById('drMelding'); el.textContent = tekst; el.hidden = false;
+    var el = d.getElementById(laag.open ? 'drIntakeMelding' : 'drMelding'); el.textContent = tekst; el.hidden = false;
+    if (laag.open) return;
     w.clearTimeout(melding.timer); melding.timer = w.setTimeout(function () { el.hidden = true; }, 3600);
   }
   async function persoonlijkToken() {
@@ -39,10 +40,10 @@
   function datum(v) { var x = new Date(v), t = x.getTime(); return Number.isFinite(t) ? x.toLocaleString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'tijd onbekend'; }
   function archief() {
     var doel = root.querySelector('#drArchief'), lijst = (staat && staat.goedkeuringen || []).filter(function (x) { return x.status !== 'wacht'; });
-    if (!lijst.length) { doel.innerHTML = '<div class="dr-leeg"><h2>Nog geen gesloten besluiten.</h2><p>Na een menselijke bevestiging verschijnt de keuze hier met reden, rol en tijdstip.</p></div>'; return; }
-    doel.innerHTML = '<div class="dr-archief">' + lijst.map(function (x) {
+    if (!lijst.length) { doel.innerHTML = '<div class="dr-leeg ds-werkdocument-leeg"><h2>Nog geen gesloten besluiten.</h2><p>Na een menselijke bevestiging verschijnt de keuze hier met reden, rol en tijdstip.</p></div>'; return; }
+    doel.innerHTML = '<div class="dr-archief ds-werkdocument-archief">' + lijst.map(function (x) {
       var b = x.besluit || {}, reden = b.reden || x.reden || 'Geen afzonderlijke beslisreden vastgelegd.';
-      return '<button class="dr-archiefkaart" type="button" data-dr-kies="' + veilig(x.id) + '"><span><span class="dr-ey">' + veilig(x.type || 'operations') + ' · ' + veilig(b.label || x.aanvragerLabel || 'menselijke beoordeling') + '</span><h2>' + veilig(x.titel) + '</h2><p>' + veilig(reden) + ' · ' + veilig(datum(x.beslotenAt || b.at || x.at)) + '</p></span><span class="dr-status ' + veilig(x.status) + '">' + veilig(x.status) + '</span></button>';
+      return '<button class="ds-knop ds-knop--klein dr-archiefkaart ds-werkdocument-archiefkaart" type="button" data-dr-kies="' + veilig(x.id) + '"><span><span class="dr-ey ds-werkdocument-ey">' + veilig(x.type || 'operations') + ' · ' + veilig(b.label || x.aanvragerLabel || 'menselijke beoordeling') + '</span><h2>' + veilig(x.titel) + '</h2><p>' + veilig(reden) + ' · ' + veilig(datum(x.beslotenAt || b.at || x.at)) + '</p></span><span class="dr-status ds-werkdocument-status ' + veilig(x.status) + '">' + veilig(x.status) + '</span></button>';
     }).join('') + '</div>';
   }
   function teken() {
@@ -62,23 +63,26 @@
       /* ?nieuw=1 komt uit RTG One: daar staat de knop "nieuw besluit", maar voorleggen
          en beslissen gebeuren hier (SCHERMEIGENAAR.json). */
       if (!intakeEenmaal && (params.get('document') || params.get('nieuw'))) { intakeEenmaal = true; openIntake(); }
-    } catch (e) { root.querySelector('#drAgenda').innerHTML = '<div class="dr-leeg"><h2>Decision Room kon niet laden.</h2><p>' + veilig(e.message) + '</p></div>'; }
+    } catch (e) { root.querySelector('#drAgenda').innerHTML = '<div class="dr-leeg ds-werkdocument-leeg"><h2>Decision Room kon niet laden.</h2><p>' + veilig(e.message) + '</p></div>'; }
   }
   /* Een herhaalsleutel per geopende intake: een tweede tik of een herhaling
      na een afgebroken verbinding maakt geen tweede voorstel (kern/rtgone.js). */
-  var intakeIdem = '';
+  var intakeIdem = '', intakeOpener = null;
+  function wisIntakeMelding() { var el = d.getElementById('drIntakeMelding'); el.textContent = ''; el.hidden = true; }
   function openIntake() {
+    if (laag.open) return;
+    intakeOpener = d.activeElement;
     intake.reset();
+    wisIntakeMelding();
     intakeIdem = w.RTGId('dr');
     intake.elements.titel.value = params.get('titel') || '';
     intake.elements.documentId.value = params.get('document') || '';
     intake.elements.documentTitel.value = params.get('titel') || '';
     intake.elements.projectId.value = params.get('project') || '';
     intake.elements.bronMailId.value = params.get('mail') || '';
-    laag.hidden = false; d.body.style.overflow = 'hidden';
-    w.setTimeout(function () { intake.elements.titel.focus(); }, 30);
+    laag.showModal(); intake.elements.titel.focus();
   }
-  function sluitIntake() { laag.hidden = true; d.body.style.overflow = ''; }
+  function sluitIntake() { if (!laag.open) return; laag.close(); wisIntakeMelding(); if (intakeOpener && intakeOpener.isConnected) intakeOpener.focus(); }
   root.addEventListener('click', function (e) {
     var knop = e.target.closest('[data-dr-open],[data-dr-kies],[data-dr-nieuw],[data-dr-huis]'); if (!knop) return;
     if (knop.dataset.drNieuw !== undefined) openIntake();
@@ -86,9 +90,14 @@
     else if (knop.dataset.drKies) { gekozenId = knop.dataset.drKies; open((gekozen() && gekozen().status === 'wacht') ? 'afweging' : 'besluit'); }
     else if (knop.dataset.drOpen) open(knop.dataset.drOpen);
   });
-  laag.addEventListener('click', function (e) { if (e.target === laag || e.target.closest('[data-dr-sluit]')) sluitIntake(); });
+  laag.addEventListener('click', function (e) {
+    if (e.target.closest('[data-dr-sluit]')) return sluitIntake();
+    if (e.target !== laag) return; var r = laag.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) sluitIntake();
+  });
+  laag.addEventListener('cancel', function (e) { e.preventDefault(); sluitIntake(); });
   intake.addEventListener('submit', async function (e) {
-    e.preventDefault(); var knop = e.submitter, fd = new FormData(intake), body = { huis: huis };
+    e.preventDefault(); wisIntakeMelding(); var knop = e.submitter, fd = new FormData(intake), body = { huis: huis };
     fd.forEach(function (v, k) { body[k] = v; }); body.omkeerbaar = intake.elements.omkeerbaar.checked; body.idem = intakeIdem;
     knop.disabled = true;
     try { var uit = await api('/api/rtgone/goedkeuring', body); gekozenId = uit.goedkeuring.id; sluitIntake(); await laad(); open('afweging'); melding('Het voorstel staat controleerbaar klaar voor menselijke afweging.'); }
@@ -102,6 +111,5 @@
     try { var uit = await api('/api/rtgone/goedkeuring/beslis', { id: gekozenId, besluit: fd.get('besluit'), reden: reden, voorwaarde: fd.get('voorwaarde') }); staat.goedkeuringen = staat.goedkeuringen.map(function (x) { return x.id === uit.goedkeuring.id ? uit.goedkeuring : x; }); open('besluit'); melding(uit.goedkeuring.status === 'wacht' ? 'Uw beoordeling staat vast. De volgende bevoegde beoordelaar is nu aan zet.' : 'Het menselijke besluit en de reden zijn vastgelegd.'); }
     catch (fout) { melding(fout.message); } finally { knop.disabled = false; }
   });
-  d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !laag.hidden) sluitIntake(); });
   laad();
 }(window, document));

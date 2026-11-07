@@ -211,8 +211,19 @@ test('7. wachten op een antwoord dat er al is', () => {
   /* shared/plek.js kon "er komt geen plek" niet doorgeven, dus wachtte de app
      altijd zijn volle time-out uit: gemeten 12,2 seconden zwart scherm. */
   assert.match(plek, /opties\.geenPlek === 'function'/, 'volg() kan een uitblijvende plek niet melden');
-  assert.match(plek, /if \(gehad \|\| gemeld \|\| gestopt\) return;/,
-    'geenPlek hoort hoogstens een keer af te gaan, en nooit na een geslaagde fix');
+  // De lifecycle woont op de Plek-owner. Toets de echte callbacks, niet de
+  // spelling van een lokale stopvariabele; dit blijft geen browserbewijs.
+  const { fixture, fix, weiger } = require('./lib/plek-fixture');
+  for (const stand of ['wacht', 'fix', 'gestopt']) {
+    const f = fixture({ key: '1' }), redenen = [];
+    const stop = f.api.volg(() => {}, { geenPlek: reden => redenen.push(reden) });
+    if (stand === 'fix') fix(f.watches[0]);
+    if (stand === 'gestopt') stop();
+    weiger(f.watches[0]); weiger(f.watches[0]);
+    assert.deepEqual(redenen, stand === 'wacht' ? ['toestel-weigert'] : [],
+      'geenPlek hoogstens eenmaal en nooit na een fix of stop: ' + stand);
+    stop();
+  }
   assert.match(schermKaal, /geenPlek: reden =>/, 'het scherm luistert niet naar een uitblijvende plek');
   assert.doesNotMatch(schermKaal, /window\.prompt/,
     'de meldknop staat weer in een browservenster; dat blokkeert de pagina en ontbreekt in een PWA');

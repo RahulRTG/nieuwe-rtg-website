@@ -1,0 +1,38 @@
+{
+  "id":"legal-documents",
+  "version":1,
+  "purpose":"find_published_legal_documents",
+  "humanIntent":"Ik wil het overzicht van de voorwaarden en het privacybeleid van RTG vinden.",
+  "audience":"public",
+  "emotionalMode":"clarity",
+  "owner":"LivingOS · publieke juridische informatie · site.juridisch",
+  "domainObject":"Verwijzingen naar de drie gepubliceerde juridische documenten",
+  "requiredStates":["loading","empty","normal","unavailable","changed","offline","uncertain","error","first-visit-cookie-notice","reloaded","price-source-unavailable"],
+  "effortBudget":{"deadEnds":0,"duplicateInput":0,"meaningfulActions":1},
+  "steps":[{
+    "id":"overview",
+    "screen":"/apps/juridisch.html",
+    "world":"living",
+    "capability":"site.juridisch",
+    "primaryAction":"open-document-overview",
+    "destination":"/apps/juridisch.html",
+    "result":"De bezoeker ziet de drie bestaande publicaties met hun afzonderlijke titels en bestemmingen.",
+    "recovery":"/apps/juridisch.html",
+    "authority":"Openbaar lezen zonder account; deze documentkeuze verleent geen rechten en wijzigt geen afspraken.",
+    "states":["loading","empty","normal","unavailable","changed","offline","uncertain","error","first-visit-cookie-notice","reloaded","price-source-unavailable"]
+  }],
+  "handoffs":[],
+  "proofs":[{
+    "id":"juridisch-destination",
+    "layer":"EXPERIENCE",
+    "test":"test/juridisch-ds.e2e.js",
+    "scope":"Getypeerd: uitsluitend anonieme normal-bestemming van het publieke overzicht, met drie afzonderlijk bereikbare documentlinks, op vier contractprofielen en normale lokale netwerkconditie. De bestaande overige documentproeven zijn geen getypeerd bewijs voor andere matrixcellen. Geen volledige toestandsdekking, juridische beoordeling, fysieke apparaten of menselijk gebruiksonderzoek."
+  }],
+  "humanReview":{
+    "status":"NOT_TESTED",
+    "questions":[
+      "Vindt een bezoeker zonder hulp het passende juridische document?",
+      "Zijn de documentkeuze, de titels en de route terug begrijpelijk?"
+    ]
+  }
+}

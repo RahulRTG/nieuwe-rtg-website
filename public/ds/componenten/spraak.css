@@ -1,0 +1,12 @@
+/* Spraakherkenning blijft eigendom van shared/spraak.js. Dit component
+   bewaakt alleen de bereikbare bedieningsmaat en de zichtbare focus. */
+@layer rtg.component {
+  .ds-spraakknop {
+    min-inline-size: var(--ds-doel);
+    min-block-size: var(--ds-doel);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ds-spraakknop:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+}

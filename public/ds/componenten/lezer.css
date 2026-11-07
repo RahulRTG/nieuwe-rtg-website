@@ -18,4 +18,28 @@
   }
   .ds-lezer[data-maat="1"] { font-size: 1.15rem; }
   .ds-lezer[data-maat="2"] { font-size: 1.32rem; }
+  /* Documenten gebruiken de paginascroll en dezelfde leesbreedte als een
+     taak. Geen tweede scrollvlak of eigen stijllaag voor lange voorwaarden. */
+  .ds-lezer--pagina {
+    block-size: auto;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: var(--ds-letter-tekst);
+    font-size: var(--ds-maat-tekst);
+    line-height: 1.7;
+    white-space: normal;
+  }
+  .ds-lezer--pagina h2 {
+    margin-block: var(--ds-ruimte-8) var(--ds-ruimte-3);
+    font-family: var(--ds-letter-display);
+    font-size: var(--ds-maat-kop);
+    font-weight: 400;
+    line-height: 1.25;
+  }
+  .ds-lezer--pagina p { margin-block: var(--ds-ruimte-4); }
+  .ds-lezer--pagina ul { padding-inline-start: var(--ds-ruimte-6); }
+  .ds-lezer--pagina li { margin-block: var(--ds-ruimte-3); }
+  .ds-lezer--pagina a { color: var(--ds-accent); text-underline-offset: 3px; }
 }

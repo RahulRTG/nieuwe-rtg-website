@@ -5,8 +5,9 @@
     flex: none;
     display: inline-flex;
     align-items: center;
+    gap: var(--ds-ruimte-2);
     text-decoration: none;
-    min-block-size: 36px;
+    min-block-size: var(--ds-doel);
     padding-inline: var(--ds-ruimte-4);
     background: var(--ds-oppervlak-sterk);
     border: 1px solid var(--ds-lijnkleur);

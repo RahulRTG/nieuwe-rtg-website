@@ -1,3 +1,14 @@
+  /* Gedeelde presentatie binnen dezelfde verbindingsowner. */
+  function netVorm(el, klas) {
+    if (!document.documentElement.hasAttribute('data-ds')) return false;
+    if (!netRail) {
+      netRail = document.createElement('div'); netRail.className = 'ds-net';
+      var host = document.querySelector('.wd-page,.wd-home') || document.body || document.documentElement;
+      if (w.RTGDesktopSurface) w.RTGDesktopSurface.move(host, netRail, host.firstChild);
+      else host.insertBefore(netRail, host.firstChild);
+    }
+    el.className = klas; netRail.appendChild(el); return true;
+  }
   /* ---------- het satelliet-noodbericht ----------
      Nieuwere telefoons versturen zonder bereik een sms via een satelliet. De
      app maakt daarvoor een zo kort mogelijk bericht klaar met tijd en locatie;
@@ -32,7 +43,7 @@
       satEl.id = 'rtg-sat-balkje';
       satEl.setAttribute('role', 'status');
       satEl.setAttribute('aria-live', 'polite');
-      satEl.style.cssText = 'position:fixed;left:50%;bottom:calc(var(--edge-bottom,0px) + env(safe-area-inset-bottom,0px) + .7rem);transform:translateX(-50%);z-index:99999;' +
+      if (!netVorm(satEl, 'ds-net__status')) satEl.style.cssText = 'position:fixed;left:50%;bottom:calc(var(--edge-bottom,0px) + env(safe-area-inset-bottom,0px) + .7rem);transform:translateX(-50%);z-index:99999;' +
         'display:flex;gap:.6rem;align-items:center;background:#14202b;color:#cfe0ee;border:1px solid #2c3f52;' +
         'border-radius:0;padding:.42rem .9rem;font:600 .78rem/1.2 system-ui,-apple-system,sans-serif;' +
         'box-shadow:0 4px 16px rgba(0,0,0,.35);max-width:92vw;';
@@ -42,11 +53,12 @@
       uit.type = 'button';
       uit.textContent = '✕';
       uit.setAttribute('aria-label', T('net.satUit', 'Zuinige stand uitzetten'));
-      uit.style.cssText = 'flex:0 0 44px;min-width:44px;min-height:44px;display:grid;place-items:center;' +
+      if (document.documentElement.hasAttribute('data-ds')) uit.className = 'ds-knop ds-knop--klein';
+      else uit.style.cssText = 'flex:0 0 44px;min-width:44px;min-height:44px;display:grid;place-items:center;' +
         'background:none;border:0;color:#8fa6ba;cursor:pointer;font-size:.8rem;padding:0;';
       uit.addEventListener('click', function () { satZet('uit'); });
       satEl.appendChild(tekst); satEl.appendChild(uit);
-      document.body.appendChild(satEl);
+      if (!satEl.parentNode) document.body.appendChild(satEl);
     }
     satEl.querySelector('button').setAttribute('aria-label',T('net.satUit','Zuinige stand uitzetten'));
     var delen = [];
@@ -78,7 +90,19 @@
     var DOOS_KEY = 'rtg_doos_url', DOOS_UIT = 'rtg_doos_uit', SESSIE = 'rtg_doos_geprobeerd';
     function lees(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
     function schrijf(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
-    function doosURL() { return lees(DOOS_KEY).trim().replace(/\/$/, ''); }
+    function veiligeDoosBasis(waarde) {
+      var raw = String(waarde || '').trim().replace(/\/$/, '');
+      if (!raw || /[?#@]/.test(raw)) return '';
+      var m = /^(https?):\/\/([^/]+)(\/.*)?$/i.exec(raw);
+      if (!m) return '';
+      if (m[1].toLowerCase() === 'http') {
+        var host = m[2].toLowerCase();
+        var lokaal = /^(?:localhost|127(?:\.\d{1,3}){3}|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}|\[?::1\]?|[a-z0-9-]+\.local)(?::\d{1,5})?$/.test(host);
+        if (!lokaal) return '';
+      }
+      return raw;
+    }
+    function doosURL() { return veiligeDoosBasis(lees(DOOS_KEY)); }
     var opDeDoos = false;
 
     // token-overdracht: kwamen we van de cloud naar de doos met de sessie in de hash?
@@ -103,7 +127,7 @@
     function naarDoos() {
       var u = doosURL(); if (!u) return;
       var tok = ''; try { tok = localStorage.getItem('rtg_member_token') || ''; } catch (e) {}
-      location.href = u + location.pathname + location.search + (tok ? '#doos-token=' + encodeURIComponent(tok) : '');
+      w.location.assign(u + location.pathname + location.search + (tok ? '#doos-token=' + encodeURIComponent(tok) : ''));
     }
     function lampje(soort) {
       var el = document.getElementById('rtg-doos-pill');
@@ -112,14 +136,14 @@
       if (!el) {
         el = document.createElement(soort === 'beschikbaar' ? 'button' : 'div');
         el.id = 'rtg-doos-pill';
-        el.style.cssText = 'position:fixed;left:.7rem;bottom:calc(var(--edge-bottom,0px) + env(safe-area-inset-bottom,0px) + .7rem);z-index:99998;display:flex;gap:.4rem;align-items:center;' +
+        if (!netVorm(el, 'ds-net__status ds-net__doos')) el.style.cssText = 'position:fixed;left:.7rem;bottom:calc(var(--edge-bottom,0px) + env(safe-area-inset-bottom,0px) + .7rem);z-index:99998;display:flex;gap:.4rem;align-items:center;' +
           'border-radius:0;padding:.4rem .8rem;font:600 .76rem/1.2 system-ui,-apple-system,sans-serif;border:1px solid;' +
           'box-shadow:0 4px 16px rgba(0,0,0,.35);' + (soort === 'beschikbaar' ? 'cursor:pointer;' : '');
         if (soort === 'beschikbaar') { el.type = 'button'; el.addEventListener('click', naarDoos); }
-        document.body.appendChild(el);
+        if (!el.parentNode) document.body.appendChild(el);
       }
-      if (soort === 'doos') { el.style.background = '#10231a'; el.style.color = '#8fe0b0'; el.style.borderColor = '#2f7d54'; el.textContent = '● Zaakdoos'; el.title = 'Deze app draait via de Zaakdoos in de zaak (valt zelf terug op de cloud).'; }
-      else { el.style.background = '#14202b'; el.style.color = '#cfe0ee'; el.style.borderColor = '#2c3f52'; el.textContent = '◐ Open op de Zaakdoos'; }
+      if (soort === 'doos') { if (!document.documentElement.hasAttribute('data-ds')) { el.style.background = '#10231a'; el.style.color = '#8fe0b0'; el.style.borderColor = '#2f7d54'; } el.textContent = '● Zaakdoos'; el.title = 'Deze app draait via de Zaakdoos in de zaak (valt zelf terug op de cloud).'; }
+      else { if (!document.documentElement.hasAttribute('data-ds')) { el.style.background = '#14202b'; el.style.color = '#cfe0ee'; el.style.borderColor = '#2c3f52'; } el.textContent = '◐ Open op de Zaakdoos'; }
     }
     function init() {
       probe('', 2500).then(function (hier) {
@@ -141,7 +165,7 @@
     w.RTGdoos = {
       opDeDoos: function () { return opDeDoos; },
       adres: doosURL,
-      instellen: function (url) { schrijf(DOOS_KEY, (String(url || '').trim().replace(/\/$/, '')) || null); },
+      instellen: function (url) { schrijf(DOOS_KEY, veiligeDoosBasis(url) || null); },
       uit: function (v) { schrijf(DOOS_UIT, v ? '1' : null); },
       naarDoos: naarDoos
     };

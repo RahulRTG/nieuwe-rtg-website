@@ -15,7 +15,7 @@
   function plaatsKnop() {
     knop = d.createElement('button');
     knop.type = 'button';
-    knop.className = 'amn-knop';
+    knop.className = menuKlasse('amn-knop', 'ds-appmenu__knop');
     knop.id = 'osMenuBtn';
     knop.setAttribute('aria-label', T('menu.label', 'Menu'));
     knop.setAttribute('aria-haspopup', 'dialog');
@@ -41,7 +41,7 @@
     var cel = rij.querySelector(':scope > .ios-nav-links');
     if (cel) return cel;
     cel = d.createElement('div');
-    cel.className = 'ios-nav-links';
+    cel.className = menuKlasse('ios-nav-links', 'ds-appmenu__links');
     rij.insertBefore(cel, rij.firstChild);
     var terug = rij.querySelector(':scope > .ios-terug');
     if (terug) cel.appendChild(terug);
@@ -87,9 +87,29 @@
        linksboven is alleen veilig als er links bovenin niets staat.
        Daarom krijgen die twee samen een rij. */
     var kop = null;
-    var koppen = d.querySelectorAll('header.kop, header.merkkop, body > header');
+    /* World Desktop verplaatst ook eigen werkbalken (zoals de browser) onder
+       .wd-page. Die behouden hun eigen rij; de knop mag er niet over zweven. */
+    /* Expliciete geneste DS-hosts bieden ruimte in hun bestaande koprij.
+       Geen algemene headerzoektocht: kaartkoppen zijn geen menu-eigenaar. */
+    var koppen = d.querySelectorAll('header.kop, header.merkkop, body > header' +
+      (d.documentElement.hasAttribute('data-ds') ? ', header.ds-kop, header[data-rtg-menu-host], .ds-wereldwerkruimte .wd-page > header' : ''));
     for (var i = 0; i < koppen.length; i++) { if (zichtbaar(koppen[i])) { kop = koppen[i]; break; } }
-    if (kop) { kop.insertBefore(knop, kop.firstChild); return; }
+    if (kop) {
+      if (d.documentElement.hasAttribute('data-ds') && kop.classList.contains('ds-kop')) {
+        /* De DS-kop heeft drie plaatsen. Menu + bestaande terug-/zoekactie
+           delen de eerste; merk en profiel blijven op hun eigen plaats. */
+        var cel = kop.querySelector(':scope > .ds-appmenu__links');
+        if (!cel) {
+          var eerste = kop.firstElementChild;
+          cel = d.createElement('div'); cel.className = 'ds-appmenu__links';
+          kop.insertBefore(cel, kop.firstChild);
+          if (eerste && !eerste.classList.contains('ds-kop__merk')) cel.appendChild(eerste);
+        }
+        kop.classList.add('ds-appmenu__host');
+        cel.insertBefore(knop, cel.firstChild);
+      } else kop.insertBefore(knop, kop.firstChild);
+      return;
+    }
 
     /* De terugweg staat lang niet altijd direct onder de body -- op
        boardroom.html zit hij binnen <main class="rtg-wrap">. Zoeken op de
@@ -100,7 +120,7 @@
     if (terug && (!zichtbaar(terug) || terug.getBoundingClientRect().top > 220)) terug = null;
     if (terug && terug.parentNode) {
       var rijtje = d.createElement('div');
-      rijtje.className = 'amn-koprij';
+      rijtje.className = menuKlasse('amn-koprij', 'ds-appmenu__koprij');
       terug.parentNode.insertBefore(rijtje, terug);
       rijtje.appendChild(knop);
       rijtje.appendChild(terug);
@@ -150,6 +170,10 @@
        pagina op dat moment heeft (de delenbalk, de tabs, de navigatiebalk, of
        wat de app zelf opgaf). Een tweede lijst handelingen aanleggen zou hier
        dezelfde fout zijn als een tweede lijst apps in de bank. */
-    functies: function () { try { return eigenFuncties(); } catch (e) { return []; } }
+    functies: function () { try { return eigenFuncties(); } catch (e) { return []; } },
+    /* De vaste systeemfuncties blijven van Appmenu: deze accessor laat de
+       canonieke DS Edge dezelfde actuele, capability-gebonden lijst tonen
+       zonder haar opnieuw te definiëren. */
+    systeemfuncties: function () { try { return vasteFuncties(); } catch (e) { return []; } }
   };
 })(window, document);

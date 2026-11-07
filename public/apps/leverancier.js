@@ -9010,35 +9010,21 @@
      handtekening garant dat het paspoort is gezien; de partner leert enkel het
      bewezen feit (18+, lid, welke pas), nooit de naam. De controle wordt ook op
      de server gelogd als officiele ID-check. */
-  function zcStijlEenmalig(){
-    if (document.getElementById('rtg-zc-stijl')) return;
-/* de stijl van het zegelvenster */
-    const st = document.createElement('style'); st.id = 'rtg-zc-stijl';
-    st.textContent = [
-      '.zc-ov{position:fixed;inset:0;z-index:100000;background:rgba(12,12,11,.78);display:flex;align-items:center;justify-content:center;padding:1.2rem;}',
-      '.zc-card{width:100%;max-width:380px;background:var(--card,#161615);border-radius:0;padding:1.6rem 1.3rem;text-align:center;color:var(--txt,#fff);border:1px solid var(--line,#2a2a28);}',
-      '.zc-card.ok{border-color:rgba(46,160,86,.6);box-shadow:0 0 0 3px rgba(46,160,86,.14);}',
-      '.zc-card.nee{border-color:rgba(194,58,94,.6);box-shadow:0 0 0 3px rgba(194,58,94,.14);}',
-      '.zc-icon{width:64px;height:64px;border-radius:0;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto .6rem;font-weight:700;}',
-      '.zc-card.ok .zc-icon{background:rgba(46,160,86,.18);color:#39B366;}',
-      '.zc-card.nee .zc-icon{background:rgba(194,58,94,.18);color:#C23A5E;}',
-      '.zc-kop{font-family:"Bodoni Moda",Georgia,serif;font-size:1.3rem;margin-bottom:.5rem;}',
-      '.zc-claims{display:flex;flex-direction:column;gap:.35rem;margin:.5rem 0;}',
-      '.zc-claim{background:rgba(46,160,86,.12);color:#39B366;border-radius:0;padding:.4rem .6rem;font-weight:600;font-size:.92rem;}',
-      '.zc-tot{color:var(--soft,#8A8680);font-size:.85rem;margin:.3rem 0;}',
-      '.zc-priv{color:var(--soft,#8A8680);font-size:.72rem;line-height:1.5;margin:.7rem 0 0;}',
-      '.zc-btn{width:100%;margin-top:1rem;background:#7F1634;color:#fff;border:none;border-radius:0;padding:.8rem;font-weight:600;font-family:inherit;cursor:pointer;}'
-    ].join('');
-    document.head.appendChild(st);
+// Verbindt leveranciersoverlays met de bestaande presentatiebasis.
+  function leverancierOverlayPresentatie() {
+    if (document.documentElement.hasAttribute('data-ds') || document.getElementById('rtgDsRuntimeCss')) return;
+    const link = document.createElement('link');
+    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+    document.head.appendChild(link);
   }
   function idResultaat(r){
-    zcStijlEenmalig();
     const geldig = r && r.geldig, claims = (geldig && r.claims) || {};
     const LBL = { leeftijd18: '18 jaar of ouder', leeftijd21: '21 jaar of ouder', lid: 'Geldig RTG-lid', pas: 'Pas', foundation: 'RTFoundation', zakelijk: 'Zakelijk lid' };
     const rijen = Object.keys(claims).map(k => '<div class="zc-claim">✓ '+(LBL[k]||k)+(k==='pas'?': '+claims[k]:'')+'</div>').join('') || '<div class="zc-tot">'+T('zc.geenclaim','geldig, maar geen feit gedeeld')+'</div>';
     const geldTot = geldig && r.exp ? new Date(r.exp*1000).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}) : null;
     const reden = { vorm:'geen geldige code', handtekening:'handtekening klopt niet', verlopen:'de code is verlopen', fout:'onleesbaar', 'geen-webcrypto':'kan niet controleren op dit toestel' }[r && r.reden] || (r && r.reden) || 'ongeldig';
-    const ov = document.createElement('div'); ov.className = 'zc-ov';
+    leverancierOverlayPresentatie();
+    const ov = document.createElement('div'); ov.className = 'ds-leverancier-overlay zc-ov';
     ov.innerHTML = '<div class="zc-card '+(geldig?'ok':'nee')+'" role="dialog" aria-modal="true" aria-label="'+(geldig?'Geldig':'Niet geldig')+'">'+
       '<div class="zc-icon">'+(geldig?'✓':'✕')+'</div>'+
       '<div class="zc-kop">'+(geldig?T('zc.ok','RTG-geverifieerd'):T('zc.nee','Niet geldig'))+'</div>'+
@@ -9068,27 +9054,6 @@
      Elke receptie/entree telt hoeveel mensen er binnen zijn en de verdeling
      man/vrouw. Bewust alleen geaggregeerd -- nooit per persoon, nooit een naam.
      De deur telt op en af; bij het sluiten leeg je de teller. */
-  function awStijlEenmalig(){
-    if (document.getElementById('rtg-aw-stijl')) return;
-    const st = document.createElement('style'); st.id = 'rtg-aw-stijl';
-    st.textContent = [
-      '.aw-ov{position:fixed;inset:0;z-index:100000;background:rgba(12,12,11,.78);display:flex;align-items:flex-end;justify-content:center;}',
-      '.aw-card{width:100%;max-width:480px;background:var(--card,#161615);border-radius:0;padding:1.3rem 1.2rem calc(1.3rem + env(safe-area-inset-bottom,0));color:var(--txt,#fff);}',
-      '.aw-kop{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.2rem;}',
-      '.aw-kop h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.2rem;margin:0;flex:1;}',
-      '.aw-binnen{text-align:center;margin:.4rem 0 1rem;}',
-      '.aw-binnen b{font-size:3rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;}',
-      '.aw-binnen span{display:block;color:var(--soft,#8A8680);font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;}',
-      '.aw-rij{display:flex;align-items:center;gap:.8rem;padding:.6rem .2rem;border-top:1px solid var(--line,#2a2a28);}',
-      '.aw-rij .lbl{flex:1;font-size:.95rem;}',
-      '.aw-rij .n{min-width:2.2rem;text-align:center;font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums;}',
-      '.aw-btn{width:44px;height:44px;border-radius:0;border:1px solid var(--line,#3a3a38);background:var(--bg,#0C0C0B);color:var(--txt,#fff);font-size:1.4rem;cursor:pointer;line-height:1;}',
-      '.aw-btn.plus{background:#7F1634;border-color:#7F1634;}',
-      '.aw-acts{display:flex;gap:.6rem;margin-top:1rem;}',
-      '.aw-acts button{flex:1;border-radius:0;padding:.75rem;font-family:inherit;font-weight:600;cursor:pointer;border:1px solid var(--line,#3a3a38);background:none;color:var(--soft,#8A8680);}'
-    ].join('');
-    document.head.appendChild(st);
-  }
   const AW_GROEPEN = [ { id: 'man', label: 'Man', icoon: '' }, { id: 'vrouw', label: 'Vrouw', icoon: '' }, { id: 'onbekend', label: 'Onbekend / anders', icoon: '○' } ];
   async function awPas(groep, delta){
     try { const d = await API.call('/supplier/aanwezig/pas', { groep, delta }); awToon(d.aanwezig); } catch(e){ toast(e.message); }
@@ -9098,11 +9063,11 @@
     for (const g of AW_GROEPEN){ const n = document.getElementById('awN-' + g.id); if (n) n.textContent = a[g.id]; }
   }
   async function openAanwezig(){
-    awStijlEenmalig();
     let a = { man: 0, vrouw: 0, onbekend: 0, binnen: 0 };
     try { a = (await API.call('/supplier/aanwezig', {})).aanwezig; } catch(e){ toast(e.message); return; }
     const oud = document.getElementById('awOverlay'); if (oud) oud.remove();
-    const ov = document.createElement('div'); ov.className = 'aw-ov'; ov.id = 'awOverlay';
+    leverancierOverlayPresentatie();
+    const ov = document.createElement('div'); ov.className = 'ds-leverancier-overlay aw-ov'; ov.id = 'awOverlay';
     ov.innerHTML = '<div class="aw-card" role="dialog" aria-modal="true" aria-label="'+T('aw.titel','Aanwezigheid')+'">'+
       '<div class="aw-kop"><h3>'+T('aw.titel','Aanwezigheid')+'</h3><button class="aw-btn" id="awSluit" aria-label="Sluiten">✕</button></div>'+
       '<div class="aw-binnen"><b id="awBinnen">'+a.binnen+'</b><span>'+T('aw.binnen','nu binnen')+'</span></div>'+
@@ -9130,25 +9095,6 @@
      op de server: het ticket draagt een HMAC-zegel, en bij het afrekenen wordt dat
      zegel vers gecontroleerd -- een gewijzigde of gemanipuleerde rekening ketst af.
      De AI (Rahul) doet ditzelfde via /api/supplier/tafelticket. */
-  function ttStijlEenmalig(){
-    if (document.getElementById('rtg-tt-stijl')) return;
-    const st = document.createElement('style'); st.id = 'rtg-tt-stijl';
-    st.textContent = [
-      '.tt-ov{position:fixed;inset:0;z-index:100000;background:rgba(12,12,11,.78);display:flex;align-items:flex-end;justify-content:center;}',
-      '.tt-card{width:100%;max-width:480px;background:var(--card,#161615);border-radius:0;padding:1.3rem 1.2rem calc(1.3rem + env(safe-area-inset-bottom,0));color:var(--txt,#fff);max-height:84vh;overflow-y:auto;}',
-      '.tt-kop{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.6rem;}',
-      '.tt-kop h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.2rem;margin:0;flex:1;}',
-      '.tt-in{width:100%;background:var(--bg,#0C0C0B);border:1px solid var(--line,#2a2a28);border-radius:0;padding:.6rem .8rem;font-size:.9rem;color:var(--txt,#fff);font-family:inherit;}',
-      '.tt-gast{display:flex;justify-content:space-between;gap:.8rem;padding:.5rem .1rem;border-top:1px solid var(--line,#2a2a28);font-size:.92rem;}',
-      '.tt-gast .n{font-variant-numeric:tabular-nums;font-weight:600;}',
-      '.tt-bon{font-size:.74rem;color:var(--soft,#8A8680);padding:.15rem 0 .15rem .6rem;}',
-      '.tt-tot{display:flex;justify-content:space-between;gap:.8rem;padding:.7rem .1rem .2rem;border-top:2px solid var(--line,#2a2a28);font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;}',
-      '.tt-zegel{font-size:.62rem;color:var(--soft,#8A8680);letter-spacing:.04em;margin:.5rem 0;word-break:break-all;}',
-      '.tt-btn{width:100%;border-radius:0;padding:.75rem;font-family:inherit;font-weight:600;cursor:pointer;border:none;background:#7F1634;color:#fff;font-size:.9rem;margin-top:.6rem;}',
-      '.tt-sluit{width:44px;height:44px;border-radius:0;border:1px solid var(--line,#3a3a38);background:var(--bg,#0C0C0B);color:var(--txt,#fff);font-size:1.1rem;cursor:pointer;}'
-    ].join('');
-    document.head.appendChild(st);
-  }
   let ttHuidig = null; // het laatst opgehaalde ticket (met zegel + at)
   function ttRender(container){
     const t = ttHuidig;
@@ -9185,11 +9131,11 @@
     }
   }
   function openTafelticket(){
-    ttStijlEenmalig();
     ttHuidig = null;
     const tafels = (typeof state !== 'undefined' && state.tables) ? state.tables : [];
     const oud = document.getElementById('ttOverlay'); if (oud) oud.remove();
-    const ov = document.createElement('div'); ov.className = 'tt-ov'; ov.id = 'ttOverlay';
+    leverancierOverlayPresentatie();
+    const ov = document.createElement('div'); ov.className = 'ds-leverancier-overlay tt-ov'; ov.id = 'ttOverlay';
     ov.innerHTML = '<div class="tt-card" role="dialog" aria-modal="true" aria-label="' + T('tt.titel','Tafel op een ticket') + '">' +
       '<div class="tt-kop"><h3>' + T('tt.titel','Tafel op een ticket') + '</h3><button class="tt-sluit" id="ttSluit" aria-label="Sluiten">✕</button></div>' +
       (tafels.length
@@ -9273,7 +9219,7 @@
       const you = a.staffId && m.id === a.staffId;
       // iedereen bereikt iedereen: een interne (video)call of een direct bericht
       const bel = (you || !a.staffId) ? '' : '<button class="tt-buzz" data-belm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.belhint','Interne call (video)')+'"></button>';
-      const dm = (you || !a.staffId) ? '' : '<button class="tt-buzz s-mw4zr1" data-dmm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.dmhint','Direct bericht')+'"><i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-5px;right:-5px;background:#C23A5E;color:#fff;border-radius:0;font-style:normal;font-size:0.58rem;min-width:1rem;height:1rem;line-height:1rem;text-align:center;"></i></button>';
+      const dm = (you || !a.staffId) ? '' : '<button class="tt-buzz s-mw4zr1 cc-dmknop ds-collegachat-badge" data-dmm="'+m.id+'" data-naam="'+escAttr(m.name)+'" title="'+T('team.dmhint','Direct bericht')+'"><i class="cc-badge cc-badge-compact" data-dmbadge="'+m.id+'" hidden></i></button>';
       const buzz = you ? '' : '<button class="tt-buzz" data-buzz="'+m.id+'" title="'+T('team.buzz','Oproepen (tril)')+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>';
       const rm = (a.manager && !you) ? '<button class="tt-rm" data-rm="'+m.id+'">'+T('team.remove','Verwijder')+'</button>' : '';
       const tag = you ? '<span class="you">'+T('team.you','jij')+'</span>' : '';

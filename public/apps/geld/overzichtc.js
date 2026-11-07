@@ -181,7 +181,6 @@
   }
 
   function start() {
-    D().stijl();
     C = B = null;
     var wrap = $('#ovAlles');
     wrap.addEventListener('click', klik);
@@ -196,8 +195,7 @@
     if (w.RTGUitvoer) w.RTGUitvoer.bron(null);
   }
 
-  /* De stijl van dit paneel staat bij die van deel 1 (Deel.ovcss in
-     overzicht-a.js): een stand heeft EEN stijlblad. */
+  /* De stijl van dit paneel staat in het statische geld-onderdelen.css. */
 
   /* ovAlles, niet ovWrap: deel 1 tekent zelf #ovWrap en #ovVooruit in #ovVak */
   V.standen.push({

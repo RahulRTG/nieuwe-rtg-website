@@ -27,7 +27,7 @@
     MAANDEN = Array.from({ length: 12 }, function (_, i) { return datum('2026-' + String(i + 1).padStart(2, '0') + '-01', { month: 'long' }); });
   }
   function chip(x, klik) {
-    var klas = 'chip' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') +
+    var klas = 'chip ds-dag-chip' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') +
       (x.status === 'uitgenodigd' ? ' uit' : '') + (x.status === 'nee' ? ' nee' : '');
     // een optionele kleur (bijv. het gezinslid in de RTF-agenda) kleurt de rand
     var stijl = /^#[0-9A-Fa-f]{3,8}$/.test(x.kleur || '') ? ' style="border-color:' + x.kleur + '"' : '';
@@ -50,16 +50,16 @@
     var eerste = iso(d);
     var start = maandagVan(eerste);
     var kaart = perDag(alles);
-    var h = '<div class="mgrid">' + DAGEN.map(function (n) { return '<div class="mkop">' + n + '</div>'; }).join('');
+    var h = '<div class="mgrid ds-dag-mgrid">' + DAGEN.map(function (n) { return '<div class="mkop ds-dag-mkop">' + n + '</div>'; }).join('');
     var dag = start;
     for (var i = 0; i < 42; i++) {
       var rij = kaart[dag] || [];
       var buiten = dag.slice(0, 7) !== eerste.slice(0, 7);
       h += '<button type="button" class="mdag' + (buiten ? ' buiten' : '') + (dag === vandaag ? ' vandaag' : '') +
-        '" data-dag="' + dag + '" aria-label="' + dag + '">' +
-        '<span class="dnr">' + +dag.slice(8) + '</span>' +
+        ' ds-dag-mdag" data-dag="' + dag + '" aria-label="' + dag + '">' +
+        '<span class="dnr ds-dag-dnr">' + +dag.slice(8) + '</span>' +
         rij.slice(0, 3).map(function (x) { return chip(x, x._i); }).join('') +
-        (rij.length > 3 ? '<span class="meer">nog ' + (rij.length - 3) + '&hellip;</span>' : '') +
+        (rij.length > 3 ? '<span class="meer ds-dag-meer">nog ' + (rij.length - 3) + '&hellip;</span>' : '') +
         '</button>';
       dag = plusDagen(dag, 1);
       // zes rijen is genoeg voor elke maand; de 42 hierboven is precies dat
@@ -73,13 +73,13 @@
     taal();
     var start = maandagVan(anker);
     var kaart = perDag(alles);
-    var h = '<div class="wgrid">';
+    var h = '<div class="wgrid ds-dag-wgrid">';
     for (var i = 0; i < 7; i++) {
       var dag = plusDagen(start, i);
-      h += '<div class="wdag"><div class="mkop"' + (dag === vandaag ? ' style="color:var(--rtg-leesgoud,var(--gold))"' : '') + '>' +
+      h += '<div class="wdag ds-dag-wdag"><div class="mkop ds-dag-mkop"' + (dag === vandaag ? ' style="color:var(--rtg-leesgoud,var(--gold))"' : '') + '>' +
         DAGEN[i] + ' ' + +dag.slice(8) + '</div>' +
         (kaart[dag] || []).map(function (x) { return chip(x, x._i); }).join('') +
-        '<button type="button" class="mdag" data-dag="' + dag + '" style="min-height:1.4rem;background:none;" aria-label="Nieuw op ' + dag + '"></button></div>';
+        '<button type="button" class="mdag ds-dag-mdag ds-dag-week-toevoegen" data-dag="' + dag + '" aria-label="Nieuw op ' + dag + '"></button></div>';
     }
     host.innerHTML = h + '</div>';
     haakKlik(host, alles, opDag);
@@ -95,19 +95,19 @@
     var h = dagen.map(function (dag) {
       var d = vanIso(dag);
       var kop = datum(dag, { weekday: 'long', day: 'numeric', month: 'long' });
-      return '<div class="ldag"><h3 translate="no">' + kop + '</h3>' + kaart[dag].map(function (x) {
-        return '<div class="litem' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') + '" data-klik="' + x._i + '" role="button" tabindex="0">' +
-          '<span class="tijd">' + (x.tijd ? x.tijd + (x.eind ? '&ndash;' + x.eind : '') : 'hele dag') + '</span>' +
-          '<span class="wat"><b data-user-content>' + esc(x.titel) + '</b><small>' +
+      return '<div class="ldag ds-dag-ldag"><h3 translate="no">' + kop + '</h3>' + kaart[dag].map(function (x) {
+        return '<div class="litem' + (x.bron === 'boeking' || x.bron === 'school' ? ' eco' : '') + ' ds-dag-litem" data-klik="' + x._i + '" role="button" tabindex="0">' +
+          '<span class="tijd ds-dag-tijd">' + (x.tijd ? x.tijd + (x.eind ? '&ndash;' + x.eind : '') : 'hele dag') + '</span>' +
+          '<span class="wat ds-dag-wat"><b data-user-content>' + esc(x.titel) + '</b><small>' +
           (x.plek ? '<span data-user-content>' + esc(x.plek) + '</span> · ' : '') +
           (x.van ? 'uitnodiging van ' + esc(x.van) + ' · ' : '') +
           (x.status && x.bron !== 'boeking' ? 'u zei: ' + esc(x.status === 'uitgenodigd' ? 'nog niets' : x.status) : '') +
           '</small></span>' +
-          (x.bron === 'boeking' ? '<span class="bron">uit RTG</span>' :
-            x.bron === 'school' ? '<span class="bron">van school</span>' : '') + '</div>';
+          (x.bron === 'boeking' ? '<span class="bron ds-dag-bron">uit RTG</span>' :
+            x.bron === 'school' ? '<span class="bron ds-dag-bron">van school</span>' : '') + '</div>';
       }).join('') + '</div>';
     }).join('');
-    host.innerHTML = h || '<p class="stil">Niets gepland in deze periode. Dat is ook een agenda-stand.</p>';
+    host.innerHTML = h || '<p class="stil ds-dag-stil">Niets gepland in deze periode. Dat is ook een agenda-stand.</p>';
     haakKlik(host, alles, opDag);
     return 'Komende dertig dagen';
   }

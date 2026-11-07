@@ -56,14 +56,14 @@
     v.innerHTML = '<p>' + esc(w.naam) + ' overdragen. Vink tafels aan om er maar een paar te geven; ' +
       'vinkt u niets aan, dan gaat de hele wijk mee. Tot uw collega ja zegt, draagt u hem zelf.</p>' +
       (anderen.length
-        ? '<select id="vBiedNaar" aria-label="Aan wie biedt u ' + esc(w.naam) + ' aan">' +
+        ? '<select class="ds-invoer" id="vBiedNaar" aria-label="Aan wie biedt u ' + esc(w.naam) + ' aan">' +
           anderen.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>'; }).join('') +
           '</select>'
         : '<p>Er is niemand anders ingelogd om aan te bieden.</p>') +
-      '<div class="v-vakjes">' + w.tafels.map(function (t) {
+      '<div class="v-vakjes ds-horeca-werkvakjes">' + w.tafels.map(function (t) {
         return '<label><input type="checkbox" value="' + esc(t) + '">' + esc(t) + '</label>';
       }).join('') + '</div>' +
-      '<div class="v-acties">' + (anderen.length ? K.knop('Bied aan', { doebied: w.id }, true) : '') +
+      '<div class="v-acties ds-horeca-werkacties">' + (anderen.length ? K.knop('Bied aan', { doebied: w.id }, true) : '') +
       K.knop('Annuleren', { biedaf: '1' }) + '</div>';
 
     K.bind(v, 'biedaf', function () { bieden = null; vorm(); });
@@ -97,11 +97,11 @@
     });
     var voor = (d.overdrachten || []).filter(function (o) { return o.voorMij; });
     $('vVoorMij').innerHTML = voor.map(function (o) {
-      return '<article class="v-bod"><p><b>' + esc(o.vanNaam) + '</b> biedt u ' + wat(o) +
+      return '<article class="v-bod ds-horeca-werkbod"><p><b>' + esc(o.vanNaam) + '</b> biedt u ' + wat(o) +
         ' aan; het aanbod staat ' + o.staat + ' min. Tot u het aanvaardt, draagt ' +
-        esc(o.vanNaam) + ' het nog.</p><div class="v-acties">' +
+        esc(o.vanNaam) + ' het nog.</p><div class="v-acties ds-horeca-werkacties">' +
         K.knop('Ik neem het over', { pak: o.id }, true) +
-        '<input type="text" maxlength="80" data-reden="' + esc(o.id) + '" ' +
+        '<input class="ds-invoer" type="text" maxlength="80" data-reden="' + esc(o.id) + '" ' +
         'placeholder="Waarom niet? (mag leeg)" aria-label="Reden om te weigeren">' +
         K.knop('Kan niet', { nee: o.id }) + '</div></article>';
     }).join('');
@@ -112,9 +112,9 @@
     });
 
     $('vAntwoord').innerHTML = (d.antwoorden || []).map(function (o) {
-      return '<article class="v-antwoord"><p><b>' + esc(o.naarNaam || 'Uw collega') +
+      return '<article class="v-antwoord ds-horeca-werkantwoord"><p><b>' + esc(o.naarNaam || 'Uw collega') +
         '</b> kan ' + wat(o) + ' niet overnemen' + (o.reden ? ': ' + esc(o.reden) : '') +
-        '. U draagt het nog steeds.</p><div class="v-acties">' +
+        '. U draagt het nog steeds.</p><div class="v-acties ds-horeca-werkacties">' +
         K.knop('Gezien', { zag: o.id }) + '</div></article>';
     }).join('');
 
@@ -132,31 +132,31 @@
         '</b>, de tafel staat nog op zijn naam';
     };
     var nWeg = Number(d.dragerWeg) || 0;
-    var wegZin = nWeg ? '<p class="v-som"><b>' + nWeg + (nWeg === 1 ? ' tafel staat' : ' tafels staan') +
+    var wegZin = nWeg ? '<p class="v-som ds-horeca-werksom"><b>' + nWeg + (nWeg === 1 ? ' tafel staat' : ' tafels staan') +
       ' nog op naam van iemand die al is uitgeklokt.</b> ' +
       (d.magIndelen ? 'U kunt ' + (nWeg === 1 ? 'hem' : 'ze') + ' hieronder teruggeven.'
         : 'Teruggeven doet de uitlener of een manager.') + '</p>' : '';
     $('vGeleend').innerHTML = wegZin + (uit.length ? uit.map(function (l) {
-      return '<div class="v-leen"><b>' + esc(l.tafel) + '</b><small>' +
+      return '<div class="v-leen ds-horeca-werkleen"><b>' + esc(l.tafel) + '</b><small>' +
         esc(l.naam) + ' draagt hem' + (l.vanNaam ? ', van ' + esc(l.vanNaam) : '') +
         (l.wijkNaam ? ' uit ' + esc(l.wijkNaam) : '') + ' · ' + l.staat + ' min' + weg(l) + '</small>' +
-        '<span class="h-flex1"></span>' +
+        '<span class="ds-horeca-groei"></span>' +
         ((l.naarMij || l.vanMij || d.magIndelen) ? K.knop('Terug', { terug: l.tafel }) : '') +
         '</div>';
-    }).join('') : '<p class="v-leeg">Geen enkele tafel staat bij iemand anders. Een halve wijk ' +
+    }).join('') : '<p class="v-leeg ds-horeca-werkleeg">Geen enkele tafel staat bij iemand anders. Een halve wijk ' +
       'overdragen doet u hierboven, bij de wijk die u zelf draagt.</p>');
 
     var open = (d.overdrachten || []);
     $('vAanbod').innerHTML = open.length ? open.map(function (o) {
-      return '<article class="v-wijk"><div class="v-wijkkop">' +
-        '<span class="v-naam">' + wat(o) + '</span>' +
-        '<span class="v-druk">' + o.staat + ' min</span></div>' +
-        '<p class="v-som">' + esc(o.vanNaam) + ' biedt het aan ' + esc(o.naarNaam || 'een collega') +
+      return '<article class="v-wijk ds-horeca-werkkaart"><div class="v-wijkkop ds-horeca-kaartrij">' +
+        '<span class="v-naam ds-horeca-werknaam">' + wat(o) + '</span>' +
+        '<span class="v-druk ds-horeca-werkaantal">' + o.staat + ' min</span></div>' +
+        '<p class="v-som ds-horeca-werksom">' + esc(o.vanNaam) + ' biedt het aan ' + esc(o.naarNaam || 'een collega') +
         ' en draagt het tot dan zelf.</p>' +
         ((o.vanMij || d.magIndelen)
-          ? '<div class="v-acties">' + K.knop('Trek in', { trek: o.id }) + '</div>' : '') +
+          ? '<div class="v-acties ds-horeca-werkacties">' + K.knop('Trek in', { trek: o.id }) + '</div>' : '') +
         '</article>';
-    }).join('') : '<p class="v-leeg">Geen open aanbiedingen.</p>';
+    }).join('') : '<p class="v-leeg ds-horeca-werkleeg">Geen open aanbiedingen.</p>';
 
     var m = $('main');
     K.bind(m, 'pak', function (b) { doe('/wijk/aanvaard', { overdrachtId: b.dataset.pak }); });

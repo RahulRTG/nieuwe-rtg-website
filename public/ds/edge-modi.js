@@ -15,9 +15,10 @@
   function schermActies() {
     var acties = Array.prototype.slice.call(d.querySelectorAll('[data-ds-actie]')).filter(function (x) {
       return !x.closest('.ds-edge') && !x.disabled && x.getAttribute('aria-disabled') !== 'true' && !x.closest('[hidden]') &&
-        !x.closest('dialog:not([open])');
+        !x.closest('dialog:not([open])') && (x.getClientRects().length > 0 || x.hasAttribute('data-rtg-edge-bar'));
     }).map(function (x) {
-      return { label: x.getAttribute('data-ds-actie') || x.textContent.trim(), doe: function () { x.click(); } };
+      return { id: x.getAttribute('data-ds-actie-id') || x.id || '',
+        label: x.getAttribute('data-ds-actie') || x.textContent.trim(), doe: function () { x.click(); } };
     });
     return voegAppmenuActiesToe(acties, 'functies');
   }
@@ -27,7 +28,7 @@
      appknoppen, springpunten en expliciet geregistreerde acties exact dezelfde
      functies uitvoeren en ontstaat er geen tweede actieregister. */
   function appmenuActie(item) {
-    return { label: item.label, doe: function () {
+    return { id: item.id || item.capability || '', label: item.label, doe: function () {
       if (typeof item.doe === 'function') return item.doe();
       if (item.knop && typeof item.knop.click === 'function') return item.knop.click();
       if (item.spring && typeof item.spring.scrollIntoView === 'function') {
@@ -49,12 +50,14 @@
     return uit;
   }
   function systeemActies() {
-    return voegAppmenuActiesToe([
+    var acties = [
+      { label: 'Alle functies', doe: function () { if (w.RTGSprong) w.RTGSprong.open(); } },
       { label: 'Berichten', href: '/apps/comm.html', icoon: I.bericht },
       { label: 'RTG Media', href: '/apps/media.html' },
       { label: 'Uw account', href: '/apps/ik.html' },
       { label: 'Privacy en veiligheid', href: '/apps/veilig.html' }
-    ], 'systeemfuncties');
+    ];
+    return voegAppmenuActiesToe(acties, 'systeemfuncties');
   }
 
   E.registreer('navigatie', function () {

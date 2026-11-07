@@ -118,7 +118,7 @@ test('premium: meenemen geeft echte velden, en weigert schermtekst',
        bruikbare bediening op een telefoon. */
     await page.waitForFunction(() => !!document.querySelector('.rtguitvoer-knop'), null, { timeout: 12000 });
     await edgeActies(page);
-    const exportKnop = page.locator('.rtg-adaptive-controls').getByRole('button', { name:'Meenemen', exact:true });
+    const exportKnop = page.locator('#dsEdgeBlad:not([hidden]),.rtg-adaptive-controls').getByRole('button', { name:'Meenemen', exact:true });
     await exportKnop.scrollIntoViewIfNeeded();
     const bediening = await exportKnop.evaluate(k => {
       const vak = k.getBoundingClientRect();

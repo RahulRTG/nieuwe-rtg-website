@@ -359,7 +359,12 @@
 
      Zonder haast: een veeg is een tweede handeling, nooit de eerste. Het blad
      laadt de laag zelf bij, dus een pagina hoeft er geen <link> voor te kennen. */
-  if (!ds && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+  /* Dit is gedragsinfrastructuur, geen legacy vormlaag. Ook een DS-scherm met
+     een expliciete app-adapter (Bestanden, Notities, Mail) moet dezelfde
+     omkeerbare veeg- en toetsenbordcontracten behouden. De laag blijft inert
+     op schermen die geen acties registreren. */
+  var gebruiktGebaren = !!document.querySelector('script[src$="/gebaren.js"],script[src$="/canvas.js"],script[src$="/reizen-veilig.js"],[data-rtg-gebaren]');
+  if (gebruiktGebaren && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
     var gb = document.createElement('script');
     gb.src = '/shared/gebaar.js'; gb.async = true;
     (document.head || document.documentElement).appendChild(gb);
@@ -609,17 +614,6 @@
     (document.head || document.documentElement).appendChild(km);
   }
 
-  /* ---- 7. de OS-klok is nu zelf een rustige analoge wijzerplaat (shared/klok.js):
-     gevulde uur-/minuut-/secondewijzers met een subtiel gouden bevel en een
-     zachte diepte -- strak en netjes. Het uitbundige opengewerkte 3D-skelet
-     (shared/klok3d.js) is daarom niet meer standaard over elke ring gelegd; dat
-     leeft in shared/horlogewerk.js, op het inlogscherm. ---- */
-
-  /* ---- 8. de 3D-tegellaag (shared/tegel3d.js) is weg. Die liet een KPI-tegel
-     met de MUIS meekantelen -- een bureaubladtruc die op een telefoon niets
-     doet en die het OS als iOS ook niet hoort te hebben. Een tegel is plat en
-     reageert op een vinger, niet op een cursor die er overheen zweeft. ---- */
-
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {
     var t = (v.type || 'text').toLowerCase();
@@ -637,29 +631,18 @@
   function springNaarInhoud() {
     function koppelSpring(anker, doel) {
       if (!anker || !doel || !doel.id) return false;
-      anker.setAttribute('href', '#' + doel.id);
+      var href = '#' + doel.id;
+      if (anker.getAttribute('href') !== href) anker.setAttribute('href', href);
       return true;
     }
     var actueleDs = document.documentElement.hasAttribute('data-ds');
-    if (document.querySelector('.rtg-spring')) return;          // al gezet
-    /* WIJKEN VOOR EEN EIGEN SPRINGLINK, MAAR ALLEEN ALS DIE WERKT.
-       app.html en backoffice.html hebben hun eigen <a class="skip" href="#content">,
-       en die is daar gemeten als eerste focusbare element -- dus krijgen ze er
-       geen tweede bij. Dat een eerste Tab daar op een knop landt komt doordat die
-       inlogschermen zelf focus op een veld zetten; de link is dan al voorbij.
-       De test hieronder kijkt daarom naar de tabVOLGORDE en niet naar waar de
-       focus toevallig staat. Alleen wat de browser echt focust telt: rects
-       alleen is niet genoeg (visibility:hidden heeft rects), tabindex<0 valt
-       buiten de volgorde. */
+    var bestaandeSpring = document.querySelector('.rtg-spring');
+    /* Een werkende route-eigen springlink blijft eigenaar. */
     var eigen = document.querySelector('a.skip, a.skiplink, a[href^="#"][class*="skip"]');
     if (eigen) {
       var eersteFocus = null;
       var kand = document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
       for (var i = 0; i < kand.length; i++) {
-        /* "Zal de browser hier naartoe tabben" is meer dan rects hebben: een
-           element op visibility:hidden heeft wel rects en krijgt geen focus, en
-           tabindex<0 valt buiten de volgorde. Twee eerdere versies keken alleen
-           naar rects en weken daardoor voor de kapotte a.skip op app.html. */
         var e = kand[i];
         if (!e.getClientRects().length) continue;
         var cs = window.getComputedStyle(e);
@@ -674,14 +657,24 @@
     if (!doel.id) doel.id = 'rtg-inhoud';
     if (!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex', '-1');
 
-    var basisSpringLink = document.createElement('a');
-    basisSpringLink.className = 'rtg-spring' + (actueleDs ? ' ds-basis__spring' : '');
+    var basisSpringLink = bestaandeSpring || document.createElement('a');
+    var springKlasse = 'rtg-spring' + (actueleDs ? ' ds-basis__spring' : '');
+    if (basisSpringLink.className !== springKlasse) basisSpringLink.className = springKlasse;
     koppelSpring(basisSpringLink, doel);
-    basisSpringLink.textContent = 'Naar de inhoud';
-    basisSpringLink.addEventListener('click', function () {
-      try { doel.focus({ preventScroll: false }); } catch (e) { doel.focus(); }
-    });
-    document.body.insertBefore(basisSpringLink, document.body.firstChild);
+    if (basisSpringLink.textContent !== 'Naar de inhoud') basisSpringLink.textContent = 'Naar de inhoud';
+    if (basisSpringLink.hasAttribute('hidden')) basisSpringLink.removeAttribute('hidden');
+    if (basisSpringLink.hasAttribute('inert')) basisSpringLink.removeAttribute('inert');
+    if (basisSpringLink.hasAttribute('aria-hidden')) basisSpringLink.removeAttribute('aria-hidden');
+    if (!basisSpringLink.dataset.rtgSpringGebonden) {
+      basisSpringLink.dataset.rtgSpringGebonden = '1';
+      basisSpringLink.addEventListener('click', function () {
+        var id = (basisSpringLink.getAttribute('href') || '').slice(1);
+        var actueelDoel = id && document.getElementById(id);
+        if (!actueelDoel) return;
+        try { actueelDoel.focus({ preventScroll: false }); } catch (e) { actueelDoel.focus(); }
+      });
+    }
+    if (document.body.firstChild !== basisSpringLink) document.body.insertBefore(basisSpringLink, document.body.firstChild);
   }
 
   function start() {
@@ -698,6 +691,7 @@
           var n = muts[i].addedNodes[j];
           if (n && n.nodeType === 1) { begrens(n); meldingenIn(n); }
         }
+        springNaarInhoud();
         /* Een venster gaat open door `hidden` of een klasse, niet door een nieuw
            element -- daarom ook op attributen letten, gebundeld in een frame.
 

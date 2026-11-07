@@ -14,6 +14,21 @@
   var MODI = {};
   var edge = null, balk = null, blad = null, modusNaam = null, vorige = [], terugFocus = null;
 
+  /* Eén gereedsignaal voor de DS-presentatie. Tijdens de migratie wachten nog
+     consumenten op het bestaande rtgDesktopState-contract. Dat attribuut zegt
+     hier uitsluitend dat de ene DS-Edge bedienbaar is; er wordt geen oude
+     World Desktop-shell of tweede controller opgebouwd. */
+  function gereed() {
+    if (!d.body) return;
+    d.body.dataset.dsReady = 'true';
+    /* Wereldschermen krijgen hun bestaande gereedsignaal pas nadat catalogus,
+       panelen en Workspace Runtime werkelijk staan. Alleen zelfstandige
+       DS-schermen zonder die runtime gebruiken het compatibele signaal hier. */
+    var heeftWerkruimte = d.body.dataset.rtgWorld &&
+      d.querySelector('script[src="/shared/rtg-world-desktop.js"]');
+    if (!heeftWerkruimte) d.body.dataset.rtgDesktopState = 'ready';
+  }
+
   function knop(naam, label, icoon, extra) {
     var b = el('button', 'ds-edge__knop' + (extra ? ' ' + extra : ''), { type: 'button', 'data-ds-edge': naam });
     b.innerHTML = icoon + '<span></span>';
@@ -71,6 +86,8 @@
       var x = r.href ? el('a', 'ds-edge__regel', { href: r.href }) : el('button', 'ds-edge__regel', { type: 'button' });
       x.innerHTML = (r.icoon ? svg(r.icoon) : '') + '<span></span>';
       x.querySelector('span').textContent = r.label;
+      x.setAttribute('aria-label', r.label);
+      if (r.id) x.setAttribute('data-ds-action-id', r.id);
       if (r.doe) x.addEventListener('click', function () { sluitBlad(); r.doe(); });
       li.appendChild(x);
       ul.appendChild(li);
@@ -94,9 +111,10 @@
     if (d.documentElement.classList.contains('ds-ingebed') || ingebed()) {
       d.documentElement.setAttribute('data-ds-ingebed', '1');
       Array.prototype.forEach.call(d.querySelectorAll('.ds-kop'), function (k) { k.remove(); });
+      gereed();
       return;
     }
-    if (d.body.hasAttribute('data-ds-geen-edge')) return;
+    if (d.body.hasAttribute('data-ds-geen-edge')) { gereed(); return; }
     edge = el('div', 'ds-edge');
     blad = el('section', 'ds-edge__blad', { id: 'dsEdgeBlad', role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'dsEdgeBladTitel' });
     blad.hidden = true;
@@ -120,6 +138,7 @@
     balk.setAttribute('data-ds-modus', naam);
     modusNaam = naam;
     MODI[naam](opties);
+    gereed();
   }
 
   var api = {

@@ -125,6 +125,12 @@ body.rtg-stijl .kaart,
 .knop.groen{background:#1d6b3c!important;box-shadow:none!important}
 .knop.rood{background:var(--rtf-crimson)!important}
 .knop.klein:not(.rood):not(.groen){background:#151a22!important;color:var(--rtf-gold-soft)!important;border-color:var(--rtf-line)!important;box-shadow:none!important}
+@media(max-width:430px){
+  html body .rtg-duimeind>[data-hoofdactie]{
+    width:100%!important;max-width:none!important;flex:1 1 100%!important;
+    grid-column:1/-1!important
+  }
+}
 .veld,input.veld,textarea.veld,select.veld,.eco-zoek{
   min-width:0;
   max-width:100%;
@@ -369,6 +375,7 @@ dialog::backdrop{background:rgba(2,4,8,.86)!important;backdrop-filter:blur(6px)}
 #rtf-toegang-slot{background:radial-gradient(circle at 50% 38%,#101d31,#08090c 62%)!important}
 #rtf-toegang-slot>div{border-color:var(--rtf-line-gold)!important;background:linear-gradient(145deg,#121923,#0b0e14)!important}
 #rtf-toegang-slot h1{color:var(--rtf-paper)!important;font-family:var(--sans)!important;font-weight:900!important;letter-spacing:-.035em!important;text-transform:uppercase}
+#rtf-toegang-slot :is(.ds-label,p){color:var(--rtf-paper)!important}
 #rtf-toegang-slot [data-rtf-wissel]{background:linear-gradient(135deg,var(--rtf-crimson),var(--rtf-crimson-bright))!important;color:#fff!important;box-shadow:0 9px 24px rgba(166,0,47,.2)}
 #rtf-toegang-slot [data-rtf-uitweg]{background:#11151d!important;border-color:var(--rtf-line)!important;color:var(--rtf-paper)!important}
 body[data-rtf-page="klas"] #vCode{padding-top:clamp(2rem,10vh,6rem)}

@@ -85,9 +85,9 @@ async function teken() {
 }
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<div class="ds-status inlog"><h2>Log eerst in</h2>' +
+  $('#main').innerHTML = '<div class="ds-status inlog"><p class="ds-label">Aanvragen uit de Mall</p><h2>Log eerst in</h2>' +
     '<p class="ds-meta oms ruimer">Dit scherm is voor aangesloten zaken. Log in op het leveranciersportaal.</p>' +
-    '<p class="ruimst"><a href="/apps/leverancier.html">Naar het portaal &rarr;</a></p></div>';
+    '<p class="ruimst"><a class="ds-knop ds-knop--stil poortlink" href="/apps/leverancier.html">Naar het portaal &rarr;</a></p></div>';
 } else {
   teken();
 }

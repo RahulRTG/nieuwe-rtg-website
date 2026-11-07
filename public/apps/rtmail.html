@@ -14,16 +14,17 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
+  html{max-width:100%;overflow-x:clip;}
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  body{max-width:100%;overflow-x:clip;background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header{min-width:0;max-width:100%;position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
   header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:0;padding:.15rem .6rem;}
-  main{padding:1.1rem;max-width:640px;margin:0 auto;}
+  main{min-width:0;width:100%;padding:1.1rem;max-width:640px;margin:0 auto;}
   .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
   .rij:hover{border-color:var(--gold);}
   .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:0;flex-shrink:0;font-size:1.1rem;}

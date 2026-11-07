@@ -1787,11 +1787,13 @@ async function edgeActies(page) {
   return page.locator('.rtg-adaptive-controls').innerText();
 }
 
-async function edgeBediening(page, naam) {
+async function edgeBediening(page, naam, actieId) {
   await edgeActies(page);
   const dsBlad = page.locator('#dsEdgeBlad:not([hidden])');
   if (await dsBlad.isVisible()) {
-    await dsBlad.getByRole('button', { name: naam, exact: true }).click();
+    const knop = actieId ? dsBlad.locator('[data-ds-action-id="' + actieId + '"]')
+      : dsBlad.getByRole('button', { name: naam, exact: true });
+    await knop.click();
     return;
   }
   await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();

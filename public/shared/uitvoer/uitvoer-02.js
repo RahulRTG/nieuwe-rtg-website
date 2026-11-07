@@ -31,6 +31,9 @@
       knop.type = 'button';
       knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast' + knopStijl + (ds ? ' ds-uitvoer-knop' : '');
       knop.setAttribute('aria-haspopup', 'dialog');
+      /* Expliciet modulecontract voor de DS Edge. De Edge voert dezelfde
+         knop uit; exportlogica en bevoegdheid blijven hier eigenaar. */
+      knop.setAttribute('data-ds-actie', 'Meenemen');
       /* Deze knop bestaat alleen zolang het scherm werkelijk uitvoerbare
          gegevens heeft. Bedien hem daarom als kortlevende hoofdactie voordat
          een andere schermhandeling de bron opnieuw tekent. Dit is ook voor

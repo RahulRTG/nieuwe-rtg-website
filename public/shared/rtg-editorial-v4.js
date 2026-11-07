@@ -46,6 +46,11 @@
   }
 
   function ensureSectionMasthead(doc, body, route, name) {
+    var toegang = doc.getElementById('rtf-toegang-slot');
+    if (toegang) {
+      Array.from(toegang.querySelectorAll(':scope > .rtg-v4-section-masthead')).forEach(function (node) { node.remove(); });
+      return;
+    }
     if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
     var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
     if (main && main.querySelector(':scope > #dailyIntro')) return;
@@ -66,6 +71,11 @@
   }
 
   function ensurePhotoLead(doc, body, route, world) {
+    var toegang = doc.getElementById('rtf-toegang-slot');
+    if (toegang) {
+      Array.from(toegang.querySelectorAll(':scope > .rtg-v4-photo-lead')).forEach(function (node) { node.remove(); });
+      return;
+    }
     if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
     var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
     if (!main || main.querySelector(':scope > .rtg-v4-photo-lead')) return;

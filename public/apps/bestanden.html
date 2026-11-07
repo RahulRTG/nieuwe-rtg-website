@@ -36,7 +36,7 @@
   <a class="terug ds-knop" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
   <span><span class="ey">RTG</span><h1 data-i18n="dailyField.files">Bestanden</h1></span>
   <span class="rij s-7myv37 ds-dag-rij ds-dag-auto">
-    <button class="knop ds-knop" id="toonBak" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.bin">Prullenbak</button>
+    <button class="knop ds-knop" id="toonBak" data-rtg-edge-bar data-ds-actie data-ds-actie-id="documents.bin" type="button" data-i18n="dailyField.bin">Prullenbak</button>
     <button class="knop ds-knop" id="nieuwMap" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.newFolder">+ Map</button>
     <input class="ds-invoer" type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen" data-i18n-aria="dailyField.chooseFiles">
   </span>
@@ -98,12 +98,12 @@
       <button class="knop ds-knop" id="bkHaal" type="button" data-i18n="dailyField.download">Download</button>
       <button class="knop ds-knop" id="bkNieuwVersie" type="button" data-i18n="dailyField.newVersion">Nieuwe versie</button>
       <button class="knop ds-knop" id="bkSter" type="button" data-i18n="dailyField.star">Ster</button>
-      <button class="knop ds-knop" id="bkWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
+      <button class="knop ds-knop" id="bkWeg" type="button" data-ds-actie data-ds-actie-id="documents.trash" data-i18n="dailyField.delete">Verwijder</button>
       <span class="ds-dag-rek"></span>
       <button class="knop ds-knop" id="bkDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
     <div class="rij ds-dag-marge ds-dag-rij">
-      <button class="knop ds-knop" id="bkHerstel" type="button" style="display:none;" data-i18n="dailyField.restore">Herstel</button>
+      <button class="knop ds-knop" id="bkHerstel" type="button" style="display:none;" data-ds-actie data-ds-actie-id="documents.restore" data-i18n="dailyField.restore">Herstel</button>
       <input class="ds-invoer" type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen" data-i18n-aria="dailyField.chooseVersion">
     </div>
   </div>
@@ -121,6 +121,7 @@
 <script src="/shared/document-capability.js"></script>
 <script src="/apps/bestanden/app.js"></script>
 <script src="/apps/bestanden/paneel.js"></script>
+<script src="/shared/gebaar.js"></script>
 <script src="/shared/adaptief.js" defer></script>
 <script src="/shared/adaptief/grammatica.js" defer></script>
 <script src="/shared/objectverwijzing.js" defer></script>

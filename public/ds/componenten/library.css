@@ -40,6 +40,9 @@
   .ds-library-akkoord { display: flex; align-items: flex-start; gap: var(--ds-ruimte-3); min-block-size: var(--ds-doel); padding-block: var(--ds-ruimte-3); font-size: var(--ds-maat-klein); cursor: pointer; }
   .ds-library-akkoord input { flex: none; inline-size: 1.5rem; block-size: 1.5rem; margin: 0; accent-color: var(--ds-accent); }
   .ds-library-layout .hide { display: none; }
+  @media (max-width: 760px) {
+    .ds-library-rail [data-hoofdactie] { inline-size: 100%; }
+  }
   @container ds (min-width: 64rem) {
     .ds-library-tabs { display: none; }
     .ds-library-layout { grid-template-columns: minmax(12rem, 1fr) minmax(0, 2.5fr) minmax(14rem, 1.15fr); }

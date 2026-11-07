@@ -15,6 +15,13 @@
   .ds-foundation-vraag > .ds-invoer { flex-basis: 14rem; }
   .ds-foundation-vraag > .ds-invoer:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
   .ds-foundation-vraag > .ds-knop { min-inline-size: var(--ds-doel); }
+  @media (max-width: 430px) {
+    .ds-foundation-vraag > .ds-knop[data-hoofdactie] {
+      flex: 1 1 100%;
+      inline-size: 100%;
+      max-inline-size: none;
+    }
+  }
   .ds-foundation-veiliglink { display: grid; gap: var(--ds-ruimte-2); padding: var(--ds-ruimte-6); text-decoration: none; color: var(--ds-inkt); border-color: var(--ds-accent); min-block-size: var(--ds-doel); }
   .ds-foundation-categorie { padding: var(--ds-ruimte-4); }
   .ds-foundation-categorie summary { display: flex; align-items: center; gap: var(--ds-ruimte-3); min-block-size: var(--ds-doel); list-style: none; cursor: pointer; font-weight: 600; }

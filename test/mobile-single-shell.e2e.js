@@ -139,7 +139,7 @@ test('one Edge responds to nested human scroll, keeps five reachable actions and
 
 
 test('custom Edge menus replace screen controls without reserving an empty action strip', { skip }, async () => {
-  const { page, ctx } = await open('/apps/notities.html');
+  const { page, ctx } = await open('/apps/rtg.html');
   try {
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
     await page.waitForSelector('.rtg-adaptive-sheet[data-rtg-custom-panel="true"]');
@@ -153,7 +153,7 @@ test('custom Edge menus replace screen controls without reserving an empty actio
 });
 
 test('all registered apps remain reachable through one mobile Edge, including retry after catalog failure', { skip }, async () => {
-  const { page, ctx } = await open('/apps/notities.html');
+  const { page, ctx } = await open('/apps/rtg.html');
   try {
     const catalog = require('../public/shared/interface/world-widget-catalog.json');
     const pattern = '**/shared/interface/world-widget-catalog.json';

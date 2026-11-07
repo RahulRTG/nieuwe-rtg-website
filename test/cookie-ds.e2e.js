@@ -20,9 +20,9 @@ for(const route of ['browser','wonen'])test('cookie DS '+route+(route==='wonen'?
   assert.equal(await melding.getByRole('link',{name:'Privacy',exact:true}).getAttribute('href'),'/apps/juridisch/privacy.html');
   for(const width of [390,820,1440])for(const zoom of [100,200]){
    await page.setViewportSize({width,height:1000});await page.evaluate(n=>document.documentElement.style.fontSize=n+'%',zoom);
-   const m=await melding.evaluate(el=>{const box=el.getBoundingClientRect(),vlak=el.closest('.wd-page'),main=vlak.querySelector('main');return {box:box.toJSON(),main:main&&main.getBoundingClientRect().toJSON(),parent:el.parentElement.className,client:el.clientWidth,scroll:el.scrollWidth,doelen:[...el.querySelectorAll('a,button')].map(n=>{const r=n.getBoundingClientRect();return {w:r.width,h:r.height,raak:n.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};}),legacy:[...document.querySelectorAll('style')].some(n=>n.textContent.includes('#rtg-cookie{')),ruimte:document.documentElement.style.getPropertyValue('--rtg-cookieruimte')};});
+   const m=await melding.evaluate(el=>{const box=el.getBoundingClientRect(),vlak=el.closest('.wd-page')||document.body,main=vlak.querySelector('main');return {box:box.toJSON(),main:main&&main.getBoundingClientRect().toJSON(),nativeDs:vlak===document.body&&document.documentElement.hasAttribute('data-ds'),parent:el.parentElement.className,client:el.clientWidth,scroll:el.scrollWidth,doelen:[...el.querySelectorAll('a,button')].map(n=>{const r=n.getBoundingClientRect();return {w:r.width,h:r.height,raak:n.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};}),legacy:[...document.querySelectorAll('style')].some(n=>n.textContent.includes('#rtg-cookie{')),ruimte:document.documentElement.style.getPropertyValue('--rtg-cookieruimte')};});
    assert.ok(m.box.top>=0&&m.box.bottom<=1000&&m.box.left>=0&&m.box.right<=width+1,JSON.stringify({width,zoom,m}));
-   assert.ok(m.scroll<=m.client+1);assert.ok(m.parent.includes('wd-page'));
+   assert.ok(m.scroll<=m.client+1);assert.ok(m.parent.includes('wd-page')||m.nativeDs);
    assert.ok(m.main&&m.main.top>=m.box.bottom-1,'melding blijft vóór echte inhoud: '+JSON.stringify(m));
    assert.ok(m.doelen.every(d=>d.w>=44&&d.h>=44&&d.raak),JSON.stringify(m.doelen));assert.equal(m.legacy,false);assert.equal(m.ruimte,'');
   }
@@ -44,6 +44,9 @@ test('cookie centrale owner op oudere 404-host',{skip,timeout:45000},async()=>{
   assert.equal(centraal,true);
   for(const width of [320,390,820])for(const zoom of [100,200]){
    await page.setViewportSize({width,height:900});await page.evaluate(n=>document.documentElement.style.fontSize=n+'%',zoom);
+   /* ResizeObserver schrijft de gereserveerde inhoudsruimte na layout. Wacht
+      op die waarneembare eindtoestand in plaats van een vaste vertraging. */
+   await page.waitForFunction(w=>{const el=document.querySelector('.ds-cookie--overlay');if(!el)return false;const r=el.getBoundingClientRect(),ruimte=parseFloat(document.documentElement.style.getPropertyValue('--rtg-cookieruimte'));return r.left>=0&&r.right<=w+1&&r.top>=0&&r.bottom<=900&&el.scrollWidth<=el.clientWidth+1&&ruimte>=r.height;},width);
    const m=await melding.evaluate(el=>{const r=el.getBoundingClientRect();return{r:r.toJSON(),client:el.clientWidth,scroll:el.scrollWidth,host:document.body.classList.contains('ds-cookie-host'),ruimte:document.documentElement.style.getPropertyValue('--rtg-cookieruimte'),doelen:[...el.querySelectorAll('a,button')].map(n=>{const b=n.getBoundingClientRect();return{w:b.width,h:b.height,raak:n.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2))};})};});
    assert.ok(m.r.left>=0&&m.r.right<=width+1&&m.r.top>=0&&m.r.bottom<=900,JSON.stringify({width,zoom,m}));
    assert.ok(m.scroll<=m.client+1);assert.equal(m.host,true);assert.ok(parseFloat(m.ruimte)>=m.r.height);

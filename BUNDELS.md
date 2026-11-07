@@ -639,7 +639,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 13 delen, 956 regels in de delen
+`public/shared/basis/` -- 13 delen, 950 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -947,7 +947,7 @@ omlaag.
 
 ## `shared/rtg-editorial-v4.js`
 
-`public/shared/rtg-editorial-v4/` -- 2 delen, 251 regels in de delen
+`public/shared/rtg-editorial-v4/` -- 2 delen, 261 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -1012,7 +1012,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 3 delen, 295 regels in de delen
+`public/shared/uitvoer/` -- 3 delen, 298 regels in de delen
 
 | deel | onderwerp |
 |---|---|

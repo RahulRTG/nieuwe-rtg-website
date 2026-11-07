@@ -78,7 +78,7 @@ body[data-rtg-desktop] .wd-page:has(#kaart) .intelligence-dock{top:auto;bottom:1
 body[data-rtg-desktop] .wp-story>a{display:flex;align-items:center;min-height:44px}
 
 @media(max-width:359px){body[data-rtg-desktop] .wp-tabs button{min-width:0;white-space:normal;overflow-wrap:anywhere;gap:4px;font-size:12px;padding-inline:2px}}
-.wd-skip{position:fixed!important;left:-9999px!important;top:8px!important;z-index:99999;background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;padding:12px!important}
+.wd-skip{position:fixed!important;left:-9999px!important;top:8px!important;z-index:99999;background:#0c0c0b!important;color:#fff!important;padding:12px!important}
 .wd-skip:focus{left:8px!important}
 
 .wd-output{display:flex;justify-content:flex-end;min-width:0}.wd-output:empty{display:none}.wd-output .rtguitvoer-knop{margin:0 0 16px!important}

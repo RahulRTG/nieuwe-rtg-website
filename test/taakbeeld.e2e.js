@@ -82,15 +82,14 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
       object: { soort: 'reisaanvraag', id: r, label: r } }), ref);
     assert.deepEqual((await page.evaluate(() => RTGEdgeBlikveld.voorRahul())).verwijzingen, [{ soort: 'reisaanvraag', id: ref }]);
 
-    const tab = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
-    await tab.waitFor({ timeout: 20000 });
-    await require('./helper').edgeRahul(page);
-    const veld = page.locator('.rtg-rahul-page input[aria-label="Vraag Rahul"]');
-    await veld.waitFor({ state: 'visible', timeout: 10000 });
     /* Eerst de Rome-vraag met de Ibiza-aanvraag aangewezen: een nieuw
-       reisconcept, en de open aanvraag wordt niet het onderwerp. */
-    await veld.fill('Ik wil met zes vrienden vier dagen naar Rome, maximaal 800 euro per persoon.');
-    await veld.press('Enter');
+       reisconcept, en de open aanvraag wordt niet het onderwerp. De centrale
+       DS Edge draagt de vraag over aan dezelfde Rahul Command-eigenaar; zo
+       bewijst de proef ook de actuele universele ingang. */
+    await page.locator('.ds-edge__balk [data-ds-edge="rahul"]').click();
+    const edgeVeld = page.locator('.ds-edge__veld[aria-label="Vraag Rahul"]');
+    await edgeVeld.fill('Ik wil met zes vrienden vier dagen naar Rome, maximaal 800 euro per persoon.');
+    await edgeVeld.press('Enter');
     const noten = page.locator('.rtg-command-log .rtg-command-noot');
     await noten.first().waitFor({ timeout: 20000 });
     const concept = await noten.last().textContent();
@@ -101,6 +100,8 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
     assert.ok(!/ibiza/i.test(concept), 'de open aanvraag wordt niet het onderwerp');
 
     /* Dan een vraag OVER de aanvraag: het plan, in de woorden van een lid. */
+    const veld = page.locator('.rtg-rahul-page input[aria-label="Vraag Rahul"]');
+    await veld.waitFor({ state: 'visible', timeout: 10000 });
     await veld.fill('Kun je deze aanvraag voor me in orde maken?');
     await veld.press('Enter');
     await page.waitForFunction(() => document.querySelectorAll('.rtg-command-log .rtg-command-noot').length >= 2, null, { timeout: 20000 });
@@ -111,7 +112,7 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
     assert.match(tekst, /Zes vrienden uitgenodigd -- geblokkeerd: Dit kan Rahul niet voor u doen/, 'in mensentaal');
     assert.ok(!/allowlist|\/api\//.test(tekst), 'geen intern woord en geen pad');
     assert.match(tekst, /Er is niets uitgevoerd/);
-    assert.equal(await page.locator('[data-done]').textContent(), 'Geen uitvoering in deze sessie',
+    assert.match(await page.locator('[data-done]').textContent(), /^Geen (?:actuele )?uitvoer/,
       'de tab meldt geen uitvoering, want er is niets gedaan');
     assert.deepEqual(fouten, [], 'geen fouten in de console');
   } finally {

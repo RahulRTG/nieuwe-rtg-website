@@ -24,7 +24,10 @@ test('DS-sneltoetsen op Studio: ontdekte acties, native modaliteit, focus en gro
       await page.goto(srv.base + '/apps/studio-pda.html', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => document.body.dataset.rtgDesktopState === 'ready' &&
         window.RTGSneltoets && document.querySelector('#pFilters button'));
-      const ingang = page.locator('#osMenuBtn'), blad = page.locator('dialog.ds-sneltoets');
+      /* De zichtbare DS-Edge is de enige universele bediening. Het oude
+         appmenuknopje blijft als bron voor bestaande functies aanwezig maar is
+         op een gemigreerd scherm geen geldige focusbestemming meer. */
+      const ingang = page.locator('.ds-edge__balk [data-ds-edge="acties"]'), blad = page.locator('dialog.ds-sneltoets');
       // Studio's Concept-knop heet niet Nieuw. De sneltoets belooft die dus niet.
       assert.equal(await page.evaluate(() => RTGSneltoets.nieuwKnop()), null);
       const nieuw = 'Nieuw proefstuk';
@@ -81,7 +84,12 @@ test('DS-sneltoetsen op Studio: ontdekte acties, native modaliteit, focus en gro
         await sluit.scrollIntoViewIfNeeded();
         const doel = await sluit.boundingBox(); assert.ok(doel.width >= 44 && doel.height >= 44);
         await page.keyboard.press('Escape'); await blad.waitFor({ state: 'hidden' });
-        assert.equal(await ingang.evaluate(el => document.activeElement === el), true);
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+        const terug = await ingang.evaluate(el => ({ klopt: document.activeElement === el,
+          ingang: { id: el.id, klasse: el.className, tekst: el.textContent.trim() },
+          actief: document.activeElement && { id: document.activeElement.id, klasse: document.activeElement.className,
+            tekst: document.activeElement.textContent.trim(), tag: document.activeElement.tagName } }));
+        assert.equal(terug.klopt, true, JSON.stringify(terug));
       }
       await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
       await page.setViewportSize({ width: 390, height: 844 });

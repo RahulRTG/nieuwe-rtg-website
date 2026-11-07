@@ -70,12 +70,35 @@
 
   var blad = null, ingang = null;
   var ds = document.documentElement.hasAttribute('data-ds');
+  function actueleIngang(doel) {
+    if (doel && doel.isConnected) return doel;
+    return doel && doel.id ? document.getElementById(doel.id) : null;
+  }
+  function herstelIngang(naBrowser) {
+    var doel = ingang;
+    ingang = null;
+    if (!ds || !doel) return;
+    var zetTerug = function () { var actueel = actueleIngang(doel); if (actueel) actueel.focus(); };
+    /* Chromium rondt na het close-event zijn eigen dialog-focusherstel af.
+       De eerstvolgende taak wint daarna deterministisch; de proef wacht op de
+       waarneembare focus en niet op een gekozen aantal milliseconden. */
+    if (naBrowser) setTimeout(zetTerug, 0); else zetTerug();
+  }
   function sluit() {
     if (!blad) return;
-    if (ds && blad.open) blad.close();
+    /* Bij een native dialoog herstelt de browser zijn eigen focus tijdens
+       close(). Doe onze expliciete terugkeer daarom in het close-event erna;
+       anders kan de browser de zojuist herstelde ingang weer overschrijven. */
+    if (ds && blad.open) {
+      var doel = ingang;
+      ingang = null;
+      blad.close();
+      blad.hidden = true;
+      if (doel) setTimeout(function () { var actueel = actueleIngang(doel); if (actueel) actueel.focus(); }, 0);
+      return;
+    }
     blad.hidden = true;
-    if (ds && ingang && ingang.isConnected) ingang.focus();
-    ingang = null;
+    herstelIngang();
   }
   function overzicht(rijen) {
     if (!blad) {
@@ -90,7 +113,9 @@
       blad.addEventListener('click', function (e) { if (!ds || e.target === blad) sluit(); });
       if (ds) {
         blad.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
-        blad.addEventListener('close', function () { if (!blad.open) blad.hidden = true; });
+        blad.addEventListener('close', function () {
+          if (!blad.open) { blad.hidden = true; herstelIngang(true); }
+        });
       }
       document.body.appendChild(blad);
     }
@@ -130,9 +155,10 @@
     document.addEventListener('keydown', function (e) {
       if (e.ctrlKey || e.metaKey || e.altKey) return;      // dan is de toets van de browser
       if (e.key === 'Escape') {
-        // Native DS-modaliteit verwerkt uitsluitend Escape voor de bovenste
-        // dialoog via cancel; een onderliggend blad sluit niet per ongeluk mee.
-        if (blad && !blad.hidden && !ds) { sluit(); e.preventDefault(); }
+        /* Dit eigen native dialoogblad kent zijn opener. Sluit het hier zodat
+           de focus al post-close is hersteld voordat de volgende invoerbeurt
+           begint. Andere native dialogen blijven volledig van hun eigenaar. */
+        if (blad && !blad.hidden && (!ds || blad.open)) { sluit(); e.preventDefault(); }
         return;
       }
       if (inVeld(document.activeElement)) return;          // typen gaat voor

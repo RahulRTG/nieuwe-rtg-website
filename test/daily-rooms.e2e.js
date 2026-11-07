@@ -16,8 +16,13 @@ async function post(base, route, body, token) {
 }
 async function language(page, code, name) {
   const huidige=(await page.locator('html').getAttribute('lang')).toUpperCase();
-  await page.locator('#osMenuBtn').click();
-  await page.locator('.amn-blad').getByRole('button',{name:/^(Instellingen|Settings)$/}).click();
+  if (await page.locator('html[data-ds]').count()) {
+    await page.locator('[data-ds-edge="menu"]').click();
+    await page.locator('#dsEdgeBlad:not([hidden])').getByRole('button',{name:/^(Instellingen|Settings)$/}).click();
+  } else {
+    await page.locator('#osMenuBtn').click();
+    await page.locator('.amn-blad').getByRole('button',{name:/^(Instellingen|Settings)$/}).click();
+  }
   try { await page.locator('.bdn-blad').getByRole('button',{name:huidige,exact:true}).click(); }
   catch(error) { error.message+='\nTaalcontext: '+JSON.stringify(await page.evaluate(()=>({route:location.pathname,html:document.documentElement.lang,owner:window.RTGi18n?.lang,knoppen:[...document.querySelectorAll('.bdn-blad button')].map(b=>({text:b.textContent,label:b.getAttribute('aria-label'),visible:!!b.getClientRects().length}))})));throw error; }
   await page.locator('#rtg-lang-zoek').fill(name);
@@ -43,7 +48,7 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
       await page.goto(srv.base + routes[app], { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('body[data-daily-state="' + state + '"]');
       await page.waitForSelector('.ds-edge__balk');
-      await page.waitForSelector('#osMenuBtn');
+      await page.waitForSelector('[data-ds-edge="menu"]');
       await page.evaluate(() => document.fonts.ready);
     }
     async function screenshot(name) {

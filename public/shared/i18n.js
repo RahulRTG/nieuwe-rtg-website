@@ -1301,7 +1301,7 @@ window.RTGUiBronTekst = function(source){
     const i18nLegacyStijlLink = document.createElement('link');
     i18nLegacyStijlLink.id = 'rtg-i18n-styles';
     i18nLegacyStijlLink.rel = 'stylesheet';
-    i18nLegacyStijlLink.href = pad;
+    i18nLegacyStijlLink.href = assetPad(pad);
     document.head.appendChild(i18nLegacyStijlLink);
   }
   const assetPad = pad => ASSET_BASIS + pad;

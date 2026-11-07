@@ -108,7 +108,14 @@
   .bell svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;}
   .bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:var(--burgundy);color:#fff;border-radius:0;font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
 
-  .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 6rem);}
+  /* De vaste tabbalk is een echte navigatielaag. Reserveer genoeg scrollruimte
+     om ook de laatste primaire actie volledig boven die balk te kunnen zetten;
+     alleen visuele padding van de balk zelf is daarvoor niet voldoende. */
+  .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 10rem);scroll-padding-block-end:calc(env(safe-area-inset-bottom,0px) + 10rem);}
+  /* De desktopwerkruimte normaliseert generieke main-elementen. Deze main is
+     echter de eigen scrollcontainer van de leverancier-app en houdt daarom
+     zijn functionele navigatieruimte. */
+  body[data-rtg-desktop] .wd-page #content.content{padding:1.3rem max(1.4rem,calc((100% - 1100px) / 2)) calc(env(safe-area-inset-bottom,0px) + 10rem)!important;scroll-padding-block-end:calc(env(safe-area-inset-bottom,0px) + 10rem)!important;}
   .view{display:none;}
   .view.active{display:block;}
   .view h2{font-size:1.5rem;line-height:1.15;}

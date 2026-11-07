@@ -18,7 +18,10 @@
     position: fixed;
     inset-inline: var(--ds-ruimte-3);
     inset-block-end: max(var(--ds-ruimte-3), env(safe-area-inset-bottom));
-    z-index: 20;
+    /* De Edge blijft de universele bediening, ook boven een niet-modale
+       detailwerkruimte. Echte modale veiligheids- en toestemmingslagen mogen
+       daar in hun eigen hogere systeemlaag nog steeds boven staan. */
+    z-index: 9000;
     max-inline-size: 40rem;
     margin-inline: auto;
     color: var(--ds-cover-inkt);

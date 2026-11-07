@@ -14,7 +14,12 @@ body[data-rtg-desktop] .wd-shell :is(.wd-widget,.wd-people,.wd-widget-open,.wd-m
 body[data-rtg-desktop] .wd-shell .wd-primary{background:var(--rtg-world-card-strong)!important;color:var(--rtg-world-ink)!important;border:1px solid var(--wd-line)!important;border-radius:var(--rtg-radius-editorial)!important;box-shadow:none!important}
 html.rtf-toegang-dicht body[data-rtg-desktop-access="locked"]>:is(.wd-shell,.rtg-edge-chrome){visibility:visible!important}
 body[data-rtg-desktop-access="locked"] .wd-home{display:none!important;visibility:hidden!important}
-body[data-rtg-desktop-access="locked"] .wd-access{display:block;position:relative;inset:auto;grid-column:2;grid-row:2;min-width:0;width:100%;max-width:100%;margin:0;padding:24px;box-sizing:border-box;background:var(--rtg-world-card)!important;color:var(--rtg-world-ink);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial)}
+body[data-rtg-desktop-access="locked"] .wd-access{display:block;position:relative;inset:auto;order:-1;grid-column:2;grid-row:2;min-width:0;width:100%;max-width:100%;margin:0;padding:24px;box-sizing:border-box;background:var(--rtg-world-card)!important;color:var(--rtg-world-ink);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial)}
+/* De toegangspoort kan op mobiel binnen de wereldshell terechtkomen nadat de
+   beveiligingslaag de oude inhoud heeft verborgen. Zet daarom de poort en
+   haar eigen inhoud expliciet terug aan; zij is op dat moment het enige
+   toegestane scherm, niet een uitzondering op de beveiliging. */
+html.rtf-toegang-dicht body[data-rtg-desktop-access="locked"] .wd-access,html.rtf-toegang-dicht body[data-rtg-desktop-access="locked"] .wd-access *{visibility:visible!important;pointer-events:auto}
 body[data-rtg-desktop-access="locked"] #rtf-toegang-slot.wd-access>div{width:auto!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
 body[data-rtg-desktop-access="locked"] #rtf-toegang-slot.wd-access h1{font:400 32px/1.15 var(--rtg-display,"Bodoni Moda",Georgia,serif)!important}
 .wp-atmosphere{position:absolute;top:0;inset-inline:0;height:180px;overflow:hidden;pointer-events:none;z-index:0;mask-image:linear-gradient(#000 35%,transparent)}

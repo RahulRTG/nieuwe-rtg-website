@@ -204,7 +204,7 @@
   .ds-werkos .wos-top-context button:focus-visible{outline:1px solid var(--ds-focus);outline-offset:-2px;}
   .ds-werkos .wos-top-context svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
   .ds-werkos .wos-top-huidig{min-width:170px;padding:.42rem .75rem;display:flex;flex-direction:column;justify-content:center;}
-  .ds-werkos .wos-top-huidig span{font-size:.47rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-top-huidig span{font-size:.47rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ds-inkt);}
   .ds-werkos .wos-top-huidig b{margin-top:.08rem;font:550 .66rem var(--rtg-interface,Inter,sans-serif);color:var(--ds-inkt);}
 
 .ds-werkos .wos-bord{

@@ -30,16 +30,16 @@
     position: fixed; z-index: 9999;
     inset-inline-start: 50%;
     inset-block-end: calc(var(--ds-cookie-bodem, 0px) + max(var(--ds-ruimte-2), env(safe-area-inset-bottom, 0px)));
-    inline-size: max-content; max-inline-size: min(92vw, 34rem);
+    inline-size: min(92vw, 34rem); max-inline-size: calc(100vw - 2 * var(--ds-ruimte-2));
     transform: translateX(-50%);
     border: 0; border-block-start: 1px solid var(--ds-glasrand);
     border-radius: 0;
-    background: var(--ds-glas); color: var(--ds-cover-inkt);
+    background: var(--ds-glas); color: var(--ds-accent-inkt);
     box-shadow: none;
   }
-  .ds-cookie--overlay > span { color: var(--ds-cover-inkt); }
-  .ds-cookie--overlay :is(a,button) { color: var(--ds-cover-inkt); }
-  .ds-cookie--overlay :is(a,button):hover { background: var(--ds-cover-grond); }
+  .ds-cookie--overlay > span { color: var(--ds-accent-inkt); }
+  .ds-cookie--overlay :is(a,button) { background: transparent; color: var(--ds-accent-inkt); }
+  .ds-cookie--overlay :is(a,button):hover { background: color-mix(in srgb, var(--ds-accent-inkt) 10%, transparent); }
   .ds-cookie--overlay :is(a,button):focus-visible { outline-color: var(--ds-cover-metaal); }
 
   .ds-cookie-host {

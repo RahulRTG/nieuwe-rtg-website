@@ -40,7 +40,12 @@
 
      Zonder haast: een veeg is een tweede handeling, nooit de eerste. Het blad
      laadt de laag zelf bij, dus een pagina hoeft er geen <link> voor te kennen. */
-  if (!ds && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+  /* Dit is gedragsinfrastructuur, geen legacy vormlaag. Ook een DS-scherm met
+     een expliciete app-adapter (Bestanden, Notities, Mail) moet dezelfde
+     omkeerbare veeg- en toetsenbordcontracten behouden. De laag blijft inert
+     op schermen die geen acties registreren. */
+  var gebruiktGebaren = !!document.querySelector('script[src$="/gebaren.js"],script[src$="/canvas.js"],script[src$="/reizen-veilig.js"],[data-rtg-gebaren]');
+  if (gebruiktGebaren && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
     var gb = document.createElement('script');
     gb.src = '/shared/gebaar.js'; gb.async = true;
     (document.head || document.documentElement).appendChild(gb);

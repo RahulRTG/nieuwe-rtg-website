@@ -37,5 +37,9 @@
   .ds-browser-fout a, .ds-browser-inlog a { color: var(--ds-accent); cursor: pointer; }
   .ds-browser-afstand { margin-block-start: var(--ds-ruimte-4); margin-block-end: var(--ds-ruimte-6); }
   .ds-browser-melding { position: fixed; inset-inline-start: 50%; inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-4)); transform: translateX(-50%); max-inline-size: calc(100% - 2 * var(--ds-goot)); padding: var(--ds-ruimte-3) var(--ds-ruimte-4); background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); box-shadow: var(--ds-schaduw-systeem); font-size: var(--ds-maat-klein); opacity: 0; pointer-events: none; z-index: 60; transition: opacity var(--ds-duur-kort); }
+  @media (max-width: 760px) {
+    .ds-browser-zoeken { flex-wrap: wrap; }
+    .ds-browser-zoeken [data-hoofdactie] { inline-size: 100%; flex: 1 1 100%; }
+  }
   @media (prefers-reduced-motion: reduce) { .ds-browser-melding { transition: none; } }
 }

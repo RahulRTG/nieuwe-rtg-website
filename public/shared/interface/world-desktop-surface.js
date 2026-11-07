@@ -75,7 +75,8 @@
           if (gate.open) gate.close();
           var panel = d.createElement('section'); panel.id = gate.id;
           panel.className = gate.className;
-          panel.setAttribute('role', 'alert');
+          panel.setAttribute('role', 'main');
+          panel.setAttribute('aria-live', 'polite');
           while (gate.firstChild) panel.appendChild(gate.firstChild);
           gate.replaceWith(panel); gate = panel;
         }
@@ -85,7 +86,9 @@
         if (gate.parentNode !== root) {
           // The permission gate remains the only usable content. Navigation
           // may leave the room; it never unlocks the protected page.
-          root.appendChild(gate);
+          /* De poort is tijdens een gesloten sessie de hoofdtaak, dus zij staat
+             vóór de ondersteunende rails en binnen de eerste mobiele zichtzone. */
+          root.insertBefore(gate, root.firstChild);
           gate.classList.add('wd-access'); gate.style.cssText = '';
         }
       } else if (locked) {

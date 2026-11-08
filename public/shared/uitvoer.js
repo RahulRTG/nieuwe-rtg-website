@@ -119,7 +119,7 @@
     document.head.appendChild(uitvoerStijlLink);
   }
 
-  var knop = null, laag = null, melding = null, tik = 0, pogingen = 0, terugFocus = null;
+  var knop = null, stroomHost = null, laag = null, melding = null, tik = 0, pogingen = 0, terugFocus = null;
   var gastKnop = null, gastLaag = null, gekozenKnop = null, gekozenLaag = null;
 
   function sluit() {
@@ -186,7 +186,18 @@
      in main is geen anker: die hoort bij een deel (dan neemt een deelwissel
      de knop mee) of bij een scherm dat de app verborgen houdt. */
   function plaats(k) {
-    if (gastKnop && gastKnop.isConnected) { gastKnop.appendChild(k); return; }
+    if (!stroomHost) {
+      stroomHost = document.createElement('span');
+      stroomHost.className = 'ds-uitvoer-host';
+    }
+    if (k.parentNode !== stroomHost) stroomHost.appendChild(k);
+    /* Ook een werkruimtehost krijgt dezelfde centrale geometrie. Zonder deze
+       grens kon World Desktop de knop terug onder Edge monteren, terwijl de
+       standalone route wel veilig was. */
+    if (gastKnop && gastKnop.isConnected) {
+      gastKnop.appendChild(stroomHost);
+      return;
+    }
     var l = document.querySelectorAll('h1, h2'), kop = null, w = wortel();
     /* De koppen van het wereldkader (shared/interface/world-desktop-home.js)
        zijn niet van deze app. Zijn laadkop staat als eerste h1 in beeld en
@@ -203,13 +214,13 @@
        beeld zet, wint. Loopt de kop over, dan valt hij terug op de plek eronder
        in gewone stroom, en die kan per definitie niet overlopen. */
     var plekken = [];
-    if (h) plekken.push(function () { h.appendChild(k); });
-    if (kop && (kop.parentNode === w || !aan)) plekken.push(function () { kop.parentNode.insertBefore(k, kop.nextSibling); });
-    plekken.push(function () { w.insertBefore(k, w.firstChild); });
+    if (h) plekken.push(function () { h.appendChild(stroomHost); });
+    if (kop && (kop.parentNode === w || !aan)) plekken.push(function () { kop.parentNode.insertBefore(stroomHost, kop.nextSibling); });
+    plekken.push(function () { w.insertBefore(stroomHost, w.firstChild); });
     for (var p = 0; p < plekken.length; p++) {
       plekken[p]();
       if (p === plekken.length - 1 || inBeeld(k)) return;
-      k.remove();
+      stroomHost.remove();
     }
   }
 
@@ -246,6 +257,7 @@
       knop = document.createElement('button');
       knop.type = 'button';
       knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast' + knopStijl + (ds ? ' ds-uitvoer-knop' : '');
+      knop.setAttribute('data-hoofdactie', '');
       knop.setAttribute('aria-haspopup', 'dialog');
       /* Expliciet modulecontract voor de DS Edge. De Edge voert dezelfde
          knop uit; exportlogica en bevoegdheid blijven hier eigenaar. */
@@ -254,7 +266,6 @@
          gegevens heeft. Bedien hem daarom als kortlevende hoofdactie voordat
          een andere schermhandeling de bron opnieuw tekent. Dit is ook voor
          toetsenbord- en Edge-regie de expliciete betekenis van de knop. */
-      knop.setAttribute('data-hoofdactie', '');
       knop.textContent = 'Meenemen';
       knop.addEventListener('click', toon);
     }

@@ -19,7 +19,7 @@ test.before(async()=>{
 });
 test.after(async()=>{if(browser)await browser.close();if(srv)await stop(srv.child);if(tmp)fs.rmSync(tmp,{recursive:true,force:true});});
 async function hit(locator){
- const info=await locator.evaluate(el=>{const r=el.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,h=document.elementFromPoint(x,y);return{rect:r.toJSON(),hit:!!h&&(h===el||el.contains(h)),cover:h?.tagName+' '+h?.className};});
+ const info=await locator.evaluate(el=>{const r=el.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,h=document.elementFromPoint(x,y);return{id:el.id,rect:r.toJSON(),hit:!!h&&(h===el||el.contains(h)),cover:h?.tagName+' '+h?.className,viewport:[innerWidth,innerHeight],font:getComputedStyle(document.documentElement).fontSize};});
  assert.ok(info.hit&&info.rect.width>=44&&info.rect.height>=44,JSON.stringify(info));
 }
 test('verbinding: offline/herstel, bereikbare bediening en bestaande meldingprioriteit op echte DS-host',{skip,timeout:120000},async()=>{
@@ -43,8 +43,8 @@ test('verbinding: offline/herstel, bereikbare bediening en bestaande meldingprio
    // Geen forceclick of wegscrollen van de rail: zichtbare hoofdbediening moet bereikbaar blijven.
    await hit(page.locator('#sbProf'));await page.locator('#sbProf').click();
    await page.locator('#sbMenu').waitFor();await page.keyboard.press('Escape');
-   await hit(page.locator('#osMenuBtn'));await page.locator('#osMenuBtn').click();
-   await page.locator('.amn-blad').waitFor();await page.keyboard.press('Escape');
+   const menu=page.locator('.ds-edge__balk [data-ds-edge="menu"]');await hit(menu);await menu.click();
+   await page.locator('#dsEdgeBlad:not([hidden])').waitFor();await page.keyboard.press('Escape');
    const uit=page.locator('#rtg-sat-balkje button');await hit(uit);await uit.click();
    await page.locator('#rtg-sat-balkje').waitFor({state:'detached'});
    assert.equal(await page.evaluate(()=>localStorage.getItem('rtg_sat')),'uit');

@@ -112,13 +112,13 @@ async function werkvloerMatrix(page, { naam, focus, panelen, checkboxen = false 
   }
   await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
   await page.setViewportSize({ width: 390, height: 1000 });
-  const menu = page.locator('#osMenuBtn');
+  const menu = page.locator('.ds-edge [data-ds-edge="menu"]');
   await menu.scrollIntoViewIfNeeded();
-  assert.equal(await menu.evaluate(el => !!el.closest('.ds-horeca-werkkop') && !el.classList.contains('amn-zweef')), true, 'menu blijft in de bestaande schermkop');
+  assert.equal(await menu.count(), 1, 'één centrale DS-menu-ingang');
   await menu.click();
-  await page.waitForFunction(() => document.querySelector('#osMenuBtn').getAttribute('aria-expanded') === 'true');
+  await page.waitForFunction(() => document.querySelector('.ds-edge [data-ds-edge="menu"]').getAttribute('aria-expanded') === 'true' && !document.querySelector('#dsEdgeBlad').hidden);
   await page.keyboard.press('Escape');
-  await page.waitForFunction(() => document.querySelector('#osMenuBtn').getAttribute('aria-expanded') === 'false');
+  await page.waitForFunction(() => document.querySelector('.ds-edge [data-ds-edge="menu"]').getAttribute('aria-expanded') === 'false' && document.querySelector('#dsEdgeBlad').hidden);
   assert.equal(await menu.evaluate(el => document.activeElement === el), true, 'menu sluit met focus terug');
 }
 

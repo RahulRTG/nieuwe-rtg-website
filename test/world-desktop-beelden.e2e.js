@@ -46,7 +46,7 @@ test('Wonen en Studio openen hun beeldeditor koud mobiel via DS Acties', { skip:
         assert.equal(await page.locator('.wd-home main').isVisible(), true);
         assert.equal(await page.locator('.wp-atmosphere').isVisible(), false);
         assert.equal(await page.locator('.wd-library').isVisible(), false);
-        assert.equal(await page.locator('.wp-atmosphere > .pi-change[data-ds-actie="Beelden aanpassen"]').count(), 1);
+        assert.equal(await page.locator('.wp-atmosphere > .pi-change[data-ds-actie="Beelden aanpassen"][data-rtg-edge-bar]').count(), 1);
         assert.equal(await editor.count(), 0, route + ': editor was nog niet geopend');
         await beeld(page, route + '-390');
 

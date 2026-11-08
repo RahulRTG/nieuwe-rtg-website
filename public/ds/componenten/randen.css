@@ -6,7 +6,12 @@
     --ds-randen-accent: var(--ds-accent, maroon);
     /* Deze systeemknop staat altijd op de donkere wereldaccenten. Een
        paginabrede inktoewijzing mag de bedieningslaag daarom niet donker maken. */
-    --ds-randen-accent-inkt: #fffaf2;
+    --ds-randen-accent-inkt: var(--ds-cover-inkt, white);
+    --rtg-txt: var(--ds-randen-accent-inkt);
+    --wh-ink: var(--ds-randen-accent-inkt);
+    --rtg-world-ink: var(--ds-randen-accent-inkt);
+    --text: var(--ds-randen-accent-inkt);
+    --ink: var(--ds-randen-accent-inkt);
     --ds-randen-focus: var(--ds-focus, white);
     --ds-randen-duur: var(--ds-duur, .15s);
     --ds-randen-curve: var(--ds-curve, ease);
@@ -29,6 +34,7 @@
   }
   .ds-randen-hint.aan { opacity: .85; }
   .ds-randen-toets {
+    display: inline-flex; align-items: center; justify-content: center;
     position: fixed;
     inset-inline-start: max(var(--ds-ruimte-2), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
     inset-block-start: env(safe-area-inset-top, 0px);

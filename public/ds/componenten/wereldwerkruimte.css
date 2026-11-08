@@ -33,7 +33,11 @@
   }
   .ds-wereldwerkruimte :is(.wd-text-button,.wd-primary,.wd-frame-retry,.wd-pages button,.wd-filters button) { cursor: pointer; }
   .ds-wereldwerkruimte .wd-primary { display: block; inline-size: 100%; margin-block: var(--ds-ruimte-3); }
-  .ds-wereldwerkruimte :is(.wd-pages button,.wd-date-nav button):disabled { opacity: .5; cursor: default; }
+  .ds-wereldwerkruimte :is(.wd-pages button,.wd-date-nav button):disabled {
+    opacity: 1;
+    color: var(--ds-inkt-zacht);
+    cursor: default;
+  }
   .ds-wereldwerkruimte .wd-library-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-4); margin-block-end: var(--ds-ruimte-4); }
   .ds-wereldwerkruimte .wd-app-controls { max-inline-size: 100%; font-size: var(--ds-maat-klein); }
   .ds-wereldwerkruimte .wd-app-controls>summary { min-block-size: var(--ds-doel); cursor: pointer; }

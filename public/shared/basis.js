@@ -363,8 +363,12 @@
      een expliciete app-adapter (Bestanden, Notities, Mail) moet dezelfde
      omkeerbare veeg- en toetsenbordcontracten behouden. De laag blijft inert
      op schermen die geen acties registreren. */
-  var gebruiktGebaren = !!document.querySelector('script[src$="/gebaren.js"],script[src$="/canvas.js"],script[src$="/reizen-veilig.js"],[data-rtg-gebaren]');
-  if (gebruiktGebaren && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+  /* Bronbundeling vervangt losse <script>-nodes door één appbundel. De oude
+     detectie op script[src] zag daardoor juist op productieachtige hosts niet
+     dat Canvas of een app-adapter gebaren gebruikte. Laad het gedrag daarom
+     als vaste, inerte basisvoorziening; zonder geregistreerde acties maakt het
+     geen DOM en op DS-hosts komt de vorm uit het centrale component. */
+  if (!window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
     var gb = document.createElement('script');
     gb.src = '/shared/gebaar.js'; gb.async = true;
     (document.head || document.documentElement).appendChild(gb);
@@ -631,8 +635,7 @@
   function springNaarInhoud() {
     function koppelSpring(anker, doel) {
       if (!anker || !doel || !doel.id) return false;
-      var href = '#' + doel.id;
-      if (anker.getAttribute('href') !== href) anker.setAttribute('href', href);
+      anker.setAttribute('href', '#' + doel.id);
       return true;
     }
     var actueleDs = document.documentElement.hasAttribute('data-ds');
@@ -658,7 +661,10 @@
     if (!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex', '-1');
 
     var basisSpringLink = bestaandeSpring || document.createElement('a');
-    var springKlasse = 'rtg-spring' + (actueleDs ? ' ds-basis__spring' : '');
+    /* De centrale basiscomponent bezit de presentatie op beide soorten host.
+       Legacy-schermen laden dit component al via basis-01; een tweede
+       springlinkstijl in world-desktop maakte de laadgraaf weer dubbel. */
+    var springKlasse = 'rtg-spring ds-basis__spring';
     if (basisSpringLink.className !== springKlasse) basisSpringLink.className = springKlasse;
     koppelSpring(basisSpringLink, doel);
     if (basisSpringLink.textContent !== 'Naar de inhoud') basisSpringLink.textContent = 'Naar de inhoud';

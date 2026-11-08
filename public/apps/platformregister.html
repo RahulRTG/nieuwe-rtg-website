@@ -20,8 +20,7 @@
     border-bottom:1px solid var(--rtg-line);max-width:64rem;margin:0 auto;}
   header .weg{display:inline-flex;align-items:center;min-height:24px;margin-left:auto;color:var(--rtg-soft);text-decoration:none;font-size:.78rem;}
   header .weg:hover,header .weg:focus-visible{color:var(--rtg-goud);}
-  /* Twee wegwijzers naast elkaar: de tweede krijgt zijn lucht uit CSS en niet
-     uit een style-attribuut, zodat style-src-attr dicht kan blijven. */
+
   header .weg + .weg{margin-left:.9rem;}
   .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-goud);}
   h1{font-size:1.3rem;margin:.1rem 0 0;}
@@ -46,10 +45,10 @@
   .zoekrij input[type="search"]{flex:1;min-width:11rem;}
   .zoekrij input[type="checkbox"]{flex:0 0 auto;margin:0;}
   .zoekrij label{font-size:.8rem;color:var(--rtg-muted);display:flex;align-items:center;gap:.35rem;}
-  button{border:1px solid var(--rtg-line);background:transparent;color:var(--rtg-txt);
+  .soort,.zoekrij>button,.pager>button,.voet>button{border:1px solid var(--rtg-line);background:transparent;color:var(--rtg-txt);
     font:inherit;font-size:.82rem;padding:.5rem .8rem;cursor:pointer;}
-  button:hover:not(:disabled){border-color:var(--rtg-goud);}
-  button:disabled{opacity:1;color:var(--rtg-muted);border-color:var(--rtg-line);cursor:default;}
+  .soort:hover,.zoekrij>button:hover,.pager>button:hover,.voet>button:hover{border-color:var(--rtg-goud);}
+  .pager>button:disabled{opacity:1;color:var(--rtg-muted);border-color:var(--rtg-line);cursor:default;}
   .ding{cursor:pointer;display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;}
   .ding .srt{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
     color:var(--rtg-soft);min-width:5.4rem;}

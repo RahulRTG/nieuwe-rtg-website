@@ -222,7 +222,19 @@ test('Daily rooms: first visit to real content, Edge, language, layout and recov
     try { await page.locator('.ds-uitvoer-knop').waitFor({state:'visible'}); }
     catch(error) { error.message+='\nUitvoercontext: '+JSON.stringify(await page.evaluate(()=>({owner:!!window.RTGUitvoer,beschikbaar:window.RTGUitvoer?.beschikbaar(),ds:document.documentElement.hasAttribute('data-ds'),knoppen:[...document.querySelectorAll('.rtguitvoer-knop')].map(e=>({class:e.className,host:e.parentElement?.className,visible:!!e.getClientRects().length})),feedPosts:document.querySelectorAll('article.post').length})));throw error; }
     assert.equal(await page.locator('.ds-uitvoer-knop').count(), 1);
-    await page.locator('.ds-uitvoer-knop').click();
+    try { await page.locator('.ds-uitvoer-knop').click(); }
+    catch (error) {
+      const geometrie = await page.evaluate(() => {
+        const meet = element => element ? { rechthoek: element.getBoundingClientRect().toJSON(), stijl: {
+          position: getComputedStyle(element).position, bottom: getComputedStyle(element).bottom,
+          zIndex: getComputedStyle(element).zIndex, display: getComputedStyle(element).display
+        } } : null;
+        return { knop: meet(document.querySelector('.ds-uitvoer-knop')),
+          host: meet(document.querySelector('.ds-uitvoer-host')), edge: meet(document.querySelector('.ds-edge')) };
+      });
+      console.error('Uitvoergeometrie:', JSON.stringify(geometrie));
+      throw error;
+    }
     await page.locator('.rtguitvoer-laag:not([hidden])').waitFor();
     await page.locator('.rtguitvoer-sluit').click();
     await screenshot('pulse-filled');

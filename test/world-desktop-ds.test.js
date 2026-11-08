@@ -32,18 +32,27 @@ function fixture(ds = true) {
   return { Node, body, document, window };
 }
 
-test('de wereldloader laat een gemigreerd DS-scherm volledig aan de DS-schil', () => {
-  let geladen = 0;
+test('de wereldloader behoudt Spatial op een DS-scherm zonder een tweede Adaptive Edge', async () => {
+  const geladen = [];
+  let gestart = 0;
   const document = {
     readyState: 'complete',
     documentElement: { hasAttribute: naam => naam === 'data-ds' },
-    body: { dataset: { rtgWorld: 'work' } },
-    createElement() { geladen++; throw new Error('DS mag geen legacy-runtime laden'); }
+    body: { dataset: { rtgWorld: 'work' }, hasAttribute: () => false },
+    head: { appendChild(node) { geladen.push(node.src); queueMicrotask(node.onload); } },
+    createElement() { return {}; }
   };
-  const window = { self: null, top: null, location: { search: '' } };
+  const window = {
+    self: null, top: null, location: { search: '' },
+    RTGDesktopHome: { start() { gestart++; } }
+  };
   window.self = window.top = window;
-  vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams });
-  assert.equal(geladen, 0);
+  vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams, queueMicrotask, console });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.ok(geladen.includes('/shared/interface/workspace-runtime.js'));
+  assert.ok(geladen.includes('/shared/interface/world-desktop-home.js'));
+  assert.equal(geladen.some(pad => pad.includes('rtg-adaptive-edge')), false);
+  assert.equal(gestart, 1);
   assert.equal(document.body.dataset.rtgDesktopState, undefined);
 });
 
@@ -86,7 +95,7 @@ test('springlink focust de echte DS-hoofdinhoud en houdt de gesloten toegangspoo
     vm.runInNewContext(lees('public/shared/interface/world-desktop-surface.js'), f);
     f.window.RTGDesktopSurface.guard(root, home);
     const skip = f.body.children[0], target = ds ? main : home;
-    assert.equal(skip.classList.contains('ds-basis__spring'), ds);
+    assert.equal(skip.classList.contains('ds-basis__spring'), true);
     assert.equal(skip.attrs.href, '#' + target.id);
     skip.click({ preventDefault() {} }); assert.equal(f.document.activeElement, target);
     gate = f.body.appendChild(new f.Node('SECTION')); gate.id = 'rtf-toegang-slot'; gate.style = {};
@@ -138,7 +147,8 @@ test('toegangsdeur behoudt presentatie en dezelfde inhoud bij native dialoog naa
     assert.equal(gesloten, 1);
     assert.equal(gate.tagName, 'section');
     assert.equal(gate.classList.contains(ds ? 'ds-foundation-deur' : 'bestaande-deur'), true);
-    assert.equal(gate.attrs.role, 'alert'); assert.equal(gate.parentNode, root);
+    assert.equal(gate.attrs.role, 'main'); assert.equal(gate.attrs['aria-live'], 'polite');
+    assert.equal(gate.parentNode, root); assert.equal(root.firstChild, gate);
     assert.equal(gate.firstChild, content); assert.equal(content.onclick(), 'zelfde handeling');
     assert.equal(home.hidden, true); assert.equal(home.inert, true);
   }

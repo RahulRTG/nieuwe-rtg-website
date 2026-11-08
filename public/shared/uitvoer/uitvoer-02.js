@@ -30,6 +30,7 @@
       knop = document.createElement('button');
       knop.type = 'button';
       knop.className = 'rtguitvoer rtguitvoer-knop rtgdeel-vast' + knopStijl + (ds ? ' ds-uitvoer-knop' : '');
+      knop.setAttribute('data-hoofdactie', '');
       knop.setAttribute('aria-haspopup', 'dialog');
       /* Expliciet modulecontract voor de DS Edge. De Edge voert dezelfde
          knop uit; exportlogica en bevoegdheid blijven hier eigenaar. */
@@ -38,7 +39,6 @@
          gegevens heeft. Bedien hem daarom als kortlevende hoofdactie voordat
          een andere schermhandeling de bron opnieuw tekent. Dit is ook voor
          toetsenbord- en Edge-regie de expliciete betekenis van de knop. */
-      knop.setAttribute('data-hoofdactie', '');
       knop.textContent = 'Meenemen';
       knop.addEventListener('click', toon);
     }

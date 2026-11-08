@@ -48,7 +48,13 @@
   .ds-foundation-berichten :is(.sb-bkop,.sb-leeg) { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
   .ds-foundation-berichten .sb-btxt { white-space: pre-wrap; }
   .ds-foundation-berichten .sb-reisknop { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); color: var(--ds-accent); }
-  .ds-foundation-toegang { visibility: visible; max-block-size: calc(100dvh - var(--ds-ruimte-8)); overflow: auto; }
+  .ds-foundation-toegang {
+    --rtg-txt: var(--ds-cover-inkt, white);
+    --rtg-world-ink: var(--ds-cover-inkt, white); --rtf-paper: var(--ds-cover-inkt, white); --text: var(--ds-cover-inkt, white);
+    --card: var(--ds-cover-grond, black); --rtg-card: var(--ds-cover-grond, black); --rtg-world-card: var(--ds-cover-grond, black);
+    visibility: visible; max-block-size: calc(100dvh - var(--ds-ruimte-8)); overflow: auto; background: var(--ds-cover-grond, black); color: var(--ds-cover-inkt, white);
+  }
+  .ds-foundation-toegang :is(.ds-label,[role="status"]) { color: var(--ds-cover-inkt, white); }
   .ds-foundation-slot { display: grid; gap: var(--ds-ruimte-4); }
   .ds-foundation-slot > :is(h1,p) { margin: 0; }
   .ds-foundation-laden { inline-size: 100%; accent-color: var(--ds-accent); }

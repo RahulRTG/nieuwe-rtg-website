@@ -18,7 +18,12 @@
         !x.closest('dialog:not([open])') && (x.getClientRects().length > 0 || x.hasAttribute('data-rtg-edge-bar'));
     }).map(function (x) {
       return { id: x.getAttribute('data-ds-actie-id') || x.id || '',
-        label: x.getAttribute('data-ds-actie') || x.textContent.trim(), doe: function () { x.click(); } };
+        /* Een pictogramknop heeft soms bewust geen zichtbare tekst. Dezelfde
+           toegankelijke naam die de knop zelf bezit is dan ook de naam in de
+           Edge. Zonder deze stap verschenen Vorige en Volgende als losse
+           tekens en waren ze vanuit de universele bediening niet vindbaar. */
+        label: x.getAttribute('data-ds-actie') || x.getAttribute('aria-label') || x.textContent.trim(),
+        doe: function () { x.click(); } };
     });
     return voegAppmenuActiesToe(acties, 'functies');
   }
@@ -50,13 +55,16 @@
     return uit;
   }
   function systeemActies() {
-    var acties = [
-      { label: 'Alle functies', doe: function () { if (w.RTGSprong) w.RTGSprong.open(); } },
+    var acties = [];
+    if (w.RTGSprong && typeof w.RTGSprong.open === 'function') {
+      acties.push({ label: 'Alle functies', doe: function () { w.RTGSprong.open(); } });
+    }
+    acties.push(
       { label: 'Berichten', href: '/apps/comm.html', icoon: I.bericht },
       { label: 'RTG Media', href: '/apps/media.html' },
       { label: 'Uw account', href: '/apps/ik.html' },
       { label: 'Privacy en veiligheid', href: '/apps/veilig.html' }
-    ];
+    );
     return voegAppmenuActiesToe(acties, 'systeemfuncties');
   }
 

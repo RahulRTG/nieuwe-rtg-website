@@ -5,7 +5,7 @@
     position: fixed; inset-inline-start: -100vw; inset-block-start: 0; z-index: 10020;
     padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
     min-block-size: var(--ds-doel); box-sizing: border-box;
-    background: var(--ds-oppervlak-sterk); color: var(--ds-inkt);
+    background: var(--ds-cover-grond); color: var(--ds-cover-inkt);
     border: 1px solid var(--ds-metaal); border-radius: var(--ds-radius-knop);
     font: 600 var(--ds-maat-klein)/1.5 var(--ds-letter-tekst); text-decoration: none;
   }

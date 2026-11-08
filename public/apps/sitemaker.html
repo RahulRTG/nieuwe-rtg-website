@@ -33,9 +33,7 @@
   .knop.online{background:var(--green);border-color:var(--rtg-leesgroen,var(--green));color:#fff;}
   .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .swatches{display:flex;gap:.35rem;align-items:center;}
-  /* De kleurstalen blijven ook in de krappe tabletbalk zelfstandig 44px:
-     flex-shrink mocht ze eerder tot veertien pixels samenpersen. */
-  .swatch{width:2.75rem;height:2.75rem;min-width:2.75rem;min-height:2.75rem;flex:0 0 2.75rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
+  .swatch{border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
   .swatch.actief{border-color:#fff;}
   .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
   .kleurbalk label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.52rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);cursor:pointer;}
@@ -493,7 +491,7 @@ async function laadMijnFotos(){ try{ const r=await api('/api/site/fotos',{}); MI
 async function laadSalon(){ try{ const r=await fetch('/api/salon/promo',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:'{}'}); const d=await r.json().catch(()=>({})); if(r.ok)SALONFOTOS=(d.fotos||[]); }catch(e){} }
 function leesBestand(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>rej(new Error('lezen mislukt')); fr.readAsDataURL(file); }); }
 function bouwBlokkies(){const g=$('#blokkies');g.textContent='';BLOKTYPES.forEach(bt=>{const b=document.createElement('button');b.type='button';b.setAttribute('data-contextactie','');b.setAttribute('data-stand','blok-'+bt.t);b.innerHTML=esc(bt.n)+'<span class="k">'+esc(bt.k)+'</span>';b.addEventListener('click',()=>{const nb=nieuwBlok(bt.t);DESIGN.blokken.push(nb);if(DESIGN.volgorde)Object.keys(DESIGN.volgorde).forEach(k=>DESIGN.volgorde[k].push(nb.id));$('#blokSheet').classList.remove('open');render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),40);});g.appendChild(b);});}
-function bouwSwatches(){const g=$('#swatches');g.textContent='';ACCENTEN.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='swatch'+(c===DESIGN.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{DESIGN.accent=c;bouwSwatches();render();});g.appendChild(b);});}
+function bouwSwatches(){const g=$('#swatches');g.textContent='';ACCENTEN.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='swatch ds-werkos-kleurstaal'+(c===DESIGN.accent?' actief':'');b.style.background=c;b.title=c;b.addEventListener('click',()=>{DESIGN.accent=c;bouwSwatches();render();});g.appendChild(b);});}
 function zetBewerk(aan){BEWERK=aan;$('#bewerkKnop').textContent=aan?'Voorbeeld':'Bewerken';$('#bewerkKnop').classList.toggle('aan',!aan);render();}
 
 function lintBij(){

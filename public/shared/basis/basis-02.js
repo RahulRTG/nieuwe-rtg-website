@@ -30,8 +30,7 @@
   function springNaarInhoud() {
     function koppelSpring(anker, doel) {
       if (!anker || !doel || !doel.id) return false;
-      var href = '#' + doel.id;
-      if (anker.getAttribute('href') !== href) anker.setAttribute('href', href);
+      anker.setAttribute('href', '#' + doel.id);
       return true;
     }
     var actueleDs = document.documentElement.hasAttribute('data-ds');
@@ -57,7 +56,10 @@
     if (!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex', '-1');
 
     var basisSpringLink = bestaandeSpring || document.createElement('a');
-    var springKlasse = 'rtg-spring' + (actueleDs ? ' ds-basis__spring' : '');
+    /* De centrale basiscomponent bezit de presentatie op beide soorten host.
+       Legacy-schermen laden dit component al via basis-01; een tweede
+       springlinkstijl in world-desktop maakte de laadgraaf weer dubbel. */
+    var springKlasse = 'rtg-spring ds-basis__spring';
     if (basisSpringLink.className !== springKlasse) basisSpringLink.className = springKlasse;
     koppelSpring(basisSpringLink, doel);
     if (basisSpringLink.textContent !== 'Naar de inhoud') basisSpringLink.textContent = 'Naar de inhoud';

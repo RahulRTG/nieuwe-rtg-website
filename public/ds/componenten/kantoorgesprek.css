@@ -43,6 +43,10 @@
     background: var(--ds-kg-accent);
     color: var(--ds-kg-accent-inkt);
   }
-  .ds-kantoorgesprek .kg-rij button:disabled { opacity: .45; cursor: default; }
+  /* De knop blijft bij een lopend verzoek volledig dekkend. Een opacity op de
+     hele knop mengde de lichte letter en het bordeaux met het ivoor van de
+     wereld erachter; op twee kantoorschermen bleef daar slechts 1,25:1 van
+     over. De disabled-eigenschap en cursor dragen de toestand al semantisch. */
+  .ds-kantoorgesprek .kg-rij button:disabled { opacity: 1; cursor: default; }
   .ds-kantoorgesprek .kg-fout { font-size: .86rem; line-height: 1.5; color: var(--ds-kg-fout); margin: .8rem 0 0; min-height: 1.2rem; }
 }

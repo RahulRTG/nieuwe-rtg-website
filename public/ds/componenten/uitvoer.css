@@ -1,6 +1,11 @@
 /* Meenemen gebruikt de bestaande knop en dialoog. Alleen de positionering
    van de bestaande exportlaag hoort hier; de uitvoerlogica blijft gedeeld. */
 @layer rtg.component {
+  /* De host is de grens tussen de centrale uitvoercomponent en nog niet
+     gemigreerde scherm-CSS. Oude schermen maken iedere hoofdactie op telefoon
+     100% breed; door die knop binnen deze DS-host te plaatsen blijft die
+     afspraak behouden zonder dat de knop buiten het blikveld kan lopen. */
+  .ds-uitvoer-host { display: contents; }
   .ds-uitvoer-knop {
     flex: 0 1 auto;
     inline-size: auto;
@@ -50,15 +55,23 @@
      bestaande uitvoercontract blijft hetzelfde; alleen zijn vaste, bereikbare
      plaats boven de Edge wordt hier door de DS-eigenaar vastgelegd. */
   @media (max-width: 760px) {
-    html body .ds-uitvoer-knop.rtguitvoer-knop[data-hoofdactie] {
-      position: fixed !important;
-      z-index: 70 !important;
-      inset-block-start: auto !important;
-      inset-block-end: calc(var(--rtg-adaptive-inset, 88px) + env(safe-area-inset-bottom, 0px) + 12px) !important;
-      inset-inline: max(12px, env(safe-area-inset-left, 0px)) max(12px, env(safe-area-inset-right, 0px)) !important;
-      inline-size: auto !important;
-      max-inline-size: none !important;
-      margin: 0 !important;
+    .ds-uitvoer-host {
+      position: fixed;
+      z-index: 70;
+      inset-block-start: auto;
+      /* Zelfde reservering als de Edge-eigenaar: Edgehoogte, zijn veilige
+         ondermarge en daarna nog een zichtbare tussenruimte. */
+      inset-block-end: calc(var(--ds-edge-hoogte) + max(var(--ds-ruimte-3), env(safe-area-inset-bottom, 0px)) + var(--ds-ruimte-3));
+      inset-inline: max(12px, env(safe-area-inset-left, 0px)) max(12px, env(safe-area-inset-right, 0px));
+      display: block;
+      margin-block: 0;
+      margin-inline: 0;
+    }
+    .ds-uitvoer-host > .ds-uitvoer-knop[data-hoofdactie] {
+      inline-size: 100%;
+      max-inline-size: 100%;
+      margin-block: 0;
+      margin-inline: 0;
     }
   }
 }

@@ -64,7 +64,7 @@
     updateSwitch() { /* geen zwevende knop meer; het paneel leest zelf uit */ },
 
     injectStyles() {
-      laadI18nLegacyStijl('/ds/taalkeuze-standalone.css');
+      laadI18nLegacyStijl();
     },
 
     /* De actieve wereldtalen ophalen (Boardroom-schakelaars). Faalt dit (bijv.

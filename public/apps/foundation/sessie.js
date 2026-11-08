@@ -131,9 +131,9 @@
     });
   }
   function toegangBeeld(reden, laden, beheer) {
-    return '<div class="ds-foundation-slot"><p class="ds-label">RTF · veilige toegang</p>' +
+    return '<div class="ds-foundation-slot"><div class="ds-label">RTF · veilige toegang</div>' +
       '<h1 class="ds-titel ds-titel--scherm">' + (laden ? 'Jouw veilige wereld wacht op je' : 'Deze ruimte blijft nog dicht') + '</h1>' +
-      '<p role="status">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
+      '<div role="status">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</div>' +
       (laden ? '<progress class="ds-foundation-laden" aria-label="Toegang controleren"></progress>' :
         '<div class="ds-foundation-acties"><a class="ds-knop ds-knop--primair" data-rtf-wissel href="index.html#profielen">Kies een profiel →</a>' +
         '<a class="ds-knop" data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +

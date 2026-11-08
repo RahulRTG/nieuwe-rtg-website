@@ -15,7 +15,7 @@
     box-sizing: border-box; inline-size: min(100%, 35rem); min-inline-size: 0;
     max-block-size: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 2 * var(--ds-ruimte-3));
     margin: 0; padding: var(--ds-ruimte-4); overflow: auto; overscroll-behavior: contain;
-    color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border-color: var(--ds-glasrand); text-align: start;
+    color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-systeem); text-align: start;
   }
   .ds-taalkeuze .rtg-lang-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-3); margin-block-end: var(--ds-ruimte-3); }
   .ds-taalkeuze .rtg-lang-eyebrow, .ds-taalkeuze .rtg-lang-label, .ds-taalkeuze .rtg-lang-quick-wrap > span {

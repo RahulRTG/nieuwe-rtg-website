@@ -107,6 +107,7 @@
      `hidden`-attribuut wordt nooit gelezen als toestemming of verwijderd. */
   var menuWeergave = new WeakMap();
   function zetMenuZichtbaar(el, aan) {
+    var doorMenu = el.classList.contains('rtgdeel-weg') || el.classList.contains('ds-deelmenu-weg');
     el.classList.toggle('rtgdeel-weg', !aan);
     el.classList.toggle('ds-deelmenu-weg', !aan);
     if (!aan) {
@@ -115,6 +116,13 @@
     } else if (menuWeergave.has(el)) {
       el.style.display = menuWeergave.get(el);
       menuWeergave.delete(el);
+    } else if (doorMenu && el.style.display === 'none') {
+      /* Een app kan zijn DOM uit innerHTML of een momentopname herstellen.
+         De nieuwe nodes dragen dan onze verbergklasse en inline display:none,
+         maar staan niet in de WeakMap van de oude nodes. De klasse bewijst dat
+         het deelmenu eigenaar was; herstel daarom ook deze gekloonde toestand
+         voordat de nieuwe indeling de zichtbaarheid opnieuw bepaalt. */
+      el.style.display = '';
     }
   }
 

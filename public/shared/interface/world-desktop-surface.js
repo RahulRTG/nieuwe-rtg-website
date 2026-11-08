@@ -40,8 +40,8 @@
     // The new people column precedes the original main. Keep bypass navigation
     // first in document order, including routes whose main appears after login.
     var skip = d.querySelector('.rtg-spring,a[href^="#"][class*="skip"]') || d.createElement('a');
-    skip.classList.add('wd-skip'); skip.textContent = skip.textContent || 'Naar de inhoud';
-    if (ds) skip.classList.add('ds-basis__spring');
+    skip.classList.add('wd-skip'); skip.classList.add('ds-basis__spring');
+    skip.textContent = skip.textContent || 'Naar de inhoud';
     if (!home.id) home.id = 'rtgWorldContent';
     function bestemming() {
       // De DS-wrapper is mobiel display:contents en kan geen focus dragen.

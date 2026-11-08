@@ -26,14 +26,19 @@ const JS = lees('public/shared/gebaar.js');
 const CSSKAAL = CSS.replace(/\/\*[\s\S]*?\*\//g, '');
 const JSKAAL = JS.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
-test('de gebarenlaag heeft twee begrensde laadwegen en geen onbesliste navigatie', () => {
-  const analyse = ontwerp.scriptLaadAnalyse(JS, { ds: true });
-  assert.deepEqual(analyse.onzeker, []);
-  assert.deepEqual(analyse.verwijzingen, [
+test('de gebarenlaag scheidt de centrale DS-presentatie van de begrensde legacy-laadweg', () => {
+  const ds = ontwerp.scriptLaadAnalyse(JS, { ds: true });
+  assert.deepEqual(ds.onzeker, []);
+  assert.deepEqual(ds.verwijzingen, [
+    { href: '/shared/adaptief/grammatica.js', soort: 'dom' }
+  ]);
+  const legacy = ontwerp.scriptLaadAnalyse(JS, { ds: false });
+  assert.deepEqual(legacy.onzeker, []);
+  assert.deepEqual(legacy.verwijzingen, [
     { href: '/shared/gebaar.css', soort: 'dom' },
     { href: '/shared/adaptief/grammatica.js', soort: 'dom' }
   ]);
-  assert.match(JS, /function laadBlad\(path\)/);
+  assert.match(JS, /document\.documentElement\.hasAttribute\('data-ds'\)/);
   assert.match(JS, /function laadScript\(path\)/);
   assert.doesNotMatch(JSKAAL, /location\.href\s*=/);
 });

@@ -87,7 +87,13 @@
     var atmosphere = photo('/images/world-homes/' + world + '-sfeer.jpg', 'sfeer', 'Sfeerbeeld', 'wp-atmosphere'); d.body.appendChild(atmosphere);
     // De Edge opent dezelfde beeldbediening wanneer de mobiele schil het sfeerbeeld verbergt.
     var imageAction = atmosphere.querySelector('.pi-change');
-    if (d.body.classList.contains('ds-wereldwerkruimte') && imageAction) imageAction.setAttribute('data-ds-actie', 'Beelden aanpassen');
+    if (d.body.classList.contains('ds-wereldwerkruimte') && imageAction) {
+      imageAction.setAttribute('data-ds-actie', 'Beelden aanpassen');
+      /* Het sfeerbeeld is op de kleine compositie bewust verborgen. Markeer
+         zijn bestaande handeling daarom expliciet als Edge-bediening; de DS
+         voert nog steeds dezelfde knop en dezelfde autorisatie uit. */
+      imageAction.setAttribute('data-rtg-edge-bar', '');
+    }
     tabs(o.root, o.home, o.people, o.favorites);
     var scene = d.body.dataset.worldHome && !d.body.dataset.publicPlatform ? homeScene(o.home, o.root) : null;
     responsive(o, scene);

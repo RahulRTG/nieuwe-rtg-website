@@ -46,8 +46,7 @@ html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="canvas"] header[data-r
 /* De toegangspoort bezit al een complete veilige kop met merk en taalkeuze.
    De globale kop wijkt hier zodat er geen dubbele header of aanraakblokkade is. */
 html body[data-rtg-editorial-v4="true"]:has(#gate[data-rtg-access]:not([style*="display: none"]))>.rtg-v4-header,
-html body[data-rtg-editorial-v4="true"]:has(#onbGate:not([hidden]))>.rtg-v4-header,
-html body[data-rtg-editorial-v4="true"]:has(#rtf-toegang-slot)>.rtg-v4-header{display:none!important;pointer-events:none!important}
+html body[data-rtg-editorial-v4="true"]:has(#onbGate:not([hidden]))>.rtg-v4-header{display:none!important;pointer-events:none!important}
 body[data-rtg-v4-kind="conversation"] .rtm-kop,body[data-rtg-v4-kind="conversation"]>header[aria-hidden="true"],body[data-rtg-v4-kind="conversation"]>main[aria-hidden="true"],body[data-rtg-v4-kind="conversation"] .wd-page>header[aria-hidden="true"],body[data-rtg-v4-kind="conversation"] .wd-page>main[aria-hidden="true"]{display:none!important}
 
 /* Eén inhoudsvlak; desktopaccessoires mogen de app niet meer in een smalle
@@ -991,42 +990,4 @@ html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([dat
    papier; smaller en op een donkere dashboardkaart blijft hij licht. */
 @media (min-width:1000px){
   html body[data-rtg-editorial-v4="true"][data-world-home] :is(.wh-paper-card,.onthaal-kies) .buurtsec{color:#554d45!important}
-}
-
-/* Laatste contractcorrecties horen bij de universele eigenaar. Oudere
-   routebladen worden bewust vóór V4 geladen en mogen deze bediening niet
-   opnieuw onleesbaar of buiten duimbereik maken. */
-html body[data-rtg-editorial-v4="true"] .rnd-toets.ds-randen-toets{
-  background:var(--v4-accent)!important;color:#fffaf2!important
-}
-html body[data-rtg-editorial-v4="true"] .ds-cookie--overlay>span,
-html body[data-rtg-editorial-v4="true"] .ds-cookie--overlay :is(a,button){color:#fffaf2!important}
-html body[data-rtg-editorial-v4="true"] .ds-cookie--overlay :is(a,button){background:transparent!important}
-html body[data-rtg-editorial-v4="true"] :is(.wd-pages,.pager) button:disabled{
-  opacity:1!important;color:var(--rtg-world-muted,#554d45)!important;background:transparent!important
-}
-html body[data-rtg-editorial-v4="true"] a.rtg-spring.wd-skip:not(#rtg-nooit-spring){
-  background:#0c0c0b!important;color:#fff!important
-}
-html body[data-rtg-editorial-v4="true"] button[data-nav="forward"]:disabled{
-  opacity:1!important;color:#554d45!important;background:transparent!important
-}
-html body[data-rtg-editorial-v4="true"] .kg-rij button{
-  background:var(--v4-accent)!important;border-color:var(--v4-accent)!important;color:#fffaf2!important
-}
-html body[data-rtg-editorial-v4="true"].rtf-premium[data-rtg-world="foundation"] .leeg{
-  color:var(--rtg-world-ink,#f7f1e5)!important
-}
-@media(max-width:699px){
-  html body[data-rtg-editorial-v4="true"] .rtg-v4-header-actions>.rtguitvoer-knop[data-hoofdactie]{
-    position:fixed!important;z-index:70!important;top:auto!important;
-    right:max(12px,env(safe-area-inset-right,0px))!important;
-    bottom:calc(var(--rtg-adaptive-inset,88px) + env(safe-area-inset-bottom,0px) + 12px)!important;
-    left:max(12px,env(safe-area-inset-left,0px))!important;
-    width:auto!important;max-width:none!important;margin:0!important;
-  }
-  html body[data-rtg-editorial-v4="true"][data-rtg-v4-kind="conversation"] .rtm-voorzijde{
-    left:auto!important;width:100%!important;max-width:100%!important;
-    margin-inline:0!important;transform:none!important;
-  }
 }

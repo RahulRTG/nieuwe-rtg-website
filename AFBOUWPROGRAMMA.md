@@ -3425,3 +3425,130 @@ EXPERIENCEWERKT is na de bronwijzigingen opnieuw afgeleid en blijft eerlijk
 `INCOMPLETE`: 114 apps en 316 schermen zijn geinventariseerd, maar geen
 volledige Experience-kwalificatie wordt geclaimd. APPWERKT blijft op het
 bewaarde register 112/114 tot de volledige kandidaatmeting wordt uitgevoerd.
+
+#### Integrale CI-foutanalyse — 7 november
+
+Bron: commit `db3323e84e808a9eb2f5088f71ad727861017aef`, PR #706,
+Node volgens `.nvmrc`. Dit is de centrale blokkadelijst voor deze afbouwronde;
+er wordt geen tweede register naast dit afbouwprogramma gemaakt.
+
+**Verplichte GitHub-poorten.** `main` is strict beschermd door vier
+eindcontroles: `Tests, checks en build`, `Kwetsbare dependencies (npm audit)`,
+`CodeQL (JavaScript)` en `Toegankelijkheid - het oordeel over alle delen`.
+Op de genoemde commit waren CodeQL en npm-audit groen. De twee samengestelde
+oordelen waren nog niet uitgevoerd: de brede CI draaide nog en de statische
+keuring was al gezakt. De overige PR-workflows blijven verplicht onderdeel van
+de kwalificatie, ook wanneer hun naam niet rechtstreeks in branch protection
+staat.
+
+| workflow / job | stand op de broncommit | foutklasse | gevolg |
+|---|---|---|---|
+| Bewijs-preflight | groen | geen fout | volledige bewijsroute gekozen |
+| Toetsscherven 1–4 | bezig | nog niet beoordeeld | volledig toetsoordeel wacht |
+| Ijkingen boot-smoke, grens-sweep, keuring, klok en zaakdoos | groen | geen fout | gesloten voor deze commit |
+| IJking meterijk | bezig | nog niet beoordeeld | volledig toetsoordeel wacht |
+| Zware toets ast-grens | groen | geen fout | gesloten voor deze commit |
+| Keuringen (statisch) en PostgreSQL | rood | architectuurschending | 166 Design System-schendingen; PostgreSQL zelf is niet de foutbron |
+| Norm, instroom en build | groen | geen fout | build en normratels gesloten voor deze commit |
+| npm audit | groen | geen fout | beschermde poort gesloten |
+| Nieuwe dependencies | groen | geen fout | geen nieuwe dependencyblokkade |
+| Adversarial rollen en isolatie | groen | geen fout | gerichte beveiligingspoort gesloten |
+| Containerproef | groen | geen fout | containerstart gesloten |
+| Toegankelijkheid delen 1–4 | bezig | nog niet beoordeeld | toegankelijkheidsoordeel wacht |
+| Toegankelijkheidsoordeel | nog niet uitgevoerd | afhankelijk geblokkeerd | wacht op alle vier delen |
+| Schermtoetsen delen 1–4 | bezig | nog niet beoordeeld | schermdekkingsoordeel wacht |
+| Schermdekkingsoordeel | nog niet uitgevoerd | afhankelijk geblokkeerd | wacht op alle vier delen |
+| Volledige tests, checks en build | nog niet uitgevoerd | afhankelijk geblokkeerd | kan door de rode statische keuring niet groen worden |
+| Tests, checks en build | nog niet uitgevoerd | afhankelijk geblokkeerd | beschermde eindpoort wacht op alle risicopoorten |
+| Incrementeel bewijs unit/browser/oordeel | overgeslagen | verklaarde routekeuze | correct: preflight koos de volledige route |
+| Endpointdekking en bewijspublicatie | nog niet uitgevoerd / niet van toepassing op PR | afhankelijk / trigger | endpointdekking wacht op volledige route; publiceren gebeurt niet vanuit deze PR |
+| Alle schermen 1440 px | groen, 309/309 | eerdere functionele regressie hersteld | definitieve rerun blijft nodig na de structurele reparatie |
+| Alle schermen 390 px | bezig | nog niet beoordeeld | mobiele kwalificatie wacht |
+| WebKit-kernroutes | groen | geen fout | Safari-motor gesloten voor deze commit |
+| Lokale kwalificatie | groen | geen fout | bouw en voorcontrole gesloten |
+| CodeQL | groen | geen fout | beschermde poort gesloten |
+
+**De 166 Design System-meldingen zijn vijf gedeelde oorzaken.** De aantallen
+hieronder zijn meldingen van de poort, niet aantallen onafhankelijke bugs.
+
+| bronoorzaak | meldingen | eigenaar | herstelstatus |
+|---|---:|---|---|
+| Commit `78238509e0` voegde schermcorrecties toe aan vijftien legacy-CSS/HTML-owners en liet 28 bytes/`!important`/hex-ratels groeien | 28 | Experience / Design System-consolidatie | open; correcties naar de juiste centrale owner brengen of de legacyowner aantoonbaar laten krimpen, nooit de norm verruimen |
+| `gebaar.js` laadt op DS-schermen het legacyblad `shared/gebaar.css`; daardoor erven 67 schermen een tweede presentatieowner | 67 | Gebaarcontract + Design System | open; gedrag hergebruiken, DS-presentatie centraal bezitten en legacy-CSS uitsluitend op legacyhosts laden |
+| Dezelfde 67 schermen hebben een onbesliste scriptlaadweg voor `gebaar.js`; `public/ds/voorbeeld.html` deelt daarnaast de i18n-onzekerheid | onderdeel van 68 laadgraafmeldingen | Design System-laadgraaf | open; de DS-poort en letterlijke laadbeslissing lokaal bewijsbaar maken |
+| `i18n.js` maakt de reeds centrale `taalkeuze-standalone.css` via een niet statisch bewijsbare URL; dit raakt alle 68 laadgraafmeldingen | onderdeel van 68 laadgraafmeldingen | I18n + Design System-laadgraaf | open; bestaande centrale asset behouden en de conditionele DOM-load rechtstreeks bewijsbaar maken |
+| `randen.css` bevat één ruwe kleur buiten tokens; `uitvoer.css` bevat acht `!important`s en één selector die niet bij de eigen `.ds-`-klasse begint | 3 | Design System-componentowners | open; tokens en cascade-eigenaarschap herstellen zonder uitzonderingen |
+
+De telling sluit exact: 28 ratelmeldingen + 3 directe DS-contractmeldingen +
+67 geladen legacybladen + 68 onbesliste laadgraven = 166.
+
+**Bewijsverval.** EXPERIENCEWERKT bindt bewijs aan de volledige relevante
+bronvingerafdruk, configuratie en kandidaatcommit. De scherm-, Edge- en
+runtimewijzigingen maakten de vorige `sourceHash` daarom terecht ongeldig. De
+registervernieuwing in `db3323e84e` veranderde uitsluitend die hash; zij heeft
+geen bewijs als geslaagd gemarkeerd. De stand blijft eerlijk `NOT_TESTED`:
+0/114 apps, 0/316 schermen en 0/3.360 toepasselijke dimensievoorwaarden. De
+912 door de statische controle gemelde verlopen APPWERKT-bewijzen blijven
+eveneens open tot de bron stabiel is en de vereiste producenten opnieuw zijn
+uitgevoerd. Verlopen bewijs wordt niet gekopieerd, geaccepteerd of administratief
+groen gemaakt.
+
+**Foutklassen en afsluitvolgorde.** De eerder gevonden ene-DS-schilregressie
+was een functionele regressie en is gericht hersteld; desktop 309/309 en de
+Edge-/taalregressies zijn daarop groen. De open harde fout is architecturaal:
+de vijf oorzaken hierboven. Er is op deze commit geen bewezen
+infrastructuurfout en geen bewezen flake; PostgreSQL, Redis, container en de
+reeds afgeronde browserpoorten functioneren. Na structureel herstel draaien
+eerst de Design System-, laadgraaf-, gebaar-, i18n-, Edge- en betrokken
+schermregressies. Pas daarna worden alle verplichte CI-controles op één nieuwe,
+schone commit uitgevoerd. APPWERKT- en Experience-bewijzen worden pas op die
+stabiele bron opnieuw geproduceerd.
+
+**Actuele herstelstand — 8 november.** De tabel hierboven bewaart de feitelijke
+uitgangssituatie van run `42421188441`; de herstelstand hieronder vervangt die
+niet en voorkomt daardoor dat een oude rode run administratief groen wordt.
+
+| gedeelde bronoorzaak | klasse | eigenaar | structureel herstel | lokale tegenproef | status |
+|---|---|---|---|---|---|
+| legacy presentatieowners groeiden terwijl de centrale DS-owner dezelfde verantwoordelijkheid al droeg | architectuur | Experience / Design System | vervangen regels naar de bestaande componentowners verplaatst en de actieve legacyregels verwijderd | `ontwerpsysteem.js --controle`: 0 schendingen | gesloten, definitieve CI-rerun vereist |
+| `gebaar.js` kon op 67 DS-hosts een tweede stylesheetowner laden | architectuur / laadgraaf | Gebaar + Design System | presentatie naar `public/ds/componenten/gebaar.css`; de bestaande loader kiest nu expliciet DS of legacy | gebaar-, laadgraaf- en DS-contracttoetsen groen | gesloten, definitieve CI-rerun vereist |
+| berekende i18n-, randen- en uitvoerloads waren niet statisch bewijsbaar | architectuur / laadgraaf | I18n + componentowners | letterlijke centrale assets en begrensde loaders; tokens en cascade-eigendom hersteld | volledige laadgraaf- en tokentoetsen groen | gesloten, definitieve CI-rerun vereist |
+| een `data-ds`-uitzondering schakelde de bestaande Workspace Runtime uit en verwijderde Spatial, panelen en sessiecontinuiteit | functionele regressie | Workspace Runtime / World Desktop | uitzondering verwijderd; DS houdt de centrale Edge en laadt de bestaande Spatial-runtime | permanente toets bewijst Workspace Runtime aanwezig en geen tweede Adaptive Edge; desktopbrowsertoetsen groen | gesloten, definitieve CI-rerun vereist |
+| browsertoetsen bedienden verborgen legacy-menu's in plaats van de centrale DS Edge | verlopen toetsverwachting | schermtoetsen | selectors gemigreerd naar de werkelijke centrale eigenaar; productgedrag niet nagebouwd | horeca- en Edge-browserregressies groen | gesloten, definitieve CI-rerun vereist |
+| uitgeschakelde `Verder`-knoppen erfden op twee hosts een lichte achtergrond uit een globale `button`-owner | toegankelijkheidsregressie | Kantoorgesprek + Merken + Platformregister | hostselectors begrensd en disabled-presentatie volledig door het centrale component bezeten | nieuwe permanente contrasttoets plus a11y-deel 4: 0 structuur, 0 contrast, 0 touch | gesloten, alle vier delen op definitieve commit vereist |
+| Foundation-deurtest mat tussen het toevoegen van de Workspace-schil en de MutationObserver die haar fail-closed maakt | instabiele toets | Foundation-toegangstoets | de toets wacht nu op het bestaande waarneembare inert- en `aria-hidden`-contract en meldt elke overtredende node | dezelfde volledige Foundation-browsertoets tweemaal op dezelfde bron | gesloten, definitieve CI-rerun vereist |
+| afgeleide architectuur-, bewijs-, bundel-, functie-, taal- en websitevingerafdrukken liepen achter na bronwijzigingen | verlopen afleiding | registereigenaren | uitsluitend de bestaande generators opnieuw uitgevoerd; geen uitkomst handmatig aangepast | `scripts/check.js`: alles in orde | gesloten, definitieve CI-rerun vereist |
+
+De Design System-telling is daarmee **166 naar 0** gegaan. De poort rapporteert
+87 gemigreerde schermen en zeven niet-blokkerende verbeterkandidaten. Er is geen
+uitzondering, normverlaging of nieuwe presentatiecontroller toegevoegd. De
+blijvende regressietoetsen bewaken nu ook de twee fouten die de oorspronkelijke
+statische telling alleen niet kon zien: behoud van Spatial op DS-hosts en
+contrast van uitgeschakelde kantoorgesprekacties.
+
+**Bewijsstatus na herstel.** De Experience-inventaris is opnieuw deterministisch
+afgeleid uit de actuele bron en omvat 114 apps en 316 schermen. De uitslag
+blijft bewust `NOT_TESTED`: 0 volledig bewezen apps, 0 volledig bewezen
+schermen en 0 van 3.360 volledig bewezen dimensievoorwaarden. APPWERKT meldt
+342 fijnmazig vervallen en 570 grof verlopen bewijzen. Alle 114 rijen staan
+daarom `NIET_GETEST`; er is geen verlopen 8/8-rij die als groen blijft gelden.
+Dit is een open Deep Green-bewijspakket, maar geen kunstmatig groene CI-uitkomst.
+
+**Infrastructuur en instabiliteit.** Twee lokale afwijkingen zijn afzonderlijk
+geclassificeerd: loopback kan in de beperkte sandbox `EPERM` geven en de
+Node-26-ophaler kan zonder netwerk `ENOTFOUND` geven. Dezelfde proeven slagen
+buiten die beperking met de vastgezette Node `v26.13.0`. Geen van beide was de
+bron van een GitHub-fout. Een echte toetsrace is wel vastgesteld: de
+Foundation-deurcontrole kon dezelfde commit voor of na een
+MutationObserver-microtask meten. De toets wacht nu op de bestaande zichtbare
+veiligheidstoestand en blijft falen als die niet binnen de grens ontstaat.
+
+**Resterende centrale blokkades.** De productreparaties zijn lokaal gericht
+gesloten. Nog open staan uitsluitend de kwalificatiestappen die niet vooraf als
+geslaagd mogen worden geschreven: (1) één schone kandidaatcommit maken,
+(2) alle verplichte PR-jobs daarop opnieuw uitvoeren, inclusief vier
+toetsscherven, vier schermscherven en vier toegankelijkheidsdelen, (3) iedere
+nieuwe rode uitkomst terugbrengen naar een bronoorzaak en opnieuw gericht
+herstellen, en (4) pas daarna het CI-oordeel op dezelfde commit vastleggen.
+APPWERKT- en Experience-herkwalificatie blijven een afzonderlijk zichtbaar
+Deep Green-pakket en worden niet door een groene PR-run vervangen.

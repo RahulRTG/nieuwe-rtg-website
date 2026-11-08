@@ -34,15 +34,23 @@ test('DS randen behoudt instellingengebaar en toetsenbordingang zonder tweede Ed
   assert.ok(o.kinderen.some(n => n.className === 'rnd-hint boven ds-randen-hint'));
   const knop = o.kinderen.find(n => n.className === 'rnd-toets ds-randen-toets');
   assert.ok(knop);
-  knop.click(); assert.equal(o.geopend(), 1);
+  assert.equal(knop.tag, 'rtg-randen-toets');
+  assert.equal(knop.getAttribute('role'), 'button');
+  assert.equal(knop.getAttribute('tabindex'), '0');
+  let toetsenbordTegenhouden = 0;
+  knop.handlers.keydown({ key: 'Enter', preventDefault() { toetsenbordTegenhouden++; } });
+  assert.equal(o.geopend(), 1); assert.equal(toetsenbordTegenhouden, 1);
+  knop.handlers.keydown({ key: 'Escape', preventDefault() { toetsenbordTegenhouden++; } });
+  assert.equal(o.geopend(), 1); assert.equal(toetsenbordTegenhouden, 1);
+  knop.click(); assert.equal(o.geopend(), 2);
   o.event('pointerdown', { clientY: 10 });
-  o.event('pointermove', { clientY: 35 }); assert.equal(o.geopend(), 1);
-  o.event('pointermove', { clientY: 55 }); assert.equal(o.geopend(), 2);
-  o.event('pointermove', { clientY: 80 }); assert.equal(o.geopend(), 2, 'één haal opent één keer');
+  o.event('pointermove', { clientY: 35 }); assert.equal(o.geopend(), 2);
+  o.event('pointermove', { clientY: 55 }); assert.equal(o.geopend(), 3);
+  o.event('pointermove', { clientY: 80 }); assert.equal(o.geopend(), 3, 'één haal opent één keer');
   let tegengehouden = 0;
   o.event('click', { preventDefault() { tegengehouden++; }, stopPropagation() {} });
   assert.equal(tegengehouden, 1, 'de geslaagde haal activeert niet de onderliggende knop');
-  o.w.RTGRanden.boven(); assert.equal(o.geopend(), 3);
+  o.w.RTGRanden.boven(); assert.equal(o.geopend(), 4);
 });
 test('legacy behoudt bestaande Edge-laders en randpresentatie', () => {
   const o = omgeving(false);

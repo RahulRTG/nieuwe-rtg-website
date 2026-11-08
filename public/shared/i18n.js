@@ -1295,13 +1295,13 @@ window.RTGUiBronTekst = function(source){
 
   /* Alle pagina's gebruiken hetzelfde DS-taalcomponent. Een legacy-document
      laadt alleen tokens + dit component; een DS-document heeft het al. */
-  function laadI18nLegacyStijl(pad) {
+  function laadI18nLegacyStijl() {
     if (document.documentElement.hasAttribute('data-ds')) return;
     if (document.getElementById('rtg-i18n-styles')) return;
     const i18nLegacyStijlLink = document.createElement('link');
     i18nLegacyStijlLink.id = 'rtg-i18n-styles';
     i18nLegacyStijlLink.rel = 'stylesheet';
-    i18nLegacyStijlLink.href = assetPad(pad);
+    i18nLegacyStijlLink.href = '/ds/taalkeuze-standalone.css';
     document.head.appendChild(i18nLegacyStijlLink);
   }
   const assetPad = pad => ASSET_BASIS + pad;
@@ -1800,7 +1800,7 @@ window.RTGUiBronTekst = function(source){
     updateSwitch() { /* geen zwevende knop meer; het paneel leest zelf uit */ },
 
     injectStyles() {
-      laadI18nLegacyStijl('/ds/taalkeuze-standalone.css');
+      laadI18nLegacyStijl();
     },
 
     /* De actieve wereldtalen ophalen (Boardroom-schakelaars). Faalt dit (bijv.

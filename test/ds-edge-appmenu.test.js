@@ -9,15 +9,20 @@ function node(tag = 'div') {
   return { tag, kinderen: [], events: {}, attrs: {},
     appendChild(kind) { this.kinderen.push(kind); return kind; },
     addEventListener(naam, fn) { this.events[naam] = fn; },
-    setAttribute(naam, waarde) { this.attrs[naam] = waarde; }
+    setAttribute(naam, waarde) { this.attrs[naam] = waarde; },
+    getAttribute(naam) { return this.attrs[naam] == null ? null : this.attrs[naam]; },
+    hasAttribute(naam) { return this.attrs[naam] != null; },
+    getClientRects() { return [{}]; },
+    closest() { return null; }
   };
 }
 
-function omgeving() {
+function omgeving(metSprong) {
   const modi = {}, bladen = {}, balk = node('nav'), uitgevoerd = [];
   const bestaand = {
     disabled: false, textContent: 'Bestaande actie',
     getAttribute(naam) { return naam === 'data-ds-actie' ? 'Bestaande actie' : null; },
+    hasAttribute() { return false; }, getClientRects() { return [{}]; },
     closest() { return null; }, click() { uitgevoerd.push('bestaand'); }
   };
   const appknop = { click() { uitgevoerd.push('appknop'); } };
@@ -45,6 +50,7 @@ function omgeving() {
       }
     }
   };
+  if (metSprong) window.RTGSprong = { open() { uitgevoerd.push('alle-functies'); } };
   const document = { querySelectorAll: () => [bestaand], createDocumentFragment: () => node('fragment') };
   vm.runInNewContext(bron, { window, document, setTimeout: fn => fn(), fetch: async () => ({ json: async () => ({}) }) });
   modi.navigatie();
@@ -65,4 +71,11 @@ test('DS Edge-menu ontsluit de capability-gebonden systeemfuncties van Appmenu',
   ]);
   regels.at(-1).doe();
   assert.deepEqual(o.uitgevoerd, ['instellingen']);
+});
+
+test('DS Edge toont Alle functies alleen met een uitvoerbare Spotlight-eigenaar', () => {
+  const o = omgeving();
+  assert.equal(o.bladen.menu.vul().regels.some(x => x.label === 'Alle functies'), false);
+  const metSprong = omgeving(true), alle = metSprong.bladen.menu.vul().regels.find(x => x.label === 'Alle functies');
+  assert.ok(alle); alle.doe(); assert.deepEqual(metSprong.uitgevoerd, ['alle-functies']);
 });

@@ -586,7 +586,7 @@ body.rtg-social-messages .nieuwknop span:first-child{
   line-height:1;
 }
 @media(min-width:431px){
-  html body.rtg-social-messages .zoekrij .nieuwknop:not(#rtg-nooit-bericht){
+  body.rtg-social-messages .nieuwknop{
     width:48px!important;
     height:48px!important;
     flex:0 0 auto!important;
@@ -619,15 +619,6 @@ body.rtg-social-messages .gesprekken{
     flex:1 1 100%!important;
   }
   body.rtg-social-messages .nieuwknop{
-    /* De lijstkolom begrenst deze actie later tot 50px. Midden in de eigen
-       gewrapte regel blijft dat compacte raakvlak voor beide handen bereikbaar. */
-    width:50px!important;
     justify-content:center;
-    min-width:50px!important;
-    max-width:50px!important;
-    flex:0 0 50px!important;
-    margin-inline:auto!important;
-    justify-self:center!important;
-    grid-column:1 / -1!important;
   }
 }

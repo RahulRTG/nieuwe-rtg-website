@@ -5,7 +5,17 @@
 
   .ds-werkos.wos .tabbar{display:none;}
   .ds-werkos.wos.wos-aan .content{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6.5rem);}
+  /* Nog niet gemigreerde WerkOS-hosts kunnen hun oude absolute tabbalk door
+     de on-gelaagde scherm-CSS zichtbaar houden. De centrale werkruimte geeft
+     daarom aan het einde van het echte werk voldoende scrollruimte. Zo kan
+     een actie volledig boven elke navigatielaag landen, zonder een nieuwe
+     pagina-eigen uitzondering of !important-regel. */
+  .ds-werkos.wos.wos-aan .content{scroll-padding-block-end:calc(env(safe-area-inset-bottom,0px) + 10rem);}
+  .ds-werkos.wos.wos-aan .content::after{content:"";display:block;block-size:4rem;inline-size:100%;pointer-events:none;}
   .ds-werkos.wos #shell{background:var(--ds-grond);}
+  /* De accentstalen blijven in krappe werkbalken visueel compact, maar hun
+     centrale raakvlak voldoet op ieder scherm aan de RTG-doelmaat. */
+  .ds-werkos-kleurstaal{inline-size:var(--ds-doel);block-size:var(--ds-doel);min-inline-size:var(--ds-doel);min-block-size:var(--ds-doel);flex:0 0 var(--ds-doel);}
   .ds-werkos.wos .topbar{
     position:relative;z-index:5;background:color-mix(in srgb,var(--ds-cover-grond) 92%,transparent);
     border-bottom-color:var(--ds-lijnkleur);box-shadow:none;

@@ -79,6 +79,7 @@
     "handenvrij",
     "conceptwerk",
     "uitvoer",
+    "gebaar",
     "ios",
     "appmenu",
     "wereldwerkruimte",
@@ -187,7 +188,6 @@
       "/shared/rtg-continue-key.js",
       "/shared/rtg-heritage-order.js",
       "/shared/randen.js",
-      "/shared/gebaar.js",
       "/shared/uurwerk.js",
       "/shared/kaart.js"
     ]

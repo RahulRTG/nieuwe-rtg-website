@@ -48,11 +48,6 @@
   /* Twee begrensde laadwegen, uitsluitend voor de bestaande gebaarbron en de
      gedeelde grammaticatabel. De letterlijke callsites blijven de bron van
      waarheid; dit is geen algemeen moduleregister. */
-  function laadBlad(path) {
-    var blad = document.createElement('link');
-    blad.rel = 'stylesheet'; blad.href = path;
-    document.head.appendChild(blad);
-  }
   function laadScript(path) {
     var script = document.createElement('script');
     script.src = path; script.async = true;
@@ -62,8 +57,12 @@
   /* Het blad hoort bij de laag en niet bij de pagina: een scherm dat gebaren
      wil, hoeft geen <link> te onthouden. Een keer, en alleen als hij er nog
      niet staat. */
-  if (!d.querySelector('link[href="/shared/gebaar.css"]')) {
-    laadBlad('/shared/gebaar.css');
+  if (!document.documentElement.hasAttribute('data-ds') && !document.getElementById('rtg-gebaar-styles')) {
+    var gebaarBlad = document.createElement('link');
+    gebaarBlad.id = 'rtg-gebaar-styles';
+    gebaarBlad.rel = 'stylesheet';
+    gebaarBlad.href = '/shared/gebaar.css';
+    document.head.appendChild(gebaarBlad);
   }
 
   /* DE GRAMMATICA KOMT OOK MEE, maar pas als er iets te vegen valt. Lang drukken

@@ -133,10 +133,18 @@
   }
 
   function toetsknop(tekst, doe) {
-    var b = d.createElement('button');
-    b.type = 'button'; b.className = 'rnd-toets ds-randen-toets';
+    /* Een eigen systeemelement voorkomt dat brede legacyregels als
+       `button { color: inherit }` de centrale componentpresentatie overnemen.
+       Rol en toetsenbordcontract blijven expliciet gelijk aan een knop. */
+    var b = d.createElement('rtg-randen-toets');
+    b.className = 'rnd-toets ds-randen-toets';
+    b.setAttribute('role', 'button'); b.setAttribute('tabindex', '0');
     b.textContent = tekst;
     b.addEventListener('click', doe);
+    b.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault(); doe();
+    });
     return b;
   }
 

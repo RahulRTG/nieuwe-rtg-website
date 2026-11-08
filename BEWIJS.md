@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3158 bestanden en 21117 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3159 bestanden en 21119 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 3158 |
-| losse beweringen (`test(...)`) | 21117 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 517 |
+| toetsbestanden | 3159 |
+| losse beweringen (`test(...)`) | 21119 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 518 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2944 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 183 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 31 |
+| niets van beide | 32 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2725 bestanden, 20305 beweringen.
+2726 bestanden, 20307 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -516,6 +516,7 @@ toets omvalt.
 | `contextpakket.test.js` | 12 | gezakt op `===->!==#0` | DE CONTEXTSAMENSTELLER -- nooit stil afkappen. Een eigen modelserver kapt stil af wat niet in zijn venster past, vanaf het begin, en daar staat de grondwet. |
 | `contextspoor.test.js` | 3 | geen module gevonden | HET CONTEXTSPOOR STAAT UIT, EN ZWIJGT ALS HET AAN STAAT. Deze meting hangt in een HEET PAD: de domeingrens-Proxy waar elke toegang tot het contextobject langskomt, dus tienduizenden keren per opstart en opnieuw bij... |
 | `contract.test.js` | 13 | gezakt op `liegpoort /api/` | HET CONTRACT: maand 13, en de prijs die vaststaat. kern/aanmeldingen/betaalschema.js zette twaalf termijnen klaar en hield op. |
+| `contrast-disabled.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `controleafronden.test.js` | 5 | gezakt op `liegpoort /api/` | Een betaling op controle wordt afgerond door een mens op naam (kern/betaalwaarheid/controle.js, routes/kantoren/betaalproviders.js). Een geweigerde terugbetaling zet de HELE betaling op CONTROLE_NODIG, met opzet (kop... |
 | `controlekamer.test.js` | 4 | gezakt op `liegpoort /api/` | De controlekamer: de eigenaar zet functies aan/uit PER DOELGROEP op de beveiligde technische pagina. Bewijs dat een functie uit kan voor de ene doelgroep (bijv. |
 | `controls.test.js` | 28 | gezakt op `return-weg#0` | HET CONTROLREGISTER (scripts/controls.js) en het uitzendcontract uit TOEZICHT.md. WAAROM DEZE TOETS ER IS. |
@@ -596,7 +597,7 @@ toets omvalt.
 | `drm.test.js` | 5 | gezakt op `liegpoort /api/` | RTG contentbescherming, de DRM-route (kern/drm.js): Encrypted Media Extensions met een Clear Key-licentie die RTG zelf bedient. Draai: npm test |
 | `droogloop.test.js` | 9 | gezakt op `!==->===#0` | De droogloop beproefd op zijn twee eigen aannames: dat hij het VERSCHIL ziet, en dat hij huishouding van domein scheidt. Niet op de server -- die draait in het instrument zelf en kost een minuut; hier staan de twee... |
 | `ds-bediening-laden.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `ds-edge-appmenu.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | De DS Edge presenteert de bestaande RTGAppMenu-contracten. Deze proef bewaakt dat er geen tweede functieregister of afwijkende uitvoering ontstaat. |
+| `ds-edge-appmenu.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | De DS Edge presenteert de bestaande RTGAppMenu-contracten. Deze proef bewaakt dat er geen tweede functieregister of afwijkende uitvoering ontstaat. |
 | `ds-edge-rahul.test.js` | 14 | gezakt op `voorwaarde-omkeren#0` | De echte Edge-modus kiest bestaande Rahul-bediening op het moment van verzenden. Deze ontwikkelcontrole bewijst routering en foutafhandeling, niet browserlayout, serverautorisatie of menselijke Experience-kwaliteit. |
 | `ds-edge-scroll.test.js` | 2 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ds-shell-laden.test.js` | 4 | gezakt op `browser-export-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -639,7 +639,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 13 delen, 950 regels in de delen
+`public/shared/basis/` -- 13 delen, 956 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -704,7 +704,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 380 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 388 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -723,7 +723,7 @@ omlaag.
 
 ## `shared/gebaar.js`
 
-`public/shared/gebaar/` -- 8 delen, 1109 regels in de delen
+`public/shared/gebaar/` -- 8 delen, 1108 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -919,7 +919,7 @@ omlaag.
 
 ## `shared/randen.js`
 
-`public/shared/randen/` -- 2 delen, 215 regels in de delen
+`public/shared/randen/` -- 2 delen, 223 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -1012,7 +1012,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 3 delen, 298 regels in de delen
+`public/shared/uitvoer/` -- 3 delen, 309 regels in de delen
 
 | deel | onderwerp |
 |---|---|

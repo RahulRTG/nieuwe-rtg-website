@@ -46,8 +46,15 @@ function scherm(ds) {
   const ctx={window, document, Blob, URL: { createObjectURL(b) { blobs.push(b); return 'blob:local-'+blobs.length; }, revokeObjectURL(u) { ingetrokken.push(u); } },
     setTimeout(f, ms) { timers.push({ f, ms }); return timers.length; }, clearTimeout() {}, requestAnimationFrame(f) { f(); } };
   vm.runInNewContext(bron, ctx);
+  function vindKnop(root) {
+    for (const n of root.children) {
+      if (n.tagName === 'BUTTON') return n;
+      const gevonden = vindKnop(n);
+      if (gevonden) return gevonden;
+    }
+  }
   return { api: window.RTGUitvoer, body, head, document, blobs, downloads, ingetrokken, timers, html, events,
-    opnieuw() { vm.runInNewContext(bron, ctx); }, knop() { return body.children.find(n => n.tagName === 'BUTTON'); } };
+    opnieuw() { vm.runInNewContext(bron, ctx); }, knop() { return vindKnop(body); } };
 }
 const gegevens = { kolommen: ['Naam', 'Tekst'], rijen: [['A', '<script>niet uitvoeren</script>;"\n']] };
 for (const ds of [false, true]) {

@@ -655,17 +655,6 @@ body.rtg-stijl [role="button"].hoofd{
      zelf te zorgen dat er plek voor is. */
   .rtg-duimeind{flex-wrap:wrap;}
 
-  /* Meenemen is een kortlevende schermactie die vroeger door de plaatszoeker
-     in de eerste kop terechtkwam. Op telefoon hoort dezelfde moduleactie bij
-     de universele onderrand: bereikbaar voor beide handen en boven de Edge. */
-  .rtguitvoer-knop[data-hoofdactie]{
-    position:fixed!important;z-index:70!important;
-    inset-inline:max(12px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-right,0px))!important;
-    inset-block-start:auto!important;
-    inset-block-end:calc(var(--rtg-adaptive-inset,88px) + env(safe-area-inset-bottom,0px) + 12px)!important;
-    width:auto!important;max-width:none!important;margin:0!important;
-  }
-
   /* TWEE UITZONDERINGEN, EN ALLEBEI MET EEN NAAM ERBIJ IN PLAATS VAN EEN GOK.
 
      Hier stond `*:has(> input, > textarea, > select) > [data-hoofdactie]`: "als

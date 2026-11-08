@@ -158,12 +158,6 @@ body.rtm-voorzijde-actief .rtm-voorzijde{
 }
 body.rtm-voorzijde-actief .rtm-binnen{padding-top:0}
 body.rtm-voorzijde-actief .rtm-kop{min-height:36px!important;border:0!important}
-/* Zoekveld en bediening delen hun regel, maar de tekstknoppen mogen niet
-   smaller worden dan hun eigen label. Het veld vangt de beschikbare ruimte
-   op; zo ontstaat op smalle schermen geen onzichtbare horizontale uitloop. */
-body.rtm-voorzijde-actief .zoekrij{min-width:0}
-body.rtm-voorzijde-actief .zoekrij .vld{min-width:0;flex:1 1 auto}
-body.rtm-voorzijde-actief .zoekrij .knp{flex:0 0 auto;white-space:nowrap}
 .rtm-kop .rtm-merk,.rtm-kop .rtm-huis,.rtm-kop .rtm-profiel{display:none}
 .rtm-ey{font-weight:500;font-size:10px;letter-spacing:.15em;color:#dec69f;line-height:1.6}
 .rtm-titel{max-width:14ch;font-weight:400;font-size:clamp(38px,9vw,66px);line-height:1.03;letter-spacing:-.035em;margin:22px 0 16px}

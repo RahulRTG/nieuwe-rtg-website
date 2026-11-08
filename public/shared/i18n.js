@@ -1301,7 +1301,9 @@ window.RTGUiBronTekst = function(source){
     const i18nLegacyStijlLink = document.createElement('link');
     i18nLegacyStijlLink.id = 'rtg-i18n-styles';
     i18nLegacyStijlLink.rel = 'stylesheet';
-    i18nLegacyStijlLink.href = '/ds/taalkeuze-standalone.css';
+    /* Op een statische projectvoordeur draagt rtg-asset-base het projectpad;
+       op app-hosts blijft de basis leeg en dus dezelfde root-route. */
+    i18nLegacyStijlLink.href = assetPad('/ds/taalkeuze-standalone.css');
     document.head.appendChild(i18nLegacyStijlLink);
   }
   const assetPad = pad => ASSET_BASIS + pad;

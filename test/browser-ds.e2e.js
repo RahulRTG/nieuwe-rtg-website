@@ -2,7 +2,7 @@
    De blokinhoud en formulierstand krijgen hun gerichte proef in webblok-ds. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,letOpFouten}=require('./helper');
+const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,letOpFouten,wachtOpSchil}=require('./helper');
 const pw=laadPlaywright(),skip=geenBrowser(pw);
 let srv,browser,token,adres;
 async function post(route,body,auth){const r=await fetch(srv.base+route,{method:'POST',headers:{'Content-Type':'application/json',...(auth?{Authorization:'Bearer '+auth}:{})},body:JSON.stringify(body||{})});const d=await r.json();assert.equal(r.status,200,route+': '+JSON.stringify(d));return d;}
@@ -24,15 +24,15 @@ for(const breedte of [390,1280])test('browserchrome '+breedte+': adres, geschied
   try{
     await page.goto(srv.base+'/apps/browser.html',{waitUntil:'domcontentloaded'});
     await page.locator('#rooster .kaart').first().waitFor();
-    await page.waitForFunction(()=>document.body.dataset.rtgDesktopState==='ready');
+    await wachtOpSchil(page);
     assert.equal(await page.locator('html').getAttribute('data-ds'),'1');
     assert.ok(await page.evaluate(()=>!!window.RTGiOS),'bestaande iOS API actief');
-    const menu=page.locator('#osMenuBtn');
-    assert.equal(await menu.evaluate(el=>el.parentElement.classList.contains('ds-browser-balk')),true,'menu hoort in de bestaande browserbalk');
-    assert.equal(await menu.evaluate(el=>el.classList.contains('amn-zweef')),false,'geen zwevende knop boven Terug');
-    await menu.click();await page.locator('.amn-blad').waitFor({state:'visible'});
-    await page.keyboard.press('Escape');await page.locator('.amn-scrim').waitFor({state:'hidden'});
-    await page.waitForFunction(()=>document.activeElement===document.querySelector('#osMenuBtn'));
+    const oudMenu=page.locator('#osMenuBtn'),menu=page.locator('.ds-edge__balk [data-ds-edge="menu"]');
+    assert.equal(await oudMenu.isVisible(),false,'het legacy-menu blijft gemonteerd voor compatibiliteit maar bezit de presentatie niet');
+    assert.equal(await menu.isVisible(),true,'de centrale DS Edge bezit de zichtbare systeemdeur');
+    await menu.click();await page.locator('#dsEdgeBlad:not([hidden])').waitFor({state:'visible'});
+    await page.keyboard.press('Escape');await page.locator('#dsEdgeBlad').waitFor({state:'hidden'});
+    await page.waitForFunction(()=>document.activeElement===document.querySelector('.ds-edge__balk [data-ds-edge="menu"]'));
     await page.locator('#adres').fill(adres+'.rtg');await page.locator('#balk button').click();
     await page.locator('.zaakbalk .zn').waitFor();
     assert.match(await page.locator('.zaakbalk .zn').textContent(),/Es Vedra/);

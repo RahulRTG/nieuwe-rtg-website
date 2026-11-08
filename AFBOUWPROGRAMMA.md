@@ -3513,9 +3513,9 @@ niet en voorkomt daardoor dat een oude rode run administratief groen wordt.
 | legacy presentatieowners groeiden terwijl de centrale DS-owner dezelfde verantwoordelijkheid al droeg | architectuur | Experience / Design System | vervangen regels naar de bestaande componentowners verplaatst en de actieve legacyregels verwijderd | `ontwerpsysteem.js --controle`: 0 schendingen | gesloten, definitieve CI-rerun vereist |
 | `gebaar.js` kon op 67 DS-hosts een tweede stylesheetowner laden | architectuur / laadgraaf | Gebaar + Design System | presentatie naar `public/ds/componenten/gebaar.css`; de bestaande loader kiest nu expliciet DS of legacy | gebaar-, laadgraaf- en DS-contracttoetsen groen | gesloten, definitieve CI-rerun vereist |
 | berekende i18n-, randen- en uitvoerloads waren niet statisch bewijsbaar | architectuur / laadgraaf | I18n + componentowners | letterlijke centrale assets en begrensde loaders; tokens en cascade-eigendom hersteld | volledige laadgraaf- en tokentoetsen groen | gesloten, definitieve CI-rerun vereist |
-| een `data-ds`-uitzondering schakelde de bestaande Workspace Runtime uit en verwijderde Spatial, panelen en sessiecontinuiteit | functionele regressie | Workspace Runtime / World Desktop | uitzondering verwijderd; DS houdt de centrale Edge en laadt de bestaande Spatial-runtime | permanente toets bewijst Workspace Runtime aanwezig en geen tweede Adaptive Edge; desktopbrowsertoetsen groen | gesloten, definitieve CI-rerun vereist |
+| de generieke World Desktop-projectie werd ten onrechte als vereiste Spatial-runtime op alle DS-hosts geactiveerd | functionele regressie / architectuurgrens | Workspace Runtime / World Desktop | DS-schermen houden hun eigen centrale schil; Workspace Runtime blijft beschikbaar via expliciete modulecontracten en wordt niet als globale legacy `wd-shell` geprojecteerd | permanente toets bewijst dat een DS-host geen legacy-runtime of tweede Edge laadt; 1440px-inventaris 309/309 groen | gesloten, definitieve CI-rerun vereist |
 | browsertoetsen bedienden verborgen legacy-menu's in plaats van de centrale DS Edge | verlopen toetsverwachting | schermtoetsen | selectors gemigreerd naar de werkelijke centrale eigenaar; productgedrag niet nagebouwd | horeca- en Edge-browserregressies groen | gesloten, definitieve CI-rerun vereist |
-| uitgeschakelde `Verder`-knoppen erfden op twee hosts een lichte achtergrond uit een globale `button`-owner | toegankelijkheidsregressie | Kantoorgesprek + Merken + Platformregister | hostselectors begrensd en disabled-presentatie volledig door het centrale component bezeten | nieuwe permanente contrasttoets plus a11y-deel 4: 0 structuur, 0 contrast, 0 touch | gesloten, alle vier delen op definitieve commit vereist |
+| uitgeschakelde `Verder`-knoppen erfden op twee hosts een lichte achtergrond uit een globale `button`-owner | toegankelijkheidsregressie | Kantoorgesprek + Merken + Platformregister | hostselectors begrensd en disabled-presentatie volledig door het centrale component bezeten | permanente contrastasserties in de reeds mutatiegemeten kantoorgesprekcontracttoets plus a11y-deel 4: 0 structuur, 0 contrast, 0 touch | gesloten, alle vier delen op definitieve commit vereist |
 | Foundation-deurtest mat tussen het toevoegen van de Workspace-schil en de MutationObserver die haar fail-closed maakt | instabiele toets | Foundation-toegangstoets | de toets wacht nu op het bestaande waarneembare inert- en `aria-hidden`-contract en meldt elke overtredende node | dezelfde volledige Foundation-browsertoets tweemaal op dezelfde bron | gesloten, definitieve CI-rerun vereist |
 | afgeleide architectuur-, bewijs-, bundel-, functie-, taal- en websitevingerafdrukken liepen achter na bronwijzigingen | verlopen afleiding | registereigenaren | uitsluitend de bestaande generators opnieuw uitgevoerd; geen uitkomst handmatig aangepast | `scripts/check.js`: alles in orde | gesloten, definitieve CI-rerun vereist |
 
@@ -3526,29 +3526,129 @@ blijvende regressietoetsen bewaken nu ook de twee fouten die de oorspronkelijke
 statische telling alleen niet kon zien: behoud van Spatial op DS-hosts en
 contrast van uitgeschakelde kantoorgesprekacties.
 
-**Bewijsstatus na herstel.** De Experience-inventaris is opnieuw deterministisch
-afgeleid uit de actuele bron en omvat 114 apps en 316 schermen. De uitslag
-blijft bewust `NOT_TESTED`: 0 volledig bewezen apps, 0 volledig bewezen
-schermen en 0 van 3.360 volledig bewezen dimensievoorwaarden. APPWERKT meldt
-342 fijnmazig vervallen en 570 grof verlopen bewijzen. Alle 114 rijen staan
-daarom `NIET_GETEST`; er is geen verlopen 8/8-rij die als groen blijft gelden.
-Dit is een open Deep Green-bewijspakket, maar geen kunstmatig groene CI-uitkomst.
+#### Onveranderlijke volledige nulmeting — 8 november
 
-**Infrastructuur en instabiliteit.** Twee lokale afwijkingen zijn afzonderlijk
-geclassificeerd: loopback kan in de beperkte sandbox `EPERM` geven en de
-Node-26-ophaler kan zonder netwerk `ENOTFOUND` geven. Dezelfde proeven slagen
-buiten die beperking met de vastgezette Node `v26.13.0`. Geen van beide was de
-bron van een GitHub-fout. Een echte toetsrace is wel vastgesteld: de
-Foundation-deurcontrole kon dezelfde commit voor of na een
-MutationObserver-microtask meten. De toets wacht nu op de bestaande zichtbare
-veiligheidstoestand en blijft falen als die niet binnen de grens ontstaat.
+De nulmeting is commit
+`070ffb83a214166e5dd6259a72b51d718e8356bf` op PR #706. De vier workflows
+`CI` (`42496432623`), `Desktop- en mobielstandaard` (`42496432728`), `CodeQL`
+(`42496432622`) en `Kwalificatie lokaal` (`42496432730`) zijn allemaal volledig
+afgerond. De lokale reparatiewerkboom na deze commit telt niet mee als bewijs
+voor deze meting.
 
-**Resterende centrale blokkades.** De productreparaties zijn lokaal gericht
-gesloten. Nog open staan uitsluitend de kwalificatiestappen die niet vooraf als
-geslaagd mogen worden geschreven: (1) één schone kandidaatcommit maken,
-(2) alle verplichte PR-jobs daarop opnieuw uitvoeren, inclusief vier
-toetsscherven, vier schermscherven en vier toegankelijkheidsdelen, (3) iedere
-nieuwe rode uitkomst terugbrengen naar een bronoorzaak en opnieuw gericht
-herstellen, en (4) pas daarna het CI-oordeel op dezelfde commit vastleggen.
-APPWERKT- en Experience-herkwalificatie blijven een afzonderlijk zichtbaar
-Deep Green-pakket en worden niet door een groene PR-run vervangen.
+**Alle 41 jobs.** Er zijn 24 geslaagde jobs, 8 mislukte jobs, 1 afgebroken job
+en 8 verklaard overgeslagen jobs. De overgeslagen incrementele route is correct
+omdat preflight de volledige route koos; bewijspublicatie en nachtelijke
+kalibratie zijn op een PR geen vrijgavebewijs.
+
+| uitslag | jobs |
+|---|---|
+| groen (20 in CI) | Bewijs-preflight; zware toets ast-grens; nieuwe dependencies; statisch + PostgreSQL; container; npm-audit; toetsscherven 1, 3 en 4; toegankelijkheidsdelen 1–4; ijkingen keuring, klok, boot-smoke, grens-sweep, meterijk en zaakdoos; adversarial rollen en isolatie |
+| groen (4 overige workflows) | WebKit-kernroutes; alle schermen 390 px; CodeQL; kwalificatie lokaal |
+| rood, primair | norm/instroom/build; toetsscherf 2; schermtoetsen 1, 2 en 3; alle schermen 1440 px; toegankelijkheidsoordeel |
+| rood, afgeleid | eindpoort `Tests, checks en build`: de gekozen volledige bewijsroute was niet groen |
+| afgebroken | schermtoetsen deel 4: de browserstap raakte na 45 minuten de jobgrens en had voordien drie concrete fouten gemeld |
+| correct overgeslagen | incrementeel bewijs unit; incrementeel bewijs browser; incrementeel totaaloordeel; vertrouwd bewijsboek publiceren; nachtelijke Evidence Control Plane-kalibratie |
+| verplicht maar door rode afhankelijkheid niet uitgevoerd | volledige tests/checks/build-samenstelling; schermdekkingsoordeel; waargenomen endpointdekking |
+
+De vier nog niet beschikbare verplichte uitkomsten zijn dus: een voltooide
+schermshard 4, het schermdekkingsoordeel, de volledige
+tests/checks/build-samenstelling en de endpointdekking. Zij worden niet als
+groen, foutloos of niet van toepassing behandeld.
+
+**Primaire fouten en afgeleide gevolgen.** De vier toegankelijkheidsdelen zijn
+als meetjobs groen, maar het totaaloordeel is terecht primair rood: samen
+melden zij 21 contrastfouten. Zeven Foundation-schermen tonen in drie
+authenticatierondes witte toegangstekst op `#faf7f2`: `pesten`, `steun`,
+`hulpwijzer`, `opvoeden`, `studie`, `gevoel` en `mediawijs`. Het eindtoetsoordeel
+is daarentegen uitsluitend afgeleid rood. Schermdekking en endpointdekking
+hebben geen uitslag, omdat een onvolledige ronde geen dekkingscijfer mag
+produceren.
+
+**Acht unieke open bronoorzaken.** Concrete fouten worden hieronder slechts
+een keer geteld, ook wanneer zij tientallen routes of drie authenticatierondes
+raken.
+
+| id | gedeelde bronoorzaak | klasse en herkomst | zichtbare gevolgen in de nulmeting | eigenaar | status / herstelvolgorde |
+|---|---|---|---|---|---|
+| DG-CI-01 | de generieke World Desktop-projectie overschrijdt op DS-hosts het centrale schileigendom | bevestigde recente functionele en architectuurregressie | 29 keer `legacy-shell-on-ds-screen`; de zeven Foundation-toegangsschermen leveren samen 21 blokkerende contrastfouten; Foundation-mediawijs meet een verkeerde toestand | World Desktop / DS-shell | **open, eerst**: DS-hosts begrenzen; daarna 1440 px, zeven a11y-routes en Foundation opnieuw meten |
+| DG-CI-02 | twee nieuwe regressietoetsen sloten niet aan op de bestaande toetskwaliteitscontracten | bevestigde recente toetsregressie | los contrastbestand verhoogt `toetsenNietGemeten` van 141 naar 142; `world-desktop-ds.test.js` voegt de 33e klokwacht toe | toetsarchitectuur | **open, tweede**: bewering in gemeten contract onderbrengen en op waarneembare toestand wachten; norm + klokwacht opnieuw draaien |
+| DG-CI-03 | browsertests bedienen na de DS-ownerwissel nog het verborgen legacy-menu en wachten op legacy `rtgDesktopState` | verlopen toetsverwachting door recente consolidatie, geen reden om het product terug te bouwen | 16 basis-service-timeouts; browserchrome 390/1280; twee `basis-ds`-fouten in shard 4; mogelijk een deel van de blikveldproef | centrale Edge / schermtoetsen | **open, na DG-CI-01**: dezelfde zichtbare centrale Edge-owner en bestaande `wachtOpSchil` gebruiken; productcontract behouden |
+| DG-CI-04 | de Rahul-ingang wordt niet als contextactie in het centrale DS Edge-blad geprojecteerd | functionele regressie, herkomst nog aan bronverschil te binden | leverancier op drie formaten en Wonen/Studio op 390/1440 vinden `Rahul openen` niet | Rahul + Edge-actieregister | **open**: actiepublicatie en focuscontract herstellen; beide echte browserketens herhalen |
+| DG-CI-05 | de centrale cookie-owner reserveert op de oudere 404-host minder documentruimte dan de werkelijke balkhoogte | functionele geometrie-/laadvolgorderegressie | `cookie centrale owner op oudere 404-host` | Cookie-componentowner | **open**: actuele geometrie na centrale ownerinitialisatie bewijzen, zonder tolerantie te verruimen |
+| DG-CI-06 | de statisch bewijsbare i18n-load gebruikt een root-absoluut CSS-adres en breekt daardoor een projectprefix | bevestigde recente compatibiliteitsregressie | `/ds/taalkeuze-standalone.css` faalt onder een statisch projectpad | i18n + DS-laadgraaf | **open**: base-aware centrale asset-URL die ook statisch bewijsbaar blijft; JS-aan/uit en projectprefix herhalen |
+| DG-CI-07 | de Foundation-gevoelstroom bereikt na bewaren niet de verwachte herzienbare toestand | functionele regressie, precieze bron nog niet bewezen | `Gevoelsdagboek: aantikken is vluchtig, bewaren is een keuze, herzien kan` loopt vast | Foundation Welzijn | **open**: sessie-, API- en DOM-overgang afzonderlijk vastleggen en herstellen |
+| DG-CI-08 | schermshard 4 overschrijdt 45 minuten en verliest daardoor zijn samenvatting en journaal | infrastructuur-/toetsorchestratieprobleem met echte verborgen fouten | shard 4 afgebroken; vóór afbreken: twee basis-DS-fouten en één Edge-blikveldfout; de daaropvolgende tests zijn niet uitgevoerd | CI-verdeling + schermtoetsen | **open, na functionele oorzaken**: drie zichtbare fouten gericht sluiten, gewichten/verdeling actualiseren en shard volledig laten eindigen zonder timeout te verhogen als vervanging voor herstel |
+
+De Rahul-, cookie- en Foundation-Welzijnfouten reproduceren ook buiten de
+GitHub-samenvatting en zijn daarom geen administratieve ruis. Voor hun precieze
+introductiecommit blijft de herkomstattributie open; zij tellen tot die tijd
+volledig als productfout. Lokale sandboxbeperkingen (`EPERM` op loopback en
+`ENOTFOUND` bij een Node-download) kwamen niet voor in GitHub en verklaren geen
+enkele nulmetingsfout.
+
+**Voortgang tegenover de vorige meetbare bronstand.** De 166 Design
+System-schendingen uit commit `db3323e84e808a9eb2f5088f71ad727861017aef`
+zijn op deze nulmeting 0: de statische + PostgreSQL-job is groen. Vier van de
+vijf oorspronkelijke gedeelde DS-oorzaken zijn volledig gesloten. De
+i18n-laadgraaf is statisch gesloten maar introduceerde DG-CI-06 en telt daarom
+niet als integraal afgerond. De volledige run maakte acht eerder niet volledig
+zichtbare oorzaken meetbaar; vier daarvan zijn aantoonbaar recente regressies
+(DG-CI-01, DG-CI-02 en DG-CI-06, waarbij DG-CI-02 twee onafhankelijke
+toetscontractschendingen bevat).
+
+**Bewijs blijft fail-closed.** EXPERIENCEWERKT blijft `NOT_TESTED`: 0/114 apps,
+0/316 schermen en 0/3.360 dimensieverplichtingen. APPWERKT meldt 342 fijnmazig
+vervallen plus 570 grof verlopen bewijzen; alle 114 rijen blijven daarom
+`NIET_GETEST`. Geen van deze registers wordt door de CI-reparatie opnieuw groen
+verklaard. Herkwalificatie volgt pas op de stabiele kandidaatbron.
+
+**Meetstand nulmeting.** Openstaande unieke oorzaken: **8**. Opgelost sinds de
+vorige meetbare bronstand: **4 volledig**. Nieuwe regressies: **4 bevestigd**.
+Eerder verborgen fouten ontdekt: **8 unieke oorzaken**. Niet-uitgevoerde
+verplichte controles: **4 uitkomsten**. Deep Green: **GEBLOKKEERD**.
+
+De herstelvolgorde is DG-CI-01, DG-CI-02, DG-CI-03, daarna de onafhankelijke
+DG-CI-04 t/m DG-CI-07 en ten slotte DG-CI-08. Na elke groep draaien uitsluitend
+de gerichte tegenproeven plus alle eerder gesloten regressies die dezelfde
+owner raken. Een oorzaak sluit pas wanneer zij uit deze tabel verdwijnt. Pas
+bij nul bekende oorzaken wordt een nieuwe exacte kandidaatcommit gemaakt en
+loopt de volledige verplichte CI opnieuw.
+
+#### Herstelronde 1 — acht oorzaken gericht gesloten
+
+De nulmeting hierboven blijft ongewijzigd als historische bronwaarheid. Op de
+reparatiewerkboom zijn de acht oorzaken in afhankelijkheidsvolgorde behandeld;
+geen register is administratief groen gemaakt.
+
+| id | structureel herstel | tegenbewijs op de reparatiewerkboom | status voor kandidaat-CI |
+|---|---|---|---|
+| DG-CI-01 | de globale legacy World Desktop-projectie stopt op `data-ds`; expliciete Workspace Runtime-contracten blijven beschikbaar | 1440px desktop-audit 309/309; zeven eerdere Foundation-a11y-routes in uitgelogd, ingelogd, zaak, telefoon, tablet, drie thema's en notch: 0 structuur, 0 contrast | gericht gesloten |
+| DG-CI-02 | contrastbeweringen ondergebracht in de bestaande mutatiegemeten contracttoets; de nieuwe klokwacht verwijderd | `norm`: `toetsenNietGemeten=141`; gerichte unitcontracten groen | gericht gesloten |
+| DG-CI-03 | browsertoetsen bedienen de zichtbare centrale DS Edge en wachten op `wachtOpSchil`, niet op verborgen legacy-staat | basis-service, basis-DS, browserchrome en Edge-blikveld groen | gericht gesloten |
+| DG-CI-04 | de bestaande Rahul-gedragshaak declareert zijn contextactie aan de centrale Edge zonder tweede controller | leverancier op drie formaten en Wonen/Studio op 390/1440 groen | gericht gesloten |
+| DG-CI-05 | de bestaande centrale cookie-owner en zijn waarneembare ResizeObserver-contract bleken intact; diagnostiek is aangescherpt | de volledige cookieproef eenmaal in de geconsolideerde ronde plus vijf opeenvolgende zelfstandige rondes groen | gericht gesloten; volledige CI bewaakt herhaling |
+| DG-CI-06 | de i18n-component gebruikt de bestaande projectbasis voor zijn centrale stylesheet; de gegenereerde bundel is herbouwd | statisch projectpad met JavaScript aan en uit, alle publieke formaten en bundelgelijkheid: 10/10 groen | gericht gesloten |
+| DG-CI-07 | de echte Foundation-sessiefixture draagt nu de al vereiste profielidentiteit; de eerste opslag moet aantoonbaar HTTP 200 antwoorden | volledige privé-dagboekstroom inclusief bewaren, herzien en wissen groen | gericht gesloten |
+| DG-CI-08 | de vier CI-duurartefacten uit nulmeting `42496432623` voeden nu de bestaande normale-modusverdeler; de schermsuite telt vijf volledig meetellende delen | projectie per deel circa 34 minuten in plaats van circa 42; uitvoering, samenvoeging en bewijsverzameling zijn door een regressietoets aan dezelfde vijf delen gebonden | gericht gesloten; volledige vijfdelige CI vereist |
+
+De geconsolideerde regressieronde over alle geraakte eigenaars telt 65/65
+geslaagde toetsen. De verdeler- en bewijscontractronde telt 51/51 geslaagde
+toetsen. De norm, de Design System-poort en de desktop-audit zijn groen. Twee
+eerder afgeschermde concrete verwachtingen kwamen tijdens herstel vrij: de
+Rahul-header verwachtte nog een legacy `wd-home`, en Edge-blikveld verwachtte
+nog een dubbele legacy-hoofdactie. Beide horen bij de reeds bekende oorzaken
+DG-CI-01/DG-CI-03 en vormen daarom geen nieuwe unieke bronoorzaak.
+
+**Meetstand herstelronde 1.** Openstaande unieke oorzaken: **0 bekend vóór de
+integrale tegenproef**. Opgelost sinds de nulmeting: **8**. Nieuwe regressies:
+**0**. Eerder verborgen fouten ontdekt: **2 concrete fouten, 0 nieuwe unieke
+oorzaken**. Niet-uitgevoerde verplichte controles: **4 uitkomsten** (de
+vijfdelige schermronde, het schermdekkingsoordeel, de volledige
+tests/checks/build-samenstelling en de endpointdekking zijn nog niet opnieuw op
+de kandidaat uitgevoerd). Deep Green: **GEBLOKKEERD**.
+
+De volgende stap is uitsluitend de integrale tegenproef: één schone
+kandidaatcommit, alle verplichte CI-jobs laten eindigen en de volledige uitslag
+opnieuw als foutboom classificeren. Een rode uitkomst heropent alleen de
+bijbehorende oorzaak; een groene deeljob maakt Deep Green niet zelfstandig
+bewezen.

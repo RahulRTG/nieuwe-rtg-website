@@ -85,7 +85,8 @@ test('Wonen en Studio houden één Rahul-ingang en dezelfde werkruimte op 390 en
         assert.equal(await werk.count(), 1);
         await werk.getByRole('button', { name: 'Terug naar werkblad', exact: true }).click();
         await werk.waitFor({ state: 'hidden' });
-        assert.equal(await page.locator('.wd-home main').isVisible(), true);
+        assert.equal(await page.locator('main').isVisible(), true, route + width + ': het echte DS-werkblad blijft zichtbaar');
+        assert.equal(await page.locator('.wd-shell').count(), 0, route + width + ': geen legacy-schil keert terug');
         assert.deepEqual(fouten, []);
       } finally { await ctx.close(); }
     }

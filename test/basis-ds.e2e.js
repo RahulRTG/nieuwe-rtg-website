@@ -2,7 +2,7 @@
    netwerkantwoorden zijn expliciete tegenproeven, geen APPWERKT-kwalificatie. */
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten, wachtOpSchil } = require('./helper');
 const pw = laadPlaywright(); let srv, browser, token;
 test.before(async () => {
   if (geenBrowser(pw)) return;
@@ -19,14 +19,15 @@ async function open() {
   const page = await context.newPage(), fouten = letOpFouten(page, []);
   await page.goto(srv.base + '/apps/wonen.html', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !!window.RTGAppMenu && !!window.RTGGids && !!window.RTGToegankelijk &&
-    document.body.dataset.rtgDesktopState === 'ready' && document.documentElement.classList.contains('ds-basis') &&
+    document.documentElement.classList.contains('ds-basis') &&
     getComputedStyle(document.querySelector('.ds-basis__spring')).position === 'fixed');
+  await wachtOpSchil(page);
   await page.evaluate(() => document.fonts.ready);
   return { page, context, fouten };
 }
 async function gids(page) {
-  await page.locator('#osMenuBtn').click();
-  await page.locator('.amn-blad').getByRole('button', { name: 'Instellingen', exact: true }).click();
+  await page.locator('.ds-edge__balk [data-ds-edge="menu"]').click();
+  await page.locator('#dsEdgeBlad:not([hidden])').getByRole('button', { name: 'Instellingen', exact: true }).click();
   await page.getByRole('dialog', { name: 'Instellingen', exact: true }).getByRole('button', { name: 'Openen', exact: true }).click();
   const d = page.getByRole('dialog', { name: 'Uitleg over deze app', exact: true }); await d.waitFor(); return d;
 }
@@ -58,7 +59,7 @@ test('basis: instellingen naar hulp, leesbare toestanden, profielen en focus op 
       assert.ok(r.doelen.every(x => x.width >= 44 && x.height >= 44));
     }
     await page.keyboard.press('Escape'); await d.waitFor({ state: 'hidden' });
-    await page.waitForFunction(() => document.activeElement === document.getElementById('osMenuBtn'));
+    await page.waitForFunction(() => document.activeElement === document.querySelector('.ds-edge__balk [data-ds-edge="menu"]'));
     const voor = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).fontSize));
     const bewaard = await page.evaluate(() => window.RTGToegankelijk.zet({ tekst: 'groter', beweging: 'stil', links: 'streep', nadruk: 'rustig', contrast: 'hoog' }));
     await page.waitForFunction(voor => parseFloat(getComputedStyle(document.documentElement).fontSize) >= voor * 1.3, voor);

@@ -2,7 +2,7 @@
    Bewijst clientpresentatie/verzoekbinding, geen serverautorisatie. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,letOpFouten}=require('./helper');
+const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,letOpFouten,wachtOpSchil}=require('./helper');
 const pw=laadPlaywright();let srv,browser,token;
 test.before(async()=>{if(geenBrowser(pw))return;srv=await startServer({env:{SMTP_URL:'',RTG_EXTERNE_AI_UIT:'1',LOCAL_AI_URL:'',OPENAI_API_KEY:'',ANTHROPIC_API_KEY:''}});
  const r=await fetch(srv.base+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Service UI',email:'basis-service@example.test',phone:'0612345897',password:'geheim12345',geboortedatum:'1990-01-01',tier:'rtg'})});assert.equal(r.status,200);token=(await r.json()).token;assert.ok(token);browser=await pw.chromium.launch(browserOpties(pw));});
@@ -17,8 +17,9 @@ async function open(antwoord){
   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
  });
  await page.goto(srv.base+'/apps/wonen.html',{waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>!!window.RTGAppMenu&&!!window.RTGGids&&document.body.dataset.rtgDesktopState==='ready');
- await page.locator('#osMenuBtn').click();await page.locator('.amn-blad').getByRole('button',{name:'Instellingen',exact:true}).click();
+ await page.waitForFunction(()=>!!window.RTGAppMenu&&!!window.RTGGids);await wachtOpSchil(page);
+ await page.locator('.ds-edge__balk [data-ds-edge="menu"]').click();
+ await page.locator('#dsEdgeBlad:not([hidden])').getByRole('button',{name:'Instellingen',exact:true}).click();
  await page.getByRole('dialog',{name:'Instellingen',exact:true}).getByRole('button',{name:'Openen',exact:true}).click();
  const d=page.getByRole('dialog',{name:'Uitleg over deze app',exact:true});await d.getByRole('button',{name:'Bevestigen',exact:true}).waitFor();
  return {context,page,d,calls,fouten};

@@ -49,7 +49,7 @@ test('cookie centrale owner op oudere 404-host',{skip,timeout:45000},async()=>{
    await page.waitForFunction(w=>{const el=document.querySelector('.ds-cookie--overlay');if(!el)return false;const r=el.getBoundingClientRect(),ruimte=parseFloat(document.documentElement.style.getPropertyValue('--rtg-cookieruimte'));return r.left>=0&&r.right<=w+1&&r.top>=0&&r.bottom<=900&&el.scrollWidth<=el.clientWidth+1&&ruimte>=r.height;},width);
    const m=await melding.evaluate(el=>{const r=el.getBoundingClientRect();return{r:r.toJSON(),client:el.clientWidth,scroll:el.scrollWidth,host:document.body.classList.contains('ds-cookie-host'),ruimte:document.documentElement.style.getPropertyValue('--rtg-cookieruimte'),doelen:[...el.querySelectorAll('a,button')].map(n=>{const b=n.getBoundingClientRect();return{w:b.width,h:b.height,raak:n.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2))};})};});
    assert.ok(m.r.left>=0&&m.r.right<=width+1&&m.r.top>=0&&m.r.bottom<=900,JSON.stringify({width,zoom,m}));
-   assert.ok(m.scroll<=m.client+1);assert.equal(m.host,true);assert.ok(parseFloat(m.ruimte)>=m.r.height);
+   assert.ok(m.scroll<=m.client+1);assert.equal(m.host,true);assert.ok(parseFloat(m.ruimte)>=m.r.height,JSON.stringify({width,zoom,m}));
    assert.ok(m.doelen.every(d=>d.w>=44&&d.h>=44&&d.raak),JSON.stringify(m.doelen));
   }
   const knop=melding.getByRole('button',{name:'Prima',exact:true});await knop.focus();await page.keyboard.press('Enter');await melding.waitFor({state:'detached'});

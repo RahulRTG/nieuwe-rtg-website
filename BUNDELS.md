@@ -785,7 +785,7 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 9 delen, 1865 regels in de delen
+`public/shared/i18n/` -- 9 delen, 1867 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -892,7 +892,7 @@ omlaag.
 
 ## `shared/rahul-tab.js`
 
-`public/shared/rahul-tab-entry/` -- 2 delen, 101 regels in de delen
+`public/shared/rahul-tab-entry/` -- 2 delen, 106 regels in de delen
 
 | deel | onderwerp |
 |---|---|

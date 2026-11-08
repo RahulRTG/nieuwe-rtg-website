@@ -32,27 +32,18 @@ function fixture(ds = true) {
   return { Node, body, document, window };
 }
 
-test('de wereldloader behoudt Spatial op een DS-scherm zonder een tweede Adaptive Edge', async () => {
-  const geladen = [];
-  let gestart = 0;
+test('de wereldloader laat een gemigreerd DS-scherm volledig aan de DS-schil', () => {
+  let geladen = 0;
   const document = {
     readyState: 'complete',
     documentElement: { hasAttribute: naam => naam === 'data-ds' },
-    body: { dataset: { rtgWorld: 'work' }, hasAttribute: () => false },
-    head: { appendChild(node) { geladen.push(node.src); queueMicrotask(node.onload); } },
-    createElement() { return {}; }
+    body: { dataset: { rtgWorld: 'work' } },
+    createElement() { geladen++; throw new Error('DS mag geen legacy-runtime laden'); }
   };
-  const window = {
-    self: null, top: null, location: { search: '' },
-    RTGDesktopHome: { start() { gestart++; } }
-  };
+  const window = { self: null, top: null, location: { search: '' } };
   window.self = window.top = window;
-  vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams, queueMicrotask, console });
-  await new Promise(resolve => setTimeout(resolve, 0));
-  assert.ok(geladen.includes('/shared/interface/workspace-runtime.js'));
-  assert.ok(geladen.includes('/shared/interface/world-desktop-home.js'));
-  assert.equal(geladen.some(pad => pad.includes('rtg-adaptive-edge')), false);
-  assert.equal(gestart, 1);
+  vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams });
+  assert.equal(geladen, 0);
   assert.equal(document.body.dataset.rtgDesktopState, undefined);
 });
 

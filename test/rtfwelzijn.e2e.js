@@ -34,7 +34,7 @@ test('Gevoelsdagboek: aantikken is vluchtig, bewaren is een keuze, herzien kan',
     await page.evaluate((sessie) => {
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
-    }, { code: g.code, token: kindToken, profiel: { naam: 'Juno', groep: 'kind', geboortedatum: '2015-02-18' } });
+    }, { code: g.code, token: kindToken, profiel: { id: k.profiel.id, naam: 'Juno', groep: 'kind', geboortedatum: '2015-02-18' } });
     /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
        zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
        begint bij het ingelogde bezoek hieronder. */
@@ -47,7 +47,10 @@ test('Gevoelsdagboek: aantikken is vluchtig, bewaren is een keuze, herzien kan',
     assert.ok(await page.evaluate(() => document.querySelector('#dagboekBlok').hidden),
       'zonder eigen keuze blijft het dagboekje leeg en verborgen');
     // bewaren is een eigen keuze
+    const opgeslagen = page.waitForResponse(r => r.url().endsWith('/api/rtf/welzijn/stemming'));
     await page.evaluate(() => { document.querySelector('#bewaarKnop').click(); });
+    const opslagAntwoord = await opgeslagen;
+    assert.equal(opslagAntwoord.status(), 200, await opslagAntwoord.text());
     await page.waitForFunction(() => /Vandaag bewaard: verdrietig/.test(document.querySelector('#bewaarKnop').textContent),
       null, { timeout: 8000 });
     await page.waitForFunction(() => !document.querySelector('#dagboekBlok').hidden, null, { timeout: 8000 });

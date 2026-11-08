@@ -3652,3 +3652,96 @@ kandidaatcommit, alle verplichte CI-jobs laten eindigen en de volledige uitslag
 opnieuw als foutboom classificeren. Een rode uitkomst heropent alleen de
 bijbehorende oorzaak; een groene deeljob maakt Deep Green niet zelfstandig
 bewezen.
+
+#### Integrale tegenproef 1 — 8 november
+
+De onveranderlijke kandidaat was commit
+`69c1189764e0a3ad1d615a7bfe95e77342944d80`. De workflows `CI`
+(`42513207005`), `Desktop- en mobielstandaard` (`42513206944`), `CodeQL`
+(`42513206943`) en `Kwalificatie lokaal` (`42513206941`) zijn volledig
+afgerond voordat aan deze werkboom verder is gewijzigd. Over alle vier
+workflows eindigden 43 jobs: 28 geslaagd, 7 mislukt en 8 overgeslagen. De vijf
+schermdelen eindigden alle vijf binnen hun bestaande 45-minutengrens; de
+vijfdelige verdeling heeft DG-CI-08 dus aantoonbaar gesloten.
+
+De zeven rode jobs vallen terug op drie unieke bronoorzaken. De afhankelijke
+job `Tests, checks en build` is een afgeleid rood oordeel en geen vierde
+oorzaak.
+
+| id | gedeelde bronoorzaak | klasse en herkomst | zichtbare gevolgen | eigenaar | status / herstelvolgorde |
+|---|---|---|---|---|---|
+| DG-CI-09 | `EXPERIENCEWERKT.json` loopt na bron- en interactiewijzigingen terecht achter op zijn afleiding | verlopen afgeleid register; geen productbewijs en geen reden om bewijs groen te maken | mobiele inventariscontrole en `Toetsscherf 4` wijzen dezelfde exacte registerafwijking af | Experience-bewijsregister | **open, eerst**: uitsluitend de bestaande coverage-generator draaien; daarna `--check` en de unitcontracttoets, met 0 bewezen resultaten behouden |
+| DG-CI-10 | de DS-audit telde ook de canonieke `body.ds-wereldwerkruimte > .wd-shell` als legacy; de eerste reparatie zette daarom de volledige bestaande werkruimteruntime uit | nieuwe functionele regressie door herstelronde 1, blootgelegd door de volledige schermronde | 11 browserfouten in LibraryOS, beeldeditor, Bureau-PDA, Volscherm, Foundation-toegang en World Desktop; favorieten, appvensters, persoonlijke beelden en fouttoestand initialiseren niet | World Desktop + DS-audit | **open, tweede**: bestaande runtime herstellen en de audit uitsluitend niet-canonieke shells of oude Edges laten afwijzen; alle geraakte werkruimtestromen herhalen |
+| DG-CI-03 | de gedeelde Horeca-werkvloertoets wacht nog op verborgen `#osMenuBtn` naast de centrale DS Edge | eerder verborgen, onvolledig gesloten toetsverwachting; geen productreden om het legacy-menu terug te bouwen | Bar en Vloer wachten elk 30 seconden op een ingang die een DS-scherm niet hoort te tonen | centrale Edge / Horeca-schermtoets | **heropend, derde**: wachten op de zichtbare centrale menu-ingang en beide volledige werkvloermatrices herhalen |
+
+Drie verplichte uitkomsten konden door deze fouten niet worden samengesteld:
+`Volledige tests, checks en build`, `Waargenomen endpoint-dekking` en
+`Schermdekking - het oordeel over alle delen`. De drie incrementele jobs waren
+correct overgeslagen omdat preflight de volledige route koos; publicatie en
+nachtelijke kalibratie zijn op een pull request geen kandidaatbewijs.
+
+De overige poorten geven belangrijk negatief bewijs: CodeQL, de lokale
+kwalificatie, alle vier toegankelijkheidsdelen plus hun oordeel, adversarial
+rollen en isolatie, PostgreSQL, architectuur, norm, dependency-audit en drie
+van de vier unitscherven zijn groen. Geen van deze deeluitkomsten heft de drie
+open oorzaken op.
+
+**Meetstand integrale tegenproef 1.** Openstaande unieke oorzaken: **3**.
+Opgelost sinds de nulmeting: **6 van de oorspronkelijke 8**. Nieuwe regressies:
+**1 unieke oorzaak** (11 concrete browserfouten). Eerder verborgen fouten
+ontdekt: **1 heropende oorzaak** (2 concrete Horeca-fouten). Niet-uitgevoerde
+verplichte controles: **3 uitkomsten**. Deep Green: **GEBLOKKEERD**.
+
+De herstelvolgorde is DG-CI-09, DG-CI-10 en DG-CI-03. Daarna draaien eerst de
+gerichte contract- en browserproeven en pas op een nieuwe schone commit opnieuw
+alle verplichte workflows. De historische nulmeting en deze rode tegenproef
+blijven ongewijzigd als bewijs van de foutontwikkeling.
+
+#### Herstelronde 2 — 8 november
+
+De drie oorzaken uit integrale tegenproef 1 zijn in afhankelijkheidsvolgorde
+gesloten. Het Experience-register is opnieuw uitsluitend uit de actuele
+inventaris afgeleid en blijft fail-closed: 114 apps en 316 schermen staan in de
+noemer, zonder dat ontbrekend ervaringsbewijs als geslaagd is ingevuld. De
+bestaande World Desktop-runtime is hersteld; de DS-audit accepteert alleen de
+canonieke directe wereldwerkruimte en blijft oude of dubbele Edges afwijzen.
+Ingebedde DS-schermen houden hun levende actiebronnen, waarna uitsluitend hun
+expliciete `data-ds-actie`-contract via de bestaande ouder-Edge beschikbaar
+wordt. De Horeca-proeven wachten nu op de centrale DS-menu-ingang in plaats van
+op het verborgen legacy-menu.
+
+De gerichte contractset sloot met **88/88** geslaagde toetsen. De acht eerder
+geraakte browserbestanden sloten gezamenlijk met **23/23** geslaagde scenario's,
+waaronder **14/14** World Desktop-scenario's. Twee gelijktijdig gestarte brede
+schermmetingen controleerden elk alle **309** routes en hadden ieder een
+eenmalige timeout op een andere route. Dezelfde routes zijn daarna sequentieel
+in hun oorspronkelijke viewport herhaald: `/apps/office.html` op 1440 px en
+`/apps/pay.html` op 390 px sloten beide zonder fout. Daarmee is resource-
+concurrentie van twee volledige lokale audits onderscheiden van een
+reproduceerbare productfout; de verplichte CI-schermdelen moeten dit nog op de
+nieuwe kandidaatcommit bevestigen.
+
+De verder gekomen bouw- en statische poorten maakten één gedeelde, eerder
+verborgen coherentieoorzaak zichtbaar: afgeleide registers waren vóór de
+definitieve buildvolgorde vernieuwd en liepen daarna terecht achter. De
+bestaande generatoren voor `BEWIJS.md`, `BUNDELS.md`, taalbewijs, websitebeelden
+en websitewaarheid zijn na de bronbuild uitgevoerd; daarna sloten
+`experience:coverage:check`, `scripts/check.js`, `scripts/build.js` en
+`scripts/norm.js` zonder fout. De sandbox kon de routekaart eenmaal niet op
+loopback openen (`EPERM`); exact dezelfde statische controle is buiten die
+beperking herhaald en sloot groen. Geen testregel, norm of bewijsstatus is
+versoepeld.
+
+**Meetstand herstelronde 2.** Openstaande unieke oorzaken: **0 binnen de lokaal
+uitgevoerde herstelset**. Opgelost sinds de vorige meting: **4** (de drie open
+CI-oorzaken plus één verborgen afleidingsvolgorde). Nieuwe regressies: **0**.
+Eerder verborgen fouten ontdekt: **1 unieke oorzaak** (vier afgeleide
+registermanifestaties). Niet-uitgevoerde verplichte controles: **3
+samengestelde CI-uitkomsten** die pas op de nieuwe kandidaatcommit kunnen
+worden gevormd. Deep Green: **GEBLOKKEERD**.
+
+De volgende onveranderlijke stap is deze werkboom als één kandidaatcommit vast
+te leggen, de vier verplichte workflows volledig te laten eindigen en alle
+rode, afgebroken, geblokkeerde en overgeslagen jobs opnieuw als één foutboom te
+classificeren. Alleen die tegenproef kan de drie nog ontbrekende samengestelde
+uitkomsten sluiten.

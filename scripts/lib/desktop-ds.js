@@ -1,6 +1,8 @@
 /* Een scherm op het RTG Design System (ONTWERPSYSTEEM.md) heeft een andere
-   schil dan de oude: geen .rtg-adaptive-bar, geen editorial-v4, geen
-   wd-shell, maar /ds/rtg-ds.css en de Edge uit /ds/edge.js. De algemene
+   schil dan de oude: geen .rtg-adaptive-bar en geen editorial-v4, maar
+   /ds/rtg-ds.css en de Edge uit /ds/edge.js. Een wereldwerkruimte mag precies
+   één bestaande, directe .wd-shell behouden; die runtime draagt de levende
+   panelen en het DS bezit haar presentatie. De algemene
    schermronde meet hier dus DIE schil en niet de afwezigheid van de oude:
    de Edge staat (met Rahul), er is geen tweede, oude Edge, het systeem is
    geladen, niets loopt horizontaal over, beelden laden echt, en er is geen
@@ -20,11 +22,17 @@ module.exports = async function dsScherm(page, row, errors) {
   await page.waitForFunction(() => [...document.querySelectorAll('img')].filter(i => i.loading !== 'lazy' || i.getClientRects().length)
     .every(i => i.complete), null, { timeout: 12000 });
   row.state = await page.evaluate(() => {
-    const zichtbaar = s => [...document.querySelectorAll(s)].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length;
+    const zichtbaarElement = e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
+    const zichtbaar = s => [...document.querySelectorAll(s)].filter(zichtbaarElement).length;
+    const oudeShells = [...document.querySelectorAll('.wd-shell')].filter(e =>
+      zichtbaarElement(e) &&
+      !(document.body.classList.contains('ds-wereldwerkruimte') && e.parentElement === document.body)
+    ).length;
     return {
       world: document.body.dataset.rtgWorld,
       systeem: getComputedStyle(document.documentElement).getPropertyValue('--ds-schermhoogte').trim(),
-      edges: zichtbaar('.ds-edge__balk'), oudeEdges: zichtbaar('.rtg-adaptive-bar,.wd-shell'),
+      edges: zichtbaar('.ds-edge__balk'),
+      oudeEdges: zichtbaar('.rtg-adaptive-bar,.rtg-edge-chrome') + oudeShells,
       toegang: zichtbaar('.ds-foundation-toegang'),
       toegangRect: (() => { const e = document.querySelector('.ds-foundation-toegang'); if (!e) return null;
         const r = e.getBoundingClientRect(); return { x:r.x, y:r.y, w:r.width, h:r.height, right:r.right, bottom:r.bottom }; })(),

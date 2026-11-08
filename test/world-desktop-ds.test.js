@@ -32,19 +32,34 @@ function fixture(ds = true) {
   return { Node, body, document, window };
 }
 
-test('de wereldloader laat een gemigreerd DS-scherm volledig aan de DS-schil', () => {
-  let geladen = 0;
+test('de wereldloader behoudt Spatial op een DS-scherm zonder een tweede Adaptive Edge', async () => {
+  const geladen = [];
+  let gestart = 0;
   const document = {
     readyState: 'complete',
     documentElement: { hasAttribute: naam => naam === 'data-ds' },
-    body: { dataset: { rtgWorld: 'work' } },
-    createElement() { geladen++; throw new Error('DS mag geen legacy-runtime laden'); }
+    body: { dataset: { rtgWorld: 'work' }, hasAttribute: () => false },
+    head: { appendChild(node) { geladen.push(node.src); queueMicrotask(node.onload); } },
+    createElement() { return {}; }
   };
-  const window = { self: null, top: null, location: { search: '' } };
+  const window = {
+    self: null, top: null, location: { search: '' },
+    RTGDesktopHome: { start() { gestart++; } }
+  };
   window.self = window.top = window;
-  vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams });
-  assert.equal(geladen, 0);
+  vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams, queueMicrotask, console });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.ok(geladen.includes('/shared/interface/workspace-runtime.js'));
+  assert.ok(geladen.includes('/shared/interface/world-desktop-home.js'));
+  assert.equal(geladen.some(pad => pad.includes('rtg-adaptive-edge')), false);
+  assert.equal(gestart, 1);
   assert.equal(document.body.dataset.rtgDesktopState, undefined);
+});
+
+test('een ingebed DS-scherm houdt zijn verborgen actiebronnen voor de ouder-Edge', () => {
+  const edge = lees('public/ds/edge.js');
+  assert.doesNotMatch(edge, /querySelectorAll\(['"]\.ds-kop['"]\)[\s\S]{0,120}\.remove\(/);
+  assert.match(edge, /data-ds-ingebed/);
 });
 
 test('DS-domein verhuist met dezelfde nodes en invoer; gedeelde bediening blijft buiten het verbergbare vlak', () => {

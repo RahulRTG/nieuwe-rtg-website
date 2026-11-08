@@ -25,6 +25,12 @@
         label: x.getAttribute('data-ds-actie') || x.getAttribute('aria-label') || x.textContent.trim(),
         doe: function () { x.click(); } };
     });
+    /* Een open wereldwerkblad blijft eigenaar van zijn levende formulier en
+       listeners. Het framecontract geeft uitsluitend de expliciet
+       gedeclareerde acties door; de Edge kopieert geen domeinlogica. */
+    if (w.RTGDesktopFrame && typeof w.RTGDesktopFrame.actions === 'function') {
+      acties = acties.concat(w.RTGDesktopFrame.actions());
+    }
     return voegAppmenuActiesToe(acties, 'functies');
   }
 
@@ -70,7 +76,12 @@
 
   E.registreer('navigatie', function () {
     var balk = D.balk();
-    balk.appendChild(D.linkKnop('/apps/app.html', 'Home', svg(I.home)));
+    var home = D.knop('home', 'Home', svg(I.home));
+    home.addEventListener('click', function () {
+      if (w.RTGDesktopFrame && w.RTGDesktopFrame.isOpen()) w.RTGDesktopFrame.collapse();
+      else w.location.assign('/apps/app.html');
+    });
+    balk.appendChild(home);
     balk.appendChild(D.linkKnop('/apps/wereld.html', 'Werelden', svg(I.werelden)));
     balk.appendChild(D.rahulKnop());
     balk.appendChild(D.bladKnop('acties', 'Acties', svg(I.acties), 'Acties', function () {

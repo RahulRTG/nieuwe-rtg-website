@@ -17,7 +17,7 @@ function node(tag = 'div') {
   };
 }
 
-function omgeving(metSprong) {
+function omgeving(metSprong, frameActies) {
   const modi = {}, bladen = {}, balk = node('nav'), uitgevoerd = [];
   const bestaand = {
     disabled: false, textContent: 'Bestaande actie',
@@ -50,6 +50,7 @@ function omgeving(metSprong) {
       }
     }
   };
+  if (frameActies) window.RTGDesktopFrame = { actions: () => frameActies, isOpen: () => false };
   if (metSprong) window.RTGSprong = { open() { uitgevoerd.push('alle-functies'); } };
   const document = { querySelectorAll: () => [bestaand], createDocumentFragment: () => node('fragment') };
   vm.runInNewContext(bron, { window, document, setTimeout: fn => fn(), fetch: async () => ({ json: async () => ({}) }) });
@@ -62,6 +63,13 @@ test('DS Edge voegt actuele Appmenu-acties toe, dedupliceert en behoudt hun uitv
   assert.deepEqual(Array.from(regels, x => x.label), ['Bestaande actie', 'Appfilter']);
   regels[0].doe(); regels[1].doe();
   assert.deepEqual(o.uitgevoerd, ['bestaand', 'appknop']);
+});
+
+test('DS Edge neemt expliciete acties van het actieve wereldwerkblad over', () => {
+  const uitgevoerd = [];
+  const o = omgeving(false, [{ id: 'nieuwLijst', label: 'Nieuwe lijst', doe: () => uitgevoerd.push('lijst') }]);
+  const actie = o.bladen.acties.vul().regels.find(x => x.id === 'nieuwLijst');
+  assert.ok(actie); actie.doe(); assert.deepEqual(uitgevoerd, ['lijst']);
 });
 
 test('DS Edge-menu ontsluit de capability-gebonden systeemfuncties van Appmenu', () => {

@@ -52,6 +52,24 @@
         }; container.appendChild(b);
       }); return true;
     }
+    function actions() {
+      var scope = active(), out = [], seen = new Set();
+      if (!scope) return out;
+      Array.prototype.forEach.call(scope.doc.querySelectorAll('[data-ds-actie]'), function (el) {
+        if (!el.matches('button,a[href]') || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+        var id = el.getAttribute('data-ds-actie-id') || el.id || '';
+        var label = el.getAttribute('data-ds-actie') || el.getAttribute('aria-label') || el.textContent.trim();
+        var key = id || label.toLowerCase();
+        if (!label || seen.has(key)) return;
+        seen.add(key);
+        out.push({ id: id, label: label, doe: function () {
+          var actueel = active();
+          if (!actueel || actueel.doc !== scope.doc || !el.isConnected || el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+          el.click();
+        } });
+      });
+      return out;
+    }
     function prepare(action) {
       if (!current || action !== 'newList' || new URL(current.url, w.location.origin).pathname !== '/apps/notities.html') return;
       current.action = action;
@@ -65,6 +83,7 @@
     w.addEventListener('pagehide', function () { entries.forEach(function (x) { clearTimeout(x.timer); if (x.observer) x.observer.disconnect(); }); });
     w.addEventListener('storage', function (e) { if (e.key == null || e.key === 'rtg_member_token' || e.key === 'rtf_sessie') w.location.reload(); });
     w.addEventListener('rtf-session-changed', function () { w.location.reload(); });
-    return { open: open, collapse: collapse, active: active, controls: controls, prepare: prepare, isOpen: function () { return !!current; } };
+    return { open: open, collapse: collapse, active: active, controls: controls, actions: actions,
+      prepare: prepare, isOpen: function () { return !!current; } };
   };
 })(window, document);

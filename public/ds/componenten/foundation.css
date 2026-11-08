@@ -60,8 +60,11 @@
   .ds-foundation-laden { inline-size: 100%; accent-color: var(--ds-accent); }
   /* De bestaande serverdeur sluit ook wanneer native showModal ontbreekt.
      De DesktopSurface-owner behoudt de deur en maakt de eigen home inert. */
-  .ds-foundation-dicht body > :not(.ds-foundation-toegang):not(.wd-shell) { visibility: hidden; pointer-events: none; }
-  .ds-foundation-dicht body > :not(.ds-foundation-toegang):not(.wd-shell) * { visibility: hidden; pointer-events: none; }
+  /* Een gesloten Foundation-ruimte houdt de universele Edge bereikbaar voor
+     veilige navigatie en uitweg. De beschermde werkruimte blijft inert en
+     onzichtbaar; de Edge verleent zelf geen toegang of domeinbevoegdheid. */
+  .ds-foundation-dicht body > :not(.ds-foundation-toegang):not(.wd-shell):not(.rtg-adaptive-edge):not(.rtg-edge-chrome):not(.ds-edge) { visibility: hidden; pointer-events: none; }
+  .ds-foundation-dicht body > :not(.ds-foundation-toegang):not(.wd-shell):not(.rtg-adaptive-edge):not(.rtg-edge-chrome):not(.ds-edge) * { visibility: hidden; pointer-events: none; }
   .ds-foundation-dicht .wd-shell > :not(.ds-foundation-toegang) { visibility: hidden; pointer-events: none; }
   .ds-foundation-dicht .wd-shell > :not(.ds-foundation-toegang) * { visibility: hidden; pointer-events: none; }
   .ds-foundation-dicht .ds-foundation-toegang { visibility: visible; pointer-events: auto; }

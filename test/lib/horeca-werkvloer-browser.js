@@ -66,7 +66,7 @@ async function echteLabeldoelen(page, context, verplicht) {
 async function werkvloerMatrix(page, { naam, focus, panelen, checkboxen = false }) {
   await page.waitForFunction(() => document.body.classList.contains('ds-wereldwerkruimte') &&
     document.body.dataset.rtgDesktopState === 'ready' &&
-    document.querySelector('.ds-edge') && document.querySelector('#osMenuBtn'));
+    document.querySelector('.ds-edge') && document.querySelector('.ds-edge [data-ds-edge="menu"]'));
   await page.evaluate(() => document.fonts.ready);
   await alleenDs(page);
   assert.equal(await page.locator('body').getAttribute('data-rtg-world'), 'work');

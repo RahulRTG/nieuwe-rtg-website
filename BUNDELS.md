@@ -801,7 +801,7 @@ omlaag.
 
 ## `shared/interface/world-desktop-frame.js`
 
-`public/shared/interface/world-desktop-frame/` -- 2 delen, 149 regels in de delen
+`public/shared/interface/world-desktop-frame/` -- 2 delen, 168 regels in de delen
 
 | deel | onderwerp |
 |---|---|

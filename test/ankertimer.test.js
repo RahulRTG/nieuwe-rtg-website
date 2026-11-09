@@ -51,3 +51,14 @@ test('audit P1-3b: een blok dat niet afrekent laat het alarm afgaan en er gaat G
     post: async () => { gepost++; return { ok: true }; } }, { warn() {} });
   assert.equal(g.ok, true); assert.equal(gepost, 1); assert.equal(wacht.bevinding(), null);
 });
+
+test('een verklaarde auditbreuk gaat als bijlage mee en blijft zichtbaar als breuk', async () => {
+  let opties = null;
+  const v = { id: 'herstel-1' };
+  const r = await t.eenRonde({
+    afrekenen: async () => ({ afgerekend: true, inBedrijf: true, ok: true, herstelverklaringen: [v] }),
+    post: async o => { opties = o; return { ok: true, inBedrijf: true }; }
+  }, { warn() {} });
+  assert.deepEqual(opties, { herstelverklaringen: [v] });
+  assert.deepEqual(r.auditbreuk, ['herstel-1']);
+});

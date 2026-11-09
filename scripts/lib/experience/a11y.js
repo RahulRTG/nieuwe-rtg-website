@@ -13,6 +13,7 @@ function expected() {
     themes:Object.fromEntries(THEMES.map(name=>[name,{structural:0,contrast:0}]))
   };
 }
+const touchExpected=()=>({belowPremiumMinimum:0,minimumCssPixels:44});
 
 function validate(measurement,screenRoutes) {
   const blockers=[];
@@ -30,7 +31,7 @@ function validate(measurement,screenRoutes) {
   for(const route of actual) if(!allowed.has(route)) blockers.push('A11Y_ROUTE_UNKNOWN:'+route);
   if(!own(measurement.routes,'/site/404.html')) blockers.push('A11Y_404_MISSING');
   if(Number(measurement.paginas)!==actual.length) blockers.push('A11Y_ROUTE_COUNT_MISMATCH');
-  const observations={};
+  const observations={},touchObservations={};
   for(const route of required) {
     const row=measurement.routes[route];
     if(!row)continue;
@@ -47,8 +48,16 @@ function validate(measurement,screenRoutes) {
     }
     if(JSON.stringify(observed)!==JSON.stringify(expected())) blockers.push('A11Y_CONTRAST_OR_STRUCTURE_FAILED:'+route);
     observations[route]=observed;
+    touchObservations[route]={};
+    for(const [device,key] of [['mobile-large','mobile'],['tablet','tablet']]) {
+      const value=row.touchTargets?.[key];
+      if(!value?.measured) blockers.push('A11Y_TOUCH_NOT_MEASURED:'+route+':'+device);
+      const touch={belowPremiumMinimum:Number(value?.belowPremiumMinimum ?? -1),minimumCssPixels:44};
+      if(JSON.stringify(touch)!==JSON.stringify(touchExpected())) blockers.push('A11Y_PREMIUM_TOUCH_FAILED:'+route+':'+device);
+      touchObservations[route][device]=touch;
+    }
   }
-  return {status:blockers.length?'BLOCKED':'PROVEN',blockers,observations};
+  return {status:blockers.length?'BLOCKED':'PROVEN',blockers,observations,touchObservations};
 }
 
 function configuration(browserVersion,subjectId) {
@@ -57,4 +66,14 @@ function configuration(browserVersion,subjectId) {
     state:'multi-state-theme',network:'local-test-server',subjectId};
 }
 
-module.exports={STATES,THEMES,expected,validate,configuration};
+function touchConfiguration(browserVersion,subjectId,device) {
+  const profile=device==='mobile-large'
+    ? {viewport:{width:390,height:844},safeAreaInsets:{top:59,bottom:34,left:0,right:0}}
+    : device==='tablet'?{viewport:{width:834,height:1112},safeAreaInsets:null}:null;
+  if(!profile)throw new Error('Onbekend a11y-aanraakprofiel: '+device);
+  return {browser:'chromium',browserVersion,device,viewport:profile.viewport,safeAreaInsets:profile.safeAreaInsets,
+    deviceScaleFactor:1,touch:false,reducedMotion:false,locale:'nl-NL',serviceWorkers:'block',persona:'rtg-member',
+    state:'normal',network:'local-test-server',subjectId};
+}
+
+module.exports={STATES,THEMES,expected,touchExpected,validate,configuration,touchConfiguration};

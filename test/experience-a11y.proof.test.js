@@ -58,5 +58,19 @@ if(!sourceHash&&!commit) {
       t.diagnostic('RTG_EXPERIENCE_CONFIGURATION '+JSON.stringify(configuration));
       t.diagnostic('RTG_EXPERIENCE_OBSERVATION '+JSON.stringify(observation));
     });
+    for(const device of ['mobile-large','tablet']) {
+      const requirement=device+'@touch-targets',touchCheck='A11y '+device+' touch targets: '+screen.id;
+      test(touchCheck,t=>{
+        const expected=a11y.touchExpected();
+        assert.deepEqual(result.touchObservations[screen.route]?.[device],expected);
+        const configuration=a11y.touchConfiguration(measurement.browser?.version||'0.0',screen.id,device);
+        const observation={version:1,instrument:'test/experience-a11y.proof.test.js',
+          subjectType:'screen',subjectId:screen.id,dimension:'accessibility',requirement,
+          sourceHash,commit,configurationHash:evidence.sha(canonical(configuration)),method:'browser',
+          checks:[{id:touchCheck,observed:expected,expected,passed:true}],result:'passed'};
+        t.diagnostic('RTG_EXPERIENCE_CONFIGURATION '+JSON.stringify(configuration));
+        t.diagnostic('RTG_EXPERIENCE_OBSERVATION '+JSON.stringify(observation));
+      });
+    }
   }
 }

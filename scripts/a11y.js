@@ -444,6 +444,7 @@ async function startEchteServer() {
      opmerking bij die tweede meting hieronder voor waarom het GEEN wachten op
      alle animaties is geworden. */
   const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
+  const PREMIUM_RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(44)})()';
   const MOB = (hand) => '(function(){' + mobiel.BRON + '\nreturn window.__mobielKeur(' + JSON.stringify({
     hand, maat: mobiel.MAAT, onder: mobiel.ONDER, smal: mobiel.SMAL, kwart: mobiel.ANKERKWART
   }) + ')})()';
@@ -459,7 +460,7 @@ async function startEchteServer() {
      twee keer meten zou hem dubbel tellen. */
   const mobiu = { breed: [], leeg: [], balk: [], duim: [], geenHoofd: [], gemeten: 0 };
   for (const hand of ['rechts', 'links']) {
-  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, locale:'nl-NL', serviceWorkers: 'block' });
   await telefoon.addInitScript((z) => {
     try {
       localStorage.setItem('rtg_member_token', z.token);
@@ -574,7 +575,15 @@ async function startEchteServer() {
       routes[pad].touchTargets.mobile = { measured: false, error: e.message.split('\n')[0] };
       continue;
     }
-    routes[pad].touchTargets.mobile = { measured: true, belowMinimum: res.klein.length };
+    let premium;
+    try { premium = await hermeet(tel, PREMIUM_RAAK, (r) => r.klein.length); }
+    catch (e) {
+      routes[pad].touchTargets.mobile = { measured: false, error: e.message.split('\n')[0] };
+      continue;
+    }
+    routes[pad].touchTargets.mobile = {
+      measured: true, belowWcagMinimum: res.klein.length, belowPremiumMinimum: premium.klein.length
+    };
     /* De tweede meting zit in hermeet() hierboven; hier stond een eigen kopie. */
     if (res.klein.length) {
       raakTotaal += res.klein.length;
@@ -606,7 +615,7 @@ async function startEchteServer() {
      WAT HIER NIET GEMETEN WORDT: leegte en duimbereik. Die twee gaan over een
      hand aan een telefoon (GRAMMATICA.md), en een tablet ligt op tafel. Breedte
      en raakvlak gaan wel over elk toestel dat je aanraakt. */
-  const tabletC = await browser.newContext({ viewport: { width: 834, height: 1112 }, serviceWorkers: 'block' });
+  const tabletC = await browser.newContext({ viewport: { width: 834, height: 1112 }, locale:'nl-NL', serviceWorkers: 'block' });
   await tabletC.addInitScript((z) => {
     try {
       localStorage.setItem('rtg_member_token', z.token);
@@ -661,7 +670,24 @@ async function startEchteServer() {
         for (const w of res.klein.slice(0, 6)) console.log(`  \u00b7 ${w}`);
       }
     }
-    routes[pad].touchTargets.tablet = { measured: true, belowMinimum: res.klein.length };
+    let premium;
+    try { premium = await tab.evaluate(PREMIUM_RAAK); }
+    catch (e) {
+      routes[pad].touchTargets.tablet = { measured: false, error: e.message.split('\n')[0] };
+      continue;
+    }
+    if(premium.klein.length) {
+      try {
+        await tab.waitForFunction(
+          () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
+          null,{timeout:1500});
+      } catch(e) {}
+      await tab.waitForTimeout(300);
+      try { premium=await tab.evaluate(PREMIUM_RAAK); } catch(e) {}
+    }
+    routes[pad].touchTargets.tablet = {
+      measured: true, belowWcagMinimum: res.klein.length, belowPremiumMinimum: premium.klein.length
+    };
   }
   await tabletC.close();
   console.log(`[a11y] ronde tablet: ${tabu.gemeten} schermen op 834 \u2014 ` +

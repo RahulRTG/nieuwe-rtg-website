@@ -96,14 +96,15 @@ test('de signatureproducer weigert een smaller of anders genoemd contract',()=>{
   }
 });
 
-test('de a11yproducer bindt desktopcontrast aan alle 316 schermen afzonderlijk',()=>{
+test('de a11yproducer bindt contrast en premium aanraakdoelen aan alle 316 schermen afzonderlijk',()=>{
   const c=structuredClone(require('../experience-architecture/coverage-contract.json'));
   c.executedProofs=c.executedProofs.filter(b=>b.proof==='screen-accessibility');
   const proof={id:'screen-accessibility',test:'test/experience-a11y.proof.test.js',timeoutMs:2700000};
   const rows=typed.required(c,signatures,[proof]);
-  assert.equal(rows.length,316);
-  assert.ok(rows.every(row=>row.subjectType==='screen'&&row.dimension==='accessibility'&&
-    row.requirement==='desktop@contrast'&&row.method==='browser'));
+  assert.equal(rows.length,948);
+  assert.ok(rows.every(row=>row.subjectType==='screen'&&row.dimension==='accessibility'&&row.method==='browser'));
+  assert.deepEqual([...new Set(rows.map(row=>row.requirement))].sort(),
+    ['desktop@contrast','mobile-large@touch-targets','tablet@touch-targets']);
   assert.equal(new Set(rows.map(row=>row.configuration.subjectId)).size,316);
   const row=rows[0],scope={...row,id:row.scope,configuration:{...row.configuration,browserVersion:'145.0.1'}};
   assert.equal(typed.covers(scope,row),true);

@@ -38,12 +38,19 @@ function accessibilityInventory(signatures,b) {
   if(!signatures.screens||typeof signatures.screens!=='object'||Array.isArray(signatures.screens)) {
     throw new Error('Experience-scherminventaris ontbreekt');
   }
-  return Object.keys(signatures.screens).sort().map(route=>{
-    const subjectId='screen:'+route,configuration=a11y.configuration('0.0',subjectId);
-    delete configuration.browserVersion;
-    return {...b,subjectType:'screen',subjectId,dimension:'accessibility',requirement:'desktop@contrast',
+  return Object.keys(signatures.screens).sort().flatMap(route=>{
+    const subjectId='screen:'+route,contrast=a11y.configuration('0.0',subjectId);
+    delete contrast.browserVersion;
+    const rows=[{...b,subjectType:'screen',subjectId,dimension:'accessibility',requirement:'desktop@contrast',
       scope:'a11y:desktop-contrast:'+subjectId,check:'A11y desktop contrast: '+subjectId,
-      configuration,expected:a11y.expected(),matrixCell:null};
+      configuration:contrast,expected:a11y.expected(),matrixCell:null}];
+    for(const device of ['mobile-large','tablet']) {
+      const configuration=a11y.touchConfiguration('0.0',subjectId,device);delete configuration.browserVersion;
+      rows.push({...b,subjectType:'screen',subjectId,dimension:'accessibility',requirement:device+'@touch-targets',
+        scope:'a11y:'+device+'-touch-targets:'+subjectId,check:'A11y '+device+' touch targets: '+subjectId,
+        configuration,expected:a11y.touchExpected(),matrixCell:null});
+    }
+    return rows;
   });
 }
 function bindings(contract,signatures,proof) {

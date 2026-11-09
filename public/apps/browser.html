@@ -58,11 +58,15 @@ function tabsBij(){
   TABS[TAB].hist=HIST; TABS[TAB].pos=POS;
   const st=$('#tabstrip'); st.textContent='';
   TABS.forEach((t,i)=>{
-    const b=document.createElement('span'); b.className='tb ds-browser-tab'+(i===TAB?' aan':''); b.setAttribute('role','button'); b.tabIndex=0; b.addEventListener('keydown',ev=>{if(ev.target===b&&(ev.key==='Enter'||ev.key===' ')){ev.preventDefault();wisselTab(i);}});
-    const tt=document.createElement('span'); tt.className='tt ds-browser-tabtitel'; tt.textContent=tabLabel(t); b.appendChild(tt);
+    /* Tabkeuze en sluiten zijn twee nevengeschikte handelingen. Een knop in
+       een element met role=button maakte de sluiting semantisch genest en
+       onvoorspelbaar voor toetsenbord, schermlezer en volledige bediening. */
+    const b=document.createElement('span'); b.className='tb ds-browser-tab'+(i===TAB?' aan':'');
+    const tt=document.createElement('button'); tt.type='button'; tt.className='tt ds-browser-tabtitel ds-browser-tabselect'; tt.textContent=tabLabel(t);
+    tt.setAttribute('aria-label','Tab openen: '+tabLabel(t)); tt.setAttribute('aria-current',i===TAB?'page':'false');
+    tt.addEventListener('click',()=>wisselTab(i)); b.appendChild(tt);
     if(TABS.length>1){ const x=document.createElement('button'); x.className='x ds-knop ds-knop--stil ds-browser-sluit'; x.textContent='×'; x.title='Tab sluiten'; x.setAttribute('aria-label','Tab sluiten');
       x.addEventListener('click',ev=>{ ev.stopPropagation(); sluitTab(i); }); b.appendChild(x); }
-    b.addEventListener('click',()=>wisselTab(i));
     st.appendChild(b);
   });
   const plus=document.createElement('button'); plus.className='plus ds-knop ds-knop--stil ds-browser-plus'; plus.textContent='+'; plus.title='Nieuwe tab'; plus.setAttribute('aria-label','Nieuwe tab');

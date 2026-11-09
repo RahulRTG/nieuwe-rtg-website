@@ -29,6 +29,10 @@
     outline-offset: 3px;
   }
   .ds-wereldwerkruimte .pi-change:hover { border-color: var(--ds-cover-metaal); }
+  /* Het sfeerbeeld ligt bewust achter de werkruimte. Zijn bronactie blijft het
+     contract voor de contextuele Edge, maar is daar de enige zichtbare en
+     focusbare presentatie; zo bestaat geen bedekte tweede knop. */
+  .ds-wereldwerkruimte .wp-atmosphere > .pi-change { display: none; }
   .ds-wereldwerkruimte .wp-edit-images {
     display: inline-flex;
     align-items: center;

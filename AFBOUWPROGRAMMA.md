@@ -3998,3 +3998,35 @@ verplichte CI-foutboom**. Opgelost sinds vorige meting: **2**. Nieuwe
 regressies: **0**. Eerder verborgen fouten ontdekt: **0**. Niet-uitgevoerde
 verplichte controles: **2 kwalificatiedomeinen** (actuele APPWERKT- en
 EXPERIENCEWERKT-bewijzen). Deep Green: **GEBLOKKEERD**.
+
+#### APPWERKT-herstelronde — één beeldactie en semantische browsertabs
+
+De volledige browsermeting op `e2144bfb5e` vond geen productdefect, maar hield
+zeven onderdelen terecht op `NIET_GETEST`: LibraryOS, Pulse, Wonen, Decision
+Room, Partner Network, Project Room en Web droegen naast de centrale Edge nog
+een bedekte bronactie voor dezelfde beeldeditor. De bronactie blijft het
+modulecontract voor Edge, maar heeft nu dezelfde toegankelijke identiteit en
+wordt in de werkruimte niet als tweede zichtbare of focusbare knop
+gepresenteerd. De bestaande Edge is de enige presentatie-eigenaar.
+
+Gerichte APPWERKT-tegenproeven sloten daarop LibraryOS 4/4, Pulse 25/25,
+Wonen 4/4, Decision Room 15/15, Partner Network 4/4 en Project Room 9/9.
+Web bracht daarna een afzonderlijke, eerder verborgen semantische oorzaak aan
+het licht: de tabsluitknop stond binnen een element met `role=button`. Tab
+kiezen en tab sluiten zijn nu twee nevengeschikte echte knoppen. Web sloot
+daarna 9/9 eigen acties en 22/22 gedeelde schilacties, zonder onaangeraakte,
+onklikbare of onderschepte bediening.
+
+De gerichte Browser-, beeldeditor- en muisregressies zijn groen; een eerste
+samengestelde run telde 8/9 doordat de Design System-keuring terecht
+`border-radius: inherit` weigerde. Na gebruik van het bestaande radiustoken
+sloot ook die keuring groen. De volledige APPWERKT-registerherbouw en de
+overige verlopen bewijsbronnen volgen uitsluitend op een schone commit; de
+gerichte uitkomst wordt niet als vervanging daarvoor gepresenteerd.
+
+**Meetstand APPWERKT-herstelronde.** Openstaande unieke oorzaken: **0 binnen
+het pakket van zeven bedieningsgaten**. Opgelost sinds vorige meting: **2**.
+Nieuwe regressies: **0 in de gerichte tegenproeven**. Eerder verborgen fouten
+ontdekt: **1** (geneste tabbediening in Web). Niet-uitgevoerde verplichte
+controles: **2 kwalificatiedomeinen** (integrale APPWERKT-herbouw inclusief de
+overige bewijsbronnen, en EXPERIENCEWERKT). Deep Green: **GEBLOKKEERD**.

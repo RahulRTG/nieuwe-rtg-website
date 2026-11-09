@@ -88,6 +88,10 @@
     // De Edge opent dezelfde beeldbediening wanneer de mobiele schil het sfeerbeeld verbergt.
     var imageAction = atmosphere.querySelector('.pi-change');
     if (d.body.classList.contains('ds-wereldwerkruimte') && imageAction) {
+      /* Bron en Edge-kloon zijn dezelfde handeling. Geef ze daarom dezelfde
+         toegankelijke naam; anders ziet bediening (en een schermlezer) twee
+         verschillende functies terwijl beide exact dezelfde editor openen. */
+      imageAction.setAttribute('aria-label', 'Beelden aanpassen');
       imageAction.setAttribute('data-ds-actie', 'Beelden aanpassen');
       /* Het sfeerbeeld is op de kleine compositie bewust verborgen. Markeer
          zijn bestaande handeling daarom expliciet als Edge-bediening; de DS

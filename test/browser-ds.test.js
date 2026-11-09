@@ -18,6 +18,9 @@ test('browserchrome en gepubliceerde blokpresentatie gebruiken DS met dezelfde r
   for(const src of ['rtg-world-desktop','ios','metgezel','uitvoer','basis','adaptief'])assert.ok(html.includes('/shared/'+src+'.js'));
   assert.match(css,/scroll-margin-block-start: 8rem/);
   assert.match(css,/prefers-reduced-motion/);
+  assert.match(html,/ds-browser-tabselect/);
+  assert.doesNotMatch(html,/setAttribute\('role','button'\)/,
+    'tabkeuze bevat geen tweede interactieve knop meer');
   const fouten=require('../scripts/ontwerpsysteem').contractFouten({paginas:{}});
   assert.deepEqual(fouten.filter(x=>/componenten\/(browser|webblok)\.css/.test(x)),[]);
   const tokens=fs.readFileSync(path.join(root,'public/ds/tokens.css'),'utf8');

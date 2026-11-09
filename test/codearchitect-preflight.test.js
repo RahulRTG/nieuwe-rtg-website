@@ -12,6 +12,14 @@ const HEAD = cp.execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding
 const NOW = Date.parse('2026-11-09T12:00:00.000Z');
 const EMPTY_PRS = { capturedAt: '2026-11-09T11:55:00.000Z', pullRequests: [] };
 
+test('gedeelde runtime- en supply-chainbronnen krijgen geen lage risicoklasse', () => {
+  assert.equal(P.riskFor(['package.json']), 'high');
+  assert.equal(P.riskFor(['package-lock.json']), 'high');
+  assert.equal(P.riskFor(['Dockerfile']), 'high');
+  assert.equal(P.riskFor(['.github/workflows/ci.yml']), 'high');
+  assert.equal(P.riskFor(['server/kern/betaling.js']), 'critical');
+});
+
 test('Proof Envelope bindt een schermtaak aan commit, eigenaar en gerichte toetsen', () => {
   const envelope = P.buildEnvelope({
     root: ROOT,

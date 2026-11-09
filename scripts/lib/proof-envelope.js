@@ -213,7 +213,8 @@ function pullRequestConflicts(root, snapshotFile, allowed, now) {
 
 function riskFor(files) {
   if (files.some(file => /(?:pay|bank|wallet|auth|gezag|autorisa|betaling|servicefee)/i.test(file))) return 'critical';
-  if (files.some(file => /^(?:server\/kern|public\/(?:shared|ds))\//.test(file))) return 'high';
+  if (files.some(file => /^(?:server\/kern|public\/(?:shared|ds)|\.github\/workflows)\//.test(file) ||
+    /^(?:package(?:-lock)?\.json|Dockerfile)$/.test(file))) return 'high';
   if (files.some(file => /^(?:server|public)\//.test(file))) return 'medium';
   return 'low';
 }

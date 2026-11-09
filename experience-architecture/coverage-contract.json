@@ -170,6 +170,14 @@
         "redirects":0,"documentErrors":0,"pageErrors":0
       },
       "limits":"Alleen de publieke overzichtsroute met drie bestaande documentlinks, afgehandelde cookiemelding en nieuwe anonieme Chromium-context per contractprofiel, op de lokale server zonder netwerkvertraging of offline-modus. Geen authenticatie, empty-state, eerste bezoek, inhoudelijke juridische zekerheid, prijs-API, alle-documentenmatrix, fysieke apparaten of menselijke kwalificatie."
+    },
+    {
+      "proof": "experience-signatures",
+      "instrument": "test/experience-signatures.proof.test.js",
+      "type": "experience-signature-inventory-v1",
+      "method": "contract",
+      "scope": "all-current-experience-signatures",
+      "check": "Experience signature contract"
     }
   ]
 }

@@ -66,3 +66,32 @@ test('scopevergelijking vereist exacte celidentiteit en configuratie zonder zelf
     assert.equal(typed.covers(changed,b),false);
   }
 });
+
+test('de signatureproducer bindt alle 114 apps en 316 schermen afzonderlijk',()=>{
+  const c=structuredClone(require('../experience-architecture/coverage-contract.json'));
+  c.executedProofs=c.executedProofs.filter(b=>b.proof==='experience-signatures');
+  const proof={id:'experience-signatures',test:'test/experience-signatures.proof.test.js'};
+  const rows=typed.required(c,signatures,[proof]);
+  assert.equal(rows.length,430);
+  assert.equal(rows.filter(row=>row.subjectType==='app').length,114);
+  assert.equal(rows.filter(row=>row.subjectType==='screen').length,316);
+  assert.ok(rows.every(row=>row.dimension==='identity'&&row.requirement==='signature'&&row.method==='contract'));
+  assert.equal(new Set(rows.map(row=>row.scope)).size,430);
+  const first=rows[0],scope={...first,id:first.scope,configuration:structuredClone(first.configuration)};
+  assert.equal(typed.covers(scope,first),true);
+  scope.configuration.subjectId='app:verzonnen';
+  assert.equal(typed.covers(scope,first),false);
+});
+
+test('de signatureproducer weigert een smaller of anders genoemd contract',()=>{
+  const basis=require('../experience-architecture/coverage-contract.json');
+  for(const wijzig of [
+    row=>{row.scope='alleen-apps';},row=>{row.method='browser';},row=>{row.check='Groene signatures';},
+    row=>{row.extra='stil veld';},row=>{row.instrument='test/experience-coverage.test.js';}
+  ]) {
+    const c=structuredClone(basis);
+    c.executedProofs=c.executedProofs.filter(b=>b.proof==='experience-signatures');
+    wijzig(c.executedProofs[0]);
+    assert.throws(()=>typed.required(c,signatures,[{id:'experience-signatures',test:c.executedProofs[0].instrument}]),/signatureproducercontract/);
+  }
+});

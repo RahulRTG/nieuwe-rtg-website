@@ -7,9 +7,33 @@ const configurations=require('./configurations');
 const canonical=value=>JSON.stringify(stable(value));
 const fixed=configuration=>{const {browserVersion,...rest}=configuration;return rest;};
 const cellKey=b=>canonical([b.instrument,b.subjectType,b.subjectId,b.dimension,b.requirement,b.configuration]);
+function signatureInventory(signatures,b) {
+  if(b.proof!=='experience-signatures'||b.instrument!=='test/experience-signatures.proof.test.js'||
+    b.type!=='experience-signature-inventory-v1'||b.method!=='contract'||
+    b.scope!=='all-current-experience-signatures'||b.check!=='Experience signature contract'||
+    !same(Object.keys(b).sort(),['check','instrument','method','proof','scope','type'])) {
+    throw new Error('Onbekend Experience-signatureproducercontract');
+  }
+  const rows=[];
+  for(const [subjectType,values] of [['app',signatures.apps],['screen',signatures.screens]]) {
+    if(!values||typeof values!=='object'||Array.isArray(values)) throw new Error('Experience-signatureinventaris ontbreekt');
+    for(const [key,value] of Object.entries(values).sort(([a],[z])=>a.localeCompare(z))) {
+      const subjectId=subjectType==='app'?key:'screen:'+key;
+      rows.push({...b,subjectType,subjectId,dimension:'identity',requirement:'signature',
+        scope:'signature:'+subjectId,check:'Experience signature contract: '+subjectId,
+        configuration:{kind:'experience-signature',subjectType,subjectId},
+        expected:{declared:true,signatureHash:sha(canonical(value))},matrixCell:null});
+    }
+  }
+  return rows;
+}
 function bindings(contract,signatures,proof) {
   const selected=(contract.executedProofs||[]).filter(b=>b.proof===proof.id),expanded=[];
   for(const b of selected) {
+    if(b.type==='experience-signature-inventory-v1') {
+      expanded.push(...signatureInventory(signatures,b));
+      continue;
+    }
     const name=b.subjectId==='screen:/apps/hotels.html'?'hotels':b.subjectId==='screen:/apps/juridisch.html'?'juridisch':null;
     if(!name||b.instrument!=='test/'+name+'-ds.e2e.js'||b.instrument!==proof.test||b.subjectType!=='screen'||proof.id!==name+'-destination'||
       b.dimension!=='continuity'||b.requirement!=='destination'||b.method!=='browser'||!contract.continuityChecks.includes(b.requirement)) throw new Error('Onbekend getypeerd Experience-contract');
@@ -57,8 +81,10 @@ function prepare(contract,signatures,proof,log,sourceHash,commit) {
   const used=new Set(),cells=[];
   for(const b of declared) {
     if(!passedChecks.has(b.check)) throw new Error('TYPED_CHECK_NOT_EXECUTED');
-    const choices=configs.filter(c=>c&&typeof c==='object'&&!Array.isArray(c)&&same(fixed(c),b.configuration));
-    if(choices.length!==1||typeof choices[0].browserVersion!=='string'||!/^\d+(\.\d+)+$/.test(choices[0].browserVersion)) throw new Error('TYPED_CONFIGURATION_MISMATCH');
+    const choices=configs.filter(c=>c&&typeof c==='object'&&!Array.isArray(c)&&
+      same(b.method==='browser'?fixed(c):c,b.configuration));
+    if(choices.length!==1||(b.method==='browser'&&
+      (typeof choices[0].browserVersion!=='string'||!/^\d+(\.\d+)+$/.test(choices[0].browserVersion)))) throw new Error('TYPED_CONFIGURATION_MISMATCH');
     const configuration=choices[0],configurationHash=sha(canonical(configuration));used.add(configurationHash);
     const binding={subjectType:b.subjectType,subjectId:b.subjectId,dimension:b.dimension,requirement:b.requirement,sourceHash,commit,configurationHash,method:b.method};
     const expected={version:1,instrument:proof.test,...binding,checks:[{id:b.check,observed:b.expected,expected:b.expected,passed:true}],result:'passed'};
@@ -71,7 +97,11 @@ function prepare(contract,signatures,proof,log,sourceHash,commit) {
   return cells;
 }
 function covers(scope,binding) {
-  return !!(scope&&scope.configuration&&typeof scope.configuration.browserVersion==='string'&&/^\d+(\.\d+)+$/.test(scope.configuration.browserVersion)&&binding&&['proof','subjectType','subjectId','dimension','requirement','instrument','check'].every(k=>scope[k]===binding[k])&&
-    scope.id===binding.scope&&same(fixed(scope.configuration),binding.configuration));
+  if(!scope||!scope.configuration||!binding||
+    !['proof','subjectType','subjectId','dimension','requirement','instrument','check'].every(k=>scope[k]===binding[k])||scope.id!==binding.scope) return false;
+  if(binding.method==='browser') return typeof scope.configuration.browserVersion==='string'&&
+    /^\d+(\.\d+)+$/.test(scope.configuration.browserVersion)&&same(fixed(scope.configuration),binding.configuration);
+  if(binding.method==='contract') return same(scope.configuration,binding.configuration);
+  return false;
 }
 module.exports={bindings,required,prepare,covers};

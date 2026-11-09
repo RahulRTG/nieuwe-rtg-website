@@ -72,6 +72,7 @@
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -94,7 +95,7 @@
     <div class="rij">
       <input class="veld s-bgu070" id="nNaam" placeholder="Naam">
       <input class="veld s-oks1y1" id="nPrijs" placeholder="Prijs" inputmode="decimal">
-      <label class="hint" style="display:flex;align-items:center;gap:.3rem;"><input type="checkbox" id="nKg">per kilo</label>
+      <label class="hint ds-presentatie-vinklabel"><input type="checkbox" id="nKg">per kilo</label>
       <button class="knop stil" id="nVoeg">Toevoegen</button>
     </div>
   </section>
@@ -140,7 +141,7 @@
 </dialog>
 <dialog id="dlgModus">
   <div class="sec">Kies de kassamodus</div>
-  <div id="modusLijst" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+  <div class="ds-presentatie-keuzekolom" id="modusLijst"></div>
   <div class="rij h-mt60"><button class="knop stil" id="modusDicht">Sluit</button></div>
 </dialog>
 <dialog id="dlgVraag">
@@ -157,7 +158,7 @@
 <dialog id="dlgScherm">
   <div class="sec">Welke kassa is dit toestel?</div>
   <p class="i-m3b83 hint">Gebruikt de zaak meerdere kassaschermen, dan krijgt elk scherm een eigen naam; elke bon draagt die naam en elk scherm kan een eigen modus hebben.</p>
-  <div id="schermLijst" style="display:flex;flex-direction:column;gap:.35rem;margin-bottom:0.5rem;"></div>
+  <div class="h-stapel h-mb50" id="schermLijst"></div>
   <div class="rij"><input class="veld h-flex1" id="schermNieuw" placeholder='Nieuwe kassa, bv. "Kassa bar"'><button class="knop" id="schermMaak">Zet neer</button></div>
   <div class="rij h-mt60"><button class="knop stil" id="schermDicht">Sluit</button></div>
 </dialog>

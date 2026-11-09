@@ -23,8 +23,8 @@
       "id": "gebruiker",
       "route": "/apps/app.html",
       "file": "gebruiker.png",
-      "sourceHash": "cceea47ca189364ec5a0c6f0220088b7588f8df1c1cb3ca255f6e252219a8a6e",
-      "imageHash": "16fd8d6c6b64507db880906f0143237a232f4cb703f6a9f8e95ee22963276595"
+      "sourceHash": "b053ea5caf59b40f06dc2579201740d7f3f82dd37b59c276625e40cbdf33349c",
+      "imageHash": "13f9424fd56f26073472d45e61f784df2ab0113150c63fd21efcf9ba29660cbd"
     }
   ]
 }

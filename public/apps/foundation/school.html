@@ -81,6 +81,7 @@
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -128,7 +129,7 @@
     <div id="koppelBlok" hidden>
       <div class="sec" id="kopTitel">Kind uitnodigen voor een klas</div>
       <div class="kaart blok">
-        <div class="mini" id="kopUitleg" style="margin-bottom:0.5rem;"></div>
+        <div class="mini h-mb50" id="kopUitleg"></div>
         <input class="veld" id="kopCode" placeholder="Klascode (van de leraar)" maxlength="8" autocapitalize="characters">
         <select class="veld" id="kopKind" aria-label="Welk kind nodig je uit"></select>
         <button class="knop" id="kopDoe">Uitnodigen</button>
@@ -142,7 +143,7 @@
   <section id="vLeraar" hidden>
     <section class="enterprise-hero">
       <div><span class="ey">Professionele toegang</span><h2>Van aanmelden naar een echte werkruimte.</h2><p>De school wordt gecontroleerd, de directie laat collega’s toe en iedere rol krijgt alleen de eigen bevoegdheden.</p>
-        <div class="enterprise-acties"><a class="knop" href="/apps/schoolpartner.html" style="text-decoration:none;">Open School Partner →</a></div>
+        <div class="enterprise-acties"><a class="knop schakel" href="/apps/schoolpartner.html">Open School Partner →</a></div>
       </div>
       <div class="enterprise-belofte"><b>Geen permanente sleutel</b>Professionele toegang blijft voortaan alleen in de huidige tabsessie en verloopt na inactiviteit.</div>
     </section>
@@ -157,7 +158,7 @@
       <a class="knop schakel" href="/apps/schoolpartner.html">Open School Partner</a>
       <div class="i-1a3ola"></div>
       <b>Inloggen</b>
-      <div class="mini" style="margin:0.25rem 0 0.5rem;">Met je schoolcode en je token (beheer of personeel).</div>
+      <div class="mini h-mt25 h-mb50">Met je schoolcode en je token (beheer of personeel).</div>
       <input class="veld" id="inCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters" autocomplete="organization" spellcheck="false">
       <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false">
       <button class="knop grijs" id="inDoe">Veilig inloggen</button>

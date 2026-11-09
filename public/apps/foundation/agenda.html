@@ -118,7 +118,7 @@
     <button class="knop aan" data-zicht="maand" type="button">Maand</button>
     <button class="knop" data-zicht="week" type="button">Week</button>
     <button class="knop" data-zicht="lijst" type="button">Lijst</button>
-    <button class="knop h-weg" id="nieuwKnop" type="button" data-hoofdactie>+ Nieuw</button>
+    <button class="knop h-weg" id="nieuwKnop" type="button" data-hoofdactie hidden>+ Nieuw</button>
   </div>
   <div id="bord" aria-live="polite"><div class="stil">Laden...</div></div>
 </div>
@@ -153,13 +153,13 @@
     <label for="afNotitie">Notitie (mag leeg)</label>
     <input class="i-186m9v veld" id="afNotitie" maxlength="120">
     <div class="fout" id="afFout"></div>
-    <div class="ds-presentatie-schooluitleg h-weg" id="afSchool">
+    <div class="ds-presentatie-schooluitleg h-weg" id="afSchool" hidden>
       Dit punt komt van school en leest de agenda alleen mee.
       Afvinken en plannen doe je in <a href="school.html" class="s-1ta0zs6">School</a>.</div>
     <div class="rijknoppen">
       <button class="knop" id="afBewaar" type="button">Bewaar</button>
       <button class="knop" id="afVerjaardag" type="button">Dit is een verjaardag</button>
-      <button class="knop h-weg" id="afWeg" type="button">Weghalen</button>
+      <button class="knop h-weg" id="afWeg" type="button" hidden>Weghalen</button>
       <span class="h-flex1"></span>
       <button class="knop" id="afDicht" type="button">Sluit</button>
     </div>
@@ -173,6 +173,10 @@
 <script>
 (function foundationPage() {
 const $ = s => document.querySelector(s);
+function verberg(el, verborgen) {
+  el.hidden = verborgen;
+  el.classList.toggle('h-weg', verborgen);
+}
 if (!window.Sessie || !Sessie.eisProfiel()) return;
 const api = Sessie.api;
 const s = Sessie.huidig();
@@ -197,7 +201,7 @@ async function laad() {
     const d = await api('/gezin/agenda/bereik', { code: s.code, token: s.token, van: v.van, tot: v.tot });
     magBewerken = d.magBewerken;
     profielen = d.profielen || [];
-    $('#nieuwKnop').classList.toggle('h-weg', !magBewerken);
+    verberg($('#nieuwKnop'), !magBewerken);
     items = (d.items || []).map(i => ({ datum: i.datum, tijd: i.tijd || null, kleur: i.wieKleur || '',
       bron: i.bron || '', titel: i.titel + (i.wieNaam ? ' · ' + i.wieNaam : ''), _r: i }));
     teken();
@@ -253,12 +257,12 @@ function toon(item, datum) {
   $('#afHerhaal').value = item ? (item.herhaal || 'geen') : 'geen';
   $('#afHerhaalTot').value = item ? (item.herhaalTot || '') : '';
   $('#afNotitie').value = item ? (item.notitie || '') : '';
-  $('#afWeg').classList.toggle('h-weg', !(item && !school));
+  verberg($('#afWeg'), !(item && !school));
   $('#afFout').textContent = '';
-  $('#afSchool').classList.toggle('h-weg', !school);
+  verberg($('#afSchool'), !school);
   ['afTitel', 'afDatum', 'afTijd', 'afWie', 'afHerhaal', 'afHerhaalTot', 'afNotitie'].forEach(id => { $('#' + id).disabled = !magBewerken || school; });
-  $('#afBewaar').classList.toggle('h-weg', !(magBewerken && !school));
-  $('#afVerjaardag').classList.toggle('h-weg', school);
+  verberg($('#afBewaar'), !(magBewerken && !school));
+  verberg($('#afVerjaardag'), school);
   $('#afScrim').classList.add('open');
 }
 function dicht() { $('#afScrim').classList.remove('open'); open = null; }

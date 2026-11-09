@@ -42,8 +42,24 @@ test('Backoffice, Foundation Agenda en RTG iD delen presentatie en zichtbaarheid
   for (const id of ['nieuwKnop', 'afSchool', 'afWeg']) {
     assert.doesNotMatch(agenda, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));
   }
+  for (const id of ['nieuwKnop', 'afSchool', 'afWeg']) {
+    assert.match(agenda, new RegExp('id="' + id + '"[^>]*hidden|hidden[^>]*id="' + id + '"'));
+  }
+  assert.match(agenda, /function verberg\(el, verborgen\)/,
+    'Agenda synchroniseert native hidden met de bestaande visuele hulpklasse');
+  assert.match(lees('public/shared/rtg-editorial-v4.css'),
+    /daily-action\):not\(\[hidden\]\):not\(\.h-weg\)\{display:inline-flex!important/,
+    'Editorial V4 maakt verborgen knoppen niet opnieuw zichtbaar');
   const rtgid = lees('public/apps/rtgid.html');
   for (const id of ['koppelKaart', 'kNamens', 'kMaak']) {
     assert.doesNotMatch(rtgid, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));
+  }
+});
+
+test('Foundation School en Kassa hebben geen vaste inline presentatie', () => {
+  for (const bestand of ['public/apps/foundation/school.html', 'public/apps/kassa.html']) {
+    const html = lees(bestand);
+    assert.doesNotMatch(html, /<[a-z][^>]*\sstyle=/i, bestand);
+    assert.match(html, /\/ds\/componenten\/presentatierol\.css/, bestand);
   }
 });

@@ -4656,3 +4656,42 @@ aanvullende**. Niet-uitgevoerde verplichte controles: **de volledige
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Foundation School en Kassa sluiten hun vaste presentatie af
+
+Foundation School gebruikt voor de toelichting, partnerdoorgang en
+inloginstructie bestaande hulpklassen en de centrale presentatierol. Kassa
+gebruikt dezelfde component voor vinklabels, keuzeopties en de schermlijst.
+De inhoud, autorisatie en bedrijfslogica zijn ongewijzigd; alleen vaste
+presentatie is uit de markup verwijderd.
+
+De School-browserproef maakte daarbij een gedeelde bestaande fout zichtbaar:
+Editorial V4 gaf iedere knop met een `!important`-regel opnieuw een zichtbare
+flexpresentatie, ook wanneer de applicatie die knop met `hidden` en `h-weg`
+had verborgen. De bestaande centrale knopselector sluit verborgen knoppen nu
+uit. Foundation Agenda synchroniseert het native `hidden`-contract en de
+bestaande hulpklasse, zodat zowel ondersteunende technologie als de visuele
+laag dezelfde toestand lezen. Er is geen nieuwe zichtbaarheidstoestand of
+stijllaag toegevoegd.
+
+De platformnoemer daalde van **48 naar 42** inline markup-attributen en van
+**29 naar 27** HTML-bestanden; presentatie daalde van 26 naar 20 en toestand
+bleef 22. De vier gerichte broncontracten sluiten **4/4**. De echte
+School-/Agenda-browserproef sluit **1/1** en de echte Kassa-herstelproef sluit
+**1/1**. De volledige statische platformcontrole sluit zonder fouten, Design
+System meldt nul schendingen en 87 gemigreerde schermen, en het
+Experience-register blijft exact 114 apps en 316 schermen afleiden. De
+gegenereerde architectuur-, bewijs-, bundel-, functie- en websiteafdrukken
+zijn op dezelfde bronstand vernieuwd.
+
+**Afsluiting School- en Kassa-presentatie.** Openstaande unieke oorzaken:
+**42 inline markup-attributen in 27 bestanden, dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **6 vaste
+presentatie-attributen en 1 gedeelde verborgen-knopregressie**. Nieuwe
+regressies: **0 in de gerichte bron- en browserproeven**. Eerder verborgen
+fouten ontdekt: **1 centrale Editorial V4-selector maakte verborgen knoppen
+zichtbaar**. Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie
+na de bronwijzigingen, de volledige platformkwalificatie, menselijke
+Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

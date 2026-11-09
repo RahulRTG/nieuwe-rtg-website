@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3162 bestanden en 21155 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3163 bestanden en 21161 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 3162 |
-| losse beweringen (`test(...)`) | 21155 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 521 |
+| toetsbestanden | 3163 |
+| losse beweringen (`test(...)`) | 21161 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 522 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2944 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 183 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 35 |
+| niets van beide | 36 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2729 bestanden, 20342 beweringen.
+2730 bestanden, 20347 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1769,6 +1769,7 @@ toets omvalt.
 | `presentatie-actuele-ds.test.js` | 3 | gezakt op `true->false#1` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `presentatie-eigenaar.test.js` | 1 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `presentatie-gezinsbeelden.test.js` | 4 | gezakt op `liegpoort /api/` | DE BEELDKEUZE VAN EEN GEZINSPROFIEL BLIJFT VAN DAT PROFIEL. routes/presentatie-gezinsbeelden.js (#413) laat een gekozen gezinsprofiel eigen foto's kiezen voor zijn schermen. |
+| `presentatierol-markup.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `presentiemeting.test.js` | 4 | gezakt op `liegpoort /api/` | De presentiebelofte: een les staat binnen dertig seconden. Wat hier hard wordt gemaakt: - het scherm is UITZONDERINGSGESTUURD: iedereen staat op aanwezig en de leraar wijzigt alleen wie er niet is. |
 | `prijsmelding.test.js` | 10 | gezakt op `===->!==#0` | DE LEDENPRIJSGARANTIE: het plafond bestond, de rechtzetting niet. De garantie was voor de helft echt gebouwd -- de ledenprijs wordt server-side afgekapt op de publieke prijs (test/partner.test.js bewaakt dat). |
 | `procinfo-takken.test.js` | 7 | gezakt op `optie-uit#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1933,7 +1934,7 @@ toets omvalt.
 | `routesbron.test.js` | 5 | gezakt op `!==->===#0` | WAAR STAAT DEZE ROUTE? -- de bronverrijking van scripts/lib/routes.js. |
 | `routeversheid.test.js` | 22 | gezakt op `!==->===#0` | HET BEWIJSVERVAL PER ROUTE -- scripts/routeversheid.js en de aansluiting op staatVan() in scripts/vertrouwen.js (PROOF.md par. 2a). |
 | `rtc-relay.test.js` | 13 | gezakt op `liegpoort /api/` | RTC VIA HET RELAIS -- bewezen tegen een ECHTE coturn, en dicht waar dat niet lukt. Wat deze toets vasthoudt (docs/turn-server.md, kern/rtc/*): 1. |
-| `rtdocs-voorzijde.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtdocs-voorzijde.test.js` | 6 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtf-bibliotheken.test.js` | 4 | gezakt op `liegpoort /api/` | De drie gezinsbibliotheken van de RTFoundation over de deur: de App-Bibliotheek (/api/rtf/bieb, routes/rtfbieb.js), de Geloof & Wijsheid-Bibliotheek (/api/rtf/geloof, routes/geloofbieb.js) en de Beroepen-Bibliotheek... |
 | `rtf-labfonds-deur.test.js` | 10 | gezakt op `liegpoort /api/` | DE GEZINSDEUR VAN HET LABFONDS -- wie komt er door, en wat doet een TWEEDE aanroep. WAAROM DEZE TOETS BESTAAT. |
 | `rtf-onboarding-client.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -2769,7 +2770,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-433 bestanden, 813 beweringen.
+433 bestanden, 814 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -3157,7 +3158,7 @@ toets omvalt.
 | `voertuigscherm.e2e.js` | 8 | geen bronmutatie mogelijk | HET VOERTUIGSCHERM: het adres dat een verwijzing nodig had. De verwijsvorm van dit huis kon nergens heen voor een voertuig -- er was geen app die er EEN opende. |
 | `volscherm-ds.e2e.js` | 2 | gezakt op `liegpoort /api/` | Echte instelling -> bestaande werkruimte. De losse main-proef onderaan is expliciet een componentfixture, geen bewijs voor een extra productroute. |
 | `vooruitscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERM-TOETS voor de twee kaarten in Mijn backoffice: "Vooruit" en "Uit uw post". WAAROM DEZE ER MOET ZIJN. |
-| `vrienden-blok.e2e.js` | 1 | gezakt op `liegpoort /api/` | RTG VRIENDEN: HET HELE SCRIPTBLOK DRAAIT, EN NIET ALLEEN HET BEGIN. WAT HIER FOUT GING, want dat bepaalt wat deze toets moet meten. |
+| `vrienden-blok.e2e.js` | 2 | gezakt op `liegpoort /api/` | RTG VRIENDEN: HET HELE SCRIPTBLOK DRAAIT, EN NIET ALLEEN HET BEGIN. WAT HIER FOUT GING, want dat bepaalt wat deze toets moet meten. |
 | `vrijheid-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `warm-presentation.e2e.js` | 4 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `webblok-ds.e2e.js` | 1 | gezakt op `liegpoort /api/` | Gepubliceerde auteursblokken en een echt bericht, op een eigen server. |

@@ -49,4 +49,5 @@
   .ds-presentatie-media-vol:not(#_#_#_) { inline-size: 100%; border-radius: 0; background: var(--ds-cover-grond); }
   .ds-presentatie-schooluitleg:not(#_#_#_) { color: var(--rtg-leesgoud, var(--ds-accent)); font-size: .85rem; }
   .ds-presentatie-koppelkaart:not(#_#_#_) { margin-block-start: .5rem; border-block-start: 1px solid var(--line, var(--ds-glasrand)); padding-block-start: .6rem; }
+  .ds-presentatie-keuzekolom:not(#_#_#_) { display: flex; flex-direction: column; gap: .4rem; }
 }

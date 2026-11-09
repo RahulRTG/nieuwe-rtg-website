@@ -4068,14 +4068,21 @@ De gerapporteerde tokens zijn uitsluitend een transparante bytes/4-proxy;
 werkelijk modelverbruik en end-to-end kostenbesparing zijn nog niet bewezen.
 
 De technische volledigheid is verbeterd, maar fase 1 is nog geen vrijgegeven
-CI-poort. De huidige ontwikkelboom is bewust vuil tijdens de implementatie, er
-is in de lokale proef geen actuele commitgebonden PR-snapshot aangeleverd en
-`TOETSROUTES.json` ontbreekt. De preflight meldt daarom terecht
-`INSUFFICIENT_CONTEXT`; deze blokkades zijn niet als succes behandeld.
+CI-poort. De schone commit `abd56ade374faa7f52ad000f6e3cffeeb2a682fa` is met
+een actuele snapshot van alle acht open pull requests opnieuw beproefd. De
+preflight voor `package.json` vond de werkelijke overlap met PR #709 en PR #702
+en leidde deterministisch `CONFLICT` af. De preflight voor
+`public/apps/browser.html` vond geen PR- of werkboomoverlap, maar bleef terecht
+`INSUFFICIENT_CONTEXT`: `TOETSROUTES.json` ontbreekt en HTTP-/subprocesrelaties
+zijn niet volledig in de bestaande statische impactgraaf waarneembaar. Deze
+kennisgaten zijn niet als succes behandeld en houden integrale CI plus gerichte
+APPWERKT-/EXPERIENCEWERKT-herkwalificatie verplicht.
 
-**Volgende gecontroleerde stap.** Na een schone commit worden dezelfde
-acceptatiecasussen opnieuw uitgevoerd met een actuele PR-snapshot. Pas wanneer
-nul verplichte tests worden gemist en de gemeten contextwinst de extra
+**Volgende gecontroleerde stap.** De Proof Envelope wordt eerst uitsluitend
+adviserend gebruikt op volgende Deep Green-werkpakketten. De volledige CI en
+een echte vergelijking van taakduur en modelkosten blijven nodig voordat fase
+1 als bewezen efficiëntieverbetering kan worden beoordeeld. Pas wanneer nul
+verplichte tests worden gemist en de gemeten contextwinst de extra
 preflightkosten rechtvaardigt, volgt een afzonderlijk voorstel voor fase 2,
 Collision Guard. Die fase mag werkgebieden reserveren, maar begint niet in dit
 werkpakket en wordt niet automatisch een blokkerende poort.
@@ -4084,5 +4091,5 @@ werkpakket en wordt niet automatisch een blokkerende poort.
 **0 in de gerichte code- en validatietoetsen**. Opgelost: **de ontbrekende
 verbinding tussen context, eigenaar, Git-conflict en bewijsplan**. Nieuwe
 regressies: **0 in 17 gerichte toetsen**. Niet-uitgevoerde verplichte controles:
-**schone commit-herproef met actuele PR-snapshot, volledige CI en een echte
-end-to-end kostenmeting**. Deep Green: **GEBLOKKEERD**.
+**volledige CI en een echte end-to-end kostenmeting op representatieve
+ontwikkelingstaken**. Deep Green: **GEBLOKKEERD**.

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '62f12f22';
+var RTG_BOUW = '0bc1bc2b';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -7488,9 +7488,9 @@ var RTG_BOUW = '62f12f22';
     $('#gcCode').textContent = o.pickup ? T('app.gc.bon','Bon') + ' ' + o.pickup : '';
     const qh = $('#gcQr');
     if (qh){
-      qh.innerHTML = ''; qh.style.display = 'none';
+      qh.innerHTML = ''; qh.classList.add('h-weg');
       if (window.RTGQRteken && d && d.code){
-        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.classList.remove('h-weg'); } catch(e){}
       }
     }
     $('#glowCode').classList.add('open');
@@ -7687,7 +7687,7 @@ var RTG_BOUW = '62f12f22';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
     const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
-    const gtab = $('#tabGezin'); if (gtab) gtab.style.display='none';
+    const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
     // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten
 /* de betaalgeschiedenis van de gratis gebruiker */
     if (user.account) loadSocial(); else { const c = $('#homeContacts'); if (c) c.style.display='none'; }
@@ -7728,11 +7728,11 @@ var RTG_BOUW = '62f12f22';
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function renderFoundation(){
     const homeEl = $('#homeFoundation'), tab = $('#tabGezin'), dot = $('#tabGezinDot');
-    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.style.display='none'; return; }
+    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.classList.add('h-weg'); return; }
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     const ongelezen = m.filter(x=>!x.gelezen).length;
-    if (tab) tab.style.display = g.length ? '' : 'none';
-    if (dot) dot.style.display = (g.length && ongelezen) ? 'block' : 'none';
+    if (tab) tab.classList.toggle('h-weg', !g.length);
+    if (dot) dot.classList.toggle('h-weg', !(g.length && ongelezen));
     // compacte ingang op Home
     if (homeEl){
       homeEl.style.display='';

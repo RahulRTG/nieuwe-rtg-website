@@ -4409,10 +4409,11 @@ eigenaar. De gedeelde geometrie staat in de bestaande `public/ds`-architectuur
 als component `presentatierol`; de drie legacyhosts laden uitsluitend die
 centrale eigenaar en hebben geen nieuwe lokale stijlverantwoordelijkheid.
 
-De actuele volledige HTML-bronscan meldt **0 statische style-attributen over 0
-bestanden**. Dit resultaat geldt bewust niet voor styles die nog in dynamische
-JavaScript-sjablonen worden opgebouwd; die blijven als afzonderlijke actieve
-migratieschuld zichtbaar en zijn niet administratief meegerekend als opgelost.
+De toen gebruikte consolidatiescan meldde **0 automatisch samen te voegen
+attributen over 0 bestanden**. Dat was geen volledige markupnoemer: unieke
+presentatiewaarden en toestandsattributen werden bewust overgeslagen. De
+volgende herstelronde heeft die meetfout expliciet gemaakt en de platformbrede
+werkelijke noemer afzonderlijk vastgelegd.
 
 De omzetting is in Chromium tegen de oude bronstand vergeleken. Spelen hield
 op **306 DOM-elementen x 10 aangeraakte eigenschappen** nul berekend verschil;
@@ -4434,3 +4435,40 @@ warmup waren DOM en berekende stijlen reproduceerbaar gelijk**.
 Niet-uitgevoerde verplichte controles: **de volledige Accessibility/Experience-
 producer, menselijke Experience-beoordeling, operationele releasepoorten en
 twee onafhankelijke integrale eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Inline-markupnoemer hersteld; ledenapp statisch schoon
+
+De inline-consolidator rapporteert nu naast de automatisch samenvoegbare winst
+ook de volledige werkelijke markupnoemer. De actuele platformscan vindt
+**111 style-attributen over 37 HTML-bestanden**: 47 presentatie-attributen en
+64 toestandsattributen. Daarvan zijn er 0 veilig automatisch te consolideren.
+Deze 111 blijven actieve afbouwschuld; zij worden niet langer verborgen achter
+de eerdere nul van de automatische kandidaatselectie.
+
+De zes resterende werkelijke attributen in `public/apps/app.html` zijn wel
+gericht gesloten. Vier vaste composities hebben de centrale
+`presentatierol`-eigenaar gekregen. De Gezin-tab, haar meldingspunt en de
+afhaal-QR gebruiken voortaan de bestaande `h-weg`-toestand via `classList`,
+zodat tonen en verbergen geen inline presentatieschakelaar meer nodig hebben.
+De gegenereerde appbundel, bouwstempel, websitewaarheid en echte appbeelden
+worden vanuit de bron opnieuw opgebouwd; geen afgeleid bestand is handmatig
+groen gemaakt.
+
+De bestaande appbeeldproducer is daarbij bronafhankelijk gemaakt. Een scherm
+wordt alleen hergebruikt wanneer route, bronvingerafdruk, beeldbestand en
+beeldhash alle vier exact bij het eerdere bewijs horen; iedere afwijking sluit
+fail-closed en maakt een nieuw echt screenshot. Twee opeenvolgende proeven op
+dezelfde bron hergebruikten **3/3** ongewijzigde schermen en produceerden geen
+nieuwe visuele diff. Daardoor vernieuwt een ledenappwijziging niet langer ook
+de ongeraakte organisatie- en partnerschermen.
+
+**Afsluiting markupnoemer.** Openstaande unieke oorzaken: **111 statische
+markup-attributen in 37 overige HTML-bestanden, dynamische templatepresentatie,
+ontbrekende Experience-bewijzen en operationele vrijgavepoorten**. Opgelost
+sinds vorige meting: **de misleidende noemer, 6 ledenapp-attributen en 3 inline
+toestandsschrijvers**. Nieuwe regressies: **0 in de gerichte proeven**. Eerder
+verborgen fouten ontdekt: **111 werkelijke attributen werden niet door de
+automatische-winsttelling gerapporteerd**. Niet-uitgevoerde verplichte
+controles: **de volledige platformkwalificatie, menselijke Experience-
+beoordeling, operationele releasepoorten en twee onafhankelijke eindruns**.
+Deep Green: **GEBLOKKEERD**.

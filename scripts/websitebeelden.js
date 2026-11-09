@@ -37,6 +37,9 @@ async function werkSessie(basis) {
 
 async function main() {
   fs.mkdirSync(DOEL, { recursive: true });
+  const registerPad = path.join(DOEL, 'HERKOMST.json');
+  let vorig = { screens: [] };
+  try { vorig = JSON.parse(fs.readFileSync(registerPad, 'utf8')); } catch (e) {}
   const server = await start({ naam: 'websitebeelden', env: { RTG_DEMO: '1', NODE_ENV: 'test' } });
   let browser;
   try {
@@ -63,7 +66,21 @@ async function main() {
     const page = await context.newPage();
     const wachten = { organisatie: '#inhoud:not([hidden])', partner: '#app.active', gebruiker: '#app.active' };
     const screens = [];
+    let vastgelegd = 0, hergebruikt = 0;
     for (const scherm of PLATFORM) {
+      const sourceHash = schermBronHash(scherm.route);
+      const eerder = (vorig.screens || []).find((item) => item.id === scherm.id && item.route === scherm.route);
+      const bestand = path.join(DOEL, scherm.id + '.png');
+      const imageHash = fs.existsSync(bestand)
+        ? crypto.createHash('sha256').update(fs.readFileSync(bestand)).digest('hex') : null;
+      /* Een ongewijzigde bron met exact hetzelfde vastgelegde beeld is nog
+         geldig. Opnieuw fotograferen voegde tijdgevoelige pixels toe aan twee
+         niet-geraakte schermen en maakte zo iedere ledenappwijziging tot drie
+         visuele diffs. Bij enige twijfel (bron, bestand of hash) valt deze
+         vergelijking dicht en wordt het echte scherm opnieuw vastgelegd. */
+      if (eerder && eerder.sourceHash === sourceHash && eerder.imageHash === imageHash) {
+        screens.push(eerder); hergebruikt++; continue;
+      }
       await page.goto(server.basis + scherm.route, { waitUntil: 'domcontentloaded', timeout: 45000 });
       try { await page.waitForSelector(wachten[scherm.id], { state: 'visible', timeout: 25000 }); }
       catch (fout) {
@@ -81,16 +98,17 @@ async function main() {
         await page.keyboard.press('Escape').catch(() => {});
         await page.waitForTimeout(400);
       }
-      const bestand = path.join(DOEL, scherm.id + '.png');
       await page.screenshot({ path: bestand, fullPage: false });
       screens.push({ id: scherm.id, route: scherm.route, file: scherm.id + '.png',
-        sourceHash: schermBronHash(scherm.route), imageHash: crypto.createHash('sha256').update(fs.readFileSync(bestand)).digest('hex') });
+        sourceHash, imageHash: crypto.createHash('sha256').update(fs.readFileSync(bestand)).digest('hex') });
+      vastgelegd++;
     }
     fs.writeFileSync(path.join(DOEL, 'HERKOMST.json'), JSON.stringify({
       kind: 'Schermafbeeldingen uit de echte RTG-app in een lokale wegwerpomgeving',
       viewport: { width: 390, height: 844 }, screens
     }, null, 2) + '\n');
-    console.log('[websitebeelden] drie echte app-schermen bijgewerkt via ' + gestart.waarmee);
+    console.log('[websitebeelden] ' + vastgelegd + ' echt(e) appscherm(en) bijgewerkt, ' + hergebruikt +
+      ' ongewijzigd hergebruikt via ' + gestart.waarmee);
   } finally {
     if (browser) await browser.close().catch(() => {});
     server.klaar();

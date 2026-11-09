@@ -147,15 +147,18 @@ function isToestand(waarde) {
 function verzamel(bron) {
   const stukken = markupStukken(bron);
   const tel = new Map();
+  let alle = 0, toestanden = 0;
   const re = /\sstyle="([^"]*)"/g;
   let m;
   while ((m = re.exec(bron))) {
     if (!inMarkup(stukken, m.index)) continue;
+    alle++;
     const waarde = m[1].trim().replace(/;\s*$/, '');
-    if (!waarde || isToestand(waarde)) continue;
+    if (!waarde) continue;
+    if (isToestand(waarde)) { toestanden++; continue; }
     tel.set(waarde, (tel.get(waarde) || 0) + 1);
   }
-  return { tel, stukken };
+  return { tel, stukken, alle, toestanden };
 }
 
 function zet(bestand) {
@@ -172,7 +175,7 @@ function zet(bestand) {
   }
   const vol = path.isAbsolute(bestand) ? bestand : path.join(WORTEL, bestand);
   const bron = fs.readFileSync(vol, 'utf8');
-  const { tel, stukken } = verzamel(bron);
+  const { tel, stukken, alle, toestanden } = verzamel(bron);
   const eigenStijl = idsMetStijlSchrijven(bron);
 
   /* Meer dan eens, en niet iets wat een browser als losse eigenschap anders
@@ -198,7 +201,9 @@ function zet(bestand) {
   if (afgekeurd) console.log('  ' + afgekeurd + ' klasse(n) overgeslagen: de proef wees ze af');
   if (TOON || !kandidaten.length) {
     console.log('\n' + bestand);
-    console.log('  style-attributen in de markup : ' + [...tel.values()].reduce((a, b) => a + b, 0));
+    console.log('  werkelijke attributen         : ' + alle);
+    console.log('  toestand (bewust overgeslagen): ' + toestanden);
+    console.log('  presentatie-attributen        : ' + [...tel.values()].reduce((a, b) => a + b, 0));
     console.log('  unieke waarden                : ' + tel.size);
     console.log('  waarden die vaker voorkomen   : ' + kandidaten.length);
     console.log('  attributen die dan verdwijnen : ' + winst + ' (' + kandidaten.length + ' klassen ervoor terug)');

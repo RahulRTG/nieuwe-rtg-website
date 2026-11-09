@@ -26,4 +26,10 @@
   .ds-presentatie-mini-acties:not(#_#_#_) { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
   .ds-presentatie-atelier-canvas:not(#_#_#_) { display: block; inline-size: 100%; margin-block-start: .5rem; border-radius: 0; touch-action: none; cursor: grab; }
   .ds-presentatie-accentlink:not(#_#_#_) { color: var(--burgundy-on-dark, var(--ds-accent)); }
+  .ds-presentatie-notificatie-acties:not(#_#_#_) { display: flex; flex-direction: column; gap: .5rem; margin: .6rem 1.25rem calc(env(safe-area-inset-bottom, 0px) + .9rem); }
+  .ds-presentatie-relatief:not(#_#_#_) { position: relative; }
+  .ds-presentatie-notificatiepunt:not(#_#_#_) { position: absolute; inset-block-start: 4px; inset-inline-end: 18px; inline-size: 8px; block-size: 8px; border-radius: var(--ds-radius-cirkel); background: var(--burgundy, var(--ds-accent)); display: block; }
+  .ds-presentatie-tabrij:not(#_#_#_) { display: flex; gap: .4rem; padding: .6rem 1.1rem 0; }
+  .ds-presentatie-paneelkolom:not(#_#_#_) { flex: 1; overflow-y: auto; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .7rem; }
+  .ds-presentatie-qr:not(#_#_#_) { display: inline-block; background: var(--ds-oppervlak-sterk); padding: 12px; border-radius: 0; margin: .9rem auto .4rem; }
 }

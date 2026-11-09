@@ -16,15 +16,15 @@
       "id": "partner",
       "route": "/apps/leverancier.html",
       "file": "partner.png",
-      "sourceHash": "a000f0e8c994a9d86fdc3c65fedc277dab80ff50e83a9b622958d022033fca73",
-      "imageHash": "e3ca78d5aba0c114e6f98aabbc1f0ac03f6cc5dde7f91c602f2200b9ff20e964"
+      "sourceHash": "4754aa65e04fe4b02925d9895ed800fcccba53c490f0f170bad59cf27ecb59ea",
+      "imageHash": "72cd25cff14585bf7f9c34fe15f31d44cf0e50b7c0d065790b98064f745921d1"
     },
     {
       "id": "gebruiker",
       "route": "/apps/app.html",
       "file": "gebruiker.png",
-      "sourceHash": "21921cf7ef65fd02f7810dac82211dc9fdaae0d253492c59c69ee7371f8ff031",
-      "imageHash": "dab6f3eeb1033067d7d6b894f1fa97204ebf9bd07d670ed4a6ad17d97f59d622"
+      "sourceHash": "391a1ed6de6b5fbecc96b07308ff66ab50bd7502bd704c1d8bd0f63034f6a44e",
+      "imageHash": "e30e78bddec2485d14bb3ce0e85dc6be728f2a0e3d45c6b417d032e123b1a419"
     }
   ]
 }

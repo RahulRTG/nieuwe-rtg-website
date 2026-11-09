@@ -141,14 +141,12 @@
     b.className = 'meelees-auto';
     b.hidden = true;
     b.setAttribute('aria-pressed', 'false');
-    b.style.cssText = o.stijl || '';
     o.kop.appendChild(b);
 
     luister.kan().then(function (st) {
       if (!st || !st.beschikbaar) {
         var uitleg = d.createElement('p');
         uitleg.className = 'meelees-geenauto';
-        uitleg.style.cssText = 'margin:.35rem 0 0;font-size:.8rem;opacity:.75;';
         uitleg.textContent = 'Automatisch ondertitelen kan hier niet: ' +
           ((st && st.reden) || 'onbekende reden') + ' Typ mee zodat iedereen kan volgen.';
         o.wrap.appendChild(uitleg);

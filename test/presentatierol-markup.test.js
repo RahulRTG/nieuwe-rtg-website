@@ -204,3 +204,20 @@ test('gedeelde herstel- en rustvensters laten hun vorm aan het Design System', (
   assert.match(lees('public/ds/componenten/pinherstel.css'), /^@layer rtg\.component/);
   assert.match(lees('public/ds/componenten/schermrust.css'), /^@layer rtg\.component/);
 });
+
+test('Meelezen en lokale ondertiteling delen één toegankelijke DS-presentatie', () => {
+  for (const bestand of ['public/shared/meelezen.js', 'public/shared/meeluister.js']) {
+    const bron = lees(bestand);
+    assert.doesNotMatch(bron, /\.style\.cssText|setAttribute\(['"]style['"]/, bestand);
+  }
+  for (const bestand of [
+    'public/apps/service-bel.html', 'public/apps/leverancier.html', 'public/apps/meet.html',
+    'public/apps/rendezvous.html', 'public/apps/app.html', 'public/apps/vonk.html',
+    'public/apps/foundation/school.html', 'public/apps/schoolpartner.html',
+    'public/apps/foundation/vrienden.html', 'public/apps/foundation/contact.html',
+    'public/apps/service.html', 'public/apps/personeel.html'
+  ]) {
+    assert.match(lees(bestand), /\/ds\/componenten\/meelezen\.css/, bestand);
+  }
+  assert.match(lees('public/ds/componenten/meelezen.css'), /^@layer rtg\.component/);
+});

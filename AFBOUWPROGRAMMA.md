@@ -4850,3 +4850,29 @@ Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie na de
 bronwijzigingen, de volledige platformkwalificatie, menselijke
 Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Meelezen en lokale ondertiteling delen één presentatiecontract
+
+Meelezen en de lokale ondertitelbediening bouwen hun live baan voortaan zonder
+`style.cssText`. De bestaande tekstveiligheid, grens van zestig regels,
+menselijke/machinale herkomstmarkering en lokale modelroute blijven
+ongewijzigd. Twaalf gespreks- en werkpagina's laden één centrale component
+onder `public/ds/`; de functie blijft zonder AI bruikbaar via handmatig
+meetypen.
+
+De functionele tekst- en spraakproeven sluiten **21/21**, inclusief
+tekstinjectie, naamveiligheid, begrenzing, modeluitval en de echte route van
+geluid naar tekst zonder opslag. De ServiceBel-browserketen sluit **3/3**.
+Design System meldt nul schendingen en 87 gemigreerde schermen.
+
+**Afsluiting Meelezen-presentatie.** Openstaande unieke oorzaken:
+**runtime-stijlinjectie in overige gedeelde legacyhulpen, dynamische
+app-templatepresentatie, ontbrekende objectieve/menselijke
+Experience-bewijzen en operationele vrijgavepoorten**. Opgelost sinds vorige
+meting: **1 gedeelde toegankelijkheidscomponent over 12 hosts en 11 lokale
+presentatieschrijvers**. Nieuwe regressies: **0 in de gerichte functionele en
+browserproeven**. Eerder verborgen fouten ontdekt: **geen aanvullende**.
+Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie na de
+bronwijzigingen, de volledige platformkwalificatie, menselijke
+Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

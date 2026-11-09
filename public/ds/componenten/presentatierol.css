@@ -50,4 +50,11 @@
   .ds-presentatie-schooluitleg:not(#_#_#_) { color: var(--rtg-leesgoud, var(--ds-accent)); font-size: .85rem; }
   .ds-presentatie-koppelkaart:not(#_#_#_) { margin-block-start: .5rem; border-block-start: 1px solid var(--line, var(--ds-glasrand)); padding-block-start: .6rem; }
   .ds-presentatie-keuzekolom:not(#_#_#_) { display: flex; flex-direction: column; gap: .4rem; }
+  .ds-presentatie-accentkaart:not(#_#_#_) { border-color: var(--goud, var(--ds-accent)); }
+  .ds-presentatie-bronnoot:not(#_#_#_) { color: var(--zacht, var(--ds-inkt-zacht)); font-size: .78rem; margin-block: .25rem; }
+  .ds-presentatie-goudgetal:not(#_#_#_) { color: var(--gold, var(--ds-accent)); font-variant-numeric: tabular-nums; }
+  .ds-presentatie-meter-leeg:not(#_#_#_) { inline-size: 0; }
+  .ds-presentatie-marge-nul:not(#_#_#_) { margin: 0; }
+  .ds-presentatie-tekst-compact:not(#_#_#_) { font-size: .82rem; }
+  .ds-presentatie-status-opzij:not(#_#_#_) { margin-inline-start: .5rem; }
 }

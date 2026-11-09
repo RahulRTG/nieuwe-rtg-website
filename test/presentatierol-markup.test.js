@@ -10,10 +10,10 @@ const lees = bestand => fs.readFileSync(path.join(root, bestand), 'utf8');
 test('Bestanden bewaart zichtbaarheid als toestand en niet als inline presentatie', () => {
   const html = lees('public/apps/bestanden.html');
   const gedrag = lees('public/apps/bestanden/app/01-overzicht.js') + '\n' +
-    lees('public/apps/bestanden/paneel.js');
+    lees('public/apps/bestanden/app.js') + '\n' + lees('public/apps/bestanden/paneel.js');
   assert.doesNotMatch(html, /\sstyle=/);
   for (const id of ['gedeeldKop', 'officeKop', 'bkKijk', 'bkVersieWrap', 'bkHerstel']) {
-    assert.match(html, new RegExp('id="' + id + '"[^>]*class="[^"]*h-weg|class="[^"]*h-weg[^"]*"[^>]*id="' + id + '"'));
+    assert.match(html, new RegExp('id="' + id + '"[^>]*hidden|hidden[^>]*id="' + id + '"'));
     assert.doesNotMatch(gedrag, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));
   }
 });
@@ -60,6 +60,21 @@ test('Foundation School en Kassa hebben geen vaste inline presentatie', () => {
   for (const bestand of ['public/apps/foundation/school.html', 'public/apps/kassa.html']) {
     const html = lees(bestand);
     assert.doesNotMatch(html, /<[a-z][^>]*\sstyle=/i, bestand);
+    assert.match(html, /\/ds\/componenten\/presentatierol\.css/, bestand);
+  }
+});
+
+test('vijf Heritage-werktuigen delen vaste presentatierollen', () => {
+  for (const bestand of [
+    'public/apps/foundation/overhoren.html',
+    'public/apps/gemeente.html',
+    'public/apps/rtgkantoor.html',
+    'public/apps/sitemaker.html',
+    'public/apps/websitestudio.html'
+  ]) {
+    const html = lees(bestand);
+    const markup = html.replace(/<script\b[\s\S]*?<\/script>/gi, '');
+    assert.doesNotMatch(markup, /<[a-z][^>]*\sstyle=/i, bestand);
     assert.match(html, /\/ds\/componenten\/presentatierol\.css/, bestand);
   }
 });

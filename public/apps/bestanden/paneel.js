@@ -39,9 +39,9 @@
     $('#bkSter').classList.toggle('h-weg', !open.vanMij);
     $('#bkBewaar').classList.toggle('h-weg', !open.vanMij);
     $('#bkWeg').textContent = !open.vanMij ? 'Haal mij eraf' : (open.weg ? 'Voorgoed weg' : 'Verwijder');
-    $('#bkHerstel').classList.toggle('h-weg', !open.weg);
-    $('#bkKijk').classList.add('h-weg'); $('#bkKijk').innerHTML = '';
-    $('#bkVersieWrap').classList.add('h-weg');
+    $('#bkHerstel').hidden = !open.weg;
+    $('#bkKijk').hidden = true; $('#bkKijk').innerHTML = '';
+    $('#bkVersieWrap').hidden = true;
     // This document surface stays connected to the standard Edge Bar.
     document.querySelector('main').inert = true;
     $('#bkScrim').classList.add('open');
@@ -56,7 +56,7 @@
     var id = open.id;
     B().api('haal', { id: id }).then(function (r) {
       if (!open || open.id !== id || r.body.error) return;
-      var k = $('#bkKijk'); k.classList.remove('h-weg');
+      var k = $('#bkKijk'); k.hidden = false;
       if (/^image\//.test(mime)) {
         var img = new Image(); img.alt = open.naam; img.src = r.body.dataUrl; k.appendChild(img);
       } else {
@@ -70,7 +70,7 @@
     var id = open.id;
     B().api('versies', { id: id }).then(function (r) {
       if (!open || open.id !== id || r.body.error || !(r.body.versies || []).length) return;
-      $('#bkVersieWrap').classList.remove('h-weg');
+      $('#bkVersieWrap').hidden = false;
       $('#bkVersies').innerHTML = r.body.versies.map(function (v) {
         return '<div class="versierij ds-dag-versierij"><span class="ds-dag-rek">' + esc(String(v.op || '').slice(0, 16).replace('T', ' ')) +
           ' · ' + B().maat(v.bytes) + (v.door ? ' · door ' + esc(v.door) : '') + '</span>' +

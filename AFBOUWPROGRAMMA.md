@@ -4695,3 +4695,43 @@ zichtbaar**. Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie
 na de bronwijzigingen, de volledige platformkwalificatie, menselijke
 Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Vijf Heritage-werktuigen delen compositie zonder hun identiteit te delen
+
+Foundation Overhoren, Gemeente, RTG Kantoor, Sitemaker en Websitestudio
+gebruiken voor hun vaste accentkaart, bronnoot, invoerrijen, voortgang,
+uploadstatus en actierijen nu de bestaande centrale `presentatierol`-component.
+De pagina's behouden hun eigen wereld-, app- en werkstroomsignatuur; alleen de
+herhaalde vaste compositie is geconsolideerd.
+
+Bestanden gebruikt als Design System-scherm voortaan uitsluitend het native
+`hidden`-contract uit de bestaande DS-reset. De vijf betrokken koppen,
+voorvertoningen en herstelacties laden daardoor geen legacy-hulpblad meer.
+De bronmodule en de gegenereerde bundel blijven gelijk. De browserproeven
+brachten daarnaast een bestaande gedeelde isolatiefout aan het licht:
+Editorial V4 legde zijn globale veld- en knopmaten over het Rahul-gesprek,
+waardoor de verzendknop op telefoon 148 pixels breed werd en de werkruimte
+74 pixels overstak. De bestaande Editorial-selector sluit de
+Rahul-formulierbediening nu uit; Rahul blijft eigenaar van zijn systeemlaag.
+
+De platformnoemer daalde van **42 naar 32** inline markup-attributen en van
+**27 naar 22** HTML-bestanden; presentatie daalde van 20 naar 10 en toestand
+bleef 22. De vijf gerichte broncontracten sluiten **5/5**. De browser- en
+gedragsproeven sluiten **18/18** voor Overhoren, burger- en ambtenarenloketten,
+Kantoor-AI, kantoorlogin, Bestanden en Rahul op drie schermformaten. De drie
+Sitemaker-contextcontracten sluiten **3/3**. Design System meldt nul
+schendingen en 87 gemigreerde schermen; het Experience-register blijft exact
+114 apps en 316 schermen afleiden.
+
+**Afsluiting vaste werktuigpresentatie.** Openstaande unieke oorzaken:
+**32 inline markup-attributen in 22 bestanden, dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **10 vaste
+presentatie-attributen, 5 legacy-zichtbaarheidscontracten op een DS-scherm en
+1 gedeelde Rahul-overloopoorzaak**. Nieuwe regressies: **0 na de geïsoleerde
+herstelproeven**. Eerder verborgen fouten ontdekt: **1 globale
+Editorial-selector overschreef de systeemlaag van Rahul op telefoon**.
+Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie na de
+bronwijzigingen, de volledige platformkwalificatie, menselijke
+Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

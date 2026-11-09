@@ -94,12 +94,24 @@ test('Rahul behoudt de legacy-presentatie op hosts met eigen globale CSS', { ski
           return { ds: document.documentElement.hasAttribute('data-ds'),
             oud: !!document.querySelector('#rtgRahulTabBasisStijl') && !!document.querySelector('#rtgRahulTabTwinStijl'),
             head: getComputedStyle(werk.querySelector('.rtg-command-head')).display,
-            breed: werk.clientWidth, inhoud: werk.scrollWidth };
+            breed: werk.clientWidth, inhoud: werk.scrollWidth,
+            formulier: [...werk.querySelector('.rtg-command-form').children].map(el => ({
+              tag: el.tagName, breed: el.getBoundingClientRect().width, breedte: getComputedStyle(el).width,
+              minimum: getComputedStyle(el).minWidth, padding: getComputedStyle(el).padding,
+              vak: getComputedStyle(el).boxSizing
+            })),
+            buiten: [...werk.querySelectorAll('*')].map(el => ({
+              tag: el.tagName, klasse: el.className, breed: el.clientWidth, inhoud: el.scrollWidth,
+              breedte: getComputedStyle(el).width, minimum: getComputedStyle(el).minWidth,
+              maximum: getComputedStyle(el).maxWidth, padding: getComputedStyle(el).padding,
+              vak: getComputedStyle(el).boxSizing
+            })).filter(x => x.inhoud > x.breed + 1).sort((a, b) => (b.inhoud - b.breed) - (a.inhoud - a.breed)).slice(0, 5) };
         });
         assert.equal(staat.ds, false, route + ': geen onterechte DS-promotie');
         assert.equal(staat.oud, true, route + ': de bestaande presentatie blijft actief');
         assert.equal(staat.head, 'grid', route + ': hostheader overschrijft de Rahul-layout niet');
-        assert.ok(staat.inhoud <= staat.breed, route + ': Rahul blijft binnen zijn werkruimte op ' + width);
+        assert.ok(staat.inhoud <= staat.breed,
+          route + ': Rahul blijft binnen zijn werkruimte op ' + width + ': ' + JSON.stringify(staat));
       }
       await page.locator('.rtg-command-form input').fill('Nog niet verzonden');
       await page.locator('.rtg-command-close').click();

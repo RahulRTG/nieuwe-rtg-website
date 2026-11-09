@@ -654,7 +654,10 @@ html body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world][
 html body[data-rtg-editorial-v4="true"][data-rtg-desktop-state="error"] .wd-shell{
   width:100%!important;max-width:none!important;margin-inline:0!important;
 }
-html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) a:not(.skip):not(.wd-skip):not(.skip-link):not(.media-mobile-nav a),
+/* Een link wordt gekleurd door het oppervlak dat hem bezit. Een globale
+   papierkleur had meer specificiteit dan donkere componentowners en maakte
+   onder meer toegang, Mall, Sociaal en Game Night onleesbaar. Alleen deze twee
+   werkruimtebedieningen zijn werkelijk onderdeel van het Editorial-papier. */
 html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wd-widget-pin,.wd-filters button){color:var(--v4-accent)!important}
 html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) .stil{color:#554d45!important}
 html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([data-rtg-v4-kind="canvas"]) :is(.wd-muted,.wd-app-controls summary,.wd-search-label>span,.ingang:not(.actief)>span){color:#554d45!important}

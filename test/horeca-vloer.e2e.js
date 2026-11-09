@@ -220,16 +220,15 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
        niemand meer opschrijft. */
     // het veld zelf wordt bij elke ronde opnieuw getekend, dus is het zijn eigen bewijs
     await verversEnHerteken(pM, redenSel);
-    /* Met een korte genadetermijn, want dit scherm ververst ook op de duw van
+    /* Met een begrensde genadetermijn, want dit scherm ververst ook op de duw van
        een COLLEGA: tussen het hertekende veld en het terugzetten van de reden
        kan onder runnerbelasting nog een tweede golf zitten, en dan meet de
        bewering het verse, nog lege veld van die tweede golf. De wacht is op de
-       WAARDE en loopt hooguit twee seconden; een herstel dat echt stuk is,
-       zakt daarna nog precies zo -- met dezelfde melding. */
+       WAARDE; een herstel dat echt stuk is zakt nog steeds met dezelfde melding. */
     await wachtTot(pM, (s) => {
       const el = document.querySelector(s);
       return !!el && el.value === 'ik sta zelf bij de pas';
-    }, redenSel, { wat: 'de teruggezette reden', ms: 2000 }).catch(() => {});
+    }, redenSel, { wat: 'de teruggezette reden', ms: 10000 });
     assert.equal(await pM.inputValue(redenSel), 'ik sta zelf bij de pas',
       'een verversing tijdens het typen gooit de reden niet weg');
     await pM.click('[data-nee]');

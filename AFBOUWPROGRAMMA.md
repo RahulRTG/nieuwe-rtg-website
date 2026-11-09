@@ -3840,3 +3840,80 @@ de statische en afgeleide controles op dezelfde werkboom uit, leg daarna één
 schone kandidaatcommit vast en laat alle vier verplichte workflows volledig
 eindigen. Alleen die integrale tegenproef kan de drie samengestelde uitkomsten
 en de actuele bewijsstatus sluiten.
+
+#### Integrale tegenproef 3 — 9 november
+
+De onveranderlijke kandidaat was commit
+`ab50f14f4e03ad12af8ed054b281f9faa0926b94`. De workflows `CI`
+(`42565992757`), `CodeQL` (`42565992679`), `Kwalificatie lokaal`
+(`42565992760`) en `Desktop- en mobielstandaard` (`42565992514`) zijn volledig
+afgerond voordat deze herstelwerkboom is gewijzigd. Over de vier workflows
+eindigden 42 jobs: 30 geslaagd, 4 mislukt en 8 overgeslagen. CodeQL, de lokale
+Slotsuite-route, WebKit en de volledige scherminventaris op 390 en 1440 px zijn
+groen. De hoofd-CI telt 25 groene jobs. Alle vier toegankelijkheidsscherven,
+vier van de vijf schermscherven en drie van de vier unitscherven hebben hun
+primaire meting volledig uitgevoerd.
+
+De vier rode jobs bestaan uit drie primaire oorzaken en het afgeleide oordeel
+`Tests, checks en build`. Het toegankelijkheidsoordeel is wel een primaire
+meetuitkomst: de vier geslaagde meetscherven rapporteerden samen 175
+contrastmanifestaties. De drie incrementele jobs zijn correct overgeslagen
+omdat preflight de volledige route koos. De volledige samenstelling,
+schermdekking en endpointdekking konden door de rode primaire jobs niet worden
+gevormd; bewijspublicatie en nachtelijke kalibratie zijn op deze pull request
+geen kandidaatbewijs.
+
+| id | gedeelde bronoorzaak | klasse en herkomst | zichtbare gevolgen | eigenaar | herstelvolgorde |
+|---|---|---|---|---|---|
+| DG-CI-14 | de brede Editorial-regel die alle links op papier het accent geeft heeft meer specificiteit dan de bestaande donkere componentowners | eerder bekende cascade-oorzaak, in herstelronde 3 onvolledig begrensd | dezelfde bordeauxkleur overschrijft het toegangsmerk, Sociaal-menu, Mall-partners en -poort en de Game Night-springlink; 175 contrastmanifestaties vallen op deze ene ownerfout terug | legacy Editorial / bestaande componentowners | de globale linkowner verwijderen en de al aanwezige componentowners laten beslissen; de betrokken a11y-scherven en het totaaloordeel herhalen |
+| DG-CI-15 | een Rendez-vous-voorstel op een gedeelde locatie zonder actueel aanwezigheidsvenster wordt wel aangemaakt maar direct daarna als ongeldig afgewezen | bestaande tijdgebonden productinconsistentie, op 9 november voor het eerst zichtbaar doordat de vaste novemberfixture verliep | `arrange` antwoordt 200 en het onmiddellijk volgende akkoord 409 | Rendez-vous Arrange | geldigheid laten aansluiten op de oorsprong van het voorstel: gedateerde voorstellen vereisen nog dezelfde gedateerde overlap, ongedateerde voorstellen vereisen nog dezelfde gedeelde locatie; beide takken gericht bewijzen |
+| DG-CI-16 | de Horeca-browserproef beoordeelt de conceptreden na slechts twee seconden en negeert eerst de mislukte toestandswacht | instabiele toets onder volledige runnerbelasting; de productassertie blijft vereist | een eenmalige lege DOM-stand wordt direct als definitief verlies beoordeeld, terwijl twee zelfstandige herhalingen op dezelfde bron groen sloten | Horeca-conceptcontinuiteit / schermtoets | wachten op de vereiste eindtoestand zonder de timeout te negeren; daarna de proef herhaald en onder de volledige schermshard uitvoeren |
+
+**Meetstand integrale tegenproef 3.** Openstaande unieke oorzaken: **3**.
+Opgelost sinds de vorige meetbare bronstand: **0 in deze tegenproef**. Nieuwe
+regressies: **0 bevestigd**. Eerder verborgen fouten ontdekt: **3 unieke
+oorzaken** (177 concrete manifestaties). Niet-uitgevoerde verplichte controles:
+**3 samengestelde uitkomsten**. Deep Green: **GEBLOKKEERD**.
+
+De herstelvolgorde is DG-CI-14, DG-CI-15 en DG-CI-16. Na iedere groep volgen
+de gerichte regressies; pas wanneer alle drie aantoonbaar gesloten zijn wordt
+een nieuwe kandidaat vastgelegd en de volledige verplichte CI opnieuw gestart.
+
+#### Herstelronde 4 — drie primaire oorzaken gericht gesloten
+
+DG-CI-14 is bij de eigenaar hersteld: de globale Editorial-regel eigent niet
+langer alle links toe, zodat donkere componenten weer hun bestaande kleurregel
+toepassen. De volledige toegankelijkheidsscherven 2/4 en 4/4 zijn lokaal op
+elk 79 schermen uitgevoerd, inclusief uitgelogde, ingelogde, zaak-, beide
+telefoonhanden, tablet-, champagne-, bordeaux-, royal- en blinde-asrondes.
+Beide scherven sloten met 0 structurele, 0 contrast- en 0
+raakvlakmanifestaties; de eerdere 175 contrastmanifestaties zijn daarmee op de
+oorspronkelijke meetroute tot nul teruggebracht.
+
+DG-CI-15 is als productcontract hersteld. Een gedateerd Rendez-vous-voorstel
+vereist nog steeds de volledige oorspronkelijke aanwezigheidsdoorsnede; een
+ongedateerd voorstel dat uit gedeelde voorkeurslocaties ontstond vereist dat
+beide profielen die locatie nog delen. De bestaande vervalproef blijft groen en
+een nieuwe tegenproef bewijst dat beide leden het zojuist ontvangen
+ongedateerde voorstel kunnen aanvaarden. `rendezvous.test.js` en
+`connection-final-routes.test.js` sloten samen met 34/34 geslaagde toetsen.
+
+DG-CI-16 is in de toetswaarneming hersteld zonder de productbewering te
+verzwakken. De proef wacht nu verplicht en begrensd op exact de teruggezette
+conceptwaarde en negeert een timeout niet meer. Drie gelijktijdige zelfstandige
+uitvoeringen van `horeca-vloer.e2e.js` sloten 3/3 groen onder runnerbelasting.
+
+De brongebonden registers zijn uitsluitend met hun bestaande generators
+bijgewerkt: `BEWIJS.md` telt de toegevoegde regressie en
+`EXPERIENCEWERKT.json` blijft eerlijk `NOT_TESTED` met 0/3360 bewezen
+voorwaarden. `npm run check`, `npm run norm`, Design System-controle, build,
+service-workercontrole en Experience-inventariscontrole zijn groen. De
+APPWERKT-versheidsmelding blijft 912 verlopen bewijzen rapporteren en wordt
+niet als groen gepresenteerd. De drie samengestelde CI-uitkomsten blijven open
+totdat een onveranderlijke kandidaat de volledige verplichte CI heeft doorlopen.
+
+**Meetstand herstelronde 4.** Openstaande unieke oorzaken: **0 van de 3 in de
+vastgelegde CI-nulmeting**. Opgelost sinds vorige meting: **3**. Nieuwe
+regressies: **0 in de gerichte tegenproeven**. Eerder verborgen fouten ontdekt:
+**0 extra**. Niet-uitgevoerde verplichte controles: **3 samengestelde
+uitkomsten**. Deep Green: **GEBLOKKEERD**.

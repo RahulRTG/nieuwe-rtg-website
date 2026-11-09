@@ -242,3 +242,13 @@ test('Verbinding gebruikt op iedere host uitsluitend de centrale DS-presentatie'
   }
   assert.match(lees('public/ds/componenten/verbinding.css'), /^\/\*[\s\S]*@layer rtg\.component/);
 });
+
+test('Invisible Arrival gebruikt voor de nadering uitsluitend de bestaande plekcomponent', () => {
+  const bron = lees('public/shared/plaatsnadering.js');
+  assert.doesNotMatch(bron, /createElement\(['"]style['"]|\.style\.|setAttribute\(['"]style['"]/, bron);
+  assert.match(bron, /className = 'rtgnader ds-plek'/);
+  assert.match(bron, /className = 'ja ds-knop ds-knop--primair'/);
+  assert.match(bron, /className = 'nee ds-knop ds-knop--stil'/);
+  assert.match(lees('public/ds/bediening.css'), /componenten\/plek\.css/);
+  assert.match(lees('public/apps/arrival.html'), /\/ds\/rtg-ds\.css/);
+});

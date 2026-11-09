@@ -4903,3 +4903,29 @@ controles: **APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Invisible Arrival hergebruikt het centrale locatievenster
+
+De automatische naderingsvraag injecteert geen eigen stijlblad meer. De enige
+host, Invisible Arrival, laadt al het volledige Design System; de bestaande
+`ds-plek`- en knopcomponenten bezitten daarom voortaan ook deze presentatie.
+De Arrival Pass, GPS-toestemming, actor- en passbinding, focusherstel en
+serverroutes zijn ongewijzigd.
+
+De locatie- en intrekkingsreeks sluit **38/38**, inclusief late responses,
+actorwissel, pagehide, herhaalde rondes en een ingetrokken toestemming. De
+twee echte browserreeksen sluiten **8/8**: de wens-aanvraag-passketen, nul
+GPS-data in de puls, geen puls bij een andere zaak, foutpresentatie, mobiel,
+desktop en RTL zijn aantoonbaar behouden.
+
+**Afsluiting Arrival-presentatie.** Openstaande unieke oorzaken:
+**runtime-stijlinjectie in overige gedeelde legacyhulpen, dynamische
+app-templatepresentatie, ontbrekende objectieve/menselijke
+Experience-bewijzen en operationele vrijgavepoorten**. Opgelost sinds vorige
+meting: **1 volledig runtime-stijlblad op 1 TravelOS-route**. Nieuwe
+regressies: **0 in de gerichte lifecycle-, privacy- en browserproeven**.
+Eerder verborgen fouten ontdekt: **geen aanvullende**. Niet-uitgevoerde
+verplichte controles: **APPWERKT-herkwalificatie na de bronwijzigingen, de
+volledige platformkwalificatie, menselijke Experience-beoordeling,
+operationele releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

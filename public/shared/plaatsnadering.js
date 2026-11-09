@@ -30,26 +30,10 @@
      hoort te zeggen. */
   function bied(naam, g) {
     return new Promise(function (klaar) {
-      var ds = document.documentElement.hasAttribute('data-ds'), gesloten = false, st = null;
-      if (!document.documentElement.hasAttribute('data-ds')) {
-      st = document.createElement('style');
-      st.textContent =
-        '.rtgnader{position:fixed;left:50%;transform:translateX(-50%);z-index:9983;' +
-          'bottom:calc(env(safe-area-inset-bottom,0px) + 1.5rem);width:min(24rem,calc(100vw - 2rem));' +
-          'background:var(--paneel,#151312);border:1px solid var(--line,var(--lijn,#2A2724));' +
-          'border-radius:0;padding:1rem 1.1rem;color:var(--txt,#F7F5F1);' +
-          'font-family:Inter,system-ui,sans-serif;box-shadow:0 14px 40px rgba(0,0,0,.45);}' +
-        '.rtgnader p{margin:0 0 .8rem;font-size:.85rem;line-height:1.55;color:var(--muted,var(--zacht,#8A8680));}' +
-        '.rtgnader .rij{display:flex;gap:.6rem;}' +
-        '.rtgnader button{flex:1;border:none;border-radius:0;padding:.6rem;font:inherit;' +
-          'font-size:.82rem;font-weight:600;cursor:pointer;}' +
-        '.rtgnader .ja{background:var(--ds-accent,var(--gold,#857007));color:var(--ds-accent-inkt,#0C0C0B);}' +
-        '.rtgnader .nee{background:none;color:var(--muted,#8A8680);font-weight:500;}';
-      document.head.appendChild(st);
-      }
+      var gesloten = false;
 
       var doos = document.createElement('div');
-      doos.className = 'rtgnader' + (ds ? ' ds-plek' : '');
+      doos.className = 'rtgnader ds-plek';
       doos.setAttribute('role', 'dialog'); doos.setAttribute('aria-modal', 'false');
       doos.setAttribute('aria-label', 'Zelf melden dat je in de buurt bent');
       var p = document.createElement('p');
@@ -57,8 +41,8 @@
         'Dan kunnen ze je tafel op tijd gereedmaken. ' + naam + ' ziet alleen dat je eraan komt, ' +
         'niet waar je bent. Je locatie blijft op je toestel, en je kunt het altijd zelf blijven doen.';
       var rij = document.createElement('div'); rij.className = 'rij';
-      var ja = document.createElement('button'); ja.className = 'ja' + (ds ? ' ds-knop ds-knop--primair' : ''); ja.type = 'button'; ja.textContent = 'Ja, meld het zelf';
-      var nee = document.createElement('button'); nee.className = 'nee' + (ds ? ' ds-knop ds-knop--stil' : ''); nee.type = 'button'; nee.textContent = 'Nu niet';
+      var ja = document.createElement('button'); ja.className = 'ja ds-knop ds-knop--primair'; ja.type = 'button'; ja.textContent = 'Ja, meld het zelf';
+      var nee = document.createElement('button'); nee.className = 'nee ds-knop ds-knop--stil'; nee.type = 'button'; nee.textContent = 'Nu niet';
       rij.append(nee, ja);
       doos.append(p, rij);
       document.body.appendChild(doos);
@@ -71,7 +55,7 @@
         a = !!a && doos.isConnected && (!g || geldig(g));
         if (g) g.sluit = null;
         var herstel = doos.contains(document.activeElement);
-        doos.remove(); if (st) st.remove();
+        doos.remove();
         try { if (herstel && vorigeFocus && vorigeFocus.focus && document.contains(vorigeFocus)) vorigeFocus.focus({ preventScroll: true }); } catch (e) {}
         klaar(a);
       }

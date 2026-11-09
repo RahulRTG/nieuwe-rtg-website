@@ -4823,3 +4823,30 @@ fouten ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte controles:
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Pinherstel en Schermrust delen centrale systeemvensters
+
+Pinherstel en Schermrust zetten geen volledige overlayvorm meer via
+`style.cssText`. Hun bestaande herstel-, API-, timer- en rustlogica bouwt nu
+uitsluitend semantische DOM; twee begrensde componenten onder `public/ds/`
+bezitten de presentatie. De negen rustschermen en de appwerktafel laden die
+componenten expliciet, zodat er geen tweede runtime-stijlregister ontstaat.
+
+De gedeelde broncontractproef sluit **9/9**. De echte pinherstelketen sluit
+**2/2**: zowel de eenmalige herstellink als de ingang vanuit het pinvenster
+zetten aantoonbaar een nieuwe pin. De nieuwe Schermrust-browserproef sluit
+**1/1**, controleert het modale venster, het minimale raakvlak van 44 pixels,
+de afwezigheid van inline presentatie en de terugkoppeling na afronden. Design
+System meldt nul schendingen en 87 gemigreerde schermen.
+
+**Afsluiting herstel- en rustpresentatie.** Openstaande unieke oorzaken:
+**runtime-stijlinjectie in overige gedeelde legacyhulpen, dynamische
+app-templatepresentatie, ontbrekende objectieve/menselijke
+Experience-bewijzen en operationele vrijgavepoorten**. Opgelost sinds vorige
+meting: **2 volledige runtime-stijlconstructies en 12 lokale
+presentatieschrijvers**. Nieuwe regressies: **0 in de gerichte bron- en
+browserproeven**. Eerder verborgen fouten ontdekt: **geen aanvullende**.
+Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie na de
+bronwijzigingen, de volledige platformkwalificatie, menselijke
+Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

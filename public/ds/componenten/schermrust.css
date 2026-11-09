@@ -1,0 +1,10 @@
+@layer rtg.component {
+  .ds-schermrust { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: var(--ds-ruimte-4); background: var(--ds-glas); backdrop-filter: blur(6px); }
+  .ds-schermrust__doos { max-inline-size: 22rem; padding: var(--ds-ruimte-6); border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: var(--ds-cover-grond); color: var(--ds-cover-inkt); font-family: var(--ds-letter-tekst); text-align: center; }
+  .ds-schermrust__kop { font: 500 1.5rem/1.3 var(--ds-letter-display); }
+  .ds-schermrust__tekst { margin: var(--ds-ruimte-3) 0 var(--ds-ruimte-4); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.6; }
+  .ds-schermrust__doe, .ds-schermrust__door { display: block; inline-size: 100%; min-block-size: var(--ds-doel); border: 0; border-radius: 0; font: inherit; cursor: pointer; }
+  .ds-schermrust__doe { padding: var(--ds-ruimte-3); background: var(--ds-cover-metaal); color: var(--ds-cover-grond); font-weight: 600; }
+  .ds-schermrust__door { margin-block-start: var(--ds-ruimte-2); padding: var(--ds-ruimte-2); background: transparent; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); }
+  .ds-schermrust__status { position: fixed; inset-inline-start: 50%; inset-block-end: var(--ds-ruimte-4); z-index: 99999; padding: var(--ds-ruimte-2) var(--ds-ruimte-4); transform: translateX(-50%); border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: var(--ds-cover-grond); color: var(--ds-cover-inkt); font-family: var(--ds-letter-tekst); font-size: var(--ds-maat-meta); }
+}

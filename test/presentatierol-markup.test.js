@@ -187,3 +187,20 @@ test('gedeelde bediening maakt dynamische markup zonder inline presentatie', () 
   assert.match(lees('public/ds/componenten/paspoortscan.css'), /^@layer rtg\.component/);
   assert.match(lees('public/ds/componenten/schoolbel.css'), /^@layer rtg\.component/);
 });
+
+test('gedeelde herstel- en rustvensters laten hun vorm aan het Design System', () => {
+  for (const bestand of ['public/shared/pinherstel.js', 'public/shared/schermrust.js']) {
+    const bron = lees(bestand);
+    assert.doesNotMatch(bron, /\.style\.cssText|setAttribute\(['"]style['"]/, bestand);
+  }
+  assert.match(lees('public/apps/app.html'), /\/ds\/componenten\/pinherstel\.css/);
+  for (const bestand of [
+    'public/apps/muziek.html', 'public/apps/spelen.html', 'public/apps/theater.html',
+    'public/apps/app.html', 'public/apps/vonk.html', 'public/apps/podium.html',
+    'public/apps/media.html', 'public/apps/clips.html', 'public/apps/foundation/vrienden.html'
+  ]) {
+    assert.match(lees(bestand), /\/ds\/componenten\/schermrust\.css/, bestand);
+  }
+  assert.match(lees('public/ds/componenten/pinherstel.css'), /^@layer rtg\.component/);
+  assert.match(lees('public/ds/componenten/schermrust.css'), /^@layer rtg\.component/);
+});

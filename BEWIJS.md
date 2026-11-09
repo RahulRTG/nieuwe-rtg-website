@@ -14,12 +14,12 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 |---|---|
 | toetsbestanden | 3159 |
 | losse beweringen (`test(...)`) | 21134 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 518 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2944 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 517 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2945 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 183 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 32 |
+| niets van beide | 31 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -129,7 +129,7 @@ toets omvalt.
 | `alpine.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Alpine: het wintersport- en seizoensresort (demo Val d'Aurora). Bewaakt de pistes en liften, de lawineregel (alleen de berggids zet het niveau, en vanaf 4 gaan de zwarte pistes dicht en blijven ze dicht),... |
 | `ankerdienst-echt.test.js` | 5 | gezakt op `liegpoort /api/` | DE ANKERDIENST OP EEN ECHTE SERVER. test/ankerdienst.test.js toetst de regels; dit toetst dat de dienst ook werkelijk aan de journalen hangt die er in productie zijn. |
 | `ankerdienst.test.js` | 13 | gezakt op `===->!==#0` | DE ANKERDIENST -- het ene getal dat naar buiten moet. De hashketen ziet gesleutel MIDDEN in een spoor. |
-| `ankerherstel.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `ankerherstel.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | Een auditbreuk wordt niet met de gewone app-sleutel gladgestreken. Alleen een apart getekende verklaring kan exact van een bestaand extern punt via een gemeenschappelijk punt naar een aantoonbare lokale tak gaan. |
 | `ankerherzegel-echt.test.js` | 1 | gezakt op `liegpoort /api/` | DE HERZEGELING OP EEN ECHTE SERVER: /api/privacy/delete legt het externe anker niet stil. test/ankerherzegel.test.js toetst de regels op een los journaal; dit toetst dat de wissing in kern/vergeten.js ze werkelijk... |
 | `ankerherzegel-takken.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | DE HERZEGELING ALS ZUIVERE REKENING (server/lib/ankerherzegel.js). Naast test/ankerherzegel.test.js (die het geheel met een echte ankerdienst en ontvanger draait) houdt dit bestand elke weigertak van plan,... |
 | `ankerherzegel.test.js` | 10 | gezakt op `voorwaarde-omkeren#0` | DE HERZEGELING: een AVG-wissing legt het externe anker niet meer stil, en een vervalsing blijft een alarm (server/lib/ankerherzegel.js). De drie beweringen, elk met zijn tegenproef: 1. |

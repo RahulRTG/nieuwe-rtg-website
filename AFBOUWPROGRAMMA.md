@@ -4154,3 +4154,25 @@ Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt: **0 aanvullend**.
 Niet-uitgevoerde verplichte controles: **de actuele VOLTOOIPROEF-, LIEGRONDE-
 en autorisatiebronnen, APPWERKT-samenstelling over alle acht dimensies en
 EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.
+
+#### VOLTOOIPROEF actuele integrale herkwalificatie
+
+De volledige bewijsproducerende VOLTOOIPROEF is ononderbroken uitgevoerd op
+schone commit `734310b3b7` met Node 26.12.1. Alle **114/114 appscenario's**
+sluiten. Het register bevat **342/342 gesloten taak-, persistentie- en
+herstelbewijzen**, 114/114 gesloten menselijke antwoord- of schermstappen en
+nul open bewijsstappen. De proef voerde echte nette herstarts, SIGKILL-
+crashvensters, dubbele verzoeken, afgebroken verzoeken en opslagcontroles uit.
+
+De expliciete bevoegdheidskruisproeven binnen deze functionele wereld sluiten
+voor 107 apps; zeven contracten verklaren eerlijk dat dit instrument daar geen
+vreemde actor heeft uitgevoerd. Zij worden niet afgeleid of als bevoegd groen
+behandeld en blijven voor de afzonderlijke IDOR-, rol- en bevoegdheidsronde.
+
+**Afsluiting VOLTOOIPROEF-pakket.** Openstaande unieke oorzaken: **0 binnen
+voltooibaar, persistent, herstelbaar en menselijk**. Opgelost sinds de vorige
+geldige bronmeting: **de volledige bewijsveroudering voor 114 appscenario's**.
+Nieuwe regressies: **0 in 342 bewijsstappen**. Eerder verborgen fouten
+ontdekt: **0**. Niet-uitgevoerde verplichte controles: **actuele LIEGRONDE,
+volledige bevoegdheidsronde, APPWERKT-samenstelling en EXPERIENCEWERKT**. Deep
+Green: **GEBLOKKEERD**.

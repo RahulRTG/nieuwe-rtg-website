@@ -53,6 +53,20 @@ test('de volledige Office-suite en versiehistorie blijven bereikbaar', () => {
   assert.match(gedrag, /classList\.remove\('rtd-voorzijde-actief'\)/);
 });
 
+test('Office beheert documentstanden via de gedeelde presentatielaag', () => {
+  const verborgen = ['werkChip', 'presBtn', 'tekstTools', 'bladTools', 'formBalk', 'bladWrap',
+    'presWrap', 'formWrap', 'schetsWrap', 'bordWrap', 'gezinBlok', 'aiToepas'];
+  for (const id of verborgen) {
+    assert.match(html, new RegExp('class="[^"]*h-weg[^"]*" id="' + id + '"'));
+  }
+  assert.match(html, /\/ds\/componenten\/presentatierol\.css/);
+  const app = ['app-01.js', 'app-02.js', 'app-02a.js', 'app-02b.js', 'app-03.js']
+    .map(naam => lees('public/apps/office/app/' + naam)).join('\n');
+  for (const id of verborgen) {
+    assert.doesNotMatch(app, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));
+  }
+});
+
 test('RTDocs verklaart diepe standen en contextacties aan Edge en replay', () => {
   const app = lees('public/apps/office/app/app-01b.js');
   assert.match(html, /data-rtd-diep="lijst" data-stand="documenten"/);

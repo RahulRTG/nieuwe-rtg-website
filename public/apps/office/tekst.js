@@ -78,7 +78,7 @@
   }
 
   function standBij(host) {
-    if (!host || host.style.display === 'none') return;
+    if (!host || getComputedStyle(host).display === 'none') return;
     var blok = '';
     try { blok = String(document.queryCommandValue('formatBlock') || '').toLowerCase(); } catch (e) {}
     Array.prototype.forEach.call(host.querySelectorAll('.tb'), function (b) {

@@ -4549,3 +4549,43 @@ verborgen fouten ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte
 controles: **de volledige platformkwalificatie, menselijke
 Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Office-documentstanden gebruiken één centrale presentatietoestand
+
+De twaalf vaste zichtbaarheidsattributen voor Office-documenttypen,
+werkbalken, presentatiebediening, gezinssamenwerking en Rahul-voorstellen zijn
+vervangen door de bestaande centrale `h-weg`-toestand. De twee dynamische
+opmaakbalken gebruiken daarnaast de bestaande `presentatierol`-component voor
+hun flexcompositie. De gesplitste Office-bronnen blijven leidend; de bestaande
+bundel is opnieuw uit die bronnen opgebouwd. Er is geen tweede
+toestandscontroller of Office-variant toegevoegd.
+
+De bestaande zichtbaarheidlezers voor Edge-capabilities, afdrukken,
+tekstbediening en presenteren lezen voortaan de werkelijk berekende stijl. De
+browserproef bracht daarbij één gedeelde contextfout aan het licht: het vaste
+paneel voor zoeken en vervangen bleef na een documentwissel boven een nieuwe
+presentatie liggen en onderschepte de knop. Een geslaagde documentwissel ruimt
+nu alle documentgebonden Office-hulppanelen op. Daardoor blijft de inhoud van
+het nieuwe document direct bedienbaar en hoeft geen test de klik te forceren.
+
+De platformnoemer daalde van **83 naar 71** inline markup-attributen en van
+**35 naar 34** HTML-bestanden; toestand daalde van 48 naar 36 en presentatie
+bleef 35. De gerichte broncontracten sluiten **6/6** en de acht echte
+Office-browserscenario's sluiten na het contextuele herstel **8/8**, inclusief
+alle zes documentsoorten op mobiel en desktop, RTDocs, XLSX, formulieren,
+schetsen, presentatie en afdruk. Design System meldt nul schendingen en 87
+gemigreerde schermen; Heritage blijft exact 296 schermen en 20 redirects
+classificeren en het Experience-register blijft exact 114 apps en 316 schermen
+afleiden.
+
+**Afsluiting Office-presentatietoestand.** Openstaande unieke oorzaken:
+**71 inline markup-attributen in 34 bestanden, dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **12
+toestandsattributen, hun gekoppelde inline zichtbaarheidsschrijvers/-lezers en
+1 documentgebonden overlaylek**. Nieuwe regressies: **0 na de gerichte
+herstelproeven**. Eerder verborgen fouten ontdekt: **1 bestaand hulppaneel kon
+bediening van een volgend Office-document onderscheppen**. Niet-uitgevoerde
+verplichte controles: **de volledige platformkwalificatie, menselijke
+Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

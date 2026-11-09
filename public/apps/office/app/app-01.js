@@ -70,7 +70,7 @@
 
   $('#terug').href = opzet.terug;
   $('#kopMijn').textContent = opzet.mijnKop;
-  if (opzet.chip) { $('#werkChip').textContent = opzet.chip; $('#werkChip').style.display = ''; }
+  if (opzet.chip) { $('#werkChip').textContent = opzet.chip; $('#werkChip').classList.remove('h-weg'); }
   Array.prototype.forEach.call(document.querySelectorAll('[data-glyf]'), function (el) {
     el.innerHTML = glyf(el.dataset.glyf);
   });

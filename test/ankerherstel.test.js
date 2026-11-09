@@ -1,7 +1,9 @@
-'use strict';
 /* Een auditbreuk wordt niet met de gewone app-sleutel gladgestreken. Alleen
    een apart getekende verklaring kan exact van een bestaand extern punt via
-   een gemeenschappelijk punt naar een aantoonbare lokale tak gaan. */
+   een gemeenschappelijk punt naar een aantoonbare lokale tak gaan. De toets
+   bewijst de vorm, de aparte Ed25519-bevoegdheid, de fail-closed koppeling aan
+   beide takken en dat eenmalig tekenen geen private herstelsleutel bewaart. */
+'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');

@@ -15,13 +15,13 @@
    par. 6). */
 'use strict';
 const { maakInplanbaar } = require('../payroll/inplanbaar');
+const tijdzone = require('../tijdzone');
 
 module.exports = (ctx) => {
-  const { nu } = ctx;
   const inplanbaar = maakInplanbaar(ctx.afwezigOp);
 
   const bestuurderAfwezig = a => !!a && a.bestuurderStaffId != null &&
-    !inplanbaar(a.vervoerder, a.bestuurderStaffId, nu().slice(0, 10)).plan;
+    !inplanbaar(a.vervoerder, a.bestuurderStaffId, tijdzone.datumIn()).plan;
 
   /* Leest `bestuurderStaffId` uit een verzoek. Geeft {} als het veld er niet
      in staat, { lid: null } om de koppeling weg te halen, { lid } voor een

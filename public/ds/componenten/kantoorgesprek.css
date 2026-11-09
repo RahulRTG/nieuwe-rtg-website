@@ -1,0 +1,52 @@
+/* Eén kantoor-inlogpresentatie. Legacy-hosts laden dit component rechtstreeks;
+   DS-hosts ontvangen het via bediening.css. De deur- en passkeylogica blijven
+   volledig in de bestaande JavaScript-owner. */
+@layer rtg.component {
+  .ds-kantoorgesprek {
+    --ds-kg-oppervlak: var(--ds-oppervlak, var(--card2, var(--bg, black)));
+    --ds-kg-lijn: var(--ds-lijnkleur, var(--line, gray));
+    --ds-kg-inkt: var(--ds-inkt, var(--txt, white));
+    --ds-kg-focus: var(--ds-focus, var(--gold, goldenrod));
+    --ds-kg-accent: var(--ds-accent, var(--gold, goldenrod));
+    --ds-kg-accent-inkt: var(--ds-accent-inkt, black);
+    --ds-kg-fout: var(--ds-status-fout, var(--burgundy-on-dark, crimson));
+    --ds-radius-kantoorgesprek: var(--ds-radius-systeem, 0px);
+    max-width: 26rem; margin: 3rem auto; padding: 0 1.2rem;
+    font-family: var(--ds-letter-tekst, Inter, system-ui, sans-serif);
+  }
+  .ds-kantoorgesprek h2 { font-family: var(--ds-letter-display, "Bodoni Moda", Georgia, serif); font-weight: 600; font-size: 1.35rem; margin: 0 0 1.2rem; }
+  .ds-kantoorgesprek h2[hidden] { display: none; }
+  .ds-kantoorgesprek .kg-zegt { font-size: .95rem; line-height: 1.55; margin: 0 0 1rem; min-height: 3rem; }
+  .ds-kantoorgesprek .kg-in {
+    width: 100%;
+    background: var(--ds-kg-oppervlak);
+    border: 1px solid var(--ds-kg-lijn);
+    border-radius: var(--ds-radius-kantoorgesprek);
+    color: var(--ds-kg-inkt);
+    font: inherit;
+    font-size: .95rem;
+    padding: .7rem .8rem;
+  }
+  .ds-kantoorgesprek .kg-in:focus { outline: none; border-color: var(--ds-kg-focus); }
+  .ds-kantoorgesprek .kg-in:focus-visible { outline: 2px solid var(--ds-kg-focus); outline-offset: 2px; }
+  .ds-kantoorgesprek .kg-rij { display: flex; gap: .6rem; margin-top: .8rem; }
+  .ds-kantoorgesprek .kg-rij button {
+    flex: 1;
+    min-height: var(--ds-doel);
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    font-size: .95rem;
+    border-radius: var(--ds-radius-kantoorgesprek);
+    padding: .7rem 1rem;
+    background: var(--ds-kg-accent);
+    color: var(--ds-kg-accent-inkt);
+  }
+  /* De knop blijft bij een lopend verzoek volledig dekkend. Een opacity op de
+     hele knop mengde de lichte letter en het bordeaux met het ivoor van de
+     wereld erachter; op twee kantoorschermen bleef daar slechts 1,25:1 van
+     over. De disabled-eigenschap en cursor dragen de toestand al semantisch. */
+  .ds-kantoorgesprek .kg-rij button:disabled { opacity: 1; cursor: default; }
+  .ds-kantoorgesprek .kg-fout { font-size: .86rem; line-height: 1.5; color: var(--ds-kg-fout); margin: .8rem 0 0; min-height: 1.2rem; }
+}

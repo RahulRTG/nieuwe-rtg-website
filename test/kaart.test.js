@@ -5,6 +5,8 @@
    Draai los: node --test test/kaart.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const Kaart = require('../public/shared/kaart');
 
 test('1. coördinaten: geo:LAT,LNG?q=LAT,LNG', () => {
@@ -64,4 +66,16 @@ test('8. q met + als spatie en percent-codering wordt netjes ontleed', () => {
   const r = Kaart.parseGeo('geo:0,0?q=Plein+1+%C2%B7+Den+Haag');
   assert.equal(r.heeftCoord, false);
   assert.equal(r.adres, 'Plein 1 · Den Haag');
+});
+
+test('9. de geo-uitwijk gebruikt op elke host de canonieke DS-presentatie', () => {
+  const css = fs.readFileSync(path.join(__dirname, '../public/ds/componenten/kaart.css'), 'utf8');
+  assert.match(css, /\.ds-kaartuitwijk\s*\{/); assert.match(css, /\.ds-kaartuitwijk__waarde/);
+  assert.doesNotMatch(css, /!important|#[0-9a-f]{3,8}\b/i);
+  const bron = fs.readFileSync(path.join(__dirname, '../public/shared/kaart.js'), 'utf8');
+  const os = require('../scripts/ontwerpsysteem');
+  const ds = os.scriptLaadAnalyse(bron, { ds: true }), legacy = os.scriptLaadAnalyse(bron, { ds: false });
+  assert.deepEqual(ds.onzeker, []); assert.deepEqual(ds.uitgesloten, ['/ds/rtg-ds.css']);
+  assert.deepEqual(legacy.verwijzingen, [{ href: '/ds/rtg-ds.css', soort: 'dom' }]);
+  assert.doesNotMatch(bron, /kaart-legacy\.css|rtg-kaart-stijl/);
 });

@@ -10,6 +10,7 @@
   'use strict';
   function T(k, nl) { try { return w.RTGi18n ? w.RTGi18n.t(k, nl) : nl; } catch (e) { return nl; } }
 
+  var netRail;
   var banner;
   function maakBanner() {
     if (banner) return banner;
@@ -17,14 +18,15 @@
     banner.id = 'rtg-net-banner';
     banner.setAttribute('role', 'status');
     banner.setAttribute('aria-live', 'polite');
-    banner.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:100000;transform:translateY(-100%);' +
+    banner.hidden = true;
+    if (!netVorm(banner, 'ds-net__status')) banner.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:100000;transform:translateY(-100%);' +
       'transition:transform .25s ease;background:#7a1f2b;color:#fff;text-align:center;' +
       'padding:0.5rem 1rem;font:600 0.82rem/1.35 system-ui,-apple-system,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.25);';
-    (document.body || document.documentElement).appendChild(banner);
+    if (!banner.parentNode) (document.body || document.documentElement).appendChild(banner);
     return banner;
   }
-  function toonBanner(tekst) { var b = maakBanner(); b.textContent = tekst; b.style.transform = 'translateY(0)'; }
-  function verbergBanner() { if (banner) banner.style.transform = 'translateY(-100%)'; }
+  function toonBanner(tekst) { var b = maakBanner(); b.textContent = tekst; b.hidden = false; if (!document.documentElement.hasAttribute('data-ds')) b.style.transform = 'translateY(0)'; }
+  function verbergBanner() { if (banner) { if (document.documentElement.hasAttribute('data-ds')) banner.hidden = true; else banner.style.transform = 'translateY(-100%)'; } }
 
   function status() {
     if (navigator.onLine === false) toonBanner(T('net.offline', 'Geen internetverbinding. Zodra je weer online bent gaat het vanzelf verder.'));
@@ -40,15 +42,16 @@
     if (!eigenToast) {
       eigenToast = document.createElement('div');
       eigenToast.setAttribute('role', 'status');
-      eigenToast.style.cssText = 'position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);z-index:100001;' +
+      if (document.documentElement.hasAttribute('data-ds')) eigenToast.className = 'ds-melding';
+      else eigenToast.style.cssText = 'position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);z-index:100001;' +
         'max-width:90vw;background:#222;color:#fff;padding:0.6rem 1rem;border-radius:0;opacity:0;transition:opacity .2s;' +
         'font:500 0.82rem/1.4 system-ui,-apple-system,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
       (document.body || document.documentElement).appendChild(eigenToast);
     }
     eigenToast.textContent = tekst;
-    eigenToast.style.opacity = '1';
+    if (eigenToast.classList.contains('ds-melding')) eigenToast.classList.add('toon'); else eigenToast.style.opacity = '1';
     clearTimeout(eigenToast._t);
-    eigenToast._t = setTimeout(function () { eigenToast.style.opacity = '0'; }, 3200);
+    eigenToast._t = setTimeout(function () { if (eigenToast.classList.contains('ds-melding')) eigenToast.classList.remove('toon'); else eigenToast.style.opacity = '0'; }, 3200);
   }
 
   // Een fetch die bij netwerkfouten een nette melding geeft en de fout doorgeeft,

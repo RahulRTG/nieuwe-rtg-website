@@ -1,11 +1,10 @@
 /* het gesprek in stappen */
   function gesprek(el, opt) {
     if (!el || !opt || !opt.stappen || !opt.stappen.length) return null;
-    stijl();
     var stappen = opt.stappen, antw = {}, i = 0, bezig = false;
 
     el.innerHTML =
-      '<div class="rp">' +
+      '<div class="rp ds-rahulpoort">' +
       '<canvas class="rp-mond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="rp-zin" role="status" aria-live="polite"></div>' +
       '<div class="rp-rij"><select hidden aria-hidden="true"></select>' +

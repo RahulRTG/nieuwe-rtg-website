@@ -1,0 +1,71 @@
+/* Foundation: presentatie van de bestaande gezinssessie en coachkamers.
+   Geen gezinsrechten, sessies of coachtransport in deze laag. */
+@layer rtg.component {
+  .ds-foundation-inhoud { min-inline-size: 0; inline-size: 100%; }
+  .ds-foundation-blok { display: grid; gap: var(--ds-ruimte-4); padding: var(--ds-ruimte-6); min-inline-size: 0; }
+  .ds-foundation-blok > :is(h2,p) { margin: 0; }
+  .ds-foundation-lijst { display: grid; gap: var(--ds-ruimte-3); }
+  .ds-foundation-regel { padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak-zacht); border-radius: var(--ds-radius-inhoud); overflow-wrap: anywhere; }
+  .ds-foundation-regel p { margin-block: var(--ds-ruimte-2) 0; }
+  .ds-foundation-acties { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+  .ds-foundation-afstand { margin-block-start: var(--ds-ruimte-3); }
+  .ds-foundation-chat { max-block-size: 28rem; padding: 0; min-inline-size: 0; }
+  .ds-foundation-chat .ds-gesprek__bericht { overflow-wrap: anywhere; white-space: pre-wrap; }
+  .ds-foundation-vraag { align-items: stretch; flex-wrap: wrap; }
+  .ds-foundation-vraag > .ds-invoer { flex-basis: 14rem; }
+  .ds-foundation-vraag > .ds-invoer:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  .ds-foundation-vraag > .ds-knop { min-inline-size: var(--ds-doel); }
+  @media (max-width: 430px) {
+    .ds-foundation-vraag > .ds-knop[data-hoofdactie] {
+      flex: 1 1 100%;
+      inline-size: 100%;
+      max-inline-size: none;
+    }
+  }
+  .ds-foundation-veiliglink { display: grid; gap: var(--ds-ruimte-2); padding: var(--ds-ruimte-6); text-decoration: none; color: var(--ds-inkt); border-color: var(--ds-accent); min-block-size: var(--ds-doel); }
+  .ds-foundation-categorie { padding: var(--ds-ruimte-4); }
+  .ds-foundation-categorie summary { display: flex; align-items: center; gap: var(--ds-ruimte-3); min-block-size: var(--ds-doel); list-style: none; cursor: pointer; font-weight: 600; }
+  .ds-foundation-categorie summary::-webkit-details-marker { display: none; }
+  .ds-foundation-categorie summary .pijl { margin-inline-start: auto; }
+  .ds-foundation-categorie[open] summary .pijl { transform: rotate(90deg); }
+  .ds-foundation-categorie > .ds-foundation-lijst { margin-block-start: var(--ds-ruimte-4); }
+  .ds-foundation-stemming { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); }
+  .ds-foundation-stemming > button { flex: 1 1 5rem; min-inline-size: var(--ds-doel); white-space: normal; }
+  .ds-foundation-stemming > button[aria-pressed="true"] { border-color: var(--ds-accent); box-shadow: inset 0 0 0 1px var(--ds-accent); }
+  .ds-foundation-reactie { padding: var(--ds-ruimte-4); border-inline-start: 3px solid var(--ds-accent); background: var(--ds-oppervlak-zacht); }
+  .ds-foundation-verloop { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); }
+  .ds-foundation-verloop > span { padding: var(--ds-ruimte-2); border: 1px solid var(--ds-lijnkleur); }
+  .ds-foundation-balk { position: relative; min-inline-size: 0; padding: var(--ds-ruimte-4); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-foundation-sessierij { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+  .ds-foundation-sessierij > .ds-knop { position: relative; min-inline-size: var(--ds-doel); max-inline-size: 100%; }
+  .ds-foundation-merk { margin-inline-end: auto; font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); }
+  .ds-foundation-merk b { font-weight: 400; }
+  .ds-foundation-sessierij .sb-nm { max-inline-size: 12rem; overflow: hidden; text-overflow: ellipsis; }
+  .ds-foundation-avatar { flex: none; display: grid; place-items: center; inline-size: 1.8rem; block-size: 1.8rem; border-radius: var(--ds-radius-cirkel); }
+  .ds-foundation-teller { display: inline-grid; place-items: center; min-inline-size: 1.5em; min-block-size: 1.5em; border-radius: var(--ds-radius-cirkel); background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-foundation-menu, .ds-foundation-berichten { display: grid; gap: var(--ds-ruimte-2); padding: var(--ds-ruimte-4); margin-block-start: var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); background: var(--ds-oppervlak); max-block-size: 60dvh; overflow: auto; }
+  .ds-foundation-berichten .sb-b { padding: var(--ds-ruimte-3); background: var(--ds-oppervlak-zacht); overflow-wrap: anywhere; }
+  .ds-foundation-berichten :is(.sb-bkop,.sb-leeg) { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-foundation-berichten .sb-btxt { white-space: pre-wrap; }
+  .ds-foundation-berichten .sb-reisknop { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); color: var(--ds-accent); }
+  .ds-dialoog.ds-foundation-toegang {
+    --rtg-txt: var(--ds-cover-inkt, white);
+    --rtg-world-ink: var(--ds-cover-inkt, white); --rtf-paper: var(--ds-cover-inkt, white); --text: var(--ds-cover-inkt, white);
+    --card: var(--ds-cover-grond, black); --rtg-card: var(--ds-cover-grond, black); --rtg-world-card: var(--ds-cover-grond, black);
+    visibility: visible; max-block-size: calc(100dvh - var(--ds-ruimte-8)); overflow: auto; background: var(--ds-cover-grond, black); color: var(--ds-cover-inkt, white);
+  }
+  .ds-dialoog.ds-foundation-toegang :is(.ds-label,[role="status"]) { color: var(--ds-cover-inkt, white); }
+  .ds-foundation-slot { display: grid; gap: var(--ds-ruimte-4); }
+  .ds-foundation-slot > :is(h1,p) { margin: 0; }
+  .ds-foundation-laden { inline-size: 100%; accent-color: var(--ds-accent); }
+  /* De bestaande serverdeur sluit ook wanneer native showModal ontbreekt.
+     De DesktopSurface-owner behoudt de deur en maakt de eigen home inert. */
+  /* Een gesloten Foundation-ruimte houdt de universele Edge bereikbaar voor
+     veilige navigatie en uitweg. De beschermde werkruimte blijft inert en
+     onzichtbaar; de Edge verleent zelf geen toegang of domeinbevoegdheid. */
+  .ds-foundation-dicht body > :not(.ds-foundation-toegang):not(.wd-shell):not(.rtg-adaptive-edge):not(.rtg-edge-chrome):not(.ds-edge) { visibility: hidden; pointer-events: none; }
+  .ds-foundation-dicht body > :not(.ds-foundation-toegang):not(.wd-shell):not(.rtg-adaptive-edge):not(.rtg-edge-chrome):not(.ds-edge) * { visibility: hidden; pointer-events: none; }
+  .ds-foundation-dicht .wd-shell > :not(.ds-foundation-toegang) { visibility: hidden; pointer-events: none; }
+  .ds-foundation-dicht .wd-shell > :not(.ds-foundation-toegang) * { visibility: hidden; pointer-events: none; }
+  .ds-foundation-dicht .ds-foundation-toegang { visibility: visible; pointer-events: auto; }
+}

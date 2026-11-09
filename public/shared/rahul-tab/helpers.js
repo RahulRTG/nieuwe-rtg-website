@@ -120,7 +120,37 @@
     if (form && form.parentNode) form.parentNode.insertBefore(k.element, form);
     return k;
   }
-  window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties, noot: noot, bericht: bericht, werk: werk };
+  /* Een nieuwe vraag neemt geen uitvoerbaar voorstel of uitkomst over. Het
+     niet-uitvoerbare werkconcept blijft staan: het is de actieve context van
+     de gebruiker en kent zelf geen pad naar boeken, betalen of indienen. Een
+     nieuw concept vervangt het in werk(); een actorwissel wist het in wis(). */
+  function begin(page, approval) {
+    if (approval) approval.clear();
+    page.querySelector('[data-done]').textContent = 'Geen actuele uitvoeringsbevestiging';
+    page.querySelector('[data-ai-state]').textContent = 'Nog geen actuele route gecontroleerd';
+    if (window.RTGLiveTwin && window.RTGLiveTwin.clear) window.RTGLiveTwin.clear();
+    if (window.RTGKompas) window.RTGKompas.toon(null);
+  }
+  /* De bestaande sessielaag bepaalt de actorwissel; dan verdwijnt ook invoer. */
+  function wis(page) {
+    begin(page);
+    var concept = page.querySelector('.rtg-conceptwerk');
+    if (concept) concept.remove();
+    var veld = page.querySelector('input');
+    if (veld) veld.value = '';
+    page.querySelector('[data-done]').textContent = 'Geen uitvoering in deze sessie';
+  }
+  /* Een laat antwoord mag geen voorstel voor een inmiddels andere selectie
+     worden. De bestaande workspace bezit de contextidentiteit; geen tweede vergelijking. */
+  function actueel(c, voeg) {
+    var twin = window.RTGLiveTwin;
+    if (twin && twin.pastBij && twin.pastBij(c)) return true;
+    if (twin && twin.clear) twin.clear();
+    if (window.RTGKompas) window.RTGKompas.toon(null);
+    voeg('rahul', 'Dit antwoord kon niet aan de huidige selectie worden gekoppeld. Vraag opnieuw om een actueel voorstel.');
+    return false;
+  }
+  window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties, noot: noot, bericht: bericht, werk: werk, wis: wis, begin: begin, actueel: actueel };
   /* Escape sluit het Rahul-paneel, zoals elke andere laag in deze schil
      (GRAMMATICA.md: ik kan bijna altijd terug). Het paneel ligt vast over het
      werkblad; zonder dit was de sluitknop de enige weg terug. Dezelfde knop,

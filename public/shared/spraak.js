@@ -23,6 +23,15 @@
    aanroeper die zijn eigen beeld meegeeft, houdt dat. */
 (function (w) {
   'use strict';
+  const doc = w.document;
+  if (doc && doc.documentElement && typeof doc.documentElement.hasAttribute === 'function' &&
+      !doc.documentElement.hasAttribute('data-ds') && !doc.getElementById('rtgDsRuntimeCss')) {
+    const link = doc.createElement('link');
+    link.id = 'rtgDsRuntimeCss';
+    link.rel = 'stylesheet';
+    link.href = '/ds/rtg-ds.css';
+    doc.head.appendChild(link);
+  }
   const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
 
   /* De twee gezichten van de knop, een keer opgeschreven. Ze stonden drie keer
@@ -30,23 +39,11 @@
   const MIC = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg>';
   const STIP = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="6"/></svg>';
 
-  /* En de knop zelf een ondergrens, om dezelfde reden als de iOS-pil: niet elk
-     scherm dat spraak.js laadt geeft die knop een maat. Op muziek.html stond hij
-     op 0 breed. Alleen min-*, dus een scherm dat hem al opmaakt merkt er niets van. */
-  function maatEenmalig() {
-    if (!w.document || w.document.getElementById('rtg-spraak-maat')) return;
-    var st = w.document.createElement('style');
-    st.id = 'rtg-spraak-maat';
-    st.textContent = '[data-spraakknop]{min-width:24px;min-height:24px;' +
-      'display:inline-flex;align-items:center;justify-content:center;}';
-    (w.document.head || w.document.documentElement).appendChild(st);
-  }
-
   function koppel(knop, opties) {
     if (!knop || !opties || typeof opties.opTekst !== 'function') return;
     if (!SR) { knop.hidden = true; return; }
     knop.setAttribute('data-spraakknop', '');
-    maatEenmalig();
+    knop.classList.add('ds-spraakknop');
     if (!knop.innerHTML.trim()) knop.innerHTML = MIC;
     knop.addEventListener('click', () => {
       try {

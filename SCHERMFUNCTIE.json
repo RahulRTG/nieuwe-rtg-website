@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-29",
-    "commit": "5cd79010f5"
+    "op": "2026-11-06",
+    "commit": "77e9d234d9"
   },
   "bronnen": {
     "schermroutes": {
@@ -2089,7 +2089,7 @@
   "schilScripts": [
     {
       "script": "public/apps/foundation/palet.js",
-      "schermen": 64
+      "schermen": 63
     },
     {
       "script": "public/apps/foundation/premium.js",
@@ -2133,7 +2133,7 @@
     },
     {
       "script": "public/ds/shell.js",
-      "schermen": 30
+      "schermen": 67
     },
     {
       "script": "public/shared/adaptief/grammatica.js",
@@ -2141,6 +2141,10 @@
     },
     {
       "script": "public/shared/i18n.js",
+      "schermen": 10
+    },
+    {
+      "script": "public/shared/interface/world-desktop-copy.js",
       "schermen": 10
     },
     {
@@ -2211,6 +2215,7 @@
   "indexBestanden": [
     "public/apps/app-main.js",
     "public/apps/foundation/sw.js",
+    "public/ds/contract.json",
     "public/shared/handelingindex.json",
     "public/shared/interface/workspace-world-catalog.js",
     "public/shared/interface/world-widget-catalog.json",
@@ -2225,7 +2230,7 @@
     "schermen": 328,
     "aliassen": 20,
     "zonderServer": 52,
-    "zonderInkomend": 1,
+    "zonderInkomend": 3,
     "overlapParen": 23,
     "titelbotsingen": 1,
     "menuOpAlias": 0
@@ -2535,7 +2540,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/agenda/",
         "/api/agenda/ai",
@@ -2547,8 +2554,8 @@
         "/api/meet"
       ],
       "zonderServer": false,
-      "inkomend": 30,
-      "inIndex": 4,
+      "inkomend": 32,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/attenties.html",
         "public/apps/command.js",
@@ -2777,7 +2784,7 @@
         "/api/zorgprofiel"
       ],
       "zonderServer": false,
-      "inkomend": 212,
+      "inkomend": 210,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -2945,13 +2952,15 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "nee",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 2,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoren.html",
         "server/kern/appgids-data/deel7.js"
@@ -2987,13 +2996,12 @@
         "/api/arrival"
       ],
       "zonderServer": false,
-      "inkomend": 5,
-      "inIndex": 7,
+      "inkomend": 4,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23b.js",
         "public/apps/horeca.html",
         "public/apps/reizen.html",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel12.js"
       ]
     },
@@ -3100,7 +3108,7 @@
         "/api/office"
       ],
       "zonderServer": false,
-      "inkomend": 11,
+      "inkomend": 12,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24b.js",
@@ -3112,6 +3120,7 @@
         "public/apps/klankwerk/kantoor.js",
         "public/apps/merken.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appgids-data/deel7.js",
         "server/kern/werkplek-kantoren-bovenbouw.js"
       ]
@@ -3120,7 +3129,7 @@
       "bestand": "public/apps/balans.html",
       "url": "/apps/balans.html",
       "titel": "Balans",
-      "h1": "",
+      "h1": "Balans",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#balans",
       "wereld": [],
@@ -3132,7 +3141,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 6,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/command.js",
         "public/apps/command/command-02.js",
@@ -3146,7 +3155,7 @@
       "bestand": "public/apps/bank.html",
       "url": "/apps/bank.html",
       "titel": "Bank",
-      "h1": "",
+      "h1": "Bank",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#bank",
       "wereld": [],
@@ -3158,7 +3167,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 5,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/command.js",
         "public/apps/command/command-02.js",
@@ -3229,7 +3238,7 @@
       "bestand": "public/apps/berichten.html",
       "url": "/apps/berichten.html",
       "titel": "Berichten",
-      "h1": "",
+      "h1": "Berichten",
       "soort": "alias",
       "aliasNaar": "/apps/comm.html",
       "wereld": [],
@@ -3241,7 +3250,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "server/kern/appgids-data/deel1.js"
@@ -3257,7 +3266,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/bestanden/"
       ],
@@ -3266,8 +3277,8 @@
         "/api/bestanden"
       ],
       "zonderServer": false,
-      "inkomend": 13,
-      "inIndex": 4,
+      "inkomend": 14,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/command.js",
         "public/apps/command/command-02.js",
@@ -3275,12 +3286,12 @@
         "public/apps/werkruimte.html",
         "public/apps/wonen.js",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "public/shared/rtg-heritage-registry.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel6.js",
         "server/kern/kantoorwereld.js",
-        "server/kern/objectlaag/caps.js",
-        "server/kern/werkplek-kantoren-bovenbouw.js"
+        "server/kern/objectlaag/caps.js"
       ]
     },
     {
@@ -3465,11 +3476,10 @@
         "/api/boeken"
       ],
       "zonderServer": false,
-      "inkomend": 5,
-      "inIndex": 2,
+      "inkomend": 4,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/reizen-wereld.js",
-        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel9.js"
@@ -3492,6 +3502,7 @@
       "rollen": [],
       "schrijft": "niet vast te stellen",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/schermcontext.js"
       ],
       "paden": [
@@ -3505,14 +3516,15 @@
         "/api/browser"
       ],
       "zonderServer": false,
-      "inkomend": 8,
-      "inIndex": 7,
+      "inkomend": 9,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/kantoor.html",
         "public/apps/sitemaker.html",
         "public/apps/zaakweb.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "public/shared/rtg-heritage-registry.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel7.js"
@@ -3675,12 +3687,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 5,
-      "inIndex": 2,
+      "inkomend": 4,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/reizen-wereld.js",
         "public/apps/werkvloer.js",
-        "public/ds/contract.json",
         "public/shared/travel-os.js",
         "server/kern/appgids-data/deel12.js"
       ]
@@ -3722,7 +3733,7 @@
         "/api/clips"
       ],
       "zonderServer": false,
-      "inkomend": 11,
+      "inkomend": 12,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -3731,6 +3742,7 @@
         "public/apps/rtg.html",
         "public/shared/rosapps.js",
         "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2-loader/01.js",
         "public/shared/split.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel6.js",
@@ -3742,7 +3754,7 @@
       "bestand": "public/apps/codewoord.html",
       "url": "/apps/codewoord.html",
       "titel": "Codewoord",
-      "h1": "",
+      "h1": "Codewoord",
       "soort": "alias",
       "aliasNaar": "/apps/veilig.html#codewoord",
       "wereld": [],
@@ -3754,7 +3766,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/veilig/codewoord.js",
         "server/kern/appgids-data/deel7b.js"
@@ -3802,21 +3814,21 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 33,
+      "inkomend": 36,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
+        "public/apps/architect-pda.html",
         "public/apps/berichten.html",
         "public/apps/command.js",
         "public/apps/command/command-02.js",
         "public/apps/foundation/zorg.html",
+        "public/apps/hardware-pda.html",
         "public/apps/personeel.html",
         "public/apps/reisboek-momenten.js",
         "public/apps/reisboek.html",
         "public/apps/rit-momenten.js",
-        "public/apps/rit.html",
-        "public/apps/rtg.html",
-        "public/apps/salon.html"
+        "public/apps/rit.html"
       ]
     },
     {
@@ -3838,12 +3850,13 @@
         "/api/command"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 5,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/backoffice.html",
         "public/apps/foundation/kantoor.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appgids-data/deel10.js"
       ]
     },
@@ -4029,7 +4042,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/rtgone/goedkeuring",
         "/api/rtgone/goedkeuring/beslis",
@@ -4041,7 +4056,7 @@
       ],
       "zonderServer": false,
       "inkomend": 11,
-      "inIndex": 7,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/command.js",
@@ -4109,12 +4124,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 4,
-      "inIndex": 2,
+      "inkomend": 3,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/personeel.js",
         "public/apps/personeel/personeel-25.js",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel6b.js"
       ]
     },
@@ -4352,15 +4366,14 @@
         "/api/flits"
       ],
       "zonderServer": false,
-      "inkomend": 11,
-      "inIndex": 8,
+      "inkomend": 10,
+      "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/reizen-veilig.html",
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
-        "public/ds/contract.json",
         "public/shared/rosapps.js",
         "public/shared/split.js",
         "public/shared/travel-os-config.js",
@@ -4558,7 +4571,7 @@
       "inkomendVan": [
         "public/apps/foundation/index.html",
         "public/apps/foundation/registreren.js",
-        "public/apps/foundation/sessie/sessie-00.js",
+        "public/apps/foundation/sessie/sessie-00b.js",
         "public/apps/foundation/sessie/sessie-01.js",
         "public/apps/foundation/sessie/sessie-03.js",
         "server/kern/appgids-data/deel3.js",
@@ -5144,6 +5157,7 @@
       "rollen": [],
       "schrijft": "niet vast te stellen",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -5160,7 +5174,7 @@
       ],
       "zonderServer": false,
       "inkomend": 4,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/foundation/campus.html",
         "public/apps/foundation/index.html",
@@ -5249,6 +5263,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -5259,7 +5274,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 14,
-      "inIndex": 5,
+      "inIndex": 6,
       "inkomendVan": [
         "public/apps/foundation/babyboek.html",
         "public/apps/foundation/gevoel.html",
@@ -5306,7 +5321,7 @@
         "/api/rtf"
       ],
       "zonderServer": false,
-      "inkomend": 82,
+      "inkomend": 83,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-26.js",
@@ -5896,6 +5911,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -5906,7 +5922,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 6,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/foundation/campus.html",
         "public/apps/foundation/index.html",
@@ -6125,6 +6141,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -6135,7 +6152,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/foundation/babyboek.html",
         "public/apps/foundation/index.html",
@@ -6310,7 +6327,7 @@
         "/api/rtfos"
       ],
       "zonderServer": false,
-      "inkomend": 49,
+      "inkomend": 50,
       "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-04.js",
@@ -6514,6 +6531,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -6524,7 +6542,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 5,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/foundation/index.html",
         "public/apps/foundation/veilig-vertrouwd.html",
@@ -7080,6 +7098,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -7090,7 +7109,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 8,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/foundation/babyboek.html",
         "public/apps/foundation/gevoel.html",
@@ -7113,6 +7132,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/samen.js",
@@ -7123,7 +7143,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 6,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/foundation/geld-later.html",
         "public/apps/foundation/index.html",
@@ -7255,14 +7275,12 @@
         "/api/foundation"
       ],
       "zonderServer": false,
-      "inkomend": 7,
+      "inkomend": 5,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/foundation/markt.html",
         "public/apps/foundation/onveilig.html",
         "public/apps/foundation/veilig-vertrouwd.html",
-        "public/shared/deelmenu.js",
-        "public/shared/deelmenu/deelmenu-01.js",
         "server/kern/appgids-data/deel8.js",
         "server/kern/werkplek-kantoren-onderbouw.js"
       ]
@@ -7657,13 +7675,14 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 8,
+      "inkomend": 9,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/leven.html",
         "public/apps/rtg.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "public/shared/rosapps.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel2.js",
@@ -7745,7 +7764,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 1,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "server/kern/appgids-data/deel12.js"
       ]
@@ -7930,7 +7949,7 @@
         "/api/wbw"
       ],
       "zonderServer": false,
-      "inkomend": 41,
+      "inkomend": 42,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-12.js",
@@ -8153,12 +8172,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 4,
-      "inIndex": 2,
+      "inkomend": 3,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/leverancier.js",
         "public/apps/leverancier/leverancier-57.js",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel6b.js"
       ]
     },
@@ -8220,8 +8238,8 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 15,
-      "inIndex": 7,
+      "inkomend": 14,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/mall.html",
@@ -8229,12 +8247,12 @@
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
-        "public/ds/contract.json",
         "public/shared/rosapps.js",
         "public/shared/travel-os-config.js",
         "server/kern/appcatalogus-rijen/deel1.js",
         "server/kern/appgids-data/deel2b.js",
-        "server/kern/bureau/plattegrond.js"
+        "server/kern/bureau/plattegrond.js",
+        "server/kern/mall/aanbodzaken.js"
       ]
     },
     {
@@ -8247,13 +8265,15 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "nee",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 3,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoren.html",
         "server/kern/appgids-data/deel8.js",
@@ -8313,6 +8333,7 @@
       "rollen": [],
       "schrijft": "onbekend",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [
@@ -8328,7 +8349,7 @@
       ],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "server/kern/appgids-data/deel10.js"
@@ -8345,6 +8366,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [],
@@ -8355,7 +8377,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/kantoor.html",
@@ -8374,6 +8396,7 @@
       "rollen": [],
       "schrijft": "onbekend",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [
@@ -8388,7 +8411,7 @@
       ],
       "zonderServer": false,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/kantoor.html",
@@ -8407,6 +8430,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [],
@@ -8417,7 +8441,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/kantoor.html",
@@ -8436,6 +8460,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [],
@@ -8446,7 +8471,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/kantoor.html",
@@ -8465,6 +8490,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [],
@@ -8475,7 +8501,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/kantoor.html",
@@ -8494,6 +8520,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [],
@@ -8504,7 +8531,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/kantoor.html",
@@ -8523,6 +8550,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [],
@@ -8533,7 +8561,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/kantoor.html",
@@ -8584,6 +8612,7 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
+        "public/ds/shell.js",
         "public/apps/horeca/kern.js"
       ],
       "paden": [],
@@ -8594,7 +8623,7 @@
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 3,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/horeca.html",
         "public/apps/horeca/pda-wijk.js",
@@ -8678,8 +8707,8 @@
         "/api/verblijf"
       ],
       "zonderServer": false,
-      "inkomend": 18,
-      "inIndex": 4,
+      "inkomend": 17,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/leven.js",
         "public/apps/mall.html",
@@ -8689,10 +8718,10 @@
         "public/apps/reizen.html",
         "public/apps/rit-momenten.js",
         "public/apps/rit.html",
-        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appcatalogus-rijen/deel1.js",
-        "server/kern/appgids-data/deel1.js"
+        "server/kern/appgids-data/deel1.js",
+        "server/kern/appgids-data/deel1c.js"
       ]
     },
     {
@@ -8722,21 +8751,21 @@
         "/api/rahul"
       ],
       "zonderServer": false,
-      "inkomend": 25,
+      "inkomend": 35,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
+        "public/apps/architect-pda.html",
         "public/apps/arrival.html",
         "public/apps/boeken.html",
         "public/apps/flits.html",
         "public/apps/hangar.html",
+        "public/apps/hardware-pda.html",
         "public/apps/hotels.html",
-        "public/apps/living-world.html",
-        "public/apps/move.html",
-        "public/apps/navigatie.html",
-        "public/apps/ov.html",
-        "public/apps/reisbureau.html",
-        "public/apps/reizen-veilig.html"
+        "public/apps/juridisch.html",
+        "public/apps/juridisch/partnervoorwaarden.html",
+        "public/apps/juridisch/privacy.html",
+        "public/apps/juridisch/voorwaarden.html"
       ]
     },
     {
@@ -8795,14 +8824,14 @@
       "rollen": [],
       "schrijft": "nee",
       "schil": [
-        "public/apps/foundation/palet.js"
+        "public/ds/shell.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 13,
-      "inIndex": 4,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/command.js",
@@ -8830,7 +8859,9 @@
         "openbaar"
       ],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/betaaldiensttarief",
         "/api/pasprijzen"
@@ -8842,7 +8873,7 @@
       ],
       "zonderServer": false,
       "inkomend": 5,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/juridisch.html",
         "public/apps/juridisch/privacy.html",
@@ -8861,13 +8892,15 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "nee",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 13,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/app-main/app-main-04.js",
         "public/apps/app.html",
@@ -8895,7 +8928,9 @@
         "openbaar"
       ],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/pasprijzen"
       ],
@@ -8905,7 +8940,7 @@
       ],
       "zonderServer": false,
       "inkomend": 7,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/app.html",
         "public/apps/juridisch.html",
@@ -8937,7 +8972,7 @@
         "/api/kantoor"
       ],
       "zonderServer": false,
-      "inkomend": 72,
+      "inkomend": 74,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2.js",
@@ -8958,7 +8993,7 @@
       "bestand": "public/apps/kantoorpda.html",
       "url": "/apps/kantoorpda.html",
       "titel": "De Kantoor-PDA zit nu in de personeels-app",
-      "h1": "",
+      "h1": "De Kantoor-PDA is verhuisd",
       "soort": "alias",
       "aliasNaar": "/apps/personeel.html?kantoor=1",
       "wereld": [],
@@ -8970,7 +9005,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 1,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "server/kern/appgids-data/deel3.js"
       ]
@@ -9006,7 +9041,7 @@
         "/api/webauthn"
       ],
       "zonderServer": false,
-      "inkomend": 16,
+      "inkomend": 17,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/backoffice.html",
@@ -9020,7 +9055,7 @@
         "public/apps/personeel/personeel-05.js",
         "public/apps/websitestudio.html",
         "public/shared/randen.js",
-        "server/kern/appgids-data/deel7.js"
+        "public/shared/randen/01-laden.js"
       ]
     },
     {
@@ -9238,7 +9273,7 @@
       "bestand": "public/apps/labfonds.html",
       "url": "/apps/labfonds.html",
       "titel": "Lab-fonds",
-      "h1": "",
+      "h1": "Lab-fonds",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#labfonds",
       "wereld": [],
@@ -9250,7 +9285,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/geld/labfonds.js",
         "public/apps/geld/labfondsb.js",
@@ -9407,7 +9442,7 @@
         "/api/uitgaan"
       ],
       "zonderServer": false,
-      "inkomend": 7,
+      "inkomend": 8,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -9416,6 +9451,7 @@
         "public/apps/life.html",
         "public/apps/rtg.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appgids-data/deel11.js"
       ]
     },
@@ -9429,7 +9465,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/mall/aanvraag/",
         "/api/supplier/mall",
@@ -9444,7 +9482,7 @@
       ],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "server/kern/appgids-data/deel2b.js",
@@ -9524,7 +9562,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/supplier/service/bericht",
         "/api/supplier/service/bevestig",
@@ -9543,7 +9583,7 @@
       ],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/site/werelden/travelos.html",
@@ -9613,7 +9653,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/library/agreement/accept",
         "/api/library/agreement/propose",
@@ -9646,7 +9688,7 @@
       ],
       "zonderServer": false,
       "inkomend": 4,
-      "inIndex": 7,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/foundation/os-publiek.html",
@@ -9891,12 +9933,12 @@
       ],
       "zonderServer": false,
       "inkomend": 6,
-      "inIndex": 3,
+      "inIndex": 4,
       "inkomendVan": [
         "public/apps/reizen.html",
         "public/apps/saloon/opbouw.js",
-        "public/ds/contract.json",
         "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2-loader/01.js",
         "server/kern/appgids-data/deel12b.js",
         "server/kern/living-world/model.js"
       ]
@@ -9934,7 +9976,7 @@
       "bestand": "public/apps/logboek.html",
       "url": "/apps/logboek.html",
       "titel": "Logboek",
-      "h1": "",
+      "h1": "Logboek",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#logboek",
       "wereld": [],
@@ -9946,7 +9988,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 8,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/command.js",
         "public/apps/command/command-02.js",
@@ -10110,11 +10152,10 @@
         "/api/lucht"
       ],
       "zonderServer": false,
-      "inkomend": 5,
-      "inIndex": 2,
+      "inkomend": 4,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/marechaussee.html",
-        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "public/shared/travel-os.js",
         "server/kern/appgids-data/deel3.js"
@@ -10205,13 +10246,14 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 9,
+      "inkomend": 10,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/kantoor.html",
         "public/apps/magnaat-kantoor.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/appgids-data/deel1c.js",
         "server/kern/magnaat-dekkingsmatrix.js",
@@ -10252,13 +10294,14 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 8,
+      "inkomend": 9,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/leven.html",
         "public/apps/rtg.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "public/shared/rosapps.js",
         "server/kern/appcatalogus-rijen/deel1.js",
         "server/kern/appgids-data/deel2b.js",
@@ -10413,12 +10456,11 @@
         "/api/kmar"
       ],
       "zonderServer": false,
-      "inkomend": 4,
-      "inIndex": 2,
+      "inkomend": 3,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/apps/luchthaven.html",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel3.js"
       ]
     },
@@ -10426,7 +10468,7 @@
       "bestand": "public/apps/mecenaat.html",
       "url": "/apps/mecenaat.html",
       "titel": "Mecenaat",
-      "h1": "",
+      "h1": "Mecenaat",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#mecenaat",
       "wereld": [],
@@ -10438,7 +10480,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/geld/mecenaat.js",
         "server/kern/appgids-data/deel2b.js",
@@ -10683,7 +10725,7 @@
       "bestand": "public/apps/metier.html",
       "url": "/apps/metier.html",
       "titel": "Métier",
-      "h1": "",
+      "h1": "Métier",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#metier",
       "wereld": [],
@@ -10695,7 +10737,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/geld/metier.js",
         "server/kern/appgids-data/deel1.js"
@@ -10735,7 +10777,7 @@
         "public/shared/rtg-adaptive-edge-visual.js",
         "public/shared/rtg-edge-preferences.js",
         "public/shared/rtg-edge-smart-menu.js",
-        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-02.js",
         "public/shared/rtg-editorial-v4.js",
         "public/shared/rtg-editorial-v4/rtg-editorial-v4-02.js",
         "server/kern/appgids-data/deel12b.js"
@@ -11005,15 +11047,16 @@
         "/api/move"
       ],
       "zonderServer": false,
-      "inkomend": 7,
-      "inIndex": 7,
+      "inkomend": 8,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/reizen-veilig-reis.js",
         "public/apps/reizen-veilig.js",
+        "public/apps/reizen-veilig/00.js",
         "public/apps/reizen.html",
-        "public/ds/contract.json",
         "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2-loader/01.js",
         "server/kern/appgids-data/deel6b.js"
       ]
     },
@@ -11077,7 +11120,7 @@
       "bestand": "public/apps/nalatenschap.html",
       "url": "/apps/nalatenschap.html",
       "titel": "Nalatenschap",
-      "h1": "",
+      "h1": "Nalatenschap",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#nalatenschap",
       "wereld": [],
@@ -11089,7 +11132,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/geld/nalatenschap.js",
         "server/kern/appgids-data/deel2b.js",
@@ -11133,7 +11176,7 @@
       ],
       "zonderServer": false,
       "inkomend": 20,
-      "inIndex": 8,
+      "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/hotels-momenten.js",
@@ -11141,12 +11184,12 @@
         "public/apps/reizen-veilig-reis.js",
         "public/apps/reizen-veilig.html",
         "public/apps/reizen-veilig.js",
+        "public/apps/reizen-veilig/00.js",
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rit-momenten.js",
         "public/apps/rit.html",
-        "public/apps/rtg.html",
-        "public/apps/sport.html"
+        "public/apps/rtg.html"
       ]
     },
     {
@@ -11199,7 +11242,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/notities/"
       ],
@@ -11208,14 +11253,15 @@
         "/api/notities"
       ],
       "zonderServer": false,
-      "inkomend": 9,
-      "inIndex": 2,
+      "inkomend": 10,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/command.js",
         "public/apps/command/command-02.js",
         "public/apps/kantoor.html",
         "public/apps/werkruimte.html",
         "public/shared/interface/world-desktop-frame.js",
+        "public/shared/interface/world-desktop-frame/01.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel6.js",
         "server/kern/kantoorwereld.js",
@@ -11255,11 +11301,12 @@
         "/api/werkplek"
       ],
       "zonderServer": false,
-      "inkomend": 23,
+      "inkomend": 25,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/bestanden/app.js",
+        "public/apps/bestanden/app/01-overzicht.js",
         "public/apps/command.js",
         "public/apps/command/command-02.js",
         "public/apps/foundation/index.html",
@@ -11268,8 +11315,7 @@
         "public/apps/kantoor.html",
         "public/apps/kantoren.html",
         "public/apps/leverancier.js",
-        "public/apps/leverancier/leverancier-57.js",
-        "public/apps/personeel-office.js"
+        "public/apps/leverancier/leverancier-57.js"
       ]
     },
     {
@@ -11282,7 +11328,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/bestanden/map",
         "/api/bestanden/mijn",
@@ -11299,7 +11347,7 @@
       ],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/wonen.html",
         "public/apps/woningdossier.html",
@@ -11346,7 +11394,7 @@
         "/api/onderneming"
       ],
       "zonderServer": false,
-      "inkomend": 7,
+      "inkomend": 8,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -11354,6 +11402,7 @@
         "public/apps/kantoor.html",
         "public/apps/saloon/acties.js",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appgids-data/deel7.js",
         "server/kern/werkplek-kantoren-bovenbouw.js"
       ]
@@ -11459,16 +11508,16 @@
       ],
       "zonderServer": false,
       "inkomend": 18,
-      "inIndex": 8,
+      "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/reizen-veilig.html",
         "public/apps/reizen-veilig.js",
+        "public/apps/reizen-veilig/00.js",
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
         "public/apps/werkvloer.js",
-        "public/ds/contract.json",
         "public/shared/rosapps.js",
         "public/shared/split.js",
         "public/shared/travel-os-config.js",
@@ -11503,11 +11552,10 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 7,
-      "inIndex": 2,
+      "inkomend": 6,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/ovdienst.html",
-        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "public/shared/travel-os.js",
         "server/kern/appgids-data/deel1b.js",
@@ -11546,14 +11594,13 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 7,
-      "inIndex": 2,
+      "inkomend": 6,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/ovcontrol.html",
         "public/apps/ovroutes.html",
         "public/apps/personeel.js",
         "public/apps/personeel/personeel-25.js",
-        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appgids-data/deel6b.js"
       ]
@@ -11705,13 +11752,12 @@
         "/api/staff"
       ],
       "zonderServer": false,
-      "inkomend": 6,
-      "inIndex": 7,
+      "inkomend": 5,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23b.js",
         "public/apps/ovdienst.html",
         "public/apps/reizen.html",
-        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appgids-data/deel6b.js"
       ]
@@ -11761,7 +11807,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/supplier/mall/aanvraag/reageer",
         "/api/supplier/netwerk/overzicht"
@@ -11772,7 +11820,7 @@
       ],
       "zonderServer": false,
       "inkomend": 5,
-      "inIndex": 7,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/kantoor.html",
@@ -11986,7 +12034,7 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 52,
+      "inkomend": 53,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24b.js",
@@ -12108,7 +12156,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/rtgone/project/bewijs",
         "/api/rtgone/project/oplever",
@@ -12121,7 +12171,7 @@
       ],
       "zonderServer": false,
       "inkomend": 9,
-      "inIndex": 7,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/command.js",
@@ -12150,7 +12200,9 @@
       ],
       "rollen": [],
       "schrijft": "niet vast te stellen",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/member/pulse/",
         "/api/member/wauw/"
@@ -12161,7 +12213,7 @@
       ],
       "zonderServer": false,
       "inkomend": 12,
-      "inIndex": 7,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/rtg.html",
@@ -12350,7 +12402,7 @@
       ],
       "zonderServer": false,
       "inkomend": 17,
-      "inIndex": 8,
+      "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/lifestyle.html",
@@ -12360,10 +12412,10 @@
         "public/apps/reizen.html",
         "public/apps/rtg.html",
         "public/apps/sociaal.html",
-        "public/ds/contract.json",
         "public/shared/interface/world-presentation.js",
         "public/shared/rosapps.js",
-        "public/shared/rtg-edge-2-loader.js"
+        "public/shared/rtg-edge-2-loader.js",
+        "public/shared/rtg-edge-2-loader/01.js"
       ]
     },
     {
@@ -12397,17 +12449,17 @@
       ],
       "zonderServer": false,
       "inkomend": 24,
-      "inIndex": 5,
+      "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-42.js",
         "public/apps/mall.html",
         "public/apps/media.html",
         "public/apps/reizen-veilig-reis.js",
         "public/apps/reizen-veilig.js",
+        "public/apps/reizen-veilig/00.js",
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/sociaal.html",
-        "public/ds/contract.json",
         "public/shared/command/console.js",
         "public/shared/experience-intent.js",
         "public/shared/interface/modules/travel-actions.js"
@@ -12440,11 +12492,10 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 7,
-      "inIndex": 2,
+      "inkomend": 6,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/reizen.html",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel1.js",
         "server/kern/reisuitnodiging-gebruik.js",
         "server/kern/reisuitnodiging.js",
@@ -12487,15 +12538,14 @@
         "/api/veiligheid"
       ],
       "zonderServer": false,
-      "inkomend": 8,
-      "inIndex": 8,
+      "inkomend": 7,
+      "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/mijn-neigingen.html",
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
-        "public/ds/contract.json",
         "public/site/werelden/travelos.html",
         "server/kern/appgids-data/deel12.js"
       ]
@@ -12565,8 +12615,8 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 83,
-      "inIndex": 7,
+      "inkomend": 85,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2b.js",
         "public/apps/appstore-dossier.html",
@@ -12708,15 +12758,14 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 11,
-      "inIndex": 8,
+      "inkomend": 10,
+      "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/reizen-veilig.html",
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
-        "public/ds/contract.json",
         "public/shared/rosapps.js",
         "public/shared/rtg-heritage-registry.js",
         "public/shared/split.js",
@@ -12810,15 +12859,14 @@
         "/api/verblijf"
       ],
       "zonderServer": false,
-      "inkomend": 10,
-      "inIndex": 4,
+      "inkomend": 9,
+      "inIndex": 5,
       "inkomendVan": [
         "public/apps/hotels-momenten.js",
         "public/apps/hotels.html",
         "public/apps/kantoor.html",
         "public/apps/reizen-performance-taxi.js",
         "public/apps/vluchten.html",
-        "public/ds/contract.json",
         "public/shared/travel-os-config.js",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/wereld/koppel.js",
@@ -12848,12 +12896,11 @@
         "/api/office"
       ],
       "zonderServer": false,
-      "inkomend": 5,
-      "inIndex": 2,
+      "inkomend": 4,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
         "public/apps/routedossier.html",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel7.js",
         "server/kern/werkplek-kantoren-onderbouw.js"
       ]
@@ -12887,14 +12934,13 @@
         "/api/office"
       ],
       "zonderServer": false,
-      "inkomend": 7,
-      "inIndex": 7,
+      "inkomend": 6,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23b.js",
         "public/apps/platformregister.html",
         "public/apps/reizen.html",
         "public/apps/routedekking.html",
-        "public/ds/contract.json",
         "public/shared/rtg-heritage-registry.js",
         "server/kern/appgids-data/deel7.js"
       ]
@@ -12919,8 +12965,6 @@
       "paden": [
         "/api/agenda/mijn-lijst",
         "/api/auth/me",
-        "/api/fluister",
-        "/api/fluister/profiel",
         "/api/gids/app",
         "/api/member/huis/dossier",
         "/api/member/huis/map",
@@ -12944,7 +12988,6 @@
       "domeinen": [
         "/api/agenda",
         "/api/auth",
-        "/api/fluister",
         "/api/gids",
         "/api/member",
         "/api/samen",
@@ -12953,7 +12996,7 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 56,
+      "inkomend": 57,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -12974,7 +13017,7 @@
       "bestand": "public/apps/rtgcode.html",
       "url": "/apps/rtgcode.html",
       "titel": "RTG-code",
-      "h1": "",
+      "h1": "RTG-code",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#rtgcode",
       "wereld": [],
@@ -12986,7 +13029,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/geld/rtgcode.js",
         "public/apps/geld/rtgcodeb.js",
@@ -13106,7 +13149,7 @@
         "/api/rtgone"
       ],
       "zonderServer": false,
-      "inkomend": 10,
+      "inkomend": 11,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -13116,6 +13159,7 @@
         "public/apps/project-room.html",
         "public/apps/rtmail-voorzijde-werk.js",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/appgids-data/deel1c.js",
         "server/kern/werkplek-kantoren-onderbouw.js"
@@ -13166,13 +13210,14 @@
         "/api/onderwijs"
       ],
       "zonderServer": false,
-      "inkomend": 11,
+      "inkomend": 12,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/kantoor.html",
         "public/apps/living-world/render.js",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "public/shared/rosapps.js",
         "server/kern/appgids-data/deel6b.js",
         "server/kern/bureau/plattegrond.js",
@@ -13209,7 +13254,7 @@
         "/api/rtgone"
       ],
       "zonderServer": false,
-      "inkomend": 12,
+      "inkomend": 13,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -13220,10 +13265,10 @@
         "public/apps/project-room-uitvoering.js",
         "public/apps/project-room.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appgids-data/deel1.js",
         "server/kern/berichten/index.js",
-        "server/kern/werkplek-kantoren-bovenbouw.js",
-        "server/routes/member/berichten.js"
+        "server/kern/werkplek-kantoren-bovenbouw.js"
       ]
     },
     {
@@ -13505,14 +13550,13 @@
         "/api/site"
       ],
       "zonderServer": false,
-      "inkomend": 7,
+      "inkomend": 6,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/kantoor.html",
-        "public/shared/ios.js",
-        "public/shared/ios/ios-02b.js",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel7.js"
       ]
@@ -13846,15 +13890,14 @@
         "/api/stream"
       ],
       "zonderServer": false,
-      "inkomend": 10,
-      "inIndex": 7,
+      "inkomend": 9,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/reizen-veilig.html",
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
-        "public/ds/contract.json",
         "public/shared/rosapps.js",
         "public/shared/travel-os-config.js",
         "server/kern/appcatalogus-rijen/deel1.js",
@@ -13905,13 +13948,15 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "nee",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoren.html",
         "public/shared/bureaupda.js",
@@ -13951,7 +13996,7 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 9,
+      "inkomend": 10,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -13959,6 +14004,7 @@
         "public/apps/rtg.html",
         "public/apps/wereld.html",
         "public/shared/randen.js",
+        "public/shared/randen/01-laden.js",
         "public/shared/rosapps.js",
         "server/kern/appcatalogus-rijen/deel1.js",
         "server/kern/appgids-data/deel2b.js",
@@ -14154,7 +14200,7 @@
       "bestand": "public/apps/thuisrust.html",
       "url": "/apps/thuisrust.html",
       "titel": "Thuisrust",
-      "h1": "",
+      "h1": "Thuisrust",
       "soort": "alias",
       "aliasNaar": "/apps/veilig.html#rust",
       "wereld": [],
@@ -14166,7 +14212,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/veilig/rust.js",
         "server/kern/appgids-data/deel7b.js"
@@ -14176,7 +14222,7 @@
       "bestand": "public/apps/thuiswacht.html",
       "url": "/apps/thuiswacht.html",
       "titel": "Thuiswacht",
-      "h1": "",
+      "h1": "Thuiswacht",
       "soort": "alias",
       "aliasNaar": "/apps/veilig.html#wacht",
       "wereld": [],
@@ -14188,7 +14234,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/veilig/wacht.js",
         "server/kern/appgids-data/deel7b.js"
@@ -14226,7 +14272,7 @@
       "bestand": "public/apps/toestemming.html",
       "url": "/apps/toestemming.html",
       "titel": "Toestemming",
-      "h1": "",
+      "h1": "Toestemming",
       "soort": "alias",
       "aliasNaar": "/apps/mijn-relaties.html#soort",
       "wereld": [],
@@ -14238,7 +14284,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 5,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/apps/bewijsmap.html",
         "public/apps/mijn-relaties.html",
@@ -14335,7 +14381,7 @@
       "bestand": "public/apps/vandaag.html",
       "url": "/apps/vandaag.html",
       "titel": "Vandaag",
-      "h1": "",
+      "h1": "Vandaag",
       "soort": "alias",
       "aliasNaar": "/apps/life.html",
       "wereld": [],
@@ -14347,7 +14393,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/shared/command/console.js",
         "server/kern/appgids-data/deel12.js"
@@ -14392,7 +14438,7 @@
         "/api/veiligheid"
       ],
       "zonderServer": false,
-      "inkomend": 21,
+      "inkomend": 23,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -14402,11 +14448,11 @@
         "public/apps/foundation/veilig-vertrouwd.html",
         "public/apps/ik.html",
         "public/apps/reizen-veilig.js",
+        "public/apps/reizen-veilig/00.js",
         "public/apps/rtg.html",
         "public/apps/thuisrust.html",
         "public/apps/thuiswacht.html",
-        "public/apps/vitaal.html",
-        "public/apps/werkruimte.html"
+        "public/apps/vitaal.html"
       ]
     },
     {
@@ -14513,7 +14559,7 @@
       "bestand": "public/apps/vitaal.html",
       "url": "/apps/vitaal.html",
       "titel": "Vitaal",
-      "h1": "",
+      "h1": "Vitaal",
       "soort": "alias",
       "aliasNaar": "/apps/veilig.html#vitaal",
       "wereld": [],
@@ -14525,7 +14571,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 2,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/veilig/vitaal.js",
         "server/kern/appgids-data/deel7b.js"
@@ -14564,8 +14610,8 @@
         "/api/member"
       ],
       "zonderServer": false,
-      "inkomend": 18,
-      "inIndex": 8,
+      "inkomend": 17,
+      "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/hotels.html",
@@ -14577,8 +14623,8 @@
         "public/apps/reizen.html",
         "public/apps/rit.html",
         "public/apps/rtg.html",
-        "public/ds/contract.json",
-        "public/shared/rosapps.js"
+        "public/shared/rosapps.js",
+        "public/shared/travel-os-config.js"
       ]
     },
     {
@@ -14633,11 +14679,10 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 4,
-      "inIndex": 2,
+      "inkomend": 3,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/wereld/koppel.js"
       ]
@@ -14700,7 +14745,7 @@
       "bestand": "public/apps/wallet.html",
       "url": "/apps/wallet.html",
       "titel": "Wallet",
-      "h1": "",
+      "h1": "Wallet",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#wallet",
       "wereld": [],
@@ -14712,7 +14757,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 5,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/app-main/app-main-42.js",
         "public/apps/app.html",
@@ -14725,7 +14770,7 @@
       "bestand": "public/apps/wbw.html",
       "url": "/apps/wbw.html",
       "titel": "Wie betaalt wat",
-      "h1": "",
+      "h1": "Wie betaalt wat",
       "soort": "alias",
       "aliasNaar": "/apps/geld.html#wbw",
       "wereld": [],
@@ -14737,7 +14782,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "public/apps/geld/wbw.js",
         "public/apps/geld/wbwb.js",
@@ -14874,21 +14919,21 @@
         "/api/werk-leverancier"
       ],
       "zonderServer": false,
-      "inkomend": 19,
+      "inkomend": 23,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/apps/app-main/app-main-24b.js",
         "public/apps/app-main/app-main-25.js",
+        "public/apps/architect-pda.html",
         "public/apps/foundation/geld-later.html",
         "public/apps/foundation/index.html",
         "public/apps/geld.html",
+        "public/apps/hardware-pda.html",
         "public/apps/kantoor.html",
         "public/apps/kosten.html",
-        "public/apps/zaakkosten.html",
-        "public/images/start/app-schermen/HERKOMST.json",
-        "public/shared/interface/modules/work.js",
-        "public/shared/rtg-edge-2-loader.js"
+        "public/apps/studio-pda.html",
+        "public/apps/zaakkosten.html"
       ]
     },
     {
@@ -14938,11 +14983,14 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 7,
+      "inkomend": 10,
       "inIndex": 4,
       "inkomendVan": [
+        "public/apps/architect-pda.html",
+        "public/apps/hardware-pda.html",
         "public/apps/kantoor.html",
         "public/apps/kantoren.html",
+        "public/apps/studio-pda.html",
         "public/shared/interface/world-presentation.js",
         "public/shared/rtg-world-identity.js",
         "public/shared/workos-premium.js",
@@ -14966,7 +15014,9 @@
       ],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/bestanden/map",
         "/api/bestanden/mijn",
@@ -14983,7 +15033,7 @@
       ],
       "zonderServer": false,
       "inkomend": 6,
-      "inIndex": 6,
+      "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/home.html",
@@ -15003,7 +15053,9 @@
       "wereld": [],
       "rollen": [],
       "schrijft": "onbekend",
-      "schil": [],
+      "schil": [
+        "public/ds/shell.js"
+      ],
       "paden": [
         "/api/bestanden/map",
         "/api/bestanden/mijn",
@@ -15020,7 +15072,7 @@
       ],
       "zonderServer": false,
       "inkomend": 3,
-      "inIndex": 2,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/onderhoud.html",
         "public/apps/wonen.html",
@@ -15172,12 +15224,11 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 9,
-      "inIndex": 2,
+      "inkomend": 8,
+      "inIndex": 3,
       "inkomendVan": [
         "public/apps/personeel.js",
         "public/apps/personeel/personeel-25.js",
-        "public/ds/contract.json",
         "server/kern/appgids-data/deel10.js",
         "server/kern/bureau/plattegrond.js",
         "server/kern/lidmaatschap.js",
@@ -15190,7 +15241,7 @@
       "bestand": "public/apps/zorgbalie.html",
       "url": "/apps/zorgbalie.html",
       "titel": "De Zorgbalie zit nu in de personeels-app",
-      "h1": "",
+      "h1": "De Zorgbalie is verhuisd",
       "soort": "alias",
       "aliasNaar": "/apps/personeel.html",
       "wereld": [],
@@ -15202,7 +15253,7 @@
       "domeinen": [],
       "zonderServer": false,
       "inkomend": 1,
-      "inIndex": 1,
+      "inIndex": 2,
       "inkomendVan": [
         "server/kern/appgids-data/deel3.js"
       ]
@@ -15222,11 +15273,9 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 1,
-      "inIndex": 0,
-      "inkomendVan": [
-        "public/ds/contract.json"
-      ]
+      "inkomend": 0,
+      "inIndex": 1,
+      "inkomendVan": []
     },
     {
       "bestand": "public/site/404.html",
@@ -15243,12 +15292,9 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 2,
+      "inkomend": 0,
       "inIndex": 0,
-      "inkomendVan": [
-        "public/shared/cookie.js",
-        "public/shared/cookie/cookie-01.js"
-      ]
+      "inkomendVan": []
     },
     {
       "bestand": "public/site/passen/business-lite.html",
@@ -15277,6 +15323,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15320,6 +15367,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15363,6 +15411,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15406,6 +15455,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15449,6 +15499,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15491,6 +15542,7 @@
         "public/site/storyline-stage.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15529,6 +15581,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15571,6 +15624,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15613,6 +15667,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],
@@ -15655,6 +15710,7 @@
         "public/site/storyline-world.js",
         "public/site/platform-data.js",
         "public/site/platform-elements.js",
+        "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
         "public/site/storyline-edge.js"
       ],

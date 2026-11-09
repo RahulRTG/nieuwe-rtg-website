@@ -1,75 +1,50 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Juridisch</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#F4EFE7">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<script src="/apps/foundation/palet.js"></script>
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--acc:var(--dag-kleur,#C23A5E);}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
-  .wrap{max-width:720px;margin:0 auto;padding:1.4rem 1.1rem 4rem;}
-  .terug{display:inline-block;margin-bottom:1rem;color:var(--acc);text-decoration:none;font-size:.85rem;}
-  .intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
-  .intro p{color:var(--soft);font-size:.9rem;margin:.3rem 0 1.4rem;max-width:54ch;}
-  .docs{display:flex;flex-direction:column;gap:.8rem;}
-  .doc{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.2rem;text-decoration:none;color:inherit;transition:border-color .15s;}
-  .doc:hover,.doc:focus-visible{border-color:var(--acc);outline:none;}
-  .doc .ic{font-size:1.5rem;flex:none;}
-  .doc .t{flex:1;min-width:0;}
-  .doc .t b{font-weight:600;font-size:1rem;}
-  .doc .t small{display:block;color:var(--soft);font-size:.82rem;margin-top:.1rem;}
-  .doc .pijl{color:var(--soft);flex:none;}
-  .vt{margin-top:2rem;font-size:.78rem;color:var(--soft);line-height:1.6;}
-</style>
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
-<main class="wrap" id="hoofd">
-  <a class="terug" href="/apps/app.html">← naar de app</a>
-  <div class="intro">
-    <h1>Juridisch</h1>
+<body class="ds-scherm" data-rtg-world="living" data-ds-schermtype="collectie" data-ds-nadruk="gereedschap">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/app.html">RTG</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
+</header>
+<main class="wrap ds-taak" id="hoofd">
+  <a class="terug ds-knop ds-knop--stil" href="/apps/app.html">← naar de app</a>
+  <div class="intro ds-paneel">
+    <h1 class="ds-titel">Juridisch</h1>
     <p>Alle voorwaarden en het privacybeleid van Rahul Travel Group op één plek. Helder, kort en zonder kleine lettertjes-trucs.</p>
   </div>
-  <nav class="docs" aria-label="Juridische documenten">
-    <a class="doc" href="/apps/juridisch/voorwaarden.html">
-      <span class="ic" aria-hidden="true"></span>
-      <span class="t"><b>Algemene voorwaarden</b><small>De afspraken voor het gebruik van RTG en de passen.</small></span>
+  <nav class="docs ds-lijst" aria-label="Juridische documenten">
+    <a class="doc ds-lijst__rij" href="/apps/juridisch/voorwaarden.html">
+      <svg class="ic ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h8l4 4v14H6Z M14 3v5h4 M9 12h6 M9 16h6"/></svg>
+      <span class="t"><b class="ds-lijst__titel">Algemene voorwaarden</b><small class="ds-lijst__tekst">De afspraken voor het gebruik van RTG en de passen.</small></span>
       <span class="pijl" aria-hidden="true">→</span>
     </a>
-    <a class="doc" href="/apps/juridisch/privacy.html">
-      <span class="ic" aria-hidden="true"></span>
-      <span class="t"><b>Privacybeleid</b><small>Wat we bewaren, waarom, en jouw rechten (inzage, download, verwijderen).</small></span>
+    <a class="doc ds-lijst__rij" href="/apps/juridisch/privacy.html">
+      <svg class="ic ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h8l4 4v14H6Z M14 3v5h4 M9 12h6 M9 16h6"/></svg>
+      <span class="t"><b class="ds-lijst__titel">Privacybeleid</b><small class="ds-lijst__tekst">Wat we bewaren, waarom, en jouw rechten (inzage, download, verwijderen).</small></span>
       <span class="pijl" aria-hidden="true">→</span>
     </a>
-    <a class="doc" href="/apps/juridisch/partnervoorwaarden.html">
-      <span class="ic" aria-hidden="true"></span>
-      <span class="t"><b>Partnervoorwaarden</b><small>De afspraken voor partnerbedrijven, met 0% commissie en verwerkersafspraken.</small></span>
+    <a class="doc ds-lijst__rij" href="/apps/juridisch/partnervoorwaarden.html">
+      <svg class="ic ds-lijst__icoon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h8l4 4v14H6Z M14 3v5h4 M9 12h6 M9 16h6"/></svg>
+      <span class="t"><b class="ds-lijst__titel">Partnervoorwaarden</b><small class="ds-lijst__tekst">De afspraken voor partnerbedrijven, met 0% commissie en verwerkersafspraken.</small></span>
       <span class="pijl" aria-hidden="true">→</span>
     </a>
   </nav>
-  <p class="vt">© Rahul Travel Group · KvK 82273510 · btw NL002291440B89</p>
+  <p class="vt ds-meta">© Rahul Travel Group · KvK 82273510 · btw NL002291440B89</p>
 </main>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 </body>
 </html>

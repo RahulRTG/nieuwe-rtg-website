@@ -14,6 +14,19 @@
   var MODI = {};
   var edge = null, balk = null, blad = null, modusNaam = null, vorige = [], terugFocus = null;
 
+  /* Eén gereedsignaal voor de DS-presentatie. Tijdens de migratie wachten nog
+     consumenten op het bestaande rtgDesktopState-contract. Dat attribuut zegt
+     hier uitsluitend dat de ene DS-Edge bedienbaar is; er wordt geen oude
+     World Desktop-shell of tweede controller opgebouwd. */
+  function gereed() {
+    if (!d.body) return;
+    d.body.dataset.dsReady = 'true';
+    /* Het scriptlabel voor de oude World Desktop-runtime kan tijdens de
+       migratie nog in een DS-document staan. Die runtime slaat DS-schermen
+       bewust over; de ene DS-Edge levert daarom zelf het gereedsignaal. */
+    d.body.dataset.rtgDesktopState = 'ready';
+  }
+
   function knop(naam, label, icoon, extra) {
     var b = el('button', 'ds-edge__knop' + (extra ? ' ' + extra : ''), { type: 'button', 'data-ds-edge': naam });
     b.innerHTML = icoon + '<span></span>';
@@ -71,6 +84,8 @@
       var x = r.href ? el('a', 'ds-edge__regel', { href: r.href }) : el('button', 'ds-edge__regel', { type: 'button' });
       x.innerHTML = (r.icoon ? svg(r.icoon) : '') + '<span></span>';
       x.querySelector('span').textContent = r.label;
+      x.setAttribute('aria-label', r.label);
+      if (r.id) x.setAttribute('data-ds-action-id', r.id);
       if (r.doe) x.addEventListener('click', function () { sluitBlad(); r.doe(); });
       li.appendChild(x);
       ul.appendChild(li);
@@ -90,13 +105,16 @@
   function maak() {
     if (edge) return;
     /* shell.js zet .ds-ingebed al in <head> (de kop verdwijnt dan zonder flits,
-       kop.css); hier volgt het attribuut waar de werkruimte op wacht. */
+       kop.css); hier volgt het attribuut waar de werkruimte op wacht. De kop
+       blijft in de DOM: de ouderwerkruimte presenteert haar expliciet
+       gedeclareerde acties via dezelfde Edge. Verwijderen maakte die acties
+       onbereikbaar en brak bovendien hun bestaande listeners. */
     if (d.documentElement.classList.contains('ds-ingebed') || ingebed()) {
       d.documentElement.setAttribute('data-ds-ingebed', '1');
-      Array.prototype.forEach.call(d.querySelectorAll('.ds-kop'), function (k) { k.remove(); });
+      gereed();
       return;
     }
-    if (d.body.hasAttribute('data-ds-geen-edge')) return;
+    if (d.body.hasAttribute('data-ds-geen-edge')) { gereed(); return; }
     edge = el('div', 'ds-edge');
     blad = el('section', 'ds-edge__blad', { id: 'dsEdgeBlad', role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'dsEdgeBladTitel' });
     blad.hidden = true;
@@ -104,6 +122,7 @@
     edge.appendChild(blad);
     edge.appendChild(balk);
     d.body.appendChild(edge);
+    d.documentElement.classList.add('ds-edge-aan');
     d.addEventListener('keydown', function (ev) {
       if (ev.key !== 'Escape') return;
       if (!blad.hidden) sluitBlad();
@@ -119,6 +138,7 @@
     balk.setAttribute('data-ds-modus', naam);
     modusNaam = naam;
     MODI[naam](opties);
+    gereed();
   }
 
   var api = {

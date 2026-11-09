@@ -1,5 +1,6 @@
 /* Constitutionele tests voor Connection OS. Zij komen boven op de bestaande
-   58 producttests en vervangen er geen. */
+   producttests en vervangen er geen. De exacte baseline groeit mee wanneer een
+   nieuwe, gerichte productregressie aantoonbaar is toegevoegd. */
 'use strict';
 
 const test = require('node:test');
@@ -12,11 +13,11 @@ const projections = require('../server/kern/connection-projection');
 
 const goed = { pass: 'lifestyle', verified: true, adult: true };
 
-test('de eerste 58 producttests blijven de baseline', () => {
+test('de 59 producttests blijven de baseline', () => {
   const tel = naam => fs.readFileSync(path.join(__dirname, naam), 'utf8')
     .split(/\r?\n/).filter(r => /^test\(/.test(r)).length;
   assert.equal(tel('vonk.test.js'), 26);
-  assert.equal(tel('rendezvous.test.js'), 32);
+  assert.equal(tel('rendezvous.test.js'), 33);
 });
 
 test('default deny: onbekende en niet-gebouwde capabilities blijven dicht', () => {

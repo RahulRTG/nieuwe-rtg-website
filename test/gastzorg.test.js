@@ -8,6 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 let srv, base;
 let lid, bar, hotel;
@@ -26,7 +27,7 @@ const managerVan = async (code) => {
     body: JSON.stringify({ code, staffId: m.id, pin: '1234' })
   })).json()).token;
 };
-const dagPlus = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const dagPlus = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -75,8 +76,9 @@ test('elke leverancier heeft de optie: het profiel reist ook mee met rit, reserv
   assert.equal(res1.body.reservering.zorg.dieet, 'vegetarisch');
   // het ticket: de deur ziet het bij de check-in en op de gastenlijst
   await api('supplier/activiteit', { name: 'Proeverij', prijs: 10, capaciteit: 20, tijden: '21:00' }, bar);
-  const actId = ((await api('supplier/programma', {}, bar)).body.slots.find(x => x.naam === 'Proeverij') || {}).activiteitId;
-  const tk = await api('ticket/koop', { supplierCode: 'PONTO', activiteitId: actId, datum: new Date().toISOString().slice(0, 10), tijd: '21:00', personen: 2 }, lid);
+  const programma = (await api('supplier/programma', {}, bar)).body;
+  const actId = (programma.slots.find(x => x.naam === 'Proeverij') || {}).activiteitId;
+  const tk = await api('ticket/koop', { supplierCode: 'PONTO', activiteitId: actId, datum: programma.datum, tijd: '21:00', personen: 2 }, lid);
   assert.equal(tk.status, 200);
   assert.deepEqual(tk.body.ticket.zorg.allergenen, ['noten', 'schaaldieren']);
   assert.equal((await api('booking/pay', { ref: tk.body.ticket.ref }, lid)).status, 200);

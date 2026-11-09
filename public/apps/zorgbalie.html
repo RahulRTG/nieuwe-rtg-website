@@ -1,7 +1,6 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
-<script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>De Zorgbalie zit nu in de personeels-app</title>
@@ -13,31 +12,14 @@
      document dat halverwege verdwijnt. Dit script stuurt al tijdens het lezen
      door; de meta-refresh blijft voor een browser zonder JavaScript. -->
 <script>location.replace('/apps/personeel.html');</script>
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  body{background:#0C0C0B;color:#F4F1EC;font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100dvh;margin:0;text-align:center;padding:1.5rem;}
-  a{color:#A98F1C;}
-</style>
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
-<script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
-<main>
-  <p>De Zorgbalie is verhuisd: alle PDA's zitten nu in één personeels-app.<br>
-  <a href="/apps/personeel.html">Ga door naar de personeels-app</a> en log in bij uw spa of kliniek; de tab Zorgbalie staat klaar.</p>
+<body class="ds-scherm" data-ds-schermtype="status" data-ds-nadruk="gereedschap">
+<main class="ds-status" id="hoofd">
+  <h1 class="ds-status__titel">De Zorgbalie is verhuisd</h1>
+  <p class="ds-status__tekst">Alle PDA's zitten nu in één personeels-app. Log in bij uw spa of kliniek; de tab Zorgbalie staat klaar.</p>
+  <a class="ds-knop ds-knop--primair ds-status__actie" href="/apps/personeel.html">Ga door naar de personeels-app</a>
 </main>
-<script src="/shared/schermbeeld.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 </body>
 </html>

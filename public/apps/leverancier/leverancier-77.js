@@ -126,5 +126,3 @@
      handtekening garant dat het paspoort is gezien; de partner leert enkel het
      bewezen feit (18+, lid, welke pas), nooit de naam. De controle wordt ook op
      de server gelogd als officiele ID-check. */
-  function zcStijlEenmalig(){
-    if (document.getElementById('rtg-zc-stijl')) return;

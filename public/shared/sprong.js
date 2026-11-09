@@ -26,6 +26,7 @@
    cel van een derde-app (APPSTORE.md) valt er niets te springen. */
 (function (w, d) {
   'use strict';
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   if (w.RTGSprong) return;
 
   var INDEX = '/shared/sprongindex.json';
@@ -50,48 +51,18 @@
     if (w.top !== w.self) return true;
     return /\/apps\/appcel\.html/.test(location.pathname);
   }
-
   /* --- deel 2: de vorm (stijl) --- */
-  var css = '.rtgsprong-greep{position:fixed;z-index:9970;right:14px;bottom:calc(76px + env(safe-area-inset-bottom,0px));' +
-      'width:52px;height:52px;display:grid;place-items:center;border:1px solid #857007;border-radius:0;' +
-      'background:#0C0C0B;color:#FFFFFF;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.45);}' +
-    '[data-hand="links"] .rtgsprong-greep{right:auto;left:14px;}' +
-    /* OP EEN BUREAU WISSELT HIJ VAN KANT, en dat is geen smaak. Daar staat de
-       console van Rahul rechtsonder met zijn maatgreep in precies dezelfde hoek
-       (shared/handenvrij-bureau.js: .hv-chat right:1rem, .hv-maat in de hoek
-       daarvan). Onze greep lag eroverheen en at de sleep op -- test/werkblad.e2e.js
-       zag de console niet meer breder worden.
-
-       ADAPTIEF.md zegt waar hij dan wel hoort: de duimzijde is van Rahul, de
-       ANKERZIJDE is van de navigatie. Op een telefoon is er geen bureauconsole
-       en blijft hij bij de duim. De spiegeling voor een linkshandige gaat mee. */
-    '@media (min-width:1000px){.rtgsprong-greep{right:auto;left:14px;}' +
-    '[data-hand="links"] .rtgsprong-greep{left:auto;right:14px;}}' +
-    '.rtgsprong-greep:focus-visible{outline:2px solid #857007;outline-offset:2px;}' +
-    '.rtgsprong{position:fixed;inset:0;z-index:9971;display:flex;flex-direction:column;background:#0C0C0B;' +
-      'font-family:Inter,system-ui,sans-serif;color:#FFFFFF;}' +
-    '.rtgsprong[hidden]{display:none;}' +
-    '.rtgsprong-kop{display:flex;gap:10px;align-items:center;padding:calc(14px + env(safe-area-inset-top,0px)) 14px 12px;' +
-      'border-bottom:1px solid #4D4A45;}' +
-    '.rtgsprong-kop input{flex:1;min-height:48px;background:#000;color:#FFFFFF;border:1px solid #4D4A45;border-radius:0;' +
-      'padding:0 12px;font:400 1rem Inter,system-ui,sans-serif;}' +
-    '.rtgsprong-kop button{min-width:48px;min-height:48px;background:none;border:1px solid #4D4A45;border-radius:0;' +
-      'color:#FFFFFF;font:600 .85rem Inter,system-ui,sans-serif;cursor:pointer;}' +
-    '.rtgsprong-lijst{flex:1;overflow:auto;padding:0 0 calc(24px + env(safe-area-inset-bottom,0px));}' +
-    '.rtgsprong-wereld{margin:0;padding:16px 14px 6px;font:600 .62rem Inter,system-ui,sans-serif;letter-spacing:.18em;' +
-      'text-transform:uppercase;color:#857007;}' +
-    '.rtgsprong-rij{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:48px;' +
-      'padding:12px 14px;background:none;border:0;border-bottom:1px solid #2A2724;border-radius:0;color:#FFFFFF;' +
-      'font:400 .95rem Inter,system-ui,sans-serif;text-align:left;cursor:pointer;}' +
-    '.rtgsprong-rij:hover,.rtgsprong-rij:focus-visible{background:#191817;outline:none;}' +
-    '.rtgsprong-rij em{font-style:normal;color:#8A8680;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;}' +
-    '.rtgsprong-leeg{padding:22px 14px;color:#8A8680;}';
-
+  function laadSprongPresentatie(pad) {
+    if (dsBijStart || document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var s = document.createElement('link');
+    s.id = 'rtgDsRuntimeCss'; s.rel = 'stylesheet'; s.href = pad;
+    document.head.appendChild(s);
+  }
   function stijl() {
-    var s = d.createElement('style');
-    s.textContent = css;
-    /* De stempelaar van de voordeur zet de nonce erop (middleware/csp.js). */
-    d.head.appendChild(s);
+    /* Alle hosts gebruiken dezelfde component; alleen oudere documenten laden
+       de centrale DS-root nog dynamisch. */
+    laadSprongPresentatie('/ds/rtg-ds.css');
   }
 
   /* De zoeklade van de leden-app, als die op deze pagina staat. */
@@ -112,8 +83,15 @@
   function ga(rij) {
     sluit();
     if (rij.url) {
-      if (w.RTGCommand && w.RTGCommand.actief && w.RTGCommand.actief()) w.RTGCommand.open(rij.url, rij.naam);
-      else location.href = rij.url;
+      /* Beide indexen worden gegenereerd, maar het netwerkantwoord blijft
+         onbetrouwbare invoer. Sprong voert uitsluitend een interne app-route
+         uit; een gewijzigd indexbestand kan geen javascript:- of extern adres
+         starten. De vaste prefix houdt ook de statische laadgraaf bewijsbaar. */
+      var veilig = typeof rij.url === 'string' &&
+        /^\/apps\/(?!\.{1,2}(?:\/|[?#]|$))(?!.*\/\.{1,2}(?:\/|[?#]|$))[A-Za-z0-9_.\/-]+(?:[?#][^\s]*)?$/.test(rij.url) ? rij.url : null;
+      if (!veilig) return;
+      if (w.RTGCommand && w.RTGCommand.actief && w.RTGCommand.actief()) w.RTGCommand.open(veilig, rij.naam);
+      else location.href = '/apps/' + veilig.slice('/apps/'.length);
       return;
     }
     /* Een tab of os-app woont IN de leden-app. Staat die om ons heen, dan
@@ -124,17 +102,9 @@
     if (rij.soort === 'tab' && knop) { knop.click(); return; }
     location.href = '/apps/app.html#' + (rij.soort === 'tab' ? 'tab=' : 'os=') + encodeURIComponent(rij.sleutel);
   }
-
   /* --- deel 3: de lijst en wat een tik doet --- */
-  /* WAT KAN IK HIER DOEN. Dezelfde lijst die het app-menu toont
-     (RTGAppMenu.functies), en met opzet geen eigen lijst: die zou binnen een
-     week iets anders zeggen dan het menu drie centimeter verderop. Staat het
-     menu niet op deze pagina, dan is er geen kopje Hier -- en niet een leeg
-     kopje, want een kopje zonder inhoud belooft iets.
-
-     Een handeling die de pagina niet AANBIEDT komt hier dus ook niet in. Dat is
-     de grens die GRAMMATICA.md al trekt: de software stelt voor, hij verzint
-     niet. */
+  /* Alleen echte handelingen uit de bestaande appmenu-owner: geen eigen lijst
+     of leeg kopje dat mogelijkheden belooft die de pagina niet aanbiedt. */
   function handelingen() {
     if (!w.RTGAppMenu || typeof w.RTGAppMenu.functies !== 'function') return [];
     var uit = [];
@@ -231,22 +201,17 @@
   }
 
   function bouw() {
-    luik = d.createElement('div');
-    luik.className = 'rtgsprong'; luik.hidden = true;
+    luik = d.createElement('dialog');
+    luik.className = 'rtgsprong ds-sprong ds-dialoog'; luik.hidden = true;
     luik.setAttribute('role', 'dialog'); luik.setAttribute('aria-modal', 'true');
     luik.setAttribute('aria-label', 'Spring naar een functie');
+    luik.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
     var kop = d.createElement('div'); kop.className = 'rtgsprong-kop';
     veld = d.createElement('input');
     veld.type = 'search'; veld.placeholder = 'Waar wilt u heen?';
     veld.setAttribute('aria-label', 'Zoek een functie');
     veld.addEventListener('input', function () { teken(veld.value); });
-    /* PIJLTJES EN ENTER, want op een bureau is dit een toetsenbordding. De
-       eerste rij staat al klaar: wie typt en meteen Enter drukt, opent de beste
-       treffer zonder de muis aan te raken -- dat is de hele reden dat zo'n lade
-       op een computer sneller voelt dan een menu.
-
-       Op een telefoon verandert er niets: daar is er geen toetsenbordfocus om
-       te verplaatsen en blijft tikken tikken. */
+    /* Enter opent de beste treffer; pijlen bewegen tussen veld en resultaten. */
     veld.addEventListener('keydown', function (e) {
       var rijen = lijst.querySelectorAll('.rtgsprong-rij');
       if (!rijen.length) return;
@@ -291,20 +256,26 @@
   function open() {
     var lade = ledenlade();
     if (lade) { lade.classList.add('open'); var i = d.getElementById('osZoekInput'); if (i) i.focus(); return; }
-    if (!luik) bouw();
+    if (!luik || !luik.isConnected) bouw();
+    if (!luik.hidden) { veld.focus(); return; }
     laadElders();
     terugNaar = d.activeElement;
     luik.hidden = false;
-    haal().then(function () { teken(veld.value); veld.focus(); });
+    if (luik.tagName === 'DIALOG') luik.showModal();
+    var eigenLuik = luik;
+    haal().then(function () {
+      if (luik !== eigenLuik || !luik.isConnected || luik.hidden) return;
+      teken(veld.value); veld.focus();
+    });
   }
   function sluit() {
-    if (luik) luik.hidden = true;
-    if (terugNaar && terugNaar.focus) terugNaar.focus();
+    if (luik) { luik.hidden = true; if (luik.tagName === 'DIALOG' && luik.open) luik.close(); }
+    if (terugNaar && terugNaar.isConnected && terugNaar.focus) terugNaar.focus();
   }
 
   function greepje() {
     greep = d.createElement('button');
-    greep.type = 'button'; greep.className = 'rtgsprong-greep';
+    greep.type = 'button'; greep.className = 'rtgsprong-greep ds-sprong-greep';
     greep.setAttribute('aria-label', 'Spring naar een functie');
     greep.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" ' +
       'stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5 21 21"/></svg>';

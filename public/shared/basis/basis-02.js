@@ -13,17 +13,6 @@
     (document.head || document.documentElement).appendChild(km);
   }
 
-  /* ---- 7. de OS-klok is nu zelf een rustige analoge wijzerplaat (shared/klok.js):
-     gevulde uur-/minuut-/secondewijzers met een subtiel gouden bevel en een
-     zachte diepte -- strak en netjes. Het uitbundige opengewerkte 3D-skelet
-     (shared/klok3d.js) is daarom niet meer standaard over elke ring gelegd; dat
-     leeft in shared/horlogewerk.js, op het inlogscherm. ---- */
-
-  /* ---- 8. de 3D-tegellaag (shared/tegel3d.js) is weg. Die liet een KPI-tegel
-     met de MUIS meekantelen -- een bureaubladtruc die op een telefoon niets
-     doet en die het OS als iOS ook niet hoort te hebben. Een tegel is plat en
-     reageert op een vinger, niet op een cursor die er overheen zweeft. ---- */
-
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {
     var t = (v.type || 'text').toLowerCase();
@@ -36,46 +25,22 @@
     var velden = (root.querySelectorAll ? root.querySelectorAll('input:not([maxlength]),textarea:not([maxlength])') : []);
     for (var i = 0; i < velden.length; i++) zetGrens(velden[i]);
   }
-  /* ---- SPRING NAAR DE INHOUD ----
-
-     Gemeten: 1 van de 258 schermen had een route naar de inhoud, en die ENE
-     werkte niet (zie hieronder). Wie met een toetsenbord of schermlezer werkt,
-     tabt dus op elk scherm eerst door de hele navigatie voordat de inhoud
-     begint -- bij elke paginawissel opnieuw. Gemeten wat dat kost tot in de
-     main: 15 tabs op wereld.html, 11 op salon.html, 4 op mall.html.
-
-     Dat is geen fout die een scan vindt: alles IS bereikbaar. Het is een fout
-     die pas opvalt als je het zelf een dag doet.
-
-     Hier en niet in 258 bestanden, want dit blad is het vangnet dat elke pagina
-     draagt. Let op: basis.js is GEGENEREERD uit deze map (scripts/bundel.js), dus
-     een wijziging hoort hier en niet in de bundel -- die wordt door de volgende
-     build overschreven. Dat is precies hoe deze functie een keer verloren ging.
-
-     Het doel krijgt tabindex=-1, anders verplaatst de browser de focus niet echt
-     naar een element dat zelf niet focusbaar is: de pagina springt dan wel, maar
-     de volgende Tab begint weer bovenaan. Dat is het verschil tussen een link
-     die lijkt te werken en een link die werkt. */
+  /* Eén springlink per scherm. tabindex=-1 verplaatst ook werkelijk de focus,
+     zodat de volgende Tab bij de inhoud begint. De bundeldelen zijn de bron. */
   function springNaarInhoud() {
-    if (document.querySelector('.rtg-spring')) return;          // al gezet
-    /* WIJKEN VOOR EEN EIGEN SPRINGLINK, MAAR ALLEEN ALS DIE WERKT.
-       app.html en backoffice.html hebben hun eigen <a class="skip" href="#content">,
-       en die is daar gemeten als eerste focusbare element -- dus krijgen ze er
-       geen tweede bij. Dat een eerste Tab daar op een knop landt komt doordat die
-       inlogschermen zelf focus op een veld zetten; de link is dan al voorbij.
-       De test hieronder kijkt daarom naar de tabVOLGORDE en niet naar waar de
-       focus toevallig staat. Alleen wat de browser echt focust telt: rects
-       alleen is niet genoeg (visibility:hidden heeft rects), tabindex<0 valt
-       buiten de volgorde. */
+    function koppelSpring(anker, doel) {
+      if (!anker || !doel || !doel.id) return false;
+      anker.setAttribute('href', '#' + doel.id);
+      return true;
+    }
+    var actueleDs = document.documentElement.hasAttribute('data-ds');
+    var bestaandeSpring = document.querySelector('.rtg-spring');
+    /* Een werkende route-eigen springlink blijft eigenaar. */
     var eigen = document.querySelector('a.skip, a.skiplink, a[href^="#"][class*="skip"]');
     if (eigen) {
       var eersteFocus = null;
       var kand = document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
       for (var i = 0; i < kand.length; i++) {
-        /* "Zal de browser hier naartoe tabben" is meer dan rects hebben: een
-           element op visibility:hidden heeft wel rects en krijgt geen focus, en
-           tabindex<0 valt buiten de volgorde. Twee eerdere versies keken alleen
-           naar rects en weken daardoor voor de kapotte a.skip op app.html. */
         var e = kand[i];
         if (!e.getClientRects().length) continue;
         var cs = window.getComputedStyle(e);
@@ -90,21 +55,27 @@
     if (!doel.id) doel.id = 'rtg-inhoud';
     if (!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex', '-1');
 
-    var a = document.createElement('a');
-    a.className = 'rtg-spring';
-    a.href = '#' + doel.id;
-    a.textContent = 'Naar de inhoud';
-    a.addEventListener('click', function () {
-      try { doel.focus({ preventScroll: false }); } catch (e) { doel.focus(); }
-    });
-
-    var st = document.createElement('style');
-    st.textContent = '.rtg-spring{position:fixed;left:-9999px;top:0;z-index:99999;' +
-      'background:#0C0C0B;color:#fff;padding:.6rem 1rem;font:600 .82rem Inter,system-ui,sans-serif;' +
-      'border:1px solid #857007;text-decoration:none}' +
-      '.rtg-spring:focus{left:.5rem;top:.5rem}';
-    document.head.appendChild(st);
-    document.body.insertBefore(a, document.body.firstChild);
+    var basisSpringLink = bestaandeSpring || document.createElement('a');
+    /* De centrale basiscomponent bezit de presentatie op beide soorten host.
+       Legacy-schermen laden dit component al via basis-01; een tweede
+       springlinkstijl in world-desktop maakte de laadgraaf weer dubbel. */
+    var springKlasse = 'rtg-spring ds-basis__spring';
+    if (basisSpringLink.className !== springKlasse) basisSpringLink.className = springKlasse;
+    koppelSpring(basisSpringLink, doel);
+    if (basisSpringLink.textContent !== 'Naar de inhoud') basisSpringLink.textContent = 'Naar de inhoud';
+    if (basisSpringLink.hasAttribute('hidden')) basisSpringLink.removeAttribute('hidden');
+    if (basisSpringLink.hasAttribute('inert')) basisSpringLink.removeAttribute('inert');
+    if (basisSpringLink.hasAttribute('aria-hidden')) basisSpringLink.removeAttribute('aria-hidden');
+    if (!basisSpringLink.dataset.rtgSpringGebonden) {
+      basisSpringLink.dataset.rtgSpringGebonden = '1';
+      basisSpringLink.addEventListener('click', function () {
+        var id = (basisSpringLink.getAttribute('href') || '').slice(1);
+        var actueelDoel = id && document.getElementById(id);
+        if (!actueelDoel) return;
+        try { actueelDoel.focus({ preventScroll: false }); } catch (e) { actueelDoel.focus(); }
+      });
+    }
+    if (document.body.firstChild !== basisSpringLink) document.body.insertBefore(basisSpringLink, document.body.firstChild);
   }
 
   function start() {
@@ -121,6 +92,7 @@
           var n = muts[i].addedNodes[j];
           if (n && n.nodeType === 1) { begrens(n); meldingenIn(n); }
         }
+        springNaarInhoud();
         /* Een venster gaat open door `hidden` of een klasse, niet door een nieuw
            element -- daarom ook op attributen letten, gebundeld in een frame.
 
@@ -144,22 +116,38 @@
        Op apps/spelen.html laadden ze allebei, uitleg.js eerst, en dan won deze
        en was .knop() weg. Geen foutmelding: shared/osmenu.js kijkt keurig of
        .knop bestaat, ziet van niet, en laat het knopje gewoon weg. */
-    var sheet = null;
-    function sluit() { if (sheet) { sheet.remove(); sheet = null; } }
+    var sheet = null, gidsFocus = null;
+    function sluit() {
+      if (!sheet) return;
+      if (ds && sheet.open) sheet.close();
+      sheet.remove(); sheet = null;
+      if (gidsFocus && gidsFocus.isConnected) gidsFocus.focus({ preventScroll: true });
+      gidsFocus = null;
+    }
     function openGids() {
-      if (sheet) return;
-      sheet = document.createElement('section');
-      sheet.className = 'bss-sheet'; sheet.setAttribute('aria-label', 'Uitleg over deze app');
+      if (sheet && sheet.isConnected) return;
+      gidsFocus = document.activeElement;
+      sheet = document.createElement(ds ? 'dialog' : 'section');
+      sheet.className = 'bss-sheet' + (ds ? ' ds-basis__gids ds-dialoog' : '');
+      sheet.setAttribute('aria-label', 'Uitleg over deze app');
       sheet.innerHTML = '<div class="bss-kop"><span></span><button class="bss-x" type="button" aria-label="Sluiten">✕</button></div>' +
         '<div class="bss-wat">Even ophalen…</div>';
       sheet.querySelector('.bss-kop span').textContent = document.title || 'Deze app';
       document.body.appendChild(sheet);
       sheet.querySelector('.bss-x').addEventListener('click', sluit);
+      if (ds) {
+        sheet.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
+        sheet.showModal();
+      }
+      sheet.querySelector('.bss-x').focus();
       var gs = gidsSessie(); // de sessie van dit scherm: ./basis-01ae-sessie.js
+      var eigenSheet = sheet;
+      function actueel() { return sheet === eigenSheet && eigenSheet.isConnected && JSON.stringify(gidsSessie()) === JSON.stringify(gs); }
       fetch('/api/gids/app', { method: 'POST', headers: gs.kop, body: JSON.stringify({ pad: location.pathname, code: gs.code, token: gs.token }) })
-        .then(function (r) { return r.json(); })
+        .then(function (r) { if (!r.ok) throw new Error('uitleg niet beschikbaar'); return r.json(); })
         .then(function (d) {
-          if (!sheet || !d || !d.gids) return;
+          if (!actueel()) return;
+          if (!d || d.error || !d.gids) throw new Error('uitleg ontbreekt');
           var g = d.gids, wat = sheet.querySelector('.bss-wat');
           wat.textContent = g.wat;
           var ul = document.createElement('ul'); ul.className = 'bss-doe';
@@ -168,7 +156,7 @@
           var tip = document.createElement('div'); tip.className = 'bss-tip'; tip.textContent = '' + g.tip;
           sheet.appendChild(tip);
         })
-        .catch(function () { if (sheet) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; probeer het straks opnieuw.'; });
+        .catch(function () { if (actueel()) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; sluit dit venster en probeer opnieuw.'; });
       hulplaag();
     }
 

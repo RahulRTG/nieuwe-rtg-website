@@ -26,6 +26,7 @@
    cel van een derde-app (APPSTORE.md) valt er niets te springen. */
 (function (w, d) {
   'use strict';
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   if (w.RTGSprong) return;
 
   var INDEX = '/shared/sprongindex.json';
@@ -50,4 +51,3 @@
     if (w.top !== w.self) return true;
     return /\/apps\/appcel\.html/.test(location.pathname);
   }
-

@@ -14,7 +14,7 @@
     }[o.world] || [];
     o.apps.sort(function (a, b) { var ai = priority.indexOf(a.id), bi = priority.indexOf(b.id);
       return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi) || a.name.localeCompare(b.name); });
-    var saving = Promise.resolve(), status = o.world === 'foundation' ? 'familySession' : 'session', enabled = false, ready = false;
+    var saving = Promise.resolve(), mutation = null, status = o.world === 'foundation' ? 'familySession' : 'session', enabled = false, ready = false;
     var top = U.el('div', 'wd-library-heading'), heading = U.copy(U.el('h2'), 'library');
     var label = U.el('label', 'wd-search-label'), input = U.el('input', 'wd-search');
     label.appendChild(U.copy(U.el('span'), 'search'));
@@ -50,7 +50,10 @@
       title.appendChild(translated(app.name, app.id + '.name')); title.appendChild(U.el('span', 'wd-expand', '↗')); open.appendChild(title);
       box.appendChild(open);
       if (!compact) {
-        var picture = U.el('div', 'wd-app-photo'), img = U.el('img');
+        /* Een beeld blijft een native beeldbron. Gebruik hier bewust niet de
+           generieke elementfabriek: zo kan de laadgraaf bewijzen dat de
+           berekende bron geen script- of stijlbron kan worden. */
+        var picture = U.el('div', 'wd-app-photo'), img = document.createElement('img');
         img.src = '/images/' + ({agenda:'daily/agenda.webp',bestanden:'daily/bestanden.webp',notities:'daily/notities.webp',reisboek:'daily/notities.webp',wereld:'editorial/living-dining.webp',navigatie:'world-homes/living-coast.webp',werkruimte:'world-homes/work.webp'}[app.id] || 'world-homes/' + o.world + '.webp');
         img.alt = ''; img.loading = 'lazy'; picture.appendChild(img); box.prepend(picture); box.classList.add('wd-app-shortcut');
       }
@@ -85,7 +88,11 @@
     function draw() { drawFavorites(); drawLibrary(); }
     function save() {
       if (!enabled || !ready) return; var order = selected.slice(), version = changed;
-      saving = saving.catch(function () {}).then(function () { return o.runtime.execute('desktop.layout.save', { order: order }); })
+      // Een nieuwe keuze is een nieuwe opdracht; herproberen houdt dezelfde sleutel.
+      try { if (!mutation || mutation.version !== version) mutation = { version: version, idem: w.RTGIdem('desktop-layout') }; }
+      catch (e) { status = 'saveError'; drawFavorites(); return; }
+      var idem = mutation.idem;
+      saving = saving.catch(function () {}).then(function () { return o.runtime.execute('desktop.layout.save', { order: order, idem: idem }); })
         .then(function () { if (version === changed) { status = 'saved'; drawFavorites(); } })
         .catch(function () { if (version === changed) { status = 'saveError'; drawFavorites(); } });
     }

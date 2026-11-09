@@ -33,8 +33,8 @@ const required = [
   ...['boot-smoke', 'grens-sweep', 'keuring', 'klok', 'meterijk', 'zaakdoos'].map(n => ({ artifact: 'routejournaal-ijking-' + n,
     job: 'De ijking - ' + n, step: 'De ijking draaien (een bestand, alleen op deze machine)',
     upload: 'Het routejournaal van deze ijking bewaren', member: 'routejournaal.log' })),
-  ...[1, 2, 3, 4].map(n => ({ artifact: 'schermjournaal-deel-' + n,
-    job: 'Schermtoetsen deel ' + n + ' van 4', step: 'Scherm-tests (PDA in de browser)',
+  ...[1, 2, 3, 4, 5].map(n => ({ artifact: 'schermjournaal-deel-' + n,
+    job: 'Schermtoetsen deel ' + n + ' van 5', step: 'Scherm-tests (PDA in de browser)',
     upload: 'Schermjournaal van dit deel bewaren', member: '.schermjournaal', nonempty: true }))
 ];
 try {

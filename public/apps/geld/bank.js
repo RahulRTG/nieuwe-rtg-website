@@ -22,34 +22,6 @@
   /* De vormen die geld.html niet kent en die dit paneel onleesbaar maken als
      ze ontbreken: de rekeningregel, de afschriftregel met bronlabel en het
      staafje van de inzichten. Een keer injecteren, met id-wacht. */
-  B.stijl = function () {
-    if (d.getElementById('bkStijl')) return;
-    var s = d.createElement('style');
-    s.id = 'bkStijl';
-    s.textContent =
-      '#paneel .bk-rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;}' +
-      '#paneel .bk-rij select,#paneel .bk-rij input{width:auto;}' +
-      '#paneel .bk-mini{font-size:.75rem;padding:.32rem .6rem;}' +
-      '#paneel .bk-rek{display:flex;justify-content:space-between;align-items:center;gap:.6rem;' +
-        'padding:.7rem 0;border-bottom:1px solid var(--rtg-line);flex-wrap:wrap;}' +
-      '#paneel .bk-rek:last-child{border-bottom:0;}' +
-      '#paneel .bk-sald{font-size:1.25rem;color:var(--gold-tekst);font-variant-numeric:var(--rtg-cijfers);}' +
-      '#paneel .bk-iban{font-size:.72rem;color:var(--rtg-soft);letter-spacing:.04em;}' +
-      '#paneel .bk-soort{font-size:.7rem;color:var(--rtg-soft);text-transform:uppercase;letter-spacing:.08em;}' +
-      '#paneel .bk-hrow{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;' +
-        'padding:.5rem 0;border-bottom:1px solid var(--rtg-line);font-size:.82rem;}' +
-      '#paneel .bk-hrow:last-child{border-bottom:0;}' +
-      '#paneel .bk-sub{color:var(--rtg-soft);font-size:.7rem;margin-top:.1rem;}' +
-      '#paneel .bk-bed{white-space:nowrap;font-variant-numeric:var(--rtg-cijfers);}' +
-      '#paneel .bk-pil{display:inline-block;border:1px solid var(--rtg-line);border-radius:0;' +
-        'padding:.06rem .5rem;font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;' +
-        'color:var(--rtg-soft);margin-left:.4rem;vertical-align:middle;}' +
-      '#paneel .bk-pil.bk-rtg{color:var(--gold-tekst);border-color:var(--gold-rand);}' +
-      '#paneel .bk-staaf{height:6px;background:var(--rtg-line);border-radius:0;overflow:hidden;margin-top:.25rem;}' +
-      '#paneel .bk-staaf i{display:block;height:100%;background:var(--gold-basis);}' +
-      '#paneel .bk-snel{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;}';
-    d.head.appendChild(s);
-  };
 
   // de bank staat nog niet aan: eerlijk zeggen, en wijzen op wat wel werkt
   B.offline = function () {
@@ -139,11 +111,14 @@
         var f = await r.json().catch(function () { return {}; });
         throw new Error(f.error || 'Export mislukt.');
       }
-      var a = d.createElement('a');
-      a.href = URL.createObjectURL(await r.blob());
-      a.download = 'rtg-afschrift-' + iban + '-' + new Date().toISOString().slice(0, 10) + '.csv';
-      d.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+      /* Gebruik hier bewust de native documentbinding. De statische
+         laadgraaf kan daardoor bewijzen dat dit een downloadanker is en geen
+         verborgen stylesheet- of scriptloader. */
+      var downloadAnker = document.createElement('a');
+      downloadAnker.href = URL.createObjectURL(await r.blob());
+      downloadAnker.download = 'rtg-afschrift-' + iban + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(downloadAnker); downloadAnker.click(); downloadAnker.remove();
+      setTimeout(function () { URL.revokeObjectURL(downloadAnker.href); }, 5000);
     } catch (e) { Geld.melding(e.message); }
   };
 })(window, document);

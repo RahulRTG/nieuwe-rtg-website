@@ -50,8 +50,15 @@
     if (!navigation) return;
     observeNavigation(event);
     if (!allowed()) { navigation.skipTransition(); return; }
-    if (!event.activation) return;
-    var to = new URL(event.activation.entry.url).pathname;
+    // Bij geschiedenisovergangen kan de browser geen bruikbaar doeladres
+    // geven. Dan vervalt alleen de filmische koppeling; navigatie blijft van
+    // de browser. Een leeg adres mag nooit als de huidige pagina worden geraden.
+    var address = event.activation && event.activation.entry && event.activation.entry.url;
+    if (typeof address !== 'string' || !address.trim()) { navigation.skipTransition(); return; }
+    var destination;
+    try { destination = new URL(address); }
+    catch (_) { navigation.skipTransition(); return; }
+    var to = destination.pathname;
     var portals = Array.from(d.querySelectorAll('.wrooster-kaart[href],[data-rtg-component="WorldPortal"][href]'));
     var portal = portals.find(function (a) { return new URL(a.href, w.location.href).pathname === to; });
     if (portal) {

@@ -16,37 +16,6 @@
      gouden zegel op een badge, en het uitvoervak van Rahul. De rijen, chips
      en badges zelf komen uit rtg-ui.css in plaats van overgetikt. Een keer
      injecteren, met id-wacht. */
-  M.stijl = function () {
-    if (d.getElementById('mtStijl')) return;
-    var s = d.createElement('style');
-    s.id = 'mtStijl';
-    s.textContent =
-      '.mt-tabs{display:flex;gap:.15rem;border-bottom:1px solid var(--rtg-line);overflow-x:auto;margin-bottom:.9rem;}' +
-      '.mt-tabs button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;' +
-        'color:var(--rtg-soft);padding:.5rem .7rem .55rem;font:inherit;font-size:.72rem;font-weight:600;' +
-        'letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}' +
-      '.mt-tabs button[aria-pressed="true"]{color:var(--rtg-txt);border-bottom-color:var(--gold-basis);}' +
-      '#paneel .mt-tx{flex:1;min-width:0;}' +
-      /* .badge en .chips zijn UI-kit-klassen die zusterstanden ook dragen, en
-         dit blad blijft (id-wacht) in de head staan na een standwissel; dus
-         op het eigen vak scopen, niet op #paneel, anders kleurt Metier de
-         chips van Mecenaat mee */
-      '#mtVak .badge{margin-left:.35rem;}' +
-      '#paneel .mt-zg{color:var(--gold-tekst);border-color:var(--gold-rand);}' +
-      '#mtVak .chips button[aria-pressed="true"]{border-color:var(--gold-rand);color:var(--gold-tekst);}' +
-      '#paneel .mt-mini{background:none;border:0;color:var(--gold-tekst);font-size:.75rem;cursor:pointer;' +
-        'padding:0;text-decoration:underline;}' +
-      '#paneel .mt-uit{border:1px solid var(--rtg-line);border-radius:0;padding:.6rem .8rem;margin-top:.6rem;' +
-        'font-size:.85rem;line-height:1.5;white-space:pre-wrap;}' +
-      '#paneel .mt-knoppen{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}' +
-      '#paneel .mt-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +
-      /* min-width:0 hoort bij flex:1: een input zakt niet onder zijn eigen
-         breedte, en duwde op 390px de knop Vraag buiten beeld. */
-      '#paneel .mt-vraag input{flex:1 1 0;min-width:0;width:auto;}' +
-      '#paneel .mt-half{display:flex;gap:.4rem;margin-top:.4rem;}' +
-      '#paneel .mt-naam{background:linear-gradient(150deg,rgba(127,22,52,.14),transparent);}';
-    d.head.appendChild(s);
-  };
 
   M.tabsKnoppen = function () {
     var esc = w.Geld.esc;

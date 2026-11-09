@@ -1,0 +1,48 @@
+/* De bestaande sneltoets-owner ontdekt acties; DS draagt zijn uitleg. */
+@layer rtg.component {
+  .ds-sneltoets {
+    margin: auto;
+    max-block-size: calc(100dvh - 2 * var(--ds-ruimte-3) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--ds-ruimte-6);
+  }
+  /* Bestaande niet-DS-hosts laden dezelfde component op aanvraag. Alleen de
+     unieke sneltoetsklasse krijgt de systeemoverlay; de rest van de host
+     blijft onaangeraakt tot zijn eigen schermmigratie. */
+  .ds-sneltoets.ds-sneltoets--overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-block-size: none;
+    padding: var(--ds-ruimte-4);
+    background: var(--ds-glas);
+  }
+  .ds-sneltoets.ds-sneltoets--overlay[hidden] { display: none; }
+  .ds-sneltoets--overlay .ds-sneltoets__kaart {
+    inline-size: min(22rem, 92vw);
+    padding: var(--ds-ruimte-6);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    box-shadow: var(--ds-schaduw-systeem);
+    font-family: var(--ds-letter-tekst);
+  }
+  .ds-sneltoets__kaart { min-inline-size: 0; }
+  .ds-sneltoets__kaart h2 {
+    margin-block: 0 var(--ds-ruimte-4);
+    font: 500 var(--ds-maat-kop)/1.2 var(--ds-letter-display);
+  }
+  .ds-sneltoets__kaart dl {
+    display: grid; grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    margin: 0; font-size: var(--ds-maat-klein); line-height: 1.5;
+  }
+  .ds-sneltoets__kaart dt { color: var(--ds-accent); font-weight: 600; }
+  .ds-sneltoets__kaart dd { margin: 0; overflow-wrap: anywhere; }
+  .ds-sneltoets--overlay :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+}

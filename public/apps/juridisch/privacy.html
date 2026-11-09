@@ -1,90 +1,30 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Privacybeleid, Rahul Travel Group</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/seizoen.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  /* DE INKT STAAT OP DE BODY EN NIET OP :root. Dat is geen smaak maar de enige
-     plek waar hij wint. shared/seizoen.css zet bij dag- en middaglicht
-     `:root[data-dagdeel="ochtend"]{--grey:rgba(26,21,18,0.78)}` -- een selector
-     met een attribuut erbij, dus SPECIFIEKER dan het `:root{}` dat hier stond.
-     De donkere paginatokens verloren daardoor overdag, terwijl de grond wel
-     donker bleef (rtg-themas.css schildert die op `body[data-rtg-eigenvlak]`,
-     nog een trede specifieker). Gemeten stond de lopende tekst van dit document
-     tussen zonsopkomst en de avond op 1,09:1 -- onzichtbaar, een heel juridisch
-     stuk lang. Een aangepaste eigenschap die op de BODY staat erft naar alles
-     eronder en verslaat elke :root-regel, hoe specifiek ook: overerving en
-     specificiteit zijn twee verschillende vragen. Wie zijn eigen grond
-     schildert, houdt zo ook zijn eigen inkt. */
-  body[data-rtg-eigenvlak]{
-    --white:#0C0C0B; --panel:#151312; --panel2:#1B1817; --black:#F4F1EC; --burgundy:#C23A5E; --gold:#A98F1C;
-    --line:var(--rtg-line); --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
-    --legal-ground:#0C0C0B; --legal-panel:#151312; --legal-ink:#F4F1EC;
-    --legal-muted:rgba(244,241,236,0.78); --legal-soft:rgba(244,241,236,0.64); --legal-line:rgba(244,241,236,0.18);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  /* body.rtg-stijl en niet body: de gedeelde UI-kit zet `body.rtg-stijl` en die
-   is specifieker, dus de verklaring hieronder verloor de GROND maar hield de
-   INKT -- bijna zwarte tekst op een bijna zwarte grond, 1,08:1. Een juridisch
-   stuk is een document en geen appvlak; het schildert zijn eigen vlak, en dan
-   allebei de kanten ervan. Zie data-rtg-eigenvlak op de body hierboven. */
-  /* EN MET data-rtg-eigenvlak ERBIJ, want anders wint de kit alsnog. `body.rtg-stijl`
-     hierboven is even specifiek als de regel in de gedeelde kit, dus besliste de
-     VOLGORDE -- en die kit wordt later ingesloten. Gemeten onder een thema stond
-     deze pagina daardoor gewoon donker (rgb(23,19,16)), leesbaar maar niet wat er
-     staat: een juridisch stuk hoort een document te zijn. Met het attribuut erbij
-     is de regel specifieker dan de kit en klopt de verklaring ook echt. */
-  /* EN ZIJ ZEGT OOK DAT ZIJ LICHT IS. Deze pagina draagt thema onyx (de
-     themalaag zet dan color-scheme:dark) en schildert daarna haar EIGEN witte
-     grond. Alles wat het kleurschema volgt koos daardoor de donkere stand op een
-     lichte pagina -- de cookiemelding kwam zo op 1,03:1 terecht, onzichtbare
-     tekst onder een juridisch stuk. Wie zijn eigen grond schildert, hoort ook
-     zijn eigen schema te melden. */
-    body.rtg-stijl[data-rtg-eigenvlak]{color-scheme:dark;background:var(--legal-ground);color:var(--legal-ink);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
-  a{color:inherit;}
-  .wrap{max-width:720px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
-  header{padding:2rem 0;border-bottom:1px solid var(--legal-line);background:rgba(12,12,11,0.96);}
-  header .wrap{display:flex;justify-content:space-between;align-items:center;}
-  header a{font-size:0.8rem;color:var(--legal-muted);text-decoration:none;border-bottom:1px solid var(--legal-line);padding-bottom:2px;}
-  main{padding:clamp(3rem,7vw,5rem) 0 5rem;}
-  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--leesgoud,var(--rtg-leesgoud,var(--gold-diep,#5E4F05)));font-weight:600;}
-  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(2rem,5vw,2.8rem);line-height:1.15;margin:0.8rem 0 0.4rem;}
-  .updated{font-size:0.78rem;color:var(--legal-soft);}
-  h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;margin:2.6rem 0 0.7rem;}
-  p,li{font-size:0.95rem;color:var(--legal-muted);}
-  ul{padding-left:1.2rem;margin:0.6rem 0;}
-  li{margin:0.35rem 0;}
-  b{color:var(--legal-ink);}
-  .card{background:var(--legal-panel);border:1px solid var(--legal-line);border-radius:0;padding:1.3rem 1.5rem;margin:1.2rem 0;}
-  footer{border-top:1px solid var(--legal-line);padding:2rem 0;font-size:0.78rem;color:var(--legal-soft);}
-  footer a{text-decoration:none;border-bottom:1px solid var(--legal-line);}
-</style>
-<link href="/shared/ios.css" rel="stylesheet">
-<script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header>
-  <div class="wrap">
-    <a href="/apps/juridisch.html">← Juridisch</a>
-  </div>
+<body class="ds-scherm" data-rtg-world="living" data-ds-schermtype="detail" data-ds-nadruk="gereedschap">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/juridisch.html">← Juridisch</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
 </header>
 
-<main>
-  <div class="wrap">
-    <span class="kicker">Privacy</span>
-    <h1>Privacybeleid</h1>
-    <p class="updated">Laatst bijgewerkt: 22 juli 2026 · Van toepassing op de website, de leden-app, de partner-apps en de personeels-app van Rahul Travel Group (RTG). Verwerkingsverantwoordelijke: RTG (merknaam Rahul Travel Group), Handelsregister (KvK) nummer 82273510.</p>
+<main class="ds-taak" id="hoofd">
+  <div class="wrap ds-lezer ds-lezer--pagina">
+    <span class="kicker ds-label">Privacy</span>
+    <h1 class="ds-titel">Privacybeleid</h1>
+    <p class="updated ds-meta">Laatst bijgewerkt: 22 juli 2026 · Van toepassing op de website, de leden-app, de partner-apps en de personeels-app van Rahul Travel Group (RTG). Verwerkingsverantwoordelijke: RTG (merknaam Rahul Travel Group), Handelsregister (KvK) nummer 82273510.</p>
 
-    <div class="card">
+    <div class="card ds-sectie ds-sectie--open">
       <p><b>In het kort.</b> U reist bij ons onder een codenaam, niet onder uw echte naam. We verzamelen alleen wat nodig is om uw lidmaatschap, reizen en betalingen te verzorgen. U kunt al uw gegevens op elk moment zelf inzien (downloaden) en definitief laten verwijderen, rechtstreeks in de app, zonder formulieren. We verkopen nooit gegevens aan derden.</p>
     </div>
 
@@ -190,16 +130,10 @@
   </div>
 </main>
 
-<footer>
-  <div class="wrap">© RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · <a href="/apps/juridisch/voorwaarden.html">Algemene voorwaarden</a> · <a href="/apps/juridisch/partnervoorwaarden.html">Partnervoorwaarden</a></div>
+<footer class="ds-taak ds-meta">
+  <div class="wrap ds-lezer ds-lezer--pagina">© RTG (Rahul Travel Group) · KvK 82273510 · btw NL002291440B89 · <a href="/apps/juridisch/voorwaarden.html">Algemene voorwaarden</a> · <a href="/apps/juridisch/partnervoorwaarden.html">Partnervoorwaarden</a></div>
 </footer>
 <script src="/shared/cookie.js"></script>
-<script src="/shared/seizoen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 </body>
 </html>

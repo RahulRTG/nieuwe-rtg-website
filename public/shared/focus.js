@@ -26,6 +26,20 @@
   const TOP_N = 3;          // met geschiedenis: zoveel kaarten standaard open
   const LEER_DREMPEL = 10;  // vanaf zoveel interacties gaat de geschiedenis sturen
 
+  /* FocusUI blijft eigenaar van de toestand en leergeschiedenis. Alleen de
+     presentatie komt uit het bestaande Design System. Oude hosts krijgen
+     dat ene centrale blad dynamisch; een DS-host heeft het al. */
+  function laadFocusStijl() {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    const focusStijlLink = document.createElement('link');
+    focusStijlLink.id = 'rtgDsRuntimeCss';
+    focusStijlLink.rel = 'stylesheet';
+    focusStijlLink.href = '/ds/rtg-ds.css';
+    document.head.appendChild(focusStijlLink);
+  }
+  laadFocusStijl();
+
   let mem = { score: {}, open: {}, dicht: {}, laatst: {}, gezien: {} };
   try { mem = Object.assign(mem, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
   if (!mem.laatst) mem.laatst = {};
@@ -37,26 +51,6 @@
   const gewicht = n => (mem.score[n] || 0) * Math.pow(0.5, (Date.now() - (mem.laatst[n] || Date.now())) / (30 * 86400000));
   const top = () => Object.keys(mem.score).sort((a, b) => gewicht(b) - gewicht(a)).slice(0, TOP_N);
 
-  function stijl() {
-    if (document.getElementById('fxStijl')) return;
-    const s = document.createElement('style');
-    s.id = 'fxStijl';
-    s.textContent = '.fx-kaart.fx-dicht > *:not(.fx-kop){display:none !important;}' +
-      '.fx-kaart.fx-dicht{padding-bottom:0.55rem;}' +
-      /* min-height en niet padding: een kaartkop is een aanklikbaar vlak (WCAG
-         2.5.8 vraagt 24x24) en de meeste zijn dat allang. Een min-height raakt
-         alleen de koppen die te klein zijn -- padding zou elke kaart in dit huis
-         verschuiven om er vier te repareren. */
-      '.fx-kop{cursor:pointer;user-select:none;min-height:24px;}' +
-      '.fx-kop:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:0;}' +
-      '.fx-pijl{float:right;margin-left:0.5rem;opacity:0.55;font-size:0.8em;transition:transform 0.15s;}' +
-      '.fx-dicht .fx-pijl{transform:rotate(-90deg);}' +
-      // dicht maar niet doof: bij meldingen kleurt de balk en telt de badge
-      '.fx-badge{display:none;margin-left:0.5rem;background:#C23A5E;color:#fff;border-radius:0;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;font-size:0.68em;font-weight:700;padding:0 0.35em;vertical-align:middle;}' +
-      '.fx-kaart.fx-dicht.fx-melding > .fx-kop .fx-badge{display:inline-block;}' +
-      '.fx-kaart.fx-dicht.fx-melding{background-image:linear-gradient(rgba(194,58,94,0.16),rgba(194,58,94,0.16));border-color:rgba(194,58,94,0.55);}';
-    document.head.appendChild(s);
-  }
   // de naam van een kaart: de koptekst zonder tellers en tijden, zodat hij
   // stabiel blijft over her-renders heen
   function naamVan(kaart) {
@@ -65,10 +59,41 @@
     const t = (kop.textContent || '').replace(/[0-9]+/g, '').replace(/[·().:/]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
     return t || null;
   }
+  /* De oude ongelegerde hosts mogen een directe kaartregel met display:grid
+     hebben. Een gelegerde DS-regel kan daar niet betrouwbaar van winnen.
+     Daarom beheert de bestaande toestandsowner uitsluitend tijdens sluiten
+     de inline display-waarde van de inhoud, en herstelt hij exact wat er stond.
+     Domain hidden blijft onaangeraakt en kan dus nooit door FocusUI worden
+     ontsloten. */
+  const inhoudWeergave = new WeakMap();
+  function zetInhoud(kaart, open) {
+    const kop = kaart.querySelector('.fx-kop');
+    Array.from(kaart.children).forEach(el => {
+      if (el === kop || (kop && el.contains(kop))) return;
+      if (!open || el.hidden) {
+        if (!inhoudWeergave.has(el)) inhoudWeergave.set(el, {
+          waarde: el.style.getPropertyValue('display'),
+          prioriteit: el.style.getPropertyPriority('display')
+        });
+        el.style.setProperty('display', 'none');
+      } else if (inhoudWeergave.has(el)) {
+        const oud = inhoudWeergave.get(el);
+        if (oud.waarde) el.style.setProperty('display', oud.waarde, oud.prioriteit);
+        else el.style.removeProperty('display');
+        inhoudWeergave.delete(el);
+      }
+    });
+  }
   function zet(kaart, open) {
     kaart.classList.toggle('fx-dicht', !open);
+    kaart.classList.toggle('ds-focus-dicht', !open);
+    zetInhoud(kaart, open);
     const kop = kaart.querySelector('.fx-kop');
-    if (kop) kop.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (kop) {
+      kop.setAttribute('aria-expanded', open ? 'true' : 'false');
+      const pijl = kop.querySelector('.fx-pijl');
+      if (pijl) pijl.textContent = open ? '▾' : '›';
+    }
   }
   function toggle(kaart) {
     const n = kaart.dataset.fx;
@@ -83,15 +108,15 @@
     const n = naamVan(kaart);
     if (!n) return;
     kaart.dataset.fx = n;
-    kaart.classList.add('fx-kaart');
+    kaart.classList.add('fx-kaart', 'ds-focus-kaart');
     const kop = kaart.querySelector(KOP);
-    kop.classList.add('fx-kop');
+    kop.classList.add('fx-kop', 'ds-focus-kop');
     if (!kop.querySelector('.fx-pijl')) {
       const badge = document.createElement('span');
-      badge.className = 'fx-badge';
+      badge.className = 'fx-badge ds-focus-badge';
       kop.appendChild(badge);
       const pijl = document.createElement('span');
-      pijl.className = 'fx-pijl';
+      pijl.className = 'fx-pijl ds-focus-pijl';
       pijl.textContent = '▾';
       pijl.setAttribute('aria-hidden', 'true');
       kop.appendChild(pijl);
@@ -156,6 +181,8 @@
         b.setAttribute('aria-label', n ? n + ' meldingen' : '');
       }
       if (kaart.classList.contains('fx-melding') !== (n > 0)) kaart.classList.toggle('fx-melding', n > 0);
+      if (kaart.classList.contains('ds-focus-melding') !== (n > 0)) kaart.classList.toggle('ds-focus-melding', n > 0);
+      zetInhoud(kaart, !kaart.classList.contains('fx-dicht'));
     });
   }
 
@@ -165,7 +192,6 @@
     bezig = true;
     requestAnimationFrame(() => {
       bezig = false;
-      stijl();
       // per ouder-container telt het volgnummer, zodat "eerste twee open"
       // per scherm geldt en niet app-breed
       const perOuder = new Map();
@@ -180,7 +206,8 @@
     });
   }
   const obs = new MutationObserver(loop);
-  const kijk = () => { obs.observe(document.body, { childList: true, subtree: true, characterData: true }); loop(); };
+  const kijk = () => { obs.observe(document.body, { childList: true, subtree: true, characterData: true,
+    attributes: true, attributeFilter: ['hidden'] }); loop(); };
   if (document.body) kijk();
   else document.addEventListener('DOMContentLoaded', kijk);
 

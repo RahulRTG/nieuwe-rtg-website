@@ -1,3 +1,6 @@
+
+  /* ---------- tickets: activiteiten, tours en musea ---------- */
+  let tkPartners = [], tkOpen = null, tkKeuze = null;
   /* De tickets van het lid: het aanbod en wat hij al heeft. Apart deel omdat
      app-main-12.js met deze twee functies erbij op 10,9 KB kwam en
      keuringsregel 13 op 10 staat. De regel heeft gelijk over de reden: de rest

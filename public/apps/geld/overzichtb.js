@@ -172,24 +172,4 @@
       : null;
   };
 
-  /* Alleen de vormen die de schil niet kent; alles hangt aan de eigen
-     ov-klassen, dus een blok te veel in head stoort niemand. Via
-     createElement en niet als <style> in een html-string: de voordeur
-     stempelt alleen echte elementen met de CSP-nonce (zie rtgcodeb.js).
-     Meteen bij het laden, want dit deel heeft geen eigen start-moment. */
-  if (!d.getElementById('ovbStijl')) {
-    var st = d.createElement('style');
-    st.id = 'ovbStijl';
-    st.textContent =
-      '#paneel .ovTdag{margin:1rem 0 .15rem;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rtg-soft);}' +
-      '#paneel .ovTr{display:flex;gap:.7rem;align-items:baseline;padding:.5rem 0;border-top:1px solid var(--rtg-line);color:var(--rtg-txt);text-decoration:none;}' +
-      '#paneel .ovTu{flex:0 0 auto;color:var(--rtg-soft);font-variant-numeric:tabular-nums;font-size:.8rem;}' +
-      '#paneel .ovTt{flex:1;font-size:.9rem;}' +
-      '#paneel .ovTbron{display:block;font-size:.72rem;color:var(--rtg-soft);}' +
-      '#paneel .ovTb{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;}' +
-      '#paneel .ovVerant{font-size:.78rem;line-height:1.55;display:flex;flex-direction:column;gap:.15rem;}' +
-      '#paneel .ovWkop{display:flex;align-items:baseline;justify-content:space-between;gap:.7rem;}' +
-      '#paneel #ovWaarom h4{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rtg-soft);margin:.9rem 0 .25rem;}';
-    d.head.appendChild(st);
-  }
 })(window, document);

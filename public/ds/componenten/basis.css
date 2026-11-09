@@ -1,0 +1,78 @@
+/* Presentatie van de bestaande basis-owner: verbinding, springlink en hulp.
+   Profielkeuzes blijven bij toegankelijk.js; er is geen tweede instellingenlaag. */
+@layer rtg.component {
+  .ds-basis__spring {
+    position: fixed; inset-inline-start: -100vw; inset-block-start: 0; z-index: 10020;
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    min-block-size: var(--ds-doel); box-sizing: border-box;
+    background: var(--ds-cover-grond); color: var(--ds-cover-inkt);
+    border: 1px solid var(--ds-metaal); border-radius: var(--ds-radius-knop);
+    font: 600 var(--ds-maat-klein)/1.5 var(--ds-letter-tekst); text-decoration: none;
+  }
+  .ds-basis__spring:focus {
+    inset-inline-start: max(var(--ds-ruimte-2), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    inset-block-start: max(var(--ds-ruimte-2), env(safe-area-inset-top, 0px));
+    outline: 2px solid var(--ds-focus); outline-offset: 2px;
+  }
+  .ds-basis__gids {
+    box-sizing: border-box; gap: var(--ds-ruimte-3);
+    max-block-size: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - var(--ds-ruimte-8));
+    overflow: auto; overscroll-behavior: contain;
+    font: 400 var(--ds-maat-tekst)/1.55 var(--ds-letter-tekst);
+    text-align: start; overflow-wrap: anywhere;
+  }
+  .ds-basis__gids[open] { display: flex; flex-direction: column; }
+  .ds-basis__gids .bss-kop { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-3); }
+  .ds-basis__gids .bss-kop > span { font: 500 var(--ds-maat-kop)/1.2 var(--ds-letter-display); }
+  .ds-basis__gids .bss-wat, .ds-basis__gids .bss-doe, .ds-basis__gids p { color: var(--ds-inkt-zacht); }
+  .ds-basis__gids p { margin: 0; }
+  .ds-basis__gids .bss-doe { margin: 0; padding-inline-start: var(--ds-ruimte-6); }
+  .ds-basis__gids .bss-tip, .ds-basis__gids .bss-hulp { border-block-start: 1px solid var(--ds-lijnkleur); padding-block-start: var(--ds-ruimte-4); }
+  .ds-basis__gids .bss-tip { color: var(--ds-metaal); font-size: var(--ds-maat-klein); }
+  .ds-basis__gids .bss-hulp, .ds-basis__gids .bss-zaak { display: flex; flex-direction: column; gap: var(--ds-ruimte-3); }
+  .ds-basis__gids .bss-hulp b { font-size: var(--ds-maat-klein); }
+  .ds-basis__gids .bss-zaak { border-inline-start: 2px solid var(--ds-lijnkleur); padding-inline-start: var(--ds-ruimte-3); }
+  .ds-basis__gids .bss-zaak i { font-style: normal; }
+  .ds-basis__gids .bss-rij { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); }
+  .ds-basis__gids button {
+    min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel);
+    max-inline-size: 100%; padding-block: var(--ds-ruimte-2); padding-inline: var(--ds-ruimte-3);
+    font: inherit; color: var(--ds-inkt); background: var(--ds-oppervlak);
+    border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop);
+    overflow-wrap: anywhere; cursor: pointer;
+  }
+  .ds-basis__gids .bss-x { flex: 0 0 auto; }
+  .ds-basis__gids .bss-ja { color: var(--ds-accent-inkt); background: var(--ds-accent); border-color: var(--ds-accent); }
+  .ds-basis__gids button:disabled { opacity: .6; cursor: default; }
+  .ds-basis__gids .bss-veld {
+    box-sizing: border-box; inline-size: 100%; min-inline-size: 0; resize: vertical;
+    padding: var(--ds-ruimte-3); color: var(--ds-inkt); background: var(--ds-oppervlak);
+    border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); font: inherit;
+  }
+  .ds-basis__gids :is(button, textarea):focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }
+  @media print { .ds-basis__spring, .ds-basis__gids { display: none; } }
+}
+/* Bewuste gebruikersvoorkeuren winnen binnen het bestaande lagencontract.
+   Contrast en rustige accenttokens bestaan al in tokens.css. */
+@layer rtg.scherm {
+  .ds-basis.rtg-tekst-groot { font-size: 118%; }
+  .ds-basis.rtg-tekst-groter { font-size: 135%; }
+  .ds-basis.rtg-stil *, .ds-basis.rtg-stil *::before, .ds-basis.rtg-stil *::after {
+    animation-duration: .01ms; animation-iteration-count: 1; transition-duration: 0ms; scroll-behavior: auto;
+  }
+  .ds-basis.rtg-rustig :is([class*="badge"], [class*="pill"]) { filter: saturate(.35); }
+  .ds-basis.rtg-rustig * { border-width: 1px; box-shadow: none; }
+  .ds-basis.rtg-linkstreep a { text-decoration: underline; text-underline-offset: .18em; }
+  .ds-basis.rtg-in-frame body > header {
+    position: static; background: none; border: 0; box-shadow: none; backdrop-filter: none;
+  }
+  .ds-basis.rtg-in-frame :is(.ios-groot, body > header h1, body > header .ios-terug, body > header .terug, body > header > a[href^="/apps/app.html"]) {
+    position: absolute; inline-size: 1px; block-size: 1px; padding: 0; margin: 0;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ds-basis *, .ds-basis *::before, .ds-basis *::after {
+      animation-duration: .01ms; animation-iteration-count: 1; transition-duration: 0ms; scroll-behavior: auto;
+    }
+  }
+}

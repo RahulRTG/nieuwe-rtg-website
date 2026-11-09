@@ -21,7 +21,10 @@
     }).catch(function () { return { status: 0, body: { error: window.RTGDailyCopy.value('failed') } }; });
   };
   var meldT; var meld = function (t) {
-    var m = $('#melding'); m.textContent = t; m.classList.add('zie');
+    var binnen = $('#ntScrim').open, m = $(binnen ? '#ntMelding' : '#melding');
+    m.textContent = t;
+    if (binnen) { clearTimeout(meldT); return; }
+    m.classList.add('zie');
     clearTimeout(meldT); meldT = setTimeout(function () { m.classList.remove('zie'); }, 3200);
   };
 
@@ -60,20 +63,20 @@
   function kaart(n) {
     var lijf = n.soort === 'lijst'
       ? (n.items || []).slice(0, 6).map(function (x, i) {
-          return '<span class="taak' + (x.af ? ' af' : '') + '">' +
+          return '<span class="taak' + (x.af ? ' af' : '') + ' ds-dag-taak">' +
             '<input type="checkbox" data-vink="' + n.id + ':' + i + '"' + (x.af ? ' checked' : '') +
             ' aria-label="' + esc(x.t) + '"> <span data-user-content>' + esc(x.t) + '</span></span>';
-        }).join('') + ((n.items || []).length > 6 ? '<span class="meta">nog ' + (n.items.length - 6) + ' punten</span>' : '')
+        }).join('') + ((n.items || []).length > 6 ? '<span class="meta ds-dag-meta">nog ' + (n.items.length - 6) + ' punten</span>' : '')
       : '<p data-user-content>' + esc(n.tekst || '') + '</p>';
     var meta = n.gewijzigd ? ['<span translate="no">' + esc(window.RTGDailyCopy.date(n.gewijzigd)) + '</span>'] : [];
-    if (n.vast) meta.push('<span class="goud">vastgepind</span>');
-    if (n.herinnerOp) meta.push('<span class="goud">herinnering ' + esc(n.herinnerOp) + (n.herinnerTijd ? ' ' + n.herinnerTijd : '') + '</span>');
+    if (n.vast) meta.push('<span class="goud ds-dag-goud">vastgepind</span>');
+    if (n.herinnerOp) meta.push('<span class="goud ds-dag-goud">herinnering ' + esc(n.herinnerOp) + (n.herinnerTijd ? ' ' + n.herinnerTijd : '') + '</span>');
     if (n.door) meta.push('van ' + esc(n.door));
     if ((n.gedeeldMet || []).length) meta.push('gedeeld met ' + n.gedeeldMet.length);
     if (n.archief) meta.push('archief');
-    return '<div class="nkaart' + (n.vast ? ' vast' : '') + '" data-open="' + n.id + '" role="button" tabindex="0">' +
+    return '<div class="nkaart' + (n.vast ? ' vast' : '') + ' ds-dag-nkaart" data-open="' + n.id + '" role="button" tabindex="0">' +
       '<h3 data-user-content>' + esc(n.titel || '(zonder titel)') + '</h3>' + lijf +
-      (meta.length ? '<span class="meta">' + meta.join(' · ') + '</span>' : '') + '</div>';
+      (meta.length ? '<span class="meta ds-dag-meta">' + meta.join(' · ') + '</span>' : '') + '</div>';
   }
   function teken() {
     if (!stand) return;
@@ -88,7 +91,7 @@
     var first = !archief && !q && !(stand.eigen || []).length && !(stand.gedeeld || []).length;
     window.RTGDaily.render('notities', first ? 'empty' : 'ready', { retry: laad });
     $('#bord').innerHTML = eigen.map(kaart).join('') ||
-      '<p class="stil">' + (q ? window.RTGDailyCopy.text('noResults') : archief ? 'Het archief is leeg.' : window.RTGDailyCopy.text('emptyNotes')) + '</p>';
+      '<p class="stil ds-dag-stil">' + (q ? window.RTGDailyCopy.text('noResults') : archief ? 'Het archief is leeg.' : window.RTGDailyCopy.text('emptyNotes')) + '</p>';
     var gedeeld = archief ? [] : (stand.gedeeld || []).filter(zeef);
     $('#gedeeldKop').style.display = gedeeld.length ? '' : 'none';
     $('#gedeeldBord').innerHTML = gedeeld.map(kaart).join('');

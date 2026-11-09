@@ -53,6 +53,16 @@ test('Heel RTG heeft echte deuren en Hier bedient de echte bronknoppen', () => {
     'ook op mobiel blijft de ene hamburger eigenaar van het slimme menu');
 });
 
+test('Slim menu begrenst catalogus, wereldtools en recent bezocht tot interne app-routes', () => {
+  assert.match(SMART, /function intern\(pad\)/);
+  assert.match(SMART, /vorige = intern\(vorige\)/);
+  assert.match(SMART, /var doel = intern\(t\[3\]\)/);
+  assert.match(SMART, /var appPad = app && intern\(app\.url\)/);
+  assert.match(SMART, /location\.href = '\/apps\/' \+ doel\.slice/);
+  for (const onveilig of ['javascript:alert(1)', 'https://example.test/apps/x.html', '//example.test/x.html', '/apps/../x.html'])
+    assert.doesNotMatch(onveilig, /^\/apps\/(?!\.{1,2}(?:\/|[?#]|$))(?!.*\/\.{1,2}(?:\/|[?#]|$))[A-Za-z0-9_.\/-]+(?:[?#][^\s]*)?$/);
+});
+
 test('vaste appbediening verhuist intact en wordt niet gekloond', () => {
   assert.match(APPBAR, /rt\.slot\.appendChild\(el\)/);
   assert.doesNotMatch(APPBAR, /cloneNode|outerHTML|innerHTML/);

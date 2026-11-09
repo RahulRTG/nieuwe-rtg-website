@@ -1,0 +1,19 @@
+/* Uurwerk is een huisbrede, decoratieve presentatielaag. De tijd en toestand
+   blijven in shared/uurwerk.js; tokens en deze presentatie behoren aan DS. */
+@import url("tokens.css");
+@layer rtg.component {
+  ::selection { background: color-mix(in srgb,var(--ds-metaal) 32%,transparent); }
+  body { font-variant-numeric: tabular-nums; }
+  hr { border: 0; block-size: 1px; background: color-mix(in srgb,var(--ds-metaal) 25%,transparent); }
+  * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb,var(--ds-metaal) 40%,transparent) transparent; }
+  ::-webkit-scrollbar { inline-size: 6px; block-size: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { border-radius: var(--ds-radius-inhoud); background: color-mix(in srgb,var(--ds-metaal) 38%,transparent); }
+  .rtg-minuutbaan { position: relative; padding-block-end: var(--ds-ruimte-2); }
+  .rtg-minuutbaan::after { content: ""; position: absolute; inset-inline-start: 0; inset-block-end: 0; inline-size: 7.5rem; max-inline-size: 60%; block-size: 5px; background-image: repeating-linear-gradient(90deg,color-mix(in srgb,var(--ds-metaal) 70%,transparent) 0 1px,transparent 1px 25px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--ds-metaal) 30%,transparent) 0 1px,transparent 1px 5px); background-size: 100% 5px,100% 3px; background-position: left bottom,left bottom; background-repeat: no-repeat; }
+  #rtgGanglijn { position: fixed; inset-block-start: 0; inset-inline-start: 0; block-size: 2px; z-index: 9991; pointer-events: none; opacity: .55; background: linear-gradient(90deg,transparent,color-mix(in srgb,var(--ds-metaal) 70%,transparent)); }
+  #rtgGanglijn i { position: absolute; inset-inline-end: -2px; inset-block-start: -1.5px; inline-size: 5px; block-size: 5px; border-radius: var(--ds-radius-cirkel); background: var(--ds-metaal); box-shadow: 0 0 6px var(--ds-metaal); animation: rtgKlop .333s ease-in-out infinite; }
+  #rtgGanglijn i.actief { animation-duration: .222s; }
+  @keyframes rtgKlop { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.3); } }
+  @media (prefers-reduced-motion: reduce) { #rtgGanglijn i { animation: none; } }
+}

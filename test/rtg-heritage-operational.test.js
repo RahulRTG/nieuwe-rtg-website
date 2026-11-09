@@ -39,7 +39,9 @@ test('alle echte appschermen lopen door dezelfde gedeelde schermlaag', () => {
       : /<link\b[^>]*href=["']\/shared\/rtg-heritage\.css["'][^>]*>/i;
     assert.match(html, stijl, route + ' mist de gedeelde schermstijl');
   }
-  assert.equal(echt, 298); // inclusief Living World en LibraryOS
+  const geregistreerd = Object.values(IDENTITEIT.MANIFEST).reduce((som, routes) => som + routes.length, 0);
+  assert.equal(echt, geregistreerd,
+    'ieder niet-redirect HTML-scherm hoort precies eenmaal in de centrale wereldidentiteit te staan');
 });
 
 test('representatieve operationele schermen houden een vaste wereld en echte bediening', () => {

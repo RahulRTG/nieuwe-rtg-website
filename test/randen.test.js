@@ -29,13 +29,14 @@ test('randen.js is geldige JS en levert RTGRanden', () => {
   assert.match(bron, /w\.RTGRanden = \{/);
 });
 
-test('elke pagina met het bedieningspaneel laadt ook de randen', () => {
+test('elk bedieningspaneel heeft de legacy-rand of de centrale DS-schil als eigenaar', () => {
   const mist = [];
   for (const p of paginas()) {
     const html = lees(p);
-    if (html.includes('shared/bediening.js') && !html.includes('shared/randen.js')) mist.push(p);
+    const dsSchil = /<html[^>]*\bdata-ds(?:="1")?(?:\s|>)/.test(html) && html.includes('/ds/shell.js');
+    if (html.includes('shared/bediening.js') && !html.includes('shared/randen.js') && !dsSchil) mist.push(p);
   }
-  assert.deepStrictEqual(mist, [], 'zonder randen.js valt het paneel niet te openen');
+  assert.deepStrictEqual(mist, [], 'zonder legacy-rand of DS-schil valt het paneel niet te openen');
 });
 
 test('het bedieningspaneel bouwt geen eigen zwevende ingang', () => {
@@ -47,7 +48,7 @@ test('het bedieningspaneel bouwt geen eigen zwevende ingang', () => {
 
 test('de chatbalk van Rahul begint weggelegd en kan weer weg', () => {
   const bron = lees('public/shared/rahul-mond.js');
-  assert.match(bron, /className = 'rmond rm-weg'/, 'start onzichtbaar');
+  assert.match(bron, /className = 'rmond rm-weg ds-rahul-mond'/, 'start onzichtbaar');
   assert.match(bron, /window\.RTGRahul\.sluit = function/, 'kan opgeruimd worden');
   assert.ok(!/rm-dicht/.test(bron), 'geen half ingeklapte pil meer, alleen weg of open');
 });
@@ -57,16 +58,19 @@ test('de Rahul-laag ligt boven de werkschillen van de apps', () => {
   // chatbalk die je oproept moet daaroverheen, anders roep je iets op dat je
   // niet ziet (dat ging eerder mis).
   for (const [bestand, klassen] of [
-    ['public/shared/rahul-mond.js', ['.rmond', '.rm-uit']],
+    ['public/ds/componenten/rahul-mond.css', ['.ds-rahul-mond.rmond', '.ds-rahul-mond.rm-uit']],
     /* Het antwoordvenster (.mgz-sheet) zweeft niet meer: het zit in .mgz-blok
        en staat daar gewoon in de stroom. Het BLOK is dus het element dat boven
        de app-schillen moet liggen, en dat is nu wat we hier toetsen. */
-    ['public/shared/metgezel/metgezel-01.js', ['.mgz-knop', '.mgz-blok', '.mgz-banner']]
+    ['public/ds/componenten/samen.css', ['.ds-samen-knop', '.ds-samen-host .mgz-blok', '.ds-samen-banner']]
   ]) {
     const bron = lees(bestand);
     for (const k of klassen) {
-      const stuk = bron.slice(bron.indexOf(k + '{'));
-      const m = /z-index:(\d+);/.exec(stuk.slice(0, 400));
+      const selector = new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\{');
+      const begin = selector.exec(bron);
+      assert.ok(begin, k + ' ontbreekt');
+      const stuk = bron.slice(begin.index);
+      const m = /z-index:\s*(\d+)\s*;/.exec(stuk.slice(0, 500));
       assert.ok(m, k + ' heeft geen z-index');
       assert.ok(Number(m[1]) > 200, k + ' ligt op ' + m[1] + ', onder de app-schillen');
     }
@@ -87,30 +91,54 @@ test('er is nog maar een rand: boven, en die opent alleen het bedieningspaneel',
   assert.ok(!/os-thuis-pill/.test(bron), 'en dus ook de uitzondering voor de home-pil niet meer');
 });
 
-test('Rahul staat als balk op de pagina, met de lippen als knop en een kleine stand', () => {
-  /* De vervanger van het gebaar: een balk die er altijd is en die je zelf klein
-     maakt. Zonder deze drie is Rahul nergens meer te bereiken.
-     We lezen de BUNDEL en niet een van de delen: welk deel de code draagt is
-     een indeling van het huis, geen belofte aan de gebruiker -- deze toets brak
-     dan ook meteen toen het blok naar een eigen deel verhuisde. */
-  const bron = lees('public/shared/metgezel.js');
-  assert.match(bron, /blok\.appendChild\(balk\)[\s\S]{0,400}document\.body\.appendChild\(blok\)/,
-    'de balk zit in het blok en dat blok staat echt op de pagina');
-  assert.match(bron, /orb\.addEventListener\('click'/, 'de lippen klappen hem klein of groot');
-  assert.match(bron, /localStorage\.setItem\(KLEIN/, 'die keuze blijft bewaard');
+/* Deze broncontroles bewijzen aansluiting en herstelpaden, NIET geometrie.
+   De oude checks lazen een onbereikbare metgezel-balk (eigenRahul=true).
+   Actieve eigenaren: Rahul-tab voor context/gesprek, handenvrij voor de balk,
+   metgezel voor Samen. Geen tweede controller voor dezelfde ingang.
+
+   Nog uit te voeren browser-eindproef op de twee leveranciersroutes:
+   - open/sluit Rahul-tab en Samen via hun bestaande hooks; heropen met context;
+   - open/leg handenvrij weg; controleer focus en bereikbare laatste formulieractie;
+   - meet overlap met Edge, safe area en toetsenbord op mobiel en desktop,
+     ook bij tekstvergroting en lange antwoorden. De vaste 3.6rem-reservering
+     is slechts een CSS-contract, geen bewijs dat alle geometrie vrij blijft.
+   Compacte-standpersistentie van de oude KLEIN-tak was nooit actief; die
+   productwens blijft open en wordt hier niet als bestaand gedrag voorgesteld. */
+test('Rahul en Samen behouden actieve ingangen en expliciete sluit- en herstelpaden', () => {
+  const tab = lees('public/shared/rahul-tab.js');
+  const hv = lees('public/shared/handenvrij-balk.js');
+  const mgz = lees('public/shared/metgezel.js');
+  assert.match(mgz, /\/shared\/rahul-tab\.js/);
+  assert.match(mgz, /\/shared\/handenvrij\.js/);
+  assert.match(tab, /host\.appendChild\(tab\)/, 'de actieve Rahul-ingang wordt aangesloten');
+  assert.match(tab, /window\.RTGMetgezel\.rahul=(?:async )?function/);
+  assert.match(tab, /page\.hidden=!ja/);
+  assert.match(tab, /rtg-command-close[^\n]*open\(false\)/, 'Rahul kan terug naar het werkblad');
+  assert.match(hv, /root\.RTGRahul\.open = haalOp; root\.RTGRahul\.sluit = legWeg/);
+  assert.match(hv, /balk\.classList\.remove\('hv-weg'\)/, 'handenvrij kan terugkomen');
+  assert.match(hv, /balk\.classList\.add\('hv-weg'\)/, 'handenvrij kan worden weggelegd');
+  assert.match(mgz, /window\.RTGMetgezel\.samen = toonSamen/);
+  assert.match(mgz, /sSheet\.hidden = false/);
+  assert.match(mgz, /sSheet\.hidden = true/);
 });
 
-test('Rahul staat nergens overheen: de pagina houdt ruimte voor hem vrij', () => {
-  /* De kern van "geintegreerd in plaats van zwevend". Twee dingen samen maken
-     dat waar: het antwoord zit IN het blok (en niet als los venster over de
-     pagina), en onderaan de body staat een tussenstuk zo hoog als het blok.
-     Dat tussenstuk is bewust geen body-padding: pagina's hebben daar hun eigen
-     marge staan en die zouden we dan overschrijven. */
-  const bron = lees('public/shared/metgezel.js');
-  assert.match(bron, /blok\.appendChild\(sheet\)/, 'het antwoord hoort in het blok, niet los over de pagina');
-  assert.match(bron, /ruimte\.style\.height/, 'de pagina krijgt een tussenstuk zo hoog als het blok');
-  assert.ok(!/body\.style\.paddingBottom/.test(bron), 'en dat gaat niet via de marge van de pagina');
-  assert.ok(!/maakSleepbaar\(sheet/.test(bron), 'een venster dat op zijn plek staat hoeft niet versleepbaar te zijn');
+test('actieve presentaties beginnen verborgen en handenvrij heeft een expliciete ruimtereservering', () => {
+  const tab = lees('public/shared/rahul-tab.js');
+  const stijl = lees('public/ds/componenten/rahul.css');
+  const hv = lees('public/shared/handenvrij-balk.js');
+  const hvStijl = lees('public/ds/componenten/handenvrij.css');
+  assert.match(tab, /page\.hidden=true/);
+  assert.match(stijl, /\.ds-rahul\[hidden\](?:\s*,[^{}]+)?\s*\{\s*display:\s*none;?\s*\}/);
+  assert.match(hv, /balk\.className = 'ds-handenvrij__balk hv-balk hv-weg'/);
+  assert.match(hv, /chat\.hidden = true/);
+  assert.match(hvStijl, /\.ds-handenvrij\.hv-ruimte\s*\{\s*padding-block-end:\s*3\.6rem;\s*\}/);
+  assert.match(hvStijl, /\.ds-handenvrij\.hv-opgeruimd,[^{]+\{\s*padding-block-end:\s*0;\s*\}/);
+  assert.match(hv, /classList\.remove\('hv-opgeruimd'\)/);
+  assert.match(hv, /classList\.add\('hv-opgeruimd'\)/);
+  const verborgen = hvStijl.match(/\.ds-handenvrij__balk\.hv-weg,[^{]+\{\s*display:\s*none;\s*\}/);
+  assert.ok(verborgen, 'de balk begint verborgen in de canonical component');
+  assert.match(verborgen[0], /\.ds-handenvrij__werk\.hv-weg/);
+  assert.match(verborgen[0], /\.ds-handenvrij__chat\.hv-weg/);
 });
 
 test('html en script van dezelfde bouw, en een mismatch herstelt zichzelf een keer', () => {

@@ -19,7 +19,8 @@
     pointer-events: none;
     transition: opacity var(--ds-duur) var(--ds-curve), transform var(--ds-duur) var(--ds-curve);
   }
-  .ds-melding.toon { opacity: 1; transform: none; }
+  /* Bestaande domeinowners gebruiken .zie; zij behouden tekst en levensduur. */
+  .ds-melding.toon, .ds-melding.zie { opacity: 1; transform: none; }
   .ds-melding:empty { display: none; }
   /* Een melding die blijft staan tot ze wordt gesloten (de mediapoort: waarom
      camera of microfoon niet opengaat). Leesbaar en aanraakbaar. */

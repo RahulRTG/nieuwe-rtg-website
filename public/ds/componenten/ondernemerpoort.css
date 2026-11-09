@@ -1,0 +1,33 @@
+/* De Ondernemerpoort houdt onboarding en online-status in
+   shared/ondernemerpoort.js. Dit component draagt band, dialoog en toast. */
+@layer rtg.component {
+  .ds-ondernemerpoort.poort-band { position: fixed; inset-block-start: calc(env(safe-area-inset-top,0px) + 3.4rem); inset-inline-start: 50%; z-index: 36; display: flex; align-items: center; gap: var(--ds-ruimte-3); max-inline-size: min(30rem,92vw); padding: var(--ds-ruimte-2) var(--ds-ruimte-2) var(--ds-ruimte-2) var(--ds-ruimte-3); color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-status-fout); border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); font-size: var(--ds-maat-klein); transform: translateX(-50%); }
+  .ds-ondernemerpoort[hidden] { display: none; }
+  .ds-ondernemerpoort.poort-band b { color: var(--ds-status-fout); font-weight: 600; }
+  .ds-ondernemerpoort.poort-band .p-open { flex: 0 0 auto; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); color: var(--ds-accent-inkt); background: var(--ds-accent); border: 0; border-radius: var(--ds-radius-inhoud); font: inherit; font-size: var(--ds-maat-klein); font-weight: 600; cursor: pointer; }
+  .ds-ondernemerpoort.poort-band .p-open:hover, .ds-ondernemerpoort .p-online:hover { background: var(--ds-accent-hover); }
+  .ds-ondernemerpoort.poort-toast { inset-block-start: auto; inset-block-end: calc(env(safe-area-inset-bottom,0px) + 5rem); }
+  .ds-ondernemerpoort.poort-waas { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding-block: max(var(--ds-ruimte-6),env(safe-area-inset-top,0px)) max(var(--ds-ruimte-6),env(safe-area-inset-bottom,0px)); padding-inline: max(var(--ds-ruimte-6),env(safe-area-inset-left,0px)) max(var(--ds-ruimte-6),env(safe-area-inset-right,0px)); background: var(--ds-glas); backdrop-filter: blur(4px); }
+  .ds-ondernemerpoort .poort-kaart { inline-size: min(34rem,100%); max-block-size: 88dvh; padding: var(--ds-ruimte-6); overflow-y: auto; color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); }
+  .ds-ondernemerpoort .poort-kaart h2 { margin: 0 0 var(--ds-ruimte-1); font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 600; }
+  .ds-ondernemerpoort .poort-kaart .p-sub { margin: 0 0 var(--ds-ruimte-4); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.5; }
+  .ds-ondernemerpoort .p-stap { display: flex; align-items: flex-start; gap: var(--ds-ruimte-3); padding-block: var(--ds-ruimte-2); border-block-start: 1px solid var(--ds-glasrand); }
+  .ds-ondernemerpoort .p-vink { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; inline-size: 1.4rem; block-size: 1.4rem; margin-block-start: var(--ds-ruimte-1); color: var(--ds-inkt-zacht); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-cirkel); font-size: var(--ds-maat-klein); }
+  .ds-ondernemerpoort .p-stap.klaar .p-vink { color: var(--ds-accent-inkt); background: var(--ds-accent); border-color: var(--ds-accent); }
+  .ds-ondernemerpoort .p-stap .p-tk { flex: 1; min-inline-size: 0; }
+  .ds-ondernemerpoort .p-stap .p-tk b { display: block; font-size: var(--ds-maat-tekst); font-weight: 600; }
+  .ds-ondernemerpoort .p-stap .p-tk span { display: block; margin-block-start: var(--ds-ruimte-1); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.45; }
+  .ds-ondernemerpoort .p-stap .p-doe { align-self: center; flex: 0 0 auto; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); color: var(--ds-status-fout); background: transparent; border: 1px solid var(--ds-status-fout); border-radius: var(--ds-radius-inhoud); font: inherit; font-size: var(--ds-maat-klein); font-weight: 600; cursor: pointer; }
+  .ds-ondernemerpoort .p-rond { margin: var(--ds-ruimte-2) 0 0; padding: var(--ds-ruimte-3) var(--ds-ruimte-4); background: var(--ds-oppervlak); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+  .ds-ondernemerpoort .p-rond h3 { margin: 0 0 var(--ds-ruimte-2); font-size: var(--ds-maat-tekst); font-weight: 600; }
+  .ds-ondernemerpoort .p-rond ol { margin: 0; padding-inline-start: var(--ds-ruimte-4); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.6; }
+  .ds-ondernemerpoort .poort-knoprij { display: flex; gap: var(--ds-ruimte-2); margin-block-start: var(--ds-ruimte-4); }
+  .ds-ondernemerpoort .poort-knoprij button { flex: 1; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-3); border: 0; border-radius: var(--ds-radius-inhoud); font: inherit; font-size: var(--ds-maat-klein); font-weight: 600; cursor: pointer; }
+  .ds-ondernemerpoort .p-online { color: var(--ds-accent-inkt); background: var(--ds-accent); }
+  .ds-ondernemerpoort .p-online:disabled { color: var(--ds-inkt-zacht); background: var(--ds-oppervlak-sterk); cursor: not-allowed; }
+  .ds-ondernemerpoort .poort-knoprij .p-sluit { color: var(--ds-inkt-zacht); background: transparent; border: 1px solid var(--ds-lijnkleur); }
+  .ds-ondernemerpoort .p-melding { min-block-size: 1rem; margin-block-start: var(--ds-ruimte-3); color: var(--ds-status-fout); font-size: var(--ds-maat-klein); }
+  .ds-ondernemerpoort :is(.p-open,.poort-knoprij button,.p-stap .p-doe):focus-visible { outline: 2px solid var(--ds-cover-inkt); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .ds-ondernemerpoort, .ds-ondernemerpoort .poort-kaart { scroll-behavior: auto; } }
+  @media print { .ds-ondernemerpoort.poort-band, .ds-ondernemerpoort.poort-waas { display: none; } }
+}

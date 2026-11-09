@@ -12,8 +12,9 @@ test('Project Room heeft uitvoering, dossier en menselijke oplevering', () => {
     assert.match(html, new RegExp('data-pr-paneel="' + stand + '"'));
     assert.match(html, new RegExp('data-pr-open="' + stand + '"'));
   }
-  assert.match(html, /rtg-project-room-2026\.css/);
-  assert.match(lees('public/shared/rtg-project-room-2026.css'), /@media\(max-width:760px\)/);
+  assert.match(html, /href="\/ds\/rtg-ds.css"/);
+  assert.doesNotMatch(html, /href="\/shared\/[^"]+\.css"/);
+  assert.match(lees('public/ds/componenten/werkdocument.css'), /@media \(max-width: 48rem\)/);
 });
 
 test('Project Room gebruikt echte RTG One-projecten en geen presentatiedata', () => {

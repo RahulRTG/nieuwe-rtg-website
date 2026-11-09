@@ -1,0 +1,84 @@
+/* Bar en Vloer: operationele werkkaarten, drankronden en wijkoverdracht.
+   De bestaande domeinowners leveren alle inhoud, standen en handelingen. */
+@layer rtg.component {
+  .ds-horeca-werkkop {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3);
+    padding: var(--ds-ruimte-4) var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur);
+  }
+  .ds-horeca-werkkop > span { min-inline-size: 0; }
+  .ds-horeca-werkkop .ds-titel { overflow-wrap: anywhere; }
+  .ds-horeca-werkvlak {
+    min-inline-size: 0; padding: var(--ds-goot);
+    padding-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12));
+  }
+  .ds-horeca-werkvloer .ds-label, .ds-horeca-werkvloer .ds-horeca-kpi span {
+    font-size: var(--ds-maat-klein);
+  }
+  .ds-horeca-werkvloer .ds-knop {
+    max-inline-size: 100%; min-block-size: var(--ds-doel); padding-block: var(--ds-ruimte-2);
+    white-space: normal; overflow-wrap: anywhere;
+  }
+  .ds-horeca-werkkopje {
+    margin-block: var(--ds-ruimte-8) var(--ds-ruimte-3);
+    font: 600 var(--ds-maat-tekst)/1.4 var(--ds-letter-tekst); color: var(--ds-inkt);
+  }
+  .ds-horeca-stapel { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+  .ds-horeca-stapel > div {
+    display: grid; gap: var(--ds-ruimte-1); min-block-size: var(--ds-doel);
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud); overflow-wrap: anywhere;
+  }
+  .ds-horeca-stapel b, .ds-horeca-werknaam { font-size: 1.1875rem; font-weight: 600; }
+  .ds-horeca-stapel small { font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-horeca-werkkaart, .ds-horeca-werkbod, .ds-horeca-werkantwoord, .ds-horeca-werkvorm {
+    min-inline-size: 0; padding: var(--ds-ruimte-4); margin-block-end: var(--ds-ruimte-3);
+    border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-oppervlak-sterk); overflow-wrap: anywhere;
+  }
+  .ds-horeca-werkkaart:is(.wacht,.los,.over), .ds-horeca-werkbod {
+    border-inline-start: 3px solid var(--ds-accent);
+  }
+  .ds-horeca-kaartrij { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+  .ds-horeca-werkaantal { margin-inline-start: auto; font-size: 1.0625rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .ds-horeca-barregels { list-style: none; margin-block: var(--ds-ruimte-2) 0; padding: 0; }
+  .ds-horeca-barregels li {
+    display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-2);
+    padding-block: var(--ds-ruimte-3); font-size: var(--ds-maat-tekst);
+    border-block-start: 1px solid var(--ds-lijnkleur);
+  }
+  .ds-horeca-barregels li:first-child { border-block-start: 0; }
+  .ds-horeca-barregels em { font-style: normal; font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-horeca-werkallergie {
+    display: inline-block; padding: var(--ds-ruimte-1) var(--ds-ruimte-2);
+    border: 1px solid var(--ds-accent); border-radius: var(--ds-radius-inhoud); font-size: var(--ds-maat-klein);
+  }
+  .ds-horeca-werkleeg {
+    border: 1px dashed var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud);
+    padding: var(--ds-ruimte-4); font-size: var(--ds-maat-tekst); color: var(--ds-inkt-zacht);
+  }
+  .ds-horeca-werkvoet { margin-block: var(--ds-ruimte-6) 0; font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-horeca-kortvoet { margin-block-start: var(--ds-ruimte-2); }
+  .ds-horeca-rijwaarschuwing {
+    margin-block-end: var(--ds-ruimte-4); padding: var(--ds-ruimte-4);
+    border: 2px solid var(--ds-accent); border-radius: var(--ds-radius-inhoud); font-size: var(--ds-maat-tekst);
+  }
+  .ds-horeca-werksom { margin-block: var(--ds-ruimte-2) 0; }
+  .ds-horeca-werktafels { margin-block: var(--ds-ruimte-2) 0; font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-horeca-werkacties { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); margin-block-start: var(--ds-ruimte-3); }
+  .ds-horeca-werkacties .ds-invoer { flex: 1 1 10rem; min-inline-size: 0; max-inline-size: 100%; }
+  .ds-horeca-werkbod > p, .ds-horeca-werkantwoord > p, .ds-horeca-werkvorm > p { margin-block: 0 var(--ds-ruimte-3); }
+  .ds-horeca-werkleen {
+    display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-3);
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4); margin-block-end: var(--ds-ruimte-2);
+    border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); overflow-wrap: anywhere;
+  }
+  .ds-horeca-werkleen small { font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); }
+  .ds-horeca-werkindeling { margin-block-start: var(--ds-ruimte-8); padding-block-start: var(--ds-ruimte-2); border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-horeca-werkvakjes { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); margin-block-start: var(--ds-ruimte-3); }
+  .ds-horeca-werkvakjes label {
+    display: inline-flex; align-items: center; gap: var(--ds-ruimte-2); min-block-size: var(--ds-doel);
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud); font-size: var(--ds-maat-tekst); cursor: pointer;
+  }
+  .ds-horeca-werkvakjes input { flex: 0 0 24px; inline-size: 24px; block-size: 24px; accent-color: var(--ds-accent); }
+}

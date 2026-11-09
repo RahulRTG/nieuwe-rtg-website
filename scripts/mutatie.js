@@ -515,7 +515,13 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
   });
   if (process.platform !== 'win32' && r.pid) {
     try { process.kill(-r.pid, 'SIGKILL'); }
-    catch (e) { if (e.code !== 'ESRCH') throw e; }
+    catch (e) {
+      // Een force-exit kan de groepsleider al hebben opgeruimd en de losse
+      // groepskill op macOS vervolgens als EPERM teruggeven. De kindrunner is
+      // dan aantoonbaar afgelopen; ESRCH en EPERM betekenen hier beide dat er
+      // niets meer door deze ouder kan worden opgeruimd.
+      if (!['ESRCH', 'EPERM'].includes(e.code)) throw e;
+    }
   }
   const uit = String(r.stdout || '');
   if (logPrefix) {
@@ -1406,6 +1412,36 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* Presentatiecontracten lezen vooral letterlijke DOM-, CSS- en eigenaarregels.
+     De generieke rekenoperatoren raakten die contracten niet. Op 5 november
+     2026 zijn daarom elf gerichte handmutaties uitgevoerd en teruggezet; elke
+     genoemde wijziging liet uitsluitend de bijbehorende toets rood worden. */
+  ['borden-presentatie.test.js', 'CSS-contract; alle min-block-size: var(--ds-doel) vervangen door 1px laat de toets zakken'],
+  ['deelmenu-ds.test.js', 'DOM-contract; ds-deelmenu-knop in de bron hernoemen laat de toets zakken'],
+  ['focus-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  ['instellingen-actuele-ds.test.js', 'DOM-contract; ds-instellingen in de bron hernoemen laat de lifecycletoets zakken'],
+  ['leverancier-overlays-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
+  ['public-platform-owner.test.js', 'DOM-contract; document.createElement img vervangen door video laat de mediatoets zakken'],
+  ['rahulpoort-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  ['scanknop-presentatie.test.js', 'CSS-contract; alle safe-area-inset-top-verwijzingen hernoemen laat de toets zakken'],
+  ['teamcall-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
+  ['werkos-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
+  ['zaakcommand-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  /* Statische scherm- en broncontracten zonder rechtstreeks requirepad. Ook
+     deze zijn op 5 november 2026 gericht gemuteerd en na iedere proef hersteld. */
+  ['aankomst-chauffeur-voorzijde.test.js', 'HTML-contract; data-ds-schermtype taak hernoemen laat de toets zakken'],
+  ['beginscherm.test.js', 'routecontract; wallet.js in geld.html hernoemen laat de toets zakken'],
+  ['canvas.test.js', 'browsercontract; var MAX van 3 naar 4 laat de canvastoets zakken'],
+  ['clipdeler.test.js', 'exportcontract; RTGClipDeler.start op null zetten laat de toets zakken'],
+  ['command-router.test.js', 'routercontract; RTGAppDirectoryCommand hernoemen laat de toets zakken'],
+  ['decision-room.test.js', 'HTML-contract; data-dr-paneel agenda hernoemen laat de toets zakken'],
+  ['eten-uitgaan-voorzijde.test.js', 'wereldcontract; rtg-night-discover in foodcourt hernoemen laat de toets zakken'],
+  ['foundation-geld-later.test.js', 'tekstcontract; de Vandaag-belofte verwijderen laat de toets zakken'],
+  ['foundation-gezondheid-welzijn.test.js', 'tekstcontract; de Stap-voor-stap-belofte verwijderen laat de toets zakken'],
+  ['foundation-hulp-zorg.test.js', 'tekstcontract; de meebewegende-hulpbelofte verwijderen laat de toets zakken'],
+  ['foundation-leren-groei.test.js', 'tekstcontract; Vandaag een stap verder verwijderen laat de toets zakken'],
+  ['foundation-meedoen-ontdekken.test.js', 'tekstcontract; de welkom-belofte verwijderen laat de toets zakken'],
+  ['foundation-samen-thuis.test.js', 'tekstcontract; Samen begint met overzicht verwijderen laat de toets zakken'],
   /* De crashherkenning van de meetronde (scripts/lib/valom.js) is een regex en
      een `||`; geen van de vier operatoren komt erin voor (0 pogingen, 28
      september 2026). Met de hand gemeten: `fout || ''` -> `fout && ''` laat
@@ -1832,12 +1868,12 @@ function overleverTelling(uitslag) {
 
 /* EEN PURE TOETS. Groen zonder mutatie is een voorwaarde: staat hij al rood, dan
    bewijst "hij zakt" niets (LAT.md regel 3 -- een meter zonder invoer meet niet). */
-function proefPuur(naam, posities) {
+function proefPuur(naam, posities, forceer) {
   if (NIET_MUTEREN.has(naam)) return { soort: 'puur', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
   if (GEEN_BRONMUTATIE.has(naam)) return { soort: 'puur', staat: 'geen bronmutatie mogelijk', reden: GEEN_BRONMUTATIE.get(naam) };
   const diep = posities || 1;
   const bestand = path.join(TEST, naam);
-  const nul = draaiToets(bestand);
+  const nul = draaiToets(bestand, null, null, forceer);
   /* Eerst de nulmeting, en een die niet AFKOMT is een eigen uitslag. Zonder deze
      regel zou de motor negen keer vier minuten wachten op een toets die toch niet
      te meten is, en dan draait niemand hem ooit af. */
@@ -1866,7 +1902,7 @@ function proefPuur(naam, posities) {
             : spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' }).status === 0;
           if (!geldig) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
-          const na = draaiToets(bestand, null, WACHT_MUTATIE);
+          const na = draaiToets(bestand, null, WACHT_MUTATIE, forceer);
           const schade = bijwerkingVan(voor, bronStand(p));
           if (schade.length) {
             herstelBron(voor, schade);
@@ -2033,15 +2069,15 @@ function proefServerScherp(naam) {
   return { staat: na.gezakt > 0 ? 'gezakt' : 'overleefd', gezakt: na.gezakt };
 }
 
-function proefServer(naam) {
+function proefServer(naam, forceer) {
   if (NIET_MUTEREN.has(naam)) return { soort: 'server', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
   const bestand = path.join(TEST, naam);
-  const nul = draaiToets(bestand);
+  const nul = draaiToets(bestand, null, null, forceer);
   if (nul.tijdout) return { soort: 'server', staat: 'te langzaam' };
   if (nul.gezakt > 0) return { soort: 'server', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
   if (!nul.toetsen) return { soort: 'server', staat: 'geen toetsen gedraaid' };
   if (nul.alGeslagen) return { soort: 'server', staat: 'slaat zichzelf over', overgeslagen: nul.overgeslagen };
-  const na = draaiToets(bestand, { RTG_LIEG: '/api/' }, WACHT_MUTATIE);
+  const na = draaiToets(bestand, { RTG_LIEG: '/api/' }, WACHT_MUTATIE, forceer);
   if (na.tijdout) return Object.assign(tijdoutMaarMeetbaar(bestand, { RTG_LIEG: '/api/' }, 'server'),
     { operator: 'liegpoort /api/' });
   return na.gezakt > 0
@@ -2147,6 +2183,7 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
+  const forceer = args.includes('--force-exit');
   const gerichtArg = args.find(a => a.startsWith('--gericht='));
   const gericht = gerichtArg ? laadGericht(gerichtArg.slice(10)) : null;
 
@@ -2260,7 +2297,7 @@ if (require.main === module) {
 
   if (alleen !== 'server') {
     console.log('  --- A: pure toetsen, bronmutatie (eerste plek per operator) ---');
-    doe(puur, (n) => proefPuur(n, 1));
+    doe(puur, (n) => proefPuur(n, 1, forceer));
     vastleggen();
     /* DE DIEPE RONDE, alleen over de overlevers. Een overlever kan twee dingen
        betekenen -- de toets legt het gedrag niet vast, of de motor heeft geen code
@@ -2277,7 +2314,7 @@ if (require.main === module) {
          meting is er dus gewoon te betalen. */
       console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, elke plek per operator ---');
       for (const naam of overlevers) {
-        const r = proefPuur(naam, 1000);
+        const r = proefPuur(naam, 1000, forceer);
         uitslag[naam] = r;
         bewaar();
         console.log('        ' + naam.padEnd(42) + r.staat +
@@ -2288,7 +2325,7 @@ if (require.main === module) {
   }
   if (alleen !== 'puur') {
     console.log('  --- B: servertoetsen, liegpoort ---');
-    doe(server, proefServer);
+    doe(server, n => proefServer(n, forceer));
     vastleggen();
 
     /* FASE C, DE SCHERPE RONDE. Fase B laat ALLES liegen, ook de deur waardoor

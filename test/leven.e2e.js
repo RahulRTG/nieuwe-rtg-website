@@ -97,7 +97,7 @@ test('RTG Leven opent op de levenslijn uit de cockpit, toont echte zaken en laat
     assert.doesNotMatch(lijnBeeld.geboorte, /sinds/i, 'een fase die geweest is, draagt een jaar en geen "sinds"');
     /* De herkomst bereikt het scherm: dit lid liet nooit een paspoort zien. */
     await page.click('.lv-lijn [data-fase-id="geboorte"] summary');
-    const herkomst = await page.locator('.lv-lijn [data-fase-id="geboorte"] details').innerText();
+    const herkomst = await page.locator('.lv-lijn [data-fase-id="geboorte"] details').textContent();
     assert.match(herkomst, /zelf opgaf/, 'een opgegeven geboortejaar staat er als opgegeven');
     assert.doesNotMatch(herkomst, /geverifieerd/i, 'en niet als geverifieerd paspoortgegeven');
 

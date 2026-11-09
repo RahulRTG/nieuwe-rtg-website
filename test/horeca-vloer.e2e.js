@@ -31,18 +31,20 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering } = require('./helper');
+const { werkvloerMatrix } = require('./lib/horeca-werkvloer-browser');
 const pw = laadPlaywright();
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vloerscherm-'));
+
 
 const post = (base, pad, body, token) => fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test('het vloerscherm toont de verdeling en draagt een wijk over',
-  { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
+  { skip: geenBrowser(pw), timeout: 150000 }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vloerscherm-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_STORE: 'sqlite', RTG_DEMO: '1', DATABASE_URL: '', PG_URL: '', REDIS_URL: '', RTG_EXTERNE_AI_UIT: '1', LOCAL_AI_URL: '', OPENAI_API_KEY: '', ANTHROPIC_API_KEY: '' } });
   let browser;
   try {
     browser = await pw.chromium.launch(browserOpties(pw));
@@ -51,7 +53,7 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     /* Twee mensen, dus twee contexten: een gedeelde localStorage zou beide
        schermen dezelfde inlog geven, en dan is er niets over te dragen. */
     async function scherm() {
-      const ctx = await browser.newContext({ serviceWorkers: 'block' });
+      const ctx = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 390, height: 1000 }, locale: 'nl-NL', reducedMotion: 'reduce' });
       const page = await ctx.newPage();
       letOpFouten(page, fouten);
       return page;
@@ -160,6 +162,8 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     const pA = await scherm(); await open(pA, tokA);
     const pM = await scherm(); await open(pM, tokM);
 
+    await werkvloerMatrix(pM, { naam: 'vloer', focus: '#vNieuw', panelen: ['#vWijken', '#vGeleend', '#vAanbod', '#vIndeel'] });
+
     /* ---- 2. de verdeling ---- */
     let a = await lees(pA);
     assert.match(a.wijken, /Serre/, 'de wijk staat er: ' + a.wijken);
@@ -216,16 +220,15 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
        niemand meer opschrijft. */
     // het veld zelf wordt bij elke ronde opnieuw getekend, dus is het zijn eigen bewijs
     await verversEnHerteken(pM, redenSel);
-    /* Met een korte genadetermijn, want dit scherm ververst ook op de duw van
+    /* Met een begrensde genadetermijn, want dit scherm ververst ook op de duw van
        een COLLEGA: tussen het hertekende veld en het terugzetten van de reden
        kan onder runnerbelasting nog een tweede golf zitten, en dan meet de
        bewering het verse, nog lege veld van die tweede golf. De wacht is op de
-       WAARDE en loopt hooguit twee seconden; een herstel dat echt stuk is,
-       zakt daarna nog precies zo -- met dezelfde melding. */
+       WAARDE; een herstel dat echt stuk is zakt nog steeds met dezelfde melding. */
     await wachtTot(pM, (s) => {
       const el = document.querySelector(s);
       return !!el && el.value === 'ik sta zelf bij de pas';
-    }, redenSel, { wat: 'de teruggezette reden', ms: 2000 }).catch(() => {});
+    }, redenSel, { wat: 'de teruggezette reden', ms: 10000 });
     assert.equal(await pM.inputValue(redenSel), 'ik sta zelf bij de pas',
       'een verversing tijdens het typen gooit de reden niet weg');
     await pM.click('[data-nee]');
@@ -322,6 +325,8 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     // de indeelvorm wordt door de klik zelf getekend; #vNaam is er het veld van
     await wachtOpZichtbaar(pM, '#vNaam');
     await pM.fill('#vNaam', 'Loge');
+    await werkvloerMatrix(pM, { naam: 'vloer-concept', focus: '#vVorm [data-bewaar]', panelen: ['#vVorm', '#vWijken'], checkboxen: true });
+    assert.equal(await pM.inputValue('#vNaam'), 'Loge', 'dezelfde conceptwijk na alle scherm- en tekstmaten');
 
     /* Dit scherm ververst op elke duw van een collega. Een vorm die daarbij
        opnieuw wordt opgebouwd, gooit een half ingetypte indeling weg -- en dat
@@ -341,7 +346,7 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     assert.deepEqual(fouten, [], 'geen fouten in de console');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

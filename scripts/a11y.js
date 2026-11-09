@@ -816,7 +816,7 @@ async function startEchteServer() {
           if (res.contrast.length) {
             n += res.contrast.length;
             console.log(`[a11y] ${pad} (${as.naam}=${stand}): ${res.contrast.length} contrastfout(en)`);
-            for (const w of res.contrast.slice(0, 3)) console.log(`  · ${w}`);
+            for (const w of res.contrast.slice(0, 3)) console.log(`  · ${typeof w === 'string' ? w : JSON.stringify(w)}`);
           }
         }
         blind[as.naam] += n;

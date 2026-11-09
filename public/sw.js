@@ -5,7 +5,7 @@
    of hij nog klopt.
 
    Een inhoudsafdruk voorkomt dat een geinstalleerde app een oude schil houdt. */
-const CACHE = 'rtg-app-03df0881';
+const CACHE = 'rtg-app-7bdb8465';
 const SHELL = [
   '/shared/interface/module-sdk.js',
   '/shared/interface/workspace-world-catalog.js',
@@ -48,6 +48,7 @@ const SHELL = [
   '/shared/rtg-world-home.css', '/shared/rtg-world-home-copy.js', '/shared/rtg-world-home.js',
   '/apps/wereld.html', '/apps/wereld-feed.css', '/apps/wereld-feed.js', '/apps/wereld-welcome.js',
   '/images/world-homes/living.webp', '/images/world-homes/living-canal.webp', '/images/world-homes/living-coast.webp',
+  '/images/world-homes/living-sfeer.jpg',
   '/images/world-homes/travel.webp', '/images/world-homes/work.webp', '/images/world-homes/foundation.webp',
   '/shared/rtg-world-start.css', '/shared/rtg-world-start.js',
   '/shared/rtg-route-memory-core.js', '/shared/rtg-route-memory.js',

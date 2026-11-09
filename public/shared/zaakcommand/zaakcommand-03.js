@@ -24,7 +24,7 @@
     T.zoek = function () {
       vak.innerHTML = '<div class="zc-kaart"><h3>Zoek in uw zaak</h3>' +
         '<p class="zc-meta">Bestelnummer, tafel, kamer, naam of status. Alleen wat van uw zaak is.</p>' +
-        '<div class="zc-rij"><input class="zc-veld" id="zcQ" placeholder="zoeken…" style="flex:1;min-width:10rem;" value="' + esc(S.zoekterm) + '">' +
+        '<div class="zc-rij"><input class="zc-veld zc-veld-zoek" id="zcQ" placeholder="zoeken…" value="' + esc(S.zoekterm) + '">' +
         '<button class="zc-knop vol" id="zcGa">Zoek</button></div></div><div id="zcUit"></div>';
       var inp = vak.querySelector('#zcQ');
       var doe = function () {
@@ -52,8 +52,8 @@
       return d.groepen.map(function (g) {
         return '<div class="zc-kaart"><h3>' + esc(g.label) + ' <span class="zc-meta">· ' + g.totaal + '</span></h3>' +
           g.rijen.map(function (r) {
-            return '<div class="zc-sig"><button class="zc-knop" data-t="' + esc(r.type) + '" data-i="' + esc(r.id) + '" ' +
-              'style="border:none;padding:0;text-align:left;"><b>' + esc(r.titel) + '</b></button>' +
+            return '<div class="zc-sig"><button class="zc-knop zc-linkknop" data-t="' + esc(r.type) + '" data-i="' + esc(r.id) + '">' +
+              '<b>' + esc(r.titel) + '</b></button>' +
               (r.sub ? '<div class="zc-meta">' + esc(r.sub) + '</div>' : '') + '</div>';
           }).join('') + '</div>';
       }).join('');
@@ -94,7 +94,7 @@
       if (!d.afhankelijkheden.length) u += '<p class="zc-meta">Niets van uw zaak verwijst hiernaar.</p>';
       u += d.afhankelijkheden.map(function (g) {
         return '<div class="zc-sig"><b>' + esc(g.label) + '</b> <span class="zc-meta">' + g.totaal + '</span><div class="zc-meta">' +
-          g.rijen.map(function (x) { return '<button class="zc-knop" data-t="' + esc(x.type) + '" data-i="' + esc(x.id) + '" style="border:none;padding:0;font-size:.78rem;">' + esc(x.titel) + '</button>'; }).join(' · ') +
+          g.rijen.map(function (x) { return '<button class="zc-knop zc-linkknop zc-linkknop-klein" data-t="' + esc(x.type) + '" data-i="' + esc(x.id) + '">' + esc(x.titel) + '</button>'; }).join(' · ') +
           '</div></div>';
       }).join('');
       if (d.afhankelijkhedenOnvolledig) u += '<p class="zc-meta">Let op: een lijst was groter dan de scangrens; dit overzicht is niet volledig.</p>';

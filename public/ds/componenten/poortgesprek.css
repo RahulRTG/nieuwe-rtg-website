@@ -1,0 +1,35 @@
+/* De bestaande gegevenspoort, ook boven een reeds geopend appdialoog. */
+@layer rtg.component {
+  .ds-poortgesprek-waas--overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--ds-ruimte-4);
+    background: var(--ds-glas);
+  }
+  .ds-poortgesprek-waas--overlay[hidden] { display: none; }
+  .ds-poortgesprek {
+    max-block-size: calc(100dvh - 2 * var(--ds-goot));
+    margin: auto;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    font-family: var(--ds-letter-tekst);
+  }
+  .ds-poortgesprek h2 {
+    margin-block: 0 var(--ds-ruimte-4);
+    font-family: var(--ds-letter-display);
+    font-size: var(--ds-maat-kop);
+    font-weight: 500;
+  }
+  .ds-poortgesprek .rp-vraag { margin-block: 0 var(--ds-ruimte-4); line-height: 1.55; }
+  .ds-poortgesprek .rp-in { border-radius: var(--ds-radius-knop); }
+  .ds-poortgesprek .rp-rij { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); margin-block-start: var(--ds-ruimte-4); }
+  .ds-poortgesprek .rp-rij button { flex: 1 1 9rem; white-space: normal; padding-block: var(--ds-ruimte-3); }
+  .ds-poortgesprek .rp-waarom { margin-block-start: var(--ds-ruimte-3); }
+  .ds-poortgesprek .rp-uitleg { margin-block: var(--ds-ruimte-3) 0; line-height: 1.55; color: var(--ds-inkt-zacht); }
+  .ds-poortgesprek :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  @media print { .ds-poortgesprek, .ds-poortgesprek-waas--overlay { display: none; } }
+}

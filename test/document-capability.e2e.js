@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies, edgeBediening } = require('./helper');
 const pw = laadPlaywright();
 for (const [lang, width, height] of [['nl', 390, 844], ['en', 1440, 1000], ['ar', 390, 844]]) {
   test('document UI and standard Edge Bar use one contract: ' + lang, { skip: geenBrowser(pw) }, async () => {
@@ -46,11 +46,10 @@ for (const [lang, width, height] of [['nl', 390, 844], ['en', 1440, 1000], ['ar'
       assert.equal((await trashResponse).status(), 200, 'trash must be confirmed by the backend');
       await page.waitForFunction(() => !document.querySelector('#bkScrim').classList.contains('open'));
       assert.equal((await state()).weg, true);
-      await edgeActies(page);
-      await page.locator('[data-rtg-adaptive-source="toonBak"]').click();
+      await edgeBediening(page, 'Prullenbak', 'documents.bin');
       await page.locator('[data-open="' + f.id + '"]').click();
       await edgeActies(page);
-      const restore = page.locator('.rtg-adaptive-controls [data-cap="bestanden.herstel"]');
+      const restore = page.locator('#dsEdgeBlad:not([hidden]) [data-ds-action-id="documents.restore"]');
       await restore.waitFor({ state: 'visible', timeout: 8000 });
       assert.ok(await restore.getAttribute('aria-label'), 'Edge action has an accessible name');
       if (out) await page.screenshot({ path: path.join(out, 'document-' + lang + '-edge.png'), fullPage: true });

@@ -4,8 +4,8 @@
    shared/qrscan.js als terugval), de camera gaat open via de mediapoort
    (shared/media.js). Zonder camera of zonder scanner is typen de weg, met
    de reden erbij: een scan is nooit een doodlopende weg. Hier stond
-   shared/scanknop.js; dat zet een eigen <style> neer en hoort dus niet op
-   een ds-scherm (ONTWERPSYSTEEM.md par. 3). */
+   shared/scanknop.js; de gedeelde overlay heeft inmiddels een statisch blad,
+   maar dit DS-scherm houdt zijn compacte native dialoogcontract. */
 (function (w, d) {
   'use strict';
   function open(o) {

@@ -1,25 +1,64 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LivingOS · Mijn thuis</title><meta name="theme-color" content="#130d0a">
-<link rel="icon" href="/icons/pas-rtg.svg"><link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet"><link href="/shared/rtg-ontwerp.css" rel="stylesheet"><link href="/shared/rtg-ui.css" rel="stylesheet"><link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet"><link href="/shared/rtg-wonen-2026.css" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LivingOS · Mijn thuis</title>
+<meta name="theme-color" content="#F4EFE7">
+<link rel="icon" href="/icons/pas-rtg.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<!-- Bestaande iOS-gebaren; presentatie komt uit het centrale DS. -->
+<script src="/ds/shell.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl rtg-living-flow rtg-home-flow" data-rtg-world="living" data-rtg-skin="heritage" data-wonen-view="thuis" data-rtg-layout="standard">
-<header><a href="/apps/rtg.html" aria-label="Terug naar LivingOS">&#8592;</a><span class="home-brand">RTG</span><span class="home-product">LivingOS<small>Thuis · samen · gerust</small></span></header>
-<main>
-  <section class="home-hero" aria-labelledby="thuisKop"><div class="home-hero-copy"><div class="home-ey">Vandaag thuis</div><h1 id="thuisKop">Alles thuis. Zonder eraan te hoeven denken.</h1><p>Wat aandacht vraagt, staat klaar. De rest blijft rustig.</p><a class="home-button" href="#vandaag">Bekijk vandaag &#8594;</a></div></section>
-  <section class="home-section" aria-labelledby="standKop"><div class="home-section-head"><h2 id="standKop">Thuis in beeld</h2><a href="/apps/home.html">Bedien apparaten &#8594;</a></div><div class="home-status-grid" id="thuisStand"><div class="home-empty">Uw woning wordt geladen.</div></div></section>
-  <section class="home-section" id="vandaag" aria-labelledby="vandaagKop"><div class="home-section-head"><h2 id="vandaagKop">Vandaag</h2><a href="/apps/onderhoud.html">Onderhoud regelen &#8594;</a></div><div id="thuisVandaag"><div class="home-empty">We halen alleen op wat echt aandacht vraagt.</div></div></section>
-  <div class="home-assurance"><b aria-hidden="true">RTG</b><span>Uw huis denkt mee. U beslist.</span></div>
+<body class="ds-scherm" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard" data-ds-schermtype="collectie" data-wonen-view="thuis">
+<header class="ds-kop">
+  <button class="ds-kop__actie" type="button" data-ds-zoek aria-label="Spring naar een functie"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+  <a class="ds-kop__merk" href="/apps/rtg.html" aria-label="Terug naar LivingOS">RTG</a>
+  <a class="ds-kop__actie" href="/apps/ik.html" aria-label="Uw account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
+</header>
+<main class="ds-collectie ds-paneel" id="inhoud">
+  <div class="ds-panelen ds-panelen--twee">
+    <section class="ds-kaart ds-kaart--beeld" aria-labelledby="thuisKop">
+      <img class="ds-kaart__beeld" src="/images/editorial/living-home.webp" alt="" fetchpriority="high">
+      <div class="ds-kaart__inhoud">
+        <p class="ds-kaart__sub">Vandaag thuis</p>
+        <h1 class="ds-kaart__titel" id="thuisKop">Alles thuis. Zonder eraan te hoeven denken.</h1>
+        <p class="ds-kaart__sub">Wat aandacht vraagt, staat klaar. De rest blijft rustig.</p>
+        <a class="ds-knop ds-knop--primair" href="#vandaag" data-ds-actie="Bekijk vandaag">Bekijk vandaag &#8594;</a>
+      </div>
+    </section>
+    <section class="ds-paneel" aria-labelledby="standKop">
+      <h2 class="ds-titel ds-titel--scherm" id="standKop">Thuis in beeld</h2>
+      <div class="ds-veldgroep" id="thuisStand"><p class="ds-meta">Uw woning wordt geladen.</p></div>
+      <a class="ds-knop" href="/apps/home.html">Bedien apparaten &#8594;</a>
+    </section>
+  </div>
+  <section class="ds-paneel" id="vandaag" aria-labelledby="vandaagKop">
+    <div class="ds-collectie__kop"><h2 class="ds-titel ds-titel--scherm" id="vandaagKop">Vandaag</h2></div>
+    <div id="thuisVandaag"><p class="ds-meta">We halen alleen op wat echt aandacht vraagt.</p></div>
+    <a class="ds-knop" href="/apps/onderhoud.html">Onderhoud regelen &#8594;</a>
+  </section>
+  <p class="ds-meta">Uw huis denkt mee. U beslist.</p>
+  <nav class="ds-chips" aria-label="Wonen en thuis">
+    <a class="ds-chip" href="/apps/wonen.html" aria-current="page">Mijn thuis</a>
+    <a class="ds-chip" href="/apps/onderhoud.html">Onderhoud</a>
+    <a class="ds-chip" href="/apps/woningdossier.html">Dossier</a>
+  </nav>
 </main>
-<nav class="rtg-deep-nav rtg-deep-nav--3" aria-label="Wonen en thuis"><a href="/apps/wonen.html" aria-current="page"><b>01</b>Mijn thuis</a><a href="/apps/onderhoud.html"><b>02</b>Onderhoud</a><a href="/apps/woningdossier.html"><b>03</b>Dossier</a></nav>
-<script src="/shared/uitvoer.js"></script><script src="/apps/wonen.js"></script>
-<script src="/shared/schermbeeld.js" defer></script><script src="/shared/metgezel.js" defer></script><script src="/shared/basis.js" defer></script><script src="/shared/bediening.js" defer></script><script src="/shared/randen.js" defer></script><script src="/shared/ios.js" defer></script>
-</body></html>
+<script src="/shared/uitvoer.js"></script>
+<script src="/apps/wonen.js"></script>
+<!-- Gedeelde bediening behouden tot Rahul, Samen, handenvrij en scherminstellingen
+     en de workspace volledig via het DS beschikbaar zijn; deze afhankelijkheid blijft WIP. -->
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

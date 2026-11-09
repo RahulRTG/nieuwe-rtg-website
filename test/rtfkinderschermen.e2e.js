@@ -64,7 +64,7 @@ const FOUNDATION_OPEN = [
   ['privacy', /Privacy en veiligheid|Wat we beschermen/i]
 ];
 
-async function toon(page, base, app) {
+async function toon(page, base, app, wachtOpEigenDeur = false) {
   const pad = '/apps/' + app + '.html';
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.removeItem('rtf_sessie'); });
@@ -72,6 +72,10 @@ async function toon(page, base, app) {
   /* Een omleiding gebeurt bij het laden; wachten tot het scherm STIL is (geen
      lopend verzoek, geen hertekening) vangt hem, en wacht niet langer dan nodig. */
   await wachtOpRust(page);
+  /* Onder zware parallelle browserbelasting kan de generieke sessiedeur al
+     zichtbaar zijn terwijl de app-eigen deur nog in dezelfde laadketen volgt.
+     Wacht op het waarneembare eindcontract, nooit op een vaste tijd. */
+  if (wachtOpEigenDeur) await page.waitForSelector('.rtgdeur', { timeout: 5000 }).catch(() => {});
   return page.evaluate(() => ({
     pad: location.pathname,
     deur: !!document.querySelector('.rtgdeur'),
@@ -102,7 +106,7 @@ test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
 
     const stuk = [];
     for (const app of GESLOTEN) {
-      const r = await toon(page, base, app);
+      const r = await toon(page, base, app, true);
       if (r.pad !== '/apps/' + app + '.html') { stuk.push(app + ': stuurt weg naar ' + r.pad); continue; }
       if (!r.deur) { stuk.push(app + ': geen deur -- ' + r.tekst.slice(0, 110)); continue; }
       /* De deur hoort te vertellen wat er achter zit EN hoe je een gezin
@@ -335,19 +339,27 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
     letOpFouten(schoolPage, fouten);
     await schoolPage.goto(base + '/apps/foundation/bord.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
     await schoolPage.waitForSelector('#rtf-school-slot', { state: 'visible', timeout: 15000 });
+    /* De Workspace Runtime kan in dezelfde beurt nog haar bestaande schil aan
+       body toevoegen. De Schoolpasbewaker sluit ook die node via een
+       MutationObserver. Wacht op dat waarneembare beveiligingscontract in
+       plaats van precies tussen appendChild en de observer-microtask te meten. */
+    await schoolPage.waitForFunction(() => [...document.body.children]
+      .filter(el => el.id !== 'rtf-school-slot')
+      .every(el => el.inert && el.getAttribute('aria-hidden') === 'true'), null, { timeout: 15000 });
     const schooldeur = await schoolPage.evaluate(() => ({
       pad: location.pathname,
       tekst: document.querySelector('#rtf-school-slot').innerText.replace(/\s+/g, ' ').trim(),
       leren: document.querySelector('#rtf-school-slot [data-school-open]')?.getAttribute('href'),
       uitweg: document.querySelector('#rtf-school-slot [data-school-uitweg]')?.getAttribute('href'),
-      afgeschermd: [...document.body.children]
+      zichtbaar: [...document.body.children]
         .filter(el => el.id !== 'rtf-school-slot')
-        .every(el => getComputedStyle(el).visibility === 'hidden')
+        .filter(el => !el.inert || el.getAttribute('aria-hidden') !== 'true')
+        .map(el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (el.className ? '.' + String(el.className).trim().replace(/\s+/g, '.') : ''))
     }));
     if (schooldeur.pad !== '/apps/foundation/bord.html') stuk.push('bord: de Schoolpasdeur verloor het gevraagde adres');
     if (!/tijdelijke Schoolpas|docentenruimte|dertig minuten/i.test(schooldeur.tekst)) stuk.push('bord: de Schoolpasdeur legt doel en verloop niet uit');
     if (schooldeur.leren !== '/apps/foundation/leren.html' || schooldeur.uitweg !== '/apps/app.html') stuk.push('bord: de Schoolpasdeur mist een veilige vervolg- of uitweg');
-    if (!schooldeur.afgeschermd) stuk.push('bord: klasbediening bleef zichtbaar achter de Schoolpasdeur');
+    if (schooldeur.zichtbaar.length) stuk.push('bord: klasbediening bleef zichtbaar achter de Schoolpasdeur: ' + schooldeur.zichtbaar.join(', '));
 
     assert.deepEqual(stuk, [], 'Foundation-deuren en openbare doelen:\n  ' + stuk.join('\n  '));
     const echt = fouten.filter(f => !/^(geen sessie|geen schoolsessie)$/.test(String(f).trim()));

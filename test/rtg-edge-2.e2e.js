@@ -38,7 +38,7 @@ const ROUTES = [
     /* TravelOS staat op het RTG Design System (TRAVELOS-MIGRATIE.md): daar is
        de ds-Edge de ene rand en bestaat Edge 2 niet. De rij blijft staan en
        wordt met hetzelfde contract op de ds-vorm gekeurd (controleerDsRoute). */
-    naam: 'TravelOS Vandaag', pad: '/apps/reizen.html', wereld: 'travel', ds: true,
+    naam: 'TravelOS Vandaag', pad: '/apps/reizen.html', wereld: 'travel', ds: true, tabs: 5,
     context: ['travel-header', 'hoofdtabs'],
     oud: [
       '.reisapp > .prestatiekop', '.reisapp > .hoofdtabs', '.tos-topbar', '.tos-nav',
@@ -54,7 +54,10 @@ const ROUTES = [
     ]
   },
   {
-    naam: 'LivingOS Agenda', pad: '/apps/agenda.html', wereld: 'living',
+    /* Agenda is inmiddels een Design System-scherm. De DS-schil bezit daar
+       de ene Edge en onderdrukt die in een iframe; Edge 2 mag hem dus niet
+       meer als legacyroute proberen op te starten. */
+    naam: 'LivingOS Agenda', pad: '/apps/agenda.html', wereld: 'living', ds: true,
     context: ['native-header', 'duimbalk'],
     oud: [
       'body > header:not(.rtg-edge-top)', 'body > .rtg-duimbalk', 'body > .rtgdeel-balk',
@@ -64,7 +67,7 @@ const ROUTES = [
   {
     /* Reisboek staat op het RTG Design System (TRAVELOS-MIGRATIE.md): één
        rand, maar die van /ds/ (ds: true), en ingebed bouwt hij er geen. */
-    naam: 'TravelOS Reisboek', pad: '/apps/reisboek.html', wereld: 'travel', ds: true,
+    naam: 'TravelOS Reisboek', pad: '/apps/reisboek.html', wereld: 'travel', ds: true, tabs: 5,
     context: ['native-header'],
     oud: [
       'body > header:not(.rtg-edge-top)', '.tos-topbar', '.tos-nav',
@@ -378,7 +381,8 @@ async function controleerDsRoute(page, route, scherm) {
   assert.equal(m.oudeChrome, 0, label + ': een oude Edge-generatie staat naast de ds-Edge');
   assert.deepEqual(m.oudZichtbaar, [], label + ': zichtbare oude chrome');
   assert.equal(m.wereld, route.wereld, label + ': verkeerde wereld');
-  assert.equal(m.tabs, 5, label + ': de lokale bediening (vijf bladen) staat niet meer in de inhoud');
+  if (route.tabs != null) assert.equal(m.tabs, route.tabs,
+    label + ': de lokale bediening staat niet meer in de inhoud');
   await page.locator('[data-ds-edge="rahul"]').click();
   assert.equal(await page.locator('.ds-edge__balk').getAttribute('data-ds-modus'), 'rahul');
   await page.keyboard.press('Escape');

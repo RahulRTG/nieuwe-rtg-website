@@ -1,6 +1,6 @@
   /* Deel 2 van het bedieningspaneel: de rijen, het blad en de ingang.
      Deel 1 (bediening-01.js) opent de module en levert stijl(). */
-  var scrim = null, blad = null;
+  var scrim = null, blad = null, terugFocus = null;
 
   function rij(label, sub) {
     var r = d.createElement('div'); r.className = 'bdn-rij';
@@ -24,9 +24,13 @@
   function vulTaal() {
     if (!w.RTGi18n || !w.RTGi18n.openModal) return;
     var doe = rij(T('bdn.taal', 'Taal'), T('bdn.taal.sub', 'Typ of zeg in welke taal u dit scherm wilt lezen.'));
-    doe.appendChild(knopje((w.RTGi18n.lang || 'nl').toUpperCase(), false, function () {
+    var taalKnop = knopje((w.RTGi18n.lang || 'nl').toUpperCase(), false, function () {
       sluit(); w.RTGi18n.openModal();
-    }));
+    });
+    // Een taalcode is een identificatie, geen vertaalbare zin ("EN" is ook
+    // het Nederlandse woord "en"). De huidige taal blijft herkenbaar.
+    taalKnop.setAttribute('translate', 'no');
+    doe.appendChild(taalKnop);
   }
 
   function vulThema() {
@@ -35,11 +39,13 @@
     w.RTGRosThema.themas.forEach(function (t) {
       var b = d.createElement('button');
       b.type = 'button'; b.className = 'bdn-stip' + (w.RTGRosThema.huidig() === t.id ? ' actief' : '');
-      b.style.background = t.stip; b.title = t.naam; b.setAttribute('aria-label', T('bdn.thema', 'Weergave') + ': ' + t.naam);
+      b.textContent = t.naam;
+      b.title = t.naam; b.setAttribute('aria-label', T('bdn.thema', 'Weergave') + ': ' + t.naam);
+      b.setAttribute('aria-pressed', String(w.RTGRosThema.huidig() === t.id));
       b.addEventListener('click', function () {
         w.RTGRosThema.zet(t.id);
-        doe.querySelectorAll('.bdn-stip').forEach(function (x) { x.classList.remove('actief'); });
-        b.classList.add('actief');
+        doe.querySelectorAll('.bdn-stip').forEach(function (x) { x.classList.remove('actief'); x.setAttribute('aria-pressed', 'false'); });
+        b.classList.add('actief'); b.setAttribute('aria-pressed', 'true');
       });
       doe.appendChild(b);
     });
@@ -48,11 +54,14 @@
   function vulBeweging() {
     if (!w.RTGBeweging || !w.RTGBeweging.standen) return;
     var doe = rij(T('bdn.beweging', 'Beweging'), T('bdn.beweging.sub', 'Hoeveel het scherm mag leven. Stil is het rustigst.'));
-    var teken = function () {
+    var teken = function (focusWaarde) {
       doe.textContent = '';
       w.RTGBeweging.standen.forEach(function (s) {
-        doe.appendChild(knopje(T('bdn.bw.' + s.n.toLowerCase(), s.n), Math.abs(w.RTGBeweging.waarde() - s.w) <= 8,
-          function () { w.RTGBeweging.zet(s.w); teken(); }));
+        var aan = Math.abs(w.RTGBeweging.waarde() - s.w) <= 8;
+        var b = knopje(T('bdn.bw.' + s.n.toLowerCase(), s.n), aan,
+          function () { w.RTGBeweging.zet(s.w); teken(s.w); });
+        b.setAttribute('aria-pressed', String(aan)); doe.appendChild(b);
+        if (focusWaarde === s.w) b.focus();
       });
     };
     teken();
@@ -81,18 +90,14 @@
     var doe = rij(T('bdn.vol.kop', 'Vul het scherm'),
       T('bdn.vol.sub', 'De app rekt op tot de randen van uw beeldscherm. Uw keuze geldt voor alle apps.'));
     var k = knopje(T('bdn.vol.aan', 'Rand tot rand'), w.RTGVol.aan(), function () {
+      if (!w.RTGVol.mogelijk()) return;
       w.RTGVol.wissel();
       k.classList.toggle('actief', w.RTGVol.aan());
+      k.setAttribute('aria-pressed', String(w.RTGVol.aan()));
     });
+    k.setAttribute('aria-pressed', String(w.RTGVol.aan()));
     doe.appendChild(k);
   }
-
-  /* Hier zat "Widgets": kaarten uit de app naast het scherm neerzetten, op de
-     lege ruimte links en rechts van het venster. Dat is een bureaublad met
-     losse widgets eromheen, en dat kent een telefoon niet -- daar staat de app
-     schermvullend en verder niets. De laag (shared/bureau.js) is weg, dus deze
-     rij ook. */
-  function vulWidgets() { /* niets meer: het bureaublad bestaat niet meer */ }
 
   function vulUitleg() {
     if (!w.RTGGids || !w.RTGGids.open) return;
@@ -102,12 +107,14 @@
 
   /* ---- het paneel ---- */
   function bouwBlad() {
-    if (scrim) return;
+    if (scrim && scrim.isConnected) return;
     stijl();
-    scrim = d.createElement('div'); scrim.className = 'bdn-scrim';
+    scrim = d.createElement('dialog'); scrim.className = 'bdn-scrim ds-instellingen';
     blad = d.createElement('section');
-    blad.className = 'bdn-blad'; blad.setAttribute('role', 'dialog');
-    blad.setAttribute('aria-modal', 'true'); blad.setAttribute('aria-label', T('bdn.kop', 'Instellingen'));
+    blad.className = 'bdn-blad ds-dialoog';
+    var dialoog = scrim;
+    dialoog.setAttribute('role', 'dialog'); dialoog.setAttribute('aria-modal', 'true');
+    dialoog.setAttribute('aria-label', T('bdn.kop', 'Instellingen'));
     var kop = d.createElement('div'); kop.className = 'bdn-kop';
     var titel = d.createElement('b'); titel.textContent = T('bdn.kop', 'Instellingen');
     var x = d.createElement('button');
@@ -119,15 +126,31 @@
     var uit = d.createElement('p'); uit.className = 'bdn-uit';
     uit.textContent = T('bdn.uit', 'Alles wat u aan dit scherm kunt instellen, bij elkaar. Uw keuzes blijven op dit toestel.');
     blad.appendChild(uit);
-    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulVol(); vulWidgets(); vulUitleg();
+    vulTaal(); vulThema(); vulBeweging(); vulBeeld(); vulVol(); vulUitleg();
     scrim.appendChild(blad);
     scrim.addEventListener('click', function (e) { if (e.target === scrim) sluit(); });
-    d.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
+    scrim.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
     d.body.appendChild(scrim);
   }
 
-  function open() { bouwBlad(); scrim.classList.add('open'); var f = blad.querySelector('button'); if (f) f.focus(); }
-  function sluit() { if (scrim) scrim.classList.remove('open'); }
+  function open() {
+    if (scrim && scrim.isConnected && scrim.classList.contains('open')) return;
+    // Lees bij een nieuwe opening de actuele keuzes bij dezelfde eigenaren.
+    // Geen tweede voorkeurcache; een open paneel behoudt zijn focus/toestand.
+    if (scrim) { scrim.remove(); scrim = null; blad = null; }
+    bouwBlad();
+    terugFocus = d.activeElement;
+    scrim.classList.add('open');
+    scrim.showModal(); // De browser beheert modaliteit, focus en inert.
+    var f = blad.querySelector('button'); if (f) f.focus();
+  }
+  function sluit() {
+    if (!scrim || !scrim.classList.contains('open')) return;
+    scrim.classList.remove('open');
+    if (scrim.open) scrim.close();
+    if (terugFocus && terugFocus.isConnected) terugFocus.focus({ preventScroll: true });
+    terugFocus = null;
+  }
 
 
   /* Geen eigen ingang meer. Het paneel wordt opgeroepen zoals een

@@ -43,7 +43,7 @@ function autoLaag(opslag) {
      precies dit (scripts/bundel.js), dus de toets draait wat de browser krijgt. */
   const bron = AUTODELEN.map(d => fs.readFileSync(path.join(ROOT, 'public/shared/i18n', d), 'utf8')).join('');
   vm.runInNewContext(bron, context);
-  return { laag: window.RTGAutoVertaling, kast: window.RTGVertaalKast, attrs };
+  return { laag: window.RTGAutoVertaling, kast: window.RTGVertaalKast, attrs, context };
 }
 
 /* Een localStorage-dubbel: genoeg om te bewijzen dat de kast er werkelijk in
@@ -274,4 +274,38 @@ test('het automatische vangnet wacht op de bewuste taalkeuze', () => {
   const bron = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-01.js'), 'utf8');
   assert.match(bron, /RTGAutoVertaling\.apply\(this\.chosen \? lang : 'nl'\)/,
     'toestel-detectie alleen mag de Nederlandstalige eerste pagina niet vertalen');
+});
+
+
+test('bestaande bedieningstaalcode blijft EN terwijl dezelfde automatische laag gewone EN vertaalt', () => {
+  const { laag, context } = autoLaag();
+  const nodes = [], taken = [];
+  function knop(tekst) {
+    const attrs = {}, el = { nodeType: 1, isConnected: true,
+      setAttribute(k,v) { attrs[k] = v; },
+      closest(selector) { return attrs.translate === 'no' && selector.includes('[translate="no"]') ? this : null; }
+    };
+    nodes.push({ nodeType: 3, isConnected: true, nodeValue: tekst, parentElement: el });
+    return el;
+  }
+  const bron = fs.readFileSync(path.join(ROOT, 'public/shared/bediening/bediening-02.js'), 'utf8');
+  const start = bron.indexOf('  function vulTaal() {'), eind = bron.indexOf('  function vulThema()', start);
+  assert.ok(start >= 0 && eind > start);
+  let gesloten = 0, geopend = 0, handler;
+  vm.runInNewContext(bron.slice(start,eind) + '\nvulTaal();', {
+    w: { RTGi18n: { lang:'en', openModal() { geopend++; } } },
+    T: (key,fallback) => fallback, rij: () => ({ appendChild() {} }),
+    knopje: (tekst,aan,doe) => { handler = doe; return knop(tekst); }, sluit() { gesloten++; }
+  });
+  knop('EN'); // Gevoeligheidscontrole: dezelfde tekst zonder uitzondering.
+  context.document.documentElement.nodeType = 1;
+  context.document.documentElement.hasAttribute = () => false;
+  context.document.createTreeWalker = () => { let i=0; return {nextNode:()=>nodes[i++] || null}; };
+  context.setTimeout = fn => { taken.push(fn); return taken.length; };
+  context.window.RTGUiBronTekst = tekst => tekst === 'EN' ? 'and' : null;
+  laag.apply('en');
+  taken.shift()();
+  assert.equal(nodes[0].nodeValue, 'EN');
+  assert.equal(nodes[1].nodeValue, 'and', 'de echte autolaag moet zonder translate=no wel ingrijpen');
+  handler(); assert.equal(gesloten,1); assert.equal(geopend,1,'bestaande taalkeuze blijft bedienbaar');
 });

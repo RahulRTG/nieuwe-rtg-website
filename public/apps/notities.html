@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -11,163 +11,91 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Notities">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
-  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
-    backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
-    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
-  header h1{font-size:1.15rem;}
-  header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
-  main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
-  .knop:hover{border-color:var(--gold);}
-  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  .knop:focus-visible,input:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  /* 4,82:1 op de lichtste notitiekaart (rgb(186,185,182)); var(--soft) haalde
-     daar 3,86 -- een notitiekleur die de gebruiker kiest is geen materiaal
-     waar de huistoon tegen is uitgerekend. */
-  .stil{color:#464644;font-size:.82rem;line-height:1.55;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font:inherit;font-size:.85rem;padding:.45rem .6rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
 
-  /* het bord: kolommen die zelf hun plek zoeken; vastgepind eerst */
-  #bord,#gedeeldBord{columns:16rem;column-gap:.7rem;}
-  .nkaart{display:inline-block;width:100%;background:var(--card);border:1px solid var(--line);
-    border-radius:0;padding:.75rem .85rem;margin:0 0 .7rem;cursor:pointer;break-inside:avoid;}
-  .nkaart:hover{border-color:var(--gold);}
-  .nkaart.vast{border-color:var(--gold);}
-  .nkaart h3{font-size:.92rem;font-weight:600;margin-bottom:.3rem;font-family:'Inter',sans-serif;}
-  .nkaart p{font-size:.8rem;color:var(--muted);white-space:pre-wrap;max-height:9rem;overflow:hidden;}
-  .nkaart .taak{display:flex;gap:.4rem;align-items:baseline;font-size:.8rem;color:var(--muted);padding:.1rem 0;}
-  .nkaart .taak.af{color:var(--soft);text-decoration:line-through;}
-  .nkaart .meta{font-size:.62rem;color:var(--soft);margin-top:.4rem;display:flex;gap:.5rem;flex-wrap:wrap;}
-  .nkaart .meta .goud{color:var(--rtg-leesgoud,var(--gold));}
 
-  /* de editor */
-  .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
-    align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
-  .scrim.open{display:flex;}
-  .paneel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;
-    width:min(560px,100%);margin:auto 0;}
-  .paneel input.titel{width:100%;background:none;border:none;border-bottom:1px solid var(--line);
-    color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.25rem;padding:.2rem 0 .5rem;outline:none;}
-  .paneel textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;
-    color:var(--txt);font:inherit;font-size:.9rem;line-height:1.6;padding:.6rem .75rem;margin-top:.7rem;resize:vertical;}
-  .taakrij{display:flex;gap:.5rem;align-items:center;padding:.25rem 0;border-bottom:1px solid var(--line);}
-  .taakrij input[type="checkbox"]{width:1.05rem;height:1.05rem;accent-color:#A98F1C;}
-  .taakrij .t{flex:1;font-size:.9rem;background:none;border:none;color:var(--txt);font:inherit;outline:none;}
-  .taakrij .t.af{color:var(--soft);text-decoration:line-through;}
-  .taakrij .weg{background:none;border:none;color:var(--soft);cursor:pointer;font-size:.9rem;}
-  .paneel label{display:block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--soft);margin:.7rem 0 .2rem;}
-  .paneel .twee{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
-  .paneel input[type="date"],.paneel input[type="time"],.paneel input.gewoon{width:100%;background:var(--card2);
-    border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.5rem .65rem;}
-  .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
-    opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
-  .melding.zie{opacity:1;}
-  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
+
+
 <script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
 
-<link href="/shared/rtg-daily.css" rel="stylesheet">
-<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-4t7hy3:not(#_#_#_){width:100%;margin-bottom:0.75rem}
-.s-7myv37:not(#_#_#_){margin-left:auto}
-</style>
+
+
+
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/appmenu.js" defer></script>
+
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl rtg-daily" data-kantoor-tool="notities" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-daily="notities" data-rtg-editorial-room="notities" data-rtg-layout="standard">
+<body class="ds-scherm ds-dagkamer rtg-stijl rtg-daily" data-kantoor-tool="notities" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-daily="notities" data-rtg-editorial-room="notities" data-rtg-layout="standard">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
-<header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
+<header class="ds-kop ds-dag-kop" data-rtg-menu-host>
+  <a class="terug ds-knop" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
   <span><span class="ey">RTG</span><h1 data-i18n="dailyField.notesTasks">Notities &amp; Taken</h1></span>
-  <span class="rij s-7myv37">
-    <button class="knop" id="toonArchief" data-rtg-edge-bar type="button" data-i18n="dailyField.archive">Archief</button>
-    <button class="knop" id="nieuwLijst" data-rtg-edge-bar type="button" data-i18n="dailyField.newList">+ Lijst</button>
+  <span class="rij s-7myv37 ds-dag-rij ds-dag-auto">
+    <button class="knop ds-knop" id="toonArchief" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.archive">Archief</button>
+    <button class="knop ds-knop" id="nieuwLijst" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.newList">+ Lijst</button>
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="nieuwNotitie" data-rtg-edge-bar type="button" data-hoofdactie data-i18n="dailyField.newNote">+ Notitie</button></div>
-<main>
+<div class="rtg-duimbalk"><button class="knop vol ds-knop" id="nieuwNotitie" data-rtg-edge-bar data-ds-actie type="button" data-hoofdactie data-i18n="dailyField.newNote">+ Notitie</button></div>
+<main class="ds-dag-main">
 <section id="dailyIntro" aria-label="Notities" data-i18n-aria="dailyField.notes"></section>
-  <div class="daily-content">
-  <input class="veld s-4t7hy3" id="zoek" type="search" placeholder="Zoek in uw notities" data-i18n-ph="daily.noteSearch" aria-label="Zoeken"
+  <div class="daily-content ds-dag-daily-content">
+  <input class="ds-invoer veld s-4t7hy3 ds-dag-breed" id="zoek" type="search" placeholder="Zoek in uw notities" data-i18n-ph="daily.noteSearch" aria-label="Zoeken"
  data-i18n-aria="dailyField.search">
   <div id="bord" aria-live="polite"></div>
-  <div id="gedeeldKop" class="kop" style="display:none;" data-i18n="dailyField.sharedEditing">Met mij gedeeld · samen bewerken</div>
+  <div id="gedeeldKop" class="kop ds-dag-kop" style="display:none;" data-i18n="dailyField.sharedEditing">Met mij gedeeld · samen bewerken</div>
   <div id="gedeeldBord"></div>
-  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="nieuwNotitie"><span data-i18n="daily.newNote">Nieuwe notitie</span> <span aria-hidden="true">→</span></button></div>
-  <p class="stil h-mt80" data-i18n="dailyField.noteHelp">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
+  <div class="daily-foot ds-dag-daily-foot"><button type="button" class="daily-action ds-knop ds-dag-actie" data-daily-target="nieuwNotitie"><span data-i18n="daily.newNote">Nieuwe notitie</span> <span aria-hidden="true">→</span></button></div>
+  <p class="stil ds-dag-marge ds-dag-stil" data-i18n="dailyField.noteHelp">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
     in RTG Agenda; daar komt ook het seintje vandaan. Delen op codenaam is samen werken: de ander kan afvinken
     en aanvullen.</p>
   </div>
 </main>
 
-<div class="scrim" id="ntScrim" role="dialog" aria-label="Notitie" data-i18n-aria="dailyField.note">
-  <div class="paneel">
-    <input class="titel" id="ntTitel" maxlength="120" placeholder="Titel" data-i18n-ph="dailyField.title">
-    <div id="ntTekstWrap"><textarea id="ntTekst" rows="7" maxlength="4000" placeholder="Schrijf hier." data-i18n-ph="dailyField.writeHere"></textarea></div>
+<dialog class="scrim ds-dag-scrim ds-dag-notitie" id="ntScrim" role="dialog" aria-label="Notitie" data-i18n-aria="dailyField.note">
+  <div class="paneel ds-dag-paneel">
+    <p id="ntMelding" role="status" class="ds-dag-stil"></p>
+    <input class="ds-invoer titel ds-dag-titel" id="ntTitel" maxlength="120" placeholder="Titel" data-i18n-ph="dailyField.title">
+    <div id="ntTekstWrap"><textarea class="ds-invoer" id="ntTekst" rows="7" maxlength="4000" placeholder="Schrijf hier." data-i18n-ph="dailyField.writeHere"></textarea></div>
     <div id="ntLijstWrap" style="display:none;">
       <div id="ntTaken"></div>
-      <div class="rij h-mt50">
-        <input class="gewoon h-flex1" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe" data-i18n-ph="dailyField.newItem">
+      <div class="rij ds-dag-marge ds-dag-rij">
+        <input class="ds-invoer gewoon ds-dag-rek ds-dag-gewoon" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe" data-i18n-ph="dailyField.newItem">
       </div>
     </div>
-    <div class="twee">
-      <span><label for="ntDatum" data-i18n="dailyField.remindOn">Herinner op</label><input type="date" id="ntDatum"></span>
-      <span><label for="ntTijd" data-i18n="dailyField.at">Om</label><input type="time" id="ntTijd"></span>
+    <div class="twee ds-dag-twee">
+      <span><label for="ntDatum" data-i18n="dailyField.remindOn">Herinner op</label><input class="ds-invoer" type="date" id="ntDatum"></span>
+      <span><label for="ntTijd" data-i18n="dailyField.at">Om</label><input class="ds-invoer" type="time" id="ntTijd"></span>
     </div>
     <div id="ntDeelWrap">
       <label for="ntCode" data-i18n="dailyField.shareNote">Delen op codenaam (samen bewerken)</label>
-      <div class="rij"><input class="gewoon h-flex1" id="ntCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
-        <button class="knop" id="ntDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
-      <p class="stil" id="ntGedeeld"></p>
+      <div class="rij ds-dag-rij"><input class="ds-invoer gewoon ds-dag-rek ds-dag-gewoon" id="ntCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
+        <button class="knop ds-knop" id="ntDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
+      <p class="stil ds-dag-stil" id="ntGedeeld"></p>
     </div>
-    <div class="rij h-mt90">
-      <button class="knop vol" id="ntBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
-      <button class="knop" id="ntVast" type="button" data-i18n="dailyField.pin">Vastpinnen</button>
-      <button class="knop" id="ntArchief" type="button" data-i18n="dailyField.archiveAction">Archiveer</button>
-      <button class="knop" id="ntWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
-      <span class="h-flex1"></span>
-      <button class="knop" id="ntDicht" type="button" data-i18n="dailyField.close">Sluit</button>
+    <div class="rij ds-dag-marge ds-dag-rij">
+      <button class="knop vol ds-knop" id="ntBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
+      <button class="knop ds-knop" id="ntVast" type="button" data-i18n="dailyField.pin">Vastpinnen</button>
+      <button class="knop ds-knop" id="ntArchief" type="button" data-i18n="dailyField.archiveAction">Archiveer</button>
+      <button class="knop ds-knop" id="ntWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
+      <span class="ds-dag-rek"></span>
+      <button class="knop ds-knop" id="ntDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
   </div>
-</div>
-<div class="melding" id="melding" role="status"></div>
+</dialog>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <script src="/shared/rtg-daily-copy.js"></script>
 <script src="/shared/rtg-daily-fields.js"></script>
 <script src="/shared/rtg-daily.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/notities/app.js"></script>
+<script src="/shared/gebaar.js"></script>
 <script src="/apps/notities/gebaren.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

@@ -42,15 +42,28 @@
    <body data-ios-home>: die krijgt geen indicator en geen balk. */
 (function (w, d) {
   'use strict';
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   if (w.RTGiOS) return;
 
   var THUIS = '/apps/app.html';
   var body = d.body;
   if (!body || body.hasAttribute('data-ios-uit')) return;
 
+  var isDs = dsBijStart;
   var isThuis = body.hasAttribute('data-ios-home');
+  var inPaneel = false;
+  try { inPaneel = w.self !== w.top; } catch (e) { inPaneel = true; }
   var rustig = false;
   try { rustig = w.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  function laadIosComponent(path) {
+    if (dsBijStart || inPaneel) return;
+    if (document.querySelector('link[href^="' + path + '"]')) return;
+    var iosStyleNode = document.createElement('link');
+    iosStyleNode.rel = 'stylesheet'; iosStyleNode.href = path;
+    document.head.appendChild(iosStyleNode);
+  }
+  laadIosComponent('/shared/ios.css');
 
   function el(tag, klas, tekst) {
     var e = d.createElement(tag);
@@ -109,7 +122,6 @@
 
   function merkWegChrome(wortel) { weghalen(wortel, MERK_CHROME); }
   function merkWegPagina() { weghalen(d.body, MERK_PAGINA); }
-
 /* ======================= De iOS-laag, deel 1b: DE BALK =======================
 
    Uit ./ios-01.js geknipt op de 10 kB-grens, en op de naad die daar al in
@@ -382,9 +394,8 @@
     }
 
     var rij = el('div', 'ios-nav-rij');
-    // de acties krijgen hun ondergrens van de component zelf, want niet elk
-    // scherm dat ios.js laadt laadt ook ios.css (zie navStijlEenmalig)
-    navStijlEenmalig();
+    // De centrale iOS-component geeft ook legacy-schermen zonder ios.css een
+    // bereikbare ondergrens; deze gedragsowner injecteert geen eigen vorm.
     var actieVak = el('div', 'ios-nav-acties');
     var extra = el('div', 'ios-nav-extra');
 
@@ -559,72 +570,16 @@
 
   /* ------------------------------------------------ 3. de home-indicator */
   function naarThuis() {
-    if (rustig) { location.href = THUIS; return; }
+    if (rustig || isDs) { location.assign(THUIS); return; }
     body.style.transform = ''; body.style.opacity = '';
     body.classList.add('ios-weg');
-    setTimeout(function () { location.href = THUIS; }, 200);
-  }
-
-  /* DE PIL BRENGT ZIJN EIGEN MAAT MEE, want niet elk scherm laadt ios.css.
-
-     Gemeten over 259 schermen: 202 laden ios.js EN ios.css, 22 laden alleen de
-     JS. Op die 22 kreeg de home-indicator dus geen enkele stijl -- een lege knop
-     krimpt dan tot zijn inhoud, en dat is precies wat de raakvlakmeting liet
-     zien: 4x4 op comm.html, 16x6 op geld.html. Onzichtbaar, onraakbaar, en toch
-     in de tabvolgorde met de naam "Omhoog vegen brengt je naar de homescreen".
-     Dat is de slechtst denkbare combinatie: een toetsenbordgebruiker landt op
-     iets dat hij niet ziet en niemand anders kan aanwijzen.
-
-     Deze regels staan daarom in de component zelf en niet in het blad. Ze zijn
-     met opzet mager (alleen maat en plaats, geen kleur): waar ios.css er wel is,
-     staat die later in de head en wint hij. Zelfde patroon als de ondertitelband
-     in shared/ondertitelband.js. */
-  function pilStijlEenmalig() {
-    if (document.getElementById('rtg-ios-thuis-basis')) return;
-    var st = document.createElement('style');
-    st.id = 'rtg-ios-thuis-basis';
-    st.textContent = '.ios-thuis{position:fixed;left:50%;transform:translateX(-50%);' +
-      'bottom:calc(env(safe-area-inset-bottom,0px) + 6px);z-index:60;' +
-      'width:150px;min-width:24px;height:24px;min-height:24px;' +
-      'background:none;border:0;padding:0;cursor:pointer;display:flex;' +
-      'align-items:center;justify-content:center;touch-action:none;}' +
-      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:0;' +
-      'background:rgba(244,241,236,.55);}';
-    (document.head || document.documentElement).appendChild(st);
-  }
-
-  /* DEZELFDE LES ALS BIJ DE PIL, EEN LAAG HOGER. ios.js bouwt de navigatiebalk
-     op elk scherm dat hem laadt, maar tweeentwintig schermen laden ios.js ZONDER
-     ios.css. Daar valt de maat weg die ios.css aan de acties rechtsboven geeft
-     (17px tekst met 0.3rem padding, ruim boven de 24), en dan meet een actie 15
-     tot 22 pixels: te klein om te raken (WCAG 2.5.8).
-
-     Dus brengt de component ook hier zijn eigen ondergrens mee. Alleen min-*:
-     waar ios.css er wel is, verandert er niets -- die zet de padding met
-     !important en komt ruim boven deze grens uit. */
-  function navStijlEenmalig() {
-    if (document.getElementById('rtg-ios-acties-basis')) return;
-    var st = document.createElement('style');
-    st.id = 'rtg-ios-acties-basis';
-    /* 24 voor de werkbalk, 44 voor de aangewezen hoofdhandeling. Die tweede
-       regel moet HIER staan en niet alleen in shared/rtg-ui.css: dit blad wordt
-       bij het laden aan <head> geplakt, dus het komt na de bundel EN
-       `.ios-nav-acties > *` (0,1,1) is zwaarder dan `[data-hoofdactie]` (0,1,0).
-       Zonder deze regel won de balkgrens van de duimgrens en stond "Ga online"
-       op /apps/sitemaker.html op 26,6 hoog terwijl rtg-ui.css 44 voorschreef --
-       een uur zoeken, want in de CSSOM matchte geen enkele regel: dit blad
-       bestaat alleen op de pagina. */
-    st.textContent = '.ios-nav-acties > *{min-width:24px;min-height:24px;box-sizing:border-box;' +
-      'display:inline-flex;align-items:center;justify-content:center;}' +
-      '.ios-nav-acties > [data-hoofdactie]{min-width:44px;min-height:44px;}';
-    (document.head || document.documentElement).appendChild(st);
+    setTimeout(function () { location.assign(THUIS); }, 200);
   }
 
   function homeIndicator() {
-    pilStijlEenmalig();
-    var pil = el('button', 'ios-thuis');
-    pil.type = 'button';
-    pil.setAttribute('aria-label', 'Omhoog vegen brengt je naar de homescreen');
+    var pil = el(isDs ? 'div' : 'button', 'ios-thuis' + (isDs ? ' ds-ios-thuis' : ''));
+    if (isDs) pil.setAttribute('aria-hidden', 'true');
+    else { pil.type = 'button'; pil.setAttribute('aria-label', 'Omhoog vegen brengt je naar de homescreen'); }
     body.appendChild(pil);
 
     var startY = null, dy = 0, veegde = false;
@@ -636,7 +591,7 @@
       if (startY == null) return;
       dy = Math.max(0, startY - e.clientY);
       if (dy > 8) veegde = true;
-      if (rustig || !veegde) return;
+      if (rustig || isDs || !veegde) return;
       var p = Math.min(dy / 260, 1);
       body.style.transformOrigin = '50% 85%';
       body.style.transform = 'scale(' + (1 - p * 0.16).toFixed(4) + ') translateY(' + Math.round(-dy * 0.35) + 'px)';
@@ -647,6 +602,7 @@
       var afstand = dy; startY = null;
       if (!veegde) return;
       if (afstand > 70) { naarThuis(); return; }
+      if (isDs) return;
       body.classList.add('ios-veert');
       body.style.transform = ''; body.style.opacity = '';
       setTimeout(function () { body.classList.remove('ios-veert'); }, 260);
@@ -689,12 +645,12 @@
      geen titelbalk, geen sluitknopje en geen dock. */
   function blad(inhoud, opties) {
     opties = opties || {};
-    var waas = el('div', 'ios-waas');
-    var vel = el('div', 'ios-blad');
+    var waas = el('div', 'ios-waas' + (isDs ? ' ds-ios-waas' : ''));
+    var vel = el('div', 'ios-blad' + (isDs ? ' ds-dialoog ds-ios-blad' : ''));
     vel.setAttribute('role', 'dialog');
     vel.setAttribute('aria-modal', 'true');
     if (opties.label) vel.setAttribute('aria-label', opties.label);
-    vel.appendChild(el('div', 'ios-greep'));
+    vel.appendChild(el('div', 'ios-greep' + (isDs ? ' ds-ios-greep' : '')));
     if (typeof inhoud === 'string') vel.appendChild(el('div', null, inhoud));
     else if (inhoud) vel.appendChild(inhoud);
 
@@ -731,11 +687,12 @@
   }
 
   /* --------------------------------------------------------- aanzetten */
-  body.setAttribute('data-ios', '');
-  body.removeAttribute('data-osbar');
+  // De DS-kop blijft bij zijn eigenaar; alleen het bestaande gedrag blijft.
+  if (isDs) body.classList.add('ds-ios-host');
+  else { body.setAttribute('data-ios', ''); body.removeAttribute('data-osbar'); }
 
   // het merk gaat ook buiten de kopbalk weg, maar dan met de smalle bezem
-  merkWegPagina();
+  if (!isDs) merkWegPagina();
 
   /* De kop is de eerste header van het scherm zelf. De desktopstandaard
      (shared/interface/world-desktop-surface.js) verhuist de kinderen van body
@@ -750,7 +707,7 @@
      als expliciete bron voor de iOS-laag. */
   var kop = d.querySelector('body > header:not(.rtg-v4-header)') ||
     d.querySelector('[data-rtg-screen-surface] > header:not(.rtg-v4-header)');
-  if (kop && !isThuis) {
+  if (kop && !isThuis && !isDs) {
     bouwBalk(kop);
     /* Pas inmeten als de balk er echt staat -- en na deze tik, want de
        menuknop van appmenu.js komt verderop in dit bestand pas binnen en
@@ -764,8 +721,6 @@
      andere) hoort GEEN home-indicator: die van het scherm eromheen is de
      echte, en twee pillen boven elkaar is een knop die de verkeerde app
      sluit. De randveeg blijft ook aan het buitenste scherm. */
-  var inPaneel = false;
-  try { inPaneel = w.self !== w.top; } catch (e) { inPaneel = true; }
   if (!isThuis && !inPaneel) { homeIndicator(); randveeg(); }
 
   w.RTGiOS = { blad: blad, thuis: naarThuis, THUIS: THUIS };

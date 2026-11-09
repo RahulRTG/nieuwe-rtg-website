@@ -2,9 +2,9 @@
   "uitleg": "Per-bestand-ratel op de CSS-erfenis (scripts/ontwerpsysteem.js, ONTWERPSYSTEEM.md). Een getal mag alleen omlaag; een pad dat hier niet staat mag buiten public/ds/ niet bestaan. Verruimen gaat alleen via `uitzonderingen` met pad, reden en vervaldatum.",
   "grens": "Telt bytes, !important en hexkleuren per stijlbron en stijlinjecties per script. Zegt niets over hoe een scherm eruitziet en niets over stijl die een script tijdens het draaien via element.style zet.",
   "totaal": {
-    "bladen": 168,
-    "schermenMetStijlblok": 265,
-    "important": 7586
+    "bladen": 160,
+    "schermenMetStijlblok": 218,
+    "important": 7537
   },
   "uitzonderingen": [],
   "bladen": {
@@ -48,11 +48,6 @@
       "important": 101,
       "hex": 26
     },
-    "public/apps/library/style.css": {
-      "bytes": 4396,
-      "important": 3,
-      "hex": 15
-    },
     "public/apps/media/studio-pro.css": {
       "bytes": 9410,
       "important": 6,
@@ -74,7 +69,7 @@
       "hex": 4
     },
     "public/apps/office/enterprise.css": {
-      "bytes": 11159,
+      "bytes": 11104,
       "important": 8,
       "hex": 8
     },
@@ -144,7 +139,7 @@
       "hex": 32
     },
     "public/shared/command.css": {
-      "bytes": 40254,
+      "bytes": 39015,
       "important": 41,
       "hex": 20
     },
@@ -202,11 +197,6 @@
       "bytes": 26309,
       "important": 95,
       "hex": 107
-    },
-    "public/shared/horeca-enterprise-modules.css": {
-      "bytes": 4316,
-      "important": 25,
-      "hex": 17
     },
     "public/shared/instant-reality.css": {
       "bytes": 10992,
@@ -273,11 +263,6 @@
       "important": 0,
       "hex": 8
     },
-    "public/shared/partner-network.css": {
-      "bytes": 18027,
-      "important": 0,
-      "hex": 61
-    },
     "public/shared/pass-recovery.css": {
       "bytes": 574,
       "important": 1,
@@ -327,21 +312,6 @@
       "bytes": 8345,
       "important": 42,
       "hex": 0
-    },
-    "public/shared/rtg-daily-rooms.css": {
-      "bytes": 5305,
-      "important": 0,
-      "hex": 6
-    },
-    "public/shared/rtg-daily.css": {
-      "bytes": 7155,
-      "important": 11,
-      "hex": 3
-    },
-    "public/shared/rtg-decision-room-2026.css": {
-      "bytes": 13781,
-      "important": 0,
-      "hex": 26
     },
     "public/shared/rtg-deep-flows-2026.css": {
       "bytes": 14946,
@@ -523,11 +493,6 @@
       "important": 25,
       "hex": 33
     },
-    "public/shared/rtg-project-room-2026.css": {
-      "bytes": 14396,
-      "important": 0,
-      "hex": 24
-    },
     "public/shared/rtg-public-warm.css": {
       "bytes": 4441,
       "important": 18,
@@ -603,13 +568,8 @@
       "important": 9,
       "hex": 27
     },
-    "public/shared/rtg-wonen-2026.css": {
-      "bytes": 7520,
-      "important": 4,
-      "hex": 21
-    },
     "public/shared/rtg-world-desktop.css": {
-      "bytes": 12787,
+      "bytes": 12769,
       "important": 58,
       "hex": 0
     },
@@ -850,12 +810,6 @@
     }
   },
   "blokken": {
-    "public/apps/agenda.html": {
-      "blokken": 2,
-      "bytes": 7960,
-      "important": 1,
-      "hex": 4
-    },
     "public/apps/app.html": {
       "blokken": 2,
       "bytes": 129154,
@@ -886,12 +840,6 @@
       "important": 0,
       "hex": 5
     },
-    "public/apps/architect-pda.html": {
-      "blokken": 2,
-      "bytes": 3170,
-      "important": 0,
-      "hex": 5
-    },
     "public/apps/attenties.html": {
       "blokken": 2,
       "bytes": 4301,
@@ -910,35 +858,11 @@
       "important": 0,
       "hex": 19
     },
-    "public/apps/balans.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
-    "public/apps/bank.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
     "public/apps/belastingkantoor.html": {
       "blokken": 2,
       "bytes": 6405,
       "important": 0,
       "hex": 5
-    },
-    "public/apps/berichten.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
-    "public/apps/bestanden.html": {
-      "blokken": 2,
-      "bytes": 6815,
-      "important": 1,
-      "hex": 3
     },
     "public/apps/bestellen.html": {
       "blokken": 1,
@@ -957,12 +881,6 @@
       "bytes": 542,
       "important": 0,
       "hex": 0
-    },
-    "public/apps/browser.html": {
-      "blokken": 2,
-      "bytes": 7864,
-      "important": 1,
-      "hex": 7
     },
     "public/apps/camera.html": {
       "blokken": 1,
@@ -987,12 +905,6 @@
       "bytes": 5821,
       "important": 2,
       "hex": 7
-    },
-    "public/apps/codewoord.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/comm.html": {
       "blokken": 2,
@@ -1180,21 +1092,9 @@
       "important": 4,
       "hex": 15
     },
-    "public/apps/foundation/gevoel.html": {
-      "blokken": 2,
-      "bytes": 3378,
-      "important": 0,
-      "hex": 1
-    },
     "public/apps/foundation/gezondheid.html": {
       "blokken": 2,
       "bytes": 3366,
-      "important": 0,
-      "hex": 1
-    },
-    "public/apps/foundation/hulpwijzer.html": {
-      "blokken": 2,
-      "bytes": 2679,
       "important": 0,
       "hex": 1
     },
@@ -1288,12 +1188,6 @@
       "important": 0,
       "hex": 26
     },
-    "public/apps/foundation/mediawijs.html": {
-      "blokken": 2,
-      "bytes": 2465,
-      "important": 0,
-      "hex": 1
-    },
     "public/apps/foundation/memorie.html": {
       "blokken": 2,
       "bytes": 2117,
@@ -1323,12 +1217,6 @@
       "bytes": 2515,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/foundation/opvoeden.html": {
-      "blokken": 2,
-      "bytes": 1744,
-      "important": 0,
-      "hex": 0
     },
     "public/apps/foundation/os-bestuur.html": {
       "blokken": 1,
@@ -1389,12 +1277,6 @@
       "bytes": 2317,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/foundation/pesten.html": {
-      "blokken": 2,
-      "bytes": 2139,
-      "important": 0,
-      "hex": 4
     },
     "public/apps/foundation/presenteren.html": {
       "blokken": 2,
@@ -1479,18 +1361,6 @@
       "bytes": 3077,
       "important": 0,
       "hex": 22
-    },
-    "public/apps/foundation/steun.html": {
-      "blokken": 1,
-      "bytes": 1557,
-      "important": 0,
-      "hex": 3
-    },
-    "public/apps/foundation/studie.html": {
-      "blokken": 2,
-      "bytes": 1407,
-      "important": 0,
-      "hex": 0
     },
     "public/apps/foundation/tellen.html": {
       "blokken": 2,
@@ -1618,75 +1488,15 @@
       "important": 0,
       "hex": 0
     },
-    "public/apps/hardware-pda.html": {
-      "blokken": 2,
-      "bytes": 3170,
-      "important": 0,
-      "hex": 5
-    },
     "public/apps/home.html": {
       "blokken": 2,
       "bytes": 4749,
       "important": 0,
       "hex": 9
     },
-    "public/apps/horeca-bar.html": {
-      "blokken": 1,
-      "bytes": 2759,
-      "important": 0,
-      "hex": 1
-    },
-    "public/apps/horeca-beheer.html": {
-      "blokken": 1,
-      "bytes": 572,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/horeca-bezorg.html": {
-      "blokken": 2,
-      "bytes": 1299,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/horeca-club.html": {
-      "blokken": 2,
-      "bytes": 1272,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/horeca-events.html": {
-      "blokken": 1,
-      "bytes": 650,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/horeca-expeditie.html": {
-      "blokken": 1,
-      "bytes": 609,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/horeca-haccp.html": {
-      "blokken": 1,
-      "bytes": 678,
-      "important": 0,
-      "hex": 0
-    },
-    "public/apps/horeca-hotel.html": {
-      "blokken": 1,
-      "bytes": 706,
-      "important": 0,
-      "hex": 0
-    },
     "public/apps/horeca-pda.html": {
       "blokken": 1,
       "bytes": 4358,
-      "important": 0,
-      "hex": 1
-    },
-    "public/apps/horeca-vloer.html": {
-      "blokken": 1,
-      "bytes": 4216,
       "important": 0,
       "hex": 1
     },
@@ -1702,41 +1512,11 @@
       "important": 0,
       "hex": 6
     },
-    "public/apps/juridisch.html": {
-      "blokken": 1,
-      "bytes": 1356,
-      "important": 0,
-      "hex": 1
-    },
-    "public/apps/juridisch/partnervoorwaarden.html": {
-      "blokken": 1,
-      "bytes": 4240,
-      "important": 0,
-      "hex": 10
-    },
-    "public/apps/juridisch/privacy.html": {
-      "blokken": 1,
-      "bytes": 4240,
-      "important": 0,
-      "hex": 10
-    },
-    "public/apps/juridisch/voorwaarden.html": {
-      "blokken": 1,
-      "bytes": 4088,
-      "important": 0,
-      "hex": 9
-    },
     "public/apps/kantoor.html": {
       "blokken": 2,
       "bytes": 3918,
       "important": 3,
       "hex": 0
-    },
-    "public/apps/kantoorpda.html": {
-      "blokken": 1,
-      "bytes": 219,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/kantoren.html": {
       "blokken": 5,
@@ -1780,12 +1560,6 @@
       "important": 0,
       "hex": 6
     },
-    "public/apps/labfonds.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
     "public/apps/labpas.html": {
       "blokken": 2,
       "bytes": 4413,
@@ -1816,12 +1590,6 @@
       "important": 0,
       "hex": 10
     },
-    "public/apps/leverancier-aanvragen.html": {
-      "blokken": 1,
-      "bytes": 3430,
-      "important": 1,
-      "hex": 5
-    },
     "public/apps/leverancier-commerce.html": {
       "blokken": 1,
       "bytes": 4648,
@@ -1833,12 +1601,6 @@
       "bytes": 7989,
       "important": 0,
       "hex": 9
-    },
-    "public/apps/leverancier-service.html": {
-      "blokken": 1,
-      "bytes": 3439,
-      "important": 1,
-      "hex": 5
     },
     "public/apps/leverancier.html": {
       "blokken": 2,
@@ -1863,12 +1625,6 @@
       "bytes": 6595,
       "important": 0,
       "hex": 7
-    },
-    "public/apps/logboek.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/loonstrook.html": {
       "blokken": 1,
@@ -1902,7 +1658,7 @@
     },
     "public/apps/magnaat.html": {
       "blokken": 2,
-      "bytes": 44950,
+      "bytes": 44680,
       "important": 3,
       "hex": 173
     },
@@ -1917,12 +1673,6 @@
       "bytes": 19269,
       "important": 0,
       "hex": 19
-    },
-    "public/apps/mecenaat.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/media.html": {
       "blokken": 1,
@@ -1959,12 +1709,6 @@
       "bytes": 2788,
       "important": 0,
       "hex": 7
-    },
-    "public/apps/metier.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/mijn-gegevens.html": {
       "blokken": 1,
@@ -2014,23 +1758,11 @@
       "important": 3,
       "hex": 27
     },
-    "public/apps/nalatenschap.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
     "public/apps/nieuws.html": {
       "blokken": 2,
       "bytes": 4154,
       "important": 0,
       "hex": 3
-    },
-    "public/apps/notities.html": {
-      "blokken": 2,
-      "bytes": 5907,
-      "important": 1,
-      "hex": 5
     },
     "public/apps/office.html": {
       "blokken": 2,
@@ -2110,12 +1842,6 @@
       "important": 2,
       "hex": 8
     },
-    "public/apps/pulse.html": {
-      "blokken": 2,
-      "bytes": 6992,
-      "important": 0,
-      "hex": 3
-    },
     "public/apps/rechtbank.html": {
       "blokken": 2,
       "bytes": 6724,
@@ -2151,12 +1877,6 @@
       "bytes": 13109,
       "important": 11,
       "hex": 25
-    },
-    "public/apps/rtgcode.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/rtgid.html": {
       "blokken": 2,
@@ -2226,7 +1946,7 @@
     },
     "public/apps/sitemaker.html": {
       "blokken": 2,
-      "bytes": 9160,
+      "bytes": 8774,
       "important": 0,
       "hex": 8
     },
@@ -2266,12 +1986,6 @@
       "important": 0,
       "hex": 6
     },
-    "public/apps/studio-pda.html": {
-      "blokken": 2,
-      "bytes": 3170,
-      "important": 0,
-      "hex": 5
-    },
     "public/apps/table.html": {
       "blokken": 2,
       "bytes": 3904,
@@ -2295,18 +2009,6 @@
       "bytes": 8847,
       "important": 0,
       "hex": 20
-    },
-    "public/apps/thuisrust.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
-    "public/apps/thuiswacht.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
     },
     "public/apps/tijdlijn.html": {
       "blokken": 1,
@@ -2350,12 +2052,6 @@
       "important": 0,
       "hex": 4
     },
-    "public/apps/vitaal.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
     "public/apps/voeding.html": {
       "blokken": 1,
       "bytes": 1362,
@@ -2365,18 +2061,6 @@
     "public/apps/vonk.html": {
       "blokken": 1,
       "bytes": 2227,
-      "important": 0,
-      "hex": 3
-    },
-    "public/apps/wallet.html": {
-      "blokken": 1,
-      "bytes": 680,
-      "important": 0,
-      "hex": 3
-    },
-    "public/apps/wbw.html": {
-      "blokken": 1,
-      "bytes": 680,
       "important": 0,
       "hex": 3
     },
@@ -2428,12 +2112,6 @@
       "important": 0,
       "hex": 3
     },
-    "public/apps/zorgbalie.html": {
-      "blokken": 1,
-      "bytes": 219,
-      "important": 0,
-      "hex": 3
-    },
     "public/site/404.html": {
       "blokken": 1,
       "bytes": 897,
@@ -2448,51 +2126,27 @@
     "public/apps/foundation/gezin-rt.js": 1,
     "public/apps/foundation/gezin-rt/gezin-rt-03.js": 1,
     "public/apps/foundation/palet.js": 1,
-    "public/apps/foundation/samen.js": 2,
-    "public/apps/foundation/samen/samen-01.js": 1,
-    "public/apps/foundation/samen/samen-02.js": 1,
     "public/apps/foundation/schil-os.js": 2,
     "public/apps/foundation/sessie.js": 4,
-    "public/apps/foundation/sessie/sessie-00.js": 1,
     "public/apps/foundation/sessie/sessie-02.js": 1,
     "public/apps/foundation/sessie/sessie-03.js": 2,
-    "public/apps/foundation/sw.js": 41,
-    "public/apps/geld/balans.js": 1,
-    "public/apps/geld/bank.js": 1,
-    "public/apps/geld/labfonds.js": 1,
-    "public/apps/geld/lidmaatschap.js": 1,
-    "public/apps/geld/logboek.js": 1,
-    "public/apps/geld/mecenaat.js": 1,
-    "public/apps/geld/metier.js": 1,
-    "public/apps/geld/nalatenschap.js": 1,
-    "public/apps/geld/overzicht.js": 1,
-    "public/apps/geld/overzichtb.js": 1,
-    "public/apps/geld/rtgcodeb.js": 1,
-    "public/apps/geld/waarde.js": 1,
-    "public/apps/geld/wallet.js": 1,
-    "public/apps/geld/wbw.js": 1,
+    "public/apps/foundation/sw.js": 40,
     "public/apps/lab-pro.js": 1,
-    "public/apps/leverancier.js": 3,
-    "public/apps/leverancier/leverancier-78.js": 2,
-    "public/apps/leverancier/leverancier-79.js": 1,
+    "public/apps/leverancier.js": 1,
+    "public/apps/leverancier/leverancier-78.js": 1,
     "public/apps/livinglab-observatorium.js": 1,
     "public/apps/magnaat-sandbox.js": 1,
     "public/shared/appmenu.js": 1,
     "public/shared/appmenu/appmenu-02.js": 1,
-    "public/shared/basis.js": 7,
-    "public/shared/basis/basis-01.js": 4,
+    "public/shared/basis.js": 5,
+    "public/shared/basis/basis-01.js": 3,
     "public/shared/basis/basis-01b.js": 2,
-    "public/shared/basis/basis-02.js": 1,
     "public/shared/bediening.js": 1,
     "public/shared/bediening/bediening-01.js": 1,
     "public/shared/borden.js": 1,
     "public/shared/borden/borden-01.js": 1,
-    "public/shared/bureaupda.js": 1,
-    "public/shared/bureaupda/bureaupda-02.js": 1,
     "public/shared/collegachat.js": 1,
     "public/shared/command/bladhaak.js": 1,
-    "public/shared/cookie.js": 1,
-    "public/shared/cookie/cookie-01.js": 1,
     "public/shared/deelmenu.js": 1,
     "public/shared/deelmenu/deelmenu-02.js": 1,
     "public/shared/deur.js": 1,
@@ -2500,20 +2154,10 @@
     "public/shared/focus.js": 1,
     "public/shared/gebaar.js": 2,
     "public/shared/gebaar/gebaar-01.js": 2,
-    "public/shared/handenvrij-balk.js": 1,
-    "public/shared/handenvrij-balk/handenvrij-balk-01b.js": 1,
-    "public/shared/handenvrij-bureau.js": 1,
-    "public/shared/handenvrij-bureau/handenvrij-bureau-01.js": 1,
-    "public/shared/handenvrij-chat.js": 1,
-    "public/shared/handenvrij-geld.js": 1,
-    "public/shared/handenvrij-oog.js": 1,
-    "public/shared/handenvrij-scherm.js": 1,
-    "public/shared/handenvrij-scherm/handenvrij-scherm-01.js": 1,
     "public/shared/i18n.js": 1,
     "public/shared/i18n/i18n-03.js": 1,
     "public/shared/inlogkleur.js": 1,
-    "public/shared/ios.js": 2,
-    "public/shared/ios/ios-02b.js": 2,
+    "public/shared/ios.js": 1,
     "public/shared/kaart.js": 1,
     "public/shared/kantoorgesprek.js": 1,
     "public/shared/klok.js": 1,
@@ -2523,9 +2167,6 @@
     "public/shared/kostenbeeld.js": 1,
     "public/shared/levendekleur.js": 1,
     "public/shared/levendekleur/levendekleur-02.js": 1,
-    "public/shared/metgezel.js": 2,
-    "public/shared/metgezel/metgezel-01b.js": 1,
-    "public/shared/metgezel/metgezel-01b2.js": 1,
     "public/shared/ondernemerpoort.js": 1,
     "public/shared/ondertitelband.js": 1,
     "public/shared/overdracht.js": 1,
@@ -2534,7 +2175,7 @@
     "public/shared/plaatsnadering.js": 1,
     "public/shared/plek.js": 1,
     "public/shared/poortgesprek.js": 1,
-    "public/shared/rahul-mond.js": 2,
+    "public/shared/rahul-mond.js": 1,
     "public/shared/rahul-tab/style-base.js": 1,
     "public/shared/rahul-tab/style-twin.js": 1,
     "public/shared/rahulpoort.js": 1,
@@ -2542,9 +2183,6 @@
     "public/shared/randen.js": 3,
     "public/shared/rtg-adaptive-edge-loader.js": 3,
     "public/shared/rtg-edge-2-loader.js": 1,
-    "public/shared/rtg-heritage-order.js": 2,
-    "public/shared/rtg-school-session.js": 1,
-    "public/shared/rtg-world-desktop.js": 1,
     "public/shared/scanknop.js": 1,
     "public/shared/sneltoets.js": 1,
     "public/shared/social-intelligence.js": 2,
@@ -2552,18 +2190,14 @@
     "public/shared/spraak.js": 1,
     "public/shared/sprong.js": 1,
     "public/shared/sprong/sprong-02.js": 1,
-    "public/shared/teamcall.js": 2,
+    "public/shared/teamcall.js": 1,
     "public/shared/teamcall/teamcall-01.js": 1,
-    "public/shared/teamcall/teamcall-01b.js": 1,
     "public/shared/thema.js": 1,
-    "public/shared/toegang.js": 2,
+    "public/shared/toegang.js": 1,
     "public/shared/uitvoer.js": 1,
     "public/shared/uitvoer/uitvoer-02.js": 1,
-    "public/shared/uurwerk.js": 2,
+    "public/shared/uurwerk.js": 1,
     "public/shared/volscherm.js": 1,
-    "public/shared/werkos.js": 2,
-    "public/shared/werkos/werkos-01c.js": 1,
-    "public/shared/werkos/werkos-03.js": 1,
     "public/shared/zaakcommand.js": 1,
     "public/shared/zaakcommand/zaakcommand-01.js": 1,
     "public/sw.js": 30

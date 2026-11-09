@@ -3,8 +3,9 @@
    aan wanneer hij ontbreekt. Core bestaat niet als zichtbare vijfde wereld. */
 (function () {
   'use strict';
+  if (document.documentElement.hasAttribute('data-ds')) return;
   var b = document.body;
-  if (ds || !b || ['living', 'travel', 'work', 'foundation'].indexOf(b.getAttribute('data-rtg-world')) < 0) return;
+  if (!b || ['living', 'travel', 'work', 'foundation'].indexOf(b.getAttribute('data-rtg-world')) < 0) return;
   if (window.RTGRanden || window.__RTGRandenBoot || document.getElementById('rtgRandenJs') ||
       document.querySelector('script[src^="/shared/randen.js"],script[src^="../shared/randen.js"]')) return;
   var s = document.createElement('script');

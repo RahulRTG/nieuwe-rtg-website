@@ -33,6 +33,20 @@
   ).replace(/\/+$/, '');
   const ASSET_BASIS = String(assetMeta && assetMeta.getAttribute('content') || '').replace(/\/+$/, '');
   const apiPad = pad => API_BASIS + pad;
+
+  /* Alle pagina's gebruiken hetzelfde DS-taalcomponent. Een legacy-document
+     laadt alleen tokens + dit component; een DS-document heeft het al. */
+  function laadI18nLegacyStijl() {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtg-i18n-styles')) return;
+    const i18nLegacyStijlLink = document.createElement('link');
+    i18nLegacyStijlLink.id = 'rtg-i18n-styles';
+    i18nLegacyStijlLink.rel = 'stylesheet';
+    /* Op een statische projectvoordeur draagt rtg-asset-base het projectpad;
+       op app-hosts blijft de basis leeg en dus dezelfde root-route. */
+    i18nLegacyStijlLink.href = assetPad('/ds/taalkeuze-standalone.css');
+    document.head.appendChild(i18nLegacyStijlLink);
+  }
   const assetPad = pad => ASSET_BASIS + pad;
   const LANGS = {
     nl: { label: 'Nederlands', native: 'Nederlands' },
@@ -369,9 +383,9 @@
       const oud = document.getElementById('rtg-lang-modal');
       const stondOpen = oud && oud.classList.contains('open');
       if (oud) oud.remove(); // opnieuw opbouwen zodra de wereldtalen binnen zijn
-      const scrim = document.createElement('div');
+      const scrim = document.createElement('dialog');
       scrim.id = 'rtg-lang-modal';
-      scrim.className = 'rtg-lang-scrim';
+      scrim.className = 'rtg-lang-scrim ds-taalkeuze';
       scrim.setAttribute('data-i18n-ignore', '');
       // de matcher kent de HELE wereld (alle 114) als die binnen is; anders de
       // actieve set. De bezoeker kiest door een land of taal te typen of uit te
@@ -403,8 +417,10 @@
         return '<button type="button" class="rtg-lang-quick' + (code === this._aanbevolen ? ' is-active' : '') + '" data-lang="' + code + '">' +
           vlag(code) + '<span>' + veilig(taal.naam || taal.en || code) + '</span></button>';
       }).join('');
+      scrim.setAttribute('aria-label', tekst.aria);
+      scrim.setAttribute('aria-modal', 'true');
       scrim.innerHTML =
-        '<div class="rtg-lang-card" role="dialog" aria-modal="true" aria-label="' + tekst.aria + '">' +
+        '<div class="rtg-lang-card ds-dialoog">' +
           '<div class="rtg-lang-head"><span class="rtg-lang-eyebrow">RTG ' + tekst.label + '</span>' +
             '<button type="button" class="rtg-lang-close" aria-label="' + tekst.sluit + '">' +
               '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +

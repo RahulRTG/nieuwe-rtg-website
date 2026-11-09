@@ -112,7 +112,6 @@
   }
 
   function start() {
-    D.stijl();
     D.stand = null;
     var wrap = $('#nlWrap');
     wrap.addEventListener('click', klik);

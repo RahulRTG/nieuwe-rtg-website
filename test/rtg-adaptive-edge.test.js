@@ -45,6 +45,23 @@ test('Adaptive Edge heeft vier toestanden en zeven swipebare decks', () => {
   });
 });
 
+test('Adaptive Edge navigeert uitsluitend naar begrensde interne app-routes', () => {
+  const calls = [];
+  const win = { location: { assign(route) { calls.push(route); } } };
+  for (const route of ['/apps/app.html', '/apps/werkruimte.html?gebied=reizen#plan']) {
+    assert.equal(kern.internalRoute(route), route);
+    assert.equal(kern.navigate(win, route), true);
+  }
+  for (const route of ['https://example.test/apps/app.html', '//example.test/apps/app.html',
+    '/apps/../site/404.html', '/site/404.html', 'javascript:alert(1)', '/apps/app.html\nscript']) {
+    assert.equal(kern.internalRoute(route), null, route);
+    assert.equal(kern.navigate(win, route), false, route);
+  }
+  assert.deepEqual(calls, ['/apps/app.html', '/apps/werkruimte.html?gebied=reizen#plan']);
+  assert.doesNotMatch(VIEW, /location\.href\s*=/);
+  assert.doesNotMatch(SERVICES, /location\.href\s*=/);
+});
+
 /* HET BLAD HEEFT GEEN EIGEN LIJST MEER (EDGE.md par. 11, ronde 2 stap 17 en 18).
    Er stond een tweede register naast RTGAdaptief met zeven vaste
    snelkoppelingen; die zijn weg (besluit K-bladlijst) en het register met hen.
@@ -100,14 +117,26 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'DesktopFrame-secties dragen een stabiele bron en herhaalbare standroute');
   assert.match(DESKTOP_FRAME, /rtgAdaptiveControl = 'app'/,
     'bediening uit het actieve appframe blijft als appbediening herkenbaar');
+  assert.equal((DESKTOP_FRAME.match(/rtgAdaptiveFrame = 'true'/g) || []).length, 2,
+    'zowel contextacties als gewone bediening uit DesktopFrame behouden hun werkbladeigenaar');
   assert.match(DESKTOP_FRAME, /el\.tagName === 'A'[\s\S]{0,100}rtgAdaptiveRoute = 'true'/,
     'een app-link in DesktopFrame blijft een herhaalbare route naar zijn bediening');
   assert.match(APPWERKT, /\[data-rtg-adaptive-route\]/,
     'APPWERKT kan een DesktopFrame-sectie opnieuw openen voor een resterende actie');
-  assert.match(APPWERKT, /if \(!k\.edgeApp\)[\s\S]{0,400}RTGAdaptiveEdge\.setState\('dock'\)/,
+  assert.match(APPWERKT, /if \(!k\.edgeApp\)[\s\S]{0,400}sluitAppdeck\(page\)/,
     'een gewone paginaactie sluit eerst een nog uitgeklapt appdeck');
+  assert.match(APPWERKT, /async function sluitAppdeck[\s\S]{0,500}RTGAdaptiveEdge\.setState\('dock'\)/,
+    'de gedeelde sluitroute gebruikt de publieke Adaptive Edge-toestand');
   assert.match(APPWERKT, /behoudHuidigeStand = !vervolg\.klaar/,
     'nieuwe vervolgbediening blijft zichtbaar voordat het Edge-deck opnieuw opent');
+  assert.match(APPWERKT, /rtg-world-desktop\.js[\s\S]{0,500}ready\|error[\s\S]{0,160}rtgDesktopState/,
+    'de appmeting begint pas nadat de bestaande World Desktop-laag haar eindtoestand publiceert');
+  assert.match(APPWERKT, /wachtOpDefinitiefBedieningsbeeld\(page\)[\s\S]{0,120}k = await kijk\(\)[\s\S]{0,80}telStand\(k\)/,
+    'na twee browserbeelden wordt nieuw geprojecteerde bediening opnieuw geïnventariseerd en niet genegeerd');
+  assert.match(APPWERKT, /k\.klaar && onbewezenMerken\(\)\.length[\s\S]{0,180}gehad\.delete\(merk\)[\s\S]{0,120}k = await kijk\(\)/,
+    'wel gevonden maar nog niet aangetikte Edge-bediening wordt opnieuw selecteerbaar');
+  assert.match(APPWERKT, /onzichtbaarHerstel < herstelgrens\(onbewezenMerken\(\)\.length\)[\s\S]{0,100}onzichtbaarHerstel\+\+[\s\S]{0,40}continue/,
+    'een tijdelijk onzichtbare bekende bediening krijgt begrensde herstelrondes voordat de appmeting stopt');
   assert.match(APPWERKT, /data-bweg[\s\S]{0,300}upload\|bestand kiezen/,
     'verwijderen en de systeembestandskiezer komen na gewone paneelbediening');
   assert.match(APPWERKT, /Number\(!hoofdopener\(a\)\)[\s\S]{0,160}Number\(!dialoogOpener\(a\)\)[\s\S]{0,160}Number\(!standNavigatie\(a\)\)/,
@@ -130,6 +159,10 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
     'annuleren sluit een dialoog pas nadat de overige bediening is aangeraakt');
   assert.match(PERSONAL_IMAGES, /button\.setAttribute\('aria-haspopup', 'dialog'\)/,
     'de beeldbewerker is als heropenbare dialoog herkenbaar voor gebruiker en meter');
+  assert.match(PERSONAL_IMAGES, /if \(!img \|\| img\.tagName !== 'IMG'\) return false;[\s\S]{0,100}img\.setAttribute\('src', String\(source \|\| ''\)\)/,
+    'de centrale beeldbron schrijft uitsluitend op echte afbeeldingselementen');
+  assert.doesNotMatch(PERSONAL_IMAGES, /img\.src\s*=/,
+    'persoonlijke beelden omzeilen de centrale afbeeldingsgrens niet');
   assert.match(PERSONAL_IMAGE_EDITOR, /save\.dataset\.dialogResult = 'save'/,
     'Opslaan publiceert dat het de beeldbewerker bij succes afsluit');
   assert.match(MAGNAAT, /padding-bottom:calc\((?:2|3)rem \+ var\(--rtg-adaptive-inset,0px\)\)/,
@@ -306,9 +339,9 @@ test('de definitieve editorial laag is centraal; de oude lagen blijven alleen al
      Command, werkruimte) en geen contrastbrug (18 oktober 2026). */
   assert.match(heritage, /@import url\('\.\/rtg-editorial-system\.css'\)/);
   assert.doesNotMatch(heritage, /rtg-cinematic-system\.css/);
-  assert.match(basisBron, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
+  assert.match(basisBron, /voegBasisStijlToe\('\/shared\/rtg-editorial-v4\.css', 'rtgEditorialV4Css'\)/);
   assert.match(basisBron, /laadEditorialBlad\(\)/);
-  assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
+  assert.match(basis, /laadBasisController\('\/shared\/rtg-editorial-v4\.js', 'RTGEditorialV4'\)/);
 });
 
 test('www bepaalt de vaste kaders van app, header en Edge in editorial v4', () => {

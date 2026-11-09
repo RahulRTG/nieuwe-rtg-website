@@ -320,7 +320,9 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     assert.match(await kaart.textContent(), /Tafel 3|Ramen/, 'de tafel/het gerecht staat op de bon');
 
     // doorzetten naar 'in bereiding' (de keuken pakt hem op)
-    await kaart.locator('.js-next').first().click();
+    const volgende = kaart.locator('.js-next').first();
+    await volgende.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }));
+    await volgende.click();
     await page.waitForFunction(r => {
       const el = document.querySelector('.order[data-ref="' + r + '"]');
       return !!(el && /in bereiding/.test(el.textContent));

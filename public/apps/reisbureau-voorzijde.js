@@ -92,7 +92,7 @@ function openReis(id) {
   const next = ALLE.find(r => r.id === id); if (!next) return;
   if (travelFlow.open(next)) {
     HUIDIG = next;
-    $('#bladBeeld').src = BEELD[Math.max(0, ALLE.indexOf(next)) % BEELD.length];
+    $('#bladBeeld').setAttribute('src', BEELD[Math.max(0, ALLE.indexOf(next)) % BEELD.length]);
     $('#bladNaam').textContent = HUIDIG.titel;
     $('#bladMeta').textContent = HUIDIG.bestemming;
     $('#bladTag').textContent = HUIDIG.omschrijving || '';

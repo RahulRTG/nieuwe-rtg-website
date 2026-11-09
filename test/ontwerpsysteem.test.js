@@ -149,8 +149,15 @@ test('contract: elk schermtype, component en wereld uit het contract bestaat', (
 const metContract = wijzig => d => { const p = path.join(d, 'contract.json'); const c = JSON.parse(fs.readFileSync(p, 'utf8')); wijzig(c); fs.writeFileSync(p, JSON.stringify(c)); };
 
 test('een overgangsscript zonder eigenaar of verwijderplan wordt tegengehouden', () => {
-  assert.match(kopieMet(metContract(c => { delete c.overgangsscripts[0].eigenaar; })), /zonder pad, eigenaar, reden, verwijderplan of vervaldatum/);
-  assert.match(kopieMet(metContract(c => { delete c.overgangsscripts[0].plan; })), /zonder pad, eigenaar, reden, verwijderplan of vervaldatum/);
+  for (const veld of ['eigenaar', 'plan']) {
+    assert.match(kopieMet(metContract(c => {
+      // De echte uitzonderingslijst mag leeg worden; de negatieve proef
+      // maakt daarom haar eigen onvolledige uitzondering in de kopie.
+      c.overgangsscripts = [{ pad: 'public/shared/plek.js', eigenaar: 'proef',
+        reden: 'tegenproef', plan: 'verwijderen', vervalt: '2099-01-01' }];
+      delete c.overgangsscripts[0][veld];
+    })), /zonder pad, eigenaar, reden, verwijderplan of vervaldatum/);
+  }
 });
 
 test('nadruk: elk schermtype heeft een standaard uit de gesloten lijst', () => {
@@ -186,9 +193,25 @@ test('contract: een ds-scherm zonder browsertoets, met erfenis of met een vreemd
   assert.match(os_.contractFouten(pagina({ injecteert: ['public/shared/ios.js'] }), DS).join(), /ios\.js, dat zelf stijl injecteert/);
 });
 
+function geladenCss(map) {
+  const geladen = [], bezocht = new Set();
+  function volg(naam) {
+    assert.ok(!bezocht.has(naam), 'dubbele of cyclische stijlimport: ' + naam);
+    bezocht.add(naam);
+    const bron = fs.readFileSync(path.join(map, naam), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const m of bron.matchAll(/@import url\("([^"]+)"\)/g)) {
+      const doel = path.posix.normalize(path.posix.join(path.posix.dirname(naam), m[1]));
+      assert.ok(!doel.startsWith('../') && !path.posix.isAbsolute(doel), 'import buiten DS: ' + doel);
+      geladen.push(doel); volg(doel);
+    }
+  }
+  volg('rtg-ds.css'); return geladen.sort();
+}
 test('rtg-ds.css laadt elk bestand van het systeem precies één keer', () => {
   const ingang = fs.readFileSync(path.join(DS, 'rtg-ds.css'), 'utf8');
-  const geladen = [...ingang.matchAll(/@import url\("([^"]+)"\)/g)].map(m => m[1]).sort();
+  const contract = JSON.parse(fs.readFileSync(path.join(DS, 'contract.json'), 'utf8'));
+  const zelfstandigeIngangen = Object.keys(contract.ingangen || {}).filter(n => n !== 'rtg-ds.css').sort();
+  const geladen = geladenCss(DS);
   const bestaand = [];
   (function loop(map, voor) {
     for (const n of fs.readdirSync(map)) {
@@ -197,8 +220,30 @@ test('rtg-ds.css laadt elk bestand van het systeem precies één keer', () => {
       else if (n.endsWith('.css') && n !== 'rtg-ds.css') bestaand.push(voor + n);
     }
   })(DS, '');
-  assert.deepEqual(geladen, bestaand.sort());
+  assert.deepEqual(geladen, bestaand.filter(n => !zelfstandigeIngangen.includes(n)).sort());
+  assert.deepEqual(zelfstandigeIngangen, ['taalkeuze-standalone.css', 'uurwerk.css']);
+  for (const naam of zelfstandigeIngangen) {
+    assert.ok(fs.existsSync(path.join(DS, naam)), 'contractingang ontbreekt: ' + naam);
+    assert.ok(!geladen.includes(naam), 'zelfstandige ingang mag niet ook via rtg-ds.css laden: ' + naam);
+  }
   assert.match(ingang, /@layer rtg\.reset, rtg\.tokens, rtg\.thema, rtg\.component, rtg\.scherm;/);
+});
+
+test('transitieve importcontrole weigert dubbel laden, een cyclus en een ontbrekend blad', () => {
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ds-import-'));
+  try {
+    fs.writeFileSync(path.join(map, 'rtg-ds.css'), '@import url("bediening.css");');
+    fs.writeFileSync(path.join(map, 'bediening.css'), '@import url("knop.css");');
+    fs.writeFileSync(path.join(map, 'knop.css'), '');
+    assert.deepEqual(geladenCss(map), ['bediening.css', 'knop.css']);
+    fs.appendFileSync(path.join(map, 'rtg-ds.css'), '@import url("knop.css");');
+    assert.throws(() => geladenCss(map), /dubbele of cyclische/);
+    fs.writeFileSync(path.join(map, 'rtg-ds.css'), '@import url("bediening.css");');
+    fs.writeFileSync(path.join(map, 'knop.css'), '@import url("rtg-ds.css");');
+    assert.throws(() => geladenCss(map), /dubbele of cyclische/);
+    fs.writeFileSync(path.join(map, 'knop.css'), '@import url("ontbreekt.css");');
+    assert.throws(() => geladenCss(map), /ENOENT/);
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
 });
 
 test('de echte boom: geen schendingen van ratel of contract', () => {

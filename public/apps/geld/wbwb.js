@@ -139,7 +139,6 @@
 
   function start() {
     var D = Deel();
-    D.stijl();
     $('#wbWrap').addEventListener('click', klik);
     /* Het document heeft EEN bron-slot en elke zusterstand schrijft het bij
        zijn start opnieuw. Dus: bij ELKE start aanmelden, bij stop weer

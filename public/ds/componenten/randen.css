@@ -1,0 +1,56 @@
+/* De bestaande randen-owner opent de bestaande instellingen. Deze component
+   bezit alleen de hint en toetsenbordingang, nooit een tweede Edge. */
+@layer rtg.component {
+  .ds-randen-hint, .ds-randen-toets {
+    --ds-randen-metaal: var(--ds-metaal, var(--gold, goldenrod));
+    --ds-randen-accent: var(--ds-accent, maroon);
+    /* Deze systeemknop staat altijd op de donkere wereldaccenten. Een
+       paginabrede inktoewijzing mag de bedieningslaag daarom niet donker maken. */
+    --ds-randen-accent-inkt: var(--ds-cover-inkt, white);
+    --rtg-txt: var(--ds-randen-accent-inkt);
+    --wh-ink: var(--ds-randen-accent-inkt);
+    --rtg-world-ink: var(--ds-randen-accent-inkt);
+    --text: var(--ds-randen-accent-inkt);
+    --ink: var(--ds-randen-accent-inkt);
+    --ds-randen-focus: var(--ds-focus, white);
+    --ds-randen-duur: var(--ds-duur, .15s);
+    --ds-randen-curve: var(--ds-curve, ease);
+    --ds-radius-randen-capsule: var(--ds-radius-capsule, 999px);
+    --ds-radius-randen-knop: var(--ds-radius-knop, 0px);
+  }
+  .ds-randen-hint {
+    position: fixed;
+    inset-inline-start: 50%;
+    inset-block-start: calc(env(safe-area-inset-top, 0px) + var(--ds-ruimte-2));
+    transform: translateX(-50%);
+    z-index: 9994;
+    inline-size: var(--ds-doel);
+    block-size: var(--ds-ruimte-1);
+    border-radius: var(--ds-radius-randen-capsule);
+    background: var(--ds-randen-metaal);
+    opacity: 0;
+    transition: opacity var(--ds-randen-duur) var(--ds-randen-curve);
+    pointer-events: none;
+  }
+  .ds-randen-hint.aan { opacity: .85; }
+  .ds-randen-toets {
+    display: inline-flex; align-items: center; justify-content: center;
+    position: fixed;
+    inset-inline-start: max(var(--ds-ruimte-2), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    inset-block-start: env(safe-area-inset-top, 0px);
+    transform: translateY(-200%);
+    z-index: 9996;
+    min-block-size: var(--ds-doel);
+    min-inline-size: var(--ds-doel);
+    max-inline-size: calc(100% - var(--ds-ruimte-4));
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-4);
+    border: 0;
+    border-radius: var(--ds-radius-randen-knop);
+    background: var(--ds-randen-accent);
+    color: var(--ds-randen-accent-inkt);
+    font: 600 var(--ds-maat-klein, .8rem)/1.5 var(--ds-letter-tekst, system-ui, sans-serif);
+    cursor: pointer;
+  }
+  .ds-randen-toets:focus { transform: none; outline: 2px solid var(--ds-randen-focus); outline-offset: 2px; }
+  @media print { .ds-randen-hint, .ds-randen-toets { display: none; } }
+}

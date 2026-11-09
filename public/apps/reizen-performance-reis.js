@@ -2,6 +2,23 @@
   'use strict';
   var $ = R.$, maak = R.maak;
 
+  function reisAdres(waarde) {
+    var bron = String(waarde || '#reizen');
+    if (bron.charAt(0) === '#') return bron;
+    try {
+      var doel = new URL(bron, location.href);
+      if (doel.origin !== location.origin || doel.pathname.indexOf('/apps/') !== 0) return '#reizen';
+      return doel.pathname + doel.search + doel.hash;
+    } catch (e) { return '#reizen'; }
+  }
+  function reisLink(klasse, tekst, waarde) {
+    var travelMomentLink = document.createElement('a');
+    travelMomentLink.className = klasse || '';
+    travelMomentLink.textContent = tekst || '';
+    travelMomentLink.href = reisAdres(waarde);
+    return travelMomentLink;
+  }
+
   function datumDelen(iso) {
     var d = new Date(String(iso || '') + 'T12:00:00');
     return isNaN(d.getTime()) ? { dag: '--', maand: '' } : { dag: String(d.getDate()).padStart(2, '0'),
@@ -36,12 +53,10 @@
   function tekenMomenten(lijst) {
     var vak = $('#momenten'); if (!vak) return;
     vak.textContent = '';
-    var toe = maak('a', 'ds-chip', '+ Voeg toe');
-    toe.href = '#worldTravelImport';
+    var toe = reisLink('ds-chip', '+ Voeg toe', '#worldTravelImport');
     vak.appendChild(toe);
     lijst.slice(0, 8).forEach(function (o) {
-      var a = maak('a', 'ds-chip');
-      a.href = o.link || '#reizen';
+      var a = reisLink('ds-chip', '', o.link);
       if (o.sig) a.dataset.sig = o.sig;
       var d = datumDelen(o.van);
       a.textContent = (TEKEN[o.soort] || '\u25C7') + ' ' + (o.bestemming || o.titel || 'Onderdeel') + ' · ' + (o.tijd || (d.dag + ' ' + d.maand).trim());
@@ -62,7 +77,7 @@
     tekenMomenten(lijst);
     var status = $('#statusLijst'); status.textContent = '';
     lijst.slice(0, 3).forEach(function (reis) {
-      var li = maak('li'), a = maak('a', 'ds-lijst__rij'); a.href = reis.link || '#reizen';
+      var li = maak('li'), a = reisLink('ds-lijst__rij', '', reis.link);
       if (reis.sig) a.dataset.sig = reis.sig;
       var i = maak('span', 'ds-lijst__tijd', reis.teken || '·'); i.setAttribute('aria-hidden', 'true');
       var span = maak('span');

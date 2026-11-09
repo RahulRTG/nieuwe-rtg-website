@@ -4,6 +4,30 @@
      loslaten. null betekent: er staat geen menu. */
   var menu = null;
 
+  /* De menu-owner beheert uitsluitend zijn eigen tijdelijke zichtbaarheid.
+     De oorspronkelijke inlinewaarde wordt per node hersteld; het domein-
+     `hidden`-attribuut wordt nooit gelezen als toestemming of verwijderd. */
+  var menuWeergave = new WeakMap();
+  function zetMenuZichtbaar(el, aan) {
+    var doorMenu = el.classList.contains('rtgdeel-weg') || el.classList.contains('ds-deelmenu-weg');
+    el.classList.toggle('rtgdeel-weg', !aan);
+    el.classList.toggle('ds-deelmenu-weg', !aan);
+    if (!aan) {
+      if (!menuWeergave.has(el)) menuWeergave.set(el, el.style.display || '');
+      el.style.display = 'none';
+    } else if (menuWeergave.has(el)) {
+      el.style.display = menuWeergave.get(el);
+      menuWeergave.delete(el);
+    } else if (doorMenu && el.style.display === 'none') {
+      /* Een app kan zijn DOM uit innerHTML of een momentopname herstellen.
+         De nieuwe nodes dragen dan onze verbergklasse en inline display:none,
+         maar staan niet in de WeakMap van de oude nodes. De klasse bewijst dat
+         het deelmenu eigenaar was; herstel daarom ook deze gekloonde toestand
+         voordat de nieuwe indeling de zichtbaarheid opnieuw bepaalt. */
+      el.style.display = '';
+    }
+  }
+
   function bouw(main) {
 
     /* Heeft de pagina eigen .deel-markers, dan bepalen ALLEEN die de delen
@@ -96,11 +120,12 @@
     if (delen.length < drempel) return;
 
     var balk = document.createElement('nav');
-    balk.className = 'rtgdeel-balk';
+    balk.className = 'rtgdeel-balk ds-tabs ds-deelmenu';
     balk.setAttribute('aria-label', 'Delen van deze app');
     delen.forEach(function (d) {
       var b = document.createElement('button');
       b.type = 'button';
+      b.className = 'ds-tab ds-deelmenu-knop';
       b.textContent = d.naam;
       /* De wacht kan de hele balk na een app-render opnieuw opbouwen. Deze
          identiteit blijft over die vervanging gelijk en zegt tegelijk dat de
@@ -112,11 +137,7 @@
       d.knop = b;
       balk.appendChild(b);
     });
-    if (!document.getElementById('rtgdeel-stijl')) {
-      var st = document.createElement('style');
-      st.id = 'rtgdeel-stijl'; st.textContent = css;
-      document.head.appendChild(st);
-    }
+    laadDeelmenuStijl('/ds/rtg-ds.css');
     // de balk komt na het vaste deel (KPI's, intro), voor het eerste deel
     main.insertBefore(balk, delen[0].leden[0]);
 
@@ -126,12 +147,13 @@
       delen.forEach(function (d) {
         var aan = d.id === doel;
         d.knop.setAttribute('aria-current', aan ? 'true' : 'false');
-        // een eigen klasse, geen hidden-attribuut: paginastijlen met een
-        // eigen display (flex, grid) zouden van het attribuut winnen
-        d.leden.forEach(function (el) { el.classList.toggle('rtgdeel-weg', !aan); });
+        // Geen hidden-attribuut: dat blijft uitsluitend van het domein.
+        d.leden.forEach(function (el) { zetMenuZichtbaar(el, aan); });
         // de eigen koppen van een deel zijn dubbelop naast de menuknop; ook
         // de tweede, anders staat het label van de knop er nog eens onder
-        d.koppen.forEach(function (el) { el.classList.add('rtgdeel-weg'); });
+        d.koppen.forEach(function (el) {
+          zetMenuZichtbaar(el, false);
+        });
       });
       try { localStorage.setItem(SLEUTEL, doel); } catch (e) {}
       if (!stil) {

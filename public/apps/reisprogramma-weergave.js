@@ -31,7 +31,7 @@ function teken(root,u,voorbeeld){
  if(o.instructies)li.append(el('p',o.instructies,K.instructies));list.append(li);
  });root.append(list);
  if(!p.onderdelen.length)root.append(el('p','Nog geen onderdelen toegevoegd.',ds?'ds-meta':''));
- if(p.contactNaam||p.contactTelefoon||p.contactEmail){const c=el('section',null,K.contact);c.append(el('h2','Uw persoonlijke contact',K.kop),el('p',p.contactNaam));if(p.contactTelefoon){const a=el('a',p.contactTelefoon);a.href='tel:'+p.contactTelefoon.replace(/[^+\d]/g,'');c.append(a);}if(p.contactEmail){const a=el('a',p.contactEmail);a.href='mailto:'+encodeURIComponent(p.contactEmail);c.append(a);}root.append(c);}
+ if(p.contactNaam||p.contactTelefoon||p.contactEmail){const c=el('section',null,K.contact);c.append(el('h2','Uw persoonlijke contact',K.kop),el('p',p.contactNaam));if(p.contactTelefoon){const telefoonLink=document.createElement('a');telefoonLink.textContent=p.contactTelefoon;telefoonLink.href='tel:'+p.contactTelefoon.replace(/[^+\d]/g,'');c.append(telefoonLink);}if(p.contactEmail){const mailLink=document.createElement('a');mailLink.textContent=p.contactEmail;mailLink.href='mailto:'+encodeURIComponent(p.contactEmail);c.append(mailLink);}root.append(c);}
  if(!voorbeeld){const print=el('button','Afdrukken / bewaren als PDF');print.type='button';print.className=K.print;print.onclick=()=>w.print();root.append(print,el('p','Een opgeslagen of afgedrukte kopie wordt niet automatisch bijgewerkt. Open de gastlink voor de actuele versie.',K.sub));}
 }
 w.RTGReisProgramma={teken};

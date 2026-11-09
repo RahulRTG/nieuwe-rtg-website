@@ -482,6 +482,14 @@ const REGISTER = {
      en die is met een mutatie zien zakken; zie BETROUWBAARHEID.md par. 5. */
   'APPWERKT.json': { meter: ['appwerktDefecten'] },
 
+  /* EXPERIENCEWERKT.json is de fail-closed Experience-inventaris voor alle
+     logische apps, schermen, toestanden en bewijsdimensies. De eigen toets
+     herleidt het register opnieuw uit MAPPEN, SCHERMEIGENAAR, APPWERKT en de
+     Experience-contracten, weigert ontbrekende schermen en laat zien dat een
+     stillere scope de poort niet groen kan maken. Het register telt daarom niet
+     als losse meting zonder ratel. */
+  'EXPERIENCEWERKT.json': { eigenRatel: 'test/experience-coverage.test.js' },
+
   /* EERSTEMINUUT.json hangt om dezelfde reden aan de NORM-ratel als APPWERKT:
      een verse meting vraagt een browser en een registratie, en dat hoort niet
      in `npm test`. Wat eraan hangt is het getal dat ertoe doet --

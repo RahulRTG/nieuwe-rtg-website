@@ -42,14 +42,14 @@
         ? 'Vandaag nog niet gemeten: ' + d.gemistVandaag.join(', ') + '.'
         : 'Alle meetpunten zijn vandaag gemeten.';
       $('aLog').innerHTML = (d.metingen || []).map(function (m) {
-        return K.rij('<b>' + esc(m.punt) + '</b> <span class="stil">· ' + esc(m.at.slice(0, 16).replace('T', ' ')) +
+        return K.rij('<b>' + esc(m.punt) + '</b> <span class="stil ds-horeca-meta">· ' + esc(m.at.slice(0, 16).replace('T', ' ')) +
           ' · ' + esc(m.door) + '</span>' +
-          (m.afwijking ? ' <span class="allergie">afwijking</span>' : '') +
-          (m.actie ? ' <span class="stil">· ' + esc(m.actie) + '</span>' : '') +
-          ((m.correcties || []).length ? ' <span class="tag">gecorrigeerd van ' + m.correcties[0].was + '</span>' : ''),
-        '<span class="tag' + (m.afwijking ? ' laat' : ' aan') + '">' + m.waarde + ' ' + esc(m.eenheid) + '</span>' +
+          (m.afwijking ? ' <span class="allergie ds-horeca-allergie">afwijking</span>' : '') +
+          (m.actie ? ' <span class="stil ds-horeca-meta">· ' + esc(m.actie) + '</span>' : '') +
+          ((m.correcties || []).length ? ' <span class="tag ds-horeca-tag">gecorrigeerd van ' + m.correcties[0].was + '</span>' : ''),
+        '<span class="tag ds-horeca-tag' + (m.afwijking ? ' laat' : ' aan') + '">' + m.waarde + ' ' + esc(m.eenheid) + '</span>' +
           K.knop('Corrigeer', { cor: m.id }));
-      }).join('') || '<p class="stil">Nog geen metingen in dit bereik.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Nog geen metingen in dit bereik.</p>';
       K.bind($('aLog'), 'cor', function (b) { $('aCorId').value = b.dataset.cor; });
     });
   }

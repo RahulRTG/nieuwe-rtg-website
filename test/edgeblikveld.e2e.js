@@ -196,14 +196,15 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
     assert.equal(schrijfsels.herkomst, 'blad:data-hoofdactie', 'de lezing hoort echt in het blad te kijken');
     assert.deepEqual(schrijfsels.log, [], 'het blikveld schreef iets');
 
-    // 6) Een los scherm: de hoofdactie die het aanwijst, en de dubbele hoofdactie als gebrek.
+    // 6) Een los DS-scherm: de aangewezen hoofdactie, zonder tweede legacy-eigenaar.
     await page.goto(srv.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForFunction(() => window.RTGEdgeBlikveld && RTGEdgeBlikveld.lees().velden.hoofdactie.waarde, null, { timeout: 20000 });
     l = await page.evaluate(() => RTGEdgeBlikveld.lees());
     assert.equal(l.velden.hoofdactie.herkomst, 'scherm:data-hoofdactie');
     assert.equal(l.velden.hoofdactie.waarde.label, '+ Afspraak');
     assert.deepEqual([l.velden.wereld.waarde, l.velden.wereld.herkomst], ['living', 'route']);
-    await page.waitForFunction(() => RTGEdgeBlikveld.lees().gebreken.includes('hoofdactie-dubbel'), null, { timeout: 10000 });
+    assert.ok(!l.gebreken.includes('hoofdactie-dubbel'), 'de DS-Edge maakt geen tweede hoofdactie naast het scherm');
+    assert.equal(await page.locator('[data-rtg-edge-primary]').count(), 0, 'de legacy Edge-padtabel draait niet op een DS-scherm');
 
     /* 7) De gewichtlaag reist mee met de balk. Op een los scherm met een register
        (Office buiten de schil) deed een `bewust`-handeling in het Edge-blad

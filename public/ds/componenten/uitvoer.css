@@ -1,0 +1,77 @@
+/* Meenemen gebruikt de bestaande knop en dialoog. Alleen de positionering
+   van de bestaande exportlaag hoort hier; de uitvoerlogica blijft gedeeld. */
+@layer rtg.component {
+  /* De host is de grens tussen de centrale uitvoercomponent en nog niet
+     gemigreerde scherm-CSS. Oude schermen maken iedere hoofdactie op telefoon
+     100% breed; door die knop binnen deze DS-host te plaatsen blijft die
+     afspraak behouden zonder dat de knop buiten het blikveld kan lopen. */
+  .ds-uitvoer-host { display: contents; }
+  .ds-uitvoer-knop {
+    flex: 0 1 auto;
+    inline-size: auto;
+    max-inline-size: calc(100vw - (2 * var(--ds-ruimte-3)));
+    box-sizing: border-box;
+    margin-inline-start: var(--ds-ruimte-2);
+    align-self: center;
+  }
+  .ds-uitvoer-laag {
+    position: fixed;
+    inset: 0;
+    z-index: 9991;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: var(--ds-glas);
+  }
+  .ds-uitvoer-laag[hidden] { display: none; }
+  .ds-uitvoer-blad {
+    inline-size: min(26rem, 100%);
+    max-block-size: calc(100dvh - env(safe-area-inset-top));
+    overflow-y: auto;
+    padding-block: var(--ds-ruimte-6);
+    padding-inline: var(--ds-ruimte-6);
+    padding-block-end: calc(var(--ds-ruimte-6) + env(safe-area-inset-bottom));
+  }
+  .ds-uitvoer-titel {
+    margin-block: 0 var(--ds-ruimte-2);
+    margin-inline: 0;
+    font-family: var(--ds-letter-display);
+    font-size: var(--ds-maat-kop);
+    font-weight: 500;
+  }
+  .ds-uitvoer-tekst {
+    margin-block: 0 var(--ds-ruimte-4);
+    margin-inline: 0;
+    font-family: var(--ds-letter-tekst);
+    font-size: var(--ds-maat-klein);
+    line-height: 1.6;
+    color: var(--ds-inkt-zacht);
+    overflow-wrap: anywhere;
+  }
+  .ds-uitvoer-rij { display: flex; gap: var(--ds-ruimte-2); flex-wrap: wrap; }
+  .ds-uitvoer-rij .ds-knop { flex: 1 1 6rem; }
+
+  /* Op telefoon is Meenemen een schermactie, geen onderdeel van de kop. Het
+     bestaande uitvoercontract blijft hetzelfde; alleen zijn vaste, bereikbare
+     plaats boven de Edge wordt hier door de DS-eigenaar vastgelegd. */
+  @media (max-width: 760px) {
+    .ds-uitvoer-host {
+      position: fixed;
+      z-index: 70;
+      inset-block-start: auto;
+      /* Zelfde reservering als de Edge-eigenaar: Edgehoogte, zijn veilige
+         ondermarge en daarna nog een zichtbare tussenruimte. */
+      inset-block-end: calc(var(--ds-edge-hoogte) + max(var(--ds-ruimte-3), env(safe-area-inset-bottom, 0px)) + var(--ds-ruimte-3));
+      inset-inline: max(12px, env(safe-area-inset-left, 0px)) max(12px, env(safe-area-inset-right, 0px));
+      display: block;
+      margin-block: 0;
+      margin-inline: 0;
+    }
+    .ds-uitvoer-host > .ds-uitvoer-knop[data-hoofdactie] {
+      inline-size: 100%;
+      max-inline-size: 100%;
+      margin-block: 0;
+      margin-inline: 0;
+    }
+  }
+}

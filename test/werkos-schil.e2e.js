@@ -8,6 +8,7 @@ const { letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./h
 
 const pw = laadPlaywright();
 const script = path.join(__dirname, '..', 'public', 'shared', 'werkos.js');
+const stijl = path.join(__dirname, '..', 'public', 'ds', 'componenten', 'werkos.css');
 
 const basisStijl = `
   :root{--rtg-bg:#0c0c0b;--rtg-grond:#0c0c0b;--rtg-txt:#f2efe9;--rtg-muted:#aaa59d;--rtg-soft:#6f6a63;--rtg-line:#302e2a;--rtg-goud:#b7a35c;--gold-rand:#7d7040;--gold-tekst:#c8b978;--gold-basis:#857007}
@@ -29,6 +30,7 @@ async function tabSchil(page) {
         <button data-tab="meer"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/></svg>Meer</button></nav>
     </div><div class="extra" id="extra"><button data-goto2="audit"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5z"/></svg>Audit</button></div>
   </body></html>`);
+  await page.addStyleTag({ path: stijl });
   await page.addScriptTag({ path: script });
   await page.evaluate(() => {
     const open = tab => {
@@ -66,7 +68,11 @@ test('WerkOS: boven-, linker- en onderbalk werken op desktop en mobiel',
         assert.ok(rail && Math.abs(rail.width - 50) < 1, 'de mobiele rail is compact en bedekt de inhoud niet');
         const context = await page.locator('.wos-top-context').boundingBox();
         const host = await page.locator('.topbar .host').boundingBox();
-        assert.ok(context && host && context.y + context.height <= host.y + 1, 'de mobiele bovenbalk bedekt de appkop niet');
+        const contextStijl = await page.locator('.wos-top-context').evaluate(e => ({ klasse: document.body.className,
+          positie: getComputedStyle(e).position, top: getComputedStyle(e).top,
+          links: getComputedStyle(e).insetInlineStart, rechts: getComputedStyle(e).insetInlineEnd }));
+        assert.ok(context && host && context.y + context.height <= host.y + 1,
+          'de mobiele bovenbalk bedekt de appkop niet: context=' + JSON.stringify(context) + ', kop=' + JSON.stringify(host) + ', stijl=' + JSON.stringify(contextStijl));
         assert.ok(context.x < 70 && context.x + context.width <= viewport.width, 'de mobiele bovenbalk benut de volle werkbreedte');
       }
 
@@ -89,6 +95,7 @@ test('WerkOS: backofficepanelen bedienen dezelfde schil op mobiel',
   try {
     await page.setContent(`<!doctype html><html><head><style>${basisStijl}header{min-height:64px;padding:14px 20px}.wrap{display:flex;justify-content:space-between}#app{padding:20px}.panel{min-height:540px;border-bottom:1px solid #302e2a}</style></head><body>
       <header><div class="wrap"><b>RTG Backoffice</b><span>Live</span></div></header><main id="app" class="on"><section class="panel"><h2>Actiecentrum</h2></section><section class="panel"><h2>Vakbewijzen</h2></section></main></body></html>`);
+    await page.addStyleTag({ path: stijl });
     await page.addScriptTag({ path: script });
     await page.evaluate(() => {
       window.RTGGlyf = { svg:() => { const n=document.createElementNS('http://www.w3.org/2000/svg','svg'); n.setAttribute('viewBox','0 0 24 24'); return n; }, svgHTML:() => '<svg viewBox="0 0 24 24"></svg>' };

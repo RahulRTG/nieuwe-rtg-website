@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '81509fa5';
+var RTG_BOUW = '62f12f22';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -2417,15 +2417,19 @@ var RTG_BOUW = '81509fa5';
 
      De indeling hieronder is afgeleid en niet bedacht: per lader is opgezocht
      welke element-ids hij vult, en in welke .view die in apps/app.html staan.
-     Drie laders (laadCare, laadBestellen, loadCv) schrijven nergens zo'n id;
-     die blijven bij het openen laden, want stil iets NIET tonen is erger dan
-     een verzoek te veel. Na de eerste keer blijft een tabblad gevuld, en de
-     live-verbinding (syncScope) houdt bij wat er verandert. */
+     Twee laders (laadBestellen en loadCv) schrijven nergens zo'n id; die
+     blijven bij het openen laden, want stil iets NIET tonen is erger dan een
+     verzoek te veel. Zorg heeft wel een eigen tab en hoort dus bij die tab te
+     laden. Dat voorkomt zowel onnodige zorgverzoeken op Home als een lege
+     directe ingang terwijl de uitgestelde achtergrondtaak nog wacht. Na de
+     eerste keer blijft een tabblad gevuld, en de live-verbinding (syncScope)
+     houdt bij wat er verandert. */
   const LADERS_PER_TAB = {
     reizen:     [['renderTrip', () => renderTrip()], ['laadShowroom', () => laadShowroom()]],
     betalen:    [['renderPay', () => renderPay()]],
     ai:         [['renderAI', () => renderAI()], ['renderFluister', () => renderFluister()]],
     assets:     [['renderAssets', () => renderAssets()]],
+    zorg:       [['laadCare', () => laadCare()]],
     salon:      [['renderSalon', () => renderSalon()], ['loadVacatures', () => loadVacatures()],
                  ['laadOntmoet', () => laadOntmoet()]],
     bestellen:  [['laadBoodschappen', () => laadBoodschappen()]],
@@ -2587,6 +2591,7 @@ var RTG_BOUW = '81509fa5';
     else setTimeout(volgende, 50);
   }
 
+// Rendert de hoofdapp en vangt ontbrekende onderdelen gecontroleerd op.
   function renderAll(){
     /* Ook deze aanloop liep zonder vangnet, en juist hier staan de regels die
        aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
@@ -2642,10 +2647,12 @@ var RTG_BOUW = '81509fa5';
     }
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
        ze opent -- zie LADERS_PER_TAB in ./app-main-12.js voor waarom, en wat
-       er gemeten is. Hier blijven alleen de drie laders staan die aan geen
-       enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een. */
+       er gemeten is. Hier blijven alleen de twee laders staan die aan geen
+       enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een.
+       Zorg staat bewust niet meer hier: openTab vult die eigen tab via
+       LADERS_PER_TAB, zodat een directe #tab=zorg-ingang niet afhankelijk is
+       van een later idle-moment. */
     naBeeld([
-      ...(guest ? [] : [['laadCare', laadCare]]),
       ['laadBestellen', laadBestellen], ['loadCv', loadCv]
     ]);
 
@@ -2818,16 +2825,22 @@ var RTG_BOUW = '81509fa5';
   const careSoort = { spa: 'Spa', wellness: 'Wellness', kliniek: 'Kliniek' };
   async function laadCare(){
     if (!API.live) return;
-    try { careOv = await API.call('/api/care', {}); } catch(e){ careOv = null; }
-    let mijn = [];
-    try { mijn = (await API.call('/api/care/mijn', {})).boekingen || []; } catch(e){}
-    try { carePak = (await API.call('/api/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
-    try { carePakMijn = (await API.call('/api/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
-    renderCareMijn(mijn);
-    renderCareIntakes();
-    renderCarePakketten();
-    renderCareAanbod();
-    laadVerzorging(); // de kapper en de barbier, apart gehouden van de zorg
+    const view = document.querySelector('.view[data-view="zorg"]');
+    if (view) view.setAttribute('aria-busy', 'true');
+    try {
+      try { careOv = await API.call('/api/care', {}); } catch(e){ careOv = null; }
+      let mijn = [];
+      try { mijn = (await API.call('/api/care/mijn', {})).boekingen || []; } catch(e){}
+      try { carePak = (await API.call('/api/care/pakketten', {})).pakketten || []; } catch(e){ carePak = []; }
+      try { carePakMijn = (await API.call('/api/care/pakket/mijn', {})).pakketten || []; } catch(e){ carePakMijn = []; }
+      renderCareMijn(mijn);
+      renderCareIntakes();
+      renderCarePakketten();
+      renderCareAanbod();
+      await laadVerzorging(); // de kapper en de barbier, apart gehouden van de zorg
+    } finally {
+      if (view) view.removeAttribute('aria-busy');
+    }
   }
   function renderCareMijn(mijn){
     const el = $('#careMijn'); if (!el) return;

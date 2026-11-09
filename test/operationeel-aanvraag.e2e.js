@@ -2,7 +2,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const pw = require('playwright');
-const { startServer, stopHard, browserOpties, geenBrowser, letOpFouten, edgeActies } = require('./helper');
+const { startServer, stopHard, browserOpties, geenBrowser, letOpFouten, edgeActies, edgeBediening, wachtOpSchil } = require('./helper');
 const bewijs = require('./operationeel-journaal');
 
 test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge', async () => {
@@ -41,7 +41,7 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     await klant.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, lid.token);
     await werk.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); }, zaak.token);
     async function open(p, url) {
-      await p.goto(srv.base + url); await p.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      await p.goto(srv.base + url); await wachtOpSchil(p);
       if (await p.locator('#rtg-cookie button').isVisible()) await p.locator('#rtg-cookie button').click();
     }
     await open(klant, '/apps/mijnmall.html#aanvragen');
@@ -60,9 +60,8 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     await eigen.getByRole('button', { name: 'Kiezen', exact: true }).click();
     await eigen.getByText('Wacht op behandeling', { exact: false }).waitFor();
     await werk.reload(); await kaart.getByRole('heading').click();
-    await edgeActies(werk);
     werk.setDefaultTimeout(10000);
-    await werk.locator('.rtg-adaptive-controls').getByRole('button', { name: 'In behandeling nemen', exact: true }).click();
+    await edgeBediening(werk, 'In behandeling nemen');
     await kaart.getByRole('button', { name: 'Antwoord afronden', exact: true }).waitFor();
     await kaart.getByRole('button', { name: 'Antwoord afronden', exact: true }).click();
     await kaart.getByRole('textbox', { name: 'Toelichting voor het lid' }).fill('Uw aanvraag is behandeld. Bel ons om de afspraak vast te leggen.');
@@ -78,8 +77,7 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     await resultaat.getByText('Uw aanvraag is behandeld. Bel ons om de afspraak vast te leggen.', { exact: true }).waitFor();
     for (const breedte of [390, 1440]) {
       await klant.setViewportSize({ width: breedte, height: 900 });
-      assert.equal(await klant.locator('.rtg-adaptive-bar:visible').count(), 1);
-      assert.equal(await klant.locator('.rtg-edge-chrome').count(), 1);
+      assert.equal(await klant.locator('.ds-edge__balk:visible,.rtg-adaptive-bar:visible,.rtg-edge-bottom:visible').count(), 1);
       assert.ok(await klant.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
       await resultaat.scrollIntoViewIfNeeded();
       if (process.env.SALOON_DESIGN_OUTPUT) await klant.screenshot({ path: path.join(process.env.SALOON_DESIGN_OUTPUT, 'saloon-aanvraag-' + breedte + '.png') });
@@ -110,8 +108,8 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     await resultaat.getByRole('button', { name: 'Open aanvraag', exact: true }).click();
     await klant.waitForURL('**/apps/mijnmall.html#aanvragen');
     await open(klant, '/apps/wereld.html');
-    await resultaat.focus(); await edgeActies(klant);
-    await klant.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Opnieuw openen in Mijn Mall', exact: true }).click();
+    await resultaat.focus();
+    await edgeBediening(klant, 'Opnieuw openen in Mijn Mall');
     await klant.waitForURL('**/apps/mijnmall.html#aanvragen');
     await eigen.getByRole('button', { name: 'Opnieuw openen', exact: true }).click();
     await eigen.getByRole('button', { name: 'Aanvraag intrekken', exact: true }).click();

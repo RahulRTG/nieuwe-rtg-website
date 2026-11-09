@@ -3,17 +3,17 @@
  "uitleg": "Hoe lang elk toetsbestand erover deed, als gewicht voor de scherfverdeling in scripts/lib/delen.js. PER MODUS, want met dekking aan is dezelfde toets een ander kostenmodel -- niet een uitschieter. Mediaan over alle waarnemingen; de p90 staat erbij en weegt niet mee. Een bestand dat hier NIET in staat is ongemeten en wordt om en om verdeeld -- nooit overgeslagen.",
  "hoe": "npm test (schrijft .toetsduur), daarna: node scripts/toetsduur.js --schrijf",
  "gelezen": {
-  "regels": 2,
+  "regels": 429,
   "verminkt": 0,
-  "opSchijf": 1547,
+  "opSchijf": 3158,
   "modi": [
    "dekking",
+   "normaal",
    "onbekend"
   ],
   "opgeruimd": {
    "weg": 0,
-   "over": 1452,
-   "wacht": "nog niet elke modus is gemeten"
+   "over": 1452
   }
  },
  "modi": {
@@ -27,8 +27,8 @@
    },
    "gemeten": {
     "bestanden": 1270,
-    "ongemeten": 277,
-    "verseWaarnemingen": 2,
+    "ongemeten": 1888,
+    "verseWaarnemingen": 0,
     "totaalMs": 9229958
    },
    "bronnen": {
@@ -14026,6 +14026,4752 @@
     }
    }
   },
+  "normaal": {
+   "stempel": {
+    "op": "2026-11-08T18:44:43.721Z",
+    "waar": "lokaal",
+    "node": "v24.18.0",
+    "kernen": 8,
+    "commit": "070ffb83a2"
+   },
+   "gemeten": {
+    "bestanden": 429,
+    "ongemeten": 2729,
+    "verseWaarnemingen": 429,
+    "totaalMs": 9300329
+   },
+   "bronnen": {
+    "ci|v26.13.0|4|d0f7317": {
+     "waar": "ci",
+     "node": "v26.13.0",
+     "kernen": 4,
+     "commit": "d0f7317"
+    }
+   },
+   "duur": {
+    "a11y-hermeet.e2e.js": 16980,
+    "aanwezigheid-routes.e2e.js": 4301,
+    "access-language.e2e.js": 38097,
+    "adaptief.e2e.js": 104936,
+    "agenda.e2e.js": 8916,
+    "appmenu-ds.e2e.js": 7889,
+    "appmenu.e2e.js": 495794,
+    "apps-ui.e2e.js": 112533,
+    "appstore.e2e.js": 56017,
+    "appwerkt-bestemming.e2e.js": 64509,
+    "appwerkt-gegevenspoort.e2e.js": 1488,
+    "appwerkt-glad.e2e.js": 440,
+    "appwerkt-juridisch.e2e.js": 37870,
+    "appwerkt-navigatielinks.e2e.js": 105850,
+    "appwerkt-query-ingang.e2e.js": 54380,
+    "appwerkt-schil.e2e.js": 842923,
+    "arrival-accountdeur.e2e.js": 4823,
+    "arrival-ds.e2e.js": 6605,
+    "avond-scherm.e2e.js": 6600,
+    "bankkamer.e2e.js": 16604,
+    "bankoverboek-dubbelklik.e2e.js": 8402,
+    "bankscherm.e2e.js": 15560,
+    "basis-ds.e2e.js": 65797,
+    "basis-service.e2e.js": 484035,
+    "berichten.e2e.js": 7112,
+    "bestanden.e2e.js": 6881,
+    "bestellen-scherm.e2e.js": 8180,
+    "bewijsmapscherm.e2e.js": 5849,
+    "bijstandscherm.e2e.js": 7346,
+    "boardroombesluiten.e2e.js": 8968,
+    "boeken-ds.e2e.js": 6808,
+    "boeken.e2e.js": 5186,
+    "borden-ds.e2e.js": 6041,
+    "browser-ds.e2e.js": 65730,
+    "browserpoort.e2e.js": 249,
+    "btw-aansluiting-scherm.e2e.js": 8346,
+    "btw-naheffing-scherm.e2e.js": 15678,
+    "btw-scherm.e2e.js": 11139,
+    "btw-waarom-scherm.e2e.js": 11857,
+    "bureaupda.e2e.js": 8709,
+    "buurtruil-scherm.e2e.js": 8386,
+    "camerascherm.e2e.js": 8688,
+    "campus-scherm.e2e.js": 11972,
+    "chauffeur-ds.e2e.js": 6258,
+    "chauffeur-scherm.e2e.js": 6002,
+    "clipdeler.e2e.js": 10157,
+    "clips-deel.e2e.js": 6761,
+    "clips-studio.e2e.js": 8363,
+    "collegachat-presentatie.e2e.js": 467,
+    "comm-zaak.e2e.js": 13216,
+    "comm.e2e.js": 23001,
+    "command.e2e.js": 8223,
+    "commerce-mand-scherm.e2e.js": 7490,
+    "commerce-scherm.e2e.js": 6275,
+    "commercie-ronde.e2e.js": 4310,
+    "concept-live.e2e.js": 4780,
+    "concern-routes.e2e.js": 12781,
+    "concern-scherm.e2e.js": 16861,
+    "conciergelusscherm.e2e.js": 13301,
+    "connect-gezinsdeur.e2e.js": 8711,
+    "connect-routes.e2e.js": 4468,
+    "connect-scherm.e2e.js": 7557,
+    "contactpin.e2e.js": 46983,
+    "contextbrug.e2e.js": 4853,
+    "contrastcontext.e2e.js": 21392,
+    "contrastfoto.e2e.js": 5964,
+    "control-uniqueness.e2e.js": 14943,
+    "cookie-ds.e2e.js": 7477,
+    "csp.e2e.js": 53555,
+    "daily-rooms.e2e.js": 14497,
+    "deelmenu-ds.e2e.js": 6090,
+    "deelmenu.e2e.js": 20260,
+    "deelmenuronde.e2e.js": 28185,
+    "deelmenuwacht.e2e.js": 7602,
+    "deur.e2e.js": 11419,
+    "dispatch-ds.e2e.js": 5442,
+    "document-capability.e2e.js": 16841,
+    "document-equivalence.e2e.js": 27291,
+    "document-persistence.e2e.js": 9933,
+    "doelen-scherm.e2e.js": 8507,
+    "ds-bediening-geometrie.e2e.js": 4792,
+    "edge-communications.e2e.js": 15182,
+    "edge-enige-balk.e2e.js": 15220,
+    "edgeblikveld.e2e.js": 21647,
+    "edgeobject.e2e.js": 7208,
+    "eigen-bedekking.e2e.js": 7796,
+    "eigenaarpasskey.e2e.js": 11325,
+    "eigensessieschermen.e2e.js": 28915,
+    "escape-lagen.e2e.js": 7064,
+    "experience-dinner.e2e.js": 18953,
+    "experience-network.e2e.js": 15319,
+    "experience-rtg.e2e.js": 14020,
+    "experience-surface.e2e.js": 8732,
+    "experience-travel.e2e.js": 7971,
+    "first-steps.e2e.js": 16976,
+    "flits-ds.e2e.js": 6319,
+    "focus-ds.e2e.js": 4917,
+    "foundation-coach-ds.e2e.js": 10320,
+    "foundation-coach-kind-ds.e2e.js": 9189,
+    "foundation-entry-lifecycle.e2e.js": 79049,
+    "foundation-sw-cache.e2e.js": 4971,
+    "foundationmailscherm.e2e.js": 13120,
+    "galerij.e2e.js": 11554,
+    "gastscherm.e2e.js": 10735,
+    "gebaar-bestanden.e2e.js": 6940,
+    "gebaar-notities.e2e.js": 10895,
+    "gebaar-rtmail.e2e.js": 9400,
+    "gebaar-salon.e2e.js": 7640,
+    "gebaar.e2e.js": 41429,
+    "gedachten-scherm.e2e.js": 8083,
+    "gedeeld-element.e2e.js": 18062,
+    "gegevenskaart-scherm.e2e.js": 9625,
+    "geld-lidmaatschap.e2e.js": 10216,
+    "geld.e2e.js": 38508,
+    "genootschap.e2e.js": 8260,
+    "gereedschap.e2e.js": 16378,
+    "geven-scherm.e2e.js": 10234,
+    "gezondheidstoestemming.e2e.js": 7716,
+    "ghost-ds.e2e.js": 5834,
+    "ghost-voertuig-herstel.e2e.js": 8620,
+    "gpsschakelaar.e2e.js": 36486,
+    "grammatica.e2e.js": 121193,
+    "handelscherm.e2e.js": 10689,
+    "handenvrij.e2e.js": 18350,
+    "hangar-ds.e2e.js": 5857,
+    "heelrtg-catalogus-poort.e2e.js": 23165,
+    "heelrtg-osapps.e2e.js": 23159,
+    "helper-veegdoor.e2e.js": 1367,
+    "heritage-context.e2e.js": 17337,
+    "heritage-intelligence.e2e.js": 74855,
+    "heritage-navigation-transition.e2e.js": 29994,
+    "horeca-bar.e2e.js": 7226,
+    "horeca-ds.e2e.js": 19142,
+    "horeca-edge.e2e.js": 6007,
+    "horeca-pda.e2e.js": 68691,
+    "horeca-rahul.e2e.js": 5232,
+    "horeca-vloer.e2e.js": 14347,
+    "horecascherm.e2e.js": 14333,
+    "horecaschermen.e2e.js": 20681,
+    "hotels-ds.e2e.js": 6409,
+    "huis.e2e.js": 8080,
+    "identiteitschermen.e2e.js": 10568,
+    "ingebedde-chrome.e2e.js": 49288,
+    "inlogkleur-ds.e2e.js": 4780,
+    "instellingen-ds.e2e.js": 2322,
+    "invoerbalie.e2e.js": 5191,
+    "ioslaag.e2e.js": 38899,
+    "isolatie-cockpit.e2e.js": 5503,
+    "juridisch-ds.e2e.js": 9383,
+    "juridischeschermen.e2e.js": 5560,
+    "kaart-ds.e2e.js": 5092,
+    "kantoor.e2e.js": 8622,
+    "kantoordeur-passkey.e2e.js": 18961,
+    "kantoordeur.e2e.js": 51063,
+    "kantoordeuren.e2e.js": 11072,
+    "kantoorgesprek.e2e.js": 5518,
+    "kantoorkoppel-productie.e2e.js": 8102,
+    "kantoorregisters.e2e.js": 43783,
+    "kassawachtrij.e2e.js": 8381,
+    "klankwerk.e2e.js": 9123,
+    "klimaatfonds-scherm.e2e.js": 10555,
+    "kosten.e2e.js": 17273,
+    "kostenklant.e2e.js": 17657,
+    "kwesties-scherm.e2e.js": 14718,
+    "kwijtschelding-scherm.e2e.js": 11652,
+    "laatstedrie.e2e.js": 6367,
+    "ledenschermen.e2e.js": 30758,
+    "leegtemeting.e2e.js": 434,
+    "leerhuis-scherm.e2e.js": 7129,
+    "leerhuis-trainer.e2e.js": 33553,
+    "leerhuis-werk.e2e.js": 23300,
+    "leerpaspoort-scherm.e2e.js": 14975,
+    "lesdeellink.e2e.js": 14849,
+    "lesstroom.e2e.js": 13067,
+    "leven.e2e.js": 12858,
+    "levenspas.e2e.js": 6639,
+    "leverancier-service-ds.e2e.js": 41054,
+    "library-studio-reader.e2e.js": 8143,
+    "liegend-scherm.e2e.js": 23549,
+    "life-scherm.e2e.js": 19464,
+    "lifecommand.e2e.js": 6744,
+    "lifestyleschermen.e2e.js": 32982,
+    "linkgezin.e2e.js": 18587,
+    "linkscan.e2e.js": 45177,
+    "living-world-ds.e2e.js": 6180,
+    "living-world.e2e.js": 34422,
+    "livinglab.e2e.js": 88297,
+    "lokale-appvoltooiing.e2e.js": 46151,
+    "loopbaan.e2e.js": 7486,
+    "luchthaven-ds.e2e.js": 7307,
+    "magnaat-partnerstudio.e2e.js": 5737,
+    "magnaatafwerking.e2e.js": 11385,
+    "magnaatgroei.e2e.js": 9188,
+    "magnaathardening.e2e.js": 10222,
+    "magnaatleven.e2e.js": 11108,
+    "magnaatonderneming.e2e.js": 9258,
+    "magnaatspeelronde.e2e.js": 9249,
+    "magnaatstad.e2e.js": 13472,
+    "magnaatstart.e2e.js": 9887,
+    "marechaussee-ds.e2e.js": 6596,
+    "media-studio-pro.e2e.js": 8778,
+    "media.e2e.js": 16258,
+    "medialijst.e2e.js": 7957,
+    "mediazaak.e2e.js": 9618,
+    "medicijnen-scherm.e2e.js": 11356,
+    "meet.e2e.js": 11309,
+    "memo.e2e.js": 13551,
+    "metgezelwijkt.e2e.js": 9302,
+    "metier.e2e.js": 7574,
+    "mijn-isolatie.e2e.js": 5119,
+    "mijn-relaties-scherm.e2e.js": 7507,
+    "mijn-sessies-scherm.e2e.js": 7381,
+    "mob-ontvangst.e2e.js": 5341,
+    "mobile-content.e2e.js": 39041,
+    "mobile-single-shell.e2e.js": 30452,
+    "mobiliteitscherm.e2e.js": 25853,
+    "move-ds.e2e.js": 6608,
+    "move-gevolg.e2e.js": 5368,
+    "move.e2e.js": 8235,
+    "muziek-bestanden.e2e.js": 9814,
+    "navigatie-ds.e2e.js": 13819,
+    "navigatiekaarten.e2e.js": 49472,
+    "neiging-scherm.e2e.js": 34850,
+    "neiging.e2e.js": 4419,
+    "nieuwe-schermen.e2e.js": 13041,
+    "notities.e2e.js": 6692,
+    "objectpaneel.e2e.js": 7543,
+    "ochtendkaart.e2e.js": 10957,
+    "office-blad.e2e.js": 8917,
+    "office-controls.e2e.js": 62464,
+    "office-formaten.e2e.js": 9245,
+    "office-formschets.e2e.js": 17435,
+    "office-suite.e2e.js": 10679,
+    "ondernemerpoort-presentatie.e2e.js": 487,
+    "onderneming-scherm.e2e.js": 35745,
+    "ondertitelband-ds.e2e.js": 4789,
+    "ontwerpvoorbeeld.e2e.js": 4904,
+    "onvolledige-appstaat.e2e.js": 26704,
+    "operationeel-aanvraag.e2e.js": 23721,
+    "ov-ds.e2e.js": 6625,
+    "ovcontrol-ds.e2e.js": 6082,
+    "ovdienst-ds.e2e.js": 5908,
+    "overdracht-ds.e2e.js": 7067,
+    "overheidschermen.e2e.js": 18119,
+    "ovroutes-ds.e2e.js": 6305,
+    "paginas.e2e.js": 189020,
+    "partijvoorstel-scherm.e2e.js": 17956,
+    "partner-ds.e2e.js": 6158,
+    "pass-startup.e2e.js": 19372,
+    "passkeys-weg.e2e.js": 6305,
+    "payrollkeur.e2e.js": 7300,
+    "paytegoed.e2e.js": 18693,
+    "pda-ui.e2e.js": 66574,
+    "pinherstel.e2e.js": 18480,
+    "plaats-intrekking.e2e.js": 7556,
+    "plaatsdienstbrug.e2e.js": 9921,
+    "plaatsmotor.e2e.js": 7499,
+    "plaatsnadering.e2e.js": 10302,
+    "plek-ds.e2e.js": 13513,
+    "poortgesprek-ds.e2e.js": 8616,
+    "poortgesprek.e2e.js": 7443,
+    "post-scherm.e2e.js": 6678,
+    "praktijk-betalen.e2e.js": 15009,
+    "praktijk.e2e.js": 43594,
+    "premium.e2e.js": 65693,
+    "prijsgarantie.e2e.js": 3718,
+    "rahul-escape.e2e.js": 7005,
+    "rahul-header-ds.e2e.js": 35081,
+    "rahul-mond.e2e.js": 6548,
+    "rahulscherm.e2e.js": 6427,
+    "rahulzicht.e2e.js": 9211,
+    "redirect-ds.e2e.js": 1479,
+    "regelwacht-scherm.e2e.js": 10200,
+    "registratie-dicht-scherm.e2e.js": 6325,
+    "reisbalie.e2e.js": 8822,
+    "reisboek-ds.e2e.js": 6592,
+    "reisbureau-ds.e2e.js": 6582,
+    "reisgezelschap-instemming.e2e.js": 13288,
+    "reisgezelschap-werkruimte.e2e.js": 11762,
+    "reisprogramma.e2e.js": 52953,
+    "reisschermen.e2e.js": 24905,
+    "reisteruggave.e2e.js": 9525,
+    "reisuitnodiging-ds.e2e.js": 5147,
+    "reisuitnodiging.e2e.js": 10061,
+    "reiswacht.e2e.js": 10249,
+    "reizen-ds.e2e.js": 10904,
+    "reizen-veilig-ds.e2e.js": 6531,
+    "reizen-veilig.e2e.js": 11838,
+    "reizenscherm.e2e.js": 4346,
+    "residentie-ds.e2e.js": 5523,
+    "rit-ds.e2e.js": 7010,
+    "routedekking-ds.e2e.js": 7284,
+    "routedekking.e2e.js": 5353,
+    "routedossier-ds.e2e.js": 7587,
+    "rtc-relay.e2e.js": 39741,
+    "rtfagenda.e2e.js": 8286,
+    "rtfalbum.e2e.js": 6459,
+    "rtfcurve.e2e.js": 10275,
+    "rtfgeld.e2e.js": 7845,
+    "rtfhulpwijzer.e2e.js": 4451,
+    "rtfkinderschermen.e2e.js": 51559,
+    "rtfkosten.e2e.js": 5788,
+    "rtfosafmaak.e2e.js": 15129,
+    "rtfosdoelgroepen.e2e.js": 50874,
+    "rtfosgovernance.e2e.js": 10043,
+    "rtfosschermen.e2e.js": 18695,
+    "rtfoundation-keuze.e2e.js": 204086,
+    "rtfrust.e2e.js": 10187,
+    "rtfschool2.e2e.js": 12120,
+    "rtfspeelhoek.e2e.js": 8476,
+    "rtfwelzijn.e2e.js": 12326,
+    "rtg-a11y.e2e.js": 2038,
+    "rtg-adaptive-edge.e2e.js": 67997,
+    "rtg-dev.e2e.js": 1037,
+    "rtg-edge-2.e2e.js": 52070,
+    "rtg-edge-quiet-presence.e2e.js": 12221,
+    "rtg-id-family.e2e.js": 33289,
+    "rtgboek.e2e.js": 10870,
+    "rtgzetel-scherm.e2e.js": 7868,
+    "rtmail-instellingen.e2e.js": 8485,
+    "rtmail-team.e2e.js": 7963,
+    "rtmail-vak.e2e.js": 9656,
+    "salon-app.e2e.js": 18383,
+    "saloon-edge.e2e.js": 15259,
+    "saloon-redactie.e2e.js": 11011,
+    "saloon.e2e.js": 14226,
+    "samendoen-scherm.e2e.js": 16351,
+    "scan-tafel.e2e.js": 13001,
+    "scanknop-ds.e2e.js": 4889,
+    "scanner.e2e.js": 10344,
+    "schermcontext.e2e.js": 8924,
+    "schil-taal.e2e.js": 7745,
+    "schuif.e2e.js": 183889,
+    "servicebel.e2e.js": 15690,
+    "servicecockpit.e2e.js": 46298,
+    "servicehulp.e2e.js": 30389,
+    "servicewerkplek.e2e.js": 18969,
+    "sessiestroom.e2e.js": 12717,
+    "sfeerbeeld-muis.e2e.js": 9808,
+    "sneltoets-ds.e2e.js": 5867,
+    "sociaal-edge.e2e.js": 22773,
+    "spelpraat.e2e.js": 15848,
+    "spelscherm.e2e.js": 5347,
+    "spelsudoku.e2e.js": 14978,
+    "spelteams.e2e.js": 8302,
+    "split-presentatie.e2e.js": 472,
+    "spraak-ds.e2e.js": 6116,
+    "sprong-ds.e2e.js": 8125,
+    "sprong.e2e.js": 19301,
+    "sso-clientgeheim-scherm.e2e.js": 9266,
+    "stad-ds.e2e.js": 5427,
+    "staff-account-scherm.e2e.js": 7533,
+    "staving-scherm.e2e.js": 6885,
+    "stilleknoppen.e2e.js": 17478,
+    "storyline-worlds.e2e.js": 6832,
+    "taakbeeld.e2e.js": 5413,
+    "taalkast.e2e.js": 4661,
+    "taalkeuze-ds.e2e.js": 2088,
+    "tabadres.e2e.js": 19629,
+    "teamcall-presentatie.e2e.js": 5256,
+    "tijdlijn-scherm.e2e.js": 9026,
+    "toegankelijk-scherm.e2e.js": 16626,
+    "toestel-kluisindex.e2e.js": 5664,
+    "toestel.e2e.js": 7444,
+    "toestemming-scherm.e2e.js": 8448,
+    "trainingsschema-scherm.e2e.js": 8414,
+    "uitstap-ds.e2e.js": 5503,
+    "uurwerk-presentatie.e2e.js": 5157,
+    "vakbewijs-scherm.e2e.js": 19392,
+    "vandaag-omleiding.e2e.js": 6685,
+    "veiligheid.e2e.js": 13348,
+    "verbinding-ds.e2e.js": 9544,
+    "verdiepende-schermen.e2e.js": 11047,
+    "verificatie.e2e.js": 6546,
+    "vertaler.e2e.js": 5744,
+    "vertegenwoordiging.e2e.js": 7386,
+    "verzorging-scherm.e2e.js": 12897,
+    "videobellen-echt.e2e.js": 108746,
+    "vluchten-ds.e2e.js": 5718,
+    "voeding-scherm.e2e.js": 9533,
+    "voertuig-ds.e2e.js": 6140,
+    "voertuigscherm.e2e.js": 5247,
+    "volscherm-ds.e2e.js": 10596,
+    "vooruitscherm.e2e.js": 12902,
+    "vrienden-blok.e2e.js": 21852,
+    "vrijheid-scherm.e2e.js": 13533,
+    "warm-presentation.e2e.js": 31492,
+    "webblok-ds.e2e.js": 7249,
+    "website-language-picker.e2e.js": 6658,
+    "website-screen-edges.e2e.js": 13299,
+    "wegwijzerscherm.e2e.js": 7487,
+    "wereldbreedte.e2e.js": 13249,
+    "wereldlaag.e2e.js": 35348,
+    "wereldrooster.e2e.js": 7345,
+    "werkblad.e2e.js": 11287,
+    "werkcommandbalk.e2e.js": 17935,
+    "werkdocument-ds.e2e.js": 8625,
+    "werkmerk.e2e.js": 7708,
+    "werkos-schil.e2e.js": 949,
+    "werkplek-tweede.e2e.js": 27529,
+    "werkruimte-objecten.e2e.js": 8633,
+    "werkruimte.e2e.js": 10496,
+    "werkscherm.e2e.js": 26136,
+    "werkschermen.e2e.js": 29852,
+    "werkstatus.e2e.js": 10595,
+    "werktafel-lussen.e2e.js": 16722,
+    "werktafel-pas.e2e.js": 10806,
+    "werktafel.e2e.js": 31656,
+    "werkuitgaven.e2e.js": 9107,
+    "winkel-scherm.e2e.js": 9593,
+    "wonen-ds.e2e.js": 7558,
+    "workspace-rechten.e2e.js": 16079,
+    "workspace-travel-accessibility.e2e.js": 7626,
+    "workspace-travel-confirmation.e2e.js": 10404,
+    "workspace-travel-recovery.e2e.js": 9248,
+    "workspace-travel-request.e2e.js": 24066,
+    "workspace-work.e2e.js": 8824,
+    "world-dashboard.e2e.js": 64867,
+    "world-desktop-beelden.e2e.js": 6129,
+    "world-desktop-ds.e2e.js": 13050,
+    "world-desktop-identity.e2e.js": 11713,
+    "world-desktop-opslag.e2e.js": 8439,
+    "world-desktop-state.e2e.js": 13927,
+    "world-function-controls.e2e.js": 29899,
+    "world-homes.e2e.js": 36891,
+    "world-palette.e2e.js": 66733,
+    "zaakregie.e2e.js": 25480,
+    "zaal.e2e.js": 19732,
+    "zakelijk-ds.e2e.js": 6033
+   },
+   "spreiding": {
+    "a11y-hermeet.e2e.js": {
+     "n": 1,
+     "min": 16980,
+     "max": 16980,
+     "p90": 16980,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "aanwezigheid-routes.e2e.js": {
+     "n": 1,
+     "min": 4301,
+     "max": 4301,
+     "p90": 4301,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "access-language.e2e.js": {
+     "n": 1,
+     "min": 38097,
+     "max": 38097,
+     "p90": 38097,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "adaptief.e2e.js": {
+     "n": 1,
+     "min": 104936,
+     "max": 104936,
+     "p90": 104936,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "agenda.e2e.js": {
+     "n": 1,
+     "min": 8916,
+     "max": 8916,
+     "p90": 8916,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appmenu-ds.e2e.js": {
+     "n": 1,
+     "min": 7889,
+     "max": 7889,
+     "p90": 7889,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appmenu.e2e.js": {
+     "n": 1,
+     "min": 495794,
+     "max": 495794,
+     "p90": 495794,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "apps-ui.e2e.js": {
+     "n": 1,
+     "min": 112533,
+     "max": 112533,
+     "p90": 112533,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appstore.e2e.js": {
+     "n": 1,
+     "min": 56017,
+     "max": 56017,
+     "p90": 56017,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appwerkt-bestemming.e2e.js": {
+     "n": 1,
+     "min": 64509,
+     "max": 64509,
+     "p90": 64509,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appwerkt-gegevenspoort.e2e.js": {
+     "n": 1,
+     "min": 1488,
+     "max": 1488,
+     "p90": 1488,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appwerkt-glad.e2e.js": {
+     "n": 1,
+     "min": 440,
+     "max": 440,
+     "p90": 440,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appwerkt-juridisch.e2e.js": {
+     "n": 1,
+     "min": 37870,
+     "max": 37870,
+     "p90": 37870,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appwerkt-navigatielinks.e2e.js": {
+     "n": 1,
+     "min": 105850,
+     "max": 105850,
+     "p90": 105850,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appwerkt-query-ingang.e2e.js": {
+     "n": 1,
+     "min": 54380,
+     "max": 54380,
+     "p90": 54380,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "appwerkt-schil.e2e.js": {
+     "n": 1,
+     "min": 842923,
+     "max": 842923,
+     "p90": 842923,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "arrival-accountdeur.e2e.js": {
+     "n": 1,
+     "min": 4823,
+     "max": 4823,
+     "p90": 4823,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "arrival-ds.e2e.js": {
+     "n": 1,
+     "min": 6605,
+     "max": 6605,
+     "p90": 6605,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "avond-scherm.e2e.js": {
+     "n": 1,
+     "min": 6600,
+     "max": 6600,
+     "p90": 6600,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bankkamer.e2e.js": {
+     "n": 1,
+     "min": 16604,
+     "max": 16604,
+     "p90": 16604,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bankoverboek-dubbelklik.e2e.js": {
+     "n": 1,
+     "min": 8402,
+     "max": 8402,
+     "p90": 8402,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bankscherm.e2e.js": {
+     "n": 1,
+     "min": 15560,
+     "max": 15560,
+     "p90": 15560,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "basis-ds.e2e.js": {
+     "n": 1,
+     "min": 65797,
+     "max": 65797,
+     "p90": 65797,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "basis-service.e2e.js": {
+     "n": 1,
+     "min": 484035,
+     "max": 484035,
+     "p90": 484035,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "berichten.e2e.js": {
+     "n": 1,
+     "min": 7112,
+     "max": 7112,
+     "p90": 7112,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bestanden.e2e.js": {
+     "n": 1,
+     "min": 6881,
+     "max": 6881,
+     "p90": 6881,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bestellen-scherm.e2e.js": {
+     "n": 1,
+     "min": 8180,
+     "max": 8180,
+     "p90": 8180,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bewijsmapscherm.e2e.js": {
+     "n": 1,
+     "min": 5849,
+     "max": 5849,
+     "p90": 5849,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bijstandscherm.e2e.js": {
+     "n": 1,
+     "min": 7346,
+     "max": 7346,
+     "p90": 7346,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "boardroombesluiten.e2e.js": {
+     "n": 1,
+     "min": 8968,
+     "max": 8968,
+     "p90": 8968,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "boeken-ds.e2e.js": {
+     "n": 1,
+     "min": 6808,
+     "max": 6808,
+     "p90": 6808,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "boeken.e2e.js": {
+     "n": 1,
+     "min": 5186,
+     "max": 5186,
+     "p90": 5186,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "borden-ds.e2e.js": {
+     "n": 1,
+     "min": 6041,
+     "max": 6041,
+     "p90": 6041,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "browser-ds.e2e.js": {
+     "n": 1,
+     "min": 65730,
+     "max": 65730,
+     "p90": 65730,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "browserpoort.e2e.js": {
+     "n": 1,
+     "min": 249,
+     "max": 249,
+     "p90": 249,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "btw-aansluiting-scherm.e2e.js": {
+     "n": 1,
+     "min": 8346,
+     "max": 8346,
+     "p90": 8346,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "btw-naheffing-scherm.e2e.js": {
+     "n": 1,
+     "min": 15678,
+     "max": 15678,
+     "p90": 15678,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "btw-scherm.e2e.js": {
+     "n": 1,
+     "min": 11139,
+     "max": 11139,
+     "p90": 11139,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "btw-waarom-scherm.e2e.js": {
+     "n": 1,
+     "min": 11857,
+     "max": 11857,
+     "p90": 11857,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "bureaupda.e2e.js": {
+     "n": 1,
+     "min": 8709,
+     "max": 8709,
+     "p90": 8709,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "buurtruil-scherm.e2e.js": {
+     "n": 1,
+     "min": 8386,
+     "max": 8386,
+     "p90": 8386,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "camerascherm.e2e.js": {
+     "n": 1,
+     "min": 8688,
+     "max": 8688,
+     "p90": 8688,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "campus-scherm.e2e.js": {
+     "n": 1,
+     "min": 11972,
+     "max": 11972,
+     "p90": 11972,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "chauffeur-ds.e2e.js": {
+     "n": 1,
+     "min": 6258,
+     "max": 6258,
+     "p90": 6258,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "chauffeur-scherm.e2e.js": {
+     "n": 1,
+     "min": 6002,
+     "max": 6002,
+     "p90": 6002,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "clipdeler.e2e.js": {
+     "n": 1,
+     "min": 10157,
+     "max": 10157,
+     "p90": 10157,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "clips-deel.e2e.js": {
+     "n": 1,
+     "min": 6761,
+     "max": 6761,
+     "p90": 6761,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "clips-studio.e2e.js": {
+     "n": 1,
+     "min": 8363,
+     "max": 8363,
+     "p90": 8363,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "collegachat-presentatie.e2e.js": {
+     "n": 1,
+     "min": 467,
+     "max": 467,
+     "p90": 467,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "comm-zaak.e2e.js": {
+     "n": 1,
+     "min": 13216,
+     "max": 13216,
+     "p90": 13216,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "comm.e2e.js": {
+     "n": 1,
+     "min": 23001,
+     "max": 23001,
+     "p90": 23001,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "command.e2e.js": {
+     "n": 1,
+     "min": 8223,
+     "max": 8223,
+     "p90": 8223,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "commerce-mand-scherm.e2e.js": {
+     "n": 1,
+     "min": 7490,
+     "max": 7490,
+     "p90": 7490,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "commerce-scherm.e2e.js": {
+     "n": 1,
+     "min": 6275,
+     "max": 6275,
+     "p90": 6275,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "commercie-ronde.e2e.js": {
+     "n": 1,
+     "min": 4310,
+     "max": 4310,
+     "p90": 4310,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "concept-live.e2e.js": {
+     "n": 1,
+     "min": 4780,
+     "max": 4780,
+     "p90": 4780,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "concern-routes.e2e.js": {
+     "n": 1,
+     "min": 12781,
+     "max": 12781,
+     "p90": 12781,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "concern-scherm.e2e.js": {
+     "n": 1,
+     "min": 16861,
+     "max": 16861,
+     "p90": 16861,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "conciergelusscherm.e2e.js": {
+     "n": 1,
+     "min": 13301,
+     "max": 13301,
+     "p90": 13301,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "connect-gezinsdeur.e2e.js": {
+     "n": 1,
+     "min": 8711,
+     "max": 8711,
+     "p90": 8711,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "connect-routes.e2e.js": {
+     "n": 1,
+     "min": 4468,
+     "max": 4468,
+     "p90": 4468,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "connect-scherm.e2e.js": {
+     "n": 1,
+     "min": 7557,
+     "max": 7557,
+     "p90": 7557,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "contactpin.e2e.js": {
+     "n": 1,
+     "min": 46983,
+     "max": 46983,
+     "p90": 46983,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "contextbrug.e2e.js": {
+     "n": 1,
+     "min": 4853,
+     "max": 4853,
+     "p90": 4853,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "contrastcontext.e2e.js": {
+     "n": 1,
+     "min": 21392,
+     "max": 21392,
+     "p90": 21392,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "contrastfoto.e2e.js": {
+     "n": 1,
+     "min": 5964,
+     "max": 5964,
+     "p90": 5964,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "control-uniqueness.e2e.js": {
+     "n": 1,
+     "min": 14943,
+     "max": 14943,
+     "p90": 14943,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "cookie-ds.e2e.js": {
+     "n": 1,
+     "min": 7477,
+     "max": 7477,
+     "p90": 7477,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "csp.e2e.js": {
+     "n": 1,
+     "min": 53555,
+     "max": 53555,
+     "p90": 53555,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "daily-rooms.e2e.js": {
+     "n": 1,
+     "min": 14497,
+     "max": 14497,
+     "p90": 14497,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "deelmenu-ds.e2e.js": {
+     "n": 1,
+     "min": 6090,
+     "max": 6090,
+     "p90": 6090,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "deelmenu.e2e.js": {
+     "n": 1,
+     "min": 20260,
+     "max": 20260,
+     "p90": 20260,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "deelmenuronde.e2e.js": {
+     "n": 1,
+     "min": 28185,
+     "max": 28185,
+     "p90": 28185,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "deelmenuwacht.e2e.js": {
+     "n": 1,
+     "min": 7602,
+     "max": 7602,
+     "p90": 7602,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "deur.e2e.js": {
+     "n": 1,
+     "min": 11419,
+     "max": 11419,
+     "p90": 11419,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "dispatch-ds.e2e.js": {
+     "n": 1,
+     "min": 5442,
+     "max": 5442,
+     "p90": 5442,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "document-capability.e2e.js": {
+     "n": 1,
+     "min": 16841,
+     "max": 16841,
+     "p90": 16841,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "document-equivalence.e2e.js": {
+     "n": 1,
+     "min": 27291,
+     "max": 27291,
+     "p90": 27291,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "document-persistence.e2e.js": {
+     "n": 1,
+     "min": 9933,
+     "max": 9933,
+     "p90": 9933,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "doelen-scherm.e2e.js": {
+     "n": 1,
+     "min": 8507,
+     "max": 8507,
+     "p90": 8507,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ds-bediening-geometrie.e2e.js": {
+     "n": 1,
+     "min": 4792,
+     "max": 4792,
+     "p90": 4792,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "edge-communications.e2e.js": {
+     "n": 1,
+     "min": 15182,
+     "max": 15182,
+     "p90": 15182,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "edge-enige-balk.e2e.js": {
+     "n": 1,
+     "min": 15220,
+     "max": 15220,
+     "p90": 15220,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "edgeblikveld.e2e.js": {
+     "n": 1,
+     "min": 21647,
+     "max": 21647,
+     "p90": 21647,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "edgeobject.e2e.js": {
+     "n": 1,
+     "min": 7208,
+     "max": 7208,
+     "p90": 7208,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "eigen-bedekking.e2e.js": {
+     "n": 1,
+     "min": 7796,
+     "max": 7796,
+     "p90": 7796,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "eigenaarpasskey.e2e.js": {
+     "n": 1,
+     "min": 11325,
+     "max": 11325,
+     "p90": 11325,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "eigensessieschermen.e2e.js": {
+     "n": 1,
+     "min": 28915,
+     "max": 28915,
+     "p90": 28915,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "escape-lagen.e2e.js": {
+     "n": 1,
+     "min": 7064,
+     "max": 7064,
+     "p90": 7064,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "experience-dinner.e2e.js": {
+     "n": 1,
+     "min": 18953,
+     "max": 18953,
+     "p90": 18953,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "experience-network.e2e.js": {
+     "n": 1,
+     "min": 15319,
+     "max": 15319,
+     "p90": 15319,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "experience-rtg.e2e.js": {
+     "n": 1,
+     "min": 14020,
+     "max": 14020,
+     "p90": 14020,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "experience-surface.e2e.js": {
+     "n": 1,
+     "min": 8732,
+     "max": 8732,
+     "p90": 8732,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "experience-travel.e2e.js": {
+     "n": 1,
+     "min": 7971,
+     "max": 7971,
+     "p90": 7971,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "first-steps.e2e.js": {
+     "n": 1,
+     "min": 16976,
+     "max": 16976,
+     "p90": 16976,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "flits-ds.e2e.js": {
+     "n": 1,
+     "min": 6319,
+     "max": 6319,
+     "p90": 6319,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "focus-ds.e2e.js": {
+     "n": 1,
+     "min": 4917,
+     "max": 4917,
+     "p90": 4917,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "foundation-coach-ds.e2e.js": {
+     "n": 1,
+     "min": 10320,
+     "max": 10320,
+     "p90": 10320,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "foundation-coach-kind-ds.e2e.js": {
+     "n": 1,
+     "min": 9189,
+     "max": 9189,
+     "p90": 9189,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "foundation-entry-lifecycle.e2e.js": {
+     "n": 1,
+     "min": 79049,
+     "max": 79049,
+     "p90": 79049,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "foundation-sw-cache.e2e.js": {
+     "n": 1,
+     "min": 4971,
+     "max": 4971,
+     "p90": 4971,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "foundationmailscherm.e2e.js": {
+     "n": 1,
+     "min": 13120,
+     "max": 13120,
+     "p90": 13120,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "galerij.e2e.js": {
+     "n": 1,
+     "min": 11554,
+     "max": 11554,
+     "p90": 11554,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gastscherm.e2e.js": {
+     "n": 1,
+     "min": 10735,
+     "max": 10735,
+     "p90": 10735,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gebaar-bestanden.e2e.js": {
+     "n": 1,
+     "min": 6940,
+     "max": 6940,
+     "p90": 6940,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gebaar-notities.e2e.js": {
+     "n": 1,
+     "min": 10895,
+     "max": 10895,
+     "p90": 10895,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gebaar-rtmail.e2e.js": {
+     "n": 1,
+     "min": 9400,
+     "max": 9400,
+     "p90": 9400,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gebaar-salon.e2e.js": {
+     "n": 1,
+     "min": 7640,
+     "max": 7640,
+     "p90": 7640,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gebaar.e2e.js": {
+     "n": 1,
+     "min": 41429,
+     "max": 41429,
+     "p90": 41429,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gedachten-scherm.e2e.js": {
+     "n": 1,
+     "min": 8083,
+     "max": 8083,
+     "p90": 8083,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gedeeld-element.e2e.js": {
+     "n": 1,
+     "min": 18062,
+     "max": 18062,
+     "p90": 18062,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gegevenskaart-scherm.e2e.js": {
+     "n": 1,
+     "min": 9625,
+     "max": 9625,
+     "p90": 9625,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "geld-lidmaatschap.e2e.js": {
+     "n": 1,
+     "min": 10216,
+     "max": 10216,
+     "p90": 10216,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "geld.e2e.js": {
+     "n": 1,
+     "min": 38508,
+     "max": 38508,
+     "p90": 38508,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "genootschap.e2e.js": {
+     "n": 1,
+     "min": 8260,
+     "max": 8260,
+     "p90": 8260,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gereedschap.e2e.js": {
+     "n": 1,
+     "min": 16378,
+     "max": 16378,
+     "p90": 16378,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "geven-scherm.e2e.js": {
+     "n": 1,
+     "min": 10234,
+     "max": 10234,
+     "p90": 10234,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gezondheidstoestemming.e2e.js": {
+     "n": 1,
+     "min": 7716,
+     "max": 7716,
+     "p90": 7716,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ghost-ds.e2e.js": {
+     "n": 1,
+     "min": 5834,
+     "max": 5834,
+     "p90": 5834,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ghost-voertuig-herstel.e2e.js": {
+     "n": 1,
+     "min": 8620,
+     "max": 8620,
+     "p90": 8620,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "gpsschakelaar.e2e.js": {
+     "n": 1,
+     "min": 36486,
+     "max": 36486,
+     "p90": 36486,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "grammatica.e2e.js": {
+     "n": 1,
+     "min": 121193,
+     "max": 121193,
+     "p90": 121193,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "handelscherm.e2e.js": {
+     "n": 1,
+     "min": 10689,
+     "max": 10689,
+     "p90": 10689,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "handenvrij.e2e.js": {
+     "n": 1,
+     "min": 18350,
+     "max": 18350,
+     "p90": 18350,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "hangar-ds.e2e.js": {
+     "n": 1,
+     "min": 5857,
+     "max": 5857,
+     "p90": 5857,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "heelrtg-catalogus-poort.e2e.js": {
+     "n": 1,
+     "min": 23165,
+     "max": 23165,
+     "p90": 23165,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "heelrtg-osapps.e2e.js": {
+     "n": 1,
+     "min": 23159,
+     "max": 23159,
+     "p90": 23159,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "helper-veegdoor.e2e.js": {
+     "n": 1,
+     "min": 1367,
+     "max": 1367,
+     "p90": 1367,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "heritage-context.e2e.js": {
+     "n": 1,
+     "min": 17337,
+     "max": 17337,
+     "p90": 17337,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "heritage-intelligence.e2e.js": {
+     "n": 1,
+     "min": 74855,
+     "max": 74855,
+     "p90": 74855,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "heritage-navigation-transition.e2e.js": {
+     "n": 1,
+     "min": 29994,
+     "max": 29994,
+     "p90": 29994,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horeca-bar.e2e.js": {
+     "n": 1,
+     "min": 7226,
+     "max": 7226,
+     "p90": 7226,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horeca-ds.e2e.js": {
+     "n": 1,
+     "min": 19142,
+     "max": 19142,
+     "p90": 19142,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horeca-edge.e2e.js": {
+     "n": 1,
+     "min": 6007,
+     "max": 6007,
+     "p90": 6007,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horeca-pda.e2e.js": {
+     "n": 1,
+     "min": 68691,
+     "max": 68691,
+     "p90": 68691,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horeca-rahul.e2e.js": {
+     "n": 1,
+     "min": 5232,
+     "max": 5232,
+     "p90": 5232,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horeca-vloer.e2e.js": {
+     "n": 1,
+     "min": 14347,
+     "max": 14347,
+     "p90": 14347,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horecascherm.e2e.js": {
+     "n": 1,
+     "min": 14333,
+     "max": 14333,
+     "p90": 14333,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "horecaschermen.e2e.js": {
+     "n": 1,
+     "min": 20681,
+     "max": 20681,
+     "p90": 20681,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "hotels-ds.e2e.js": {
+     "n": 1,
+     "min": 6409,
+     "max": 6409,
+     "p90": 6409,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "huis.e2e.js": {
+     "n": 1,
+     "min": 8080,
+     "max": 8080,
+     "p90": 8080,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "identiteitschermen.e2e.js": {
+     "n": 1,
+     "min": 10568,
+     "max": 10568,
+     "p90": 10568,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ingebedde-chrome.e2e.js": {
+     "n": 1,
+     "min": 49288,
+     "max": 49288,
+     "p90": 49288,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "inlogkleur-ds.e2e.js": {
+     "n": 1,
+     "min": 4780,
+     "max": 4780,
+     "p90": 4780,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "instellingen-ds.e2e.js": {
+     "n": 1,
+     "min": 2322,
+     "max": 2322,
+     "p90": 2322,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "invoerbalie.e2e.js": {
+     "n": 1,
+     "min": 5191,
+     "max": 5191,
+     "p90": 5191,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ioslaag.e2e.js": {
+     "n": 1,
+     "min": 38899,
+     "max": 38899,
+     "p90": 38899,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "isolatie-cockpit.e2e.js": {
+     "n": 1,
+     "min": 5503,
+     "max": 5503,
+     "p90": 5503,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "juridisch-ds.e2e.js": {
+     "n": 1,
+     "min": 9383,
+     "max": 9383,
+     "p90": 9383,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "juridischeschermen.e2e.js": {
+     "n": 1,
+     "min": 5560,
+     "max": 5560,
+     "p90": 5560,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kaart-ds.e2e.js": {
+     "n": 1,
+     "min": 5092,
+     "max": 5092,
+     "p90": 5092,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kantoor.e2e.js": {
+     "n": 1,
+     "min": 8622,
+     "max": 8622,
+     "p90": 8622,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kantoordeur-passkey.e2e.js": {
+     "n": 1,
+     "min": 18961,
+     "max": 18961,
+     "p90": 18961,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kantoordeur.e2e.js": {
+     "n": 1,
+     "min": 51063,
+     "max": 51063,
+     "p90": 51063,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kantoordeuren.e2e.js": {
+     "n": 1,
+     "min": 11072,
+     "max": 11072,
+     "p90": 11072,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kantoorgesprek.e2e.js": {
+     "n": 1,
+     "min": 5518,
+     "max": 5518,
+     "p90": 5518,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kantoorkoppel-productie.e2e.js": {
+     "n": 1,
+     "min": 8102,
+     "max": 8102,
+     "p90": 8102,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kantoorregisters.e2e.js": {
+     "n": 1,
+     "min": 43783,
+     "max": 43783,
+     "p90": 43783,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kassawachtrij.e2e.js": {
+     "n": 1,
+     "min": 8381,
+     "max": 8381,
+     "p90": 8381,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "klankwerk.e2e.js": {
+     "n": 1,
+     "min": 9123,
+     "max": 9123,
+     "p90": 9123,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "klimaatfonds-scherm.e2e.js": {
+     "n": 1,
+     "min": 10555,
+     "max": 10555,
+     "p90": 10555,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kosten.e2e.js": {
+     "n": 1,
+     "min": 17273,
+     "max": 17273,
+     "p90": 17273,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kostenklant.e2e.js": {
+     "n": 1,
+     "min": 17657,
+     "max": 17657,
+     "p90": 17657,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kwesties-scherm.e2e.js": {
+     "n": 1,
+     "min": 14718,
+     "max": 14718,
+     "p90": 14718,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "kwijtschelding-scherm.e2e.js": {
+     "n": 1,
+     "min": 11652,
+     "max": 11652,
+     "p90": 11652,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "laatstedrie.e2e.js": {
+     "n": 1,
+     "min": 6367,
+     "max": 6367,
+     "p90": 6367,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ledenschermen.e2e.js": {
+     "n": 1,
+     "min": 30758,
+     "max": 30758,
+     "p90": 30758,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "leegtemeting.e2e.js": {
+     "n": 1,
+     "min": 434,
+     "max": 434,
+     "p90": 434,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "leerhuis-scherm.e2e.js": {
+     "n": 1,
+     "min": 7129,
+     "max": 7129,
+     "p90": 7129,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "leerhuis-trainer.e2e.js": {
+     "n": 1,
+     "min": 33553,
+     "max": 33553,
+     "p90": 33553,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "leerhuis-werk.e2e.js": {
+     "n": 1,
+     "min": 23300,
+     "max": 23300,
+     "p90": 23300,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "leerpaspoort-scherm.e2e.js": {
+     "n": 1,
+     "min": 14975,
+     "max": 14975,
+     "p90": 14975,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "lesdeellink.e2e.js": {
+     "n": 1,
+     "min": 14849,
+     "max": 14849,
+     "p90": 14849,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "lesstroom.e2e.js": {
+     "n": 1,
+     "min": 13067,
+     "max": 13067,
+     "p90": 13067,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "leven.e2e.js": {
+     "n": 1,
+     "min": 12858,
+     "max": 12858,
+     "p90": 12858,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "levenspas.e2e.js": {
+     "n": 1,
+     "min": 6639,
+     "max": 6639,
+     "p90": 6639,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "leverancier-service-ds.e2e.js": {
+     "n": 1,
+     "min": 41054,
+     "max": 41054,
+     "p90": 41054,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "library-studio-reader.e2e.js": {
+     "n": 1,
+     "min": 8143,
+     "max": 8143,
+     "p90": 8143,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "liegend-scherm.e2e.js": {
+     "n": 1,
+     "min": 23549,
+     "max": 23549,
+     "p90": 23549,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "life-scherm.e2e.js": {
+     "n": 1,
+     "min": 19464,
+     "max": 19464,
+     "p90": 19464,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "lifecommand.e2e.js": {
+     "n": 1,
+     "min": 6744,
+     "max": 6744,
+     "p90": 6744,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "lifestyleschermen.e2e.js": {
+     "n": 1,
+     "min": 32982,
+     "max": 32982,
+     "p90": 32982,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "linkgezin.e2e.js": {
+     "n": 1,
+     "min": 18587,
+     "max": 18587,
+     "p90": 18587,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "linkscan.e2e.js": {
+     "n": 1,
+     "min": 45177,
+     "max": 45177,
+     "p90": 45177,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "living-world-ds.e2e.js": {
+     "n": 1,
+     "min": 6180,
+     "max": 6180,
+     "p90": 6180,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "living-world.e2e.js": {
+     "n": 1,
+     "min": 34422,
+     "max": 34422,
+     "p90": 34422,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "livinglab.e2e.js": {
+     "n": 1,
+     "min": 88297,
+     "max": 88297,
+     "p90": 88297,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "lokale-appvoltooiing.e2e.js": {
+     "n": 1,
+     "min": 46151,
+     "max": 46151,
+     "p90": 46151,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "loopbaan.e2e.js": {
+     "n": 1,
+     "min": 7486,
+     "max": 7486,
+     "p90": 7486,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "luchthaven-ds.e2e.js": {
+     "n": 1,
+     "min": 7307,
+     "max": 7307,
+     "p90": 7307,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaat-partnerstudio.e2e.js": {
+     "n": 1,
+     "min": 5737,
+     "max": 5737,
+     "p90": 5737,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaatafwerking.e2e.js": {
+     "n": 1,
+     "min": 11385,
+     "max": 11385,
+     "p90": 11385,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaatgroei.e2e.js": {
+     "n": 1,
+     "min": 9188,
+     "max": 9188,
+     "p90": 9188,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaathardening.e2e.js": {
+     "n": 1,
+     "min": 10222,
+     "max": 10222,
+     "p90": 10222,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaatleven.e2e.js": {
+     "n": 1,
+     "min": 11108,
+     "max": 11108,
+     "p90": 11108,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaatonderneming.e2e.js": {
+     "n": 1,
+     "min": 9258,
+     "max": 9258,
+     "p90": 9258,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaatspeelronde.e2e.js": {
+     "n": 1,
+     "min": 9249,
+     "max": 9249,
+     "p90": 9249,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaatstad.e2e.js": {
+     "n": 1,
+     "min": 13472,
+     "max": 13472,
+     "p90": 13472,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "magnaatstart.e2e.js": {
+     "n": 1,
+     "min": 9887,
+     "max": 9887,
+     "p90": 9887,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "marechaussee-ds.e2e.js": {
+     "n": 1,
+     "min": 6596,
+     "max": 6596,
+     "p90": 6596,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "media-studio-pro.e2e.js": {
+     "n": 1,
+     "min": 8778,
+     "max": 8778,
+     "p90": 8778,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "media.e2e.js": {
+     "n": 1,
+     "min": 16258,
+     "max": 16258,
+     "p90": 16258,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "medialijst.e2e.js": {
+     "n": 1,
+     "min": 7957,
+     "max": 7957,
+     "p90": 7957,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mediazaak.e2e.js": {
+     "n": 1,
+     "min": 9618,
+     "max": 9618,
+     "p90": 9618,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "medicijnen-scherm.e2e.js": {
+     "n": 1,
+     "min": 11356,
+     "max": 11356,
+     "p90": 11356,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "meet.e2e.js": {
+     "n": 1,
+     "min": 11309,
+     "max": 11309,
+     "p90": 11309,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "memo.e2e.js": {
+     "n": 1,
+     "min": 13551,
+     "max": 13551,
+     "p90": 13551,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "metgezelwijkt.e2e.js": {
+     "n": 1,
+     "min": 9302,
+     "max": 9302,
+     "p90": 9302,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "metier.e2e.js": {
+     "n": 1,
+     "min": 7574,
+     "max": 7574,
+     "p90": 7574,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mijn-isolatie.e2e.js": {
+     "n": 1,
+     "min": 5119,
+     "max": 5119,
+     "p90": 5119,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mijn-relaties-scherm.e2e.js": {
+     "n": 1,
+     "min": 7507,
+     "max": 7507,
+     "p90": 7507,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mijn-sessies-scherm.e2e.js": {
+     "n": 1,
+     "min": 7381,
+     "max": 7381,
+     "p90": 7381,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mob-ontvangst.e2e.js": {
+     "n": 1,
+     "min": 5341,
+     "max": 5341,
+     "p90": 5341,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mobile-content.e2e.js": {
+     "n": 1,
+     "min": 39041,
+     "max": 39041,
+     "p90": 39041,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mobile-single-shell.e2e.js": {
+     "n": 1,
+     "min": 30452,
+     "max": 30452,
+     "p90": 30452,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "mobiliteitscherm.e2e.js": {
+     "n": 1,
+     "min": 25853,
+     "max": 25853,
+     "p90": 25853,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "move-ds.e2e.js": {
+     "n": 1,
+     "min": 6608,
+     "max": 6608,
+     "p90": 6608,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "move-gevolg.e2e.js": {
+     "n": 1,
+     "min": 5368,
+     "max": 5368,
+     "p90": 5368,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "move.e2e.js": {
+     "n": 1,
+     "min": 8235,
+     "max": 8235,
+     "p90": 8235,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "muziek-bestanden.e2e.js": {
+     "n": 1,
+     "min": 9814,
+     "max": 9814,
+     "p90": 9814,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "navigatie-ds.e2e.js": {
+     "n": 1,
+     "min": 13819,
+     "max": 13819,
+     "p90": 13819,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "navigatiekaarten.e2e.js": {
+     "n": 1,
+     "min": 49472,
+     "max": 49472,
+     "p90": 49472,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "neiging-scherm.e2e.js": {
+     "n": 1,
+     "min": 34850,
+     "max": 34850,
+     "p90": 34850,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "neiging.e2e.js": {
+     "n": 1,
+     "min": 4419,
+     "max": 4419,
+     "p90": 4419,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "nieuwe-schermen.e2e.js": {
+     "n": 1,
+     "min": 13041,
+     "max": 13041,
+     "p90": 13041,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "notities.e2e.js": {
+     "n": 1,
+     "min": 6692,
+     "max": 6692,
+     "p90": 6692,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "objectpaneel.e2e.js": {
+     "n": 1,
+     "min": 7543,
+     "max": 7543,
+     "p90": 7543,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ochtendkaart.e2e.js": {
+     "n": 1,
+     "min": 10957,
+     "max": 10957,
+     "p90": 10957,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "office-blad.e2e.js": {
+     "n": 1,
+     "min": 8917,
+     "max": 8917,
+     "p90": 8917,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "office-controls.e2e.js": {
+     "n": 1,
+     "min": 62464,
+     "max": 62464,
+     "p90": 62464,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "office-formaten.e2e.js": {
+     "n": 1,
+     "min": 9245,
+     "max": 9245,
+     "p90": 9245,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "office-formschets.e2e.js": {
+     "n": 1,
+     "min": 17435,
+     "max": 17435,
+     "p90": 17435,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "office-suite.e2e.js": {
+     "n": 1,
+     "min": 10679,
+     "max": 10679,
+     "p90": 10679,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ondernemerpoort-presentatie.e2e.js": {
+     "n": 1,
+     "min": 487,
+     "max": 487,
+     "p90": 487,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "onderneming-scherm.e2e.js": {
+     "n": 1,
+     "min": 35745,
+     "max": 35745,
+     "p90": 35745,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ondertitelband-ds.e2e.js": {
+     "n": 1,
+     "min": 4789,
+     "max": 4789,
+     "p90": 4789,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ontwerpvoorbeeld.e2e.js": {
+     "n": 1,
+     "min": 4904,
+     "max": 4904,
+     "p90": 4904,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "onvolledige-appstaat.e2e.js": {
+     "n": 1,
+     "min": 26704,
+     "max": 26704,
+     "p90": 26704,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "operationeel-aanvraag.e2e.js": {
+     "n": 1,
+     "min": 23721,
+     "max": 23721,
+     "p90": 23721,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ov-ds.e2e.js": {
+     "n": 1,
+     "min": 6625,
+     "max": 6625,
+     "p90": 6625,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ovcontrol-ds.e2e.js": {
+     "n": 1,
+     "min": 6082,
+     "max": 6082,
+     "p90": 6082,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ovdienst-ds.e2e.js": {
+     "n": 1,
+     "min": 5908,
+     "max": 5908,
+     "p90": 5908,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "overdracht-ds.e2e.js": {
+     "n": 1,
+     "min": 7067,
+     "max": 7067,
+     "p90": 7067,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "overheidschermen.e2e.js": {
+     "n": 1,
+     "min": 18119,
+     "max": 18119,
+     "p90": 18119,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "ovroutes-ds.e2e.js": {
+     "n": 1,
+     "min": 6305,
+     "max": 6305,
+     "p90": 6305,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "paginas.e2e.js": {
+     "n": 1,
+     "min": 189020,
+     "max": 189020,
+     "p90": 189020,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "partijvoorstel-scherm.e2e.js": {
+     "n": 1,
+     "min": 17956,
+     "max": 17956,
+     "p90": 17956,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "partner-ds.e2e.js": {
+     "n": 1,
+     "min": 6158,
+     "max": 6158,
+     "p90": 6158,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "pass-startup.e2e.js": {
+     "n": 1,
+     "min": 19372,
+     "max": 19372,
+     "p90": 19372,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "passkeys-weg.e2e.js": {
+     "n": 1,
+     "min": 6305,
+     "max": 6305,
+     "p90": 6305,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "payrollkeur.e2e.js": {
+     "n": 1,
+     "min": 7300,
+     "max": 7300,
+     "p90": 7300,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "paytegoed.e2e.js": {
+     "n": 1,
+     "min": 18693,
+     "max": 18693,
+     "p90": 18693,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "pda-ui.e2e.js": {
+     "n": 1,
+     "min": 66574,
+     "max": 66574,
+     "p90": 66574,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "pinherstel.e2e.js": {
+     "n": 1,
+     "min": 18480,
+     "max": 18480,
+     "p90": 18480,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "plaats-intrekking.e2e.js": {
+     "n": 1,
+     "min": 7556,
+     "max": 7556,
+     "p90": 7556,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "plaatsdienstbrug.e2e.js": {
+     "n": 1,
+     "min": 9921,
+     "max": 9921,
+     "p90": 9921,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "plaatsmotor.e2e.js": {
+     "n": 1,
+     "min": 7499,
+     "max": 7499,
+     "p90": 7499,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "plaatsnadering.e2e.js": {
+     "n": 1,
+     "min": 10302,
+     "max": 10302,
+     "p90": 10302,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "plek-ds.e2e.js": {
+     "n": 1,
+     "min": 13513,
+     "max": 13513,
+     "p90": 13513,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "poortgesprek-ds.e2e.js": {
+     "n": 1,
+     "min": 8616,
+     "max": 8616,
+     "p90": 8616,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "poortgesprek.e2e.js": {
+     "n": 1,
+     "min": 7443,
+     "max": 7443,
+     "p90": 7443,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "post-scherm.e2e.js": {
+     "n": 1,
+     "min": 6678,
+     "max": 6678,
+     "p90": 6678,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "praktijk-betalen.e2e.js": {
+     "n": 1,
+     "min": 15009,
+     "max": 15009,
+     "p90": 15009,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "praktijk.e2e.js": {
+     "n": 1,
+     "min": 43594,
+     "max": 43594,
+     "p90": 43594,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "premium.e2e.js": {
+     "n": 1,
+     "min": 65693,
+     "max": 65693,
+     "p90": 65693,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "prijsgarantie.e2e.js": {
+     "n": 1,
+     "min": 3718,
+     "max": 3718,
+     "p90": 3718,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rahul-escape.e2e.js": {
+     "n": 1,
+     "min": 7005,
+     "max": 7005,
+     "p90": 7005,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rahul-header-ds.e2e.js": {
+     "n": 1,
+     "min": 35081,
+     "max": 35081,
+     "p90": 35081,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rahul-mond.e2e.js": {
+     "n": 1,
+     "min": 6548,
+     "max": 6548,
+     "p90": 6548,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rahulscherm.e2e.js": {
+     "n": 1,
+     "min": 6427,
+     "max": 6427,
+     "p90": 6427,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rahulzicht.e2e.js": {
+     "n": 1,
+     "min": 9211,
+     "max": 9211,
+     "p90": 9211,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "redirect-ds.e2e.js": {
+     "n": 1,
+     "min": 1479,
+     "max": 1479,
+     "p90": 1479,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "regelwacht-scherm.e2e.js": {
+     "n": 1,
+     "min": 10200,
+     "max": 10200,
+     "p90": 10200,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "registratie-dicht-scherm.e2e.js": {
+     "n": 1,
+     "min": 6325,
+     "max": 6325,
+     "p90": 6325,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisbalie.e2e.js": {
+     "n": 1,
+     "min": 8822,
+     "max": 8822,
+     "p90": 8822,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisboek-ds.e2e.js": {
+     "n": 1,
+     "min": 6592,
+     "max": 6592,
+     "p90": 6592,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisbureau-ds.e2e.js": {
+     "n": 1,
+     "min": 6582,
+     "max": 6582,
+     "p90": 6582,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisgezelschap-instemming.e2e.js": {
+     "n": 1,
+     "min": 13288,
+     "max": 13288,
+     "p90": 13288,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisgezelschap-werkruimte.e2e.js": {
+     "n": 1,
+     "min": 11762,
+     "max": 11762,
+     "p90": 11762,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisprogramma.e2e.js": {
+     "n": 1,
+     "min": 52953,
+     "max": 52953,
+     "p90": 52953,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisschermen.e2e.js": {
+     "n": 1,
+     "min": 24905,
+     "max": 24905,
+     "p90": 24905,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisteruggave.e2e.js": {
+     "n": 1,
+     "min": 9525,
+     "max": 9525,
+     "p90": 9525,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisuitnodiging-ds.e2e.js": {
+     "n": 1,
+     "min": 5147,
+     "max": 5147,
+     "p90": 5147,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reisuitnodiging.e2e.js": {
+     "n": 1,
+     "min": 10061,
+     "max": 10061,
+     "p90": 10061,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reiswacht.e2e.js": {
+     "n": 1,
+     "min": 10249,
+     "max": 10249,
+     "p90": 10249,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reizen-ds.e2e.js": {
+     "n": 1,
+     "min": 10904,
+     "max": 10904,
+     "p90": 10904,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reizen-veilig-ds.e2e.js": {
+     "n": 1,
+     "min": 6531,
+     "max": 6531,
+     "p90": 6531,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reizen-veilig.e2e.js": {
+     "n": 1,
+     "min": 11838,
+     "max": 11838,
+     "p90": 11838,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "reizenscherm.e2e.js": {
+     "n": 1,
+     "min": 4346,
+     "max": 4346,
+     "p90": 4346,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "residentie-ds.e2e.js": {
+     "n": 1,
+     "min": 5523,
+     "max": 5523,
+     "p90": 5523,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rit-ds.e2e.js": {
+     "n": 1,
+     "min": 7010,
+     "max": 7010,
+     "p90": 7010,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "routedekking-ds.e2e.js": {
+     "n": 1,
+     "min": 7284,
+     "max": 7284,
+     "p90": 7284,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "routedekking.e2e.js": {
+     "n": 1,
+     "min": 5353,
+     "max": 5353,
+     "p90": 5353,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "routedossier-ds.e2e.js": {
+     "n": 1,
+     "min": 7587,
+     "max": 7587,
+     "p90": 7587,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtc-relay.e2e.js": {
+     "n": 1,
+     "min": 39741,
+     "max": 39741,
+     "p90": 39741,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfagenda.e2e.js": {
+     "n": 1,
+     "min": 8286,
+     "max": 8286,
+     "p90": 8286,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfalbum.e2e.js": {
+     "n": 1,
+     "min": 6459,
+     "max": 6459,
+     "p90": 6459,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfcurve.e2e.js": {
+     "n": 1,
+     "min": 10275,
+     "max": 10275,
+     "p90": 10275,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfgeld.e2e.js": {
+     "n": 1,
+     "min": 7845,
+     "max": 7845,
+     "p90": 7845,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfhulpwijzer.e2e.js": {
+     "n": 1,
+     "min": 4451,
+     "max": 4451,
+     "p90": 4451,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfkinderschermen.e2e.js": {
+     "n": 1,
+     "min": 51559,
+     "max": 51559,
+     "p90": 51559,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfkosten.e2e.js": {
+     "n": 1,
+     "min": 5788,
+     "max": 5788,
+     "p90": 5788,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfosafmaak.e2e.js": {
+     "n": 1,
+     "min": 15129,
+     "max": 15129,
+     "p90": 15129,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfosdoelgroepen.e2e.js": {
+     "n": 1,
+     "min": 50874,
+     "max": 50874,
+     "p90": 50874,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfosgovernance.e2e.js": {
+     "n": 1,
+     "min": 10043,
+     "max": 10043,
+     "p90": 10043,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfosschermen.e2e.js": {
+     "n": 1,
+     "min": 18695,
+     "max": 18695,
+     "p90": 18695,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfoundation-keuze.e2e.js": {
+     "n": 1,
+     "min": 204086,
+     "max": 204086,
+     "p90": 204086,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfrust.e2e.js": {
+     "n": 1,
+     "min": 10187,
+     "max": 10187,
+     "p90": 10187,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfschool2.e2e.js": {
+     "n": 1,
+     "min": 12120,
+     "max": 12120,
+     "p90": 12120,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfspeelhoek.e2e.js": {
+     "n": 1,
+     "min": 8476,
+     "max": 8476,
+     "p90": 8476,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtfwelzijn.e2e.js": {
+     "n": 1,
+     "min": 12326,
+     "max": 12326,
+     "p90": 12326,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtg-a11y.e2e.js": {
+     "n": 1,
+     "min": 2038,
+     "max": 2038,
+     "p90": 2038,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtg-adaptive-edge.e2e.js": {
+     "n": 1,
+     "min": 67997,
+     "max": 67997,
+     "p90": 67997,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtg-dev.e2e.js": {
+     "n": 1,
+     "min": 1037,
+     "max": 1037,
+     "p90": 1037,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtg-edge-2.e2e.js": {
+     "n": 1,
+     "min": 52070,
+     "max": 52070,
+     "p90": 52070,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtg-edge-quiet-presence.e2e.js": {
+     "n": 1,
+     "min": 12221,
+     "max": 12221,
+     "p90": 12221,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtg-id-family.e2e.js": {
+     "n": 1,
+     "min": 33289,
+     "max": 33289,
+     "p90": 33289,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtgboek.e2e.js": {
+     "n": 1,
+     "min": 10870,
+     "max": 10870,
+     "p90": 10870,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtgzetel-scherm.e2e.js": {
+     "n": 1,
+     "min": 7868,
+     "max": 7868,
+     "p90": 7868,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtmail-instellingen.e2e.js": {
+     "n": 1,
+     "min": 8485,
+     "max": 8485,
+     "p90": 8485,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtmail-team.e2e.js": {
+     "n": 1,
+     "min": 7963,
+     "max": 7963,
+     "p90": 7963,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "rtmail-vak.e2e.js": {
+     "n": 1,
+     "min": 9656,
+     "max": 9656,
+     "p90": 9656,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "salon-app.e2e.js": {
+     "n": 1,
+     "min": 18383,
+     "max": 18383,
+     "p90": 18383,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "saloon-edge.e2e.js": {
+     "n": 1,
+     "min": 15259,
+     "max": 15259,
+     "p90": 15259,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "saloon-redactie.e2e.js": {
+     "n": 1,
+     "min": 11011,
+     "max": 11011,
+     "p90": 11011,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "saloon.e2e.js": {
+     "n": 1,
+     "min": 14226,
+     "max": 14226,
+     "p90": 14226,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "samendoen-scherm.e2e.js": {
+     "n": 1,
+     "min": 16351,
+     "max": 16351,
+     "p90": 16351,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "scan-tafel.e2e.js": {
+     "n": 1,
+     "min": 13001,
+     "max": 13001,
+     "p90": 13001,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "scanknop-ds.e2e.js": {
+     "n": 1,
+     "min": 4889,
+     "max": 4889,
+     "p90": 4889,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "scanner.e2e.js": {
+     "n": 1,
+     "min": 10344,
+     "max": 10344,
+     "p90": 10344,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "schermcontext.e2e.js": {
+     "n": 1,
+     "min": 8924,
+     "max": 8924,
+     "p90": 8924,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "schil-taal.e2e.js": {
+     "n": 1,
+     "min": 7745,
+     "max": 7745,
+     "p90": 7745,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "schuif.e2e.js": {
+     "n": 1,
+     "min": 183889,
+     "max": 183889,
+     "p90": 183889,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "servicebel.e2e.js": {
+     "n": 1,
+     "min": 15690,
+     "max": 15690,
+     "p90": 15690,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "servicecockpit.e2e.js": {
+     "n": 1,
+     "min": 46298,
+     "max": 46298,
+     "p90": 46298,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "servicehulp.e2e.js": {
+     "n": 1,
+     "min": 30389,
+     "max": 30389,
+     "p90": 30389,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "servicewerkplek.e2e.js": {
+     "n": 1,
+     "min": 18969,
+     "max": 18969,
+     "p90": 18969,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "sessiestroom.e2e.js": {
+     "n": 1,
+     "min": 12717,
+     "max": 12717,
+     "p90": 12717,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "sfeerbeeld-muis.e2e.js": {
+     "n": 1,
+     "min": 9808,
+     "max": 9808,
+     "p90": 9808,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "sneltoets-ds.e2e.js": {
+     "n": 1,
+     "min": 5867,
+     "max": 5867,
+     "p90": 5867,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "sociaal-edge.e2e.js": {
+     "n": 1,
+     "min": 22773,
+     "max": 22773,
+     "p90": 22773,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "spelpraat.e2e.js": {
+     "n": 1,
+     "min": 15848,
+     "max": 15848,
+     "p90": 15848,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "spelscherm.e2e.js": {
+     "n": 1,
+     "min": 5347,
+     "max": 5347,
+     "p90": 5347,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "spelsudoku.e2e.js": {
+     "n": 1,
+     "min": 14978,
+     "max": 14978,
+     "p90": 14978,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "spelteams.e2e.js": {
+     "n": 1,
+     "min": 8302,
+     "max": 8302,
+     "p90": 8302,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "split-presentatie.e2e.js": {
+     "n": 1,
+     "min": 472,
+     "max": 472,
+     "p90": 472,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "spraak-ds.e2e.js": {
+     "n": 1,
+     "min": 6116,
+     "max": 6116,
+     "p90": 6116,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "sprong-ds.e2e.js": {
+     "n": 1,
+     "min": 8125,
+     "max": 8125,
+     "p90": 8125,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "sprong.e2e.js": {
+     "n": 1,
+     "min": 19301,
+     "max": 19301,
+     "p90": 19301,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "sso-clientgeheim-scherm.e2e.js": {
+     "n": 1,
+     "min": 9266,
+     "max": 9266,
+     "p90": 9266,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "stad-ds.e2e.js": {
+     "n": 1,
+     "min": 5427,
+     "max": 5427,
+     "p90": 5427,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "staff-account-scherm.e2e.js": {
+     "n": 1,
+     "min": 7533,
+     "max": 7533,
+     "p90": 7533,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "staving-scherm.e2e.js": {
+     "n": 1,
+     "min": 6885,
+     "max": 6885,
+     "p90": 6885,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "stilleknoppen.e2e.js": {
+     "n": 1,
+     "min": 17478,
+     "max": 17478,
+     "p90": 17478,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "storyline-worlds.e2e.js": {
+     "n": 1,
+     "min": 6832,
+     "max": 6832,
+     "p90": 6832,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "taakbeeld.e2e.js": {
+     "n": 1,
+     "min": 5413,
+     "max": 5413,
+     "p90": 5413,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "taalkast.e2e.js": {
+     "n": 1,
+     "min": 4661,
+     "max": 4661,
+     "p90": 4661,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "taalkeuze-ds.e2e.js": {
+     "n": 1,
+     "min": 2088,
+     "max": 2088,
+     "p90": 2088,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "tabadres.e2e.js": {
+     "n": 1,
+     "min": 19629,
+     "max": 19629,
+     "p90": 19629,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "teamcall-presentatie.e2e.js": {
+     "n": 1,
+     "min": 5256,
+     "max": 5256,
+     "p90": 5256,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "tijdlijn-scherm.e2e.js": {
+     "n": 1,
+     "min": 9026,
+     "max": 9026,
+     "p90": 9026,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "toegankelijk-scherm.e2e.js": {
+     "n": 1,
+     "min": 16626,
+     "max": 16626,
+     "p90": 16626,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "toestel-kluisindex.e2e.js": {
+     "n": 1,
+     "min": 5664,
+     "max": 5664,
+     "p90": 5664,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "toestel.e2e.js": {
+     "n": 1,
+     "min": 7444,
+     "max": 7444,
+     "p90": 7444,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "toestemming-scherm.e2e.js": {
+     "n": 1,
+     "min": 8448,
+     "max": 8448,
+     "p90": 8448,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "trainingsschema-scherm.e2e.js": {
+     "n": 1,
+     "min": 8414,
+     "max": 8414,
+     "p90": 8414,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "uitstap-ds.e2e.js": {
+     "n": 1,
+     "min": 5503,
+     "max": 5503,
+     "p90": 5503,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "uurwerk-presentatie.e2e.js": {
+     "n": 1,
+     "min": 5157,
+     "max": 5157,
+     "p90": 5157,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vakbewijs-scherm.e2e.js": {
+     "n": 1,
+     "min": 19392,
+     "max": 19392,
+     "p90": 19392,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vandaag-omleiding.e2e.js": {
+     "n": 1,
+     "min": 6685,
+     "max": 6685,
+     "p90": 6685,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "veiligheid.e2e.js": {
+     "n": 1,
+     "min": 13348,
+     "max": 13348,
+     "p90": 13348,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "verbinding-ds.e2e.js": {
+     "n": 1,
+     "min": 9544,
+     "max": 9544,
+     "p90": 9544,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "verdiepende-schermen.e2e.js": {
+     "n": 1,
+     "min": 11047,
+     "max": 11047,
+     "p90": 11047,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "verificatie.e2e.js": {
+     "n": 1,
+     "min": 6546,
+     "max": 6546,
+     "p90": 6546,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vertaler.e2e.js": {
+     "n": 1,
+     "min": 5744,
+     "max": 5744,
+     "p90": 5744,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vertegenwoordiging.e2e.js": {
+     "n": 1,
+     "min": 7386,
+     "max": 7386,
+     "p90": 7386,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "verzorging-scherm.e2e.js": {
+     "n": 1,
+     "min": 12897,
+     "max": 12897,
+     "p90": 12897,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "videobellen-echt.e2e.js": {
+     "n": 1,
+     "min": 108746,
+     "max": 108746,
+     "p90": 108746,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vluchten-ds.e2e.js": {
+     "n": 1,
+     "min": 5718,
+     "max": 5718,
+     "p90": 5718,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "voeding-scherm.e2e.js": {
+     "n": 1,
+     "min": 9533,
+     "max": 9533,
+     "p90": 9533,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "voertuig-ds.e2e.js": {
+     "n": 1,
+     "min": 6140,
+     "max": 6140,
+     "p90": 6140,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "voertuigscherm.e2e.js": {
+     "n": 1,
+     "min": 5247,
+     "max": 5247,
+     "p90": 5247,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "volscherm-ds.e2e.js": {
+     "n": 1,
+     "min": 10596,
+     "max": 10596,
+     "p90": 10596,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vooruitscherm.e2e.js": {
+     "n": 1,
+     "min": 12902,
+     "max": 12902,
+     "p90": 12902,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vrienden-blok.e2e.js": {
+     "n": 1,
+     "min": 21852,
+     "max": 21852,
+     "p90": 21852,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "vrijheid-scherm.e2e.js": {
+     "n": 1,
+     "min": 13533,
+     "max": 13533,
+     "p90": 13533,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "warm-presentation.e2e.js": {
+     "n": 1,
+     "min": 31492,
+     "max": 31492,
+     "p90": 31492,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "webblok-ds.e2e.js": {
+     "n": 1,
+     "min": 7249,
+     "max": 7249,
+     "p90": 7249,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "website-language-picker.e2e.js": {
+     "n": 1,
+     "min": 6658,
+     "max": 6658,
+     "p90": 6658,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "website-screen-edges.e2e.js": {
+     "n": 1,
+     "min": 13299,
+     "max": 13299,
+     "p90": 13299,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "wegwijzerscherm.e2e.js": {
+     "n": 1,
+     "min": 7487,
+     "max": 7487,
+     "p90": 7487,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "wereldbreedte.e2e.js": {
+     "n": 1,
+     "min": 13249,
+     "max": 13249,
+     "p90": 13249,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "wereldlaag.e2e.js": {
+     "n": 1,
+     "min": 35348,
+     "max": 35348,
+     "p90": 35348,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "wereldrooster.e2e.js": {
+     "n": 1,
+     "min": 7345,
+     "max": 7345,
+     "p90": 7345,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkblad.e2e.js": {
+     "n": 1,
+     "min": 11287,
+     "max": 11287,
+     "p90": 11287,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkcommandbalk.e2e.js": {
+     "n": 1,
+     "min": 17935,
+     "max": 17935,
+     "p90": 17935,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkdocument-ds.e2e.js": {
+     "n": 1,
+     "min": 8625,
+     "max": 8625,
+     "p90": 8625,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkmerk.e2e.js": {
+     "n": 1,
+     "min": 7708,
+     "max": 7708,
+     "p90": 7708,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkos-schil.e2e.js": {
+     "n": 1,
+     "min": 949,
+     "max": 949,
+     "p90": 949,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkplek-tweede.e2e.js": {
+     "n": 1,
+     "min": 27529,
+     "max": 27529,
+     "p90": 27529,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkruimte-objecten.e2e.js": {
+     "n": 1,
+     "min": 8633,
+     "max": 8633,
+     "p90": 8633,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkruimte.e2e.js": {
+     "n": 1,
+     "min": 10496,
+     "max": 10496,
+     "p90": 10496,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkscherm.e2e.js": {
+     "n": 1,
+     "min": 26136,
+     "max": 26136,
+     "p90": 26136,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkschermen.e2e.js": {
+     "n": 1,
+     "min": 29852,
+     "max": 29852,
+     "p90": 29852,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkstatus.e2e.js": {
+     "n": 1,
+     "min": 10595,
+     "max": 10595,
+     "p90": 10595,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werktafel-lussen.e2e.js": {
+     "n": 1,
+     "min": 16722,
+     "max": 16722,
+     "p90": 16722,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werktafel-pas.e2e.js": {
+     "n": 1,
+     "min": 10806,
+     "max": 10806,
+     "p90": 10806,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werktafel.e2e.js": {
+     "n": 1,
+     "min": 31656,
+     "max": 31656,
+     "p90": 31656,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "werkuitgaven.e2e.js": {
+     "n": 1,
+     "min": 9107,
+     "max": 9107,
+     "p90": 9107,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "winkel-scherm.e2e.js": {
+     "n": 1,
+     "min": 9593,
+     "max": 9593,
+     "p90": 9593,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "wonen-ds.e2e.js": {
+     "n": 1,
+     "min": 7558,
+     "max": 7558,
+     "p90": 7558,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "workspace-rechten.e2e.js": {
+     "n": 1,
+     "min": 16079,
+     "max": 16079,
+     "p90": 16079,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "workspace-travel-accessibility.e2e.js": {
+     "n": 1,
+     "min": 7626,
+     "max": 7626,
+     "p90": 7626,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "workspace-travel-confirmation.e2e.js": {
+     "n": 1,
+     "min": 10404,
+     "max": 10404,
+     "p90": 10404,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "workspace-travel-recovery.e2e.js": {
+     "n": 1,
+     "min": 9248,
+     "max": 9248,
+     "p90": 9248,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "workspace-travel-request.e2e.js": {
+     "n": 1,
+     "min": 24066,
+     "max": 24066,
+     "p90": 24066,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "workspace-work.e2e.js": {
+     "n": 1,
+     "min": 8824,
+     "max": 8824,
+     "p90": 8824,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-dashboard.e2e.js": {
+     "n": 1,
+     "min": 64867,
+     "max": 64867,
+     "p90": 64867,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-desktop-beelden.e2e.js": {
+     "n": 1,
+     "min": 6129,
+     "max": 6129,
+     "p90": 6129,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-desktop-ds.e2e.js": {
+     "n": 1,
+     "min": 13050,
+     "max": 13050,
+     "p90": 13050,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-desktop-identity.e2e.js": {
+     "n": 1,
+     "min": 11713,
+     "max": 11713,
+     "p90": 11713,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-desktop-opslag.e2e.js": {
+     "n": 1,
+     "min": 8439,
+     "max": 8439,
+     "p90": 8439,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-desktop-state.e2e.js": {
+     "n": 1,
+     "min": 13927,
+     "max": 13927,
+     "p90": 13927,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-function-controls.e2e.js": {
+     "n": 1,
+     "min": 29899,
+     "max": 29899,
+     "p90": 29899,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-homes.e2e.js": {
+     "n": 1,
+     "min": 36891,
+     "max": 36891,
+     "p90": 36891,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "world-palette.e2e.js": {
+     "n": 1,
+     "min": 66733,
+     "max": 66733,
+     "p90": 66733,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "zaakregie.e2e.js": {
+     "n": 1,
+     "min": 25480,
+     "max": 25480,
+     "p90": 25480,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "zaal.e2e.js": {
+     "n": 1,
+     "min": 19732,
+     "max": 19732,
+     "p90": 19732,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    },
+    "zakelijk-ds.e2e.js": {
+     "n": 1,
+     "min": 6033,
+     "max": 6033,
+     "p90": 6033,
+     "bronnen": [
+      "ci|v26.13.0|4|d0f7317"
+     ],
+     "gemetenOp": "2026-11-08"
+    }
+   }
+  },
   "onbekend": {
    "stempel": {
     "op": "2026-09-02T22:06:48.356Z",
@@ -14036,8 +18782,8 @@
    },
    "gemeten": {
     "bestanden": 1452,
-    "ongemeten": 94,
-    "verseWaarnemingen": 16,
+    "ongemeten": 1706,
+    "verseWaarnemingen": 0,
     "totaalMs": 11067647
    },
    "bronnen": {

@@ -24,23 +24,6 @@
   'use strict';
   if (window.RTGDeur) return;
 
-  var css = '.rtgdeur{max-width:34rem;margin:2rem auto;padding:1.6rem 1.5rem;text-align:left;' +
-      'border:1px solid var(--line,var(--lijn,#2A2724));border-radius:0;' +
-      'background:var(--rtg-world-card,var(--paneel,rgba(255,255,255,.02)));color:var(--rtg-world-ink,var(--txt,#F7F5F1));}' +
-    '.rtgdeur h2{font-family:var(--serif),Georgia,serif;font-size:1.35rem;font-weight:500;margin:0 0 .4rem;}' +
-    '.rtgdeur .rtgdeur-wat{color:var(--rtg-world-ink,var(--txt,#F7F5F1));line-height:1.6;font-size:.92rem;margin-bottom:1.1rem;}' +
-    '.rtgdeur .rtgdeur-kop{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;' +
-      'color:var(--rtg-world-ink,var(--txt,#F7F5F1));margin:0 0 .5rem;}' +
-    '.rtgdeur ul{list-style:none;margin:0 0 1.2rem;padding:0;}' +
-    '.rtgdeur li{padding:.45rem 0 .45rem .95rem;position:relative;font-size:.92rem;line-height:1.5;' +
-      'border-bottom:1px solid var(--line,var(--lijn,#2A2724));}' +
-    '.rtgdeur li:last-child{border-bottom:none;}' +
-    '.rtgdeur li::before{content:"";position:absolute;left:0;top:1.05rem;width:4px;height:4px;border-radius:50%;' +
-      'background:var(--gold,var(--goud,#857007));}' +
-    '.rtgdeur .rtgdeur-weg{border-top:1px solid var(--line,var(--lijn,#2A2724));padding-top:1rem;' +
-      'font-size:.88rem;line-height:1.65;color:var(--rtg-world-ink,var(--txt,#F7F5F1));}' +
-    '.rtgdeur .rtgdeur-weg a{color:var(--rtg-world-ink,var(--txt,#F7F5F1));}';
-
   function esc(t) {
     return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
@@ -67,17 +50,27 @@
       'Hebt u de pas al? Dan opent deze app zodra hij op uw account staat.';
   }
 
+  function laadDeurPresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var presentatie = document.createElement('link');
+    presentatie.id = 'rtgDsRuntimeCss';
+    presentatie.rel = 'stylesheet';
+    presentatie.href = pad;
+    document.head.appendChild(presentatie);
+  }
+
   function teken(doel, o, gids) {
     var titel = (gids && gids.wat ? String(gids.wat).split(':')[0] : '') ||
       (document.title || 'Deze app').split(/[-·|]/)[0].trim();
-    var h = '<section class="rtgdeur" aria-label="Deze app is nog niet voor u geopend">' +
+    var h = '<section class="rtgdeur ds-accountdeur ds-accountdeur--poort ds-lezer ds-lezer--pagina" aria-label="Deze app is nog niet voor u geopend">' +
       '<h2>' + esc(titel) + '</h2>';
-    if (gids && gids.wat) h += '<div class="rtgdeur-wat">' + esc(gids.wat) + '</div>';
+    if (gids && gids.wat) h += '<div class="rtgdeur-wat ds-meta">' + esc(gids.wat) + '</div>';
     if (gids && gids.doe && gids.doe.length) {
-      h += '<p class="rtgdeur-kop">Wat u hier straks doet</p><ul>' +
+      h += '<p class="rtgdeur-kop ds-label">Wat u hier straks doet</p><ul>' +
         gids.doe.slice(0, 5).map(function (d) { return '<li>' + esc(d) + '</li>'; }).join('') + '</ul>';
     }
-    h += '<div class="rtgdeur-weg">' + weg(o) + '</div></section>';
+    h += '<div class="rtgdeur-weg ds-sectie">' + weg(o) + '</div></section>';
     doel.innerHTML = h;
   }
 
@@ -101,11 +94,8 @@
   function toon(doel, opties) {
     if (!doel) return;
     var o = opties || {};
-    if (!document.getElementById('rtgdeur-stijl')) {
-      var st = document.createElement('style');
-      st.id = 'rtgdeur-stijl'; st.textContent = css;
-      document.head.appendChild(st);
-    }
+    // Ook oudere hosts laden dezelfde bestaande accountdeur/lezer-componenten.
+    laadDeurPresentatie('/ds/rtg-ds.css');
     // eerst zonder gids tekenen: de weg naar binnen is het belangrijkste en
     // mag niet op een netwerkverzoek wachten
     teken(doel, o, null);

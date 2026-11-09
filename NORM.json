@@ -1439,9 +1439,18 @@
       "soort": "schuld",
       "sleutel": "keuringOmvang",
       "van": 320,
+      "naar": 356,
       "vervalt": "2026-11-02",
       "meter": "keuringOmvang 320 -> 356 (VERHOOGD, gemeten over de verzameling)",
-      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Zesendertig bestanden extra in de band vlak onder de 10 kB. Vijf modules zijn deze ronde WEL geknipt op hun naad (appgids deel1, ios-01, fiscaal/index, kernlaag7, pay/index, auth/inlog); de rest van de groei komt uit de veertien nieuwe takken. Hangt samen met keuringDubbeling hieronder en deelt daarom zijn einddatum."
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Zesendertig bestanden extra in de band vlak onder de 10 kB. Vijf modules zijn deze ronde WEL geknipt op hun naad (appgids deel1, ios-01, fiscaal/index, kernlaag7, pay/index, auth/inlog); de rest van de groei komt uit de veertien nieuwe takken. Hangt samen met keuringDubbeling hieronder en deelt daarom zijn einddatum.",
+      "aflossingsbewijs": {
+        "datum": "2026-11-06",
+        "van": 378,
+        "naar": 331,
+        "bewijs": "Na de samenvoegronde daalde de gemeten omvang van 378 naar 331; 47 punten verbetering betaalt deze tranche van 36 zonder de huidige norm te verruimen.",
+        "bronVan": "keuringOmvang 169 -> 378",
+        "bronNaar": "keuringOmvang 331 -> 332"
+      }
     },
     {
       "datum": "2026-08-21",
@@ -2167,8 +2176,17 @@
       "soort": "schuld",
       "sleutel": "keuringScheef",
       "van": 5,
+      "naar": 34,
       "vervalt": "2026-10-31",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Modules die scheef staan (veel export, weinig samenhang) uit de gebundelde takken. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 5."
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Modules die scheef staan (veel export, weinig samenhang) uit de gebundelde takken. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 5.",
+      "aflossingsbewijs": {
+        "datum": "2026-11-06",
+        "van": 41,
+        "naar": 10,
+        "bewijs": "De scheefstand daalde gemeten van 41 naar 10; 31 punten verbetering betaalt de tranche van 29.",
+        "bronVan": "keuringScheef 18 -> 41, keuringTeGroot 16 -> 37, inlineStijlAttributen 4936 -> 5999",
+        "bronNaar": "huidige meter"
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2176,7 +2194,9 @@
       "soort": "schuld",
       "sleutel": "keuringOmvang",
       "van": 169,
-      "vervalt": "2026-10-31",
+      "vervalt": "2026-11-30",
+      "herzienOp": "2026-11-06",
+      "herziening": "De termijn is expliciet herzien omdat 350 van de oorspronkelijke 378 bandbestanden resteren. De norm blijft 350 en deze schuld blijft open; de herziening maakt de restschuld zichtbaar zonder haar als afgelost te presenteren.",
       "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Bestanden vlak onder de 10 kB-grens; de samenvoeging bracht er nieuwe bij zonder ze te knippen. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 169."
     },
     {
@@ -2185,8 +2205,17 @@
       "soort": "schuld",
       "sleutel": "keuringTeGroot",
       "van": 5,
+      "naar": 26,
       "vervalt": "2026-10-31",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Servermodules ECHT over de 10 kB-grens, meegekomen uit de gebundelde takken. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 5."
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Servermodules ECHT over de 10 kB-grens, meegekomen uit de gebundelde takken. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 5.",
+      "aflossingsbewijs": {
+        "datum": "2026-11-06",
+        "van": 37,
+        "naar": 8,
+        "bewijs": "Het aantal te grote modules daalde gemeten van 37 naar 8; 29 punten verbetering betaalt de tranche van 21.",
+        "bronVan": "keuringScheef 18 -> 41, keuringTeGroot 16 -> 37, inlineStijlAttributen 4936 -> 5999",
+        "bronNaar": "huidige meter"
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2194,7 +2223,9 @@
       "soort": "schuld",
       "sleutel": "keuringDubbeling",
       "van": 121,
-      "vervalt": "2026-10-31",
+      "vervalt": "2026-11-30",
+      "herzienOp": "2026-11-06",
+      "herziening": "De termijn is expliciet herzien omdat de meter wel van 383 naar 184 daalde, maar de tranche van 262 nog 63 punten tekortkomt. De norm blijft 184 en de schuld blijft open.",
       "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Functienamen die in meer dan twee kernmodules staan; 24 takken naast elkaar leveren dubbele namen. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 121."
     },
     {
@@ -2203,7 +2234,9 @@
       "soort": "schuld",
       "sleutel": "kernBreedte",
       "van": 1418,
-      "vervalt": "2026-10-31",
+      "vervalt": "2026-11-30",
+      "herzienOp": "2026-11-06",
+      "herziening": "De termijn is expliciet herzien: de gedeelde kern is sinds de samenvoeging verder verbreed en staat op 1695. De norm blijft 1695; de open afbouw loopt via de bestaande domeingrenzen en wordt niet als afgelost geboekt.",
       "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Kern-eigenschappen die routes aanraken; nieuwe werelden verbreden de kern. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 1418."
     },
     {
@@ -2212,7 +2245,9 @@
       "soort": "schuld",
       "sleutel": "kernGedeeld",
       "van": 194,
-      "vervalt": "2026-10-31",
+      "vervalt": "2026-11-30",
+      "herzienOp": "2026-11-06",
+      "herziening": "De termijn is expliciet herzien: 260 kernnamen worden nog door meer dan een domein aangeraakt. De norm blijft 260 en de schuld blijft open totdat echte modulegrenzen de koppelingen verwijderen.",
       "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Kern-eigenschappen die MEER dan een domein aanraken -- de echte koppeling. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 194."
     },
     {

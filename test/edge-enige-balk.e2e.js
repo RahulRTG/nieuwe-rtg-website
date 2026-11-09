@@ -63,11 +63,9 @@ const SCHERMEN = [
      chips in het scherm zelf. Wat deze regel bewaakte (een balk naast de
      Edge, en geen bestemming kwijt) staat voor die schermen in DS_OPERATIE
      hieronder. */
-  /* De tabbalk van de twee kamers is smaller dan 60% van het scherm en werd
-     daarom niet als balk herkend; hij bleef staan, precies onder de onderbalk
-     van de Edge (27 september 2026: alle tabs volledig bedekt). */
-  { pad: '/apps/decision-room.html', balk: '.dr-nav', knop: 'Afweging' },
-  { pad: '/apps/project-room.html', balk: '.pr-nav', knop: 'Dossier' }
+  /* De twee kamers staan inmiddels volledig op het DS. Hun documenttabs zijn
+     inhoudsnavigatie en blijven naast precies één DS-Edge bereikbaar; dat
+     contract staat in DS_WERKDOCUMENTEN hieronder. */
 ];
 
 /* De operatieschermen op het Design System: de Edge is daar de enige balk,
@@ -75,13 +73,17 @@ const SCHERMEN = [
    bereikbaar in het scherm (de chips met data-ds-opsnav). */
 const DS_OPERATIE = ['/apps/luchthaven.html', '/apps/ovcontrol.html'];
 const OPS_BESTEMMINGEN = ['/apps/ov.html', '/apps/chauffeur.html', '/apps/luchthaven.html', '/apps/ovcontrol.html'];
+const DS_WERKDOCUMENTEN = [
+  { pad: '/apps/decision-room.html', nav: '.dr-nav', knop: 'Afweging' },
+  { pad: '/apps/project-room.html', nav: '.pr-nav', knop: 'Dossier' }
+];
 
 /* Wat de Edge NIET overneemt, hoort ook niet onder hem te liggen. In de
    compacte stand legt de Edge een onzichtbare herstelstrook over de bovenrand;
    de werkbalk van browser.html (met adresveld, dus niet over te nemen) lag er
    volledig onder. Hij schuift nu uit met --edge-randboven. */
 const VRIJ = [
-  { pad: '/apps/browser.html', knop: 'header.ios-nav button.ga', compact: true },
+  { pad: '/apps/browser.html', knop: 'header.ds-browser-balk button.ga' },
   /* De kaartlagen zijn bediening OP de kaart, geen balk: die blijven bij het
      scherm. Het oude navigatie-premium.css zette ze op 1280 breed rechtsonder,
      en de eerste laag (bank) lag volledig onder de onderbalk van de Edge. Op
@@ -205,6 +207,18 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       });
     }
 
+    for (const scherm of DS_WERKDOCUMENTEN) {
+      await t.test(scherm.pad + ': één DS-Edge en bereikbare documentnavigatie', async () => {
+        await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
+        await wachtTot(page, (g) => !!document.querySelector('.ds-edge__balk') &&
+          [...document.querySelectorAll(g.nav + ' button')].some(b => b.textContent.includes(g.knop)), scherm,
+        { wat: scherm.pad + ': DS-Edge en documenttab ' + scherm.knop });
+        assert.equal(await page.locator('.ds-edge__balk').count(), 1);
+        assert.equal(await page.locator('.rtg-adaptive-bar,.rtg-edge-chrome').count(), 0);
+        await page.locator(scherm.nav).getByRole('button', { name: scherm.knop, exact: true }).click();
+      });
+    }
+
     for (const scherm of VRIJ) {
       await t.test(scherm.pad + ': de eigen bediening ligt niet onder de Edge', async () => {
         await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
@@ -236,12 +250,12 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
     await t.test('een balk met een invoerveld blijft bij het scherm', async () => {
       await page.goto(base + '/apps/browser.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
-        document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
-        !!document.querySelector('header.ios-nav #adres'), null,
+        document.body.getAttribute('data-rtg-desktop-state') === 'ready' &&
+        !!document.querySelector('header.ds-browser-balk #adres'), null,
         { wat: 'de adresbalk van browser.html' });
       const balk = await page.evaluate(() => {
-        const kop = document.querySelector('header.ios-nav');
-        const veld = document.querySelector('header.ios-nav #adres');
+        const kop = document.querySelector('header.ds-browser-balk');
+        const veld = document.querySelector('header.ds-browser-balk #adres');
         const s = getComputedStyle(kop), r = veld.getBoundingClientRect();
         return { geclaimd: kop.classList.contains('rtg-edge-owned-bar'),
           kopZichtbaar: s.display !== 'none',
@@ -260,7 +274,7 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
        draait. Zonder deze proef zou een grovere claimregel onopgemerkt inhoud
        wegnemen. */
     await t.test('een hero die alleen de naam draagt, blijft staan', async () => {
-      await page.goto(base + '/apps/browser.html', { waitUntil: 'domcontentloaded' });
+      await page.goto(base + '/apps/comm.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
         document.body.getAttribute('data-rtg-adaptive-ready') === 'true' && !!window.RTGAdaptiveEdgeClaim, null,
         { wat: 'een scherm waarop de claim draait' });

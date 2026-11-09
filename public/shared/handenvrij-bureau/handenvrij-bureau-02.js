@@ -1,6 +1,6 @@
     // de maat-greep rechtsonder in het gesprek
     var maat = document.createElement('div');
-    maat.className = 'hv-maat';
+    maat.className = 'ds-handenvrij__maat hv-maat';
     maat.setAttribute('aria-hidden', 'true');
     maat.title = 'Groter of kleiner slepen';
     kamer.vak.appendChild(maat);
@@ -48,7 +48,7 @@
   if (!opWerk || !api || !api.plekken) return;
   var rij = document.createElement('div');
   // hoort bij de handenvrij-balk en ligt dus met hem weg tot je hem oproept
-  rij.className = 'hv-werk hv-weg';
+  rij.className = 'ds-handenvrij__werk hv-werk hv-weg';
   rij.setAttribute('role', 'group');
   rij.setAttribute('aria-label', 'Snel naar (het broodnodige; de rest gaat via Rahul)');
 
@@ -68,10 +68,10 @@
     if (!kies.length) { rij.hidden = true; document.body.classList.remove('hv-werkrij'); return; }
     rij.hidden = false;
     document.body.classList.add('hv-werkrij');
-    rij.innerHTML = '<span class="hv-werk-kop">Snel</span>';
+    rij.innerHTML = '<span class="ds-handenvrij__werkkop hv-werk-kop">Snel</span>';
     kies.forEach(function (p) {
       var b = document.createElement('button');
-      b.type = 'button'; b.textContent = p.naam; b.title = p.naam;
+      b.className = 'ds-handenvrij__werkknop'; b.type = 'button'; b.textContent = p.naam; b.title = p.naam;
       b.addEventListener('click', function () { try { p.doen(); } catch (e) {} });
       rij.appendChild(b);
     });

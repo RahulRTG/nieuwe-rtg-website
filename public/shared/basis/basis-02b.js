@@ -8,35 +8,27 @@
    bevestigen, welke zaken er lopen, iets melden, en de knop die er niet was --
    "ik wil een mens". Zie server/kern/service/mens.js voor waarom die knop een
    contract is en geen beleefdheid. */
-    /* ---- 4b. HULP, IN DEZELFDE LA ALS DE UITLEG ----
-
-       WAAROM HIER EN NIET IN EEN EIGEN APP. Hulp is Core (WERELDEN.md): hij
-       zit in elke doelgroep en reist met de mens mee, dus hij hoort niet in een
-       wereld en al helemaal niet in een 84e app. PLATFORM.md par. 0 telt apps,
-       en een los /apps/hulp.html zou er een zijn die niets eigen bezit. Deze la
-       staat al op elk scherm, en dat is precies wat een servicevoordeur nodig
-       heeft.
-
-       EN HIJ WEET WAAR JE STOND. Dat is het punt van RTG Service: wie vanuit een
-       betaling om hulp vraagt, hoeft niet te horen "waarmee kunnen wij u
-       helpen?" terwijl het systeem al weet welk scherm hij openhad. Het pad
-       reist mee als VERWIJZING (soort plus code) en niet als gegevens; de server
-       gooit al het andere weg (kern/service/zaak.js).
-
-       DRIE DINGEN DIE DEZE LAAG NIET DOET:
-       - hij verschijnt niet zonder lid-token. Zonder account is er geen kanaal
-         om iemand terug te bereiken, en een knop die een wachtrij vult waar
-         niemand uit komt is erger dan geen knop;
-       - hij toont niemand een bevestigingscode die er niet om vroeg: die komt
-         uit /api/service/bevestiging/toon, dus uit de eigen sessie, een keer;
-       - hij zwijgt bij een storing. Deze la is de UITLEG van een scherm; loopt
-         de servicelaag niet, dan hoort die uitleg gewoon te blijven werken. */
+    /* Servicehulp blijft bij de bestaande gids. Alleen een actuele leden-
+       sessie mag eigen servicegegevens publiceren of een opdracht sturen. */
     function tok() { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } }
-    function svc(pad, lijf) {
+    function hulpActueel(blok) {
+      return !!blok && blok.isConnected && sheet === blok._sheet && tok() === blok._token;
+    }
+    function hulpFout(blok, doel) {
+      if (hulpActueel(blok)) doel.textContent = 'Niet gelukt. Probeer opnieuw.';
+      else if (blok) blok.remove();
+    }
+    function svc(pad, lijf, blok) {
       var t = tok();
-      if (!t) return Promise.reject(new Error('geen lid'));
+      if (!t || !hulpActueel(blok)) return Promise.reject(new Error('sessie gewijzigd'));
       return fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
-        body: JSON.stringify(lijf || {}) }).then(function (r) { return r.json(); });
+        body: JSON.stringify(lijf || {}) }).then(function (r) {
+        return r.json().then(function (d) {
+          if (!hulpActueel(blok)) { blok.remove(); throw new Error('sessie gewijzigd'); }
+          if (!r.ok || !d || d.error || d.ok === false || (/\/(bevestig|weiger|mens|open)$/.test(pad) && d.ok !== true)) throw new Error('service niet bevestigd');
+          return d;
+        });
+      });
     }
     function el(soort, klasse, tekst) {
       var n = document.createElement(soort);
@@ -53,19 +45,20 @@
     function hulplaag() {
       if (!tok() || !sheet) return;
       var blok = el('div', 'bss-hulp');
+      blok._token = tok(); blok._sheet = sheet;
       blok.appendChild(el('b', null, 'Hulp nodig?'));
       sheet.appendChild(blok);
       Promise.all([
-        svc('/api/service/bevestigingen').catch(function () { return null; }),
-        svc('/api/service/mijn').catch(function () { return null; }),
-        svc('/api/service/stand').catch(function () { return null; }),
-        svc('/api/service/bel/mijn').catch(function () { return null; })
+        svc('/api/service/bevestigingen', null, blok).catch(function () { return null; }),
+        svc('/api/service/mijn', null, blok).catch(function () { return null; }),
+        svc('/api/service/stand', null, blok).catch(function () { return null; }),
+        svc('/api/service/bel/mijn', null, blok).catch(function () { return null; })
       ]).then(function (uit) { teken(blok, uit[0], uit[1], uit[2], uit[3]); })
         .catch(function () { blok.remove(); });
     }
 
     function teken(blok, verzoeken, mijn, stand, bel) {
-      if (!sheet || !blok.isConnected) return;
+      if (!hulpActueel(blok)) { blok.remove(); return; }
 
       /* DE PERSOONLIJKE STAND, en alleen als hij iets ZEGT. Raakt er geen
          storing aan uw zaken, dan staat er niets -- geen groen vinkje en geen
@@ -94,19 +87,19 @@
         z.appendChild(el('p', null, 'Opent: ' + v.capabilities.join(', ') + '. Zaak ' + v.zaak + '.'));
         var rij = el('div', 'bss-rij');
         rij.appendChild(knop('bss-ja', 'Bevestigen', function () {
-          svc('/api/service/bevestig', { id: v.id }).then(function () { z.textContent = 'Bevestigd.'; });
+          svc('/api/service/bevestig', { id: v.id }, blok).then(function () { z.textContent = 'Bevestigd.'; }).catch(function () { hulpFout(blok, z); });
         }));
         rij.appendChild(knop(null, 'Nee', function () {
-          svc('/api/service/weiger', { id: v.id }).then(function () { z.textContent = 'Geweigerd.'; });
+          svc('/api/service/weiger', { id: v.id }, blok).then(function () { z.textContent = 'Geweigerd.'; }).catch(function () { hulpFout(blok, z); });
         }));
         z.appendChild(rij);
         // de terugvalcode bestaat pas als het lid erom vraagt (kern/service/bevestiging-code.js)
         var cr = el('p', null, 'Kunt u niet bevestigen? ');
         cr.appendChild(knop(null, 'Toon een code om voor te lezen', function () {
-          svc('/api/service/bevestiging/toon', { id: v.id }).then(function (d) {
+          svc('/api/service/bevestiging/toon', { id: v.id }, blok).then(function (d) {
             cr.textContent = d && d.code ? 'Lees deze code voor: ' + d.code + ' (' + v.minuten + ' minuten, een keer).'
               : ((d && d.error) || 'Er is nu geen code te krijgen.');
-          });
+          }).catch(function () { hulpFout(blok, cr); });
         }));
         z.appendChild(cr);
         blok.appendChild(z);
@@ -129,9 +122,9 @@
          legt uit waarom dat twee verschillende dingen waren. */
       if (lopend.length) {
         rij.appendChild(knop(null, 'Ik wil een mens', function () {
-          svc('/api/service/mens', { id: lopend[0].id }).then(function (d) {
+          svc('/api/service/mens', { id: lopend[0].id }, blok).then(function (d) {
             rij.replaceWith(el('p', null, (d && d.let) || 'Doorgezet.'));
-          });
+          }).catch(function () { hulpFout(blok, rij); });
         }));
       }
       /* DE BELKNOP, alleen waar hij bestaat (Lifestyle en Business: de ladder,
@@ -152,6 +145,7 @@
        routering leest ze toch liever uit wat hij typt plus waar hij stond
        (kern/service/router.js). */
     function meldForm(blok) {
+      if (!hulpActueel(blok)) { blok.remove(); return; }
       var f = el('div', 'bss-zaak');
       var veld = el('textarea', 'bss-veld');
       veld.rows = 3;
@@ -162,19 +156,19 @@
         var t = String(veld.value || '').trim();
         if (t.length < 3) { veld.focus(); return; }
         svc('/api/service/open', { titel: t.slice(0, 110), tekst: t,
-          betrokken: { soort: 'scherm', code: location.pathname } })
+          betrokken: { soort: 'scherm', code: location.pathname } }, blok)
           .then(function (d) {
             f.textContent = (d && d.zaak)
               ? 'Genoteerd als ' + d.zaak.id + '. U hoort van ons.'
               : ((d && d.error) || 'Er ging iets mis.');
-          });
+          }).catch(function () { hulpFout(blok, f); });
       }));
       /* EN HET ADRES, want een kanaal dat niemand kent bestaat niet. Het komt
          van de server (kern/service/post.js is de enige plek waar het wordt
          uitgerekend) en staat er alleen als de servicelaag hem meegeeft -- geen
          adres in dit bestand overtypen. Het staat ONDER de knop: wie hier al
          zit, meldt sneller met dit veld dan met zijn mailprogramma. */
-      svc('/api/service/keuzes').then(function (k) {
+      svc('/api/service/keuzes', null, blok).then(function (k) {
         if (!k || !k.hulpAdres || !f.isConnected) return;
         f.appendChild(el('p', null, 'Liever mailen? ' + k.hulpAdres +
           ' -- dat wordt dezelfde melding. Mail vanaf het adres waarmee u bij RTG bekend bent.'));

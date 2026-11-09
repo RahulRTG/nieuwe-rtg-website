@@ -80,6 +80,11 @@ function maakFoutmelder(opts) {
   const timeout = opts.timeout || 5000;
   const venster = opts.vensterMs || 60000;        // per vingerafdruk max 1x per minuut
   const gezien = new Map();                        // vingerafdruk -> laatste verzending (ms)
+  /* Een systeemklok kan door NTP of de virtualisatie van een CI-run voor- of
+     achteruitspringen. Een stormvenster meet verstreken tijd en gebruikt
+     daarom de monotone procesklok; de kalenderklok blijft alleen voor het
+     leesbare tijdstip in het bericht. */
+  const monotoneNu = () => Number(process.hrtime.bigint() / 1000000n);
 
   /* EEN ALARM DAT JE NIET KUNT ZIEN AANKOMEN, IS GEEN ALARM.
 
@@ -126,10 +131,11 @@ function maakFoutmelder(opts) {
     try {
       const vf = vinger(err, ctx);
       const nu = Date.now();
+      const vensterNu = monotoneNu();
       const vorige = gezien.get(vf);
-      if (vorige && nu - vorige < venster) return;   // te snel opnieuw: overslaan
-      gezien.set(vf, nu);
-      if (gezien.size > 2000) for (const [k, t] of gezien) if (nu - t > venster) gezien.delete(k);
+      if (vorige !== undefined && vensterNu - vorige < venster) return; // te snel opnieuw: overslaan
+      gezien.set(vf, vensterNu);
+      if (gezien.size > 2000) for (const [k, t] of gezien) if (vensterNu - t > venster) gezien.delete(k);
 
       /* Redactie HIER en niet bij de aanroeper: deze melding verlaat het huis.
          log.onError geeft al een schone fout mee, maar kern/command/alarm-uitgang

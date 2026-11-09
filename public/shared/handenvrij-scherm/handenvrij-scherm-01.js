@@ -42,43 +42,21 @@
   var BEWAAR = 'rtg_hv_stand';
   var stand = 'min', vast = false, weggeklapt = false, voorWeg = 'min';
 
-  var css =
-    /* De hoogtes per stand. Het paneel zelf scrolt; de pagina erachter blijft
-       gewoon de pagina. In `vol` staat de bovenkant op 12vh: die strook is
-       geen decoratie maar de uitweg. */
-    '.hv-chat{transition:max-height .22s ease,top .22s ease;}' +
-    '.hv-chat[data-stand="half"]{max-height:46vh;}' +
-    '.hv-chat[data-stand="vol"]{max-height:calc(88vh - 3.4rem);}' +
-    '.hv-chat[data-stand="scherm"]{top:0;bottom:0;max-height:none;padding-top:0;}' +
-    '.hv-chat[data-stand="scherm"] .hv-greep{border-radius:0;}' +
-    /* de greep: sticky bovenin het paneel, zodat hij bij het scrollen blijft */
-    '.hv-greep{position:sticky;top:-.7rem;margin:-.7rem -.8rem .3rem;padding:.45rem .8rem .5rem;' +
-    'background:#0C0C0B;border-bottom:1px solid #201e1c;display:flex;align-items:center;gap:.4rem;' +
-    'z-index:2;touch-action:none;cursor:ns-resize;}' +
-    '.hv-lijn{width:2.2rem;height:.22rem;border-radius:0;background:#3a3733;margin-right:auto;}' +
-    '.hv-sk{background:transparent;border:1px solid #3a3733;border-radius:0;color:#cfccc7;' +
-    'font:inherit;font-size:.72rem;line-height:1;padding:.32rem .45rem;cursor:pointer;flex:0 0 auto;}' +
-    '.hv-sk:hover{border-color:var(--gold,#857007);color:#fff;}' +
-    '.hv-sk:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:2px;}' +
-    '.hv-sk[aria-pressed="true"]{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);}' +
-    /* weggeklapt: iets anders staat op vol scherm */
-    'body.hv-weg .hv-chat,body.hv-weg .hv-balk{display:none !important;}' +
-    'body.hv-weg{padding-bottom:0 !important;}' +
-    /* de zwevers die hierin opgaan */
-    'body.hv-os .rtg-scherm,body.hv-os .mgz-rahul{display:none !important;}' +
-    '@media (prefers-reduced-motion: reduce){.hv-chat{transition:none;}}';
-  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  // Presentatie komt op iedere host uit de centrale DS-component.
+  /* Presentatie: public/ds/componenten/handenvrij.css. */
+
+
   document.body.classList.add('hv-os');
 
   /* ---------- de greep ---------- */
   var greep = document.createElement('div');
-  greep.className = 'hv-greep';
-  greep.innerHTML = '<span class="hv-lijn" aria-hidden="true"></span>' +
-    '<button class="hv-sk" type="button" data-stand="half">Half</button>' +
-    '<button class="hv-sk" type="button" data-stand="vol">Vol</button>' +
-    '<button class="hv-sk" type="button" data-scherm>Volledig</button>' +
-    '<button class="hv-sk" type="button" data-draai title="Beeld draaien">Draai</button>' +
-    '<button class="hv-sk" type="button" data-min aria-label="Chat wegklappen">v</button>';
+  greep.className = 'ds-handenvrij__greep hv-greep';
+  greep.innerHTML = '<span class="ds-handenvrij__greeplijn hv-lijn" aria-hidden="true"></span>' +
+    '<button class="ds-handenvrij__schermknop hv-sk" type="button" data-stand="half">Half</button>' +
+    '<button class="ds-handenvrij__schermknop hv-sk" type="button" data-stand="vol">Vol</button>' +
+    '<button class="ds-handenvrij__schermknop hv-sk" type="button" data-scherm>Volledig</button>' +
+    '<button class="ds-handenvrij__schermknop hv-sk" type="button" data-draai title="Beeld draaien">Draai</button>' +
+    '<button class="ds-handenvrij__schermknop hv-sk" type="button" data-min aria-label="Chat wegklappen">v</button>';
   chat.insertBefore(greep, chat.firstChild);
 
   function tekenKnoppen() {
@@ -173,4 +151,3 @@
     if (b && b.contains(e.target)) return;
     zet('min', true);
   }, true);
-

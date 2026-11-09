@@ -1,8 +1,9 @@
 /* RTG Design System: de schil van een gemigreerd scherm.
 
-   Een gemigreerd scherm laadt /ds/rtg-ds.css, dit script in de <head> en
-   daarna gewoon shared/basis.js. Dit script zet html[data-ds] VOORDAT de
-   basis draait; de basis houdt dan al zijn gedrag (offline, begrenzing, de
+   Een gemigreerd scherm draagt html[data-ds], laadt /ds/rtg-ds.css, dit
+   script in de <head> en daarna gewoon shared/basis.js. Het document bezit
+   de grens; deze schil kan een legacydocument dus nooit stil promoveren.
+   De basis houdt dan al zijn gedrag (offline, begrenzing, de
    springlink, het toegankelijkheidsprofiel, de toestelsleutel, de gids, de
    taal) en laat zijn oude vormlagen weg: het Heritage- en editorial-blad,
    rust.css, de iOS-laag en de drie generaties Edge (samen ruim 150 kB CSS
@@ -17,7 +18,7 @@
 (function (w, d) {
   'use strict';
   if (w.RTGDs) return;
-  d.documentElement.setAttribute('data-ds', '1');
+  if (!d.documentElement.hasAttribute('data-ds')) return;
   /* Ingebed (een blad van de werktafel, een iframe, ?embed=1): de buitenste
      schil heeft al een Edge en een kop; dit scherm tekent er dan geen tweede
      (EDGE.md, zelfde regel als rtg-edge-system.js). Vroeg gezet, zodat de kop
@@ -62,11 +63,6 @@
   function token() {
     try { return w.localStorage.getItem('rtg_member_token'); } catch (e) { return null; }
   }
-  function laad(src) {
-    var s = d.createElement('script');
-    s.src = src; s.async = false;
-    (d.head || d.documentElement).appendChild(s);
-  }
 
   /* RTGDs.hulp is voor de twee Edge-scripts hieronder, niet voor schermen. */
   w.RTGDs = { versie: 1, token: token, hulp: { ICONEN: ICONEN, lippen: lippen, svg: svg, el: el } };
@@ -78,6 +74,17 @@
     if (z && w.RTGSprong) { ev.preventDefault(); w.RTGSprong.open(); }
   });
 
-  laad('/ds/edge.js');
-  laad('/ds/edge-modi.js');
+  /* De DS-Edge is een andere presentatie van dezelfde context, geen tweede
+     contextmotor. Laad daarom eerst de bestaande, alleen-lezende
+     blikveldcontracten en daarna de twee DS-presentatiescripts. */
+  function laadScript(pad) {
+    var script = document.createElement('script');
+    script.src = pad; script.async = false;
+    document.head.appendChild(script);
+  }
+  laadScript('/shared/edge/actiestaat.js');
+  laadScript('/shared/edge/blikveld-hoofdactie.js');
+  laadScript('/shared/edge/blikveld.js');
+  laadScript('/ds/edge.js');
+  laadScript('/ds/edge-modi.js');
 }(window, document));

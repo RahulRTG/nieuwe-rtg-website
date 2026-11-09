@@ -38,29 +38,22 @@
      heritage-blad komt bewust LAAT in <head>, na de stijl van het scherm. */
   if (document.body && !ds) document.body.setAttribute('data-rtg-skin', 'heritage');
 
+  function voegBasisStijlToe(pad, id) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    var bestaandBlad = document.getElementById(id) || document.querySelector('link[href^="' + pad + '"]');
+    if (bestaandBlad) { if (!bestaandBlad.id) bestaandBlad.id = id; return bestaandBlad; }
+    var basisStyleNode = document.createElement('link');
+    basisStyleNode.id = id; basisStyleNode.rel = 'stylesheet'; basisStyleNode.href = pad;
+    document.head.appendChild(basisStyleNode);
+    return basisStyleNode;
+  }
+
   function laadEditorialBlad() {
-    if (document.getElementById('rtgEditorialV4Css') ||
-        document.querySelector('link[href^="/shared/rtg-editorial-v4.css"]')) return;
-    var blad = document.createElement('link');
-    blad.id = 'rtgEditorialV4Css';
-    blad.rel = 'stylesheet';
-    blad.href = '/shared/rtg-editorial-v4.css';
-    (document.head || document.documentElement).appendChild(blad);
+    voegBasisStijlToe('/shared/rtg-editorial-v4.css', 'rtgEditorialV4Css');
   }
 
   function laadHeritageBlad() {
-    var bestaand = document.getElementById('rtgHeritageCss') ||
-      document.querySelector('link[href^="/shared/rtg-heritage.css"]');
-    if (bestaand) {
-      if (!bestaand.id) bestaand.id = 'rtgHeritageCss';
-      laadEditorialBlad();
-      return;
-    }
-    var blad = document.createElement('link');
-    blad.id = 'rtgHeritageCss';
-    blad.rel = 'stylesheet';
-    blad.href = '/shared/rtg-heritage.css';
-    (document.head || document.documentElement).appendChild(blad);
+    voegBasisStijlToe('/shared/rtg-heritage.css', 'rtgHeritageCss');
     /* Een @import staat volgens CSS altijd vóór de regels van zijn eigenaar.
        V4 moet juist ná alle Heritage-regels komen om werkelijk de ene schil
        te zijn; daarom is dit bewust een volgend stylesheet in de DOM. */
@@ -80,10 +73,11 @@
     var identiteitScript = document.getElementById('rtgWorldIdentityJs') ||
       document.querySelector('script[src^="/shared/rtg-world-identity.js"]');
     if (!identiteitScript) {
-      identiteitScript = document.createElement('script');
-      identiteitScript.id = 'rtgWorldIdentityJs';
-      identiteitScript.src = '/shared/rtg-world-identity.js';
-      identiteitScript.async = false;
+      var nieuwIdentiteitScript = document.createElement('script');
+      nieuwIdentiteitScript.id = 'rtgWorldIdentityJs';
+      nieuwIdentiteitScript.src = '/shared/rtg-world-identity.js';
+      nieuwIdentiteitScript.async = false;
+      identiteitScript = nieuwIdentiteitScript;
     }
     identiteitScript.addEventListener('load', pasWereldIdentiteitToe, { once: true });
     identiteitScript.addEventListener('error', function () { if (!ds) laadHeritageBlad(); }, { once: true });
@@ -91,6 +85,8 @@
       (document.head || document.documentElement).appendChild(identiteitScript);
     }
   }
+
+  if (!ds) voegBasisStijlToe('/ds/componenten/basis.css', 'rtgBasisComponentCss');
 
   /* ---- taal: elk echt appscherm krijgt dezelfde 114-talige laag ---------
      Vijf grote shells namen i18n.js zelf al op; alle andere schermen hadden
@@ -227,8 +223,9 @@
    aan wanneer hij ontbreekt. Core bestaat niet als zichtbare vijfde wereld. */
 (function () {
   'use strict';
+  if (document.documentElement.hasAttribute('data-ds')) return;
   var b = document.body;
-  if (ds || !b || ['living', 'travel', 'work', 'foundation'].indexOf(b.getAttribute('data-rtg-world')) < 0) return;
+  if (!b || ['living', 'travel', 'work', 'foundation'].indexOf(b.getAttribute('data-rtg-world')) < 0) return;
   if (window.RTGRanden || window.__RTGRandenBoot || document.getElementById('rtgRandenJs') ||
       document.querySelector('script[src^="/shared/randen.js"],script[src^="../shared/randen.js"]')) return;
   var s = document.createElement('script');
@@ -236,18 +233,25 @@
   (document.head || document.documentElement).appendChild(s);
 }());
 /* De centrale controllers laden één keer, ook als een route een adapter vóór
-   basis nodig heeft. Ze behouden de bestaande nodes en bevoegdheden. */
-  [['rtg-route-memory-core', 'RTGRouteMemoryCore'], ['rtg-route-memory', 'RTGRouteMemory'], ['rtg-heritage-transition', 'RTGHeritageTransition'], ['rtg-action-dock', 'RTGActionDock'], ['rtg-edge-preferences', 'RTGEdgePreferences'],
-    ['rtg-heritage-registry', 'RTGHeritageRegistry'],
-    ['rtg-heritage-components', 'RTGHeritageComponents'],
-    ['rtg-editorial-v4-model', 'RTGEditorialV4Model'],
-    ['rtg-editorial-v4-header', 'RTGEditorialV4Header'],
-    ['rtg-editorial-v4', 'RTGEditorialV4']].forEach(function (bron) {
-    if (ds || window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
-    var script = document.createElement('script');
-    script.src = '/shared/' + bron[0] + '.js'; script.async = false;
-    (document.head || document.documentElement).appendChild(script);
-  });
+   basis nodig heeft. Ze behouden de bestaande nodes en bevoegdheden. De
+   letterlijke callsites zijn tevens het controleerbare laadcontract. */
+  function laadBasisController(pad, global) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (window[global] || document.querySelector('script[src="' + pad + '"]')) return;
+    var basisControllerNode = document.createElement('script');
+    basisControllerNode.src = pad; basisControllerNode.async = false;
+    document.head.appendChild(basisControllerNode);
+  }
+  laadBasisController('/shared/rtg-route-memory-core.js', 'RTGRouteMemoryCore');
+  laadBasisController('/shared/rtg-route-memory.js', 'RTGRouteMemory');
+  laadBasisController('/shared/rtg-heritage-transition.js', 'RTGHeritageTransition');
+  laadBasisController('/shared/rtg-action-dock.js', 'RTGActionDock');
+  laadBasisController('/shared/rtg-edge-preferences.js', 'RTGEdgePreferences');
+  laadBasisController('/shared/rtg-heritage-registry.js', 'RTGHeritageRegistry');
+  laadBasisController('/shared/rtg-heritage-components.js', 'RTGHeritageComponents');
+  laadBasisController('/shared/rtg-editorial-v4-model.js', 'RTGEditorialV4Model');
+  laadBasisController('/shared/rtg-editorial-v4-header.js', 'RTGEditorialV4Header');
+  laadBasisController('/shared/rtg-editorial-v4.js', 'RTGEditorialV4');
 /* De sessie van dit scherm, voor de app-gids (eigenaarsbesluit 19 oktober
    2026: gebruiken vraagt een account; server/kern/elkesessie.js). Elk soort
    scherm draagt zijn eigen token -- lid, zaak, kantoor of PDA -- en een
@@ -314,6 +318,7 @@
     '.bss-zaak i{font-style:normal;color:#d7c690;}' +
     '.bss-veld{width:100%;background:transparent;color:#eee;border:1px solid #555;border-radius:0;font:inherit;font-size:.82rem;padding:.5rem;}' +
     /* In een split-paneel is de grote titel dubbelop: je hebt de app zelf net
+// Beheert de toegankelijke titel en acties van het gekozen basispaneel.
        gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
        zicht maar blijven in de toegankelijkheidsboom (zelfde techniek als
        .vis-verborgen). De ACTIEknoppen in de balk (zoeken, uploaden, nieuw)
@@ -323,8 +328,11 @@
     'html.rtg-in-frame body>header .ios-terug,html.rtg-in-frame body>header .terug,' +
     'html.rtg-in-frame body>header>a[href^="/apps/app.html"]' +
     '{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;}';
-  var st = document.createElement('style'); st.textContent = css;
-  (document.head || document.documentElement).appendChild(st);
+  if (ds) document.documentElement.classList.add('ds-basis');
+  else {
+    var st = document.createElement('style'); st.textContent = css;
+    (document.head || document.documentElement).appendChild(st);
+  }
 
   /* de gedeelde rustlaag: één ingetogen stijl die overal dezelfde kalmte legt
      (zachte, trage overgangen + een rustige focusrand). Als apart bestand zodat
@@ -351,14 +359,27 @@
 
      Zonder haast: een veeg is een tweede handeling, nooit de eerste. Het blad
      laadt de laag zelf bij, dus een pagina hoeft er geen <link> voor te kennen. */
-  if (!ds && !window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+  /* Dit is gedragsinfrastructuur, geen legacy vormlaag. Ook een DS-scherm met
+     een expliciete app-adapter (Bestanden, Notities, Mail) moet dezelfde
+     omkeerbare veeg- en toetsenbordcontracten behouden. De laag blijft inert
+     op schermen die geen acties registreren. */
+  /* Bronbundeling vervangt losse <script>-nodes door één appbundel. De oude
+     detectie op script[src] zag daardoor juist op productieachtige hosts niet
+     dat Canvas of een app-adapter gebaren gebruikte. Laad het gedrag daarom
+     als vaste, inerte basisvoorziening; zonder geregistreerde acties maakt het
+     geen DOM en op DS-hosts komt de vorm uit het centrale component. */
+  if (!window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
     var gb = document.createElement('script');
     gb.src = '/shared/gebaar.js'; gb.async = true;
     (document.head || document.documentElement).appendChild(gb);
   }
 
   function toost(t) {
-    var m = document.createElement('div'); m.className = 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;
+    var actueleDs = document.documentElement.hasAttribute('data-ds');
+    // Verbinding bezit op DS al de blijvende netwerkstatus. Basis blijft een
+    // terugval voor schermen die die owner niet laden, zonder dubbele melding.
+    if (actueleDs && window.RTGNet) return;
+    var m = document.createElement('div'); m.className = actueleDs ? 'ds-melding toon' : 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;
     document.body.appendChild(m);
     setTimeout(function () { if (m.parentNode) m.parentNode.removeChild(m); }, 3500);
   }
@@ -597,17 +618,6 @@
     (document.head || document.documentElement).appendChild(km);
   }
 
-  /* ---- 7. de OS-klok is nu zelf een rustige analoge wijzerplaat (shared/klok.js):
-     gevulde uur-/minuut-/secondewijzers met een subtiel gouden bevel en een
-     zachte diepte -- strak en netjes. Het uitbundige opengewerkte 3D-skelet
-     (shared/klok3d.js) is daarom niet meer standaard over elke ring gelegd; dat
-     leeft in shared/horlogewerk.js, op het inlogscherm. ---- */
-
-  /* ---- 8. de 3D-tegellaag (shared/tegel3d.js) is weg. Die liet een KPI-tegel
-     met de MUIS meekantelen -- een bureaubladtruc die op een telefoon niets
-     doet en die het OS als iOS ook niet hoort te hebben. Een tegel is plat en
-     reageert op een vinger, niet op een cursor die er overheen zweeft. ---- */
-
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {
     var t = (v.type || 'text').toLowerCase();
@@ -620,46 +630,22 @@
     var velden = (root.querySelectorAll ? root.querySelectorAll('input:not([maxlength]),textarea:not([maxlength])') : []);
     for (var i = 0; i < velden.length; i++) zetGrens(velden[i]);
   }
-  /* ---- SPRING NAAR DE INHOUD ----
-
-     Gemeten: 1 van de 258 schermen had een route naar de inhoud, en die ENE
-     werkte niet (zie hieronder). Wie met een toetsenbord of schermlezer werkt,
-     tabt dus op elk scherm eerst door de hele navigatie voordat de inhoud
-     begint -- bij elke paginawissel opnieuw. Gemeten wat dat kost tot in de
-     main: 15 tabs op wereld.html, 11 op salon.html, 4 op mall.html.
-
-     Dat is geen fout die een scan vindt: alles IS bereikbaar. Het is een fout
-     die pas opvalt als je het zelf een dag doet.
-
-     Hier en niet in 258 bestanden, want dit blad is het vangnet dat elke pagina
-     draagt. Let op: basis.js is GEGENEREERD uit deze map (scripts/bundel.js), dus
-     een wijziging hoort hier en niet in de bundel -- die wordt door de volgende
-     build overschreven. Dat is precies hoe deze functie een keer verloren ging.
-
-     Het doel krijgt tabindex=-1, anders verplaatst de browser de focus niet echt
-     naar een element dat zelf niet focusbaar is: de pagina springt dan wel, maar
-     de volgende Tab begint weer bovenaan. Dat is het verschil tussen een link
-     die lijkt te werken en een link die werkt. */
+  /* Eén springlink per scherm. tabindex=-1 verplaatst ook werkelijk de focus,
+     zodat de volgende Tab bij de inhoud begint. De bundeldelen zijn de bron. */
   function springNaarInhoud() {
-    if (document.querySelector('.rtg-spring')) return;          // al gezet
-    /* WIJKEN VOOR EEN EIGEN SPRINGLINK, MAAR ALLEEN ALS DIE WERKT.
-       app.html en backoffice.html hebben hun eigen <a class="skip" href="#content">,
-       en die is daar gemeten als eerste focusbare element -- dus krijgen ze er
-       geen tweede bij. Dat een eerste Tab daar op een knop landt komt doordat die
-       inlogschermen zelf focus op een veld zetten; de link is dan al voorbij.
-       De test hieronder kijkt daarom naar de tabVOLGORDE en niet naar waar de
-       focus toevallig staat. Alleen wat de browser echt focust telt: rects
-       alleen is niet genoeg (visibility:hidden heeft rects), tabindex<0 valt
-       buiten de volgorde. */
+    function koppelSpring(anker, doel) {
+      if (!anker || !doel || !doel.id) return false;
+      anker.setAttribute('href', '#' + doel.id);
+      return true;
+    }
+    var actueleDs = document.documentElement.hasAttribute('data-ds');
+    var bestaandeSpring = document.querySelector('.rtg-spring');
+    /* Een werkende route-eigen springlink blijft eigenaar. */
     var eigen = document.querySelector('a.skip, a.skiplink, a[href^="#"][class*="skip"]');
     if (eigen) {
       var eersteFocus = null;
       var kand = document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
       for (var i = 0; i < kand.length; i++) {
-        /* "Zal de browser hier naartoe tabben" is meer dan rects hebben: een
-           element op visibility:hidden heeft wel rects en krijgt geen focus, en
-           tabindex<0 valt buiten de volgorde. Twee eerdere versies keken alleen
-           naar rects en weken daardoor voor de kapotte a.skip op app.html. */
         var e = kand[i];
         if (!e.getClientRects().length) continue;
         var cs = window.getComputedStyle(e);
@@ -674,21 +660,27 @@
     if (!doel.id) doel.id = 'rtg-inhoud';
     if (!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex', '-1');
 
-    var a = document.createElement('a');
-    a.className = 'rtg-spring';
-    a.href = '#' + doel.id;
-    a.textContent = 'Naar de inhoud';
-    a.addEventListener('click', function () {
-      try { doel.focus({ preventScroll: false }); } catch (e) { doel.focus(); }
-    });
-
-    var st = document.createElement('style');
-    st.textContent = '.rtg-spring{position:fixed;left:-9999px;top:0;z-index:99999;' +
-      'background:#0C0C0B;color:#fff;padding:.6rem 1rem;font:600 .82rem Inter,system-ui,sans-serif;' +
-      'border:1px solid #857007;text-decoration:none}' +
-      '.rtg-spring:focus{left:.5rem;top:.5rem}';
-    document.head.appendChild(st);
-    document.body.insertBefore(a, document.body.firstChild);
+    var basisSpringLink = bestaandeSpring || document.createElement('a');
+    /* De centrale basiscomponent bezit de presentatie op beide soorten host.
+       Legacy-schermen laden dit component al via basis-01; een tweede
+       springlinkstijl in world-desktop maakte de laadgraaf weer dubbel. */
+    var springKlasse = 'rtg-spring ds-basis__spring';
+    if (basisSpringLink.className !== springKlasse) basisSpringLink.className = springKlasse;
+    koppelSpring(basisSpringLink, doel);
+    if (basisSpringLink.textContent !== 'Naar de inhoud') basisSpringLink.textContent = 'Naar de inhoud';
+    if (basisSpringLink.hasAttribute('hidden')) basisSpringLink.removeAttribute('hidden');
+    if (basisSpringLink.hasAttribute('inert')) basisSpringLink.removeAttribute('inert');
+    if (basisSpringLink.hasAttribute('aria-hidden')) basisSpringLink.removeAttribute('aria-hidden');
+    if (!basisSpringLink.dataset.rtgSpringGebonden) {
+      basisSpringLink.dataset.rtgSpringGebonden = '1';
+      basisSpringLink.addEventListener('click', function () {
+        var id = (basisSpringLink.getAttribute('href') || '').slice(1);
+        var actueelDoel = id && document.getElementById(id);
+        if (!actueelDoel) return;
+        try { actueelDoel.focus({ preventScroll: false }); } catch (e) { actueelDoel.focus(); }
+      });
+    }
+    if (document.body.firstChild !== basisSpringLink) document.body.insertBefore(basisSpringLink, document.body.firstChild);
   }
 
   function start() {
@@ -705,6 +697,7 @@
           var n = muts[i].addedNodes[j];
           if (n && n.nodeType === 1) { begrens(n); meldingenIn(n); }
         }
+        springNaarInhoud();
         /* Een venster gaat open door `hidden` of een klasse, niet door een nieuw
            element -- daarom ook op attributen letten, gebundeld in een frame.
 
@@ -728,22 +721,38 @@
        Op apps/spelen.html laadden ze allebei, uitleg.js eerst, en dan won deze
        en was .knop() weg. Geen foutmelding: shared/osmenu.js kijkt keurig of
        .knop bestaat, ziet van niet, en laat het knopje gewoon weg. */
-    var sheet = null;
-    function sluit() { if (sheet) { sheet.remove(); sheet = null; } }
+    var sheet = null, gidsFocus = null;
+    function sluit() {
+      if (!sheet) return;
+      if (ds && sheet.open) sheet.close();
+      sheet.remove(); sheet = null;
+      if (gidsFocus && gidsFocus.isConnected) gidsFocus.focus({ preventScroll: true });
+      gidsFocus = null;
+    }
     function openGids() {
-      if (sheet) return;
-      sheet = document.createElement('section');
-      sheet.className = 'bss-sheet'; sheet.setAttribute('aria-label', 'Uitleg over deze app');
+      if (sheet && sheet.isConnected) return;
+      gidsFocus = document.activeElement;
+      sheet = document.createElement(ds ? 'dialog' : 'section');
+      sheet.className = 'bss-sheet' + (ds ? ' ds-basis__gids ds-dialoog' : '');
+      sheet.setAttribute('aria-label', 'Uitleg over deze app');
       sheet.innerHTML = '<div class="bss-kop"><span></span><button class="bss-x" type="button" aria-label="Sluiten">✕</button></div>' +
         '<div class="bss-wat">Even ophalen…</div>';
       sheet.querySelector('.bss-kop span').textContent = document.title || 'Deze app';
       document.body.appendChild(sheet);
       sheet.querySelector('.bss-x').addEventListener('click', sluit);
+      if (ds) {
+        sheet.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
+        sheet.showModal();
+      }
+      sheet.querySelector('.bss-x').focus();
       var gs = gidsSessie(); // de sessie van dit scherm: ./basis-01ae-sessie.js
+      var eigenSheet = sheet;
+      function actueel() { return sheet === eigenSheet && eigenSheet.isConnected && JSON.stringify(gidsSessie()) === JSON.stringify(gs); }
       fetch('/api/gids/app', { method: 'POST', headers: gs.kop, body: JSON.stringify({ pad: location.pathname, code: gs.code, token: gs.token }) })
-        .then(function (r) { return r.json(); })
+        .then(function (r) { if (!r.ok) throw new Error('uitleg niet beschikbaar'); return r.json(); })
         .then(function (d) {
-          if (!sheet || !d || !d.gids) return;
+          if (!actueel()) return;
+          if (!d || d.error || !d.gids) throw new Error('uitleg ontbreekt');
           var g = d.gids, wat = sheet.querySelector('.bss-wat');
           wat.textContent = g.wat;
           var ul = document.createElement('ul'); ul.className = 'bss-doe';
@@ -752,7 +761,7 @@
           var tip = document.createElement('div'); tip.className = 'bss-tip'; tip.textContent = '' + g.tip;
           sheet.appendChild(tip);
         })
-        .catch(function () { if (sheet) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; probeer het straks opnieuw.'; });
+        .catch(function () { if (actueel()) sheet.querySelector('.bss-wat').textContent = 'De uitleg is er zo weer; sluit dit venster en probeer opnieuw.'; });
       hulplaag();
     }
 
@@ -770,35 +779,27 @@
    bevestigen, welke zaken er lopen, iets melden, en de knop die er niet was --
    "ik wil een mens". Zie server/kern/service/mens.js voor waarom die knop een
    contract is en geen beleefdheid. */
-    /* ---- 4b. HULP, IN DEZELFDE LA ALS DE UITLEG ----
-
-       WAAROM HIER EN NIET IN EEN EIGEN APP. Hulp is Core (WERELDEN.md): hij
-       zit in elke doelgroep en reist met de mens mee, dus hij hoort niet in een
-       wereld en al helemaal niet in een 84e app. PLATFORM.md par. 0 telt apps,
-       en een los /apps/hulp.html zou er een zijn die niets eigen bezit. Deze la
-       staat al op elk scherm, en dat is precies wat een servicevoordeur nodig
-       heeft.
-
-       EN HIJ WEET WAAR JE STOND. Dat is het punt van RTG Service: wie vanuit een
-       betaling om hulp vraagt, hoeft niet te horen "waarmee kunnen wij u
-       helpen?" terwijl het systeem al weet welk scherm hij openhad. Het pad
-       reist mee als VERWIJZING (soort plus code) en niet als gegevens; de server
-       gooit al het andere weg (kern/service/zaak.js).
-
-       DRIE DINGEN DIE DEZE LAAG NIET DOET:
-       - hij verschijnt niet zonder lid-token. Zonder account is er geen kanaal
-         om iemand terug te bereiken, en een knop die een wachtrij vult waar
-         niemand uit komt is erger dan geen knop;
-       - hij toont niemand een bevestigingscode die er niet om vroeg: die komt
-         uit /api/service/bevestiging/toon, dus uit de eigen sessie, een keer;
-       - hij zwijgt bij een storing. Deze la is de UITLEG van een scherm; loopt
-         de servicelaag niet, dan hoort die uitleg gewoon te blijven werken. */
+    /* Servicehulp blijft bij de bestaande gids. Alleen een actuele leden-
+       sessie mag eigen servicegegevens publiceren of een opdracht sturen. */
     function tok() { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } }
-    function svc(pad, lijf) {
+    function hulpActueel(blok) {
+      return !!blok && blok.isConnected && sheet === blok._sheet && tok() === blok._token;
+    }
+    function hulpFout(blok, doel) {
+      if (hulpActueel(blok)) doel.textContent = 'Niet gelukt. Probeer opnieuw.';
+      else if (blok) blok.remove();
+    }
+    function svc(pad, lijf, blok) {
       var t = tok();
-      if (!t) return Promise.reject(new Error('geen lid'));
+      if (!t || !hulpActueel(blok)) return Promise.reject(new Error('sessie gewijzigd'));
       return fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
-        body: JSON.stringify(lijf || {}) }).then(function (r) { return r.json(); });
+        body: JSON.stringify(lijf || {}) }).then(function (r) {
+        return r.json().then(function (d) {
+          if (!hulpActueel(blok)) { blok.remove(); throw new Error('sessie gewijzigd'); }
+          if (!r.ok || !d || d.error || d.ok === false || (/\/(bevestig|weiger|mens|open)$/.test(pad) && d.ok !== true)) throw new Error('service niet bevestigd');
+          return d;
+        });
+      });
     }
     function el(soort, klasse, tekst) {
       var n = document.createElement(soort);
@@ -815,19 +816,20 @@
     function hulplaag() {
       if (!tok() || !sheet) return;
       var blok = el('div', 'bss-hulp');
+      blok._token = tok(); blok._sheet = sheet;
       blok.appendChild(el('b', null, 'Hulp nodig?'));
       sheet.appendChild(blok);
       Promise.all([
-        svc('/api/service/bevestigingen').catch(function () { return null; }),
-        svc('/api/service/mijn').catch(function () { return null; }),
-        svc('/api/service/stand').catch(function () { return null; }),
-        svc('/api/service/bel/mijn').catch(function () { return null; })
+        svc('/api/service/bevestigingen', null, blok).catch(function () { return null; }),
+        svc('/api/service/mijn', null, blok).catch(function () { return null; }),
+        svc('/api/service/stand', null, blok).catch(function () { return null; }),
+        svc('/api/service/bel/mijn', null, blok).catch(function () { return null; })
       ]).then(function (uit) { teken(blok, uit[0], uit[1], uit[2], uit[3]); })
         .catch(function () { blok.remove(); });
     }
 
     function teken(blok, verzoeken, mijn, stand, bel) {
-      if (!sheet || !blok.isConnected) return;
+      if (!hulpActueel(blok)) { blok.remove(); return; }
 
       /* DE PERSOONLIJKE STAND, en alleen als hij iets ZEGT. Raakt er geen
          storing aan uw zaken, dan staat er niets -- geen groen vinkje en geen
@@ -856,19 +858,19 @@
         z.appendChild(el('p', null, 'Opent: ' + v.capabilities.join(', ') + '. Zaak ' + v.zaak + '.'));
         var rij = el('div', 'bss-rij');
         rij.appendChild(knop('bss-ja', 'Bevestigen', function () {
-          svc('/api/service/bevestig', { id: v.id }).then(function () { z.textContent = 'Bevestigd.'; });
+          svc('/api/service/bevestig', { id: v.id }, blok).then(function () { z.textContent = 'Bevestigd.'; }).catch(function () { hulpFout(blok, z); });
         }));
         rij.appendChild(knop(null, 'Nee', function () {
-          svc('/api/service/weiger', { id: v.id }).then(function () { z.textContent = 'Geweigerd.'; });
+          svc('/api/service/weiger', { id: v.id }, blok).then(function () { z.textContent = 'Geweigerd.'; }).catch(function () { hulpFout(blok, z); });
         }));
         z.appendChild(rij);
         // de terugvalcode bestaat pas als het lid erom vraagt (kern/service/bevestiging-code.js)
         var cr = el('p', null, 'Kunt u niet bevestigen? ');
         cr.appendChild(knop(null, 'Toon een code om voor te lezen', function () {
-          svc('/api/service/bevestiging/toon', { id: v.id }).then(function (d) {
+          svc('/api/service/bevestiging/toon', { id: v.id }, blok).then(function (d) {
             cr.textContent = d && d.code ? 'Lees deze code voor: ' + d.code + ' (' + v.minuten + ' minuten, een keer).'
               : ((d && d.error) || 'Er is nu geen code te krijgen.');
-          });
+          }).catch(function () { hulpFout(blok, cr); });
         }));
         z.appendChild(cr);
         blok.appendChild(z);
@@ -891,9 +893,9 @@
          legt uit waarom dat twee verschillende dingen waren. */
       if (lopend.length) {
         rij.appendChild(knop(null, 'Ik wil een mens', function () {
-          svc('/api/service/mens', { id: lopend[0].id }).then(function (d) {
+          svc('/api/service/mens', { id: lopend[0].id }, blok).then(function (d) {
             rij.replaceWith(el('p', null, (d && d.let) || 'Doorgezet.'));
-          });
+          }).catch(function () { hulpFout(blok, rij); });
         }));
       }
       /* DE BELKNOP, alleen waar hij bestaat (Lifestyle en Business: de ladder,
@@ -914,6 +916,7 @@
        routering leest ze toch liever uit wat hij typt plus waar hij stond
        (kern/service/router.js). */
     function meldForm(blok) {
+      if (!hulpActueel(blok)) { blok.remove(); return; }
       var f = el('div', 'bss-zaak');
       var veld = el('textarea', 'bss-veld');
       veld.rows = 3;
@@ -924,19 +927,19 @@
         var t = String(veld.value || '').trim();
         if (t.length < 3) { veld.focus(); return; }
         svc('/api/service/open', { titel: t.slice(0, 110), tekst: t,
-          betrokken: { soort: 'scherm', code: location.pathname } })
+          betrokken: { soort: 'scherm', code: location.pathname } }, blok)
           .then(function (d) {
             f.textContent = (d && d.zaak)
               ? 'Genoteerd als ' + d.zaak.id + '. U hoort van ons.'
               : ((d && d.error) || 'Er ging iets mis.');
-          });
+          }).catch(function () { hulpFout(blok, f); });
       }));
       /* EN HET ADRES, want een kanaal dat niemand kent bestaat niet. Het komt
          van de server (kern/service/post.js is de enige plek waar het wordt
          uitgerekend) en staat er alleen als de servicelaag hem meegeeft -- geen
          adres in dit bestand overtypen. Het staat ONDER de knop: wie hier al
          zit, meldt sneller met dit veld dan met zijn mailprogramma. */
-      svc('/api/service/keuzes').then(function (k) {
+      svc('/api/service/keuzes', null, blok).then(function (k) {
         if (!k || !k.hulpAdres || !f.isConnected) return;
         f.appendChild(el('p', null, 'Liever mailen? ' + k.hulpAdres +
           ' -- dat wordt dezelfde melding. Mail vanaf het adres waarmee u bij RTG bekend bent.'));

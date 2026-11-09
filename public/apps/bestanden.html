@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -11,192 +11,104 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bestanden">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
-  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
-    backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
-    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
-  header h1{font-size:1.15rem;}
-  header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
-  main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
-  .knop:hover{border-color:var(--gold);}
-  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  .knop:focus-visible,input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .veld,select.veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
-    font:inherit;font-size:.85rem;padding:.45rem .6rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
 
-  /* het quotum: een dunne eerlijke meter */
-  .meter{height:4px;background:var(--card2);border-radius:0;overflow:hidden;margin:.3rem 0 .9rem;}
-  .meter i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s;}
 
-  /* het pad en de mappen */
-  #pad{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:.6rem;}
-  /* min-height erbij: .15rem boven en onder bracht de knop net niet op 24 (WCAG 2.5.8) */
-  #pad button{background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;padding:.15rem .2rem;min-height:24px;}
-  #pad button:hover{color:var(--rtg-leesgoud,var(--gold));}
-  #pad .hier{color:var(--txt);font-weight:600;}
-  .mapkaart{display:inline-flex;align-items:center;gap:.45rem;background:var(--card);border:1px solid var(--line);
-    border-radius:0;padding:.5rem .75rem;margin:0 .5rem .5rem 0;cursor:pointer;font-size:.84rem;}
-  .mapkaart:hover{border-color:var(--gold);}
-  .mapkaart .mp{width:.95rem;height:.75rem;border:1.5px solid var(--gold);border-radius:0;
-    border-top-width:4px;opacity:.85;}
 
-  /* de bestandenlijst */
-  .item{display:flex;align-items:center;gap:.7rem;background:var(--card);border:1px solid var(--line);
-    border-radius:0;padding:.55rem .7rem;margin-bottom:.45rem;cursor:pointer;}
-  .item:hover{border-color:var(--gold);}
-  .item .ext{flex:0 0 auto;width:2.3rem;height:2.3rem;border:1px solid var(--line);border-radius:0;
-    display:flex;align-items:center;justify-content:center;font-size:.56rem;font-weight:700;
-    letter-spacing:.06em;color:var(--rtg-leesgoud,var(--gold));background:var(--card2);text-transform:uppercase;}
-  .item .wat{flex:1;min-width:0;}
-  .item .wat b{display:block;font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .item .wat span{font-size:.68rem;color:var(--soft);display:flex;gap:.55rem;flex-wrap:wrap;}
-  .item .wat .goud{color:var(--rtg-leesgoud,var(--gold));}
-  .item.weg .wat b{text-decoration:line-through;color:var(--muted);}
-  .sleep{border:2px dashed var(--gold);border-radius:0;padding:2rem 1rem;text-align:center;color:var(--rtg-leesgoud,var(--gold));
-    display:none;margin-bottom:.7rem;}
-  body.sleept .sleep{display:block;}
 
-  /* het paneel */
-  .file-detail{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
-    align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
-  .file-detail.open{display:flex;padding-bottom:calc(var(--rtg-adaptive-inset,108px) + env(safe-area-inset-bottom,0px) + 20px);}
-  .paneel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;
-    width:min(560px,100%);margin:auto 0;}
-  .paneel input.titel{width:100%;background:none;border:none;border-bottom:1px solid var(--line);
-    color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.15rem;padding:.2rem 0 .5rem;outline:none;}
-  .paneel label{display:block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--soft);margin:.7rem 0 .2rem;}
-  #bkKijk{margin-top:.8rem;border:1px solid var(--line);border-radius:0;overflow:hidden;background:var(--card2);}
-  #bkKijk img{display:block;max-width:100%;max-height:320px;margin:0 auto;}
-  #bkKijk pre{padding:.7rem .8rem;font-size:.78rem;line-height:1.5;color:var(--muted);max-height:280px;
-    overflow:auto;white-space:pre-wrap;font-family:ui-monospace,monospace;}
-  .versierij{display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.8rem;color:var(--muted);}
-  .versierij .knop{padding:.25rem .55rem;font-size:.7rem;}
-  .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
-    opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
-  .melding.zie{opacity:1;}
-  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/adaptief.css" rel="stylesheet">
-<link href="/shared/grammatica.css" rel="stylesheet">
 
-<link href="/shared/rtg-daily.css" rel="stylesheet">
-<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-15e9keb:not(#_#_#_){justify-content:space-between}
-.s-1m37x9n:not(#_#_#_){text-decoration:none;color:inherit}
-.s-4t7hy3:not(#_#_#_){width:100%;margin-bottom:0.75rem}
-.s-7myv37:not(#_#_#_){margin-left:auto}
-</style>
+
+
+
+
+
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/appmenu.js" defer></script>
+
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl rtg-daily" data-rtg-edge-na-openen-object="Een bestand is er pas als je er een opent; dan draagt de Edge een verwijzing ernaar (soort, id en naam), nooit de inhoud." data-kantoor-tool="bestanden" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-daily="bestanden" data-rtg-editorial-room="bestanden" data-rtg-layout="standard">
+<body class="ds-scherm ds-dagkamer rtg-stijl rtg-daily" data-rtg-edge-na-openen-object="Een bestand is er pas als je er een opent; dan draagt de Edge een verwijzing ernaar (soort, id en naam), nooit de inhoud." data-kantoor-tool="bestanden" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-daily="bestanden" data-rtg-editorial-room="bestanden" data-rtg-layout="standard">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
-<header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
+<header class="ds-kop ds-dag-kop" data-rtg-menu-host>
+  <a class="terug ds-knop" href="/apps/app.html" aria-label="Terug naar het bureaublad" data-i18n-aria="dailyField.backHome">&#8592;</a>
   <span><span class="ey">RTG</span><h1 data-i18n="dailyField.files">Bestanden</h1></span>
-  <span class="rij s-7myv37">
-    <button class="knop" id="toonBak" data-rtg-edge-bar type="button" data-i18n="dailyField.bin">Prullenbak</button>
-    <button class="knop" id="nieuwMap" data-rtg-edge-bar type="button" data-i18n="dailyField.newFolder">+ Map</button>
-    <input type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen" data-i18n-aria="dailyField.chooseFiles">
+  <span class="rij s-7myv37 ds-dag-rij ds-dag-auto">
+    <button class="knop ds-knop" id="toonBak" data-rtg-edge-bar data-ds-actie data-ds-actie-id="documents.bin" type="button" data-i18n="dailyField.bin">Prullenbak</button>
+    <button class="knop ds-knop" id="nieuwMap" data-rtg-edge-bar data-ds-actie type="button" data-i18n="dailyField.newFolder">+ Map</button>
+    <input class="ds-invoer" type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen" data-i18n-aria="dailyField.chooseFiles">
   </span>
 </header>
 <!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
      "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
      een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
      rij onder de kop. -->
-<div class="rtg-duimbalk"><button class="knop vol" id="kies" data-rtg-edge-bar type="button" data-hoofdactie data-i18n="dailyField.upload">Upload</button></div>
-<main>
+<div class="rtg-duimbalk"><button class="knop vol ds-knop" id="kies" data-rtg-edge-bar data-ds-actie type="button" data-hoofdactie data-i18n="dailyField.upload">Upload</button></div>
+<main class="ds-dag-main">
 <section id="dailyIntro" aria-label="Bestanden" data-i18n-aria="dailyField.files"></section>
-  <div class="daily-content">
-  <input class="veld s-4t7hy3" id="zoek" type="search" placeholder="Zoek in uw bestanden" data-i18n-ph="daily.fileSearch" aria-label="Zoeken"
+  <div class="daily-content ds-dag-daily-content">
+  <input class="ds-invoer veld s-4t7hy3 ds-dag-breed" id="zoek" type="search" placeholder="Zoek in uw bestanden" data-i18n-ph="daily.fileSearch" aria-label="Zoeken"
  data-i18n-aria="dailyField.search">
-  <div class="sleep" data-i18n="dailyField.dropUpload">Laat los om te uploaden</div>
-  <nav id="pad" aria-label="Mappenpad" data-i18n-aria="dailyField.folderPath"></nav>
-  <h2 id="dailyFolders" data-i18n="daily.folders" class="kop">Uw mappen</h2>
+  <div class="sleep ds-dag-sleep" data-i18n="dailyField.dropUpload">Laat los om te uploaden</div>
+  <nav class="ds-dag-rij" id="pad" aria-label="Mappenpad" data-i18n-aria="dailyField.folderPath"></nav>
+  <h2 id="dailyFolders" data-i18n="daily.folders" class="kop ds-dag-kop">Uw mappen</h2>
   <div id="mappen"></div>
-  <h2 class="kop" data-i18n="daily.files">Uw documenten</h2>
+  <h2 class="kop ds-dag-kop" data-i18n="daily.files">Uw documenten</h2>
   <div id="lijst" aria-live="polite"></div>
-  <div id="gedeeldKop" class="kop" style="display:none;" data-i18n="dailyField.sharedWithMe">Met mij gedeeld</div>
+  <div id="gedeeldKop" class="kop ds-dag-kop" style="display:none;" data-i18n="dailyField.sharedWithMe">Met mij gedeeld</div>
   <div id="gedeeldLijst"></div>
-  <div id="officeKop" class="kop" style="display:none;" data-i18n="dailyField.officeSource">Uit RTG Office · werken doet u daar</div>
+  <div id="officeKop" class="kop ds-dag-kop" style="display:none;" data-i18n="dailyField.officeSource">Uit RTG Office · werken doet u daar</div>
   <div id="officeLijst"></div>
-  <div class="daily-foot"><button type="button" class="daily-action" data-daily-target="kies"><span data-i18n="daily.addFile">Bestand toevoegen</span> <span aria-hidden="true">→</span></button></div>
-<div class="daily-storage">  <div class="rij s-15e9keb">
-    <span class="stil" id="quotumTekst">&nbsp;</span>
-    <select class="veld" id="sorteer" aria-label="Sorteren" data-i18n-aria="dailyField.sort">
+  <div class="daily-foot ds-dag-daily-foot"><button type="button" class="daily-action ds-knop ds-dag-actie" data-daily-target="kies"><span data-i18n="daily.addFile">Bestand toevoegen</span> <span aria-hidden="true">→</span></button></div>
+<div class="daily-storage ds-dag-daily-storage">  <div class="rij s-15e9keb ds-dag-rij ds-dag-verdeel">
+    <span class="stil ds-dag-stil" id="quotumTekst">&nbsp;</span>
+    <select class="ds-invoer veld" id="sorteer" aria-label="Sorteren" data-i18n-aria="dailyField.sort">
       <option value="nieuw" data-i18n="dailyField.newest">Nieuwste eerst</option>
       <option value="naam" data-i18n="dailyField.byName">Op naam</option>
       <option value="groot" data-i18n="dailyField.largest">Grootste eerst</option>
     </select>
   </div>
-  <div class="meter" aria-hidden="true"><i id="quotumBalk"></i></div>
+  <div class="meter ds-dag-meter" aria-hidden="true"><i id="quotumBalk"></i></div>
 </div>
-  <p class="stil h-mt80" data-i18n="daily.fileHelp">Verwijderde bestanden blijven dertig dagen in de prullenbak en tellen mee voor uw opslagruimte. Als u een bestand deelt op codenaam, kan de ander het bekijken en nieuwe versies toevoegen.</p>
+  <p class="stil ds-dag-marge ds-dag-stil" data-i18n="daily.fileHelp">Verwijderde bestanden blijven dertig dagen in de prullenbak en tellen mee voor uw opslagruimte. Als u een bestand deelt op codenaam, kan de ander het bekijken en nieuwe versies toevoegen.</p>
   </div>
 </main>
 
-<div class="file-detail" id="bkScrim" role="dialog" aria-modal="false" aria-label="Bestand" data-i18n-aria="dailyField.file">
-  <div class="paneel">
-    <input class="titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam" data-i18n-aria="dailyField.filename">
-    <p class="stil h-mt40" id="bkMeta"></p>
+<div class="file-detail ds-dag-file-detail" id="bkScrim" role="dialog" aria-modal="false" aria-label="Bestand" data-i18n-aria="dailyField.file">
+  <div class="paneel ds-dag-paneel">
+    <input class="ds-invoer titel ds-dag-titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam" data-i18n-aria="dailyField.filename">
+    <p class="stil ds-dag-marge ds-dag-stil" id="bkMeta"></p>
     <div id="bkKijk" style="display:none;"></div>
     <label for="bkMap" data-i18n="dailyField.inFolder">In map</label>
-    <select class="veld" id="bkMap" style="width:100%;"></select>
+    <select class="ds-invoer veld ds-invoer" id="bkMap" style="width:100%;"></select>
     <div id="bkDeelWrap">
       <label for="bkCode" data-i18n="dailyField.shareFile">Delen op codenaam (kijken en nieuwe versies)</label>
-      <div class="rij"><input class="veld h-flex1" id="bkCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
-        <button class="knop" id="bkDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
-      <p class="stil" id="bkGedeeld"></p>
+      <div class="rij ds-dag-rij"><input class="ds-invoer veld ds-dag-rek ds-invoer" id="bkCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
+        <button class="knop ds-knop" id="bkDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
+      <p class="stil ds-dag-stil" id="bkGedeeld"></p>
     </div>
     <div id="bkVersieWrap" style="display:none;">
       <label data-i18n="dailyField.versions">Versies</label>
       <div id="bkVersies"></div>
     </div>
-    <div class="rij h-mt90">
-      <button class="knop vol" id="bkBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
-      <button class="knop" id="bkHaal" type="button" data-i18n="dailyField.download">Download</button>
-      <button class="knop" id="bkNieuwVersie" type="button" data-i18n="dailyField.newVersion">Nieuwe versie</button>
-      <button class="knop" id="bkSter" type="button" data-i18n="dailyField.star">Ster</button>
-      <button class="knop" id="bkWeg" type="button" data-i18n="dailyField.delete">Verwijder</button>
-      <span class="h-flex1"></span>
-      <button class="knop" id="bkDicht" type="button" data-i18n="dailyField.close">Sluit</button>
+    <div class="rij ds-dag-marge ds-dag-rij">
+      <button class="knop vol ds-knop" id="bkBewaar" type="button" data-i18n="dailyField.save">Bewaar</button>
+      <button class="knop ds-knop" id="bkHaal" type="button" data-i18n="dailyField.download">Download</button>
+      <button class="knop ds-knop" id="bkNieuwVersie" type="button" data-i18n="dailyField.newVersion">Nieuwe versie</button>
+      <button class="knop ds-knop" id="bkSter" type="button" data-i18n="dailyField.star">Ster</button>
+      <button class="knop ds-knop" id="bkWeg" type="button" data-ds-actie data-ds-actie-id="documents.trash" data-i18n="dailyField.delete">Verwijder</button>
+      <span class="ds-dag-rek"></span>
+      <button class="knop ds-knop" id="bkDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
-    <div class="rij h-mt50">
-      <button class="knop" id="bkHerstel" type="button" style="display:none;" data-i18n="dailyField.restore">Herstel</button>
-      <input type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen" data-i18n-aria="dailyField.chooseVersion">
+    <div class="rij ds-dag-marge ds-dag-rij">
+      <button class="knop ds-knop" id="bkHerstel" type="button" style="display:none;" data-ds-actie data-ds-actie-id="documents.restore" data-i18n="dailyField.restore">Herstel</button>
+      <input class="ds-invoer" type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen" data-i18n-aria="dailyField.chooseVersion">
     </div>
   </div>
 </div>
-<div class="melding" id="melding" role="status"></div>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <script src="/shared/rtg-daily-copy.js"></script>
 <script src="/shared/rtg-daily-fields.js"></script>
 <script src="/shared/rtg-daily.js"></script>
@@ -209,6 +121,7 @@
 <script src="/shared/document-capability.js"></script>
 <script src="/apps/bestanden/app.js"></script>
 <script src="/apps/bestanden/paneel.js"></script>
+<script src="/shared/gebaar.js"></script>
 <script src="/shared/adaptief.js" defer></script>
 <script src="/shared/adaptief/grammatica.js" defer></script>
 <script src="/shared/objectverwijzing.js" defer></script>

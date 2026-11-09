@@ -13,17 +13,75 @@
   /* De handelingen van DIT scherm: elk element met data-ds-actie. Het scherm
      bezit ze, met zijn eigen listeners en rechten; de Edge toont en klikt. */
   function schermActies() {
-    return Array.prototype.slice.call(d.querySelectorAll('[data-ds-actie]')).filter(function (x) {
+    var acties = Array.prototype.slice.call(d.querySelectorAll('[data-ds-actie]')).filter(function (x) {
       return !x.closest('.ds-edge') && !x.disabled && x.getAttribute('aria-disabled') !== 'true' && !x.closest('[hidden]') &&
-        !x.closest('dialog:not([open])');
+        !x.closest('dialog:not([open])') && (x.getClientRects().length > 0 || x.hasAttribute('data-rtg-edge-bar'));
     }).map(function (x) {
-      return { label: x.getAttribute('data-ds-actie') || x.textContent.trim(), doe: function () { x.click(); } };
+      return { id: x.getAttribute('data-ds-actie-id') || x.id || '',
+        /* Een pictogramknop heeft soms bewust geen zichtbare tekst. Dezelfde
+           toegankelijke naam die de knop zelf bezit is dan ook de naam in de
+           Edge. Zonder deze stap verschenen Vorige en Volgende als losse
+           tekens en waren ze vanuit de universele bediening niet vindbaar. */
+        label: x.getAttribute('data-ds-actie') || x.getAttribute('aria-label') || x.textContent.trim(),
+        doe: function () { x.click(); } };
     });
+    /* Een open wereldwerkblad blijft eigenaar van zijn levende formulier en
+       listeners. Het framecontract geeft uitsluitend de expliciet
+       gedeclareerde acties door; de Edge kopieert geen domeinlogica. */
+    if (w.RTGDesktopFrame && typeof w.RTGDesktopFrame.actions === 'function') {
+      acties = acties.concat(w.RTGDesktopFrame.actions());
+    }
+    return voegAppmenuActiesToe(acties, 'functies');
+  }
+
+  /* Appmenu ontdekt de actuele handelingen en bezit hun uitvoeringscontract.
+     De Edge maakt daarvan alleen een presentatie-adapter; zo blijven
+     appknoppen, springpunten en expliciet geregistreerde acties exact dezelfde
+     functies uitvoeren en ontstaat er geen tweede actieregister. */
+  function appmenuActie(item) {
+    return { id: item.id || item.capability || '', label: item.label, doe: function () {
+      if (typeof item.doe === 'function') return item.doe();
+      if (item.knop && typeof item.knop.click === 'function') return item.knop.click();
+      if (item.spring && typeof item.spring.scrollIntoView === 'function') {
+        item.spring.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } };
+  }
+  function voegAppmenuActiesToe(bestaand, bron) {
+    var uit = bestaand.slice(), gezien = {};
+    uit.forEach(function (a) { gezien[String(a.label || '').trim().toLowerCase()] = true; });
+    var menu = w.RTGAppMenu;
+    if (!menu || typeof menu[bron] !== 'function') return uit;
+    menu[bron]().forEach(function (item) {
+      var sleutel = String(item && item.label || '').trim().toLowerCase();
+      if (!sleutel || gezien[sleutel]) return;
+      gezien[sleutel] = true;
+      uit.push(appmenuActie(item));
+    });
+    return uit;
+  }
+  function systeemActies() {
+    var acties = [];
+    if (w.RTGSprong && typeof w.RTGSprong.open === 'function') {
+      acties.push({ label: 'Alle functies', doe: function () { w.RTGSprong.open(); } });
+    }
+    acties.push(
+      { label: 'Berichten', href: '/apps/comm.html', icoon: I.bericht },
+      { label: 'RTG Media', href: '/apps/media.html' },
+      { label: 'Uw account', href: '/apps/ik.html' },
+      { label: 'Privacy en veiligheid', href: '/apps/veilig.html' }
+    );
+    return voegAppmenuActiesToe(acties, 'systeemfuncties');
   }
 
   E.registreer('navigatie', function () {
     var balk = D.balk();
-    balk.appendChild(D.linkKnop('/apps/app.html', 'Home', svg(I.home)));
+    var home = D.knop('home', 'Home', svg(I.home));
+    home.addEventListener('click', function () {
+      if (w.RTGDesktopFrame && w.RTGDesktopFrame.isOpen()) w.RTGDesktopFrame.collapse();
+      else w.location.assign('/apps/app.html');
+    });
+    balk.appendChild(home);
     balk.appendChild(D.linkKnop('/apps/wereld.html', 'Werelden', svg(I.werelden)));
     balk.appendChild(D.rahulKnop());
     balk.appendChild(D.bladKnop('acties', 'Acties', svg(I.acties), 'Acties', function () {
@@ -36,19 +94,27 @@
     /* Dezelfde bestemmingen als de bestaande Edge-diensten
        (shared/rtg-adaptive-edge-services.js): geen eigen register. */
     balk.appendChild(D.bladKnop('menu', 'Menu', svg(I.menu), 'Menu', function () {
-      return D.lijst([
-        { label: 'Berichten', href: '/apps/comm.html', icoon: I.bericht },
-        { label: 'RTG Media', href: '/apps/media.html' },
-        { label: 'Uw account', href: '/apps/ik.html' },
-        { label: 'Privacy en veiligheid', href: '/apps/veilig.html' }
-      ]);
+      return D.lijst(systeemActies());
     }));
   });
 
-  /* Rahul: dezelfde vraagweg als de metgezel (shared/metgezel.js: POST
-     /api/fluister met het ledentoken). Rahul bereidt voor; uitvoeren doet
-     het lid, op het scherm dat erover gaat. */
+  /* Een scherm met Rahul Command behoudt zijn bestaande eigenaar, context,
+     historie en goedkeuringsweg. De Edge opent die bediening via haar
+     publieke hook; hij kiest daar geen eigen actor of tweede transport.
+     Schermen zonder die bediening houden hun bestaande ledenvraagweg. */
   function vraagRahul(q, bron) {
+    if (w.RTGMetgezel && typeof w.RTGMetgezel.rahul === 'function') {
+      function nietGeopend() {
+        var melding = el('p', 'ds-edge__bladtekst', { 'role': 'status' });
+        melding.textContent = 'Rahul kon niet worden geopend. Uw vraag blijft in de balk; probeer het opnieuw.';
+        D.openBlad('Rahul', bron, melding);
+      }
+      try { Promise.resolve(w.RTGMetgezel.rahul(q)).then(function (overgenomen) {
+        if (overgenomen === false) nietGeopend();
+      }, nietGeopend); }
+      catch (e) { nietGeopend(); }
+      return;
+    }
     var t = R.token();
     var uit = el('p', 'ds-edge__bladtekst', { 'aria-live': 'polite' });
     if (!t) {

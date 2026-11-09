@@ -4318,3 +4318,28 @@ verouderde Juridisch-interactienoemer**. Nieuwe regressies: **0**. Eerder
 verborgen fouten ontdekt: **0 aanvullend**. Niet-uitgevoerde verplichte
 controles: **schermcontracten, objectieve en menselijke Experience-proeven en
 de acht releasekwalificatiepoorten**. Deep Green: **GEBLOKKEERD**.
+
+#### Experience-schermcontracten 316/316 gedeclareerd
+
+Alle **316/316 fysieke schermen** hebben nu een geldige Experience Signature.
+De 306 ontbrekende contracten zijn toegevoegd op basis van het bestaande
+SCHERMEIGENAAR-register, de actuele HTML-structuur, de wereldclassificatie en
+waar beschikbaar de APPWERKT-interactienoemer. De tien bestaande handmatig
+verdiepte schermsignatures zijn behouden. De actuele inventaris classificeert
+20 technische redirects afzonderlijk; hun bestemmingen blijven eigenaar van
+inhoud en bediening en de redirects behouden een expliciet terug/vooruit- en
+luscontract.
+
+De 316 signatures declareren samen **6.514 interactie-eisen** naast identiteit,
+doel, compositie, beweging, herstel en menselijke taken. Dit vergroot en
+formaliseert de bewijslast en is geen automatisch kwaliteitsbewijs. De
+Experience-compiler blijft geldig, de contracttests sluiten **15/15** en de
+afgeleide registercontrole bevestigt opnieuw exact 114 apps en 316 schermen.
+
+**Afsluiting Experience-signatures.** Openstaande unieke oorzaken: **1
+gedeelde Experience-groep: commitgebonden objectief en menselijk bewijs voor
+de gedeclareerde noemer**. Opgelost sinds vorige meting: **306 ontbrekende
+schermcontracten**. Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt:
+**0 aanvullend**. Niet-uitgevoerde verplichte controles: **de daadwerkelijke
+Experience-proeven, inventarisvolledigheidsaudit en de acht
+releasekwalificatiepoorten**. Deep Green: **GEBLOKKEERD**.

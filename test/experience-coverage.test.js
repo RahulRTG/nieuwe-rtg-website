@@ -38,6 +38,19 @@ test('register is volledig afgeleid uit alle logische apps en alle fysieke scher
   assert.equal(report.status,'NOT_TESTED','schermbewijs alleen mag de operationele vrijgavepoorten niet omzeilen');
 });
 
+test('uitvoeringsprojectie bewaart bewijs voor apps en schermen zonder het zelf te maken',()=>{
+  const appScope={subjectType:'app',subjectId:'app:test'};
+  const screenScope={subjectType:'screen',subjectId:'screen:/apps/test.html'};
+  const matrix={runs:[{runId:'r'}],status:'NOT_TESTED'};
+  const report={
+    logicalApps:[{id:'app:test',dimensions:[{id:'identity',scopedProofs:[{scope:appScope}]},{id:'continuity',configurationCoverage:[matrix]}]}],
+    screens:[{id:'screen:/apps/test.html',dimensions:[{id:'identity',scopedProofs:[{scope:screenScope}]}]}]
+  };
+  const projected=coverage.executionProjection(report);
+  assert.deepEqual(projected.scopedProofs.map(row=>row.scope),[appScope,screenScope]);
+  assert.deepEqual(projected.configurationCoverage,[{subjectId:'app:test',dimension:'continuity',...matrix}]);
+});
+
 test('de acht Deep Green-vrijgavepoorten en Experience-budgetten zijn fail-closed', () => {
   const report = coverage.build(ROOT,{contract,signatures,apps:[],screens:[],sourceHash:'source',commit:'candidate'});
   assert.deepEqual(report.releaseReadiness.qualificationGates.map(gate=>gate.id),[

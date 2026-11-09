@@ -63,9 +63,7 @@ const rows=proofs.map(p=>{
   return {...p,...record,state:result,log:record?p.id+'.log':null};
 });
 const combined=build(root,{evidence:{records:typedEvidence.flatMap(e=>e.records)},commit});
-const scopedProofs=combined.screens.flatMap(screen=>screen.dimensions.flatMap(d=>d.scopedProofs||[]));
-const configurationCoverage=combined.screens.flatMap(screen=>screen.dimensions.flatMap(d=>(d.configurationCoverage||[])
-  .filter(matrix=>matrix.runs?.length).map(matrix=>({subjectId:screen.id,dimension:d.id,...matrix}))));
+const {scopedProofs,configurationCoverage}=require('./lib/experience/coverage').executionProjection(combined);
 const covered=binding=>scopedProofs.some(p=>typed.covers(p.scope,binding));
 const typedComplete=typedRequired.every(covered);
 const currentCandidate=candidate(root),current=clean.ok&&currentCandidate.ok&&currentCandidate.commit===commit&&fingerprint(root)===sourceHash;

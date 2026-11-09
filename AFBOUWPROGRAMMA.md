@@ -4054,7 +4054,7 @@ Historische regressietoetsen dekken de vijf gedeelde oorzaken achter de eerdere
 166 Design System-meldingen, de desktop-/mobiele schermlaag, de zeven recent
 herstelde APPWERKT-gaten, een overlappende PR, een verouderde base-commit,
 testversmalling bij onbekende afhankelijkheden en administratief groen ondanks
-een conflict. Samen met de bestaande Code Architect-toetsen sluiten 16/16.
+een conflict. Samen met de bestaande Code Architect-toetsen sluiten 17/17.
 
 **Vergelijkbare nulmeting.** Op dezelfde lokale Node 26-werkboom gaf de oude
 `context` voor `public/apps/browser.html` in 204 ms 4.338 bytes, maar geen
@@ -4083,6 +4083,6 @@ werkpakket en wordt niet automatisch een blokkerende poort.
 **Meetstand Proof-Bound fase 1.** Openstaande unieke implementatieoorzaken:
 **0 in de gerichte code- en validatietoetsen**. Opgelost: **de ontbrekende
 verbinding tussen context, eigenaar, Git-conflict en bewijsplan**. Nieuwe
-regressies: **0 in 16 gerichte toetsen**. Niet-uitgevoerde verplichte controles:
+regressies: **0 in 17 gerichte toetsen**. Niet-uitgevoerde verplichte controles:
 **schone commit-herproef met actuele PR-snapshot, volledige CI en een echte
 end-to-end kostenmeting**. Deep Green: **GEBLOKKEERD**.

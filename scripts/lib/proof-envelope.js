@@ -6,6 +6,7 @@
    stelt de taak vast; deze module rekent deterministisch uit of de beschikbare
    context voldoende is. */
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const cp = require('node:child_process');
 const { performance } = require('node:perf_hooks');
@@ -181,8 +182,21 @@ function worktreeConflicts(root, allowed, base, currentBranch) {
 function pullRequestConflicts(root, snapshotFile, allowed, now) {
   if (!snapshotFile) return { status: 'UNKNOWN', reason: 'geen commitgebonden PR-snapshot meegegeven', conflicts: [] };
   const inMemory = typeof snapshotFile === 'object';
-  const file = inMemory ? null : normalizeFile(root, snapshotFile);
-  const snapshot = inMemory ? snapshotFile : file ? json(root, file) : null;
+  let file = null;
+  if (!inMemory) {
+    const candidate = path.resolve(root, String(snapshotFile));
+    const inRepository = !path.relative(root, candidate).startsWith('../') && !path.isAbsolute(path.relative(root, candidate));
+    const temporaryRoot = fs.realpathSync(os.tmpdir());
+    let realCandidate = candidate;
+    try { realCandidate = fs.realpathSync(candidate); } catch (_) {}
+    const inTemporaryDirectory = realCandidate === temporaryRoot || realCandidate.startsWith(temporaryRoot + path.sep);
+    if (inRepository || inTemporaryDirectory) file = candidate;
+  }
+  let snapshot = null;
+  if (inMemory) snapshot = snapshotFile;
+  else if (file) {
+    try { snapshot = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (_) {}
+  }
   if (!snapshot || !Array.isArray(snapshot.pullRequests) || !snapshot.capturedAt)
     return { status: 'UNKNOWN', reason: 'PR-snapshot ontbreekt of heeft niet het verwachte contract', conflicts: [] };
   const ageMs = now - Date.parse(snapshot.capturedAt);

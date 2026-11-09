@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const cp = require('node:child_process');
 const P = require('../scripts/lib/proof-envelope');
@@ -75,6 +76,16 @@ test('actuele PR-snapshot maakt een overlap vóór de wijziging zichtbaar', () =
   }, ['public/apps/browser.html'], NOW);
   assert.equal(result.status, 'CURRENT');
   assert.deepEqual(result.conflicts[0].files, ['public/apps/browser.html']);
+});
+
+test('PR-snapshot mag tijdelijk zijn maar leest geen willekeurig bestand buiten repository of temp', () => {
+  const temporary = path.join(os.tmpdir(), 'rtg-preflight-prs-' + process.pid + '.json');
+  fs.writeFileSync(temporary, JSON.stringify(EMPTY_PRS));
+  try {
+    assert.equal(P.pullRequestConflicts(ROOT, temporary, [], NOW).status, 'CURRENT');
+    const forbidden = P.pullRequestConflicts(ROOT, path.join(path.dirname(ROOT), 'geen-pr-snapshot.json'), [], NOW);
+    assert.equal(forbidden.status, 'UNKNOWN');
+  } finally { fs.unlinkSync(temporary); }
 });
 
 function synthetic() {

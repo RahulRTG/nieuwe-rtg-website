@@ -4906,6 +4906,8 @@
       "server/kern/zaakregiebeeld.js",
       "server/kern/zelfzorg/repareren.js",
       "server/kern/zorgketen/index.js",
+      "server/lib/ankerdienst.js",
+      "server/lib/ankertimer.js",
       "server/lib/document-operatiepad.js",
       "server/lib/dubbeltikkast.js",
       "server/lib/duurzaam.js",

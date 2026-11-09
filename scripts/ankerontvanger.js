@@ -2,22 +2,15 @@
 /* ============================================================================
    DE ANKERONTVANGER -- een REFERENTIE voor de tweede machine (audit P1-3).
 
-   server/lib/ankerpost.js brengt het ankerblok weg naar RTG_ANKERPOST_URL en
-   haalt het laatst weggebrachte terug; server/lib/ankertimer.js doet dat
-   periodiek en vergelijkt eerst. Zonder iets aan de andere kant is die keten
-   niet te draaien. Dit script is die andere kant, zo klein mogelijk, zodat de
-   keten van begin tot eind te beproeven is. Het is NIET de bestemming zelf: die
-   hoort op een andere machine, onder een ander beheer, met opslag die het
-   besturingssysteem of de opslagdienst onveranderlijk houdt (WORM / Object
-   Lock). Dat besluit hoort bij een mens; zie ankerpost.js punt 5.
+   ankerpost.js brengt blokken hierheen; ankertimer.js vergelijkt ze eerst.
+   Productie hoort dit op een andere machine en onveranderlijke opslag te
+   draaien. Dit script is de kleine, beproefbare ontvangende kant.
 
    WAT HIJ AFDWINGT, en wat een ontvanger minimaal moet doen:
      1. ALLEEN BIJSCHRIJVEN. Het bestand wordt in append-modus geopend; er is
         geen route die iets wist of overschrijft.
-     2. GEEN TERUGGANG. Een blok waarin een journaal een LAGER volgnummer heeft
-        dan het laatst bewaarde, of hetzelfde nummer met een andere hash, wordt
-        geweigerd (409). Zo kan een aanvaller die de kop van een journaal
-        afknipte, het anker niet "bijwerken" naar zijn ingekorte stand.
+     2. GEEN TERUGGANG. Een lager nummer of dezelfde nr met een andere hash
+        wordt geweigerd (409).
      3. EEN SLEUTEL. Met RTG_ANKERPOST_SLEUTEL moet de afzender die als bearer
         meesturen. Met RTG_ANKER_PUBLIEK (base64, 32 bytes Ed25519) moet het blok
         daarmee getekend zijn; zonder die instelling wordt de sleutel van het
@@ -31,6 +24,10 @@
         het blok getekende herzegelingen meebrengt (zelfde sleutel als het
         blok) die precies DIE oude hash naar precies DIE nieuwe voeren. De
         herzegelingen worden mee bewaard, zodat het waarom hier blijft liggen.
+     6. EEN NIEUW TIJDVAK BEWAART DE BREUK. Alleen een APARTE herstelsleutel
+        mag exact de oude externe kop, een eerder extern gemeenschappelijk punt
+        en het lokale beginpunt binden. De oude blokken en de verklaring blijven
+        append-only staan; de gewone ankersleutel kan dit niet autoriseren.
 
    Draai: RTG_ANKER_MAP=/pad/naar/worm PORT=8443 node scripts/ankerontvanger.js
    (achter TLS; de ankerpost weigert http zonder RTG_ANKERPOST_ONVEILIG=1).
@@ -41,6 +38,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { herstelGoed, tijdvak } = require('./lib/ankerherstel-ontvanger');
 
 const SPKI_ED25519 = Buffer.from('302a300506032b6570032100', 'hex');
 /* Gelijk aan TEKENDOEL in server/lib/ankerherzegel.js; dit script draait op een
@@ -54,7 +52,7 @@ function kanoniek(v) {
   return JSON.stringify(v === undefined ? null : v);
 }
 
-function maakOntvanger({ map, sleutel, publiek } = {}) {
+function maakOntvanger({ map, sleutel, publiek, herstelPubliek } = {}) {
   if (!map) throw new Error('ankerontvanger: RTG_ANKER_MAP ontbreekt');
   fs.mkdirSync(map, { recursive: true });
   const bestand = path.join(map, 'ankers.jsonl');
@@ -102,11 +100,18 @@ function maakOntvanger({ map, sleutel, publiek } = {}) {
     return gebruikt.size > 0 && hash === n.hash;
   }
 
-  function terugGang(oud, nieuw, herzegelingen, sleutelB64) {
+  function terugGang(oud, nieuw, herzegelingen, herstelverklaringen, sleutelB64, geschiedenis) {
     for (const [naam, p] of Object.entries((oud && oud.punten) || {})) {
       if (!p) continue;
       const n = nieuw.punten[naam];
       if (!n) return naam + ' ontbreekt in het nieuwe blok';
+      if (tijdvak(n) !== tijdvak(p)) {
+        if (tijdvak(n) !== tijdvak(p) + 1 || !herstelGoed({ naam, oud: p, nieuw: n,
+          verklaringen: herstelverklaringen, geschiedenis, publiek: herstelPubliek }))
+          return naam + ' wisselt van tijdvak ' + tijdvak(p) + ' naar ' + tijdvak(n) + ' zonder geldige aparte herstelverklaring';
+        continue;
+      }
+      if ((p.herstelId || null) !== (n.herstelId || null)) return naam + ' draagt binnen hetzelfde tijdvak een ander herstel-id';
       if (Number(n.nr) < Number(p.nr)) return naam + ' gaat terug van ' + p.nr + ' naar ' + n.nr;
       if (Number(n.nr) === Number(p.nr) && n.hash !== p.hash && !herzegeldGoed(naam, p, n, herzegelingen, sleutelB64))
         return naam + ' heeft op ' + p.nr + ' een andere hash, en geen getekende herzegeling verklaart dat';
@@ -122,10 +127,15 @@ function maakOntvanger({ map, sleutel, publiek } = {}) {
     const fout = handtekeningGoed(blok, pin);
     if (fout) return { status: 400, error: fout };
     const herzegelingen = Array.isArray(lijf.herzegelingen) ? lijf.herzegelingen : [];
-    const terug = vorige ? terugGang(vorige.blok, blok, herzegelingen, blok.handtekening.publiek) : null;
+    const herstelverklaringen = Array.isArray(lijf.herstelverklaringen) ? lijf.herstelverklaringen : [];
+    if (!vorige && Object.values(blok.punten).some(p => p && tijdvak(p) !== 1))
+      return { status: 409, error: 'geweigerd: een lege ontvanger kan niet in een later tijdvak beginnen' };
+    const terug = vorige ? terugGang(vorige.blok, blok, herzegelingen, herstelverklaringen,
+      blok.handtekening.publiek, alles()) : null;
     if (terug) return { status: 409, error: 'geweigerd, geen teruggang: ' + terug };
     const regel = { ontvangen: new Date().toISOString(), blok };
     if (herzegelingen.length) regel.herzegelingen = herzegelingen;
+    if (herstelverklaringen.length) regel.herstelverklaringen = herstelverklaringen;
     const fd = fs.openSync(bestand, 'a', 0o600);           // ALLEEN bijschrijven
     try { fs.writeSync(fd, JSON.stringify(regel) + '\n'); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
     return { status: 200, ok: true, nr: alles().length };
@@ -156,7 +166,8 @@ function maakOntvanger({ map, sleutel, publiek } = {}) {
 
 if (require.main === module) {
   const o = maakOntvanger({ map: process.env.RTG_ANKER_MAP, sleutel: process.env.RTG_ANKERPOST_SLEUTEL || null,
-    publiek: process.env.RTG_ANKER_PUBLIEK || null });
+    publiek: process.env.RTG_ANKER_PUBLIEK || null,
+    herstelPubliek: process.env.RTG_ANKER_HERSTEL_PUBLIEK || null });
   const poort = Number(process.env.PORT || 8443);
   o.server.listen(poort, () => console.log('[ankerontvanger] luistert op ' + poort + ', bewaart in ' + o.bestand));
 }

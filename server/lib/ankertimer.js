@@ -80,7 +80,7 @@ async function eenRonde(ankerpost, log) {
     if (log && log.warn) log.warn('[anker] ' + reden);
     return staat.laatste;
   }
-  if (vergelijk.afgerekend) { staat.laatsteVergeleken = at(); auditwacht().wis('anker'); }
+  if (vergelijk.afgerekend) staat.laatsteVergeleken = at();
 
   /* Een vergelijking die alleen klopte DANKZIJ een herzegeling (een AVG-wissing
      sinds het vorige blok), brengt die herzegeling mee naar buiten: dan ligt
@@ -88,12 +88,19 @@ async function eenRonde(ankerpost, log) {
      waarom. */
   let uit;
   const mee = vergelijk.afgerekend && Array.isArray(vergelijk.herzegelingen) ? vergelijk.herzegelingen : [];
-  try { uit = await ankerpost.post(mee.length ? { herzegelingen: mee } : undefined); }
+  const herstel = vergelijk.afgerekend && Array.isArray(vergelijk.herstelverklaringen) ? vergelijk.herstelverklaringen : [];
+  const bijlage = {};
+  if (mee.length) bijlage.herzegelingen = mee;
+  if (herstel.length) bijlage.herstelverklaringen = herstel;
+  try { uit = await ankerpost.post(mee.length || herstel.length ? bijlage : undefined); }
   catch (e) { uit = { ok: false, reden: 'de ankerpost gooide: ' + (e && e.message || e) }; }
   staat.laatste = { at: at(), ok: !!uit.ok, inBedrijf: uit.inBedrijf !== false, vergeleken: !!vergelijk.afgerekend,
-    herzegeld: mee.map(r => r.id), reden: uit.ok ? null : (uit.reden || 'onbekend') };
-  if (uit.ok) staat.laatsteGeslaagd = staat.laatste.at;
-  else if (log && log.warn) log.warn('[anker] periodieke post mislukt: ' + staat.laatste.reden);
+    herzegeld: mee.map(r => r.id), auditbreuk: herstel.map(r => r.id), reden: uit.ok ? null : (uit.reden || 'onbekend') };
+  if (uit.ok) { staat.laatsteGeslaagd = staat.laatste.at; auditwacht().wis('anker'); }
+  else {
+    auditwacht().meld('anker', 'het gecontroleerde anker kon niet append-only worden weggebracht: ' + staat.laatste.reden, 'ankertimer');
+    if (log && log.warn) log.warn('[anker] periodieke post mislukt: ' + staat.laatste.reden);
+  }
   return staat.laatste;
 }
 

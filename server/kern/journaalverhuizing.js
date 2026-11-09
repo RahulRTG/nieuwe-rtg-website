@@ -18,6 +18,24 @@ function verhuisOude({ db, save, boek }) {
   if (!boek) return 0;
   const oud = db.data && db.data.doorgeefjournaal;
   if (!Array.isArray(oud) || !oud.length) return 0;
+  /* Het echte journaalbestand kan de hele collectie atomisch en idempotent
+     plaatsen. Dat is nodig zodra de lijst groter is dan zijn asynchrone
+     stapelgrens, en zodra meerdere serverprocessen tegelijk starten. Kleine
+     toetsdubbels zonder deze methode blijven via het oude, algemene contract
+     lopen. */
+  if (typeof boek.verhuisEenmalig === 'function') {
+    const uit = boek.verhuisEenmalig(oud);
+    if (!uit || !uit.ok || Number(uit.geschreven) !== oud.length) {
+      const reden = uit && uit.reden ? ', reden: ' + uit.reden : '';
+      console.warn('[journaal] verhuizing NIET voltooid (' + Number(uit && uit.geschreven || 0) + ' van ' +
+        oud.length + ' regels geschreven' + reden + '). De oude collectie blijft staan; er gaat niets verloren.');
+      return 0;
+    }
+    delete db.data.doorgeefjournaal;
+    try { save(); } catch (e) { console.warn('[journaal] het weghalen van de verhuisde collectie niet bewaard:', e && e.message); }
+    console.log('[journaal] ' + oud.length + ' bewaarde regels ' + (uit.reeds ? 'waren al verhuisd naar ' : 'verhuisd van de database naar ') + boek.stand().map);
+    return oud.length;
+  }
   let n = 0;
   for (const r of oud) if (boek.noteerRegel(r)) n++;
   /* EERST BEWIJZEN DAT HET GESCHREVEN IS, DAN PAS WEGGOOIEN. Hier stond

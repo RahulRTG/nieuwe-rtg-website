@@ -4242,3 +4242,18 @@ binnen IDOR en ROLPROEF**. Opgelost sinds vorige meting: **1 gedeelde
 bewijsveroudering**. Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt:
 **0**. Niet-uitgevoerde verplichte controles: **nieuwe BEVOEGD-samenstelling en
 daarna APPWERKT over alle acht dimensies**. Deep Green: **GEBLOKKEERD**.
+
+#### BEVOEGD definitief samengesteld
+
+De bevoegdheidsronde is op schone commit `2bee85c5af` opnieuw samengesteld uit
+de actuele IDOR-, ROLPROEF- en VOLTOOIPROEF-registers. Geen bron is verlopen en
+alle **114/114 appcontracten** hebben de status `BEWEZEN`. De negatieve 401- en
+403-antwoorden in de uitvoer zijn de vereiste weigeringen voor vreemde,
+anonieme of onvoldoende bevoegde contexten en zijn niet als functionele
+successen behandeld.
+
+**Afsluiting bevoegdheid.** Openstaande unieke oorzaken: **0 binnen de
+appautorisatie**. Opgelost sinds vorige meting: **1 gedeelde bronoorzaak, met
+vier daardoor gesloten apps**. Nieuwe regressies: **0**. Eerder verborgen
+fouten ontdekt: **0**. Niet-uitgevoerde verplichte controles: **APPWERKT over
+alle acht dimensies en EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.

@@ -4206,3 +4206,21 @@ vorige meting: **0**. Nieuwe regressies: **0**. Eerder verborgen fouten: **0**.
 Niet-uitgevoerde verplichte controles: **actuele IDOR- en ROLPROEF-rondes,
 daarna de nieuwe BEVOEGD- en APPWERKT-samenstelling**. Deep Green:
 **GEBLOKKEERD**.
+
+#### IDOR actuele integrale herkwalificatie
+
+De volledige IDOR-proef is uitgevoerd op schone commit `378ed0251c` met Node
+26.12.1. Het commitgebonden register onderzocht **2.627 routes** en meldt
+**1.124 aantoonbaar gescheiden routes, nul doorbraken en nul gegevenslekken**.
+Ook de afzonderlijke werkplek-, zaak-, werkruimte-, zware-pad-, passkey- en
+realtime-streamproeven sluiten zonder doorbraak. De twee 409-antwoorden in de
+wereldopbouw zijn verwachte domeinconflicten voor een reeds bestaand kringadres
+en een dubbele reservering; zij hebben geen autorisatie- of isolatiebewijs als
+geslaagd vervangen.
+
+**Meetstand na IDOR.** Openstaande unieke oorzaken: **1 gedeelde
+bevoegdheidsbron** (de rollenproef is nog vervallen). Opgelost sinds vorige
+meting: **de IDOR-helft van de gedeelde bewijsveroudering**. Nieuwe regressies:
+**0**. Eerder verborgen fouten ontdekt: **0**. Niet-uitgevoerde verplichte
+controles: **actuele ROLPROEF, daarna BEVOEGD- en APPWERKT-samenstelling**. Deep
+Green: **GEBLOKKEERD**.

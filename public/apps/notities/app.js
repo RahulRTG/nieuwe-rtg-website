@@ -93,7 +93,7 @@
     $('#bord').innerHTML = eigen.map(kaart).join('') ||
       '<p class="stil ds-dag-stil">' + (q ? window.RTGDailyCopy.text('noResults') : archief ? 'Het archief is leeg.' : window.RTGDailyCopy.text('emptyNotes')) + '</p>';
     var gedeeld = archief ? [] : (stand.gedeeld || []).filter(zeef);
-    $('#gedeeldKop').style.display = gedeeld.length ? '' : 'none';
+    $('#gedeeldKop').hidden = !gedeeld.length;
     $('#gedeeldBord').innerHTML = gedeeld.map(kaart).join('');
     Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function (el) {
       el.addEventListener('click', function () { toon(el.dataset.open); });
@@ -115,7 +115,6 @@
     this.textContent = archief ? 'Terug naar het bord' : 'Archief';
     teken();
   });
-
   /* ---- de editor ---- */
   var terugFocus = null;
   function openEditor() {
@@ -141,8 +140,8 @@
   }
   function vul() {
     $('#ntTitel').value = open.titel || '';
-    $('#ntTekstWrap').style.display = open.soort === 'notitie' ? '' : 'none';
-    $('#ntLijstWrap').style.display = open.soort === 'lijst' ? '' : 'none';
+    $('#ntTekstWrap').hidden = open.soort !== 'notitie';
+    $('#ntLijstWrap').hidden = open.soort !== 'lijst';
     $('#ntTekst').value = open.tekst || '';
     $('#ntDatum').value = open.herinnerOp || '';
     $('#ntTijd').value = open.herinnerTijd || '';

@@ -9641,7 +9641,7 @@
   // ---- meldingen ----
   function renderBell(){
     const unread = notifs.filter(n=>!n.read).length;
-    const b = $('#bellBadge'); b.style.display = unread>0?'flex':'none'; b.textContent = unread>9?'9+':unread;
+    const b = $('#bellBadge'); b.hidden = unread <= 0; b.textContent = unread>9?'9+':unread;
 /* de meldingenlijst van de zaak */
     $('#notifList').innerHTML = notifs.length ? notifs.map(n =>
       '<div class="notif-item'+(n.read?'':' unread')+'"><div class="ic">'+(window.RTGGlyf&&RTGGlyf.heeft(n.icon)?RTGGlyf.svgHTML(n.icon,{klasse:'gl-inline'}):(n.icon||'•'))+'</div><div class="tx"><b>'+n.title+'</b><span>'+n.body+'</span><time>'+timeAgo(n.at)+'</time></div></div>'

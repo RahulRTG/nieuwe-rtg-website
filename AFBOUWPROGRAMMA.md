@@ -4766,3 +4766,31 @@ gekopieerde Edge-actie**. Niet-uitgevoerde verplichte controles:
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Alle vaste zichtbaarheid gebruikt één semantisch toestandscontract
+
+De laatste 22 inline markup-attributen zijn verwijderd. Vijftien schermen
+gebruiken nu native `hidden`; legacyhosts krijgen via de bestaande centrale
+`presentatierol` uitsluitend een cascadegrendel en DS-schermen blijven hun
+eigen reset gebruiken. Notities, Leverancier, Scanner, drie overheidsbalies,
+Podium, Galerij, Handel, Vertaler en vijf Foundation-schermen schrijven geen
+`style.display` meer voor deze toestanden. De zichtbare layout blijft van de
+app-eigen componenten.
+
+De broncontractproef sluit **7/7** en controleert alle betrokken
+begintoestanden en gedragsbronnen. De gerichte browserreeks sluit **15/15**
+voor Galerij, Handel, mediarechten, Notities, overheidsgrenzen, Geldschool,
+Foundation-deuren, Scanner en Vertaler. De platformmeter telt nu **0 inline
+markup-attributen over 0 bestanden**. Design System meldt nul schendingen en
+87 gemigreerde schermen.
+
+**Afsluiting markup-toestand.** Openstaande unieke oorzaken: **dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **22
+toestandsattributen en de bijbehorende lokale `style.display`-schrijvers**.
+Nieuwe regressies: **0 in de gerichte bron- en browserproeven**. Eerder
+verborgen fouten ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte
+controles: **APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

@@ -66,6 +66,7 @@
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -79,7 +80,7 @@
   <div class="kaart saldo">
     <div class="b" id="saldo">€ 0,00</div>
     <small>vrij in je potje</small>
-    <div class="mini" id="week" style="display:none;margin-top:0.5rem;"></div>
+    <div class="mini ds-presentatie-toestand ds-presentatie-boven-half" id="week" hidden></div>
   </div>
 
   <div class="deel">Boeken</div>
@@ -163,7 +164,7 @@ function toon(d){
   potje = d;
   $('#saldo').textContent = euro(d.saldoCenten);
   // weekgeld (de geldschool): komt er elke week vanzelf bij, zonder timer-fratsen
-  $('#week').style.display = d.weekgeldCenten ? '' : 'none';
+  $('#week').hidden = !d.weekgeldCenten;
   if (d.weekgeldCenten) $('#week').textContent = 'Je krijgt ' + euro(d.weekgeldCenten) + ' per week; dat komt er elke week vanzelf bij.';
   $('#doelen').innerHTML = d.doelen.length ? d.doelen.map(x => {
     const pct = Math.min(100, Math.round(100 * x.gespaard / x.doelCenten));

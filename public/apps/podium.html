@@ -181,7 +181,7 @@
     <button class="knop" id="terugZaal2" type="button">← Terug naar de zaal</button>
     <div class="scherm h-mt70">
       <video id="studioVideo" autoplay playsinline muted></video>
-      <div class="over"><span class="liveDot" id="studioLiveDot" style="display:none;">Live</span></div>
+      <div class="over"><span class="liveDot ds-presentatie-toestand" id="studioLiveDot" hidden>Live</span></div>
       <span class="tel" id="studioTel"></span>
     </div>
     <div class="rij">
@@ -591,7 +591,7 @@
     $('#studioKnop').textContent = studioLive ? 'Stop de uitzending' : 'Ga live';
     $('#studioKnop').classList.toggle('vol', !studioLive);
     $('#studioKnop').classList.toggle('rood', studioLive);
-    $('#studioLiveDot').style.display = studioLive ? '' : 'none';
+    $('#studioLiveDot').hidden = !studioLive;
   }
   async function studioSchakel() {
     const abbAan = $('#studioAbb').getAttribute('aria-pressed') === 'true';

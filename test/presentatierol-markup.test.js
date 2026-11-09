@@ -114,3 +114,51 @@ test('de laatste tien vaste presentatiestijlen komen uit het Design System', () 
   const bron = gevallen.map(([bestand]) => lees(bestand)).join('\n');
   for (const patroon of statischePresentatie) assert.doesNotMatch(bron, patroon);
 });
+
+test('alle vaste markup gebruikt native zichtbaarheid in plaats van style.display', () => {
+  const schermen = new Map([
+    ['public/apps/notities.html', ['gedeeldKop', 'ntLijstWrap']],
+    ['public/apps/leverancier.html', ['bellBadge']],
+    ['public/apps/scanner.html', ['cameraStop', 'bewaarRij']],
+    ['public/apps/gemeentepda.html', ['rahulFab']],
+    ['public/apps/podium.html', ['studioLiveDot']],
+    ['public/apps/galerij.html', ['terugblikWrap', 'albumPad', 'albums']],
+    ['public/apps/gemeenteloket.html', ['rahulFab']],
+    ['public/apps/rijksloket.html', ['rahulFab']],
+    ['public/apps/handel.html', ['hZaak', 'hPrijs']],
+    ['public/apps/vertaler.html', ['bewaardKop', 'histKop']],
+    ['public/apps/foundation/keuken.html', ['bOpruim']],
+    ['public/apps/foundation/klusjes.html', ['geldBlok', 'maakBlok']],
+    ['public/apps/foundation/schrift.html', ['tekentools']],
+    ['public/apps/foundation/zakgeld.html', ['week']],
+    ['public/apps/foundation/ochtend.html', ['kinderenBlok']]
+  ]);
+  for (const [bestand, ids] of schermen) {
+    const html = lees(bestand);
+    const markup = html.replace(/<script\b[\s\S]*?<\/script>/gi, '');
+    assert.doesNotMatch(markup, /<[a-z][^>]*\sstyle=/i, bestand);
+    for (const id of ids) {
+      assert.match(markup, new RegExp('id="' + id + '"[^>]*hidden|hidden[^>]*id="' + id + '"'),
+        bestand + ': ' + id + ' begint veilig verborgen');
+    }
+    if (bestand !== 'public/apps/notities.html') {
+      assert.match(html, /\/ds\/componenten\/presentatierol\.css/, bestand);
+    }
+  }
+
+  const gedrag = [
+    'public/apps/notities/app/app-01.js', 'public/apps/notities/app/app-02.js',
+    'public/apps/leverancier/leverancier-83.js', 'public/apps/scanner/app.js',
+    'public/apps/gemeentepda.html', 'public/apps/podium.html',
+    'public/apps/galerij/app.js', 'public/apps/gemeenteloket.html',
+    'public/apps/rijksloket.html', 'public/apps/handel-aanvraag.js',
+    'public/apps/vertaler/app.js', 'public/apps/foundation/keuken.html',
+    'public/apps/foundation/klusjes.html', 'public/apps/foundation/schrift.html',
+    'public/apps/foundation/zakgeld.html', 'public/apps/foundation/ochtend.html'
+  ].map(lees).join('\n');
+  const ids = Array.from(new Set(Array.from(schermen.values()).flat().concat(['ntTekstWrap', 'tijdlijn', 'hGenre'])));
+  for (const id of ids) {
+    assert.doesNotMatch(gedrag, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"), id);
+    assert.doesNotMatch(gedrag, new RegExp("getElementById\\('#" + id + "'\\)\\.style\\.display"), id);
+  }
+});

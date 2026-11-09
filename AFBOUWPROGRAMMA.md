@@ -4275,3 +4275,23 @@ bedieningsroute en de gedeelde autorisatieveroudering**. Nieuwe regressies:
 **0**. Eerder verborgen fouten ontdekt: **0 aanvullend**. Niet-uitgevoerde
 verplichte controles: **EXPERIENCEWERKT, operationele releasepoorten en twee
 onafhankelijke integrale eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### EXPERIENCEWERKT actuele nulmeting
+
+Na APPWERKT 114/114 is het bestaande Experience-register opnieuw uit de
+actuele inventaris afgeleid. De compiler is geldig en de noemer blijft volledig
+op **114 logische apps en 316 fysieke schermen**. De bewijsstand is eerlijk nog
+**0/114 apps, 0/316 schermen en 0/3.360 toepasselijke dimensiecontracten**.
+Slechts één app-signature bestaat en is door de vernieuwde APPWERKT-noemer
+geblokkeerd; 113 apps missen een signature. Tien schermsignatures zijn
+gedeclareerd en 306 ontbreken. Alle acht releasekwalificatiepoorten staan op
+`NOT_TESTED`.
+
+**Meetstand Experience.** Openstaande unieke oorzaken: **drie gedeelde
+contractgroepen**: ontbrekende app-signatures, ontbrekende schermsignatures en
+ontbrekend commitgebonden Experience-bewijs. Opgelost sinds vorige meting:
+**0 binnen Experience**. Nieuwe regressies: **0**. Eerder verborgen fouten
+ontdekt: **de bestaande Juridisch-appsignature volgt de actuele
+APPWERKT-interactienoemer niet meer volledig**. Niet-uitgevoerde verplichte
+controles: **alle objectieve en menselijke Experience-proeven en de acht
+releasekwalificatiepoorten**. Deep Green: **GEBLOKKEERD**.

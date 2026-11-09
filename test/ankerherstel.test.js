@@ -86,3 +86,15 @@ test('de handmatige bediening houdt de private sleutel buiten app en verklaring'
   assert.throws(() => cli.teken(dossierPad, uit, { RTG_ANKER_HERSTEL_SIGN_KEY_FILE: prive }), /exist|bestaat|EEXIST/i,
     'een verklaring wordt niet overschreven');
 });
+
+test('eenmalig tekenen bewaart alleen publiek en verklaring, nooit een private sleutel', () => {
+  const cli = require('../scripts/ankerherstel');
+  const basis = path.join(tmp, 'eenmalig'); fs.mkdirSync(basis);
+  const dossierPad = path.join(basis, 'dossier.json'), verklaring = path.join(basis, 'verklaring.json');
+  const publiek = path.join(basis, 'publiek.b64'); fs.writeFileSync(dossierPad, JSON.stringify(dossier()));
+  const r = cli.tekenEenmalig(dossierPad, verklaring, publiek);
+  assert.equal(r.priveBewaard, false);
+  assert.deepEqual(fs.readdirSync(basis).sort(), ['dossier.json', 'publiek.b64', 'verklaring.json']);
+  assert.equal(cli.controleer(verklaring, { RTG_ANKER_HERSTEL_PUBLIEK_BESTAND: publiek }).geldig, true);
+  assert.throws(() => cli.tekenEenmalig(dossierPad, verklaring, publiek), /exist|bestaat|EEXIST/i);
+});

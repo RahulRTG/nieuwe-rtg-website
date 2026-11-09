@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3159 bestanden en 21133 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3159 bestanden en 21134 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3159 |
-| losse beweringen (`test(...)`) | 21133 |
+| losse beweringen (`test(...)`) | 21134 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 518 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2944 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2726 bestanden, 20321 beweringen.
+2726 bestanden, 20322 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -129,7 +129,7 @@ toets omvalt.
 | `alpine.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Alpine: het wintersport- en seizoensresort (demo Val d'Aurora). Bewaakt de pistes en liften, de lawineregel (alleen de berggids zet het niveau, en vanaf 4 gaan de zwarte pistes dicht en blijven ze dicht),... |
 | `ankerdienst-echt.test.js` | 5 | gezakt op `liegpoort /api/` | DE ANKERDIENST OP EEN ECHTE SERVER. test/ankerdienst.test.js toetst de regels; dit toetst dat de dienst ook werkelijk aan de journalen hangt die er in productie zijn. |
 | `ankerdienst.test.js` | 13 | gezakt op `===->!==#0` | DE ANKERDIENST -- het ene getal dat naar buiten moet. De hashketen ziet gesleutel MIDDEN in een spoor. |
-| `ankerherstel.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `ankerherstel.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ankerherzegel-echt.test.js` | 1 | gezakt op `liegpoort /api/` | DE HERZEGELING OP EEN ECHTE SERVER: /api/privacy/delete legt het externe anker niet stil. test/ankerherzegel.test.js toetst de regels op een los journaal; dit toetst dat de wissing in kern/vergeten.js ze werkelijk... |
 | `ankerherzegel-takken.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | DE HERZEGELING ALS ZUIVERE REKENING (server/lib/ankerherzegel.js). Naast test/ankerherzegel.test.js (die het geheel met een echte ankerdienst en ontvanger draait) houdt dit bestand elke weigertak van plan,... |
 | `ankerherzegel.test.js` | 10 | gezakt op `voorwaarde-omkeren#0` | DE HERZEGELING: een AVG-wissing legt het externe anker niet meer stil, en een vervalsing blijft een alarm (server/lib/ankerherzegel.js). De drie beweringen, elk met zijn tegenproef: 1. |

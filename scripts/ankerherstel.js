@@ -10,6 +10,11 @@
      uit RTG_ANKER_HERSTEL_SIGN_KEY_FILE; niet uit een argument of de database.
      Het doelbestand moet nog niet bestaan.
 
+   teken-eenmalig DOSSIER.json VERKLARING.json PUBLIEK.txt
+     Genereert de aparte sleutel uitsluitend in procesgeheugen. Alleen de
+     publieke sleutel en verklaring worden bewaard; de private helft wordt
+     nooit geexporteerd en kan dus geen tweede overgang tekenen.
+
    controleer VERKLARING.json
      Toetst met RTG_ANKER_HERSTEL_PUBLIEK of
      RTG_ANKER_HERSTEL_PUBLIEK_BESTAND.
@@ -47,6 +52,21 @@ function teken(dossierPad, uitPad, env = process.env) {
     vanTijdvak: herstel.tijdvakVan(verklaring.van), tijdvak: herstel.tijdvakVan(verklaring.naar), uit: uitPad };
 }
 
+function tekenEenmalig(dossierPad, uitPad, publiekPad) {
+  if (!dossierPad || !uitPad || !publiekPad)
+    throw new Error('gebruik: ankerherstel teken-eenmalig DOSSIER.json VERKLARING.json PUBLIEK.txt');
+  const dossier = JSON.parse(fs.readFileSync(dossierPad, 'utf8'));
+  const paar = crypto.generateKeyPairSync('ed25519');
+  const verklaring = herstel.teken(dossier, paar.privateKey);
+  const publiek = paar.publicKey.export({ type: 'spki', format: 'der' }).subarray(-32).toString('base64') + '\n';
+  schrijfNieuw(publiekPad, publiek, 0o444);
+  try { schrijfNieuw(uitPad, JSON.stringify(verklaring, null, 2) + '\n', 0o444); }
+  catch (e) { try { fs.unlinkSync(publiekPad); } catch {} throw e; }
+  return { getekend: true, eenmalig: true, priveBewaard: false, id: verklaring.id,
+    journaal: verklaring.journaal, vanTijdvak: herstel.tijdvakVan(verklaring.van),
+    tijdvak: herstel.tijdvakVan(verklaring.naar), uit: uitPad, publiek: publiekPad };
+}
+
 function controleer(pad, env = process.env) {
   if (!pad) throw new Error('gebruik: ankerherstel controleer VERKLARING.json');
   const verklaring = JSON.parse(fs.readFileSync(pad, 'utf8'));
@@ -54,10 +74,11 @@ function controleer(pad, env = process.env) {
 }
 
 function main() {
-  const [cmd, a, b] = process.argv.slice(2);
+  const [cmd, a, b, c] = process.argv.slice(2);
   let uit;
   if (cmd === 'sleutel') uit = sleutel(a, b);
   else if (cmd === 'teken') uit = teken(a, b);
+  else if (cmd === 'teken-eenmalig') uit = tekenEenmalig(a, b, c);
   else if (cmd === 'controleer') uit = controleer(a);
   else throw new Error('gebruik: ankerherstel <sleutel|teken|controleer> ...');
   console.log(JSON.stringify(uit));
@@ -68,4 +89,4 @@ if (require.main === module) {
   try { main(); } catch (e) { console.error(JSON.stringify({ fout: String(e && e.message || e).slice(0, 300) })); process.exitCode = 1; }
 }
 
-module.exports = { sleutel, teken, controleer };
+module.exports = { sleutel, teken, tekenEenmalig, controleer };

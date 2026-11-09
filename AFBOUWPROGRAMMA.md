@@ -4624,3 +4624,35 @@ browserproeven**. Eerder verborgen fouten ontdekt: **geen aanvullende**.
 Niet-uitgevoerde verplichte controles: **de volledige platformkwalificatie,
 menselijke Experience-beoordeling, operationele releasepoorten en twee
 onafhankelijke eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Backoffice, Foundation Agenda en RTG iD delen centrale toestandsrollen
+
+De live-indicator, tijdlijnpaginering en SOS-videolaag van Backoffice gebruiken
+nu de bestaande `h-weg`-toestand plus centrale presentatierollen. De
+Backoffice-bundel is opnieuw uit zijn bestaande gesplitste bronnen gebouwd.
+Foundation Agenda gebruikt dezelfde toestand voor bevoegd nieuw maken,
+schoolpunten en verwijderen; zijn notitieveld hergebruikt de bestaande
+veldmaat. RTG iD gebruikt dezelfde toestand voor de koppelkaart, namens-keuze
+en passkey-aanmaak. De identiteits- en autorisatiebeslissingen zelf zijn niet
+verplaatst of verdubbeld.
+
+De platformnoemer daalde van **60 naar 48** inline markup-attributen en van
+**32 naar 29** HTML-bestanden; presentatie daalde van 29 naar 26 en toestand
+van 31 naar 22. De gerichte bron-, architectuur- en laadgraafproeven sluiten
+**94/94**. De echte Agenda-browserproef sluit **1/1**; de twee echte
+Backoffice-scenario's sluiten **2/2**; de RTG iD-credential- en
+idempotentiecontracten sluiten **7/7**. Design System meldt nul schendingen en
+87 gemigreerde schermen. Het Experience-register blijft exact 114 apps en 316
+schermen afleiden.
+
+**Afsluiting gedeelde toestandsrollen.** Openstaande unieke oorzaken:
+**48 inline markup-attributen in 29 bestanden, dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **12
+markup-attributen en hun gekoppelde zichtbaarheidslogica in drie
+beveiligingsgevoelige schermen**. Nieuwe regressies: **0 in 104 gerichte bron-,
+browser- en contractproeven**. Eerder verborgen fouten ontdekt: **geen
+aanvullende**. Niet-uitgevoerde verplichte controles: **de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

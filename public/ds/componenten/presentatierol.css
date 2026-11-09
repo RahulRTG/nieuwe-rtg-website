@@ -44,4 +44,9 @@
   .ds-presentatie-studio-label:not(#_#_#_) { color: var(--zacht); font-size: .8rem; }
   .ds-presentatie-studio-kleuren:not(#_#_#_) { display: flex; gap: .4rem; }
   .ds-presentatie-studio-stuur:not(#_#_#_) { inline-size: 100%; margin-block-start: .5rem; }
+  .ds-presentatie-paginering:not(#_#_#_) { display: flex; align-items: center; justify-content: center; gap: .9rem; padding: .7rem; border-block-start: 1px solid var(--line, var(--ds-glasrand)); }
+  .ds-presentatie-noodlaag:not(#_#_#_) { display: flex; position: fixed; inset: 0; background: color-mix(in srgb, var(--ds-cover-grond) 85%, transparent); z-index: 60; align-items: center; justify-content: center; }
+  .ds-presentatie-media-vol:not(#_#_#_) { inline-size: 100%; border-radius: 0; background: var(--ds-cover-grond); }
+  .ds-presentatie-schooluitleg:not(#_#_#_) { color: var(--rtg-leesgoud, var(--ds-accent)); font-size: .85rem; }
+  .ds-presentatie-koppelkaart:not(#_#_#_) { margin-block-start: .5rem; border-block-start: 1px solid var(--line, var(--ds-glasrand)); padding-block-start: .6rem; }
 }

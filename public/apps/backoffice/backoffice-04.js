@@ -17,7 +17,7 @@
         '<div class="s-dkemdj"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
     const pager = $('#tlPager');
-    pager.style.display = tl.pages > 1 ? 'flex' : 'none';
+    pager.classList.toggle('h-weg', tl.pages <= 1);
     $('#tlWaar').textContent = T('bo.pagina','Pagina') + ' ' + tl.page + ' / ' + tl.pages;
     $('#tlPrev').disabled = tl.page <= 1;
     $('#tlNext').disabled = tl.page >= tl.pages;
@@ -116,4 +116,3 @@
   instellingKnop();
 
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
-

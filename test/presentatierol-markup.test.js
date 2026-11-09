@@ -26,3 +26,24 @@ test('Clips gebruikt de centrale presentatierollen voor alle vaste actierijen', 
   assert.equal((html.match(/class="ds-presentatie-actierij"/g) || []).length, 2);
   assert.equal((html.match(/class="ds-presentatie-keuzerij(?: h-mt50)?"/g) || []).length, 3);
 });
+
+test('Backoffice, Foundation Agenda en RTG iD delen presentatie en zichtbaarheid', () => {
+  for (const bestand of ['public/apps/backoffice.html', 'public/apps/foundation/agenda.html', 'public/apps/rtgid.html']) {
+    const html = lees(bestand);
+    assert.doesNotMatch(html, /<[a-z][^>]*\sstyle=/i, bestand);
+    assert.match(html, /\/ds\/componenten\/presentatierol\.css/, bestand);
+  }
+  const backoffice = ['backoffice-01.js', 'backoffice-03.js', 'backoffice-04.js']
+    .map(naam => lees('public/apps/backoffice/' + naam)).join('\n');
+  for (const id of ['liveInd', 'tlPager', 'ontLiveScrim']) {
+    assert.doesNotMatch(backoffice, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));
+  }
+  const agenda = lees('public/apps/foundation/agenda.html');
+  for (const id of ['nieuwKnop', 'afSchool', 'afWeg']) {
+    assert.doesNotMatch(agenda, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));
+  }
+  const rtgid = lees('public/apps/rtgid.html');
+  for (const id of ['koppelKaart', 'kNamens', 'kMaak']) {
+    assert.doesNotMatch(rtgid, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));
+  }
+});

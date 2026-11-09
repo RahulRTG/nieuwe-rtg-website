@@ -7,10 +7,10 @@
     $('#ontLiveNaam').textContent = '' + naam;
     $('#ontLiveStatus').textContent = T('bo.ontwacht','Wachten op het camerabeeld van het lid…');
     $('#ontLiveVid').srcObject = null;
-    $('#ontLiveScrim').style.display = 'flex';
+    $('#ontLiveScrim').classList.remove('h-weg');
   }
   function ontLiveSluit(){
-    $('#ontLiveScrim').style.display = 'none';
+    $('#ontLiveScrim').classList.add('h-weg');
     const baan = $('#ontLiveTekst');
     if (baan){ baan.hidden = true; while (baan.firstChild) baan.removeChild(baan.firstChild); }
     if (ontPc){ try { ontPc.close(); } catch(e){} ontPc = null; }
@@ -21,7 +21,7 @@
     // een nieuw aanbod: open het scherm als dat nog niet openstaat
     if (d.payload.sdp && d.payload.sdp.type === 'offer'){
       ontLiveDate = d.dateId;
-      if ($('#ontLiveScrim').style.display !== 'flex'){ $('#ontLiveNaam').textContent = '' + (d.codenaam||'SOS'); $('#ontLiveScrim').style.display = 'flex'; }
+      if ($('#ontLiveScrim').classList.contains('h-weg')){ $('#ontLiveNaam').textContent = '' + (d.codenaam||'SOS'); $('#ontLiveScrim').classList.remove('h-weg'); }
       await ontHaalIce();
       if (ontPc){ try { ontPc.close(); } catch(e){} }
       ontPc = new RTCPeerConnection({ iceServers: ontIce || [{ urls:'stun:stun.l.google.com:19302' }] });

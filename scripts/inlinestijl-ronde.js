@@ -135,10 +135,10 @@ function rondeVoor(webpad) {
 const paginas = losse.length ? losse.map(p => (p.startsWith('/') ? p : '/' + p)) : allePaginas();
 
 if (TOON) {
-  let tot = 0, alle = 0, toestanden = 0, presentatie = 0, bestanden = 0; const rijen = [];
+  let tot = 0, alle = 0, toestanden = 0, presentatie = 0, bestanden = 0; const rijen = [], schuld = [];
   for (const p of paginas) {
     const m = meting(p);
-    if (m.alle) bestanden++;
+    if (m.alle) { bestanden++; schuld.push([p, m.alle, m.presentatie, m.toestanden]); }
     alle += m.alle; toestanden += m.toestanden; presentatie += m.presentatie;
     if (m.winst) { rijen.push([p, m.winst]); tot += m.winst; }
   }
@@ -146,6 +146,12 @@ if (TOON) {
   console.log('\nWERKELIJKE MARKUP: ' + alle + ' style-attributen over ' + bestanden + ' bestanden' +
     ' (' + presentatie + ' presentatie, ' + toestanden + ' toestand)');
   console.log('AUTOMATISCH TE CONSOLIDEREN: ' + tot + ' attributen over ' + rijen.length + ' bestanden\n');
+  schuld.sort((a, b) => b[1] - a[1]);
+  for (const [p, a, pr, t] of schuld.slice(0, 20)) {
+    console.log(String(a).padStart(5) + '  ' + p + '  (' + pr + ' presentatie, ' + t + ' toestand)');
+  }
+  if (schuld.length > 20) console.log('  ... en nog ' + (schuld.length - 20) + ' bestanden met werkelijke markupschuld');
+  if (rijen.length) console.log('\nAUTOMATISCHE KANDIDATEN');
   for (const [p, w] of rijen.slice(0, 20)) console.log(String(w).padStart(5) + '  ' + p);
   if (rijen.length > 20) console.log('  ... en nog ' + (rijen.length - 20) + ' bestanden');
   process.exit(0);

@@ -26,7 +26,7 @@
   }
   function renderMarinaPda(){
     const tabBtn = document.getElementById('tabMarina');
-    if (tabBtn) tabBtn.style.display = heeftMarina() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftMarina());
     const wrap = $('#marinaPdaWrap'); if (!wrap) return;
     if (!heeftMarina()){ wrap.innerHTML = ''; return; }
     if (!pdMar){ wrap.innerHTML = '<div class="card">…</div>'; laadMarinaPda(); return; }
@@ -78,7 +78,7 @@
   }
   function renderPolisPda(){
     const tabBtn = document.getElementById('tabPolis');
-    if (tabBtn) tabBtn.style.display = heeftPolis() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftPolis());
     const wrap = $('#polisPdaWrap'); if (!wrap) return;
     if (!heeftPolis()){ wrap.innerHTML = ''; return; }
     if (!pdPol || !pdPolZorg){ wrap.innerHTML = '<div class="card">…</div>'; laadPolisPda(); return; }

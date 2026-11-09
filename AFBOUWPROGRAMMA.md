@@ -4472,3 +4472,45 @@ automatische-winsttelling gerapporteerd**. Niet-uitgevoerde verplichte
 controles: **de volledige platformkwalificatie, menselijke Experience-
 beoordeling, operationele releasepoorten en twee onafhankelijke eindruns**.
 Deep Green: **GEBLOKKEERD**.
+
+#### Personeelsmodulepresentatie geconsolideerd; statische noemer verder verlaagd
+
+De vijftien conditionele module-tabs van de personeels-PDA begonnen allemaal
+met een lokaal `style="display:none"`-attribuut en twaalf bronbestanden
+schreven daarna rechtstreeks naar `style.display`. De bestaande centrale
+`h-weg`-toestand is nu de enige presentatieowner: alle tabs beginnen met die
+klasse en de bestaande modulelogica wisselt haar via `classList`. Er is geen
+nieuwe component, controller of tweede toestandsmachine toegevoegd. De
+servergestuurde modulelijst en alle bestaande modulevoorwaarden zijn behouden.
+
+De werkelijke platformnoemer daalde daarmee van **111 naar 96** inline
+markup-attributen en van **37 naar 36** HTML-bestanden. De verbeterde
+afbouwmeter toont voortaan ook de twintig grootste werkelijke schuldbronnen,
+ook wanneer geen attribuut automatisch samenvoegbaar is. Daardoor blijft de
+resterende schuld zichtbaar in plaats van achter een nul voor automatische
+kandidaten te verdwijnen.
+
+De personeelscontracten en bronregressies sluiten **21/21**. De echte
+Chromiumproef sluit **4/4** volledige PDA-scenario's, inclusief Team Room,
+taalbediening, pauze, gastafhandeling en behoud van lokale concepten. De
+Design System-controle meldt nul schendingen en 87 gemigreerde schermen;
+Heritage blijft exact 296 schermen en 20 redirects classificeren en het
+Experience-register blijft exact 114 apps en 316 schermen afleiden. De brede
+statische controle bracht vijf reeds aanwezige coherentieafwijkingen tegelijk
+in beeld; architectuurkaart, bewijsdocument, functielijst en taalbewijs zijn
+daarom als een registergroep opnieuw uit hun bestaande bronnen opgebouwd. De
+Code Architect-uitvoer gebruikt weer de geldende huisstijl zonder zijn
+Proof-Envelope-contract te wijzigen.
+
+**Afsluiting personeelsmodulepresentatie.** Openstaande unieke oorzaken:
+**96 inline markup-attributen in 36 bestanden, dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **15
+toestandsattributen, 15 inline toestandsschrijvers en 5 registercoherentie-
+afwijkingen**. Nieuwe regressies: **0 in de gerichte bron- en browserproeven**.
+Eerder verborgen fouten ontdekt: **de schuldmeter rangschikte alleen
+automatisch samenvoegbare kandidaten en toonde daardoor de grootste werkelijke
+schuldbronnen niet**. Niet-uitgevoerde verplichte controles: **de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

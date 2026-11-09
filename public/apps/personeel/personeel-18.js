@@ -76,7 +76,7 @@
   function winkelInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" class="s-nk8io2">'; }
   function renderWinkel(){
     const tabBtn = document.getElementById('tabWinkel');
-    if (tabBtn) tabBtn.style.display = heeftRetail() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftRetail());
     const wrap = $('#winkelWrap');
     if (!wrap) return;
     if (!heeftRetail()){ wrap.innerHTML = ''; return; }

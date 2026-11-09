@@ -68,7 +68,7 @@ function main() {
     });
     if (json) console.log(JSON.stringify(envelope, null, 1));
     else {
-      console.log('\nPROOF ENVELOPE ' + envelope.task.id + ' — ' + envelope.validity.status + '\n');
+      console.log('\nPROOF ENVELOPE ' + envelope.task.id + ': ' + envelope.validity.status + '\n');
       console.log('  commit      ' + envelope.git.headCommit);
       console.log('  agent       ' + envelope.task.agent);
       console.log('  onderwerp   ' + envelope.task.subject);

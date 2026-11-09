@@ -44,6 +44,19 @@ test('Team Room blijft warm, menselijk en verbonden met de volledige PDA', () =>
   for (const tab of ['taken', 'rooster', 'hulp']) assert.match(html, new RegExp('data-trm-diep="' + tab + '"'));
 });
 
+test('module-tabs gebruiken de gedeelde verborgen toestand zonder inline presentatie', () => {
+  const ids = ['tabKeuken', 'tabKamers', 'tabRitten', 'tabEntree', 'tabWinkel', 'tabVaart',
+    'tabVerkoop', 'tabBevPda', 'tabBezorgen', 'tabBoer', 'tabGebouw', 'tabMarina', 'tabPolis',
+    'tabZorgbalie', 'tabMeldkamer'];
+  for (const id of ids) {
+    assert.match(html, new RegExp('id="' + id + '" class="h-weg"'), id + ' begint centraal verborgen');
+  }
+  assert.doesNotMatch(html, /id="(?:tabKeuken|tabKamers|tabRitten|tabEntree|tabWinkel|tabVaart|tabVerkoop|tabBevPda|tabBezorgen|tabBoer|tabGebouw|tabMarina|tabPolis|tabZorgbalie|tabMeldkamer)"[^>]*style=/,
+    'module-tabs dragen geen inline presentatie');
+  assert.doesNotMatch(kern, /tabBtn\.style\.display/,
+    'de modulewerking wisselt de gedeelde toestandklasse en injecteert geen presentatie');
+});
+
 test('de nieuwe Team Room-modules blijven klein', () => {
   for (const bestand of ['public/apps/personeel-voorzijde.js', 'public/apps/personeel-voorzijde-weergave.js',
     'public/apps/personeel-voorzijde-team.js', 'public/shared/rtg-team-room-2026.css',

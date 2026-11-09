@@ -85,7 +85,7 @@
   }
   function renderGebouwPda(){
     const tabBtn = document.getElementById('tabGebouw');
-    if (tabBtn) tabBtn.style.display = heeftGebouw() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftGebouw());
     const wrap = $('#gebouwPdaWrap'); if (!wrap) return;
     if (!heeftGebouw()){ wrap.innerHTML = ''; return; }
     if (!pdGeb){ wrap.innerHTML = '<div class="card">…</div>'; laadGebouwPda(); return; }
@@ -140,7 +140,7 @@
   }
   function renderMarinaPda(){
     const tabBtn = document.getElementById('tabMarina');
-    if (tabBtn) tabBtn.style.display = heeftMarina() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftMarina());
     const wrap = $('#marinaPdaWrap'); if (!wrap) return;
     if (!heeftMarina()){ wrap.innerHTML = ''; return; }
     if (!pdMar){ wrap.innerHTML = '<div class="card">…</div>'; laadMarinaPda(); return; }
@@ -192,7 +192,7 @@
   }
   function renderPolisPda(){
     const tabBtn = document.getElementById('tabPolis');
-    if (tabBtn) tabBtn.style.display = heeftPolis() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftPolis());
     const wrap = $('#polisPdaWrap'); if (!wrap) return;
     if (!heeftPolis()){ wrap.innerHTML = ''; return; }
     if (!pdPol || !pdPolZorg){ wrap.innerHTML = '<div class="card">…</div>'; laadPolisPda(); return; }
@@ -1330,7 +1330,7 @@
     const aan = heeftKamers() || heeftOpdrachten() || heeftClubdorp();
     const tabNaam = heeftKamers() ? T('pd.t.kamers','Kamers') : heeftClubdorp() ? T('pd.t.dorp','Afdelingen') : T('pd.t.opdr','Opdrachten');
     if (tabBtn){
-      tabBtn.style.display = aan ? '' : 'none';
+      tabBtn.classList.toggle('h-weg', !aan);
       const lbl = tabBtn.querySelector('span');
       if (lbl) lbl.textContent = tabNaam;
     }
@@ -1908,7 +1908,7 @@
   function renderRitten(){
     const aan = heeftRitten();
     const tabBtn = document.getElementById('tabRitten');
-    if (tabBtn) tabBtn.style.display = aan ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !aan);
     const wrap = $('#rittenWrap');
     if (!aan){ if (wrap) wrap.innerHTML = ''; return; }
     const jet = state.supplier && state.supplier.type === 'jet';
@@ -2005,7 +2005,7 @@
   const voertuig = () => { try { return localStorage.getItem('pd_voertuig') || 'auto'; } catch(e){ return 'auto'; } };
   function renderBezorgen(){
     const tabBtn = document.getElementById('tabBezorgen');
-    if (tabBtn) tabBtn.style.display = heeftBezorg() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftBezorg());
     const wrap = $('#bezorgenWrap');
     if (!wrap) return;
     if (!heeftBezorg()){ wrap.innerHTML = ''; return; }
@@ -2370,7 +2370,7 @@
   }
   function renderKeuken(){
     const tabBtn = document.getElementById('tabKeuken');
-    if (tabBtn) tabBtn.style.display = (heeftKeuken() || heeftBar()) ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !(heeftKeuken() || heeftBar()));
     const wrap = $('#keukenWrap'); if (!wrap) return;
     if (!heeftKeuken() && !heeftBar()){ wrap.innerHTML = ''; return; }
     // een pure bar of club heeft alleen de barkant; stuur de keuze daarheen
@@ -2553,7 +2553,7 @@
   function winkelInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" class="s-nk8io2">'; }
   function renderWinkel(){
     const tabBtn = document.getElementById('tabWinkel');
-    if (tabBtn) tabBtn.style.display = heeftRetail() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftRetail());
     const wrap = $('#winkelWrap');
     if (!wrap) return;
     if (!heeftRetail()){ wrap.innerHTML = ''; return; }
@@ -2681,7 +2681,7 @@
   function boerPdaToe(r){ if (r && r.overzicht) pdBoer = r.overzicht; renderBoer(); }
   function renderBoer(){
     const tabBtn = document.getElementById('tabBoer');
-    if (tabBtn) tabBtn.style.display = heeftBoer() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftBoer());
     const wrap = $('#boerPdaWrap'); if (!wrap) return;
     if (!heeftBoer()){ wrap.innerHTML = ''; return; }
     if (!pdBoer){ wrap.innerHTML = '<div class="card">…</div>'; laadBoer(); return; }
@@ -2724,7 +2724,7 @@
   }
   function renderEntree(){
     const tabBtn = document.getElementById('tabEntree');
-    if (tabBtn) tabBtn.style.display = heeftEntree() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftEntree());
     const wrap = $('#entreeWrap');
     if (!wrap) return;
     if (!heeftEntree()){ wrap.innerHTML = ''; return; }
@@ -2816,7 +2816,7 @@
   }
   function renderVaart(){
     const tabBtn = document.getElementById('tabVaart');
-    if (tabBtn) tabBtn.style.display = heeftCharter() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftCharter());
     const wrap = $('#vaartWrap');
     if (!wrap) return;
     if (!heeftCharter()){ wrap.innerHTML = ''; return; }
@@ -2877,7 +2877,7 @@
   }
   function renderVerkoop(){
     const tabBtn = document.getElementById('tabVerkoop');
-    if (tabBtn) tabBtn.style.display = (heeftVerkoop() && pdVerkoop && pdVerkoop.aan) ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !(heeftVerkoop() && pdVerkoop && pdVerkoop.aan));
     const wrap = $('#verkoopWrap'); if (!wrap) return;
     if (!heeftVerkoop()){ wrap.innerHTML = ''; return; }
     if (!pdVerkoop){ wrap.innerHTML = '<div class="card">…</div>'; laadVerkoop(); return; }
@@ -2919,7 +2919,7 @@
   }
   function renderBevPda(){
     const tabBtn = document.getElementById('tabBevPda');
-    if (tabBtn) tabBtn.style.display = heeftBeveiliging() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftBeveiliging());
     const wrap = $('#bevPdaWrap'); if (!wrap) return;
     if (!heeftBeveiliging()){ wrap.innerHTML = ''; return; }
     if (!pdBev){ wrap.innerHTML = '<div class="card">…</div>'; laadBevPda(); return; }
@@ -3129,7 +3129,7 @@
   }
   function renderZorgbalie(){
     const tabBtn = document.getElementById('tabZorgbalie');
-    if (tabBtn) tabBtn.style.display = zbData ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !zbData);
     const wrap = $('#zorgbalieWrap');
     if (!wrap) return;
     if (!zbData){ wrap.innerHTML = ''; return; }
@@ -3184,7 +3184,7 @@
   }
   function renderMeldkamerPda(){
     const tabBtn = document.getElementById('tabMeldkamer');
-    if (tabBtn) tabBtn.style.display = (mkHulp || mkZorg) ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !(mkHulp || mkZorg));
     const wrap = $('#meldkamerWrap');
     if (!wrap) return;
     if (!mkHulp && !mkZorg){ wrap.innerHTML = ''; return; }

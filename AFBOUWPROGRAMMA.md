@@ -3967,3 +3967,34 @@ laatste integrale tegenproef**. Opgelost sinds vorige meting: **2**. Nieuwe
 regressies: **0 in de gerichte tegenproeven**. Eerder verborgen fouten ontdekt:
 **0 extra**. Niet-uitgevoerde verplichte controles: **3 samengestelde
 uitkomsten**. Deep Green: **GEBLOKKEERD**.
+
+#### Integrale tegenproef 5 — verplichte CI volledig groen
+
+De vier verplichte workflows zijn volledig geëindigd op commit
+`0e18812ec8e070db10c8c47ba814206551e33ca0`: CI `42583567918`, CodeQL
+`42583567815`, Kwalificatie lokaal `42583567640` en Desktop- en
+mobielstandaard `42583567720`. Over de vier workflows sloten 42 jobs: 37
+geslaagd, 0 mislukt en 5 conditioneel overgeslagen.
+
+Alle vier unitscherven, vijf schermscherven, vier toegankelijkheidsscherven,
+hun samengestelde oordelen, de volledige test-, check- en buildroute,
+endpointdekking, adversarial beveiliging, PostgreSQL, CodeQL, WebKit en beide
+volledige schermformaten zijn groen. DG-CI-17 en DG-CI-18 zijn onder de echte
+matrixbelasting niet teruggekomen.
+
+De vijf overgeslagen jobs zijn geen ontbrekende PR-controles: drie
+incrementele bewijsroutes zijn door de gekozen volledige route vervangen,
+publicatie van het vertrouwde bewijsboek is aan de publicatiecontext gebonden
+en kalibratie aan de nachtelijke planning. Geen rode job is door een groene
+afgeleide job gemaskeerd.
+
+Deze tegenproef sluit de actuele verplichte CI-foutboom. Zij verklaart RTG nog
+niet Deep Green: `npm run check` meldt 912 verlopen APPWERKT-bewijzen en
+EXPERIENCEWERKT blijft eerlijk `NOT_TESTED` met 0/3360 bewezen voorwaarden.
+Die twee kwalificatiedomeinen volgen als afzonderlijke verplichte metingen.
+
+**Meetstand integrale tegenproef 5.** Openstaande unieke oorzaken: **0 in de
+verplichte CI-foutboom**. Opgelost sinds vorige meting: **2**. Nieuwe
+regressies: **0**. Eerder verborgen fouten ontdekt: **0**. Niet-uitgevoerde
+verplichte controles: **2 kwalificatiedomeinen** (actuele APPWERKT- en
+EXPERIENCEWERKT-bewijzen). Deep Green: **GEBLOKKEERD**.

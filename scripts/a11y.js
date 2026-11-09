@@ -372,7 +372,7 @@ async function startEchteServer() {
     { naam: 'ingelogd', sleutels: { rtg_member_token: lid.token } },
     { naam: 'zaak', sleutels: { rtg_sup_token: zaak.token } }
   ]) {
-    const context = await browser.newContext({ serviceWorkers: 'block' });
+    const context = await browser.newContext({ viewport:{width:1440,height:900}, locale:'nl-NL', serviceWorkers: 'block' });
     if (ronde.sleutels) {
       await context.addInitScript((s) => {
         try {
@@ -703,7 +703,7 @@ async function startEchteServer() {
   const perThema = [];
   console.log(`\n[a11y] ===== ronde THEMA'S (${THEMAS.length} x ${PAGINAS.length} schermen, ingelogd) =====`);
   for (const thema of THEMAS) {
-    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const ctx = await browser.newContext({ viewport:{width:1440,height:900}, locale:'nl-NL', serviceWorkers: 'block' });
     await ctx.addInitScript((o) => {
       try {
         localStorage.setItem('rtg_member_token', o.t);

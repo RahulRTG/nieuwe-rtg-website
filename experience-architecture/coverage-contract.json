@@ -178,6 +178,15 @@
       "method": "contract",
       "scope": "all-current-experience-signatures",
       "check": "Experience signature contract"
+    },
+    {
+      "proof": "screen-accessibility",
+      "instrument": "test/experience-a11y.proof.test.js",
+      "type": "a11y-screen-inventory-v1",
+      "method": "browser",
+      "scope": "all-current-experience-screens",
+      "check": "A11y desktop contrast",
+      "timeoutMs": 2700000
     }
   ]
 }

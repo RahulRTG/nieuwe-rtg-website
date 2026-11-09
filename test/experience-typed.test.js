@@ -95,3 +95,27 @@ test('de signatureproducer weigert een smaller of anders genoemd contract',()=>{
     assert.throws(()=>typed.required(c,signatures,[{id:'experience-signatures',test:c.executedProofs[0].instrument}]),/signatureproducercontract/);
   }
 });
+
+test('de a11yproducer bindt desktopcontrast aan alle 316 schermen afzonderlijk',()=>{
+  const c=structuredClone(require('../experience-architecture/coverage-contract.json'));
+  c.executedProofs=c.executedProofs.filter(b=>b.proof==='screen-accessibility');
+  const proof={id:'screen-accessibility',test:'test/experience-a11y.proof.test.js',timeoutMs:2700000};
+  const rows=typed.required(c,signatures,[proof]);
+  assert.equal(rows.length,316);
+  assert.ok(rows.every(row=>row.subjectType==='screen'&&row.dimension==='accessibility'&&
+    row.requirement==='desktop@contrast'&&row.method==='browser'));
+  assert.equal(new Set(rows.map(row=>row.configuration.subjectId)).size,316);
+  const row=rows[0],scope={...row,id:row.scope,configuration:{...row.configuration,browserVersion:'145.0.1'}};
+  assert.equal(typed.covers(scope,row),true);
+  scope.configuration.subjectId='screen:/apps/verzonnen.html';
+  assert.equal(typed.covers(scope,row),false);
+});
+
+test('de a11yproducer weigert een kleinere scope of kortere uitvoering',()=>{
+  const basis=require('../experience-architecture/coverage-contract.json');
+  for(const wijzig of [row=>{row.scope='enkele-schermen';},row=>{row.timeoutMs=240000;},row=>{row.method='contract';}]) {
+    const c=structuredClone(basis);c.executedProofs=c.executedProofs.filter(b=>b.proof==='screen-accessibility');
+    wijzig(c.executedProofs[0]);
+    assert.throws(()=>typed.required(c,signatures,[{id:'screen-accessibility',test:'test/experience-a11y.proof.test.js'}]),/a11yproducercontract/);
+  }
+});

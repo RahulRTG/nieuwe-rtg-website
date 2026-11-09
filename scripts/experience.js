@@ -32,7 +32,7 @@ const proofById=new Map(journeyProofs.map(proof=>[proof.id,proof]));
 for(const binding of contract.executedProofs||[]) {
   const known=proofById.get(binding.proof);
   if(known&&known.test!==binding.instrument) {console.error('BLOCKED: Experience-proef heeft twee instrumenten: '+binding.proof);process.exit(2);}
-  if(!known) proofById.set(binding.proof,{id:binding.proof,test:binding.instrument,journey:'experience-contract',
+  if(!known) proofById.set(binding.proof,{id:binding.proof,test:binding.instrument,timeoutMs:binding.timeoutMs,journey:'experience-contract',
     layer:'EXPERIENCE',scope:'Getypeerde contractproducer; de binding bepaalt de exacte onderwerpen en grenzen.'});
 }
 const proofs=[...proofById.values()];

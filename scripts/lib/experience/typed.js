@@ -4,6 +4,7 @@
 const {stable,same}=require('./artifact');
 const {sha}=require('./evidence');
 const configurations=require('./configurations');
+const a11y=require('./a11y');
 const canonical=value=>JSON.stringify(stable(value));
 const fixed=configuration=>{const {browserVersion,...rest}=configuration;return rest;};
 const cellKey=b=>canonical([b.instrument,b.subjectType,b.subjectId,b.dimension,b.requirement,b.configuration]);
@@ -27,11 +28,33 @@ function signatureInventory(signatures,b) {
   }
   return rows;
 }
+function accessibilityInventory(signatures,b) {
+  if(b.proof!=='screen-accessibility'||b.instrument!=='test/experience-a11y.proof.test.js'||
+    b.type!=='a11y-screen-inventory-v1'||b.method!=='browser'||b.scope!=='all-current-experience-screens'||
+    b.check!=='A11y desktop contrast'||b.timeoutMs!==2700000||
+    !same(Object.keys(b).sort(),['check','instrument','method','proof','scope','timeoutMs','type'])) {
+    throw new Error('Onbekend Experience-a11yproducercontract');
+  }
+  if(!signatures.screens||typeof signatures.screens!=='object'||Array.isArray(signatures.screens)) {
+    throw new Error('Experience-scherminventaris ontbreekt');
+  }
+  return Object.keys(signatures.screens).sort().map(route=>{
+    const subjectId='screen:'+route,configuration=a11y.configuration('0.0',subjectId);
+    delete configuration.browserVersion;
+    return {...b,subjectType:'screen',subjectId,dimension:'accessibility',requirement:'desktop@contrast',
+      scope:'a11y:desktop-contrast:'+subjectId,check:'A11y desktop contrast: '+subjectId,
+      configuration,expected:a11y.expected(),matrixCell:null};
+  });
+}
 function bindings(contract,signatures,proof) {
   const selected=(contract.executedProofs||[]).filter(b=>b.proof===proof.id),expanded=[];
   for(const b of selected) {
     if(b.type==='experience-signature-inventory-v1') {
       expanded.push(...signatureInventory(signatures,b));
+      continue;
+    }
+    if(b.type==='a11y-screen-inventory-v1') {
+      expanded.push(...accessibilityInventory(signatures,b));
       continue;
     }
     const name=b.subjectId==='screen:/apps/hotels.html'?'hotels':b.subjectId==='screen:/apps/juridisch.html'?'juridisch':null;

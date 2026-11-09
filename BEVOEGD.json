@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-30T13:07:03.522Z",
-    "commit": "0afc8afa15",
+    "op": "2026-11-09T15:21:33.334Z",
+    "commit": "3f4d8e88a2",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
@@ -10,7 +10,10 @@
   "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode, en expliciet gemarkeerde vreemde-actorproeven uit de volledige appscenario's. Een concreet lek uit een bron blokkeert altijd. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.",
   "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist.",
   "bronnen": {
-    "vervallen": [],
+    "vervallen": [
+      "IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js",
+      "ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
+    ],
     "registers": [
       {
         "register": "IDOR.json",
@@ -38,10 +41,10 @@
       },
       {
         "register": "VOLTOOIPROEF.json",
-        "sha256": "e6ca7069f9870be1bf6aad7e0d130b86339e01b588ec0db931822dafdeaeee90",
+        "sha256": "5ae7202d8fe81e91c494e733a74ae2919b3990d3f4af577a0507fce63659af5f",
         "stempel": {
-          "op": "2026-10-30T12:43:47.576Z",
-          "commit": "39f5705b6e",
+          "op": "2026-11-09T14:55:52.990Z",
+          "commit": "734310b3b7",
           "boomVuil": false,
           "boomAnders": 0,
           "instrument": "scripts/voltooiproef.js",
@@ -51,7 +54,8 @@
     ]
   },
   "telling": {
-    "BEWEZEN": 114
+    "BEWEZEN": 110,
+    "NIET_GETEST": 4
   },
   "regels": [
     {
@@ -63,7 +67,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:aankomst",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 9 van de 9 routes niet gemeten, o.a. /api/arrival/interpret: IDOR draagt geen volledige ruwe antwoordafbakening; /api/arrival/pass: IDOR draagt geen volledige ruwe antwoordafbakening; /api/arrival/pulse: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:appdossier",
@@ -74,7 +78,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:appdossier",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 2 van de 2 routes niet gemeten, o.a. /api/appstore/dossier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/appstore/kanaal: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:attenties",
@@ -92,9 +96,8 @@
       "app": "Balans",
       "ingang": "/apps/geld.html#balans",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 1,
-      "reden": "alle 1 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
     },
     {
       "functie": "link:bank",
@@ -105,7 +108,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:bank",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:berichten",
@@ -116,7 +119,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:berichten",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 21 van de 22 routes niet gemeten, o.a. /api/comm/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/begin: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/comm/concept: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:bescherming",
@@ -127,7 +130,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:bescherming",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 7 routes niet gemeten, o.a. /api/isolatie/mijn: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/isolatie/mijn/ontsluiting: IDOR draagt geen volledige ruwe antwoordafbakening; /api/isolatie/mijn/ontsluiting/afbreken: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:browser",
@@ -138,7 +141,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:browser",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 4 van de 4 routes niet gemeten, o.a. /api/browser/bericht: IDOR draagt geen volledige ruwe antwoordafbakening; /api/browser/gids: IDOR noemt de route nagekeken: afbakening-kandidaat, met de hand nagekeken en GEEN lek: webmaker-blader gids() geeft alleen sites die hun maker zelf online zette (d.online && d.adres): een openbare gids, en het adres is de codenaam die de maker publiceerde; deze smalle duiding is geen ruwe proef van afscherming; /api/browser/open: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:buurtruil",
@@ -167,7 +170,7 @@
       "status": "BEWEZEN",
       "context": "lokale-media-met-sessieassistent",
       "routes": 1,
-      "reden": "de nepcamera leverde beeld en een lokale blob zonder API-verzoek; A las zijn eigen camerageheim terug, B niet, en anoniem kreeg 401 op dezelfde sessiegebonden Rahul-route; de generieke routeprojectie bleef open: 1 van de 1 routes niet gemeten, o.a. /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming",
+      "reden": "de nepcamera leverde beeld en een lokale blob zonder API-verzoek; A las zijn eigen camerageheim terug, B niet, en anoniem kreeg 401 op dezelfde sessiegebonden Rahul-route; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js",
       "cameraProef": {
         "beeld": true,
         "fotoLokaal": true,
@@ -211,7 +214,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:clips",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 12 routes niet gemeten, o.a. /api/clips/feed: IDOR draagt geen volledige ruwe antwoordafbakening; /api/clips/geluid: IDOR draagt geen volledige ruwe antwoordafbakening; /api/clips/knip: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:commerce",
@@ -222,7 +225,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:commerce",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 9 van de 9 routes niet gemeten, o.a. /api/commerce/aanbod: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/commerce/etalage: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/commerce/mand: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:connect",
@@ -306,7 +309,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:flits",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 4 van de 4 routes niet gemeten, o.a. /api/flits/meld: IDOR draagt geen volledige ruwe antwoordafbakening; /api/flits/rond: IDOR draagt geen volledige ruwe antwoordafbakening; /api/flits/stem: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:foodcourt",
@@ -317,7 +320,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:foodcourt",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 5 van de 7 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/foodcourt/tijden: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: openingstijden van een restaurant zijn publiek; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:foundationzorg",
@@ -329,7 +332,7 @@
       "reden": "4 van de 4 kruisparen gescheiden (beide eigenaren binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token; alleen 401/403 telt als weigering, redirects worden niet gevolgd; A en B moeten met hun eigen code en token 2xx krijgen; de eigen controle vervangt alleen de gezinscode en het token, andere objectidentiteiten worden niet geraden; niet passend ingerichte testdata blijven onbeslist",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/DC44HJ/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/UZUZ7F/gezondheid",
           "a": 200,
           "bEigen": 200,
           "b": 403,
@@ -382,7 +385,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:gegevens",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 13 van de 15 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/gegevens: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:geldcommand",
@@ -393,7 +396,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:geldcommand",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:geven",
@@ -434,7 +437,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:horeca",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 136 van de 138 routes niet gemeten, o.a. /api/gids/app: IDOR draagt geen volledige ruwe antwoordafbakening; POST /api/stroom/ticket staat niet in ROLPROEF.json; /api/supplier/horeca/arrival/promise: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:huis",
@@ -445,7 +448,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:huis",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 20 van de 22 routes niet gemeten, o.a. /api/thuis/annuleer: IDOR draagt geen volledige ruwe antwoordafbakening; /api/thuis/bericht: IDOR draagt geen volledige ruwe antwoordafbakening; /api/thuis/beslis: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:ik",
@@ -456,17 +459,15 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:ik",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 12 routes niet gemeten, o.a. /api/ik: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/geloof: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/ik/toegankelijk/zet: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:juridisch",
       "app": "Juridisch",
       "ingang": "/apps/juridisch.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 0,
-      "context": "publieke-inhoud",
-      "reden": "expliciet contract voor publieke statische inhoud; de gemeten ingang roept geen API aan en ontsluit daardoor geen account-, object- of organisatiedata"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
     },
     {
       "functie": "link:klimaat",
@@ -504,7 +505,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:krant",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 7 routes niet gemeten, o.a. /api/auth/login staat niet in IDOR.json; /api/auth/register staat niet in IDOR.json; /api/krant/artikel: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:kwesties",
@@ -534,7 +535,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:labfonds",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:leven",
@@ -545,7 +546,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:leven",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 3 van de 5 routes niet gemeten, o.a. /api/foodcourt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/leven/cockpit: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/uitgaan: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:library",
@@ -586,7 +587,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:loonstrook",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 3 van de 3 routes niet gemeten, o.a. /api/member/dossier: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/identiteit/verzoeken: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/loonstroken: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:loopbaan",
@@ -597,7 +598,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:loopbaan",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 8 van de 8 routes niet gemeten, o.a. /api/carriere/ledger/afschrift: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/carriere/ledger/deel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/carriere/ledger/delen: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:magnaat",
@@ -608,7 +609,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:magnaat",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 83 van de 90 routes niet gemeten, o.a. /api/member/magnaat/controle/overzicht: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/magnaat/controle/taak/maak: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/magnaat/controle/taak/zet: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:maison",
@@ -630,7 +631,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:mall",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 59 van de 61 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/appstore/bon: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/appstore/catalogus: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:mecenaat",
@@ -652,7 +653,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:mediaos",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 26 van de 27 routes niet gemeten, o.a. /api/mediaos/bewaar: IDOR draagt geen volledige ruwe antwoordafbakening; /api/mediaos/bieb: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mediaos/bord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:mijnmall",
@@ -663,7 +664,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:mijnmall",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 17 van de 18 routes niet gemeten, o.a. /api/mall/aanvraag: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: mallAanvragen.plaats(req.session.key, ...) maakt een nieuwe aanvraag voor B; de pool vulde openbare categorie- en etage-id's in, en met verzonnen waarden faalt de validatie (400). Er wordt geen aanvraag van A aangeraakt; deze smalle duiding is geen ruwe proef van afscherming; /api/mall/aanvraag/heropen: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mall/aanvraag/kies: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:move",
@@ -674,7 +675,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:move",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 3 van de 5 routes niet gemeten, o.a. /api/move/gevolg: IDOR draagt geen volledige ruwe antwoordafbakening; /api/move/reis: IDOR draagt geen volledige ruwe antwoordafbakening; /api/move/volgende: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:muziek",
@@ -685,7 +686,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:muziek",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 12 routes niet gemeten, o.a. /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/muziek/bestand: IDOR draagt geen volledige ruwe antwoordafbakening; /api/muziek/bestand-ticket: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:nalatenschap",
@@ -707,7 +708,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:navigatie",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 11 van de 11 routes niet gemeten, o.a. /api/nav/bestemmingen: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/nav/gebied/kies: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/nav/gebied/pakket: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:neigingen",
@@ -718,7 +719,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:neigingen",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 18 van de 20 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/toestel/introk: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:nieuws",
@@ -729,7 +730,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:nieuws",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 3 van de 3 routes niet gemeten, o.a. /api/member/nieuws: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/nieuws/ai: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/nieuws/artikel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:office",
@@ -740,7 +741,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:office",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 41 van de 41 routes niet gemeten, o.a. /api/office/kantoorpakket/aanwezig staat niet in IDOR.json; /api/office/kantoorpakket/ai staat niet in IDOR.json; /api/office/kantoorpakket/beheer staat niet in IDOR.json"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:onderneming",
@@ -751,7 +752,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:onderneming",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 14 van de 14 routes niet gemeten, o.a. /api/onderneming/aanvraag: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/onderneming/aanvraag/stand: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/onderneming/dagbeeld: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:ontdek",
@@ -762,7 +763,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:ontdek",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 7 routes niet gemeten, o.a. /api/agenda/mijn-lijst: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/auth/me: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/huis/dossier: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:ov",
@@ -773,7 +774,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:ov",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 30 van de 32 routes niet gemeten, o.a. /api/mob/aanbod: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mob/abo/aanbod: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mob/abo/koop: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:ovroutes",
@@ -806,7 +807,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:passkeys",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 7 routes niet gemeten, o.a. /api/webauthn/bevestig/opties: IDOR draagt geen volledige ruwe antwoordafbakening; /api/webauthn/lijst: IDOR draagt geen volledige ruwe antwoordafbakening; /api/webauthn/login staat niet in IDOR.json"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:pay",
@@ -817,7 +818,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:pay",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 16 van de 17 routes niet gemeten, o.a. /api/login staat niet in IDOR.json; /api/member/connections: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/pay/oplaad: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:podium",
@@ -828,7 +829,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:podium",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 18 van de 19 routes niet gemeten, o.a. /api/drm/key: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ice staat niet in IDOR.json; /api/podium/abonneer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:post",
@@ -839,7 +840,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:post",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 15 van de 17 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/post: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mijn/post/alles-uit: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:projectroom",
@@ -861,7 +862,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:pulse",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 15 van de 15 routes niet gemeten, o.a. /api/member/pulse/bewaar: IDOR noemt de route nagekeken: doorbraak-kandidaat, met de hand nagekeken en GEEN lek: een bladwijzer op andermans bericht, in B's EIGEN plank; het bericht moet door zichtbaar() heen; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewaard: IDOR noemt de route nagekeken: B zag wie A is; met de hand nagekeken en GEEN lek: pulseBewaard(req.session.key): B's EIGEN bladwijzers, gefilterd op zichtbaar(); B bewaarde in gang 2 een zichtbare post van A (pulse/bewaar, hierboven nagekeken), dus de auteur-codenaam staat erin; deze smalle duiding is geen ruwe proef van afscherming; /api/member/pulse/bewerk: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:rechterhand",
@@ -894,7 +895,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:reizen",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 9 routes niet gemeten, o.a. /api/move/volgende: IDOR draagt geen volledige ruwe antwoordafbakening; /api/reisbureau: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/veiligheid/moment: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:relaties",
@@ -905,7 +906,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:relaties",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 17 van de 19 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/inzagekaart: IDOR draagt geen volledige ruwe antwoordafbakening; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:rendezvous",
@@ -927,7 +928,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:residentie",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 26 van de 27 routes niet gemeten, o.a. /api/member/connect: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/member/find: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/spel/antwoord: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:routedossier",
@@ -1025,7 +1026,7 @@
       "scenario": true,
       "tegenproeven": 2,
       "bronFunctie": "link:rtgcode",
-      "reden": "volledige bevoegde kernworkflow en 2 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 2 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:rtgone",
@@ -1047,7 +1048,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:rtmail",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 63 van de 63 routes niet gemeten, o.a. /api/account/start: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/rtmail/adres: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/rtmail/afwezig: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:school",
@@ -1058,7 +1059,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:school",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 15 van de 17 routes niet gemeten, o.a. /api/leerstof/antwoord: IDOR draagt geen volledige ruwe antwoordafbakening; /api/leerstof/dag: IDOR draagt geen volledige ruwe antwoordafbakening; /api/leerstof/examen: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:sessies",
@@ -1069,7 +1070,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:sessies",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 16 van de 18 routes niet gemeten, o.a. /api/auth/password: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/mijn/sessies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/mijn/sessies/sluit: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:sitemaker",
@@ -1080,7 +1081,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:sitemaker",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 15 van de 15 routes niet gemeten, o.a. /api/salon/promo: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/site/ai: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/site/bewaar: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:sociaal",
@@ -1091,7 +1092,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:sociaal",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 13 routes niet gemeten, o.a. /api/comm/inbox: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/actielog: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/sociaal/beleid: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:spelavond",
@@ -1102,7 +1103,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:spelavond",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 2 van de 2 routes niet gemeten, o.a. /api/projectie/kijk staat niet in IDOR.json; /api/projectie/koppel staat niet in IDOR.json"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:spelen",
@@ -1113,7 +1114,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:spelen",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 166 van de 202 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/foundation/gezin/agenda: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/foundation/gezin/agenda/bereik: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:sport",
@@ -1124,7 +1125,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:sport",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 9 van de 11 routes niet gemeten, o.a. /api/adres/zoek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/sport/bord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/sport/momenten: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:stad",
@@ -1135,7 +1136,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:stad",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 3 van de 4 routes niet gemeten, o.a. /api/stad/bewoner: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/stad/melding: IDOR draagt geen volledige ruwe antwoordafbakening; POST /api/stroom/ticket staat niet in ROLPROEF.json"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:table",
@@ -1157,7 +1158,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:theater",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 22 van de 23 routes niet gemeten, o.a. /api/drm/key: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ice staat niet in IDOR.json; POST /api/stroom/ticket staat niet in ROLPROEF.json"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:tweedescherm",
@@ -1179,7 +1180,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:uitgaan",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 6 van de 6 routes niet gemeten, o.a. /api/event/rsvp: IDOR draagt geen volledige ruwe antwoordafbakening; /api/event/rsvp/annuleer: IDOR draagt geen volledige ruwe antwoordafbakening; /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:vandaag",
@@ -1190,7 +1191,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:vandaag",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 25 van de 26 routes niet gemeten, o.a. /api/dag: IDOR draagt geen volledige ruwe antwoordafbakening; /api/gemoed: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/gemoed/weg: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:veilig",
@@ -1201,16 +1202,15 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:veilig",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 21 van de 21 routes niet gemeten, o.a. /api/veiligheid: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/veiligheid/alarm: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/veiligheid/codewoord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:verificatie",
       "app": "Identiteit aantonen",
       "ingang": "/apps/verificatie.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 3,
-      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
     },
     {
       "functie": "link:vertegenwoordiging",
@@ -1221,7 +1221,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:vertegenwoordiging",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 6 van de 6 routes niet gemeten, o.a. /api/vertegenwoordiging/aanvaard: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/vertegenwoordiging/bevoegdheden: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/vertegenwoordiging/grens: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:vluchten",
@@ -1232,7 +1232,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:vluchten",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 9 routes niet gemeten, o.a. /api/member/vluchten/boek: IDOR draagt geen volledige ruwe antwoordafbakening; /api/member/vluchten/bord: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/member/vluchten/charter: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:vonk",
@@ -1243,7 +1243,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:vonk",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 22 van de 22 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment: IDOR draagt geen volledige ruwe antwoordafbakening; /api/ondertiteling/stand: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:vooruitzicht",
@@ -1254,7 +1254,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "link:vooruitzicht",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 12 van de 12 routes niet gemeten, o.a. /api/agenda/bereik: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/fluister: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/geld/cockpit: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:vrienden",
@@ -1276,7 +1276,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:wallet",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:wbw",
@@ -1287,7 +1287,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:wbw",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 96 van de 99 routes niet gemeten, o.a. /api/bank/advies: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bank/afschrift: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bank/afschrift.csv: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:wereldlaag",
@@ -1298,7 +1298,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:wereldlaag",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 5 van de 5 routes niet gemeten, o.a. /api/krant/artikel: IDOR draagt geen volledige ruwe antwoordafbakening; /api/mediaos/volg: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/salon/plaats: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:werkos",
@@ -1309,7 +1309,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:werkos",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 18 van de 18 routes niet gemeten, o.a. /api/auth/login staat niet in IDOR.json; /api/auth/register staat niet in IDOR.json; /api/bedrijf/mijn: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "link:wonen",
@@ -1320,7 +1320,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "link:wonen",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 7 van de 7 routes niet gemeten, o.a. /api/bestanden/map: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/bestanden/mijn: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bestanden/upload: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "os:bellen",
@@ -1331,18 +1331,15 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "os:bellen",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 11 van de 11 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/klets: IDOR draagt geen volledige ruwe antwoordafbakening; /api/klets/gesprek: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "os:rtf",
       "app": "RTFoundation",
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 0,
-      "context": "lokale-navigatie",
-      "bestemmingen": 5,
-      "reden": "expliciet contract voor lokale navigatie; de gemeten kiezer roept geen API aan, draagt geen domeingegevens en verwijst uitsluitend naar 5 lokale app-ingangen met een eigen bevoegdheidsgrens"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; appkruisproef: het scenario markeerde geen uitgevoerde kruisproef met een vreemde actor"
     },
     {
       "functie": "os:snaps",
@@ -1350,8 +1347,10 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "BEWEZEN",
-      "routes": 3,
-      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is; publiek/nagekeken zijn geen bewezen afscherming, en een los gescheiden-label mist de eigen positieve controles; de bekende methoden komen uit de bewijsregisters en vormen geen volledige canonieke route-inventaris; afgebakend leest alleen het antwoord: B kreeg met hetzelfde verzoek geen merkteken van A terug, een stille schrijfactie ziet het niet"
+      "scenario": true,
+      "tegenproeven": 3,
+      "bronFunctie": "os:snaps",
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "os:videobellen",
@@ -1362,7 +1361,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "os:bellen",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; gedeelde bevoegdheidsgrens gemeten via os:bellen; de generieke routeprojectie bleef open: 11 van de 11 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/klets: IDOR draagt geen volledige ruwe antwoordafbakening; /api/klets/gesprek: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; gedeelde bevoegdheidsgrens gemeten via os:bellen; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "os:werk",
@@ -1373,7 +1372,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "os:werk",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 2 van de 2 routes niet gemeten, o.a. /api/account/rollen: IDOR draagt geen volledige ruwe antwoordafbakening; /api/account/start: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:assets",
@@ -1384,7 +1383,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "tab:assets",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 20 van de 20 routes niet gemeten, o.a. /api/asset/aanvraag/betaal: IDOR draagt geen volledige ruwe antwoordafbakening; /api/asset/aanvragen: IDOR draagt geen volledige ruwe antwoordafbakening; /api/asset/document: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:bestellen",
@@ -1395,7 +1394,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "tab:bestellen",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 6 van de 6 routes niet gemeten, o.a. /api/groothandel/annuleer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/groothandel/bestel: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/groothandel/markt: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:betalen",
@@ -1406,7 +1405,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "tab:betalen",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 5 van de 5 routes niet gemeten, o.a. /api/betaal/direct: IDOR draagt geen volledige ruwe antwoordafbakening; /api/betaal/mijn: IDOR draagt geen volledige ruwe antwoordafbakening; /api/betaal/verzoek/pay: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:gezin",
@@ -1417,7 +1416,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "tab:gezin",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 9 van de 9 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/order/pay: IDOR draagt geen volledige ruwe antwoordafbakening; /api/orders/mine: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:reizen",
@@ -1428,7 +1427,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "tab:reizen",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 21 van de 21 routes niet gemeten, o.a. /api/agenda/mijn: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/bezorg/partners: IDOR draagt geen volledige ruwe antwoordafbakening; /api/contract/teken: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:salon",
@@ -1439,7 +1438,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "tab:salon",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 2 van de 2 routes niet gemeten, o.a. /api/comment: IDOR draagt geen volledige ruwe antwoordafbakening; /api/like: IDOR draagt geen volledige ruwe antwoordafbakening"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:terplaatse",
@@ -1450,7 +1449,7 @@
       "scenario": true,
       "tegenproeven": 1,
       "bronFunctie": "tab:terplaatse",
-      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 25 van de 25 routes niet gemeten, o.a. /api/bezorg/partners: IDOR draagt geen volledige ruwe antwoordafbakening; /api/booking/pay: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/care/pakket/betaal: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 1 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     },
     {
       "functie": "tab:zorg",
@@ -1461,7 +1460,7 @@
       "scenario": true,
       "tegenproeven": 3,
       "bronFunctie": "tab:zorg",
-      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: 16 van de 16 routes niet gemeten, o.a. /api/care: IDOR noemt de route publiek: ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden; deze smalle duiding is geen ruwe proef van afscherming; /api/care/annuleer: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding; /api/care/betaal: IDOR bewaart hier geen volledige A-eigen en B-eigen-objectcontrole op dezelfde route en methode; een weigering alleen bewijst geen scheiding"
+      "reden": "volledige bevoegde kernworkflow en 3 expliciete vreemde-actorproef/proeven gesloten in VOLTOOIPROEF.json; de generieke routeprojectie bleef open: bewijs vervallen: IDOR.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js; ROLPROEF.json: serverronde gemeten op 39f5705b6e; sindsdien 11 relevant(e) bestand(en) gewijzigd, eerst server/foutmelder.js"
     }
   ]
 }

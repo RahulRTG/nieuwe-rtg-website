@@ -4190,3 +4190,19 @@ LIEGRONDE**. Opgelost sinds de vorige geldige bronmeting: **bewijsveroudering
 voor 114 appcontracten**. Nieuwe regressies: **0**. Eerder verborgen fouten:
 **0**. Niet-uitgevoerde verplichte controles: **volledige bevoegdheidsronde,
 APPWERKT-samenstelling en EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.
+
+#### BEVOEGD tussenmeting — gedeelde routebewijzen vervallen
+
+De samengestelde bevoegdheidsronde op schone commit `3f4d8e88a2` bewijst
+**110/114 apps**. Balans, Juridisch, Identiteit aantonen en RTFoundation
+blijven `NIET_GETEST`; zij delen één bronoorzaak. De generieke `IDOR.json`- en
+`ROLPROEF.json`-serverrondes zijn nog gemeten vóór elf relevante
+serverwijzigingen, met `server/foutmelder.js` als eerste geraakt bestand. De
+vier apps zijn daarom niet afzonderlijk gerepareerd en het oude bewijs is niet
+opnieuw geldig verklaard.
+
+**Meetstand bevoegdheid.** Openstaande unieke oorzaken: **1**. Opgelost sinds
+vorige meting: **0**. Nieuwe regressies: **0**. Eerder verborgen fouten: **0**.
+Niet-uitgevoerde verplichte controles: **actuele IDOR- en ROLPROEF-rondes,
+daarna de nieuwe BEVOEGD- en APPWERKT-samenstelling**. Deep Green:
+**GEBLOKKEERD**.

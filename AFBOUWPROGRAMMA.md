@@ -4374,3 +4374,27 @@ inline-attributen**. Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt:
 DOM-attributen**. Niet-uitgevoerde verplichte controles: **gerichte browser- en
 Experience-herkwalificatie op de uiteindelijke kandidaatbron**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Experience-identiteit volledig uitvoeringsgebonden bewezen
+
+De nieuwe signatureproducer is op schone commit `2f834642a3` met Node 26.12.1
+uitgevoerd. De proef sloot **431/431 tests**: één volledige inventariscontrole
+en **430 afzonderlijke, commit- en brongebonden contractwaarnemingen** voor
+exact 114 apps en 316 schermen. De Experience-uitvoeringsprojectie is daarbij
+hersteld: zij nam eerder alleen schermonderwerpen mee, waardoor werkelijk
+uitgevoerde appbewijzen niet in dezelfde run konden worden geselecteerd.
+
+De selectie heeft de status `PROVEN_IN_SCOPE`. Dit bewijst uitsluitend de
+dimensie **identiteit / signature** voor de actuele inventaris. Het is geen
+bewijs voor compositie, bediening, toegankelijkheid, vloeiendheid, menselijke
+kwaliteit of vrijgave. De bewijsengine blijft terecht `INCOMPLETE`; lokale
+artefacten krijgen buiten hun live procesreceipt geen herbruikbaar gezag.
+
+**Afsluiting Experience-identiteit.** Openstaande unieke oorzaken: **objectieve
+Experience-producenten voor de overige dimensies, menselijke beoordeling en de
+acht releasekwalificatiepoorten**. Opgelost sinds vorige meting: **430 exacte
+identity-contracten en de ontbrekende appprojectie**. Nieuwe regressies: **0**.
+Eerder verborgen fouten ontdekt: **appbewijzen werden door de scherm-only
+uitvoeringsprojectie weggelaten**. Niet-uitgevoerde verplichte controles:
+**alle overige Experience-dimensies, operationele releasepoorten en twee
+onafhankelijke integrale eindruns**. Deep Green: **GEBLOKKEERD**.

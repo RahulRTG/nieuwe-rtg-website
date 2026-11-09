@@ -4295,3 +4295,26 @@ ontdekt: **de bestaande Juridisch-appsignature volgt de actuele
 APPWERKT-interactienoemer niet meer volledig**. Niet-uitgevoerde verplichte
 controles: **alle objectieve en menselijke Experience-proeven en de acht
 releasekwalificatiepoorten**. Deep Green: **GEBLOKKEERD**.
+
+#### Experience-appcontracten 114/114 gedeclareerd
+
+Alle **114/114 logische apps** hebben nu een geldige Experience Signature. De
+signatures verwijzen voor hun productdoel naar het bestaande appcontract en
+voor hun volledige bedieningsnoemer naar het actuele APPWERKT-register. Daarmee
+ontstaat geen tweede catalogus van productbeloften of knoppen. Identiteit,
+compositie, beweging, dichtheid en menselijke taken blijven per app expliciet
+gedeclareerd, met de vijf bestaande RTG-werelden en Heritage als gedeelde
+presentatiebasis.
+
+De Experience-engine-regressies sluiten **15/15** en de afgeleide
+inventariscontrole bevestigt exact **114 apps en 316 schermen**. Dit pakket
+declareert de vereiste kwaliteit; het levert bewust nog geen automatisch of
+menselijk kwaliteitsbewijs.
+
+**Afsluiting app-signatures.** Openstaande unieke oorzaken: **2 gedeelde
+Experience-groepen**: 306 ontbrekende schermsignatures en het nog ontbrekende
+commitgebonden bewijs. Opgelost sinds vorige meting: **114 appcontracten en de
+verouderde Juridisch-interactienoemer**. Nieuwe regressies: **0**. Eerder
+verborgen fouten ontdekt: **0 aanvullend**. Niet-uitgevoerde verplichte
+controles: **schermcontracten, objectieve en menselijke Experience-proeven en
+de acht releasekwalificatiepoorten**. Deep Green: **GEBLOKKEERD**.

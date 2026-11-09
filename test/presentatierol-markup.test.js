@@ -162,3 +162,28 @@ test('alle vaste markup gebruikt native zichtbaarheid in plaats van style.displa
     assert.doesNotMatch(gedrag, new RegExp("getElementById\\('#" + id + "'\\)\\.style\\.display"), id);
   }
 });
+
+test('gedeelde bediening maakt dynamische markup zonder inline presentatie', () => {
+  const bronnen = [
+    'public/shared/metgezel/metgezel-03.js',
+    'public/shared/rtg-schil/05-context.js',
+    'public/shared/paspoortscan.js',
+    'public/shared/schoolbel.js',
+    'public/shared/thema.js'
+  ];
+  const gedrag = bronnen.map(lees).join('\n');
+  assert.doesNotMatch(gedrag, /style=/, 'gedeelde HTML-sjablonen dragen geen stijlattributen');
+  assert.doesNotMatch(gedrag, /\.style\.(?:display|cssText)/,
+    'zichtbaarheid en componentvorm lopen niet via DOM-stijlschrijfacties');
+
+  const contracten = [
+    ['public/apps/app.html', '/ds/componenten/paspoortscan.css'],
+    ['public/apps/foundation/school.html', '/ds/componenten/schoolbel.css'],
+    ['public/apps/schoolpartner.html', '/ds/componenten/schoolbel.css']
+  ];
+  for (const [bestand, component] of contracten) {
+    assert.match(lees(bestand), new RegExp(component.replace(/[/.]/g, '\\$&')), bestand + ': ' + component);
+  }
+  assert.match(lees('public/ds/componenten/paspoortscan.css'), /^@layer rtg\.component/);
+  assert.match(lees('public/ds/componenten/schoolbel.css'), /^@layer rtg\.component/);
+});

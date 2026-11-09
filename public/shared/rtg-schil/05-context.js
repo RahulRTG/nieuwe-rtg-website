@@ -34,7 +34,7 @@
             return '<button type="button" data-ga="' + esc(s.id) + '"' +
               (schil.actief === s ? ' data-open' : '') + '>' + esc(s.naam) + '</button>';
           }).join('')
-        : '<span class="stil" style="font-size:.78rem;">nog niets open</span>';
+        : '<span class="stil context">nog niets open</span>';
       c.querySelectorAll('[data-ga]').forEach(function (b) {
         b.addEventListener('click', function () { var s = vind(b.dataset.ga); if (s) { zoom(s, 'work'); maakActief(s); } });
       });
@@ -49,7 +49,7 @@
         ? namen.map(function (n) {
             return '<button type="button" data-ruimte="' + esc(n) + '">' + esc(n) + '</button>';
           }).join('')
-        : '<span class="stil" style="font-size:.78rem;">nog niets bewaard</span>';
+        : '<span class="stil context">nog niets bewaard</span>';
       wr.querySelectorAll('[data-ruimte]').forEach(function (b) {
         b.addEventListener('click', function () { haalRuimte(b.dataset.ruimte); });
       });

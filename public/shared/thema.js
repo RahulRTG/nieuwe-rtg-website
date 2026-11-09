@@ -57,6 +57,8 @@
       letter-spacing:0.04em;cursor:pointer;transition:background .18s;white-space:nowrap;}
     .rtg-thema-knop:hover{background:#7F1634;border-color:#7F1634;}
     .rtg-thema-dot{width:0.7rem;height:0.7rem;border-radius:50%;border:1px solid rgba(255,255,255,0.5);}
+    .rtg-thema-dot--licht{background:#FBFAF7;}
+    .rtg-thema-dot--donker{background:#161310;}
     :root[data-thema="licht"] .rtg-thema-knop{background:rgba(251,250,247,0.9);color:#161310;border-color:rgba(20,18,16,0.2);}
     :root[data-thema="licht"] .rtg-thema-dot{border-color:rgba(20,18,16,0.4);}
     @media print{.rtg-thema-knop{display:none;}}`;
@@ -91,7 +93,7 @@
     const b = document.getElementById('rtg-thema-knop');
     if (!b) return;
     const doel = huidig() === 'licht' ? 'donker' : 'licht';
-    b.innerHTML = '<span class="rtg-thema-dot" style="background:' + (doel === 'licht' ? '#FBFAF7' : '#161310') + ';"></span>' +
+    b.innerHTML = '<span class="rtg-thema-dot rtg-thema-dot--' + doel + '"></span>' +
       (doel === 'licht' ? 'Licht' : 'Donker');
   }
 

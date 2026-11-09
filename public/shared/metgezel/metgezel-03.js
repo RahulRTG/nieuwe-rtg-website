@@ -20,7 +20,7 @@
       .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   };
   var sKnop = maakEl('<button class="mgz-knop mgz-samen' + (metgezelDs ? ' ds-samen-knop ds-samen-ingang' : '') + '" type="button" aria-label="Samen kijken en doen">Samen</button>');
-  var sSheet = maakEl('<section class="mgz-sheet' + (metgezelDs ? ' ds-samen-venster' : '') + '" aria-label="Samen" hidden style="bottom:3.6rem;">' +
+  var sSheet = maakEl('<section class="mgz-sheet' + (metgezelDs ? ' ds-samen-venster' : '') + '" aria-label="Samen" hidden>' +
     '<div class="mgz-kop' + (metgezelDs ? ' ds-samen-kop' : '') + '"><span>Samen</span><button class="mgz-x' + (metgezelDs ? ' ds-samen-sluit' : '') + '" type="button" aria-label="Sluiten">✕</button></div>' +
     '<div class="mgz-vak "></div></section>');
   // De zwevende Samen-knop is overal weggehaald en verhuisd naar het
@@ -48,8 +48,8 @@
   function teken(chatOnder) {
     if (!kamerId) {
       vak.innerHTML = '<div class="mgz-uit' + (metgezelDs ? ' ds-samen-uitleg' : '') + '">Kijk en doe samen: start een sessie en deel de code, of doe mee met de code van een vriend. Wie ergens heen gaat, kan de rest met een tik laten meegaan.</div>' +
-        '<button class="mgz-go' + (metgezelDs ? ' ds-samen-doe' : '') + '" data-start data-stand="samen-actief" type="button" style="width:100%;">Start een samen-sessie</button>' +
-        '<form class="mgz-rij' + (metgezelDs ? ' ds-samen-rij' : '') + '" data-mee><input placeholder="Code van een vriend" maxlength="48" style="text-transform:uppercase;" aria-label="Samen-code"><button class="mgz-go' + (metgezelDs ? ' ds-samen-doe' : '') + '" type="submit">Doe mee</button></form>';
+        '<button class="mgz-go' + (metgezelDs ? ' ds-samen-doe ds-samen-doe--breed' : '') + '" data-start data-stand="samen-actief" type="button">Start een samen-sessie</button>' +
+        '<form class="mgz-rij' + (metgezelDs ? ' ds-samen-rij' : '') + '" data-mee><input class="ds-samen-codeinvoer" placeholder="Code van een vriend" maxlength="48" aria-label="Samen-code"><button class="mgz-go' + (metgezelDs ? ' ds-samen-doe' : '') + '" type="submit">Doe mee</button></form>';
       vak.querySelector('[data-start]').addEventListener('click', function () {
         api('maak', { idem: veiligeIdem('samen-maak') })
           .then(function (d) { zetKamer(d.kamer.id); deelCode = d.code; meldHier(); teken(); })
@@ -73,7 +73,7 @@
       vak.innerHTML = '<div class="mgz-uit' + (metgezelDs ? ' ds-samen-uitleg' : '') + '">' + toegang + '<br>In de kamer: ' + k.leden.map(esc).join(', ') + '</div>' +
         '<div class="mgz-chat' + (metgezelDs ? ' ds-samen-chat' : '') + '" data-chat>' + k.chat.map(function (c) { return '<div><b>' + esc(c.van) + ':</b> ' + esc(c.tekst) + '</div>'; }).join('') + '</div>' +
         '<form class="mgz-rij' + (metgezelDs ? ' ds-samen-rij' : '') + '" data-zeg><input placeholder="Zeg iets tegen de kamer" maxlength="300" aria-label="Chatbericht"><button class="mgz-go' + (metgezelDs ? ' ds-samen-doe' : '') + '" type="submit" data-contextactie>→</button></form>' +
-        '<div class="mgz-rij' + (metgezelDs ? ' ds-samen-rij' : '') + '"><button class="mgz-stil' + (metgezelDs ? ' ds-samen-secundair' : '') + '" data-hier type="button" style="flex:1;" data-contextactie>Kom hierheen</button>' +
+        '<div class="mgz-rij' + (metgezelDs ? ' ds-samen-rij' : '') + '"><button class="mgz-stil' + (metgezelDs ? ' ds-samen-secundair ds-samen-groei' : '') + '" data-hier type="button" data-contextactie>Kom hierheen</button>' +
         (k.benGastheer ? '<button class="mgz-stil' + (metgezelDs ? ' ds-samen-secundair' : '') + '" data-code type="button" data-contextactie>Nieuwe deelcode</button><button class="mgz-stil' + (metgezelDs ? ' ds-samen-secundair' : '') + '" data-sluit type="button" data-contextactie>Sluit</button>' : '') +
         '<button class="mgz-stil' + (metgezelDs ? ' ds-samen-secundair' : '') + '" data-weg type="button" data-contextactie>Verlaat</button></div>';
       var chatEl = vak.querySelector('[data-chat]'); chatEl.scrollTop = chatEl.scrollHeight;

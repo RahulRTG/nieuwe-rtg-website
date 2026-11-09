@@ -4794,3 +4794,32 @@ controles: **APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Gedeelde bediening produceert geen inline presentatie meer
+
+De gedeelde Samen-laag, Workspace-console, paspoortscan, SchoolBel en
+themaschakelaar bouwen hun dynamische DOM zonder `style`-attributen of lokale
+`style.display`-schrijvers. Samen en Workspace hergebruiken bestaande
+presentatieklassen. De paspoortscan en SchoolBel hebben hun vorm uit de
+runtime-JavaScript verplaatst naar twee begrensde componenten onder
+`public/ds/`; hun bestaande gedrag, routes en bevoegdheidsgrenzen zijn niet
+gewijzigd.
+
+De gedeelde broncontractproef sluit **8/8**. De gerichte school-, paspoort-,
+CSP- en browserreeks sluit **38/38**. De CSP-proef bevestigt daarbij dat geen
+eigen werk wordt geblokkeerd. Design System meldt nul schendingen en 87
+gemigreerde schermen. De gegenereerde Samen- en Workspace-bundels zijn uit
+dezelfde bron opnieuw opgebouwd.
+
+**Afsluiting gedeelde dynamische markup.** Openstaande unieke oorzaken:
+**runtime-stijlinjectie in overige gedeelde legacyhulpen, dynamische
+app-templatepresentatie, ontbrekende objectieve/menselijke
+Experience-bewijzen en operationele vrijgavepoorten**. Opgelost sinds vorige
+meting: **12 gedeelde template-stijlattributen, 5 lokale
+zichtbaarheidsschrijvers en 2 runtime-componentstijlen**. Nieuwe regressies:
+**0 in de gerichte bron-, beveiligings- en browserproeven**. Eerder verborgen
+fouten ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte controles:
+**APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

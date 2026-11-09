@@ -369,7 +369,11 @@ async function toonSite(adres,pad){
     // de paginabalk: Home plus de extra pagina's van de site
     if(paginas.length){
       const nav=document.createElement('nav'); nav.className='paginanav ds-browser-paginas'; nav.setAttribute('aria-label',"Pagina's van deze site");
-      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.className='ds-knop ds-knop--stil'; b.textContent=naam; if(aan){b.classList.add('aan');b.disabled=true;b.setAttribute('aria-current','page');}
+      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.className='ds-knop ds-knop--stil'; b.textContent=naam;
+        /* Dit is echte interne standnavigatie. Het declaratieve contract laat
+           Edge, toetsenbordhulpen en APPWERKT dezelfde publieke route volgen,
+           ook wanneer een vervolgactie uitsluitend op deze pagina bestaat. */
+        b.dataset.stand=doel||'home'; if(aan){b.classList.add('aan');b.disabled=true;b.setAttribute('aria-current','page');}
         b.addEventListener('click',()=>{ if(!aan) ga({adres,pad:doel}); }); nav.appendChild(b); };
       maak('Home','',!pad);
       paginas.forEach(p=>maak(p.naam,p.slug,pad===p.slug));

@@ -4105,3 +4105,36 @@ verbinding tussen context, eigenaar, Git-conflict en bewijsplan**. Nieuwe
 regressies: **0 in 18 gerichte toetsen**. Niet-uitgevoerde verplichte controles:
 **volledige CI en een echte end-to-end kostenmeting op representatieve
 ontwikkelingstaken**. Deep Green: **GEBLOKKEERD**.
+
+#### APPWERKT actuele browsernulmeting — interne Web-paginaroute
+
+De volledige browsercontrole en aansluitende registermeting zijn uitgevoerd
+op schone broncommit `fc583728e7` met Node 26.12.1. De controle sloot met nul
+productdefecten; de registermeting bezocht 114/114 apps en vond 1.991 unieke
+eigen bedieningen. Daarvan zijn 1.990 werkelijk aangeraakt. Alleen `Verstuur`
+op de dynamische Contact-pagina van App Web bleef terecht `NIET_GETEST`.
+
+De gedeelde oorzaak is de ontbrekende declaratieve standidentiteit van de
+interne sitepagina's. De meter ontdekte de verzendactie, maar kon na Home niet
+bewijsbaar terugkeren via Contact en heropende daarom begrensd de ingang. De
+sitepaginaknoppen publiceren nu hun bestaande route via `data-stand`; er is
+geen uitzonderingslijst, geforceerde klik of administratief bewijs toegevoegd.
+Een gerichte echte Chromium-regressie bootst Home -> Contact -> Verstuur na,
+laat Home de actie eerst opnieuw verbergen en bewijst daarna dat de publieke
+Contact-route wordt herhaald tot `Verstuur` werkelijk is aangeraakt. De
+statische Browser-contracttoets is eveneens groen.
+
+De overige zeven APPWERKT-dimensies blijven fail-closed: VOLTOOIPROEF,
+LIEGRONDE en autorisatiebronnen zijn op deze bronstand nog verlopen. Deze
+browserreparatie sluit dus uitsluitend het laatste actuele bedieningsgat. Een
+nieuwe volledige browsermeting op de schone reparatiecommit is vereist voordat
+114/114 bedienbaar wordt vastgelegd.
+
+**Meetstand APPWERKT-browsernulmeting.** Openstaande unieke oorzaken: **1 in
+de actuele browserbediening, technisch hersteld maar nog integraal te
+hermeten**. Opgelost sinds de vorige meting: **0 reeds opnieuw samengestelde
+registeroorzaken**. Nieuwe regressies: **0 in de gerichte contract- en
+browserproef**. Eerder verborgen fouten ontdekt: **1** (ontbrekende
+standidentiteit van interne Web-pagina's). Niet-uitgevoerde verplichte
+controles: **volledige APPWERKT-browserhermeting, actuele samengestelde
+bewijsbronnen en EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.

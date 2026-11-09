@@ -38,4 +38,6 @@ test('adresnormalisatie en escaping uit werkelijke browserbron blijven begrensd'
   assert.match(script,/Authorization:'Bearer '\+TOKEN/);
   assert.match(script,/if\(!r.ok\)throw new Error/);
   assert.match(script,/idem=idem\|\|RTGId\('web'\)/);
+  assert.match(script,/b\.dataset\.stand=doel\|\|'home'/,
+    'de interne sitepagina publiceert haar route zodat bediening achter die stand herstelbaar blijft');
 });

@@ -159,6 +159,17 @@ const NAVIGEERT = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="location.href=\'/apps/bestemming.html\'">Terug</button>' +
   '<button type="button" onclick="window.lokaal=true">Lokale actie</button>' +
   '</main></body></html>';
+
+/* De RTG-browser vervangt Home door een interne Contact-stand. Daar staat een
+   verzendactie, maar de vaste Home-route komt in DOM-volgorde eerst en maakt
+   haar weer onzichtbaar. Alleen het publieke data-stand-contract geeft de
+   meter een controleerbare route terug naar de nog onaangeraakte actie. */
+const PAGINA_ROUTE = '<!doctype html><html><body><main id="vlak"></main><script>' +
+  'function teken(pad){document.getElementById("vlak").innerHTML=' +
+  '`<button type="button" data-stand="home" ${pad?"":"disabled"} onclick="teken(\\\'\\\')">Home</button>`+' +
+  '`<button type="button" data-stand="contact" ${pad?"disabled":""} onclick="teken(\\\'contact\\\')">Contact</button>`+' +
+  '(pad?`<button type="button" onclick="window.verstuurd=true">Verstuur</button>`:"")}' +
+  'teken("")</script></body></html>';
 const BESTEMMING = '<!doctype html><html><body><main>' +
   Array.from({ length: 12 }, (_, i) => '<button type="button">Vreemde actie ' + i + '</button>').join('') +
   '</main></body></html>';
@@ -326,6 +337,30 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
     await ctx.close();
   } finally {
     await browser.close(); srv.close();
+  }
+});
+
+test('een interne browserpagina blijft herstelbaar tot haar laatste actie is geraakt',
+  { skip: geenBrowser(pw), timeout: 30000 }, async () => {
+  const { bedien } = require('../scripts/appwerkt');
+  const srv = http.createServer((req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.end(PAGINA_ROUTE);
+  });
+  await new Promise((k) => srv.listen(0, '127.0.0.1', k));
+  const base = 'http://127.0.0.1:' + srv.address().port;
+  const browser = await pw.chromium.launch(browserOpties(pw));
+  try {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const pagina = await bedien(ctx, base, '/apps/paginaroute.html');
+    assert.equal(pagina.gevonden, 3, 'Home, Contact en de toestandsgebonden verzendactie staan in de noemer');
+    assert.equal(pagina.geklikt, pagina.gevonden, 'de interne Contact-route wordt herhaald tot Verstuur werkelijk is geraakt');
+    assert.deepEqual(pagina.onaangeraakt, [], 'geen bediening achter een interne sitepagina blijft achter');
+    assert.ok(pagina.aangeraakt.includes('Verstuur'), 'de vervolgactie is echt bediend en niet administratief afgevinkt');
+    await ctx.close();
+  } finally {
+    await browser.close();
+    srv.close();
   }
 });
 

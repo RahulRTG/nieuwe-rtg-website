@@ -4224,3 +4224,21 @@ meting: **de IDOR-helft van de gedeelde bewijsveroudering**. Nieuwe regressies:
 **0**. Eerder verborgen fouten ontdekt: **0**. Niet-uitgevoerde verplichte
 controles: **actuele ROLPROEF, daarna BEVOEGD- en APPWERKT-samenstelling**. Deep
 Green: **GEBLOKKEERD**.
+
+#### ROLPROEF actuele integrale herkwalificatie
+
+De volledige routegebonden rollenproef is uitgevoerd op schone commit
+`94548d8f64` met Node 26.12.1. De inventaris vond **5.442 schrijfroutes**,
+waarvan 4.606 een kruisbare rol hebben. **4.514 routes** zijn met 9.369
+verkeerde-rolpogingen daadwerkelijk beproefd; 92 routes zijn expliciet als
+niet kruisbaar geclassificeerd. Het resultaat bevat **nul open ACL-routes, nul
+privacylekken, nul onbesliste uitkomsten, nul blijvende neveneffecten en nul
+blinde rondes**. De 836 overige schrijfroutes zijn niet als groen afgeleid,
+maar uitgesplitst naar handlerbewaking, objectpoorten, lichaamssleutels,
+rem/cache-middleware en verzoekgebonden HMAC-contracten.
+
+**Afsluiting gedeelde autorisatiebronnen.** Openstaande unieke oorzaken: **0
+binnen IDOR en ROLPROEF**. Opgelost sinds vorige meting: **1 gedeelde
+bewijsveroudering**. Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt:
+**0**. Niet-uitgevoerde verplichte controles: **nieuwe BEVOEGD-samenstelling en
+daarna APPWERKT over alle acht dimensies**. Deep Green: **GEBLOKKEERD**.

@@ -252,3 +252,15 @@ test('Invisible Arrival gebruikt voor de nadering uitsluitend de bestaande plekc
   assert.match(lees('public/ds/bediening.css'), /componenten\/plek\.css/);
   assert.match(lees('public/apps/arrival.html'), /\/ds\/rtg-ds\.css/);
 });
+
+test('levende RTG-codes delen één presentatiecontract op beide hosts', () => {
+  const bron = lees('public/shared/dyncode.js');
+  assert.doesNotMatch(bron, /\.style\.(?:cssText|textAlign)|setAttribute\(['"]style['"]/, bron);
+  assert.match(bron, /classList\.add\('ds-dyncode'\)/);
+  assert.match(bron, /className = 'ds-dyncode__ring'/);
+  assert.match(bron, /className = 'ds-dyncode__beeld'/);
+  for (const bestand of ['public/apps/app.html', 'public/apps/foundation/vrienden.html']) {
+    assert.match(lees(bestand), /\/ds\/componenten\/dyncode\.css/, bestand);
+  }
+  assert.match(lees('public/ds/componenten/dyncode.css'), /^\/\*[\s\S]*@layer rtg\.component/);
+});

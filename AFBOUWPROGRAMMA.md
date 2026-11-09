@@ -4929,3 +4929,30 @@ verplichte controles: **APPWERKT-herkwalificatie na de bronwijzigingen, de
 volledige platformkwalificatie, menselijke Experience-beoordeling,
 operationele releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Levende codes scheiden codec en presentatie
+
+De gedeelde DynCode-toner schrijft geen vaste uitlijning, voortgangsgeometrie
+of canvasvorm meer in de DOM. De appwerktafel en Foundation Vrienden laden één
+begrensd component onder `public/ds/`; de bestaande HMAC-code, serverroutes,
+rotatie, verval en verificatie blijven eigenaar van het gedrag.
+
+De bron-, cryptografie- en presentatieproeven sluiten **20/20**. De echte
+contactcode-browserketen sluit **4/4** en bewijst onder meer dat code en
+aftelring werkelijk worden getekend, geen inline presentatie dragen en dat de
+vaste pin na een bewuste uitschakeling server-side onvindbaar is. De Design
+System-meting daalt van 85 naar **84 scripts met stijlinjectie** en van 172
+naar **171 injectieplekken**, zonder schendingen.
+
+**Afsluiting DynCode-presentatie.** Openstaande unieke oorzaken:
+**84 scripts met resterende runtime-stijlinjectie, dynamische
+app-templatepresentatie, ontbrekende objectieve/menselijke
+Experience-bewijzen en operationele vrijgavepoorten**. Opgelost sinds vorige
+meting: **3 vaste presentatieschrijvers op 2 hosts en 1 gedeelde
+stijlinjectie-eigenaar**. Nieuwe regressies: **0 in de gerichte
+cryptografie-, presentatie- en browserproeven**. Eerder verborgen fouten
+ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte controles:
+**APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

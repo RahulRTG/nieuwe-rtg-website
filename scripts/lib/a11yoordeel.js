@@ -33,7 +33,23 @@ const RONDES = ['uitgelogd', 'ingelogd', 'zaak'];
 function telOp(delen) {
   const perNaam = new Map();
   let totaal = 0, raakTotaal = 0, paginas = 0;
+  const routes = {}, routeIssues = [];
+  let browser = null;
   for (const d of delen) {
+    if (!d.browser || d.browser.name!=='chromium' || typeof d.browser.version!=='string') {
+      routeIssues.push('BROWSER_IDENTITY_MISSING:' + (d.deel || '?'));
+    } else if (!browser) browser = d.browser;
+    else if (browser.name!==d.browser.name || browser.version!==d.browser.version) {
+      routeIssues.push('BROWSER_IDENTITY_CONFLICT:' + (d.deel || '?'));
+    }
+    if (d.schemaVersion !== 2 || !d.routes || typeof d.routes !== 'object' || Array.isArray(d.routes)) {
+      routeIssues.push('ROUTE_EVIDENCE_MISSING:' + (d.deel || '?'));
+    } else {
+      for (const [route, result] of Object.entries(d.routes)) {
+        if (Object.prototype.hasOwnProperty.call(routes, route)) routeIssues.push('DUPLICATE_ROUTE:' + route);
+        else routes[route] = result;
+      }
+    }
     for (const r of (d.perRonde || [])) {
       const bij = perNaam.get(r.naam) || { naam: r.naam, struct: 0, contr: 0 };
       bij.struct += Number(r.struct || 0);
@@ -48,7 +64,7 @@ function telOp(delen) {
      map afhangt; een ronde die er niet was, komt er ook niet bij. */
   const perRonde = RONDES.filter(n => perNaam.has(n)).map(n => perNaam.get(n));
   for (const [naam, r] of perNaam) if (!RONDES.includes(naam)) perRonde.push(r);
-  return { perRonde, totaal, raakTotaal, paginas, delen: delen.length };
+  return { perRonde, totaal, raakTotaal, paginas, delen: delen.length, schemaVersion: 2, browser, routes, routeIssues };
 }
 
 /* Het oordeel zelf. Geeft terug wat er FOUT is (leeg = geslaagd), wat er te

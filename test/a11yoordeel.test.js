@@ -40,6 +40,10 @@ const deel = (n, { struct = 0, uit = 0, in_ = 0, zaak = 0, raak = 0, paginas = 6
   ]
 });
 
+const bewezenDeel = (n, routes) => ({...deel(n, { paginas: routes.length }), schemaVersion:2,
+  browser:{name:'chromium',version:'145.0.0.0'},
+  routes:Object.fromEntries(routes.map(route=>[route,{states:{},mobile:{},touchTargets:{},tablet:null,themes:{}}]))});
+
 test('vier schone delen zijn samen een schone ronde', () => {
   const samen = oordeel.telOp([deel(1), deel(2), deel(3), deel(4)]);
   assert.equal(samen.paginas, 268);
@@ -79,6 +83,16 @@ test('structuur en raakvlak tellen ook over de delen heen', () => {
   assert.match(struct.fouten.join(' '), /1 structurele overtreding/);
   const raak = oordeel.veld(oordeel.telOp([deel(1), deel(2, { raak: 3 }), deel(3), deel(4)]), GRENS);
   assert.match(raak.fouten.join(' '), /3 raakvlak\(ken\)/);
+});
+
+test('per-schermmetingen worden uniek samengevoegd en duplicaten blijven zichtbaar', () => {
+  const schoon=oordeel.telOp([bewezenDeel(1,['/apps/a.html']),bewezenDeel(2,['/apps/b.html'])]);
+  assert.deepEqual(Object.keys(schoon.routes).sort(),['/apps/a.html','/apps/b.html']);
+  assert.deepEqual(schoon.routeIssues,[]);
+  const dubbel=oordeel.telOp([bewezenDeel(1,['/apps/a.html']),bewezenDeel(2,['/apps/a.html'])]);
+  assert.deepEqual(dubbel.routeIssues,['DUPLICATE_ROUTE:/apps/a.html']);
+  const oud=oordeel.telOp([deel(1)]);
+  assert.deepEqual(oud.routeIssues,['BROWSER_IDENTITY_MISSING:1/4','ROUTE_EVIDENCE_MISSING:1/4']);
 });
 
 /* En de andere kant: het oordeel over EEN hele ronde (zoals `npm run a11y`
@@ -132,4 +146,19 @@ test('minder metingen dan beloofde delen zakt', () => {
   } finally {
     fs.rmSync(map, { recursive: true, force: true });
   }
+});
+
+test('alle unieke actuele routes leveren wel een controleerbaar totaaloordeel', () => {
+  const routes=require('../scripts/schermen').alleSchermen().concat(['/site/404.html']);
+  const map=fs.mkdtempSync(path.join(os.tmpdir(),'a11yvolledig-'));
+  try {
+    const delen=[[],[],[],[]];
+    routes.forEach((route,index)=>delen[index%4].push(route));
+    delen.forEach((groep,index)=>fs.writeFileSync(path.join(map,`deel-${index+1}.json`),
+      JSON.stringify(bewezenDeel(index+1,groep))));
+    const r=spawnSync(process.execPath,
+      [path.join(__dirname,'..','scripts','a11y-oordeel.js'),map,'--delen=4'],{encoding:'utf8'});
+    assert.equal(r.status,0,r.stderr);
+    assert.match(r.stdout,new RegExp(routes.length+' schermen in DRIE staten'));
+  } finally { fs.rmSync(map,{recursive:true,force:true}); }
 });

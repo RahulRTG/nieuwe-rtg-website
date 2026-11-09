@@ -67,11 +67,26 @@ if (verwachteDelen && delen.length !== verwachteDelen) {
 }
 
 const samen = oordeel.telOp(delen);
-const verwachteSchermen = alleSchermen().length + 1;   // + /site/404.html, zie a11y.js
+const verwachteRoutes = alleSchermen().concat(['/site/404.html']).sort();
+const verwachteSchermen = verwachteRoutes.length;
 if (samen.paginas !== verwachteSchermen) {
   console.error('[a11y] de delen samen zagen ' + samen.paginas + ' schermen, en er zijn er ' +
     verwachteSchermen + '. Er is een deel dat minder heeft gemeten dan het beloofde;');
   console.error('       een oordeel over een gat is geen oordeel.');
+  process.exit(1);
+}
+if (samen.routeIssues.length) {
+  console.error('[a11y] de per-schermmeting is ongeldig: ' + samen.routeIssues.join(', '));
+  console.error('       een totaaltelling zonder unieke schermwaarnemingen is geen schermbewijs.');
+  process.exit(1);
+}
+const gemetenRoutes = Object.keys(samen.routes).sort();
+const ontbrekend = verwachteRoutes.filter(route => !Object.prototype.hasOwnProperty.call(samen.routes, route));
+const onbekend = gemetenRoutes.filter(route => !verwachteRoutes.includes(route));
+if (ontbrekend.length || onbekend.length) {
+  console.error('[a11y] per-schermdekking wijkt af: ' + ontbrekend.length + ' ontbrekend, ' + onbekend.length + ' onbekend.');
+  if (ontbrekend.length) console.error('       ontbrekend: ' + ontbrekend.slice(0, 10).join(', '));
+  if (onbekend.length) console.error('       onbekend: ' + onbekend.slice(0, 10).join(', '));
   process.exit(1);
 }
 

@@ -4138,3 +4138,19 @@ browserproef**. Eerder verborgen fouten ontdekt: **1** (ontbrekende
 standidentiteit van interne Web-pagina's). Niet-uitgevoerde verplichte
 controles: **volledige APPWERKT-browserhermeting, actuele samengestelde
 bewijsbronnen en EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.
+
+De vereiste volledige hermeting is daarna ononderbroken afgerond op schone
+commit `d3a2cd8a66` met Node 26.12.1. Het actuele register bindt zich aan die
+commit en meldt **114/114 bereikbaar, 114/114 bedienbaar, 1.980/1.980 unieke
+bedieningen werkelijk aangeraakt, nul onklikbare bediening, nul restanten en
+nul browserdefecten**. Het aantal gevonden knoppen verschilt van de eerdere
+1.991 doordat de wegwerpwereld per run actuele dynamische inhoud opbouwt; de
+bewijsgrens blijft de volledige noemer van de vastgelegde run en is daar
+1.980/1.980.
+
+**Afsluiting browserpakket.** Openstaande unieke oorzaken: **0 binnen
+APPWERKT-bereikbaarheid en -bediening**. Opgelost sinds de nulmeting: **1**.
+Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt: **0 aanvullend**.
+Niet-uitgevoerde verplichte controles: **de actuele VOLTOOIPROEF-, LIEGRONDE-
+en autorisatiebronnen, APPWERKT-samenstelling over alle acht dimensies en
+EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.

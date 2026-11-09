@@ -221,3 +221,24 @@ test('Meelezen en lokale ondertiteling delen één toegankelijke DS-presentatie'
   }
   assert.match(lees('public/ds/componenten/meelezen.css'), /^@layer rtg\.component/);
 });
+
+test('Verbinding gebruikt op iedere host uitsluitend de centrale DS-presentatie', () => {
+  for (const bestand of [
+    'public/shared/verbinding/verbinding-01.js',
+    'public/shared/verbinding/verbinding-02.js'
+  ]) {
+    const bron = lees(bestand);
+    assert.doesNotMatch(bron, /\.style\.(?:cssText|opacity|transform|background|color|borderColor)/, bestand);
+    assert.doesNotMatch(bron, /setAttribute\(['"]style['"]/, bestand);
+  }
+  for (const bestand of [
+    'public/apps/backoffice.html', 'public/apps/spelen.html', 'public/apps/leverancier.html',
+    'public/apps/app.html', 'public/apps/boardroom.html', 'public/apps/personeel.html',
+    'public/apps/werkplek.html'
+  ]) {
+    const html = lees(bestand);
+    assert.match(html, /\/ds\/componenten\/verbinding\.css/, bestand);
+    assert.match(html, /\/ds\/componenten\/melding\.css/, bestand);
+  }
+  assert.match(lees('public/ds/componenten/verbinding.css'), /^\/\*[\s\S]*@layer rtg\.component/);
+});

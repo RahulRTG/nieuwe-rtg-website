@@ -4876,3 +4876,30 @@ Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie na de
 bronwijzigingen, de volledige platformkwalificatie, menselijke
 Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Verbinding heeft één presentatie-eigenaar op alle zeven hosts
+
+De gedeelde offline-, fout-, satelliet- en Zaakdooslaag bevat geen tweede
+inline presentatiepad meer. Backoffice, Spelen, Leverancier, de
+appwerktafel, Boardroom, Personeel en Werkplek laden nu expliciet de bestaande
+centrale componenten voor meldingen en verbinding. De transportlogica,
+retryregels, veilige Zaakdoosnavigatie en app-eigen meldingprioriteit zijn
+ongewijzigd.
+
+De bron- en gedragsproeven sluiten **18/18**, zowel met als zonder een
+statische DS-marker. De echte browserproef sluit **1/1** en controleert
+offline/herstel, 100% en 200% tekst, mobiel en breed scherm, minimaal 44
+pixels raakvlak, satellietbediening, Zaakdoosstatus en bestaande
+appmeldingen. Design System meldt nul schendingen en 87 gemigreerde schermen.
+
+**Afsluiting Verbinding-presentatie.** Openstaande unieke oorzaken:
+**runtime-stijlinjectie in overige gedeelde legacyhulpen, dynamische
+app-templatepresentatie, ontbrekende objectieve/menselijke
+Experience-bewijzen en operationele vrijgavepoorten**. Opgelost sinds vorige
+meting: **4 gedeelde inline presentatiepaden over 7 hosts**. Nieuwe
+regressies: **0 in de gerichte bron-, gedrags- en browserproeven**. Eerder
+verborgen fouten ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte
+controles: **APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

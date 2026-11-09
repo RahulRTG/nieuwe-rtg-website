@@ -121,8 +121,12 @@ test('Foundation DS mediawijs: kind 10 krijgt de echte leeftijdsweigering', { sk
     const document = await page.goto(srv.base + schermen.mediawijs, { waitUntil: 'domcontentloaded' }); assert.equal(document.status(), 200);
     const r = await deur; assert.equal(r.status(), 403); const d = await r.json(); assert.equal(d.toegestaan, false);
     await page.locator('#rtf-toegang-slot [data-rtf-wissel]').waitFor({ state: 'visible' });
-    assert.equal(await page.locator('body > #rtf-toegang-slot[role="alertdialog"]').isVisible(), true);
-    assert.equal(await page.locator('#main').evaluate(e => e.hidden && e.inert), true);
+    assert.equal(await page.locator('#rtf-toegang-slot:visible').count(), 1);
+    assert.match(await page.locator('#rtf-toegang-slot').getAttribute('role'), /^(alertdialog|main)$/,
+      'de poort blijft de enige hoofdtaak, ook nadat de werkruimte haar overneemt');
+    await page.locator('.wd-page').waitFor({ state: 'hidden' });
+    assert.equal(await page.locator('.wd-page').evaluate(e => e.hidden && e.inert), true);
+    assert.equal(await page.locator('#main').isVisible(), false);
     assert.equal(await page.locator('#vraag').isVisible(), false);
     assert.match(await page.locator('#rtf-toegang-slot').textContent(), /Deze ruimte blijft nog dicht/);
     await page.locator('#rtf-toegang-slot [data-rtf-wissel]').focus();

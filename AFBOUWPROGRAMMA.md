@@ -3745,3 +3745,98 @@ te leggen, de vier verplichte workflows volledig te laten eindigen en alle
 rode, afgebroken, geblokkeerde en overgeslagen jobs opnieuw als één foutboom te
 classificeren. Alleen die tegenproef kan de drie nog ontbrekende samengestelde
 uitkomsten sluiten.
+
+#### Integrale tegenproef 2 — 8 en 9 november
+
+De onveranderlijke kandidaat was commit
+`00915695906acb02821e497649df0e6d53a72c4a`. De workflows `CI`
+(`42520404092`), `CodeQL` (`42520404162`), `Kwalificatie lokaal`
+(`42520404205`) en `Desktop- en mobielstandaard` (`42520404463`) zijn volledig
+afgerond voordat de herstelwerkboom is gewijzigd. Over de vier workflows
+eindigden 42 jobs: 28 geslaagd, 6 mislukt en 8 overgeslagen. CodeQL, de lokale
+Slotsuite-route, WebKit en de volledige scherminventaris op 390 en 1440 px zijn
+groen. In de hoofd-CI zijn 23 jobs groen, waaronder PostgreSQL, container,
+architectuur, norm/build, drie unitscherven, twee schermscherven, vier
+toegankelijkheidsdelen en alle ijkingen.
+
+De zes rode jobs bestaan uit vijf primaire meetjobs en het afgeleide oordeel
+`Tests, checks en build`. De drie incrementele jobs zijn correct overgeslagen
+omdat preflight de volledige route koos. De volledige samenstelling,
+schermdekking en endpointdekking konden door de rode primaire jobs niet worden
+gevormd; bewijspublicatie en nachtelijke kalibratie zijn op deze pull request
+evenmin vrijgavebewijs.
+
+De concrete fouten vallen terug op vier gedeelde oorzaken. Een gevolg wordt
+hier maar eenmaal geteld, ook wanneer het in meerdere schermscherven of drie
+toegankelijkheidsrondes zichtbaar is.
+
+| id | gedeelde bronoorzaak | klasse en herkomst | zichtbare gevolgen | eigenaar | herstelvolgorde |
+|---|---|---|---|---|---|
+| DG-CI-11 | schermtoetsen verwarden bewust behouden, verborgen DS-actiebronnen en de canonieke Workspace-schil met een zichtbare tweede eigenaar | verlopen toetscontract na de recente eigenaarsconsolidatie | Foundation-selectorcontract, Foundation-kindpoort, Reizen & Veilig, Wonen, Home en Luchthaven wezen geldig centraal gedrag af | schermtoetsen / DS-ownercontract | zichtbaarheid en directe eigenaar meten, niet DOM-afwezigheid of het oude elementtype |
+| DG-CI-12 | `world-desktop-ds.test.js` wachtte met een nieuwe kale kloktimer | bevestigde recente toetsregressie | de klokschuld steeg van 32 naar 33 en maakte twee klokcontracttoetsen rood | toetsarchitectuur | wachten op microtaken/waarneembare toestand zonder tijdsvertraging |
+| DG-CI-13 | de Foundation-toegangslaag kreeg de lichte generieke dialoogachtergrond boven haar donkere toegangstokens | bevestigde recente presentatieregressie | zeven Foundation-routes leverden in uitgelogd, ingelogd en zaak samen 21 contrastfouten per ronde | Foundation-componentowner | het bestaande beveiligde dialoogcontract specifieker eigenaar maken en alle betrokken a11y-toestanden herhalen |
+| DG-CI-14 | brede legacy Editorial-regels lekten in donkere mobiele navigatie en de Foundation World Home-oppervlakken | eerder verborgen cascade- en eigenaarschapsfout, zichtbaar in de blinde/notch-as van de volledige a11y-meting | onleesbare mobiele navigatie en een transparant/onjuiste leeg- en operationeel oppervlak zonder hoofdcontrastfout in de gewone as | legacy Editorial + bestaande DS-componentowners | legacy selectors begrenzen en semantische DS-kleuren gebruiken; geen nieuwe stijlowner |
+
+**Meetstand integrale tegenproef 2.** Openstaande unieke oorzaken: **4**.
+Opgelost sinds de vorige meetbare bronstand: **0 in deze tegenproef**. Nieuwe
+regressies: **2 bevestigd** (DG-CI-12 en DG-CI-13). Eerder verborgen fouten
+ontdekt: **2 unieke oorzaken** (DG-CI-11 en DG-CI-14). Niet-uitgevoerde
+verplichte controles: **3 samengestelde uitkomsten**. Deep Green:
+**GEBLOKKEERD**.
+
+#### Herstelronde 3 — 9 november
+
+De vier oorzaken uit integrale tegenproef 2 zijn in afhankelijkheidsvolgorde
+behandeld. Verborgen DS-koppen blijven als bestaande actiebron in de DOM, maar
+de regressies meten nu uitsluitend zichtbare chrome. De canonieke
+`body.ds-wereldwerkruimte > .wd-shell` blijft de bestaande Workspace Runtime;
+Home wordt via zijn werkelijke DS-knop bewezen. Alle zichtbaarheid van elementen
+uit een kindframe wordt voortaan door de `defaultView` van dat kinddocument
+berekend, zodat een buitenvenster geen verborgen kindbediening als zichtbaar
+kan tellen. De kale kloktimer is vervangen door een deterministische
+microtask-wacht.
+
+De Foundation-poort gebruikt dezelfde bestaande donkere beveiligde dialoog,
+maar bezit haar achtergrond nu met voldoende selectorspecificiteit tegenover
+de generieke dialoog. De legacy Editorial-laag is begrensd rond donkere
+media-/veiligheidsnavigatie en `data-world-home`; de bestaande mobiele
+navigatie gebruikt semantische DS-kleuren en de bestaande Foundation
+World Home-kaart behoudt haar papieroppervlak en leesbare labels. Er is geen
+nieuwe component, controller, stylesheet of dependency toegevoegd en de
+legacybestanden zijn kleiner geworden.
+
+Gericht tegenbewijs op de herstelwerkboom:
+
+* de Foundation- en World Desktop-contractset sluit met **25/25** toetsen;
+* de vier betrokken Edge/Foundation/Luchthaven-browserbestanden sluiten samen
+  met **15/15** scenario's;
+* de volledige appmenu-keten sluit met **11/11** scenario's, inclusief Reizen
+  & Veilig en de contextvaste zichtbaarheidstoets;
+* de Design System-poort meldt **0 schendingen** en 87 centraal gemigreerde
+  schermen;
+* toegankelijkheidsdelen 1, 2 en 3 sluiten met 0 structurele en 0
+  hoofdcontrastfouten; deel 3 mat bovendien telefoon, tablet, drie thema's en
+  alle blinde assen, inclusief notch, zonder contrast- of raakvlakfout. De al
+  bekende niet-blokkerende duimbereikwaarneming bij `Berichten` blijft zichtbaar
+  voor de latere Experience-kwalificatie. De volledige CI moet alle vier delen
+  en het totaaloordeel nog bevestigen;
+* `scripts/check.js` is inhoudelijk groen en houdt de 912 verlopen
+  APPWERKT-bewijzen terecht fail-closed.
+
+De brede appmenu-tegenproef maakte nog één concrete, eerder verborgen
+meetfout zichtbaar: `getComputedStyle` uit het bovenvenster werd gebruikt voor
+een element in een kindframe. Dit is geen vijfde productoorzaak maar een extra
+manifestatie van DG-CI-11. Na de contextvaste reparatie bleef de volledige
+11-scenario-keten groen.
+
+**Meetstand herstelronde 3.** Openstaande unieke oorzaken: **0 binnen de lokaal
+uitgevoerde herstelset**. Opgelost sinds de vorige meting: **4**. Nieuwe
+regressies: **0**. Eerder verborgen fouten ontdekt: **1 concrete
+testmanifestatie, 0 nieuwe unieke oorzaken**. Niet-uitgevoerde verplichte
+controles: **3 samengestelde CI-uitkomsten**. Deep Green: **GEBLOKKEERD**.
+
+De volgende stap blijft onveranderd: rond de lopende gerichte meting af, voer
+de statische en afgeleide controles op dezelfde werkboom uit, leg daarna één
+schone kandidaatcommit vast en laat alle vier verplichte workflows volledig
+eindigen. Alleen die integrale tegenproef kan de drie samengestelde uitkomsten
+en de actuele bewijsstatus sluiten.

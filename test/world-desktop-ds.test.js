@@ -48,7 +48,7 @@ test('de wereldloader behoudt Spatial op een DS-scherm zonder een tweede Adaptiv
   };
   window.self = window.top = window;
   vm.runInNewContext(lees('public/shared/rtg-world-desktop.js'), { window, document, URLSearchParams, queueMicrotask, console });
-  await new Promise(resolve => setTimeout(resolve, 0));
+  for (let beurt = 0; beurt < 10 && !gestart; beurt++) await Promise.resolve();
   assert.ok(geladen.includes('/shared/interface/workspace-runtime.js'));
   assert.ok(geladen.includes('/shared/interface/world-desktop-home.js'));
   assert.equal(geladen.some(pad => pad.includes('rtg-adaptive-edge')), false);

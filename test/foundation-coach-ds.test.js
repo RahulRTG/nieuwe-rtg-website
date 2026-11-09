@@ -14,8 +14,10 @@ test('Foundation Samen reserveert het volledige Uitstap-raakvlak', () => {
 
 test('de Foundation-deur verbergt ook expliciet zichtbare afstammelingen', () => {
   const css = read('public/ds/componenten/foundation.css');
-  assert.match(css, /\.ds-foundation-dicht body > :not\(\.ds-foundation-toegang\):not\(\.wd-shell\) \*/);
+  assert.match(css, /\.ds-foundation-dicht body > :not\(\.ds-foundation-toegang\):not\(\.wd-shell\):not\(\.rtg-adaptive-edge\):not\(\.rtg-edge-chrome\):not\(\.ds-edge\) \*/);
   assert.match(css, /\.ds-foundation-dicht \.wd-shell > :not\(\.ds-foundation-toegang\) \*/);
+  assert.match(css, /\.ds-dialoog\.ds-foundation-toegang[\s\S]*background: var\(--ds-cover-grond/,
+    'de beveiligde deur wint de cascade van de gewone lichte dialoog');
 });
 
 test('de Foundation-deur sluit de bestaande documentinhoud ook vóór CSS geladen is', () => {

@@ -125,6 +125,22 @@ test('een style-attribuut BINNEN een <script> blijft staan', () => {
   });
 });
 
+test('style-voorbeeldtekst in CSS en HTML-commentaar is geen DOM-attribuut', () => {
+  const pagina = '<!doctype html><html><head><style>\n' +
+    '/* Als klassen, niet als style="..." op elk element. */\n.x{color:red}\n</style></head><body>' +
+    '<!-- Voorbeeld: <p style="..."></p><p style="..."></p> -->' +
+    '<p style="color:blue">a</p><p style="color:blue">b</p></body></html>';
+  metBestand('t.html', pagina, (p) => {
+    const r = draai(p);
+    assert.equal(r.status, 0, r.stderr);
+    const uit = fs.readFileSync(p, 'utf8');
+    assert.match(uit, /style="\.\.\."/, 'uitleg in de CSS of het commentaar is gewijzigd');
+    assert.doesNotMatch(uit, /\.i-[0-9a-z-]+\{\.\.\.\}/, 'voorbeeldtekst werd ongeldige CSS');
+    assert.doesNotMatch(uit, /<p style="color:blue">/, 'de twee echte attributen zijn niet omgezet');
+    assert.match(uit, /\.i-[0-9a-z-]+\{color:blue\}/, 'de echte DOM-stijl kreeg geen klasse');
+  });
+});
+
 test('alles afgekeurd is GEEN blok: er blijft geen lege kop achter', () => {
   /* Zeven bestanden droegen die na de eerste ronde -- een blok dat zegt dat er
      iets is omgezet terwijl er niets is omgezet. */

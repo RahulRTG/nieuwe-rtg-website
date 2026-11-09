@@ -4343,3 +4343,34 @@ schermcontracten**. Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt:
 **0 aanvullend**. Niet-uitgevoerde verplichte controles: **de daadwerkelijke
 Experience-proeven, inventarisvolledigheidsaudit en de acht
 releasekwalificatiepoorten**. Deep Green: **GEBLOKKEERD**.
+
+#### Inline-presentatiebron correct begrensd
+
+De bestaande omzetter voor herhaalde inline-presentatie bleek
+`style="..."`-voorbeeldtekst in CSS- en HTML-commentaar als echte
+DOM-attributen te tellen. Daardoor rapporteerde de eerdere ronde zes
+schijnverwijderingen in drie bestanden, terwijl geen element was gewijzigd. De
+bronselectie sluit nu `<script>`, `<style>` en HTML-commentaar uit en heeft een
+permanente tegenproef voor deze drie contexten.
+
+Na de correctie zijn **53 werkelijke, herhaalde inline-attributen in drie
+bestanden** opnieuw met berekende browserstijlen beproefd. Alleen twee identieke
+presentatie-attributen in `public/apps/app.html` bleken cascadeveilig en zijn
+naar één statische klasse geconsolideerd. De 41 attributen in Kantoren en tien
+in Spelen zijn door de bestaande browserproef afgewezen en automatisch
+hersteld; zij blijven zichtbaar als actieve migratieschuld en zijn niet
+geforceerd. De actuele noemer is daardoor **51 attributen in twee bestanden**.
+
+De omzetter- en bronregressies sluiten **27/27**, de Design
+System-laadgraaf **82/82** en Heritage classificeert nog steeds **296 schermen
+en 20 redirects** zonder ontbrekende wereld, stylesheet of vroege
+overgangsobserver.
+
+**Afsluiting inline-ronde.** Openstaande unieke oorzaken: **1 gedeelde
+presentatieoorzaak: cascadeafhankelijke inline-stijlen in Kantoren en Spelen**.
+Opgelost sinds vorige meting: **1 foutieve brondetectie en 2 aantoonbaar veilige
+inline-attributen**. Nieuwe regressies: **0**. Eerder verborgen fouten ontdekt:
+**6 eerder als verwijderd gerapporteerde commentaarvoorbeelden waren geen
+DOM-attributen**. Niet-uitgevoerde verplichte controles: **gerichte browser- en
+Experience-herkwalificatie op de uiteindelijke kandidaatbron**. Deep Green:
+**GEBLOKKEERD**.

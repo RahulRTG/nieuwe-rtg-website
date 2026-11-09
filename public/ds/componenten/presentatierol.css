@@ -32,4 +32,16 @@
   .ds-presentatie-tabrij:not(#_#_#_) { display: flex; gap: .4rem; padding: .6rem 1.1rem 0; }
   .ds-presentatie-paneelkolom:not(#_#_#_) { flex: 1; overflow-y: auto; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .7rem; }
   .ds-presentatie-qr:not(#_#_#_) { display: inline-block; background: var(--ds-oppervlak-sterk); padding: 12px; border-radius: 0; margin: .9rem auto .4rem; }
+  .ds-presentatie-beschermd-uitleg:not(#_#_#_) { padding: .9rem 1.1rem; line-height: 1.5; font-size: .9rem; }
+  .ds-presentatie-snap-noot:not(#_#_#_) { color: var(--zacht, var(--ds-inkt-zacht)); font-size: .75rem; margin-block-start: .5rem; }
+  .ds-presentatie-story-opdracht:not(#_#_#_) { color: var(--goud2); font-size: .8rem; margin-block-start: .5rem; }
+  .ds-presentatie-inkomend:not(#_#_#_) { max-inline-size: 22rem; text-align: center; padding: 1.4rem; }
+  .ds-presentatie-belavatar:not(#_#_#_) { margin: 0 auto 1.25rem; }
+  .ds-presentatie-belsoort:not(#_#_#_) { margin: .25rem 0 1.25rem; }
+  .ds-presentatie-belacties:not(#_#_#_) { display: flex; gap: 1rem; justify-content: center; }
+  .ds-presentatie-studio:not(#_#_#_) { background: var(--ds-cover-grond); max-inline-size: 30rem; }
+  .ds-presentatie-studio-inhoud:not(#_#_#_) { padding: .7rem; overflow-y: auto; }
+  .ds-presentatie-studio-label:not(#_#_#_) { color: var(--zacht); font-size: .8rem; }
+  .ds-presentatie-studio-kleuren:not(#_#_#_) { display: flex; gap: .4rem; }
+  .ds-presentatie-studio-stuur:not(#_#_#_) { inline-size: 100%; margin-block-start: .5rem; }
 }

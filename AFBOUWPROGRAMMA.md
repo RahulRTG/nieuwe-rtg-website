@@ -4514,3 +4514,38 @@ schuldbronnen niet**. Niet-uitgevoerde verplichte controles: **de volledige
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Foundation Contacten gebruikt centrale presentatie; vaste markup schoon
+
+De grootste resterende presentatieschuld zat in Foundation Contacten. Twaalf
+vaste compositieregels voor het beschermde profiel, snaps, verhalen,
+inkomende gesprekken en de snap-studio zijn verplaatst naar de bestaande
+centrale `presentatierol`-component. De verborgen bestandsingang gebruikt de
+bestaande `h-weg`-toestand. Het scherm laadt de centrale component rechtstreeks
+en heeft vóór zijn gedragsbron geen vast inline style-attribuut meer. Dynamische
+editorgegevens, waaronder de bewust gekozen penkleur, zijn niet als statische
+vormgeving vermomd of administratief weggefilterd.
+
+De platformnoemer daalde hierdoor van **96 naar 83** markup-attributen en van
+**36 naar 35** HTML-bestanden; presentatie daalde van 47 naar 35 en toestand
+van 49 naar 48. De Design System-contracten blijven streng: de nieuwe regels
+gebruiken uitsluitend semantische kleurentokens, geen letterlijke kleurwaarden
+of primitieve tokens.
+
+De centrale Design System-, laadgraaf-, contract- en Vrienden-proeven sluiten
+**114/114**. De echte Vrienden-browserproef bewijst daarnaast dat de volledige
+contactenlijst, stream, verversing, chat, snap-studio en late bediening tot het
+einde van het bestaande scriptblok bereikbaar blijven. Design System meldt
+nul schendingen en 87 gemigreerde schermen; Heritage blijft exact 296 schermen
+en 20 redirects classificeren.
+
+**Afsluiting Foundation Contacten-presentatie.** Openstaande unieke oorzaken:
+**83 inline markup-attributen in 35 bestanden, dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **12 vaste
+presentatie-attributen, 1 verborgen toestandsattribuut en 1 lokale
+presentatiebron**. Nieuwe regressies: **0 in 114 gerichte proeven**. Eerder
+verborgen fouten ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte
+controles: **de volledige platformkwalificatie, menselijke
+Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

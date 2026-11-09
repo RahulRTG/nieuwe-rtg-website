@@ -4257,3 +4257,21 @@ appautorisatie**. Opgelost sinds vorige meting: **1 gedeelde bronoorzaak, met
 vier daardoor gesloten apps**. Nieuwe regressies: **0**. Eerder verborgen
 fouten ontdekt: **0**. Niet-uitgevoerde verplichte controles: **APPWERKT over
 alle acht dimensies en EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.
+
+#### APPWERKT 114/114 afgesloten
+
+De bestaande bewijsgebonden samensteller heeft op schone commit `5c5f81258a`
+de geldige browser-, VOLTOOIPROEF-, LIEGRONDE- en BEVOEGD-bronnen opnieuw per
+app verbonden. Het resultaat is **114/114 `BEWEZEN`**, met voor ieder van de
+acht bewijsgebieden afzonderlijk **114/114 `BEWEZEN`**. De aansluitende
+`appwerkt:vers:controle` meldt **912 `GROF_VERS`-bewijzen, nul verlopen of
+geraakte bewijzen en 114 geldige 8/8-rijen**. De browserstempel blijft bewust
+gebonden aan de volledige 1.980/1.980-bedieningsronde op `d3a2cd8a66`; de
+samensteller heeft die waarneming niet nagebootst of administratief vernieuwd.
+
+**Afsluiting APPWERKT.** Openstaande unieke oorzaken: **0 binnen de acht
+APPWERKT-dimensies**. Opgelost sinds de vorige integrale appmeting: **de laatste
+bedieningsroute en de gedeelde autorisatieveroudering**. Nieuwe regressies:
+**0**. Eerder verborgen fouten ontdekt: **0 aanvullend**. Niet-uitgevoerde
+verplichte controles: **EXPERIENCEWERKT, operationele releasepoorten en twee
+onafhankelijke integrale eindruns**. Deep Green: **GEBLOKKEERD**.

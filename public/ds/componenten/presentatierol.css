@@ -1,0 +1,29 @@
+/* Centrale, tijdelijke presentatierollen voor legacyhosts die statische
+   style-attributen afbouwen. De rollen bevatten uitsluitend compositie; de
+   volledige schermmigratie vervangt ze door de vaste DS-schermtypen. */
+@layer rtg.component {
+  .ds-presentatie-uitleg-na:not(#_#_#_) { padding-block-start: .3rem; }
+  .ds-presentatie-actie-compact:not(#_#_#_) { flex: 0 1 auto; }
+  .ds-presentatie-gecentreerd:not(#_#_#_) { text-align: center; }
+  .ds-presentatie-bord-smal:not(#_#_#_) { max-inline-size: 16rem; margin: 0 auto; }
+  .ds-presentatie-keuze-midden:not(#_#_#_) { justify-content: center; margin-block-start: .5rem; }
+  .ds-presentatie-uitleg-onder:not(#_#_#_) { padding-block-end: .4rem; }
+  .ds-presentatie-veldlabel:not(#_#_#_) { display: block; font-size: .72rem; color: var(--soft, var(--ds-inkt-zacht)); margin-block-end: .25rem; }
+  .ds-presentatie-velden:not(#_#_#_) { display: flex; gap: .5rem; flex-wrap: wrap; align-items: flex-end; margin-block-start: .75rem; }
+  .ds-presentatie-keuzerij:not(#_#_#_) { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .ds-presentatie-actierij:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin-block-start: .75rem; }
+  .ds-presentatie-velden-compact:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-block-start: .5rem; }
+  .ds-presentatie-veldlabel-ruim:not(#_#_#_) { display: block; font-size: .72rem; color: var(--soft, var(--ds-inkt-zacht)); margin-block: .7rem .3rem; }
+  .ds-presentatie-velden-zonder-marge:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; }
+  .ds-presentatie-velden-ruim:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-block-start: .75rem; }
+  .ds-presentatie-rijveld:not(#_#_#_) { display: flex; gap: .5rem; flex-wrap: wrap; margin-block: .75rem; }
+  .ds-presentatie-actierij-na:not(#_#_#_) { display: flex; gap: .6rem; align-items: center; margin-block-start: .7rem; flex-wrap: wrap; }
+  .ds-presentatie-vinklabel:not(#_#_#_) { font-size: .78rem; display: flex; align-items: center; gap: .3rem; }
+  .ds-presentatie-inline-acties:not(#_#_#_) { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+  .ds-presentatie-inline-gap:not(#_#_#_) { display: flex; gap: .6rem; }
+  .ds-presentatie-fases:not(#_#_#_) { display: flex; gap: .6rem; align-items: flex-start; flex-wrap: wrap; }
+  .ds-presentatie-verdeelrij:not(#_#_#_) { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+  .ds-presentatie-mini-acties:not(#_#_#_) { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+  .ds-presentatie-atelier-canvas:not(#_#_#_) { display: block; inline-size: 100%; margin-block-start: .5rem; border-radius: 0; touch-action: none; cursor: grab; }
+  .ds-presentatie-accentlink:not(#_#_#_) { color: var(--burgundy-on-dark, var(--ds-accent)); }
+}

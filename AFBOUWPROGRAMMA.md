@@ -4398,3 +4398,39 @@ Eerder verborgen fouten ontdekt: **appbewijzen werden door de scherm-only
 uitvoeringsprojectie weggelaten**. Niet-uitgevoerde verplichte controles:
 **alle overige Experience-dimensies, operationele releasepoorten en twee
 onafhankelijke integrale eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Statische inline-presentatie volledig uit de HTML-bron verwijderd
+
+De gedeelde presentatieoorzaak uit de vorige ronde is zonder versoepeling van
+de Design System-poort gesloten. In `Spelen` zijn **13** werkelijke statische
+style-attributen verwijderd en in `Kantoren` **52**. Ook de twee eerder naar
+een lokale klasse verplaatste rijen in `app.html` hebben nu één centrale
+eigenaar. De gedeelde geometrie staat in de bestaande `public/ds`-architectuur
+als component `presentatierol`; de drie legacyhosts laden uitsluitend die
+centrale eigenaar en hebben geen nieuwe lokale stijlverantwoordelijkheid.
+
+De actuele volledige HTML-bronscan meldt **0 statische style-attributen over 0
+bestanden**. Dit resultaat geldt bewust niet voor styles die nog in dynamische
+JavaScript-sjablonen worden opgebouwd; die blijven als afzonderlijke actieve
+migratieschuld zichtbaar en zijn niet administratief meegerekend als opgelost.
+
+De omzetting is in Chromium tegen de oude bronstand vergeleken. Spelen hield
+op **306 DOM-elementen x 10 aangeraakte eigenschappen** nul berekend verschil;
+Kantoren op **791 x 30** eveneens nul verschil. De twee app-rijen hielden exact
+`display:flex`, `gap:9.6px` en dezelfde kindstructuur. De Design System-ratel
+meldt daarna **nul schendingen** en **87 gemigreerde schermen**; tien al
+gerealiseerde erfenisverbeteringen zijn in `ONTWERPNORM.json` alleen strakker
+vastgelegd. De gerichte bron-, omzetter-, laadgraaf- en contractproeven sluiten
+**139/139**, en de geraakte Experience-, app- en mutatieproeven **564/564**.
+
+**Afsluiting statische inline-presentatie.** Openstaande unieke oorzaken:
+**dynamische templatepresentatie en de nog ontbrekende objectieve/menselijke
+Experience- en operationele vrijgavebewijzen**. Opgelost sinds vorige meting:
+**65 statische markup-attributen, drie lokale presentatieowners en de
+bestaande Design System-ratelovertreding in app.html**. Nieuwe regressies:
+**0**. Eerder verborgen fouten ontdekt: **de eerste browsermeting zag een
+eenmalig door de lokale stijlbundelaar toegevoegd head-element; na expliciete
+warmup waren DOM en berekende stijlen reproduceerbaar gelijk**.
+Niet-uitgevoerde verplichte controles: **de volledige Accessibility/Experience-
+producer, menselijke Experience-beoordeling, operationele releasepoorten en
+twee onafhankelijke integrale eindruns**. Deep Green: **GEBLOKKEERD**.

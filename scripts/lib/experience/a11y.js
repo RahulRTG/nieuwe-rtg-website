@@ -14,6 +14,8 @@ function expected() {
   };
 }
 const touchExpected=()=>({belowPremiumMinimum:0,minimumCssPixels:44});
+const mobileLayoutExpected=()=>({hands:['rechts','links'],overflow:false,empty:false,barsOutside:0});
+const tabletLayoutExpected=()=>({overflow:false});
 
 function validate(measurement,screenRoutes) {
   const blockers=[];
@@ -31,7 +33,7 @@ function validate(measurement,screenRoutes) {
   for(const route of actual) if(!allowed.has(route)) blockers.push('A11Y_ROUTE_UNKNOWN:'+route);
   if(!own(measurement.routes,'/site/404.html')) blockers.push('A11Y_404_MISSING');
   if(Number(measurement.paginas)!==actual.length) blockers.push('A11Y_ROUTE_COUNT_MISMATCH');
-  const observations={},touchObservations={};
+  const observations={},touchObservations={},layoutObservations={};
   for(const route of required) {
     const row=measurement.routes[route];
     if(!row)continue;
@@ -56,8 +58,21 @@ function validate(measurement,screenRoutes) {
       if(JSON.stringify(touch)!==JSON.stringify(touchExpected())) blockers.push('A11Y_PREMIUM_TOUCH_FAILED:'+route+':'+device);
       touchObservations[route][device]=touch;
     }
+    const hands=['rechts','links'],mobile={hands,overflow:false,empty:false,barsOutside:0};
+    for(const hand of hands) {
+      const value=row.mobile?.[hand];
+      if(!value?.measured) blockers.push('A11Y_MOBILE_NOT_MEASURED:'+route+':'+hand);
+      mobile.overflow=mobile.overflow||Boolean(value?.overflow);
+      mobile.empty=mobile.empty||Boolean(value?.empty);
+      mobile.barsOutside+=Number(value?.barsOutside ?? -1);
+    }
+    const tablet={overflow:Boolean(row.tablet?.overflow)};
+    if(!row.tablet?.measured) blockers.push('A11Y_TABLET_NOT_MEASURED:'+route);
+    if(JSON.stringify(mobile)!==JSON.stringify(mobileLayoutExpected())) blockers.push('A11Y_MOBILE_LAYOUT_FAILED:'+route);
+    if(JSON.stringify(tablet)!==JSON.stringify(tabletLayoutExpected())) blockers.push('A11Y_TABLET_LAYOUT_FAILED:'+route);
+    layoutObservations[route]={'mobile-large':mobile,tablet};
   }
-  return {status:blockers.length?'BLOCKED':'PROVEN',blockers,observations,touchObservations};
+  return {status:blockers.length?'BLOCKED':'PROVEN',blockers,observations,touchObservations,layoutObservations};
 }
 
 function configuration(browserVersion,subjectId) {
@@ -76,4 +91,11 @@ function touchConfiguration(browserVersion,subjectId,device) {
     state:'normal',network:'local-test-server',subjectId};
 }
 
-module.exports={STATES,THEMES,expected,touchExpected,validate,configuration,touchConfiguration};
+function layoutConfiguration(browserVersion,subjectId,device) {
+  const configuration=touchConfiguration(browserVersion,subjectId,device);
+  configuration.network='normal';
+  return configuration;
+}
+
+module.exports={STATES,THEMES,expected,touchExpected,mobileLayoutExpected,tabletLayoutExpected,
+  validate,configuration,touchConfiguration,layoutConfiguration};

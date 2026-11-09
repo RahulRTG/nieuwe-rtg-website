@@ -5,6 +5,7 @@ const {stable,same}=require('./artifact');
 const {sha}=require('./evidence');
 const configurations=require('./configurations');
 const a11y=require('./a11y');
+const screenOwners=require('../../../SCHERMEIGENAAR.json').schermen;
 const canonical=value=>JSON.stringify(stable(value));
 const fixed=configuration=>{const {browserVersion,...rest}=configuration;return rest;};
 const cellKey=b=>canonical([b.instrument,b.subjectType,b.subjectId,b.dimension,b.requirement,b.configuration]);
@@ -49,6 +50,14 @@ function accessibilityInventory(signatures,b) {
       rows.push({...b,subjectType:'screen',subjectId,dimension:'accessibility',requirement:device+'@touch-targets',
         scope:'a11y:'+device+'-touch-targets:'+subjectId,check:'A11y '+device+' touch targets: '+subjectId,
         configuration,expected:a11y.touchExpected(),matrixCell:null});
+    }
+    const owner=screenOwners[route.replace(/^\//,'')];
+    if(!owner)throw new Error('Experience-a11yproducer mist schermeigenaar: '+route);
+    if(owner.rol!=='alias') for(const device of ['mobile-large','tablet']) {
+      const configuration=a11y.layoutConfiguration('0.0',subjectId,device);delete configuration.browserVersion;
+      rows.push({...b,subjectType:'screen',subjectId,dimension:'adaptability',requirement:device+'@normal',
+        scope:'a11y:'+device+'-layout:'+subjectId,check:'A11y '+device+' layout: '+subjectId,
+        configuration,expected:device==='mobile-large'?a11y.mobileLayoutExpected():a11y.tabletLayoutExpected(),matrixCell:null});
     }
     return rows;
   });

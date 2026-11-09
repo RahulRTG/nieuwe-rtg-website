@@ -5,10 +5,13 @@ const a11y=require('../scripts/lib/experience/a11y');
 
 const routeResult=()=>({
   states:Object.fromEntries(a11y.STATES.map(name=>[name,{measured:true,structural:0,contrast:0}])),
-  mobile:{},touchTargets:{
+  mobile:{
+    rechts:{measured:true,overflow:false,empty:false,barsOutside:0},
+    links:{measured:true,overflow:false,empty:false,barsOutside:0}
+  },touchTargets:{
     mobile:{measured:true,belowWcagMinimum:0,belowPremiumMinimum:0},
     tablet:{measured:true,belowWcagMinimum:0,belowPremiumMinimum:0}
-  },tablet:null,
+  },tablet:{measured:true,overflow:false},
   themes:Object.fromEntries(a11y.THEMES.map(name=>[name,{measured:true,structural:0,contrast:0}]))
 });
 const measurement=()=>({schemaVersion:2,browser:{name:'chromium',version:'145.0.1'},paginas:3,
@@ -26,6 +29,7 @@ for(const [name,change,reason] of [
   ['niet gemeten staat',m=>{m.routes['/apps/a.html'].states.zaak.measured=false;},'A11Y_STATE_NOT_MEASURED:/apps/a.html:zaak'],
   ['contrastfout',m=>{m.routes['/apps/a.html'].themes.royal.contrast=1;},'A11Y_CONTRAST_OR_STRUCTURE_FAILED:/apps/a.html'],
   ['te klein premiumdoel',m=>{m.routes['/apps/a.html'].touchTargets.mobile.belowPremiumMinimum=1;},'A11Y_PREMIUM_TOUCH_FAILED:/apps/a.html:mobile-large'],
+  ['mobiele overflow',m=>{m.routes['/apps/a.html'].mobile.links.overflow=true;},'A11Y_MOBILE_LAYOUT_FAILED:/apps/a.html'],
   ['browser zonder versie',m=>{m.browser.version='';},'A11Y_BROWSER_IDENTITY_INVALID']
 ]) test('a11y-adapter weigert '+name,()=>{
   const m=measurement();change(m);const out=a11y.validate(m,['/apps/a.html','/apps/b.html']);

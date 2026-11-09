@@ -72,5 +72,19 @@ if(!sourceHash&&!commit) {
         t.diagnostic('RTG_EXPERIENCE_OBSERVATION '+JSON.stringify(observation));
       });
     }
+    if(screen.profile==='interface') for(const device of ['mobile-large','tablet']) {
+      const requirement=device+'@normal',layoutCheck='A11y '+device+' layout: '+screen.id;
+      test(layoutCheck,t=>{
+        const expected=device==='mobile-large'?a11y.mobileLayoutExpected():a11y.tabletLayoutExpected();
+        assert.deepEqual(result.layoutObservations[screen.route]?.[device],expected);
+        const configuration=a11y.layoutConfiguration(measurement.browser?.version||'0.0',screen.id,device);
+        const observation={version:1,instrument:'test/experience-a11y.proof.test.js',
+          subjectType:'screen',subjectId:screen.id,dimension:'adaptability',requirement,
+          sourceHash,commit,configurationHash:evidence.sha(canonical(configuration)),method:'browser',
+          checks:[{id:layoutCheck,observed:expected,expected,passed:true}],result:'passed'};
+        t.diagnostic('RTG_EXPERIENCE_CONFIGURATION '+JSON.stringify(configuration));
+        t.diagnostic('RTG_EXPERIENCE_OBSERVATION '+JSON.stringify(observation));
+      });
+    }
   }
 }

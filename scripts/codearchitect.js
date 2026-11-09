@@ -19,12 +19,24 @@
    ========================================================================== */
 'use strict';
 const A = require('./lib/codearchitect');
+const P = require('./lib/proof-envelope');
 
 const args = process.argv.slice(2);
 const json = args.includes('--json');
 const rest = args.filter((a) => a !== '--json');
 const [opdracht, ...onderwerp] = rest;
 const lezer = A.maakLezer();
+
+function opties(args) {
+  const uit = {};
+  for (const arg of args) {
+    if (!arg.startsWith('--')) continue;
+    const i = arg.indexOf('=');
+    const key = arg.slice(2, i < 0 ? undefined : i);
+    uit[key] = i < 0 ? true : arg.slice(i + 1);
+  }
+  return uit;
+}
 
 const assen = (r) => '[' + r.graad + ' · ' + r.versheid + ' · ' + r.tegenspraak + ']';
 const toon = (w) => (w == null ? '--' : Array.isArray(w) ? (w.length ? w.length + ': ' + w.slice(0, 6).join(', ') + (w.length > 6 ? ', …' : '') : 'geen') : typeof w === 'object' ? JSON.stringify(w) : String(w));
@@ -38,6 +50,41 @@ function drukRegels(regels) {
 }
 
 function main() {
+  if (opdracht === 'preflight') {
+    const o = opties(onderwerp);
+    const allowedFiles = String(o.allow || o.subject || '').split(',').map(x => x.trim()).filter(Boolean);
+    const envelope = P.buildEnvelope({
+      taskId: o.task,
+      agent: o.agent,
+      taskClass: o.class || 'code-wijzigen',
+      subject: o.subject,
+      allowedFiles,
+      baseCommit: o.base,
+      integrationRef: o['integration-ref'],
+      prSnapshot: o['pr-snapshot'],
+      budgetMinutes: o['budget-minutes'] == null ? null : Number(o['budget-minutes']),
+      budgetTokens: o['budget-tokens'] == null ? null : Number(o['budget-tokens']),
+      budgetCiMinutes: o['budget-ci-minutes'] == null ? null : Number(o['budget-ci-minutes'])
+    });
+    if (json) console.log(JSON.stringify(envelope, null, 1));
+    else {
+      console.log('\nPROOF ENVELOPE ' + envelope.task.id + ' — ' + envelope.validity.status + '\n');
+      console.log('  commit      ' + envelope.git.headCommit);
+      console.log('  agent       ' + envelope.task.agent);
+      console.log('  onderwerp   ' + envelope.task.subject);
+      console.log('  risico      ' + envelope.task.risk);
+      console.log('  scope       ' + envelope.scope.allowedFiles.join(', '));
+      const screens = envelope.context.screens.map(x => x.screen);
+      console.log('  schermen    ' + (screens.length ? screens.length + ': ' + screens.slice(0, 12).join(', ') + (screens.length > 12 ? ', …' : '') : 'geen vastgesteld'));
+      const tests = envelope.tests.direct.concat(envelope.tests.indirect);
+      console.log('  toetsen     ' + (tests.length ? tests.length + ': ' + tests.slice(0, 12).join(', ') + (tests.length > 12 ? ', …' : '') : 'geen gericht vastgesteld'));
+      console.log('  conflicten  ' + envelope.conflicts.detected.length);
+      console.log('  onbekenden  ' + envelope.tests.unknownDependencies.length);
+      for (const reason of envelope.validity.reasons) console.log('    - ' + reason);
+      console.log('\n  adviserend: geen push, merge, bewijswijziging, lock of releaseactie uitgevoerd.');
+    }
+    return envelope.validation.valid ? 0 : 2;
+  }
   if (opdracht === 'map') {
     const k = A.kaart(lezer);
     if (json) return console.log(JSON.stringify(k, null, 1)), 0;
@@ -127,7 +174,7 @@ function main() {
     console.log('  ' + v.grens);
     return 0;
   }
-  console.error('gebruik: codearchitect map | explain <ding> | impact <bestand...> | unknowns [scope] | why [poort] | context <taakklasse> <ding>  [--json]');
+  console.error('gebruik: codearchitect map | explain <ding> | impact <bestand...> | unknowns [scope] | why [poort] | context <taakklasse> <ding> | preflight --task=<id> --agent=<naam> --subject=<bestand> [--allow=<bestand,...>] [--json]');
   return 2;
 }
 

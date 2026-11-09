@@ -4030,3 +4030,59 @@ Nieuwe regressies: **0 in de gerichte tegenproeven**. Eerder verborgen fouten
 ontdekt: **1** (geneste tabbediening in Web). Niet-uitgevoerde verplichte
 controles: **2 kwalificatiedomeinen** (integrale APPWERKT-herbouw inclusief de
 overige bewijsbronnen, en EXPERIENCEWERKT). Deep Green: **GEBLOKKEERD**.
+
+#### Proof-Bound Engineering fase 1 — Evidence-Aware Code Architect
+
+Dit werkpakket bouwt geen Agent OS, register, releaseketen of nieuwe
+bewijsbron. De bestaande Code Architect heeft één adviserende `preflight`-
+projectie gekregen. Het vluchtige contract `rtg-proof-envelope-v1` bindt een
+taak aan de exacte HEAD/base-commit, agent, toegestane bestanden, schermowners,
+letterlijke runtimeverwijzingen, risicoklasse, gerichte en integrale toetsen,
+bewijsimpact, kennisgaten, werkboom- en PR-conflicten en expliciete tijd-,
+token- en CI-budgetten. Een afzonderlijke deterministische validator leidt
+`VALID`, `INSUFFICIENT_CONTEXT` of `CONFLICT` af.
+
+De projectie hergebruikt `SCHERMEIGENAAR.json`, de Code Architect-registers,
+het bestaande evidence-plan, Git-worktrees en regressiehistorie. Zij schrijft
+niets, voert geen shelltekst uit repositoryinhoud uit, promoveert geen bewijs
+en kan niet pushen, mergen, locken of releasen. Een ontbrekende actuele
+PR-snapshot, vuile werkboom, achterlopende basis of onbekende testrelatie houdt
+de context onvoldoende. Bij een kennisgat blijven volledige CI en gerichte
+APPWERKT-/EXPERIENCEWERKT-herkwalificatie verplicht.
+
+Historische regressietoetsen dekken de vijf gedeelde oorzaken achter de eerdere
+166 Design System-meldingen, de desktop-/mobiele schermlaag, de zeven recent
+herstelde APPWERKT-gaten, een overlappende PR, een verouderde base-commit,
+testversmalling bij onbekende afhankelijkheden en administratief groen ondanks
+een conflict. Samen met de bestaande Code Architect-toetsen sluiten 16/16.
+
+**Vergelijkbare nulmeting.** Op dezelfde lokale Node 26-werkboom gaf de oude
+`context` voor `public/apps/browser.html` in 204 ms 4.338 bytes, maar geen
+schermowner, gerichte test of conflictanalyse. De eerste volledige preflight
+deed dit in 2.268 ms en 11.708 bytes; na begrenzing en compacte uitvoer in circa
+2.053 ms en 9.768 bytes, met één owner, elf gerichte toetsen en elf gecontroleerde
+werkbomen. Voor de gedeelde World-presentatie ging de preflight van de eerste
+3.405 ms en 108.086 bytes naar circa 2.095 ms en 42.397 bytes, terwijl 261
+geraakte schermowners en 83 gerichte of historische toetsen zichtbaar bleven.
+De gerapporteerde tokens zijn uitsluitend een transparante bytes/4-proxy;
+werkelijk modelverbruik en end-to-end kostenbesparing zijn nog niet bewezen.
+
+De technische volledigheid is verbeterd, maar fase 1 is nog geen vrijgegeven
+CI-poort. De huidige ontwikkelboom is bewust vuil tijdens de implementatie, er
+is in de lokale proef geen actuele commitgebonden PR-snapshot aangeleverd en
+`TOETSROUTES.json` ontbreekt. De preflight meldt daarom terecht
+`INSUFFICIENT_CONTEXT`; deze blokkades zijn niet als succes behandeld.
+
+**Volgende gecontroleerde stap.** Na een schone commit worden dezelfde
+acceptatiecasussen opnieuw uitgevoerd met een actuele PR-snapshot. Pas wanneer
+nul verplichte tests worden gemist en de gemeten contextwinst de extra
+preflightkosten rechtvaardigt, volgt een afzonderlijk voorstel voor fase 2,
+Collision Guard. Die fase mag werkgebieden reserveren, maar begint niet in dit
+werkpakket en wordt niet automatisch een blokkerende poort.
+
+**Meetstand Proof-Bound fase 1.** Openstaande unieke implementatieoorzaken:
+**0 in de gerichte code- en validatietoetsen**. Opgelost: **de ontbrekende
+verbinding tussen context, eigenaar, Git-conflict en bewijsplan**. Nieuwe
+regressies: **0 in 16 gerichte toetsen**. Niet-uitgevoerde verplichte controles:
+**schone commit-herproef met actuele PR-snapshot, volledige CI en een echte
+end-to-end kostenmeting**. Deep Green: **GEBLOKKEERD**.

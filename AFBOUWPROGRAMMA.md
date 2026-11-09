@@ -4087,6 +4087,16 @@ preflightkosten rechtvaardigt, volgt een afzonderlijk voorstel voor fase 2,
 Collision Guard. Die fase mag werkgebieden reserveren, maar begint niet in dit
 werkpakket en wordt niet automatisch een blokkerende poort.
 
+De eerste echte opvolgpreflight voor de integrale APPWERKT-herbouw voorkomt
+meteen dubbel werk. Alle vijf voorgenomen bronnen (`scripts/appwerkt.js`,
+`APPWERKT.json`, `APPWERKT-RAAKVLAK.json`, `BEVOEGD.json` en
+`VOLTOOIPROEF.json`) zijn al als committed werkgebied aanwezig in werkboom
+`rtg-open-prs-integration` op branch `codex/deep-green-round-4`. De preflight
+leidt daarom `CONFLICT` af en selecteert 22 directe plus twee historische
+toetsen, terwijl de integrale bewijscontroles verplicht blijven. De juiste
+volgorde is de bestaande APPWERKT-eigenaar eerst inhoudelijk integreren of
+afsluiten; deze Proof-werkboom maakt geen concurrerende wijziging.
+
 **Meetstand Proof-Bound fase 1.** Openstaande unieke implementatieoorzaken:
 **0 in de gerichte code- en validatietoetsen**. Opgelost: **de ontbrekende
 verbinding tussen context, eigenaar, Git-conflict en bewijsplan**. Nieuwe

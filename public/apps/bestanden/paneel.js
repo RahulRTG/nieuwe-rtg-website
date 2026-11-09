@@ -32,16 +32,16 @@
       return '<option value="' + m.id + '"' + (open.map === m.id ? ' selected' : '') + '>' + esc(m.naam) + '</option>';
     }).join('');
     $('#bkMap').parentNode.style.display = '';
-    ['bkDeelWrap'].forEach(function (i) { $('#' + i).style.display = open.vanMij ? '' : 'none'; });
-    $('#bkMap').style.display = open.vanMij ? '' : 'none';
+    ['bkDeelWrap'].forEach(function (i) { $('#' + i).classList.toggle('h-weg', !open.vanMij); });
+    $('#bkMap').classList.toggle('h-weg', !open.vanMij);
     $('#bkGedeeld').textContent = (open.gedeeldMet || []).length ? 'Gedeeld met: ' + open.gedeeldMet.join(', ') : '';
     window.RTGDailyFields.set($('#bkSter'), open.ster ? 'unstar' : 'star');
-    $('#bkSter').style.display = open.vanMij ? '' : 'none';
-    $('#bkBewaar').style.display = open.vanMij ? '' : 'none';
+    $('#bkSter').classList.toggle('h-weg', !open.vanMij);
+    $('#bkBewaar').classList.toggle('h-weg', !open.vanMij);
     $('#bkWeg').textContent = !open.vanMij ? 'Haal mij eraf' : (open.weg ? 'Voorgoed weg' : 'Verwijder');
-    $('#bkHerstel').style.display = open.weg ? '' : 'none';
-    $('#bkKijk').style.display = 'none'; $('#bkKijk').innerHTML = '';
-    $('#bkVersieWrap').style.display = 'none';
+    $('#bkHerstel').classList.toggle('h-weg', !open.weg);
+    $('#bkKijk').classList.add('h-weg'); $('#bkKijk').innerHTML = '';
+    $('#bkVersieWrap').classList.add('h-weg');
     // This document surface stays connected to the standard Edge Bar.
     document.querySelector('main').inert = true;
     $('#bkScrim').classList.add('open');
@@ -56,7 +56,7 @@
     var id = open.id;
     B().api('haal', { id: id }).then(function (r) {
       if (!open || open.id !== id || r.body.error) return;
-      var k = $('#bkKijk'); k.style.display = '';
+      var k = $('#bkKijk'); k.classList.remove('h-weg');
       if (/^image\//.test(mime)) {
         var img = new Image(); img.alt = open.naam; img.src = r.body.dataUrl; k.appendChild(img);
       } else {
@@ -70,7 +70,7 @@
     var id = open.id;
     B().api('versies', { id: id }).then(function (r) {
       if (!open || open.id !== id || r.body.error || !(r.body.versies || []).length) return;
-      $('#bkVersieWrap').style.display = '';
+      $('#bkVersieWrap').classList.remove('h-weg');
       $('#bkVersies').innerHTML = r.body.versies.map(function (v) {
         return '<div class="versierij ds-dag-versierij"><span class="ds-dag-rek">' + esc(String(v.op || '').slice(0, 16).replace('T', ' ')) +
           ' · ' + B().maat(v.bytes) + (v.door ? ' · door ' + esc(v.door) : '') + '</span>' +

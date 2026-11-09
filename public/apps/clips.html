@@ -106,6 +106,7 @@
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -145,7 +146,7 @@
     <video id="studioDoek" autoplay muted playsinline></video>
     <label for="clipTitel">Titel</label>
     <input id="clipTitel" maxlength="80" placeholder="Bijv. Zonsondergang bij de haven">
-    <div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap;">
+    <div class="ds-presentatie-actierij">
       <button class="knop vol" id="opneem" type="button">● Opnemen</button>
       <button class="knop" id="stopOpname" type="button" disabled>◼ Stop</button>
       <button class="knop" id="deelClip" type="button" disabled>Deel de clip</button>
@@ -164,7 +165,7 @@
       altijd terugdraaien. Ondertitels staan wel bij RTG, want de kijker moet ze kunnen lezen.</p>
 
     <h3 class="i-1p8dz4">Knippen</h3>
-    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+    <div class="ds-presentatie-keuzerij">
       <label for="knipVan">Van (s)</label><input id="knipVan" type="number" min="0" step="0.1" class="i-1l3ksy">
       <label for="knipTot">Tot (s)</label><input id="knipTot" type="number" min="0" step="0.1" class="i-1l3ksy">
       <button class="knop vol" id="knipZet" type="button">Zet de knip</button>
@@ -174,7 +175,7 @@
     <h3 class="i-1p8dz4">Geluid</h3>
     <p class="stil">We hebben geen rechten op muziek en doen dus niet alsof. Dit zegt de kijker
       wat hij gaat horen.</p>
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+    <div class="ds-presentatie-keuzerij h-mt50">
       <button class="knop" data-geluid="eigen" type="button">Eigen geluid</button>
       <button class="knop" data-geluid="stil" type="button">Zonder geluid te bekijken</button>
       <button class="knop" data-geluid="stem" type="button">Met gesproken toelichting</button>
@@ -183,7 +184,7 @@
     <h3 class="i-1p8dz4">Ondertitels</h3>
     <p class="stil">Een clip zonder ondertitel is een clip die een deel van de mensen niet kan volgen.</p>
     <div class="h-mt50" id="cueLijst"></div>
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <div class="ds-presentatie-keuzerij">
       <button class="knop" id="cueBij" type="button">Regel erbij</button>
       <button class="knop vol" id="cueBewaar" type="button">Bewaar de ondertitels</button>
     </div>
@@ -198,7 +199,7 @@
   <div class="vlak">
     <h2>Reacties</h2>
     <div id="reactieLijst"></div>
-    <form id="reactieForm" style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+    <form class="ds-presentatie-actierij" id="reactieForm">
       <label for="reactieVeld" class="s-1v4gr3o">Uw reactie</label>
       <input id="reactieVeld" maxlength="300" placeholder="Schrijf een reactie…">
       <button class="knop vol" type="submit">Plaats</button>

@@ -4589,3 +4589,38 @@ bediening van een volgend Office-document onderscheppen**. Niet-uitgevoerde
 verplichte controles: **de volledige platformkwalificatie, menselijke
 Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Bestanden en Clips delen centrale presentatierollen
+
+Bestanden gebruikt voor de twee voorwaardelijke overzichtskoppen, de
+voorvertoning, versiegeschiedenis en herstelhandeling nu uitsluitend de
+bestaande `h-weg`-toestand. Ook alle gekoppelde paneellogica wisselt dezelfde
+klasse; de kaartbreedte komt uit de bestaande Daily Design System-rol. De
+gesplitste Bestanden-bron blijft leidend en zijn bestaande bundel is opnieuw
+gegenereerd.
+
+De vijf vaste actie- en keuzerijen van Clips gebruiken de bestaande centrale
+`presentatierol`-component. De studio, knipbediening, geluid, ondertitels en
+reacties houden hun eigen inhoud en filmische Clip-identiteit; alleen de
+herhaalde flexcompositie is geconsolideerd. Er is geen nieuwe mediacomponent,
+studio of protocol toegevoegd.
+
+De platformnoemer daalde van **71 naar 60** inline markup-attributen en van
+**34 naar 32** HTML-bestanden; presentatie daalde van 35 naar 29 en toestand
+van 36 naar 31. De vijftien gerichte bron-, Heritage- en protocolproeven sluiten
+**15/15**. De echte Bestanden-browserproef sluit **1/1** volledige
+upload-/deel-/versie-/herstelketen; de twee echte Clip-proeven sluiten **2/2**
+voor opname, herhaalde deling, knippen, geluid, ondertitels en filteren. Design
+System meldt nul schendingen en 87 gemigreerde schermen. Het
+Experience-register blijft exact 114 apps en 316 schermen afleiden.
+
+**Afsluiting Bestanden- en Clips-presentatie.** Openstaande unieke oorzaken:
+**60 inline markup-attributen in 32 bestanden, dynamische
+templatepresentatie, ontbrekende objectieve/menselijke Experience-bewijzen en
+operationele vrijgavepoorten**. Opgelost sinds vorige meting: **6 Bestanden-
+attributen, 5 Clip-attributen en de bijbehorende inline
+zichtbaarheidsschrijvers**. Nieuwe regressies: **0 in 18 gerichte bron- en
+browserproeven**. Eerder verborgen fouten ontdekt: **geen aanvullende**.
+Niet-uitgevoerde verplichte controles: **de volledige platformkwalificatie,
+menselijke Experience-beoordeling, operationele releasepoorten en twee
+onafhankelijke eindruns**. Deep Green: **GEBLOKKEERD**.

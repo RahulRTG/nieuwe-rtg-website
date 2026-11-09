@@ -3917,3 +3917,53 @@ vastgelegde CI-nulmeting**. Opgelost sinds vorige meting: **3**. Nieuwe
 regressies: **0 in de gerichte tegenproeven**. Eerder verborgen fouten ontdekt:
 **0 extra**. Niet-uitgevoerde verplichte controles: **3 samengestelde
 uitkomsten**. Deep Green: **GEBLOKKEERD**.
+
+#### Integrale tegenproef 4 — volledige foutboom op kandidaat 243ddd0eea
+
+De vier verplichte workflows zijn volledig geëindigd op commit
+`243ddd0eea8d99c9111b3eab7db8db868e513c41`: CI `42577499659`, CodeQL
+`42577499614`, Kwalificatie lokaal `42577499492` en Desktop- en
+mobielstandaard `42577499506`. Over de vier workflows sloten 42 jobs: 31
+geslaagd, 3 mislukt en 8 overgeslagen. CodeQL, lokale kwalificatie, beide
+volledige scherminventarissen, WebKit, alle vier toegankelijkheidsscherven en
+hun totaaloordeel zijn groen. De eerdere drie oorzaken DG-CI-14 tot en met
+DG-CI-16 zijn niet teruggekomen.
+
+Van de drie rode jobs is `Tests, checks en build` afgeleid: de gekozen volledige
+route kon door twee rode primaire scherven niet samenstellen. De complete logs
+van beide primaire jobs zijn verzameld voordat nieuw herstelwerk begon.
+
+| id | gedeelde bronoorzaak | klasse en herkomst | zichtbare gevolgen | eigenaar | herstelvolgorde |
+|---|---|---|---|---|---|
+| DG-CI-17 | de constitutionele producttestteller bleef op 32 Rendez-vous-tests staan nadat de nieuwe geldigheidsregressie de aantoonbare baseline naar 33 bracht | nieuwe registerregressie uit herstelronde 4; productgedrag en alle 33 tests zijn groen | unitscherf 2 vergelijkt 33 met de oude exacte 32 en faalt als enige van dat bestand | Connection Constitution / testbaseline | de exacte baseline naar 59 producttests (26 Vonk + 33 Rendez-vous) brengen en de constitutionele proef gericht herhalen |
+| DG-CI-18 | de documentequivalentieproef geeft een echte UI/Edge-handeling onder volledige schijfbelasting slechts de Playwright-standaard van 30 seconden om het verplichte antwoord waar te nemen | instabiele toetswaarneming; dezelfde volledige proef sloot daarna driemaal parallel groen in circa 28 seconden per uitvoering | schermscherf 5 ziet eenmaal geen `/api/bestanden/actie`-antwoord binnen 30 seconden; 255 overige toetsen in de scherf slagen | document-equivalentie / browserwaarneming | de vereiste response met een expliciete begrensde 60-secondenlasttermijn blijven eisen en de mislukking aan caller en case binden; daarna herhaald en in de volledige scherf bewijzen |
+
+**Meetstand integrale tegenproef 4.** Openstaande unieke oorzaken: **2**.
+Opgelost sinds vorige integrale meting: **3**. Nieuwe regressies: **1**
+(DG-CI-17). Eerder verborgen fouten ontdekt: **1** (DG-CI-18).
+Niet-uitgevoerde verplichte controles: **3 samengestelde uitkomsten**. Deep
+Green: **GEBLOKKEERD**.
+
+#### Herstelronde 5 — testbaseline en belastingswaarneming gesloten
+
+DG-CI-17 is bij de constitutionele eigenaar gesloten. De bestaande exacte
+producttestbaseline is bijgewerkt naar 59 aantoonbare producttests: 26 Vonk en
+33 Rendez-vous. De norm blijft exact en de nieuwe geldigheidsregressie wordt
+niet uitgezonderd. `connection-constitution.test.js` sloot gericht groen.
+
+DG-CI-18 is bij de documentequivalentieproef gesloten zonder de producteis te
+versoepelen. De proef vereist nog steeds exact het POST-antwoord van
+`/api/bestanden/actie`, maar gebruikt daarvoor een expliciet begrensd
+60-secondenlastbudget en rapporteert bij uitval de aanroeper en fixture. Drie
+afzonderlijke uitvoeringen van `document-equivalence.e2e.js` sloten achter
+elkaar groen; afwezigheid van de handeling blijft een harde fout.
+
+De twee reparaties worden pas integraal gesloten wanneer een onveranderlijke
+nieuwe kandidaat alle verplichte CI heeft doorlopen. Tot dat moment blijven de
+drie samengestelde uitkomsten uit de vorige meting open.
+
+**Meetstand herstelronde 5.** Openstaande unieke oorzaken: **0 van de 2 in de
+laatste integrale tegenproef**. Opgelost sinds vorige meting: **2**. Nieuwe
+regressies: **0 in de gerichte tegenproeven**. Eerder verborgen fouten ontdekt:
+**0 extra**. Niet-uitgevoerde verplichte controles: **3 samengestelde
+uitkomsten**. Deep Green: **GEBLOKKEERD**.

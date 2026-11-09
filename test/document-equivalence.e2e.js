@@ -90,7 +90,17 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
               assert.equal(body.capability, f.capability); assert.equal(body.id, f.item.id); assert.equal(body.expectedVersion, f.input.expectedVersion);
               await route.continue({ headers: { ...route.request().headers(), authorization: 'Bearer ' + token }, postData: JSON.stringify(f.input) });
             });
-            const received = page.waitForResponse(r => new URL(r.url()).pathname === '/api/bestanden/actie');
+            /* De volledige schermscherf draait honderden echte browserketens
+               tegelijk op dezelfde runner. De handeling blijft verplicht: wij
+               wachten op precies haar POST en laten afwezigheid nog steeds
+               hard zakken, maar gebruiken een expliciet lastbudget in plaats
+               van Playwrights kortere algemene standaard. */
+            const received = page.waitForResponse(r =>
+              new URL(r.url()).pathname === '/api/bestanden/actie' && r.request().method() === 'POST',
+            { timeout: 60000 }).catch(e => {
+              e.message = caller + ':' + f.name + ': ' + e.message;
+              throw e;
+            });
             if (caller === 'UI') await page.locator(f.capability === 'documents.restore' ? '#bkHerstel' : '#bkWeg').click();
             else await edgeBediening(page,
               f.capability === 'documents.restore' ? 'Terugzetten' : 'Verwijder', f.capability);

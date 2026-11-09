@@ -4176,3 +4176,17 @@ Nieuwe regressies: **0 in 342 bewijsstappen**. Eerder verborgen fouten
 ontdekt: **0**. Niet-uitgevoerde verplichte controles: **actuele LIEGRONDE,
 volledige bevoegdheidsronde, APPWERKT-samenstelling en EXPERIENCEWERKT**. Deep
 Green: **GEBLOKKEERD**.
+
+#### LIEGRONDE actuele integrale herkwalificatie
+
+De volledige LIEGRONDE is uitgevoerd op schone commit `acf193db3e` met Node
+26.12.1. Alle **114/114 appcontracten** sluiten als `BEWEZEN`. De ronde toetst
+de bestaande lege-, fout- en onbesliste antwoordpaden afzonderlijk van de
+succesroute; een functioneel resultaat telt daardoor niet als waarheidsgetrouw
+wanneer de interface uitvoering suggereert die de server niet bevestigde.
+
+**Afsluiting waarheidsgetrouwheid.** Openstaande unieke oorzaken: **0 binnen
+LIEGRONDE**. Opgelost sinds de vorige geldige bronmeting: **bewijsveroudering
+voor 114 appcontracten**. Nieuwe regressies: **0**. Eerder verborgen fouten:
+**0**. Niet-uitgevoerde verplichte controles: **volledige bevoegdheidsronde,
+APPWERKT-samenstelling en EXPERIENCEWERKT**. Deep Green: **GEBLOKKEERD**.

@@ -57,4 +57,14 @@
   .ds-presentatie-marge-nul:not(#_#_#_) { margin: 0; }
   .ds-presentatie-tekst-compact:not(#_#_#_) { font-size: .82rem; }
   .ds-presentatie-status-opzij:not(#_#_#_) { margin-inline-start: .5rem; }
+  .ds-presentatie-gespreksrij:not(#_#_#_) { display: flex; align-items: center; gap: .9rem; }
+  .ds-presentatie-noot-op:not(#_#_#_) { margin-block-start: -.3rem; }
+  .ds-presentatie-linkknop:not(#_#_#_) { text-decoration: none; }
+  .ds-presentatie-regelaars:not(#_#_#_) { display: flex; gap: .35rem; flex-wrap: wrap; margin-block-start: .5rem; }
+  .ds-presentatie-rechts:not(#_#_#_) { margin-inline-start: auto; }
+  .ds-presentatie-canvas-vol:not(#_#_#_) { display: block; inline-size: 100%; border-radius: 0; touch-action: none; cursor: grab; }
+  .ds-presentatie-veld-middel:not(#_#_#_) { flex: 0 1 16rem; }
+  .ds-presentatie-waarschuwing:not(#_#_#_) { color: var(--zacht, var(--ds-inkt-zacht)); font-size: .88rem; margin-block-end: 1.25rem; line-height: 1.45; }
+  .ds-presentatie-gezinsnaam:not(#_#_#_) { font-size: 1.9rem; margin-block-start: .4rem; }
+  .ds-presentatie-kop-klein:not(#_#_#_) { font-size: 1.1rem; }
 }

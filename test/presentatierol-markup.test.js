@@ -48,7 +48,7 @@ test('Backoffice, Foundation Agenda en RTG iD delen presentatie en zichtbaarheid
   assert.match(agenda, /function verberg\(el, verborgen\)/,
     'Agenda synchroniseert native hidden met de bestaande visuele hulpklasse');
   assert.match(lees('public/shared/rtg-editorial-v4.css'),
-    /daily-action\):not\(\[hidden\]\):not\(\.h-weg\)\{display:inline-flex!important/,
+    /\.daily-action\):not\(\[hidden\]\):not\(\.h-weg\):not\(\.rtg-command-form button\)\{display:inline-flex!important/,
     'Editorial V4 maakt verborgen knoppen niet opnieuw zichtbaar');
   const rtgid = lees('public/apps/rtgid.html');
   for (const id of ['koppelKaart', 'kNamens', 'kMaak']) {
@@ -77,4 +77,40 @@ test('vijf Heritage-werktuigen delen vaste presentatierollen', () => {
     assert.doesNotMatch(markup, /<[a-z][^>]*\sstyle=/i, bestand);
     assert.match(html, /\/ds\/componenten\/presentatierol\.css/, bestand);
   }
+});
+
+test('de laatste tien vaste presentatiestijlen komen uit het Design System', () => {
+  const gevallen = [
+    ['public/apps/leverancier.html', 'stClock', 'ds-presentatie-gespreksrij'],
+    ['public/apps/podium.html', 'kijkerLijst', 'ds-presentatie-noot-op'],
+    ['public/apps/pay.html', 'gDemo', 'ds-presentatie-linkknop'],
+    ['public/apps/media.html', 'regelaarsRij', 'ds-presentatie-regelaars'],
+    ['public/apps/zaal.html', 'stopKnop', 'ds-presentatie-rechts'],
+    ['public/apps/lab.html', 'lab3d', 'ds-presentatie-canvas-vol'],
+    ['public/apps/handel.html', 'hGenre', 'ds-presentatie-veld-middel'],
+    ['public/apps/foundation/beheer.html', 'dlgWisTitel', 'ds-presentatie-waarschuwing'],
+    ['public/apps/foundation/index.html', 'pGezinNaam', 'ds-presentatie-gezinsnaam'],
+    ['public/apps/foundation/club.html', 'pNaam', 'ds-presentatie-kop-klein']
+  ];
+  for (const [bestand, anker, rol] of gevallen) {
+    const html = lees(bestand);
+    assert.match(html, /\/ds\/componenten\/presentatierol\.css/, bestand);
+    assert.match(html, new RegExp('class="[^"]*' + rol + '[^"]*"'), bestand + ': ' + rol);
+    assert.match(html, new RegExp('id="' + anker + '"'), bestand + ': ' + anker);
+  }
+
+  const statischePresentatie = [
+    /style="display:flex;align-items:center;gap:0\.9rem;"/,
+    /style="margin-top:-0\.3rem;"/,
+    /style="text-decoration:none;"/,
+    /style="display:flex;gap:0\.35rem;flex-wrap:wrap;margin-top:0\.5rem;"/,
+    /style="margin-left:auto;"/,
+    /style="display:block;width:100%;border-radius:0;touch-action:none;cursor:grab;"/,
+    /style="flex:0 1 16rem;"/,
+    /style="color:var\(--zacht\);font-size:\.88rem;margin-bottom:1\.25rem;line-height:1\.45;"/,
+    /style="font-size:1\.9rem;margin-top:\.4rem;"/,
+    /style="font-size:1\.1rem;"/
+  ];
+  const bron = gevallen.map(([bestand]) => lees(bestand)).join('\n');
+  for (const patroon of statischePresentatie) assert.doesNotMatch(bron, patroon);
 });

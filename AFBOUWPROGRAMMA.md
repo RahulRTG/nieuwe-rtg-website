@@ -4590,6 +4590,7 @@ verplichte controles: **de volledige platformkwalificatie, menselijke
 Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
 
+
 #### Bestanden en Clips delen centrale presentatierollen
 
 Bestanden gebruikt voor de twee voorwaardelijke overzichtskoppen, de
@@ -4735,3 +4736,33 @@ Niet-uitgevoerde verplichte controles: **APPWERKT-herkwalificatie na de
 bronwijzigingen, de volledige platformkwalificatie, menselijke
 Experience-beoordeling, operationele releasepoorten en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Vaste presentatie uit de resterende markup verwijderd
+
+De laatste tien vaste presentatie-attributen van Leverancier, Podium, Pay,
+Media, Zaal, Living Lab, Handel en drie Foundation-schermen gebruiken nu de
+bestaande centrale `presentatierol`-component. De app-eigen inhoud en
+filmische signatuur blijven intact; alleen herhaalde vaste compositie is uit
+de markup gehaald. De platformmeter telt daardoor **22 inline
+markup-attributen in 15 bestanden: 0 presentatie en 22 toestand**.
+
+De gerichte bron- en browserreeks sloot 25 van 26 scenario's direct. De
+overgebleven Zaal-keten legde een gedeelde semantische Edge-fout bloot:
+`innerText` nam de visuele `text-transform` over en veranderde de toegankelijke
+actie `Bewaren` in `BEWAREN`. De bestaande Adaptive Edge gebruikt nu eerst de
+ongewijzigde `textContent`; de volledige Zaal-keten sluit daarna **1/1**. De
+vaste presentatierolproef sluit **6/6**, Design System meldt nul schendingen en
+87 gemigreerde schermen.
+
+**Afsluiting vaste inline-presentatie.** Openstaande unieke oorzaken: **22
+toestandsattributen in 15 bestanden, dynamische templatepresentatie,
+ontbrekende objectieve/menselijke Experience-bewijzen en operationele
+vrijgavepoorten**. Opgelost sinds vorige meting: **10 vaste
+presentatie-attributen en 1 gedeelde semantische Edge-labeloorzaak**. Nieuwe
+regressies: **0 na de gerichte bron- en browserproeven**. Eerder verborgen
+fouten ontdekt: **1 CSS-transformatie wijzigde de toegankelijke naam van een
+gekopieerde Edge-actie**. Niet-uitgevoerde verplichte controles:
+**APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

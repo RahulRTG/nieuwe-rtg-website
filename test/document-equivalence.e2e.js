@@ -64,7 +64,11 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
         if (caller === 'UI' || caller === 'Edge') {
           page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
           await page.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, owner);
-          page.on('dialog', d => d.accept());
+          // De bevestigingsdialoog is hier niet het onderwerp; deze proef meet
+          // of dezelfde zichtbare handeling via UI, Edge, API en Rahul exact
+          // hetzelfde capability-contract uitvoert. Maak de bevestiging daarom
+          // deterministisch, zodat een headless dialoog de POST niet kan gijzelen.
+          await page.addInitScript(() => { window.confirm = () => true; });
           letOpFouten(page, browserErrors);
         }
         results[caller] = [];
@@ -98,13 +102,13 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
             const received = page.waitForResponse(r =>
               new URL(r.url()).pathname === '/api/bestanden/actie' && r.request().method() === 'POST',
             { timeout: 60000 }).catch(e => {
-              e.message = caller + ':' + f.name + ': ' + e.message;
-              throw e;
+              throw new Error(caller + ':' + f.name + ': ' + e.message, { cause: e });
             });
-            if (caller === 'UI') await page.locator(f.capability === 'documents.restore' ? '#bkHerstel' : '#bkWeg').click();
-            else await edgeBediening(page,
-              f.capability === 'documents.restore' ? 'Terugzetten' : 'Verwijder', f.capability);
-            const r = await received; response = { status: r.status(), body: await r.json() };
+            const action = caller === 'UI'
+              ? page.locator(f.capability === 'documents.restore' ? '#bkHerstel' : '#bkWeg').click()
+              : edgeBediening(page, f.capability === 'documents.restore' ? 'Terugzetten' : 'Verwijder', f.capability);
+            const [r] = await Promise.all([received, action]);
+            response = { status: r.status(), body: await r.json() };
             await page.unroute('**/api/bestanden/actie');
           }
           const expected = { ALLOW: 200, NOOP: 200, DENY: 404, STALE: 409, INVALID: 409 }[f.scenario];

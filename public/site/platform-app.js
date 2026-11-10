@@ -21,17 +21,22 @@
  }
  X.choose('dinner',false);
  shell=P.init({kind:'app',source:d.getElementById('inhoud'),open:open,state:X.snapshot,
-  select:function(story){X.choose(story.id==='travelWorld'?'travel':story.id,false);},
+  select:function(story){X.choose(story.id==='overview'?'dinner':story.id==='travelWorld'?'travel':story.id,false);},
   calendar:function(value){X.permission('calendar',value);}});
+ function momentbeeld(){var dag=d.documentElement.dataset.dagdeel||'avond',naam={ochtend:'morning',middag:'afternoon',avond:'evening',nacht:'night'}[dag]||'evening',beeld=d.querySelector('.pp-feature-photo');if(beeld)beeld.src=new URL('images/editorial/public-'+naam+'.webp',P.asset()).href;}
+ momentbeeld();w.addEventListener('rtg-website-truth',momentbeeld);
  w.RTGPublicApp={shell:shell,open:open};
- var sections=P.node('nav',null,'pp-section-index');sections.setAttribute('aria-label','Alle onderdelen');
- source.querySelectorAll('[data-scene]').forEach(function(el){var b=P.button(titles[el.id],function(){open(el.id);},'pp-button');sections.append(b);});
+ var sections=P.node('nav',null,'pp-section-index');sections.setAttribute('aria-label','Meer over RTG');
+ var hoofdsecties=['platform','verhaal','regie','techniek','passen','vragen'],overig=d.createElement('details'),overigLijst=P.node('div',null,'pp-section-index');
+ overig.dataset.publicSectionsMore='';overig.append(P.node('summary','allSections','pp-button'),overigLijst);
+ source.querySelectorAll('[data-scene]').forEach(function(el){var b=P.button(titles[el.id],function(){open(el.id);},'pp-button');(hoofdsecties.includes(el.id)?sections:overigLijst).append(b);});
+ sections.append(overig);
  d.querySelector('.wd-library').append(P.node('h3','moreRtg','pp-section-title'),sections);
  var footer=d.querySelector('.pp-footer'),nav=P.node('nav',null,'pp-footer-links');
  [['support','mailto:roellie.i@gmail.com'],['privacy','https://app.rahultravelgroup.com/apps/juridisch/privacy.html'],['terms','https://app.rahultravelgroup.com/apps/juridisch/voorwaarden.html']].forEach(function(row){var a=P.node('a',row[0],'pp-button');a.href=row[1];nav.append(a);});footer.append(nav);
  X.permission('calendar',false);
  d.addEventListener('rtg-public-state',shell.refresh);
- w.RTGPublicEdge({kind:'app',shell:shell,open:open,proposal:X.proposal,reset:function(){X.reset();shell.select('travel',false);shell.collapse();}});
+ w.RTGPublicEdge({kind:'app',shell:shell,open:open,proposal:X.proposal,reset:function(){X.reset();shell.select('overview',false);shell.collapse();}});
  if(hash.get('story'))shell.select(hash.get('story'),true);
  if(hash.get('detail'))open(hash.get('detail'));
  else if(w.location.hash&&!w.location.hash.startsWith('#rtg?'))open(w.location.hash.slice(1));

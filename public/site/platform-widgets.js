@@ -28,10 +28,10 @@
    if(company){
     favorites.append(widget({id:'architectureSide',title:'architecture',target:'architecture',icon:'branch',type:'chain',body:'technologyBody',action:'architectureOpen'}),widget(data.cards.find(function(c){return c.id==='foundation';})));
    }else{
-    var agenda=node('section',null,'wd-widget pp-side-widget');agenda.append(node('h2','calendar'),calendarControl(),node('p','unknown','pp-calendar-status'),button('clarify',function(){o.open('regie');}));
-    var regie=node('section',null,'wd-widget pp-side-widget');regie.append(node('h2','regie'));
-    ['plan','effects','decide'].forEach(function(k,i){var p=node('p',null,'pp-plan-row');p.append(icon(['plane','doc','shield'][i]),node('span',k));regie.append(p);});
-    regie.append(node('p','nothing'),button('inspect',function(){o.open('uw-rtg');}));favorites.append(agenda,regie);
+    var appBase=d.querySelector('meta[name="rtg-app-base"]');
+    var account=node('section',null,'wd-widget pp-side-widget');account.append(node('h2','alreadyMember'),node('p','alreadyMemberBody'),button('signIn',function(){w.location.assign(new URL('apps/app.html',appBase&&appBase.content?appBase.content:d.baseURI).href);}));
+    var organisation=node('section',null,'wd-widget pp-side-widget');organisation.append(node('h2','organisationStart'),node('p','organisationStartBody'),button('organisationAction',function(){o.open('platform');}));
+    favorites.append(account,organisation);
    }
   }
   return {widget:widget,calendarControl:calendarControl,favoritesPaint:favoritesPaint};

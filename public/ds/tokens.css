@@ -111,6 +111,11 @@
     --ds-goot: clamp(16px, 4cqi, 48px);
     --ds-breedte-lees: 42rem;
     --ds-breedte-max: 80rem;
+    /* Presentatiebreedte: voor filmische publieke verhalen en redactionele
+       wereldcovers. De leesregel blijft smaller; alleen het beeld ademt breed. */
+    --ds-breedte-cinema: 90rem;
+    --ds-hoogte-cinema: clamp(32rem, 78dvh, 56rem);
+    --ds-lucht-cinema: clamp(4rem, 8vw, 8rem);
 
     /* Geometrie (eigenaarsbesluit 19 oktober 2026): inhoud vrijwel recht,
        systeemlagen herkenbaar rond, een knop mag een capsule zijn. */

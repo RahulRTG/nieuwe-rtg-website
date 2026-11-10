@@ -1,4 +1,4 @@
-/* RTG access in a real browser: one shared Edge, four concise registration
+/* RTG access in a real browser: one shared Edge, six concise registration
    steps, explicit agreement and existing password/WebAuthn/2FA recovery routes.
    All identities and credentials belong to isolated local test fixtures. */
 'use strict';
@@ -155,22 +155,26 @@ test('het inlogportaal en de aanmelding werken met de bestaande beveiligde route
         assert.equal(geometry.color,'rgb(244, 242, 236)');
         await p.locator('#agNieuw').click();
         assert.match(await p.locator('#agZin').innerText(),/Vul uw volledige naam in\./);
-        assert.equal(await p.locator('#agStappen').innerText(),'STAP 1 VAN 4');
+        assert.equal(await p.locator('#agStappen').innerText(),'STAP 1 VAN 6');
         await p.keyboard.press('Tab');assert.notEqual(await p.evaluate(()=>document.activeElement.tagName),'BODY');
         assert.deepEqual(errors,[]);await c.close();
       }
     });
-    await t.test('vier vragen, corrigeren, foutafhandeling, gratis account en bewust akkoord',async()=>{
+    await t.test('zes stappen, corrigeren, foutafhandeling, gratis account en bewust akkoord',async()=>{
       const c=await context(),p=await open(c),calls=[];
       p.on('request',r=>{if(r.method()==='POST')calls.push({path:new URL(r.url()).pathname,body:r.postData()});});
       await p.locator('#agNieuw').click();await enter(p,'Portal Proefpersoon');
       await enter(p,'geen-mailadres');
       assert.equal(await p.locator('#agIn').getAttribute('aria-invalid'),'true');
       await enter(p,email);await enter(p,'1992-03-14');
+      await p.getByRole('button',{name:/Dagelijks leven/}).click();
+      await p.locator('#agGo').click();
+      await p.locator('#agGo').click();
       await p.locator('#agSummary summary').click();
       await p.locator('#agReview button').first().click();
       assert.equal(await p.locator('#agIn').inputValue(),'Portal Proefpersoon');
       await enter(p,'Portal Testpersoon');assert.equal(await p.locator('#agIn').inputValue(),email);
+      await p.locator('#agGo').click();await p.locator('#agGo').click();
       await p.locator('#agGo').click();await p.locator('#agGo').click();
       let failOnce=true;
       await p.route('**/api/auth/register',async route=>{

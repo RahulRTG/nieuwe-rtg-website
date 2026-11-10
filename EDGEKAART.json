@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-06T18:47:05.430Z",
-    "commit": "d74cc164f9",
+    "op": "2026-11-10T14:28:37.259Z",
+    "commit": "aa79dabfa",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
-    "node": "v26.12.1"
+    "node": "v24.18.0"
   },
   "uitleg": "Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. Elk citaat hangt aan het etiket (naam:letter) waar het over gaat, of aan null als het over geen van de veertien gaat; elk etiket s of b heeft minstens een citaat. schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. `gemeten` komt uit de bron zonder commentaar en kent alleen letterlijke namen: attributen alleen op body/html of een alias daarvan, opslag `onbekend` als de opslag niet letterlijk local- of sessionStorage heet. Fetch volgt daarnaast letterlijke aanroepen van eenduidige top-level const-helpers die direct fetch(parameter) doen; geen algemene callgraph. dodeKanalen gaat over rtg-events in public/ (zonder public/dist, .min.js en bundels, wel hun delen) plus index.html; een naam in luisterZonderZender kan nog een zender hebben onder `dynamisch`. `afgeleid` is wat de lexicale lezer over dezelfde wandeling vindt en naast de kaart legt: wie registerAction aanroept op de Edge-kern, wie data-rtg-world en wie data-rtg-edge-2-state op body zet. Een ondergrens: een samengestelde naam ontsnapt. Een dubbele eigenaar is een vondst en geen oordeel.",
   "bestanden": [
@@ -3351,7 +3351,8 @@
         ],
         "zendt": [],
         "luistert": [
-          "rtg-public-state"
+          "rtg-public-state",
+          "rtg-website-truth"
         ],
         "attributen": [
           "data-rtg-desktop",
@@ -3384,7 +3385,8 @@
         ],
         "zendt": [],
         "luistert": [
-          "rtg-public-state"
+          "rtg-public-state",
+          "rtg-website-truth"
         ],
         "attributen": [
           "data-rtg-desktop",

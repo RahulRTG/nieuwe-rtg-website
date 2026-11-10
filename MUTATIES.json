@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-11-10T07:55:13.408Z",
-    "commit": "73ebe2d40a",
-    "boomVuil": true,
-    "boomAnders": 7,
+    "op": "2026-11-10T08:00:43.012Z",
+    "commit": "e09ba7a976",
+    "boomVuil": false,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v26.12.1"
   },
@@ -867,14 +867,8 @@
     },
     "app-thema-eigenaar.test.js": {
       "soort": "puur",
-      "staat": "geen bruikbare mutatie",
-      "modules": [
-        "public/apps/app-main/app-main-02b.js",
-        "public/apps/app-main/app-main-27.js",
-        "public/apps/app-main/app-main-27b.js",
-        "public/apps/app-main/app-main-29.js"
-      ],
-      "posities": 1
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "broncontract over een eigenaarnaam en drie letterlijke themawaarden; 0 bruikbare rekenmutaties. Handmutatie RTGOSThema naar RTGOSThemaOud liet de eigenaarstoets zakken"
     },
     "appbieb.test.js": {
       "soort": "server",
@@ -14863,34 +14857,8 @@
     },
     "presentatierol-markup.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/apps/bestanden/app/01-overzicht.js",
-        "public/apps/bestanden/app.js",
-        "public/apps/bestanden/paneel.js",
-        "public/apps/notities/app/app-01.js",
-        "public/apps/notities/app/app-02.js",
-        "public/apps/leverancier/leverancier-83.js",
-        "public/apps/scanner/app.js",
-        "public/apps/galerij/app.js",
-        "public/apps/handel-aanvraag.js",
-        "public/apps/vertaler/app.js",
-        "public/shared/metgezel/metgezel-03.js",
-        "public/shared/rtg-schil/05-context.js",
-        "public/shared/paspoortscan.js",
-        "public/shared/schoolbel.js",
-        "public/shared/pinherstel.js",
-        "public/shared/schermrust.js",
-        "public/shared/meelezen.js",
-        "public/shared/meeluister.js",
-        "public/shared/verbinding/verbinding-01.js",
-        "public/shared/verbinding/verbinding-02.js",
-        "public/shared/plaatsnadering.js",
-        "public/shared/dyncode.js"
-      ],
-      "geprobeerd": 587,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "statische HTML- en CSS-eigenaarschapscensus; 587 rekenmutaties in uitvoerlogica raken die foutklasse niet. Handmutatie die presentatierol.css uit Clips verwijderde liet uitsluitend de Clips-toets zakken"
     },
     "presentiemeting.test.js": {
       "soort": "server",
@@ -17666,9 +17634,9 @@
       "geprobeerd": 9
     },
     "schermrust.e2e.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "browsercontract over berekende CSS en bediening; de serverliegpoort raakt geen presentatie. Handmutatie position fixed naar absolute in schermrust.css liet de venstertoets zakken"
     },
     "schermsuite-bewijs.test.js": {
       "soort": "puur",

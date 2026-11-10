@@ -5619,11 +5619,15 @@ foutdiagnostiek meldt voortaan compact de statussen en foutcodes van beide
 workers zodat een eventuele herhaling volledig zichtbaar blijft.
 
 DG-CI-12 is gesloten door uitsluitend de acht nieuwe toetsen met de bestaande
-mutatiemotor te meten. Vier zuivere toetsen zakken aantoonbaar op een
-bronmutatie; twee krijgen een eerlijke mechanische uitkomst zonder bruikbare
-mutatie; de twee browsertests zijn via de bestaande liegpoort beproefd. Daarmee
-keert `toetsenNietGemeten` terug van **149** naar de vastgelegde **141**, zonder
-de norm te verhogen of bestaand bewijs opnieuw te verklaren.
+mutatiemotor te meten. Vier zuivere toetsen en één browsertest zakken
+aantoonbaar op de bestaande automatische foutproef. Voor de drie statische
+presentatiecontracten raakt een rekenmutatie of serverliegpoort de beweerde
+foutklasse niet; zij zijn daarom afzonderlijk beproefd met een hernoemde
+thema-eigenaar, een verwijderd centraal presentatieblad en een onjuist
+gepositioneerd rustvenster. Alle drie werden rood en iedere tijdelijke mutatie
+is teruggezet. Daarmee keert `toetsenNietGemeten` terug van **149** naar de
+vastgelegde **141** en `toetsenOngevoeligPct` naar **0**, zonder de norm te
+verhogen of bestaand bewijs opnieuw te verklaren.
 
 **Meetstand herstelronde 6.** Releaseblokkerende bronoorzaken: **3 nog uitsluitend
 door de volledige GitHub-tegenproef te beslissen**: DG-CI-09 (gedeelde

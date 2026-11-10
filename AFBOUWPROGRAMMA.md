@@ -5112,3 +5112,40 @@ overgenomen en alle definitieve proeven zijn onder de voorgeschreven Node
 APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven, platformbrede
 gedragssuite, staging/load/herstel/rollback en twee onafhankelijke eindruns**.
 Deep Green: **GEBLOKKEERD**.
+
+#### Afgesloten gedeelde oorzaak: eigenaarszetelpresentatie
+
+De Boardroom-eigenaarszetel bouwt niet langer een eigen runtime-stijlblad. De
+bestaande eigenaarspoort, Boardroom-API's, betaalprovideracties, talenregie,
+Rahul-voorstellen en storingslog blijven ongewijzigd. Hun presentatie woont nu
+in `public/ds/componenten/eigenaarszetel.css`, geladen via de bestaande
+componentzone van de Boardroom en het centrale Design System-manifest.
+
+De generieke elementbouwer accepteert geen ongebruikte `html`-eigenschap meer;
+alle gebruikerszichtbare tekst blijft via `textContent` lopen. De statusstip en
+de AI-actierij gebruiken centrale klassen in plaats van `element.style` en een
+inline `style`-attribuut. De statusbetekenis blijft ook in tekst en bediening
+zichtbaar. Alle interactieve zetelacties hebben centraal minimaal 44 bij 48
+pixels bedieningsruimte en een zichtbare focusstaat.
+
+Gerichte kwalificatie op Node **26.12.1** sluit **116/116** Design System-,
+laadgraaf-, token- en contracttests en **2/2** echte Boardroombrowserketens. De
+eigenaarproef bewijst een echte eigenaarssessie, het ontbreken van runtime- en
+inline presentatie in de zetel, toegankelijke actieafmetingen en de intacte
+koppeling naar het kostenbord. De niet-eigenaargrens blijft door de bestaande
+server- en schermcontracten bewaakt. Design System meldt nul schendingen en 87
+gemigreerde schermen. De actuele presentatiemeter daalt van 82 naar **81 scripts
+met stijlinjectie** en van 169 naar **168 injectieplekken**; de verdwenen owner
+is uit de ratel verwijderd.
+
+**Afsluiting eigenaarszetelpresentatie.** Openstaande unieke oorzaken:
+**81 scripts met resterende runtime-stijllading of -injectie, actieve
+legacybladen en schermstijlblokken, ontbrekende actuele APPWERKT-
+herkwalificatie, 3360 niet-uitgevoerde Experience-voorwaarden en operationele
+vrijgavepoorten**. Opgelost sinds vorige meting: **1 runtime-stijlowner, 1
+injectieplek, 1 ongebruikte generieke HTML-sink en 2 inline presentatiepaden**.
+Nieuwe regressies: **0 in de gerichte Design System- en Boardroomproeven**.
+Eerder verborgen fouten ontdekt: **geen**. Niet-uitgevoerde verplichte
+controles: **actuele volledige APPWERKT, EXPERIENCEWERKT inclusief menselijke
+proeven, platformbrede gedragssuite, staging/load/herstel/rollback en twee
+onafhankelijke eindruns**. Deep Green: **GEBLOKKEERD**.

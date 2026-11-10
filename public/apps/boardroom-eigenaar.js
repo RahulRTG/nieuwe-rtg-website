@@ -21,52 +21,19 @@
     var e = document.createElement(tag);
     for (var k in (attrs || {})) {
       if (k === 'text') e.textContent = attrs[k];
-      else if (k === 'html') e.innerHTML = attrs[k];
       else e.setAttribute(k, attrs[k]);
     }
     for (var i = 2; i < arguments.length; i++) if (arguments[i]) e.appendChild(arguments[i]);
     return e;
   }
 
-  var stijl = document.createElement('style');
-  stijl.textContent =
-    '.ez{margin:0 0 1.6rem;}' +
-    '.ez-kop{display:flex;align-items:center;gap:.8rem;justify-content:center;margin:.4rem 0 .2rem;' +
-      "font-family:Inter,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--gold,#857007);}" +
-    '.ez-kop::before,.ez-kop::after{content:"";flex:0 0 2.2rem;height:1px;background:color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
-    ".ez-naam{font-family:'Bodoni Moda',serif;font-size:1.25rem;text-align:center;margin:.35rem 0 1.1rem;}" +
-    '.ez details{border:1px solid var(--line,#DEDBD5);border-radius:0;margin:.6rem 0;background:var(--card,rgba(255,255,255,.03));}' +
-    ".ez summary{cursor:pointer;padding:.85rem 1rem;font-family:'Bodoni Moda',serif;font-size:1.02rem;list-style:none;}" +
-    '.ez summary::-webkit-details-marker{display:none;}' +
-    '.ez summary::after{content:"▾";float:right;color:var(--gold,#857007);opacity:.7;}' +
-    '.ez .ez-body{padding:0 1rem .9rem;}' +
-    '.ez-fn{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-top:1px solid color-mix(in srgb, var(--line,#DEDBD5) 45%, transparent);}' +
-    '.ez-fn:first-child{border-top:none;}' +
-    '.ez-stip{flex:0 0 8px;width:8px;height:8px;border-radius:50%;}' +
-    '.ez-fn small{display:block;color:var(--muted,#8A8680);font-size:.72rem;line-height:1.45;}' +
-    '.ez-fn>div{flex:1;min-width:0;font-size:.86rem;}' +
-    '.ez-knop{background:none;border:1px solid var(--line,#DEDBD5);border-radius:0;color:inherit;' +
-      'font:inherit;font-size:.72rem;padding:.3rem .8rem;cursor:pointer;white-space:nowrap;}' +
-    '.ez-knop.aan{border-color:color-mix(in srgb, var(--gold,#857007) 65%, transparent);color:var(--gold,#857007);}' +
-    '.ez-cat{margin:.7rem 0 .2rem;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold,#857007);}' +
-    '.ez-taal{display:inline-block;margin:.2rem .3rem .2rem 0;}' +
-    '.ez-ai textarea{width:100%;box-sizing:border-box;background:none;border:1px solid var(--line,#DEDBD5);border-radius:0;' +
-      'color:inherit;font:inherit;font-size:.86rem;padding:.6rem;min-height:3.2rem;resize:vertical;}' +
-    '.ez-ai .ez-antwoord{margin:.7rem 0;font-size:.84rem;line-height:1.55;color:var(--muted,#8A8680);white-space:pre-wrap;}' +
-    '.ez-log{font-size:.76rem;color:var(--muted,#8A8680);line-height:1.6;}' +
-    '.ez-betaal{border-top:1px solid color-mix(in srgb,var(--line,#DEDBD5) 45%,transparent);padding:.65rem 0;}' +
-    '.ez-betaal:first-child{border-top:none;}.ez-betaal-kop{display:flex;align-items:center;justify-content:space-between;gap:.5rem;}' +
-    '.ez-betaal-acties{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.45rem}.ez-betaal select{background:none;color:inherit;border:1px solid var(--line,#DEDBD5);border-radius:0;padding:.28rem .55rem;font-size:.72rem;}' +
-    '.ez-melding{margin:.5rem 0;font-size:.8rem;color:var(--gold,#857007);min-height:1.1rem;}';
-  document.head.appendChild(stijl);
-
   var wrap = null, meldEl = null;
   function meld(t) { if (meldEl) { meldEl.textContent = t || ''; if (t) setTimeout(function () { if (meldEl.textContent === t) meldEl.textContent = ''; }, 5000); } }
 
-  function stipKleur(f) {
-    if (f.storing) return '#B0483B';
-    if (f.automaat) return '#C9A24B';
-    return f.aan ? '#4C7A4C' : 'color-mix(in srgb, var(--muted,#8A8680) 60%, transparent)';
+  function stipStand(f) {
+    if (f.storing) return 'storing';
+    if (f.automaat) return 'automaat';
+    return f.aan ? 'aan' : 'uit';
   }
 
   function bouwFuncties(d) {
@@ -74,8 +41,7 @@
     (d.functies || []).forEach(function (cat) {
       body.appendChild(el('div', { 'class': 'ez-cat', text: cat.categorie }));
       (cat.functies || []).forEach(function (f) {
-        var stip = el('span', { 'class': 'ez-stip' });
-        stip.style.background = stipKleur(f);
+        var stip = el('span', { 'class': 'ez-stip ez-stip--' + stipStand(f), 'aria-hidden': 'true' });
         var knop = el('button', { 'class': 'ez-knop' + (f.aan ? ' aan' : ''), type: 'button',
           text: f.aan ? T('ez.aan', 'aan') : T('ez.uit', 'uit') });
         knop.addEventListener('click', function () {
@@ -144,7 +110,7 @@
         laad();
       }).catch(function (e) { meld(e.message); pasToe.disabled = false; });
     });
-    body.append(veld, el('div', { style: 'margin-top:0.5rem;display:flex;gap:0.5rem;' }, knop, pasToe), uit);
+    body.append(veld, el('div', { 'class': 'ez-ai-acties' }, knop, pasToe), uit);
     return body;
   }
 
@@ -206,7 +172,7 @@
 
   function render(d) {
     if (!wrap) {
-      wrap = el('section', { 'class': 'ez', 'aria-label': T('ez.zetel', 'De eigenaarszetel') });
+      wrap = el('section', { 'class': 'ez ds-eigenaarszetel', 'aria-label': T('ez.zetel', 'De eigenaarszetel') });
       var bord = document.getElementById('bord');
       if (bord && bord.parentNode) bord.parentNode.insertBefore(wrap, bord);
       else document.getElementById('hoofd').appendChild(wrap);

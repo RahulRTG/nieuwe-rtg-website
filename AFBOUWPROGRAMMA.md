@@ -5220,3 +5220,41 @@ fouten ontdekt: **geen**. Niet-uitgevoerde verplichte controles: **actuele
 volledige APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven,
 platformbrede gedragssuite, staging/load/herstel/rollback en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Afgesloten gedeelde oorzaak: Magnaat-trainingsgrenspresentatie
+
+De afgeschermde Magnaat-trainingskopie gebruikt op iedere host voortaan de al
+bestaande centrale `ds-magnaatproef`-component. De tweede legacy-presentatie in
+`magnaat-sandbox.js` is verwijderd. De hoofdapp laadt het begrensde
+componentblad via haar bestaande Design System-componentzone; volledige
+Design System-hosts krijgen dezelfde component via `rtg-ds.css`.
+
+De beveiligingsgrens is ongewijzigd: API-verkeer, XHR, echte browseropslag,
+camera, microfoon, locatie, realtimekanalen, serviceworkers en externe
+navigatie blijven in de trainingskopie geblokkeerd. Gerichte kwalificatie op
+Node **26.12.1** sluit **17/17** sandbox-, opslag-, netwerk-, apparaat- en
+Design System-contractproeven en **6/6** echte Chauffeur-browserproeven. De
+browser bewijst dat het keurmerk zichtbaar blijft, de centrale owner draagt,
+geen runtime-stijl injecteert en geen mobiliteits-API raakt.
+
+Omdat de hoofdappbron veranderde, zijn ook de taal- en websitebewijzen
+inhoudelijk vernieuwd: **27/27** taalproeven sluiten groen en het werkelijke
+gebruikersscherm plus zijn herkomstafdruk zijn opnieuw opgebouwd. De volledige
+statische huiskeuring sluit daarna groen. Design System meldt nul schendingen
+en 87 gemigreerde schermen. De actuele presentatiemeter daalt van 79 naar **78
+scripts met stijlinjectie** en van 166 naar **165 injectieplekken**; de
+verdwenen owner is uit `ONTWERPNORM.json` verwijderd.
+
+**Afsluiting Magnaat-trainingsgrenspresentatie.** Openstaande unieke oorzaken:
+**78 scripts met resterende runtime-stijllading of -injectie, actieve
+legacybladen en schermstijlblokken, ontbrekende actuele APPWERKT-
+herkwalificatie, 3360 niet-uitgevoerde Experience-voorwaarden en operationele
+vrijgavepoorten**. Opgelost sinds vorige meting: **1 runtime-stijlowner en 1
+injectieplek**. Nieuwe regressies: **0 in de gerichte sandbox-, Design System-,
+browser-, taal-, websitewaarheids- en statische proeven**. Eerder verborgen
+fouten ontdekt: **de bestaande centrale Magnaat-component was op de hoofdapp
+niet geladen; dat laadpad is nu expliciet en door de echte host bewezen**.
+Niet-uitgevoerde verplichte controles: **actuele volledige APPWERKT,
+EXPERIENCEWERKT inclusief menselijke proeven, platformbrede gedragssuite,
+staging/load/herstel/rollback en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

@@ -144,9 +144,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1696 |
+| kern-namen die routes aanraken | 1695 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 260 |
-| daarvan door precies één domein | 1436 |
+| daarvan door precies één domein | 1435 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -158,9 +158,9 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(217) auth(136) supplierAuth(67) officeAuth(50) db(41) liveCodename(36) status(32)
+app(216) auth(135) supplierAuth(67) officeAuth(50) db(41) liveCodename(36) status(32)
 accounts(30) schoon(23) rtf(23) boardroomWie(22) codenaamVan(21) managerOnly(20)
-save(20) tooManyTries(15) geenGast(14) express(14) boardroomAuth(14) findSupplier(13)
+save(20) tooManyTries(14) geenGast(14) express(14) boardroomAuth(14) findSupplier(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
 logActivity(8) resolveSession(8) mail(7) onboarding(7) naamAuth(7) sseToSupplier(7)

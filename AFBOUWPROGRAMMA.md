@@ -5495,7 +5495,8 @@ geclassificeerde presentatiebronnen**. Bewezen afgesloten sinds vorige ronde:
 Nieuwe regressies: **0 in 150 gerichte tests, de volledige statische
 huiskeuring en de Design System- en bundelcontroles**. Eerder verborgen fouten:
 **0; de lokale loopbackfout was infrastructuurgebonden en verdween zonder
-bronwijziging in de toegestane omgeving**. Nog niet uitgevoerde verplichte controles: **actuele
+bronwijziging in de toegestane omgeving**. Nog niet uitgevoerde verplichte
+controles: **actuele
 volledige CI en commitgebonden GitHub-status, APPWERKT-herkwalificatie,
 EXPERIENCEWERKT inclusief menselijke proeven, security/finance/load,
 staging/back-up/herstel/rollback/incidentrespons en twee onafhankelijke
@@ -5505,3 +5506,52 @@ gekwalificeerd**. Actuele broncommit vóór deze registerwijziging:
 `f44074bf7f6c43f2e177d55a0c1c15e8e109b48f`. Eerstvolgende blokkade:
 **één definitieve bronstand samenstellen en de volledige verplichte CI-status
 op die commit vastleggen**. Deep Green: **GEBLOKKEERD**.
+
+### Definitieve bronstand en open PR-afhankelijkheden — 10 november 2026
+
+Na een verse `git fetch --prune origin` staat de gecontroleerde productbron op
+commit
+`760ecac68234a83b53fad80aec8b22d69d4b6898`, **58 commits voor** en **0
+commits achter** `origin/main` (`290144d6411b81644dfb407365932c35a58ab277`).
+De drie laatste productherstellen voor Magnaat, ondertiteling en FocusUI zijn
+lineaire voorouders van deze stand; er ontbreekt geen aparte lokale
+herstelcommit. De werkboom was schoon vóór deze register-only vastlegging; de
+vastlegging zelf wordt de directe kindcommit van deze productbron.
+
+De actuele open GitHub-PR's zijn als volgt beoordeeld:
+
+* **#702 Experience Architecture v1** is `dirty` tegen main en gebouwd op de
+  oude merge-base `08b4e2dca2`. De enige commit die niet in deze kandidaat
+  voorkomt wijzigt een gegenereerde `BEWIJS.md`-afdruk van de oude bronstand en
+  verkort alleen commentaar in `zakelijk-voorzijde.js`. Deze commit wordt niet
+  geïntegreerd: de actuele kandidaat bevat de latere Experience- en
+  presentatieafbouw en haar bewijs mag niet door een oude afdruk worden
+  teruggezet.
+* **#703, #704 en #705** vervangen uitsluitend vastgezette Postgres-, Rust- en
+  Node-containerdigests. **#707 en #708** vervangen uitsluitend de vastgezette
+  CodeQL-actiondigest. **#709** verhoogt uitsluitend de toetsbrowser van
+  Playwright 1.64.1 naar 1.65.0. Zij zijn mergeable maar `behind`; GitHub meldt
+  geen open Dependabot-security-alert voor de repository. Binnen de scope
+  freeze zijn dit afzonderlijk te kwalificeren onderhoudsupdates en geen
+  ontbrekende productherstellen. Ze worden niet stil in de kandidaat gemengd.
+* **#696** is een draft tegen `claude/design-system-v1`, niet tegen main, en is
+  daardoor geen afhankelijkheid van deze releasekandidaat.
+
+De eerder gemergede PR #706 hoort bij dezelfde branchnaam maar eindigde op
+`0e18812ec8`; de huidige 58 commits vormen dus een nieuwe kwalificatiescope.
+Er staat nog geen open PR op de actuele branchkop. De volgende noodzakelijke
+handeling is deze exacte branchkop publiceren, daar een afzonderlijke
+kwalificatie-PR voor openen en alle verplichte GitHub-controles volledig laten
+uitlopen. Een rode of niet-uitgevoerde job blijft blokkerend.
+
+**Bronstandronde.** Releaseblokkerende bronoorzaken: **0 bekende
+presentatieoorzaken; platformbrede CI nog niet uitgevoerd op de actuele kop**.
+Bewezen afgesloten sinds vorige ronde: **main-synchronisatie, lokale
+herstelcommitinventaris en open-PR-afhankelijkheidsanalyse**. Nieuwe regressies:
+**0 in de gerichte en statische kwalificaties**. Nog niet uitgevoerde
+verplichte controles: **GitHub CI op de actuele branchkop, APPWERKT,
+EXPERIENCEWERKT, operationele proeven en twee onafhankelijke eindruns**.
+APPWERKT: **0/114 actueel geldig**. EXPERIENCEWERKT: **0/316 schermen en
+0/3360 voorwaarden actueel gekwalificeerd**. Eerstvolgende blokkade:
+**commitgebonden kwalificatie-PR en volledige CI**. Deep Green:
+**GEBLOKKEERD**.

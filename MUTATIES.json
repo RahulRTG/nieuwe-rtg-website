@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-09T17:37:22.801Z",
-    "commit": "ddadba6be",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-11-10T07:55:13.408Z",
+    "commit": "73ebe2d40a",
+    "boomVuil": true,
+    "boomAnders": 7,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v26.12.1"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -864,6 +864,17 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "letterlijke browsercontracten; 93 generieke mutaties raakten geen tekenreeks, handmutatie zonder js-asintrek laat de Assets-bewering zakken"
+    },
+    "app-thema-eigenaar.test.js": {
+      "soort": "puur",
+      "staat": "geen bruikbare mutatie",
+      "modules": [
+        "public/apps/app-main/app-main-02b.js",
+        "public/apps/app-main/app-main-27.js",
+        "public/apps/app-main/app-main-27b.js",
+        "public/apps/app-main/app-main-29.js"
+      ],
+      "posities": 1
     },
     "appbieb.test.js": {
       "soort": "server",
@@ -3208,6 +3219,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "codearchitect-preflight.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/proof-envelope.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "codearchitect-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5319,6 +5338,22 @@
       "staat": "al rood",
       "gezakteZonderMutatie": 2
     },
+    "experience-a11y.proof.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/a11y.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 22
+    },
+    "experience-a11y.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/a11y.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "experience-artifact-matrix.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5479,6 +5514,14 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "experience-signatures.proof.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/artifact.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "experience-surface.e2e.js": {
       "soort": "server",
@@ -9572,6 +9615,13 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "lab-pro-ds.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "lab2-bewoner.test.js": {
       "soort": "server",
@@ -14811,6 +14861,37 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "presentatierol-markup.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "public/apps/bestanden/app/01-overzicht.js",
+        "public/apps/bestanden/app.js",
+        "public/apps/bestanden/paneel.js",
+        "public/apps/notities/app/app-01.js",
+        "public/apps/notities/app/app-02.js",
+        "public/apps/leverancier/leverancier-83.js",
+        "public/apps/scanner/app.js",
+        "public/apps/galerij/app.js",
+        "public/apps/handel-aanvraag.js",
+        "public/apps/vertaler/app.js",
+        "public/shared/metgezel/metgezel-03.js",
+        "public/shared/rtg-schil/05-context.js",
+        "public/shared/paspoortscan.js",
+        "public/shared/schoolbel.js",
+        "public/shared/pinherstel.js",
+        "public/shared/schermrust.js",
+        "public/shared/meelezen.js",
+        "public/shared/meeluister.js",
+        "public/shared/verbinding/verbinding-01.js",
+        "public/shared/verbinding/verbinding-02.js",
+        "public/shared/plaatsnadering.js",
+        "public/shared/dyncode.js"
+      ],
+      "geprobeerd": 587,
+      "posities": 1000,
+      "dekking": "beproefd"
+    },
     "presentiemeting.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -17583,6 +17664,11 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 9
+    },
+    "schermrust.e2e.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
     },
     "schermsuite-bewijs.test.js": {
       "soort": "puur",

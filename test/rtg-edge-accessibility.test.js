@@ -17,7 +17,7 @@ const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
 const CHAUFFEUR = lees('public/apps/chauffeur.html');
 const DS_KOP = lees('public/ds/componenten/kop.css');
 const DS_TOKENS = lees('public/ds/tokens.css');
-const VERBINDING = lees('public/shared/verbinding/verbinding-02.js');
+const VERBINDING = lees('public/ds/componenten/verbinding.css');
 
 function variabele(blok, naam) {
   const raak = blok.match(new RegExp('--' + naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ':\\s*(#[0-9a-f]{6})', 'i'));
@@ -69,7 +69,8 @@ test('route-eigen mobiele bediening houdt hetzelfde volledige raakvlak', () => {
     'een kopactie is zo breed en hoog als het raakdoel');
   const doel = Number((DS_TOKENS.match(/--ds-doel:\s*(\d+)px/) || [])[1]);
   assert.ok(doel >= 44, 'het raakdoel van het systeem is minstens 44px, kreeg ' + doel);
-  assert.match(VERBINDING, /flex:0 0 44px;min-width:44px;min-height:44px;display:grid/);
+  assert.match(VERBINDING, /\.ds-net__status > button\s*\{[^}]*min-inline-size: var\(--ds-doel\);[^}]*min-block-size: var\(--ds-doel\);/,
+    'de verbindingstoets erft het centrale Design System-raakdoel');
 });
 
 test('Edge verbergt een hoofdactie zonder doel en respecteert de toesteluitsparing', () => {

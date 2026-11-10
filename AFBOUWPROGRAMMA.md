@@ -4959,7 +4959,7 @@ releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 
 #### De hoofdapp heeft geen verborgen licht/donker-eigenaar meer
 
-De laatste host van `shared/thema.js` gebruikt voortaan voor de zichtbare
+De laatste host van de inmiddels verwijderde gedeelde thema-eigenaar gebruikt voortaan voor de zichtbare
 driekeuze, de korte weergavetegel, Spotlight en Rahul dezelfde bestaande
 `RTGOSThema`-controller. De drie bestaande keuzes Champagne, Donker en
 Bordeaux en hun opslagcontract blijven behouden. Onbekende themawaarden
@@ -5555,3 +5555,85 @@ APPWERKT: **0/114 actueel geldig**. EXPERIENCEWERKT: **0/316 schermen en
 0/3360 voorwaarden actueel gekwalificeerd**. Eerstvolgende blokkade:
 **commitgebonden kwalificatie-PR en volledige CI**. Deep Green:
 **GEBLOKKEERD**.
+
+### Onveranderlijke CI-nulmeting kandidaat `73ebe2d40a` — 10 november 2026
+
+De eerste volledige GitHub-kwalificatie op exact commit
+`73ebe2d40a2afb5fddf121f1c585520b4d115d0c` is volledig uitgelopen in run
+`42740506546`; de afzonderlijke alle-schermenrun is `42740506180`. Van de 43
+gerapporteerde controles waren er 12 niet groen. Twee daarvan zijn afgeleide
+totaaloordelen en geen zelfstandige bronoorzaak. De mobiele 390-pixelrun werd
+door GitHub na circa 49 minuten afgebroken en is daarom niet uitgevoerd bewijs,
+geen geslaagde of mislukte productproef.
+
+De concrete foutboom is bevroren voordat bronherstel begint:
+
+| ID | Primaire oorzaak | Soort | Getroffen verplichte controles | Herstelvolgorde |
+| --- | --- | --- | --- | --- |
+| DG-CI-01 | Vijf centrale componentbladen worden in `public/apps/app.html` na Heritage en de observator geladen. Dit doorbreekt de vastgelegde first-paint- en bundelvolgorde. | Bronregressie | unit-shard 2 (twee Heritage-proeven), unit-shard 4 (`stijlbundel`) | 1 |
+| DG-CI-02 | `componenten/magnaatproef.css` heeft twee import-eigenaren: rechtstreeks in `rtg-ds.css` en via `bediening.css`. | Architectuurschending | unit-shard 3 (cyclische/dubbele DS-import) | 1 |
+| DG-CI-03 | De offline-shellvingerafdruk verwijst nog naar de vorige app-shellinhoud. | Gegenereerd artefact verlopen | unit-shard 1 | 2 |
+| DG-CI-04 | `EXPERIENCEWERKT.json` is niet opnieuw afgeleid na de actuele broninventaris. | Verlopen bewijsregister | unit-shard 2, norm/build | 2 |
+| DG-CI-05 | `STILLEZING.json` telt 185 scripts terwijl de actuele inventaris 184 scripts bevat. | Registerafwijking | unit-shard 3 | 2 |
+| DG-CI-06 | Dit register noemde een inmiddels verwijderde thema-eigenaar nog als actief bronadres. | Documentatie-/adresregressie | unit-shard 2, norm/build | 2 |
+| DG-CI-07 | Browserproeven lezen visueel getransformeerde `innerText` hoofdlettergevoelig als semantische tekst. De bron bevat de juiste tekst; de centrale DS-laag past alleen presentatie toe. | Testcontract verouderd | scherm-shard 2, scherm-shard 3 (`werkuitgaven`), scherm-shard 5 (`veiligheid`) | 3 |
+| DG-CI-08 | Twee oude verbindingstests verwachten inline `style.transform` en inline CSS, terwijl zichtbaarheid en doelgrootte inmiddels centraal door `hidden` en `verbinding.css` worden beheerd. | Testcontract verouderd | unit-shard 4, scherm-shard 3 (`apps-ui`) | 3 |
+| DG-CI-09 | `navigatiekaarten.e2e.js` bereikt onder gedeelde CI-belasting de shardtimeout, maar sluit op dezelfde commit lokaal volledig groen. | CI-instabiliteit, nog tegen te beproeven | scherm-shard 3 | 4 |
+| DG-CI-10 | De gelijktijdige Magnaat-besluitproef ontvangt voor een worker een status buiten het vastgelegde contract. De CI-log bevat door afkapping alleen de eerste 200-respons; de tweede status moet in echte PostgreSQL worden gereproduceerd voordat bron of test wijzigt. | Onbekend, nader bewijs vereist | static+PostgreSQL | 4 |
+| DG-CI-11 | De mobiele 390-pixelkwalificatie is door de CI-omgeving afgebroken en leverde geen geldige uitslag. | Niet-uitgevoerde verplichte controle | mobiele schermkwalificatie | 5 |
+| DG-CI-12 | Acht toetsen die na de laatste mutatiecampagne zijn toegevoegd, hadden nog geen commitgebonden gevoeligheidsuitslag. Daardoor steeg `toetsenNietGemeten` van 141 naar 149. | Eerder verborgen ontbrekend bewijs | norm/build | 4 |
+
+`Tests, checks en build` en `Toegankelijkheid - oordeel` zijn afgeleide
+samenvattingen van bovenstaande deeljobs. Zij worden niet als extra oorzaak
+geteld. Alle overige uitgevoerde verplichte jobs waren groen. De lokale gerichte
+tegenproef bevestigt DG-CI-07 en DG-CI-08, terwijl `navigatiekaarten.e2e.js`
+daarbij volledig slaagt; er zijn geen JavaScript-fouten of ontbrekende
+productpanelen waargenomen.
+
+**Nulmeting.** Openstaande unieke oorzaken: **12**, waarvan **7 direct
+reproduceerbaar**, **3 register-/bewijsafleidingen**, **1 CI-instabiliteit** en
+**1 nog onbekende PostgreSQL-uitkomst**. Opgelost sinds deze meting: **0**.
+Nieuwe regressies: **0 gemeten na de nulmeting**. Eerder verborgen fouten:
+**DG-CI-09, DG-CI-10 en DG-CI-11 werden pas zichtbaar nadat eerdere jobs waren
+uitgelopen**. Niet-uitgevoerde verplichte controles: **1 mobiele shard plus de
+latere APPWERKT-, EXPERIENCEWERKT-, operationele en dubbele eindkwalificatie**.
+Deep Green: **GEBLOKKEERD**.
+
+### Herstelronde kandidaat na `73ebe2d40a` — 10 november 2026
+
+De broncorrecties volgen uitsluitend de bevroren foutboom. De centrale
+first-paintvolgorde is hersteld in de bestaande Heritage-uitrol; zeventien
+afhankelijke schermen zijn met dezelfde generator opnieuw afgeleid. De dubbele
+Magnaatproef-import is bij de bron verwijderd. Offline- en Foundation-caches,
+bundels, stillezing, taalbewijzen, websitewaarheid en Experience-inventaris zijn
+via hun bestaande generatoren vernieuwd. Browserproeven lezen nu de semantische
+toestand (`hidden` en `textContent`) in plaats van een visuele hoofdlettervorm of
+een verdwenen inline-stijlcontract.
+
+De gerichte statische kwalificaties zijn groen. De vijf geraakte browsergroepen
+sluiten **34/34** groen. De echte geïsoleerde PostgreSQL-proef voor
+Magnaat-besluiten sluit **6/6** opeenvolgende uitvoeringen groen, telkens met twee
+workers, herstart, replay, inhoudsconflict en actorisolatie. Omdat de afwijkende
+CI-status niet lokaal reproduceert, is de producttransactie niet gewijzigd; de
+foutdiagnostiek meldt voortaan compact de statussen en foutcodes van beide
+workers zodat een eventuele herhaling volledig zichtbaar blijft.
+
+DG-CI-12 is gesloten door uitsluitend de acht nieuwe toetsen met de bestaande
+mutatiemotor te meten. Vier zuivere toetsen zakken aantoonbaar op een
+bronmutatie; twee krijgen een eerlijke mechanische uitkomst zonder bruikbare
+mutatie; de twee browsertests zijn via de bestaande liegpoort beproefd. Daarmee
+keert `toetsenNietGemeten` terug van **149** naar de vastgelegde **141**, zonder
+de norm te verhogen of bestaand bewijs opnieuw te verklaren.
+
+**Meetstand herstelronde 6.** Releaseblokkerende bronoorzaken: **3 nog uitsluitend
+door de volledige GitHub-tegenproef te beslissen**: DG-CI-09 (gedeelde
+CI-duur/instabiliteit), DG-CI-10 (de lokaal niet reproduceerbare PostgreSQL-
+uitkomst) en DG-CI-11 (de niet-uitgevoerde mobiele kwalificatie). DG-CI-10 blijft
+tot diezelfde tegenproef conservatief open als omgevingsafhankelijke uitkomst. Bewezen
+afgesloten sinds de nulmeting: **9 van 12**. Nieuwe regressies: **0 in de
+gerichte controles**. Nog niet uitgevoerde verplichte controles: **volledige CI
+op de nieuwe schone commit, APPWERKT-herkwalificatie, EXPERIENCEWERKT-proeven,
+operationele kwalificatie en twee onafhankelijke eindruns**. APPWERKT:
+**0/114 actueel geldig**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden
+actueel gekwalificeerd**. Eerstvolgende blokkade: **commitgebonden volledige CI**.
+Deep Green: **GEBLOKKEERD**.

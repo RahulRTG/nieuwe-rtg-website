@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-11-10T17:49:12.884Z",
-  "commit": "1f92b532f",
+  "op": "2026-11-10T18:45:17.913Z",
+  "commit": "fb2743bdb",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -3316,13 +3316,13 @@
   },
   {
    "sleutel": "POST /api/personalos/contract",
-   "bestand": "server/routes/personalos.js:19",
+   "bestand": "server/routes/personalos.js:18",
    "staat": "openbaar",
    "reden": "de openbare onboarding moet geldige doelen en layouts kunnen tonen voordat er een account bestaat; bevat alleen vaste contractmetadata"
   },
   {
    "sleutel": "POST /api/personalos/preview",
-   "bestand": "server/routes/personalos.js:20",
+   "bestand": "server/routes/personalos.js:19",
    "staat": "openbaar",
    "reden": "de progressieve kennismaking componeert uitsluitend openbare catalogusmetadata voor registratie, is per bron geremd en antwoordt expliciet authorizationClaim=false"
   },

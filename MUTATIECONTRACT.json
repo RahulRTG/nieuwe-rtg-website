@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-11-10T17:49:57.100Z",
-  "commit": "3b5744adf",
+  "op": "2026-11-10T19:47:37.314Z",
+  "commit": "9f3180668",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -13,13 +13,13 @@
   "totaal": 5425,
   "geclassificeerd": 5425,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3164,
+   "BLOCKED_BY_TEST_FIXTURE": 3163,
    "NOT_APPLICABLE": 1304,
-   "PROTECTED": 731,
+   "PROTECTED": 732,
    "INTENTIONALLY_NON_IDEMPOTENT": 226
   },
-  "vastgesteldDoorMens": 2313,
-  "afgeleidDoorScript": 3112,
+  "vastgesteldDoorMens": 2314,
+  "afgeleidDoorScript": 3111,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4511,
    "PUBLIC": 85,
@@ -91027,7 +91027,7 @@
    "mutatieId": "rtf.onboarding.opslaan",
    "route": "POST /api/rtf/onboarding/opslaan",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -91045,8 +91045,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

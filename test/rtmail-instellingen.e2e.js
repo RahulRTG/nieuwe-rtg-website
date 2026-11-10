@@ -46,7 +46,7 @@ test('instellingen op het scherm: handtekening, afwezigheid, alias en regel doen
     const bAdres = (await api(base, '/api/member/rtmail/adres', {}, bTok)).adres;
 
     browser = await pw.chromium.launch(browserOpties(pw));
-    const page = await browser.newPage();
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript((tok) => { localStorage.setItem('rtg_member_token', tok); }, aTok);
@@ -54,6 +54,8 @@ test('instellingen op het scherm: handtekening, afwezigheid, alias en regel doen
     await edgeActies(page);
     await page.locator('.rtg-adaptive-controls').getByRole('button', { name: /Alle post$/i }).click();
     await page.waitForSelector('#instKnp', { timeout: 15000 });
+    assert.equal(await page.evaluate(() => document.body.scrollWidth <= document.body.clientWidth), true,
+      'zoeken en instellingen blijven binnen het mobiele postvak');
     await page.click('#instKnp');
     await page.waitForSelector('#rtmInstellingen', { timeout: 10000 });
 

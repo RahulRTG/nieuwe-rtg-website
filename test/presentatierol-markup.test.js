@@ -48,8 +48,8 @@ test('Backoffice, Foundation Agenda en RTG iD delen presentatie en zichtbaarheid
   assert.match(agenda, /function verberg\(el, verborgen\)/,
     'Agenda synchroniseert native hidden met de bestaande visuele hulpklasse');
   assert.match(lees('public/shared/rtg-editorial-v4.css'),
-    /\.daily-action\):not\(\[hidden\]\):not\(\.h-weg\):not\(\.rtg-command-form button\)\{display:inline-flex!important/,
-    'Editorial V4 maakt verborgen knoppen niet opnieuw zichtbaar');
+    /\.daily-action\):where\(:not\(\[hidden\],\.h-weg,\.rtg-command-form button\)\)\{display:inline-flex!important/,
+    'Editorial V4 maakt verborgen knoppen niet opnieuw zichtbaar en verdringt geen actievariant');
   const rtgid = lees('public/apps/rtgid.html');
   for (const id of ['koppelKaart', 'kNamens', 'kMaak']) {
     assert.doesNotMatch(rtgid, new RegExp("\\$\\('#" + id + "'\\)\\.style\\.display"));

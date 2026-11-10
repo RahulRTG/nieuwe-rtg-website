@@ -99,7 +99,7 @@ test('de signatureproducer weigert een smaller of anders genoemd contract',()=>{
 test('de a11yproducer bindt contrast, premium aanraakdoelen en toepasselijke layouts per scherm',()=>{
   const c=structuredClone(require('../experience-architecture/coverage-contract.json'));
   c.executedProofs=c.executedProofs.filter(b=>b.proof==='screen-accessibility');
-  const proof={id:'screen-accessibility',test:'test/experience-a11y.proof.test.js',timeoutMs:2700000};
+  const proof={id:'screen-accessibility',test:'test/experience-a11y.proof.test.js',timeoutMs:3600000};
   const rows=typed.required(c,signatures,[proof]);
   assert.equal(rows.length,1540);
   assert.ok(rows.every(row=>row.subjectType==='screen'&&row.method==='browser'));

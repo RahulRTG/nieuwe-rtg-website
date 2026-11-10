@@ -186,7 +186,7 @@
       "method": "browser",
       "scope": "all-current-experience-screens",
       "check": "A11y desktop contrast",
-      "timeoutMs": 2700000
+      "timeoutMs": 3600000
     }
   ]
 }

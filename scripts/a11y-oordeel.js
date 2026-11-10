@@ -22,7 +22,7 @@
       de kop van scripts/lib/a11yoordeel.js.
 
    Gebruik:
-     node scripts/a11y-oordeel.js <map-met-metingen> [--delen=4]
+     node scripts/a11y-oordeel.js <map-met-metingen> [--delen=4] [--meting=hele-ronde.json]
    ========================================================================== */
 
 const fs = require('fs');
@@ -33,6 +33,7 @@ const oordeel = require('./lib/a11yoordeel');
 const ROOT = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
 const verwachteDelen = Number((argv.find(a => a.startsWith('--delen=')) || '').slice(8)) || 0;
+const metingUit = (argv.find(a => a.startsWith('--meting=')) || '').slice(9);
 const paden = argv.filter(a => !a.startsWith('--'));
 
 function metingen(paden) {
@@ -103,3 +104,12 @@ if (uit.fouten.length) {
 }
 for (const m of uit.meldingen) console.log(m);
 console.log(uit.samenvatting);
+/* EXPERIENCEWERKT heeft de routegebonden ruwe ronde nodig. Schrijf die pas
+   NADAT deelgetal, routebereik, browseridentiteit en het gezamenlijke budget
+   geldig zijn bevonden. Een half oordeel mag nooit een bewijsbestand worden. */
+if (metingUit) {
+  const tijdelijk = metingUit + '.tmp-' + process.pid;
+  fs.writeFileSync(tijdelijk, JSON.stringify(samen, null, 1) + '\n');
+  fs.renameSync(tijdelijk, metingUit);
+  console.log('[a11y] samengevoegde meting: ' + metingUit);
+}

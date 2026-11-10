@@ -5,6 +5,7 @@ const {execFileSync} = require('node:child_process');
 const {exactStempel} = require('../stempel');
 const SOURCE_PATHS = ['server','public','experience','experience-architecture','scripts','test','.github/workflows',
   'package.json','package-lock.json','.nvmrc','.node-version','Dockerfile','index.html','SCHERMEIGENAAR.json','APPWERKT.json'];
+const SOURCE_DIRECTORIES = new Set(['server','public','experience','experience-architecture','scripts','test','.github/workflows']);
 // Gegenereerde runtime-uitvoer is geen Experience-bron. public/dist wordt per
 // platform opnieuw gebouwd en mag de bronvingerafdruk daarom niet laten
 // verschillen tussen een schone ontwikkelboom en GitHub Actions.
@@ -33,17 +34,28 @@ function fingerprint(root) {
   const hash = crypto.createHash('sha256');
   function add(name) {
     const file = path.join(root,name);
-    hash.update(name); hash.update('\0');
-    if (!fs.existsSync(file)) { hash.update('MISSING\0'); return; }
+    /* Een ontbrekende bronMAP en een lege bronmap zijn dezelfde Git-inhoud:
+       geen bestand. Benoemde bronBESTANDEN behouden wel een ontbreekt-marker,
+       zodat bijvoorbeeld een verwijderd package.json de hash verandert. */
+    if (!fs.existsSync(file)) {
+      if (!SOURCE_DIRECTORIES.has(name)) { hash.update(name); hash.update('\0MISSING\0'); }
+      return;
+    }
     const stat = fs.lstatSync(file);
     if (stat.isSymbolicLink()) throw new Error('Onbekende Experience-bronafhankelijkheid: ' + name);
     if (stat.isDirectory()) {
-      hash.update('DIRECTORY\0');
+      /* Git bewaart geen lege mappen. Een lokale runtime kan ze wel achterlaten
+         (bijvoorbeeld server/opzet/data/theater), waardoor dezelfde commit op
+         een schone CI-export vroeger een andere hash kreeg. Alleen bestanden
+         dragen Experience-inhoud; hun volledige relatieve pad blijft hieronder
+         onderdeel van de hash. */
       for (const child of fs.readdirSync(file).sort()) {
         if (['node_modules','.git'].includes(child) || GENERATED_PATHS.has(name+'/'+child)) continue;
         add(name+'/'+child);
       }
-    } else if (stat.isFile()) { hash.update('FILE\0'); hash.update(fs.readFileSync(file)); hash.update('\0'); }
+    } else if (stat.isFile()) {
+      hash.update(name); hash.update('\0FILE\0'); hash.update(fs.readFileSync(file)); hash.update('\0');
+    }
     else throw new Error('Onleesbare Experience-bron: ' + name);
   }
   // Geen extensiefilter: fotografie, SVG, fonts en manifesten bepalen de ervaring.

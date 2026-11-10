@@ -32,7 +32,7 @@ function signatureInventory(signatures,b) {
 function accessibilityInventory(signatures,b) {
   if(b.proof!=='screen-accessibility'||b.instrument!=='test/experience-a11y.proof.test.js'||
     b.type!=='a11y-screen-inventory-v1'||b.method!=='browser'||b.scope!=='all-current-experience-screens'||
-    b.check!=='A11y desktop contrast'||b.timeoutMs!==2700000||
+    b.check!=='A11y desktop contrast'||b.timeoutMs!==3600000||
     !same(Object.keys(b).sort(),['check','instrument','method','proof','scope','timeoutMs','type'])) {
     throw new Error('Onbekend Experience-a11yproducercontract');
   }

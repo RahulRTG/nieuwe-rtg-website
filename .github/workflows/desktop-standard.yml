@@ -22,12 +22,12 @@ jobs:
     # minuten kosten; de kwaliteitsproeven mogen daardoor niet onuitgevoerd
     # worden geannuleerd.
     # Op een koude runner kost installatie circa 13 minuten. De mobiele en
-    # WebKit-proeven daarna circa 8 minuten; de brongebonden Experience-a11y-
-    # producer heeft zelf een fail-closed maximum van 42 minuten. Run
-    # 42780106704 werd daarom midden in die verplichte producer afgebroken.
-    # De proef of haar norm wordt niet verkleind; alleen de omringende job
-    # krijgt voldoende tijd om het bestaande contract werkelijk uit te voeren.
-    timeout-minutes: 75
+    # WebKit-proeven daarna circa 8 minuten. De brongebonden Experience-a11y-
+    # producer meet dezelfde inventaris nu in twee fail-closed delen; zijn
+    # contract laat maximaal 60 minuten toe en de interne scan stopt na 55.
+    # De proef of haar norm wordt niet verkleind; de omringende job houdt ruimte
+    # voor installatie, de voorproeven en het bewaren van de bewijsartefacten.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

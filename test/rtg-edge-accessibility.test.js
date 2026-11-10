@@ -111,6 +111,8 @@ test('functionele Edge-labels zakken niet terug naar 6-9 pixels', () => {
   assert.doesNotMatch(EDGE + '\n' + EDGE2, /font-size:\s*[5-9](?:\.\d+)?px/);
   assert.match(EDGE, /\.rtg-edge-find input\{[^}]*font-size:14px/);
   assert.match(EDGE, /\.rtg-edge-status-inner dl div\{[^}]*font-size:11px/);
+  assert.match(EDGE, /\.rtg-edge-status-panel\[aria-hidden="true"\] \.rtg-edge-status-inner\{display:none\}/,
+    'een gesloten statuspaneel draagt geen onzichtbare breedte bij aan het document');
   assert.match(EDGE2, /\.rtg-edge-2-context-button\{[^}]*font-size:10px!important/);
 });
 

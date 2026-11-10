@@ -5742,3 +5742,116 @@ gekwalificeerd**. Actuele commit vóór deze herstelcommit:
 `88751960e12e900ef57ec56a59b82215b18c65b3`. Eerstvolgende blokkade:
 **herstelcommit publiceren en alle verplichte GitHub-jobs volledig laten
 uitlopen op diezelfde bronstand**. Deep Green: **GEBLOKKEERD**.
+
+### Vierde volledige CI-meting kandidaat `5be104037e` — 10 november 2026
+
+De verplichte CI-run `42818852355`, de afzonderlijke desktop- en mobielrun
+`42818852323`, CodeQL-run `42818852419` en de lokale kwalificatierun
+`42818852331` zijn volledig uitgelopen op headcommit
+`5be104037e79ed5689b32cdacec87c29c83e594b`. Van de 43 controles sloten er 28
+groen, 7 rood en 8 als niet van toepassing overgeslagen. Het samengestelde
+`Tests, checks en build`-oordeel is een afgeleide mislukking en geen
+zelfstandige bronoorzaak.
+
+De foutboom bevat vijf primaire oorzaken:
+
+| ID | Primaire oorzaak | Soort | Bewijs op de bevroren commit | Herstelvolgorde |
+| --- | --- | --- | --- | --- |
+| DG-CI-19 | De twee bestaande service-workerbestanden bevatten nog de cachevingerafdruk van vóór de huidige app-shellbron. | Gegenereerd artefact verlopen | norm/build en unitscherf 1; `npm run build` produceert uitsluitend de nieuwe cache-identiteiten | 1 |
+| DG-CI-20 | De Experience-bronvingerafdruk nam lokale lege runtime-mappen mee. Git bewaart zulke mappen niet, waardoor dezelfde bestanden in een schone CI-export een andere hash kregen. | Niet-deterministische bewijsvingerafdruk | unitscherf 2; lokaal opgeslagen `f133f6fd…`, schone export en CI beide `0f599223…` | 1 |
+| DG-CI-21 | Eén presentatietest verwacht nog letterlijk de oude driemaal-`:not()`-selector, terwijl de productcorrectie dezelfde uitsluitingen specificiteitsloos in `:where()` vastlegt. | Verlopen toetscontract | unitscherf 3; de gerichte browserproef bewijst dat verborgen bediening verborgen blijft en dat de contrastregressie weg is | 2 |
+| DG-CI-22 | De wereldidentiteitsproef verloor aan het einde van schermscherf 3 zijn browsercontext (`Target page, context or browser has been closed`) zonder falende productassertie. | Omgevings- of toetsinstabiliteit, nader te reproduceren | schermscherf 3: 222/223 groen; gerichte tegenproef vereist | 3 |
+| DG-CI-23 | De centrale 390-pixeltoegankelijkheidsproducent bereikte zijn interne fail-closed grens van 42 minuten nadat drie volledige schermtoestanden zonder structurele of contrastfouten waren gemeten. De 1.542 vervolgmeldingen zijn ontbrekende meetdata, geen afzonderlijke productfouten. | Producent-/orchestratiebudget | 951 uitgevoerde schermmetingen groen; time-out na 42:03 bij de volgende touchronde; de bestaande deelmeter en het bestaande totaaloordeel kunnen dezelfde inventaris veilig parallel meten | 3 |
+
+DG-CI-17 is door de fail-closed generatiecontrole inhoudelijk gesloten: de
+lokale head kan niet meer met een onbekende invoer worden gegenereerd. DG-CI-18
+is eveneens inhoudelijk gesloten: de uitgevoerde desktoptoestanden en de
+gerichte telefoon- en tabletrondes melden nul contrastregressies. De eerdere
+classificatie van DG-CI-20 als `main`-drift is door de exacte merge-refcontrole
+verworpen: mergecommit `e3fa76476448` heeft dezelfde tree
+`762fb8e361457e99e704752348849c3f01ca34de` als head `5be104037e`, en `main`
+is al voorouder van de branch. Het verschil kwam uitsluitend uit lokale lege
+mappen onder `server/opzet/data`, die in een schone Git-export niet bestaan.
+
+**Meetstand herstelronde 9.** Releaseblokkerende bronoorzaken: **5**. Bewezen
+afgesloten sinds de vorige volledige meting: **2** (DG-CI-17 en DG-CI-18).
+Nieuwe regressies: **1** (DG-CI-21, uitsluitend het toetscontract van de
+selectorcorrectie). Eerder verborgen fouten ontdekt: **4** (DG-CI-19,
+DG-CI-20, DG-CI-22 en DG-CI-23). Nog niet uitgevoerde verplichte controles:
+**gerichte tegenproef voor DG-CI-22, volledige mobiele Experience-producent,
+volledige CI op de geïntegreerde herstelcommit, APPWERKT-herkwalificatie,
+EXPERIENCEWERKT inclusief menselijke proeven, operationele kwalificatie en twee
+onafhankelijke eindruns**. APPWERKT: **0/114 actueel geldig**.
+EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden actueel
+gekwalificeerd**. Actuele commit: `5be104037e79ed5689b32cdacec87c29c83e594b`.
+Eerstvolgende blokkade: **de vijf bron- en toetscorrecties sluiten en daarna de
+volledige verplichte CI op één nieuwe commit uitvoeren**. Deep Green:
+**GEBLOKKEERD**.
+
+### Gerichte herstelronde na kandidaat `5be104037e` — 10 november 2026
+
+De vijf oorzaken uit herstelronde 9 zijn lokaal in afhankelijkheidsvolgorde
+gesloten. De bestaande build heeft uitsluitend de twee verlopen
+service-workeridentiteiten vernieuwd (DG-CI-19). De Experience-bronvingerafdruk
+baseert zich voortaan alleen op bestanden die Git daadwerkelijk kan bewaren en
+is in een schone bronexport reproduceerbaar (DG-CI-20). Het oude
+presentatietoetscontract volgt weer de specificiteitsloze `:where()`-eigenaar
+(DG-CI-21). De toegankelijkheidsproducent verdeelt dezelfde fail-closed
+inventaris over twee processen en voegt de uitkomst centraal samen; een
+volledige 316-schermenmeting sloot zonder structurele of contrastmelding en de
+strikte inventarisvalidator rapporteerde `PROVEN` (DG-CI-23).
+
+DG-CI-22 is afzonderlijk tegenbeproefd. De vier eerder aan het einde van de
+lange `appmenu`-scherf afgebroken Edge-, TravelOS- en Spatial-scenario's sluiten
+geisoleerd **4/4** groen. De volledige systeemdeurcensus bracht vervolgens een
+onjuist gedeelde testafhankelijkheid aan het licht: zij wachtte op alle
+achtergrondverzoeken van elk scherm, hoewel haar contract uitsluitend menu of
+veilige uitweg bewijst. Na 254 eerder geopende routes kon een vertraagd
+`/api/chat/history`-verzoek daardoor Rijksloket rood maken. Rijksloket zelf
+antwoordt in de gerichte tegenproef binnen circa 300 ms en wordt binnen 1,3 s
+stil. De census wacht nu rechtstreeks op het vereiste zichtbare contract. De
+volledige run opent alle 316 app-routes en sluit **2/2** groen in 3:47, zonder
+de eerdere contextsluiting of het chat-history-timeoutsignaal.
+
+De volledige toegankelijkheidsmeting ontdekte drie gedeelde
+presentatieoorzaken die voor de volgende CI-run zijn gesloten:
+
+| ID | Primaire oorzaak | Herstel en regressiebewijs | Status |
+| --- | --- | --- | --- |
+| DG-CI-24 | Zes schermen erfden een 40px muziek-/standenoverride boven de centrale 44px-doelmaat. | De globale muziekeigenaar is verwijderd; Heritage en het native DS bewaken centraal minimaal 44px. Alle eerder getroffen telefoon- en tabletdoelen meten nu nul overtredingen; een statisch eigenaarschapscontract voorkomt terugkeer. | bewezen gesloten |
+| DG-CI-25 | Life/Vandaag lieten een flexkind en brontekst buiten de mobiele dagrij groeien. | `min-width:0`, afkapping en overflow-eigenaarschap staan bij het bestaande Life-scherm. Life en de Vandaag-omleiding meten op telefoon en tablet zonder horizontale overloop; de browsergroep sluit groen. | bewezen gesloten |
+| DG-CI-26 | De globale Editorial-regel gaf `.standen` 100% breedte en overschreef daarmee de vaste insetbediening van Geld. | Geld behoudt zijn bestaande domeineigenaar en is expliciet uitgesloten van de globale breedteregel. Geld en Geld-command meten op telefoon en tablet exact binnen de viewport; een statisch contract bewaakt beide kanten. | bewezen gesloten |
+
+Na deze correcties meldt de Design System-controle **nul schendingen**, **87
+gemigreerde schermen** en **7 ratchetverbeteringen**. De rechtstreeks geraakte
+statische groepen sluiten **49/49** en **6/6** groen; de browsergroepen voor
+Life, Vandaag, redirects en RTMail sluiten **25/25** groen. De volledige
+Experience-toegankelijkheidsmeting was groen voor de laatste
+eigenaarschapsconsolidatie; alle daardoor geraakte routes zijn daarna op de
+actuele bron gericht groen gemeten. De exacte volledige producent en de
+volledige CI moeten daarom nog op de definitieve herstelcommit worden herhaald;
+de eerdere producentuitslag wordt niet als actueel eindbewijs gepresenteerd.
+
+De repositorybrede `npm run check`-poort sluit na afleiding van de bestaande
+`ARCHITECTUUR.md`, `BEWIJS.md` en `FUNCTIES.md` volledig groen. Daarbij zijn
+onder meer 316 app-pagina's, 5.508 bekende API-paden, 5.412 schrijfroutes, 302
+collectie-eigenaars en de verboden afhankelijkheidsgraaf gecontroleerd. De
+melding over 912 verlopen APPWERKT-bewijzen blijft bewust staan: zij is geen
+check-fout, maar de open herkwalificatieopdracht en wordt niet administratief
+vernieuwd.
+
+**Meetstand herstelronde 10.** Releaseblokkerende bronoorzaken: **0 lokaal
+bekend; volledige CI-tegenproef vereist**. Bewezen afgesloten sinds de vorige
+volledige meting: **8** (DG-CI-19 tot en met DG-CI-26). Nieuwe regressies:
+**0 in de gerichte actuele controles**. Eerder verborgen testkoppeling:
+**1**, de ongerelateerde netwerk-rustvoorwaarde in de systeemdeurcensus.
+Nog niet uitgevoerde verplichte controles: **exacte volledige
+Experience-toegankelijkheidsproducent op de uiteindelijke herstelbron,
+volledige CI, APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief menselijke
+proeven, operationele kwalificatie en twee onafhankelijke eindruns**.
+APPWERKT: **0/114 actueel geldig**. EXPERIENCEWERKT: **0/316 schermen en
+0/3360 voorwaarden actueel gekwalificeerd**. Actuele vastgelegde commit voor de
+herstelcommit: `5be104037e79ed5689b32cdacec87c29c83e594b`. Eerstvolgende
+blokkade: **alle gerichte kwaliteitscontroles op de samenhangende werkboom,
+daarna herstelcommit en volledige verplichte CI**. Deep Green:
+**GEBLOKKEERD**.

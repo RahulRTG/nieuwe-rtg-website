@@ -152,13 +152,18 @@ test('alle unieke actuele routes leveren wel een controleerbaar totaaloordeel', 
   const routes=require('../scripts/schermen').alleSchermen().concat(['/site/404.html']);
   const map=fs.mkdtempSync(path.join(os.tmpdir(),'a11yvolledig-'));
   try {
+    const samengevoegd=path.join(map,'samengevoegd-uit.json');
     const delen=[[],[],[],[]];
     routes.forEach((route,index)=>delen[index%4].push(route));
     delen.forEach((groep,index)=>fs.writeFileSync(path.join(map,`deel-${index+1}.json`),
       JSON.stringify(bewezenDeel(index+1,groep))));
     const r=spawnSync(process.execPath,
-      [path.join(__dirname,'..','scripts','a11y-oordeel.js'),map,'--delen=4'],{encoding:'utf8'});
+      [path.join(__dirname,'..','scripts','a11y-oordeel.js'),map,'--delen=4','--meting='+samengevoegd],{encoding:'utf8'});
     assert.equal(r.status,0,r.stderr);
     assert.match(r.stdout,new RegExp(routes.length+' schermen in DRIE staten'));
+    const meting=JSON.parse(fs.readFileSync(samengevoegd,'utf8'));
+    assert.equal(meting.paginas,routes.length);
+    assert.equal(Object.keys(meting.routes).length,routes.length);
+    assert.deepEqual(meting.routeIssues,[]);
   } finally { fs.rmSync(map,{recursive:true,force:true}); }
 });

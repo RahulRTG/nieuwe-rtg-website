@@ -115,7 +115,7 @@ body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif
 .pp-footer{max-width:1680px;margin:0 auto;padding:0 1.5rem 9rem;display:flex;justify-content:space-between;gap:1.5rem;font-size:.8rem;color:var(--wh-soft)}
 @media(min-width:1000px){body[data-public-platform] .wd-home{max-height:none!important;overflow:visible!important}body[data-public-platform] .wd-people,body[data-public-platform] .wd-favorites{max-height:none}.pp-shell .wd-favorites{padding:0}.pp-shell .wd-library{margin-top:1rem}.pp-shell .wd-shell{margin-bottom:4rem}}
 @media(max-width:999px){
- .pp-header{padding:1.1rem 1.2rem!important;gap:.7rem;background:transparent!important;border:0}.pp-tagline,.pp-header>.pp-icon-button:not(.pp-profile){display:none}.pp-profile{margin-inline-start:auto}.pp-brand{font-size:2.7rem!important}.pp-context{font-size:1.1rem}
+ .pp-header{padding:1.1rem 1.2rem!important;gap:.7rem;background:transparent!important;border:0}.pp-tagline,.pp-header>.pp-icon-button:not(.pp-profile):not(.pp-language){display:none}.pp-profile{margin-inline-start:auto}.pp-brand{font-size:2.7rem!important}.pp-context{font-size:1.1rem}
  body[data-public-platform]{background:linear-gradient(180deg,#221910,#100e0b 300px)!important}
  body[data-public-platform] .wd-shell{display:flex;flex-direction:column;width:auto;max-width:none;margin:0 1rem 2rem;gap:1.1rem}
  .pp-shell>.wd-greeting{display:block;width:100%;border:0;padding:0;margin:0}.pp-shell .wd-greeting h1{font-size:.85rem;font-family:Inter,sans-serif;margin:0}.pp-shell .wd-greeting>p{display:none}.pp-subtitle{display:block;font-size:.75rem;margin-top:.4rem}

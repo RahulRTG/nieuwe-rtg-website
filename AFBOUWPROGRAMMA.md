@@ -4991,3 +4991,87 @@ verbreden**. Niet-uitgevoerde verplichte controles:
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+### Integrale bronwaarheid en uitvoeringscontract — 10 november 2026
+
+Dit is geen tweede plan of register. Het integreert de opdracht voor Deep
+Green, Proof-Bound Engineering, SENTINEL, inline-codebeheersing en de
+Zaakdozen in dit bestaande afbouwprogramma. De volgorde is bewust streng:
+eerst de actuele bron en bestaande voorzieningen kwalificeren, daarna alleen
+de ontbrekende verbindingen bouwen. Een adviserende engineeringverbetering of
+Mirage-pilot mag de releasekandidaat niet opnieuw laten bewegen zolang zij
+geen bestaande releaseblokkade sluit.
+
+#### Vastgelegde bronstand
+
+`origin/main` op `290144d641` is met een mergecommit opgenomen in de
+afbouwbranch. Daarmee zitten ook de audit-herstelketen, journaalmigratie,
+productie-ankercontroles en de GitHub Pages-koppeling in dezelfde bron als de
+recente Experience- en Design System-consolidatie. De vier conflicten waren
+uitsluitend afgeleide registers (`ARCHITECTUUR.md`, `BEWIJS.md`,
+`FUNCTIES.md` en `EXPERIENCEWERKT.json`); zij zijn opnieuw gegenereerd uit de
+samengevoegde bron en niet handmatig groen gekozen. De gerichte
+audit-/anker-/migratiereeks sluit **46/46** en de statische bronkeuring is
+groen. De mergecommit is `c3948344cb`.
+
+De open pull requests zijn #702 en de dependency-updates #703-#709. PR #702
+heeft op zijn eigen oude head groene CI, maar is conflicterend met de actuele
+main. Zijn enige patch die niet patch-equivalent in deze branch zit, verkort
+een commentaar in `zakelijk-voorzijde.js` en vernieuwt het afgeleide
+`BEWIJS.md`; hij bevat geen ontbrekend productgedrag. De Experience-
+architectuur, signatures, coveragecontracten en fail-closed motor uit die
+werklijn zijn al in deze afbouwbranch aanwezig. Daarom wordt de verouderde PR
+niet blind gemerged. De dependency-PR's worden pas afzonderlijk gepromoveerd
+na hun eigen compatibiliteits- en supply-chaincontrole.
+
+#### Actuele kwalificatiestatus
+
+| Gebied | Classificatie | Actuele bronwaarheid en volgende sluitvoorwaarde |
+|---|---|---|
+| APPWERKT | GEIMPLEMENTEERD MAAR NIET VOLLEDIG BEWEZEN | Het register bevat 114/114 op alle acht dimensies, maar zijn browserstempel hoort bij `d3a2cd8a66`. De huidige bron is `c3948344cb`; alle 912 app-dimensies blijven daarom te herkwalificeren na de volgende kandidaatbevriezing. |
+| EXPERIENCEWERKT | OPENSTAAND | 114 appcontracten en 316 schermcontracten bestaan, maar de uitvoeringsstatus is eerlijk **0/114 apps, 0/316 schermen en 0/3360 voorwaarden**. Ontbrekende objectieve en menselijke uitvoering telt niet als groen. |
+| Design System | GEIMPLEMENTEERD MAAR NIET VOLLEDIG BEWEZEN | De keuring meldt nul schendingen en 87 gemigreerde schermen. De aangescherpte ratel verwijdert drie verdwenen runtime-stijleigenaren uit de toegestane erfenis. Er blijven 83 scripts met runtime-stijlinjectie en 170 injectieplekken; die worden per gedeelde oorzaak afgebouwd, niet via een massale herschrijving. |
+| Inline veiligheid | GEIMPLEMENTEERD MAAR NIET VOLLEDIG BEWEZEN | De centrale bronkeuring bewijst nul inline HTML-eventhandlers. `innerHTML`, dynamische templates en noodzakelijke runtimepresentatie worden niet op naam verboden maar per bron, escaping, Trusted Types/CSP-grens en eigenaar beoordeeld. |
+| Proof-Bound Engineering fase 1 | BEWEZEN AFGEROND ALS ADVIESLAAG | Code Architect, Evidence Control Plane, Proof Envelope en Proof Delta hergebruiken de bestaande registers. **60/60** contract-, conflict-, negatieve en fail-closed toetsen zijn groen op de actuele bron. De laag blijft adviserend totdat een echte A/B-meting netto tijd-, token- en CI-winst bewijst zonder gemiste verplichte toets. |
+| Collision Guard | GEIMPLEMENTEERD MAAR NIET VOLLEDIG BEWEZEN | De Proof Envelope vindt actuele PR- en worktree-overlap en leidt `CONFLICT` af. Tijdelijke werkreserveringen en promotie naar een blokkerende poort blijven open; permanente locks of een tweede Agent OS zijn verboden. |
+| Causal CI | OPENSTAAND ALS VERBETERING | Bestaande CI, nulmetingen en foutboomclassificatie leveren de bron. Alleen de ontbrekende automatische oorzaak-/eigenaarkoppeling mag worden toegevoegd nadat de releasekritieke afbouw is gesloten. |
+| RTG Motor en SENTINEL | BEWEZEN AFGEROND BINNEN DE LOKALE PROEF | De bestaande zero-dependency Rust-motor is gebouwd. **99/99** Rust-tests en de echte SENTINEL-procesgrensproef zijn groen. Verzoeksmuggling, doorgestuurde headers, betaalherhaling, upload/webshellpatronen, versleutelde snapshots, auditmanipulatie, isolatie en fail-closed herstel zijn geraakt. Productie-inrichting en incidentrepetitie blijven operationele poorten. |
+| Upload- en webshellbescherming | BEWEZEN IN DE RUST-KERN, OPERATIE OPEN | De bestaande `ontsmetter` weigert PHP-in-afbeeldingen, dubbele extensies, PE-bestanden, EICAR, typevervalsing en verdachte inhoud. Uploadpaden en productieopslag moeten nog in staging aantonen dat uitvoerbaarheid werkelijk uitstaat. |
+| Node-runtime en supply chain | BEWEZEN ALS BRONCONTRACT, OPERATIE OPEN | `.nvmrc` en de huidige proeven gebruiken Node 26; deze afbouwrun gebruikt Node 26.12.1. Er komt geen Node 24-migratie. SBOM, lockfile, dependency-audit en releasebewijs bestaan; patchpromotie blijft een afzonderlijke gekwalificeerde wijziging. |
+| Zaakdozen | GEIMPLEMENTEERD MAAR NIET VOLLEDIG BEWEZEN | Apparaatsleutels, scope, intrekking, ondertekende updates, mTLS-proeven en afzonderlijke zaakbinding bestaan. Productieachtige multi-worker-, update-, rollback- en intrekkingsproeven op de kandidaat blijven open. |
+| RTG Mirage | OPENSTAAND, NIET RELEASEKRITIEK | Er is geen volledige geïsoleerde deception-laag aangetroffen. Een latere kleine pilot mag uitsluitend synthetische data en niet-werkende credentials gebruiken. Mirage vervangt geen toegangsbeveiliging en wordt niet vóór de kernkwalificatie in productie opgenomen. |
+| Definitieve release | GEBLOKKEERD | Er is nog geen vaste kandidaat met actuele APPWERKT-, EXPERIENCEWERKT-, menselijke, staging-, load-, back-up-, rollback- en incidentbewijzen, gevolgd door twee onafhankelijke volledige runs. |
+
+#### Definitieve uitvoeringsvolgorde
+
+1. Houd `origin/main`, open PR's en de afbouwbranch inhoudelijk coherent; neem
+   alleen niet-dubbele, actuele wijzigingen op.
+2. Sluit gedeelde Design System-, inline-template- en eigenaarschapsoorzaken en
+   verwijder de vervangen erfenis uit de ratel.
+3. Herhaal gerichte security-, financiële, autorisatie-, Zaakdoos- en
+   runtimeproeven zodra hun bronnen veranderen.
+4. Bevries één schone kandidaat wanneer de bekende technische oorzaken dicht
+   zijn.
+5. Bouw APPWERKT op die kandidaat opnieuw op; historisch groen bewijs is geen
+   kandidaatbewijs.
+6. Voer EXPERIENCEWERKT objectief uit voor 114 apps, 316 schermen en 3360
+   voorwaarden en laat de menselijke taakpakketten door de eigenaar en de
+   agent samen beoordelen.
+7. Sluit staging, externe diensten, load, bestaande data, back-up, rollback,
+   monitoring en incidentrespons.
+8. Voer twee onafhankelijk opgebouwde volledige kwalificatieruns uit op exact
+   dezelfde kandidaat.
+
+**Meetstand integrale inventarisatie.** Openstaande unieke hoofdoorzaken:
+**resterende actieve presentatie-erfenis, ontbrekende actuele APPWERKT-
+herkwalificatie, 3360 niet-uitgevoerde Experience-voorwaarden en de
+operationele vrijgavepoorten**. Opgelost sinds de vorige meetstand: **actuele
+main-synchronisatie, volledige lokale bouw van de Rust-motor en de ontbrekende
+SENTINEL-procesgrensproef**. Nieuwe regressies: **0 in 46 audit-/hersteltoetsen,
+60 Proof-Bound-toetsen, 99 Rust-toetsen en 1 SENTINEL-eindproef**. Eerder
+verborgen fouten ontdekt: **geen productfout; drie eerste Rust-failures bleken
+uitsluitend de loopbackbeperking van de sandbox en sloten groen in de toegestane
+testomgeving**. Niet-uitgevoerde verplichte controles: **actuele volledige
+APPWERKT, 3360 Experience-voorwaarden inclusief menselijke proeven,
+productieachtige Zaakdoos- en loadproeven, staging/herstel/rollback en twee
+onafhankelijke eindruns**. Deep Green: **GEBLOKKEERD**.

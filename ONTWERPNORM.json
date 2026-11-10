@@ -812,7 +812,7 @@
   "blokken": {
     "public/apps/app.html": {
       "blokken": 2,
-      "bytes": 129154,
+      "bytes": 129137,
       "important": 5,
       "hex": 200
     },
@@ -2168,9 +2168,7 @@
     "public/shared/ondernemerpoort.js": 1,
     "public/shared/ondertitelband.js": 1,
     "public/shared/overdracht.js": 1,
-    "public/shared/paspoortscan.js": 1,
     "public/shared/plaatsdienst.js": 1,
-    "public/shared/plaatsnadering.js": 1,
     "public/shared/plek.js": 1,
     "public/shared/poortgesprek.js": 1,
     "public/shared/rahul-mond.js": 1,
@@ -2190,7 +2188,6 @@
     "public/shared/sprong/sprong-02.js": 1,
     "public/shared/teamcall.js": 1,
     "public/shared/teamcall/teamcall-01.js": 1,
-    "public/shared/thema.js": 1,
     "public/shared/toegang.js": 1,
     "public/shared/uitvoer.js": 1,
     "public/shared/uitvoer/uitvoer-02.js": 1,

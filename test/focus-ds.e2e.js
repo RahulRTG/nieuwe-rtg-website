@@ -18,7 +18,8 @@ test('FocusUI gebruikt op DS en bestaande hosts dezelfde toegankelijke kaarttoes
         const pad = '/__focus-' + (ds ? 'ds' : 'bestaand');
         await page.route('**' + pad, route => route.fulfill({ contentType: 'text/html', body:
           '<!doctype html><html lang="nl"' + (ds ? ' data-ds' : '') + '><head><meta name="viewport" content="width=device-width,initial-scale=1">' +
-          (ds ? '<link rel="stylesheet" href="/ds/rtg-ds.css">' : '<style>.kaart{display:grid}.kaart>p{display:block}</style>') +
+          '<link rel="stylesheet" href="/ds/tokens.css"><link rel="stylesheet" href="/ds/componenten/focus.css">' +
+          (ds ? '' : '<style>.kaart{display:grid}.kaart>p{display:block}</style>') +
           '</head><body class="' + (ds ? 'ds-scherm' : '') + '"><main><section class="kaart"><h2>Reservering</h2>' +
           '<label>Concept<input id="concept" value="blijft staan"></label><p id="status" data-fxtel>2</p><p id="privaat" hidden>Niet bevoegd</p></section>' +
           '<section class="kaart"><h2>Reisplan</h2><p>Plan</p></section><section class="kaart"><h2>Betaling</h2><p>Betaal</p></section>' +
@@ -26,7 +27,7 @@ test('FocusUI gebruikt op DS en bestaande hosts dezelfde toegankelijke kaarttoes
         await page.goto(srv.base + pad, { waitUntil: 'domcontentloaded' });
         await page.waitForSelector('.ds-focus-kop');
         await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue('--ds-doel').trim() !== '');
-        assert.equal(await page.locator('#rtgDsRuntimeCss').count(), ds ? 0 : 1);
+        assert.equal(await page.locator('#rtgDsRuntimeCss').count(), 0);
         const kop = page.getByRole('button', { name: 'Reservering in- of uitklappen', exact: true });
         assert.equal(await kop.getAttribute('aria-expanded'), 'true');
         await kop.focus();

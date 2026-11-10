@@ -5293,3 +5293,39 @@ componentcontract**. Niet-uitgevoerde verplichte controles: **actuele volledige
 APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven, platformbrede
 gedragssuite, staging/load/herstel/rollback en twee onafhankelijke eindruns**.
 Deep Green: **GEBLOKKEERD**.
+
+#### Afgesloten gedeelde oorzaak: dynamische FocusUI-presentatie
+
+FocusUI behoudt zijn bestaande toestand, leergeschiedenis, kaartbediening en
+privacygrens, maar laadt niet langer tijdens runtime het volledige Design
+System. De vier werkelijke hosts laden nu expliciet uitsluitend
+`public/ds/componenten/focus.css`; hun bestaande tokenbladen blijven de
+centrale waarden leveren. Hiermee blijft de migratiegrens van deze legacyhosts
+eerlijk en is presentatie niet langer een bijwerking van gedragscode.
+
+Gerichte kwalificatie op Node **26.12.1** sluit **84/84** FocusUI-, laadgraaf-
+en architectuurproeven en **7/7** browserproeven voor de toegankelijke
+kaarttoestand en de echte leverancierflows. De browser bewijst toetsenbord,
+44-pixelbediening, reduced motion, vergrote tekst, dynamische inhoud,
+domein-`hidden` en behoud van invoer. De vernieuwde taalproef sluit **27/27**,
+de twee geraakte websitebeelden zijn uit de echte appbron opgebouwd en de
+volledige statische huiskeuring sluit groen.
+
+Design System meldt nul schendingen en 87 gemigreerde schermen. De actuele
+presentatiemeter daalt van 77 naar **76 scripts met stijlinjectie** en van 164
+naar **163 injectieplekken**; de verdwenen owner is uit `ONTWERPNORM.json`
+verwijderd.
+
+**Afsluiting dynamische FocusUI-presentatie.** Openstaande unieke oorzaken:
+**76 scripts met resterende runtime-stijllading of -injectie, actieve
+legacybladen en schermstijlblokken, ontbrekende actuele APPWERKT-
+herkwalificatie, 3360 niet-uitgevoerde Experience-voorwaarden en operationele
+vrijgavepoorten**. Opgelost sinds vorige meting: **1 runtime-stijlowner en 1
+injectieplek op 4 hosts**. Nieuwe regressies: **0 in de gerichte FocusUI-,
+laadgraaf-, browser-, taal-, websitewaarheids- en statische proeven**. Eerder
+verborgen fouten ontdekt: **geen productfout; bronwijzigingen maakten de taal-
+en websiteafdruk terecht ongeldig en beide zijn inhoudelijk vernieuwd**.
+Niet-uitgevoerde verplichte controles: **actuele volledige APPWERKT,
+EXPERIENCEWERKT inclusief menselijke proeven, platformbrede gedragssuite,
+staging/load/herstel/rollback en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

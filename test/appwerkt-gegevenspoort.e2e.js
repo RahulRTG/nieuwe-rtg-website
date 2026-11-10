@@ -30,6 +30,13 @@ test('gegevenspoort: alleen een zichtbare, bedienbare en gekoppelde vervolgvraag
       await page.route('http://meter.test/**', route => {
         const pad = new URL(route.request().url()).pathname;
         if (pad === '/') return route.fulfill({ contentType: 'text/html', body: '<!doctype html><body>Vluchten</body>' });
+        /* Chromium haalt opportunistisch browserbronnen op (zoals een favicon
+           en zijn eigen well-known metadata). Alleen de twee API-paden horen
+           bij deze proef; alle browser-infrastructuur krijgt daarom geen
+           productstatus. Anders hing het aantal 428-antwoorden van timing af. */
+        if (!['/api/gegevens/start', '/api/member/vluchten/boek'].includes(pad)) {
+          return route.fulfill({ status: 204, body: '' });
+        }
         const start = pad === '/api/gegevens/start';
         return route.fulfill({ status: start ? (geval.status || 200) : 428, contentType: 'application/json', body: JSON.stringify(start ? { ...vraag, veld: geval.veld || vraag.veld } : poort) });
       });

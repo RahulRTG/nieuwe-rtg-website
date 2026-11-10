@@ -1,3 +1,5 @@
+/* Aanmeldformulier en de progressieve accountstappen. */
+
     let presentationOnly=false;
     function field(type, label, auto, value){
       if(!presentationOnly){inp.type = type; inp.value = value || '';} inp.name = auto || 'answer';

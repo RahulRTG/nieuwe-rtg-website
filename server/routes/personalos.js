@@ -3,8 +3,7 @@
    wordt uitsluitend uit de server-side accountsessie opgebouwd. */
 'use strict';
 
-module.exports = (kern) => {
-  const { app, auth, personalOS, tooManyTries } = kern;
+module.exports = (app, auth, personalOS, tooManyTries) => {
   const stuur = (res, r) => {
     res.setHeader('Cache-Control', 'private, no-store');
     if (!r || r.error) return res.status((r && r.status) || 400).json({

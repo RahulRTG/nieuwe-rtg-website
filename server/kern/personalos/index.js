@@ -7,7 +7,7 @@ const contract = require('./contract');
 const catalogus = require('./catalog');
 const engine = require('./engine');
 
-function maakPersonalOS({ accounts, db, crypto, toegankelijkVan }) {
+function maakPersonalOS({ accounts, functieStand, crypto, toegankelijkVan }) {
   const digest = s => crypto.createHash('sha256').update(String(s)).digest('hex');
   const catalogVersion = 'sprong_' + digest(JSON.stringify(catalogus.BINDINGS)).slice(0, 12);
   const now = () => klok.datum().toISOString();
@@ -23,7 +23,7 @@ function maakPersonalOS({ accounts, db, crypto, toegankelijkVan }) {
     return uitDossier(md);
   };
 
-  function preview(body) {
+  function maakPreview(body) {
     const r = contract.normaliseer(body, ids);
     if (r.error) return r;
     const capabilities = catalogus.preview();
@@ -66,7 +66,7 @@ function maakPersonalOS({ accounts, db, crypto, toegankelijkVan }) {
 
   function composition({ user, session }) {
     if (!user || !user.id) return { error: 'Een eigen account is vereist.', status: 403 };
-    const state = db.data.functies || {};
+    const state = typeof functieStand === 'function' ? functieStand() : {};
     const catalog = catalogus.toegestaan({ tier: user.tier, state, person: session && session.key });
     const authorityRevision = 'a_' + digest(JSON.stringify(catalog.map(x => x.id)) + JSON.stringify(state)).slice(0, 16);
     const contextRef = 'private:' + digest((session && session.key) || ('user-' + user.id)).slice(0, 16);
@@ -82,7 +82,8 @@ function maakPersonalOS({ accounts, db, crypto, toegankelijkVan }) {
   }
 
   return { personalOS: { contract: () => ({ schemaVersion: contract.SCHEMA_VERSION,
-    goals: contract.GOALS, layouts: contract.LAYOUTS }), preview, preferences: bewaard, zet, composition } };
+    goals: contract.GOALS, layouts: contract.LAYOUTS }), preview: maakPreview,
+    preferences: bewaard, zet, composition } };
 }
 
 module.exports = { maakPersonalOS };

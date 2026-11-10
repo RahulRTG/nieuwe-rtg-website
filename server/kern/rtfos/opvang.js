@@ -1,18 +1,5 @@
-/* ============================================================================
-   CIVILIS-OPVANG -- de ontbrekende naad tussen een beschermzaak en een plek.
-
-   Dit is GEEN tweede hulpvraag en GEEN universele ketenmotor. De beschermzaak
-   blijft eigenaar van veiligheid en toestemming; het partnerregister blijft
-   eigenaar van de organisatie; deze module bezit alleen voorziening,
-   reservering, acceptatie, aankomst en vervolg.
-
-   Vier grenzen:
-   - capaciteit is pas bruikbaar als de aanbieder haar zelf actueel maakte;
-   - een plek heet pas bevestigd na expliciete acceptatie door die aanbieder;
-   - een noodplaats wacht niet op regulier budget, maar die uitzondering draagt
-     een reden en wordt nooit als budgetbesluit voorgesteld;
-   - intrekken stopt iedere open reservering en wist de geschiedenis niet.
-   ========================================================================== */
+/* CIVILIS-opvang verbindt een beschermzaak met een voorziening. Veiligheid en
+   toestemming blijven bij de zaak; de aanbieder bezit capaciteit en acceptatie. */
 'use strict';
 
 const OPEN = ['aangevraagd', 'geaccepteerd'];

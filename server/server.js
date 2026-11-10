@@ -2115,6 +2115,7 @@ const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
   anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, leesCollectie, economischeBoekingEenmaal, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen: rondEuro, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
+  functieStand: () => (db.data && db.data.techniek && db.data.techniek.functies) || {},
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,

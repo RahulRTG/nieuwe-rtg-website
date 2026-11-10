@@ -33,9 +33,10 @@ function toegestaan({ tier, state, person }) {
   }).map(c => ({ ...c }));
 }
 
-function preview() {
+function previewCatalogus() {
   return geselecteerd.map(c => ({ id: c.id, name: c.name, world: c.world, url: c.url,
     availability: 'preview_only' }));
 }
 
-module.exports = { BINDINGS, allIds: () => geselecteerd.map(x => x.id), toegestaan, preview };
+module.exports = { BINDINGS, allIds: () => geselecteerd.map(x => x.id), toegestaan,
+  preview: previewCatalogus };

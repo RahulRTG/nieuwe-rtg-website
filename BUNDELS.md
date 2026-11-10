@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**75 bundels, 530 delen, 1 zonder onderwerp.**
+**75 bundels, 530 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 107 delen, 10291 regels in de delen, waarvan 1 zonder onderwerp
+`public/apps/app-main/` -- 107 delen, 10293 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -24,7 +24,7 @@ omlaag.
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |
-| `app-main-04a.js` | -- |
+| `app-main-04a.js` | Aanmeldformulier en de progressieve accountstappen |
 | `app-main-04a0.js` | Each question is a full sentence; labels and keyboard hints stay explicit |
 | `app-main-04aa.js` | PersonalOS-onboarding gebruikt dezelfde ene formulierlaag, maar de twee compositiestappen zijn keuzes en geen vrije p... |
 | `app-main-04ab.js` | Refresh only presentation during a language change; identity stays in memory |

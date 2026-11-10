@@ -44,10 +44,11 @@ Object.assign(kern, require('../kern/experience').maakExperience({
 }));
 /* PersonalOS is de compositielaag BOVEN de bestaande catalogus, Authority
    Engine en accountvoorkeuren. Hij krijgt geen AI en bezit geen domeindata. */
-Object.assign(kern, require('../kern/personalos').maakPersonalOS({
-  accounts: hulp.accounts, db: hulp.db, crypto: hulp.crypto,
+const { personalOS } = require('../kern/personalos').maakPersonalOS({
+  accounts: hulp.accounts, functieStand: hulp.functieStand, crypto: hulp.crypto,
   toegankelijkVan: kern.toegankelijkVan
-}));
+});
+kern.experience.personalOS = personalOS;
 require('./living-world')(kern, hulp);
 /* RTG Neiging (kern/neiging/, NEIGING.md): de persoonlijke laag. Hij
    staat NAAST het Experience Platform en niet erin, want hij doet het

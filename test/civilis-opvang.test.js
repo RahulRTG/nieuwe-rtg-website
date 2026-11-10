@@ -181,6 +181,8 @@ test('een andere partner ziet en beslist niets van deze opvangaanvragen', async 
   assert.equal(lijst.status, 200, JSON.stringify(lijst.body));
   assert.equal(lijst.body.reserveringen.length, 0);
   const eigen = await partner('', {});
+  assert.ok(eigen.body.reserveringen.length >= 1,
+    'de primaire partner moet een gevulde tegenproef hebben');
   const id = eigen.body.reserveringen[0].id;
   const poging = await post('/api/rtfos/portaal/partner/opvang/besluit',
     { code: ander.code, id, accepteer: false, reden: 'Niet onze aanvraag.' }, ander.token);

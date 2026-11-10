@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-11-09T17:37:22.801Z",
-    "commit": "ddadba6be",
+    "op": "2026-11-10T18:30:42.330Z",
+    "commit": "8b0055341",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3138,6 +3138,21 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "civilis-contract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/civilis/contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "civilis-opvang.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "claims-btw.test.js": {
       "soort": "puur",
@@ -14298,6 +14313,27 @@
     "persistentiestand.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "personalos-contract.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "personalos-experience.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "personalos.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "personeel-aanmelden-takken.test.js": {
       "soort": "puur",

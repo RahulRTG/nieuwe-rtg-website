@@ -1369,6 +1369,19 @@ const EIGEN_MODULE = new Map([
      wel degelijk kunnen zakken (vier zijn er met de hand op nagemeten). */
   ['moveproef.test.js', ['public/apps/move.html', 'scripts/moveproef.js']],
   ['rtg-edge-appbar.test.js', ['public/shared/rtg-edge-appbar.js', 'public/shared/rtg-edge-smart-menu.js']],
+  /* Deze statische regressietoets leest de gedeelde aanraakmaat en de twee
+     concrete mobiele correcties rechtstreeks met fs. Zonder expliciete
+     bronkoppeling ziet de require-scanner geen productmodule en zou het nieuwe
+     veiligheidsbewijs als ongemeten meetellen. De gerichte mutatieronde moet
+     deze koppeling bevestigen voordat de uitslag als bewijs geldt. */
+  ['premium-raakdoelen.test.js', [
+    'public/ds/componenten/basis.css',
+    'public/shared/rtg-editorial-v4.css',
+    'public/shared/rtg-experience-2026.css',
+    'public/apps/muziek-heritage.css',
+    'public/ds/tokens.css',
+    'public/apps/life.html'
+  ]],
   /* Deze regressietoets raakt drie achtergrondschrijvers via hun facades en
      een directe meter-import. modulesVan() ziet daardoor alleen de dunne
      gevels, terwijl de geteste retry-, pending- en serialisatielogica hier
@@ -1427,6 +1440,12 @@ const GEEN_BRONMUTATIE = new Map([
   ['teamcall-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
   ['werkos-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
   ['zaakcommand-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  /* De generieke operatoren raakten geen van de letterlijke CSS-contracten:
+     122 geldige mutaties overleefden op 11 november 2026. Twee gerichte
+     handmutaties zijn daarna afzonderlijk uitgevoerd en teruggezet:
+     --ds-doel 48px -> 47px en Life min-width 0 -> 1px lieten de toets beide
+     rood worden. */
+  ['premium-raakdoelen.test.js', 'letterlijke CSS-contracten; 122 generieke mutaties raakten geen assertion, handmutaties --ds-doel 48px -> 47px en Life min-width 0 -> 1px laten de toets zakken'],
   /* Statische scherm- en broncontracten zonder rechtstreeks requirepad. Ook
      deze zijn op 5 november 2026 gericht gemuteerd en na iedere proef hersteld. */
   ['aankomst-chauffeur-voorzijde.test.js', 'HTML-contract; data-ds-schermtype taak hernoemen laat de toets zakken'],

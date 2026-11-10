@@ -5862,9 +5862,9 @@ De herstelbron is gecontroleerd samengebracht met `main` op
 `81fd3442c2`. De nieuwe fotografische Beleving-laag, websitepresentatie en
 bijbehorende schermproeven uit `main` zijn behouden. De latere centrale
 Design System-eigenaars uit de Deep Green-herstelbron zijn eveneens behouden.
-De merge bracht een verwijzing naar het al verwijderde
-`public/shared/thema.js` terug; die dode laadkant en de bijbehorende lokale
-verbergregel zijn verwijderd. Daarmee blijft er één centrale
+De merge bracht een verwijzing naar de al verwijderde legacy-themamodule
+terug; die dode laadkant en de bijbehorende lokale verbergregel zijn
+verwijderd. Daarmee blijft er één centrale
 presentatie-eigenaar en geen schijnbaar beschikbare module die in productie
 404 zou geven.
 

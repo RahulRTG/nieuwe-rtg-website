@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-11-10T08:00:43.012Z",
-    "commit": "e09ba7a976",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-11-10T23:53:40.216Z",
+    "commit": "83a9496888",
+    "boomVuil": true,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v26.12.1"
   },
@@ -14824,6 +14824,11 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "premium-raakdoelen.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "letterlijke CSS-contracten; 122 generieke mutaties raakten geen assertion, handmutaties --ds-doel 48px -> 47px en Life min-width 0 -> 1px laten de toets zakken"
     },
     "premium.e2e.js": {
       "soort": "server",

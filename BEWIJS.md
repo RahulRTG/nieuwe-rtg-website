@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3164 bestanden en 21153 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3164 bestanden en 21155 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3164 |
-| losse beweringen (`test(...)`) | 21153 |
+| losse beweringen (`test(...)`) | 21155 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 520 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2945 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2730 bestanden, 20340 beweringen.
+2730 bestanden, 20342 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -416,7 +416,7 @@ toets omvalt.
 | `ci-lokaal.test.js` | 19 | gezakt op `<=-><#0` | DE LOKALE KETEN -- draait hier wat de CI straks draait? Deze toetsen bewaken twee dingen die uit elkaar kunnen lopen zonder dat iemand het merkt: de AFLEIDING (leest scripts/lib/werkstroom.js de werkstromen goed... |
 | `cijferopmens.test.js` | 8 | gezakt op `===->!==#0` | CAR-05 OVER DE HELE CARRIEREKANT -- er komt geen cijfer op een mens. DEZE TOETS BESTAAT OMDAT DE GRENS VIER DOCUMENTEN HAD EN EEN HANDHAVER, en die ene dekte precies EEN map. |
 | `civilis-contract.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `civilis-opvang.test.js` | 5 | -- | CIVILIS-OPVANG: de eerste maatschappelijke verticale keten. Deze proef bewijst softwaregedrag op een wegwerpserver. |
+| `civilis-opvang.test.js` | 6 | -- | CIVILIS-OPVANG: de eerste maatschappelijke verticale keten. Deze proef bewijst softwaregedrag op een wegwerpserver. |
 | `claims-btw.test.js` | 11 | gezakt op `===->!==#0` | BTW EN CLAIMS: het tarief op EEN plek, en geen bewering zonder dekking. TWEE GATEN uit de doorlichting van 20 augustus 2026: 4.10 `* 1.21` stond hard in kern/fonds.js en kern/lid/facturen.js, terwijl het platform... |
 | `clientafbreking.test.js` | 2 | gezakt op `liegpoort /api/` | EEN CLIENT DIE OPHANGT IS GEEN SERVERFOUT (server/opzet/afsluiters.js) WebKit verbreekt de verbinding als het weg-navigeert terwijl een POST nog loopt. Node geeft dan Error('aborted') aan de bodylezer, en de laatste... |
 | `clipdeler.test.js` | 4 | geen bronmutatie mogelijk | DE CLIPDELER STAAT ÉÉN KEER. Korte video's staan alleen op het toestel van de maker en reizen rechtstreeks (WebRTC-datakanaal). |
@@ -1709,7 +1709,7 @@ toets omvalt.
 | `pdf.test.js` | 14 | gezakt op `liegpoort /api/` | PDF: lezen, en redactie die de passage ECHT uit de bytes haalt. De maat die TAKEN 5.9 stelde staat in de derde toets: zoeken op de geredigeerde tekst in het RESULTAAT vindt hem niet meer -- niet in de tekstlaag en... |
 | `perimeter-risico.test.js` | 3 | gezakt op `liegpoort /api/` | DE PERIMETER VAN DE RISICOVOLLE ENDPOINTS ZONDER EIGEN TOETS. NORM.json telt honderden endpoints die in geen enkel toetsbestand voorkomen. |
 | `persistentiestand.test.js` | 3 | geen module gevonden | DE PERSISTENTIESTAND (server/db/persistentieStand) -- het enige getal waarmee een aanroeper kan vaststellen dat zijn schrijfactie de SCHIJF heeft gehaald. WAAROM DIT ER LOS STAAT, en waarom de geldroute hem nog NIET... |
-| `personalos-contract.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `personalos-contract.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `personalos.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `personeel-aanmelden-takken.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | POST /api/supplier/staff/join (server/routes/supplier/werving/ personeel-aanmelden.js), rechtstreeks aangeroepen met een nagemaakte app, kern en uitnodiging: elke stap van de volgorde (bedrijf en kassacode, dan... |
 | `personeelsuitnodiging-montage.test.js` | 2 | gezakt op `!==->===#0` | De personeelsuitnodiging (workos.personeelsuitnodiging) belooft een atomaire claim, en die bestaat alleen in een collectietransactie. Werving en supplier maakten elk een eigen instantie met alleen `kern`, en kern... |

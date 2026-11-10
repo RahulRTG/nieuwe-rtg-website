@@ -5149,3 +5149,41 @@ Eerder verborgen fouten ontdekt: **geen**. Niet-uitgevoerde verplichte
 controles: **actuele volledige APPWERKT, EXPERIENCEWERKT inclusief menselijke
 proeven, platformbrede gedragssuite, staging/load/herstel/rollback en twee
 onafhankelijke eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Afgesloten gedeelde oorzaak: Onderzoekslabpresentatie
+
+De professionele laag van het Onderzoekslab maakt niet langer tijdens runtime
+een eigen stijlblad voor KPI's, projectfasen en statusmeldingen. De bestaande
+projectketen, kennisbank, onderzoekscoach, gegevensroutes en
+autorisatiecontracten blijven ongewijzigd. Hun presentatie woont nu in
+`public/ds/componenten/onderzoekslab.css`, met `ds-onderzoekslab` als begrensde
+owner en uitsluitend semantische Design System-tokens.
+
+De statusmelding houdt haar `role=status`, staat boven de mobiele safe area en
+schakelt haar overgang uit bij reduced motion. De KPI-band en fase-indicatoren
+behouden hun betekenis en bestaande DOM-contracten; `lab-pro.js` bevat alleen
+nog gedrag. Gerichte kwalificatie op Node **26.12.1** sluit **129/129** Design
+System-, laadgraaf-, token- en contracttests, **1/1** echte mobiele
+Onderzoekslabbrowserketen en **8/8** bestaande Lab-domein- en
+autorisatieproeven. De volledige statische huiskeuring sluit groen nadat de
+bestaande architectuur-, bewijs- en functielijstafdrukken opnieuw uit de
+actuele bron zijn opgebouwd.
+
+Design System meldt nul schendingen en 87 gemigreerde schermen. De actuele
+presentatiemeter daalt van 81 naar **80 scripts met stijlinjectie** en van 168
+naar **167 injectieplekken**; de verdwenen owner is uit `ONTWERPNORM.json`
+verwijderd en kan daardoor niet ongemerkt terugkomen.
+
+**Afsluiting Onderzoekslabpresentatie.** Openstaande unieke oorzaken: **80
+scripts met resterende runtime-stijllading of -injectie, actieve legacybladen
+en schermstijlblokken, ontbrekende actuele APPWERKT-herkwalificatie, 3360
+niet-uitgevoerde Experience-voorwaarden en operationele vrijgavepoorten**.
+Opgelost sinds vorige meting: **1 runtime-stijlowner en 1 injectieplek**.
+Nieuwe regressies: **0 in de gerichte Design System-, browser-, Lab- en
+statische proeven**. Eerder verborgen fouten ontdekt: **geen productfout; de
+eerste statische run kon de routekaart uitsluitend door de lokale
+sandboxbeperking niet op loopback bouwen en is daarna in de toegestane
+testomgeving volledig groen herhaald**. Niet-uitgevoerde verplichte controles:
+**actuele volledige APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven,
+platformbrede gedragssuite, staging/load/herstel/rollback en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

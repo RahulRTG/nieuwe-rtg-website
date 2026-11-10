@@ -88,6 +88,7 @@ test('bronhash negeert platformafhankelijke builduitvoer in public/dist',t=>{
 test('bronhash hangt niet af van lege lokale runtime-mappen',t=>{
   const f=fixture(t),before=fingerprint(f.root);
   fs.mkdirSync(path.join(f.root,'server/opzet/data/theater'),{recursive:true});
+  fs.mkdirSync(path.join(f.root,'test/lokaal/leeg'),{recursive:true});
   assert.equal(fingerprint(f.root),before,'Git bewaart lege mappen niet; een commit hoort er niet door te veranderen');
   f.write('server/opzet/data/theater/bron.js','module.exports=true;\n');
   assert.notEqual(fingerprint(f.root),before,'een werkelijk bronbestand blijft wel hashinvoer');

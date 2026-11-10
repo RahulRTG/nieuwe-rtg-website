@@ -1,0 +1,58 @@
+/* Beleving: de gedeelde presentatielaag van RTG.
+
+   Twee standen, een contract. `publiek` gebruikt fotografie om een verhaal te
+   dragen; `werktafel` gebruikt dezelfde maat, rust en intentiehierarchie zonder
+   van het instrument een marketingscherm te maken. Bestaande hosts mogen de
+   variabelen hieronder lezen terwijl zij naar het Design System migreren. */
+@layer rtg.component {
+  .ds-beleving {
+    --ds-beleving-breedte: var(--ds-breedte-cinema);
+    --ds-beleving-leesbreedte: var(--ds-breedte-lees);
+    --ds-beleving-coverhoogte: var(--ds-hoogte-cinema);
+    --ds-beleving-lucht: var(--ds-lucht-cinema);
+    --ds-beleving-sluier: var(--ds-cover-sluier);
+    --ds-beleving-overgang: var(--ds-duur-vol) var(--ds-curve);
+    container-type: inline-size;
+  }
+
+  .ds-beleving[data-ds-beleving="publiek"] {
+    --ds-beleving-grond: var(--ds-cover-grond);
+    --ds-beleving-inkt: var(--ds-cover-inkt);
+    --ds-beleving-metaal: var(--ds-cover-metaal);
+  }
+
+  .ds-beleving[data-ds-beleving="werktafel"] {
+    --ds-beleving-grond: var(--ds-cover-grond);
+    --ds-beleving-inkt: var(--ds-cover-inkt);
+    --ds-beleving-metaal: var(--ds-cover-metaal);
+    --ds-beleving-coverhoogte: auto;
+  }
+
+  .ds-beleving__kader { inline-size: min(100%,var(--ds-beleving-breedte)); margin-inline: auto; }
+  .ds-beleving__lees { inline-size: min(100%,var(--ds-beleving-leesbreedte)); }
+  .ds-beleving__hoofdstuk { padding-block: var(--ds-beleving-lucht); }
+  .ds-beleving__beeld { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
+
+  /* Een redactionele beeldreeks: een groot moment met twee stillere hoofdstukken.
+     De beelden blijven links; de component verzint geen verhaal of status. */
+  .ds-belevingsverhalen {
+    display: grid; grid-template-columns: minmax(0,1.35fr) minmax(15rem,.65fr);
+    grid-template-rows: repeat(2,minmax(13rem,1fr)); gap: 1px;
+    margin-block: var(--ds-ruimte-8); background: var(--ds-lijnkleur);
+  }
+  .ds-belevingsverhaal { position: relative; min-block-size: 13rem; overflow: hidden; background: var(--ds-cover-grond); }
+  .ds-belevingsverhaal:first-child { grid-row: 1 / 3; min-block-size: 32rem; }
+  .ds-belevingsverhaal img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; transition: transform var(--ds-beleving-overgang); }
+  .ds-belevingsverhaal::after { content: ""; position: absolute; inset: 35% 0 0; background: var(--ds-beleving-sluier); pointer-events: none; }
+  .ds-belevingsverhaal figcaption { position: absolute; z-index: 1; inset-inline: var(--ds-ruimte-6); inset-block-end: var(--ds-ruimte-6); color: var(--ds-cover-inkt); }
+  .ds-belevingsverhaal small { display: block; margin-block-end: var(--ds-ruimte-2); color: var(--ds-cover-metaal); font: 650 var(--ds-maat-meta)/1.3 var(--ds-letter-tekst); letter-spacing: var(--ds-spatie-label); text-transform: uppercase; }
+  .ds-belevingsverhaal strong { display: block; max-inline-size: 18ch; font: 400 var(--ds-maat-kop)/1.08 var(--ds-letter-display); }
+  .ds-belevingsverhaal a { position: absolute; z-index: 2; inset: 0; color: transparent; }
+  .ds-belevingsverhaal:has(a:hover) img, .ds-belevingsverhaal:has(a:focus-visible) img { transform: scale(1.025); }
+  .ds-belevingsverhaal a:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: -4px; }
+
+  @container (max-width: 42rem) {
+    .ds-belevingsverhalen { grid-template-columns: 1fr; grid-template-rows: none; }
+    .ds-belevingsverhaal, .ds-belevingsverhaal:first-child { grid-row: auto; min-block-size: 22rem; }
+  }
+}

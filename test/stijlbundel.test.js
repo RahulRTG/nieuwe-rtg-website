@@ -125,7 +125,7 @@ test('9. de echte app-pagina: bundelen bewaart de portal-cascade en alle scripts
   assert.deepEqual(b[1], ['/shared/interface/second-screen.css', '/shared/interface/workspace-components.css',
     '/shared/interface/second-screen-personal.css'], 'de werkruimte blijft een eigen cascadegroep');
   assert.deepEqual(b[2], ['/shared/ios.css', '/apps/access/portal.css', '/shared/rtg-communication-surface.css',
-    '/ds/tokens.css', '/ds/componenten/focus.css', '/ds/componenten/melding.css',
+    '/ds/tokens.css', '/ds/componenten/beleving.css', '/ds/componenten/focus.css', '/ds/componenten/melding.css',
     '/ds/componenten/verbinding.css', '/ds/componenten/dyncode.css', '/ds/componenten/cookie.css',
     '/ds/componenten/samen.css', '/ds/componenten/handenvrij.css', '/ds/componenten/presentatierol.css',
     '/ds/componenten/paspoortscan.css', '/ds/componenten/pinherstel.css', '/ds/componenten/schermrust.css',

@@ -5855,3 +5855,52 @@ herstelcommit: `5be104037e79ed5689b32cdacec87c29c83e594b`. Eerstvolgende
 blokkade: **alle gerichte kwaliteitscontroles op de samenhangende werkboom,
 daarna herstelcommit en volledige verplichte CI**. Deep Green:
 **GEBLOKKEERD**.
+
+### Integratieherstelronde op actuele `main` — 11 november 2026
+
+De herstelbron is gecontroleerd samengebracht met `main` op
+`81fd3442c2`. De nieuwe fotografische Beleving-laag, websitepresentatie en
+bijbehorende schermproeven uit `main` zijn behouden. De latere centrale
+Design System-eigenaars uit de Deep Green-herstelbron zijn eveneens behouden.
+De merge bracht een verwijzing naar het al verwijderde
+`public/shared/thema.js` terug; die dode laadkant en de bijbehorende lokale
+verbergregel zijn verwijderd. Daarmee blijft er één centrale
+presentatie-eigenaar en geen schijnbaar beschikbare module die in productie
+404 zou geven.
+
+De gecombineerde bron is opnieuw opgebouwd. De schermbeelden en hun
+herkomstregister zijn aan de actuele presentatie gebonden, de taalbewijzen en
+Experience-inventaris zijn opnieuw afgeleid en de Design System-controle meldt
+**nul schendingen**, **87 gemigreerde schermen** en **12 gecontroleerde
+verbeterpunten**. De volledige statische repositorypoort sluit groen. Zij
+controleert onder meer 316 app-pagina's, 5.508 bekende API-paden, 5.412
+schrijfroutes, 302 collectie-eigenaars en de verboden afhankelijkheidsgraaf.
+De 912 verlopen APPWERKT-bewijzen blijven terecht verlopen.
+
+De gerichte integratieregressies sluiten groen:
+
+* publieke Experience en statische fallback: **6/6**;
+* gedeelde desktopwerelden, Edge, widgets en Foundation: **14/14**;
+* documentbediening via UI, Edge, API en Rahul: **1/1**;
+* volledige Edge- en systeemdeurcensus over alle 316 routes: **11/11** in
+  6:39, met **0 failures** en **0 skips**.
+
+De waarschuwingen met 401, 403, 404, 409 en 428 in deze proeven zijn de
+verwachte negatieve autorisatie-, conflict- en contractscenario's; de
+asserties bevestigen dat zij fail-closed blijven. De lokale meldingen over een
+ontbrekende encryptiesleutel en ingeschakelde testvoorzieningen horen bij de
+afgeschermde loopbackomgeving en gelden niet als productieconfiguratiebewijs.
+
+**Meetstand herstelronde 11.** Releaseblokkerende bronoorzaken: **0 lokaal
+bekend; GitHub-CI op de mergecommit vereist**. Bewezen afgesloten sinds de
+vorige ronde: **1 integratieoorzaak**, de teruggekeerde dode thema-laadkant.
+Nieuwe regressies: **0 in de actuele gerichte en statische controles**. Nog
+niet uitgevoerde verplichte controles: **volledige GitHub-CI op de
+mergecommit, exacte volledige Experience-toegankelijkheidsproducent,
+APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief menselijke proeven,
+operationele kwalificatie en twee onafhankelijke eindruns**. APPWERKT:
+**0/114 actueel geldig**. EXPERIENCEWERKT: **0/316 schermen en 0/3360
+voorwaarden actueel gekwalificeerd**. Actuele commit vóór het vastleggen van
+de merge: `fbb854ec49`; geïntegreerde `main`: `81fd3442c2`. Eerstvolgende
+blokkade: **mergecommit vastleggen, publiceren en alle verplichte GitHub-jobs
+volledig laten uitlopen op exact die commit**. Deep Green: **GEBLOKKEERD**.

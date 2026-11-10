@@ -57,6 +57,8 @@
     const gate = document.getElementById('gate');
     if (!gate || !API.enabled) return;
     gate.dataset.rtgAccess = 'true';
+    gate.classList.add('ds-beleving');
+    gate.dataset.dsBeleving = 'publiek';
     gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
       '<section class="access-brand" aria-label="RTG">' +

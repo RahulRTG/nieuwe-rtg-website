@@ -79,6 +79,13 @@ laadvolgorde.
   dialoog en edge. Elke selector begint bij een eigen `.ds-`-klasse. Een
   verbetering aan `.ds-knop` werkt door in elk aangesloten scherm van elke
   wereld.
+- **Beleving** (`componenten/beleving.css`) is het gedeelde contract voor de
+  nieuwe publieke voordeuren en de appwerelden. `data-ds-beleving="publiek"`
+  geeft fotografie de brede cover, sluier en redactionele lucht;
+  `data-ds-beleving="werktafel"` bewaart hetzelfde ritme maar laat de handeling
+  vooropstaan. De beeldreeks `.ds-belevingsverhalen` gebruikt één groot moment
+  en twee rustige hoofdstukken. Zo kunnen LivingOS en volgende wereldpagina's
+  fotografisch worden zonder een routegebonden kaartstijl of nieuwe kleuren.
 - **Schermtypen** (`schermen/`): de zeven uit de goedgekeurde mockups,
   namelijk **Cover, Collectie, Taak, Detail, Gesprek, Canvas en Status**. Elk
   scherm van RTG is een van deze zeven of een samenstelling ervan.

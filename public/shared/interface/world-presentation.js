@@ -3,7 +3,7 @@
   'use strict';
   var U, world, P;
   var content = {
-    living: ['LIVING · VANDAAG', 'Dichtbij begint hier.', 'Ontdek uw omgeving', '/apps/navigatie.html', 'Uit uw Saloon', 'Een nieuw perspectief op dichtbij', '/apps/wereld.html', '/images/editorial/moment-family-support.webp', '/images/world-homes/living-warm.jpg'],
+    living: ['LIVING · VANDAAG', 'Dichtbij begint hier.', 'Ontdek uw omgeving', '/apps/navigatie.html', 'Uit uw Saloon', 'Een nieuw perspectief op dichtbij', '/apps/wereld.html', '/images/editorial/living-table-story.webp', '/images/world-homes/living-warm.jpg'],
     work: ['WORK · VANDAAG', 'Maak ruimte voor focus.', 'Open uw werkruimte', '/apps/werkruimte.html', 'Uw werkruimte', 'Ruimte voor uw plannen', '/apps/werkruimte.html', '/images/world-homes/work.webp', '/images/world-homes/work-warm.jpg'],
     travel: ['TRAVEL · ONTDEKKEN', 'De ruimte om te ontdekken.', 'Bekijk uw reis', '/apps/reizen.html#reisoverzicht', 'Uw reis in het kort', 'Alles op één plek', '/apps/reisboek.html', '/images/world-homes/living-coast.webp', '/images/world-homes/travel-warm.jpg'],
     foundation: ['FOUNDATION · SAMEN', 'Ruimte om verder te komen.', 'Ontdek wat bij u past', '/apps/foundation/meedoen-ontdekken.html', 'In uw buurt', 'Samen aan de slag', '/apps/foundation/meedoen-ontdekken.html', '/images/world-homes/foundation.webp', '/images/world-homes/foundation-warm.jpg']

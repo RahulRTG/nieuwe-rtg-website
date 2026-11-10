@@ -15,4 +15,5 @@
   card('create','Maak mijn RTG','Make RTG mine','Begin op uw eigen moment.','Begin in your own time.','Bekijk de volgende stap','See the next step','people','create','living',null,'begin')
  ];
  w.RTGPublicContent.app.cards=appCards;
+ w.RTGPublicContent.app.primary=appCards.filter(function(card){return ['living','travel','work','foundationApp'].includes(card.id);});
 })(window);

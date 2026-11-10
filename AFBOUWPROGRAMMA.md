@@ -5075,3 +5075,40 @@ testomgeving**. Niet-uitgevoerde verplichte controles: **actuele volledige
 APPWERKT, 3360 Experience-voorwaarden inclusief menselijke proeven,
 productieachtige Zaakdoos- en loadproeven, staging/herstel/rollback en twee
 onafhankelijke eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Afgesloten gedeelde oorzaak: plaatsdienstpresentatie
+
+De toestemmingskaart voor aanwezigheid tijdens een lopende dienst maakt niet
+langer tijdens runtime een eigen stijlblad. De bestaande toestemming-, plaats-,
+sessie- en servercontracten zijn ongewijzigd. Alleen de presentatie is naar de
+bestaande centrale eigenaar verplaatst als
+`public/ds/componenten/plaatsdienst.css`; de hoofdapp laadt dit begrensde
+componentblad via zijn bestaande Design System-laadzone. Het component gebruikt
+uitsluitend semantische tokens, behoudt de mobiele safe area en geeft beide
+keuzes minimaal 44 bij 44 pixels bedieningsruimte. Focus start op de primaire
+keuze en de bestaande focusherstel- en Escape-contracten blijven bestaan.
+
+Gerichte kwalificatie op Node **26.12.1** sluit **5/5** servercontracttests en
+**1/1** echte mobiele browserketen. De browser bewijst daarnaast dat geen
+runtime-stijl voor dit component ontstaat, beide acties groot genoeg zijn en de
+mens nog steeds vóór plaatswaarneming toestemming geeft. De taalroute is na de
+bronwijziging inhoudelijk opnieuw uitgevoerd (**27/27**) en het websitebeeld is
+opnieuw tegen de actuele appbron gecontroleerd. De volledige statische
+bronkeuring sluit daarna groen. Design System meldt nul schendingen en 87
+gemigreerde schermen. De actuele presentatiemeter daalt van 83 naar **82 scripts
+met stijlinjectie** en van 170 naar **169 injectieplekken**; de verdwenen owner
+is uit `ONTWERPNORM.json` verwijderd en kan daardoor niet ongemerkt terugkomen.
+
+**Afsluiting plaatsdienstpresentatie.** Openstaande unieke oorzaken:
+**82 scripts met resterende runtime-stijlinjectie, actieve legacybladen en
+schermstijlblokken, ontbrekende actuele APPWERKT-herkwalificatie, 3360
+niet-uitgevoerde Experience-voorwaarden en operationele vrijgavepoorten**.
+Opgelost sinds vorige meting: **1 runtime-stijlowner en 1 injectieplek**. Nieuwe
+regressies: **0 in de gerichte server-, browser-, taal-, websitebeeld-, Design
+System- en statische proeven**. Eerder verborgen fouten ontdekt: **de lokale
+standaardshell wees nog naar Node 24.18.0; het mislukte bewijs is niet
+overgenomen en alle definitieve proeven zijn onder de voorgeschreven Node
+26.12.1 herhaald**. Niet-uitgevoerde verplichte controles: **actuele volledige
+APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven, platformbrede
+gedragssuite, staging/load/herstel/rollback en twee onafhankelijke eindruns**.
+Deep Green: **GEBLOKKEERD**.

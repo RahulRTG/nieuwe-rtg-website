@@ -1,0 +1,61 @@
+/* Plaatsdienst: toestemming van de medewerker zelf. Dit component blijft
+   bewust klein en rustig, maar de twee keuzes houden een volledige
+   aanraakruimte. De eigenaar bepaalt alleen presentatie; plaatsdienst.js en
+   de server blijven eigenaar van toestemming, levensduur en gegevens. */
+@layer rtg.component {
+  .ds-plaatsdienst {
+    position: fixed;
+    inset-inline-start: 50%;
+    inset-block-end: calc(env(safe-area-inset-bottom, 0px) + var(--ds-edge-hoogte) + var(--ds-ruimte-4));
+    z-index: 9984;
+    inline-size: min(24rem, calc(100vw - 2 * var(--ds-ruimte-4)));
+    padding: var(--ds-ruimte-4);
+    transform: translateX(-50%);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+    font: var(--ds-maat-tekst)/1.55 Inter, system-ui, sans-serif;
+  }
+
+  .ds-plaatsdienst__uitleg {
+    margin: 0 0 var(--ds-ruimte-3);
+    color: var(--ds-inkt-zacht);
+    font-size: var(--ds-maat-klein);
+  }
+
+  .ds-plaatsdienst__acties {
+    display: flex;
+    gap: var(--ds-ruimte-2);
+  }
+
+  .ds-plaatsdienst__actie {
+    flex: 1;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-3);
+    border: 0;
+    border-radius: var(--ds-radius-knop);
+    font: inherit;
+    font-size: var(--ds-maat-klein);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .ds-plaatsdienst__actie--aan {
+    background: var(--ds-metaal);
+    color: var(--ds-grond);
+  }
+
+  .ds-plaatsdienst__actie--niet {
+    background: transparent;
+    color: var(--ds-inkt-zacht);
+    font-weight: 500;
+  }
+
+  .ds-plaatsdienst__actie:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}

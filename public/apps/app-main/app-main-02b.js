@@ -25,14 +25,25 @@
     if (window.RTGLevend) RTGLevend.familie();
   }
   function pasThemaZet(t){
+    if (t !== 'standaard' && t !== 'bordeaux' && t !== 'parelmoer') return;
     try { localStorage.setItem(pasThemaKey(), t); } catch(e){}
     pasThemaToepassen();
+  }
+  function pasThemaWissel(){
+    const t = pasThemaHuidig() === 'parelmoer' ? 'standaard' : 'parelmoer';
+    pasThemaZet(t);
+    return t;
   }
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
   // seam voor de OS-schil (bedieningspaneel): thema lezen/zetten zonder de
   // logica hierboven te dupliceren. Iedereen mag kiezen.
-  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => true };
+  window.RTGOSThema = {
+    huidig: pasThemaHuidig,
+    zet: pasThemaZet,
+    wissel: pasThemaWissel,
+    keuzeMogelijk: () => true
+  };
 
   /* DE PAS AANNEMEN ZONDER HERLADEN. Een kale /apps/app.html (zonder ?pas=) is
      de deur waar bijna elk scherm naar terugwijst. Tot hier herlaadde de

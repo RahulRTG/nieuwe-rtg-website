@@ -76,6 +76,12 @@
 @import url("componenten/rahulpoort.css");
 @import url("componenten/uitstap.css");
 @import url("componenten/geld.css");
+@import url("componenten/dyncode.css");
+@import url("componenten/meelezen.css");
+@import url("componenten/paspoortscan.css");
+@import url("componenten/pinherstel.css");
+@import url("componenten/schermrust.css");
+@import url("componenten/schoolbel.css");
 @import url("levendekleur.css");
 @import url("schermen/cover.css");
 @import url("schermen/collectie.css");

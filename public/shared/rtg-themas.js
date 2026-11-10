@@ -1,15 +1,10 @@
-/* De themakiezer: EEN systeem, vier standen, op de materialen.
+/* De themakiezer: vier materiaalstanden op één centrale sleutel.
 
-   Hier stonden er twee. shared/thema.js kende donker/licht en werd door een
-   pagina geladen; shared/rosthema.js kende parelmoer/standaard/bordeaux en werd
-   door twintig pagina's geladen -- en ze schreven in DEZELFDE sleutel
-   (rtg_thema) met een ander vocabulaire. Wie in het paneel "Champagne" koos,
-   zag op het beginscherm "donker". Twee plekken die een waarheid vasthouden
-   (LAT.md regel 4), uit elkaar gelopen.
-
-   Deze laag gebruikt een eigen sleutel en laat de oude twee met rust, zodat een
-   pagina die nog niet om is niets merkt. Migreren gebeurt pagina voor pagina;
-   zolang dat loopt is er geen moment waarop beide half werken. */
+   De vroegere gedeelde licht/donkerlaag is verwijderd nadat haar laatste host
+   op zijn expliciete OS-controller is aangesloten. shared/rosthema.js bedient
+   nog de kantoor- en PDA-schermen met hun drie bestaande pasmaterialen; deze
+   laag blijft hun centrale wereld- en materiaalgrond. Migreren gebeurt per host
+   en pas nadat zijn zichtbare bediening en opslagcontract zijn bewezen. */
 (function (w, d) {
   'use strict';
   var KEY = 'rtg_thema_v2';

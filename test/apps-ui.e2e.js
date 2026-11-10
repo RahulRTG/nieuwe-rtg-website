@@ -149,6 +149,33 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.match(await page.textContent('#homeSub'), /lid sinds|member since/i,
         'de passregel is niet gevuld; dan is de sessie niet echt hersteld');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
+
+      /* De oude gedeelde licht/donkerlaag is weg. De zichtbare tegel, de drie
+         knoppen en Rahul delen nu de ene OS-controller. Bewijs hier in de echte
+         browser dat de korte tegel beide kanten op gaat, de opslag meereist en
+         een onbekende waarde niet stil in het contract terechtkomt. */
+      const thema = await page.evaluate(() => {
+        RTGOSThema.zet('bordeaux');
+        document.getElementById('osCcLicht').click();
+        const licht = {
+          huidig: RTGOSThema.huidig(),
+          bewaard: localStorage.getItem('rtg_ros_thema'),
+          attribuut: document.documentElement.getAttribute('data-pas-thema')
+        };
+        document.getElementById('osCcLicht').click();
+        const donker = {
+          huidig: RTGOSThema.huidig(),
+          bewaard: localStorage.getItem('rtg_ros_thema'),
+          attribuut: document.documentElement.getAttribute('data-pas-thema')
+        };
+        RTGOSThema.zet('neon');
+        return { licht, donker, naOngeldig: RTGOSThema.huidig(), oud: typeof window.RTGThema };
+      });
+      assert.deepEqual(thema, {
+        licht: { huidig: 'parelmoer', bewaard: 'parelmoer', attribuut: 'parelmoer' },
+        donker: { huidig: 'standaard', bewaard: 'standaard', attribuut: null },
+        naOngeldig: 'standaard', oud: 'undefined'
+      }, 'de ledenapp heeft niet precies één geldige OS-thema-eigenaar');
     }
   });
 });

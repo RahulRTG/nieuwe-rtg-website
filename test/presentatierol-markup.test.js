@@ -168,8 +168,7 @@ test('gedeelde bediening maakt dynamische markup zonder inline presentatie', () 
     'public/shared/metgezel/metgezel-03.js',
     'public/shared/rtg-schil/05-context.js',
     'public/shared/paspoortscan.js',
-    'public/shared/schoolbel.js',
-    'public/shared/thema.js'
+    'public/shared/schoolbel.js'
   ];
   const gedrag = bronnen.map(lees).join('\n');
   assert.doesNotMatch(gedrag, /style=/, 'gedeelde HTML-sjablonen dragen geen stijlattributen');

@@ -4956,3 +4956,38 @@ ontdekt: **geen aanvullende**. Niet-uitgevoerde verplichte controles:
 platformkwalificatie, menselijke Experience-beoordeling, operationele
 releasepoorten en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### De hoofdapp heeft geen verborgen licht/donker-eigenaar meer
+
+De laatste host van `shared/thema.js` gebruikt voortaan voor de zichtbare
+driekeuze, de korte weergavetegel, Spotlight en Rahul dezelfde bestaande
+`RTGOSThema`-controller. De drie bestaande keuzes Champagne, Donker en
+Bordeaux en hun opslagcontract blijven behouden. Onbekende themawaarden
+worden geweigerd. De oude afzonderlijke sleutel, verborgen knop,
+MutationObserver en het volledige runtime-geinjecteerde stijlblad zijn uit de
+bron verwijderd. Dit is een consolidatie van bestaand gedrag; de centrale
+vier-materialenlaag en de resterende ROS-hosts blijven afzonderlijk zichtbaar
+in de verdere migratielijst.
+
+De bron-, thema- en Design System-contracten sluiten **51/51**. De echte
+ledenbrowserketen sluit **1/1** en bewijst sessieherstel, beide richtingen van
+de korte licht/donkerhandeling, opslag, het toegepaste wortelattribuut en het
+weigeren van een ongeldige waarde. Het centrale DS-manifest bevat weer alle
+begrensde componenten precies eenmaal. Design System meldt nul schendingen en
+87 gemigreerde schermen. De actuele meter daalt van 84 naar **83 scripts met
+stijlinjectie** en van 171 naar **170 injectieplekken**.
+
+**Afsluiting oude hoofdapp-thema-eigenaar.** Openstaande unieke oorzaken:
+**83 scripts met resterende runtime-stijlinjectie, resterende thema-eigenaren
+op nog niet gemigreerde hosts, dynamische app-templatepresentatie, ontbrekende
+objectieve/menselijke Experience-bewijzen en operationele vrijgavepoorten**.
+Opgelost sinds vorige meting: **1 parallelle twee-standencontroller, 1
+runtime-stijlblad en 3 dode verborgen-knopverbindingen**. Nieuwe regressies:
+**0 in de gerichte bron-, Design System- en browserproeven**. Eerder verborgen
+fouten ontdekt: **het centrale DS-manifest miste zes reeds begrensde
+componenten; de contractproef heeft dit hersteld zonder laadwegen te
+verbreden**. Niet-uitgevoerde verplichte controles:
+**APPWERKT-herkwalificatie na de bronwijzigingen, de volledige
+platformkwalificatie, menselijke Experience-beoordeling, operationele
+releasepoorten en twee onafhankelijke eindruns**. Deep Green:
+**GEBLOKKEERD**.

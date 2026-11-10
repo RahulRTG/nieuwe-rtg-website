@@ -343,14 +343,25 @@ var RTG_BOUW = '0bc1bc2b';
     if (window.RTGLevend) RTGLevend.familie();
   }
   function pasThemaZet(t){
+    if (t !== 'standaard' && t !== 'bordeaux' && t !== 'parelmoer') return;
     try { localStorage.setItem(pasThemaKey(), t); } catch(e){}
     pasThemaToepassen();
+  }
+  function pasThemaWissel(){
+    const t = pasThemaHuidig() === 'parelmoer' ? 'standaard' : 'parelmoer';
+    pasThemaZet(t);
+    return t;
   }
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
   // seam voor de OS-schil (bedieningspaneel): thema lezen/zetten zonder de
   // logica hierboven te dupliceren. Iedereen mag kiezen.
-  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => true };
+  window.RTGOSThema = {
+    huidig: pasThemaHuidig,
+    zet: pasThemaZet,
+    wissel: pasThemaWissel,
+    keuzeMogelijk: () => true
+  };
 
   /* DE PAS AANNEMEN ZONDER HERLADEN. Een kale /apps/app.html (zonder ?pas=) is
      de deur waar bijna elk scherm naar terugwijst. Tot hier herlaadde de
@@ -5206,7 +5217,7 @@ var RTG_BOUW = '0bc1bc2b';
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
   function osActies() {
     const uit = [
-      { naam: 'Licht of donker', glyf: 'thema', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Licht of donker', glyf: 'thema', doe: () => { if (window.RTGOSThema) RTGOSThema.wissel(); } },
       { naam: 'Meldingen', glyf: 'meldingen', doe: () => { const b = $('#bell'); if (b) b.click(); } },
       { naam: 'Bedieningspaneel', glyf: 'paneel', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
       { naam: 'Taal kiezen', glyf: 'taal', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
@@ -5435,9 +5446,12 @@ var RTG_BOUW = '0bc1bc2b';
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
   if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
-  // licht/donker: de (verborgen) gedeelde themaknop blijft de motor
+  // licht/donker is een korte ingang naar dezelfde OS-themamotor als de drie
+  // zichtbare keuzes hierboven; er is geen tweede opslag of verborgen knop.
   const ccLicht = $('#osCcLicht');
-  if (ccLicht) ccLicht.addEventListener('click', () => { const b = $('#rtg-thema-knop'); if (b) b.click(); });
+  if (ccLicht) ccLicht.addEventListener('click', () => {
+    if (window.RTGOSThema) { RTGOSThema.wissel(); ccSync(); }
+  });
   const ccUit = $('#osCcUit');
   if (ccUit) ccUit.addEventListener('click', () => { sluitScrims(); const b = $('#logoutBtn'); if (b) b.click(); });
   // helderheid: puur visueel, onthouden per browser
@@ -5737,8 +5751,12 @@ var RTG_BOUW = '0bc1bc2b';
       return true;
     }
     if (/^(licht|donker|lichte modus|donkere modus)$/.test(q)) {
-      const b = $('#rtg-thema-knop');
-      if (b) { b.click(); bannerToon('✦', 'Rahul', 'De weergave is omgezet.'); return true; }
+      if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
+        const licht = /^(licht|lichte modus)$/.test(q);
+        RTGOSThema.zet(licht ? 'parelmoer' : 'standaard');
+        bannerToon('✦', 'Rahul', 'De weergave staat op ' + (licht ? 'licht' : 'donker') + '.');
+        return true;
+      }
       return false;
     }
     m = q.match(/^(?:open|start|ga naar)\s+(.+)$/);

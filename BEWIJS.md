@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3165 bestanden en 21173 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3166 bestanden en 21184 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 3165 |
-| losse beweringen (`test(...)`) | 21173 |
+| toetsbestanden | 3166 |
+| losse beweringen (`test(...)`) | 21184 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 524 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2944 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2945 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 183 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2731 bestanden, 20358 beweringen.
+2732 bestanden, 20369 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -129,13 +129,14 @@ toets omvalt.
 | `alpine.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Alpine: het wintersport- en seizoensresort (demo Val d'Aurora). Bewaakt de pistes en liften, de lawineregel (alleen de berggids zet het niveau, en vanaf 4 gaan de zwarte pistes dicht en blijven ze dicht),... |
 | `ankerdienst-echt.test.js` | 5 | gezakt op `liegpoort /api/` | DE ANKERDIENST OP EEN ECHTE SERVER. test/ankerdienst.test.js toetst de regels; dit toetst dat de dienst ook werkelijk aan de journalen hangt die er in productie zijn. |
 | `ankerdienst.test.js` | 13 | gezakt op `===->!==#0` | DE ANKERDIENST -- het ene getal dat naar buiten moet. De hashketen ziet gesleutel MIDDEN in een spoor. |
+| `ankerherstel.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | Een auditbreuk wordt niet met de gewone app-sleutel gladgestreken. Alleen een apart getekende verklaring kan exact van een bestaand extern punt via een gemeenschappelijk punt naar een aantoonbare lokale tak gaan. |
 | `ankerherzegel-echt.test.js` | 1 | gezakt op `liegpoort /api/` | DE HERZEGELING OP EEN ECHTE SERVER: /api/privacy/delete legt het externe anker niet stil. test/ankerherzegel.test.js toetst de regels op een los journaal; dit toetst dat de wissing in kern/vergeten.js ze werkelijk... |
 | `ankerherzegel-takken.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | DE HERZEGELING ALS ZUIVERE REKENING (server/lib/ankerherzegel.js). Naast test/ankerherzegel.test.js (die het geheel met een echte ankerdienst en ontvanger draait) houdt dit bestand elke weigertak van plan,... |
 | `ankerherzegel.test.js` | 10 | gezakt op `voorwaarde-omkeren#0` | DE HERZEGELING: een AVG-wissing legt het externe anker niet meer stil, en een vervalsing blijft een alarm (server/lib/ankerherzegel.js). De drie beweringen, elk met zijn tegenproef: 1. |
 | `ankerketen.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `ankerontvanger-takken.test.js` | 8 | gezakt op `voorwaarde-omkeren#0` | De ankerontvanger (scripts/ankerontvanger.js), los van de ankerketen: elke weigering van neemAan (geen blok, niet of fout getekend, een andere sleutel dan de vastgepinde of ingestelde, een teruggang, een herzegeling... |
-| `ankerpost.test.js` | 8 | gezakt op `===->!==#0` | DE ANKERPOST (server/lib/ankerpost.js) -- de bestemming van het ankerblok. Het besluit erachter: een tweede machine binnen RTG. |
-| `ankertimer.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `ankerontvanger-takken.test.js` | 10 | gezakt op `voorwaarde-omkeren#0` | De ankerontvanger (scripts/ankerontvanger.js), los van de ankerketen: elke weigering van neemAan (geen blok, niet of fout getekend, een andere sleutel dan de vastgepinde of ingestelde, een teruggang, een herzegeling... |
+| `ankerpost.test.js` | 9 | gezakt op `===->!==#0` | DE ANKERPOST (server/lib/ankerpost.js) -- de bestemming van het ankerblok. Het besluit erachter: een tweede machine binnen RTG. |
+| `ankertimer.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `anthropic.test.js` | 4 | gezakt op `return-weg#3` | Test voor de eigen Claude-client (server/anthropic.js), die @anthropic-ai/sdk verving. We draaien tegen een lokale nep-API (geen echte sleutel/kosten) en controleren: de juiste headers + body gaan eruit, het antwoord... |
 | `antivirus.test.js` | 23 | gezakt op `true->false` | Tests voor De Ontsmetter (server/kern/antivirus.js): de platform-malware- scanner. Handtekeningen, magie-controle, extensies en entropie. |
 | `antwoord-einde.test.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1071,7 +1072,7 @@ toets omvalt.
 | `isolatieregisters.test.js` | 4 | geen module gevonden | DE TWEE ISOLATIEREGISTERS DRAGEN EEN TAND -- en dat was de reden dat `metingenZonderRatel` van 33 naar 35 ging. scripts/lib/metingen.js zegt het scherp: een meetbestand dat aan geen enkele ratel hangt, groeit... |
 | `jeugdbestuur.e2e.test.js` | 11 | gezakt op `liegpoort /api/` | HET JEUGDBESTUUR OVER HTTP -- kan een talent van zestien iemand naast zich zetten zonder dat hij iets tekent wat hij niet leest? Dit is CARRIERE.md par. |
 | `journaalbestand-weerbaar.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | HET JOURNAAL OP SCHIJF ONDER DRUK (server/kern/journaalbestand.js, met ./journaalrotatie.js en ./journaallezen.js eronder). Het append-only journaal is waar het doorgeefjournaal terugkijkt: wat er binnenkwam en wat... |
-| `journaalbestand.test.js` | 11 | gezakt op `getal+1#7` | HET JOURNAAL OP SCHIJF (server/kern/journaalbestand.js). Het doorgeefjournaal woonde in db.data.doorgeefjournaal: één array van 20.000 regels, dus één blob in één rij van de opslag. |
+| `journaalbestand.test.js` | 12 | gezakt op `getal+1#7` | HET JOURNAAL OP SCHIJF (server/kern/journaalbestand.js). Het doorgeefjournaal woonde in db.data.doorgeefjournaal: één array van 20.000 regels, dus één blob in één rij van de opslag. |
 | `journaalschrijf.test.js` | 6 | gezakt op `true->false#0` | EEN LOGBOEK MAG DE SERVER NIET TRAAG MAKEN. WAT ER MIS WAS, en het was mijn eigen code van dezelfde dag. |
 | `journalistiek-redactie.test.js` | 11 | gezakt op `liegpoort /api/` | DE REDACTIE VAN EEN NIEUWSBEDRIJF -- 13 endpoints achter de leverancier-inlog. Deze dertien wees de waargenomen dekkingsmeting aan als nooit aangeroepen: niet een enkele test raakte /api/supplier/redactie/*. |
 | `journalistiek-versies.test.js` | 3 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1775,7 +1776,7 @@ toets omvalt.
 | `prijsmelding.test.js` | 10 | gezakt op `===->!==#0` | DE LEDENPRIJSGARANTIE: het plafond bestond, de rechtzetting niet. De garantie was voor de helft echt gebouwd -- de ledenprijs wordt server-side afgekapt op de publieke prijs (test/partner.test.js bewaakt dat). |
 | `procinfo-takken.test.js` | 7 | gezakt op `optie-uit#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `procinfo.test.js` | 4 | gezakt op `===->!==#0` | PROCESGEGEVENS OP ELK PLATFORM (scripts/lib/procinfo.js). Zes scripts lazen /proc rechtstreeks, en een toets sloeg zichzelf zonder /proc stil over. |
-| `productie-anker.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `productie-anker.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-communicatie.test.js` | 10 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-failclosed.test.js` | 21 | gezakt op `===->!==#0` | PRODUCTIE FAIL-CLOSED -- regressie voor RTG-V1-RELEASE blocker 3. DE FOUT (bewezen in de audit): vrijwel alle productie-hardening hing aan NODE_ENV==='production'. |
 | `productie-installatie.test.js` | 4 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -17,6 +17,12 @@
 'use strict';
 
 function keurAnker(env, fouten, waarschuwingen, priveBeta) {
+  if (env.RTG_ANKER_HERSTEL_SIGN_KEY_FILE)
+    fouten.push('De private audit-herstelsleutel staat in de app-omgeving. Alleen het handmatige scripts/ankerherstel.js mag die sleutel lezen.');
+  if (env.RTG_ANKER_HERSTEL_FILE) {
+    const h = require('../lib/ankerherstel').maakHerstel({ omgeving: env }).lees();
+    if (!h.verklaring) fouten.push('RTG_ANKER_HERSTEL_FILE is gezet, maar de apart getekende herstelverklaring is ongeldig: ' + (h.fout || 'onbekend'));
+  }
   if (!env.RTG_ANKERPOST_URL) {
     const melding = 'RTG_ANKERPOST_URL niet gezet: het auditspoor wordt nergens buiten dit huis verankerd. ' +
       'Kopafknipping en een volledige herberekening van een journaal blijven dan onzichtbaar. Zet het adres van ' +

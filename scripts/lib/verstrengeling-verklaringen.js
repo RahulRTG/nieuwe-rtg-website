@@ -238,6 +238,8 @@ module.exports = [
     reden: 'journaalbestand.js r.77 maakt de rotatie; een journaal en zijn rotatie zijn een onderwerp, geknipt op de 10 KB van keuringsregel 13' },
   { van: 'domein:journaalbestand', naar: 'domein:journaallezen', soort: 'EIGEN_DATA',
     reden: 'r.135: de leeskant van datzelfde journaal' },
+  { van: 'domein:journaalbestand', naar: 'domein:journaalmigratie', soort: 'EIGEN_DATA',
+    reden: 'journaalbestand.js laat de migratie van datzelfde append-only journaal per inhoudsdigest atomair voltooien voordat de schrijver opent; migratie bezit geen ander domein of opslagcontract' },
   { van: 'domein:journaalbestand', naar: 'domein:doorgeefjournaal', soort: 'EIGEN_DATA',
     reden: 'r.165: het doorgeven van datzelfde journaal naar een volgende bestemming' },
   { van: 'domein:doorgeefjournaal', naar: 'domein:journaalvorm', soort: 'EIGEN_DATA',

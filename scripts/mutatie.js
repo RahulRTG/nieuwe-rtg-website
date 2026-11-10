@@ -1550,6 +1550,16 @@ const GEEN_BRONMUTATIE = new Map([
      laat rtg-heritage zakken. */
   ['rtg-edge-accessibility.test.js', 'CSS-contract; handmutatie 44px naar 40px liet de raakdoeltoets zakken'],
   ['rtg-heritage.test.js', 'CSS-contract; handmutatie inhoudsradius 2px naar 8px liet de geometriepoort zakken'],
+  /* Deze twee nieuwe consolidatietoetsen bewaken namen en laadcontracten in
+     statische bron. De rekenoperatoren raken die foutklasse niet: de eerste
+     kreeg nul bruikbare mutaties, de tweede overleefde 587 mutaties in
+     uitvoerlogica die buiten zijn bewering ligt. Op 10 november 2026 daarom de
+     eigen foutklasse aangebracht en direct teruggezet. RTGOSThema hernoemen
+     naar RTGOSThemaOud liet de eerste thema-eigenaarstoets zakken; het centrale
+     presentatierolblad uit Clips verwijderen liet precies de Clips-toets
+     zakken. */
+  ['app-thema-eigenaar.test.js', 'broncontract over een eigenaarnaam en drie letterlijke themawaarden; 0 bruikbare rekenmutaties. Handmutatie RTGOSThema naar RTGOSThemaOud liet de eigenaarstoets zakken'],
+  ['presentatierol-markup.test.js', 'statische HTML- en CSS-eigenaarschapscensus; 587 rekenmutaties in uitvoerlogica raken die foutklasse niet. Handmutatie die presentatierol.css uit Clips verwijderde liet uitsluitend de Clips-toets zakken'],
   /* Deze ratel staat op NUL, en dat is precies wat hem onmeetbaar maakt voor de
      motor: meet() leest de echte testmap, telt daar nul wachten, en elke
      gedragsmatige mutatie in scripts/klokwacht.js laat dat nul. Nul in, nul uit.

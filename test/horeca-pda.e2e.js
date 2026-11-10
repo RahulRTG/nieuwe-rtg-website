@@ -34,6 +34,7 @@ const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, klikEnWacht, tekstVan } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
+const tijdzone = require('../server/kern/tijdzone');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pda-'));
 
@@ -114,13 +115,12 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
        die lijst nul. Valt de start in de eerste twee minuten van een dag, dan
        bestaat de voorwaarde van deze toets domweg niet en wachten we hem uit;
        overslaan zou een bewering wegpoetsen die het hele scherm draagt. */
-    const middernacht = new Date(); middernacht.setHours(0, 0, 0, 0);
     const RUIMTE = 2 * 60000;
-    if (Date.now() - middernacht.getTime() < RUIMTE) {
-      await new Promise((r) => setTimeout(r, RUIMTE - (Date.now() - middernacht.getTime()) + 1000));
+    const huisNu = tijdzone.huis(new Date());
+    if (huisNu.minuten < 2) {
+      await new Promise((r) => setTimeout(r, RUIMTE - huisNu.minuten * 60000 + 1000));
     }
-    const toen = new Date(Math.max(Date.now() - 20 * 60000, middernacht.getTime() + 60000));
-    const serveerOm = String(toen.getHours()).padStart(2, '0') + ':' + String(toen.getMinutes()).padStart(2, '0');
+    const serveerOm = tijdzone.hhmmIn(new Date(Date.now() - 20 * 60000));
     const laat = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'PDA-LAAT', gasten: 2 })).body.rekening;
     const l1 = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: laat.id, naam: 'Tartaar', prijs: 22, aantal: 1, gang: 1, station: 'koud' })).body.regel;
     await H('/api/supplier/horeca/rekening/regel', { rekeningId: laat.id, naam: 'Zeebaars', prijs: 29, aantal: 1, gang: 1, station: 'warm' });

@@ -4,7 +4,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
+const os = require('node:os');
+const cp = require('node:child_process');
 const coverage = require('../scripts/lib/experience/coverage');
+const evidence = require('../scripts/lib/experience/evidence');
 
 const ROOT = path.join(__dirname,'..');
 const contract = JSON.parse(fs.readFileSync(path.join(ROOT,'experience-architecture/coverage-contract.json')));
@@ -14,6 +17,20 @@ test('EXPERIENCEWERKT.json is exact uit de actuele inventaris afgeleid', () => {
   const stored = fs.readFileSync(path.join(ROOT,'EXPERIENCEWERKT.json'),'utf8');
   const report = coverage.build(ROOT,{contract,signatures});
   assert.equal(stored,coverage.serializeRegistry(report));
+});
+
+test('Experience-generatie herkent onbekende broninvoer voordat die een onreproduceerbare hash maakt', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(),'rtg-experience-input-'));
+  try {
+    fs.mkdirSync(path.join(root,'server'),{recursive:true});
+    fs.writeFileSync(path.join(root,'server','basis.js'),'module.exports = true;\n');
+    cp.execFileSync('git',['init','-q'],{cwd:root});
+    cp.execFileSync('git',['add','server/basis.js'],{cwd:root});
+    fs.writeFileSync(path.join(root,'server','tijdelijke-diagnostiek.js'),'niet voor de kandidaat\n');
+    assert.deepEqual(evidence.untrackedInputs(root),['server/tijdelijke-diagnostiek.js']);
+  } finally {
+    fs.rmSync(root,{recursive:true,force:true});
+  }
 });
 
 test('register is volledig afgeleid uit alle logische apps en alle fysieke schermen', () => {

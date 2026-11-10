@@ -20,6 +20,15 @@ function candidate(root) {
     return {ok:true,commit:stamp.commit};
   } catch (_) { return {ok:false,reason:'Experience-kandidaat kon niet worden gecontroleerd',commit:null}; }
 }
+function untrackedInputs(root) {
+  try {
+    const status = execFileSync('git',['status','--porcelain=v1','-z','--untracked-files=all','--',...SOURCE_PATHS],
+      {cwd:root,encoding:'utf8',stdio:['ignore','pipe','ignore']});
+    return status.split('\0').filter(Boolean).filter(line => line.startsWith('?? ')).map(line => line.slice(3));
+  } catch (_) {
+    throw new Error('Experience-broninvoer kon niet tegen Git worden gecontroleerd');
+  }
+}
 function fingerprint(root) {
   const hash = crypto.createHash('sha256');
   function add(name) {
@@ -59,4 +68,4 @@ function state(record, sourceHash, test, now = Date.now(), candidate) {
   return record.passed === true && record.exitCode === 0 ? 'PROVEN' : 'FAILED';
 }
 function sha(text) { return crypto.createHash('sha256').update(text).digest('hex'); }
-module.exports = {fingerprint,outcome,state,sha,candidate};
+module.exports = {fingerprint,outcome,state,sha,candidate,untrackedInputs,SOURCE_PATHS};

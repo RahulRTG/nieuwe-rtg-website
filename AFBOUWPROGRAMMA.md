@@ -5691,3 +5691,54 @@ voorwaarden actueel gekwalificeerd**. Actuele commit vóór deze herstelcommit:
 `8c962c79ffc131e4c7dcc2cff5145c00a1061b87`. Eerstvolgende blokkade:
 **de herstelwijzigingen vastleggen, publiceren en alle verplichte GitHub-jobs
 volledig laten uitlopen**. Deep Green: **GEBLOKKEERD**.
+
+### Derde volledige CI-meting kandidaat `88751960e1` — 10 november 2026
+
+De verplichte CI-run `42798944414`, de afzonderlijke desktop- en mobielrun
+`42798944439`, CodeQL en de lokale kwalificatie zijn volledig beoordeeld op
+exact commit `88751960e12e900ef57ec56a59b82215b18c65b3`. Alle uitgevoerde
+unit-, browser-, security-, PostgreSQL-, container-, architectuur- en
+CodeQL-controles sloten groen, behalve unitscherf 2 en de samengestelde
+toegankelijkheids- en mergeoordelen. De afzonderlijke 390-pixeljob liep ditmaal
+volledig uit en leverde een inhoudelijke uitslag.
+
+De twee primaire oorzaken waren:
+
+| ID | Primaire oorzaak | Soort | Bewijs op de bevroren commit | Herstel |
+| --- | --- | --- | --- | --- |
+| DG-CI-17 | `EXPERIENCEWERKT.json` was gegenereerd terwijl een onbekend, niet vastgelegd bestand onder een bewaakt bronpad aanwezig was. De opgeslagen hash `9d95b8d9…` was daardoor niet uit de commit te reproduceren; een schone export van exact dezelfde commit berekent, gelijk aan CI, `3df0e405…`. | onreproduceerbaar afgeleid register | unitscherf 2; inventaris bleef exact 114 apps en 316 schermen | generatie weigert voortaan fail-closed bij onbekende invoer onder bewaakte bronpaden; register is daarna uit de vastgelegde bron opnieuw afgeleid |
+| DG-CI-18 | De generieke Editorial-actieselector combineerde drie `:not()`-filters, waardoor zijn specificiteit hoger was dan die van de latere primaire en secundaire varianteigenaren. Late Editorial-activatie overschreef daardoor zeven routes en veroorzaakte twintig contrastmeldingen. | gedeelde Design System-cascaderegressie | toegankelijkheidsoordeel en 390-pixel Experience-producent | toestandsfilters staan nu in een specificiteitsloze `:where()`; een contracttest bewaakt dat de oude selector niet terugkeert |
+
+De 390-pixelproducent meldde na het vroegtijdig stoppen van de centrale
+toegankelijkheidsmeting 1.542 falende schermproeven. Dat zijn geen 1.542
+afzonderlijke productfouten: het artefact toont eerst exact de twintig
+contrastmeldingen van DG-CI-18 en daarna ontbrekende desktop-, touch- en
+layoutmeetdata voor de resterende schermen. Deze meldingen zijn afgeleid van
+dezelfde primaire oorzaak. Ook het samengestelde toegankelijkheidsoordeel en de
+mergepoort zijn afgeleide uitkomsten.
+
+De gerichte herstelproeven zijn groen. De zeven rechtstreeks getroffen routes
+zijn opnieuw beproefd in uitgelogde, ingelogde en zakelijke toestand, op
+telefoon en tablet en in de drie wereldpaletten: **0 structurele en 0
+contrastmeldingen** over **3.330 zichtbare tekstelementen**. De Editorial-,
+Adaptive Edge-, Experience- en bewijscontracten sluiten **48/48** groen. De
+volledige oorspronkelijke unitscherf-2-batch van **75 bestanden** sluit op de
+schone bronstand groen. De Design System-controle meldt **nul schendingen**, 87
+gemigreerde schermen en één ratchetverbetering. De Experience-exactheidstoets
+bevestigt opnieuw exact **114 apps en 316 schermen**.
+
+**Meetstand herstelronde 8.** Openstaande unieke oorzaken vóór herstel: **2**.
+Gericht opgelost sinds de vorige meting: **2**, beide nog door de volledige
+GitHub-tegenproef op de nieuwe commit te bevestigen. Nieuwe regressies: **0 in
+de gerichte controles**. Eerder verborgen fouten ontdekt: **0 nieuwe primaire
+oorzaken; de 1.542 schermmeldingen zijn als afgeleide meetuitval
+geclassificeerd**. Niet-uitgevoerde verplichte controles: **volledige CI op de
+nieuwe kandidaat, APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief
+menselijke proeven, security/finance/load,
+staging/back-up/herstel/rollback/incidentrespons en twee onafhankelijke
+eindruns**. APPWERKT: **0/114 actueel geldig; de historische bewijzen blijven
+verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden actueel
+gekwalificeerd**. Actuele commit vóór deze herstelcommit:
+`88751960e12e900ef57ec56a59b82215b18c65b3`. Eerstvolgende blokkade:
+**herstelcommit publiceren en alle verplichte GitHub-jobs volledig laten
+uitlopen op diezelfde bronstand**. Deep Green: **GEBLOKKEERD**.

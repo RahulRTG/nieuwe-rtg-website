@@ -22,24 +22,29 @@ function candidate(root) {
 }
 function fingerprint(root) {
   const hash = crypto.createHash('sha256');
-  function add(name) {
+  function add(name, required = false) {
     const file = path.join(root,name);
-    hash.update(name); hash.update('\0');
-    if (!fs.existsSync(file)) { hash.update('MISSING\0'); return; }
+    if (!fs.existsSync(file)) {
+      if (required) { hash.update(name); hash.update('\0MISSING\0'); }
+      return;
+    }
     const stat = fs.lstatSync(file);
     if (stat.isSymbolicLink()) throw new Error('Onbekende Experience-bronafhankelijkheid: ' + name);
     if (stat.isDirectory()) {
-      hash.update('DIRECTORY\0');
       for (const child of fs.readdirSync(file).sort()) {
         if (['node_modules','.git'].includes(child) || GENERATED_PATHS.has(name+'/'+child)) continue;
         add(name+'/'+child);
       }
-    } else if (stat.isFile()) { hash.update('FILE\0'); hash.update(fs.readFileSync(file)); hash.update('\0'); }
+    } else if (stat.isFile()) {
+      hash.update(name); hash.update('\0FILE\0'); hash.update(fs.readFileSync(file)); hash.update('\0');
+    }
     else throw new Error('Onleesbare Experience-bron: ' + name);
   }
   // Geen extensiefilter: fotografie, SVG, fonts en manifesten bepalen de ervaring.
   // Gegenereerde bewijsregisters/artifacts zijn geen invoer van hun eigen hash.
-  for (const name of SOURCE_PATHS) add(name);
+  // Alleen bestanden dragen broninhoud: een lege, genegeerde runtime-map mag
+  // een schone checkout niet een andere kandidaat maken dan een werkstation.
+  for (const name of SOURCE_PATHS) add(name, true);
   return hash.digest('hex');
 }
 function outcome(code, tap) {

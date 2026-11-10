@@ -85,6 +85,13 @@ test('bronhash negeert platformafhankelijke builduitvoer in public/dist',t=>{
   assert.equal(first,before);
   assert.equal(fingerprint(f.root),before);
 });
+test('bronhash negeert lege runtime-mappen die een verse checkout niet bezit',t=>{
+  const f=fixture(t), before=fingerprint(f.root);
+  fs.mkdirSync(path.join(f.root,'test/lokaal/leeg'),{recursive:true});
+  assert.equal(fingerprint(f.root),before,'een lege lokale map is geen broninhoud');
+  f.write('test/lokaal/leeg/bron.json','{}');
+  assert.notEqual(fingerprint(f.root),before,'een werkelijk bronbestand telt wel');
+});
 test('pilotbewijs van andere commit is niet actueel kandidaatbewijs',()=>{
   const now=Date.now(), record={version:1,test:'test/a.js',at:new Date(now).toISOString(),sourceHash:'src',logHash:'log',tests:1,skipped:0,passed:true,exitCode:0,worktreeDirty:false,commit:'old'};
   assert.equal(state(record,'src','test/a.js',now,'new'),'STALE');

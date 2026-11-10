@@ -158,6 +158,8 @@ async function main() {
             const shown = e => !!(e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none');
             return { url: location.pathname, world:b.dataset.rtgWorld, worldHome:b.dataset.worldHome || '', palette:b.dataset.rtgPalette, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
               editorialV4:b.dataset.rtgEditorialV4 === 'true', v4Kind:b.dataset.rtgV4Kind || '',
+              publicBeleving:b.matches('.ds-beleving[data-ds-beleving="publiek"]') ||
+                !!document.querySelector('.wd-shell.ds-beleving[data-ds-beleving="publiek"]'),
               cinematic:b.dataset.rtgCinematic === 'true', viewport:innerWidth,
               access:[...document.querySelectorAll('[data-rtg-access],.ds-foundation-toegang,.wd-access')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
               accessDialog:visible('.ds-foundation-toegang,.wd-access'),
@@ -194,7 +196,12 @@ async function main() {
              eigen marge (24). Hier stond 24: dat legde vast dat de inhoud onder
              de kop doorliep, zodat het logo over "Uw mensen" lag (18 oktober 2026). */
           const v4Top = s.worldHome && !mobile ? 96 : s.v4Kind === 'cover' ? 0 : (mobile ? 58 : 72);
-          const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (mobile ? 76 : 88) :
+          /* De publieke Beleving heeft twee bewust verschillende composities.
+             De voordeur is een gecentreerde, redactionele index met 48px lucht
+             (12px op mobiel); een verhaalpagina laat zijn foto direct onder de
+             vaste kop doorlopen. Dit is geen oude wereldhome met drie rails. */
+          const belevingTop = s.public === 'detail' ? 64 : (mobile ? 76 : 112);
+          const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (s.publicBeleving ? belevingTop : (mobile ? 76 : 88)) :
             s.cinematic ? (/^(compact|focus)$/.test(s.edgeState || '') ? 0 : (mobile ? 82 : 88)) :
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (!s.access && s.v4Kind !== 'canvas' && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
@@ -240,6 +247,18 @@ async function main() {
                kolommen verboden en worden ze door Editorial V4 verborgen. */
             if (!s.worldHome && ((s.left && s.left.w > 1) || (s.right && s.right.w > 1) || (s.library && s.library.w > 1))) row.failures.push('visible-legacy-column');
             if (s.content.x < s.shell.x-1 || s.content.right > s.shell.right+1) row.failures.push('content-outside-v4-frame');
+          } else if (!s.access && !mobile && s.publicBeleving) {
+            /* Publieke fotografie is een pagina en geen dashboard. Bewaak de
+               nieuwe geometrie even streng: verhalen zijn werkelijk full-bleed,
+               de voordeur is maximaal 1280px en exact gecentreerd, en geen
+               verborgen legacyrail mag opnieuw ruimte innemen. */
+            const detail = s.public === 'detail';
+            const expectedWidth = Math.min(1280, s.viewport - 80);
+            const expectedX = (s.viewport - expectedWidth) / 2;
+            if (detail ? (Math.abs(s.shell.x) > 2 || Math.abs(s.shell.w-s.viewport) > 2)
+              : (Math.abs(s.shell.x-expectedX) > 2 || Math.abs(s.shell.w-expectedWidth) > 2)) row.failures.push('nonstandard-public-beleving-frame');
+            if ((s.left && s.left.w > 1) || (s.right && s.right.w > 1)) row.failures.push('visible-public-legacy-column');
+            if (s.content.x < s.shell.x-1 || s.content.right > s.shell.right+1) row.failures.push('public-content-outside-frame');
           } else if (!s.access && !mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100)) row.failures.push('missing-column');
           else if (!s.access && !mobile) {
             if (s.cinematic) {

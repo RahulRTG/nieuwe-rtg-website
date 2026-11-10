@@ -25,7 +25,7 @@
 (function(w,d){
   'use strict';
   w.RTGCommandBeginscherm=function(vak,o){
-      var m=d.createElement('div');m.className='cmd-leeg';
+      var m=d.createElement('div');m.className='cmd-leeg ds-beleving';m.dataset.dsBeleving='werktafel';
       /* HET HUIS OPENT NOOIT LEEG (WERELD.md, herzien 12 september 2026).
 
          Hier stond een regel tekst -- "Kies een wereld om te beginnen." -- boven

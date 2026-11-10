@@ -1560,6 +1560,7 @@ const GEEN_BRONMUTATIE = new Map([
      zakken. */
   ['app-thema-eigenaar.test.js', 'broncontract over een eigenaarnaam en drie letterlijke themawaarden; 0 bruikbare rekenmutaties. Handmutatie RTGOSThema naar RTGOSThemaOud liet de eigenaarstoets zakken'],
   ['presentatierol-markup.test.js', 'statische HTML- en CSS-eigenaarschapscensus; 587 rekenmutaties in uitvoerlogica raken die foutklasse niet. Handmutatie die presentatierol.css uit Clips verwijderde liet uitsluitend de Clips-toets zakken'],
+  ['schermrust.e2e.js', 'browsercontract over berekende CSS en bediening; de serverliegpoort raakt geen presentatie. Handmutatie position fixed naar absolute in schermrust.css liet de venstertoets zakken'],
   /* Deze ratel staat op NUL, en dat is precies wat hem onmeetbaar maakt voor de
      motor: meet() leest de echte testmap, telt daar nul wachten, en elke
      gedragsmatige mutatie in scripts/klokwacht.js laat dat nul. Nul in, nul uit.

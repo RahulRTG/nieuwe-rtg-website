@@ -1,0 +1,63 @@
+/* Living Lab-observatorium: presentatie van het bestaande serveroordeel. Deze
+   owner berekent geen drempels en verandert geen stand; hij toont uitsluitend
+   wat /api/lab2/observatorium teruggeeft. */
+@layer rtg.component {
+  .ds-livinglab-observatorium .obs-kop {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--ds-ruimte-3);
+    margin-block-end: var(--ds-ruimte-4);
+  }
+
+  .ds-livinglab-observatorium .obs-stand {
+    padding: var(--ds-ruimte-1) var(--ds-ruimte-3);
+    border: 1px solid currentColor;
+    border-radius: var(--ds-radius-inhoud);
+    font-size: var(--ds-maat-meta);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .ds-livinglab-observatorium .ok { color: var(--ds-accent); }
+  .ds-livinglab-observatorium .onbekend { color: var(--ds-metaal); }
+  .ds-livinglab-observatorium .storing { color: var(--ds-status-fout); }
+
+  .ds-livinglab-observatorium .obs-seinen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+    gap: var(--ds-ruimte-3);
+  }
+
+  .ds-livinglab-observatorium .sein {
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-zacht);
+    border-inline-start: 3px solid currentColor;
+  }
+
+  .ds-livinglab-observatorium .sein h4 {
+    margin: 0 0 var(--ds-ruimte-1);
+    color: inherit;
+    font-size: var(--ds-maat-tekst);
+    font-weight: 600;
+  }
+
+  .ds-livinglab-observatorium .sein .aantal {
+    font: 500 1.8rem/1.1 var(--ds-letter-display);
+  }
+
+  .ds-livinglab-observatorium .sein p,
+  .ds-livinglab-observatorium .sein ul,
+  .ds-livinglab-observatorium .obs-niet {
+    color: var(--ds-inkt-zacht);
+    font-size: var(--ds-maat-klein);
+    line-height: 1.5;
+  }
+
+  .ds-livinglab-observatorium .sein p { margin: var(--ds-ruimte-2) 0 0; }
+  .ds-livinglab-observatorium .sein ul {
+    margin: var(--ds-ruimte-2) 0 0;
+    padding-inline-start: var(--ds-ruimte-6);
+  }
+  .ds-livinglab-observatorium .obs-niet { margin-block-start: var(--ds-ruimte-4); }
+}

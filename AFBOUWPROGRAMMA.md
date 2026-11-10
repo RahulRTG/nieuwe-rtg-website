@@ -5187,3 +5187,36 @@ testomgeving volledig groen herhaald**. Niet-uitgevoerde verplichte controles:
 **actuele volledige APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven,
 platformbrede gedragssuite, staging/load/herstel/rollback en twee onafhankelijke
 eindruns**. Deep Green: **GEBLOKKEERD**.
+
+#### Afgesloten gedeelde oorzaak: Living Lab-observatoriumpresentatie
+
+Het Living Lab-observatorium maakt niet langer bij iedere tekening een eigen
+runtime-stijlblad. Het bestaande serveroordeel, de zes seinen, storingslogica,
+privacygrenzen en kantoortoegang blijven ongewijzigd. Alleen de presentatie is
+verplaatst naar `public/ds/componenten/livinglab-observatorium.css`, met
+`ds-livinglab-observatorium` als begrensde owner en uitsluitend semantische
+Design System-tokens.
+
+De bestaande volledige Living Lab-browserproef bewijst nu aanvullend dat het
+bord zijn serverseinen en serverstand toont, het centrale raster werkelijk
+gebruikt en geen `obsStijl` meer injecteert. Gerichte kwalificatie op Node
+**26.12.1** sluit **21/21** observatorium-, route-, negatieve autorisatie- en
+waarheidsproeven en **2/2** volledige Living Lab-browserketens. De Design
+System-contractcontrole en de volledige statische huiskeuring sluiten groen.
+
+Design System meldt nul schendingen en 87 gemigreerde schermen. De actuele
+presentatiemeter daalt van 80 naar **79 scripts met stijlinjectie** en van 167
+naar **166 injectieplekken**; de verdwenen owner is uit `ONTWERPNORM.json`
+verwijderd en kan daardoor niet ongemerkt terugkomen.
+
+**Afsluiting Living Lab-observatoriumpresentatie.** Openstaande unieke
+oorzaken: **79 scripts met resterende runtime-stijllading of -injectie, actieve
+legacybladen en schermstijlblokken, ontbrekende actuele APPWERKT-
+herkwalificatie, 3360 niet-uitgevoerde Experience-voorwaarden en operationele
+vrijgavepoorten**. Opgelost sinds vorige meting: **1 runtime-stijlowner en 1
+injectieplek**. Nieuwe regressies: **0 in de gerichte Design System-,
+observatorium-, autorisatie-, browser- en statische proeven**. Eerder verborgen
+fouten ontdekt: **geen**. Niet-uitgevoerde verplichte controles: **actuele
+volledige APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven,
+platformbrede gedragssuite, staging/load/herstel/rollback en twee onafhankelijke
+eindruns**. Deep Green: **GEBLOKKEERD**.

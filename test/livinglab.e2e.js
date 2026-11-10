@@ -85,6 +85,22 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner met een grati
     assert.equal(await page.locator('#nSoort option').count(), 12, 'twaalf projectsoorten uit het kader');
     assert.ok((await page.locator('#labKies option').count()) > 0, 'het lab staat in de keuzelijst');
 
+    await wachtTot(page, () => !!document.querySelector('#obs .obs-seinen'),
+      null, { wat: 'het Observatorium uit de bestaande serverstand' });
+    const observatorium = await page.evaluate(() => ({
+      owner: document.getElementById('obs').classList.contains('ds-livinglab-observatorium'),
+      runtimeStijl: !!document.getElementById('obsStijl'),
+      seinen: document.querySelectorAll('#obs .sein').length,
+      weergave: getComputedStyle(document.querySelector('#obs .obs-seinen')).display,
+      stand: (document.querySelector('#obs .obs-stand') || {}).textContent || ''
+    }));
+    assert.equal(observatorium.owner, true, 'het bord gebruikt de centrale DS-owner');
+    assert.equal(observatorium.runtimeStijl, false, 'het bord injecteert geen runtime-stijlblad');
+    assert.ok(observatorium.seinen > 0, 'het bord toont de serverseinen');
+    assert.equal(observatorium.weergave, 'grid', 'de centrale component tekent het seinenraster');
+    assert.match(observatorium.stand, /in orde|niet vast te stellen|storing/i,
+      'het serveroordeel blijft zichtbaar en wordt niet lokaal verzonnen');
+
     await page.fill('#nTitel', 'Water op straat bij zware regen');
     await page.fill('#nVraag', 'Kan deze straat tijdens zware regen beter omgaan met water?');
     await page.selectOption('#nSoort', 'leefomgeving');

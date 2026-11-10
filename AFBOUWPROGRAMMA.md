@@ -5329,3 +5329,179 @@ Niet-uitgevoerde verplichte controles: **actuele volledige APPWERKT,
 EXPERIENCEWERKT inclusief menselijke proeven, platformbrede gedragssuite,
 staging/load/herstel/rollback en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+### Scope freeze en classificatie resterende presentatiebronnen — 10 november 2026
+
+Deze ronde bevriest de productscope op commit
+`f44074bf7f6c43f2e177d55a0c1c15e8e109b48f`. Er is geen productcode,
+architectuurgrens of kwaliteitsnorm gewijzigd. De bestaande Proof
+Envelope-preflight is adviserend uitgevoerd. Hij meldt uitsluitend een
+historische overlap op `AFBOUWPROGRAMMA.md` met de schone werkboom
+`codex/proof-bound-phase1`; die branch bevat geen unieke patch ten opzichte van
+de huidige integratiestand. De PR-snapshot bleef `UNKNOWN`, omdat geen actuele,
+commitgebonden GitHub-snapshot aan de lokale preflight was meegegeven.
+
+De teller **76 scripts / 163 injectieplekken** is een bronratel en geen telling
+van 163 actieve DOM-injecties. `scripts/ontwerpsysteem.js` telt ook statische
+`.css`-verwijzingen, service-worker-precache en de losse bronstukken van een
+browserbundel. Daarom zijn alle 76 bestanden opnieuw beoordeeld op hun
+werkelijke laadpad, DS-grens, bundelrol en bestaande regressiebewijs. De
+volledige laadgraaf bevat op deze commit **nul bewezen en nul mogelijke
+presentatie-injecties op DS-schermen**. `public/ds/contract.json` bevat geen
+overgangsuitzonderingen en `ONTWERPNORM.json` blijft ongewijzigd fail-closed
+ratelen.
+
+#### RELEASEBLOKKEREND — 0 scripts / 0 plekken
+
+Geen van de 76 resterende bronnen schendt op deze bronstand een verplichte
+Design System-poort, lekt aantoonbaar legacy-presentatie in een DS-scherm of
+veroorzaakt in de uitgevoerde proeven een gebruikersregressie. Dit oordeel
+geldt alleen voor de presentatiebronclassificatie; het sluit APPWERKT,
+EXPERIENCEWERKT of de operationele vrijgavepoorten niet.
+
+#### VEILIG EN TOEGESTAAN — 60 scripts / 140 getelde plekken
+
+De volgende twee service workers vertegenwoordigen samen **70** getelde
+plekken. Het zijn statische precacheverwijzingen; een service worker heeft geen
+document-DOM en injecteert deze bladen niet in een scherm:
+
+* `public/apps/foundation/sw.js`
+* `public/sw.js`
+
+De overige **58** bronnen vertegenwoordigen **70** getelde plekken. Zij laden
+een centraal, statisch of aantoonbaar door de DS-grens bewaakt blad, of zijn
+losse bouwbronnen van zo'n byte-identieke browserbundel:
+
+* `public/apps/foundation/palet.js`
+* `public/apps/foundation/schil-os.js`
+* `public/apps/foundation/sessie.js`
+* `public/apps/foundation/sessie/sessie-00b.js`
+* `public/apps/foundation/sessie/sessie-02.js`
+* `public/apps/foundation/sessie/sessie-03.js`
+* `public/apps/leverancier.js`
+* `public/apps/leverancier/leverancier-78.js`
+* `public/shared/appmenu.js`
+* `public/shared/appmenu/appmenu-02.js`
+* `public/shared/bediening.js`
+* `public/shared/bediening/bediening-01.js`
+* `public/shared/borden.js`
+* `public/shared/borden/borden-01.js`
+* `public/shared/collegachat.js`
+* `public/shared/deelmenu.js`
+* `public/shared/deelmenu/deelmenu-02.js`
+* `public/shared/deur.js`
+* `public/shared/edge/conceptwerk.js`
+* `public/shared/gebaar.js`
+* `public/shared/gebaar/gebaar-01.js`
+* `public/shared/i18n.js`
+* `public/shared/i18n/i18n-01.js`
+* `public/shared/inlogkleur.js`
+* `public/shared/ios.js`
+* `public/shared/ios/ios-01.js`
+* `public/shared/kaart.js`
+* `public/shared/kantoorgesprek.js`
+* `public/shared/kostenbeeld.js`
+* `public/shared/levendekleur.js`
+* `public/shared/levendekleur/levendekleur-02.js`
+* `public/shared/ondernemerpoort.js`
+* `public/shared/overdracht.js`
+* `public/shared/plek.js`
+* `public/shared/poortgesprek.js`
+* `public/shared/rahul-mond.js`
+* `public/shared/rahulpoort.js`
+* `public/shared/rahulpoort/rahulpoort-01.js`
+* `public/shared/randen.js`
+* `public/shared/randen/01-laden.js`
+* `public/shared/rtg-adaptive-edge-loader.js`
+* `public/shared/rtg-edge-2-loader.js`
+* `public/shared/rtg-edge-2-loader/01.js`
+* `public/shared/scanknop.js`
+* `public/shared/sneltoets.js`
+* `public/shared/social-intelligence.js`
+* `public/shared/split.js`
+* `public/shared/spraak.js`
+* `public/shared/sprong.js`
+* `public/shared/sprong/sprong-02.js`
+* `public/shared/teamcall.js`
+* `public/shared/teamcall/teamcall-01.js`
+* `public/shared/toegang.js`
+* `public/shared/uitvoer.js`
+* `public/shared/uitvoer/uitvoer-02.js`
+* `public/shared/uurwerk.js`
+* `public/shared/zaakcommand.js`
+* `public/shared/zaakcommand/zaakcommand-01.js`
+
+De berekende documentbestemmingen in Leverancier en Split en de dynamische
+Edge-loader zijn niet als stijlpad genegeerd: hun bestaande negatieve
+architectuurproeven controleren expliciet dat zij geen runtime-stijl maken,
+dat de centrale DS-component wordt geladen en dat de Edge-assets eenmaal via
+de bestaande gereedbarriere starten.
+
+#### NIET-RELEASEKRITIEKE TECHNISCHE SCHULD — 16 scripts / 23 plekken
+
+Deze bronnen bevatten nog een echte, lokaal begrensde runtime-`style` voor een
+legacyoverlay, legacyfallback of ingebed Command-werkblad. De huidige
+architectuurpoort staat dit buiten DS-schermen toe en de bronratel voorkomt
+groei. Er is geen bestaand verplicht releasecontract gevonden dat voor deze
+legacyhosts nul runtimepresentatie eist. Daarom worden zij niet blind in deze
+release verwijderd, maar blijven zij zichtbaar als technische schuld:
+
+* `public/apps/app-main.js`
+* `public/apps/app-main/app-main-55.js`
+* `public/apps/foundation/gezin-rt.js`
+* `public/apps/foundation/gezin-rt/gezin-rt-03.js`
+* `public/shared/basis.js`
+* `public/shared/basis/basis-01.js`
+* `public/shared/basis/basis-01ba.js`
+* `public/shared/command/bladhaak.js`
+* `public/shared/klok.js`
+* `public/shared/klok/klok-01.js`
+* `public/shared/klok3d.js`
+* `public/shared/klok3d/klok3d-01.js`
+* `public/shared/rahul-tab/style-base.js`
+* `public/shared/rahul-tab/style-base/01-tab-kop.js`
+* `public/shared/rahul-tab/style-twin.js`
+* `public/shared/volscherm.js`
+
+De losse deelbestanden in deze lijst zijn geen tweede browserimplementatie:
+`scripts/bundel.js` bouwt ze byte-identiek samen tot de genoemde runtimeowner.
+De bundelcontrole sluit groen. Verwijdering blijft pas verantwoord wanneer de
+betrokken legacyhost en zijn gebruikersgedrag afzonderlijk zijn gemigreerd en
+bewezen; de scope freeze verbiedt die niet-kritieke verbouwing nu.
+
+#### ONBEKEND — 0 scripts / 0 plekken
+
+De statische analyser meldt nog berekende navigatie- en bronadressen in enkele
+grote owners, maar de relevante stijlvragen zijn door bestaande specifieke
+contracttests gesloten. Er blijft daarom geen presentatiebron zonder
+classificatie over. Nieuwe of gewijzigde laadpaden vervallen opnieuw naar
+onbekend door de bestaande fail-closed laadgraaf.
+
+#### Bewijs en vrijgavegevolg
+
+Gerichte kwalificatie op Node **26.12.1** sluit **105/105** laadgraaf-, DS-,
+wereldwerkruimte- en randenproeven plus **45/45** Edge-, Leverancier-, Split-,
+Basis- en presentatieproeven. De bundels zijn byte-identiek. De Design
+System-contractcontrole sluit met **nul schendingen** en meldt **87**
+gemigreerde schermen. De eerste statische huiskeuring liep binnen de sandbox
+tegen een verboden lokale loopbackbinding aan; exact dezelfde keuring buiten
+die omgevingsbeperking sluit volledig groen. De vijf daarbij eerst gemelde
+publieke-routevermeldingen waren afgeleide meldingen van de ontbrekende
+routekaart en geen bronafwijkingen.
+
+**Classificatieronde.** Releaseblokkerende bronoorzaken: **0 binnen de 76
+geclassificeerde presentatiebronnen**. Bewezen afgesloten sinds vorige ronde:
+**1 classificatieblokkade; alle 76 bronnen hebben nu een onderbouwde status**.
+Nieuwe regressies: **0 in 150 gerichte tests, de volledige statische
+huiskeuring en de Design System- en bundelcontroles**. Eerder verborgen fouten:
+**0; de lokale loopbackfout was infrastructuurgebonden en verdween zonder
+bronwijziging in de toegestane omgeving**. Nog niet uitgevoerde verplichte controles: **actuele
+volledige CI en commitgebonden GitHub-status, APPWERKT-herkwalificatie,
+EXPERIENCEWERKT inclusief menselijke proeven, security/finance/load,
+staging/back-up/herstel/rollback/incidentrespons en twee onafhankelijke
+eindruns**. APPWERKT: **0/114 actueel geldig; 912 historische bewijzen zijn
+verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden actueel
+gekwalificeerd**. Actuele broncommit vóór deze registerwijziging:
+`f44074bf7f6c43f2e177d55a0c1c15e8e109b48f`. Eerstvolgende blokkade:
+**één definitieve bronstand samenstellen en de volledige verplichte CI-status
+op die commit vastleggen**. Deep Green: **GEBLOKKEERD**.

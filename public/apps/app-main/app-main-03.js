@@ -69,6 +69,29 @@
     const intent=RTGAccessMeaning.plan(meaningId,parameters,1);
     return API.call(intent.route,intent.parameters);
   }
+  /* De persoonlijke compositie reist met de accountsessie, niet met een
+     clientgekozen context. Iedere laadronde krijgt een volgnummer en bewaart
+     het token waarmee zij begon; zo kan een laat antwoord van een vorige
+     sessie of toestelstand de actuele werktafel niet terugzetten. */
+  let personalOSComposition=null, personalOSPreferences=null, personalOSLaadnummer=0;
+  async function laadPersonalOS(){
+    if(!API.live){personalOSComposition=null;personalOSPreferences=null;return null;}
+    const nummer=++personalOSLaadnummer, token=API.token;
+    try{
+      const uit=await Promise.all([API.call('/personalos/preferences',{}),API.call('/personalos/composition',{})]);
+      if(nummer!==personalOSLaadnummer||token!==API.token)return personalOSComposition;
+      personalOSPreferences=uit[0]&&uit[0].preferences||null;
+      personalOSComposition=uit[1]&&uit[1].composition||null;
+      window.RTGPersonalOS={
+        composition:personalOSComposition,preferences:personalOSPreferences,
+        refresh:laadPersonalOS
+      };
+      return personalOSComposition;
+    }catch(e){
+      if(nummer===personalOSLaadnummer&&token===API.token){personalOSComposition=null;personalOSPreferences=null;}
+      return null;
+    }
+  }
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
@@ -83,6 +106,12 @@
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
+          if(cred.register&&cred.personalOS){
+            try{await API.call('/personalos/complete',cred.personalOS);}catch(personalFout){
+              toast(T('personalos.onboarding.save_failed','Uw account is klaar. De persoonlijke indeling kon nog niet worden bewaard.'));
+            }
+          }
+          await laadPersonalOS();
           /* Registratie wisselt de uitnodiging in dezelfde serverhandeling in.
              Een terugkerend lid doet dat direct na zijn bewezen login en vóór
              een eventuele pas-omleiding, zodat het geheim niet opnieuw hoeft
@@ -136,6 +165,7 @@
         toast('Geen serververbinding. Start RTG via de server.'); return;
       }
     }
+    if(API.live&&!personalOSComposition)await laadPersonalOS();
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');

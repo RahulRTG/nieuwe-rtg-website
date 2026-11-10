@@ -113,9 +113,6 @@ module.exports = (state) => {
   const inkoop = require('./inkoop')(ctx, { boekAanvraag: geld.boekAanvraag });
   const campagnes = require('./campagnes')(ctx, { bronUitCampagne: geld.bronUitCampagne });
   const koppeling = require('./koppeling')(ctx, { agenda: state.agenda });
-  /* De drie doelgroepen die tot nu toe wel in het systeem stonden maar er niet
-     in konden: de vrijwilliger, de hulpvrager en de buurt. Alle drie op een
-     eigen ingang met een eigen, engere blik -- zie de kop van elke module. */
   /* Fase drie: de governance-laag. Het bestuur zelf (vergaderingen, quorum,
      besluiten), de regels die het stelt, de verantwoording achteraf en de
      dingen die mis kunnen gaan. Het jaarverslag leunt op drie delen -- rapport.js
@@ -132,6 +129,8 @@ module.exports = (state) => {
   const meldcode = require('./meldcode')(ctx);
   // Buiten deze map, en dat is het punt (../beschermzaak/index.js).
   const beschermzaak = require('../beschermzaak')(ctx);
+  const opvang = require('./opvang')(ctx, { beschermzaak, partners });
+  ctx.opvangStopVoorZaak = opvang.stopVoorZaak;
 
   const vrijwilligerportaal = require('./vrijwilligerportaal')(ctx);
   const deelnemerportaal = require('./deelnemerportaal')(ctx, { toestemmingWegDirect: casus.toestemmingWegDirect });
@@ -158,7 +157,7 @@ module.exports = (state) => {
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
     subsidies, voorraad, ruil, gift, winkel, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
-    bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak,
+    bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak, opvang,
     vrijwilligerportaal, deelnemerportaal, publiek,
     veld, donateur, codeRoteren: require('./coderoteer')(ctx, { partners, gemeente, ondernemers }),
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN

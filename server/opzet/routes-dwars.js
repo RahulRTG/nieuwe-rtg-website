@@ -81,6 +81,9 @@ module.exports = function hangDwarseRoutersOp(grens) {
   const experienceGrens = grens('experience');
   require('../routes/experience')(experienceGrens.app, experienceGrens.auth,
     experienceGrens.experience);
+  /* PersonalOS componeert de bestaande capabilities en werelden; daarom staat
+     de route naast Experience en niet in een vijfde wereld of app. */
+  require('../routes/personalos')(grens('personalos'));
   /* De economielaag eronder (kern/economie/, ECONOMIE.md): de vier werelden en
      de firewall ertussen. Na de kosten, want de werelden-route toont de
      verdeling van de nota's die daar wordt gerekend. */

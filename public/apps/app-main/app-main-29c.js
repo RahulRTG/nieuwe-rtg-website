@@ -27,9 +27,20 @@
      pas die intussen veranderd is. */
   function wereldBij() {
     if (!window.RTGCommand || !RTGCommand.werelden) return;
-    RTGCommand.werelden(MAPPEN.filter(function (m) {
+    var lijst=MAPPEN.filter(function (m) {
       return m.sleutel !== 'map-instellingen' && m.wereld && m.items.some(itemZichtbaar);
-    }).map(function (m) {
+    });
+    /* PersonalOS ordent uitsluitend de bestaande wereldlijst. Een ontbrekende
+       of onvolledige compositie laat alle werelden in hun canonieke volgorde
+       staan; zij kan nooit een wereld of bevoegdheid toevoegen. */
+    var ids={ 'map-rtg':'livingos','map-werk':'workos','map-reizen':'travelos','map-rtf':'foundationos' };
+    var volgorde=personalOSComposition&&personalOSComposition.worlds
+      ?personalOSComposition.worlds.map(function(w){return w.id;}):[];
+    lijst=lijst.map(function(m,i){return{m:m,i:i};}).sort(function(a,b){
+      var ai=volgorde.indexOf(ids[a.m.sleutel]),bi=volgorde.indexOf(ids[b.m.sleutel]);
+      if(ai<0)ai=100+a.i;if(bi<0)bi=100+b.i;return ai-bi;
+    }).map(function(x){return x.m;});
+    RTGCommand.werelden(lijst.map(function (m) {
       return {
         sleutel: m.sleutel,
         naam: mapNaam(m),

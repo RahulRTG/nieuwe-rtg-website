@@ -70,6 +70,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `WERELD.md` beschrijft het beginscherm
 - `WERELDEN.md` is de kaart
 - `ADAPTIEF.md` is de adaptieve interactielaag
+- `PERSONALOS.md` is de persoonlijke compositielaag boven catalogus, Authority, Experience en Mijn RTG
 - `GRAMMATICA.md` is de RTG Mobile Interaction Grammar
 - `EDGE.md` is RTG Edge 3.0
 - `WERKRUIMTE.md` is het desktopparadigma
@@ -91,7 +92,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen
 - `CONSOLIDATIE.md` is het opruimbesluit van de eigenaar; lees het vóór elke PR
 - `AFBOUWPROGRAMMA.md` is het eigenaarsbesluit van 11 oktober 2026, en het is leidend
-- `CIVILIS.md` breidt uit
+- `CIVILIS.md` breidt uit; `CIVILIS-UITVOERING.md` is de traceerbare maatschappelijke ketenarchitectuur en actuele uitvoeringsaudit
 
 ## Structuur en starten (kort)
 

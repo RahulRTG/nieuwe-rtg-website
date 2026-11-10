@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '62f12f22';
+var RTG_BOUW = '0d3731b0';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -465,6 +465,29 @@ var RTG_BOUW = '62f12f22';
     const intent=RTGAccessMeaning.plan(meaningId,parameters,1);
     return API.call(intent.route,intent.parameters);
   }
+  /* De persoonlijke compositie reist met de accountsessie, niet met een
+     clientgekozen context. Iedere laadronde krijgt een volgnummer en bewaart
+     het token waarmee zij begon; zo kan een laat antwoord van een vorige
+     sessie of toestelstand de actuele werktafel niet terugzetten. */
+  let personalOSComposition=null, personalOSPreferences=null, personalOSLaadnummer=0;
+  async function laadPersonalOS(){
+    if(!API.live){personalOSComposition=null;personalOSPreferences=null;return null;}
+    const nummer=++personalOSLaadnummer, token=API.token;
+    try{
+      const uit=await Promise.all([API.call('/personalos/preferences',{}),API.call('/personalos/composition',{})]);
+      if(nummer!==personalOSLaadnummer||token!==API.token)return personalOSComposition;
+      personalOSPreferences=uit[0]&&uit[0].preferences||null;
+      personalOSComposition=uit[1]&&uit[1].composition||null;
+      window.RTGPersonalOS={
+        composition:personalOSComposition,preferences:personalOSPreferences,
+        refresh:laadPersonalOS
+      };
+      return personalOSComposition;
+    }catch(e){
+      if(nummer===personalOSLaadnummer&&token===API.token){personalOSComposition=null;personalOSPreferences=null;}
+      return null;
+    }
+  }
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
@@ -479,6 +502,12 @@ var RTG_BOUW = '62f12f22';
           API.token = data.token;
           applyState(data.state);           // user = het echte account
           tier = user.tier;
+          if(cred.register&&cred.personalOS){
+            try{await API.call('/personalos/complete',cred.personalOS);}catch(personalFout){
+              toast(T('personalos.onboarding.save_failed','Uw account is klaar. De persoonlijke indeling kon nog niet worden bewaard.'));
+            }
+          }
+          await laadPersonalOS();
           /* Registratie wisselt de uitnodiging in dezelfde serverhandeling in.
              Een terugkerend lid doet dat direct na zijn bewezen login en vóór
              een eventuele pas-omleiding, zodat het geheim niet opnieuw hoeft
@@ -532,6 +561,7 @@ var RTG_BOUW = '62f12f22';
         toast('Geen serververbinding. Start RTG via de server.'); return;
       }
     }
+    if(API.live&&!personalOSComposition)await laadPersonalOS();
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
@@ -578,6 +608,7 @@ var RTG_BOUW = '62f12f22';
       try { localStorage.setItem('rtg_werktafel_pas', vastePas); } catch(e){}
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
+      await laadPersonalOS();
       renderAll();
       await verwerkWebsiteAanvraag();
       if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
@@ -594,6 +625,8 @@ var RTG_BOUW = '62f12f22';
   }
 
   async function doLogout(){
+    personalOSLaadnummer++; personalOSComposition=null; personalOSPreferences=null;
+    try { delete window.RTGPersonalOS; } catch(e) { window.RTGPersonalOS=null; }
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
@@ -645,6 +678,7 @@ var RTG_BOUW = '62f12f22';
         '</div>' +
         '<form id="agForm" hidden novalidate>' +
           '<label class="access-field" id="agLabel"><span id="agFieldLabel"></span><input id="agIn" aria-describedby="agZin agError" required></label>' +
+          '<div class="access-summary" id="agPersonal" hidden></div>' +
           '<label class="access-field" id="agCodeLabel" hidden><span>' + 'Sms-code, als u die heeft ontvangen' +
             '</span><input id="agCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label>' +
           '<button id="agShowPassword" class="access-secondary" type="button" hidden aria-pressed="false">' + 'Toon wachtwoord' + '</button>' +
@@ -661,7 +695,7 @@ var RTG_BOUW = '62f12f22';
       '</div>';
     const el = id => gate.querySelector('#' + id);
     const inp = el('agIn'), form = el('agForm'), title = el('agTitle');
-    const draft = { name: '', email: '', geboortedatum: '' };
+    const draft = { name: '', email: '', geboortedatum: '', goals: [], layout: 'balanced' };
     let view = 'welcome', step = 0, busy = false, accountName = '', secondProof = '';
     let passkeyAbort = null, passkeyAttempt = 0;
     let resetToken = new URLSearchParams(location.search).get('reset') || '';
@@ -677,21 +711,6 @@ var RTG_BOUW = '62f12f22';
       busy = on; form.setAttribute('aria-busy', String(on));
       gate.querySelectorAll('button,input').forEach(button => { button.disabled = on; });
     }
-    /* Each question is a full sentence; labels and keyboard hints stay explicit. */
-    const steps = () => [
-      { key:'name', type:'text', auto:'name', label:T('access.portal.full_name','Volledige naam'),
-        title:T('access.portal.what_is_your_name','Hoe mogen we u noemen?'),
-        text:T('access.portal.enter_your_full_name_we_use_it_for_your_account_and_the_agreement','Vul uw volledige naam in. We gebruiken deze voor uw account en de overeenkomst.') },
-      { key:'email', type:'email', auto:'email', label:T('access.portal.email_address','E-mailadres'),
-        title:T('access.portal.which_email_address_can_we_reach_you_at','Op welk adres kunnen we u bereiken?'),
-        text:T('access.portal.you_use_this_email_address_to_sign_in_and_recover_your_account','U gebruikt dit e-mailadres om in te loggen en uw account te herstellen.') },
-      { key:'geboortedatum', type:'date', auto:'bday', label:T('access.portal.date_of_birth','Geboortedatum'),
-        title:T('access.portal.what_is_your_date_of_birth','Wat is uw geboortedatum?'),
-        text:T('access.portal.your_age_determines_which_features_you_can_use_you_must_be_at_lea','Uw leeftijd bepaalt welke onderdelen u kunt gebruiken. Voor dit account moet u minimaal 15 jaar zijn.') },
-      { key:'password', type:'password', auto:'new-password', label:T('access.portal.password','Wachtwoord'),
-        title:T('access.portal.how_would_you_like_to_secure_your_account','Hoe wilt u uw account beveiligen?'),
-        text:T('access.portal.choose_a_unique_password_of_at_least_six_characters_you_are_creat','Kies een uniek wachtwoord van minstens zes tekens. U maakt een gratis account aan; een betaalde pas kiest u apart. Daarna leest en bevestigt u de overeenkomst.') }
-    ];
     let presentationOnly=false;
     function field(type, label, auto, value){
       if(!presentationOnly){inp.type = type; inp.value = value || '';} inp.name = auto || 'answer';
@@ -722,7 +741,8 @@ var RTG_BOUW = '62f12f22';
       el('agError').textContent = ''; el('agStatus').textContent = '';
       el('agWelcome').hidden = view !== 'welcome'; form.hidden = view === 'welcome' || view === 'sent';
       el('agBack').hidden = view === 'welcome'; el('agStappen').hidden = view !== 'register';
-      el('agSummary').hidden = view !== 'register' || step !== 3;
+      el('agSummary').hidden = view !== 'register' || step !== 5;
+      el('agPersonal').hidden = true;
       el('agCodeLabel').hidden = view !== 'reset'; el('agForgot').hidden = view !== 'password';
       el('agFoundation').hidden = true;
       el('agGo').textContent = T('access.portal.continue','Ga verder');
@@ -732,10 +752,13 @@ var RTG_BOUW = '62f12f22';
         const brand = document.createElement('em'); brand.textContent=T('access.portal.brand','RTG.'); title.appendChild(brand);
         el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén account voor RTG, Connect, Travel en Work.');
       } else if (view === 'register') {
-        const s = steps()[step]; title.textContent = s.title; el('agZin').textContent = s.text;
-        el('agStappen').textContent = T('access.portal.progress','Stap {step} van 4').replace('{step}',String(step+1));
-        field(s.type, s.label, s.auto, draft[s.key]);
-        if (step === 3) {
+        const reeks=steps(), s = reeks[step]; title.textContent = s.title; el('agZin').textContent = s.text;
+        el('agStappen').textContent = T('access.portal.progress_total','Stap {step} van {total}')
+          .replace('{step}',String(step+1)).replace('{total}',String(reeks.length));
+        el('agLabel').hidden=!!s.kind;
+        if(s.kind){el('agShowPassword').hidden=true;personalKeuzes(s);if(s.kind==='layout')personalPreview();}
+        else field(s.type, s.label, s.auto, draft[s.key]);
+        if (step === 5) {
           el('agGo').textContent = T('access.portal.create_my_account','Maak mijn account aan');
           const review = el('agReview'); review.textContent = '';
           steps().slice(0,3).forEach((s,i) => {
@@ -747,6 +770,8 @@ var RTG_BOUW = '62f12f22';
             button.addEventListener('click', () => { step=i; render('register',true); });
             review.appendChild(button);
           });
+          const p=document.createElement('p'); p.textContent=T('personalos.onboarding.review','Uw RTG: {goals} · {layout}')
+            .replace('{goals}',draft.goals.map(function(x){return personalGoalLabel(x)}).join(', ')).replace('{layout}',personalLayoutLabel(draft.layout)); review.appendChild(p);
         }
       } else {
         const copy = {
@@ -762,7 +787,8 @@ var RTG_BOUW = '62f12f22';
         if (view === 'forgot') el('agGo').textContent = T('access.portal.request_recovery','Vraag herstel aan');
         if (view === 'reset') el('agGo').textContent = T('access.portal.save_my_password','Sla mijn wachtwoord op');
       }
-      const action={password:'identity.session.open',second:'identity.second_factor.verify',forgot:'identity.recovery.request',reset:'identity.password.replace'}[view] || (view==='register' && step===3?'identity.account.create':'');
+      if(view!=='register')el('agLabel').hidden=false;
+      const action={password:'identity.session.open',second:'identity.second_factor.verify',forgot:'identity.recovery.request',reset:'identity.password.replace'}[view] || (view==='register' && step===5?'identity.account.create':'');
       el('agGo').dataset.rtgMeaning=action;
       if (saved) {
         // Do not rewrite a focused input: it would collapse its selection or IME composition.
@@ -774,6 +800,66 @@ var RTG_BOUW = '62f12f22';
       }
       presentationOnly=false;
       if (focus) { if (!form.hidden) inp.focus({preventScroll:true}); else title.focus({preventScroll:true}); gate.scrollTop=0; }
+    }
+    /* Each question is a full sentence; labels and keyboard hints stay explicit. */
+    const steps = () => [
+      { key:'name', type:'text', auto:'name', label:T('access.portal.full_name','Volledige naam'),
+        title:T('access.portal.what_is_your_name','Hoe mogen we u noemen?'),
+        text:T('access.portal.enter_your_full_name_we_use_it_for_your_account_and_the_agreement','Vul uw volledige naam in. We gebruiken deze voor uw account en de overeenkomst.') },
+      { key:'email', type:'email', auto:'email', label:T('access.portal.email_address','E-mailadres'),
+        title:T('access.portal.which_email_address_can_we_reach_you_at','Op welk adres kunnen we u bereiken?'),
+        text:T('access.portal.you_use_this_email_address_to_sign_in_and_recover_your_account','U gebruikt dit e-mailadres om in te loggen en uw account te herstellen.') },
+      { key:'geboortedatum', type:'date', auto:'bday', label:T('access.portal.date_of_birth','Geboortedatum'),
+        title:T('access.portal.what_is_your_date_of_birth','Wat is uw geboortedatum?'),
+        text:T('access.portal.your_age_determines_which_features_you_can_use_you_must_be_at_lea','Uw leeftijd bepaalt welke onderdelen u kunt gebruiken. Voor dit account moet u minimaal 15 jaar zijn.') },
+      { key:'goals', kind:'goals', title:T('personalos.onboarding.goals.title','Wat wilt u als eerste bereiken?'),
+        text:T('personalos.onboarding.goals.text','Kies een of meer doelen. Dit bepaalt alleen de indeling van uw RTG, nooit uw rechten of toegang.') },
+      { key:'layout', kind:'layout', title:T('personalos.onboarding.layout.title','Hoe wilt u RTG gebruiken?'),
+        text:T('personalos.onboarding.layout.text','Kies een rustige, gebalanceerde of uitgebreide weergave en bekijk direct de openbare preview.') },
+      { key:'password', type:'password', auto:'new-password', label:T('access.portal.password','Wachtwoord'),
+        title:T('access.portal.how_would_you_like_to_secure_your_account','Hoe wilt u uw account beveiligen?'),
+        text:T('access.portal.choose_a_unique_password_of_at_least_six_characters_you_are_creat','Kies een uniek wachtwoord van minstens zes tekens. U maakt een gratis account aan; een betaalde pas kiest u apart. Daarna leest en bevestigt u de overeenkomst.') }
+    ];
+    /* PersonalOS-onboarding gebruikt dezelfde ene formulierlaag, maar de twee
+       compositiestappen zijn keuzes en geen vrije profielvelden. */
+    const PERSONAL_GOALS = ['dagelijks_leven','reizen','talent_ontwikkelen','ondernemen','werken_en_leren','ondersteuning','bijdragen'];
+    const PERSONAL_LAYOUTS = ['simple','balanced','advanced'];
+    function personalGoalLabel(id){return T('personalos.goal.'+id,({dagelijks_leven:'Dagelijks leven',reizen:'Reizen',talent_ontwikkelen:'Talent ontwikkelen',ondernemen:'Ondernemen',werken_en_leren:'Werken en leren',ondersteuning:'Ondersteuning',bijdragen:'Bijdragen'})[id]||id);}
+    function personalLayoutLabel(id){return T('personalos.layout.'+id,({simple:'Eenvoudig',balanced:'Gebalanceerd',advanced:'Uitgebreid'})[id]||id);}
+    let previewVolgorde = 0;
+    function personalKeuzes(s){
+      const vak=el('agPersonal'); vak.textContent=''; vak.hidden=false;
+      const bron=s.kind==='goals'?PERSONAL_GOALS:PERSONAL_LAYOUTS;
+      bron.forEach(function(key){
+        const b=document.createElement('button'); b.type='button'; b.className='access-secondary';
+        const gekozen=s.kind==='goals'?draft.goals.includes(key):draft.layout===key;
+        const label=s.kind==='goals'?personalGoalLabel(key):personalLayoutLabel(key);
+        b.setAttribute('aria-pressed',String(gekozen)); b.textContent=label+(gekozen?T('personalos.choice.selected_suffix',' · gekozen'):'');
+        b.addEventListener('click',function(){
+          if(s.kind==='goals') draft.goals=draft.goals.includes(key)?draft.goals.filter(function(x){return x!==key}):draft.goals.concat(key);
+          else draft.layout=key;
+          personalKeuzes(s); personalPreview();
+        });
+        vak.appendChild(b);
+      });
+      if(s.kind==='layout'){
+        const preview=document.createElement('p'); preview.id='agPersonalPreview'; preview.className='access-description';
+        preview.setAttribute('role','status'); preview.setAttribute('aria-live','polite');
+        preview.textContent=T('personalos.onboarding.preview.loading','Uw persoonlijke RTG-preview wordt opgebouwd.'); vak.appendChild(preview);
+      }
+    }
+    async function personalPreview(){
+      const vak=el('agPersonalPreview'); if(!vak)return;
+      const poging=++previewVolgorde;
+      try{
+        const antwoord=await API.call('/personalos/preview',{goals:draft.goals,layout:draft.layout});
+        if(poging!==previewVolgorde||!antwoord||!antwoord.composition)return;
+        const werelden=antwoord.composition.worlds.map(function(w){
+          return w.id.replace('livingos','LivingOS').replace('travelos','TravelOS').replace('workos','WorkOS').replace('foundationos','FoundationOS');
+        });
+        vak.textContent=T('personalos.onboarding.preview.ready','Uw RTG begint met: {worlds}.')
+          .replace('{worlds}',werelden.join(', '));
+      }catch(e){if(poging===previewVolgorde)vak.textContent=T('personalos.onboarding.preview.unavailable','De preview is nu niet bereikbaar. Uw accountgegevens blijven hier staan.');}
     }
 /* Refresh only presentation during a language change; identity stays in memory. */
     function refreshChrome(){
@@ -846,10 +932,17 @@ var RTG_BOUW = '62f12f22';
     }
     async function submit(){
       if (busy) return;
+      if(view==='register' && steps()[step].kind){
+        if(steps()[step].kind==='goals' && !draft.goals.length){
+          message(()=>T('personalos.onboarding.goals.required','Kies ten minste één doel. U kunt dit later altijd wijzigen.'),true);
+          const eerste=el('agPersonal').querySelector('button'); if(eerste)eerste.focus(); return;
+        }
+        step++; render('register',true); return;
+      }
       const value = inp.type === 'password' || el('agShowPassword').getAttribute('aria-pressed') === 'true' ? inp.value : inp.value.trim();
       inp.removeAttribute('aria-invalid'); el('agError').textContent='';
       if (!value || !inp.checkValidity()) return invalid(()=>T('access.portal.please_check_this_field_and_complete_it','Controleer dit veld en vul het volledig in.'));
-      if (view === 'register' && step < 3) {
+      if (view === 'register' && step < 5) {
         const s=steps()[step];
         if (step === 1 && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) return invalid(()=>T('access.portal.enter_a_valid_email_address_such_as_name_example_com','Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.'));
         if (step === 2) {
@@ -873,8 +966,9 @@ var RTG_BOUW = '62f12f22';
       message(()=>T('access.portal.one_moment_we_are_processing_your_request','Een ogenblik, we verwerken uw verzoek.'));
       try {
         if (view === 'register') {
-          const result=await login('rtg',{register:true,name:draft.name,u:draft.email,geboortedatum:draft.geboortedatum,p:value,tier:'guest',portal:true});
-          if (result) { Object.keys(draft).forEach(key=>{draft[key]='';}); inp.value=''; }
+          const result=await login('rtg',{register:true,name:draft.name,u:draft.email,geboortedatum:draft.geboortedatum,p:value,tier:'guest',portal:true,
+            personalOS:{goals:draft.goals.slice(),layout:draft.layout,preferenceVersion:0}});
+          if (result) { draft.name='';draft.email='';draft.geboortedatum='';draft.goals=[];draft.layout='balanced';inp.value=''; }
         } else if (view === 'password') {
           const result=await login('rtg',{u:accountName,p:value});
           inp.value='';
@@ -921,7 +1015,7 @@ var RTG_BOUW = '62f12f22';
         step--; render('register',true);
       } else if (view==='password' || view==='second' || view==='forgot' || view==='sent') {
         secondProof=''; render('login',true);
-      } else { Object.keys(draft).forEach(key=>{draft[key]='';}); render('welcome',true); }
+      } else { draft.name='';draft.email='';draft.geboortedatum='';draft.goals=[];draft.layout='balanced';render('welcome',true); }
     });
     window.addEventListener('rtglang',()=>{ if (gate.style.display !== 'none') render(view,false,true); });
     render(resetToken?'reset':'welcome',false);
@@ -5185,7 +5279,7 @@ var RTG_BOUW = '62f12f22';
   if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
 
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osPersonalScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
     .map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));
@@ -5467,6 +5561,60 @@ var RTG_BOUW = '62f12f22';
   }
   if (klaarKnop) klaarKnop.addEventListener('click', () => zetWiebel(false));
   rijen.forEach(grid => {
+  /* Mijn RTG gebruikt het bestaande instellingenpaneel en dezelfde PersonalOS-
+     bron als de onboarding. Er ontstaat geen tweede dashboard of catalogus:
+     de capabilityknoppen komen uit de actuele, door Authority gefilterde
+     compositie. Conditioneel bewaren voorkomt last-write-wins tussen twee
+     toestellen; bij 409 toont dit toestel de nieuwere serverstand. */
+  const personalScrim=$('#osPersonalScrim'), personalOpen=$('#osCcPersonal');
+  const personalGoals=$('#osPersonalGoals'), personalLayouts=$('#osPersonalLayouts');
+  const personalPins=$('#osPersonalPins'), personalStatus=$('#osPersonalStatus');
+  const PERSONAL_DOELEN=['dagelijks_leven','reizen','talent_ontwikkelen','ondernemen','werken_en_leren','ondersteuning','bijdragen'];
+  const PERSONAL_INDELINGEN=['simple','balanced','advanced'];
+  function personalDoelLabel(id){return T('personalos.goal.'+id,({dagelijks_leven:'Dagelijks leven',reizen:'Reizen',talent_ontwikkelen:'Talent ontwikkelen',ondernemen:'Ondernemen',werken_en_leren:'Werken en leren',ondersteuning:'Ondersteuning',bijdragen:'Bijdragen'})[id]||id);}
+  function personalIndelingLabel(id){return T('personalos.layout.'+id,({simple:'Eenvoudig',balanced:'Gebalanceerd',advanced:'Uitgebreid'})[id]||id);}
+  let personalConcept=null, personalBewaarVolgorde=0;
+  function personalKnop(vak,label,aan,doe){
+    const b=document.createElement('button');b.type='button';b.textContent=label;b.classList.toggle('aan',aan);
+    b.setAttribute('aria-pressed',String(aan));b.addEventListener('click',doe);vak.appendChild(b);
+  }
+  function personalTeken(){
+    if(!personalConcept||!personalGoals||!personalLayouts||!personalPins)return;
+    personalGoals.textContent='';personalLayouts.textContent='';personalPins.textContent='';
+    PERSONAL_DOELEN.forEach(function(id){personalKnop(personalGoals,personalDoelLabel(id),personalConcept.goals.includes(id),function(){
+      personalConcept.goals=personalConcept.goals.includes(id)?personalConcept.goals.filter(function(x){return x!==id;}):personalConcept.goals.concat(id);personalTeken();});});
+    PERSONAL_INDELINGEN.forEach(function(id){personalKnop(personalLayouts,personalIndelingLabel(id),personalConcept.layout===id,function(){personalConcept.layout=id;personalTeken();});});
+    const gezien=new Set();
+    ((personalOSComposition&&personalOSComposition.worlds)||[]).forEach(function(w){(w.capabilities||[]).forEach(function(c){
+      if(gezien.has(c.id))return;gezien.add(c.id);personalKnop(personalPins,c.name,personalConcept.pinnedCapabilities.includes(c.id),function(){
+        personalConcept.pinnedCapabilities=personalConcept.pinnedCapabilities.includes(c.id)
+          ?personalConcept.pinnedCapabilities.filter(function(x){return x!==c.id;}):personalConcept.pinnedCapabilities.concat(c.id);personalTeken();});});});
+  }
+  function openPersonal(){
+    if(!personalScrim)return;sluitScrims();
+    const p=personalOSPreferences||{goals:[],layout:'balanced',pinnedCapabilities:[],hiddenSuggestions:[],worldOrder:[],worldOrderMode:'auto',revision:0};
+    personalConcept={goals:(p.goals||[]).slice(),layout:p.layout||'balanced',pinnedCapabilities:(p.pinnedCapabilities||[]).slice(),
+      hiddenSuggestions:(p.hiddenSuggestions||[]).slice(),worldOrder:(p.worldOrder||[]).slice(),worldOrderMode:p.worldOrderMode||'auto',revision:Number(p.revision)||0};
+    personalStatus.textContent='';personalTeken();personalScrim.classList.add('open');
+  }
+  if(personalOpen)personalOpen.addEventListener('click',openPersonal);
+  const personalClose=$('#osPersonalClose');if(personalClose)personalClose.addEventListener('click',sluitScrims);
+  const personalSave=$('#osPersonalSave');if(personalSave)personalSave.addEventListener('click',async function(){
+    if(!personalConcept||!personalConcept.goals.length){personalStatus.textContent=T('personalos.settings.goal_required','Kies ten minste één doel.');return;}
+    const poging=++personalBewaarVolgorde;personalSave.disabled=true;personalStatus.textContent=T('personalos.settings.saving','Uw RTG wordt bewaard.');
+    try{
+      const uit=await API.call('/personalos/complete',{goals:personalConcept.goals,layout:personalConcept.layout,
+        pinnedCapabilities:personalConcept.pinnedCapabilities,hiddenSuggestions:personalConcept.hiddenSuggestions,
+        worldOrder:personalConcept.worldOrder,worldOrderMode:personalConcept.worldOrderMode,preferenceVersion:personalConcept.revision});
+      if(poging!==personalBewaarVolgorde)return;
+      personalOSPreferences=uit.preferences;await laadPersonalOS();personalConcept.revision=personalOSPreferences.revision;
+      if(typeof wereldBij==='function')wereldBij();personalStatus.textContent=T('personalos.settings.saved','Uw persoonlijke RTG is bijgewerkt.');
+    }catch(e){
+      if(poging!==personalBewaarVolgorde)return;
+      if(e&&e.status===409&&e.data&&e.data.currentPreferences){personalOSPreferences=e.data.currentPreferences;openPersonal();personalStatus.textContent=T('personalos.settings.conflict','Uw RTG was op een ander apparaat gewijzigd. De nieuwste versie is geladen.');}
+      else personalStatus.textContent=e.message||T('personalos.settings.save_failed','Bewaren is niet gelukt.');
+    }finally{if(poging===personalBewaarVolgorde)personalSave.disabled=false;}
+  });
 /* het springboard verslepen, met vinger en met muis */
     grid.addEventListener('pointerdown', e => {
       const el = e.target.closest('.os-app'); if (!el) return;
@@ -6012,9 +6160,20 @@ var RTG_BOUW = '62f12f22';
      pas die intussen veranderd is. */
   function wereldBij() {
     if (!window.RTGCommand || !RTGCommand.werelden) return;
-    RTGCommand.werelden(MAPPEN.filter(function (m) {
+    var lijst=MAPPEN.filter(function (m) {
       return m.sleutel !== 'map-instellingen' && m.wereld && m.items.some(itemZichtbaar);
-    }).map(function (m) {
+    });
+    /* PersonalOS ordent uitsluitend de bestaande wereldlijst. Een ontbrekende
+       of onvolledige compositie laat alle werelden in hun canonieke volgorde
+       staan; zij kan nooit een wereld of bevoegdheid toevoegen. */
+    var ids={ 'map-rtg':'livingos','map-werk':'workos','map-reizen':'travelos','map-rtf':'foundationos' };
+    var volgorde=personalOSComposition&&personalOSComposition.worlds
+      ?personalOSComposition.worlds.map(function(w){return w.id;}):[];
+    lijst=lijst.map(function(m,i){return{m:m,i:i};}).sort(function(a,b){
+      var ai=volgorde.indexOf(ids[a.m.sleutel]),bi=volgorde.indexOf(ids[b.m.sleutel]);
+      if(ai<0)ai=100+a.i;if(bi<0)bi=100+b.i;return ai-bi;
+    }).map(function(x){return x.m;});
+    RTGCommand.werelden(lijst.map(function (m) {
       return {
         sleutel: m.sleutel,
         naam: mapNaam(m),

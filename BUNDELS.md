@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**75 bundels, 527 delen, 0 zonder onderwerp.**
+**75 bundels, 530 delen, 1 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 104 delen, 10132 regels in de delen
+`public/apps/app-main/` -- 107 delen, 10291 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -24,7 +24,9 @@ omlaag.
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |
-| `app-main-04a.js` | Each question is a full sentence; labels and keyboard hints stay explicit |
+| `app-main-04a.js` | -- |
+| `app-main-04a0.js` | Each question is a full sentence; labels and keyboard hints stay explicit |
+| `app-main-04aa.js` | PersonalOS-onboarding gebruikt dezelfde ene formulierlaag, maar de twee compositiestappen zijn keuzes en geen vrije p... |
 | `app-main-04ab.js` | Refresh only presentation during a language change; identity stays in memory |
 | `app-main-04b.js` | WebAuthn uses the existing challenge, signature check and session path |
 | `app-main-05.js` | Account access: validate the current step and submit through the existing auth routes |
@@ -75,6 +77,7 @@ omlaag.
 | `app-main-26c.js` | Afgesplitst van app-main-26b.js toen dat over de 10 KB ging (regel 13) |
 | `app-main-27.js` | een map hernoemen op het springboard |
 | `app-main-27b.js` | Afgesplitst van app-main-27.js, dat over de 10 KB ging |
+| `app-main-27c.js` | Mijn RTG gebruikt het bestaande instellingenpaneel en dezelfde PersonalOS- bron als de onboarding |
 | `app-main-28.js` | het springboard verslepen, met vinger en met muis |
 | `app-main-29.js` | de realtime-verbinding starten en herstellen |
 | `app-main-29b.js` | het gesprek met Rahul op het beginscherm |

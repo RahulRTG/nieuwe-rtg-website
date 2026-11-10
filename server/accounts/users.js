@@ -296,9 +296,7 @@ const { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActi
 // De clientprojectie kan geen account wijzigen of token uitgeven.
 const { publicUser } = require('./profiel')({ realNameOf, emailOf, phoneOf });
 
-/* Het ledendossier, de verificatie, de kantoorlijsten en de AVG-vergetelheid
-   staan in ./dossier.js; ook dat deel krijgt getUserById mee en verhuist mee in
-   de export, zodat aanroepers niets merken. */
+/* Ledendossier, verificatie en AVG-vergetelheid wonen in ./dossier.js. */
 const { getMemberState, saveMemberState, wijzigMemberState, setVerification, listByVerification,
   conversations, ledenRegisterRijen, deleteUser } = require('./dossier').maakDossier(getUserById);
 

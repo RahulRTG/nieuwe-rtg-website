@@ -8,6 +8,20 @@ const { normaliseer } = require('../server/kern/personalos/contract');
 const catalog = require('../server/kern/personalos/catalog');
 const engine = require('../server/kern/personalos/engine');
 
+test('het openbare PersonalOS-contract is via de echte route bereikbaar', async () => {
+  const { startServer, stop } = require('./helper');
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  try {
+    const response = await fetch(srv.base + '/api/personalos/contract', { method: 'POST' });
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.ok, true);
+    assert.equal(body.contract.schemaVersion, 1);
+  } finally {
+    await stop(srv.child);
+  }
+});
+
 test('PersonalOS-contract bewaart alleen beperkte vrijwillige voorkeuren', () => {
   const ids = catalog.allIds();
   const r = normaliseer({ goals: ['ondernemen', 'ondernemen'], layout: 'simple',

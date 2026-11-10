@@ -71,6 +71,22 @@ test.before(async () => {
 });
 test.after(() => { stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
+test('alle muterende opvangroutes weigeren een onbevoegde aanroep', async () => {
+  const routes = [
+    '/api/rtfos/opvang/voorzieningen',
+    '/api/rtfos/opvang/voorziening/maak',
+    '/api/rtfos/opvang/aanvraag',
+    '/api/rtfos/opvang/vervolgplan',
+    '/api/rtfos/portaal/partner/opvang/capaciteit',
+    '/api/rtfos/portaal/partner/opvang/aankomst'
+  ];
+  for (const route of routes) {
+    const response = await post(route, {});
+    assert.ok(response.status === 401 || response.status === 403,
+      route + ' liet een onbevoegde aanroep door of bestaat niet: ' + response.status);
+  }
+});
+
 test('geen schijnbevestiging: aanvraag, actuele capaciteit en aanbiederacceptatie zijn drie stappen', async () => {
   const z = await zaakTotStabilisatie();
   const a = await kantoor('opvang/aanvraag', { zaakId: z.id, voorzieningId: VOORZIENING,

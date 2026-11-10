@@ -550,13 +550,14 @@ test('werkelijke Ondertitelband-owner gebruikt de centrale DS-component',()=>{
  const bron=lees('public/shared/ondertitelband.js');
  const a=os.scriptLaadAnalyse(bron,{ds:false});
  assert.deepEqual(a.onzeker,[]);assert.equal(a.injecties+a.mogelijkeInjecties,0);
- assert.ok(a.verwijzingen.some(v=>v.href==='/ds/rtg-ds.css'&&v.soort==='dom'));
+ assert.equal(a.verwijzingen.length,0);
  assert.doesNotMatch(bron,/createElement\(['"]style['"]\)|\.textContent\s*=\s*STIJL|ondertitelband\.css/);
  assert.match(lees('public/ds/rtg-ds.css'),/componenten\/ondertitelband\.css/);
  for(const app of ['clips','media','salon','theater','wereld']){
   const html=lees('public/apps/'+app+'.html');
   assert.equal((html.match(/\/shared\/ondertitelband\.css/g)||[]).length,0,app);
   assert.equal((html.match(/\/shared\/ondertitelband\.js/g)||[]).length,1,app);
+  assert.equal((html.match(/\/ds\/componenten\/ondertitelband\.css/g)||[]).length,1,app);
  }
 });
 

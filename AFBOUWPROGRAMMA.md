@@ -5258,3 +5258,38 @@ Niet-uitgevoerde verplichte controles: **actuele volledige APPWERKT,
 EXPERIENCEWERKT inclusief menselijke proeven, platformbrede gedragssuite,
 staging/load/herstel/rollback en twee onafhankelijke eindruns**. Deep Green:
 **GEBLOKKEERD**.
+
+#### Afgesloten gedeelde oorzaak: dynamische ondertitelpresentatie
+
+De gedeelde ondertitelband voegt niet langer tijdens runtime een stylesheet aan
+het document toe. De vijf bestaande mediahosts laden nu expliciet uitsluitend
+`public/ds/componenten/ondertitelband.css`; hun al aanwezige Design
+System-tokens blijven de kleur-, ruimte- en typografiewaarden leveren. Daardoor
+worden legacyhosts niet ten onrechte als volledig gemigreerde Design
+System-schermen aangemerkt.
+
+De cuevolgorde, tijdsprongen, opruiming na het einde, tekstveilige DOM-opbouw en
+de bestaande mediafuncties blijven ongewijzigd. Gerichte kwalificatie op Node
+**26.12.1** sluit **85/85** component-, laadgraaf- en architectuurproeven en
+**5/5** echte browserketens voor ondertiteling, Clips, Media, Salon en mobiele
+schermbreedte. De volledige statische huiskeuring sluit daarna groen.
+
+Design System meldt nul schendingen en 87 gemigreerde schermen. De actuele
+presentatiemeter daalt van 78 naar **77 scripts met stijlinjectie** en van 165
+naar **164 injectieplekken**; de verdwenen owner is uit `ONTWERPNORM.json`
+verwijderd en kan daardoor niet ongemerkt terugkomen.
+
+**Afsluiting dynamische ondertitelpresentatie.** Openstaande unieke oorzaken:
+**77 scripts met resterende runtime-stijllading of -injectie, actieve
+legacybladen en schermstijlblokken, ontbrekende actuele APPWERKT-
+herkwalificatie, 3360 niet-uitgevoerde Experience-voorwaarden en operationele
+vrijgavepoorten**. Opgelost sinds vorige meting: **1 runtime-stijlowner en 1
+injectieplek op 5 hosts**. Nieuwe regressies: **0 in de gerichte component-,
+laadgraaf-, browser- en statische proeven**. Eerder verborgen fouten ontdekt:
+**een statische verwijzing naar het volledige Design System zou vijf
+legacyhosts onterecht als volledig gemigreerd classificeren; de bestaande
+architectuurpoort heeft dit geblokkeerd en de laadscope is versmald tot het
+componentcontract**. Niet-uitgevoerde verplichte controles: **actuele volledige
+APPWERKT, EXPERIENCEWERKT inclusief menselijke proeven, platformbrede
+gedragssuite, staging/load/herstel/rollback en twee onafhankelijke eindruns**.
+Deep Green: **GEBLOKKEERD**.

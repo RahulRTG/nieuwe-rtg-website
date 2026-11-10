@@ -21,7 +21,13 @@ jobs:
     # koude GitHub-run kan alleen die gecontroleerde installatie al ruim twintig
     # minuten kosten; de kwaliteitsproeven mogen daardoor niet onuitgevoerd
     # worden geannuleerd.
-    timeout-minutes: 45
+    # Op een koude runner kost installatie circa 13 minuten. De mobiele en
+    # WebKit-proeven daarna circa 8 minuten; de brongebonden Experience-a11y-
+    # producer heeft zelf een fail-closed maximum van 42 minuten. Run
+    # 42780106704 werd daarom midden in die verplichte producer afgebroken.
+    # De proef of haar norm wordt niet verkleind; alleen de omringende job
+    # krijgt voldoende tijd om het bestaande contract werkelijk uit te voeren.
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

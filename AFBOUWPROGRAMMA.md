@@ -5641,3 +5641,53 @@ operationele kwalificatie en twee onafhankelijke eindruns**. APPWERKT:
 **0/114 actueel geldig**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden
 actueel gekwalificeerd**. Eerstvolgende blokkade: **commitgebonden volledige CI**.
 Deep Green: **GEBLOKKEERD**.
+
+### Tweede volledige CI-meting kandidaat `8c962c79ff` — 10 november 2026
+
+De commitgebonden tegenproef is volledig geïnventariseerd voordat nieuwe
+broncorrecties begonnen. CI-run `42780106784` eindigde rood; de afzonderlijke
+desktop- en mobielrun `42780106704` werd door de omringende jobtermijn
+afgebroken. CodeQL-run `42780106933` en de lokale kwalificatierun
+`42780106718` sloten groen. Alle uitgevoerde static- en PostgreSQL-proeven,
+unitscherven 1, 3 en 4, norm, security, adversarial, container, schermscherven
+1, 3, 4 en 5, toegankelijkheidsdelen 1, 3 en 4, de 1440-pixelproef en WebKit
+waren groen. Daarmee zijn DG-CI-09 en DG-CI-10 niet teruggekomen en is de
+werkelijke mobiele productproef van DG-CI-11 groen; uitsluitend de daarna
+gestarte, dubbele volledige Experience-producent kreeg onvoldoende jobtijd.
+
+De vier resterende primaire oorzaken waren:
+
+| ID | Primaire oorzaak | Soort | Bewijs op de bevroren commit | Herstel |
+| --- | --- | --- | --- | --- |
+| DG-CI-13 | `EXPERIENCEWERKT.json` was vóór de laatste test- en scriptwijzigingen afgeleid, waardoor uitsluitend de bronvingerafdruk achterliep | verlopen afgeleid register | unitscherf 2; inventaris bleef exact 114 apps, 316 schermen en 3360 voorwaarden | als laatste bronstap opnieuw afleiden en exactheidstoets uitvoeren |
+| DG-CI-14 | de Leven-browsertest klikte de bewust verborgen legacy-`Acties`-trigger in plaats van de zichtbare centrale Adaptive Edge | verlopen toetscontract | schermscherf 2; productbron publiceerde alle Leven-acties correct in het centrale Edge-blad | bestaande `edgeActies`-helper gebruiken en de zichtbare contextknop bedienen |
+| DG-CI-15 | toegankelijkheidsdeel 2 werd na 30:16 afgebroken terwijl dezelfde volledige scan nog liep; delen 1, 3 en 4 gebruikten 24:37-25:21 inclusief installatie | CI-orchestratiebudget | geen mislukte a11y-assertie; uitsluitend een geannuleerde job zonder samenvatting | omringende jobtermijn naar 45 minuten, zonder scan, norm of fail-closed gedrag te wijzigen |
+| DG-CI-16 | de 390-pixeljob werd na 45:17 midden in de bestaande `screen-accessibility`-producent afgebroken; alle voorafgaande mobiele, WebKit-, Pass- en wereldpaletproeven waren groen | CI-orchestratiebudget | de producent heeft zelf een fail-closed maximum van 42 minuten, terwijl installatie en voorafgaande verplichte proeven circa 21 minuten gebruikten | omringende jobtermijn naar 75 minuten, zonder de producent of haar bewijsnorm te verkleinen |
+
+`Tests, checks en build` en het samengestelde toegankelijkheidsoordeel zijn
+afgeleide mislukkingen en tellen niet als extra bronoorzaken. Er is geen
+productfout verborgen achter de twee termijnafbrekingen: de jobs bevatten geen
+falende assertie en hun reeds uitgevoerde productassen waren groen.
+
+De gerichte herstelproeven sluiten inmiddels lokaal: de volledige Leven-stroom
+via de zichtbare Adaptive Edge is **1/1** groen; de Experience-inventaris en
+vrijgavecontracten zijn **55/55** groen; de bestaande coverage-check bevestigt
+exact **114 apps en 316 schermen**, met nog steeds **0** administratief
+geproduceerde groene Experience-resultaten. De twee termijnwijzigingen laten
+alle onderliggende opdrachten en kwaliteitsnormen bytegelijk staan. Hun
+definitieve bewijs is de volgende volledige GitHub-run op de nieuwe commit.
+
+**Meetstand herstelronde 7.** Openstaande unieke oorzaken vóór herstel: **4**.
+Gericht opgelost sinds de vorige meting: **4**, waarvan twee pas door een
+volledige GitHub-tegenproef definitief gesloten kunnen worden. Nieuwe
+regressies: **1** (DG-CI-13, veroorzaakt door een te vroege registerafleiding).
+Eerder verborgen fouten ontdekt: **3** (DG-CI-14 tot en met DG-CI-16).
+Niet-uitgevoerde verplichte controles: **volledige CI op de nieuwe kandidaat,
+APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief menselijke proeven,
+security/finance/load, staging/back-up/herstel/rollback/incidentrespons en twee
+onafhankelijke eindruns**. APPWERKT: **0/114 actueel geldig; 912 historische
+bewijzen blijven verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360
+voorwaarden actueel gekwalificeerd**. Actuele commit vóór deze herstelcommit:
+`8c962c79ffc131e4c7dcc2cff5145c00a1061b87`. Eerstvolgende blokkade:
+**de herstelwijzigingen vastleggen, publiceren en alle verplichte GitHub-jobs
+volledig laten uitlopen**. Deep Green: **GEBLOKKEERD**.

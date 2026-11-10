@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, wachtOpWaarde } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-civilis-opvang-'));
 const OFFICE_CODE = 'CIVILIS-OPVANG-KEURING';
@@ -168,7 +168,9 @@ test('een verlopen acceptatie kan niet meer als aankomst worden bevestigd', asyn
     financiering: 'niet_vereist', idempotentie: 'verval-' + z.id });
   const akkoord = await partner('/besluit', { id: a.body.reservering.id, accepteer: true });
   assert.equal(akkoord.status, 200, JSON.stringify(akkoord.body));
-  await new Promise(resolve => setTimeout(resolve, 2100));
+  await wachtOpWaarde(() => Date.now() > Date.parse(geldigTot), {
+    ms: 3000, stap: 20, wat: 'het aantoonbare einde van de capaciteitsreservering'
+  });
   const teLaat = await partner('/aankomst', { id: a.body.reservering.id });
   assert.equal(teLaat.status, 409);
   const lijst = await kantoor('opvang/voorzieningen', { stad: STAD });

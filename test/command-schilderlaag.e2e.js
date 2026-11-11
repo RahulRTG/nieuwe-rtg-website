@@ -70,8 +70,8 @@ test('de actieve Command-werkvloer blijft zichtbaar boven de levende shellgrond'
     const deur = await gast.newPage();
     await deur.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await deur.waitForFunction(() => document.querySelector('#levendegrond-stijl')?.sheet);
-    assert.notEqual(await deur.locator('#shell').evaluate(el => getComputedStyle(el, '::before').content), 'none',
-      'de gewone niet-ingelogde shell behoudt de levende grond');
+    assert.equal(await deur.locator('#shell').evaluate(el => getComputedStyle(el, '::before').content), 'none',
+      'ook de inlogdeur blijft vrij van de hogere shellwas; de werkelijke Command-grond schildert de toegang');
     await gast.close(); await ctx.close();
   } finally {
     if (browser) await browser.close(); await h.stop(srv);

@@ -424,6 +424,16 @@ function poortenVan(bestand, tekst) {
   return poortenVanDoc({ bestand, naam: doc.name || bestand, aanleiding: Object.keys(doc.on || doc.true || {}), doc });
 }
 
+/* Een pad is een argument (of omgevingswaarde), geen willekeurige substring:
+   actionuitvoer `check` maakt `scripts/check.js` niet afhankelijk. */
+function actiepadGebruikt(gat, pad) {
+  const letterlijk = pad.replace(/^(?:\.\/)+/, '').replace(/\/+$/, '')
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (!letterlijk) return false;
+  const grens = new RegExp("(?:^|[\\s\"'=])(?:\\./)*" + letterlijk + "(?=$|[\\s\"'/])");
+  return [gat.opdracht, gat.opgelost, ...Object.values(gat.env)].some(v => typeof v === 'string' && grens.test(v));
+}
+
 function poortenVanDoc(ws) {
   const scripts = pakketScripts();
   const uit = [];
@@ -457,22 +467,26 @@ function poortenVanDoc(ws) {
           stap: typeof stap.name === 'string' ? stap.name : '(zonder naam)',
           regel: stap.__regel || 0,
           opdracht, soort, doel, opgelost: opgelost || opdracht, samengesteld: !!samengesteld,
-          informatief: !!informatief, env: stap.env && typeof stap.env === 'object' ? stap.env : {},
+          informatief: !!informatief,
+          // De specifiekste YAML-omgeving wint, net als op de GitHub-runner.
+          env: Object.assign({}, ...[ws.doc.env, job.env, stap.env]
+            .filter(v => v && typeof v === 'object' && !Array.isArray(v))),
           voorwaarde: typeof stap.if === 'string' ? stap.if : ''
         };
         if (soort === 'toets' && GEEN_POORT.includes(doel)) gat.soort = 'inrichting';
         gat.voorzieningen = gat.soort === 'toets' ? voorzieningen(gat, browser) : [];
         gat.artefact = artefact;
-        gat.actieUitvoer = [...actieUitvoer].find(pad => String(opdracht).includes(pad)) || null;
+        gat.actieUitvoer = [...actieUitvoer].find(pad => actiepadGebruikt(gat, pad)) || null;
         const envWaarden = Object.values(gat.env);
+        const onopgelosteOmgeving = envWaarden.some(v => typeof v === 'string' && /\$\{\{/.test(v));
         gat.geheim = envWaarden.some(v => typeof v === 'string' && /\$\{\{\s*secrets\./.test(v));
         /* De lokale ronde meet juist ook poorten die GitHub conditioneel
            kiest. Alleen hun ONOPGELOSTE invoer maakt de handeling anders; de
            `if`-expressie zelf is geen reden om een zelfstandig draaibare poort
            weg te laten. */
-        gat.ketenwaarde = KETENWAARDE.test(opdracht) ||
-          envWaarden.some(v => typeof v === 'string' && /\$\{\{/.test(v) && !/\$\{\{\s*secrets\./.test(v));
-        gat.verdeeld = alleenVerdeeld(opdracht);
+        gat.ketenwaarde = KETENWAARDE.test(opdracht) || onopgelosteOmgeving;
+        // Alleen de opdracht verdelen lost een ontbrekende stapomgeving niet op.
+        gat.verdeeld = alleenVerdeeld(opdracht) && !onopgelosteOmgeving;
         uit.push(gat);
       }
     }

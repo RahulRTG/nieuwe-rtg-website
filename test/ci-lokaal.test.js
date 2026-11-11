@@ -69,6 +69,98 @@ test('uitvoer van een voorafgaande action is geen lokaal bestaand bewijsstuk', (
   assert.equal(W.oordeel(gates[1]).lokaal, true);
 });
 
+test('een matrixherleiding laat geen onopgeloste stapomgeving vallen', t => {
+  for (const waarde of ['${{ inputs.candidate }}', '${{ matrix.variant }}', '${{ secrets.TOKEN }}', 'vast']) {
+    const gates = W.poortenVan('fixture.yml', [
+      'on:', '  pull_request:', 'jobs:', '  bewijs:', '    steps:',
+      '      - run: node scripts/check.js --deel=${{ matrix.scherf }}/4',
+      '        env:', '          RTG_PROEF: ' + waarde
+    ].join('\n'));
+    const stub = t.mock.method(W, 'poorten', () => gates);
+    try {
+      const [rij] = lokaal.plan({ gedekt: new Set() });
+      assert.equal(rij.stand, waarde === 'vast' ? 'draait' : 'niet-lokaal', waarde);
+      assert.equal(rij.herleid, waarde === 'vast', waarde);
+      if (waarde === 'vast') assert.deepEqual(rij.omgeving, { RTG_PROEF: 'vast' });
+      else assert.match(rij.opdracht, /matrix\.scherf/);
+    } finally { stub.mock.restore(); }
+  }
+});
+
+test('overgeerfde keteninvoer blokkeert herleiding totdat de stap haar concreet overschrijft', t => {
+  for (const stapWaarde of [null, 'vast']) {
+    const [gat] = W.poortenVan('fixture.yml', [
+      'on:', '  pull_request:', 'env:',
+      '  RTG_PROEF: ${{ inputs.workflow }}', '  WORKFLOW_ONLY: workflow',
+      'jobs:', '  bewijs:', '    env:',
+      '      RTG_PROEF: ${{ inputs.job }}', '      JOB_ONLY: job',
+      '    steps:', '      - run: node scripts/check.js --deel=${{ matrix.scherf }}/4',
+      ...(stapWaarde ? ['        env:', '          RTG_PROEF: ' + stapWaarde] : [])
+    ].join('\n'));
+    assert.equal(gat.env.RTG_PROEF, stapWaarde || '${{ inputs.job }}');
+    assert.equal(gat.env.WORKFLOW_ONLY, 'workflow');
+    assert.equal(gat.env.JOB_ONLY, 'job');
+    const stub = t.mock.method(W, 'poorten', () => [gat]);
+    try {
+      const [rij] = lokaal.plan({ gedekt: new Set() });
+      assert.equal(rij.stand, stapWaarde ? 'draait' : 'niet-lokaal');
+      assert.equal(rij.herleid, !!stapWaarde);
+      assert.equal(rij.omgeving.RTG_PROEF, stapWaarde || undefined);
+    } finally { stub.mock.restore(); }
+  }
+});
+
+test('infrastructuur uit werkstroom en job bereikt de voorzieningen van de stap', () => {
+  const [gat] = W.poortenVan('fixture.yml', [
+    'on:', '  pull_request:', 'env:', '  DATABASE_URL: postgres://localhost/workflow',
+    'jobs:', '  bewijs:', '    env:', '      REDIS_URL: redis://localhost:6379',
+    '    steps:', '      - run: node scripts/check.js',
+    '        env:', '          DATABASE_URL: postgres://localhost/stap'
+  ].join('\n'));
+  assert.deepEqual(gat.voorzieningen, ['postgres', 'redis']);
+  assert.deepEqual(W.stapOmgeving(gat), {
+    DATABASE_URL: 'postgres://localhost/stap', REDIS_URL: 'redis://localhost:6379'
+  });
+});
+
+test('actionuitvoer herkent een pad en geen toevallig stuk van een ander argument', () => {
+  for (const [opdracht, verwacht] of [
+    ['node scripts/check.js', false],
+    ['node scripts/check.js --dir=checker', false],
+    ['node scripts/check.js --dir=other/check', false],
+    ['node scripts/check.js --dir=check', true],
+    ['node scripts/check.js --dir="./check/rapport.json"', true]
+  ]) {
+    const [gat] = W.poortenVan('fixture.yml', [
+      'on:', '  pull_request:', 'jobs:', '  bewijs:', '    steps:',
+      '      - uses: voorbeeld/analyse@vast', '        with:', '          output: check',
+      '      - run: ' + opdracht
+    ].join('\n'));
+    assert.equal(W.oordeel(gat).lokaal, !verwacht, opdracht);
+  }
+});
+
+test('actionuitvoer in de stapomgeving blijft een ontbrekende invoer', () => {
+  const [gat] = W.poortenVan('fixture.yml', [
+    'on:', '  pull_request:', 'jobs:', '  bewijs:', '    steps:',
+    '      - uses: voorbeeld/analyse@vast', '        with:', '          output: rapport[1]',
+    '      - run: node scripts/check.js',
+    '        env:', '          RESULTS_DIR: ./rapport[1]/uitvoer.json'
+  ].join('\n'));
+  assert.equal(W.oordeel(gat).soortReden, 'actie-uitvoer');
+});
+
+test('actionuitvoer geldt alleen na de producerende stap en binnen dezelfde job', () => {
+  const gates = W.poortenVan('fixture.yml', [
+    'on:', '  pull_request:', 'jobs:', '  eerste:', '    steps:',
+    '      - run: node scripts/check.js --dir=rapport',
+    '      - uses: voorbeeld/analyse@vast', '        with:', '          output: rapport',
+    '      - run: node scripts/check.js --dir=rapport/uitvoer.json',
+    '  tweede:', '    steps:', '      - run: node scripts/check.js --dir=rapport'
+  ].join('\n'));
+  assert.deepEqual(gates.map(g => W.oordeel(g).lokaal), [true, false, true]);
+});
+
 test('de ontleder leest een werkstroom: jobs, stappen, blokschalen en regelnummers', () => {
   const doc = W.ontleed([
     'name: Proef',

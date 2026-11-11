@@ -49,13 +49,13 @@ test('2. perVerzoek NEST NIET: twee schillen delen een teller', () => {
   assert.strictEqual(uit.sms, 1);
 });
 
-test('3. de bon draagt de zeven velden, en GEEN payload', () => {
+test('3. de bon draagt de acht velden, en GEEN payload', () => {
   const bon = effectbon.maak({
     envelop: { correlatie: 'r1', oorzaak: 'r0', capability: 'POST /api/bank/sepa' },
     voor: 'bankSaldi=3,doorgeefjournaal=9', na: 'bankSaldi=4,doorgeefjournaal=10',
     teller: { opslag: 2, mail: 1, sms: 0 } });
   assert.deepStrictEqual(Object.keys(bon).sort(),
-    ['at', 'capability', 'dekking', 'klassen', 'objectrefs', 'oorzaak', 'verzoek']);
+    ['at', 'capability', 'dekking', 'klassen', 'objectrefs', 'oorzaak', 'verzoek', 'waarborg']);
   assert.strictEqual(bon.verzoek, 'r1');
   assert.strictEqual(bon.oorzaak, 'r0');
   assert.deepStrictEqual(bon.klassen, ['EXTERN_BEREIKEN', 'GELD_BEWEGEN']);

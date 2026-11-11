@@ -8,7 +8,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
-const tijdzone = require('../server/kern/tijdzone');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-verjaardagen-'));
@@ -40,7 +39,12 @@ async function gezin() {
 }
 // dag/maand van morgen, zodat 'dagenTot' klein en voorspelbaar is
 function morgen() {
-  const d = tijdzone.plusDagen(tijdzone.datumIn(), 1);
+  /* De verjaardagenlaag rekent op de kalender van het huis (Amsterdam), niet
+     op de tijdzone van de CI-runner. Tussen 23:00 UTC en lokale middernacht
+     is `new Date()` op Linux nog gisteren en zou deze proef onbedoeld vandaag
+     invoeren. Gebruik daarom exact hetzelfde kalendercontract als de bron. */
+  const tz = require('../server/kern/tijdzone');
+  const d = tz.plusDagen(tz.datumIn(), 1);
   return { dag: Number(d.slice(8, 10)), maand: Number(d.slice(5, 7)) };
 }
 

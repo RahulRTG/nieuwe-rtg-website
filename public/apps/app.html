@@ -56,7 +56,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="59d84768">
+<meta name="rtg-bouw" content="c1db8933">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -1102,8 +1102,7 @@ try {
 
   /* de oude tabbar blijft in de DOM als model voor de OS-laag, maar is onzichtbaar */
   .tabbar{display:none !important;}
-  /* de zwevende taal- en licht/donker-knoppen botsen met het dock; hun functie
-     zit in het bedieningspaneel (dat de verborgen knoppen aanstuurt) */
+  /* de zwevende taalknop botst met het dock; zijn functie zit in het paneel */
   #rtg-lang-switch{display:none !important;}
 
   /* wallpaper: subtiel goud boven, bordeaux onder, over het pasthema heen */
@@ -2132,64 +2131,64 @@ try {
 .s-yztz7f:not(#_#_#_){white-space:pre-wrap;line-height:1.4;font-size:.92rem}
 .s-z2eubj:not(#_#_#_){font-size:0.62rem;color:var(--soft);margin-top:0.25rem}
 </style>
-<script src="/shared/command/catalog.js?v=59d84768" defer></script>
-<script src="/shared/command/console.js?v=59d84768" defer></script>
-<script src="/shared/command/verdeler.js?v=59d84768" defer></script>
-<script src="/shared/interface/module-sdk.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-world-catalog.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-directory.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-continuity.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-composer.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-registries.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-session.js?v=59d84768" defer></script>
+<script src="/shared/command/catalog.js?v=c1db8933" defer></script>
+<script src="/shared/command/console.js?v=c1db8933" defer></script>
+<script src="/shared/command/verdeler.js?v=c1db8933" defer></script>
+<script src="/shared/interface/module-sdk.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-world-catalog.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-directory.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-continuity.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-composer.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-registries.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-session.js?v=c1db8933" defer></script>
 <script src="/shared/experience-intent.js" defer></script>
-<script src="/shared/interface/workspace-intents.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-policy.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-assistant-manifest.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-context.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-navigation.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-state.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-orchestrator.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-blueprints.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-broker.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-module-host.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-runtime.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-legacy.js?v=59d84768" defer></script>
-<script src="/shared/interface/workspace-empty.js?v=59d84768" defer></script>
+<script src="/shared/interface/workspace-intents.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-policy.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-assistant-manifest.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-context.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-navigation.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-state.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-orchestrator.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-blueprints.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-broker.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-module-host.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-runtime.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-legacy.js?v=c1db8933" defer></script>
+<script src="/shared/interface/workspace-empty.js?v=c1db8933" defer></script>
 <!-- RTG_WORKSPACE_MODULES_START: nieuwe modules komen via scripts/workspace-module.js binnen -->
-<script src="/shared/interface/second-screen-modules.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/context.js?v=59d84768" defer></script>
+<script src="/shared/interface/second-screen-modules.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/context.js?v=c1db8933" defer></script>
 <script src="/shared/travel-request-controller.js" defer></script>
-<script src="/shared/interface/modules/travel-dossier-view.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/travel-view.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/travel-edge.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/travel-continuity.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/travel-actions.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/travel.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/work-view.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/work-edge.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/work.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/coordination-view.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/coordination-edge.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/coordination.js?v=59d84768" defer></script>
-<script src="/shared/interface/modules/safety.js?v=59d84768" defer></script>
+<script src="/shared/interface/modules/travel-dossier-view.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/travel-view.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/travel-edge.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/travel-continuity.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/travel-actions.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/travel.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/work-view.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/work-edge.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/work.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/coordination-view.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/coordination-edge.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/coordination.js?v=c1db8933" defer></script>
+<script src="/shared/interface/modules/safety.js?v=c1db8933" defer></script>
 <!-- RTG_WORKSPACE_MODULES_END -->
-<script src="/shared/interface/workspace-experience.js?v=59d84768" defer></script>
-<script src="/shared/interface/second-screen.js?v=59d84768" defer></script>
-<script src="/shared/interface/second-screen-personal.js?v=59d84768" defer></script>
-<script src="/shared/command/bank.js?v=59d84768" defer></script>
-<script src="/shared/command/praat.js?v=59d84768" defer></script>
-<script src="/shared/command/inlogpoort.js?v=59d84768" defer></script>
-<script src="/shared/command/bladhaak.js?v=59d84768" defer></script>
-<script src="/shared/command/romp.js?v=59d84768" defer></script>
-<script src="/shared/command/geheugen.js?v=59d84768" defer></script>
+<script src="/shared/interface/workspace-experience.js?v=c1db8933" defer></script>
+<script src="/shared/interface/second-screen.js?v=c1db8933" defer></script>
+<script src="/shared/interface/second-screen-personal.js?v=c1db8933" defer></script>
+<script src="/shared/command/bank.js?v=c1db8933" defer></script>
+<script src="/shared/command/praat.js?v=c1db8933" defer></script>
+<script src="/shared/command/inlogpoort.js?v=c1db8933" defer></script>
+<script src="/shared/command/bladhaak.js?v=c1db8933" defer></script>
+<script src="/shared/command/romp.js?v=c1db8933" defer></script>
+<script src="/shared/command/geheugen.js?v=c1db8933" defer></script>
 <script src="/shared/edge/rahulzicht.js" defer></script>
 <script src="/shared/rahul-tab/helpers.js" defer></script>
-<script src="/shared/command/beginscherm.js?v=59d84768" defer></script>
-<script src="/shared/command/bladstand.js?v=59d84768" defer></script>
-<script src="/shared/command/werktafel.js?v=59d84768" defer></script>
-<script src="/shared/command.js?v=59d84768" defer></script>
-<!-- mediarecht voor inline scripts en kaders -->
+<script src="/shared/command/beginscherm.js?v=c1db8933" defer></script>
+<script src="/shared/command/bladstand.js?v=c1db8933" defer></script>
+<script src="/shared/command/werktafel.js?v=c1db8933" defer></script>
+<script src="/shared/command.js?v=c1db8933" defer></script>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/apps/access/portal.css" rel="stylesheet">
@@ -2197,20 +2196,9 @@ try {
 <script src="/shared/rtg-communication-surface.js" defer></script>
 <link href="/ds/tokens.css" rel="stylesheet">
 <link href="/ds/componenten/beleving.css" rel="stylesheet">
-<link href="/ds/componenten/focus.css" rel="stylesheet">
-<link href="/ds/componenten/melding.css" rel="stylesheet">
-<link href="/ds/componenten/verbinding.css" rel="stylesheet">
-<link href="/ds/componenten/dyncode.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
-<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
-<link href="/ds/componenten/paspoortscan.css" rel="stylesheet">
-<link href="/ds/componenten/pinherstel.css" rel="stylesheet">
-<link href="/ds/componenten/schermrust.css" rel="stylesheet">
-<link href="/ds/componenten/meelezen.css" rel="stylesheet">
-<link href="/ds/componenten/plaatsdienst.css" rel="stylesheet">
-<link href="/ds/componenten/magnaatproef.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -2319,7 +2307,7 @@ try {
         <button class="notif-push" id="notifPush" data-i18n="app.pushenable">Push aanzetten</button>
       </div>
       <div class="notif-list" id="notifList"></div>
-      <div class="ds-presentatie-notificatie-acties">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
         <button id="logoutBtn" class="s-ml86rw" data-i18n="app.logout">Uitloggen</button>
         <div class="privrij">
           <button id="privExport" class="privknop" data-i18n="app.priv.export">Download mijn gegevens</button>
@@ -2526,7 +2514,7 @@ try {
       <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="app.tab.tp">Ter plaatse</span></button>
       <button data-tab="zorg" id="tabZorg"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-6.5-4.4-9-9C1.5 8 3 4.5 6.5 4.5c2 0 3.2 1.2 4 2.4C11.3 5.7 12.5 4.5 14.5 4.5 18 4.5 19.5 8 18 11c-.6 1.1-1.5 2.2-2.5 3.2"/><path d="M14 15h5M16.5 12.5v5"/></svg><span data-i18n="app.tab.care">Zorgaanbod</span></button>
       <button data-tab="assets" id="tabAssets" class="h-weg"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M9.5 20v-4.5h5V20"/><path d="M12 8.5v.01"/></svg><span data-i18n="app.tab.assets">Assets</span></button>
-      <button data-tab="gezin" id="tabGezin" class="h-weg ds-presentatie-relatief"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-6-4.2-6-9a4 4 0 0 1 7.4-2A4 4 0 0 1 18 11c0 4.8-6 9-6 9z"/></svg><span>Gezin</span><span id="tabGezinDot" class="h-weg ds-presentatie-notificatiepunt"></span></button>
+      <button data-tab="gezin" id="tabGezin" style="display:none;position:relative;"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-6-4.2-6-9a4 4 0 0 1 7.4-2A4 4 0 0 1 18 11c0 4.8-6 9-6 9z"/></svg><span>Gezin</span><span id="tabGezinDot" style="display:none;position:absolute;top:4px;right:18px;width:8px;height:8px;border-radius:50%;background:var(--burgundy,#C23A5E);"></span></button>
     </div>
 
     <!-- RTG OS: de home-indicator. Geen dock en geen zoekpil meer: het
@@ -2639,12 +2627,27 @@ try {
                staan hier al; meldingen hoorden mee. Zonder deze tegel was er na
                het leegmaken van de balk geen enkele ingang meer naar wat er voor
                je klaarligt -- en dat merk je pas als je iets mist. -->
+          <button id="osCcPersonal"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/><path d="M18 4v4M16 6h4"/></svg></b><span data-i18n="personalos.settings.open">Mijn RTG</span></button>
           <button id="osCcBel"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></b><span data-i18n="app.notifs">Meldingen</span><i class="os-cc-tel" id="osCcBelTel" hidden></i></button>
           <button id="osCcUit"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.6 7a8 8 0 1 0 10.8 0"/></svg></b><span data-i18n="app.logout">Uitloggen</span></button>
         </div>
       </div>
     </div>
 
+  </div>
+
+  <div class="os-scrim" id="osPersonalScrim">
+    <div class="os-cc" role="dialog" aria-modal="true" aria-labelledby="osPersonalTitel">
+      <div class="os-cc-rij">
+        <span class="os-cc-label" id="osPersonalTitel" data-i18n="personalos.settings.title">Mijn RTG aanpassen</span>
+        <small class="os-aiwet" data-i18n="personalos.settings.authority_notice">Doelen veranderen alleen de indeling. Ze geven geen toegang en bepalen nooit uw rechten.</small>
+      </div>
+      <div class="os-cc-rij"><span class="os-cc-label" data-i18n="personalos.settings.goals">Doelen</span><div class="os-cc-knoppen" id="osPersonalGoals"></div></div>
+      <div class="os-cc-rij"><span class="os-cc-label" data-i18n="personalos.settings.layout">Weergave</span><div class="os-cc-knoppen" id="osPersonalLayouts"></div></div>
+      <div class="os-cc-rij"><span class="os-cc-label" data-i18n="personalos.settings.pinned">Vastgezet</span><div class="os-cc-tegels" id="osPersonalPins"></div></div>
+      <p class="os-aiwet" id="osPersonalStatus" role="status" aria-live="polite"></p>
+      <div class="os-cc-knoppen"><button type="button" id="osPersonalSave" data-i18n="personalos.settings.save">Bewaar mijn RTG</button><button type="button" id="osPersonalClose" data-i18n="personalos.settings.close">Sluiten</button></div>
+    </div>
   </div>
 
   <!-- betaaloverlay -->
@@ -2693,7 +2696,7 @@ try {
       <div><b data-i18n="zak.h">RTG Zakelijk</b><span data-i18n="zak.sub">Het professionele netwerk van de Lifestyle en Business Pass</span></div>
       <button class="ms-close" id="zakClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ds-presentatie-tabrij">
+    <div style="display:flex;gap:0.4rem;padding:0.6rem 1.1rem 0;">
       <button class="zak-tab active" data-zaktab="feed" data-i18n="zak.tab.feed">Feed</button>
       <button class="zak-tab" data-zaktab="netwerk" data-i18n="zak.tab.net">Netwerk</button>
       <button class="zak-tab" data-zaktab="kansen" data-i18n="zak.tab.kans">Kansen</button>
@@ -2748,8 +2751,8 @@ try {
       <div><b id="rideSup"></b><span data-i18n="ride.sub">Vaste nettoprijs, direct bevestigd</span></div>
       <button class="ms-close" id="rideClose" aria-label="Sluiten">✕</button>
     </div>
-    <div class="ds-presentatie-paneelkolom">
-      <div class="ds-presentatie-inline-gap">
+    <div class="ms-body" style="padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.7rem;">
+      <div style="display:flex;gap:0.6rem;">
         <label class="soft-sm-grow"><span data-i18n="ride.pax">Personen</span>
           <select id="ridePax" class="ms-note h-mt30"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
         </label>
@@ -2757,7 +2760,7 @@ try {
           <select id="rideBag" class="ms-note h-mt30"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
         </label>
       </div>
-      <div class="ds-presentatie-inline-gap">
+      <div style="display:flex;gap:0.6rem;">
         <label class="soft-sm-grow"><span data-i18n="ride.plan">Wanneer</span>
           <select id="ridePlan" class="ms-note h-mt30"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
         </label>
@@ -2842,7 +2845,7 @@ try {
     <div class="gc-inner">
       <div class="gc-sup" id="gcSup"></div>
       <div class="gc-code" id="gcCode"></div>
-      <div id="gcQr" class="h-weg ds-presentatie-qr"></div>
+      <div id="gcQr" style="background:#fff;padding:12px;border-radius:0;margin:0.9rem auto 0.4rem;display:none;"></div>
       <div class="gc-hint" data-i18n="app.gc.hint">Laat dit scherm zien bij het ophalen</div>
       <div class="gc-close" data-i18n="app.gc.close">Tik om te sluiten</div>
     </div>
@@ -2891,8 +2894,8 @@ try {
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=59d84768"></script>
-<script src="/apps/magnaat-data.js?v=59d84768"></script>
+<script src="/apps/magnaat-sandbox.js?v=c1db8933"></script>
+<script src="/apps/magnaat-data.js?v=c1db8933"></script>
 <script src="/apps/access/meaning.js"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>
@@ -3142,6 +3145,27 @@ window.I18N = { en: {
   'access.portal.privacy':'Privacy',
   'access.portal.help':'Help',
   'access.portal.language_notice':'Some confirmation text is shown in English. Your actions and permissions stay the same.',
+  'access.portal.progress_total':'Step {step} of {total}',
+  'personalos.onboarding.goals.title':'What would you like to achieve first?',
+  'personalos.onboarding.goals.text':'Choose one or more goals. This only determines the layout of your RTG, never your rights or access.',
+  'personalos.onboarding.layout.title':'How would you like to use RTG?',
+  'personalos.onboarding.layout.text':'Choose a simple, balanced or advanced view and immediately preview the public layout.',
+  'personalos.onboarding.review':'Your RTG: {goals} · {layout}',
+  'personalos.onboarding.goals.required':'Choose at least one goal. You can always change this later.',
+  'personalos.onboarding.preview.loading':'Your personal RTG preview is being prepared.',
+  'personalos.onboarding.preview.ready':'Your RTG starts with: {worlds}.',
+  'personalos.onboarding.preview.unavailable':'The preview is currently unavailable. Your account details remain here.',
+  'personalos.goal.dagelijks_leven':'Daily life',
+  'personalos.goal.reizen':'Travel',
+  'personalos.goal.talent_ontwikkelen':'Develop talent',
+  'personalos.goal.ondernemen':'Entrepreneurship',
+  'personalos.goal.werken_en_leren':'Work and learn',
+  'personalos.goal.ondersteuning':'Support',
+  'personalos.goal.bijdragen':'Contribute',
+  'personalos.layout.simple':'Simple',
+  'personalos.layout.balanced':'Balanced',
+  'personalos.layout.advanced':'Advanced',
+  'personalos.choice.selected_suffix':' · selected',
   'access.onb.sourceNotice':'The agreement below is the Dutch source text. Please confirm only if you understand it.',
   'access.onb.languageNotice':'This agreement is in Dutch. The confirmation is available in Dutch and English. Choose one of these languages with the Language button.',
   'access.onb.brand':'COMPLETE YOUR ACCOUNT',

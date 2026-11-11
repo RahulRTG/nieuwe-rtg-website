@@ -2115,17 +2115,12 @@ const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
   anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, leesCollectie, economischeBoekingEenmaal, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen: rondEuro, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
+  functieStand: () => (db.data && db.data.techniek && db.data.techniek.functies) || {},
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,
-  /* pasTegoedToe EN herstelTegoed horen als PAAR mee. Alleen de eerste stond
-     hier, en dat viel niet op omdat de tweede alleen wordt geroepen als een
-     betaling MISLUKT of een HERHALING is -- kern/lidacties/afrekenen.js geeft
-     het verrekende puntentegoed dan terug. Bij een dubbele betaling op
-     dezelfde bestelling (twee tikken, een race) viel de server daardoor met
-     "herstelTegoed is not a function": het lid kreeg een 500 waar een nette
-     409 hoorde, en het tegoed bleef verrekend. Nooit de ene helft van dit
-     paar doorgeven zonder de andere. */
+  /* Tegoed toepassen en herstellen reizen als paar: bij een mislukte of
+     herhaalde betaling moet het al verrekende tegoed terug. */
   ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, afhaalcode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sessieregister, sendPush, sendPushToUser, sociaal, sseToCustomer,
   sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zetServiceOverdracht, zorgContact, zegel,

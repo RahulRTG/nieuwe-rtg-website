@@ -109,8 +109,13 @@ function maakOchtendkaart({ db, scheduleFor, klokVan, inplanbaar, vrij, vandaag 
   }
 
   function kaart(code, staffId) {
-    const dag = dagVan();
     const week = scheduleFor(code);
+    /* Het rooster bepaalt de kalender van de zaak. Rond lokale middernacht kan
+       die al een dag verder zijn dan UTC; met de UTC-terugval zocht de kaart
+       dan in een andere dag dan scheduleFor() net had opgebouwd en verdween
+       zelfs de eigen naam. Een expliciet aangereikte toetsklok blijft leidend;
+       productie leest dezelfde eerste dag als het rooster. */
+    const dag = vandaag ? dagVan() : (((week.days || [])[0] || {}).date || dagVan());
     const d0 = (week.days || []).find(d => d.date === dag) || { date: dag, staff: [] };
     const sup = (db.data.suppliers || []).find(s => s.code === code);
     const rooster = {

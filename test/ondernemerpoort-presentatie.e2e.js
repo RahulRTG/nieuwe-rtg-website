@@ -41,6 +41,8 @@ test('ondernemer-poort opent en sluit beheerst in een echte mobiele browser', { 
 
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('.poort-waas').getAttribute('hidden'), '');
+    assert.equal(await page.locator('.poort-waas').evaluate(el => getComputedStyle(el).display), 'none',
+      'een gesloten poort vormt fysiek geen laag meer boven het kantoor');
     assert.equal(await page.evaluate(() => document.activeElement && document.activeElement.id), 'voor');
   } finally {
     if (browser) await browser.close();

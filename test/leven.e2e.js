@@ -11,7 +11,7 @@
    Draait alleen waar een browser beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stopNet, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stopNet, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeBediening } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -113,14 +113,10 @@ test('RTG Leven opent op de levenslijn uit de cockpit, toont echte zaken en laat
        neemt hij hun knoppen over -- maar alleen van een balk die hij kent. De
        bank van Leven stond daar niet bij, dus Bestellen, Uitgaan, Verblijf,
        Mijn plannen en Instellingen waren voor een lid onbereikbaar. Daarom
-       wordt hier gewisseld zoals een mens het doet: de contextbediening van
-       de Edge openen, en dan de zichtbare knop kiezen.
+       wordt hier gewisseld zoals een mens het doet: Acties, en dan de knop.
        Mutatie gezien: `data-rtg-edge-controls` van de bank gehaald -- de klik
        op "Ontdekken" in het Edge-blad vindt niets. */
-    const kies = async (naam) => {
-      await edgeActies(page);
-      await page.locator('.rtg-adaptive-controls button', { hasText: naam }).first().click({ timeout: 8000 });
-    };
+    const kies = (naam) => edgeBediening(page, naam);
     await kies('Ontdekken');
     await page.waitForSelector('.lv-ontdek [data-restaurants] h2', { timeout: 15000 });
     const lees = async (pad) => (await fetch(base + pad, {

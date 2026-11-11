@@ -3,16 +3,16 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-29T12:35:07.807Z",
-  "commit": "a45aec5603",
+  "op": "2026-11-10T20:13:40.124Z",
+  "commit": "0c97e3f7e",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v26.12.1"
+  "node": "v24.18.0"
  },
  "gemeten": {
-  "artefacten": 397,
-  "bron": 57,
+  "artefacten": 399,
+  "bron": 59,
   "afgeleid": 209,
   "fragmenten": 28,
   "momentopname": 1,
@@ -223,15 +223,16 @@
    "naam": "APPWERKT.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/appwerkt.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
+    "scripts/appwerkt-samenstellen.js",
     "scripts/appwerkt.js"
    ],
    "stempelInstrument": "scripts/appwerkt.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run appwerkt",
    "grendelt": true,
-   "botsingVerklaard": null
+   "botsingVerklaard": true
   },
   {
    "naam": "ARBEID.md",
@@ -643,6 +644,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/carrierevorm.js --vastleggen",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CIVILIS-UITVOERING.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -3427,6 +3440,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run paktebetekenis:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "PERSONALOS.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {

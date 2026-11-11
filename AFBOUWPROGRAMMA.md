@@ -6109,3 +6109,49 @@ als volledige vrijgave gekwalificeerd**; inventaris en afleiding zijn wel exact
 `6e163dde1712e90e2df54c10d34475ed5d302839`. Eerstvolgende blokkade: **de
 samenhangende herstelcommit publiceren en alle verplichte GitHub-jobs volledig
 laten uitlopen**. Deep Green: **GEBLOKKEERD**.
+
+### Integratie van actuele main — herstelronde 16
+
+De herstelbron `21efd9d2110449e546a343cf659b59914d36ad34` is lokaal
+samengevoegd met de actuele `main`-bron
+`abd1eafdccd6865631d634d5899676c1c1e7fa68`. Daarmee zijn de inmiddels op
+main geïntegreerde PersonalOS-, CIVILIS- en bewijswijzigingen onderdeel van
+dezelfde toekomstige kandidaat. Er is geen functionaliteit toegevoegd vanuit
+deze herstelronde; de ronde sluit uitsluitend integratie- en bewijsafwijkingen.
+
+De integratie maakte twee gedeelde presentatieoorzaken zichtbaar. Ten eerste
+had `app.html` de legacy-stijlratel met 17 bytes verruimd voor een themaknop
+waarvan de enige laadbron niet meer bestaat. De dode laadbron en selector zijn
+verwijderd; de lagere ratel blijft ongewijzigd. De Design System-controle sluit
+daarna met **0 schendingen**, **87 gemigreerde schermen** en **13
+ratchetverbeteringen**. Ten tweede kon de centrale cookie-owner bij een
+tekstmaatwijziging zijn eigen meetlus veroorzaken, omdat de reservering en de
+tekstmaat hetzelfde `style`-attribuut wijzigen. De owner reageert nu uitsluitend
+op een werkelijk veranderde tekstmaat. De cookieproef sluit tweemaal
+achtereen **3/3** groen, inclusief de 404-host, 200% tekst en 320/390/820px.
+
+Alle geraakte build-, taal-, websitebeeld-, bundel- en Experience-afleidingen
+zijn via hun bestaande producent vernieuwd. De taalproef sluit **27/27** groen,
+de Experience-inventaris is exact **114 apps en 316 schermen**, de volledige
+statische controle sluit groen en de samengevoegde gerichte integratiebatch
+sluit in een enkele run **100/100** groen, zonder failure of skip. Dit bewijst
+de lokale integratie en haar gerichte regressies; het is geen vervanging voor
+de volledige GitHub-CI of de nog openstaande product- en operationele
+kwalificatie.
+
+**Meetstand herstelronde 16.** Releaseblokkerende bronoorzaken: **0 lokaal
+bekend; volledige GitHub-CI op de mergecommit vereist**. Bewezen afgesloten
+sinds de vorige ronde: **2 integratieoorzaken**. Nieuwe regressies: **0 in de
+definitieve batch van 100 gerichte controles en de volledige statische poort**.
+Nog niet uitgevoerde verplichte controles: **volledige GitHub-CI,
+APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief menselijke proeven,
+security/finance/load, staging/back-up/herstel/rollback/incidentrespons en twee
+onafhankelijke eindruns**. APPWERKT: **0/114 actueel geldig; 912 bewijzen zijn
+terecht verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden
+als volledige vrijgave gekwalificeerd**; inventaris en afleiding zijn exact
+114/114 en 316/316. Actuele bron vóór de nog te maken mergecommit:
+`21efd9d2110449e546a343cf659b59914d36ad34` met
+`abd1eafdccd6865631d634d5899676c1c1e7fa68`. Eerstvolgende blokkade: **de
+mergecommit vastleggen, publiceren en alle verplichte GitHub-jobs zonder
+verdere bronwijziging volledig laten uitlopen**. Deep Green:
+**GEBLOKKEERD**.

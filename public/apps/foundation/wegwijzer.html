@@ -233,7 +233,8 @@
     $('#fout2').textContent = ''; $('#standuit').textContent = '';
     api('stand', { code: $('#mijncode').value }).then(function (r) {
       if (!r.ok) { $('#fout2').textContent = r.d.error || 'Er ging iets mis.'; return; }
-      $('#standuit').innerHTML = '<b>' + esc(r.d.uitleg) + '</b><br>' + esc(r.d.nietsKlaar || '');
+      var route = r.d.route ? '<br><br><b>Uw route</b><br>' + esc(r.d.route.uitleg || '') : '';
+      $('#standuit').innerHTML = '<b>' + esc(r.d.uitleg) + '</b>' + route + '<br><br>' + esc(r.d.nietsKlaar || '');
     });
   });
 

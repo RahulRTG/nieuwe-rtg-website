@@ -1,6 +1,6 @@
 # Rahul Travel Group — projectregels voor elke agent
 
-Dit bestand is de ene bron voor elke agent die in deze repository werkt: Codex leest het rechtstreeks, Claude Code via `CLAUDE.md`. Wat hier staat geldt voor allebei.
+Dit is de ene bron voor alle agents: Codex leest hem rechtstreeks en Claude Code via `CLAUDE.md`.
 
 ## Wat dit project is
 
@@ -10,7 +10,7 @@ Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een members
 
 ## Documenten
 
-Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; dat bestand laadt niet vanzelf. Lees de kaart en daarna het document zelf vóór je aan het onderwerp werkt. Hieronder staat alleen de kop van elke samenvatting.
+Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt. Lees vóór inhoudelijk werk de kaart en het document zelf.
 
 - `PLATFORM.md` bevat de super-app-regel
 - `SCHERMEIGENAAR.json` zegt per zichtbare functie wie de eigenaar is
@@ -70,6 +70,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `WERELD.md` beschrijft het beginscherm
 - `WERELDEN.md` is de kaart
 - `ADAPTIEF.md` is de adaptieve interactielaag
+- `PERSONALOS.md` is de persoonlijke compositielaag boven catalogus, Authority, Experience en Mijn RTG
 - `GRAMMATICA.md` is de RTG Mobile Interaction Grammar
 - `EDGE.md` is RTG Edge 3.0
 - `WERKRUIMTE.md` is het desktopparadigma
@@ -91,7 +92,8 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen
 - `CONSOLIDATIE.md` is het opruimbesluit van de eigenaar; lees het vóór elke PR
 - `AFBOUWPROGRAMMA.md` is het eigenaarsbesluit van 11 oktober 2026, en het is leidend
-- `CIVILIS.md` breidt uit
+- `CIVILIS.md` breidt RTG maatschappelijk uit
+- `CIVILIS-UITVOERING.md` is de traceerbare ketenarchitectuur en uitvoeringsaudit
 
 ## Structuur en starten (kort)
 

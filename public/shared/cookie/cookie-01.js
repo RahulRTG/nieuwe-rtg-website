@@ -42,7 +42,8 @@
 
   var RUIMTE = '--rtg-cookieruimte';
   var BODEM = '--ds-cookie-bodem';
-  var maatkijker, tekstmaatkijker, tekstmaatBezig = false;
+  var maatkijker, tekstmaatkijker;
+  var laatsteTekstmaat = document.documentElement.style.fontSize;
   function meetRuimte() {
     if (ds || !el.isConnected) return;
     var h = Math.ceil(el.getBoundingClientRect().height) + 12;

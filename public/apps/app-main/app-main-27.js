@@ -6,7 +6,7 @@
   if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
 
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osPersonalScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
     .map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));

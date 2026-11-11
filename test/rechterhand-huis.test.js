@@ -45,12 +45,9 @@ const raw = (pad, body, token) => fetch(base + '/api/' + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const rh = (pad, body) => raw('member/rechterhand/' + pad, body, lid);
 
-/* De Rechterhand rekent in de lokale kalender van de server. Een UTC-datum
-   schuift in het uur rond middernacht al naar morgen en maakt negen dagen
-   daardoor acht. Werk op het lokale middaguur, ook over een DST-grens. */
-const dag = (n) => {
-  return tijdzone.plusDagen(tijdzone.datumIn(), n);
-};
+/* De Rechterhand rekent op de huiskalender. Die is op een UTC-CI-runner rond
+   Amsterdamse middernacht al een dag verder, dus lees hetzelfde contract. */
+const dag = (n) => tijdzone.plusDagen(tijdzone.datumIn(), n);
 const dagmaand = (n) => dag(n).slice(5);
 
 test.before(async () => {

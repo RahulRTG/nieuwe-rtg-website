@@ -1,10 +1,10 @@
 {
   "grens": "Telt alleen benoemde catalogi (een hoofdletterconstante met een gesloten verzameling ids) onder server/; een begrip dat anders wordt vastgelegd ziet hij niet. Een naam in twee domeinen met weinig gedeelde leden is een KANDIDAAT-botsing, geen bewezen misverstand: of het hetzelfde ding hoort te zijn, beslist een mens.",
-  "catalogi": 1235,
-  "verschillendeNamen": 754,
-  "namenInMeerDomeinen": 134,
-  "woordenMetMeerBetekenissen": 116,
-  "betekenissenTotaal": 434,
+  "catalogi": 1242,
+  "verschillendeNamen": 756,
+  "namenInMeerDomeinen": 136,
+  "woordenMetMeerBetekenissen": 118,
+  "betekenissenTotaal": 441,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -398,7 +398,7 @@
       "betekenissenVanDitWoord": 1,
       "waar": [
         "server/ai-budget-beleid.js",
-        "server/kern/aanmeldingen.js",
+        "server/kern/aanmeldingen/catalogus.js",
         "server/kern/paseis.js",
         "server/kern/pasgeschiedenis.js",
         "server/kern/passen.js"
@@ -3166,6 +3166,144 @@
       ]
     },
     {
+      "naam": "DOMEINEN",
+      "domeinen": 5,
+      "betekenissen": 5,
+      "hoogsteOverlap": 0.09,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/delegatie.js"
+          ],
+          "leden": 14,
+          "voorbeeld": [
+            "huishouden",
+            "vervoer",
+            "kring",
+            "reizen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/civilis/contract.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "veiligheid_en_crisis",
+            "wonen",
+            "inkomen",
+            "schulden_en_geld"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "lifestyle",
+            "rechterhand",
+            "bureau",
+            "levensgraaf"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-adres.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "personeel",
+            "kantoor",
+            "rtf",
+            "rtg"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stad/domeinen.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "verkeer",
+            "licht",
+            "lucht",
+            "geluid"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "FASES",
+      "domeinen": 5,
+      "betekenissen": 5,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/functies/register/fases.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "start",
+            "ontmoeten",
+            "partners",
+            "bestellen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/civilis/contract.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "toegang",
+            "veiligheid",
+            "begrijpen",
+            "plan_en_regie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/hospitality-universe/world-model.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "discovery",
+            "onboarding",
+            "planning",
+            "arrival"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/office/basis.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "concept",
+            "beoordeling",
+            "goedgekeurd",
+            "archief"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rahul-fases.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "kind",
+            "scholier",
+            "student",
+            "volwassen"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "STANDAARD",
       "domeinen": 5,
       "betekenissen": 5,
@@ -3586,120 +3724,6 @@
       ]
     },
     {
-      "naam": "DOMEINEN",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0.09,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/bureau/delegatie.js"
-          ],
-          "leden": 14,
-          "voorbeeld": [
-            "huishouden",
-            "vervoer",
-            "kring",
-            "reizen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/levensdossier/velden.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "lifestyle",
-            "rechterhand",
-            "bureau",
-            "levensgraaf"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-adres.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "personeel",
-            "kantoor",
-            "rtf",
-            "rtg"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stad/domeinen.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "verkeer",
-            "licht",
-            "lucht",
-            "geluid"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "FASES",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/functies/register/fases.js"
-          ],
-          "leden": 7,
-          "voorbeeld": [
-            "start",
-            "ontmoeten",
-            "partners",
-            "bestellen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/hospitality-universe/world-model.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "discovery",
-            "onboarding",
-            "planning",
-            "arrival"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/office/basis.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "concept",
-            "beoordeling",
-            "goedgekeurd",
-            "archief"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rahul-fases.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "kind",
-            "scholier",
-            "student",
-            "volwassen"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "GRONDEN",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3757,5 +3781,5 @@
       ]
     }
   ],
-  "bestanden": 4618
+  "bestanden": 4646
 }

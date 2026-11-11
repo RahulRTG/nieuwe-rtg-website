@@ -1285,6 +1285,11 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/cv/get` / `POST /api/cv/save` | Het RTG-cv van het lid (de cv-builder in de leden-app) |
 | `POST /api/member/apply` `{supplierCode, func}` | Solliciteren bij een partner; kan pas met een afgerond cv |
 | `POST /api/supplier/apply` `{code, name, func, contact}` | Open sollicitatie via het startscherm van een partner-app |
+| `POST /api/personalos/contract` | Openbare doelen en layouts voor progressieve onboarding |
+| `POST /api/personalos/preview` | Openbare persoonlijke preview, zonder bevoegdheidsclaim |
+| `POST /api/personalos/preferences` | Opgeslagen PersonalOS-voorkeuren van het eigen account |
+| `POST /api/personalos/complete` | Voorkeuren idempotent voltooien of wijzigen |
+| `POST /api/personalos/composition` | Actuele sessiegebonden, door Authority begrensde werktafel |
 
 ### Waar de omzet vandaan komt, en tegen welk tarief
 

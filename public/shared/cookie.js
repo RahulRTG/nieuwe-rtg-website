@@ -42,7 +42,8 @@
 
   var RUIMTE = '--rtg-cookieruimte';
   var BODEM = '--ds-cookie-bodem';
-  var maatkijker, tekstmaatkijker, tekstmaatBezig = false;
+  var maatkijker, tekstmaatkijker;
+  var laatsteTekstmaat = document.documentElement.style.fontSize;
   function meetRuimte() {
     if (ds || !el.isConnected) return;
     var h = Math.ceil(el.getBoundingClientRect().height) + 12;
@@ -114,15 +115,13 @@
        moeten de gereserveerde ruimte onmiddellijk en idempotent vernieuwen. */
     if (window.MutationObserver) {
       tekstmaatkijker = new window.MutationObserver(function () {
-        if (tekstmaatBezig || !el.isConnected) return;
-        tekstmaatBezig = true;
-        /* Maak de oude reservering meteen ongeldig. Na de volgende layoutframe
-           wordt uitsluitend de actuele, vergrote maat gepubliceerd. */
-        document.documentElement.style.removeProperty(RUIMTE);
-        window.requestAnimationFrame(function () {
-          meetRuimte();
-          window.setTimeout(function () { tekstmaatBezig = false; }, 0);
-        });
+        if (!el.isConnected) return;
+        var tekstmaat = document.documentElement.style.fontSize;
+        /* De reservering zelf staat ook in het style-attribuut. Reageer alleen
+           op de tekstmaat, anders veroorzaakt de owner zijn eigen meetlus. */
+        if (tekstmaat === laatsteTekstmaat) return;
+        laatsteTekstmaat = tekstmaat;
+        window.requestAnimationFrame(meetRuimte);
       });
       tekstmaatkijker.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
     }

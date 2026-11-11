@@ -126,7 +126,16 @@
   $('#kaartenKnop').addEventListener('click', kaartenOpen);
   $('#poortKaarten').addEventListener('click', kaartenOpen);
   $('#kaartenSluit').addEventListener('click', kaartenDicht);
-  paneel.addEventListener('close', kaartenDicht);
+  /* `dialog.close()` plant zelf ook een `close`-event. Een mens kan de laag al
+     opnieuw openen voordat dat event wordt bezorgd. De oude handler riep dan
+     kaartenDicht() nogmaals aan en sloot daarmee de NIEUWE opening. Het event
+     mag alleen de attributen van de inmiddels gesloten dialoog gelijkzetten;
+     het mag geen tweede sluitopdracht geven. */
+  paneel.addEventListener('close', () => {
+    if (paneel.open) return;
+    paneel.classList.remove('zien');
+    $('#kaartenKnop').setAttribute('aria-expanded', 'false');
+  });
   $('#kaartenFilter').addEventListener('input', kaartenTeken);
 
   /* DE TOESTELKNOP. Manifest vragen, delen halen, elk deel tegen zijn

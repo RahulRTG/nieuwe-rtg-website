@@ -16,6 +16,7 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 function morgen() {
+  // Meet dezelfde huiskalender als de agenda-parser, ook op een UTC-runner.
   return tijdzone.plusDagen(tijdzone.datumIn(), 1);
 }
 

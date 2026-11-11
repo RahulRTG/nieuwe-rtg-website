@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-11-06T22:39:21.821Z",
-  "commit": "f9487f1cc6",
+  "op": "2026-11-10T18:45:17.913Z",
+  "commit": "fb2743bdb",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v26.12.1"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 651,
+  "zonderBewakerslaag": 653,
   "bewaakt": 565,
-  "openbaarMetReden": 43,
+  "openbaarMetReden": 45,
   "eigenControle": 26,
   "sleutelDoorgegeven": 10,
   "zonderWachtMetReden": 7,
@@ -3313,6 +3313,18 @@
    "bestand": "server/routes/kantoren/geld.js:22",
    "staat": "openbaar",
    "reden": "de prijslijst is publieke informatie"
+  },
+  {
+   "sleutel": "POST /api/personalos/contract",
+   "bestand": "server/routes/personalos.js:18",
+   "staat": "openbaar",
+   "reden": "de openbare onboarding moet geldige doelen en layouts kunnen tonen voordat er een account bestaat; bevat alleen vaste contractmetadata"
+  },
+  {
+   "sleutel": "POST /api/personalos/preview",
+   "bestand": "server/routes/personalos.js:19",
+   "staat": "openbaar",
+   "reden": "de progressieve kennismaking componeert uitsluitend openbare catalogusmetadata voor registratie, is per bron geremd en antwoordt expliciet authorizationClaim=false"
   },
   {
    "sleutel": "POST /api/pin/herstel",

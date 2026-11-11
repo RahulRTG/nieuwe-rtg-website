@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-11-06",
-    "commit": "77e9d234d9"
+    "op": "2026-11-10",
+    "commit": "ad0aae9c3"
   },
   "bronnen": {
     "schermroutes": {
@@ -2784,7 +2784,7 @@
         "/api/zorgprofiel"
       ],
       "zonderServer": false,
-      "inkomend": 210,
+      "inkomend": 211,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",

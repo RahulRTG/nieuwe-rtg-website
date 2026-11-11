@@ -129,7 +129,7 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
     assert.equal(kop.status, 200, 'de personeelsrol hangt aan het ene account');
 
     // de werkgever sluit vandaag de werkomgeving
-    const vandaag = tijdzone.weekdagIn();
+    const vandaag = tijdzone.huis().dag;
     const zet = await api(base, '/api/supplier/werkvenster', { dagen: { [vandaag]: { dicht: true } }, aan: true }, mtok);
     assert.equal(zet.status, 200);
     assert.equal(zet.body.werkvenster.aan, true);

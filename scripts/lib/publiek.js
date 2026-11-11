@@ -168,6 +168,8 @@ const PUBLIEK = new Map([
   ['/api/rtfos/publiek/jaarverslagen', 'eigenaarsbesluit 19 oktober 2026, uitzondering 7: de wettelijke ANBI-publicatieplicht; een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers, en niets ernaast'],
 
   // ---- publieke informatie: staat ook gewoon op de site ----
+  ['/api/personalos/contract', 'de openbare onboarding moet geldige doelen en layouts kunnen tonen voordat er een account bestaat; bevat alleen vaste contractmetadata'],
+  ['/api/personalos/preview', 'de progressieve kennismaking componeert uitsluitend openbare catalogusmetadata voor registratie, is per bron geremd en antwoordt expliciet authorizationClaim=false'],
   ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
   /* DE DRIE COMMERCIELE FEITEN. Ze staan hier om dezelfde reden als
      /api/pasprijzen erboven, en ze zijn de reparatie van het gat dat dit hele

@@ -1617,8 +1617,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->134<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->116<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->434<!--/getal-->
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->136<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->118<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->441<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2870,3 +2870,26 @@ bewezen, falend* is een leestabel op bestaande standen), en elke nieuwe keten
 krijgt een proef met schakels en storingen. De eerste staat: `voorraad-ontvangst`
 (`scripts/voorraadproef.js`), een restaurant dat inkoopt bij een groothandel. Die
 vond meteen een stil defect: geleverd zonder dat er iets in de keuken landde.
+
+**`CIVILIS-UITVOERING.md` is de maatschappelijke uitvoeringsbijlage van 10
+november 2026** — tien herhaalbare fasen, twaalf domeinen, zes gedeelde lagen en
+vijftien motorverantwoordelijkheden, met repository-audit, capability-matrix,
+afhankelijkheidsgraaf, ketencontract, juridische beslispunten, bouwvolgorde,
+bewijsregister en testmatrix. Het is geen tweede completion-register:
+`APPWERKT.json` en de bestaande ketenproeven blijven beslissend. De eerste
+verticale keten is geen veilige slaapplek; de software voor capaciteit,
+aanbiederacceptatie, aankomst en vervolg is geïmplementeerd en gesimuleerd,
+maar nog niet extern geaccepteerd of operationeel bewezen. Het gedeelde
+contract is alleen een envelop en woordenlijst; domeinen behouden hun eigen
+bevoegdheden en toestandmachines.
+
+**`PERSONALOS.md` is de persoonlijke compositielaag** — niet een vijfde wereld,
+nieuwe app of tweede autorisatiemotor, maar de deterministische laag die de
+bestaande catalogus, actuele Authority-uitkomst, vrijwillige doelen,
+accountvoorkeuren en toegankelijkheid tot één versiebeheerbare werktafel
+samenstelt. Lees dit vóór je onboarding, persoonlijke navigatie, appaanbevelingen
+of contextwisseling bouwt. De harde grens: Authority bepaalt wat mag,
+PersonalOS ordent alleen wat daarbinnen relevant is, de gebruiker kan altijd
+zelf vastzetten en Heel RTG blijft volledig bereikbaar. Het document bevat ook
+de repository-audit, werkelijk geïmplementeerde API-contracten, dreigingsmodel,
+lokale prestatiemeting, migratie/rollback en het actuele NO-GO.

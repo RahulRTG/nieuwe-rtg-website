@@ -433,10 +433,20 @@ function poortenVanDoc(ws) {
     const stappen = Array.isArray(job.steps) ? job.steps : [];
     // Een latere download kan geen invoer van een eerdere stap zijn.
     let artefact = false;
+    /* Een action kan ook BINNEN dezelfde job een bestand of map voor een
+       volgende shellstap maken. Dat is geen download-artifact, maar lokaal
+       bestaat die uitvoer evenmin. We onthouden alleen expliciet benoemde
+       `with.output`-paden en koppelen ze pas wanneer de opdracht het pad echt
+       gebruikt; een willekeurige action maakt latere, onafhankelijke poorten
+       dus niet onnodig onbereikbaar. */
+    const actieUitvoer = new Set();
     const browser = stappen.some(s => s && typeof s.run === 'string' &&
       /browserinstall\.js|playwright\s+install/.test(s.run));
     for (const stap of stappen) {
       if (stap && typeof stap.uses === 'string' && /download-artifact/.test(stap.uses)) artefact = true;
+      if (stap && typeof stap.uses === 'string' && stap.with && typeof stap.with === 'object' &&
+          typeof stap.with.output === 'string' && stap.with.output && !/\$\{\{/.test(stap.with.output))
+        actieUitvoer.add(stap.with.output);
       if (!stap || typeof stap.run !== 'string') continue;
       for (const { opdracht, informatief } of opdrachtenUit(stap.run)) {
         const soort = soortVan(opdracht);
@@ -447,15 +457,22 @@ function poortenVanDoc(ws) {
           stap: typeof stap.name === 'string' ? stap.name : '(zonder naam)',
           regel: stap.__regel || 0,
           opdracht, soort, doel, opgelost: opgelost || opdracht, samengesteld: !!samengesteld,
-          informatief: !!informatief, env: stap.env && typeof stap.env === 'object' ? stap.env : {}
+          informatief: !!informatief, env: stap.env && typeof stap.env === 'object' ? stap.env : {},
+          voorwaarde: typeof stap.if === 'string' ? stap.if : ''
         };
         if (soort === 'toets' && GEEN_POORT.includes(doel)) gat.soort = 'inrichting';
         gat.voorzieningen = gat.soort === 'toets' ? voorzieningen(gat, browser) : [];
         gat.artefact = artefact;
-        gat.ketenwaarde = KETENWAARDE.test(opdracht);
+        gat.actieUitvoer = [...actieUitvoer].find(pad => String(opdracht).includes(pad)) || null;
+        const envWaarden = Object.values(gat.env);
+        gat.geheim = envWaarden.some(v => typeof v === 'string' && /\$\{\{\s*secrets\./.test(v));
+        /* De lokale ronde meet juist ook poorten die GitHub conditioneel
+           kiest. Alleen hun ONOPGELOSTE invoer maakt de handeling anders; de
+           `if`-expressie zelf is geen reden om een zelfstandig draaibare poort
+           weg te laten. */
+        gat.ketenwaarde = KETENWAARDE.test(opdracht) ||
+          envWaarden.some(v => typeof v === 'string' && /\$\{\{/.test(v) && !/\$\{\{\s*secrets\./.test(v));
         gat.verdeeld = alleenVerdeeld(opdracht);
-        gat.geheim = gat.ketenwaarde ? false :
-          Object.values(gat.env).some(v => typeof v === 'string' && /\$\{\{\s*secrets\./.test(v));
         uit.push(gat);
       }
     }
@@ -479,6 +496,9 @@ function oordeel(gat) {
     return { lokaal: false, soortReden: 'doel-weg', reden: 'het doel ' + gat.doel + ' staat niet in deze werkboom' };
   if (gat.artefact)
     return { lokaal: false, soortReden: 'artefact', reden: 'deze stap volgt op het ophalen van een artefact uit een andere job' };
+  if (gat.actieUitvoer)
+    return { lokaal: false, soortReden: 'actie-uitvoer',
+      reden: 'de opdracht gebruikt ' + gat.actieUitvoer + ', uitvoer van een voorafgaande GitHub-action die hier niet is uitgevoerd' };
   if (gat.geheim)
     return { lokaal: false, soortReden: 'geheim', reden: 'de stap krijgt een geheim uit de keten mee' };
   if (gat.ketenwaarde)

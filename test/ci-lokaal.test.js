@@ -31,6 +31,44 @@ test('artifact dependency starts after download and never leaks into another job
   assert.equal(W.oordeel(gates[2]).lokaal, true);
 });
 
+test('onopgeloste stapcontext draait lokaal niet met een verzonnen lege waarde', () => {
+  const gates = W.poortenVan('fixture.yml', [
+    'on:', '  workflow_dispatch:', 'jobs:', '  bewijs:', '    steps:',
+    '      - name: Alleen handmatig binden',
+    "        if: github.event_name == 'workflow_dispatch'",
+    '        env:', '          RTG_EXPECTED_COMMIT: ${{ inputs.verwachte_commit }}',
+    '        run: node scripts/evidence-control.js bind-source'
+  ].join('\n')).filter(g => g.soort === 'toets');
+  assert.equal(gates.length, 1);
+  assert.equal(gates[0].voorwaarde, "github.event_name == 'workflow_dispatch'");
+  assert.equal(W.oordeel(gates[0]).soortReden, 'ketenwaarde');
+  assert.deepEqual(W.stapOmgeving(gates[0]), {});
+});
+
+test('een geheim blijft een geheim en wordt niet als gewone ketenwaarde afgezwakt', () => {
+  const gate = W.poortenVan('fixture.yml', [
+    'on:', '  pull_request:', 'jobs:', '  bewijs:', '    steps:',
+    '      - env:', '          TOKEN: ${{ secrets.DEPLOY_TOKEN }}',
+    '        run: node scripts/check.js'
+  ].join('\n')).find(g => g.soort === 'toets');
+  assert.equal(gate.geheim, true);
+  assert.equal(W.oordeel(gate).soortReden, 'geheim');
+});
+
+test('uitvoer van een voorafgaande action is geen lokaal bestaand bewijsstuk', () => {
+  const gates = W.poortenVan('fixture.yml', [
+    'on:', '  pull_request:', 'jobs:', '  analyse:', '    steps:',
+    '      - uses: voorbeeld/analyse@vast',
+    '        with:', '          output: analyse-resultaten',
+    '      - run: node scripts/check.js --dir=analyse-resultaten',
+    '      - run: node scripts/document-fitness.js'
+  ].join('\n')).filter(g => g.soort === 'toets');
+  assert.equal(gates[0].actieUitvoer, 'analyse-resultaten');
+  assert.equal(W.oordeel(gates[0]).soortReden, 'actie-uitvoer');
+  assert.equal(gates[1].actieUitvoer, null);
+  assert.equal(W.oordeel(gates[1]).lokaal, true);
+});
+
 test('de ontleder leest een werkstroom: jobs, stappen, blokschalen en regelnummers', () => {
   const doc = W.ontleed([
     'name: Proef',
@@ -135,6 +173,7 @@ test('een poort die hier niet kan draaien, draagt altijd de reden', () => {
     artefact: false, geheim: false, ketenwaarde: false };
   assert.equal(W.oordeel(grond).lokaal, true);
   assert.equal(W.oordeel({ ...grond, artefact: true }).soortReden, 'artefact');
+  assert.equal(W.oordeel({ ...grond, actieUitvoer: 'analyse-resultaten' }).soortReden, 'actie-uitvoer');
   assert.equal(W.oordeel({ ...grond, geheim: true }).soortReden, 'geheim');
   assert.equal(W.oordeel({ ...grond, ketenwaarde: true }).soortReden, 'ketenwaarde');
   assert.equal(W.oordeel({ ...grond, opdracht: 'node scripts/toetsduur.js $gevonden' }).soortReden, 'variabele');

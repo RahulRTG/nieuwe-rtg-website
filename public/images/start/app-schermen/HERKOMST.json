@@ -1,5 +1,9 @@
 {
   "kind": "Schermafbeeldingen uit de echte RTG-app in een lokale wegwerpomgeving",
+  "browser": {
+    "versie": "156.0.8078.4",
+    "infrastructuur": "de gepinde Playwright-build"
+  },
   "viewport": {
     "width": 390,
     "height": 844
@@ -16,8 +20,9 @@
       "id": "partner",
       "route": "/apps/leverancier.html",
       "file": "partner.png",
-      "sourceHash": "a57213dfcb63bb64cea50b630dc1a3dd6b591eb791334385e040595568536da9",
-      "imageHash": "0cc6e69efb2a0b39200443a99a9b54502ad0336220f890f6cc5565af2322c2e1"
+      "weergave": "Bestaande ingelogde werkplek met proefgegevens",
+      "sourceHash": "3b1c9e480a695544cbacfa5a0f9dc8791e7c170c61d99eeb498dc4a70fc19a69",
+      "imageHash": "824dd01ab1567c461931d7ae2e24538112593d9adbdfe0090d76c1e12b13a743"
     },
     {
       "id": "gebruiker",

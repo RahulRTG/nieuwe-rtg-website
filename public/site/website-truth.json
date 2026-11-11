@@ -1,15 +1,20 @@
 {
-  "schema": 4,
+  "schema": 5,
   "source": [
     "public/apps/app-main.js",
     "public/shared/rtg-edge-worlds.js",
+    "public/shared/interface/world-presentation.js",
     "server/kern/pasladder.js",
     "server/kern/appgids.js",
+    "public/ds/thema/living.css",
+    "public/ds/thema/travel.css",
+    "public/ds/thema/work.css",
+    "public/ds/thema/foundation.css",
     "public/apps/werk.html",
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "cb6406a6f397da034ffd99c67aa123c85ac824185dfe0d64e17c55cc43bab220",
+  "sourceHash": "a2b5c056fd264bb4ada1537d6fcb82d71d34089e75d40ca24efb96ce164475e2",
   "platform": [
     {
       "id": "organisatie",
@@ -56,11 +61,12 @@
         "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
       ],
       "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
-      "sourceHash": "b7e5cf3219fe35181913dd518f9151a4e81e85b949fcb16bf3bdf97ea6be54ff"
+      "sourceHash": "ab08625f09839eb82b4cfc1f03c808932642c9c543434c1d334bd88a02dec675"
     }
   ],
   "worlds": {
     "living": {
+      "id": "living",
       "name": "LivingOS",
       "appName": "LIVING OS",
       "publicRoute": "/apps/rtg.html",
@@ -69,6 +75,12 @@
       "action": "Vergelijk werelden",
       "groupCount": 3,
       "featureCount": 59,
+      "theme": {
+        "source": "public/ds/thema/living.css",
+        "selector": "[data-rtg-world=\"living\"]",
+        "sourceHash": "cc5e9f393154eb2827e7e7341b8ebd9527533be77543ff19f6af8feaafd2c06f",
+        "image": "/images/world-homes/living-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",
@@ -907,6 +919,7 @@
       ]
     },
     "travel": {
+      "id": "travel",
       "name": "TravelOS",
       "appName": "TRAVEL OS",
       "publicRoute": "/apps/reizen.html",
@@ -915,6 +928,12 @@
       "action": "Open reisdetail",
       "groupCount": 2,
       "featureCount": 15,
+      "theme": {
+        "source": "public/ds/thema/travel.css",
+        "selector": "[data-rtg-world=\"travel\"]",
+        "sourceHash": "996b713d1e2b25b4d679a89883972925d2ed459ee1abfa652af2eef4c90a56e3",
+        "image": "/images/world-homes/travel-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",
@@ -1173,6 +1192,7 @@
       ]
     },
     "work": {
+      "id": "work",
       "name": "WorkOS",
       "appName": "WORK OS",
       "publicRoute": "/apps/kantoor.html",
@@ -1181,6 +1201,12 @@
       "action": "Open werkbank",
       "groupCount": 2,
       "featureCount": 17,
+      "theme": {
+        "source": "public/ds/thema/work.css",
+        "selector": "[data-rtg-world=\"work\"]",
+        "sourceHash": "f04b7fe91dfc75ab1cc186efe60a5be5d9b52bb06c4db6157d70a6f386062f0c",
+        "image": "/images/world-homes/work-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",
@@ -1467,6 +1493,7 @@
       ]
     },
     "foundation": {
+      "id": "foundation",
       "name": "FoundationOS",
       "appName": "RTFOUNDATION",
       "publicRoute": "/apps/foundation/os-publiek.html",
@@ -1475,6 +1502,12 @@
       "action": "Ga verder",
       "groupCount": 2,
       "featureCount": 13,
+      "theme": {
+        "source": "public/ds/thema/foundation.css",
+        "selector": "[data-rtg-world=\"foundation\"]",
+        "sourceHash": "9e39c173fd63c4473328ceeb380f2ecbc3b07af17646c70de65d4640f7b52e7e",
+        "image": "/images/world-homes/foundation-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",

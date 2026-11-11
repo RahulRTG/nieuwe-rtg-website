@@ -65,3 +65,13 @@ test('de canonieke presentatie bevat adaptieve beweging en de drie geregistreerd
   assert.match(css, /\[data-levendegrond\]::before/);
   assert.doesNotMatch(css, /!important/);
 });
+
+test('alleen de transparante Command-schil onderdrukt zijn levende pseudo-laag', () => {
+  const css = fs.readFileSync('public/ds/levendekleur.css', 'utf8');
+  const grond = css.match(/(?:^|\n)\s*\[data-levendegrond\]::before\s*\{([^}]+)\}/);
+  assert.ok(grond, 'echte levende grondvlakken houden hun centrale presentatie');
+  assert.match(grond[1], /content\s*:\s*["']["']\s*;/,
+    'de gewone levende grond blijft een pseudo-laag schilderen');
+  assert.match(css, /body\.rtg-command\s+#shell\[data-levendegrond\]::before\s*\{\s*content\s*:\s*none\s*;\s*\}/,
+    'de hogere Command-ladehouder blijft transparant, voor en na het inloggen');
+});

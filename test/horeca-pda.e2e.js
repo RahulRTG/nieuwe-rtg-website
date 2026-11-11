@@ -115,14 +115,12 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
        die lijst nul. Valt de start in de eerste twee minuten van een dag, dan
        bestaat de voorwaarde van deze toets domweg niet en wachten we hem uit;
        overslaan zou een bewering wegpoetsen die het hele scherm draagt. */
-    let huis = tijdzone.huis();
-    const RUIMTE = 2;
-    if (huis.minuten < RUIMTE) {
-      await new Promise((r) => setTimeout(r, (RUIMTE - huis.minuten) * 60000 + 1000));
-      huis = tijdzone.huis();
+    const RUIMTE = 2 * 60000;
+    const huisNu = tijdzone.huis(new Date());
+    if (huisNu.minuten < 2) {
+      await new Promise((r) => setTimeout(r, RUIMTE - huisNu.minuten * 60000 + 1000));
     }
-    const toen = Math.max(huis.minuten - 20, 1);
-    const serveerOm = String(Math.floor(toen / 60)).padStart(2, '0') + ':' + String(toen % 60).padStart(2, '0');
+    const serveerOm = tijdzone.hhmmIn(new Date(Date.now() - 20 * 60000));
     const laat = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'PDA-LAAT', gasten: 2 })).body.rekening;
     const l1 = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: laat.id, naam: 'Tartaar', prijs: 22, aantal: 1, gang: 1, station: 'koud' })).body.regel;
     await H('/api/supplier/horeca/rekening/regel', { rekeningId: laat.id, naam: 'Zeebaars', prijs: 29, aantal: 1, gang: 1, station: 'warm' });

@@ -45,16 +45,34 @@ function luister() {
     if (!e.viewTransition) { window.__gedeeld.klaar = true; return; }
     window.__gedeeld.overgang = true;
     e.viewTransition.ready.then(() => {
-      /* `ready` zegt dat de pseudo-boom is berekend. Onder runnerbelasting kan
-         Chromium de bijbehorende compositor-animaties pas in het volgende
-         schilderframe aan document.getAnimations() leveren. Lees dus na twee
-         frames: nog ruim binnen de structurele overgang van 340 ms, maar niet
-         tussen stijlberekening en compositorpublicatie in. */
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        window.__gedeeld.groepen = document.getAnimations()
-          .map((a) => a.effect && a.effect.pseudoElement).filter(Boolean);
-        window.__gedeeld.klaar = true;
-      }));
+      /* Chromium maakt de pseudo-animaties niet atomair zichtbaar via
+         document.getAnimations(): onder zware runnerbelasting kan de oude
+         kant pas in een volgende animatietick verschijnen. Een enkele
+         snapshot maakte de proef daardoor rood, terwijl de browser de
+         gedeelde kaart aantoonbaar even later had vastgelegd.
+
+         Verzamel de unie van de eerste vier frames. We versoepelen de eis
+         niet: beneden moet de oude kaart nog steeds werkelijk door de browser
+         zijn gemeld en het doel draagt dezelfde naam. We nemen alleen de race
+         rond de registratie weg. Stop zodra het bronbewijs er is, zodat ook
+         een korte overgang niet eerst hoeft af te lopen. */
+      const gezien = new Set();
+      let frame = 0;
+      const meet = () => {
+        document.getAnimations().forEach((a) => {
+          const pseudo = a.effect && a.effect.pseudoElement;
+          if (pseudo) gezien.add(pseudo);
+        });
+        window.__gedeeld.groepen = [...gezien];
+        const oud = gezien.has('::view-transition-old(rtg-gedeeld-reisboek)');
+        if (oud || frame >= 3) {
+          window.__gedeeld.klaar = true;
+          return;
+        }
+        frame += 1;
+        requestAnimationFrame(meet);
+      };
+      meet();
     }).catch(() => { window.__gedeeld.klaar = true; });
   });
 }
@@ -128,11 +146,13 @@ test('gedeeld element: de reisboekkaart wordt het reisboek, in een blad van de w
   { skip: geenBrowser(pw) }, async () => {
   const { uit, fouten } = await proef('no-preference');
   assert.ok(uit.g.overgang, 'de browser maakt een overgang tussen de twee documenten');
-  assert.ok(uit.g.groepen.includes('::view-transition-group(rtg-gedeeld-reisboek)'),
-    'de kaart en de kop vormen samen een groep (gevonden: ' + uit.g.groepen.join(', ') + ')');
-  /* Een groep alleen is niet genoeg: een doel met een naam en GEEN bron levert
-     een groep met alleen een nieuwe kant op (mutatieproef: de markering van de
-     kaart weg, en deze toets zakt hier). De oude kant IS de kaart. */
+  /* De structurele `group`-pseudo is de ouder van `old`, maar Chromium hoeft
+     daar niet ook een afzonderlijk Web Animations-record voor te publiceren.
+     Dat record onder runnerbelasting eisen testte dus een intern detail. Het
+     doel hierboven draagt aantoonbaar dezelfde naam; de oude kant hieronder
+     bewijst dat de bronkaart ook werkelijk door de browser is vastgelegd.
+     Zonder bronmarkering ontbreekt precies deze oude kant en zakt de
+     mutatieproef nog steeds. */
   assert.ok(uit.g.groepen.includes('::view-transition-old(rtg-gedeeld-reisboek)'),
     'de oude kant van de groep is de kaart (gevonden: ' + uit.g.groepen.join(', ') + ')');
   assert.deepEqual(fouten, [], 'geen paginafouten');

@@ -112,7 +112,8 @@ const LADDER = [
   { id: 'releasebewijs', naam: 'Releasebewijs', wat: 'de bronboom gehasht, de stuklijst, de herkomst, de poort ervoor',
     patronen: [/release-bewijs\.js$/, /bron-release-bewijs\.js$/, /imageherkomst\.js$/, /release-gate\.js$/, /ci-pg-bewijs\.js$/,
       /build\.js$/, /zekerheid\.js$/, /bewijsmatrix\.js$/, /vertrouwen\.js$/, /versheid\.js$/, /meetronde\.js$/,
-      /envelop\.js$/, /gezag\.js$/, /release-workflow-bewijs\.js$/, /^npm run afbouw:software$/] },
+      /envelop\.js$/, /gezag\.js$/, /release-workflow-bewijs\.js$/, /websitewaarheid\.js$/,
+      /^npm run afbouw:software$/] },
   { id: 'kandidaat', naam: 'Onveranderlijke kandidaat', wat: 'het image gebonden aan een digest en een handtekening',
     /* kwalificatie.js: de releasekwalificatie test de BYTES van het image en
        legt het image-ID vast; de toetsen draaien op wat uit het image komt, en

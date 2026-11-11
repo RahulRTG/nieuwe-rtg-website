@@ -6247,3 +6247,49 @@ gekwalificeerd**. Actuele vastgelegde bron vóór deze herstelcommit:
 herstelcommit vastleggen, de norm op de schone boom herhalen en alle verplichte
 GitHub-jobs zonder verdere bronwijziging volledig laten uitlopen**. Deep Green:
 **GEBLOKKEERD**.
+
+### Achtste onveranderlijke CI-nulmeting — 11 november 2026
+
+De volledige verplichte CI is zonder tussentijdse bronwijziging uitgelopen op
+PR-head `fb3793d1f07f2b515e18daa0b6420b0a0ec9d623`. De hoofd-CI is run
+`43007368857`; Desktop- en mobielstandaard is run `43007368802`; CodeQL-run
+`43007368785` en lokale kwalificatie-run `43007369014` sloten groen. De rode
+logs van iedere primaire deeljob zijn volledig verzameld voordat broncode is
+gewijzigd.
+
+De foutboom bevat vier unieke primaire oorzaken. De rode totaaljob is een
+afgeleid oordeel en telt niet als afzonderlijke oorzaak.
+
+| ID | Soort | Primaire oorzaak | Getroffen controles | Herstelrichting |
+| --- | --- | --- | --- | --- |
+| DG-CI-45 | verlopen bouwafleiding | `public/sw.js` draagt cache-identiteit `rtg-app-f569bb6f`, terwijl de actuele shell volgens de bestaande build `rtg-app-d5a15bae` vereist. De normpoort is inhoudelijk groen en faalt pas op de reproduceerbaarheidsdiff; dezelfde afwijking breekt de offline-shellunit. | norm/build; unitscherf 1 | Draai uitsluitend de bestaande buildproducent, leg de actuele cache-identiteit vast en bewijs build-idempotentie plus beide offline shells. |
+| DG-CI-46 | verlopen Experience-inventaris | `EXPERIENCEWERKT.json` is niet byte-exact uit de actuele app-, scherm-, signature- en interactie-inventaris afgeleid. De fout maakt geen Experience-bewijs groen; het register blijft fail-closed. | unitscherf 3 | Leid het register opnieuw af met de bestaande producent en bewijs byte-exactheid en ongewijzigde noemers. |
+| DG-CI-47 | contract- of productafwijking in Edge-blikveld | De echte browserproef ontvangt op het losse Living-scherm leespad `['living','pagina']`, terwijl het vastgelegde contract `['living','route']` vereist. Alle overige schermtoetsen in scherf 5 slagen. | schermscherf 5 | Bepaal aan broncontract en geschiedenis welke term eigenaar is; herstel vervolgens product of toets zonder de context- of privacynorm te verzwakken. |
+| DG-CI-48 | Experience-producent bereikt geen bruikbaar eindoordeel | De mobiele `experience:prove`-run sluit alle voorafgaande producenten groen, maar `screen-accessibility` eindigt na circa 60 minuten met `FAILED (0 tests)`. Daardoor ontbreekt een routegebonden toegankelijkheidsmeting; de Experience-selectie blijft terecht `INCOMPLETE`. | mobiel 390 | Onderzoek proceslevenscyclus en uitvoertijd binnen de bestaande producent. Lever een expliciet fail-closed resultaat en sluit de volledige routeproef binnen de CI-capaciteitsgrens, zonder routes of normen te schrappen. |
+
+In de hoofd-CI sloten 24 jobs groen. Vier primaire jobs waren rood; de
+samengestelde totaaljob was afgeleid rood. Acht jobs werden overgeslagen: de
+drie incrementele jobs zijn volgens het full-runcontract bewust niet van
+toepassing; de volledige verzameljob en vier downstream bewijs-/publicatiejobs
+werden door rode afhankelijkheden niet uitgevoerd. In de mobiele workflow
+werd de opvolgende actuele-inventariscontrole niet uitgevoerd na DG-CI-48.
+Daarmee zijn **zes verplichte vervolgcontroles** nog niet uitgevoerd. WebKit,
+desktop 1440, CodeQL, lokale kwalificatie, statisch/PostgreSQL, adversarial
+autorisatie, dependencycontrole, containerstart, AST-grens, alle ijkingen,
+unitscherven 2 en 4, schermscherven 1 tot en met 4 en alle
+toegankelijkheidsscherven sloten groen op dezelfde bronstand.
+
+**Meetstand vóór herstelronde 18.** Releaseblokkerende bronoorzaken: **4**.
+Bewezen afgesloten sinds de vorige meting: **DG-CI-40 tot en met DG-CI-44
+blijven gesloten in de actuele CI**. Nieuwe regressies: **0 als productregressie
+bewezen; DG-CI-47 vereist broncontractonderzoek**. Eerder verborgen fouten
+ontdekt: **0 aanvullende**. Nog niet uitgevoerde verplichte controles: **6**;
+daarnaast blijven APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief
+menselijke proeven, security/finance/load,
+staging/back-up/herstel/rollback/incidentrespons en twee onafhankelijke
+eindruns open. APPWERKT: **0/114 actueel geldig; 912 bewijzen zijn terecht
+verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden als
+volledige vrijgave gekwalificeerd**. Eerstvolgende blokkade: **DG-CI-47 aan het
+broncontract toetsen, daarna DG-CI-45 en DG-CI-46 met hun bestaande
+producenten vernieuwen en DG-CI-48 binnen de bestaande Experience-producent
+structureel sluiten**. Deep Green: **GEBLOKKEERD**.

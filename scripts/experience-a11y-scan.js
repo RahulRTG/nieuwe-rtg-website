@@ -7,11 +7,13 @@
    raakte daardoor na 42 minuten zijn procesdeadline. De bestaande a11y-meter
    kan al veilig delen meten en scripts/a11y-oordeel.js kan die delen al
    fail-closed samenvoegen. Deze adapter verbindt alleen die twee bestaande
-   verantwoordelijkheden: twee metingen tegelijk, daarna precies een oordeel.
+   verantwoordelijkheden: drie metingen tegelijk, daarna precies een oordeel.
 
-   Twee is bewust. Vier lokale Chromium-processen maakten de runner niet sneller
-   maar veroorzaakten 30-secondennavigatietime-outs. Twee halveert de bestaande
-   seriele routevoorraad zonder de browseromgeving te overbelasten.
+   Drie is bewust. Twee scherven bereikten op de volledige 316-routevoorraad de
+   harde uurgrens voordat zij een oordeel konden teruggeven. Vier lokale
+   Chromium-processen maakten de runner niet sneller maar veroorzaakten
+   30-secondennavigatietime-outs. Drie houdt dezelfde routevoorraad en hetzelfde
+   eindoordeel, met voldoende ruimte voor een expliciete fail-closed uitslag.
 
    Dit is geen tweede meter. Een ontbrekend deel, dubbele route, afwijkende
    browser, schermgat of globale budgetoverschrijding laat het oordeel zakken en
@@ -24,7 +26,7 @@ const cp = require('node:child_process');
 const ROOT = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
 const metingUit = (argv.find(arg => arg.startsWith('--meting=')) || '').slice(9);
-const DELEN = 2;
+const DELEN = 3;
 
 if (!metingUit) {
   console.error('[experience-a11y] --meting=<bestand> is verplicht.');

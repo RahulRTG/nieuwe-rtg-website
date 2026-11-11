@@ -45,9 +45,35 @@ function luister() {
     if (!e.viewTransition) { window.__gedeeld.klaar = true; return; }
     window.__gedeeld.overgang = true;
     e.viewTransition.ready.then(() => {
-      window.__gedeeld.groepen = document.getAnimations()
-        .map((a) => a.effect && a.effect.pseudoElement).filter(Boolean);
-      window.__gedeeld.klaar = true;
+      /* Chromium maakt de pseudo-animaties niet atomair zichtbaar via
+         document.getAnimations(): onder zware runnerbelasting kan de oude
+         kant al bestaan terwijl group/new pas in de volgende animatietick
+         verschijnen. Een enkele snapshot maakte de proef daardoor rood,
+         terwijl de browser de gedeelde kaart aantoonbaar al had vastgelegd.
+
+         Verzamel de unie van de eerste vier frames. We versoepelen de eis
+         niet: beneden moeten group EN old nog steeds werkelijk door de
+         browser zijn gemeld. We nemen alleen de race tussen hun registratie
+         weg. Stop zodra beide bewijzen er zijn, zodat ook een korte overgang
+         niet eerst hoeft af te lopen. */
+      const gezien = new Set();
+      let frame = 0;
+      const meet = () => {
+        document.getAnimations().forEach((a) => {
+          const pseudo = a.effect && a.effect.pseudoElement;
+          if (pseudo) gezien.add(pseudo);
+        });
+        window.__gedeeld.groepen = [...gezien];
+        const groep = gezien.has('::view-transition-group(rtg-gedeeld-reisboek)');
+        const oud = gezien.has('::view-transition-old(rtg-gedeeld-reisboek)');
+        if ((groep && oud) || frame >= 3) {
+          window.__gedeeld.klaar = true;
+          return;
+        }
+        frame += 1;
+        requestAnimationFrame(meet);
+      };
+      meet();
     }).catch(() => { window.__gedeeld.klaar = true; });
   });
 }

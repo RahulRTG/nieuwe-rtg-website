@@ -28,6 +28,14 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Gebruik de vastgelegde Node-versie
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Werk de publieke appwaarheid bij
+        run: node scripts/websitewaarheid.js
+
       - name: Bouw uitsluitend de publieke website
         run: |
           mkdir -p _site

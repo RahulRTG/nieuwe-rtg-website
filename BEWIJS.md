@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3164 bestanden en 21157 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3164 bestanden en 21160 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3164 |
-| losse beweringen (`test(...)`) | 21157 |
+| losse beweringen (`test(...)`) | 21160 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 520 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2950 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2730 bestanden, 20344 beweringen.
+2730 bestanden, 20347 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1203,7 +1203,7 @@ toets omvalt.
 | `lesdeel.test.js` | 5 | gezakt op `!==->===#0` | DE LESCODE ALS DEELLINK EN QR (besluit B20, RELEASEKANDIDAAT.md), zonder browser. De browserweg zelf staat in test/lesdeellink.e2e.js. |
 | `letters.test.js` | 4 | geen module gevonden | DE LETTERS: wat public/fonts/fonts.css moet blijven waarmaken. Deze toets bestaat om EEN gemeten fout: Bodoni Moda tekent U+20AC als een kale C -- de twee dwarsbalkjes zitten niet in de glief. |
 | `levenbandroutes.test.js` | 13 | gezakt op `liegpoort /api/` | LEVEN.md fase 2 aan de BUITENKANT: de routes die de twee sessiewerelden aan elkaar knopen (server/routes/levenband.js). De kernregels zelf staan in test/levensband.test.js en worden hier niet overgedaan. |
-| `levendekleur-ds.test.js` | 3 | gezakt op `browser-export-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `levendekleur-ds.test.js` | 4 | gezakt op `browser-export-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `levensband.test.js` | 17 | gezakt op `===->!==#0` | LEVEN.md fase 2: rechten per relatie. Dit bestand handhaaft de twee besluiten van 11 augustus 2026, en het is daarmee het belangrijkste toetsbestand van deze fase. |
 | `levensbeleid.test.js` | 9 | gezakt op `===->!==#0` | Het levensbeleid (LEVEN.md par. 3): de tweede laag van het wereldpatroon voor RTFoundation, en de laag die er nog niet was. |
 | `levensgraafleven.test.js` | 7 | gezakt op `===->!==#0` | De levenslaag van de levensgraaf: talenten, interesses en bijdrage (LEVEN.md par. 1.2), en vooral de twee dingen die daar het werk zijn. |
@@ -2634,7 +2634,7 @@ toets omvalt.
 | `website-aanvraag-handoff.test.js` | 2 | geen module gevonden | De publieke website geeft een aanvraag browser-tot-browser door aan de app. Deze toets bewaakt de privacygrens en de enige ontvangende route: het fragment mag niet in serverlogs belanden en pas na inloggen mag... |
 | `website-codeproof.test.js` | 4 | geen bronmutatie mogelijk | DE PUBLIEKE BLOKKEN ZEGGEN ALLEEN WAT DE CODE DRAAGT. Deze toets bewaakt dat ieder compact startblok en iedere resultaat- of mogelijkheidskaart verdieping heeft, en dat elk zichtbaar code-anker werkelijk in deze... |
 | `website-text-style.test.js` | 4 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `website-truth.test.js` | 7 | gezakt op `===->!==#0` | DE WEBSITE VERTELT DE APPWAARHEID. Deze toets bewaakt de hele verbinding: de gegenereerde momentopname moet exact uit de wereld- en pasbronnen komen, iedere openbare pagina moet haar laden en alle pagina's moeten... |
+| `website-truth.test.js` | 9 | gezakt op `===->!==#0` | DE WEBSITE VERTELT DE APPWAARHEID. Deze toets bewaakt de hele verbinding: de gegenereerde momentopname moet exact uit de wereld- en pasbronnen komen, iedere openbare pagina moet haar laden en alle pagina's moeten... |
 | `wegwerpserver-takken.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | DE WEGWERPSERVER, TAK VOOR TAK (scripts/lib/wegwerpserver.js). test/luisteraarlek.test.js toetst de opruiming en test/meetserver-schorspoort.test.js de volgorde van de omgeving. |
 | `weigering-laat-niets-achter.test.js` | 4 | gezakt op `liegpoort /api/` | EEN WEIGERING LAAT NIETS ACHTER. PROOF.md paragraaf 9: degraderen gaat naar de veiligste toestand, en de veiligste toestand van een geweigerd verzoek is dat het nooit heeft plaatsgevonden. |
 | `wekdekking.test.js` | 5 | gezakt op `===->!==#0` | DE WEKDEKKING: houdt het besluit de code bij, en houdt de code het besluit bij? scripts/wekdekking.js zegt vandaag `zonderUitspraak: 0`. |

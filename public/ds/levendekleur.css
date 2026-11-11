@@ -35,6 +35,12 @@
       var(--levend-basis);
   }
 
+  /* Command bewaart #shell boven zijn werkvlak als doorzichtige ladehouder.
+     De levende was mag daar geen tweede scherm schilderen: ook een negatieve
+     pseudo-laag blijft binnen die hogere stapelcontext en bedekt anders zowel
+     de inlog als de werktafel. Werkelijke grondvlakken houden hun eigen was. */
+  body.rtg-command #shell[data-levendegrond]::before { content: none; }
+
   @media (prefers-reduced-motion: no-preference) {
     :root {
       transition:

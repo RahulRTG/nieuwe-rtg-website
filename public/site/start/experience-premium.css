@@ -8,7 +8,7 @@
 
 .rtg-experience .experience-arrival{height:auto;min-height:900px;padding-top:155px;padding-bottom:122px;display:grid;grid-template-columns:minmax(360px,.86fr) minmax(540px,1.14fr);align-items:center;gap:clamp(60px,7vw,112px);background:var(--rtg-ink);overflow:hidden}
 .experience-arrival .hero-media{opacity:.13;filter:grayscale(1) contrast(1.08)}
-.experience-arrival .hero-media::after{background:linear-gradient(90deg,#0d0e0cf2 0%,#0d0e0cd9 44%,#0d0e0ca8),linear-gradient(0deg,#0d0e0c 0%,transparent 45%,#0d0e0c52)}
+.experience-arrival .hero-media::after{background:var(--ds-beleving-sluier-tekst)}
 .experience-arrival::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,transparent 49.94%,rgba(255,255,255,.055) 50%,transparent 50.06%),linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px);background-size:100% 100%,100% 90px;pointer-events:none}
 .experience-arrival .opening-copy{z-index:2;max-width:620px;align-self:center}
 .experience-arrival .opening-copy h1{max-width:620px;margin-bottom:28px;font-size:clamp(64px,6.3vw,98px);line-height:.94;letter-spacing:-.062em;text-wrap:balance}

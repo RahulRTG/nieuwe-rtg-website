@@ -8,6 +8,9 @@
     travel: ['TRAVEL · ONTDEKKEN', 'De ruimte om te ontdekken.', 'Bekijk uw reis', '/apps/reizen.html#reisoverzicht', 'Uw reis in het kort', 'Alles op één plek', '/apps/reisboek.html', '/images/world-homes/living-coast.webp', '/images/world-homes/travel-warm.jpg'],
     foundation: ['FOUNDATION · SAMEN', 'Ruimte om verder te komen.', 'Ontdek wat bij u past', '/apps/foundation/meedoen-ontdekken.html', 'In uw buurt', 'Samen aan de slag', '/apps/foundation/meedoen-ontdekken.html', '/images/world-homes/foundation.webp', '/images/world-homes/foundation-warm.jpg']
   };
+  /* De publieke website leest exact deze presentatiebron tijdens de bouw. Zij
+     kopieert geen wereldfoto's naar een tweede register. */
+  w.RTGWorldPresentationData = content;
   function localLink(anchor, path) {
     if (!(path === '#reisoverzicht' || /^\/apps\/[a-z0-9/_-]+\.html(?:#[a-z0-9_-]+)?$/i.test(path))) throw new Error('Ongeldige wereldroute');
     anchor.setAttribute('href', path); return anchor;

@@ -27,6 +27,23 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method())&&!['/api/talen','/api/vertaal/ui'].includes(new URL(r.url()).pathname))mutations.push(r.url());});
    await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
    await page.waitForFunction(()=>document.documentElement.dataset.websiteTruth==='actueel');
+   const worldThemes=await page.locator('[data-app-truth-world]').evaluateAll(cards=>cards.map(card=>({
+    world:card.dataset.rtgWorld,accent:getComputedStyle(card).getPropertyValue('--ds-accent').trim(),
+    overlay:getComputedStyle(card,'::after').backgroundImage,
+    ink:getComputedStyle(card.querySelector('h3')).color,
+    image:new URL(card.querySelector(':scope > img').src).pathname
+   })));
+   assert.deepEqual(worldThemes.map(item=>item.world),['living','travel','work','foundation']);
+   assert.equal(new Set(worldThemes.map(item=>item.accent.toLowerCase())).size,4,
+    'de vier kaarten erven vier verschillende app-accenten: '+JSON.stringify(worldThemes));
+   assert.equal(new Set(worldThemes.map(item=>item.overlay)).size,4,
+    'de fotografische gloed volgt het accent van iedere wereld: '+JSON.stringify(worldThemes));
+   assert.deepEqual(worldThemes.map(item=>item.image),[
+    '/images/world-homes/living-warm.jpg','/images/world-homes/travel-warm.jpg',
+    '/images/world-homes/work-warm.jpg','/images/world-homes/foundation-warm.jpg'
+   ],'de www-kaarten tonen dezelfde hoofdfoto’s als de appwerelden');
+   assert.ok(worldThemes.every(item=>item.overlay!=='none'&&item.ink.match(/^rgb\(2[3-5]\d, 2[3-5]\d, 2[2-5]\d\)$/)),
+    'iedere fotokaart heeft een leeslaag en witte koptekst: '+JSON.stringify(worldThemes));
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
    assert.match(await page.locator('#platform-story-title').innerText(),/Technologie rondom mensen/i);
    assert.equal(await page.locator('.pp-story[data-public-story]').count(),1);

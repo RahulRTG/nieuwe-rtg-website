@@ -45,9 +45,16 @@ function luister() {
     if (!e.viewTransition) { window.__gedeeld.klaar = true; return; }
     window.__gedeeld.overgang = true;
     e.viewTransition.ready.then(() => {
-      window.__gedeeld.groepen = document.getAnimations()
-        .map((a) => a.effect && a.effect.pseudoElement).filter(Boolean);
-      window.__gedeeld.klaar = true;
+      /* `ready` zegt dat de pseudo-boom is berekend. Onder runnerbelasting kan
+         Chromium de bijbehorende compositor-animaties pas in het volgende
+         schilderframe aan document.getAnimations() leveren. Lees dus na twee
+         frames: nog ruim binnen de structurele overgang van 340 ms, maar niet
+         tussen stijlberekening en compositorpublicatie in. */
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        window.__gedeeld.groepen = document.getAnimations()
+          .map((a) => a.effect && a.effect.pseudoElement).filter(Boolean);
+        window.__gedeeld.klaar = true;
+      }));
     }).catch(() => { window.__gedeeld.klaar = true; });
   });
 }

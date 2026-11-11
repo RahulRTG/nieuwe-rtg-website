@@ -89,21 +89,32 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
               file.weg = f.capability === 'documents.restore'; file.documentVersion = f.input.expectedVersion;
               window.RTGBestandenPaneel.open(file.id);
             }, { f });
+            let ontvang, weiger;
+            const ontvangen = new Promise((resolve, reject) => { ontvang = resolve; weiger = reject; });
             await page.route('**/api/bestanden/actie', async route => {
-              const body = route.request().postDataJSON();
-              assert.equal(body.capability, f.capability); assert.equal(body.id, f.item.id); assert.equal(body.expectedVersion, f.input.expectedVersion);
-              await route.continue({ headers: { ...route.request().headers(), authorization: 'Bearer ' + token }, postData: JSON.stringify(f.input) });
+              try {
+                const body = route.request().postDataJSON();
+                assert.equal(body.capability, f.capability); assert.equal(body.id, f.item.id); assert.equal(body.expectedVersion, f.input.expectedVersion);
+                /* De route is al de transportgrens waarop deze adversarial
+                   proef actor en versie vervangt. route.fetch() geeft op die
+                  zelfde grens de echte serverreactie terug; fulfill levert
+                   exact die reactie aan de zichtbare UI. Zo kan een 409 niet
+                   tussen serverjournaal en Playwrights losse response-event
+                   verdwijnen. */
+                const reactie = await route.fetch({ headers: { ...route.request().headers(), authorization: 'Bearer ' + token },
+                  postData: JSON.stringify(f.input) });
+                await route.fulfill({ response: reactie });
+                ontvang(reactie);
+              } catch (error) {
+                weiger(error);
+                await route.abort().catch(() => {});
+              }
             });
-            /* De volledige schermscherf draait honderden echte browserketens
-               tegelijk op dezelfde runner. De handeling blijft verplicht: wij
-               wachten op precies haar POST en laten afwezigheid nog steeds
-               hard zakken, maar gebruiken een expliciet lastbudget in plaats
-               van Playwrights kortere algemene standaard. */
-            const received = page.waitForResponse(r =>
-              new URL(r.url()).pathname === '/api/bestanden/actie' && r.request().method() === 'POST',
-            { timeout: 60000 }).catch(e => {
-              throw new Error(caller + ':' + f.name + ': ' + e.message, { cause: e });
-            });
+            /* Afwezigheid blijft hard zakken op hetzelfde lastbudget. */
+            let klok;
+            const grens = new Promise((_, reject) => { klok = setTimeout(() => reject(new Error(
+              caller + ':' + f.name + ': geen /api/bestanden/actie-reactie binnen 60000ms')), 60000); });
+            const received = Promise.race([ontvangen, grens]).finally(() => clearTimeout(klok));
             const action = caller === 'UI'
               ? page.locator(f.capability === 'documents.restore' ? '#bkHerstel' : '#bkWeg').click()
               : edgeBediening(page, f.capability === 'documents.restore' ? 'Terugzetten' : 'Verwijder', f.capability);

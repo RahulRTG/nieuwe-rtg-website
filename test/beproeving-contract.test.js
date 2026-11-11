@@ -20,11 +20,13 @@ function rolwereld(afwijking) {
     else if (pad === '/api/techniek/inloggen') data = { token: 'eigenaar', eigenaar: true };
     else if (pad === '/api/techniek/functie') data = { status: 'ongewijzigd' };
     else if (pad === '/api/auth/me' && token === tokens.member) data = { user: { id: 42 } };
-    else if (pad === '/api/supplier/backoffice' && token === tokens.supplier) data = { toppers: [], alerts: [] };
+    else if (pad === '/api/supplier/backoffice' && token === tokens.supplier) data = { toppers: [], alerts: [],
+      alertBron: { schema: 1, bereik: 'zaakcommand-signalen', sha256: 'a'.repeat(64) } };
     else if (pad === '/api/office/state' && token === tokens.office) data = { state: {} };
     else if (pad === '/api/pay/oplaad' && token === tokens.member) { saldo += lijf.centen; geschiedenis++; }
     else if (pad === '/api/pay/overzicht' && token === tokens.member) data = { saldo, geschiedenis, aanMij: [], vanMij: [] };
     else if (pad === '/api/verkoop/mijn' && token === tokens.member) data = { deals: [] };
+    else if (pad === '/api/site/mijn' || pad === '/api/supplier/site/mijn') data = { lijst: [] };
     else if (pad.endsWith('/bewaar')) data = { design: { id: token + '-site' } };
     else if (!pad.endsWith('/publiceer')) {
       const r = routes.find(r => r.pad === pad);

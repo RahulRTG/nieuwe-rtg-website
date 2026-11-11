@@ -21,6 +21,7 @@
    restaurant en een jachthaven vinden niet hetzelfde "te lang". */
 'use strict';
 
+const { berichtHash } = require('../../lib/zegel');
 const s = (v) => (v == null ? '' : String(v));
 const norm = (v) => s(v).trim().toUpperCase();
 const min = (iso, nu) => Math.round((nu - new Date(iso).getTime()) / 60000);
@@ -37,20 +38,47 @@ function maakSignalen({ db, beleid, commGast }) {
     return Array.isArray(sleutel ? v[sleutel] : null) ? v[sleutel] : [];
   };
 
+  /* Dezelfde bron voor signalen én de expliciet aangevraagde bronstempel.
+     Geen klok, presentatietekst of dashboard-afkapping in deze stand. De
+     gastlijst draagt opgeslagen lastAt en ongelezenstand, niet inbox-online
+     of typt. Haar bestaande bereik blijft commGast.voorZaak: de inbox geeft
+     maximaal 400 gesprekken. Dit bewaakt de signalenbron, NIET alle appdata. */
+  function bronVan(zaak, opties) {
+    const code = norm(zaak && zaak.code), leiding = !!(opties && opties.leiding);
+    if (!code) return null;
+    return {
+      code, leiding,
+      reactieMinuten: beleid.getal('zaak.reactieMinuten', 10),
+      boekingMinuten: beleid.getal('zaak.boekingMinuten', 30),
+      orders: lijstVan('orders', code), rides: lijstVan('rides', code),
+      boekingen: lijstVan('boekingen', code),
+      verlof: leiding ? lijstVan('verlof', code) : [],
+      applications: leiding ? lijstVan('applications', code) : [],
+      chats: commGast ? (commGast.voorZaak(code) || []) : [],
+      tickets: lijstVan('tickets', code), rooms: zaak.rooms || []
+    };
+  }
+
+  function bronstempel(zaak, opties) {
+    const bron = bronVan(zaak, opties);
+    if (!bron) throw new Error('Geen zaak voor de signalenbron.');
+    const schema = 1, bereik = 'zaakcommand-signalen';
+    return { schema, bereik, sha256: berichtHash({ schema, bereik, bron }) };
+  }
+
   /* DE HR-SIGNALEN ZIJN VOOR DE LEIDING. Een verlofaanvraag of een sollicitatie
      is geen vloerwerk; overal elders in deze app staan die achter managerOnly.
      Zonder deze grens zou de PDA van de vloer alsnog laten zien dat er verlof
      ligt te wachten -- minder erg dan de namen, maar het hoort er niet. */
   function voor(zaak, opties) {
-    const leiding = !!(opties && opties.leiding);
-    const code = norm(zaak && zaak.code);
-    if (!code) return [];
+    const bron = bronVan(zaak, opties);
+    if (!bron) return [];
     const nu = Date.now();
     const uit = [];
-    const traag = beleid.getal('zaak.reactieMinuten', 10);
-    const boekTraag = beleid.getal('zaak.boekingMinuten', 30);
+    const traag = bron.reactieMinuten;
+    const boekTraag = bron.boekingMinuten;
 
-    for (const o of lijstVan('orders', code)) {
+    for (const o of bron.orders) {
       if (!o.paid || s(o.status) !== 'nieuw') continue;
       const m = min(o.paidAt || o.at, nu);
       if (m < traag) continue;
@@ -61,7 +89,7 @@ function maakSignalen({ db, beleid, commGast }) {
         en: 'Order ' + s(o.ref) + ' has been untouched for ' + m + ' min (' + s(o.customerCodename) + ').' });
     }
 
-    for (const r of lijstVan('rides', code)) {
+    for (const r of bron.rides) {
       if (!r.paid || s(r.status) !== 'aangevraagd' || r.driver) continue;
       const straks = r.plannedFor && (new Date(r.plannedFor) - nu) > 45 * 60000;
       if (!straks && min(r.paidAt || r.at, nu) >= traag) {
@@ -80,7 +108,7 @@ function maakSignalen({ db, beleid, commGast }) {
       }
     }
 
-    for (const b of lijstVan('boekingen', code)) {
+    for (const b of bron.boekingen) {
       if (!b.paid || s(b.status) !== 'aangevraagd') continue;
       if (min(b.paidAt || b.at, nu) < boekTraag) continue;
       const naam = (b.service && b.service.name) || s(b.kind) || 'Boeking';
@@ -91,13 +119,13 @@ function maakSignalen({ db, beleid, commGast }) {
         en: 'Booking ' + s(b.ref) + ' (' + naam + ') is still waiting for your confirmation.' });
     }
 
-    const verlofN = !leiding ? 0 : lijstVan('verlof', code).filter(v => s(v.status) === 'nieuw').length;
+    const verlofN = bron.verlof.filter(v => s(v.status) === 'nieuw').length;
     if (verlofN) uit.push({ id: 'verlof-open', niveau: 'amber', type: 'verlof', objectId: null,
       oorzaak: 'verlof wacht op besluit', beslissing: 'Toekennen of afwijzen?',
       nl: verlofN + ' verlofaanvraag/aanvragen wachten op uw besluit (HR & team).',
       en: verlofN + ' leave request(s) await your decision (HR & team).' });
 
-    const sollN = !leiding ? 0 : lijstVan('applications', code).filter(a => s(a.status) === 'nieuw').length;
+    const sollN = bron.applications.filter(a => s(a.status) === 'nieuw').length;
     if (sollN) uit.push({ id: 'sollicitatie-open', niveau: 'info', type: 'sollicitatie', objectId: null,
       oorzaak: 'sollicitatie open', beslissing: 'Uitnodigen of afwijzen?',
       nl: sollN + ' open sollicitatie(s) (HR & team).',
@@ -108,19 +136,19 @@ function maakSignalen({ db, beleid, commGast }) {
        Zonder deze bron zou dit signaal stil wegvallen bij het samenvoegen -- en
        een signaal dat verdwijnt zonder dat iemand het merkt, is precies wat
        samenvoegen gevaarlijk maakt. */
-    const chatsN = commGast ? (commGast.voorZaak(code) || []).filter(c => c && c.unread).length : 0;
+    const chatsN = bron.chats.filter(c => c && c.unread).length;
     if (chatsN) uit.push({ id: 'gastchat-open', niveau: 'amber', type: 'gastchat', objectId: null,
       oorzaak: 'gastchat wacht op antwoord', beslissing: 'Wie beantwoordt deze gasten?',
       nl: chatsN + ' gastchat(s) wachten op een antwoord.',
       en: chatsN + ' guest chat(s) waiting for a reply.' });
 
-    const klussenN = lijstVan('tickets', code).filter(t => s(t.status) !== 'klaar').length;
+    const klussenN = bron.tickets.filter(t => s(t.status) !== 'klaar').length;
     if (klussenN) uit.push({ id: 'klus-open', niveau: 'info', type: 'klus', objectId: null,
       oorzaak: 'klus open', beslissing: 'Inplannen of sluiten?',
       nl: klussenN + ' open klus(sen) of onderhoud.',
       en: klussenN + ' open job(s) or maintenance.' });
 
-    const vuilN = (zaak.rooms || []).filter(r => r && r.hk && s(r.hk.status) === 'vuil').length;
+    const vuilN = bron.rooms.filter(r => r && r.hk && s(r.hk.status) === 'vuil').length;
     if (vuilN) uit.push({ id: 'kamer-vuil', niveau: 'amber', type: 'kamer', objectId: null,
       oorzaak: 'kamer nog schoon te maken', beslissing: 'Wie maakt deze kamers schoon?',
       nl: vuilN + ' kamer(s) nog schoon te maken.',
@@ -136,7 +164,7 @@ function maakSignalen({ db, beleid, commGast }) {
      iets aan zijn antwoord verandert. */
   const alerts = (zaak, en, opties) => voor(zaak, opties).map(x => ({ level: x.niveau, text: en ? x.en : x.nl }));
 
-  return { voor, alerts };
+  return { voor, alerts, bronstempel };
 }
 
 module.exports = { maakSignalen };

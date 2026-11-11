@@ -60,7 +60,12 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
 
      De vorm van het antwoord verandert niet: nog steeds { level, text } in de
      taal van het scherm. */
-  const alerts = kern.zaakcommand.voor(s, { leiding: true }).signalen.alerts(s, en, { leiding: true });
+  const signalen = kern.zaakcommand.voor(s, { leiding: true }).signalen;
+  const alerts = signalen.alerts(s, en, { leiding: true });
+  // Alleen expliciet opvragen, achter dezelfde managerpoort. Gewone scherm-
+  // en sessiecontroles betalen geen serialisatie/hash van de signalenbron.
+  const bron = req.body.bronstempel === true
+    ? { alertBron: signalen.bronstempel(s, { leiding: true }) } : {};
   const kassaVandaag = kassa.filter(v => dag(v.at) === vandaag).reduce((x, v) => x + (v.total || 0), 0);
   const stats = {
     omzetVandaag: week[6].omzet,
@@ -89,7 +94,7 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
       ? (en ? 'Nothing is stuck; ' + alerts.length + ' routine item(s) remain.' : 'Niets loopt vast; nog ' + alerts.length + ' routinepunt(en).')
       : (en ? 'Everything is running smoothly.' : 'Alles loopt.'));
   zin.push(en ? 'RTG charges 0% commission: this revenue is fully yours.' : 'RTG rekent 0% commissie: deze omzet is volledig van u.');
-  res.json({ stats, week, toppers, alerts: alerts.slice(0, 12), briefing: zin.join(' ') });
+  res.json({ stats, week, toppers, alerts: alerts.slice(0, 12), briefing: zin.join(' '), ...bron });
 });
 
 

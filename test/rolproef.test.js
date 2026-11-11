@@ -77,7 +77,8 @@ function nepServer(antwoord) {
       if (pad === '/api/pay/oplaad') { saldo += 137; return { status: 200, data: { ok: true } }; }
       if (pad === '/api/pay/overzicht') return { status: 200, data: { saldo, geschiedenis: [], aanMij: [], vanMij: [] } };
       if (pad === '/api/verkoop/mijn') return { status: 200, data: { deals: [] } };
-      if (pad === '/api/supplier/backoffice') return { status: 200, data: { toppers: [], alerts: [] } };
+      if (pad === '/api/supplier/backoffice') return { status: 200, data: { toppers: [], alerts: [],
+        alertBron: { schema: 1, bereik: 'zaakcommand-signalen', sha256: 'a'.repeat(64) } } };
       if (pad === '/api/auth/me' || pad === '/api/office/state') return { status: 200, data: {} };
       gezien.push({ pad, tok });
       return antwoord(pad, tok);
@@ -414,4 +415,57 @@ test('een mislukte nameting is een meetfout, geen bewezen toestandswijziging', a
   const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
   assert.match(uit.bevindingen.meterStuk, /toestandscontrole/);
   assert.deepEqual(uit.bevindingen.gewijzigd, []);
+});
+
+test('tijdsafgeleide alerts blijven waarnemingen naast een stabiele bron', async () => {
+  const nep = nepServer(() => ({ status: 403, data: {} }));
+  let gemeten = 0;
+  const post = async (pad, lijf, token) => {
+    const r = await nep.post(pad, lijf, token);
+    if (pad === '/api/supplier/backoffice' && lijf.bronstempel === true) {
+      gemeten++;
+      r.data.alerts = gemeten === 4 ? Array(4).fill({ text: 'CANARY-TOKEN-ALERT-783' }) : [];
+    }
+    return r;
+  };
+  const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
+  assert.equal(gemeten, 4, 'ijking en voor/na vragen de bron expliciet op');
+  assert.deepEqual(uit.bevindingen.gewijzigd, []);
+  assert.equal(uit.bevindingen.meterStuk, undefined);
+  assert.deepEqual(uit.voor.waarnemingen, { alerts: 0 });
+  assert.deepEqual(uit.na.waarnemingen, { alerts: 4 });
+  assert.equal(JSON.stringify(uit).includes('CANARY-TOKEN-ALERT-783'), false);
+});
+
+test('een geweigerde schrijfpoging met gewijzigde signalenbron blijft rood bij gelijke alerttelling', async () => {
+  let hash = 'a'.repeat(64);
+  const nep = nepServer(() => { hash = 'b'.repeat(64); return { status: 403, data: {} }; });
+  const post = async (...args) => {
+    const r = await nep.post(...args);
+    if (args[0] === '/api/supplier/backoffice') r.data.alertBron.sha256 = hash;
+    return r;
+  };
+  const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
+  assert.equal(uit.bevindingen.tweexx.length, 0);
+  assert.ok(uit.bevindingen.gewijzigd.some(x => x.startsWith('alertBron:')));
+  assert.equal(uit.voor.waarnemingen.alerts, uit.na.waarnemingen.alerts);
+});
+
+test('een ontbrekende of ongeldige signalenbron blokkeert ijking en nameting', async () => {
+  for (const ongeldig of [undefined, null, {}, { schema: 2, bereik: 'zaakcommand-signalen', sha256: 'a'.repeat(64) },
+    { schema: 1, bereik: 'alle-data', sha256: 'a'.repeat(64) },
+    { schema: 1, bereik: 'zaakcommand-signalen', sha256: 'geen-hash' }]) {
+    for (const pasNa of [false, true]) {
+      const nep = nepServer(() => ({ status: 403, data: {} })); let gelezen = 0;
+      const post = async (...args) => {
+        const r = await nep.post(...args);
+        if (args[0] === '/api/supplier/backoffice' && args[1].bronstempel === true &&
+            (++gelezen === 4 || !pasNa)) r.data.alertBron = ongeldig;
+        return r;
+      };
+      const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
+      assert.ok(uit.bevindingen.meterStuk, JSON.stringify({ ongeldig, pasNa }));
+      assert.deepEqual(uit.bevindingen.gewijzigd, []);
+    }
+  }
 });

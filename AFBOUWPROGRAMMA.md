@@ -6868,3 +6868,57 @@ De registerregressies sluiten 89/89 groen, zonder skips. De bundelindex en
 Commerce-afdruk zijn eveneens door hun eigen producent bijgewerkt; `NORM.json`
 is ongewijzigd. Experience blijft uitdrukkelijk `NOT_TESTED`: een actuele
 inventaris bewijst geen menselijke beoordeling of volledige uitvoeringsronde.
+
+#### Technische eindronde en uitrolvoorbereiding, 12 november 2026
+
+De eigenaar verduidelijkt de opdracht: volledig technisch groen en klaarmaken
+voor uitrol; geen daadwerkelijke uitrol of integratie naar main. De bron- en
+registerkandidaat is `b7f2fee9e5f90741cb73a1a32a954015a47a9f59`. De statische
+huiscontrole en ongewijzigde normcontrole zijn groen. Volledige CI
+`43118242096`, diagnostische performanceronde `43118243625` en een nieuwe
+lokale voltooiproef zijn gestart. Gestart is geen geslaagd eindbewijs; de
+profileronde is bovendien uitdrukkelijk geen prestatievrijgave.
+
+Voor uitrol blijft `deploy/NATIVE.md` het bestaande draaiboek voor de Mac-host.
+Staging met synthetische gegevens vervangt geen echte providerwerking of een
+bewezen terugkeer naar een andere bekende goede release. De bestaande native
+poort vraagt `READY`, terwijl de geldconfiguratie expliciet meldt dat een
+productie-uitbetaalprovider nog ontbreekt (`server/config/productie-geld.js`).
+`READY_ZONDER_RAIL` mag niet stil als geautoriseerde native productieroute
+worden gepresenteerd. Providerkeuze, echte hostconfiguratie, getekende vorige
+release en de gescheiden vrijgavebevoegdheden blijven uitrolvoorwaarden.
+Er zijn geen productiegeheimen ingevuld, geldwegen geopend of hostverwijzingen
+omgezet. De technische kandidaat wordt onafhankelijk daarvan verder getoetst.
+
+De volledige ronde op `b7f2fee` is niet groen verklaard. De voltooiproef vond
+in de Vandaag-keten een echte daggrensfout: na middernacht in de huiszone
+vergeleken gezondheidsonderdelen nog met de UTC-datum. Gewoonten, metingen,
+gemoed en Life gebruiken nu de bestaande huiskalender, ook voor kalenderdagen
+over de zomer-/wintertijdgrens. De gerichte HTTP-/daggrensgroep sluit 54/54
+groen en de afzonderlijke Vandaag-voltooiketen sluit alle onderdelen, inclusief
+opslag, herstart en herstel. Die deelproef overschrijft het rode volledige
+register niet. Een gelijksoortige leverancierslogboekfout is op dezelfde
+bestaande kalenderbron hersteld; de HTTP-/daggrensgroep sluit 13/13 groen.
+
+De diagnostische storm vond geen verkeerde positieve rolantwoorden, maar
+wel een onbesliste domeinfixture en een oplopende alertteller. De domeinfixture
+gebruikt nu een eigen bestaande website wanneer de leverancier zijn maximum
+al bereikt heeft, zonder ontwerp te overschrijven of de limiet te verruimen.
+Tijdafhankelijke alertpresentatie is geen stabiele toestandsvingerafdruk: de
+rolproef vergelijkt nu expliciet de broninhoud van de bestaande signalenmaker,
+met effectieve beleidswaarden en zonder klok/alerttekst. De telling blijft als
+waarneming bewaard. Alleen een manager kan de bronstempel expliciet opvragen;
+een ontbrekende of ongeldige stempel blokkeert de meting. Gewijzigde broninhoud
+bij gelijke aantallen blijft rood. Het bereik heet `zaakcommand-signalen`,
+behoudt de bestaande gastinboxgrens en claimt geen volledige databankdekking.
+De gezamenlijke echte HTTP-/rol-/bronstempelgroep sluit 62/62 groen, nul skips.
+
+Alle vijf browserdelen van CI `43118242096` zijn geslaagd; drie unitdelen
+zijn afgekeurd. Naast de logboekfout betroffen de bevindingen verouderde
+afgeleide documentgetallen, CODEWERELD, routedekking en twee nieuwe fixtures
+die nog op het algemene load-event wachtten. De eigen registerproducenten
+herstellen de documentafleidingen. De Edge-fixtures wachten op DOM, werkelijke
+stylesheets en het bestaande versiecontract; de volledige Edge-selectie
+sluit 31/31 groen. De oorspronkelijke prestatielatten blijven staan. De
+profileronde met p99 233 ms en event-loop 135,2 ms is diagnostiek, geen
+prestatievrijgave. Een nieuwe schone volledige kwalificatie blijft nodig.

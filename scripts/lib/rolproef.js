@@ -24,8 +24,8 @@
 
    De opzet is een gericht experiment en geen storm: momentopname van de
    waarneembare toestand, alle schrijfroutes met alle verkeerde rollen, en daarna
-   dezelfde momentopname. Wat er dan verschilt, is door een verkeerde rol
-   veroorzaakt.
+   dezelfde momentopname. Een verschil is een te onderzoeken mutatie; de proef
+   bewijst op zichzelf niet welke aanvraag of achtergrondtaak haar veroorzaakte.
    ========================================================================== */
 'use strict';
 
@@ -110,9 +110,11 @@ function plausibelLijf(pad) {
   };
 }
 
-/* De momentopname. Bewust GETALLEN en geen hele JSON-blobs: een tijdstempel of
-   een teller die uit zichzelf loopt zou elke vergelijking laten mislukken, en
-   een proef die altijd rood staat wordt binnen een week uitgezet.
+/* De momentopname bewaart getallen en de inhoudsstempel van de signalenbron,
+   geen antwoordblobs. Alerts zijn tijdafgeleid: een onaangeroerde bestelling
+   wordt vanzelf een alert. Hun telling blijft een WAARNEMING, terwijl de
+   bronstempel echte wijzigingen (ook met gelijke aantallen) bewaakt. Het
+   bereik is de bestaande signalenbron, niet de volledige appdatabase.
 
    DE VELDEN ZIJN GEMETEN, NIET GERADEN. Mijn eerste versie gokte namen
    (boekingen, items, lijst, aantalLeden) en zat er bijna overal naast -- vier van
@@ -121,16 +123,16 @@ function plausibelLijf(pad) {
 
      /api/pay/overzicht      saldo, geschiedenis[], aanMij[], vanMij[]
      /api/verkoop/mijn       deals[]
-     /api/supplier/backoffice stats, week[7], toppers[], alerts[]
+     /api/supplier/backoffice toppers[], alerts[], alertBron op expliciet verzoek
 
    Maar de echte borging is niet deze lijst -- die kan morgen weer verschuiven.
    Dat is ijkVingerafdruk() hieronder. */
 async function vingerafdruk(post, tok) {
   const lengte = (v) => (Array.isArray(v) ? v.length : (typeof v === 'number' ? v : null));
-  const uit = { meetfouten: [] };
-  async function lees(pad, token) {
+  const uit = { meetfouten: [], waarnemingen: {} };
+  async function lees(pad, token, lijf = {}) {
     try {
-      const r = await post(pad, {}, token);
+      const r = await post(pad, lijf, token);
       if (!geslaagd(r && r.status) || !r.data || typeof r.data !== 'object') {
         uit.meetfouten.push(pad + ' -> ' + statusVan(r));
         return {};
@@ -150,11 +152,26 @@ async function vingerafdruk(post, tok) {
   }
   { const r = await lees('/api/verkoop/mijn', tok.member); uit.deals = lengte(r.data && r.data.deals); }
   {
-    const r = await lees('/api/supplier/backoffice', tok.supplier);
+    const r = await lees('/api/supplier/backoffice', tok.supplier, { bronstempel: true });
     uit.toppers = lengte(r.data && r.data.toppers);
-    uit.alerts = lengte(r.data && r.data.alerts);
+    uit.waarnemingen.alerts = Array.isArray(r.data?.alerts) ? r.data.alerts.length : null;
+    if (uit.waarnemingen.alerts === null) uit.meetfouten.push('/api/supplier/backoffice -> geen alertwaarneming');
+    const bron = r.data?.alertBron;
+    if (bron?.schema !== 1 || bron.bereik !== 'zaakcommand-signalen' ||
+        typeof bron.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(bron.sha256)) {
+      uit.meetfouten.push('/api/supplier/backoffice -> ontbrekende of ongeldige signalenbron');
+      uit.alertBron = null;
+    } else uit.alertBron = 'zaakcommand-signalen:v1:' + bron.sha256;
   }
   return uit;
+}
+
+function gewijzigdeToestand(voor, na) {
+  // Metadata en waarnemingen zijn geen toestand. Alle toestandsvelden blijven
+  // meetellen; een werkelijke timerwrite wordt niet uitgezonderd of bevroren.
+  return [...new Set([...Object.keys(voor), ...Object.keys(na)])]
+    .filter(k => k !== 'meetfouten' && k !== 'waarnemingen' &&
+      !(voor[k] == null && na[k] == null) && voor[k] !== na[k]);
 }
 
 /* ---- DE IJKING: KAN DEZE VINGERAFDRUK EIGENLIJK IETS ZIEN? ----
@@ -178,7 +195,7 @@ async function ijkVingerafdruk(post, tok) {
     gelukt = geslaagd(r.status);
   } catch (e) {}
   const na = await vingerafdruk(post, tok);
-  const bewogen = Object.keys(na).filter(k => k !== 'meetfouten' && voor[k] !== na[k]);
+  const bewogen = gewijzigdeToestand(voor, na);
   return { gelukt, bewogen, voor, na,
     gevoelig: !voor.meetfouten.length && !na.meetfouten.length && bewogen.length > 0 };
 }
@@ -369,11 +386,7 @@ async function draaiRolproef({ post, vraag, routes, tokensVoor, maxPogingen, lij
     bevindingen.meterStuk = 'de toestandscontrole gaf geen geldig antwoord: ' +
       [...voor.meetfouten, ...na.meetfouten].join('; ');
   } else {
-    for (const k of new Set([...Object.keys(voor), ...Object.keys(na)])) {
-      if (k === 'meetfouten') continue;
-      if (voor[k] == null && na[k] == null) continue;
-      if (voor[k] !== na[k]) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);
-    }
+    for (const k of gewijzigdeToestand(voor, na)) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);
   }
   return { bevindingen, perRoute, nietTeKruisen, pogingen: gedaan, voor, na, ijk };
 }

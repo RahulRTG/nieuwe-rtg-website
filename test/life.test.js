@@ -14,6 +14,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 const { winstVan } = require('../server/kern/life');
+const tijdzone = require('../server/kern/tijdzone');
 
 let srv, base, lid;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-life-'));
@@ -22,7 +23,7 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const overDagen = n => tijdzone.plusDagen(tijdzone.huis().datum, n);
 const sig = (b, id) => b.signalen.find(s => s.id === id);
 
 test.before(async () => {

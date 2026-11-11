@@ -29,13 +29,13 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 
-function maak() {
+function maak(commGast) {
   const zaak = { code: 'MIJN', name: 'Sal de Mar', type: 'restaurant', city: 'Ibiza', rooms: [], tables: [] };
   const db = { data: { suppliers: [zaak], orders: [], boekingen: [], rides: [] } };
   let bewaard = 0;
   const zc = require('../server/kern/zaakcommand').maakZaakCommand({
     db, save: () => { bewaard++; }, crypto, anthropic: null,
-    findSupplier: (c) => db.data.suppliers.find(x => x.code === c)
+    findSupplier: (c) => db.data.suppliers.find(x => x.code === c), commGast
   });
   return { db, zaak, zc, laag: zc.voor(zaak, { leiding: true }), saves: () => bewaard };
 }
@@ -69,6 +69,90 @@ test('de signalen van het dashboard lezen schrijft niet', () => {
   assert.ok(Array.isArray(alerts));
   assert.equal(db.data.zaakCommand, undefined,
     'het opbouwen van het actiecentrum schreef in zaakCommand');
+});
+
+test('vier orders worden door tijd alerts zonder bronmutatie of schrijfactie', (t) => {
+  const { db, laag, zaak, saves } = maak();
+  const begin = Date.parse('2026-11-11T23:14:50Z');
+  db.data.orders = Array.from({ length: 4 }, (_, i) => ({ ref: 'O-' + i,
+    supplierCode: zaak.code, paid: true, status: 'nieuw', paidAt: new Date(begin).toISOString() }));
+  const opgeslagen = structuredClone(db.data);
+  let nu = begin + 569999;
+  t.mock.method(Date, 'now', () => nu);
+  const voor = laag.signalen.bronstempel(zaak, { leiding: true });
+  assert.equal(laag.signalen.alerts(zaak, false, { leiding: true }).length, 0);
+  nu++;
+  assert.equal(laag.signalen.alerts(zaak, false, { leiding: true }).length, 4);
+  assert.deepEqual(laag.signalen.bronstempel(zaak, { leiding: true }), voor);
+  assert.equal(voor.schema, 1);
+  assert.equal(voor.bereik, 'zaakcommand-signalen');
+  assert.match(voor.sha256, /^[a-f0-9]{64}$/);
+  assert.deepEqual(db.data, opgeslagen);
+  assert.equal(saves(), 0);
+});
+
+test('de signalenbron ziet inhoud en beleid, ook zonder gewijzigde aantallen', () => {
+  const chats = [{ key: 'G-1', unread: 1, lastAt: '2026-11-11T23:14:50Z' }];
+  const { db, zaak, laag } = maak({ voorZaak: () => chats });
+  db.data.orders = Array.from({ length: 90 }, (_, i) => ({ ref: 'O-' + i,
+    supplierCode: zaak.code, paid: true, status: 'nieuw', at: '2026-11-11T23:14:50Z' }));
+  db.data.rides = [{ ref: 'R-1', supplierCode: zaak.code, driver: null }];
+  db.data.boekingen = [{ ref: 'B-1', supplierCode: zaak.code, status: 'aangevraagd' }];
+  db.data.verlof = { MIJN: [{ id: 'V-1', status: 'nieuw' }] };
+  db.data.applications = { MIJN: [{ id: 'A-1', status: 'nieuw' }] };
+  db.data.tickets = { MIJN: [{ id: 'T-1', status: 'open' }] };
+  zaak.rooms.push({ id: 'K-1', hk: { status: 'vuil' } });
+  const stempel = () => laag.signalen.bronstempel(zaak, { leiding: true });
+  for (const wijzig of [
+    () => { db.data.orders[89].status = 'in bereiding'; },
+    () => { db.data.orders[0].ref = 'O-VERVANGEN'; },
+    () => { db.data.rides[0].driver = 'chauffeur'; },
+    () => { db.data.boekingen[0].status = 'bevestigd'; },
+    () => { db.data.verlof.MIJN[0].status = 'toegestaan'; },
+    () => { db.data.applications.MIJN[0].status = 'uitgenodigd'; },
+    () => { db.data.tickets.MIJN[0].status = 'klaar'; },
+    () => { zaak.rooms[0].hk.status = 'schoon'; },
+    () => { chats[0].unread = 0; },
+    () => { laag.beleid.zet('zaak.reactieMinuten', 11, 'toets', 'andere termijn'); },
+    () => { laag.beleid.zet('zaak.boekingMinuten', 31, 'toets', 'andere termijn'); }
+  ]) {
+    const voor = stempel(); wijzig();
+    assert.notEqual(stempel().sha256, voor.sha256, String(wijzig));
+  }
+  const voor = stempel();
+  db.data.orders.push({ ref: 'O-BUUR', supplierCode: 'BUUR', status: 'nieuw' });
+  db.data.verlof.BUUR = [{ status: 'nieuw' }];
+  assert.deepEqual(stempel(), voor, 'andere zaken horen niet bij deze bron');
+  db.data.orders[0].notitie = 'CANARY-GEHEIME-BODY-783';
+  assert.equal(JSON.stringify(stempel()).includes('CANARY-GEHEIME-BODY-783'), false);
+});
+
+test('alleen een expliciet managerverzoek berekent de backoffice-bronstempel', () => {
+  let handler, berekend = 0;
+  const zaak = { code: 'MIJN', rooms: [] };
+  const signalen = { alerts: () => [], bronstempel: () => {
+    berekend++; return { schema: 1, bereik: 'zaakcommand-signalen', sha256: 'a'.repeat(64) };
+  } };
+  require('../server/routes/supplier/backoffice')({
+    app: { post: (_pad, _auth, fn) => { handler = fn; } }, supplierAuth() {},
+    db: { data: { rides: [], posSales: {}, klok: {} } },
+    ordersVanZaak: () => [], boekingenVanZaak: () => [], zaakcommand: { voor: () => ({ signalen }) }
+  });
+  const lees = (body, manager = true) => {
+    let status = 200, data;
+    handler({ supplier: zaak, actor: { manager }, body }, {
+      status(n) { status = n; return this; }, json(v) { data = v; }
+    });
+    return { status, data };
+  };
+  for (const body of [{}, { bronstempel: false }, { bronstempel: 'true' }]) {
+    assert.equal(lees(body).data.alertBron, undefined);
+  }
+  assert.equal(berekend, 0, 'gewone scherm- en sessiecontroles serialiseren de bron niet');
+  assert.equal(lees({ bronstempel: true }, false).status, 403);
+  assert.equal(berekend, 0, 'een medewerker kan de berekening niet opvragen');
+  assert.equal(lees({ bronstempel: true }).data.alertBron.sha256, 'a'.repeat(64));
+  assert.equal(berekend, 1);
 });
 
 /* DE ANDERE HELFT. Zonder deze toets is de reparatie hierboven te "halen" door

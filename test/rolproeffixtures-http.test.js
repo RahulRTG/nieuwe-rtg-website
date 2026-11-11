@@ -28,6 +28,20 @@ for (const viaE3 of [false, true]) test((viaE3 ? 'E3: ' : '') +
     }
     const lid = await maakProeflid({ post, naam: 'Rolfixture HTTP', basis: server.basis });
     assert.ok(lid.klaar?.gekeurd, lid.reden || lid.klaar?.keurReden);
+    // De storm kan de gewone sitegrens al bereikt hebben. De domeinproef
+    // moet dan een EIGEN bestaand ontwerp gebruiken, niet een dertiende site
+    // eisen of de productielimiet verruimen.
+    const sitesVoor = [];
+    if (viaE3) {
+      for (let i = 0; i < 12; i++) {
+        const r = await post('/api/supplier/site/bewaar', { design: {
+          titel: 'Stormsite ' + i, blokken: [{ type: 'kop', tekst: 'Bewaren ' + i }]
+        } }, tokens.supplier);
+        assert.equal(r.status, 200);
+        sitesVoor.push(r.data.design);
+      }
+      assert.equal((await post('/api/supplier/site/bewaar', { design: { titel: 'Dertiende' } }, tokens.supplier)).status, 400);
+    }
     const postT = metToestellen(post, { voorLid: { lid: lid.klaar, van: () => tokens.member } });
     let uit;
     if (viaE3) {
@@ -35,6 +49,13 @@ for (const viaE3 of [false, true]) test((viaE3 ? 'E3: ' : '') +
         tokens, proeflid: lid.klaar, basis: server.basis });
       assert.equal(uit.maxPogingen, null, 'E3 heeft standaard geen afkapbudget');
       assert.equal(rolproefGeslaagd(uit), true, JSON.stringify(uit.bevindingen));
+      const sitesNa = await post('/api/supplier/site/mijn', {}, tokens.supplier);
+      assert.equal(sitesNa.data.lijst.length, 12, 'geen extra site en geen verwijdering');
+      for (const site of sitesVoor) {
+        const bewaard = await post('/api/supplier/site/haal', { id: site.id }, tokens.supplier);
+        assert.equal(bewaard.data.design.titel, site.titel);
+        assert.deepEqual(bewaard.data.design.blokken, site.blokken, 'geen bestaand ontwerp overschreven');
+      }
     } else {
       const fixtures = await maakRolfixtures({ post, basis: server.basis, tokens, proeflid: lid.klaar });
       for (const [route, fixture] of Object.entries(fixtures)) {

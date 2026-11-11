@@ -43,6 +43,7 @@
 
 // de gesloten lijst beschermde soorten en de oude teksten: ./beschermdesoorten.js
 const { KLOKSOORTEN, OUDE_KLOKTEKST } = require('./beschermdesoorten');
+const { datumVan } = require('../tijdzone');
 
 // de velden van een bewakersdienst die WANNEER zeggen (besluit 1A): alleen voor een manager en de bewaker zelf
 const DIENSTKLOKVELDEN = Object.freeze(['inklokAt', 'uitklokAt', 'plekIn']);
@@ -115,7 +116,7 @@ function aanwezigVoor(lijst, actor, naamVan) {
    over gaan: wie er binnen is (voor iedereen) met de klokregels van vandaag, en
    de nieuwste 40 logboekregels -- allebei voor DEZE actor. */
 function staatDelen(data, code, actor, vandaag) {
-  const entries = ((data.klok || {})[code] || []).filter(e => e && String(e.in).slice(0, 10) === vandaag).slice(0, 60);
+  const entries = ((data.klok || {})[code] || []).filter(e => e && datumVan(e.in) === vandaag).slice(0, 60);
   return {
     klok: { vandaag: klokVandaagVoor(entries, actor), binnen: aanwezigVoor([...new Set(entries.filter(e => !e.out).map(e => e.name))], actor, (n) => n) },
     activity: logboekVoor((data.supplierActivity || {})[code], actor, 40).regels

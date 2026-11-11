@@ -547,7 +547,7 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
         await page.setViewportSize({ width: 390, height: 844 });
         // Een lege nieuwe pagina heeft een opaque origin: CORP same-origin blokkeert
         // daar onze echte CSS/JS. Neem eerst dezelfde origin zonder app-runtime.
-        await page.goto(base + '/api/health', { waitUntil: 'load' });
+        await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
         // De bestaande stijlen/runtime, met één nog niet gecommitteerde presentatiebron.
         // Geen eigen visibilityregel of timer die de race kunstmatig nabootst.
         await page.setContent(`<!doctype html><html><head>
@@ -559,7 +559,10 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
             data-rtg-edge-2-rendered="true" data-rtg-world-dashboard-ready="true">
           <div class="rtg-world-start">LivingOS wordt klaargezet…</div>
           <header class="rtg-v4-header">RTG</header><div class="rtg-adaptive-bar">Edge</div>
-          </body></html>`, { waitUntil: 'load' });
+          </body></html>`, { waitUntil: 'domcontentloaded' });
+        // De meting vraagt de echte schilstijlen, niet alle subverzoeken van de pagina.
+        await page.waitForFunction(() => [...document.querySelectorAll('link[rel="stylesheet"]')].every(link => !!link.sheet) &&
+          getComputedStyle(document.body).getPropertyValue('--rtg-editorial-version').trim() === '20261016');
         const laden = await page.evaluate(() => {
           const header = document.querySelector('body>.rtg-v4-header'), bar = document.querySelector('.rtg-adaptive-bar');
           window.__rtgV4EdgeStabiel = performance.now() - 1000;

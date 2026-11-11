@@ -36,8 +36,14 @@ function maakKetenofferte(data, verkoper, vorigeVersie, providerVan, nu) {
     const provider = providerVan(p.supplierCode);
     if (!provider || provider.error) return provider || fout(503, 'De aanbieder kan niet worden gecontroleerd.');
     ids.add(p.id);
+    const productRef = tekst(p.productRef, 160);
+    /* Alleen de leverancier-/tenantbinding is gecontroleerd. De productref
+       blijft de opgave van de verkoper, geen live boekingsbewijs of economische
+       klasse. Een clientbron mag de gecontroleerde binding niet vervangen. */
+    const productbron = { soort: 'opgegeven-productreferentie', org: provider.org,
+      supplierCode: provider.supplierCode, productRef };
     onderdelen.push({ id: p.id, wat: tekst(p.wat, 160), soort: p.soort,
-      productRef: tekst(p.productRef, 160), supplierCode: provider.supplierCode,
+      productRef, bron: productbron, supplierCode: provider.supplierCode,
       org: provider.org, naam: provider.naam, centen: p.centen,
       verschuldigdCenten: p.verschuldigdCenten });
   }

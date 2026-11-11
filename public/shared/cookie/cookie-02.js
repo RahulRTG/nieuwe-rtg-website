@@ -54,7 +54,10 @@
            op de tekstmaat, anders veroorzaakt de owner zijn eigen meetlus. */
         if (tekstmaat === laatsteTekstmaat) return;
         laatsteTekstmaat = tekstmaat;
-        window.requestAnimationFrame(meetRuimte);
+        /* De nieuwe tekst kan al vóór de volgende frame worden uitgelezen.
+           Reserveer daarom in deze microtaskronde; de maatkijker blijft
+           latere font- en layoutwijzigingen volgen. */
+        meetRuimte();
       });
       tekstmaatkijker.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
     }

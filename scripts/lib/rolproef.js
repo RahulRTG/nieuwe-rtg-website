@@ -352,8 +352,9 @@ async function draaiRolproef({ post, vraag, routes, tokensVoor, maxPogingen, lij
         continue;
       }
       if (oordeel.lek) {
-        bevindingen.lekken.push(sleutel + ' [' + rol + ' -> ' + s + '] ' + oordeel.lek +
-          ': ' + lijf.slice(0, 120).replace(/\s+/g, ' '));
+        // Een lekmelding mag het gevonden geheim niet zelf doorgeven aan
+        // loggers of bewijsregisters. Route, rol, status en categorie volstaan.
+        bevindingen.lekken.push(sleutel + ' [' + rol + ' -> ' + s + '] ' + oordeel.lek);
       }
     }
     Object.assign(bij, beoordeelRolrij(bij));

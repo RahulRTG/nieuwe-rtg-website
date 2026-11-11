@@ -95,37 +95,7 @@ aangenomen sollicitant). `opzet/meldaan.js` heeft nu twee wegen uit één
 schrijver. En let op de vondst die een bestaande toets afdwong: een **afgewezen**
 reisaanvraag hoort juist op de tijdlijn te blijven staan, want `reisoplosser.js`
 hangt aan dat signaal om alternatieven te zoeken — alleen `geannuleerd` en
-`afgezegd` vallen weg. Paragraaf 9 blijft een historische meting van 10
-september: de later gebouwde `reisbureau-betaling.js`, samenstelling,
-geldherkomst en teruggave sluiten softwarestappen, maar maken de federatieve
-partnerketen en de integrale productiekwalificatie niet achteraf groen.
-**`TRAVELOS-UITVOERING.md` is het federatieve uitvoeringscontract van 11
-november 2026** — geen nieuwe reisbackend, PartnerOS of bewijsregister, maar de
-repositorygebonden vertaling van REIZEN.md en TRAVELCOMMERCE.md. Het legt vier
-harde richtingen vast: een partner houdt eigen klanten, leveranciers,
-contracten, tarieven, betaalprovider en uitgang; de juridische en economische
-rol staat per transactie en niet alleen per organisatie; de operationele én
-financiële lus moeten sluiten; en brede reisdekking wordt niet als directe
-boekbaarheid verkocht. Daarom onderscheidt het `ondersteund`, `operationeel
-bewezen` en `direct boekbaar bewezen`, steeds provider-, product-, markt- en
-broncommitgebonden. De repositorymatrix wijst per verantwoordelijkheid de
-bestaande module, het aanwezige contract, de ontbrekende overgang, de vereiste
-proef en de blokkade-eigenaar aan. De eerste kwalificatie is een spiegelproef:
-dezelfde beperkte reis voor RTG Travel en een onafhankelijke tenant, met drie
-zelfstandige leveranciers. `APPWERKT.json`, EXPERIENCEWERKT en Deep Green
-blijven beslissend; de actuele conclusie in de bijlage is NO-GO. Paragraaf 15
-beschrijft de inmiddels lokaal aangesloten keten in de bestaande
-reisAanvragen-opslag: persoonlijke actoren, offerteversies, leveranciers-
-acceptatie, inning en leveringsverklaringen. De bestaande reiskern bewaart nu
-haar prijsgrond en herstelt betalingen op dezelfde economische identiteit.
-Nieuwe inning vraagt de bestaande identiteitspoort en huisvrijgave; read-only
-herstel verplaatst geen nieuw geld. Nazorgvragen en verkopersantwoorden zijn
-aangesloten zonder uitvoerings- of financieel mandaat. De bestaande tenant-
-uitgang draagt een zaakgebonden documentair reisarchief zonder actieve rechten;
-geopende schermen herstellen na netwerkuitval zonder gevoelig lokaal dossier.
-Settlement, gedeeltelijke refund, volledige tenantuitgang en externe acceptatie
-zijn daarmee niet stilzwijgend opgelost. Het meetverslag staat uitsluitend in
-het bestaande AFBOUWPROGRAMMA.md.
+`afgezegd` vallen weg.
 **`KAARTEN.md` is de kaartlaag onder de navigatie** — hoe RTG elk land en elke
 stad kan aanbieden terwijl een lid zelf kiest welke kaarten hij wil hebben. Lees
 die vóór je aan navigatie, kaartdekking of een gebied werkt. Drie standen die
@@ -2923,3 +2893,35 @@ PersonalOS ordent alleen wat daarbinnen relevant is, de gebruiker kan altijd
 zelf vastzetten en Heel RTG blijft volledig bereikbaar. Het document bevat ook
 de repository-audit, werkelijk geïmplementeerde API-contracten, dreigingsmodel,
 lokale prestatiemeting, migratie/rollback en het actuele NO-GO.
+
+**`TRAVELOS-UITVOERING.md` is het federatieve uitvoeringscontract van 11
+november 2026** — geen nieuwe reisbackend, PartnerOS of bewijsregister, maar de
+repositorygebonden vertaling van REIZEN.md en TRAVELCOMMERCE.md. Het legt vier
+harde richtingen vast: een partner houdt eigen klanten, leveranciers,
+contracten, tarieven, betaalprovider en uitgang; de juridische en economische
+rol staat per transactie en niet alleen per organisatie; de operationele én
+financiële lus moeten sluiten; en brede reisdekking wordt niet als directe
+boekbaarheid verkocht. Daarom onderscheidt het `ondersteund`, `operationeel
+bewezen` en `direct boekbaar bewezen`, steeds provider-, product-, markt- en
+broncommitgebonden. De repositorymatrix wijst per verantwoordelijkheid de
+bestaande module, het aanwezige contract, de ontbrekende overgang, de vereiste
+proef en de blokkade-eigenaar aan. De eerste kwalificatie is een spiegelproef:
+dezelfde beperkte reis voor RTG Travel en een onafhankelijke tenant, met drie
+zelfstandige leveranciers. `APPWERKT.json`, EXPERIENCEWERKT en Deep Green
+blijven beslissend; de actuele conclusie in de bijlage is NO-GO. Paragraaf 15
+beschrijft de inmiddels lokaal aangesloten keten in de bestaande
+reisAanvragen-opslag: persoonlijke actoren, offerteversies, leveranciers-
+acceptatie, inning en leveringsverklaringen. De bestaande reiskern bewaart nu
+haar prijsgrond en herstelt betalingen op dezelfde economische identiteit.
+Nieuwe inning vraagt de bestaande identiteitspoort en huisvrijgave; read-only
+herstel verplaatst geen nieuw geld. Nazorgvragen en verkopersantwoorden zijn
+aangesloten zonder uitvoerings- of financieel mandaat. De bestaande tenant-
+uitgang draagt een zaakgebonden documentair reisarchief zonder actieve rechten;
+geopende schermen herstellen na netwerkuitval zonder gevoelig lokaal dossier.
+Settlement, gedeeltelijke refund, volledige tenantuitgang en externe acceptatie
+zijn daarmee niet stilzwijgend opgelost. Het meetverslag staat uitsluitend in
+het bestaande AFBOUWPROGRAMMA.md. Paragraaf 9 van TRAVELCOMMERCE.md blijft een
+historische meting van 10 september: de later gebouwde
+`reisbureau-betaling.js`, samenstelling, geldherkomst en teruggave sluiten
+softwarestappen, maar maken de federatieve partnerketen en de integrale
+productiekwalificatie niet achteraf groen.

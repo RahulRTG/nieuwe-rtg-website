@@ -4,6 +4,7 @@
 const test = require('node:test'), assert = require('node:assert/strict'), crypto = require('node:crypto');
 const maakExport = require('../server/kern/reisbureau-ketenexport');
 const maakUitgang = require('../server/kern/tenant/uitgang');
+const { offerte: maakKetenofferte } = require('../server/kern/reisbureau-ketencontract');
 const { berichtHash } = require('../server/lib/zegel');
 const kloon = x => structuredClone(x), AT = '2026-11-11T15:00:00.000Z';
 const account = 'user-91919', klant = 'user-81818';
@@ -90,6 +91,63 @@ test('verkoper neemt volledige benoemde eigen geschiedenis mee, niet zusterzaak 
   assert.equal(h.uitgang.controleer(u).ok, true);
   for (const c of u.catalogus) assert.equal(c.checksum, som(u.inhoud[c.soort]));
   assert.equal(u.checksum, som(u.catalogus)); assert.deepEqual(h.db.data, voor);
+});
+
+test('een nieuwe offerte houdt productbronnen en oorspronkelijke hashes na export en documentaire roundtrip', async () => {
+  const h = huis(), a = h.db.data.reisAanvragen[0], k = a.keten, basis = kloon(k.offerte);
+  const providerVan = code => basis.onderdelen.find(p => p.supplierCode === code);
+  const maak = versie => maakKetenofferte(basis, k.verkoper, versie - 1, providerVan, AT).offerte;
+  k.offerte = maak(2); k.offerteVersies = [maak(1)];
+  k.leveringen.forEach((p, i) => { p.bron = kloon(k.offerte.onderdelen[i].bron); });
+  k.akkoord.offerteHash = k.offerte.hash;
+  const voor = kloon(h.db.data), r = await h.uitvoer.zaken(actor());
+  assert.equal(r.ok, true);
+  const u = r.uitvoer, uit = u.inhoud.reisarchief.reizen[0];
+  assert.deepEqual(uit.offerte, k.offerte);
+  assert.deepEqual(uit.offerteVersies, k.offerteVersies);
+  for (const o of [uit.offerte, ...uit.offerteVersies]) {
+    const { hash: afdruk, ...grond } = o;
+    assert.equal(som(grond), afdruk, 'de oorspronkelijke offerte blijft onafhankelijk herhashbaar');
+  }
+  assert.deepEqual(uit.leveringen.map(p => p.bron), k.leveringen.map(p => p.bron));
+  const aanbieder = (await h.uitvoer.opdrachten(actor('HOTEL-A'))).uitvoer.inhoud.reisarchief.reizen[0];
+  assert.deepEqual(aanbieder.opdrachten[0].bron, k.leveringen[0].bron);
+  assert.equal(JSON.stringify(aanbieder).includes('TAXI-B'), false);
+  const ingelezen = h.uitgang.lees(u);
+  assert.equal(ingelezen.ok, true);
+  const terug = h.uitgang.exporteer(ingelezen.werkruimte).uitvoer;
+  assert.deepEqual(terug.inhoud.reisarchief.reizen[0], uit);
+  assert.equal(terug.inhoud.reisarchief.operationeelHerstel, false);
+  uit.offerte.onderdelen[0].bron.org = 'GEWIJZIGD';
+  uit.leveringen[0].bron.productRef = 'GEWIJZIGD';
+  aanbieder.opdrachten[0].bron.supplierCode = 'GEWIJZIGD';
+  assert.deepEqual(h.db.data.reisAanvragen, voor.reisAanvragen, 'bronprojecties delen geen geneste opslagobjecten');
+});
+
+test('een oude offerte blijft hashbaar zonder achteraf toegevoegde bron; oude opdrachten noemen de onbekende bron', async () => {
+  const h = huis(), r = await h.uitvoer.zaken(actor()), a = r.uitvoer.inhoud.reisarchief.reizen[0];
+  assert.equal(Object.hasOwn(a.offerte.onderdelen[0], 'bron'), false, 'geen nieuw veld in een historische hashgrond');
+  const { hash: afdruk, ...grond } = a.offerte;
+  assert.equal(som(grond), afdruk);
+  assert.equal(a.leveringen[0].bron, null);
+  const eigen = (await h.uitvoer.opdrachten(actor('HOTEL-A'))).uitvoer.inhoud.reisarchief.reizen[0];
+  assert.equal(eigen.opdrachten[0].bron, null, 'onbekend is geen teruggevulde productclaim');
+});
+
+test('bronexport bevat alleen de eigen scalaire referentievelden, geen vreemde binding of geneste geheimen', async () => {
+  const h = huis(), p = h.db.data.reisAanvragen[0].keten.leveringen[0];
+  const bron = { soort: 'opgegeven-productreferentie', org: p.org, supplierCode: p.supplierCode, productRef: p.productRef };
+  p.bron = { ...bron, token: 'GEHEIM', metadata: { actorRef: account, economischeEigenaar: 'rtg' } };
+  let u = (await h.uitvoer.opdrachten(actor('HOTEL-A'))).uitvoer;
+  assert.deepEqual(u.inhoud.reisarchief.reizen[0].opdrachten[0].bron, bron);
+  assert.equal(JSON.stringify(u).includes('GEHEIM'), false);
+  for (const afwijking of [{ soort: 'live-boeking' }, { org: 'ORG-B' }, { supplierCode: 'TAXI-B' },
+    { productRef: 'ANDERE-BRON' }, { productRef: { token: 'GEHEIM' } }]) {
+    p.bron = { ...bron, ...afwijking };
+    u = (await h.uitvoer.opdrachten(actor('HOTEL-A'))).uitvoer;
+    assert.equal(u.inhoud.reisarchief.reizen[0].opdrachten[0].bron, null, 'afwijkende referentie is geen eigen bronbewijs');
+    assert.equal(JSON.stringify(u).includes('GEHEIM'), false);
+  }
 });
 
 test('zaakzelfexport bevat geen account-, replay-, sessie- of betaalopdrachtsleutel', async () => {

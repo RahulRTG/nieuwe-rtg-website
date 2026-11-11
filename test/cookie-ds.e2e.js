@@ -42,16 +42,33 @@ test('cookie centrale owner op oudere 404-host',{skip,timeout:45000},async()=>{
   assert.equal(await page.locator('style').evaluateAll(xs=>xs.some(n=>n.textContent.includes('#rtg-cookie{'))),false);
   const centraal=await page.evaluate(()=>{function zoek(regels){for(const r of regels||[]){if(r.selectorText&&r.selectorText.includes('.ds-cookie--overlay'))return true;if(r.cssRules&&zoek(r.cssRules))return true;}return false;}return[...document.styleSheets].some(s=>{try{return zoek(s.cssRules);}catch(e){return false;}});});
   assert.equal(centraal,true);
+  const tekstBasis=await page.evaluate(()=>parseFloat(getComputedStyle(document.documentElement).fontSize));
   for(const width of [320,390,820])for(const zoom of [100,200]){
    await page.setViewportSize({width,height:900});await page.evaluate(n=>document.documentElement.style.fontSize=n+'%',zoom);
-   /* ResizeObserver schrijft de gereserveerde inhoudsruimte na layout. Wacht
-      op die waarneembare eindtoestand in plaats van een vaste vertraging. */
-   await page.waitForFunction(w=>{const el=document.querySelector('.ds-cookie--overlay');if(!el)return false;const r=el.getBoundingClientRect(),ruimte=parseFloat(document.documentElement.style.getPropertyValue('--rtg-cookieruimte'));return r.left>=0&&r.right<=w+1&&r.top>=0&&r.bottom<=900&&el.scrollWidth<=el.clientWidth+1&&ruimte>=r.height;},width);
+   /* De legacy-host animeert ook tekstmaat kort bij reduced motion. Een oude,
+      grotere layout is geen bewijs voor de gevraagde zoomstand. Wacht op de
+      echte tekstmaat, afgeronde overgangen én de reservering. */
+   await page.waitForFunction(({w,font})=>{const el=document.querySelector('.ds-cookie--overlay');if(!el)return false;const r=el.getBoundingClientRect(),ruimte=parseFloat(document.documentElement.style.getPropertyValue('--rtg-cookieruimte')),beweging=[...document.documentElement.getAnimations(),...el.getAnimations({subtree:true})].some(a=>a.playState==='running'||a.pending);return !beweging&&parseFloat(getComputedStyle(document.documentElement).fontSize)===font&&r.left>=0&&r.right<=w+1&&r.top>=0&&r.bottom<=900&&el.scrollWidth<=el.clientWidth+1&&ruimte>=r.height;},{w:width,font:tekstBasis*zoom/100});
    const m=await melding.evaluate(el=>{const r=el.getBoundingClientRect();return{r:r.toJSON(),client:el.clientWidth,scroll:el.scrollWidth,host:document.body.classList.contains('ds-cookie-host'),ruimte:document.documentElement.style.getPropertyValue('--rtg-cookieruimte'),doelen:[...el.querySelectorAll('a,button')].map(n=>{const b=n.getBoundingClientRect();return{w:b.width,h:b.height,raak:n.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2))};})};});
    assert.ok(m.r.left>=0&&m.r.right<=width+1&&m.r.top>=0&&m.r.bottom<=900,JSON.stringify({width,zoom,m}));
    assert.ok(m.scroll<=m.client+1);assert.equal(m.host,true);assert.ok(parseFloat(m.ruimte)>=m.r.height,JSON.stringify({width,zoom,m}));
    assert.ok(m.doelen.every(d=>d.w>=44&&d.h>=44&&d.raak),JSON.stringify(m.doelen));
   }
+  /* Een host kan de tekstmaat tussen twee frames wijzigen. De observer moet
+     de nieuwe maat al verwerken in dezelfde microtaskronde, niet pas in een
+     latere frame: anders kan grotere tekst tijdelijk over de inhoud vallen. */
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.setViewportSize({width:820,height:900});
+  await page.evaluate(()=>document.documentElement.style.fontSize='100%');
+  await page.waitForFunction(font=>{const el=document.querySelector('.ds-cookie--overlay');return parseFloat(getComputedStyle(document.documentElement).fontSize)===font&&parseFloat(document.documentElement.style.getPropertyValue('--rtg-cookieruimte'))===Math.ceil(el.getBoundingClientRect().height)+12;},tekstBasis);
+  const vergroot=await melding.evaluate(async el=>{
+   const voor={hoogte:el.getBoundingClientRect().height,ruimte:parseFloat(document.documentElement.style.getPropertyValue('--rtg-cookieruimte')),font:getComputedStyle(document.documentElement).fontSize};
+   document.documentElement.style.fontSize='200%';
+   await Promise.resolve();
+   return{voor,hoogte:el.getBoundingClientRect().height,ruimte:parseFloat(document.documentElement.style.getPropertyValue('--rtg-cookieruimte')),font:getComputedStyle(document.documentElement).fontSize};
+  });
+  assert.equal(parseFloat(vergroot.voor.font),tekstBasis);assert.equal(parseFloat(vergroot.font),tekstBasis*2);
+  assert.ok(vergroot.ruimte>=vergroot.hoogte,'tekstvergroting reserveert meteen voldoende ruimte: '+JSON.stringify(vergroot));
   const knop=melding.getByRole('button',{name:'Prima',exact:true});await knop.focus();await page.keyboard.press('Enter');await melding.waitFor({state:'detached'});
   assert.equal(await page.locator('body.ds-cookie-host').count(),0);assert.equal(await page.evaluate(()=>document.documentElement.style.getPropertyValue('--rtg-cookieruimte')),'');assert.deepEqual(errors,[]);
  }finally{await ctx.close();}

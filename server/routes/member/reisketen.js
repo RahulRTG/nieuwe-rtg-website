@@ -3,7 +3,8 @@ const antwoord = require('../../lib/reisketen-antwoord');
 module.exports = kern => {
   const { app, auth, reisbureau, liveCodename, gegevensStop } = kern;
   const reisketen = reisbureau.keten;
-  const actor = req => req.session.tier === 'guest' ? { status: 403, error: 'Een persoonlijk ledenaccount is vereist.' }
+  const actor = req => req.session.tier === 'guest' ? { status: 403,
+    error: 'De reiscontractketen vraagt een betalend lidmaatschap; een gratis RTG Community-account geeft hier geen toegang.' }
     : { actorRef: req.session.key };
   app.post('/api/reisbureau/keten', auth, (req, res) => antwoord(req, res, actor(req),
     a => reisketen.mijn(a, (req.body || {}).ref)));

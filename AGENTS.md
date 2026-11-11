@@ -17,7 +17,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `GELD.md`, `LEVEN.md` en `LIFE.md` zijn de diepte-documenten per wereld.
 - `REIZEN.md` is het diepte-document van RTG Reizen
 - `TRAVELCOMMERCE.md` is de handelskant daarvan
-- `TRAVELOS-UITVOERING.md` is het federatieve uitvoeringscontract en de repository-audit daarvan
+- `TRAVELOS-UITVOERING.md`: uitvoering
 - `KAARTEN.md` is de kaartlaag onder de navigatie
 - `NAVIGATIE.md` is de plaats-these
 - `FOUNDATION.md` is het diepte-document van de RTFoundation als platform

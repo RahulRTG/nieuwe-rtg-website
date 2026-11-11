@@ -6768,3 +6768,94 @@ servertoetsen zakten ook in de scherpe ronde op de inhoud. `MUTATIES.json` en
 `BEWIJS.md` zijn uit die campagne vernieuwd. Dit vervangt niet de volledige
 lokale CI-, release- en stagingpoort; die worden hieronder pas groen genoemd na
 een nieuwe, brongebonden eindrun.
+
+#### Volledige kandidaatcontrole en gerichte reparaties, 11 november 2026
+
+Op de schone bron `67a7d688119582d54323724310f09117b0a0b475` zijn de
+voltooiproef (114 apps, 342 gesloten kernproeven), IDOR-proef en volledige
+rolproef opnieuw uitgevoerd. De rolproef deed 9.421 pogingen op 4.540 routes:
+geen verkeerde rol kwam binnen, geen lekkende weigering of blijvende wijziging,
+en nul onbeslist. De zeven niet expliciet door de voltooiproef onderzochte
+actorgrenzen zijn daarmee niet achteraf als eigen voltooiproefbewijs gelabeld.
+De keuring en normcontrole slaagden eveneens op deze bron; dit zijn afzonderlijke
+controles, geen volledige softwarevrijgave.
+
+De volledige Linux-CI `43104350250` is **rood**. Zij vond verouderde afgeleide
+registers, de gewijzigde documentenkaart/startomvang, een verloren
+ritmigratieverwijzing, een misleidende gratis-accountweigering, ontbrekende
+bronverwijzingen aan drie reisgeldvormen en twee browserbevindingen. PostgreSQL,
+toegankelijkheid, containerstart en adversarial controles slaagden binnen die
+run, maar maken de rode suite niet groen. De afzonderlijke Beproeving
+`43106103309` is eveneens **rood**: de rolronde had een te klein pogingenbudget
+en miste eigen fixturecontroles; daarnaast overschreed de event-loopmeting
+(137,7 ms) haar bestaande norm (97,9 ms). Geen van deze grenzen is versoepeld.
+
+De gerichte reparatie bewaart nu een expliciete opgegeven productreferentie met
+gecontroleerde leverancier-/organisatiebinding, van offerte via levering tot
+eigen leveranciersprojectie en export. Dat is geen liveboekingsbewijs of
+economische classificatie. Nieuwe offertehashes blijven onafhankelijk
+herberekenbaar; historische offertes krijgen geen extra hashvelden. Vervalste
+bronvelden geven geen recht op andermans opdracht. De kern-, toegang-,
+vrijgave- en exportgroep is 54/54 groen. De echte HTTP/SQLite-keten- en
+exportgroep is 11/11 groen, inclusief een echt geregistreerd gratis account:
+de bestaande toegangsgrens blijft staan, de tekst noemt nu eerlijk het
+vereiste betalende lidmaatschap.
+
+De ritmigratiemeter herkent de doorgegeven `data.rides`-lezer op zijn nieuwe
+plek; er is geen historische lezer als verdwenen winst weggeschreven.
+Documenttoevoegingen staan los van de bevroren oorspronkelijke blokken en de
+start blijft onder de ongewijzigde omvanggrens. Die twee controlegroepen
+sluiten 18/18 groen. Bron- en bewijsregisters moeten na afronding van alle
+reparaties opnieuw op de dan bevroren kandidaat worden afgeleid en beproefd.
+De bovenstaande oudere groene deelproeven zijn geen groenbewijs voor latere
+bronwijzigingen. Geen merge, productieclaim of uitrol volgt uit deze tussenstand.
+
+De E3-rolcontrole in de Beproeving doorloopt nu standaard de volledige
+aangeboden inventaris. Een expliciet kleiner budget blijft rood/onvolledig.
+De bestaande positieve fixtures worden na de destructieve storm maar vóór de
+toestandsijking opgebouwd. De bestaande meting bewaart alle routestatussen,
+ook de onbesliste; een lekkend antwoord blijft een rode bevinding met route,
+rol, status en categorie, zonder het antwoord of credentialfragment opnieuw
+te publiceren. De canarieregressie heeft die oude lekregistratie eerst rood
+aangetoond. De gerichte rol-/instrumentgroep sluit 49/49 groen, inclusief twee
+echte HTTP-proeven met elk 17 kruispogingen en acht positieve fixtures.
+Stormduur, workers en prestatielatten zijn ongewijzigd; de eerdere
+event-loopoverschrijding is hiermee niet als opgelost aangemerkt.
+
+Het afbouwoordeel las eerder alleen `geslaagd: false`, terwijl de volledige
+suite haar resultaat onder `gemeten.groen` schrijft. Daardoor kon een rode
+suite als geleverd meetellen. Vier nieuwe negatieve regressies maakten dit
+aantoonbaar. De lezer vereist nu de werkelijke positieve boolean, een schone
+bronstempel en de bestaande integriteitsratel voor de volledige TAP-telling.
+De afbouw-, registerratel- en productiestatusgroep sluit 58/58 groen, nul skips.
+Een gezamenlijke herhaling van document-, reis-, HTTP- en rolcontroles sluit
+daarnaast 78/78 groen; dit is een gerichte selectie, niet de volledige suite.
+
+De cookiecontroller reserveert tekstvergroting direct in de bestaande
+MutationObserver-microtask. De negatieve browserproef toonde eerst de oude
+te kleine reservering; de herhaling toetst ook de werkelijk bereikte tekstmaat
+en afgeronde CSS-overgangen. De cookie-/Edge-selectie sloot 37/37 groen.
+De aparte mobiele headerbevinding bleek een meetrace: de wereldlaadlaag houdt
+een al gemonteerde kop terecht verborgen totdat haar presentatie gereed is.
+De test wacht nu op dat bestaande contract en zichtbaarheid, met ongewijzigde
+timeout en stabiliteitsduur. Een fixture met de echte laadlaag bevestigt dat
+de oude predicate de verborgen kop accepteerde en de nieuwe niet.
+
+Bij het opnieuw vastleggen van de drie echte website-appbeelden werd dubbele
+partnerchrome zichtbaar. De leverancier laat nu de bestaande WerkOS-regel
+over het verborgen tabmodel beslissen en sluit de oude merkbalk op de bestaande
+headerowner aan. Actor- en meldingsbediening blijven binnen de sessiepoort;
+zij worden niet naar de globale kop buiten die grens verplaatst. De uitgebreide
+schilgroep sloot 71/71 groen, inclusief echte leverancierssessies op 390 en
+1440 px, tabwissels, meldingen en gebruikerswissel. De rechtenmelding bij de
+organisatieproeffiguur blijft staan: projectleider geeft geen klantrecht,
+en een screenshot is geen reden om bevoegdheden te verruimen.
+
+De laatste visuele hercontrole vond nog een oude universele padding-reset
+die de bestaande DS-inhoudsruimte overschreef. Die reset en de ongebruikte
+oude identiteitsstijlen zijn verwijderd; zaaknaam en type/plaats staan nu op
+eigen regels binnen de sessiepoort. Een geometrische regressie toetst de
+zijruimte op mobiel en desktop. De afsluitende cookie-/Edge-browserselectie
+is 47/47 groen, zonder skips; de ontwerpsysteemcontrole vindt nul schendingen.
+De aparte actuele rol-/Edge-selectie was 51/51 groen. Dit blijven gerichte
+regressies, geen vervanging voor de volledige kwalificatie van de kandidaat.

@@ -175,6 +175,56 @@ test('een leverancier ziet uitsluitend de eigen opdracht en niet klantkey, marge
   assert.equal(h.rij(reis.ref).keten.offerte.rollen.contractpartij, 'Eigen verkoper');
 });
 
+test('productbron bewaart de gecontroleerde leverancierbinding van offerte tot eigen opdracht', async () => {
+  const h = huis(), vraag = await aangevraagd(h, bureau), b = offerte(h, vraag);
+  const vervalst = { soort: 'live-boeking', org: 'VERVALSTE-ORG', supplierCode: 'ANDERE-ZAAK', productRef: 'VERVALST' };
+  b.onderdelen = b.onderdelen.map(p => ({ ...p, productRef: ' ' + p.productRef + ' ',
+    org: vervalst.org, bron: vervalst, economischeHerkomst: 'rtg', economischeEigenaar: 'rtg' }));
+  let reis = geslaagd(await h.dienst.biedAan(bureau, b));
+  const bronnen = [hotel, transfer].map((actor, i) => ({ soort: 'opgegeven-productreferentie',
+    org: actor.org, supplierCode: actor.supplierCode, productRef: b.onderdelen[i].productRef.trim() }));
+  assert.deepEqual(reis.offerte.onderdelen.map(p => p.bron), bronnen);
+  for (const p of reis.offerte.onderdelen) {
+    assert.equal(Object.hasOwn(p, 'economischeHerkomst'), false, 'een productreferentie bewijst geen economische klasse');
+    assert.equal(Object.hasOwn(p, 'economischeEigenaar'), false);
+  }
+  const { hash: afdruk, ...grond } = reis.offerte;
+  assert.equal(hash(grond), afdruk, 'de bronbinding valt onder de geaccepteerde offertehash');
+  const gewijzigdeGrond = clone(grond);
+  gewijzigdeGrond.onderdelen[0].bron.org = vervalst.org;
+  assert.notEqual(hash(gewijzigdeGrond), afdruk);
+  reis = geslaagd(await h.dienst.akkoord(lid, h.body(reis, { offerteHash: afdruk, bron: vervalst })));
+  const keten = h.rij(reis.ref).keten;
+  assert.deepEqual(keten.offerte.onderdelen.map(p => p.bron), bronnen);
+  assert.deepEqual(keten.leveringen.map(p => p.bron), bronnen);
+  for (const [i, actor] of [hotel, transfer].entries()) {
+    const beeld = (await h.dienst.opdrachten(actor)).reizen[0];
+    assert.equal(beeld.opdrachten.length, 1);
+    assert.deepEqual(beeld.opdrachten[0].bron, bronnen[i]);
+    assert.equal(beeld.opdrachten[0].productRef, bronnen[i].productRef);
+    assert.equal(JSON.stringify(beeld).includes(bronnen[1 - i].supplierCode), false, 'geen bron van de andere aanbieder');
+    beeld.opdrachten[0].bron.org = vervalst.org;
+    assert.deepEqual(h.rij(reis.ref).keten.leveringen[i].bron, bronnen[i], 'projectie wijzigt de vastgelegde bron niet');
+  }
+});
+
+test('vervalste opdrachtbron geeft een andere leverancier geen recht en overschrijft ook bij de eigen leverancier niets', async () => {
+  const h = huis(); let reis = await geaccepteerd(h, bureau);
+  const voor = h.rij(reis.ref), bron = voor.keten.leveringen[0].bron;
+  assert.ok(bron, 'de opdracht heeft een concrete productbron');
+  const vervalst = { soort: 'live-boeking', org: transfer.org, supplierCode: transfer.supplierCode, productRef: 'VERVALST' };
+  const poging = actor => h.dienst.opdracht(actor, h.body(reis, { onderdeel: 'slaap', besluit: 'accepteer',
+    bewijsRef: 'EIGEN-VERKLARING', org: hotel.org, supplierCode: hotel.supplierCode, productRef: vervalst.productRef, bron: vervalst }));
+  assert.equal((await poging(transfer)).status, 404);
+  assert.deepEqual(h.rij(reis.ref), voor);
+  assert.deepEqual((await h.dienst.opdrachten({ ...hotel, org: transfer.org })).reizen, []);
+  assert.deepEqual((await h.dienst.opdrachten({ ...hotel, supplierCode: transfer.supplierCode })).reizen, []);
+  reis = geslaagd(await poging(hotel));
+  assert.deepEqual(reis.opdrachten[0].bron, bron);
+  assert.equal(reis.opdrachten[0].productRef, bron.productRef);
+  assert.deepEqual(h.rij(reis.ref).keten.leveringen[0].bron, bron);
+});
+
 test('dubbele start is transactioneel één aanvraag; gewijzigde gegevens met dezelfde sleutel conflicteren', async () => {
   const h = huis(), vraag = { titel: 'Vakantie', bestemming: 'Bestemming', idem: 'start_uniek', org: bureau.org };
   const uitslagen = await Promise.all([h.dienst.start(lid, 'reiziger-maan', vraag), h.dienst.start(lid, 'reiziger-maan', clone(vraag))]);

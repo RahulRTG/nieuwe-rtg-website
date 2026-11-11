@@ -14,6 +14,7 @@ function maakReisketen({ bewerkCollectie, toegang, payVan, nu = () => huisklok.d
       verkoper: { naam: a.keten.verkoper.naam },
       opdrachten: a.keten.leveringen.filter(p => p.org === actor.org && p.supplierCode === actor.supplierCode)
         .map(p => ({ id: p.id, wat: p.wat, productRef: p.productRef, status: p.status,
+          bron: C.kopie(p.bron || null),
           verschuldigdCenten: p.verschuldigdCenten, valuta: 'EUR', bewijsRef: p.bewijsRef || null })) };
   }
   async function start(actor, codenaam, b) {
@@ -66,7 +67,10 @@ function maakReisketen({ bewerkCollectie, toegang, payVan, nu = () => huisklok.d
         if (actueel.error || actueel.org !== p.org) return C.fout(409, 'Een aanbieder is veranderd. Vraag een nieuwe offerte.');
       }
       a.keten.akkoord = { offerteHash: o.hash, at: nu(), actorRef: actor.actorRef };
+      /* De gehashte bron blijft bij de verplichting. Oudere offertes zonder
+         bronenvelop krijgen geen achteraf verzonnen bronbewijs. */
       a.keten.leveringen = o.onderdelen.map(p => ({ id: p.id, wat: p.wat, productRef: p.productRef,
+        bron: C.kopie(p.bron || null),
         org: p.org, supplierCode: p.supplierCode, verschuldigdCenten: p.verschuldigdCenten, status: 'aangevraagd' }));
       a.status = 'geaccepteerd';
     }, C.lidbeeld);

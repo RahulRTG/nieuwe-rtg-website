@@ -15,8 +15,15 @@ function projecteerReisexport(a, actor, rol) {
     return actoren.get(ref);
   };
   const bewijs = p => ({ ...neem(p, ['besluit', 'status', 'bewijsRef', 'at', 'bewijsSoort']), actor: persoon(p.actorRef) });
+  const productbron = p => {
+    const b = p.bron;
+    if (!b || b.soort !== 'opgegeven-productreferentie' ||
+        !['org', 'supplierCode', 'productRef'].every(k => typeof b[k] === 'string' && b[k].trim() && b[k] === p[k])) return null;
+    // Alleen scalaire bronrefs; geen geneste clientvelden, rechten of economische kwalificatie.
+    return neem(b, ['soort', 'org', 'supplierCode', 'productRef']);
+  };
   const levering = p => ({ ...neem(p, ['id', 'wat', 'productRef', 'org', 'supplierCode', 'verschuldigdCenten', 'status']),
-    valuta: 'EUR', ...bewijs(p), bewijzen: (p.bewijzen || []).map(bewijs) });
+    bron: productbron(p), valuta: 'EUR', ...bewijs(p), bewijzen: (p.bewijzen || []).map(bewijs) });
   if (rol === 'aanbieder') return {
     ref: a.ref, versie: k.versie, status: a.status, verkoper: { naam: k.verkoper.naam },
     opdrachten: k.leveringen.filter(p => p.org === actor.org && p.supplierCode === actor.supplierCode).map(levering)
@@ -24,7 +31,10 @@ function projecteerReisexport(a, actor, rol) {
   const offerte = o => o ? { ...neem(o, ['schemaVersion', 'versie', 'hash', 'geldigTot', 'voorwaarden', 'valuta', 'totaalCenten']),
     verkoper: neem(o.verkoper, ['org', 'supplierCode']),
     rollen: neem(o.rollen, ['hoedanigheid', 'contractpartij', 'factureert', 'aansprakelijk']),
-    onderdelen: (o.onderdelen || []).map(p => neem(p, ['id', 'wat', 'soort', 'productRef', 'supplierCode', 'org', 'naam', 'centen', 'verschuldigdCenten']))
+    onderdelen: (o.onderdelen || []).map(p => ({
+      ...neem(p, ['id', 'wat', 'soort', 'productRef', 'supplierCode', 'org', 'naam', 'centen', 'verschuldigdCenten']),
+      // Een ontbrekend legacyveld toevoegen zou de historische offertehash veranderen.
+      ...(Object.hasOwn(p, 'bron') ? { bron: productbron(p) } : {}) }))
   } : null;
   const nazorg = v => ({ ...neem(v, ['id', 'soort', 'status', 'offerteHash', 'offerteVersie', 'toelichting', 'at',
     'uitvoering', 'financieleUitvoering']), onderdelen: v.onderdelen.slice(), actor: persoon(v.actorRef),

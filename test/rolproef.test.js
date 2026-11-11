@@ -136,6 +136,25 @@ test('een route die netjes weigert maar de naam noemt, komt als LEK per route te
   assert.equal(r.privacy, 'LEK');
 });
 
+test('een lekmelding bewaart route, rol en status maar nooit het antwoord of credentials', async () => {
+  const geheim = 'SYNTHETISCHE-ANTWOORDSLEUTEL-7cc19';
+  const antwoord = 'PRIVE-ANTWOORDLIJF-2ab44';
+  const tokens = { member: 'INVOERSLEUTEL-LID-61e2', supplier: 'INVOERSLEUTEL-ZAAK-91b3', office: 'INVOERSLEUTEL-KANTOOR-732f' };
+  const nep = nepServer(() => ({ status: 403, data: { token: geheim, error: antwoord } }));
+  const uit = await draaiRolproef({ post: nep.post, routes: ROUTES, tokensVoor: () => tokens });
+  assert.equal(uit.bevindingen.lekken.length, 2, 'beide gevonden lekken blijven meetellen');
+  assert.deepEqual(uit.bevindingen.lekken, [
+    'POST /api/zaak/prijs [member -> 403] geheim veld',
+    'POST /api/zaak/prijs [office -> 403] geheim veld'
+  ]);
+  const rij = uit.perRoute['POST /api/zaak/prijs'];
+  assert.equal(rij.privacy, 'LEK', 'het weglaten van de inhoud mag de bevinding niet groen maken');
+  assert.deepEqual(rij.antwoorden.map(a => [a.status, a.eigenVoor, a.eigenNa, a.lek]),
+    [[403, 200, 200, 'geheim veld'], [403, 200, 200, 'geheim veld']]);
+  const bewaard = JSON.stringify(uit);
+  for (const waarde of [geheim, antwoord, ...Object.values(tokens)]) assert.equal(bewaard.includes(waarde), false);
+});
+
 test('een route die netjes en zwijgzaam weigert, is op beide punten in orde', async () => {
   const nep = nepServer(() => ({ status: 403, data: { error: 'Verboden' } }));
   const uit = await draaiRolproef({ post: nep.post, routes: ROUTES, tokensVoor: TOKENS });

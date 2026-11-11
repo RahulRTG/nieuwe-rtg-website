@@ -10,6 +10,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { startServer, stop } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisketen-http-'));
 let srv, x, rtgReis, partnerReis;
 const env = { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' };
@@ -20,6 +21,17 @@ const OP = '/api/office/reisbureau/keten';
 const SP = '/api/supplier/reisbureau/keten';
 const DP = '/api/supplier/reisbureau/opdracht/besluit';
 const lees = async ref => goed(await x.api(MP, { ref }, x.reiziger.token), 'lid leest').reizen[0];
+
+test('een gratis Community-account krijgt een eerlijke lidmaatschapseis, geen belofte dat een account volstaat', async () => {
+  const gratis = await registreerGratis(srv.base);
+  assert.ok(gratis, 'de gratis sessie komt uit de echte accountregistratie');
+  assert.equal((await x.api(MP)).status, 401, 'zonder sessie blijft de deur dicht');
+  const geweigerd = await x.api(MP, {}, gratis.token);
+  assert.equal(geweigerd.status, 403);
+  assert.equal(geweigerd.body.error,
+    'De reiscontractketen vraagt een betalend lidmaatschap; een gratis RTG Community-account geeft hier geen toegang.');
+  assert.equal((await x.api(MP, {}, x.reiziger.token)).status, 200, 'het bestaande betaalde lid houdt toegang');
+});
 
 test('persoonlijke actoren, geen gedeelde werkplek of tenant uit de aanvraag als bevoegdheid', async () => {
   assert.equal((await x.api(MP)).status, 401);

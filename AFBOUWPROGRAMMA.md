@@ -5904,3 +5904,49 @@ voorwaarden actueel gekwalificeerd**. Actuele commit vóór het vastleggen van
 de merge: `fbb854ec49`; geïntegreerde `main`: `81fd3442c2`. Eerstvolgende
 blokkade: **mergecommit vastleggen, publiceren en alle verplichte GitHub-jobs
 volledig laten uitlopen op exact die commit**. Deep Green: **GEBLOKKEERD**.
+
+### Vijfde volledige CI-meting en afhankelijkheidsherstel — 11 november 2026
+
+De verplichte CI-run `42925398536` is volledig uitgelopen op exact commit
+`83a94968886d1f4262b8b99fde22dad4717f5f11`. Van de 37 jobs sloten **19
+groen**, **10 rood** en **8 als afgeleid niet-uitvoerbaar overgeslagen**. De
+samengestelde jobs `Tests, checks en build`, `Schermdekking` en de volledige
+bewijsuitvoer zijn afgeleide uitkomsten: zij voegen geen zelfstandige
+productoorzaak toe. De eerdere classificatie van de 76 resterende
+presentatiebronnen blijft geldig: **0 releaseblokkerend, 60 veilig en
+toegestaan, 16 niet-releasekritieke technische schuld en 0 onbekend**. Er is
+daarom geen niet-kritieke CSS- of injectieopschoning aan deze herstelronde
+toegevoegd.
+
+De volledige foutboom is teruggebracht tot de volgende gedeelde oorzaken:
+
+| ID | Primaire oorzaak | Getroffen jobs | Herstel en actueel gericht bewijs |
+| --- | --- | --- | --- |
+| DG-CI-27 | De norm- en mutatieafdruk liepen achter op de samengebrachte `main`-bron. | norm/build; vervolgens afgeleide build- en totaaljobs | De bestaande afleidings- en mutatievoorzieningen zijn op een schone bron uitgevoerd. `npm run norm` sluit groen en is op zeven meetpunten strenger, zonder verlaagde norm. |
+| DG-CI-28 | Productcode en tests gebruikten op meerdere plekken de UTC-/hostdag terwijl RTG de Amsterdamse huisdag contracteert. De CI begon rond lokale middernacht; dezelfde ene kalendergrens liet daardoor eventtickets, agenda, balans, rooster, ochtendkaart, personeelszicht, leercurve, sociale lijn, verjaardagen en werkvenster tegelijk zakken. | unitscherven 1 tot en met 4 | De geraakte productmodules gebruiken de bestaande RTG-klok en tijdzonekalender. De gerichte tegenproef op het oorspronkelijke grensmoment `RTG_KLOK=2026-11-11T23:43:00Z` sluit **55/55** groen, zonder skips. |
+| DG-CI-29 | Een globale minimale raakvlakregel met `!important` overschreef de bedoelde filmische minimumhoogte van de primaire wereldkaart. | schermscherf 4 | De bestaande kaartowner legt zijn 238/228/300px-varianten expliciet vast. De gerichte werktafelproef en de volledige vier-schermenbatch sluiten groen. |
+| DG-CI-30 | De Reizen-toets verwachtte nog 44px terwijl de centrale mediabediening aantoonbaar naar de toegankelijkere 48px Design System-maat was geconsolideerd. | schermscherf 3 | Alleen het verouderde toetscontract is aan de bestaande 48px-owner gebonden; de zes Reizen/DS-scenario's en de gecombineerde browserbatch sluiten groen. |
+| DG-CI-31 | De bestaande sfeerbeeldactie stond in een decoratieve laag achter de kop en werkruimte en was op 1100px niet met de muis te raken. | schermscherf 2 | Dezelfde actie, autorisatie en editor zijn zonder duplicaat naar de bestaande gereedschapskop verplaatst. De 1440- en 1100px-muisproeven sluiten **2/2** groen. |
+| DG-CI-32 | De gedeeld-elementproef zag in de lange CI-scherf eenmaal niet beide overgangsgroepen. | schermscherf 5 | De bestaande overgangscode is niet gewijzigd: herhaalde gerichte tegenproeven en de actuele gecombineerde browserbatch sluiten groen. Dit blijft tot de nieuwe volledige CI als mogelijke omgevingsinstabiliteit onder observatie; het wordt niet administratief als eindbewijs behandeld. |
+
+De actuele gecombineerde browserbatch voor Reizen, werktafel, sfeerbeeld en
+gedeelde overgang sluit **14/14** groen, met 0 failures en 0 skips. De
+kalendergrensbatch sluit **55/55** groen. De statische norm sluit volledig
+groen. Deze gerichte resultaten bewijzen de herstelgroepen, maar vervangen de
+volledige GitHub-tegenproef niet.
+
+**Meetstand herstelronde 12.** Releaseblokkerende bronoorzaken: **0 lokaal
+bekend; DG-CI-32 en alle overige herstelgroepen vereisen nog de volledige
+GitHub-tegenproef op de nieuwe commit**. Bewezen afgesloten sinds de vorige
+ronde: **5 gedeelde oorzaken** (DG-CI-27 tot en met DG-CI-31). Nieuwe
+regressies: **0 in 69 actuele gerichte unit- en browserproeven en de volledige
+normcontrole**. Nog niet uitgevoerde verplichte controles: **volledige CI op de
+nieuwe herstelcommit, APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief
+menselijke proeven, security/finance/load,
+staging/back-up/herstel/rollback/incidentrespons en twee onafhankelijke
+eindruns**. APPWERKT: **0/114 actueel geldig; historische bewijzen blijven
+verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden actueel
+gekwalificeerd**. Actuele vastgelegde bron vóór deze herstelcommit:
+`9d28ecab6f`. Eerstvolgende blokkade: **de samenhangende herstelcommit
+publiceren en alle 37 verplichte GitHub-jobs opnieuw volledig laten uitlopen**.
+Deep Green: **GEBLOKKEERD**.

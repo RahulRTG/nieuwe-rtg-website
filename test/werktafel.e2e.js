@@ -571,6 +571,8 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       poortVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
       intentie: document.querySelector('.cmd-intentie').getBoundingClientRect().toJSON(),
       eersteWereld: document.querySelector('.cmd-startwereld').getBoundingClientRect().toJSON(),
+      eersteWereldMin: getComputedStyle(document.querySelector('.cmd-startwereld')).minHeight,
+      mobielVenster: matchMedia('(max-width:767px)').matches,
       beeldLaden: [...document.querySelectorAll('.cmd-wereldbeeld')].map(x => x.loading),
     }));
     assert.equal(geland.poortVerborgen, true, 'de passkey sluit de inlogpoort na de echte sessie');
@@ -600,7 +602,8 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
     assert.ok(geland.intentie.height >= 44, 'de Rahul-ingang is kleiner dan een toegankelijk raakvlak');
     assert.ok(geland.eersteWereld.left >= 15 && geland.eersteWereld.right <= 375,
       'de filmische wereld respecteert de mobiele schermrand niet');
-    assert.ok(geland.eersteWereld.height >= 280, 'de primaire wereld mist de bedoelde filmische diepte');
+    assert.ok(geland.eersteWereld.height >= 280,
+      'de primaire wereld mist de bedoelde filmische diepte: ' + JSON.stringify({ hoogte: geland.eersteWereld.height, min: geland.eersteWereldMin, mobiel: geland.mobielVenster }));
     assert.deepEqual(geland.beeldLaden, ['eager','lazy','lazy','lazy'],
       'alle wereldbeelden worden tegelijk geladen in plaats van op zichtbaarheid');
     assert.deepEqual(fouten, [], 'geen JS-fouten');

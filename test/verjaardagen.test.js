@@ -8,6 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-verjaardagen-'));
@@ -39,8 +40,8 @@ async function gezin() {
 }
 // dag/maand van morgen, zodat 'dagenTot' klein en voorspelbaar is
 function morgen() {
-  const d = new Date(Date.now() + 86400000);
-  return { dag: d.getDate(), maand: d.getMonth() + 1 };
+  const d = tijdzone.plusDagen(tijdzone.datumIn(), 1);
+  return { dag: Number(d.slice(8, 10)), maand: Number(d.slice(5, 7)) };
 }
 
 test('het boek: mensen toevoegen, leeftijd berekenen, en op aankomend sorteren', async () => {

@@ -221,7 +221,7 @@ body[data-rtg-skin="heritage"] .cmd-startwerelden{
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld{
   position:relative;display:grid!important;grid-template-columns:minmax(0,1fr) 48px;grid-template-rows:1fr auto;
-  min-height:238px;padding:22px!important;align-items:end;gap:8px 12px;
+  min-height:238px!important;padding:22px!important;align-items:end;gap:8px 12px;
   overflow:hidden;border:1px solid color-mix(in srgb,var(--rtg-world-metal) 34%,var(--rtg-world-line))!important;
   background:var(--rtg-world-card)!important;
   color:#fff8ee!important;box-shadow:var(--rtg-depth-focus);text-align:left!important;
@@ -528,8 +528,8 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
   body[data-rtg-skin="heritage"] .cmd-intentie-golf{min-width:30px}
   body[data-rtg-skin="heritage"] .cmd-starttitel{margin-bottom:16px;font-size:30px!important}
   body[data-rtg-skin="heritage"] .cmd-startwerelden{grid-template-columns:1fr;gap:14px!important}
-  body[data-rtg-skin="heritage"] .cmd-startwereld{min-height:228px;padding:20px!important}
-  body[data-rtg-skin="heritage"] .cmd-startwereld:first-child{min-height:300px}
+  body[data-rtg-skin="heritage"] .cmd-startwereld{min-height:228px!important;padding:20px!important}
+  body[data-rtg-skin="heritage"] .cmd-startwerelden>.cmd-startwereld:first-of-type{min-height:300px!important}
   body[data-rtg-skin="heritage"] .cmd-startwereld:hover,
   body[data-rtg-skin="heritage"] .cmd-startwereld:focus-visible{padding-left:20px!important}
   body[data-rtg-skin="heritage"] .cmd-startwereld strong{font-size:clamp(34px,10vw,44px)}

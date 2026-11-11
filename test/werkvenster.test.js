@@ -8,6 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
+const tijdzone = require('../server/kern/tijdzone');
 
 /* ---------- de kernlogica, met een vaste klok ---------- */
 function verseKern(klok) {
@@ -128,7 +129,7 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
     assert.equal(kop.status, 200, 'de personeelsrol hangt aan het ene account');
 
     // de werkgever sluit vandaag de werkomgeving
-    const vandaag = new Date().getDay();
+    const vandaag = tijdzone.weekdagIn();
     const zet = await api(base, '/api/supplier/werkvenster', { dagen: { [vandaag]: { dicht: true } }, aan: true }, mtok);
     assert.equal(zet.status, 200);
     assert.equal(zet.body.werkvenster.aan, true);

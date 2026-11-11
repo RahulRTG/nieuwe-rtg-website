@@ -9,6 +9,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-curve-'));
@@ -20,8 +21,7 @@ const leren = (actie, body) => fetch(BASE + (actie.startsWith('/api/') ? actie :
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const json = r => r.json();
-const plus = n => { const d = new Date(Date.now() + n * 86400000);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const plus = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 let g, kind, broer, lijstId;
 

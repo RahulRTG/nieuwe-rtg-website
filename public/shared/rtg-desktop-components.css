@@ -22,7 +22,7 @@ body[data-rtg-desktop-access="locked"] #rtf-toegang-slot.wd-access h1{font:400 3
    its headings or controls. Both used to paint at level zero in DOM order. */
 body[data-rtg-desktop] .wd-shell{z-index:1}
 .wp-atmosphere img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 45%}.wp-atmosphere .pi-change{pointer-events:auto;top:80px}
-.wp-edit-images{order:0;margin-inline-start:20px!important;min-height:44px!important;font:400 13px/1.4 Inter,sans-serif!important;white-space:nowrap}
+.wp-edit-images,.wp-edit-atmosphere{display:inline-flex;align-items:center;justify-content:center;gap:8px;order:0;margin-inline-start:20px!important;min-height:44px!important;font:400 13px/1.4 Inter,sans-serif!important;white-space:nowrap}
 .wp-heading{display:grid;grid-template-columns:1fr;align-items:end;gap:4px 12px;margin-bottom:16px}.wp-overline{font:600 11px/1.5 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;margin:0 0 8px;color:var(--wh-ink)}.wp-heading .wp-overline{grid-column:1/-1}
 body[data-rtg-desktop] .wp-heading h2{font:400 clamp(34px,3.6vw,58px)/1.04 var(--rtg-display,"Bodoni Moda",Georgia,serif)!important;margin:0!important;letter-spacing:-.045em!important;color:var(--wh-ink)}
 .wp-scene{position:relative}.wp-scene>.wp-action{position:absolute;right:0;top:32px}.wp-action{font:400 13px/1.5 Inter,sans-serif;color:var(--wh-ink);min-height:44px;display:flex;align-items:end;padding-bottom:4px;text-decoration:none}
@@ -32,7 +32,7 @@ body[data-rtg-desktop] .wp-heading h2{font:400 clamp(34px,3.6vw,58px)/1.04 var(-
 @media(max-width:999px){
  body[data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-desktop] .rtg-edge-top{padding-inline:16px!important;height:64px;gap:4px}
  body[data-rtg-desktop] .rtg-edge-mark{font-size:30px}body[data-rtg-desktop] .rtg-edge-mark .wd-world-label{font-size:13px!important;margin-inline:12px;padding-inline-start:12px}
- body[data-rtg-desktop] .rtg-edge-state{display:none}.wp-edit-images{font-size:0!important;width:44px;margin-inline-start:auto!important}.wp-edit-images>span:not(.wd-icon){display:none}
+ body[data-rtg-desktop] .rtg-edge-state{display:none}.wp-edit-images,.wp-edit-atmosphere{font-size:0!important;width:44px;margin-inline-start:auto!important}.wp-edit-images>span:not(.wd-icon),.wp-edit-atmosphere>span:not(.wd-icon){display:none}
  body[data-rtg-desktop] .rtg-adaptive-edge:not([data-rtg-adaptive-state="peek"]){bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;height:64px!important}
  .wp-atmosphere{height:170px}.wp-atmosphere .pi-change{top:76px}.wp-heading{display:flex;flex-direction:column;align-items:start;gap:4px}.wp-heading h2{font-size:32px!important}.wp-action{order:3;font-size:14px}
  .wp-photo{aspect-ratio:1.82;border-radius:var(--rtg-radius-editorial)}.wp-story{grid-template-columns:96px 1fr;gap:8px 12px;margin-top:20px}.wp-story>a{font-size:14px}.wp-domain{margin-top:16px}

@@ -24,6 +24,7 @@
    maakWerkvenster(state) volgt het vaste kern-patroon. */
 const { coord } = require('./util');
 const tijdzone = require('./tijdzone');
+const klok = require('../lib/klok');
 
 const DAGEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
 const STANDEN = ['zaak', 'altijd', 'nooit', 'eigen'];
@@ -115,7 +116,7 @@ function maakWerkvenster({ db, save, klokVan, zorgVan, haversine }) {
     if (per.stand === 'nooit') {
       return { ok: false, error: 'De werkgever heeft de werkomgeving en de PDA voor jou op dit moment uitgezet. Vraag je leidinggevende wanneer je er weer in kunt.' };
     }
-    const nu = d || new Date();
+    const nu = d || klok.datum();
     const hier = tijdzone.huis(nu, tijdzone.zaakZoneOfHuis(s)); // het venster staat in de tijd van de zaak
     const dag = hier.dag;
     if (per.stand !== 'altijd') {
@@ -153,7 +154,7 @@ function maakWerkvenster({ db, save, klokVan, zorgVan, haversine }) {
      lid, de geklokte uren en het zorgprofiel. Geeft hooguit een zin terug;
      null betekent: niets aan de hand, geen gepush. Nooit blokkerend. */
   function werkAdvies({ code, staffId, lidKey, d }) {
-    const nu = d || new Date();
+    const nu = d || klok.datum();
     const redenen = [];
     if (code != null && staffId != null && klokVan) {
       try {
@@ -163,7 +164,7 @@ function maakWerkvenster({ db, save, klokVan, zorgVan, haversine }) {
       } catch (e) {}
     }
     if (lidKey) {
-      const dag = nu.toISOString().slice(0, 10);
+      const dag = tijdzone.datumIn(nu);
       const items = (db.data.agendas || {})['lid:' + lidKey] || [];
       const vrij = !items.some(i => !i.gedaan && String(i.datum) === dag);
       const L = (db.data.live || {})[lidKey];

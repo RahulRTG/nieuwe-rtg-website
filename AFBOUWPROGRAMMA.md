@@ -5980,3 +5980,39 @@ schermen en 0/3360 voorwaarden actueel gekwalificeerd**. Actuele vastgelegde
 productbron vóór deze registerwijziging: `079d5ea570`. Eerstvolgende blokkade:
 **de registercommit publiceren en alle verplichte GitHub-jobs zonder verdere
 bronwijziging laten uitlopen**. Deep Green: **GEBLOKKEERD**.
+
+#### Taalbewijs na buildafdruk — herstelronde 13
+
+De volledige GitHub-tegenproef op `ec72bfc4be` is in de preflight fail-closed
+gestopt. De preflight heeft geen productregressie gevonden: de voorafgaande
+buildherstelronde wijzigde de gegenereerde appbronnen `public/apps/app.html` en
+`public/apps/app-main.js`, terwijl het bestaande taalbewijs nog aan hun vorige
+inhoud was gebonden. Beide bestanden vallen aantoonbaar onder het bestaande
+`language:proof`-broncontract. Daardoor was het bewijs verlopen en zijn de
+afhankelijke zware CI-jobs terecht niet uitgevoerd.
+
+De herstelactie voor **DG-CI-35** is beperkt tot het opnieuw uitvoeren van de
+bestaande inhoudelijke taalproef op de definitieve bron, gevolgd door de
+volledige statische controle en een idempotente buildtegenproef. Er worden geen
+bewijsregels versoepeld en geen bewijsbestanden handmatig groen gemaakt.
+
+**Meetstand vóór tegenproef.** Releaseblokkerende bronoorzaken: **1 verlopen
+taalbewijs**. Bewezen afgesloten sinds de vorige ronde: **0**. Nieuwe
+regressies: **0 vastgesteld; de niet-uitgevoerde zware jobs blijven onbekend**.
+Nog niet uitgevoerde verplichte controles: **de door preflight geblokkeerde
+GitHub-jobs, APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief menselijke
+proeven, operationele kwalificatie en twee onafhankelijke eindruns**.
+APPWERKT: **0/114 actueel geldig**. EXPERIENCEWERKT: **0/316 schermen en
+0/3360 voorwaarden actueel gekwalificeerd**. Actuele bron:
+`ec72bfc4be7f09691cd46c028846ba22f19bdb7b`. Eerstvolgende blokkade: **het
+taalbewijs inhoudelijk vernieuwen en dezelfde statische en buildpoorten opnieuw
+sluiten**. Deep Green: **GEBLOKKEERD**.
+
+De tegenproef sluit DG-CI-35 lokaal: `npm run language:proof` heeft **27/27**
+inhoudelijke proeven zonder failure of skip uitgevoerd, `npm run check` heeft
+alle statische en bewijsgebonden regels gesloten en `npm run build` heeft de
+bron ongewijzigd gelaten. Releaseblokkerende bronoorzaken: **0 lokaal bekend;
+volledige GitHub-CI vereist**. Bewezen afgesloten sinds de vorige ronde:
+**1**. Nieuwe regressies: **0 in de uitgevoerde controles**. Eerstvolgende
+blokkade: **alle verplichte GitHub-jobs op de nieuwe kandidaat volledig laten
+uitlopen**. Deep Green blijft **GEBLOKKEERD**.

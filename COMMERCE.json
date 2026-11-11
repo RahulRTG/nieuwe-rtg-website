@@ -2,8 +2,8 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-11-11",
   "gemeten": {
-    "bestanden": 3055,
-    "domeinenTotaal": 768,
+    "bestanden": 3056,
+    "domeinenTotaal": 769,
     "koopbareVormen": 627,
     "koopbareDomeinen": 132,
     "envelopDrempel": 8,
@@ -73,7 +73,7 @@
     "zaak"
   ],
   "perWerkwoord": {
-    "toon": 98,
+    "toon": 97,
     "prijs": 43,
     "beschikbaarheid": 55,
     "reserveer": 34,
@@ -1658,24 +1658,6 @@
       "telt": 2
     },
     {
-      "domein": "kern/reisbureau-nazorg",
-      "heeft": {
-        "toon": true,
-        "prijs": true,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "lidBeeld",
-        "prijs": "herbereken"
-      },
-      "telt": 2
-    },
-    {
       "domein": "kern/reisbureau-prijsgrond",
       "heeft": {
         "toon": true,
@@ -2053,6 +2035,23 @@
       },
       "bewijs": {
         "reserveer": "zelfdeClaim"
+      },
+      "telt": 1
+    },
+    {
+      "domein": "kern/reisbureau-nazorg",
+      "heeft": {
+        "toon": false,
+        "prijs": true,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "prijs": "herbereken"
       },
       "telt": 1
     },

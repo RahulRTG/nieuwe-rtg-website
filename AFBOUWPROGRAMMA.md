@@ -6155,3 +6155,95 @@ als volledige vrijgave gekwalificeerd**; inventaris en afleiding zijn exact
 mergecommit vastleggen, publiceren en alle verplichte GitHub-jobs zonder
 verdere bronwijziging volledig laten uitlopen**. Deep Green:
 **GEBLOKKEERD**.
+
+### Zevende onveranderlijke CI-nulmeting — 11 november 2026
+
+De volledige verplichte CI is zonder tussentijdse bronwijziging uitgelopen op
+PR-head `adbd9e8204398bef04324df52adfc28c2d4e2fff`. De hoofd-CI is run
+`42992771875`; Desktop- en mobielstandaard is run `42992771586`; CodeQL en de
+lokale kwalificatie sloten afzonderlijk groen. Alle rode logs en het mobiele
+bewijsartefact zijn gelezen voordat broncode is gewijzigd.
+
+De foutboom bevat vijf unieke primaire oorzaken. De rode totaaljob en de
+massale mobiele vervolgfouten zijn afgeleid en tellen niet als afzonderlijke
+productoorzaken.
+
+| ID | Soort | Primaire oorzaak | Getroffen controles | Herstelrichting |
+| --- | --- | --- | --- | --- |
+| DG-CI-40 | integratieregressie in centrale presentatie-owner | De actuele `main`-samenvoeging verwijderde elf bestaande DS-componentlinks uit `public/apps/app.html` en bracht acht statische stijlattributen terug. Eén gedeelde oorzaak brak FocusUI, melding/verbinding/dyncode, presentatierollen, stijlbundeling en de gekoppelde gezinsbediening. | unitscherven 2, 3 en 4; schermscherf 1 | Herstel uitsluitend de bestaande DS-links en presentatierollen, met behoud van de nieuwe PersonalOS-markup. |
+| DG-CI-41 | testinfrastructuur | De minimale DOM-fixture van de cookie-unit implementeerde `setProperty` en `removeProperty`, maar niet de standaard-API `getPropertyValue` die de inmiddels bewezen centrale controller gebruikt. | unitscherf 2 | Maak de fixture browserconform; productgedrag en asserts blijven ongewijzigd. |
+| DG-CI-42 | fout-negatief toetscontract | De raakvlakassertie vereiste onbedoeld minstens één declaratie tussen `min-width` en `min-height`. Aangrenzende geldige 44px-declaraties werden daardoor rood ondanks dezelfde inhoudelijke norm. | unitscherf 4 | Corrigeer uitsluitend de kwantor; beide 44px-eisen blijven verplicht. |
+| DG-CI-43 | verlopen mutatiebewijs | De samengebrachte bron bevat negen toetsbestanden meer zonder actuele mutatiemeting: `toetsenNietGemeten` is 150 bij een ongewijzigde norm van 141. | norm/build | Meet exact de ontbrekende toetsen via de bestaande kandidaatgebonden mutatiemotor; verlaag de norm niet. |
+| DG-CI-44 | CI-capaciteitsgrens | De volledige Experience-a11yproducent bereikte zijn harde interne grens van 55 minuten op Node 26.13.0 en leverde daardoor geen meting. De daaropvolgende 1.542 failures zijn uitsluitend afgeleid uit het ontbrekende document. | mobiel 390; daarna Experience-inventarisstap | Geef dezelfde fail-closed tweedelige scan de reeds gedocumenteerde volle 60-minutencontractgrens; inhoud, routes en normen blijven gelijk. |
+
+Geslaagde onafhankelijke controles zijn onder meer statisch/PostgreSQL,
+adversarial autorisatie, AST-grens, alle zeven ijkingen, containerstart,
+dependencycontrole, WebKit, CodeQL, unitscherf 1, schermscherven 2 tot en met 5,
+alle vier toegankelijkheidsscherven met hun totaaloordeel en desktop 1440.
+Zes verplichte vervolgcontroles zijn niet uitgevoerd door de rode
+afhankelijkheden: de volledige producent, het schermdekkingsoordeel, het
+endpointdekkingsoordeel, publicatie van het vertrouwde bewijsboek, de Evidence
+Control Plane-kalibratie en de Experience-inventarisstap na de mobiele
+producent. De drie incrementele jobs zijn volgens het full-runcontract bewust
+niet van toepassing en geen onverklaarde skips.
+
+**Meetstand vóór herstelronde 17.** Releaseblokkerende bronoorzaken: **5**.
+Bewezen afgesloten sinds de vorige ronde: **0**. Nieuwe regressies: **1
+gedeelde bronoorzaak** (DG-CI-40); DG-CI-41 en DG-CI-42 zijn
+testcontractfouten, DG-CI-43 is verlopen bewijs en DG-CI-44 is een
+capaciteitsgrens. Eerder verborgen fouten ontdekt: **0 aanvullende
+productoorzaken**. Nog niet uitgevoerde verplichte CI-controles: **6**;
+daarnaast blijven APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief
+menselijke proeven, security/finance/load,
+staging/back-up/herstel/rollback/incidentrespons en twee onafhankelijke
+eindruns open. APPWERKT: **0/114 actueel geldig; 912 bewijzen zijn terecht
+verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden als
+volledige vrijgave gekwalificeerd**. Eerstvolgende blokkade: **DG-CI-40 tot en
+met DG-CI-44 gericht sluiten en alle geraakte controles opnieuw uitvoeren**.
+Deep Green: **GEBLOKKEERD**.
+
+### Gerichte sluiting van de zevende CI-foutboom — herstelronde 17
+
+De vijf primaire oorzaken uit de onveranderlijke nulmeting zijn uitsluitend in
+afhankelijkheidsvolgorde behandeld. DG-CI-40 is gesloten door de elf bestaande
+centrale Design System-links en acht bestaande presentatierollen in
+`public/apps/app.html` te herstellen, met behoud van de nieuwe PersonalOS-
+markup. De gecombineerde geraakte unitbatch sluit **126/126** groen en de echte
+APPWERKT-gezinsbediening sluit **1/1** groen. DG-CI-41 is gesloten met een
+browserconforme `getPropertyValue` in de bestaande minimale DOM-fixture.
+DG-CI-42 is gesloten door uitsluitend de fout-negatieve regexkwantor te
+corrigeren; beide afzonderlijke eisen van minimaal 44 px blijven verplicht.
+
+DG-CI-43 is via de bestaande mutatiemotor gesloten voor exact de negen nieuwe
+toetsbestanden. De normmeter `toetsenNietGemeten` staat weer op **141**, gelijk
+aan de ongewijzigde norm. De normpoort heeft geen inhoudelijke verslechtering
+gevonden; vóór vastlegging meldt zij uitsluitend terecht dat registers uit een
+vuile werkboom niet reproduceerbaar zijn. DG-CI-44 gebruikt nu de reeds
+gedocumenteerde volledige contractgrens van 60 minuten voor dezelfde
+fail-closed Experience-a11yscan. De snelle contract- en inventarisproeven
+sluiten **440/440** groen. De daadwerkelijke volledige producent blijft een
+verplichte CI-tegenproef en wordt niet door deze lokale contractproef vervangen.
+
+De door deze reparaties geraakte `BEWIJS.md`-, taal- en gebruikersbeeld-
+afdrukken zijn uitsluitend met hun bestaande producenten vernieuwd. De
+inhoudelijke taalproef sluit **27/27** groen. Na die afleiding sluit
+`npm run check` volledig groen; zij blijft eerlijk melden dat **912**
+APPWERKT-bewijzen voor alle 114 apps verlopen zijn. Er is geen APPWERKT- of
+Experience-bewijs administratief groen gemaakt.
+
+**Meetstand herstelronde 17.** Releaseblokkerende bronoorzaken: **0 lokaal
+bekend; DG-CI-44 en de volledige foutboom vereisen de nieuwe GitHub-CI-run**.
+Bewezen afgesloten sinds de vorige meting: **4** (DG-CI-40 tot en met
+DG-CI-43); voor DG-CI-44 is de gerichte contractreparatie groen maar het
+integrale bewijs nog open. Nieuwe regressies: **0 in 126 geraakte units, 1 echte
+gezinsflow, 440 Experience-contractcontroles, 27 taalproeven en de volledige
+statische poort**. Nog niet uitgevoerde verplichte controles: **de volledige
+GitHub-CI op de nog vast te leggen herstelcommit; de zes eerder geblokkeerde
+vervolgcontroles hebben daardoor nog geen geldig nieuw oordeel**. APPWERKT:
+**0/114 actueel geldig; 912 bewijzen zijn terecht verlopen**.
+EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden als volledige vrijgave
+gekwalificeerd**. Actuele vastgelegde bron vóór deze herstelcommit:
+`adbd9e8204398bef04324df52adfc28c2d4e2fff`. Eerstvolgende blokkade: **de
+herstelcommit vastleggen, de norm op de schone boom herhalen en alle verplichte
+GitHub-jobs zonder verdere bronwijziging volledig laten uitlopen**. Deep Green:
+**GEBLOKKEERD**.

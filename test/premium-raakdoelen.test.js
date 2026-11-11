@@ -11,7 +11,7 @@ test('native DS en de Heritage-overgang bewaken dezelfde premium-doelmaat', () =
   const ds = lees('public/ds/componenten/basis.css');
   const heritage = lees('public/shared/rtg-editorial-v4.css');
   assert.match(ds, /\.ds-scherm :where\([^}]+min-inline-size: var\(--ds-doel\);[^}]+min-block-size: var\(--ds-doel\);/s);
-  assert.match(heritage, /body\[data-rtg-editorial-v4="true"\] :where\([^}]+min-width:44px!important;[^}]+min-height:44px!important;/s);
+  assert.match(heritage, /body\[data-rtg-editorial-v4="true"\] :where\([^}]+min-width:44px!important;[^}]*min-height:44px!important;/s);
   assert.match(heritage, /\.standen>button\{[^}]*min-width:44px!important;/);
   assert.doesNotMatch(lees('public/shared/rtg-experience-2026.css'),
     /body\.rtg-music-experience \.speler button/);

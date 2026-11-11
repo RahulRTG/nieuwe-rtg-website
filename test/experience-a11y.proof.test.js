@@ -32,7 +32,7 @@ if(!sourceHash&&!commit) {
   const map=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-experience-a11y-'));
   const meting=path.join(map,'meting.json');
   const run=cp.spawnSync(process.execPath,['scripts/experience-a11y-scan.js','--meting='+meting],{
-    cwd:ROOT,env:{...process.env,A11Y_STRICT:'1'},encoding:'utf8',timeout:55*60*1000,maxBuffer:64*1024*1024
+    cwd:ROOT,env:{...process.env,A11Y_STRICT:'1'},encoding:'utf8',timeout:60*60*1000,maxBuffer:64*1024*1024
   });
   test.after(()=>fs.rmSync(map,{recursive:true,force:true}));
   test('volledige a11y-scan leverde een leesbare meting',()=>{

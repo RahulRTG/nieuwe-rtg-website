@@ -5950,3 +5950,33 @@ gekwalificeerd**. Actuele vastgelegde bron vóór deze herstelcommit:
 `9d28ecab6f`. Eerstvolgende blokkade: **de samenhangende herstelcommit
 publiceren en alle 37 verplichte GitHub-jobs opnieuw volledig laten uitlopen**.
 Deep Green: **GEBLOKKEERD**.
+
+#### Buildafdruk na herstelronde 12
+
+De eerste GitHub-tegenproef op `c39c0627a8` sloot preflight, lokale
+kwalificatie, WebKit en CodeQL groen, maar de norm/build-job wees de
+idempotentie terecht af. Norm, instroom en de build zelf slaagden; de build
+toonde uitsluitend dat de vastgelegde assetversies en twee
+service-workercache-identiteiten nog bij de vorige bron hoorden. Die bestaande
+buildartefacten zijn zonder handmatige bronaanpassing opnieuw gegenereerd en
+vastgelegd als **DG-CI-33**.
+
+De directe idempotentietegenproef stopte daarna fail-closed omdat het echte
+gebruikersscherm op de openbare website nog aan de vorige schermbron was
+gebonden. De bestaande `websitebeelden`-route heeft exact één appbeeld opnieuw
+gemeten, twee ongewijzigde beelden hergebruikt en het herkomst- en
+waarheidsregister vernieuwd. Een tweede volledige build sluit daarna groen en
+laat de werkboom ongewijzigd. Dit sluit **DG-CI-34** lokaal; de volledige
+GitHub-tegenproef blijft verplicht.
+
+**Meetstand buildherstel.** Releaseblokkerende bronoorzaken: **0 lokaal
+bekend; volledige CI vereist**. Bewezen afgesloten sinds herstelronde 12:
+**2 afgeleide buildoorzaken**. Nieuwe regressies: **0 in de idempotente
+tegenbuild**. Nog niet uitgevoerde verplichte controles: **volledige CI op de
+definitieve commit, APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief
+menselijke proeven, operationele kwalificatie en twee onafhankelijke
+eindruns**. APPWERKT: **0/114 actueel geldig**. EXPERIENCEWERKT: **0/316
+schermen en 0/3360 voorwaarden actueel gekwalificeerd**. Actuele vastgelegde
+productbron vóór deze registerwijziging: `079d5ea570`. Eerstvolgende blokkade:
+**de registercommit publiceren en alle verplichte GitHub-jobs zonder verdere
+bronwijziging laten uitlopen**. Deep Green: **GEBLOKKEERD**.

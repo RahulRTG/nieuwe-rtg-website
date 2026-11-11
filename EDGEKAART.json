@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-11-10T14:28:37.259Z",
-    "commit": "aa79dabfa",
+    "op": "2026-11-11T12:10:45.566Z",
+    "commit": "d6536c133",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -3554,6 +3554,41 @@
         "opslag": [],
         "fetch": []
       }
+    },
+    {
+      "pad": "public/site/website-truth.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "etiket": "wereld:s",
+          "wat": "de openbare wereldpagina volgt dezelfde wereldbron als de app",
+          "citaat": "document.body.dataset.rtgWorld = wereld.id;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGWebsiteTruth",
+          "RTGWebsiteTruthRefresh"
+        ],
+        "zendt": [
+          "rtg-website-truth"
+        ],
+        "luistert": [],
+        "attributen": [
+          "data-app-truth-theme",
+          "data-rtg-world",
+          "data-website-truth"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
     }
   ],
   "verantwoordelijkheden": {
@@ -3807,7 +3842,8 @@
         "public/site/platform-controller.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
-        "public/site/start/experience.js"
+        "public/site/start/experience.js",
+        "public/site/website-truth.js"
       ],
       "beslissers": [
         "public/shared/command/bladstand.js",
@@ -3879,7 +3915,8 @@
       "public/site/platform-controller.js",
       "public/site/start/experience-edge.js",
       "public/site/start/experience-graph.js",
-      "public/site/start/experience.js"
+      "public/site/start/experience.js",
+      "public/site/website-truth.js"
     ],
     "blikveld": [
       "public/shared/edge/actiestaat.js",
@@ -4117,7 +4154,8 @@
         "public/site/platform-controller.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
-        "public/site/start/experience.js"
+        "public/site/start/experience.js",
+        "public/site/website-truth.js"
       ],
       "beslissers": [
         "public/shared/command/bladstand.js",
@@ -4125,7 +4163,7 @@
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
         "public/shared/rtg-edge-system.js"
       ],
-      "waarom": "De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scene vanuit drie scripts."
+      "waarom": "De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, de landing zet hem per scene vanuit drie scripts en de openbare wereldpagina projecteert de appbron op body."
     },
     {
       "naam": "zichtbaarheidsstand",
@@ -4188,7 +4226,8 @@
       "public/site/platform-controller.js",
       "public/site/start/experience-edge.js",
       "public/site/start/experience-graph.js",
-      "public/site/start/experience.js"
+      "public/site/start/experience.js",
+      "public/site/website-truth.js"
     ],
     "zichtbaarheidsstand": [
       "public/apps/foundation/os-publiek.html",
@@ -4202,8 +4241,8 @@
     ]
   },
   "telling": {
-    "bestanden": 78,
-    "rollen": 218,
+    "bestanden": 79,
+    "rollen": 219,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
     "levendeKanalen": 19

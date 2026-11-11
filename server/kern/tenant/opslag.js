@@ -45,6 +45,7 @@ module.exports = function maakTenantOpslag({ db }) {
     tenants: () => { if (!isKaart(db.data.tenants)) db.data.tenants = {}; return db.data.tenants; },
     tenantsKijk: () => db.data.tenants || {},
     herstelproefRuimtes: () => { if (!db.data.herstelproefRuimtes) db.data.herstelproefRuimtes = []; return db.data.herstelproefRuimtes; },
+    reisAanvragenKijk: () => db.data.reisAanvragen,
     zetHerstelproefRuimtes: (lijst) => {
       if (!Array.isArray(lijst)) throw new Error('kern/tenant/opslag: herstelproefRuimtes hoort een lijst te zijn');
       db.data.herstelproefRuimtes = lijst;

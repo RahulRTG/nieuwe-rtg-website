@@ -6752,3 +6752,19 @@ het oude suitebewijs hoort bij `816906a8`; schermsuite, releasepoort en
 stagingrepetitie ontbreken. De eerder genoemde contractuele, financiële,
 menselijke en onafhankelijke externe kwalificatieblokkades blijven ongewijzigd.
 Geen merge, nieuwe vrijgave of uitrol uitgevoerd.
+
+#### Herstel van de samengevoegde kandidaat, 11 november 2026
+
+De gezamenlijke kandidaat is na de eerdere brede onderbreking structureel
+hersteld. `kernlaag2` en `kernlaag4` zijn op reisbureau- respectievelijk
+bedrijfsmaatgrens gesplitst; de federatieve routes gebruiken de bestaande
+`reisbureau`-facade. De ratels staan daardoor weer op `dbDeuren 464`,
+`kernBreedte 1695` en `kernGedeeld 260`. Vier door de bundel gegroeide modules
+zijn weer onder de omvangwaarschuwing; de meter verbetert van 350 naar 349.
+
+De gerichte functionele herhaling sloot **90/90 groen**. De daaropvolgende
+mutatiecampagne mat de 33 nieuwe toetsen: alle 33 zakten; de twintig toepasselijke
+servertoetsen zakten ook in de scherpe ronde op de inhoud. `MUTATIES.json` en
+`BEWIJS.md` zijn uit die campagne vernieuwd. Dit vervangt niet de volledige
+lokale CI-, release- en stagingpoort; die worden hieronder pas groen genoemd na
+een nieuwe, brongebonden eindrun.

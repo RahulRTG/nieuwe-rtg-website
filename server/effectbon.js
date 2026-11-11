@@ -16,8 +16,7 @@
      objectrefs   de COLLECTIES die bewogen -- namen, nooit rijen en nooit sleutels
      at           wanneer
      dekking      wat deze bon wel en niet kon zien, bij naam
-     waarborg     de controle van meetbare negatieve invarianten uit hetzelfde
-                  gevolgcontract; onbekende of blinde dekking blijft zichtbaar
+     waarborg     controle van meetbare negatieve invarianten; blind blijft blind
 
    EN WAT ER NOOIT IN KOMT: geen momentopnames, geen lijven, geen payload, geen diff,
    geen codenaam, geen enkele rij-id. Een bon die de inhoud draagt is een gedragslogboek
@@ -120,9 +119,7 @@ function maak({ envelop, voor, na, teller }) {
     })
   };
   if (Array.isArray(voorspeld)) bon.nameting = nameet(voorspeld, bon);
-  /* PRE- EN POSTCONDITIES blijven van het domein; de universele effectbon kan
-     wel de negatieve invarianten uit `nooit` controleren. Ook ONBEKEND blijft
-     zichtbaar: geen contract is geen stil geslaagde controle. */
+  // Een ontbrekend of blind contract wordt nooit stil als geslaagd aangemerkt.
   bon.waarborg = controleerInvarianten(bon.capability, bon);
   return Object.freeze(bon);
 }

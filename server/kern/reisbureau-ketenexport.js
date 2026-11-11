@@ -7,7 +7,7 @@ const fout = (status, error) => ({ status, error });
 const neem = (v, velden) => Object.fromEntries(velden.filter(k => v && v[k] != null).map(k => [k, v[k]]));
 const kopie = v => JSON.parse(JSON.stringify(v));
 
-function projecteer(a, actor, rol) {
+function projecteerReisexport(a, actor, rol) {
   const k = a.keten, actoren = new Map();
   const persoon = ref => {
     if (!ref) return null;
@@ -54,7 +54,7 @@ module.exports = ({ bewerkCollectie, toegang, uitgangVan, nu = () => datum().toI
       const eigen = a => a.keten && (rol === 'verkoper'
         ? a.keten.verkoper.org === actor.org && a.keten.verkoper.supplierCode === actor.supplierCode
         : (a.keten.leveringen || []).some(p => p.org === actor.org && p.supplierCode === actor.supplierCode));
-      const reizen = data.reisAanvragen.filter(eigen).map(a => projecteer(a, actor, rol));
+      const reizen = data.reisAanvragen.filter(eigen).map(a => projecteerReisexport(a, actor, rol));
       const archief = { schemaVersion: 1, status: 'documentair', operationeelHerstel: false,
         scope: { soort: 'zaak', rol, org: actor.org, supplierCode: actor.supplierCode },
         naam: zaak.naam, at: nu(), reizen,

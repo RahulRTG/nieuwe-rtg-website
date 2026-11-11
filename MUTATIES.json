@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-11T10:46:18.208Z",
-    "commit": "4b0650be53",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-11-11T15:25:39.636Z",
+    "commit": "c3cd193179",
+    "boomVuil": true,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.12.1"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -3483,6 +3483,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "command-schilderlaag.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "command-zware-rechten.test.js": {
@@ -8520,6 +8527,14 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "intelligentiesubstitutie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/substitutie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "intentie-model.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12476,6 +12491,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "native-intelligentie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/waarborgcontract.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "native-process.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -14109,6 +14132,14 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "payboeking-bekend.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pay/boeking.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "payboeking-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15585,6 +15616,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "reisbetaling-integriteit.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "reisbieb.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -15622,6 +15660,66 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "reisbureau-keten-kantoor.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisbureau-keten-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "reisbureau-keten-vrijgave.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/reisketen-antwoord.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "reisbureau-keten.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisbureau-keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau-keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 26,
+      "geprobeerd": 1
+    },
+    "reisbureau-ketenexport-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "reisbureau-ketenexport.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau-ketenexport.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "reisbureau-legacy-isolatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau-opslag.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
     "reisbureau-nazorg.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -15629,12 +15727,28 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "reisbureau-tenantuitgang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/uitgang.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "reisbureau-thuis.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "reisbureau-toegang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau-toegang.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "reisbureau.test.js": {
       "soort": "server",
@@ -15701,6 +15815,113 @@
       "geprobeerd": 2
     },
     "reisherkomst.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "reisketen-continuiteit.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "reisketen-financiele-grenzen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "reisketen-financiele-herstel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reisbureau.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "reisketen-kantoor-token.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "reisketen-leverancier-sessie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/appshell.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "reisketen-liveconcept.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisketen-livecontext.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisketen-nazorg.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisketen-nazorg.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "reisketen-offline.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisketen-prestatie.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "reisketen-sessiegrenzen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "reisketen-sessiewissel.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisketen-werktafel.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisketen-zaakdoos.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -20129,12 +20350,35 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "tenantreis-vernietiging-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "tenantreis-vernietiging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/uitgang.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "tenantspine.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/tenant/register.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "tenantuitgang-validatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/uitgang.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
       "geprobeerd": 1
     },
     "tenantuitgang.test.js": {

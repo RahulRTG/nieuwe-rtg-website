@@ -10,11 +10,10 @@ module.exports = (kern) => {
     paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn,
     reisbureau, logies, uitgaan, gegevensStop } = kern;
 
-// de koop- en bibliotheek-ingangen van de Mall staan apart (winkel klein houden)
+// koop- en bibliotheekingangen van de Mall staan apart
 require('./winkel-bieb')(kern);
 // de vindlaag van de Mall: zoeken, plekken, lijsten en de vraagkant
 require('./mall-vindlaag')(kern);
-require('./reisketen')(kern);
 
 /* ---- de losse verblijf-pagina: hotels, appartementen en villa's ---- */
 // het overzicht van de overnachters met hun vrije kamers; boeken gaat via /api/verblijf

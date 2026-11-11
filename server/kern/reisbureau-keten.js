@@ -51,7 +51,7 @@ function maakReisketen({ bewerkCollectie, toegang, payVan, nu = () => huisklok.d
       a.status = 'aangeboden';
     }, C.verkoperbeeld);
   }
-  function akkoord(actor, b) {
+  function bevestigAkkoord(actor, b) {
     return O.mutatie(actor, b, 'akkoord', lidMag, a => {
       const o = a.keten.offerte;
       if (a.status !== 'aangeboden' || !C.geldigeOfferte(o) || o.hash !== b.offerteHash || Date.parse(o.geldigTot) <= Date.parse(nu()))
@@ -71,7 +71,7 @@ function maakReisketen({ bewerkCollectie, toegang, payVan, nu = () => huisklok.d
       a.status = 'geaccepteerd';
     }, C.lidbeeld);
   }
-  function opdracht(actor, b) {
+  function verwerkOpdracht(actor, b) {
     return O.mutatie(actor, b, 'opdracht-' + String(b.besluit), aanbiederMag, a => {
       const p = a.keten.leveringen.find(x => x.id === b.onderdeel && x.org === actor.org && x.supplierCode === actor.supplierCode);
       if (!p) return C.fout(404, 'Opdracht niet gevonden.');
@@ -96,7 +96,7 @@ function maakReisketen({ bewerkCollectie, toegang, payVan, nu = () => huisklok.d
         : staten.every(x => ['bevestigd', 'geleverd'].includes(x)) ? 'bevestigd' : 'gedeeltelijk-bevestigd';
     }, a => opdrachtenbeeld(a, actor));
   }
-  function afronden(actor, b) {
+  function rondReisketenAf(actor, b) {
     return O.mutatie(actor, b, 'afronden', O.eigenaar, a => {
       if (a.status !== 'geleverd') return C.fout(409, 'Niet alle onderdelen zijn aantoonbaar geleverd.');
       /* Geen nep-afsluiting: bestaande settlement/teruggavepoorten zijn nog
@@ -107,7 +107,8 @@ function maakReisketen({ bewerkCollectie, toegang, payVan, nu = () => huisklok.d
   }
   const betaling = require('./reisbureau-ketenbetaling')({ O, payVan, toegang, nu });
   const nazorg = require('./reisbureau-ketennazorg')({ O, nu });
-  return { start, biedAan, akkoord, opdracht, afronden, betaal: betaling.betaal, ...nazorg,
+  return { start, biedAan, akkoord: bevestigAkkoord, opdracht: verwerkOpdracht, afronden: rondReisketenAf,
+    betaal: betaling.betaal, ...nazorg,
     mijn: (actor, ref) => O.lees(a => lidMag(a, actor) && (!ref || a.ref === ref), C.lidbeeld),
     zaken: (actor, ref) => O.lees(a => O.eigenaar(a, actor) && (!ref || a.ref === ref), C.verkoperbeeld),
     opdrachten: actor => O.lees(a => aanbiederMag(a, actor), a => opdrachtenbeeld(a, actor)) };

@@ -2,11 +2,10 @@
    reisdata. Alleen blokkeren: geen nieuwe bewaartermijn, verwijdering of inzage. */
 'use strict';
 const { object } = require('./uitgang-validatie');
-module.exports = (db, tenant) => {
+module.exports = (bron, tenant) => {
   const onzeker = () => ({ status: 503, code: 'REISKETEN_VERNIETIGING_ONZEKER',
     error: 'De dekking van de reishistorie kon niet veilig worden vastgesteld. Er is niets vernietigd.' });
   try {
-    const bron = db.data.reisAanvragen;
     if (bron === undefined) return null; // bestaande opslag vóór de reiscollectie
     if (!Array.isArray(bron)) return onzeker();
     const zaken = new Set(tenant.zaken || []);

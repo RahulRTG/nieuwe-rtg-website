@@ -26,7 +26,7 @@ function padVan(capability) {
   return raak ? raak[0].replace(/\/$/, '') : ruw.replace(/[?#].*$/, '').replace(/\/$/, '');
 }
 
-function projecteer(capability, contracten) {
+function projecteerWaarborg(capability, contracten) {
   const pad = padVan(capability);
   const c = (contracten || CONTRACTEN)[pad] || null;
   if (!c) return {
@@ -78,7 +78,7 @@ function meetbaarZonderWaarneming(klasse, bon) {
 }
 
 function controleerInvarianten(capability, bon, contracten) {
-  const contract = projecteer(capability, contracten);
+  const contract = projecteerWaarborg(capability, contracten);
   if (contract.stand === 'ONBEKEND' || contract.open.includes('gevolgcontract-afgekeurd')) {
     return {
       capability: contract.capability, stand: 'ONBEKEND', rijen: [], open: contract.open,
@@ -120,4 +120,4 @@ function controleerInvarianten(capability, bon, contracten) {
   };
 }
 
-module.exports = { projecteer, controleerInvarianten, padVan, UITKOMSTEN };
+module.exports = { projecteer: projecteerWaarborg, controleerInvarianten, padVan, UITKOMSTEN };

@@ -164,7 +164,7 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
       return { error: 'De bewaartermijn loopt tot ' + v.bewaarTot.slice(0, 10) + '. Tot die datum wordt er niets vernietigd.', status: 409 };
     const door = schoon(o.door, 80);
     if (!door) return { error: 'Wie tekent voor deze vernietiging?', status: 400 };
-    const reisgrens = require('./uitgang-reisgrens')(db, t);
+    const reisgrens = require('./uitgang-reisgrens')(opslag.reisAanvragenKijk(), t);
     if (reisgrens) return reisgrens;
 
     /* Het bewijs wordt uit de LAATSTE stand gerekend, vlak voor het weghalen --

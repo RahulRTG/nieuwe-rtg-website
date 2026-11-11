@@ -13,7 +13,7 @@ const SOORTEN = new Set(['verblijf', 'vervoer', 'activiteit', 'dienst']);
 const ROLLEN = new Set(['reisagent', 'touroperator', 'bemiddelaar', 'leverancier']);
 const geldigeOfferte = o => { if (!o) return false; const { hash: afdruk, ...grond } = o; return hash(grond) === afdruk; };
 
-function offerte(data, verkoper, vorigeVersie, providerVan, nu) {
+function maakKetenofferte(data, verkoper, vorigeVersie, providerVan, nu) {
   const voorwaarden = tekst(data.voorwaarden, 4000, true);
   const geldig = typeof data.geldigTot === 'string' ? Date.parse(data.geldigTot) : NaN;
   if (!voorwaarden || !Number.isFinite(geldig) || geldig <= Date.parse(nu) ||
@@ -81,4 +81,4 @@ function verkoperbeeld(a) {
       settlement: 'niet-gekwalificeerd', externeBetaalprovider: 'niet-gekoppeld',
       kostenbesparing: 'niet-gemeten' } };
 }
-module.exports = { fout, tekst, hash, kopie, IDEM, offerte, geldigeOfferte, lidbeeld, verkoperbeeld };
+module.exports = { fout, tekst, hash, kopie, IDEM, offerte: maakKetenofferte, geldigeOfferte, lidbeeld, verkoperbeeld };

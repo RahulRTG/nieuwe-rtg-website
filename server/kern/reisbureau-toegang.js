@@ -17,7 +17,7 @@ const fout = (status, error) => ({ status, error });
 const codeVan = value => String(value || '').trim().toUpperCase();
 
 function maakReisToegang(kern) {
-  function kantoor(req) {
+  function kantoorActor(req) {
     if (!kern.accounts || typeof kern.accounts.getUserById !== 'function' ||
         typeof kern.accounts.isActief !== 'function' || typeof kern.boardroomWie !== 'function')
       return fout(503, 'De persoonlijke kantoortoegang is niet beschikbaar.');
@@ -107,7 +107,7 @@ function maakReisToegang(kern) {
       actorRef: 'user-' + Number(staff.member_id), role: staff.role });
   }
 
-  return { kantoor, partner: req => zaak(req, true), aanbieder: req => zaak(req, false), ontvanger, leverancier };
+  return { kantoor: kantoorActor, partner: req => zaak(req, true), aanbieder: req => zaak(req, false), ontvanger, leverancier };
 }
 
 module.exports = { maakReisToegang };

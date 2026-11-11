@@ -8,7 +8,7 @@ module.exports = ({ bewerkCollectie, nu }) => {
   const schrijf = werk => bewerkCollectie({ reisAanvragen: 'lijst' }, data => werk(data.reisAanvragen));
   const eigenaar = (a, actor) => a.keten.verkoper.org === actor.org &&
     (a.keten.verkoper.supplierCode || null) === (actor.supplierCode || null);
-  function gebeurtenis(a, soort, actorRef) {
+  function ketengebeurtenis(a, soort, actorRef) {
     a.keten.versie++;
     a.keten.gebeurtenissen.push({ volgnummer: a.keten.versie, soort, actorRef, at: nu() });
   }
@@ -28,11 +28,11 @@ module.exports = ({ bewerkCollectie, nu }) => {
         return fout(409, 'De betaaluitkomst is nog niet bevestigd. Herstel eerst dezelfde betaling.');
       const r = werk(a);
       if (r && r.error) return r;
-      gebeurtenis(a, soort, actor.actorRef);
+      ketengebeurtenis(a, soort, actor.actorRef);
       a.keten.ontvangsten.push({ sleutel, afdruk });
       return { ok: true, reis: beeld(a) };
     });
   }
-  return { schrijf, eigenaar, gebeurtenis, mutatie,
+  return { schrijf, eigenaar, gebeurtenis: ketengebeurtenis, mutatie,
     lees: async (mag, beeld) => schrijf(lijst => ({ ok: true, reizen: lijst.filter(a => a.keten && mag(a)).map(a => kopie(beeld(a))) })) };
 };

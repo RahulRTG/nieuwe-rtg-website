@@ -592,3 +592,20 @@ annulerings-/terugbetaalregels, betaalprovider en leveranciersafspraken nodig.
 De keuze voor beide pilots verleent geen bevoegdheid om die voorwaarden zelf
 vast te stellen, extern te tekenen of echte bedragen te verplaatsen. TRV-01,
 TRV-03, TRV-04, TRV-07 en TRV-10 blijven open tot hun eigen bewijs er is.
+
+### Samengevoegde Deep Green-kandidaat, 11 november 2026
+
+De federatieve uitvoering hangt nu onder de bestaande `reisbureau`-facade in
+plaats van drie nieuwe publieke kernnamen. Toegang, uitvoering en documentaire
+export blijven afzonderlijke onderdelen, maar routes kunnen niet buiten het
+reisbureaudomein om bij die onderdelen. De montage van het reisbureau en de
+alleen-lezen bedrijfsmaten zijn op hun natuurlijke domeinnaad uit de te brede
+kernlagen gehaald. Daardoor blijven beide bestaande lagen onder de 10 kB-grens
+zonder de opslag-, autorisatie- of geldcontracten te verruimen.
+
+De 33 nieuwe toetsen zijn gericht door de mutatiemotor gegaan. Allemaal zakten
+onder een echte bronmutatie of liegpoort; de twintig servertoetsen uit de scherpe
+ronde zakten ook terwijl de algemene toegangsdeuren openbleven. Dit bewijst
+gevoeligheid voor fout gedrag, niet externe pilotgeschiktheid. De open TRV-
+besluiten en de juridische, financiële en operationele GO/NO-GO-grenzen blijven
+dus ongewijzigd.

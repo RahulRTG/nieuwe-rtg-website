@@ -24,7 +24,7 @@ module.exports = ({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save }) 
     if (g.error) return g;
     const a = g.aanvraag;
     if (a.customerKey !== key) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
-    if (a.betaald) return { status: 409, error: 'Deze reis is betaald. Een adviseur moet eerst de financiële gevolgen en een nieuwe offerte vaststellen; de betaalde reis blijft ongewijzigd.' };
+    if (a.betaald) return { status: 409, error: 'Voor deze reis staat een geslaagde inning geregistreerd. Een adviseur moet eerst de financiële gevolgen en een nieuwe offerte vaststellen; de reis blijft ongewijzigd.' };
 
     const w = wens || {};
     const gevraagd = {};

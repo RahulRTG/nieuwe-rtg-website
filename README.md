@@ -6285,3 +6285,17 @@ Drie productiegrenzen leveren nu shadow-bewijs: `betaalwaarheid` voor Money
 Integrity, de Vonk-reserveringsnaad voor External Dependency Integrity en de
 Connection-consent/call-naad voor Authority & Revocation Integrity. Provider-
 bevestiging zonder waargenomen fulfilment blijft bewust onvolledig.
+
+## Samengevoegde Deep Green-kandidaat
+
+De consolidatietak combineert Deep Green-herstel, TravelOS en de native
+intelligentieplanning in één kandidaat. De federatieve reisketen is geen tweede
+site of los platform: zij hangt onder het bestaande reisbureau en hergebruikt
+de bestaande identiteit-, tenant-, opslag- en geldpoorten. Een Plan Twin of
+waarborgprojectie kan niets uitvoeren; onbekende dekking blijft onbekend.
+
+De nieuwe bron is structureel op de bestaande ratels teruggebracht en alle 33
+toegevoegde toetsen zijn mutatiegevoelig gemeten. Dat is intern technisch bewijs.
+Een productieclaim volgt pas uit de bestaande volledige lokale CI-, release- en
+stagingpoorten én uit de nog open externe, juridische en operationele besluiten
+die in `TRAVELOS-UITVOERING.md` staan.

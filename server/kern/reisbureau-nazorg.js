@@ -151,25 +151,7 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid, terugboeken }) => {
     catch (e) { console.error('[reisbureau-nazorg] melding niet bezorgd'); return null; }
   }
 
-  /* ---- wat het lid van de nazorg ziet ----
-
-     Dezelfde regel als bij het besluit in ./reisbureau-besluit.js: het lid ziet
-     WAT er is gebeurd en WANNEER, niet WIE er in het kantoor op de knop drukte.
-     Die naam is een interne sleutel ('user-3', of "backoffice (gedeelde code)")
-     en hoort in het kantoor te blijven. Zijn eigen handelingen ziet hij wel als
-     de zijne. */
-  function lidBeeld(a) {
-    if (!a.geschiedenis) return a;
-    return Object.assign({}, a, {
-      geschiedenis: a.geschiedenis.map(r => {
-        const uit = { wat: r.wat, at: r.at, door: r.door === 'lid' ? 'u' : 'het reisbureau' };
-        for (const veld of ['reden', 'bericht', 'toelichting', 'gevraagd', 'was', 'werd']) {
-          if (r[veld] != null) uit[veld] = r[veld];
-        }
-        return uit;
-      })
-    });
-  }
+  const lidBeeld = require('./reisbureau-nazorgbeeld');
 
   const { vraagWijziging, besluitWijziging } =
     require('./reisbureau-wijziging')({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save });

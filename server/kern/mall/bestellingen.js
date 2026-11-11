@@ -103,7 +103,7 @@ module.exports = (ctx) => {
   }
 
   function bronReizen(key) {
-    return (db.data.reisAanvragen || []).filter(a => a.customerKey === key).map(a => regel({
+    return (db.data.reisAanvragen || []).filter(a => !a.keten && a.customerKey === key).map(a => regel({
       id: a.ref, bron: 'reisbureau', soort: 'reis',
       titel: a.titel, aanbieder: 'RTG Reisbureau',
       status: a.status, betaald: false,

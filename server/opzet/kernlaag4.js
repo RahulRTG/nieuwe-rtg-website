@@ -153,7 +153,7 @@ kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
   lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
     betaalschemas: () => db.data.lidmaatschapBetalingen,
     /* klantwaarde per wereld (besluit C3): drie lezers erbij, niets schrijvends */
-    reizen: () => db.data.reisAanvragen, loonruns: () => db.data.payrollRunsV2,
+    reizen: () => (db.data.reisAanvragen || []).filter(a => !a.keten), loonruns: () => db.data.payrollRunsV2,
     casussen: () => (db.data.rtfos && db.data.rtfos.casussen) },
   pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
   kosten: () => kern.kosten, bank: kern.bankpositie, boek: kern.rtgBoek, kanalen: kern.aanmeldkanaalStand,

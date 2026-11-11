@@ -62,6 +62,10 @@ module.exports = function lijfpoort(deps) {
      (./betaalstop.js). Hier, omdat pas na de body-parser de wijze te lezen is. */
   app.use(require('./betaalstop').externWijzePoort);
 
+  // Een lokale Zaakdoos-kopie is geen geautoriseerd offline reisdossier.
+  // De online proxy staat vóór deze keten; de weigering vóór idem en handlers.
+  app.use(require('../kern/zaakdoos/reisketen')(zaakdoos));
+
   /* Geld-dragende codes zonder bewezen atomaire lifecycle blijven in productie
      dicht. Dit staat na de begrensde body-parser (de algemene POS-route wordt
      alleen voor cadeaukaart/RTG Pay geraakt) en vóór idemopslag en handlers. */

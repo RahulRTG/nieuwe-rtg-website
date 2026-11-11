@@ -54,7 +54,8 @@ const { isSoort } = require('./waarde/economischeherkomst');
 
 const centenVanEuro = (v) => {
   const n = Number(v);
-  return Number.isFinite(n) ? Math.round(n * 100) : null;
+  const c = Math.round(n * 100);
+  return Number.isFinite(n) && n >= 0 && Number.isSafeInteger(c) ? c : null;
 };
 
 /* ---------- de samenstelling van EEN reis ---------- */
@@ -88,7 +89,7 @@ function samenstellingVan(trip) {
     if (!isSoort(eigenaar) || eigenaar === 'onbekend') {
       bezwaren.push(plek + ': eigenaar "' + eigenaar + '" is geen vastgestelde partijsoort');
     }
-    if (!Number.isInteger(pp) || pp < 0) bezwaren.push(plek + ': ppCenten is geen heel, niet-negatief getal');
+    if (!Number.isSafeInteger(pp) || pp < 0) bezwaren.push(plek + ': ppCenten is geen veilig heel, niet-negatief getal');
 
     onderdelen.push({
       soort, herkomst, eigenaar, ppCenten: Number.isInteger(pp) ? pp : null,
@@ -103,6 +104,7 @@ function samenstellingVan(trip) {
      van de streep belandt. Er wordt niets bijgeschaald en niets afgerond naar de
      prijs toe: de samenstelling is de waarheid of hij is stuk. */
   const som = onderdelen.reduce((a, o) => a + (o.ppCenten || 0), 0);
+  if (!Number.isSafeInteger(som) || nettoCenten === null) bezwaren.push('de reissom is geen veilig bedrag in centen');
   const verschil = nettoCenten == null ? null : som - nettoCenten;
   if (verschil !== 0 && bezwaren.length === 0) {
     bezwaren.push('de onderdelen tellen op tot ' + som + ' cent terwijl de reis ' + nettoCenten +
@@ -126,6 +128,8 @@ function voorAanvraag(trip, personen) {
   const s = samenstellingVan(trip);
   const n = Math.max(1, Math.round(Number(personen) || 1));
   if (!s.bekend) return Object.assign({}, s, { personen: n, totaalCenten: null, regels: [] });
+  if (!Number.isSafeInteger(n) || !Number.isSafeInteger(s.somCenten * n))
+    return Object.assign({}, s, { bekend: false, waarom: 'het aantal of het totaal overschrijdt veilige gehele centen', personen: n, totaalCenten: null, regels: [] });
   return Object.assign({}, s, {
     personen: n,
     totaalCenten: s.somCenten * n,

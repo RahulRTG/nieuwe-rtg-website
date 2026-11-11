@@ -7,22 +7,13 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+const api = window.RTGReisbureauApi(TOKEN);
 const taal = () => document.documentElement.lang || 'nl';
 const euro = n => new Intl.NumberFormat(taal(), { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(n) || 0);
 /* Sfeerbeeld uit eigen huis, geen beeld van de bestemming zelf: er bestaat
    (nog) geen herkomstbeeld per reis, dus het beeld beweert geen plek. */
 const BEELD = ['/images/worlds/heritage/travel-heritage-v2.jpg', '/campagne/jet.jpg', '/campagne/palacio.jpg'];
 function meld(t) { const m = $('#melding'); m.textContent = t; m.classList.add('toon'); clearTimeout(m._t); m._t = setTimeout(() => m.classList.remove('toon'), 3200); }
-const api = (pad, body, herkans) => fetch(pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
-  body: JSON.stringify(body || {})
-}).then(async r => {
-  const d = await r.json().catch(() => ({}));
-  /* 428 = de gegevenspoort: Rahul vraagt wat er mist en daarna gaat dit gewoon door */
-  const p = herkans ? null : (window.RTGGegevensPoort && window.RTGGegevensPoort.vang(d, r.status, () => api(pad, body, true), api));
-  if (p) return p;
-  if (!r.ok) { const fout = new Error(d.error || 'Er ging iets mis.'); fout.status = r.status; throw fout; } return d;
-});
 const eerste = k => window.RTGFirstSteps ? RTGFirstSteps.text(k) : '';
 
 /* De eerste keer: geen boekbaar aanbod, of nog niet ingelogd. Het beeld is
@@ -122,6 +113,10 @@ async function laadRegels(bestemming) {
 
 if (!TOKEN) { $('#lijst').innerHTML = welkom(true); }
 else {
+  if (window.RTGReisbureauKeten) {
+    $('#reisKeten').hidden = false;
+    window.RTGReisbureauKeten.mount($('#reisKeten'), api);
+  }
   travelFlow = window.RTGTravelExperience({ token: TOKEN, api, refresh: AANVRAGEN.laadMijn });
   $('#main').addEventListener('click', e => {
     const voorkeur = e.target.closest('[data-first-preference]');

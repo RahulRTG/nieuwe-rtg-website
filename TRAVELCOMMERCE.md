@@ -404,3 +404,39 @@ de leveranciers- en partnerkant is niets gemeten. `APPWERKT.json` kent vier
 reisrijen, waarvan er drie `bereikbaar: BEWEZEN` dragen en de overige bewijzen
 `NIET_GETEST` of `GEEN_FIXTURE` zijn -- niet gemeten mag nooit als "in orde"
 langskomen.
+
+---
+
+## 10. Federatieve reisarchitectuur en vier lussen (besluit 11 november 2026)
+
+De brede richting is vastgelegd zonder een nieuwe reisbackend, PartnerOS of
+completion-register te maken. TravelOS wordt de federatieve contract- en
+uitvoeringslaag waarop RTG Travel, een zelfstandig reisbureau en een leverancier
+dezelfde bestaande RTG-vermogens gebruiken, met behoud van hun eigen klanten,
+leveranciers, contracten, tarieven, betaalprovider, boekingskanalen en uitgang.
+
+Drie eisen staan vanaf nu naast TC-1 tot en met TC-7:
+
+1. **De rol is transactioneel.** Reisagent, organisator, bemiddelaar,
+   leverancier, platform, verkoper, factuurpartij en betaler worden per
+   overeenkomst en levering vastgelegd. Een genre of organisatie bepaalt die
+   juridische rol niet stil voor alle transacties.
+2. **De lus is economisch gesloten.** Verkoop, levering, facturatie,
+   aansprakelijkheid, allocatie, gedeeltelijke levering, annulering, uitval,
+   settlement en reconciliatie blijven aantoonbaar verbonden.
+3. **Breedte is geen boekbaarheidsclaim.** Een reisvorm draagt voortaan één van
+   drie kwalificatieniveaus: `ondersteund`, `operationeel bewezen` of `direct
+   boekbaar bewezen`. De laatste twee vereisen echte uitvoering; geen generieke
+   claim geldt automatisch voor zestien disciplines.
+
+Naast de reizigerslus, partnerlus en bewijslus staat de **economische
+verbeterlus**: nulmeting, uitvoering via bestaande RTG-vermogens, werkelijke
+resultaten, gecontroleerde verbetering en nameting -- per tenant, zonder
+centrale ranglijst en zonder vrijgekomen tijd automatisch als bespaarde euro's
+te verkopen.
+
+`TRAVELOS-UITVOERING.md` is het repositorygebonden implementatiecontract bij
+dit besluit. Het koppelt iedere verantwoordelijkheid aan de bestaande eigenaar,
+het aanwezige contract, de ontbrekende overgang, de vereiste proef en het bewijs
+dat een blokkade mag opheffen. Het document verandert geen APPWERKT-stand en de
+productiestatus blijft NO-GO.

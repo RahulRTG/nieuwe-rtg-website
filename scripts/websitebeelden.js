@@ -59,13 +59,13 @@ async function main() {
     if (!gestart) throw new Error('geen Chromium beschikbaar om echte app-schermen vast te leggen');
     browser = gestart.browser;
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1,
-      serviceWorkers: 'block', colorScheme: 'light' });
+      serviceWorkers: 'block', colorScheme: 'light', reducedMotion: 'reduce' });
     await context.addInitScript((waarden) => {
       Object.keys(waarden).forEach((sleutel) => localStorage.setItem(sleutel, waarden[sleutel]));
     }, opslag);
     const page = await context.newPage();
     const wachten = { organisatie: '#inhoud:not([hidden])', partner: '#app.active', gebruiker: '#app.active' };
-    const screens = [];
+    const screens = [], beelden = [];
     let vastgelegd = 0, hergebruikt = 0;
     for (const scherm of PLATFORM) {
       const sourceHash = schermBronHash(scherm.route);
@@ -95,16 +95,36 @@ async function main() {
       }
       await page.waitForTimeout(2200);
       if (scherm.id === 'gebruiker') {
-        await page.keyboard.press('Escape').catch(() => {});
-        await page.waitForTimeout(400);
+        /* #app.active bewijst alleen de sessieschil. Leg de normale Home vast,
+           zonder Escape, menuklik of kunstmatige DOM-/stijlwijziging. Een
+           hogere levende shellwas bedekte eerder de hit-testbare werkvloer;
+           de echte screenshotpixelregressie staat in command-schilderlaag.e2e. */
+        const wereld = page.locator('#rtgCommand[data-stand="open"] .cmd-startwereld').first();
+        await wereld.waitFor({ state: 'visible', timeout: 25000 });
+        await page.waitForFunction(() => {
+          const beeld = document.querySelector('.cmd-startwereld .cmd-wereldbeeld'), shell = document.querySelector('#shell');
+          return beeld && beeld.complete && beeld.naturalWidth > 0 && shell &&
+            getComputedStyle(shell, '::before').content === 'none';
+        });
+        const bruikbaar = await wereld.evaluate(el => {
+          const r = el.getBoundingClientRect(), boven = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return !!boven && (boven === el || el.contains(boven));
+        });
+        if (!bruikbaar) throw new Error('het echte RTG-beginscherm is afgedekt; geen websitebeeld vastgelegd');
       }
-      await page.screenshot({ path: bestand, fullPage: false });
+      await page.evaluate(() => document.fonts.ready);
+      const buffer = await page.screenshot({ fullPage: false });
+      beelden.push({ bestand, buffer });
       screens.push({ id: scherm.id, route: scherm.route, file: scherm.id + '.png',
-        sourceHash, imageHash: crypto.createHash('sha256').update(fs.readFileSync(bestand)).digest('hex') });
+        weergave: scherm.id === 'gebruiker' ? 'Standaard Home, zonder extra bediening' : 'Bestaande ingelogde werkplek met proefgegevens',
+        sourceHash, imageHash: crypto.createHash('sha256').update(buffer).digest('hex') });
       vastgelegd++;
     }
+    // Een mislukte derde opname mag de twee eerdere beelden niet vervangen.
+    for (const beeld of beelden) fs.writeFileSync(beeld.bestand, beeld.buffer);
     fs.writeFileSync(path.join(DOEL, 'HERKOMST.json'), JSON.stringify({
       kind: 'Schermafbeeldingen uit de echte RTG-app in een lokale wegwerpomgeving',
+      browser: { versie: browser.version(), infrastructuur: gestart.waarmee },
       viewport: { width: 390, height: 844 }, screens
     }, null, 2) + '\n');
     console.log('[websitebeelden] ' + vastgelegd + ' echt(e) appscherm(en) bijgewerkt, ' + hergebruikt +

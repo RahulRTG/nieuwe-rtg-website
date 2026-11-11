@@ -114,7 +114,15 @@
     laadTijdKaart(el);
   }
 
-  async function refresh(){ try { applyState((await API.call('/supplier/state')).state); renderAll(); } catch(e){} }
+  async function refresh(){
+    try { applyState((await API.call('/supplier/state')).state); renderAll(); }
+    catch(e){
+      // Een geweigerde algemene lezing bereikt renderStation niet. Alleen
+      // de geopende reiswerktafel hercontroleert dan zijn eigen sessiepoort.
+      const reis = $('#zaakReisContracten');
+      if (stationMode === 'kantoor' && kantoorSec === 'reiscontracten' && reis && reis._reisControle) reis._reisControle();
+    }
+  }
 
   /* Het werkvenster (werkgever): wanneer mag personeel de werkomgeving in
      (leverancier-app en PDA), en wanneer niet. Per weekdag een tijdslot of de

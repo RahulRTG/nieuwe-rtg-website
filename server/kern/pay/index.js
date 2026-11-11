@@ -72,7 +72,7 @@ module.exports = (ctxIn) => {
      ./boeking.js. Dat is een ander onderwerp dan dit bestand: wie daar iets
      verandert, verandert wat er met GELD gebeurt; wie hier iets verandert,
      verandert welke ONDERDELEN aan elkaar hangen. */
-  const { pasToe, boek, boekAsync, reserveerSleutel } = require('./boeking')({
+  const { pasToe, boek, boekAsync, boekBekend, reserveerSleutel } = require('./boeking')({
     saldi, saldoVan, grootboek, payBoekingenVoegToe, save: paySave, id, schoon, nu, waardePoort,
     betalingenUit, uitFout, geldModus, motorklant, schaduw, boekEenmaal: economischeBoekingEenmaal,
     MIN_CENTEN, MAX_CENTEN });
@@ -109,7 +109,7 @@ module.exports = (ctxIn) => {
   /* KASCODE_* staat OP DE API en niet alleen in de ctx: ./kassacode.js leest
      pay.KASCODE_MS voor zijn eigen ttl. Main kent dat bestand niet, dus was het
      undefined en weigerde de linklaag bij het opstarten. */
-  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, rekPartner, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor, ledentegoed };
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, boekBekend, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, rekPartner, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor, ledentegoed };
   api.schaduw = schaduwStand;
   api.vrijgavePoort = vrijgavePoort;   // ook voor de brug uit de RTG Bank (../bank/walletbrug.js)
   // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen

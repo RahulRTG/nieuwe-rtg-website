@@ -139,14 +139,23 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
 /* Het RTG-reisbureau (kern/reisbureau.js): de aanvraag landt bij een
    RTG-reisadviseur, een mens bevestigt. De haken zijn laat gebonden. */
 Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
+  bewerkCollectie: hulp.bewerkCollectie,
   visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid, reisbetalingVan: () => kern.reisbetaling }));
 /* De geldgebeurtenis van een reis. Waarom, staat in de kop daar. */
 Object.assign(kern, require('../kern/reisbureau-betaling').maakReisbetaling({
-  db, save, crypto, payVan: () => kern.pay, reisbureauVan: () => kern.reisbureau }));
+  db, save, crypto, bewerkCollectie: hulp.bewerkCollectie, payVan: () => kern.pay, reisbureauVan: () => kern.reisbureau }));
 /* Het REISAANBOD (kern/reisaanbod.js): de enige schrijver van partnerTrips, de
    bak die het reisbureau hierboven leest. Waarom die schrijver moest bestaan
    staat in de kop daar; de balie zit in routes/kantoren/reizen.js. */
 Object.assign(kern, require('../kern/reisaanbod').maakReisaanbod({ db, save, crypto }));
+/* De federatieve contractvorm gebruikt dezelfde reisAanvragen-opslag. De
+   bestaande poorten blijven eigenaar van identiteit, tenant en geld. */
+kern.reisketenToegang = require('../kern/reisbureau-toegang').maakReisToegang(kern);
+kern.reisketen = require('../kern/reisbureau-keten').maakReisketen({
+  bewerkCollectie: hulp.bewerkCollectie, toegang: kern.reisketenToegang, payVan: () => kern.pay });
+kern.reisketenExport = require('../kern/reisbureau-ketenexport')({
+  bewerkCollectie: hulp.bewerkCollectie, toegang: kern.reisketenToegang,
+  uitgangVan: () => kern.tenant && kern.tenant.uitgang });
 /* De losse verblijf-pagina (kern/logies.js): hotels, appartementen en villa's
    op een rij met hun vrije kamers; boeken loopt via /api/verblijf. */
 Object.assign(kern, require('../kern/logies').maakLogies({ db }));

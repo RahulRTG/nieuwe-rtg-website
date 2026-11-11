@@ -6293,3 +6293,462 @@ volledige vrijgave gekwalificeerd**. Eerstvolgende blokkade: **DG-CI-47 aan het
 broncontract toetsen, daarna DG-CI-45 en DG-CI-46 met hun bestaande
 producenten vernieuwen en DG-CI-48 binnen de bestaande Experience-producent
 structureel sluiten**. Deep Green: **GEBLOKKEERD**.
+### TravelOS — eerste federatieve softwareketen, 11 november 2026
+
+**Bron:** `22171d7d9ca1f7918c82be268f1e02bd350b8538` plus de lokale
+implementatiewerkboom op `codex/personalos-civilis-afbouw`. Dit is geen
+kwalificatie van een onveranderlijke kandidaat en geen uitspraak over main of
+productie. De implementatiekaart en resterende ontwerpverbindingen staan in
+`TRAVELOS-UITVOERING.md` paragraaf 15. Er is geen tweede bewijsregister gemaakt.
+
+**Daadwerkelijk aangesloten:** dezelfde contractkern binnen het bestaande
+reisbureau, reisAanvragen-opslag, persoonlijke account-/kantoor-/staffpoorten,
+tenantregister en RTG Pay. Reiziger, RTG-kantoor, onafhankelijk bureau en
+aanbieder gebruiken hun bestaande schermen. Offerte, akkoord, afzonderlijke
+acceptatie, inning en leveringsverklaring hebben afzonderlijke standen. Een
+gezamenlijke zaakversie voorkomt lost updates; duurzame ontvangst- en
+economische sleutels begrenzen retries. Het oude RTG-reisbureau kan geen
+partnerketen lezen, wijzigen of via een volledige-lijstschrijver verwijderen.
+
+**Bij deze implementatie gevonden en hersteld:**
+
+- De klassieke reisbetaling kon haar bedrag uit een gewijzigde catalogus
+  reconstrueren. De aanvraag bewaart nu de prijsgrond; onbekende legacygrond
+  wordt geweigerd in plaats van verzonnen.
+- Gelijktijdige innings-/wijzigingshandelingen en een crash tussen boeking en
+  projectie konden uiteenlopen. De bestaande aanvraag- en geldcollecties
+  krijgen transactionele claims en stabiele projectie-identiteiten.
+- De transportcache kon een oude projectie vóór actuele ketenautorisatie
+  teruggeven. Alleen de twaalf betreffende routes gebruiken de bestaande
+  operatiepad-uitzondering en lezen bevoegdheid/projectie opnieuw.
+- Sluiting van een aanbieder na een reeds geboekte betaling met antwoordverlies
+  blokkeerde herstel. `pay.boekBekend` sluit alleen bestaand, exact aansluitend
+  betaalbewijs aan. Een storing of mismatch verleent nooit toestemming voor
+  een nieuwe inning; daarvoor blijven alle actuele controles vereist.
+- Levering overschreef de acceptatiereferentie. De opdracht bewaart nu beide
+  actor- en tijdgebonden verklaringen; een replay voegt geen tweede bewijs toe.
+- Een gesloten/hergebonden verkoper kon nog een offerteakkoord ontvangen.
+  Ook de verkoper wordt bij aanvaarden opnieuw gecontroleerd.
+- De offerte-UI liet meerregelige voorwaarden toe die de server weigerde.
+  Alleen de twee tekstblokken accepteren regeleinden; HTML en overige
+  besturingstekens blijven verboden.
+- Een werkruimte-export kon onterecht als volledige tenantuitgang worden
+  gelezen. De checksum-gedekte scope meldt nu expliciet gedeeltelijke dekking;
+  import kan die grens, accountsleutels of nieuwe tenantbinding niet omzeilen.
+
+#### Gerichte regressiemeting
+
+De onderstaande gezamenlijke run sloot met **171/171 geslaagde tests**, nul
+overgeslagen en nul mislukt. Het TAP-resultaat staat lokaal in
+`artifacts/experience/travelos-regressie.tap`; de testbronnen zijn reproduceerbaar:
+
+```sh
+node --test test/reisbureau.test.js test/reisbureau-nazorg.test.js \
+  test/reisbureau-thuis.test.js test/reisherkomst.test.js \
+  test/reisteruggave.test.js test/reisbetaling-integriteit.test.js \
+  test/reisbureau-keten.test.js test/reisbureau-keten-routes.test.js \
+  test/reisbureau-keten-vrijgave.test.js test/reisbureau-legacy-isolatie.test.js \
+  test/reisbureau-toegang.test.js test/reisbureau-tenantuitgang.test.js \
+  test/tenantuitgang.test.js test/tenantherstelproef.test.js \
+  test/tenantspine.test.js test/payboeking-bekend.test.js test/payboeking-takken.test.js
+```
+
+De kernproeven gebruiken expliciet gesimuleerde Pay-antwoorden en
+copy-on-write-opslag voor foutinjectie. Daarnaast draaien de HTTP-spiegelketens
+tegen echte lokale servers, SQLite en de bestaande Pay-ledger: RTG Travel en
+het onafhankelijke bureau ontvangen ieder hun eigen betaling, drie aanbieders
+behandelen uitsluitend hun eigen opdrachten, een herstart bewaart dezelfde
+economische beweging en intrekking werkt ook met een herhaalde transportheader.
+De klassieke betaalproef gebruikt twee echte serverprocessen op dezelfde
+SQLite-database en een derde herstart. De nieuwe Pay-leesproef controleert ook
+de echte economische sleutelindex. Motorantwoorden worden in de gerichte
+adapterproef gesimuleerd; dit bewijst geen echte motor-/PSP-acceptatie.
+
+Alle ondernemingen, toelatingscontroles, betalingen en providerreferenties in
+deze proeven zijn fictieve lokale testgegevens. Een leveranciersverklaring is
+geen extern reserverings-, capaciteits- of leveringsbewijs. De extra
+agentreview is interne codebeoordeling, geen onafhankelijk securityonderzoek.
+
+#### Browser-, sessie- en visuele regressiemeting
+
+De afsluitende gerichte interfacereeks sloot met **39/39 geslaagde tests**, nul
+overgeslagen en nul mislukt. Het lokale resultaat staat in
+`artifacts/experience/travelos-browser.tap`. De echte browser was Chromium
+**156.0.8078.4**, bij Playwright **1.64.1** uit de bestaande lockfile en
+browserinfrastructuur. De bestaande CI-installatieroute gebruikt diezelfde
+lockfile; deze lokale macOS-run bewijst geen uitgevoerde Linux-CI-run.
+
+```sh
+node --test test/reisbureau-keten.e2e.js test/reisbureau-keten-kantoor.e2e.js \
+  test/reisketen-werktafel.e2e.js test/reisketen-sessiewissel.e2e.js \
+  test/reisketen-leverancier-sessie.test.js test/reisbureau-ds.e2e.js \
+  test/experience-travel.e2e.js test/uitvoer-ds.test.js \
+  test/ds-edge-scroll.test.js test/kantoordeuren.e2e.js \
+  test/reisbalie.e2e.js test/command-schilderlaag.e2e.js \
+  test/levendekleur-ds.test.js
+```
+
+Dit is een **gemengde** reeks, niet 39 externe ketenacceptaties. De nieuwe
+keten-, kantoor-, offerte-race-, ledenwissel- en schilderlaagproeven gebruiken
+een echte browser. De leverancierssessieproef is een gerichte
+wrapper-/lifecycle-simulatie; uitvoer- en DS-contracten bevatten ook
+DOM-/bronproeven. API-antwoordverlies en vertraging worden doelbewust
+uitgelokt; hun bodies komen uit de echte lokale server, niet uit nagemaakte
+boekingsbevestigingen. Een tweede tabblad is geen tweede fysiek apparaat.
+
+Bij deze reeks zijn daadwerkelijk hersteld:
+
+- Een late werktafellezing kon een nieuwe offerteversie of een gewiste
+  onbevoegde projectie terugzetten. Leesgeneraties en het mutatieslot sluiten
+  die race; de tegenproef was vóór herstel rood en daarna groen.
+- Oude antwoorden konden een leden-/leverancierswissel overleven. De
+  sessiegebonden adapters controleren vóór én na transport; de bestaande
+  leverancierswissel verwijdert de oude stationinhoud. De kantoorproef trekt
+  de echte sessie in en controleert dat dossier en token verdwijnen.
+- De mobiele Meenemen-knop bedekte de laatste reisactie. De bestaande DS
+  reserveert nu ruimte; negen echte raakvlakpunten blijven bereikbaar.
+- Een levende shell-pseudolaag schilderde over de Command-werkvloer heen.
+  De DOM en hit-test waren groen terwijl de screenshot leeg was. De nieuwe
+  pixelproef was eerst rood en is na de begrensde DS-correctie groen; de gewone
+  inlogachtergrond blijft bestaan. De standaard-Home-opname is ook visueel
+  gecontroleerd, zonder vervangende inhoud of extra menuklik.
+
+`npm run build`, de ontwerpsysteemcontrole, `npm run swcache` en de
+gecontroleerde websitebeeldopname zijn geslaagd. De afsluitende
+`npm run check` sloot met "Alles in orde" nadat de bestaande architectuurkaart
+uit de actuele code was gegenereerd. Dat is uitsluitend statische
+repositorykwalificatie, geen integrale gedrags- of vrijgaveproef.
+Het beeldscript wacht voortaan op de
+zichtbare standaard-Home, geladen wereldfoto en afwezigheid van de
+overlappende schilderlaag; het vervangt pas na drie geslaagde opnames de beeldset.
+Browserversie, bron- en beeldhashes blijven in het bestaande `HERKOMST.json`.
+De organisatieopname toont eerlijk de beperkte projectleidersrechten; dat is
+geen kwalificatie van een volledig organisatiebrede werktafel.
+
+#### Vrijgave blijft geblokkeerd
+
+De nieuwe contractroutes weigeren buiten de bestaande bewezen lokale
+installatiegrens. `afronden` weigert expliciet: financieel aansluiten is niet
+hetzelfde als een bedrag op het scherm tonen. Settlement, wijzigingen na
+akkoord, gedeeltelijke annulering/refund, externe betaalproviders per tenant,
+volledige reisexport, offline noodset/synchronisatie en economische
+nul-/nameting zijn nog niet gesloten voor deze contractvorm. Ook echte
+leveranciersacceptatie, menselijke Experience-proeven, representatieve
+mobiele prestatiemetingen en onafhankelijke security/privacy/financecontrole
+blijven nodig.
+
+Geen APPWERKT-app is door deze lokale proeven voltooid verklaard. De bestaande
+912 verlopen APPWERKT-bewijzen worden niet overschreven. PersonalOS en Deep
+Green krijgen geen GO; twee onafhankelijke volledige runs op dezelfde
+kandidaatcommit ontbreken. Er is niets uitgerold.
+
+### TravelOS — betaalgrenzen, nazorg en herstel, vervolg op 11 november 2026
+
+**De eindnorm is niet behaald.** Dit vervolg bouwt op dezelfde lokale werkboom
+boven `22171d7d9ca1f7918c82be268f1e02bd350b8538`, niet op een nieuwe vastgezette
+releasekandidaat. Het vult de vorige meting aan en vervangt geen volledige
+suite, externe acceptatie of menselijke aftekening. PersonalOS-functionaliteit
+is niet uitgebreid en geen productiepoort is geopend.
+
+#### Aangesloten en gericht bewezen
+
+- **Identiteit en betaalvrijgave:** de klassieke én federatieve reisinning
+  gebruiken de bestaande `onboarding.payGate` en `pay.vrijgavePoort.intern`.
+  Een werkelijk ingetrokken verificatie blokkeert nieuwe inning; een ontbrekende,
+  falende of dubbelzinnige poort sluit eveneens. Eerste Pay-gebruik veroorzaakt
+  geen geneste opslagtransactie. Read-only herstel accepteert uitsluitend een
+  reeds geboekte beweging met exact dezelfde economische identiteit, richting,
+  centen en referentie. Een onzekere uitkomst opent geen tweede inning.
+  Dit bewijst weigering van een nieuw verzoek na intrekking. Het bestaande
+  Pay-contract leest identiteit uit de request-snapshot; atomair intrekken
+  halverwege een al lopend verzoek is hiermee niet afzonderlijk bewezen.
+- **Nazorg in dezelfde zaak en werktafels:** de eigen reiziger vraagt wijziging
+  of annulering van onderdelen uit de exacte geaccepteerde offerte. Alleen de
+  actuele eigen verkoper antwoordt. Versie, ontvangst en antwoord blijven
+  controleerbaar na herstart. Het antwoord verandert geen offerte, opdracht,
+  leveringsbewijs, betaalrecord of ledger. Een bronverwijzing is uitdrukkelijk
+  een ongeverifieerde verklaring; `juridischGoedgekeurd` blijft `false`.
+- **Documentaire reisuitgang:** de bestaande persoonlijke partner- en
+  aanbiederslezingen leveren via de bestaande tenantuitgang een checksum-
+  gedekt archief van uitsluitend hun zaakbevoegdheid. Verkoopgeschiedenis,
+  verklaringen en nazorg krijgen beperkte projecties en zaaklokale actoraliases.
+  De aanbieder krijgt geen nazorg- of klantdossier. Import/herexport maakt geen
+  actieve reis, nieuwe tenantbinding, oorspronkelijke accountkey of betaalrecht.
+- **Geopende sessies herstellen:** offerteconcepten blijven bij netwerkfalen
+  en een versieconflict tijdelijk in dezelfde mount; na bronherlezing moet de
+  medewerker expliciet herbeoordelen. Er is geen automatische replay of merge.
+  Reis-API-antwoorden worden niet als gevoelig offline dossier gecachet.
+  Een echte leveranciers-SSE mag de geopende offerte niet opnieuw opbouwen;
+  de bestaande werktafel controleert wel opnieuw haar actuele zaaktoegang.
+  Ook een succesvolle lege of anders begrensde projectie wist een inmiddels
+  onbevoegd dossier. Een ouder, vertraagd antwoord kan dat wissen niet ongedaan
+  maken. Opslaguitval sluit vóór transport; andere-tab-sessiewissel wist de oude
+  reiswerkplek. Twee late kantoortekenaars houden hun eigen DOM-doel vast en
+  tekenen niet meer nadat de sessiedeur dat doel heeft verwijderd.
+  De extra interne codebeoordeling vond vervolgens dat een laat kantoorantwoord
+  met token A het nieuw opgeslagen token B kon wissen. Beide echte gevallen
+  (HTTP 200 en HTTP 401 na intrekking van A) waren eerst rood. De uitlogdeur
+  ontvangt nu het afgewezen token en verwijdert alleen datzelfde opgeslagen
+  token. De gerichte herhaling met de bestaande sessiegrenzen sloot 5/5 groen;
+  B blijft server-side geldig en het oude dossier/concept verdwijnt. Dit is
+  gerichte code-/browserkwalificatie, geen onafhankelijke externe audit.
+
+#### Server- en contractbewijs
+
+De herhaalde gerichte serverreeks sloot met **206/206 geslaagde tests**, nul
+mislukt en nul overgeslagen, in 56,45 seconden. Lokaal TAP-resultaat:
+`artifacts/experience/travelos-regressie-vervolg-2.tap`. De opdracht is de
+171-testopdracht hierboven met `--test-concurrency=2` en deze vijf toevoegingen:
+
+```text
+test/reisketen-financiele-grenzen.test.js
+test/reisketen-financiele-herstel.test.js
+test/reisbureau-ketenexport.test.js
+test/reisbureau-ketenexport-routes.test.js
+test/reisketen-nazorg.test.js
+```
+
+De eerste gezamenlijke run bleef **205/206**, vastgelegd in
+`artifacts/experience/travelos-regressie-vervolg.tap`: de bestaande negatieve
+herkomstproef gebruikte een ongeverifieerd lid en kreeg door de gerepareerde
+identiteitspoort 403 voordat zij haar bedoelde 409-grondslagcontrole bereikte.
+De fixture doorloopt nu dezelfde bestaande `keurLidGoed` als de positieve proef;
+de verwachte 409 en reden zijn niet afgezwakt. Er is een extra vergelijking
+toegevoegd die bewijst dat saldo en ledgerhistorie ongewijzigd blijven.
+
+De vijftien extra financiële proeven bestaan uit drie echte HTTP/SQLite-
+controles en twaalf expliciet gesimuleerde fout-/herstelgevallen. De zeven
+nazorgproeven gebruiken echte lokale HTTP/SQLite en de bestaande ledger,
+inclusief verkeerde actoren, vervalste financiële/goedkeuringsvelden,
+gelijktijdige vragen, antwoordoverschrijving en herstart. Export wordt zowel
+met gerichte kernproeven als met echte HTTP export/import/herexport getoetst.
+Alle partijen en externe bronverklaringen blijven fictieve testgegevens.
+
+De bestaande PersonalOS-opdracht met `test/personalos-contract.test.js`,
+`test/personalos.test.js` en `test/personalos-experience.e2e.js` sloot daarnaast
+met **12/12 groen**, nul skips, in 22,02 seconden. Resultaat:
+`artifacts/experience/travelos-personalos-regressie.tap`. Dit is een gerichte
+regressiecontrole, geen nieuwe PersonalOS-vrijgave of bewijs voor alle vijf
+contexten, echte apparaten en alle Deep Green-gates.
+
+De bestaande mutatie-/ontvangstregressies zijn **60/60 groen**, nul skips:
+`test/mutatiecontract.test.js`, `test/dubbeltik.test.js`,
+`test/dubbeltikgzip.test.js` en `test/onboarding-ontvangst.test.js`.
+Resultaat: `artifacts/experience/travelos-mutatie-regressie.tap`.
+De voorafgaande registerproef ontdekte nog een verschil tussen 5.440 actuele
+schrijfroutes en de oude inventaris van 5.425. De bestaande inventaris en
+afleidgang zijn hergegenereerd, gevolgd door de afzonderlijke vastleggang;
+er is geen route buiten de telling geplaatst en geen gedragsbewijs afgeleid
+uit alleen de inventaris. De bestaande inventaris meldt nog oude kruisingen
+met eerdere metingen; die zijn niet als nieuwe TravelOS-proeven geteld.
+
+#### Afsluitende browser- en broncontrole
+
+Na de laatste sessiereparatie sloot de gezamenlijke gerichte interfacereeks
+met **51/51 groen**, nul mislukt en nul overgeslagen, in 207,55 seconden.
+Resultaat: `artifacts/experience/travelos-browser-vervolg-3.tap`.
+Dit is de bovenstaande 39-testopdracht met `--test-concurrency=2` en deze zeven
+bestanden erbij:
+
+```text
+test/reisketen-continuiteit.e2e.js
+test/reisketen-offline.e2e.js
+test/reisketen-sessiegrenzen.e2e.js
+test/reisketen-nazorg.e2e.js
+test/reisketen-liveconcept.e2e.js
+test/reisketen-livecontext.e2e.js
+test/reisketen-kantoor-token.e2e.js
+```
+
+De werkelijk gebruikte browser was **Chromium 156.0.8078.4**, Playwright
+**1.64.1**, gepinde browserrevisie **1248**, op lokale Node **v24.18.0**.
+De bestaande gedeelde browserstarter is gebruikt; geen vervangende browser of
+afgezwakte norm. De reeks blijft gemengd: echte browser/HTTP-proeven naast de
+bestaande wrapper-, lifecycle- en DS-bronproeven. De testduur is geen mobiele
+prestatiemeting. Meerdere browsercontexten zijn geen twee fysieke apparaten;
+geopend-schermherstel is geen koude offline noodvoorziening.
+
+De twee eerdere gezamenlijke runs van 49/49 staan in
+`travelos-browser-vervolg.tap` en `travelos-browser-vervolg-2.tap`. Zij tellen
+niet als kwalificatie van de latere reparatie. Extra gerichte tegenproeven en
+codebeoordeling vonden fouten die die eerdere groene reeks nog niet afdekte;
+alleen de laatste reeks omvat ook de twee A/B-tokentegenproeven. De
+diagnostische eigen `pageerror`-luisteraar is verwijderd volgens het bestaande
+testcontract; de centrale `letOpFouten` en lege-foutenasserties bleven intact.
+
+De drie bestaande websitebeelden zijn opnieuw uit echte lokale schermen
+opgenomen en visueel bekeken; browser-, bron- en beeldhashes staan in het
+bestaande `public/images/start/app-schermen/HERKOMST.json`. Er is geen
+vervangend demo-ontwerp getoond. De organisatieopname blijft bewust beperkt
+tot de bestaande projectleidersrechten. `npm run build`,
+`npm run websitewaarheid:controle`, `npm run ontwerpsysteem:controle` en
+`npm run swcache` zijn op de afsluitende bron geslaagd. Een eerdere
+ontwerpsysteemrun kruiste een gelijktijdige build en vond een tijdelijk
+ontbrekend gegenereerd bestand; die run is ongeldig en is na de build volledig
+herhaald, niet als groen geteld.
+
+Ook de afsluitende `npm run check` eindigde met **Alles in orde**, exit 0.
+De voorafgaande twee meldingen (de diagnostische foutluisteraar en de
+verouderde FUNCTIES-afdruk) zijn via de bestaande helper en generator
+gecorrigeerd; geen huisregel of uitzondering is gewijzigd. `git diff --check`
+is eveneens groen. De huiscontrole meldt nog **912 vervallen APPWERKT-
+bewijzen** en kwalificeert geen gedrag of productie. Dat is geen vrijgave.
+
+#### Onveranderde vrijgavegrens en benodigde besluiten
+
+`npm run afbouw:oordeel -- --eis-bewezen` gaf **ONBEWEZEN, 0/4**, exit 1:
+het volledige suitebewijs hoort bij `816906a8`, en het vereiste bewijs voor
+schermsuite, releasepoort en stagingrepetitie ontbreekt. Dit oordeel leest
+commitbewijzen en kwalificeert de vuile werkboom niet alsnog. De bestaande
+APPWERKT-inventaris weigerde eveneens op de ongecommitte bron te schrijven;
+er is geen override gebruikt om er een geldige uitslag van te maken.
+
+De betaal-/annuleringscontracten van beide echte pilots, de transactiegebonden
+juridische rollen, bevoegde financiële actoren en echte provideracceptatie
+zijn niet aangeleverd. De eigenaar heeft beide pilots gekozen, niet hun
+verplichtingen ondertekend. De klassieke RTG-teruggave uit de eigen kas en
+inkomende leveranciersfacturen zijn geen bevoegdheid om partnergeld uit te
+betalen. Uitgevoerde wijziging, refund, settlement en reconciliatie blijven
+daarom geblokkeerd; een getypte nazorgbron mag die grens niet opheffen.
+
+Daarnaast blijven volledige tenantuitgang inclusief sluiting/bewaring, een
+veilige koude offline noodset, economische nul-/nameting, representatieve
+mobiele prestaties, menselijke Experience-proeven, onafhankelijk
+security/privacy/financeonderzoek en twee volledige geldige runs op dezelfde
+kandidaat open. Geen testnorm is verlaagd, geen app voltooid verklaard en geen
+uitrol uitgevoerd. De volgende financiële implementatie vraagt eerst de
+goedgekeurde pilotstukken en hun bevoegde eigenaar, niet een nieuwe GO-vlag.
+
+### TravelOS — offlinegrens, veilige import en meetbare werktafel, 11 november 2026
+
+**Vrijgave blijft NO-GO.** Dit vervolg staat nog steeds in de lokale werkboom
+boven `22171d7d9ca1f7918c82be268f1e02bd350b8538`. Geen nieuwe app, tweede
+reisbackend, nieuw bewijsregister, contractgoedkeuring of productie-uitrol.
+Het bestaande APPWERKT-register is in deze ronde niet opnieuw groen gezet.
+
+#### Gerepareerde grenzen, met eerst falende tegenproeven
+
+- **Geen reisautoriteit uit een oude Zaakdoos-kopie.** De eerste twee
+  tegenproeven faalden: het doosjournaal accepteerde persoonlijke reisroutes
+  en een koude doos gaf een oude reisprojectie met HTTP 200 terug. De nieuwe
+  `server/kern/zaakdoos/reisketen.js` weigert alle vijftien bestaande
+  contractroutes met 503/no-store als de eerdere online proxy niet heeft
+  geantwoord. De poort staat vóór antwoordcache, handlers en journaling.
+  De padselectie komt uit het bestaande `idemsleutels-reisketen`-contract;
+  `ontvangst-operatiepad` en het journaal delen diezelfde afbakening.
+  Ook een vroeger correct ondertekende reisjournaalregel wordt niet
+  nagespeeld. De proef controleert ongewijzigde SQLite-reisdata, geen
+  reisjournaal, gewone online herlezing én een werkelijk werkende cloudproxy
+  die na lijnuitval niet lokaal terugvalt. Dit is veilig weigeren, niet de
+  nog ontbrekende koude offline noodset.
+- **Import weigeren vóór gedeeltelijke opslag.** Van de negen nieuwe
+  import-/levensloop-kernproeven waren er vóór reparatie zeven rood.
+  `tenant/uitgang-validatie.js` controleert JSON-vorm en diepte,
+  prototypevelden, unieke catalogussoorten, werkelijke aantallen, checksums,
+  ledenvormen en de bestaande documentaire scope. `uitgang-reis.js`
+  weigert onleesbare reisrecords. Correcte import/herexport blijft werken;
+  oude accountkoppelingen, sleutels en moederbinding worden niet geactiveerd.
+  Echte HTTP-tegenproeven vergelijken SQLite-waarden én versies vóór/na
+  iedere geweigerde import.
+- **Geen onware vernietigingsverklaring.** `tenant/uitgang-reisgrens.js`
+  stopt de bestaande vernietigingshandeling bij eigen federatieve
+  verkoop-, offerte- of leveringshistorie. Een onleesbare bron sluit met
+  503; een bekende maar niet gedekte geschiedenis met 409. Er wordt geen
+  gedeeld contract gewist, nieuwe termijn opgelegd of exportrecht verleend.
+  Een echte HTTP-/SQLite-proef herstart met de bestaande testklok na
+  31 dagen: de bewaartermijn is verstreken, maar werkruimte, tenantstand en
+  reisdata blijven ongewijzigd; verlopen sessies worden niet hersteld.
+
+Een afzonderlijke interne codebeoordeling vond nog dat `offerte: false`,
+`0` of `''` als afwezig kon worden behandeld. Dat is gecorrigeerd met een
+expliciete aanwezigheidstoets en drie regressiegevallen. Deze beoordeling
+is geen onafhankelijke externe security-/privacyacceptatie. De bestaande
+hoofdlettergevoelige online proxy blijft ongewijzigd: niet-canoniek
+`/API/...` op een doos sluit veilig, ook wanneer de cloud bereikbaar is.
+
+De gerichte Zaakdoos-, vrijgave- en bestaande journaalreeks sloot eerst
+15/15 groen; daarna slaagde ook de toegevoegde echte online-proxy/uitvalproef.
+De finale import-/levensloop-/exportgroep sloot afzonderlijk met **65/65**,
+nul mislukt en nul overgeslagen, in 17,9 seconden:
+
+```sh
+node --test test/tenantuitgang-validatie.test.js \
+  test/tenantreis-vernietiging.test.js test/tenantreis-vernietiging-routes.test.js \
+  test/reisbureau-ketenexport.test.js test/reisbureau-ketenexport-routes.test.js \
+  test/reisbureau-tenantuitgang.test.js test/tenantuitgang.test.js \
+  test/tenantherstelproef.test.js test/tenantspine.test.js
+```
+
+Dit mengt geïsoleerde kernproeven met echte lokale HTTP/SQLite-proeven.
+Fictieve accounts, leveranciers en testklok leveren geen extern of juridisch
+operationeel bewijs. De productmodules van deze reparaties blijven onder
+10 KB; bestaande uitzonderingen elders zijn niet verruimd.
+
+#### Echte federatieve werktafel meten, niet de oude reismodule
+
+De bestaande oudere TravelExperience-proeven raken niet vanzelf de nieuwe
+`/api/reisbureau/keten`-route. Daarom meet
+`test/reisketen-prestatie.e2e.js` het bestaande Reisbureau-scherm met echte
+lokale HTTP/SQLite en de huidige gedeelde Chromium-starter, zonder
+transportintercept of nagemaakte API-antwoorden. De hulpcode staat uitsluitend
+onder `test/lib/reisketen-prestatiemeter.js`, niet in de productruntime.
+
+Per profiel worden één verse browsercontext en twintig warme herlezingen
+gemeten. Halverwege verandert de echte bronofferte van versie 1 naar 2;
+de proef vergelijkt ref, versie, voorwaarden en offertehash, controleert
+bruikbare acties en telt precies 21 bronverzoeken. Geen horizontale overloop
+of browserfouten. De DOM-/framegrens is niet hetzelfde als zichtbare content
+onder de vouw: de koude bereikbaarheidsmeting omvat expliciet de benodigde
+scroll en controleert raakvlak, zichtbaarheid en bedekking.
+
+De afsluitende herhaalcapture is **2/2 groen**, nul skips, in 30,62 seconden.
+Een eerdere capture kruiste kort een eigen indexgenerator en is niet als
+afsluitende meting gebruikt. De herhaling draaide zonder andere tests vanuit
+deze taak; exclusief gebruik van de hele computer is niet gegarandeerd.
+
+| Meting | Lokale desktop | Mobiele simulatie |
+|---|---:|---:|
+| Document → bereikbare offerte, inclusief scroll | 286,4 ms | 1.858,8 ms |
+| Warme klik → actuele bronkaart + twee frames P50/P95/P99 | 47,0 / 48,3 / 55,4 ms | 195,4 / 317,1 / 341,2 ms |
+| HTTP-verzoek → volledig antwoord P95 | 10,5 ms | 232,1 ms |
+| Antwoord → bronkaart + twee frames P95 | 45,1 ms | 27,3 ms |
+| FCP | 168 ms | 1.028 ms |
+| Waargenomen LCP-kandidaat | 240 ms | 1.188 ms |
+| JS-heap op eindmoment | 4.003.876 bytes | 3.996.736 bytes |
+
+Mobiel betekent **390×844, CPU×4, 150 ms netwerklatentie, 1,6 Mbps download
+en 0,75 Mbps upload** op dezelfde computer, geen fysiek mobiel apparaat.
+Koud betekent een verse browsercontext, geen koude server/OS-cache.
+P99 bij twintig monsters is het maximum, geen stabiele populatieschatting.
+INP en CLS zijn expliciet **NIET_GEMETEN**; database- en autorisatiekosten
+zijn niet afzonderlijk uitgesplitst. Geen prestatienorm, APPWERKT-status of
+Experience-vrijgave volgt uitsluitend uit deze cijfers.
+
+Ruwe monsters, definities, machinegegevens en bronbinding staan in de bestaande
+artefactmap: `artifacts/experience/reisketen-prestatie.json` en
+`artifacts/experience/reisketen-prestatie.tap`. Chromium **156.0.8078.4**,
+revisie **1248**, Playwright **1.64.1**, Node **v24.18.0**. De bestaande
+Experience-bronvingerafdruk bleef vóór/na gelijk:
+`73ae065e6e8e566f017761e7098b2d5bf13904c33e5c9a6b0321c2180ef01a01`.
+De stempel vermeldt terecht `boomVuil: true`; dit is geen schone kandidaat
+en geen uitgevoerde Linux-CI- of fysieke-apparaatkwalificatie.
+
+#### Brede herhaling en vrijgave
+
+De uitgebreide gezamenlijke herhaling met `--test-concurrency=2` is **niet
+groen**. Het resultaat blijft bewaard in
+`artifacts/experience/travelos-grenzen-vervolg.tap`: meerdere echte
+testservers bereikten de bestaande gezondheidsgrens niet, met gerapporteerde
+hostbelasting van circa 2,3 tot 5,6 maal het aantal kernen. De eigen
+overlappende broncontrole en vervolgens de brede run zijn gestopt. Dat
+maakt de eerdere gerichte groene uitkomsten niet tot een geslaagde volledige
+herhaling. Het is evenmin zelfstandig bewijs dat alle fouten uitsluitend
+omgevingsproblemen zijn. Time-outs en testnormen zijn niet verruimd.
+
+De build is geslaagd. De eigen volledige huiscontrole is onderbroken en mag
+voor deze bron dus niet als groen worden opgevoerd. Het opnieuw gelezen
+`npm run afbouw:oordeel -- --eis-bewezen` blijft **ONBEWEZEN, 0/4**, exit 1:
+het oude suitebewijs hoort bij `816906a8`; schermsuite, releasepoort en
+stagingrepetitie ontbreken. De eerder genoemde contractuele, financiële,
+menselijke en onafhankelijke externe kwalificatieblokkades blijven ongewijzigd.
+Geen merge, nieuwe vrijgave of uitrol uitgevoerd.

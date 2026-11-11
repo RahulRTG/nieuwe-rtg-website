@@ -602,6 +602,7 @@
     </div>
     <!-- de reisbalie: alleen in de kamer 'reisbureau' -->
     <div class="kaart" id="kReisbureau" hidden>
+      <section id="kReisContracten" aria-label="Eigen reiscontracten"></section>
       <h4 class="s-30otbc">Aanvragen bevestigen</h4>
       <p class="stil s-1fcmbqj">Een aanvraag heet "aangevraagd" tot u hem bevestigt, en dat is precies wat het lid op zijn scherm leest. Bevestig dus pas als het verblijf, het vervoer en de datum echt rond zijn. Afwijzen kan alleen met een reden, want die reden leest het lid. Onder uw besluit staat uw eigen inlog; die komt uit uw sessie en is niet mee te sturen.</p>
       <div id="kReisOpen"><div class="leeg">Laden...</div></div>
@@ -1412,21 +1413,46 @@
 <script src="/apps/reisprogramma-velden.js"></script>
 <script src="/apps/reisprogramma-weergave.js"></script>
 <script src="/apps/reisprogramma-editor.js"></script>
+<script src="/apps/reisketen-nazorg.js"></script>
+<script src="/apps/reisketen-offerte.js"></script>
+<script src="/apps/reisketen-werktafel.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-const api = (pad, body) => fetch('/api/office/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+function sessieActueel(token) {
+  if (!token || TOKEN !== token) return false;
+  try { return localStorage.getItem('rtg_office_token') === token; } catch (e) { return false; }
+}
+window.addEventListener('storage', e => {
+  if ((e.key === 'rtg_office_token' && e.oldValue !== e.newValue) || e.key === null) {
+    TOKEN = null; document.body.hidden = true; location.reload();
+  }
+});
+const api = (pad, body) => {
+  const gevraagdMet = TOKEN;
+  if (!sessieActueel(gevraagdMet)) return Promise.reject(Object.assign(new Error('Deze kantoorsessie is niet meer actief.'), { status: 401 }));
+  return fetch('/api/office/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + gevraagdMet },
   body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { if (r.status === 401) uitgelogd(gevraagdMet); const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; }
+  if (!sessieActueel(gevraagdMet)) { uitgelogd(gevraagdMet); throw Object.assign(new Error('Deze kantoorsessie is niet meer actief.'), { status: 401 }); }
+  return d;
+});
+};
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
 function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vIntegraties','vBalie','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
-function uitgelogd(){
-  TOKEN = null; try { localStorage.removeItem('rtg_office_token'); } catch (e) {}
+function uitgelogd(afgewezenToken){
+  // Ook .catch(uitgelogd) gebruikt deze deur: een Error is geen credential.
+  // Een laat A-antwoord sluit dit oude scherm, maar wist nooit opgeslagen B.
+  const token = typeof afgewezenToken === 'string' ? afgewezenToken : TOKEN;
+  TOKEN = null;
+  try { if (token && localStorage.getItem('rtg_office_token') === token) localStorage.removeItem('rtg_office_token'); } catch (e) {}
   var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search);
   if (!window.RTGDeur) { location.replace(naar); return; }
   /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
@@ -1435,6 +1461,8 @@ function uitgelogd(){
      netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
      zodra de pagina klaar is met opbouwen. */
   setTimeout(function () {
+    clearInterval(chatTimer); clearInterval(wereldTimer); clearInterval(techTimer); clearInterval(boardTimer);
+    clearTimeout(osseT); if (osse) { osse.close(); osse = null; }
     var el = document.getElementById('main') || document.body;
     RTGDeur.toon(el, { soort: 'personeel', naar: naar });
   }, 0);
@@ -1566,6 +1594,7 @@ async function openKamer(id){
   $('#kReisbureau').hidden = (id !== 'reisbureau');
   if (id === 'reisbureau') {
     laadReisbalie();
+    if (window.RTGReisketenWerktafel) RTGReisketenWerktafel.mount($('#kReisContracten'), function (pad, body) { return api('reisbureau/' + pad, body); });
     RTGReisPlanner.mount(api);
     /* De knoppen een KEER bedraden. Twee keer dezelfde luisteraar erop zetten
        levert twee klaargezette reizen per klik op -- en die tweede staat dan
@@ -1803,11 +1832,13 @@ const volgendeFase = (fasen, nu) => fasen[Math.min(fasen.length - 2, fasen.index
 
 /* ---------- het eigen huis van elke afdeling ---------- */
 async function laadAfdHotel(kamerId, kamerNaam){
+  const vak = $('#kHotelVak'); if (!vak) return;
   try {
     const d = await api('afdelingshotel', { kamer: kamerId });
+    if (!vak.isConnected) return;
     $('#kHotelNaam').textContent = d.hotel.naam;
     $('#kHotSoort').innerHTML = d.kamers.map(k => '<option value="' + esc(k.soort) + '">' + esc(k.naam) + ' (' + k.vrij + ' vrij)</option>').join('');
-    $('#kHotelVak').innerHTML =
+    vak.innerHTML =
       '<div class="s-13sojn1">' + esc(d.hotel.motto) + '</div>' +
       '<div class="s-oi0t6z">' + d.eenheden + ' kamers · vannacht ' + d.vannacht + ' bezet (' + d.bezettingPct + '%)</div>' +
       d.kamers.map(k => '<div style="display:flex;gap:.6rem;font-size:.82rem;padding:.2rem 0;"><span class="s-6xdtu8">' + esc(k.naam) + '</span>' +
@@ -1815,7 +1846,7 @@ async function laadAfdHotel(kamerId, kamerNaam){
       (d.komend.length ? '<div class="s-v8r6w1">' + d.komend.slice(0, 6).map(b =>
         '<div class="s-1pv2lmv">' + esc(b.van) + ' → ' + esc(b.tot) + ' · ' + esc(b.soortNaam) + ' · ' + esc(b.voor) + '</div>').join('') + '</div>' : '') +
       '<div class="s-1e3l51k">' + esc(d.verrekening) + '</div>';
-  } catch (e) { $('#kHotelVak').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  } catch (e) { if (vak.isConnected) vak.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
   const boek = $('#kHotBoek');
   if (boek && !boek._b) { boek._b = 1; boek.addEventListener('click', async () => {
     try { await api('afdelingshotel/boek', { kamer: KAMER, soort: $('#kHotSoort').value, voor: $('#kHotVoor').value, van: $('#kHotVan').value, tot: $('#kHotTot').value });
@@ -3608,11 +3639,12 @@ const BALIE_DICHTE_STANDEN = ['opgelost', 'gesloten'];
    betekent "geen zetel" en verdient de uitleg in plaats van een rode regel bij
    een knop; elke andere fout hoort wel bij de knop waarop u drukte. */
 async function balieApi(pad, body){
+  const gevraagdMet = TOKEN;
   const r = await fetch('/api/office/balie/' + pad, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + gevraagdMet },
     body: JSON.stringify(body || {}) });
   const d = await r.json().catch(() => ({}));
-  if (r.status === 401) { uitgelogd(); throw new Error(BALIE_DICHT); }
+  if (r.status === 401) { uitgelogd(gevraagdMet); throw new Error(BALIE_DICHT); }
   if (r.status === 403) { balieDeur(true, d.error); throw new Error(BALIE_DICHT); }
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
   return d;
@@ -4540,7 +4572,7 @@ $('#bAllesUit').addEventListener('click', async () => {
 });
 
 /* de boardroom ververst zichzelf zolang hij openstaat */
-setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
+const boardTimer = setInterval(() => { const bord = $('#vBoard'); if (TOKEN && bord && !bord.hidden && !document.hidden) openBoard(); }, 30000);
 
 /* Live: het office-kanaal (SSE). De bank-kern geeft bij elke boeking een
    gedempt seintje (scope 'bank') en de stad bij elke schakeling of meting

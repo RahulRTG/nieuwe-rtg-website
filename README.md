@@ -4644,6 +4644,81 @@ een tweede besluit ketst af en afwijzen zonder reden verandert niets) en
 `test/reisbalie.e2e.js` (het scherm liegt niet: de knop raakt alleen zijn eigen
 aanvraag, en een geweigerde afwijzing laat de regel gewoon staan).
 
+### Federatieve reiscontracten: lokale kwalificatieketen
+
+De bestaande reisbureau-, kantoor- en leveranciersdeuren delen nu een
+versievaste contractvorm in **de bestaande `reisAanvragen`-collectie**.
+`server/kern/reisbureau-keten.js` coördineert aanvraag, offerte, klantakkoord,
+afzonderlijke aanbiedersacceptatie, Pay-inning en leveringsverklaringen.
+Dezelfde zaak draagt via `reisbureau-ketennazorg.js` een wijzigings-/
+annuleringsvraag en een antwoord van de eigen verkoper. De reiziger gebruikt
+`POST /api/reisbureau/keten/nazorg`; kantoor en partner gebruiken respectievelijk
+`POST /api/office/reisbureau/keten/nazorg/antwoord` en
+`POST /api/supplier/reisbureau/keten/nazorg/antwoord`. Die handelingen veranderen
+geen oorspronkelijke offerte, levering of betaling. Een getypte bronreferentie
+is een verklaring, geen geverifieerde contractgoedkeuring of uitvoeringsbewijs.
+`reisbureau-ketencontract.js` maakt uitsluitend positieve projecties: de
+reiziger krijgt geen inkoopverdeling, de aanbieder geen klantkey, marge of
+andere leveranciersopdracht. Klassieke RTG-lezers sluiten de `keten`-envelop
+uit. Het is geen tweede boekingsdatabase en geen nieuwe app.
+
+De ingangen zijn `/api/reisbureau/keten`,
+`/api/office/reisbureau/keten` en `/api/supplier/reisbureau/keten`;
+aanbieders gebruiken `/api/supplier/reisbureau/opdrachten` en
+`/api/supplier/reisbureau/opdracht/besluit`. Actor, actuele managementrol,
+tenantbinding en lifecycle volgen uit de bestaande persoonlijke deuren via
+`reisbureau-toegang.js`, nooit uit clientvelden. De browser gebruikt de
+bestaande schermen Reisbureau, Kantoor en Leverancier.
+
+Iedere mutatie vraagt een versie en idempotentiesleutel. De transactionele
+collectiepoort bewaart ontvangsten en gebeurtenissen. Offerteversies zijn
+gehasht met de bestaande canonieke berichtafdruk; na akkoord verandert de
+offerte niet. Een betalingsclaim staat duurzaam vóór de async Pay-aanroep.
+Onbekende afloop blijft geblokkeerd en herstelt uitsluitend met dezelfde
+economische identiteit. De transportcache mag de actuele autorisatie niet
+overslaan. Ook de klassieke reisbetaling heeft nu een bij aanvraag bevroren
+prijsgrond en stabiele financiële projecties. Oude aanvragen zonder geldige
+prijsgrond worden niet achteraf uit de actuele catalogus geprijsd: een
+adviseur moet een nieuwe, gecontroleerde aanvraag voorbereiden. Beide
+betaalpaden toetsen vóór een nieuwe inning de bestaande identiteitspoort en
+huisvrijgave. Alleen exact reeds geboekt bewijs kan na intrekking read-only
+worden aangesloten; onbekend is geen toestemming om opnieuw te innen.
+
+**Vrijgave: NO-GO.** Deze nieuwe contractroutes werken uitsluitend op een
+bewezen lokale ontwikkel-/testinstallatie volgens de bestaande
+`kern/vrijgave/lokaal`-grens. Productie en openbare ontwikkelinstallaties
+krijgen 503; er bestaat geen alternatieve GO-vlag. Een aanbiedersverklaring
+is geen live voorraadgarantie, juridische toets of bankbewijs. Eigen externe
+betaalproviders, settlement, restituties, verstoringsherstel en economische
+afsluiting van deze federatieve contractvorm zijn nog niet gekwalificeerd.
+`afronden` weigert daarom expliciet; levering wordt geen schijnafsluiting.
+
+De bestaande partnerlezingen `/api/supplier/reisbureau/keten` en
+`/api/supplier/reisbureau/opdrachten` accepteren `vorm: uitvoer` (JSON) en
+`vorm: leesbaar` (Markdown). `reisbureau-ketenexport.js` gebruikt de bestaande
+tenantuitgang voor een documentair archief van uitsluitend de eigen huidige
+zaakbevoegdheid, met een checksum en veilige actoraliases. De aanbieder krijgt
+geen klant-, marge- of nazorgdossier. Een org-binding geeft een
+werkruimtebeheerder geen recht op alle reizen. Import herstelt geen actieve
+reizen, oude accountsleutels, RTG-binding of financiële autoriteit. Vertrek na
+sluiting en volledige tenantbrede reisuitgang blijven ongekwalificeerd.
+De importcontrole weigert ongeldige catalogusvormen, dubbele soorten,
+afwijkende aantallen en onveilige documentaire reisrecords vóór opslag.
+De bestaande tenantlevensloop weigert vernietiging zolang federatieve
+reishistorie buiten haar werkruimtecontract valt; zij wist die geschiedenis
+niet en presenteert de tenant niet als volledig vernietigd.
+
+Een actieve Zaakdoos geeft deze contractroutes alleen via de bestaande online
+proxy door. Na proxyuitval weigert zij ze met 503 en `no-store`, vóór
+antwoordcache, handlers en journaling. Ook oudere ondertekende
+reisjournaalregels mogen niet worden nagespeeld. Een lokale kopie verleent
+geen actuele persoonlijke reisbevoegdheid. Dit is een veilige offlinegrens,
+geen geïmplementeerde koude offline reisvoorziening.
+De implementatiekaart
+staat in `TRAVELOS-UITVOERING.md`; de meetvoortgang en resterende blokkades
+staan uitsluitend in het bestaande `AFBOUWPROGRAMMA.md` en de bestaande
+afgeleide registers.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails. Alles wat het huis ECHT verlaat krijgt naast de boeking een **betaalopdracht** (`kern/betaalopdracht/`, voor de bank bedraad in `kern/bank/uitgang.js`): die wordt vastgelegd voordat de rail wordt gebeld, wordt bij een mislukking opnieuw ingediend met dezelfde idempotentiesleutel, en boekt het geld terug als de rail hem blijft weigeren. Het openstaande bedrag staat als **reconciliatie** naast de sluitcontrole in `/api/office/bank/gezond` (`railOpenCenten`) -- twee verschillende metingen, want een grootboek kan perfect sluiten terwijl er geen euro is aangekomen. De provider-webhook sluit een opdracht ook echt af: `payout.paid` zet hem op AFGEWIKKELD, `payout.failed`/`payout.canceled` boeken het geld terug -- de mislukte payout is daar het belangrijke geval, want dan staat het geld van de klant af zonder aan te komen. Alle drie de uitgangen delen die rij -- de bank-SEPA, de partneruitbetaling van RTG Pay en de 30%-afdracht van het fonds -- zodat `railOpenCenten` het getal van het hele huis is en niet van een van de drie. De teruggang blijft per rail, want elk boekt in zijn eigen grootboek terug; een soort zonder geregistreerde teruggang wordt geweigerd in plaats van geraden.

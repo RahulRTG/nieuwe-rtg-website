@@ -83,6 +83,7 @@ const CONTRACTEN = Object.assign({},
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-reisherkomst').CONTRACTEN,
+  require('./mutatiecontracten-reisketen').CONTRACTEN,
   require('./mutatiecontracten-conciergelus').CONTRACTEN,
   require('./mutatiecontracten-partnernetwerk').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen

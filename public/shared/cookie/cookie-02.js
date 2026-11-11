@@ -40,8 +40,25 @@
       meetRuimte();
     });
     if (window.ResizeObserver) {
-      var maatkijker = new window.ResizeObserver(meetRuimte);
+      maatkijker = new window.ResizeObserver(meetRuimte);
       maatkijker.observe(el);
+    }
+    /* Browsertekstvergroting verandert normaal de viewport en wordt hierboven
+       al gemeten. Ook hosts die hun basistekstmaat rechtstreeks aanpassen,
+       moeten de gereserveerde ruimte onmiddellijk en idempotent vernieuwen. */
+    if (window.MutationObserver) {
+      tekstmaatkijker = new window.MutationObserver(function () {
+        if (tekstmaatBezig || !el.isConnected) return;
+        tekstmaatBezig = true;
+        /* Maak de oude reservering meteen ongeldig. Na de volgende layoutframe
+           wordt uitsluitend de actuele, vergrote maat gepubliceerd. */
+        document.documentElement.style.removeProperty(RUIMTE);
+        window.requestAnimationFrame(function () {
+          meetRuimte();
+          window.setTimeout(function () { tekstmaatBezig = false; }, 0);
+        });
+      });
+      tekstmaatkijker.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
     }
   }
   if (document.body) plaats(); else document.addEventListener('DOMContentLoaded', plaats);

@@ -6016,3 +6016,96 @@ volledige GitHub-CI vereist**. Bewezen afgesloten sinds de vorige ronde:
 **1**. Nieuwe regressies: **0 in de uitgevoerde controles**. Eerstvolgende
 blokkade: **alle verplichte GitHub-jobs op de nieuwe kandidaat volledig laten
 uitlopen**. Deep Green blijft **GEBLOKKEERD**.
+
+### Zesde volledige CI-nulmeting — 11 november 2026
+
+De verplichte GitHub-controles zijn zonder tussentijdse bronwijziging volledig
+uitgelopen voor PR-bron `6e163dde1712e90e2df54c10d34475ed5d302839`
+tegen de vastgelegde `main`-basis
+`81fd3442c25d2d124f840635d8cb1c33068f6688`. GitHub toetste daarvan de
+onveranderlijke merge-snapshot `cf2b646a2ccc3772c3224149f0ce826b1856d5b2`.
+Van de 43 gerapporteerde checks sloten **29 groen**, **6 rood** en **8
+overgeslagen**. De rode totaaljob `Tests, checks en build` en de overgeslagen
+samengestelde bewijsjobs zijn afgeleide gevolgen; zij voegen geen zelfstandige
+productoorzaak toe. De incrementele jobs zijn volgens het volledige-runcontract
+bewust niet van toepassing en zijn geen onverklaarde skips.
+
+De volledige foutboom bevat vier unieke primaire oorzaken:
+
+| ID | Soort en herkomst | Primaire oorzaak | Getroffen verplichte jobs | Vereiste herstelrichting |
+| --- | --- | --- | --- | --- |
+| DG-CI-36 | recente architectuurregressie | Drie presentatiecorrecties zijn rechtstreeks in twee geratchete legacy-eigenaars vastgelegd: `rtg-desktop-components.css` groeide 149 bytes en `rtg-simple.css` groeide 51 bytes en drie `!important`-declaraties. Het gedrag is nodig, maar het eigenaarschap is onjuist. | statisch/PostgreSQL; unitscherf 3 | Verplaats uitsluitend het benodigde gedrag naar de bestaande wereldwerkruimte-DS-eigenaars, herstel de legacy-ratchets en bewijs sfeerbeeld- en wereldkaartgedrag opnieuw. |
+| DG-CI-37 | verlopen afgeleid register | `EXPERIENCEWERKT.json` is niet meer exact uit de actuele route-, scherm- en broninventaris afgeleid. De inhoudelijke Experience-run zelf sloot wel volledig groen: alle 21 producenten, inclusief **1.542** toegankelijkheidsproeven, rapporteerden `PROVEN_IN_SCOPE`. | unitscherf 2; alle schermen op 390px | Leid het register opnieuw af met de bestaande generator en voer de exacte inventariscontrole opnieuw uit; presenteer de geslaagde producent niet als volledige Experience-vrijgave. |
+| DG-CI-38 | verouderd toetscontract | De Heritage-unit verwacht nog letterlijk `.cmd-startwereld:first-child{min-height:300px}`, terwijl het actuele contract een preciezere eerste-wereldselector gebruikt. De 300px-productnorm blijft verplicht. | unitscherf 3 | Bind de assertie aan de bestaande centrale DS-owner en de inhoudelijke 300px-norm; verzwak de norm niet. |
+| DG-CI-39 | bestaande product-/herstelafwijking, nu volledig zichtbaar | De centrale cookiecontroller hermeet de gereserveerde ruimte van een oudere host niet betrouwbaar wanneer de tekstmaat na layout naar 200% verandert. De melding zelf blijft zichtbaar, binnen de viewport en met geldige 44px-doelen, maar `--rtg-cookieruimte` blijft 58px terwijl de melding 87px hoog is. | schermscherf 5 | Laat dezelfde centrale controller de ruimte idempotent vernieuwen bij tekstmaatswijziging en bewijs alle bestaande breedte-/zoomcombinaties opnieuw. |
+
+Er zijn **geen** aanvullende fouten gevonden in de twee resterende
+schermscherfen, de vier toegankelijkheidsscherfen, de 1440px-run, WebKit,
+CodeQL, dependencycontrole, adversarial autorisatie, containerstart, AST-grens,
+norm/build of de zeven ijkingen. De lange mobiele Experience-producent was geen
+timeout of verborgen fout: hij sloot na 58 minuten inhoudelijk groen en faalde
+pas in de daaropvolgende actuele-inventariscontrole door DG-CI-37.
+
+**Meetstand herstelronde 14.** Releaseblokkerende bronoorzaken: **4**.
+Bewezen afgesloten sinds de vorige volledige meting: **DG-CI-27 tot en met
+DG-CI-35 blijven gesloten in de actuele CI**. Nieuwe regressies: **2**
+(DG-CI-36 en DG-CI-38, beide uit de recente presentatiecorrectie). Eerder
+verborgen fouten ontdekt: **1** (DG-CI-39). Verlopen afleiding: **1**
+(DG-CI-37). Nog niet uitgevoerde verplichte controles na herstel: **gerichte
+regressies voor de vier oorzaken, volledige CI op de herstelcommit,
+APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief menselijke proeven,
+security/finance/load, staging/back-up/herstel/rollback/incidentrespons en twee
+onafhankelijke eindruns**. APPWERKT: **0/114 actueel geldig**.
+EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden als volledige
+vrijgave gekwalificeerd**; de actuele geautomatiseerde Experience-producent is
+wel inhoudelijk groen. Eerstvolgende blokkade: **DG-CI-36 en DG-CI-38 bij de
+centrale presentatie-eigenaar sluiten, daarna DG-CI-37 en DG-CI-39 gericht
+bewijzen**. Deep Green: **GEBLOKKEERD**.
+
+#### Gerichte sluiting herstelronde 14
+
+De vier oorzaken uit de onveranderlijke nulmeting zijn als één samenhangende
+herstelgroep aangepakt. DG-CI-36 is bij de bestaande eigenaars gesloten: de
+legacybladen zijn terug onder hun ratchets, de atmosfeeractie staat bij de
+bestaande wereldwerkruimte-DS-owner en de globale 44px-regel laat de
+redactionele wereldkaart haar eigen grotere maat bezitten. De
+Design System-controle rapporteert **0 schendingen**, **87 gemigreerde
+schermen** en **12 ratchetverbeteringen**. DG-CI-38 is zonder
+toetsversoepeling gesloten: de oorspronkelijke inhoudelijke 300px-assertie
+blijft gelden en sluit groen tegen de herstelde eigenaarschapsgraaf.
+
+DG-CI-39 is in de bestaande centrale cookiecontroller gesloten. De controller
+publiceert gereserveerde ruimte idempotent, trekt de oude maat bij een
+tekstmaatswijziging direct in en meet na de browserlayout opnieuw. De
+gegenereerde bundel komt weer exact uit haar bestaande splitsource. De
+gecombineerde browsertegenproef voor cookie, sfeerbeeld en werktafel sluit
+**9/9** groen, met 0 failures en 0 skips; daarin zijn de oudere host, 200%
+tekstvergroting, 320/390/820px, de twee sfeerbeeldbreedtes en de vier
+werktafelstromen opgenomen. De 47 gerichte Design System- en Heritage-units
+sluiten eveneens volledig groen.
+
+DG-CI-37 is met de bestaande afleider gesloten:
+`EXPERIENCEWERKT.json` is exact gelijk aan de actuele inventaris van **114
+apps** en **316 schermen** en alle 17 registercontracttests slagen. Dit bewijst
+de volledigheid van het register, niet de nog openstaande integrale
+Experience-vrijgave. De geraakte bundel-, taal- en websitebewijzen zijn alleen
+via hun bestaande inhoudelijke producenten vernieuwd. De taalproducent sloot
+**27/27** groen; `npm run check` sluit daarna volledig groen. De build is
+herhaald met dezelfde bouwstempel en service-workercache-identiteiten en de
+Experience-inventariscontrole blijft erna groen.
+
+**Meetstand herstelronde 15.** Releaseblokkerende bronoorzaken: **0 lokaal
+bekend; volledige GitHub-CI op de nieuwe commit vereist**. Bewezen afgesloten
+sinds de vorige ronde: **4** (DG-CI-36 tot en met DG-CI-39). Nieuwe regressies:
+**0 in 73 gerichte unit- en browserproeven, de volledige statische poort en de
+herhaalde build**. Eerder verborgen fouten ontdekt: **0 aanvullende**. Nog niet
+uitgevoerde verplichte controles: **volledige GitHub-CI op de herstelcommit,
+APPWERKT-herkwalificatie, EXPERIENCEWERKT inclusief menselijke proeven,
+security/finance/load, staging/back-up/herstel/rollback/incidentrespons en twee
+onafhankelijke eindruns**. APPWERKT: **0/114 actueel geldig; 912 bewijzen zijn
+terecht verlopen**. EXPERIENCEWERKT: **0/316 schermen en 0/3360 voorwaarden
+als volledige vrijgave gekwalificeerd**; inventaris en afleiding zijn wel exact
+114/114 en 316/316. Actuele vastgelegde bron vóór deze herstelcommit:
+`6e163dde1712e90e2df54c10d34475ed5d302839`. Eerstvolgende blokkade: **de
+samenhangende herstelcommit publiceren en alle verplichte GitHub-jobs volledig
+laten uitlopen**. Deep Green: **GEBLOKKEERD**.

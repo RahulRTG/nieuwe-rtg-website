@@ -42,12 +42,18 @@
 
   var RUIMTE = '--rtg-cookieruimte';
   var BODEM = '--ds-cookie-bodem';
+  var maatkijker, tekstmaatkijker, tekstmaatBezig = false;
   function meetRuimte() {
     if (ds || !el.isConnected) return;
     var h = Math.ceil(el.getBoundingClientRect().height) + 12;
-    document.documentElement.style.setProperty(RUIMTE, h + 'px');
+    var waarde = h + 'px';
+    if (document.documentElement.style.getPropertyValue(RUIMTE) !== waarde) {
+      document.documentElement.style.setProperty(RUIMTE, waarde);
+    }
   }
   function geefRuimteTerug() {
+    if (maatkijker) maatkijker.disconnect();
+    if (tekstmaatkijker) tekstmaatkijker.disconnect();
     document.documentElement.style.removeProperty(RUIMTE);
     document.documentElement.style.removeProperty(BODEM);
     if (document.body && document.body.classList) document.body.classList.remove('ds-cookie-host');
@@ -100,8 +106,25 @@
       meetRuimte();
     });
     if (window.ResizeObserver) {
-      var maatkijker = new window.ResizeObserver(meetRuimte);
+      maatkijker = new window.ResizeObserver(meetRuimte);
       maatkijker.observe(el);
+    }
+    /* Browsertekstvergroting verandert normaal de viewport en wordt hierboven
+       al gemeten. Ook hosts die hun basistekstmaat rechtstreeks aanpassen,
+       moeten de gereserveerde ruimte onmiddellijk en idempotent vernieuwen. */
+    if (window.MutationObserver) {
+      tekstmaatkijker = new window.MutationObserver(function () {
+        if (tekstmaatBezig || !el.isConnected) return;
+        tekstmaatBezig = true;
+        /* Maak de oude reservering meteen ongeldig. Na de volgende layoutframe
+           wordt uitsluitend de actuele, vergrote maat gepubliceerd. */
+        document.documentElement.style.removeProperty(RUIMTE);
+        window.requestAnimationFrame(function () {
+          meetRuimte();
+          window.setTimeout(function () { tekstmaatBezig = false; }, 0);
+        });
+      });
+      tekstmaatkijker.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
     }
   }
   if (document.body) plaats(); else document.addEventListener('DOMContentLoaded', plaats);

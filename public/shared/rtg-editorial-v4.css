@@ -981,10 +981,5 @@ html body[data-rtg-editorial-v4="true"]:not([data-rtg-v4-kind="cover"]):not([dat
    Alleen daar leest hij donker. */
 html body[data-rtg-editorial-v4="true"][data-world-home] :is(.wh-paper-card,.onthaal-kies) .buurtsec{color:#554d45!important}
 
-/* De Heritage-overgang bewaakt dezelfde 44px doelmaat als het native DS.
-   Inline tekstlinks blijven inline; echte bedieningsboxen groeien mee. */
-body[data-rtg-editorial-v4="true"] :where(a[href],button,input:not([type="hidden"]),select,textarea,[role="button"],[tabindex]:not([tabindex="-1"])){
-  min-width:44px!important;
-  min-height:44px!important;
-  box-sizing:border-box;
-}
+/* De overgang bewaakt 44px; redactionele wereldkaarten bezitten hun eigen maat. */
+body[data-rtg-editorial-v4="true"] :where(a[href],button,input:not([type="hidden"]),select,textarea,[role="button"],[tabindex]:not([tabindex="-1"])):not(.cmd-startwereld){min-width:44px!important;min-height:44px!important;box-sizing:border-box}

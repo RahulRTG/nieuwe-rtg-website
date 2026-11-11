@@ -6859,3 +6859,12 @@ zijruimte op mobiel en desktop. De afsluitende cookie-/Edge-browserselectie
 is 47/47 groen, zonder skips; de ontwerpsysteemcontrole vindt nul schendingen.
 De aparte actuele rol-/Edge-selectie was 51/51 groen. Dit blijven gerichte
 regressies, geen vervanging voor de volledige kwalificatie van de kandidaat.
+
+Op broncommit `c4c453ab8672eae89b6b5b3d6f7ab0f40daff1bf` zijn de bestaande
+bronregisters opnieuw afgeleid. De verse schrijfanalyse gaat daarbij vóór de
+routevergelijking: alle 4.915 vergelijkbare routes stemmen overeen, zonder
+verouderde verschillen of tegenspraak, op een routerinventaris van 5.573.
+De registerregressies sluiten 89/89 groen, zonder skips. De bundelindex en
+Commerce-afdruk zijn eveneens door hun eigen producent bijgewerkt; `NORM.json`
+is ongewijzigd. Experience blijft uitdrukkelijk `NOT_TESTED`: een actuele
+inventaris bewijst geen menselijke beoordeling of volledige uitvoeringsronde.

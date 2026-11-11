@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-24T14:49:59.771Z",
-    "commit": "897d49afc0",
+    "op": "2026-11-11T23:08:26.091Z",
+    "commit": "c4c453ab86",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 23,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v26.12.1"
   },
@@ -11,12 +11,12 @@
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
-    "bestanden": 126,
-    "plekken": 138,
+    "bestanden": 127,
+    "plekken": 139,
     "perSoort": {
       "vertakt": 23,
       "onderscheidt": 27,
-      "pas-eis": 11,
+      "pas-eis": 12,
       "leden": 77
     },
     "tegenspraak": 0
@@ -99,7 +99,7 @@
       "zegt": null
     },
     {
-      "plek": "server/kern/lidacties.js:31",
+      "plek": "server/kern/lidacties.js:32",
       "soort": "vertakt",
       "zegt": null
     },
@@ -464,6 +464,11 @@
       "zegt": null
     },
     {
+      "plek": "server/routes/member/reisketen.js:6",
+      "soort": "pas-eis",
+      "zegt": "De reiscontractketen vraagt een betalend lidmaatschap; een gratis RTG Community-account geeft hier geen toegang."
+    },
+    {
       "plek": "server/routes/member/residentie.js:12",
       "soort": "leden",
       "zegt": "De Residence is er voor leden."
@@ -554,17 +559,17 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/winkel.js:116",
+      "plek": "server/routes/member/winkel.js:117",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/winkel.js:123",
+      "plek": "server/routes/member/winkel.js:124",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/winkel.js:140",
+      "plek": "server/routes/member/winkel.js:141",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -699,17 +704,17 @@
       "zegt": null
     },
     {
-      "plek": "server/server.js:516",
+      "plek": "server/server.js:426",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1172",
+      "plek": "server/server.js:1082",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1198",
+      "plek": "server/server.js:1108",
       "soort": "vertakt",
       "zegt": null
     }

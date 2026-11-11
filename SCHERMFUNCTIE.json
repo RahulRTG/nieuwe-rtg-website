@@ -2,18 +2,20 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-11-10",
-    "commit": "ad0aae9c3"
+    "op": "2026-11-11",
+    "commit": "c4c453ab86"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-10-23",
-      "commit": "94493e9497",
+      "op": "2026-11-11",
+      "commit": "c4c453ab86",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
         "boomVuil": false,
-        "ongecommitteInvoer": [],
+        "ongecommitteInvoer": [
+          "ROUTEBRON.json"
+        ],
         "bestanden": [
           "ROUTEBRON.json",
           "public/apps/access/meaning.js",
@@ -31,6 +33,8 @@
           "public/apps/app-main/app-main-03.js",
           "public/apps/app-main/app-main-04.js",
           "public/apps/app-main/app-main-04a.js",
+          "public/apps/app-main/app-main-04a0.js",
+          "public/apps/app-main/app-main-04aa.js",
           "public/apps/app-main/app-main-04ab.js",
           "public/apps/app-main/app-main-04b.js",
           "public/apps/app-main/app-main-05.js",
@@ -50,6 +54,7 @@
           "public/apps/app-main/app-main-10a.js",
           "public/apps/app-main/app-main-11.js",
           "public/apps/app-main/app-main-12.js",
+          "public/apps/app-main/app-main-12a-voor.js",
           "public/apps/app-main/app-main-12a.js",
           "public/apps/app-main/app-main-12b.js",
           "public/apps/app-main/app-main-13.js",
@@ -80,6 +85,7 @@
           "public/apps/app-main/app-main-26c.js",
           "public/apps/app-main/app-main-27.js",
           "public/apps/app-main/app-main-27b.js",
+          "public/apps/app-main/app-main-27c.js",
           "public/apps/app-main/app-main-28.js",
           "public/apps/app-main/app-main-29.js",
           "public/apps/app-main/app-main-29b.js",
@@ -153,7 +159,8 @@
           "public/apps/berichten.html",
           "public/apps/bestanden.html",
           "public/apps/bestanden/adaptief.js",
-          "public/apps/bestanden/app.js",
+          "public/apps/bestanden/app/01-overzicht.js",
+          "public/apps/bestanden/app/02-upload-bediening.js",
           "public/apps/bestanden/context.js",
           "public/apps/bestanden/gebaren.js",
           "public/apps/bestanden/paneel.js",
@@ -262,6 +269,7 @@
           "public/apps/foundation/geloofbieb.html",
           "public/apps/foundation/geven.html",
           "public/apps/foundation/gevoel.html",
+          "public/apps/foundation/gevoel.js",
           "public/apps/foundation/gezin-rt/gezin-rt-01.js",
           "public/apps/foundation/gezin-rt/gezin-rt-02.js",
           "public/apps/foundation/gezin-rt/gezin-rt-03.js",
@@ -291,6 +299,8 @@
           "public/apps/foundation/mail.html",
           "public/apps/foundation/markt.html",
           "public/apps/foundation/mediawijs.html",
+          "public/apps/foundation/mediawijs/mediawijs-00.js",
+          "public/apps/foundation/mediawijs/mediawijs-01.js",
           "public/apps/foundation/meedoen-ontdekken-weergave.js",
           "public/apps/foundation/meedoen-ontdekken.html",
           "public/apps/foundation/meedoen-ontdekken.js",
@@ -327,6 +337,7 @@
           "public/apps/foundation/samen-thuis.html",
           "public/apps/foundation/samen-thuis.js",
           "public/apps/foundation/samen/samen-01.js",
+          "public/apps/foundation/samen/samen-01a.js",
           "public/apps/foundation/samen/samen-01b.js",
           "public/apps/foundation/samen/samen-02.js",
           "public/apps/foundation/samendoen.js",
@@ -344,6 +355,8 @@
           "public/apps/foundation/schrift.html",
           "public/apps/foundation/schrijven.html",
           "public/apps/foundation/sessie/sessie-00.js",
+          "public/apps/foundation/sessie/sessie-00b.js",
+          "public/apps/foundation/sessie/sessie-00c.js",
           "public/apps/foundation/sessie/sessie-01.js",
           "public/apps/foundation/sessie/sessie-02.js",
           "public/apps/foundation/sessie/sessie-03.js",
@@ -402,7 +415,6 @@
           "public/apps/geld/metierc.js",
           "public/apps/geld/nalatenschap.js",
           "public/apps/geld/nalatenschapb.js",
-          "public/apps/geld/overzicht-a.js",
           "public/apps/geld/overzicht.js",
           "public/apps/geld/overzichtb.js",
           "public/apps/geld/overzichtc.js",
@@ -691,6 +703,7 @@
           "public/apps/library.html",
           "public/apps/library/api.js",
           "public/apps/library/app/app-01.js",
+          "public/apps/library/app/app-01b.js",
           "public/apps/library/app/app-02.js",
           "public/apps/life-lagen.js",
           "public/apps/life.html",
@@ -924,9 +937,15 @@
           "public/apps/reisboek.html",
           "public/apps/reisboek.js",
           "public/apps/reisbureau-aanvragen.js",
+          "public/apps/reisbureau-api.js",
           "public/apps/reisbureau-experience.js",
+          "public/apps/reisbureau-keten.js",
           "public/apps/reisbureau-voorzijde.js",
           "public/apps/reisbureau.html",
+          "public/apps/reisketen-leverancier.js",
+          "public/apps/reisketen-nazorg.js",
+          "public/apps/reisketen-offerte.js",
+          "public/apps/reisketen-werktafel.js",
           "public/apps/reisprogramma-editor.js",
           "public/apps/reisprogramma-velden.js",
           "public/apps/reisprogramma-weergave.js",
@@ -951,7 +970,8 @@
           "public/apps/reizen-stand.js",
           "public/apps/reizen-veilig-reis.js",
           "public/apps/reizen-veilig.html",
-          "public/apps/reizen-veilig.js",
+          "public/apps/reizen-veilig/00.js",
+          "public/apps/reizen-veilig/01.js",
           "public/apps/reizen-wacht.js",
           "public/apps/reizen-wereld.js",
           "public/apps/reizen.html",
@@ -1118,7 +1138,8 @@
           "public/apps/vluchten.html",
           "public/apps/voeding.html",
           "public/apps/voertuig.html",
-          "public/apps/voertuig.js",
+          "public/apps/voertuig/01-weergave.js",
+          "public/apps/voertuig/02-ophalen.js",
           "public/apps/vonk.html",
           "public/apps/wallet.html",
           "public/apps/wbw.html",
@@ -1167,7 +1188,8 @@
           "public/apps/zaakweb.html",
           "public/apps/zaal.html",
           "public/apps/zakelijk-overzicht.js",
-          "public/apps/zakelijk-voorzijde.js",
+          "public/apps/zakelijk-voorzijde/zakelijk-voorzijde-01.js",
+          "public/apps/zakelijk-voorzijde/zakelijk-voorzijde-02.js",
           "public/apps/zakelijk.html",
           "public/apps/zorgbalie.html",
           "public/ds/edge-modi.js",
@@ -1203,6 +1225,7 @@
           "public/shared/appmenu/appmenu-06.js",
           "public/shared/appshell.js",
           "public/shared/basis/basis-01.js",
+          "public/shared/basis/basis-01a-00-thema.js",
           "public/shared/basis/basis-01a-motion.js",
           "public/shared/basis/basis-01aa-continue.js",
           "public/shared/basis/basis-01ab-heritage-order.js",
@@ -1210,6 +1233,7 @@
           "public/shared/basis/basis-01ad-intelligence.js",
           "public/shared/basis/basis-01ae-sessie.js",
           "public/shared/basis/basis-01b.js",
+          "public/shared/basis/basis-01ba.js",
           "public/shared/basis/basis-01c.js",
           "public/shared/basis/basis-02.js",
           "public/shared/basis/basis-02b.js",
@@ -1352,7 +1376,8 @@
           "public/shared/interface/workspace-world-catalog.js",
           "public/shared/interface/world-desktop-cards.js",
           "public/shared/interface/world-desktop-copy.js",
-          "public/shared/interface/world-desktop-frame.js",
+          "public/shared/interface/world-desktop-frame/00.js",
+          "public/shared/interface/world-desktop-frame/01.js",
           "public/shared/interface/world-desktop-home.js",
           "public/shared/interface/world-desktop-people.js",
           "public/shared/interface/world-desktop-projection.js",
@@ -1397,10 +1422,6 @@
           "public/shared/metgezel/metgezel-00.js",
           "public/shared/metgezel/metgezel-01.js",
           "public/shared/metgezel/metgezel-01b.js",
-          "public/shared/metgezel/metgezel-01b2.js",
-          "public/shared/metgezel/metgezel-01c.js",
-          "public/shared/metgezel/metgezel-01d.js",
-          "public/shared/metgezel/metgezel-02.js",
           "public/shared/metgezel/metgezel-03.js",
           "public/shared/metgezel/metgezel-03b.js",
           "public/shared/moedertaal.js",
@@ -1428,19 +1449,22 @@
           "public/shared/qrscan.js",
           "public/shared/qrteken.js",
           "public/shared/rahul-mond.js",
-          "public/shared/rahul-tab.js",
+          "public/shared/rahul-tab-entry/00.js",
+          "public/shared/rahul-tab-entry/01.js",
           "public/shared/rahul-tab/approval.js",
           "public/shared/rahul-tab/dialog.js",
           "public/shared/rahul-tab/helpers.js",
           "public/shared/rahul-tab/inkt.js",
           "public/shared/rahul-tab/kompas.js",
           "public/shared/rahul-tab/session.js",
-          "public/shared/rahul-tab/style-base.js",
+          "public/shared/rahul-tab/style-base/01-tab-kop.js",
+          "public/shared/rahul-tab/style-base/02-werkruimte.js",
           "public/shared/rahul-tab/style-twin.js",
           "public/shared/rahul-tab/workspace.js",
           "public/shared/rahulpoort/rahulpoort-01.js",
           "public/shared/rahulpoort/rahulpoort-02.js",
-          "public/shared/randen.js",
+          "public/shared/randen/01-laden.js",
+          "public/shared/randen/02-bediening.js",
           "public/shared/realtime.js",
           "public/shared/rekenfuncties.js",
           "public/shared/rekenfuncties2.js",
@@ -1471,7 +1495,8 @@
           "public/shared/rtg-daily-fields.js",
           "public/shared/rtg-daily.js",
           "public/shared/rtg-edge-2-context.js",
-          "public/shared/rtg-edge-2-loader.js",
+          "public/shared/rtg-edge-2-loader/00.js",
+          "public/shared/rtg-edge-2-loader/01.js",
           "public/shared/rtg-edge-2-reveal.js",
           "public/shared/rtg-edge-2.js",
           "public/shared/rtg-edge-appbar.js",
@@ -1482,6 +1507,7 @@
           "public/shared/rtg-edge-preferences.js",
           "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
           "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
+          "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-02.js",
           "public/shared/rtg-edge-system.js",
           "public/shared/rtg-edge-worlds.js",
           "public/shared/rtg-editorial-v4-header.js",
@@ -1547,7 +1573,6 @@
           "public/shared/teamcall/teamcall-01.js",
           "public/shared/teamcall/teamcall-01b.js",
           "public/shared/teamcall/teamcall-02.js",
-          "public/shared/thema.js",
           "public/shared/toegang.js",
           "public/shared/toegankelijk.js",
           "public/shared/toestel/cel.js",
@@ -1572,6 +1597,7 @@
           "public/shared/uitleg.js",
           "public/shared/uitstap.js",
           "public/shared/uitvoer/uitvoer-01.js",
+          "public/shared/uitvoer/uitvoer-01b.js",
           "public/shared/uitvoer/uitvoer-02.js",
           "public/shared/uurwerk.js",
           "public/shared/veiligheid.js",
@@ -1582,7 +1608,8 @@
           "public/shared/vonk-2-core.js",
           "public/shared/wachtrij.js",
           "public/shared/wauw.js",
-          "public/shared/wereldschil.js",
+          "public/shared/wereldschil/00.js",
+          "public/shared/wereldschil/01.js",
           "public/shared/werkos/werkos-01.js",
           "public/shared/werkos/werkos-01b.js",
           "public/shared/werkos/werkos-01bb.js",
@@ -1669,6 +1696,9 @@
             "pad": "public/apps/bestanden"
           },
           {
+            "pad": "public/apps/bestanden/app"
+          },
+          {
             "pad": "public/apps/boardroom"
           },
           {
@@ -1691,6 +1721,9 @@
           },
           {
             "pad": "public/apps/foundation/gezin-rt"
+          },
+          {
+            "pad": "public/apps/foundation/mediawijs"
           },
           {
             "pad": "public/apps/foundation/samen"
@@ -1771,6 +1804,9 @@
             "pad": "public/apps/redactie"
           },
           {
+            "pad": "public/apps/reizen-veilig"
+          },
+          {
             "pad": "public/apps/residentie"
           },
           {
@@ -1825,10 +1861,16 @@
             "pad": "public/apps/vertaler"
           },
           {
+            "pad": "public/apps/voertuig"
+          },
+          {
             "pad": "public/apps/werk"
           },
           {
             "pad": "public/apps/werkplek-bureaus"
+          },
+          {
+            "pad": "public/apps/zakelijk-voorzijde"
           },
           {
             "pad": "public/beeld"
@@ -1969,6 +2011,9 @@
             "pad": "public/shared/interface/modules"
           },
           {
+            "pad": "public/shared/interface/world-desktop-frame"
+          },
+          {
             "pad": "public/shared/ios"
           },
           {
@@ -1996,7 +2041,19 @@
             "pad": "public/shared/rahul-tab"
           },
           {
+            "pad": "public/shared/rahul-tab-entry"
+          },
+          {
+            "pad": "public/shared/rahul-tab/style-base"
+          },
+          {
             "pad": "public/shared/rahulpoort"
+          },
+          {
+            "pad": "public/shared/randen"
+          },
+          {
+            "pad": "public/shared/rtg-edge-2-loader"
           },
           {
             "pad": "public/shared/rtg-edge-smart-menu"
@@ -2032,6 +2089,9 @@
             "pad": "public/shared/verbinding"
           },
           {
+            "pad": "public/shared/wereldschil"
+          },
+          {
             "pad": "public/shared/werkos"
           },
           {
@@ -2060,8 +2120,8 @@
       }
     },
     "schermgedrag": {
-      "op": "2026-10-06",
-      "commit": "643c390ff"
+      "op": "2026-11-11",
+      "commit": "c4c453ab86"
     }
   },
   "ruis": [
@@ -2981,7 +3041,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -3019,8 +3079,10 @@
           "sleutel": "link:attenties"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/ai",
@@ -3352,7 +3414,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/rtgid/bewijzen"
@@ -3499,8 +3561,10 @@
           "sleutel": "link:browser"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [
         "public/ds/shell.js",
         "public/apps/schermcontext.js"
@@ -3588,8 +3652,10 @@
           "sleutel": "link:cellier"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/ai",
@@ -3629,8 +3695,10 @@
           "sleutel": "link:cercle"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/ai",
@@ -3710,8 +3778,10 @@
           "sleutel": "link:clips"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/rtg-protect.js",
         "public/apps/schermcontext.js"
@@ -3789,7 +3859,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "onbekend",
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/comm/ai",
@@ -3946,8 +4016,11 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "kantoor-op-naam",
+        "office"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/office/bureau",
@@ -3991,7 +4064,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/connect/dossier",
@@ -4108,7 +4181,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -4207,8 +4280,10 @@
           "sleutel": "link:entourage"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/ai",
@@ -4351,7 +4426,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -4508,7 +4583,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -4587,7 +4662,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "ja",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -4623,7 +4698,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -4749,9 +4824,10 @@
         }
       ],
       "rollen": [
+        "member",
         "openbaar"
       ],
-      "schrijft": "onbekend",
+      "schrijft": "ja",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js"
@@ -4823,8 +4899,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/sessie.js",
         "public/apps/foundation/schil-os.js",
@@ -4858,8 +4936,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "office"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js"
@@ -5070,7 +5150,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -5114,8 +5194,10 @@
           "sleutel": "link:geven"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js"
@@ -5155,7 +5237,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js",
         "public/apps/foundation/palet.js",
@@ -5164,9 +5246,7 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/rtf/welzijn/dagboek",
-        "/api/rtf/welzijn/stemming",
-        "/api/rtf/welzijn/toestemming"
+        "/api/rtf/welzijn/"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -5350,7 +5430,7 @@
         "boardroom",
         "office"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js"
@@ -5509,9 +5589,10 @@
         }
       ],
       "rollen": [
-        "member"
+        "member",
+        "openbaar"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "ja",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js"
@@ -5645,8 +5726,10 @@
           "sleutel": "link:kwesties"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js"
@@ -6199,8 +6282,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js",
@@ -6233,8 +6318,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js",
@@ -6271,8 +6358,10 @@
           "sleutel": "link:rtfportaal"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js",
@@ -6312,8 +6401,10 @@
           "sleutel": "link:rtfbuurt"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/premium.js"
       ],
@@ -6382,8 +6473,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js",
@@ -6494,8 +6587,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js",
@@ -6880,7 +6975,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "ja",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -6969,7 +7064,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -7190,7 +7285,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -7507,8 +7602,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [
         "public/apps/foundation/schil-os.js",
         "public/apps/foundation/premium.js"
@@ -7540,7 +7637,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/foundation/palet.js",
         "public/apps/foundation/sessie.js",
@@ -7659,8 +7756,10 @@
           "sleutel": "link:garderobe"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/ai",
@@ -8157,9 +8256,7 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "supplier"
-      ],
+      "rollen": [],
       "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
@@ -8224,7 +8321,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -9066,8 +9163,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "supplier"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/supplier/kassa/artikel",
@@ -9209,8 +9308,10 @@
           "sleutel": "link:krant"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/krant/artikel",
@@ -9241,8 +9342,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "office"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/lab/ai",
@@ -9780,8 +9883,10 @@
           "sleutel": "link:rechterhand"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/bureau/ai",
@@ -10014,8 +10119,10 @@
           "sleutel": "link:loonstrook"
         }
       ],
-      "rollen": [],
-      "schrijft": "onbekend",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/member/dossier",
@@ -10049,8 +10156,10 @@
           "sleutel": "link:loopbaan"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/carriere/ledger/afschrift",
@@ -10087,7 +10196,7 @@
       "rollen": [
         "openbaar"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/carriere/regel/toon"
@@ -10111,11 +10220,8 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "eigen-poort",
-        "supplier"
-      ],
-      "schrijft": "ja",
+      "rollen": [],
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js",
         "public/apps/werkvloer.js",
@@ -10275,8 +10381,10 @@
           "sleutel": "link:maison"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/ai",
@@ -10427,11 +10535,8 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "eigen-poort",
-        "supplier"
-      ],
-      "schrijft": "ja",
+      "rollen": [],
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js",
         "public/apps/werkvloer.js",
@@ -10697,8 +10802,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "office"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/office/merk/haal",
@@ -10754,7 +10861,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/mijn/gegevens",
@@ -10830,7 +10937,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/neiging/antwoord",
@@ -10865,7 +10972,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/mijn/post",
@@ -10939,7 +11046,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/mijn/sessies",
@@ -11032,8 +11139,10 @@
           "sleutel": "link:move"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -11154,7 +11263,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -11206,8 +11315,10 @@
           "sleutel": "link:nieuws"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/member/nieuws",
@@ -11368,8 +11479,10 @@
           "sleutel": "link:onderneming"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [
         "public/apps/schermcontext.js"
       ],
@@ -11463,8 +11576,10 @@
           "sleutel": "link:ov"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [
         "public/ds/shell.js",
         "public/apps/schermcontext.js"
@@ -11532,9 +11647,7 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "supplier"
-      ],
+      "rollen": [],
       "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js",
@@ -11571,9 +11684,7 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "supplier"
-      ],
+      "rollen": [],
       "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js",
@@ -11614,7 +11725,8 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [
-        "member"
+        "member",
+        "openbaar"
       ],
       "schrijft": "ja",
       "schil": [],
@@ -11735,7 +11847,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js",
         "public/apps/werkvloer.js"
@@ -11863,8 +11975,11 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member",
+        "openbaar"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/schermcontext.js"
       ],
@@ -11910,7 +12025,8 @@
         }
       ],
       "rollen": [
-        "eigen-poort"
+        "eigen-poort",
+        "member"
       ],
       "schrijft": "onbekend",
       "schil": [],
@@ -11962,8 +12078,11 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "kantoor-op-naam",
+        "office"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/office/payroll/aangifte",
@@ -12093,8 +12212,10 @@
           "sleutel": "link:podium"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/rtg-protect.js",
         "public/apps/schermcontext.js"
@@ -12334,8 +12455,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "office"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/office/redactie",
@@ -12426,9 +12549,7 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "member"
-      ],
+      "rollen": [],
       "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
@@ -12436,9 +12557,14 @@
       "paden": [
         "/api/reis/wijzer",
         "/api/reisbureau",
+        "/api/reisbureau/",
         "/api/reisbureau/advies",
         "/api/reisbureau/afzeggen",
         "/api/reisbureau/annuleer",
+        "/api/reisbureau/keten",
+        "/api/reisbureau/keten/akkoord",
+        "/api/reisbureau/keten/betaal",
+        "/api/reisbureau/keten/start",
         "/api/reisbureau/mijn",
         "/api/reisbureau/wijzig"
       ],
@@ -12558,9 +12684,7 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "member"
-      ],
+      "rollen": [],
       "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
@@ -12649,7 +12773,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rendezvous/aanwezig/wis",
@@ -12881,9 +13005,7 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [
-        "office"
-      ],
+      "rollen": [],
       "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
@@ -12919,9 +13041,7 @@
           "sleutel": "link:routedossier"
         }
       ],
-      "rollen": [
-        "office"
-      ],
+      "rollen": [],
       "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
@@ -13044,8 +13164,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/schermcontext.js"
       ],
@@ -13082,8 +13204,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "office"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/office/onderzoeker",
@@ -13127,7 +13251,8 @@
         }
       ],
       "rollen": [
-        "member"
+        "member",
+        "office"
       ],
       "schrijft": "onbekend",
       "schil": [],
@@ -13468,8 +13593,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "kantoor-op-naam"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/office/service/ai/vraag",
@@ -13776,8 +13903,10 @@
           "sleutel": "link:sport"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/sport/bord",
@@ -13875,7 +14004,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -13913,6 +14042,8 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [
+        "kantoor-op-naam",
+        "office",
         "openbaar"
       ],
       "schrijft": "onbekend",
@@ -13978,8 +14109,10 @@
           "sleutel": "link:table"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/member/rechterhand/ai",
@@ -14089,8 +14222,10 @@
           "sleutel": "link:theater"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/rtg-protect.js",
         "public/apps/schermcontext.js"
@@ -14151,8 +14286,10 @@
           "sleutel": "link:huis"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/schermcontext.js"
       ],
@@ -14463,8 +14600,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/verify/selfie",
@@ -14530,8 +14669,10 @@
           "sleutel": "link:vertegenwoordiging"
         }
       ],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "member"
+      ],
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/vertegenwoordiging/aanvaard",
@@ -14592,7 +14733,7 @@
         }
       ],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
@@ -14671,7 +14812,6 @@
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/supplier/mob/vloot",
         "/api/supplier/mob/voertuig"
       ],
       "schilPaden": [],
@@ -14704,7 +14844,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/vonk/bericht",
@@ -14797,8 +14937,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "office"
+      ],
+      "schrijft": "onbekend",
       "schil": [
         "public/apps/schermcontext.js"
       ],
@@ -15144,8 +15286,10 @@
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
-      "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "rollen": [
+        "supplier"
+      ],
+      "schrijft": "ja",
       "schil": [],
       "paden": [
         "/api/supplier/site/cijfers",
@@ -15212,12 +15356,12 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [
         "public/ds/shell.js"
       ],
       "paden": [
-        "/api/supplier/mob/"
+        "/api/supplier/mob/akkoord"
       ],
       "schilPaden": [],
       "domeinen": [

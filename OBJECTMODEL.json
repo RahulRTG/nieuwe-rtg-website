@@ -9,9 +9,9 @@
     "domeinen": 328,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1634,
+    "veldenDomeineigen": 1635,
     "veldenGedeeldVanafVier": 239,
-    "gelijkendeVormparen": 65
+    "gelijkendeVormparen": 64
   },
   "envelop": [
     "aantal",
@@ -922,19 +922,6 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/reisbureau-keten.js",
-      "b": "server/kern/reisbureau-ketencontract.js",
-      "domeinA": "kern/reisbureau-keten",
-      "domeinB": "kern/reisbureau-ketencontract",
-      "gedeeld": [
-        "org",
-        "productRef",
-        "supplierCode",
-        "verschuldigdCenten"
-      ]
-    },
-    {
-      "gelijkenis": 1,
       "a": "server/kern/webplatform-live.js",
       "b": "server/kern/webplatform.js",
       "domeinA": "kern/webplatform-live",
@@ -1097,6 +1084,19 @@
       "b": "server/kern/service/loop-source.js",
       "domeinA": "kern/library",
       "domeinB": "kern/service",
+      "gedeeld": [
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/library/journal.js",
+      "b": "server/bedrijf/loop-source-change.js",
+      "domeinA": "kern/library",
+      "domeinB": "bedrijf",
       "gedeeld": [
         "classificatie",
         "correlatie",

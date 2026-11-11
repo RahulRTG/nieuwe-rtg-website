@@ -26,7 +26,7 @@ test('gegevenspoort: alleen een zichtbare, bedienbare en gekoppelde vervolgvraag
       { naam: 'alleen een oude dialoog', oud: true }
     ]) await t.test(geval.naam, async () => {
       const page = await browser.newPage();
-      const bak = { crash: [], config: [], serverfout: [], rem: [], weigering: [] }, gezegd = [];
+      const bak = { crash: [], config: [], serverfout: [], rem: [], weigering: [], wachtend: [] }, gezegd = [];
       await page.route('http://meter.test/**', route => {
         const pad = new URL(route.request().url()).pathname;
         if (pad === '/') return route.fulfill({ contentType: 'text/html', body: '<!doctype html><body>Vluchten</body>' });
@@ -38,7 +38,12 @@ test('gegevenspoort: alleen een zichtbare, bedienbare en gekoppelde vervolgvraag
           return route.fulfill({ status: 204, body: '' });
         }
         const start = pad === '/api/gegevens/start';
-        return route.fulfill({ status: start ? (geval.status || 200) : 428, contentType: 'application/json', body: JSON.stringify(start ? { ...vraag, veld: geval.veld || vraag.veld } : poort) });
+        if (start || pad === '/api/member/vluchten/boek') return route.fulfill({
+          status: start ? (geval.status || 200) : 428,
+          contentType: 'application/json',
+          body: JSON.stringify(start ? { ...vraag, veld: geval.veld || vraag.veld } : poort)
+        });
+        return route.fulfill({ status: 404, contentType: 'text/plain', body: 'fixturepad ontbreekt' });
       });
       await page.goto('http://meter.test/');
       await page.addScriptTag({ content: fs.readFileSync(path.join(__dirname, '../public/shared/poortgesprek.js'), 'utf8') });
@@ -57,7 +62,7 @@ test('gegevenspoort: alleen een zichtbare, bedienbare en gekoppelde vervolgvraag
       if (geval.tekst) await page.locator('.rp-vraag').evaluate((el, tekst) => { el.textContent = tekst; }, geval.tekst);
       for (let n = 0; !bak.weigering.length && n < 100; n++) await new Promise(resolve => setTimeout(resolve, 10));
       assert.equal(bak.weigering.length, 1, 'de echte 428-respons is verwerkt vóór beoordeling');
-      await beoordeelWeigeringen(page, bak.weigering, gezegd, bak.serverfout);
+      await beoordeelWeigeringen(page, bak.weigering, gezegd, bak.serverfout, bak.wachtend);
       assert.equal(gezegd.length, geval.goed ? 1 : 0);
       assert.ok(geval.goed ? bak.serverfout.length === 0 : bak.serverfout.some(s => s.startsWith('428 ')), JSON.stringify(bak));
       await page.close();

@@ -1,32 +1,6 @@
-/* ============================================================================
-   DE BEDOELING PER SCHRIJFROUTE -- mensenwerk in het contractregister.
-
-   scripts/mutatiecontract.js leidt routes, deuren, duplicaatgedrag en bewijs
-   af. Alleen de BEDOELING blijft mensenwerk: is herhaling een dubbeltik of een
-   tweede handeling, en hoort een open deur open te staan?
-
-   DE VOLGORDE IS EEN GRENS EN GEEN GEWOONTE. Eerst het contract, dan de route.
-   scripts/check.js weigert een schrijfroute zonder contract.
-
-   WAT HIER NIET MAG. Een stand invullen omdat de meter iets liet zien. De meter
-   levert een VOORSTEL; hier staat een besluit. Het verschil is dat een besluit
-   een naam en een datum draagt, en dat iemand het kan terugdraaien omdat hij
-   ziet wie het nam.
-
-   VORM (zie server/kern/mutatiecontract.js voor de keuring):
-
-     'POST /api/pad': {
-       mutatieId: 'domein.handeling',
-       semantiek: { klasse: '<uit kern/mutatie.js>' },
-       toegang:   { klasse: '<uit kern/mutatiecontract.js>', ... },
-       stand:     '<uit kern/mutatiecontract.js>',
-       waarom:    '...',            // verplicht bij NON_IDEMPOTENT en UNTESTABLE
-       nagekeken: 'wie, wanneer',   // verplicht bij NOT_APPLICABLE
-       bewijs:    { gemeten: '...', op: '...' }
-     }
-
-   Domeinmodules hieronder dragen de afzonderlijke contracten en hun bewijs.
-   ========================================================================== */
+/* Contractregister voor de bedoeling van iedere schrijfroute. De meetlaag mag
+   een voorstel leveren, maar alleen een benoemd besluit bepaalt semantiek,
+   toegang en bewijs. Het contract gaat altijd vóór de route. */
 'use strict';
 
 const CONTRACTEN = Object.assign({},
@@ -91,7 +65,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-muziekfeed').CONTRACTEN,
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
-  require('./mutatiecontracten-neiging').CONTRACTEN,
+  require('./mutatiecontracten-civilis-opvang').CONTRACTEN,
+  require('./mutatiecontracten-personalisatie'),
+  require('./mutatiecontracten-rtf-onboarding').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
   require('./mutatiecontracten-drager').CONTRACTEN,
   require('./mutatiecontracten-connectdelen').CONTRACTEN,

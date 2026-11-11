@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5541,
-    "mutationContracts": 5412,
+    "mutationContracts": 5425,
     "screens": 328
   },
   "classifications": [
@@ -3406,6 +3406,7 @@
     ],
     "decisionCandidates": [
       "server/accounts/actietokens.js",
+      "server/accounts/dossier.js",
       "server/accounts/registratie.js",
       "server/accounts/users.js",
       "server/accounts/wachtwoord.js",
@@ -4645,6 +4646,7 @@
     "deliveryRecoveryCandidates": [
       "server/accounts/achtergrond.js",
       "server/accounts/actietokens.js",
+      "server/accounts/dossier.js",
       "server/accounts/herstel.js",
       "server/accounts/index.js",
       "server/accounts/intreklijst.js",
@@ -5520,7 +5522,6 @@
       "server/kern/rtfkantoor-advies.js",
       "server/kern/rtfkantoor.js",
       "server/kern/rtfos/beleid.js",
-      "server/kern/rtfos/index.js",
       "server/kern/rtfos/partners.js",
       "server/kern/rtgai.js",
       "server/kern/rtgid-bevestigen.js",
@@ -5725,6 +5726,7 @@
       "server/opzet/kernlaag2.js",
       "server/opzet/kernlaag3.js",
       "server/opzet/kernlaag3c.js",
+      "server/opzet/kernlaag3w.js",
       "server/opzet/kernlaag4-comm.js",
       "server/opzet/kernlaag4-gemeenschap.js",
       "server/opzet/kernlaag4.js",
@@ -6791,7 +6793,6 @@
       "server/kern/rtfos/gift-voornemen.js",
       "server/kern/rtfos/gift.js",
       "server/kern/rtfos/index-spiegel.js",
-      "server/kern/rtfos/index.js",
       "server/kern/rtfos/inkoop-sluiten.js",
       "server/kern/rtfos/inkoop.js",
       "server/kern/rtfos/integriteit.js",
@@ -9818,7 +9819,7 @@
       "behaviourEvidence": {
         "routeCount": 264,
         "mutationRoutes": 263,
-        "declaredMutationSemantics": 108,
+        "declaredMutationSemantics": 109,
         "sourceFileCount": 26,
         "kernelDependencyCount": 80,
         "screenCount": 29,
@@ -13758,12 +13759,13 @@
       },
       "entryPoints": [
         "/api/experience",
-        "/api/living-world"
+        "/api/living-world",
+        "/api/personalos"
       ],
       "behaviourEvidence": {
         "routeCount": 8,
-        "mutationRoutes": 8,
-        "declaredMutationSemantics": 4,
+        "mutationRoutes": 13,
+        "declaredMutationSemantics": 9,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
         "screenCount": 1,
@@ -22313,8 +22315,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 205,
-        "mutationRoutes": 205,
-        "declaredMutationSemantics": 60,
+        "mutationRoutes": 213,
+        "declaredMutationSemantics": 68,
         "sourceFileCount": 9,
         "kernelDependencyCount": 0,
         "screenCount": 14,

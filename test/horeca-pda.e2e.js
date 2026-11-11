@@ -93,7 +93,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     /* En een halve gang met een afgesproken serveertijd die AL VOORBIJ is: die
        is over zijn grens (het serveermoment zelf) en hoort dus in "nu". Twintig
-       minuten terug, in de tijd van deze machine -- dezelfde tijd waarmee
+       minuten terug, in de tijd van de zaak -- dezelfde tijd waarmee
        kern/horeca/cadans.js rekent.
 
        MAAR NOOIT OVER MIDDERNACHT HEEN, en dat is dezelfde valkuil als bij de
@@ -249,10 +249,9 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
        laat dat door (alleen `datum < vandaag()` wordt gekeurd), zet vervaltAt
        op aankomst + 12 uur, en dan gooit de werklijst de aankomst weg omdat
        hij verlopen is. Deze toets zakte daardoor elke avond na tienen. */
-    const tijd = new Date(Date.now() + 2 * 3600000);
-    const hh = String(tijd.getHours()).padStart(2, '0') + ':' + String(tijd.getMinutes()).padStart(2, '0');
-    const dag = tijd.getFullYear() + '-' + String(tijd.getMonth() + 1).padStart(2, '0') +
-      '-' + String(tijd.getDate()).padStart(2, '0');
+    const tijd = tijdzone.huis(Date.now() + 2 * 3600000);
+    const hh = tijd.hhmm;
+    const dag = tijd.datum;
     /* een account voor alles (19 oktober 2026): de aanvraag doet een ingelogd lid */
     const u = String(Date.now()).slice(-8);
     const lid = (await post(base, '/api/auth/register', { name: 'Aankomend Lid', email: 'pd' + u + '@voorbeeld.nl',

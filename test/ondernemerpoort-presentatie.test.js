@@ -26,6 +26,7 @@ test('ondernemer-poort houdt veilige bediening, focus en beweging', () => {
   assert.match(css, /\.ds-ondernemerpoort\.poort-band \.p-open \{[^}]*min-block-size: var\(--ds-doel\)/);
   assert.match(css, /\.ds-ondernemerpoort \.poort-knoprij button \{[^}]*min-block-size: var\(--ds-doel\)/);
   assert.match(css, /safe-area-inset-bottom/);
+  assert.match(css, /\.ds-ondernemerpoort\.poort-band\[hidden\], \.ds-ondernemerpoort\.poort-waas\[hidden\] \{ display: none; \}/);
   assert.match(css, /:focus-visible/);
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.doesNotMatch(css, /#[\da-f]{3,8}\b|!important/);

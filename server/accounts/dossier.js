@@ -15,6 +15,7 @@
 const S = require('./state');
 const gebonden = require('./gebonden');
 const mirror = require('./mirror');
+const duurzaamheid = require('./duurzaamheid');
 
 function maakDossier(getUserById) {
   /* ---------- ledeninhoud per persoon (eigen boekingen/betalingen) ---------- */
@@ -32,6 +33,33 @@ function maakDossier(getUserById) {
   function saveMemberState(userId, obj) {
     S.zin('UPDATE users SET member_state = ? WHERE id = ?').run(gebonden.zegel('member_state', userId, JSON.stringify(obj)), userId);
     mirror.markUser(userId);
+  }
+
+  /* Conditionele dossiermutatie voor voorkeuren met een revisiecontract.
+
+     De callback blijft synchroon en draait onder precies dezelfde schrijfgrens
+     als de accountwaarheid. In lokale SQLite neemt BEGIN IMMEDIATE het slot
+     VOOR de lezing; in transactionele productie heeft duurzaamheid.eisMutatie
+     dan al de request-lokale werkkopie geopend. Zo kunnen twee toestellen niet
+     allebei dezelfde revision lezen en daarna allebei winnen. */
+  function wijzigMemberState(userId, werk) {
+    if (typeof werk !== 'function' || (werk.constructor && werk.constructor.name === 'AsyncFunction'))
+      throw new TypeError('wijzigMemberState verwacht een synchrone functie');
+    duurzaamheid.eisMutatie('conditionele wijziging van member_state');
+    const requestDb = duurzaamheid.transactieDatabase();
+    const eigenTransactie = !requestDb;
+    const db = requestDb || S.db;
+    if (eigenTransactie) db.exec('BEGIN IMMEDIATE');
+    try {
+      const huidig = getMemberState(userId) || {};
+      const besluit = werk(huidig) || {};
+      if (besluit.bewaar) saveMemberState(userId, huidig);
+      if (eigenTransactie) db.exec('COMMIT');
+      return besluit.waarde;
+    } catch (e) {
+      if (eigenTransactie) { try { db.exec('ROLLBACK'); } catch (x) {} }
+      throw e;
+    }
   }
 
   /* ---------- identiteitsverificatie ---------- */
@@ -87,7 +115,7 @@ function maakDossier(getUserById) {
     return u.id_doc || null;
   }
 
-  return { getMemberState, saveMemberState, setVerification, listByVerification,
+  return { getMemberState, saveMemberState, wijzigMemberState, setVerification, listByVerification,
     conversations, ledenRegisterRijen, deleteUser };
 }
 

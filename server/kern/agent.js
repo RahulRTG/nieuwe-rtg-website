@@ -6,6 +6,7 @@
    bestelling echt bij de gekoppelde groothandel geplaatst. */
 
 const { dagContext } = require('./context');
+const tijdzone = require('./tijdzone');
 const { maakInplanbaar, naKijken, NIET_GELEZEN } = require('./payroll/inplanbaar');
 /* Het vastgestelde rooster is EEN veld (s.roosterVast), onzichtbaar voor de
    rij-telling van opzet/handeling.js; daarom meldt hij zijn omvang zelf. */
@@ -134,13 +135,17 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     const staff = accounts.listStaff(s.code).map(accounts.publicStaff);
     if (!staff.length) return { status: 409, error: 'Geen personeel gevonden.' };
     const days = []; let nietGelezen = false, vrijgehouden = 0;
+    // voorstel en zichtbaar rooster beginnen op dezelfde lokale zaakdag
+    const zone = tijdzone.zaakZoneOfHuis(s);
+    const eersteDag = tijdzone.datumIn(null, zone);
     for (let d = 0; d < 7; d++) {
-      const date = new Date(Date.now() + d * 86400000);
+      const datum = tijdzone.plusDagen(eersteDag, d);
+      const date = tijdzone.moment(datum, 12 * 60, zone);
       const [factor, label] = weekdagFactor(date);
       const druk = factor >= 1.1;
       const rows = staff.map((m, i) => {
         // ziek of vrij: niet inplannen
-        const ip = inplanbaar(s.code, m.id, date.toISOString().slice(0, 10));
+        const ip = inplanbaar(s.code, m.id, datum);
         if (ip.onbekend) nietGelezen = true;
         if (!ip.plan) { vrijgehouden++; return { id: m.id, name: m.name, role: m.role, shift: SHIFT_NAMES[2], afwezig: ip.zin }; }
         let shift;
@@ -149,7 +154,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
         else shift = SHIFT_NAMES[(i + d) % 2];
         return { id: m.id, name: m.name, role: m.role, shift };
       });
-      days.push({ date: date.toISOString().slice(0, 10), label, factor, staff: rows });
+      days.push({ date: datum, label, factor, staff: rows });
     }
     agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString(),
       afwezigheid: nietGelezen ? NIET_GELEZEN : vrijgehouden + ' dienst(en) vrijgehouden voor wie afwezig is.' };

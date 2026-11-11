@@ -2,12 +2,12 @@
    shared/ondernemerpoort.js. Dit component draagt band, dialoog en toast. */
 @layer rtg.component {
   .ds-ondernemerpoort.poort-band { position: fixed; inset-block-start: calc(env(safe-area-inset-top,0px) + 3.4rem); inset-inline-start: 50%; z-index: 36; display: flex; align-items: center; gap: var(--ds-ruimte-3); max-inline-size: min(30rem,92vw); padding: var(--ds-ruimte-2) var(--ds-ruimte-2) var(--ds-ruimte-2) var(--ds-ruimte-3); color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-status-fout); border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); font-size: var(--ds-maat-klein); transform: translateX(-50%); }
-  .ds-ondernemerpoort[hidden] { display: none; }
   .ds-ondernemerpoort.poort-band b { color: var(--ds-status-fout); font-weight: 600; }
   .ds-ondernemerpoort.poort-band .p-open { flex: 0 0 auto; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); color: var(--ds-accent-inkt); background: var(--ds-accent); border: 0; border-radius: var(--ds-radius-inhoud); font: inherit; font-size: var(--ds-maat-klein); font-weight: 600; cursor: pointer; }
   .ds-ondernemerpoort.poort-band .p-open:hover, .ds-ondernemerpoort .p-online:hover { background: var(--ds-accent-hover); }
   .ds-ondernemerpoort.poort-toast { inset-block-start: auto; inset-block-end: calc(env(safe-area-inset-bottom,0px) + 5rem); }
   .ds-ondernemerpoort.poort-waas { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding-block: max(var(--ds-ruimte-6),env(safe-area-inset-top,0px)) max(var(--ds-ruimte-6),env(safe-area-inset-bottom,0px)); padding-inline: max(var(--ds-ruimte-6),env(safe-area-inset-left,0px)) max(var(--ds-ruimte-6),env(safe-area-inset-right,0px)); background: var(--ds-glas); backdrop-filter: blur(4px); }
+  .ds-ondernemerpoort.poort-band[hidden], .ds-ondernemerpoort.poort-waas[hidden] { display: none; }
   .ds-ondernemerpoort .poort-kaart { inline-size: min(34rem,100%); max-block-size: 88dvh; padding: var(--ds-ruimte-6); overflow-y: auto; color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); }
   .ds-ondernemerpoort .poort-kaart h2 { margin: 0 0 var(--ds-ruimte-1); font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 600; }
   .ds-ondernemerpoort .poort-kaart .p-sub { margin: 0 0 var(--ds-ruimte-4); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.5; }

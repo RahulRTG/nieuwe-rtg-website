@@ -29,10 +29,11 @@ const assert = require('node:assert/strict');
 
 const maakGraaf = require('../server/kern/levensgraaf/graaf');
 const bronnenLeven = require('../server/kern/levensgraaf/bronnen-leven');
+const tijdzone = require('../server/kern/tijdzone');
 
 const KEY = 'user-4242';
 const ANDER = 'user-9999';
-const dag = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const dag = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 /* Een database met precies genoeg erin, en met opzet ook de gevallen die er
    NIET uit horen te komen: het project van een ander en de machtiging die de

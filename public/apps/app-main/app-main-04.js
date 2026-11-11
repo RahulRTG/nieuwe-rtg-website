@@ -24,6 +24,7 @@
       try { localStorage.setItem('rtg_werktafel_pas', vastePas); } catch(e){}
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
+      await laadPersonalOS();
       renderAll();
       await verwerkWebsiteAanvraag();
       if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
@@ -40,6 +41,8 @@
   }
 
   async function doLogout(){
+    personalOSLaadnummer++; personalOSComposition=null; personalOSPreferences=null;
+    try { delete window.RTGPersonalOS; } catch(e) { window.RTGPersonalOS=null; }
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
@@ -93,6 +96,7 @@
         '</div>' +
         '<form id="agForm" hidden novalidate>' +
           '<label class="access-field" id="agLabel"><span id="agFieldLabel"></span><input id="agIn" aria-describedby="agZin agError" required></label>' +
+          '<div class="access-summary" id="agPersonal" hidden></div>' +
           '<label class="access-field" id="agCodeLabel" hidden><span>' + 'Sms-code, als u die heeft ontvangen' +
             '</span><input id="agCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></label>' +
           '<button id="agShowPassword" class="access-secondary" type="button" hidden aria-pressed="false">' + 'Toon wachtwoord' + '</button>' +
@@ -109,7 +113,7 @@
       '</div>';
     const el = id => gate.querySelector('#' + id);
     const inp = el('agIn'), form = el('agForm'), title = el('agTitle');
-    const draft = { name: '', email: '', geboortedatum: '' };
+    const draft = { name: '', email: '', geboortedatum: '', goals: [], layout: 'balanced' };
     let view = 'welcome', step = 0, busy = false, accountName = '', secondProof = '';
     let passkeyAbort = null, passkeyAttempt = 0;
     let resetToken = new URLSearchParams(location.search).get('reset') || '';

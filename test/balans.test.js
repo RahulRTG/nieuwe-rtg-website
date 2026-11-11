@@ -8,6 +8,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 const { weekBeeld, adviezenUit, seintjeVoorBalans } = require('../server/kern/balans.js');
+const tijdzone = require('../server/kern/tijdzone');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-balans-'));
 let srv, base, lid, zaak, staf;
@@ -18,7 +19,7 @@ function api(pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-const dagPlus = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const dagPlus = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 test('het pure weekbeeld: volle en lege dagen, avonden en late nachten', () => {
   const agenda = [0, 1, 2, 3, 4, 5, 6].map(i => ({ datum: dagPlus(i), tijd: '20:00', gedaan: false }));

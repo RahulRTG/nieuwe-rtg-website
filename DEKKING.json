@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-10-20T18:14:29.266Z",
-    "commit": "350743bfae",
-    "routesToen": 5545
+    "op": "2026-11-10T22:46:37.533Z",
+    "commit": "f2324f24a",
+    "routesToen": 5558
   },
   "aangeraakt": [
     "GET /",
@@ -3229,6 +3229,11 @@
     "POST /api/pay/verzoek",
     "POST /api/pay/verzoek/betaal",
     "POST /api/pay/verzoek/intrek",
+    "POST /api/personalos/complete",
+    "POST /api/personalos/composition",
+    "POST /api/personalos/contract",
+    "POST /api/personalos/preferences",
+    "POST /api/personalos/preview",
     "POST /api/pin/check",
     "POST /api/pin/herstel",
     "POST /api/pin/status",
@@ -3750,6 +3755,10 @@
     "POST /api/rtfos/ondernemer/koppel",
     "POST /api/rtfos/ondernemer/maak",
     "POST /api/rtfos/ondernemers",
+    "POST /api/rtfos/opvang/aanvraag",
+    "POST /api/rtfos/opvang/vervolgplan",
+    "POST /api/rtfos/opvang/voorziening/maak",
+    "POST /api/rtfos/opvang/voorzieningen",
     "POST /api/rtfos/partner/beoordeel",
     "POST /api/rtfos/partner/code/roteren",
     "POST /api/rtfos/partner/document",
@@ -3766,6 +3775,10 @@
     "POST /api/rtfos/portaal/partner",
     "POST /api/rtfos/portaal/partner/genootschap",
     "POST /api/rtfos/portaal/partner/genootschap/erken",
+    "POST /api/rtfos/portaal/partner/opvang",
+    "POST /api/rtfos/portaal/partner/opvang/aankomst",
+    "POST /api/rtfos/portaal/partner/opvang/besluit",
+    "POST /api/rtfos/portaal/partner/opvang/capaciteit",
     "POST /api/rtfos/portaal/vrijwilliger",
     "POST /api/rtfos/portaal/vrijwilliger/koppel",
     "POST /api/rtfos/portaal/vrijwilliger/ontkoppel",

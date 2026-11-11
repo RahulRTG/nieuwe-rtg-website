@@ -17,9 +17,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const maakLijn = require('../server/kern/socialegraaf/lijn');
+const tijdzone = require('../server/kern/tijdzone');
 
-const VANDAAG = new Date().toISOString().slice(0, 10);
-const dag = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+const VANDAAG = tijdzone.datumIn();
+const dag = (n) => tijdzone.plusDagen(VANDAAG, n);
 const L = maakLijn();
 
 const moment = (o) => Object.assign({ soort: 'bijeenkomst', titel: 'X', wie: '', tijd: null,

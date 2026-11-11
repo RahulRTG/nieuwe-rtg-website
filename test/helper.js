@@ -1796,7 +1796,17 @@ async function edgeBediening(page, naam, actieId) {
     await knop.click();
     return;
   }
-  await page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true }).click();
+  const knop = page.locator('.rtg-adaptive-controls').getByRole('button', { name: naam, exact: true });
+  if (!await knop.count()) {
+    const stand = await page.evaluate(() => ({
+      body: { ...document.body.dataset },
+      bediening: Array.from(document.querySelectorAll('.rtg-adaptive-controls button')).map(b => b.textContent.trim()),
+      bronnen: Array.from(document.querySelectorAll('[data-rtg-edge-controls] button')).map(b => b.textContent.trim()),
+      contextVerborgen: !!document.querySelector('.rtg-edge-2-context')?.hidden
+    }));
+    throw new Error('Edge-bediening "' + naam + '" ontbreekt na een stabiele render: ' + JSON.stringify(stand));
+  }
+  await knop.click();
 }
 
 /* De lippen openen eerst het fotografische Edge-scherm. Rahul is daar één

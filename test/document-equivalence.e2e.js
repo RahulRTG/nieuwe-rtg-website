@@ -69,6 +69,36 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
           // hetzelfde capability-contract uitvoert. Maak de bevestiging daarom
           // deterministisch, zodat een headless dialoog de POST niet kan gijzelen.
           await page.addInitScript(() => { window.confirm = () => true; });
+          /* Playwrights route.fetch() kan onder zwaar parallel CI-gebruik zelf
+             blijven wachten nadat de zichtbare handeling de POST al heeft
+             verstuurd. Leg daarom de adversarial actor/versie op dezelfde
+             browser-fetchgrens vast. De zichtbare UI/Edge-actie en de echte
+             server blijven ongewijzigd; alleen het testcredential en de
+             verwachte projectie worden voor deze negatieve proef vervangen. */
+          await page.addInitScript(() => {
+            const echteFetch = window.fetch.bind(window);
+            window.fetch = async (input, init) => {
+              const url = input instanceof Request ? input.url : String(input);
+              const probe = window.__rtgDocumentProbe;
+              if (!probe || new URL(url, location.href).pathname !== '/api/bestanden/actie') return echteFetch(input, init);
+              try {
+                const headers = new Headers((init && init.headers) || (input instanceof Request ? input.headers : undefined));
+                headers.set('authorization', 'Bearer ' + probe.token);
+                const verzonden = init && init.body != null
+                  ? JSON.parse(String(init.body))
+                  : input instanceof Request ? JSON.parse(await input.clone().text()) : null;
+                const reactie = await echteFetch(url, { ...(init || {}), method: 'POST', headers, body: JSON.stringify(probe.input) });
+                let body;
+                try { body = await reactie.clone().json(); }
+                catch { body = { error: await reactie.clone().text() }; }
+                probe.result = { status: reactie.status, body, request: verzonden };
+                return reactie;
+              } catch (error) {
+                probe.error = String(error && error.stack || error);
+                throw error;
+              }
+            };
+          });
           letOpFouten(page, browserErrors);
         }
         results[caller] = [];
@@ -89,38 +119,29 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
               file.weg = f.capability === 'documents.restore'; file.documentVersion = f.input.expectedVersion;
               window.RTGBestandenPaneel.open(file.id);
             }, { f });
-            let ontvang, weiger;
-            const ontvangen = new Promise((resolve, reject) => { ontvang = resolve; weiger = reject; });
-            await page.route('**/api/bestanden/actie', async route => {
-              try {
-                const body = route.request().postDataJSON();
-                assert.equal(body.capability, f.capability); assert.equal(body.id, f.item.id); assert.equal(body.expectedVersion, f.input.expectedVersion);
-                /* De route is al de transportgrens waarop deze adversarial
-                   proef actor en versie vervangt. route.fetch() geeft op die
-                  zelfde grens de echte serverreactie terug; fulfill levert
-                   exact die reactie aan de zichtbare UI. Zo kan een 409 niet
-                   tussen serverjournaal en Playwrights losse response-event
-                   verdwijnen. */
-                const reactie = await route.fetch({ headers: { ...route.request().headers(), authorization: 'Bearer ' + token },
-                  postData: JSON.stringify(f.input) });
-                await route.fulfill({ response: reactie });
-                ontvang(reactie);
-              } catch (error) {
-                weiger(error);
-                await route.abort().catch(() => {});
-              }
-            });
-            /* Afwezigheid blijft hard zakken op hetzelfde lastbudget. */
-            let klok;
-            const grens = new Promise((_, reject) => { klok = setTimeout(() => reject(new Error(
-              caller + ':' + f.name + ': geen /api/bestanden/actie-reactie binnen 60000ms')), 60000); });
-            const received = Promise.race([ontvangen, grens]).finally(() => clearTimeout(klok));
+            await page.evaluate(({ token, input }) => {
+              window.__rtgDocumentProbe = { token, input, result: null, error: null };
+            }, { token, input: f.input });
+            /* Afwezigheid blijft hard zakken op exact hetzelfde lastbudget. */
+            const received = page.waitForFunction(() => {
+              const probe = window.__rtgDocumentProbe;
+              return !!(probe && (probe.result || probe.error));
+            }, null, { timeout: 60000 });
             const action = caller === 'UI'
               ? page.locator(f.capability === 'documents.restore' ? '#bkHerstel' : '#bkWeg').click()
               : edgeBediening(page, f.capability === 'documents.restore' ? 'Terugzetten' : 'Verwijder', f.capability);
-            const [r] = await Promise.all([received, action]);
-            response = { status: r.status(), body: await r.json() };
-            await page.unroute('**/api/bestanden/actie');
+            try { await Promise.all([received, action]); }
+            catch (error) {
+              const probe = await page.evaluate(() => window.__rtgDocumentProbe).catch(() => null);
+              throw new Error(caller + ':' + f.name + ': geen /api/bestanden/actie-reactie binnen 60000ms; probe=' +
+                JSON.stringify(probe) + '; oorzaak=' + String(error && error.message || error));
+            }
+            const probe = await page.evaluate(() => window.__rtgDocumentProbe);
+            if (probe.error) throw new Error(caller + ':' + f.name + ': browsertransport: ' + probe.error);
+            assert.equal(probe.result.request.capability, f.capability);
+            assert.equal(probe.result.request.id, f.item.id);
+            assert.equal(probe.result.request.expectedVersion, f.input.expectedVersion);
+            response = { status: probe.result.status, body: probe.result.body };
           }
           const expected = { ALLOW: 200, NOOP: 200, DENY: 404, STALE: 409, INVALID: 409 }[f.scenario];
           assert.equal(response.status, expected, caller + ':' + f.name + ':' + JSON.stringify(response));

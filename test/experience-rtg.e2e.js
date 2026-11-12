@@ -104,6 +104,7 @@ test('static project path and JavaScript-disabled visitors retain content and re
     browser = await pw.chromium.launch(browserOpties(pw));
     for (const javaScriptEnabled of [true, false]) {
       const context = await browser.newContext({ javaScriptEnabled, viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+      await context.addInitScript(() => localStorage.setItem('rtg_lang', 'nl'));
       const page = await context.newPage(), failed = [];
       page.on('response', r => { if (r.status() >= 400) failed.push(r.url()); });
       await page.goto('http://127.0.0.1:' + server.address().port + prefix, { waitUntil: 'networkidle' });

@@ -1,4 +1,4 @@
-/* PUBLIEKE WEBSITE — main integreren is geen toestemming om te publiceren.
+/* PUBLIEKE WEBSITE -- main integreren is geen toestemming om te publiceren.
    Bewaakt de werkelijke Pages-werkstroom: uitsluitend een bewuste handmatige
    opdracht mag de beschermde main-bron publiceren. Beide verboden toestanden
    (automatisch starten en publiceren vanaf een andere tak) zijn afzonderlijk

@@ -44,7 +44,7 @@ module.exports = function maakSaveplan({ db, mutaties, voorcheck }) {
       /* De trackerproxy is de schrijfgrens, niet het opslagformaat. Via zijn
          begrensde serializer lezen we exact dezelfde target zonder miljoenen
          proxy-getvallen tijdens een volledige veiligheidsronde. */
-      const json = mutaties.serialiseerVoorOpslag(db.data[k]);
+      const json = mutaties.serialiseerVoorOpslag(db.data[k], k);
       voorcheck.onthoud(k, json.length, db.data[k], nu);
       if (generaties.has(k)) nagekeken.push(generaties.get(k));
       if (laatsteJson.get(k) !== json) gewijzigd.push([k, json]);

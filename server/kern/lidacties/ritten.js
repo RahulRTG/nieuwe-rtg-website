@@ -139,7 +139,7 @@ async function betaalRitVoor(session, body) {
     codenaam: r.customerCodename, ref: r.ref, methode: 'rtg',
     regels: [{ omschrijving: (r.type === 'jet' ? 'Vlucht ' : 'Rit ') + r.from + ' naar ' + (r.to || 'bestemming'),
       aantal: 1, stuk: r.quote || 0 }] });
-  meld(r.supplierCode, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
+  (meld.naOpslag || meld)(r.supplierCode, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   pushLive(session.key);

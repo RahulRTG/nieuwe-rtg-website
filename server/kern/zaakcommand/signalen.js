@@ -43,7 +43,7 @@ function maakSignalen({ db, beleid, commGast }) {
      gastlijst draagt opgeslagen lastAt en ongelezenstand, niet inbox-online
      of typt. Haar bestaande bereik blijft commGast.voorZaak: de inbox geeft
      maximaal 400 gesprekken. Dit bewaakt de signalenbron, NIET alle appdata. */
-  function bronVan(zaak, opties) {
+  function signalenBronVan(zaak, opties) {
     const code = norm(zaak && zaak.code), leiding = !!(opties && opties.leiding);
     if (!code) return null;
     return {
@@ -60,7 +60,7 @@ function maakSignalen({ db, beleid, commGast }) {
   }
 
   function bronstempel(zaak, opties) {
-    const bron = bronVan(zaak, opties);
+    const bron = signalenBronVan(zaak, opties);
     if (!bron) throw new Error('Geen zaak voor de signalenbron.');
     const schema = 1, bereik = 'zaakcommand-signalen';
     return { schema, bereik, sha256: berichtHash({ schema, bereik, bron }) };
@@ -71,7 +71,7 @@ function maakSignalen({ db, beleid, commGast }) {
      Zonder deze grens zou de PDA van de vloer alsnog laten zien dat er verlof
      ligt te wachten -- minder erg dan de namen, maar het hoort er niet. */
   function voor(zaak, opties) {
-    const bron = bronVan(zaak, opties);
+    const bron = signalenBronVan(zaak, opties);
     if (!bron) return [];
     const nu = Date.now();
     const uit = [];

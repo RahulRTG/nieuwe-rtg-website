@@ -760,3 +760,35 @@ test('betaalde order laat keuken en melding elk uitsluitend hun eigen collectie 
   assert.equal((await betaal(p.actor, { ref: order.ref })).status, 409);
   assert.equal(p.lees('supplierNotifications').AAA.length, 1, 'retry maakt geen tweede melding');
 });
+
+for (const fout of [false, true]) test('betaalde rit bewaart eigen toestand vóór gerichte melding' + (fout ? ' bij meldingsfout' : ' en retry'), async t => {
+  const p = aanvraagMetMelding(t, 'rit');
+  p.db.data.rides.push({ ref: 'RIT-BETAAL', customerKey: p.actor.key, supplierCode: p.zaak.code,
+    supplierName: p.zaak.name, customerCodename: 'Anna', quote: 12, paid: false,
+    status: 'aangevraagd', from: 'A', to: 'B', passengers: 1, type: 'taxi' });
+  p.db.data.punten = { lid: { saldo: 0 } }; p.save();
+  p.ctx.verdienPunten = key => { p.db.data.punten[key].saldo++; };
+  const betaal = require('../server/kern/lidacties/ritten')(p.ctx).betaalRitVoor;
+  if (fout) {
+    const exec = DatabaseSync.prototype.exec; let commits = 0;
+    t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+      if (sql === 'COMMIT' && ++commits === 2) throw new Error('melding na ritbetaling mislukt');
+      return exec.call(this, sql);
+    });
+    await assert.rejects(betaal(p.actor, { ref: 'RIT-BETAAL' }), /melding na ritbetaling/);
+    assert.deepEqual(p.lees('supplierNotifications'), {});
+    assert.deepEqual(p.signalen, [], 'geen notify, sync of push na mislukte melding');
+  } else {
+    assert.equal((await betaal(p.actor, { ref: 'RIT-BETAAL' })).ok, true);
+    assert.deepEqual(p.signalen, ['notify', 'supplier', 'office', 'push']);
+    assert.equal(p.lees('supplierNotifications').AAA.length, 1);
+    assert.equal(p.breed(), 1);
+    assert.equal(p.scans(), 1, 'alleen de fixture leest het vreemde domein');
+  }
+  assert.equal(p.lees('rides')[0].paid, true);
+  assert.equal(p.lees('punten').lid.saldo, 1);
+  assert.equal(p.lees('ander').waarde, 1, 'de melding bewaart geen vreemde pending mutatie');
+  assert.equal(p.db.data.ander.waarde, 3);
+  assert.equal((await betaal(p.actor, { ref: 'RIT-BETAAL' })).status, 409);
+  assert.equal(p.lees('punten').lid.saldo, 1, 'retry verdient geen tweede punt');
+});

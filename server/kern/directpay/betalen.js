@@ -31,7 +31,11 @@ module.exports = (ctx) => {
       const al = idemZoek(idemSleutel);
       if (al && (al.bedrag !== cent || al.supplierCode !== s.code))
         return { status: 409, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
-      if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
+      if (al) {
+        // Een klantretry bevestigt eerst de mogelijk nog onopgeslagen RAM-idem.
+        save();
+        return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
+      }
       const bezig = inVlucht.get(idemSleutel);
       if (bezig) {
         if (bezig.cent !== cent || bezig.supplierCode !== s.code)

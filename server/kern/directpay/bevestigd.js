@@ -23,7 +23,11 @@ module.exports = (ctx) => {
       // een herhaling is alleen een herhaling bij hetzelfde bedrag en dezelfde partner
       if (al && (al.bedrag !== cent || al.supplierCode !== s.code))
         return { status: 409, error: 'Deze sleutel hoort al bij een ander bedrag of een andere partner.' };
-      if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
+      if (al) {
+        // Een vorige save kan ná het vullen van de RAM-index zijn mislukt.
+        save();
+        return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
+      }
     }
     const isMunt = betaalwijze === 'munt';
     const b = {

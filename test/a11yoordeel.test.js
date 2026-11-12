@@ -26,6 +26,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const vm = require('node:vm');
 const oordeel = require('../scripts/lib/a11yoordeel');
 
 /* Het echte register, want de grens die hier telt is de grens die de CI gebruikt. */
@@ -43,6 +44,77 @@ const deel = (n, { struct = 0, uit = 0, in_ = 0, zaak = 0, raak = 0, paginas = 6
 const bewezenDeel = (n, routes) => ({...deel(n, { paginas: routes.length }), schemaVersion:2,
   browser:{name:'chromium',version:'145.0.0.0'},
   routes:Object.fromEntries(routes.map(route=>[route,{states:{},mobile:{},touchTargets:{},tablet:null,themes:{}}]))});
+
+/* Voer het echte mobiele meetblok uit, niet een tweede implementatie ervan.
+   Alleen de twee DOM-metingen zijn bestuurbaar; lus, teller, foutafhandeling
+   en routeprojectie komen letterlijk uit de CI-producent. */
+async function mobieleRaakproef(uitkomsten) {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts/a11y.js'), 'utf8');
+  const begin = "    if (hand !== 'rechts') continue;   // het raakvlak hangt niet van de hand af";
+  const einde = '\n  }\n  await telefoon.close();';
+  const van = bron.indexOf(begin), tot = bron.indexOf(einde, van);
+  assert.ok(van >= 0 && tot > van, 'de productie-meetlus moet exact vindbaar blijven');
+  assert.equal(bron.indexOf(begin, van + begin.length), -1, 'geen tweede mobiele meetlus');
+  const paden = Object.keys(uitkomsten), oproepen = [];
+  const context = {
+    paden, hand: 'rechts', raakTotaal: 0,
+    routes: Object.fromEntries(paden.map(pad => [pad, { touchTargets: {} }])),
+    tel: {}, RAAK: 'wcag', PREMIUM_RAAK: 'premium', raakvlak: { GRENS: 24 },
+    console: { log() {}, error() {} },
+    async hermeet(tel, soort) {
+      const pad = paden[Math.floor(oproepen.length / 2)];
+      oproepen.push([pad, soort]);
+      const uit = uitkomsten[pad][soort];
+      if (uit instanceof Error) throw uit;
+      return { klein: uit };
+    }
+  };
+  await vm.runInNewContext('(async () => { for (const pad of paden) {\n' +
+    bron.slice(van, tot) + '\n} })()', context);
+  return { context, oproepen };
+}
+
+test('mobiele raakvlakproductie bewaart een volledige gezonde meting', async () => {
+  const { context, oproepen } = await mobieleRaakproef({
+    '/eerste': { wcag: [], premium: [] }, '/volgende': { wcag: [], premium: [] }
+  });
+  assert.equal(context.raakTotaal, 0);
+  assert.deepEqual(oproepen, [['/eerste', 'wcag'], ['/eerste', 'premium'], ['/volgende', 'wcag'], ['/volgende', 'premium']]);
+  for (const pad of context.paden) {
+    const uit = context.routes[pad].touchTargets.mobile;
+    assert.equal(uit.measured, true);
+    assert.equal(uit.belowWcagMinimum, 0);
+    assert.equal(uit.belowPremiumMinimum, 0);
+  }
+  assert.deepEqual(oordeel.veld({ raakTotaal: context.raakTotaal }, GRENS).fouten, []);
+});
+
+test('mobiele raakvlakproductie telt echte WCAG-vondsten over routes op', async () => {
+  const { context } = await mobieleRaakproef({
+    '/eerste': { wcag: ['klein-a', 'klein-b'], premium: ['klein-a', 'klein-b'] },
+    '/volgende': { wcag: ['klein-c'], premium: ['klein-c'] }
+  });
+  assert.equal(context.raakTotaal, 3);
+  assert.equal(context.routes['/eerste'].touchTargets.mobile.belowWcagMinimum, 2);
+  assert.equal(context.routes['/volgende'].touchTargets.mobile.belowWcagMinimum, 1);
+  assert.match(oordeel.veld({ raakTotaal: context.raakTotaal }, GRENS).fouten.join(' '), /3 raakvlak\(ken\)/);
+});
+
+test('mobiele raakvlakproductie verliest geen WCAG-vondst als de premiumproef faalt', async () => {
+  const { context, oproepen } = await mobieleRaakproef({
+    '/eerste': { wcag: ['al-gemeten-klein'], premium: new Error('premium-meetfout') },
+    '/volgende': { wcag: [], premium: [] }
+  });
+  assert.deepEqual(oproepen, [['/eerste', 'wcag'], ['/eerste', 'premium'], ['/volgende', 'wcag'], ['/volgende', 'premium']],
+    'de fout mag ook de volgende route niet uit de scan halen');
+  assert.equal(context.raakTotaal, 1, 'de reeds gemeten WCAG-fout blijft meetellen');
+  const mislukt = context.routes['/eerste'].touchTargets.mobile;
+  assert.equal(mislukt.measured, false, 'een mislukte premiumproef is geen volledig bewijs');
+  assert.equal(mislukt.belowWcagMinimum, 1, 'het bekende deelresultaat blijft in het ruwe bewijs');
+  assert.equal(mislukt.error, 'premium-meetfout');
+  assert.equal(context.routes['/volgende'].touchTargets.mobile.measured, true);
+  assert.match(oordeel.veld({ raakTotaal: context.raakTotaal }, GRENS).fouten.join(' '), /1 raakvlak\(ken\)/);
+});
 
 test('vier schone delen zijn samen een schone ronde', () => {
   const samen = oordeel.telOp([deel(1), deel(2), deel(3), deel(4)]);

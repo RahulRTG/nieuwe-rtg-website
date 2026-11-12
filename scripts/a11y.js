@@ -575,21 +575,24 @@ async function startEchteServer() {
       routes[pad].touchTargets.mobile = { measured: false, error: e.message.split('\n')[0] };
       continue;
     }
-    let premium;
-    try { premium = await hermeet(tel, PREMIUM_RAAK, (r) => r.klein.length); }
-    catch (e) {
-      routes[pad].touchTargets.mobile = { measured: false, error: e.message.split('\n')[0] };
-      continue;
-    }
-    routes[pad].touchTargets.mobile = {
-      measured: true, belowWcagMinimum: res.klein.length, belowPremiumMinimum: premium.klein.length
-    };
-    /* De tweede meting zit in hermeet() hierboven; hier stond een eigen kopie. */
+    /* Een extra premium-meting mag een al gemeten WCAG-fout niet wissen.
+       Tel de bestaande ondergrens voordat de extra meting kan mislukken. */
     if (res.klein.length) {
       raakTotaal += res.klein.length;
       console.log(`\n[a11y] ${pad} (raakvlak): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
       for (const w of res.klein.slice(0, 6)) console.log(`  · ${w}`);
     }
+    let premium;
+    try { premium = await hermeet(tel, PREMIUM_RAAK, (r) => r.klein.length); }
+    catch (e) {
+      routes[pad].touchTargets.mobile = {
+        measured: false, belowWcagMinimum: res.klein.length, error: e.message.split('\n')[0]
+      };
+      continue;
+    }
+    routes[pad].touchTargets.mobile = {
+      measured: true, belowWcagMinimum: res.klein.length, belowPremiumMinimum: premium.klein.length
+    };
   }
   await telefoon.close();
   }
@@ -673,7 +676,9 @@ async function startEchteServer() {
     let premium;
     try { premium = await tab.evaluate(PREMIUM_RAAK); }
     catch (e) {
-      routes[pad].touchTargets.tablet = { measured: false, error: e.message.split('\n')[0] };
+      routes[pad].touchTargets.tablet = {
+        measured: false, belowWcagMinimum: res.klein.length, error: e.message.split('\n')[0]
+      };
       continue;
     }
     if(premium.klein.length) {

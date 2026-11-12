@@ -142,7 +142,10 @@ module.exports = ({ save, saveDuurzaam }) => {
              valse bevestiging waar deze hele ronde over ging. En met een
              onvoorwaardelijk gooien zou een opslag die niet kan tellen elke
              transactie laten mislukken; dat brak eerder vier geldtoetsen. */
-              if (uit.bevestigbaar && !uit.duurzaam) {
+              // Een bekende verloren write is een afwijzing, ook als deze
+              // backend geen transactieteller heeft. Dat maakt stand niet
+              // fictief bevestigbaar en raakt de PG-antwoordcommit niet.
+              if (uit.afgewezen || (uit.bevestigbaar && !uit.duurzaam)) {
                 throw new Error('[duurzaam] de commit is niet vastgelegd: ' + uit.reden);
               }
             } else if (sleutels && sleutels.length) save.sleutels(sleutels);

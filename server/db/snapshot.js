@@ -44,7 +44,7 @@ function schrijfSnapshotNu(opties) {
     beslotenMap(DATA_DIR);
     // compact (geen pretty-print): bij grote data scheelt dat ~40% tijd en ruimte
     const uit = kluis.AAN ? kluis.versleutel(rtgjson.stringify(db.data)) : rtgjson.stringify(db.data);
-    schrijfDuurzaam(DB_FILE, uit, 0o600);
+    schrijfDuurzaam(DB_FILE, uit, 0o600, { vereist });
     besloten(DB_FILE);
     snapshotVol = false;
     // De lokale snapshot staat nu vast. Een optionele mirror mag die bekende

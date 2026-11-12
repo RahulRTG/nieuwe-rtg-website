@@ -32,18 +32,37 @@ function beslotenMap(d) { try { fs.mkdirSync(d, { recursive: true, mode: 0o700 }
    stroomstoring overleeft. Zonder die fsync kan de directory de nieuwe naam al
    hebben terwijl de data nog in de buffer stond: dat geeft een leeg of half
    bestand na een stroomuitval. */
-function schrijfDuurzaam(doel, data, mode) {
+function schrijfDuurzaam(doel, data, mode, opties) {
+  const vereist = opties?.vereist === true;
+  // fs.writeSync accepteert ArrayBufferViews, niet alleen Buffer. Gebruik
+  // byteLength/byteOffset: .length telt bij Uint16Array elementen en ontbreekt
+  // bij DataView. Ongeldige invoer faalt vóór het tijdelijke bestand opent.
+  if (typeof data !== 'string' && !ArrayBuffer.isView(data))
+    throw new TypeError('Een snapshot vereist tekst of een ArrayBufferView.');
+  const bytes = typeof data === 'string' ? Buffer.from(data)
+    : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
   const tmp = doel + '.tmp';
   const fd = fs.openSync(tmp, 'w', mode || 0o600);
   try {
-    fs.writeSync(fd, typeof data === 'string' ? Buffer.from(data) : data);
+    // Een geslaagde write kan minder bytes schrijven dan gevraagd. Pas na de
+    // volledige buffer mag de nieuwe snapshot de oude naam overnemen.
+    let offset = 0;
+    while (offset < bytes.length) {
+      const n = fs.writeSync(fd, bytes, offset, bytes.length - offset, null);
+      if (!Number.isInteger(n) || n <= 0 || n > bytes.length - offset)
+        throw new Error('De snapshotwrite heeft niet alle bytes vastgelegd.');
+      offset += n;
+    }
     fs.fsyncSync(fd);
   } finally { fs.closeSync(fd); }
   try { fs.chmodSync(tmp, mode || 0o600); } catch (e) {}
   fs.renameSync(tmp, doel);
-  // de map fsync-en maakt de hernoeming duurzaam; niet elk platform staat dit
-  // toe (Windows), dus fouten hier zijn niet fataal.
-  try { const dfd = fs.openSync(path.dirname(doel), 'r'); try { fs.fsyncSync(dfd); } finally { fs.closeSync(dfd); } } catch (e) {}
+  // Een best-effort cache blijft bruikbaar op platforms zonder directory-fsync.
+  // Een vereiste snapshot mag dat ontbrekende bewijs niet als succes melden.
+  // Na rename is de nieuwe inhoud mogelijk al zichtbaar: een fout hier bewijst
+  // nadrukkelijk GEEN rollback naar het vorige bestand.
+  try { const dfd = fs.openSync(path.dirname(doel), 'r'); try { fs.fsyncSync(dfd); } finally { fs.closeSync(dfd); } }
+  catch (e) { if (vereist) throw e; }
 }
 
 // Zoek de nieuwste bruikbare dagbackup (server maakt die in DATA_DIR/backups).

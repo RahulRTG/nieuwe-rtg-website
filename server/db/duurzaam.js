@@ -82,7 +82,7 @@ module.exports = ({ save }) => {
     if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de duurzame schrijfactie mislukte (schrijf-faalt)');
     if (verraad.sla('schrijf-verloren')) {
       const stand = persistentieStand();
-      return { duurzaam: false, bevestigbaar: stand !== null, stand,
+      return { duurzaam: false, bevestigbaar: stand !== null, afgewezen: true, stand,
         reden: 'de opslag bevestigde de schrijfactie niet' };
     }
 

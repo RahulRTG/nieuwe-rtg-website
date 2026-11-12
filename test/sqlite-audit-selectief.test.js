@@ -737,6 +737,102 @@ for (const soort of ['order', 'rit']) {
   });
 }
 
+// Lokale opslag na de financiële betaalgrens: Pay en handler-nevenwerk zijn
+// doubles. Entryfactory, puntenhelpers, index en SQLite blijven de echte modules.
+function betaalScope(t, soort, legacy = false) {
+  const p = aanvraagMetMelding(t, soort), collectie = soort === 'order' ? 'orders' : 'rides';
+  const vreemd = ['orders', 'boekingen', 'rides'].filter(k => k !== collectie);
+  for (const k of vreemd) p.db.data[k] = [{ ref: 'ANDER-' + k, waarde: 'vast' }];
+  p.db.data[collectie] = [{ ref: 'SCOPE', customerKey: p.actor.key, supplierCode: p.zaak.code,
+    supplierName: p.zaak.name, customerCodename: 'Anna', total: 25, quote: 25, paid: false,
+    status: 'wacht-op-betaling', at: new Date().toISOString(), from: 'A', to: 'B', passengers: 1,
+    items: [{ id: 'eten', name: 'Lunch', price: 25, qty: 1 }] }];
+  p.db.data.punten = { lid: { saldo: 3, tegoedCenten: 500, historie: [] } };
+  p.save();
+  const scans = Object.fromEntries(vreemd.map(k => [k, 0])), sleutels = [], signalen = [];
+  let betalingen = 0, bredeSaves = 0;
+  for (const k of vreemd) Object.defineProperty(p.db.data[k], 'toJSON', {
+    value() { scans[k]++; return this; }
+  });
+  const save = () => { bredeSaves++; return p.save(); };
+  if (!legacy) save.bestaande = keys => { sleutels.push([...keys]); return p.save.bestaande(keys); };
+  const punten = require('../server/kern/ervaring/leden/punten')({ db: p.db, save: p.save,
+    nu: () => '2026-11-12T00:00:00.000Z' });
+  const sein = () => {
+    assert.equal(p.lees(collectie)[0].paid, true, 'eigen commit staat vóór publicatie vast');
+    assert.equal(p.lees('punten').lid.tegoedCenten, 0);
+    signalen.push('sein');
+  };
+  const acties = require('../server/kern/lidacties')({ ...p.ctx, ...punten, save,
+    facturatie: null, keuken: { boekVerkoopAf() {} },
+    notifySupplier: sein, sseToSupplier: sein, sseToOffice: sein, pushLive: sein,
+    pay: { betaalZaak: async invoer => {
+      betalingen++;
+      assert.equal(invoer.centen, 2000); assert.equal(invoer.bijlageCenten, 500);
+      // Meet uitsluitend de lokale opslag NA de financiële betaalgrens.
+      for (const k of vreemd) { p.db.data[k][0].waarde = 'pending'; scans[k] = 0; }
+      return { ok: true, betaaldCenten: 2000, bijgelegdCenten: 500 };
+    } } });
+  const betaal = () => (soort === 'order' ? acties.betaalOrderVoor : acties.betaalRitVoor)(p.actor, { ref: 'SCOPE' });
+  return { ...p, collectie, vreemd, scans, sleutels, signalen, betaal,
+    betalingen: () => betalingen, bredeSaves: () => bredeSaves };
+}
+
+for (const soort of ['order', 'rit']) {
+  test(soort + ': entryfactory bewaart na betaling alleen eigen transactie en echte punten', async t => {
+    const p = betaalScope(t, soort);
+    assert.equal((await p.betaal()).ok, true);
+    for (const k of p.vreemd) {
+      assert.equal(p.scans[k], 0, k + ' wordt na rekenAf niet opnieuw geserialiseerd');
+      assert.equal(p.lees(k)[0].waarde, 'vast', k + ' heeft geen nieuwe publicatie');
+      assert.equal(p.db.data[k][0].waarde, 'pending', 'vreemd werk blijft intact');
+    }
+    assert.deepEqual(p.sleutels, [[p.collectie, 'punten']]);
+    assert.equal(p.bredeSaves(), 0);
+    const rij = p.lees(p.collectie)[0], punten = p.lees('punten').lid;
+    assert.equal(rij.paid, true); assert.ok(Number.isFinite(Date.parse(rij.paidAt)));
+    assert.equal(rij.payBetaaldCenten, 2000); assert.equal(rij.payBijgelegdCenten, 500);
+    assert.equal(rij.status, soort === 'order' ? 'nieuw' : 'aangevraagd');
+    assert.equal(punten.tegoedCenten, 0); assert.equal(punten.saldo, 5); assert.equal(punten.historie.length, 2);
+    assert.ok(p.signalen.length > 0);
+    assert.equal((await p.betaal()).status, 409);
+    assert.equal(p.betalingen(), 1); assert.deepEqual(p.lees('punten').lid, punten);
+  });
+
+  test(soort + ': entryfactory houdt de oude save-interface zonder gerichte API bruikbaar', async t => {
+    const p = betaalScope(t, soort, true);
+    assert.equal((await p.betaal()).ok, true);
+    assert.equal(p.bredeSaves(), 1); assert.equal(p.sleutels.length, 0);
+    assert.equal(p.lees(p.collectie)[0].paid, true);
+    assert.equal(p.lees('punten').lid.tegoedCenten, 0);
+    for (const k of p.vreemd) {
+      assert.ok(p.scans[k] > 0); assert.equal(p.lees(k)[0].waarde, 'pending');
+    }
+  });
+
+  test(soort + ': lokale betaalcommitfout publiceert geen paid, punten of seintje', async t => {
+    const p = betaalScope(t, soort), exec = DatabaseSync.prototype.exec;
+    t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+      if (sql === 'COMMIT') throw new Error('lokale betaalcommit faalt');
+      return exec.call(this, sql);
+    });
+    await assert.rejects(p.betaal(), /lokale betaalcommit faalt/);
+    assert.equal(p.lees(p.collectie)[0].paid, false);
+    assert.deepEqual(p.lees('punten').lid, { saldo: 3, tegoedCenten: 500, historie: [] });
+    assert.deepEqual(p.signalen, []);
+  });
+}
+
+test('argumentloze lidSave voor een ritaanvraag behoudt de vier bestaande collecties', t => {
+  const p = aanvraagMetMelding(t, 'rit'), sleutels = [];
+  const save = () => p.save();
+  save.bestaande = keys => { sleutels.push([...keys]); return p.save.bestaande(keys); };
+  const acties = require('../server/kern/lidacties')({ ...p.ctx, save, zorgContact() {},
+    notifySupplier() {}, sseToSupplier() {}, sseToOffice() {}, pushLive() {} });
+  assert.equal(acties.vraagRitVoor(p.actor, { supplierCode: p.zaak.code }).ok, true);
+  assert.deepEqual(sleutels, [['orders', 'boekingen', 'rides', 'punten']]);
+});
+
 test('betaalde order laat keuken en melding elk uitsluitend hun eigen collectie bewaren', async t => {
   const p = aanvraagMetMelding(t, 'order');
   const order = { ref: 'BETAAL', customerKey: p.actor.key, supplierCode: p.zaak.code,

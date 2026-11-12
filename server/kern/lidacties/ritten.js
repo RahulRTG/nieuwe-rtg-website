@@ -133,7 +133,7 @@ async function betaalRitVoor(session, body) {
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
   verdienPunten(session.key, r.quote - kortingR - voordeelR, r.supplierName);
-  save();
+  save(['rides', 'punten']);
   // en de factuur, net als bij een bestelling (zie ../lidacties.js)
   factuurVoorLid({ soort: 'dienst', supplierCode: r.supplierCode, supplierNaam: r.supplierName,
     codenaam: r.customerCodename, ref: r.ref, methode: 'rtg',

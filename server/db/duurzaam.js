@@ -103,7 +103,7 @@ module.exports = ({ save }) => {
          Dat bewijst geen stroomuitval: die garantie komt nu van FULL op deze
          eigen transactie, of de gecontroleerde checkpoint bij een netto-noop. */
     } else if (STORE === 'json') {
-      schrijfSnapshotNu();               // schrijft via schrijfDuurzaam(): fsync + rename
+      schrijfSnapshotNu({ vereist: true }); // fsync + rename; een fout of cooldown bevestigt niets
     } else {
       save();                            // postgres/geheugen: geen synchrone weg hier
     }

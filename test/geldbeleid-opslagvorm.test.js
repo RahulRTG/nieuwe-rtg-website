@@ -8,7 +8,7 @@ function kind(t, store, bron, dir) {
     t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   }
   const env = { ...process.env, RTG_DATA_DIR: dir, RTG_STORE: store,
-    DATABASE_URL: '', PG_URL: '', REDIS_URL: '', RTG_ENC_KEY: '', RTG_DUURZAAM: '' };
+    DATABASE_URL: '', PG_URL: '', REDIS_URL: '', RTG_ENC_KEY: '', RTG_DUURZAAM: '', RTG_SAVE_MS: '250' };
   const r = spawnSync(process.execPath, ['-e', bron], { cwd: path.join(__dirname, '..'), env, encoding: 'utf8', timeout: 10000 });
   assert.equal(r.status, 0, r.stderr); assert.equal(r.signal, null);
   return { dir, uit: JSON.parse(r.stdout.trim().split('\n').pop()) };
@@ -40,11 +40,15 @@ test('JSON-renamefout geeft 503 en laat de vorige snapshot intact', t => {
       if(naar===o.DB_FILE)throw new Error('snapshotrename mislukt');return rename.apply(this,arguments);
     };
     const g=require('./server/kern/geldbeleid')(p).geldbeleid;
-    try{const r=await g.vast(()=>g.potZet('lid',{naam:'Reis',doelCenten:1000},'een'));
-      console.log(JSON.stringify({r,d:o.leesLokaleSnapshot()}));
-    }finally{fs.renameSync=rename;}
+    let r;try{r=await g.vast(()=>g.potZet('lid',{naam:'Reis',doelCenten:1000},'een'));}
+    finally{fs.renameSync=rename;}
+    const d=o.leesLokaleSnapshot();
+    const retry=await g.vast(()=>g.potZet('lid',{naam:'Reis',doelCenten:1000},'een'));
+    console.log(JSON.stringify({r,d,retry,na:o.leesLokaleSnapshot()}));
   })().catch(e=>{console.error(e);process.exitCode=1;});`);
   assert.equal(uit.r.status, 503); assert.deepEqual(uit.d, { ander: { waarde: 1 } });
+  assert.equal(uit.retry.ok, true); assert.equal(uit.na.geldbeleid.perLid.lid.potten.length, 1);
+  assert.equal(uit.na.geldbeleid.perLid.lid.log.length, 1);
 });
 test('PostgreSQL zonder requestcommit weigert vóór de schrijver', t => {
   const { uit } = kind(t, 'postgres', `(async()=>{
@@ -73,7 +77,7 @@ test('strict weigert serialisatiefout en cooldown zonder opnieuw te serialiseren
   assert.match(uit.fouten[1], /niets bevestigd/); assert.equal(uit.n, 1);
   assert.equal(uit.voor.ander.waarde, 1); assert.equal(uit.na.ander.waarde, 2);
 });
-test('best-effort snapshot en PG-warmcache blijven niet-gooiend bij renamefout', t => {
+test('best-effort snapshot en de warmcachefunctie blijven niet-gooiend bij renamefout', t => {
   const { uit } = kind(t, 'json', `(()=>{
     const fs=require('node:fs'),p=require('./server/db'),o=require('./server/db/opslag'),s=require('./server/db/snapshot');
     p.db.data={ander:{waarde:1}};o.schrijfLokaleSnapshot();p.db.data.ander.waarde=2;
@@ -85,6 +89,22 @@ test('best-effort snapshot en PG-warmcache blijven niet-gooiend bij renamefout',
     }finally{fs.renameSync=rename;}
   })();`);
   assert.deepEqual(uit, { ander: { waarde: 1 } });
+});
+
+test('fsyncfout op uitsluitend het snapshotbestand geeft geen bevestiging', t => {
+  const { uit } = kind(t, 'json', `(async()=>{
+    const fs=require('node:fs'),p=require('./server/db'),o=require('./server/db/opslag');
+    p.db.data={ander:{waarde:1}};o.schrijfLokaleSnapshot();
+    const open=fs.openSync,sync=fs.fsyncSync;let doelFd,geraakt=0;
+    fs.openSync=function(f){const fd=open.apply(this,arguments);if(f===o.DB_FILE+'.tmp')doelFd=fd;return fd;};
+    fs.fsyncSync=function(fd){if(fd===doelFd){geraakt++;throw new Error('snapshotfsync mislukt');}return sync.apply(this,arguments);};
+    try{const g=require('./server/kern/geldbeleid')(p).geldbeleid;
+      const r=await g.vast(()=>g.potZet('lid',{naam:'Reis',doelCenten:1000},'een'));
+      console.log(JSON.stringify({r,geraakt,d:o.leesLokaleSnapshot()}));
+    }finally{fs.openSync=open;fs.fsyncSync=sync;}
+  })().catch(e=>{console.error(e);process.exitCode=1;});`);
+  assert.equal(uit.geraakt, 1); assert.equal(uit.r.status, 503);
+  assert.deepEqual(uit.d, { ander: { waarde: 1 } });
 });
 test('een mirrorfout na fsync en rename maakt de vastgelegde pot niet tot een schijnmislukking', t => {
   const { uit } = kind(t, 'json', `(async()=>{

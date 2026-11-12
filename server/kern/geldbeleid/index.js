@@ -31,6 +31,12 @@ const MAX_CENTEN = 100000000; // 1 miljoen euro: grens op het doel (LAT.md regel
 
 function maakGeldbeleid({ db, save, klok, bijeen, inBundel }) {
   const nu = typeof klok === 'function' ? klok : () => new Date();
+  /* Alle schrijvers hieronder bezitten uitsluitend geldbeleid. Meld die
+     eigenaar ook aan de duurzame bundel: een herhaling hoeft geen vreemde
+     pending collecties te scannen of mee te bewaren. De bestaande save-poort
+     houdt de FULL-bevestiging, buitenbundels en opslagfouten ongewijzigd. */
+  const beleidSave = () => typeof save.bestaande === 'function'
+    ? save.bestaande(['geldbeleid']) : save();
   /* DE SCHRIJVERS VAN HET LID, DUURZAAM (18 oktober 2026). Elke schrijver
      hieronder deed `save()` -- write-behind -- en de route antwoordde 200. De
      schrijfproef (SCHRIJFPROEF.json, verraad `schrijf-verloren`) mat dat op
@@ -47,7 +53,7 @@ function maakGeldbeleid({ db, save, klok, bijeen, inBundel }) {
      commit. Zonder bundel (een los toetsstel dat alleen
      db en save meegeeft) draait `werk` gewoon zoals vroeger. */
   const vastleggen = typeof bijeen === 'function'
-    ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'geldbeleid' }) : null;
+    ? require('../../lib/duurzaam')({ bijeen, save: beleidSave, inBundel, bron: 'geldbeleid' }) : null;
   const vast = (werk) => (vastleggen ? vastleggen.antwoord(werk) : Promise.resolve().then(werk));
   const eigen = require('../eigencollectie')({ db, domein: 'kern/geldbeleid/index', bezit: { geldbeleid: 'kaart' } });
   function d() {
@@ -86,7 +92,7 @@ function maakGeldbeleid({ db, save, klok, bijeen, inBundel }) {
   const zichtRegel = r => ({ id: r.id, soort: r.soort, drempelCenten: r.drempelCenten, niveau: r.niveau, aan: !!r.aan, potId: r.potId || null, laatst: r.laatst || null });
   const zichtPot = p => ({ id: p.id, naam: p.naam, doelCenten: p.doelCenten, standCenten: p.standCenten });
 
-  const ctx = { save, nu, kijk, pak, maakId, bedragVan, zichtRegel, zichtPot, MAX_CENTEN };
+  const ctx = { save: beleidSave, nu, kijk, pak, maakId, bedragVan, zichtRegel, zichtPot, MAX_CENTEN };
   const { logSchrijf, log } = require('./actielog')(ctx);
   ctx.logSchrijf = logSchrijf;
   const { potten, potZet, potReserveer, potWeg } = require('./potten')(ctx);

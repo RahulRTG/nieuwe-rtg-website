@@ -90,3 +90,18 @@ test('echte SQLite meet BEGIN, payloadwrite, COMMIT en checkpoint zonder gegeven
     assert.equal(rijen.get('kv.write.trustEvidence').storedChars, waarde.val.length);
   } finally { meter.restore(); db.close(); }
 });
+
+test('de optionele fase-observer ziet alleen scalars en kan SQLite-antwoorden en fouten niet vervangen',()=>{
+  const fout=Error('oorspronkelijk'), antwoord={zelfde:true}, gezien=[];
+  class StatementSync { run(){return antwoord;} get(){return antwoord;} }
+  class DatabaseSync { exec(sql){if(sql==='ROLLBACK')throw fout;return antwoord;} prepare(){return new StatementSync();} }
+  const meter=meetSqlite({DatabaseSync,StatementSync},()=>1,(...args)=>{gezien.push(args);throw Error('diagnose');});
+  try {
+    const db=new DatabaseSync();assert.equal(db.exec('COMMIT'),antwoord);
+    assert.throws(()=>db.exec('ROLLBACK'),e=>e===fout);
+    assert.equal(db.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?)').run('sessions','geheime data',1),antwoord);
+    assert.deepEqual(gezien,[['exec.commit',1,0,true,0],['exec.rollback',1,0,false,0],['kv.write.sessions',1,0,true,12]]);
+    assert.equal(JSON.stringify(gezien).includes('geheime'),false);
+    assert.equal(meter.drain().rows.find(r=>r.phase==='exec.rollback').failures,1);
+  } finally {meter.restore();}
+});

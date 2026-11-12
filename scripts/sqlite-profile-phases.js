@@ -2,7 +2,7 @@
 /* Uitsluitend door de optionele testprofiler te monteren. Geen SQL-tekst,
    parameters, routegegevens of payloads in de meting. Splits native SQLite-
    tijd in commit, begin, checkpoint en de bekende grote KV-schrijvers. */
-module.exports = function meetSqlite(sqlite, nu = () => performance.now()) {
+module.exports = function meetSqlite(sqlite, nu = () => performance.now(), observeer) {
   const db = sqlite.DatabaseSync.prototype, stmt = sqlite.StatementSync.prototype;
   const origineel = { exec: db.exec, prepare: db.prepare, run: stmt.run, get: stmt.get };
   const statements = new WeakMap(), metingen = new Map();
@@ -28,6 +28,8 @@ module.exports = function meetSqlite(sqlite, nu = () => performance.now()) {
       const i = grenzen.findIndex(grens => ms < grens);
       rij.buckets[i < 0 ? grenzen.length : i]++;
       metingen.set(sleutel, rij);
+      // Diagnose mag de echte SQLite-uitkomst of oorspronkelijke fout niet vervangen.
+      if (observeer) { try { observeer(naam, connection, ms, gelukt, gelukt ? chars : 0); } catch (e) {} }
     }
   }
   function exec(...args) {

@@ -129,6 +129,9 @@
   }
 
   function bindPas(element, pas) {
+    // Runtimewaarheid blijft voor bestaande producten. De aangekondigde prijzen
+    // uit PRIJZEN.md §7.3/§9.3 gebruiken data-policy-price/billing, met zichtbare
+    // beschikbaarheidsgrens; publicatie migreert geen contract of factuurtarief.
     zetTekst(element.querySelector('[data-app-truth-pass-name]'), pas.name);
     zetTekst(element.querySelector('[data-app-truth-price]'), pas.priceLabel);
     zetTekst(element.querySelector('[data-app-truth-billing]'), pas.billingNote);

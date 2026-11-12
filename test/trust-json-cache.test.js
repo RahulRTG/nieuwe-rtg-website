@@ -21,6 +21,8 @@ test('opslag hergebruikt alleen gecertificeerde records van de echte Trust-schri
   const { root, data, voegToe } = opzet();
   for (let i = 0; i < 600; i++) voegToe(i);
   const verwacht = JSON.stringify(root);
+  assert.equal(tracker.serialiseerVoorOpslag(data.trustEvidence, 'trustEvidence'), verwacht,
+    'eerste opslag materialiseert de gecertificeerde fragmenten');
   const native = JSON.stringify, objectAanroepen = [];
   let tekst;
   try {

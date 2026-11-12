@@ -3513,6 +3513,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
     ['test/sqlite-duurzaam-sync.test.js', 'bewijst FULL vóór dezelfde atomaire commit, fouten zonder schijnsucces en duurzame herhaling zonder dubbel effect'],
+    ['test/trust-json-opslag.test.js', 'bewijst met echte SQLite dat gecertificeerde JSON-fragmenten FULL, rollback, encryptie en herstart niet veranderen; geen productaanroeper'],
+    ['test/lib/lidbetaling-crashkind.js', 'geïsoleerd kindproces observeert de echte financiële FULL-commit en stopt op de lokale paid/punten-grens; geen productaanroeper'],
     ['test/sqlite-audit-publicatie.test.js', 'bewijst dat onpubliceerbare auditresultaten vóór de duurzame commit worden geweigerd, zodat vastgelegd werk niet als mislukt terugkomt'],
     ['test/ritreferentie.test.js', 'bewijst verse ritidentiteit, idempotente herhaling en actor-isolation via de echte duurzame SQLite-geldboeking'],
     ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen en niet tweemaal worden gecommit'],

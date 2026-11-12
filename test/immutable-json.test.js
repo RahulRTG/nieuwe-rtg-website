@@ -5,6 +5,40 @@ const { certifieer, serialiseer } = require('../server/lib/immutable-json');
 const vries = x => require('../server/kern/bewijsvlak/canon').bevries(x);
 function gelijk(v) { assert.equal(serialiseer(v), JSON.stringify(v)); }
 
+test('certificering maakt geen JSON; alleen eerste opslag materialiseert een identiteit', () => {
+  const eerste = vries({ n: 1 }), tweede = vries({ n: 2 });
+  const native = JSON.stringify; let aanroepen = 0;
+  try {
+    JSON.stringify = function(v, ...rest) {
+      if (v === eerste || v === tweede) aanroepen++;
+      return native(v, ...rest);
+    };
+    assert.equal(certifieer(eerste), true);
+    assert.equal(aanroepen, 0, 'andere opslagmotoren krijgen geen ongebruikte JSON-fragmenten');
+    const root = { a: eerste, b: eerste };
+    assert.equal(serialiseer(root), native(root)); assert.equal(aanroepen, 1);
+    assert.equal(serialiseer(root), native(root)); assert.equal(aanroepen, 1);
+    assert.equal(certifieer(tweede), true); assert.equal(aanroepen, 1);
+    root.c = tweede;
+    assert.equal(serialiseer(root), native(root)); assert.equal(aanroepen, 2);
+    assert.equal(serialiseer(root), native(root)); assert.equal(aanroepen, 2);
+  } finally { JSON.stringify = native; }
+});
+
+test('koud certificaat respecteert latere prototype-toJSON en volledige accessorfallback', () => {
+  const v = vries({ n: 1 }); assert.equal(certifieer(v), true);
+  try {
+    Object.defineProperty(Object.prototype, 'toJSON', { configurable: true, value(k) { return k + ':anders'; } });
+    gelijk({ v });
+  } finally { delete Object.prototype.toJSON; }
+  gelijk({ v });
+  const koud = vries({ n: 2 }); assert.equal(certifieer(koud), true);
+  let reads = 0;
+  const root = { koud, get later() { reads++; return reads; } };
+  const tekst = serialiseer(root); assert.equal(reads, 1); reads = 0;
+  assert.equal(tekst, JSON.stringify(root)); assert.equal(reads, 1);
+});
+
 test('alleen transitief JSON-onveranderlijke inhoud krijgt een certificaat', () => {
   const kind = { n: 1 }, half = Object.freeze({ kind });
   assert.equal(certifieer(half), false);

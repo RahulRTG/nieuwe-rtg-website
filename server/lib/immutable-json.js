@@ -50,7 +50,9 @@ function certifieer(v) {
   // Een cache is geen nieuwe validatiepoort voor een domeinwrite.
   try {
     if (!veilig(v, 0)) return false;
-    fragmenten.set(v, JSON.stringify(v));
+    // Andere opslagmotoren gebruiken deze fragmenten niet. Maak de tekst
+    // daarom pas bij de eerste daadwerkelijke SQLite-serialisatie.
+    fragmenten.set(v, null);
     return true;
   } catch (_) { return false; }
 }
@@ -64,8 +66,14 @@ function serialiseer(waarde, ruw = v => v) {
     // Alleen de root was ook vóór deze optimalisatie onthuld. Een geneste
     // trackerproxy behoudt zijn get-semantiek via volledige native fallback.
     const v = invoer;
-    const vast = v && typeof v === 'object' ? fragmenten.get(v) : undefined;
-    if (vast !== undefined) return vast;
+    let vast = v && typeof v === 'object' ? fragmenten.get(v) : undefined;
+    if (vast !== undefined) {
+      if (vast === null) {
+        vast = JSON.stringify(v);
+        fragmenten.set(v, vast);
+      }
+      return vast;
+    }
     if (--budget < 0 || diepte > 64) return TERUG;
     if (v === null || ['string', 'number', 'boolean'].includes(typeof v)) return JSON.stringify(v);
     // BigInt/toJSON, undefined en andere exotische waarden: native HELE root.

@@ -3502,6 +3502,7 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
 {
   const TOEGESTAAN = new Map([
+    ['server/kern/bankregie/index.js', 'een bevestigde bankregieschakeling en haar uitvoeringsaudit moeten samen de procesherstart overleven; een menselijke noodstop mag niet alleen in write-behind staan'],
     ['server/bedrijf/praktijk.js', 'Werk van een organisatie en de herhaalsleutel worden samen duurzaam bevestigd; verlies na een geslaagde reactie zou dubbel werk veroorzaken.'],
     ['server/bedrijf/praktijk-leverancier-routes.js', 'Leveranciersbeslissing en eenmalig gebruik moeten duurzaam staan vóór bevestiging.'],
     ['server/bedrijf/praktijk-betalen-routes.js', 'Betaalopdracht, ontvanger en hervatopties moeten duurzaam staan vóór extern netwerkverkeer.'],

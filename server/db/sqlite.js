@@ -1,5 +1,5 @@
 /* SQLite/WAL: collecties hebben versies; de poll leest externe wijzigingen.
-   Schrijvers delen dezelfde transactionele store.db. De twee auditjournalen
+   Schrijvers delen dezelfde transactionele store.db. De auditjournalen
    hebben eigen rijen; db.data blijft de leesprojectie van dezelfde opslag.
    Een verwijderde collectie wordt een tombstone (kolom `deleted`), zodat een
    tweede instance haar niet uit een verouderde werkkopie laat herrijzen. */

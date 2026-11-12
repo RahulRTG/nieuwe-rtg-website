@@ -29,17 +29,27 @@ const keten = require('../../lib/keten');
 function maakInlogspoor({ db, save, schoon }) {
   const opslag = require('../eigencollectie')({ db, domein: 'inlogherkomst',
     bezit: { securityLog: 'lijst' } });
+  let audit;
   function logInlog(kanaal, ok, wie, req) {
     opslag.kijk('securityLog'); // beschadigde bestaande auditdata nooit als leeg vervangen
-    const lijst = opslag.bak('securityLog');
-    keten.noteerIn(lijst, {
+    // SQLite bewaart dezelfde regels via de bestaande auditrijeigenaar.
+    // Pas op de eerste schrijfactie openen: alleen lezen schept geen log.
+    if (audit === undefined) audit = save.audit?.open('securityLog') || null;
+    const regel = {
       at: new Date().toISOString(), kanaal, ok: !!ok,
       wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
-    }, 5000);
+    };
+    if (audit) {
+      audit.append(vorige => keten.schakel(regel, vorige?.hash || null,
+        (Number(vorige?.nr) || 0) + 1), r => Boolean(r?.hash));
+      return;
+    }
+    keten.noteerIn(opslag.bak('securityLog'), regel, 5000);
     save.sleutels(['securityLog']);
   }
   function securityLogKeten() {
-    const lijst = opslag.kijk('securityLog');
+    const vast = opslag.kijk('securityLog');
+    const lijst = audit?.voorlopig() || vast;
     return Object.assign({ top: keten.top(lijst) }, keten.verifieer(lijst));
   }
   return { logInlog, securityLogKeten };

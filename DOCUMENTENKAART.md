@@ -2544,7 +2544,7 @@ schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
 in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6471<!--/getal--> van
-<!--getal:codewereld.paden-->6934<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+<!--getal:codewereld.paden-->6959<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is

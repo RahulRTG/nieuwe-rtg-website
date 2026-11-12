@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-11-12T21:13:48.759Z",
-  "commit": "2018bdba80",
+  "op": "2026-11-12T22:00:45.844Z",
+  "commit": "b99fd4c8ab",
   "boomVuil": false,
-  "boomAnders": 25,
+  "boomAnders": 2,
   "instrument": "scripts/schrijfanalyse.js",
   "node": "v26.12.1"
  },

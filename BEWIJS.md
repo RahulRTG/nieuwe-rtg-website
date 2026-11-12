@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 3232 bestanden en 21535 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 3232 bestanden en 21538 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 3232 |
-| losse beweringen (`test(...)`) | 21535 |
+| losse beweringen (`test(...)`) | 21538 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 561 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 3014 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,12 +33,12 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2783 bestanden, 20701 beweringen.
+2783 bestanden, 20704 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
 | `a11ykeuring.test.js` | 15 | gezakt op `true->false` | Eigen a11y-keuring (scripts/a11ykeuring.js), die axe-core verving. De keuring zelf draait in de browser (scripts/a11y.js); hier toetsen we de PURE kern in Node -- kleur/luminantie/contrast-wiskunde en de... |
-| `a11yoordeel.test.js` | 9 | gezakt op `===->!==#0` | HET A11Y-OORDEEL OVER OPGEDEELDE METINGEN. De a11y-scan is opgedeeld over vier runners, en dat mocht alleen omdat zijn oordeel is losgemaakt van zijn meting (scripts/lib/a11yoordeel.js). |
+| `a11yoordeel.test.js` | 12 | gezakt op `===->!==#0` | HET A11Y-OORDEEL OVER OPGEDEELDE METINGEN. De a11y-scan is opgedeeld over vier runners, en dat mocht alleen omdat zijn oordeel is losgemaakt van zijn meting (scripts/lib/a11yoordeel.js). |
 | `aanbouw-collectie.test.js` | 2 | gezakt op `!==->===#0` | opzet/aanbouw.js en aanbouw2.js haalden bewerkCollectie uit `kern`, en die draagt hem niet. Vijf modules (samen, samenrtf, rtgai, rtgid, vracht) kregen daardoor undefined en namen stil hun niet-atomaire terugval --... |
 | `aankomst-chauffeur-voorzijde.test.js` | 4 | geen bronmutatie mogelijk | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `aanmeldbesluit.test.js` | 5 | gezakt op `liegpoort /api/` | WIE HEEFT DEZE PAS TOEGEKEND? Het accepteren of afwijzen van een aanmelding is de ENE menselijke handeling in een verder volledig geautomatiseerde stroom. |

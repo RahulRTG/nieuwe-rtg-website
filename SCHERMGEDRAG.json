@@ -3,7 +3,7 @@
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
   "op": "2026-11-12",
-  "commit": "2018bdba80"
+  "commit": "b99fd4c8ab"
  },
  "grond": [
   "SCHERMROUTES.json",

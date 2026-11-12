@@ -2,7 +2,7 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-11-12",
-    "commit": "2018bdba80"
+    "commit": "b99fd4c8ab"
   },
   "registers": {
     "geteld": 217,
@@ -13,11 +13,11 @@
   },
   "assen": {
     "route": {
-      "sleutels": 6934,
+      "sleutels": 6959,
       "registers": 88
     },
     "bestand": {
-      "sleutels": 7450,
+      "sleutels": 7452,
       "registers": 181
     },
     "symbool": {
@@ -33,14 +33,14 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 20181,
-        "seconden": 2.1
+        "seconden": 2.3
       }
     }
   },
   "ruggengraat": {
-    "paden": 6934,
+    "paden": 6959,
     "inMeerDanEenRegister": 6471,
-    "pct": 93.3,
+    "pct": 93,
     "verdeling": [
       {
         "registers": 38,
@@ -192,7 +192,7 @@
       },
       {
         "registers": 1,
-        "paden": 463
+        "paden": 488
       }
     ]
   },
@@ -543,7 +543,7 @@
     "bestanden": 6094,
     "genoemd": 6094,
     "pct": 100,
-    "gedrag": 4795,
+    "gedrag": 4797,
     "gedragPct": 78.7,
     "relatie": 6094,
     "indexregisters": [
@@ -597,7 +597,7 @@
         "bestanden": 4700,
         "genoemd": 4700,
         "pct": 100,
-        "gedrag": 4205,
+        "gedrag": 4207,
         "gedragPct": 89.5
       },
       {
@@ -1108,8 +1108,8 @@
     {
       "register": "MUTATIES.json",
       "as": "bestand",
-      "paden": 41,
-      "bestanden": 1175,
+      "paden": 66,
+      "bestanden": 1193,
       "symbolen": 0,
       "paren": 0
     },

@@ -27,17 +27,17 @@ gevonden. Dus eerst meten — `npm run codewereld`, uitslag in `CODEWERELD.json`
 | As **route** | 5709 paden, in 42 registers |
 | As **bestand** | 1457 bestanden, in 54 registers |
 | As **symbool** | <!--getal:codewereld.symboolSleutels-->28873<!--/getal--> symbolen — *stond op 0 tot 3 september 2026, zie §0.2* |
-| Ruggengraat | **<!--getal:codewereld.ruggengraat-->6471<!--/getal--> van <!--getal:codewereld.paden-->6934<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->93.3<!--/getal-->%) staan in meer dan één register** |
+| Ruggengraat | **<!--getal:codewereld.ruggengraat-->6471<!--/getal--> van <!--getal:codewereld.paden-->6959<!--/getal--> paden (<!--getal:codewereld.ruggengraatPct-->93<!--/getal-->%) staan in meer dan één register** |
 | Brug route → bestand | <!--getal:codewereld.brugPaden-->5894<!--/getal--> paden, uit **2** registers |
 | Verschillen in die brug | 1, getoetst op <!--getal:codewereld.brugToetsbaar-->5691<!--/getal--> paden (<!--getal:codewereld.brugDekkingPct-->96.6<!--/getal-->%) — soort: zie §0.3 |
 | Bronbereik **structuur** | <!--getal:codewereld.bronGenoemd-->6094<!--/getal--> van <!--getal:codewereld.bronBestanden-->6094<!--/getal--> (<!--getal:codewereld.bronPct-->100<!--/getal-->%) — welke functies er wonen, wie ervan afhangt |
-| Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->4795<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->78.7<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
+| Bronbereik **gedrag** | **<!--getal:codewereld.bronGedrag-->4797<!--/getal--> van 3987 (<!--getal:codewereld.bronGedragPct-->78.7<!--/getal-->%)** — schrijft het, is het bewezen, is het herhaalbaar |
 | — gedrag in `server/` | <!--getal:codewereld.bronServerPct-->89.5<!--/getal-->% |
 | — gedrag in `public/` | <!--getal:codewereld.bronPublicPct-->42.3<!--/getal-->% |
 
 Vier dingen volgen daaruit, en ze zijn belangrijker dan het plan zelf.
 
-**De Codewereld is te bouwen, maar op de as ROUTE.** <!--getal:codewereld.ruggengraatPct-->93.3<!--/getal-->% van de paden staat in
+**De Codewereld is te bouwen, maar op de as ROUTE.** <!--getal:codewereld.ruggengraatPct-->93<!--/getal-->% van de paden staat in
 meer dan één register: er is een echte ruggengraat, geen verzameling losse
 lenzen. Dat is de sterkste uitslag hier.
 
@@ -718,7 +718,7 @@ sleutels, geen productiegegevens, en een dak op wat er per vraag uit mag.
 |---|---|
 | Deterministische code-analyse | **staat** — <!--getal:codewereld.registers-->217<!--/getal--> registers, alle uit `scripts/`, geen model |
 | Scheiding runtime ↔ bron | **staat**, en afgedwongen (`test/codegrens.test.js`) |
-| Ruggengraat op route | **staat** — <!--getal:codewereld.ruggengraatPct-->93.3<!--/getal-->%, gemeten |
+| Ruggengraat op route | **staat** — <!--getal:codewereld.ruggengraatPct-->93<!--/getal-->%, gemeten |
 | Symboolas | **staat** — `SYMBOLEN.json`, §0.2 |
 | Codewereld als één object | **een stap weg** — drie assen, en de brug route→bestand heeft sinds §0.3 twee bronnen |
 | Brug scherm → route | **staat** — `SCHERMROUTES.json`, §0.3 |

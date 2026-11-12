@@ -40,11 +40,16 @@ test('PG bevestigt pot en log vóór antwoord, behoudt retry na herstart en weig
     const login = await api('auth/login', { login: 'beleid@voorbeeld.test', password: 'ProefGeheim123!' });
     assert.equal(login.status, 200, JSON.stringify(login)); token = login.body.token; assert.ok(token);
     assert.equal((await api('geld/pot/zet', body)).body.herhaald, true); assert.deepEqual(await lees(), vast);
+    await pool.query('CREATE SEQUENCE beleidsfout_geraakt');
     await pool.query(`CREATE FUNCTION weiger_geldbeleid() RETURNS trigger LANGUAGE plpgsql AS $$
-      BEGIN IF NEW.key='geldbeleid' THEN RAISE EXCEPTION 'beleidsproef weigert write'; END IF; RETURN NEW; END $$`);
+      BEGIN IF NEW.key='geldbeleid' THEN PERFORM nextval('beleidsfout_geraakt');
+        RAISE EXCEPTION 'beleidsproef weigert write'; END IF; RETURN NEW; END $$`);
     await pool.query('CREATE TRIGGER weiger_geldbeleid BEFORE INSERT OR UPDATE ON kv FOR EACH ROW EXECUTE FUNCTION weiger_geldbeleid()');
+    assert.equal((await pool.query('SELECT is_called FROM beleidsfout_geraakt')).rows[0].is_called, false);
     const fout = await api('geld/pot/zet', { naam: 'Buffer', doelCenten: 2000, idem: 'tweede-pot' });
     assert.equal(fout.status, 503, JSON.stringify(fout)); assert.deepEqual(await lees(), vast);
+    assert.equal((await pool.query('SELECT is_called FROM beleidsfout_geraakt')).rows[0].is_called, true,
+      'de echte write-trigger moet geraakt zijn; een vooraf gesloten poort bewijst niets');
     await pool.query('DROP TRIGGER weiger_geldbeleid ON kv');
     // De responsepoort sluit na een echte commitfout terecht tot resync.
     // Een verse worker bewijst herstel vanaf PG, niet vanaf de mislukte RAM.

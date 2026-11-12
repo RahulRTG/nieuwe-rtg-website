@@ -97,7 +97,7 @@ function statements() {
 // Plan, transactie en publicatie na de commit: ./sqlite-save.js.
 const saveSqlite = require('./sqlite-save')({ db, verbinding: () => { sqliteInit(); return kvdb; },
   statements, auditMotor, mutaties, voorcheck, merge3, uitStore, naarStore, laatsteJson, toegepast,
-  vouwWal: () => vouwWalSqlite() });
+  vouwWal: () => bevestigWalSqlite() });
 
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
 // en zet ze in db.data. Zo blijven losse domeinprocessen bij elkaar in de pas.
@@ -118,7 +118,7 @@ function startSqliteSync() {
    hun eigen volledige flush; de WAL-grens staat naast de transactielaag. Bij
    afsluiten vervalt de geplande vangrail: de laatste save is zelf volledig. */
 const wal = require('./sqlite-checkpoint')({ verbinding: () => kvdb, saveSqlite });
-const { checkpointSqlite, vouwWalSqlite } = wal;
+const { checkpointSqlite, vouwWalSqlite, bevestigWalSqlite } = wal;
 function afrondSqlite() { saveSqlite.stopVangrail(); wal.afrondSqlite(); }
 
 const persistentieStandSqlite = require('./sqlite-persistentie')({

@@ -11,6 +11,7 @@ module.exports = function profileer() {
   // Diagnose per route, zonder payloads. Wacht op de normale moduleinitialisatie:
   // de preload mag geen tweede database of gewijzigde opstartvolgorde maken.
   const saves = new Map(), sqlitePath = require.resolve('../server/db/sqlite');
+  const serialisaties = new Map(), trackerPath = require.resolve('../server/db/mutatietracker');
   const handelingPath = require.resolve('../server/opzet/handeling');
   const koppel = setInterval(() => {
     const sqlite = require.cache[sqlitePath];
@@ -31,6 +32,23 @@ module.exports = function profileer() {
         saves.set(naam, rij);
       }
     };
+    const tracker = require.cache[trackerPath];
+    if (tracker?.loaded) {
+      const serialiseer = tracker.exports.serialiseerVoorOpslag;
+      tracker.exports.serialiseerVoorOpslag = function(...args) {
+        const naam = typeof args[1] === 'string' && (serialisaties.has(args[1]) || serialisaties.size < 5000)
+          ? args[1] : 'overig';
+        const rij = serialisaties.get(naam) || { collection: naam, count: 0, ms: 0, maxMs: 0, chars: 0 };
+        const start = performance.now(); let uit;
+        try { uit = serialiseer.apply(this, args); return uit; }
+        finally {
+          const ms = performance.now() - start;
+          rij.count++; rij.ms += ms; rij.maxMs = Math.max(rij.maxMs, ms);
+          if (typeof uit === 'string') rij.chars += uit.length;
+          serialisaties.set(naam, rij);
+        }
+      };
+    }
   }, 1000);
   koppel.unref();
   const session = new Session();
@@ -55,8 +73,10 @@ module.exports = function profileer() {
             .sort((a, b) => b.bytes - a.bytes).slice(0, 20);
         } catch (error) { collections = { error: error.message }; }
         const storage = [...saves.values()].sort((a, b) => b.ms - a.ms).slice(0, 30);
-        fs.writeFileSync(path.join(dir, stem + '.json'), JSON.stringify({ pid: process.pid, begin, end, diagnosticOnly: true, collections, storage }));
+        const serialization = [...serialisaties.values()].sort((a, b) => b.ms - a.ms).slice(0, 30);
+        fs.writeFileSync(path.join(dir, stem + '.json'), JSON.stringify({ pid: process.pid, begin, end, diagnosticOnly: true, collections, storage, serialization }));
         saves.clear();
+        serialisaties.clear();
         begin = end;
         await post('Profiler.start');
       } catch (error) { console.error('[cpu-profile]', error.message); }

@@ -19,6 +19,17 @@ const herlees = p => {
   assert.equal(r.status, 0, r.stderr); return JSON.parse(r.stdout).perLid.lid;
 };
 
+test('de duurzame factory weigert een ongeldige save vóór iedere domeinmutatie', () => {
+  const maak = require('../server/kern/geldbeleid');
+  for (const save of [undefined, null, {}]) {
+    const db = { data: {} };
+    assert.throws(() => maak({ db, save, bijeen() {} }), /db.bijeen en db.save nodig/);
+    assert.deepEqual(db.data, {});
+    assert.deepEqual(maak({ db, save }).geldbeleid.potten('lid'), [], 'losse lezers blijven bruikbaar');
+    assert.deepEqual(db.data, {});
+  }
+});
+
 test('pot, reservering en herhaling bewaren hun eigenaar zonder vreemde pending data te scannen', async t => {
   const p = setup(t); p.db.data.ander.waarde = 9;
   const a = await zet(p); assert.equal(a.status, 200);

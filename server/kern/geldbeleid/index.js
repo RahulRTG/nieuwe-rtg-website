@@ -35,8 +35,9 @@ function maakGeldbeleid({ db, save, klok, bijeen, inBundel }) {
      eigenaar ook aan de duurzame bundel: een herhaling hoeft geen vreemde
      pending collecties te scannen of mee te bewaren. De bestaande save-poort
      houdt de FULL-bevestiging, buitenbundels en opslagfouten ongewijzigd. */
-  const beleidSave = () => typeof save.bestaande === 'function'
-    ? save.bestaande(['geldbeleid']) : save();
+  const beleidSave = typeof save === 'function'
+    ? () => typeof save.bestaande === 'function' ? save.bestaande(['geldbeleid']) : save()
+    : save; // laat de bestaande opstartcontrole een ongeldige afhankelijkheid weigeren
   /* DE SCHRIJVERS VAN HET LID, DUURZAAM (18 oktober 2026). Elke schrijver
      hieronder deed `save()` -- write-behind -- en de route antwoordde 200. De
      schrijfproef (SCHRIJFPROEF.json, verraad `schrijf-verloren`) mat dat op

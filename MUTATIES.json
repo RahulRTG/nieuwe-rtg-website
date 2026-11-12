@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-11-10T18:34:48.644Z",
-    "commit": "62794c74d",
+    "op": "2026-11-12T02:38:49.361Z",
+    "commit": "f368dcd70",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -15086,6 +15086,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "DOM-contract; document.createElement img vervangen door video laat de mediatoets zakken"
+    },
+    "public-pricing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/platform-data.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "publieke-adressen.test.js": {
       "soort": "server",

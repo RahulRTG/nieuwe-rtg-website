@@ -16,6 +16,23 @@ hebben we alles om onze klanten te helpen"*. Het antwoord uit de meting was:
 de BESLISLUS is af en netjes bewaakt, de UITVOERLUS bestaat niet. Par. 9 is die
 meting; de rest van dit document is wat eruit volgt.
 
+**Leesstatus, 12 november 2026:** de historische meting hieronder is geen
+actuele verkoopvrijgave. Het definitieve interne commerciële reisbeleid staat
+in `PRIJZEN.md` §9.3, inclusief versie en inwerkingtredingsvoorwaarden.
+RTG draagt verantwoordelijkheid voor zijn eigen aangeboden
+en samengestelde reizen, inclusief de toepasselijke organisator- en
+nazorgplichten. Zelfstandig bij andere reisbureaus gekochte reizen vallen buiten
+die RTG-verkoop en afrekening; een account of documentimport maakt RTG niet de
+verkoper. TravelOS mag de toegestane reisinformatie blijven tonen. Dienstverlening
+aan een extern reisbureau als platformklant is evenmin automatisch RTG-reisverkoop.
+De partnercommissie is geen fictieve commissie aan RTG zelf. Reisrol,
+reisprijs, fiscale reismarge en leveranciersafrekening afzonderlijk onderbouwen.
+Inmiddels bestaan `server/kern/reisbureau-samenstelling.js` en
+`server/kern/reisbureau-betaling.js`; hun bestaan bewijst nog geen gekwalificeerde
+providerketen, pakketreisdekking of kloppende publieke voorwaarden. §9.3.5 benoemt
+die aansluitingen. De algemene bemiddelaarsclaim uit de huidige publieke
+voorwaarden mag niet als dekking voor eigen RTG-pakketten worden gebruikt.
+
 ---
 
 ## 0. De kern, in twee zinnen

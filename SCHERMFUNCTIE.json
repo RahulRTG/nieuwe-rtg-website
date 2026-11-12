@@ -2,19 +2,28 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-11-11",
-    "commit": "c4c453ab86"
+    "op": "2026-11-12",
+    "commit": "6bfa6b4528"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-11-11",
-      "commit": "c4c453ab86",
+      "op": "2026-11-12",
+      "commit": "6bfa6b4528",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
-        "boomVuil": false,
+        "boomVuil": true,
         "ongecommitteInvoer": [
-          "ROUTEBRON.json"
+          "ROUTEBRON.json",
+          "public/site/passen/business-lite.html",
+          "public/site/passen/business-pass.html",
+          "public/site/passen/community.html",
+          "public/site/passen/lifestyle-pass.html",
+          "public/site/passen/rtg-pass.html",
+          "public/site/platform-app.js",
+          "public/site/platform-data.js",
+          "public/site/start/experience.js",
+          "public/site/website-truth.js"
         ],
         "bestanden": [
           "ROUTEBRON.json",
@@ -2120,8 +2129,8 @@
       }
     },
     "schermgedrag": {
-      "op": "2026-11-11",
-      "commit": "c4c453ab86"
+      "op": "2026-11-12",
+      "commit": "6bfa6b4528"
     }
   },
   "ruis": [
@@ -2844,7 +2853,7 @@
         "/api/zorgprofiel"
       ],
       "zonderServer": false,
-      "inkomend": 211,
+      "inkomend": 207,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -9069,7 +9078,7 @@
         "/api/kantoor"
       ],
       "zonderServer": false,
-      "inkomend": 74,
+      "inkomend": 73,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2.js",
@@ -15444,7 +15453,7 @@
       "bestand": "public/site/passen/business-lite.html",
       "url": "/site/passen/business-lite.html",
       "titel": "RTG Business Lite | Rahul Travel Group",
-      "h1": "Veel bedrijfssoftware. Eén heldere basis.",
+      "h1": "Minder dubbel werk. Meer grip op uw zaak.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15488,7 +15497,7 @@
       "bestand": "public/site/passen/business-pass.html",
       "url": "/site/passen/business-pass.html",
       "titel": "RTG Business Pass | Rahul Travel Group",
-      "h1": "Uw organisatie, verbonden op iedere schaal.",
+      "h1": "Zakelijke regie, met duidelijke verantwoordelijkheid.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15620,7 +15629,7 @@
       "bestand": "public/site/passen/rtg-pass.html",
       "url": "/site/passen/rtg-pass.html",
       "titel": "RTG Pass | Rahul Travel Group",
-      "h1": "Het hele RTG-platform, voor jou.",
+      "h1": "Meer overzicht. Ruimte voor je plannen.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],

@@ -7582,3 +7582,25 @@ kwalificaties op dezelfde uiteindelijke kandidaat en de verdere operationele
 releasepoorten. De bronboom is gecommit; gegenereerde bewijsregisters blijven
 afzonderlijke werkuitvoer en vormen nog geen schone productievrijgave.
 Geen productie geactiveerd, geen secrets gebruikt en geen vrijgave ondertekend.
+
+### 12 november: expliciet main-besluit zonder publicatie
+
+De eigenaar vraagt de integratietak naar main te brengen en kiest daarbij
+uitsluitend main, zonder automatische websitepublicatie. Dit is een expliciet
+integratiebesluit, geen Deep Green-verklaring of productie-/releasevrijgave.
+De bestaande beschermde PR-route en vereiste controles blijven ongewijzigd.
+
+De recentere main-bron 96c7d1a620fd360a2c36004f16275ed68d9fd40b wordt met
+een mergecommit behouden, inclusief de gepubliceerde prijsbeleidsbron en
+bijbehorende regressietoetsen. Afgeleide kaarten worden uit de gecombineerde
+bron herbouwd. MUTATIES.json behoudt de gemeten records uit beide takken,
+inclusief public-pricing.test.js; het samengevoegde register is geen nieuwe
+integrale mutatiemeting.
+
+De Pages-werkstroom is vooraf bij GitHub uitgeschakeld; er stonden geen
+lopende of wachtende Pages-runs. In de bron vervalt de main-pushtrigger.
+De publicatiejob eist voortaan zowel workflow_dispatch als refs/heads/main.
+De twee contracttoetsen in pages-publicatie.test.js falen op de oude
+werkstroom (2 rood) en slagen met deze begrenzing (2 groen). Handmatig
+publiceren blijft een afzonderlijk besluit; deze integratie start het niet.
+De hierboven genoemde open technische kwalificatiepunten blijven bestaan.

@@ -63,6 +63,7 @@
   footer:say('footer','Een omgeving rondom mensen.','An environment built around people.'),
   faq:say('faq','Wat wilt u weten?','What would you like to know?'),
   privacy:say('privacy','Privacy','Privacy'),terms:say('terms','Voorwaarden','Terms'),
+  existingTerms:say('existingTerms','Bestaande voorwaarden','Existing terms'),
   consent:say('consent','Uw toestemming','Your permission'),depart:say('depart','Vertrek in dit voorbeeld','Departure in this example'),
   optional:say('optional','U kiest zelf welke interesses u wilt meenemen.','You decide which interests to take with you.')
  };

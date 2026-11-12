@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-11-11T23:08:11.018Z",
-  "commit": "c4c453ab86",
+  "op": "2026-11-12T21:13:51.825Z",
+  "commit": "2018bdba80",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3458,6 +3458,7 @@
     "server/lib/idemsleutels-werelden.js",
     "server/lib/idemsleutels-zaakregie.js",
     "server/lib/idemsleutels.js",
+    "server/lib/immutable-json.js",
     "server/lib/jws.js",
     "server/lib/keten-anker.js",
     "server/lib/keten-verifieer.js",
@@ -4727,7 +4728,6 @@
     "server/betaal/connect",
     "server/betaal/uitbetaalgate.json",
     "server/config",
-    "server/data",
     "server/db",
     "server/db/tx",
     "server/foundation",
@@ -5991,10 +5991,10 @@
  "vergelekenMet": {
   "register": "SCHRIJFANALYSE.json",
   "stempel": {
-   "op": "2026-11-11T23:08:07.825Z",
-   "commit": "c4c453ab86",
+   "op": "2026-11-12T21:13:48.759Z",
+   "commit": "2018bdba80",
    "boomVuil": false,
-   "boomAnders": 23,
+   "boomAnders": 25,
    "instrument": "scripts/schrijfanalyse.js",
    "node": "v26.12.1"
   }
@@ -25781,13 +25781,13 @@
   {
    "route": "POST /api/office/bank/autoriseer/annuleer",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 83,
+   "regel": 84,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/bank/autoriseer/bevestig",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 78,
+   "regel": 79,
    "samengesteld": false
   },
   {
@@ -25799,7 +25799,7 @@
   {
    "route": "POST /api/office/bank/draai",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 70,
+   "regel": 71,
    "samengesteld": false
   },
   {
@@ -25847,7 +25847,7 @@
   {
    "route": "POST /api/office/bank/herstel",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 97,
+   "regel": 98,
    "samengesteld": false
   },
   {
@@ -25883,7 +25883,7 @@
   {
    "route": "POST /api/office/bank/instellingen",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 117,
+   "regel": 118,
    "samengesteld": false
   },
   {
@@ -25901,25 +25901,25 @@
   {
    "route": "POST /api/office/bank/leden",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 111,
+   "regel": 112,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/bank/mislukking",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 103,
+   "regel": 104,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/bank/modus",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 67,
+   "regel": 68,
    "samengesteld": false
   },
   {
    "route": "POST /api/office/bank/nood",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 91,
+   "regel": 92,
    "samengesteld": false
   },
   {
@@ -25949,7 +25949,7 @@
   {
    "route": "POST /api/office/bank/operationeel",
    "bestand": "server/routes/kantoren/bank.js",
-   "regel": 73,
+   "regel": 74,
    "samengesteld": false
   },
   {

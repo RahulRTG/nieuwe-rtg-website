@@ -3,27 +3,18 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-11-12",
-    "commit": "6bfa6b4528"
+    "commit": "2018bdba80"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-11-12",
-      "commit": "6bfa6b4528",
+      "commit": "2018bdba80",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
-        "boomVuil": true,
+        "boomVuil": false,
         "ongecommitteInvoer": [
-          "ROUTEBRON.json",
-          "public/site/passen/business-lite.html",
-          "public/site/passen/business-pass.html",
-          "public/site/passen/community.html",
-          "public/site/passen/lifestyle-pass.html",
-          "public/site/passen/rtg-pass.html",
-          "public/site/platform-app.js",
-          "public/site/platform-data.js",
-          "public/site/start/experience.js",
-          "public/site/website-truth.js"
+          "ROUTEBRON.json"
         ],
         "bestanden": [
           "ROUTEBRON.json",
@@ -2130,7 +2121,7 @@
     },
     "schermgedrag": {
       "op": "2026-11-12",
-      "commit": "6bfa6b4528"
+      "commit": "2018bdba80"
     }
   },
   "ruis": [

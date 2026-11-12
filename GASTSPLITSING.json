@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-11-11T23:08:26.091Z",
-    "commit": "c4c453ab86",
+    "op": "2026-11-12T21:14:10.849Z",
+    "commit": "2018bdba80",
     "boomVuil": false,
-    "boomAnders": 23,
+    "boomAnders": 25,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v26.12.1"
   },
@@ -99,7 +99,7 @@
       "zegt": null
     },
     {
-      "plek": "server/kern/lidacties.js:32",
+      "plek": "server/kern/lidacties.js:33",
       "soort": "vertakt",
       "zegt": null
     },

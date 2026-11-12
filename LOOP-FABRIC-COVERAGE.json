@@ -4593,7 +4593,6 @@
       "server/kern/auditboek/gebeurtenissen.js",
       "server/kern/bank/zakelijk.js",
       "server/kern/bankpositie.js",
-      "server/kern/bankregie/index.js",
       "server/kern/betaalopdracht/afstemming.js",
       "server/kern/betaalopdracht/index.js",
       "server/kern/betaalopdracht/inzending.js",
@@ -4796,10 +4795,12 @@
       "server/db/economische-identiteit.js",
       "server/db/geheugen.js",
       "server/db/keuze.js",
+      "server/db/opslag.js",
       "server/db/opslagfout.js",
       "server/db/postgres-verzoeken.js",
       "server/db/postgres.js",
       "server/db/resync.js",
+      "server/db/sqlite-checkpoint.js",
       "server/db/sqlite-duurzaam.js",
       "server/db/sqlite-poll.js",
       "server/db/sqlite-save.js",
@@ -6497,6 +6498,7 @@
       "server/kern/gegevensgesprek.js",
       "server/kern/gegevenspoort.js",
       "server/kern/geldbeleid/grens.js",
+      "server/kern/geldbeleid/index.js",
       "server/kern/geldwereld.js",
       "server/kern/gemeente/index.js",
       "server/kern/gemeente/info.js",
@@ -12021,7 +12023,7 @@
         "mutationRoutes": 61,
         "declaredMutationSemantics": 12,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2,
+        "kernelDependencyCount": 5,
         "screenCount": 8,
         "sourceFiles": [
           "server/routes/mobiliteit.js",
@@ -12031,7 +12033,10 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/leverancier/beschermdesoorten.js",
-          "server/kern/leverancier/logboekzicht.js"
+          "server/kern/leverancier/logboekzicht.js",
+          "server/kern/tijdzone-format.js",
+          "server/kern/tijdzone-instant.js",
+          "server/kern/tijdzone.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
@@ -12051,6 +12056,7 @@
           "booking",
           "transaction",
           "failure",
+          "event",
           "ai"
         ]
       },

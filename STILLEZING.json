@@ -3,10 +3,10 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-11-10T08:02:00.685Z",
-  "commit": "92e6d3d6fb",
+  "op": "2026-11-12T21:14:15.097Z",
+  "commit": "2018bdba80",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 25,
   "instrument": "scripts/stillezing.js",
   "node": "v26.12.1"
  },
@@ -22,12 +22,12 @@
   },
   "scripts": {
    "bewijslezingen": 185,
-   "metVanger": 107,
+   "metVanger": 108,
    "smeltSamen": 1,
    "zegtHet": 16,
    "onderscheidt": 8,
    "gooit": 61,
-   "anders": 21
+   "anders": 22
   }
  },
  "plekken": {
@@ -139,6 +139,14 @@
     "soort": "gooit"
    },
    {
+    "bestand": "scripts/afbouwoordeel.js",
+    "regel": 140,
+    "leest": [
+     "SUITE.json"
+    ],
+    "soort": "anders"
+   },
+   {
     "bestand": "scripts/bewijskosten.js",
     "regel": 193,
     "leest": [
@@ -213,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4850,
+    "regel": 4856,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5354,
+    "regel": 5360,
     "leest": [
      "APPWERKT.json",
      "MUTATIECONTRACT.json"
@@ -230,7 +238,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5625,
+    "regel": 5631,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -238,7 +246,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5801,
+    "regel": 5807,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -246,7 +254,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5814,
+    "regel": 5820,
     "leest": [
      "NORM.json"
     ],
@@ -254,7 +262,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 6029,
+    "regel": 6035,
     "leest": [
      "APPWERKT.json"
     ],
@@ -771,7 +779,7 @@
    },
    {
     "bestand": "scripts/outputcollect.js",
-    "regel": 122,
+    "regel": 111,
     "leest": [
      "routejournaal"
     ],

@@ -1,4 +1,27 @@
 'use strict';
+// One inventory for collection and planning; every CI shard must remain present.
+const requiredJournals = Object.freeze([
+  ...[1, 2, 3, 4].map(n => ({ artifact: 'routejournaal-scherf-' + n,
+    job: 'Toetsscherf ' + n + ' van 4', step: 'Deze scherf, met dekking als lcov',
+    upload: 'Het routejournaal van deze scherf bewaren', member: 'routejournaal.log', nonempty: true })),
+  ...['boot-smoke', 'grens-sweep', 'keuring', 'klok', 'meterijk', 'zaakdoos'].map(n => ({ artifact: 'routejournaal-ijking-' + n,
+    job: 'De ijking - ' + n, step: 'De ijking draaien (een bestand, alleen op deze machine)',
+    upload: 'Het routejournaal van deze ijking bewaren', member: 'routejournaal.log' })),
+  ...[1, 2, 3, 4, 5].map(n => ({ artifact: 'schermjournaal-deel-' + n,
+    job: 'Schermtoetsen deel ' + n + ' van 5', step: 'Scherm-tests (PDA in de browser)',
+    upload: 'Schermjournaal van dit deel bewaren', member: '.schermjournaal', nonempty: true }))
+].map(Object.freeze));
+function verifyJournalSources(sources) {
+  const expected = new Map(requiredJournals.map(row => [row.artifact, row]));
+  if (!Array.isArray(sources) || sources.length !== expected.size)
+    throw Error('All ' + expected.size + ' complete CI journals are required.');
+  for (const source of sources) {
+    const row = expected.get(source?.artifact);
+    if (!row || source.jobName !== row.job || source.testStep !== row.step || source.testConclusion !== 'success')
+      throw Error('CI journals must contain every required successful source exactly once.');
+    expected.delete(source.artifact);
+  }
+}
 // Preserve the exact API bytes for hashing; log consumers strip ANSI before parsing.
 function githubBytes(repository, endpoint, execute = require('node:child_process').execFileSync) {
   return execute('gh', ['api', 'repos/' + repository + endpoint, '--allow-escape-sequences'],
@@ -43,4 +66,4 @@ function verifyUpload(name, stepName, job, artifact, text) {
     completedAt: step.completed_at, finalizedAt: finalizations[0][1], artifactId: artifact.id,
     artifactName: name, artifactDigest: artifact.digest };
 }
-module.exports = { verifyUpload, githubBytes };
+module.exports = { verifyUpload, githubBytes, requiredJournals, verifyJournalSources };

@@ -16,7 +16,14 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const s = req.supplier;
   const en = req.body.lang === 'en';
   const nu = Date.now();
-  const tz = require('../../kern/tijdzone'), dag = iso => tz.omzetdagVan(s, iso) || ''; // omzetdag tot 05:00 (HORECA.md)
+  const tz = require('../../kern/tijdzone'), dagen = new Map();
+  // Dezelfde transactietijd komt terug in omzet, aantal en kassadag. Alleen
+  // binnen dit verzoek hergebruiken; zone en inhoud blijven per verzoek actueel.
+  const dag = iso => {
+    if (typeof iso !== 'string') return tz.omzetdagVan(s, iso) || '';
+    if (!dagen.has(iso)) dagen.set(iso, tz.omzetdagVan(s, iso) || '');
+    return dagen.get(iso);
+  }; // omzetdag tot 05:00 (HORECA.md)
   const vandaag = tz.omzetdag(s);
   // Niet elke betaalde boeking heeft een genest service-object: ticket-/verblijf-
   // boekingen (en direct gezaaide rijen) dragen alleen een `kind`. Nooit blind

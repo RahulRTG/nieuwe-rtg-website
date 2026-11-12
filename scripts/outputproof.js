@@ -4,6 +4,7 @@
 // source updates, Git writes, deployments or automatic debt adjudications.
 const fs = require('node:fs'), path = require('node:path');
 const S = require('./lib/outputshards');
+const { verifyJournalSources } = require('./lib/outputartifact');
 const tooling = path.resolve(__dirname, '..');
 function setup(candidate, sha) {
   candidate = fs.realpathSync(candidate);
@@ -19,8 +20,7 @@ function planRun(candidate, sha, journal, output) {
   const ctx = setup(candidate, sha), { op, B } = ctx;
   const binding = B.binding(journal), k = op.koppeling(journal), g = op.gevoeligheid();
   const provenance = S.read(journal + '.provenance.json');
-  if (provenance.sources?.length !== 14 || provenance.sources.some(s => s.testConclusion !== 'success'))
-    throw Error('All fourteen complete CI journals are required.');
+  verifyJournalSources(provenance.sources);
   const old = S.read(path.join(candidate, 'OUTPUTPROEF.json'));
   const thin = op.teDun({ routes: k?.perRoute.size || 0 }, old);
   if (thin) throw Error(thin);

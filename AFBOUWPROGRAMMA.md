@@ -6922,3 +6922,663 @@ stylesheets en het bestaande versiecontract; de volledige Edge-selectie
 sluit 31/31 groen. De oorspronkelijke prestatielatten blijven staan. De
 profileronde met p99 233 ms en event-loop 135,2 ms is diagnostiek, geen
 prestatievrijgave. Een nieuwe schone volledige kwalificatie blijft nodig.
+
+De daaropvolgende bronkandidaat is
+`5d400d11060b6336340b1605243f533e397332fd`. De nieuwe lokale IDOR- en
+rolronde vinden geen nieuwe lekken, verkeerde positieve antwoorden of
+rolmutaties; de rolronde voert 9.421 pogingen uit met alle acht fixtures
+geslaagd en nul onbesliste antwoorden. De liegronde sluit 114/114 bewezen.
+De bronregisterregressies sluiten 96/96 groen. De huiscontrole is groen nadat
+de eigen FUNCTIES-producent het werkelijke aantal toetsbestanden bijwerkt.
+Dit zijn deelresultaten: de volledige voltooiproef en uiteindelijke
+samengestelde kwalificatie zijn daarmee niet vervangen.
+
+De routedekking is afzonderlijk herleid uit de vijftien werkelijk uitgevoerde
+routejournaals van CI `43118242096`, op exact diens broncommit `b7f2fee`.
+Voor elk journaal zijn de GitHub-artifactbytes, digest, uploadstap en
+bronidentiteit gecontroleerd. De ongewijzigde dekkingsproducent meet daarmee
+5.573/5.573 routes, nul gaten; de actuele route-/FUNCTIES-regressies sluiten
+14/14 groen. Dit zijn uitsluitend routewaarnemingen uit een afgekeurde CI-run,
+geen bewijs dat de aangeraakte routes correct werkten. De mislukte unitdelen
+blijven mislukt; er is geen groen CI- of OUTPUT-bewijs van gemaakt. Het
+afzonderlijke waarnemingsdossier heet `COVERAGE-OBSERVATIONS-ONLY.json`, met
+`qualification: NOT_PASSED` en `outputProof: false`. De normale
+OUTPUT-collectiepoort is niet gewijzigd of omzeild.
+
+De niet-geprofileerde performanceronde `43123586093` op `5d400d` sluit de
+correctheidsstorm wel: 567 verhalen slagen, 8.164 verkeerde-rolpogingen leveren
+geen lekken of mutaties, geen server-5xx en geen onbereikte eindpunten. De
+gewijzigde alertteller verandert de stabiele bronstempel niet. De
+prestatievrijgave blijft echter rood: p99 is 144 ms bij een grens van 144 ms,
+maar de event-loop-p99 is 116,4 ms bij de oorspronkelijke grens van 64,8 ms.
+De bronoorzaak wordt gericht onderzocht in onnodig volledige opslag tijdens
+financiële bundels. Herstel mag de duurzame bevestiging, FULL-synchronisatie,
+idempotentie, herstel na crash of periodieke volledige veiligheidsopslag niet
+verzwakken. De norm krijgt geen ruimere prestatielat.
+
+De volledige voltooiproef op `5d400d` eindigt vervolgens groen: 114 onderdelen,
+342/342 gesloten bewijzen voor voltooibaarheid, persistentie en herstel, plus
+114/114 gesloten antwoord-/schermbewijzen. De 107 expliciet aanwezige
+bevoegdheidsketens sluiten; de overige zeven claimen dat afzonderlijke bewijs
+niet. De brede IDOR-/rolbewijzen blijven daarvan onderscheiden.
+
+De twee nieuwe daggrenstoetsen zijn bovendien met de bestaande mutatiemotor
+gemeten in een onafhankelijke schone checkout op exact `5d400d`. Het opnieuw
+inbrengen van de oude UTC-fout laat beide toetsen op hun specifieke
+inhoudsasserties zakken; de nulproeven en herproeven zijn groen zonder skips.
+MUTATIES bevat de daadwerkelijk geproduceerde, hashgebonden rijen. De interne
+signaalbronfunctie heet nu `signalenBronVan`, zodat zij niet ten onrechte
+dezelfde generieke naam draagt als leeftijds- en factuurherkomstfuncties.
+De gerichte signaal-/rolgroep blijft 47/47 groen. Geen normgrens is aangepast.
+
+De opslagverkenning verwerpt twee te brede optimalisaties vóór integratie.
+Een uitsluitend op betaalwaarheid/inbox gerichte save verliest het al
+verrekende oude puntentegoed bij de duurzame betaalcommit: de echte SQLite-
+proef ziet 500 cent op schijf in plaats van nul, bij bestellen én ritten.
+Het behouden van de bestaande brede betaalwaarheid herstelt beide proeven.
+Ook globale Trust-scoping is niet overgenomen: consent en Vonk hebben nog
+impliciete domeinschrijvingen vóór hun Trust-save. De review vond daar een
+nieuw crashvenster; dit is bronanalyse, geen uitgevoerde consent-crashproef.
+De brede betaalwaarheid- en Trust-opslag blijven daarom ongewijzigd.
+
+Wel geïntegreerd op `14cc3f9aab`: de reeds opgeslagen betaalde rit gebruikt
+de bestaande `naOpslag`-meldingsingang, net als een betaalde bestelling.
+Een echte SQLite-regressie toont vóór de fix een onnodige tweede brede save;
+na de fix slagen 42/42 selectieve-opslagproeven, inclusief punten, retry,
+meldingscommitfailure en geen publicatie na die fout. Deze kleine winst
+vervangt geen nieuwe performancekwalificatie; de prestatienorm blijft open.
+
+Op diezelfde bronkandidaat sluiten de nieuwe volledige voltooiproef
+(342/342 kernbewijzen), liegronde en bevoegdheidsronde (ieder 114/114),
+IDOR-/rolronde, 96 registerregressies en 125 financiële regressies groen.
+De huiscontrole en bronratels zijn groen zonder wijziging van NORM.json.
+Dit vervangt de nog te vernieuwen samengestelde softwarekwalificatie niet.
+
+De niet-geprofileerde performanceronde `43131252815` op exact `14cc3f9aab`
+is afgekeurd: p99 233 ms bij de oorspronkelijke grens 144 ms en
+event-loop-p99 139 ms bij 64,8 ms. De correctheidsstorm kent geen
+server-5xx, onbereikte eindpunten of mislukte verhalen. Ook de kalibratie
+is niet vergelijkbaar (9,5 ms tegenover 13,3 ms); deze ronde bewijst dus
+geen prestatieverbetering of -verslechtering door de kleine ritwijziging.
+Het oorspronkelijke artifact `13905827378` is gecontroleerd op SHA-256
+`2fdc6f66ab1de235f68e554185b75e5d2824ea13f55700073d811c50c704f2d4`.
+De kandidaat is daarmee nadrukkelijk nog niet technisch volledig groen.
+
+Een afzonderlijke synthetische SQLite-verkenning met FULL-synchronisatie
+vond geen winst door de auto-checkpointgrens van 1.000 naar 2.048 of 4.096
+pagina's te verhogen: commitvertraging en WAL-piek namen juist toe. Dat is
+diagnostiek, geen appkwalificatie. De opslaginstellingen blijven ongewijzigd.
+
+Brondelta `1e57a34b09` vermindert vervolgens uitsluitend onnodig lezen: de
+gewone SQLite-save haalt eerst versie en grafsteen op en leest de oude
+payload alleen bij een nieuwere externe collectieversie. Beide lezingen
+blijven onder hetzelfde bestaande schrijfslot. Geen opslagscope, volledige
+veiligheidsscan, merge, FULL-synchronisatie of commitgrens is versmald.
+De negen nieuwe echte SQLite-proeven tonen vóór de wijziging zes specifieke
+mislukkingen en daarna negen successen. NORMAL én FULL, externe merges,
+grafstenen, metadata-/payloadleesfouten, commitfouten en retry zijn afgedekt;
+de onafhankelijke controle ziet bij eigen writes nul oude payloadbytes.
+De brede opslag-/crashregressiegroep sluit 115/115 groen, zonder skips, ook
+na overname in de hoofdwerkkopie. Dit is geen bewijs van de volledige
+prestatienorm. De lopende APPWERKT-ronde op de vorige bron is bewust
+afgebroken en levert geen eindbewijs; de nieuwe bron vereist nieuwe rondes.
+
+### Technische vervolgronde 12 november 2026
+
+De opdracht is verduidelijkt: volledig technisch groen en gereedmaken voor
+uitrol; geen productie-uitrol, ondertekening of menselijke acceptatie namens
+de gebruiker. De prestatienormen blijven ongewijzigd.
+
+De bron `768d516cc9` bindt alle vijftien verplichte CI-journalen en hergebruikt
+omzetdagberekeningen uitsluitend binnen één backofficeverzoek. De gerichte
+broncontrole sluit 89/89 groen; de voorgeschreven Rust 1.97.1 sluit 99/99
+groen. De on-geprofileerde performanceronde `43141943491` is desondanks
+BLOCKED: p99 144 ms, event-loop-p99 110,8 ms en geheugenhelling 4 MB/min.
+De hardware en kalibratie zijn vergelijkbaar; correctheid, dekking en
+herstel slagen. Artifact `13910626753` heeft gecontroleerde SHA-256
+`6d11981cdcf5797a26e6e2c219d6d9dcb9605bf1500351e2c20f8ab8a68700d8`.
+Deze meting is geen technisch-groene vrijgave.
+
+De volledige lokale testsuite op `768d516cc9` eindigt op 21.870 geslaagd,
+2 mislukt, nul afgebroken en nul overgeslagen; daarnaast slagen alle 57
+PostgreSQL-testbestanden. De twee oorzaken zijn een verouderd regeladres in
+STILLEZING.json en een ontbrekende redis-cli. De registergenerator is opnieuw
+uitgevoerd; de officiële Redis 7.4.11-client is lokaal gebouwd, na controle
+van de gepubliceerde bronchecksum. De launcher toetst voortaan vooraf zowel
+redis-server als redis-cli. De betreffende regressiegroep sluit daarna
+10/10 groen. Dit maakt de eerdere volledige ronde niet achteraf groen.
+
+Brondelta `b0bb9a0d57` bevat drie begrensde optimalisaties: niet-gebruikte
+lengtemetadata niet berekenen, gecomprimeerde auditpagina's in een buffer
+met exacte capaciteit bewaren, en de lokale opslag ná een order-/ritbetaling
+beperken tot de eigen transactie en punten. De brede financiële en Trust-
+commits, synchronisatie, serialisatie, retentie en betaalgrenzen zijn niet
+versmald. De nieuwe gerichte negatieve proeven falen op de oude code en
+slagen op de reparatie. Na integratie sluiten 253 opslag-, audit-, betaal-
+en crashregressies groen, zonder skips.
+
+Vier echte SQLite/autolaad/SIGKILL/herstartproeven stoppen direct na de
+lokale betaalcommit, met nul of 500 cent oud tegoed, voor zowel order als
+rit. Een tweede verbinding controleert bovendien de eerdere financiële
+FULL-commit. Herhaling boekt geld of punten niet opnieuw; een dubbele
+webhook levert één ontvangst op. Dit bewijst geld- en toestandsbehoud,
+NIET volledig herstel van factuur, keuken en meldingen na die crashgrens.
+Die naverwerking ligt ná de kill; herstel daarvan is nog niet bewezen.
+Aanvullend brononderzoek vindt een bestaand herstelgat: de betaalhandlers
+weigeren een reeds betaalde of financieel herhaalde poging vóór factuur,
+voorraad en leveranciersmelding. De opstartronde van BetaalWaarheid herstelt
+deze lokale gevolgen niet. Een afzonderlijke negatieve crashproef op een
+ongewijzigde `b0bb9a0d57`-bronkopie bevestigt ook het eerdere venster: echte
+Pay/Trust/SQLite, FULL-commit waargenomen op een tweede verbinding, SIGKILL
+direct na Pay-retour, nieuw proces en uitsluitend de lid-handler herhaald.
+Alle vier varianten (order/rit, nul/500 cent oud tegoed) falen op dezelfde
+gewenste herstelassertie: de zaak heeft 2.000 cent, maar `paid` blijft false
+en verdiende punten blijven nul. Zonder oud tegoed antwoordt de retry
+"Al betaald"; met oud tegoed botst de opnieuw berekende betaalafdruk.
+Geld, idempotentiesleutels en economische opladingsontvangst veranderen niet
+opnieuw. De vier eerdere lokale-commitproeven slagen in dezelfde reeks.
+Het log is `validation/payment-recovery-b0bb/pay-boundary-1794470236207.tap`
+in de consolidatiewerkruimte. De negatieve proeven staan nog uitsluitend in
+de tijdelijke proefkopie, niet als schijnbaar groene integratietoets.
+Dit is geen nieuw
+tekort door de opslagoptimalisatie, maar wel een open technische blokkade;
+ongecontroleerd opnieuw aanroepen kan dubbele facturen of voorraadmutaties
+maken en is dus geen hersteloplossing.
+
+Een afzonderlijke synthetische auditproef meet bij 50.000 rijen dezelfde
+85.020 gecomprimeerde inhoudsbytes, maar 85.020 in plaats van 25.584.000
+vastgehouden backing-bytes. Oude snapshots en rij-identiteit blijven intact.
+Dit betreft sterk comprimeerbare proefdata en externe buffercapaciteit;
+de vrijwel gelijke JS-heap sluit geen geheugenhelling- of prestatienorm.
+De niet-geprofileerde performanceronde op `b0bb9a0d57` (`43172045340`) is
+BLOCKED: p99 233 ms tegenover het oorspronkelijke doel 144 ms, en
+event-loop-p99 128,8 ms tegenover 64,8 ms. De geheugenhelling is 0 MB/min,
+ook in de stille meting; 784/784 goede verhalen slagen, 4.689 endpoints
+zijn bereikt, onverwachte 5xx zijn nul en herstel duurt één seconde.
+De hardwareklasse en kalibratie zijn vergelijkbaar (9,6 tegenover 13,3 ms,
+binnen de bestaande factor 1,4). Artifact `13922723272` heeft gecontroleerde
+SHA-256 `638114464c0d4f995543964b11a370003f284448d5f9605b02ff36ea75036460`.
+Doorvoer, kalibratie en werklast verschillen van de vorige ronde: deze
+uitslagen bewijzen geen oorzakelijk prestatie-effect van één optimalisatie.
+De kandidaat is niet technisch groen.
+
+Op dezelfde bron slagen de 96 registerregressies, IDOR zonder doorbraak of
+veldlek, de rolproef zonder onterechte 2xx of blijvende mutatie, en de
+liegronde voor alle 114 onderdelen. Dit vervangt de nog uit te voeren
+integrale software-, browser- en releasekwalificatie niet.
+
+Brondelta `997452cb90` hergebruikt de native JSON-fragmenten van nieuw
+aangemaakte, transitief bevroren Trust-records. Alleen de twee bestaande
+record-eigenaren certificeren; geladen JSON blijft veranderlijk en wordt
+nooit vanzelf gecertificeerd. De cache is aan exacte objectidentiteit
+gebonden via WeakMap. Onbekende vormen, getters, foreign of geneste
+trackerproxies, toJSON, rawJSON, boxed primitives, cycli en budgetoverschrijding
+vallen terug op native serialisatie van de oorspronkelijke root. De mutable
+containers worden elke keer gelezen; er verandert geen save-scope, norm,
+retentie, encryptie, FULL-sync of commitgrens.
+
+De extra echte SQLite-proeven vonden daarnaast een bestaand RAM-rollbackgat:
+store en standalone ledger vergeleken een teruggelezen trackerproxy met de
+ongewikkelde input, zodat hun eigen record bij een savefout achterbleef.
+Zij onthouden nu de zichtbare toegepaste identiteit. Een vervangend record
+of een nieuwere ledgerstaart wordt niet verwijderd. De negatieve proef
+faalde aantoonbaar voor de reparatie; een los RAM-experiment op `b0bb9a0d57`
+bevestigde hetzelfde bestaande gedrag. Ook een echte coordinator-COMMITfout
+herstelt nu de oorspronkelijke RAM- en schijftoestand en laat de incidentpoort
+dicht. Op de geïntegreerde bron slagen 133 Trust-/opslagregressies en de
+afzonderlijke brede groep van 253 financiële, audit- en crashregressies,
+zonder skips. Overlap tussen beide groepen wordt niet als unieke dekking geteld.
+De logs staan in `validation/trust-json-997452` in de consolidatiewerkruimte.
+
+De lokale synthetische proef met echte Trust-schrijvers meet bij 2.000 records
+dezelfde 3.124.496 JSON-tekens: native 4,99–5,18 ms per opbouw en hergebruik
+2,16–2,59 ms, in vier afwisselende rondes. Dit is geen storm- of p99-bewijs.
+Een aanvullende onafhankelijke geladen-stateproef meet juist circa 0,07 ms
+extra fallbackwerk; een heap-proef houdt bij 2.000 levende records circa
+1,55 MiB extra fragmenten vast. Na loslaten van de eigenaar zijn nul van
+2.000 WeakRefs nog levend. Dit zijn beperkte lokale proeven, geen bewijs
+dat de platform-geheugennorm is gehaald. De on-geprofileerde performanceronde
+`43187264502` op exact `997452cb90481592f3e81bf6cb14d32fd962b5a1` is BLOCKED:
+p99 is 144 ms (het oorspronkelijke doel gehaald), event-loop-p99 113,8 ms
+(doel 64,8, norm 97,9) en geheugenhelling 4 MB/min (norm 0), stil 0.
+Alle 588 goede verhalen slagen, 4.689 endpoints zijn bereikt en onverwachte
+5xx zijn nul. Artifact `13929742024` heeft gecontroleerde SHA-256
+`b742411ee680df90535836bfc7c23b9e7b8d57a7db65157038053d61f7975485`.
+De heapvloeren zijn afgerond 224, 224 en 225 MiB; één MiB in het laatste
+interval van 15 seconden geeft 4 MiB/min. Dit bewijst geen cachelek en maakt
+de norm evenmin groen. Hardwareklasse en kalibratie voldoen aan de gate,
+maar CPU-model, doorvoer en afgehandeld werk verschillen van de vorige ronde:
+er is geen gecontroleerde A/B en geen causale platformwinst toegekend.
+
+Een kleine vervolgreparatie bewaart bij certificering alleen een koud
+WeakMap-certificaat. Pas de eerste echte SQLite-serialisatie materialiseert
+het native fragment; andere opslagmotoren krijgen geen ongebruikte tekst.
+De negatieve proef faalt vóór de wijziging op één ongewenste JSON-aanroep;
+erna slagen 31 gerichte en de omvattende 135 Trust-/opslagregressies, zonder
+skips. Prototypewijzigingen en volledige fallback behouden native effecten.
+De lokale synthetische proef met 2.000 records meet 10,74 ms eerste opslag
+en 2,24–2,39 ms hergebruik tegenover 5,05–5,23 ms native. Eerste-gebruikskosten
+zijn dus zichtbaar, niet weggeboekt; dit is nog geen nieuwe stormkwalificatie.
+
+Deze vervolgreparatie staat op `626c5c1ce7cc097398a56262463f254fda5667b0`.
+Op exact die bron slagen 135 Trust-/opslagregressies, de afzonderlijke groep
+van 253 financiële/audit/crashregressies en 96 registerregressies, zonder
+skips. Vijf gerichte bronmutaties zijn elk daadwerkelijk door een assertie
+ontdekt, met groene baseline en herstelproef; de motor heeft de meting zelf
+vastgelegd. De statische controle en aantalsnormcontrole slagen na verse
+bronregistratie. De prestatienormen zijn daarmee NIET bewezen: de lokale
+normcontrole slaat de oude, niet-vergelijkbare Mac-meting terecht over.
+De ongeprofileerde Linux-belastingronde `43190997374` op dezelfde bron is
+BLOCKED op alleen de event-loop: p99 144 ms, event-loop-p99 109,2 ms,
+geheugenhelling 0 MB/min en stil 0, herstel één seconde. De duur is 186,8 s,
+4.689 endpoints zijn bereikt, onverwachte 5xx zijn nul en alle goede verhalen
+slagen. Hardware/kalibratie zijn vergelijkbaar volgens de bestaande gate
+(4k/17g/Linux/SQLite, 12,4 tegenover 13,3 ms). Artifact `13930024869` heeft
+gecontroleerde SHA-256
+`025198fa829a2c282ecc9cd651164ae66553fd40e4b86b17d2f558f1ad196ce6`.
+Dit is geen causale A/B-winsttoekenning. Alle 57 PostgreSQL-testbestanden
+slagen daarnaast op deze bron. De volledige lokale suite is opnieuw gestart;
+profielronde `43191767606` dient uitsluitend om resterende kosten te vinden,
+nooit om een prestatienorm groen te verklaren.
+Logs en mutatiebewijs staan in `validation/trust-json-626c5c` in de
+consolidatiewerkruimte. De betaalherstelblokkade blijft afzonderlijk open.
+
+De volledige suite op `626c5c1ce7` is afgerond: 22.082 van 22.087 toetsen
+slagen, vijf falen, nul overgeslagen of geannuleerd; alle 57 PostgreSQL-
+testbestanden slagen ook binnen deze ronde. De vijf fouten komen uit
+`ritreferentie.test.js`: de eigen, volledig vervangende SQLite-fixture mist
+`punten`, terwijl zij de puntenlogica dubbelt en de strikte ruwe save aan
+de ritmodule geeft. Productie initialiseert deze collectie en gebruikt de
+lid-save-adapter. De fixture krijgt daarom uitsluitend lokaal `punten: {}`;
+opslagguards en productiecode worden niet versoepeld. De negatieve proef
+faalt vijfmaal vóór die reparatie; erna slagen alle zes ritreferentietests.
+Dit maakt de eerdere volledige ronde niet achteraf groen.
+
+Brondelta `e49a5371adbe3c3db9df86dca2dc8b299a40c170` bevat die fixture-
+reparatie en verfijnt alleen de optionele testprofiler met seriële kosten per
+collectienaam (aantal, totale/maximale duur en tekentelling, geen inhoud).
+Drie echte regressies bewaken de uitschakeling buiten expliciete teststand,
+antwoord/fout/this/argumentbehoud, vensterreset en begrensde rapportage.
+Negen gerichte profiler-/rittests slagen. Zeven kandidaatgebonden
+bronmutaties zijn elk daadwerkelijk ontdekt en na herstel weer groen.
+Profielronde `43202030269` is diagnostisch; zij kan geen prestatienorm sluiten.
+
+Een afgescheiden callback-prototype op een b0bb-bronkopie is afgewezen.
+De gewone weg zet geld, ontvangst en een lokale betaalmarker samen weg,
+maar een synchrone afrondingsfout geeft 503 terwijl een onafhankelijke
+SQLite-verbinding 2.000 cent bij de zaak, `paid: false` en geen ontvangst
+ziet. `bijeen` flusht immers ook na een worp. Het log
+`validation/payment-recovery-b0bb/callback-prototype-1794479883412.tap`
+is permanent bewaard in de consolidatiewerkruimte. De prototypewijzigingen
+staan uitsluitend in de tijdelijke kopie; de hoofdbron heeft deze onveilige
+callback niet gekregen. Er is nog geen dynamisch bewezen betaalherstel.
+
+### 12 november, vervolg: factuurkopie, volledige suite en WAL-barrière
+
+`22c2ce7491a8e0d12760143f5633e7535ee1b254` voorkomt de overbodige
+`facturen.slice()` na iedere factuur. Onder de grens blijven de oorspronkelijke
+opslagobjecten behouden; boven 100.000 blijft de bestaande wortelvervanging
+voor de begrotingscontrole intact. De negatieve proef vond eerst 50 proxies
+in de ruwe opslagarray en daarna nul. Vier opslagvormproeven en 72 gerichte
+factuur-/begrotingsregressies slagen. Acht gerichte bronmutaties zijn ontdekt.
+De lokale seriële microproef is alleen diagnose, geen platformwinstclaim.
+
+De volledige suite op exact `22c2ce7` is op 12 november van 11:21:24 tot
+12:23:24 UTC uitgevoerd: **22.094 van 22.094 toetsen geslaagd**, nul fouten,
+skips of annuleringen, 2.767 bestanden. Alle 57 PostgreSQL-testbestanden
+slagen binnen dezelfde ronde. Het SUITE-register en de oorspronkelijke logs
+zijn bewaard in `validation/suite-22c2ce` in de consolidatiewerkruimte.
+Het gebonden PG-bewijs heeft SHA-256
+`fd73abf1cc561b509a6b911c3353d74c220c702340106c17526203d0eac4172a`.
+Dit resultaat geldt voor die bron, niet automatisch voor latere wijzigingen.
+
+De ongeprofileerde Linux-ronde `43205992009` op dezelfde bron blijft BLOCKED:
+p99 144 ms, event-loop-p99 110 ms (norm 97,9; doel 64,8), geheugenhelling nul,
+stil nul en herstel één seconde. Alle 4.689 endpoints zijn bereikt, alle goede
+verhalen slagen en onverwachte 5xx zijn nul. De kalibratie is vergelijkbaar
+volgens de bestaande gate. Artifact `13940475121` heeft gecontroleerde SHA-256
+`453efb4d24b4177c2b8d5825737e81e121edd34ce6851ea086c388bd27f43e3a`.
+
+Een begrensde vervolgreparatie op `99356a0f4b5cb3bb1bb290a13e5d22623babccde`
+gebruikt uitsluitend voor de duurzame netto-noop een FULL-checkpoint. De
+schrijvende FULL-COMMIT, verificatie van volledige checkpointuitkomst en het
+herstel van de synchronisatiestand blijven gelijk. Backup en afsluiten blijven
+TRUNCATE gebruiken. Een actuele actieve WAL-lezer hoeft voor bevestiging niet
+weg; een oude snapshot blijft fail-closed. Dit volgt de FULL/TRUNCATE-grens in
+de SQLite-documentatie: https://sqlite.org/pragma.html#pragma_wal_checkpoint.
+De echte negatieve lezerproef faalt eerst; daarna slagen 45 relevante
+duurzaamheids-, procescrash- en herstartproeven. Met de nieuwe optionele
+profilerproeven erbij slagen op de geïntegreerde bron 53 toetsen zonder skips.
+Er is geen claim dat een fysieke stroomuitval is getest.
+
+Vier lokale AB/BA-vergelijkingen met elk 64 gemeten synthetische cycli laten
+lagere medianen met FULL zien (13,77–15,89 ms tegenover 17,10–18,95 ms).
+De hoofdsuite draaide tegelijk; uitschieters zijn niet causaal toegeschreven.
+Het WAL-bestand bleef groter voor hergebruik: 8.207.072 tegenover 4.202.432
+bytes piek. Dit is geen prestatienormbewijs en geen absolute WAL-groottegrens.
+Script, beperkte samenvatting en testlogs staan in
+`validation/sqlite-noop-barrier` in de consolidatiewerkruimte.
+
+De optionele testprofiler onderscheidt nu BEGIN, COMMIT, rollback, checkpoint
+en bekende KV-schrijvers, met maximaal zestien anonieme verbindinglabels en
+een restcategorie. Hij bewaart geen SQL-inhoud, parameters of payloads.
+`storedChars` telt aangeboden tekst, niet fysieke diskbytes. Inspector- en
+schrijffouten herstellen de hooks en stoppen de meettimers; acht gerichte
+proeven slagen. Instrumentatie blijft uitsluitend diagnostisch.
+`ba4a58ff8ca9a04d09ffbcb20423c57a6ffb737e` voegt alleen de reden voor de nieuwe
+duurzaamheidstest toe aan de bestaande statische huisregel. De volgende
+Linux-rondes moeten de event-loopgrens nog daadwerkelijk beoordelen.
+
+Het afzonderlijke betaalherstelprototype is niet geïntegreerd. Acht SQLite-
+proeven, acht requestcontextproeven en acht PG-testnodes voor zeven scenario's
+bewijzen deelgrenzen, inclusief echte COMMIT, verloren bevestiging, behoud van
+remote_apply en weigering van een als onveilig gerapporteerde fsync-stand.
+Drie aanvullende echte PG-races falen echter alle drie: nieuwe request- of
+gedeelde wijzigingen verdwijnen tijdens SQL of na COMMIT vóór publicatie,
+terwijl het prototype succes teruggeeft. Het log staat in
+`validation/payment-storage-prototype/collectie-pgrace-1794485211331.tap`.
+Dit blokkeert gebruik als betaalafronding. Een oude ontvangst bevat bovendien
+niet beide geldbewegingidentiteiten en geen oorspronkelijke intentiebinding.
+De open betaalherstelblokkade wordt niet gesloten door de groene hoofdsuite.
+
+### 12 november, vervolg: gemeten COMMIT-kosten en beveiligingslog in rijen
+
+Op `ba4a58f` slagen 253 kandidaatregressies, 96 registertests, tien gerichte
+bronmutaties, de huisregels en de aantalsnormen. De ongeprofileerde Linux-ronde
+`43218091311` blijft echter BLOCKED: p99 233 ms (schuldendoel 144), event-loop
+p99 124,9 ms (norm 97,9) en geheugenhelling 4 MB/min (norm nul). Alle 4.689
+endpoints zijn bereikt, alle goede verhalen slagen en onverwachte 5xx zijn nul.
+Kalibratie 13,1 tegenover 13,3 ms is volgens de bestaande gate vergelijkbaar.
+Artifact `13945102605` heeft gecontroleerde SHA-256
+`9886f4df366ad9187f48e31008bedd9372f81893a03ac583a3eec021ffd16a11`.
+De geheugenhelling in rust is -4 MB/min; dit bewijst nog geen duurzame lekfix.
+
+Diagnoseronde `43217809891` op `99356a0` onderscheidt de opslagfasen.
+In vijf volledige stormvensters duren 33.171 COMMIT-aanroepen samen 29.864,844
+ms, met maximum 459,677 ms; BEGIN kost samen 298,002 ms. De 242 expliciete
+FULL-checkpoints kosten 3.002,860 ms. COMMIT omvat ook goedkope leestransacties;
+de profiler onderscheidt interne fsync en automatisch checkpoint niet.
+Van 2.048.182.403 aangeboden KV-tekens zijn 489.884.519 (23,9%) voor securityLog,
+verspreid over 2.107 writes. Dit is aangeboden tekst, geen gemeten diskbytes.
+Artifact `13945580613` heeft gecontroleerde SHA-256
+`43c00ac8e892c74f82e99ac613b9dabd1c911ba6b006538396d69ecdaf1ca873`.
+
+Daarom sluit securityLog nu in SQLite aan op de bestaande auditrijeigenaar:
+dezelfde velden, hashketen, oudste-eerst fysieke opslag/nieuwste-eerst projectie,
+5000-regelgrens, versleuteling en synchrone commitgrens. Alleen de eerste
+schrijfactie migreert; lezen schept geen log. Een beschadigde migratiebron of
+nog openstaande lokale vervanging/verwijdering weigert vóór de migratie.
+Een pure duurzame auditbundel neemt haar collectienamen mee naar de bestaande
+scopecontrole, zonder die controle af te zwakken. Lijst en keten blijven buiten
+bundels hetzelfde snapshot lezen; binnen de bundel ziet de eigenaar de preview.
+
+De negatieve proef faalt eerst op zes van zeven nieuwe scenario's, inclusief
+bulkserialisatie, een ongecommitteerde RAM-regel en verlies bij twee schrijvers.
+Een aanvullende negatieve migratieproef vindt daarna de lokale-vervangingsgrens.
+Na herstel slagen in de afgescheiden bronkopie 135 gerichte audit-, inlog-,
+retentie-, herstart- en regressietests. Dit is nog geen eindkwalificatie of
+bewijs van prestatiewinst op de geïntegreerde kandidaat.
+
+Uitrolvoorwaarde: geen gemengde oude en nieuwe schrijvers op deze rijopslag.
+Een downgrade vereist gestopte schrijvers en de **nieuwe**
+`scripts/audit-sqlite-rollback.js` om de rijen eerst naar de oude KV-vorm terug
+te materialiseren. De synthetische nieuw-oud-nieuw-proef behoudt alle regels
+en ketenbindingen. Er is geen productieopslag gemigreerd of release uitgerold.
+
+Het afzonderlijke betaalontvangstprototype slaagt nu voor twaalf proeven,
+waaronder echte kill/herstart voor order en rit met en zonder oud tegoed.
+De v2-ontvangst bindt intentie-ID, eigenaar, collectie en beide geldbeweging-ID's.
+Legacy/onvolledige ontvangsten worden niet als v2-bewijs herhaald. Dit is geen
+volledig herstel: paid/punten worden in die proef bewust nog niet afgerond.
+De volledige oorspronkelijke intentie, autoritatieve historische dekking,
+PostgreSQL-requestcommit en veilige late publicatie blijven open. De drie
+eerder gevonden PG-races zijn niet gerepareerd of in de hoofdbron geïntegreerd.
+
+### 12 november, vervolg: geïntegreerd rijbewijs, backup en late PG-publicatie
+
+Op `84989f4e3faecb9f85689dbcceac0c8ebef792b0` slagen 152 auditregressies,
+253 betaal-/opslagregressies, 96 registertests en elf gerichte bronmutaties.
+De mutaties zijn ontdekt en de bron is hersteld; de aantalsnorm is ongewijzigd.
+De huisregel vond de ontbrekende reden voor de nieuwe duurzame auditbundeltest.
+`c9f3de70464775568d152092bded86d1333338ff` voegt alleen die testregistratie toe.
+
+`750288145b5982ec17618fd091f7ddabbc6fbf58` voegt twee echte versleutelde
+backup/herstelproeven toe: normale TRUNCATE en een actieve oude WAL-lezer.
+De productiebackupfabriek kopieert de rijtabellen; een nieuw proces op een
+andere datamap behoudt alle regels, ketenkop en encryptie, en sluit de volgende
+login aan met precies het volgende volgnummer. De tweede proef bevestigt dat
+de meegekopieerde WAL echt nodig is; de eerste bevestigt een lege WAL.
+De twee proeven plus Experience- en stille-lezingregressies slagen 26/26.
+
+De eerste volledige ronde op c9f3de is bewust ABORTED, niet groen: na de
+regeltoevoeging liepen alleen de Experience-bronhash en de catch-regeladressen
+in STILLEZING achter. De gecontroleerde procesgroep is gestopt en leeg bevonden.
+Alle 27 bronregistergeneratoren zijn op 750288 opnieuw uitgevoerd; de
+ongewijzigde negatieve registertests en de huisregels slagen daarna.
+De nieuwe volledige ronde begon om 13:39:33 UTC op exact 750288. Haar uitslag
+moet nog worden afgewacht; het eerdere SUITE-bewijs op 22c2ce kwalificeert
+deze bron niet automatisch.
+
+De ongeprofileerde Linux-ronde `43224158065` op 84989f blijft BLOCKED:
+p99 233 ms (schuldendoel 144), event-loop-p99 130,9 ms (norm 97,9; doel 64,8),
+doorvoer 517/s, geheugenhelling en rusthelling nul, herstel één seconde.
+Alle 4.689 endpoints zijn bereikt, alle goede verhalen slagen en onverwachte
+5xx zijn nul. Kalibratie 10,9 versus 13,3 ms is volgens de bestaande gate
+vergelijkbaar. Artifact `13948441113` heeft gecontroleerde SHA-256
+`820234586fc249e130e4647b5fb04fd3dbbec057f7f5af658fd19e8a344c26c3`.
+Een hogere doorvoer is nog geen gesloten latentieblokkade.
+
+Diagnoseronde `43226881361` op c9f3de heeft artifact `13949081491`, SHA-256
+`16a5236addb44520e80f3ce18a669d9999dcb438080d6f3633739f3759d31535`.
+In vijf volledige stormvensters (13:24:48.230–13:27:18.388 UTC) verdwijnen
+de securityLog-KV-writes geheel. 33.424 COMMITs kosten samen 7.162,7 ms,
+maximum 18,0 ms; 287 FULL-checkpoints samen 796,2 ms, maximum 10,0 ms.
+Alle aangeboden KV-tekens samen zijn 1.540.193.747. De serializer blijft een
+hotspot: 17.925,2 ms sampled leaf-tijd; volledige saves bereiken 144,3 ms
+(labfonds/stem) en 111,5 ms (order/pay). Dit is geen gecontroleerde A/B:
+kalibratie verschilt, de profiler heeft overhead en de event-loopmeter gebruikt
+een cumulatief histogram, ook terwijl profieluitvoer buiten de CPU-vensters
+wordt geschreven. De volgende diagnose moet kosten per afzonderlijke lange
+save correleren, niet op basis hiervan de checkpointbelofte verlagen.
+
+Het afzonderlijke vaste-basis-PG-prototype bewaakt nu vóór callback, vóór
+COMMIT en vóór publicatie de oorspronkelijke requestcontext, gedeelde wortel,
+collectie-inhoud en cacheversies. Negen echte race-/vervolgopslagproeven slagen,
+waaronder gesloten requestcontext, late wortelvervanging, rollback vóór COMMIT
+en bekend gecommitteerd conflict zonder schijnsucces. Een vaste transactie
+verbergt latere gewone requestwrites niet meer achter eigenCommit. De bestaande
+acht PG-testnodes, acht contextproeven en acht SQLite-proeven blijven groen.
+Deze code staat uitsluitend in de geïsoleerde prototypekopie: zware resync,
+reëntrante publicatie, volledige betaalintentie en historische ontvangstdekking
+zijn daarmee niet gesloten. Er is nog geen geïntegreerd automatisch betaalherstel.
+
+### 12 november, vervolg: negatieve test gerepareerd en opslagkosten gecorreleerd
+
+De volledige ronde op 750288 eindigde om 14:39:14 UTC: 22.116 van 22.117
+tests geslaagd, één mislukt, nul overgeslagen/geannuleerd; 2.771 bestanden,
+inclusief alle 57 PostgreSQL-bestanden. Het gebonden PG-bewijs heeft SHA-256
+`9111d9bfc6bed74b238ae7da94fa3f804cea2eb363d40aa0ce3d54c2822fe518`.
+Dit is ROOD en blijft zo bewaard. De fout zat in de negatieve SUITE-controle:
+zij zette een al groene opgeslagen ronde opnieuw op groen en verwachtte dat
+die ongewijzigde geldige invoer zou zakken. Een nieuwe hermetische groen/rood-
+proef reproduceert dit eerst. Commit `5dec4c7132` maakt de drie mutanten vanuit
+beide geldige kleuren echt ongeldig en bewaakt dat geen tegenproef een no-op is.
+Alle twintig registerrateltests slagen; de ratel en productnormen zijn ongewijzigd.
+
+Commit `cc06037ec58f1148d2e39e151476b1e75ee7e83d` breidt uitsluitend de
+optionele testprofiler uit. Hij koppelt per save serializer- en native-fasen,
+bewaart hoogstens de 32 traagste saves en acht serializergevallen per save,
+en scheidt nesting, ongekoppelde kosten en profielonderhoud. Gesloten
+save-callbacks blijven buiten de exportwrapper en worden niet als nul gemeld.
+`unscoped` betekent geen expliciete sleutelset, NIET automatisch een volledige
+collectiescan; het oude veld `storage.full` droeg precies die beperktere betekenis.
+De eerder als volledige saves beschreven pieken zijn dus ongescopeerde oproepen.
+`failed` betekent een geworpen fout, niet het ontbreken van een COMMIT.
+Tijden overlappen bij nesting en zijn geen sluitende CPU-boekhouding. De gemeten
+profieluitvoer staat één metadata-bestand later; dit is niet de gehele capture-gap.
+31 profiler-/rateltests en 27 bronregistergeneratoren slagen op deze commit.
+Diagnoseronde `43245368768` is gestart; die is geen ongeprofileerd prestatiebewijs.
+
+De afgescheiden ontvangstchecker slaagt 57/57: beide legs, expliciete nul-legs,
+tegenstrijdige bedragen/rekeningen, ID-hergebruik, retouren, ontbrekende historie
+en inerte getters/proxies. Twee extra reviewproeven faalden eerst en zijn hersteld:
+een echte accountkey wordt opaque gebonden, niet uit de codenaam verzonnen;
+een cijferkey buiten de arraylengte kan geen retourregel meer laten verdwijnen.
+Deze checker bewijst uitsluitend inputconsistentie. Hij bewijst geen duurzame
+herkomst, volledig archief, puntenbeleid of toestemming en zet niets op paid.
+Alle betaalherstelcode blijft buiten de hoofdbron; geen productieactie uitgevoerd.
+
+### 12 november, vervolg: eigenaarscope en eerlijke JSON-foutbevestiging
+
+De cc0603-diagnoseronde is afgerond, niet deepgreen: endpoint-p99 144 ms,
+event-loop-p99 108,6 ms. Artifact `13957027311` heeft SHA-256
+`bbbc45de90b5ca6a195112fc5d50b205f86d45ca4e36150cdf478227a473d3d1`.
+Vijf volledige stormvensters tonen 32.944 COMMITs, samen 6.752,853 ms,
+maximum 17,711 ms. De langzaamste geld/pot/zet-save kost 116,958 ms,
+waarvan 110,072 ms serialisatie van 442 collecties, zonder KV-write/COMMIT;
+de FULL-barriere kost 3,167 ms. Dit is een concrete kostenhypothese, geen
+gecontroleerde prestatiewinst. Profileronderhoud zelf kost in die vensters
+1.634,790 ms en kan het doorlopende event-loop-histogram raken.
+De cc0603-checkpointregressie slaagt 56/56. Vier echte gerichte mutanten
+(backup-WAL, correlatie, native observer en SUITE-volledigheid) zakken en
+slagen na herstel. Na registerverversing haalt cc0603 de ongewijzigde norm.
+
+De nieuwe bron `558fc52dc0e4e02f6ed9551946c6a1ed8d80b47d` bevat een
+kleine eigenaarwijziging: zowel geldbeleidschrijvers als hun duurzame
+afsluiting melden alleen geldbeleid. De bestaande save-poort bewaakt nog
+steeds FULL, opslagfouten, sleutelunies en een expliciet brede buiten-save.
+Ontbrekende eigenaar/legacy-interface behouden hun brede fallback; de
+opstartcontrole blijft ongeldige save-afhankelijkheden vooraf weigeren.
+De proef onderscheidt ook een gewone, niet-duurzame buitenbundel: die wordt
+hiermee niet stilzwijgend tot FULL gepromoveerd. Twaalf initiële SQLite-
+proeven plus de nieuwe opstartproef bewaken deze grenzen; een echte oude
+WAL-lezer maakt de noop-bevestiging tijdelijk 503 en vrijgave herstelt haar.
+
+De aanvullende JSON-proef vond een echte bestaande schijnbevestiging:
+rename van db.json kon mislukken terwijl geldbeleid 200 antwoordde.
+Verplichte snapshots geven nu schrijf-/serialisatiefouten en grootte-
+cooldown door aan de duurzame aanroeper. Achtergrondopslag blijft best-effort;
+een optionele Redis-mirrorfout na de geslaagde schijfwrite maakt vastgelegd
+werk niet alsnog tot een schijnmislukking. Acht proeven dekken onder meer
+gerichte bestands-fsyncfout, renamefout plus retry, cooldown, timingmetadata
+en de mirrorgrens. Er is GEEN nieuwe JSON-persistentiestand verzonnen.
+De bestaande schrijf-verloren-injectietak bij opslag zonder teller valt
+buiten dit herstel en blijft een afzonderlijk open auditpunt; deze tests
+bewijzen geen algehele JSON-duurzaamheid. Ook een niet-idempotente nieuwe
+geldgrens krijgt hiermee geen algemene RAM-rollback na een mislukte commit.
+
+De geïsoleerde bredere regressieronde slaagde 113/113 vóór de laatste twee
+extra grensproeven; de hoofdbron heeft daarna de specifieke SQLite/JSON-
+proeven groen uitgevoerd. De echte PostgreSQL-test leest pot en log vóór
+antwoord onafhankelijk terug, herstart, forceert een KV-triggerfout en
+herhaalt na herstel. Een testsequence bewijst dat de fouttrigger echt is
+geraakt. De test is toegevoegd aan de expliciete PG-lijst: nu 58 bestanden.
+Twee gerichte bronmutanten zijn op exact 558fc5 rood gezien en daarna groen
+hersteld; de reguliere PG-HTTP-mutatiemotor laat ook de scherpe variant
+(authenticatiedeuren open) zakken. De gerichte mutatiemotor weigert terecht
+externe opslagdoelen en is daarvoor niet versoepeld.
+
+De ongeprofileerde Linux-prestatieronde op 558fc5 is gestart. De volledige
+kwalificatie moet op deze bron opnieuw; ouder SUITE-bewijs geldt niet vanzelf.
+Geen norm verhoogd, geen productie-uitrol, geen ondertekende vrijgave.
+
+### 12 november, vervolg: foutbevestiging, eigenaarherstel en native proefpakket
+
+De volledige ronde op `558fc52dc0e4e02f6ed9551946c6a1ed8d80b47d`
+is op 17:18:37 UTC groen gesloten: 22.143/22.143 tests, nul mislukt,
+overgeslagen, geannuleerd of todo; 2.774 toetsbestanden en alle 58 echte
+PostgreSQL-bestanden. De PG-bewijs-SHA is
+`71a690c51d0386a60cb7db2989f2b235140a7ff7754cc265839cf4088eac73c3`.
+Het archief staat buiten de checkout in `validation/suite-558fc5`.
+Dit bewijs geldt voor 558fc5, niet automatisch voor de volgende reparaties.
+
+Commit `f1d10e08fbc0c9c089343194ca398e3d66179e68` sluit de aanvullende
+JSON-randen: gedeeltelijke writes worden afgemaakt, onmogelijke voortgang
+wordt geweigerd, verplichte directory-fsyncfouten bereiken de aanroeper en
+de bekende schrijf-verloren-injectie wordt ook zonder teller afgewezen.
+Typed-arrayviews behouden hun byte-offset; ongeldige invoer faalt vóór open.
+De gerichte hoofdbronregressie slaagt 100/100 en twee bronmutanten worden
+onderschept. Een aanvankelijk te lang commentaar in bijeen veroorzaakte één
+omvangsratel; b24dfb comprimeert alleen dat commentaar, zonder logica- of
+normwijziging. Een fout na rename blijft een onzekere uitkomst, geen rollback;
+proces-SIGKILL is geen bewijs van fysieke stroomuitval.
+
+Commit `b24dfbf813d31149b327dcc927819f9ddd1f2591` wacht op de echte
+bank-uitvoeringsaudit en maakt de besluitbundel duurzaam. Vóór herstel
+faalden twee JSON-proeven na HTTP 200 plus SIGKILL en vier auditproeven.
+Daarna slagen 38/38 bank-/opslagproeven, opnieuw 100/100 JSON-regressies en
+de echte PostgreSQL-geldbeleidproef. Twee gerichte bankmutanten worden
+onderschept. Bronregisters, huiscontrole en ongewijzigde norm slagen.
+De scope is de besluit-ingang; automatische clearing en iedere toekomstige
+buitenbundel krijgen daarmee geen algemene garantie. Ook hier is een
+geworpen fout geen belofte dat reeds vastgelegd werk is teruggedraaid.
+
+De ongeprofileerde Linux-ronde `43255615043` op 558fc5 sluit de
+correctheidsstorm, maar NIET de prestatielat. Endpoint-p99 is 144 ms;
+event-loop-p99 is 105,1 ms, boven zowel de normgrens 97,9 ms als het
+oorspronkelijke doel 64,8 ms. Kalibratie 14 ms tegenover 13,3 ms; één ronde
+bewijst geen causale verbetering. Artifact `13960049887` heeft SHA-256
+`b522d0d6b1b21212e868dec9d064b53393b873e35af9c50a8cd8bed1bdf2bd24`.
+De nieuwe bron heeft nog geen eigen prestatiekwalificatie. NORM.json bleef
+ongewijzigd; een lokale normuitslag vervangt deze Linux-prestatiepoort niet.
+
+Commit `eb4070d27d9b1707bf5f98a3fe244d934641e21e` herbevestigt de
+eigenaarsave bij reeds in RAM afgehandelde betalingen van Markt, Assets en
+Directpay. De eerste mutatie wordt niet opnieuw uitgevoerd: dezelfde tickets,
+poolkas, betaalreferentie en ontvangstteller blijven exact eenmaal bestaan.
+De nulproef op de hoofdbron gaf 14 rode en zes groene nieuwe grensproeven.
+Na de fix slagen alle 56 nieuwe en bestaande regressies, inclusief de zes
+bestaande Markt-betaaltests. Een eerdere ronde met verkeerd gespelde
+bestandsnaam telde terecht slechts 50; de tijdelijke draaier weigert nu
+ieder ontbrekend expliciet toetsbestand vóór hij begint.
+
+Assets en Directpay zijn elk beproefd via provider- en klantretry, met
+owner-only Truth-opslag én een gewone legacy-savefunctie. De owner-only
+dependency is een proefgrens, geen overgenomen wijziging van productie-Trust
+of betaalwaarheid. Naast een fout vóór schrijven wordt een geslaagde echte
+SQLite-commit gevolgd door een geworpen fout en nóg een falende herstel-save
+beproefd. Onafhankelijke SQLite-lezers controleren de opgeslagen bedragen.
+Zes exact commit-/bron-/testgebonden mutanten falen op hun bedoelde assertie;
+nulproeven en herproeven slagen. Registers, huiscontrole en norm slagen op
+eb4070. Bewijs: `validation/owner-retry-eb4070` en de twee mutatiemapjes.
+Geen PG-, stroomuitval- of volledig notificatieherstelbewijs afleiden uit
+deze SQLite-ownerproeven; Assets-notificatie na een mislukte eerste save
+blijft een afzonderlijke open bedrijfsafhandelingsgrens.
+
+De drie prestatie-scopes blijven buiten de hoofdbron. De concrete Trust-
+tegenproef vindt bij intrekking plus falende eigenaarsave wel opgeslagen
+authority.revoked maar nog ACTIVE eigenaartoestemming. Op het bestaande
+brede opslagpad slagen beide succes-/foutproeven, met onafhankelijke lezing
+en een nieuw proces. Dat gedrag is nu een vaste regressietest. Alleen
+Trust scopen zonder gezamenlijke geteste eigenaargrens blijft afgewezen.
+
+De afgescheiden vaste-ontvangstverkenning heeft 15 replayproeven, 34
+ontvangst-/crashregressies en 57 pure checkerproeven groen. Zij bewijst
+uitsluitend inputconsistentie en zet geen order/rit op paid. Productie legt
+nog geen servergebonden volledige betaalintentie en eenmalige tegoedreservering
+vóór Pay vast. Dat moet eerst in één bestaande vaste eigenaar-/puntentransactie.
+Een latere finalizer moet binnen dezelfde transactie ook receipt, afdruk,
+boekingen, eigenaar, bevoegdheid en reservering controleren. Een losse
+replaycheck gevolgd door een owner-save is onvoldoende. Begrensde KV-historie
+bewijst geen afwezigheid van gearchiveerde retouren; onbekende legacy-intenties
+mogen niet uit huidige saldi worden gereconstrueerd. Deze crashopening blijft
+een technische blokkade, geen doorgeschoven externe auditvraag.
+
+Uit een afzonderlijke schone checkout op exact eb4070 is een native macOS
+arm64-pakket met Node 26.12.1 en Rust 1.97.1 gebouwd. De 338.893.686 bytes
+hebben SHA-256
+`1beebb70d6744018f1ca03d9227f7903c0a2f6848ba4a52dd76b53ae89d5e216`.
+De eigen pakketproef slaagt op 20:48:33 UTC: aanmelden, documentmutatie,
+herhaling, onbevoegde weigering, procesherstart, login, duurzame trash en
+restore, twee onafhankelijke SQLite-integriteitscontroles en onveranderde
+pakketbytes. Het dossier staat in `validation/native-eb4070` buiten de
+checkout. Dit is uitsluitend een synthetische nonproductieproef; geen echte
+geldrail, volledige appkwalificatie of rollback naar een vorige goede versie.
+ARTIFACT-IDENTITY blijft NOT_SIGNED/BLOCKED en rollback blijft NOT_PROVEN.
+
+Eindoordeel blijft NIET DEEP GREEN. Open staan het volledige financiële
+crashherstel, de prestatielat, actuele APPWERKT-/ketenbewijzen, twee integrale
+kwalificaties op dezelfde uiteindelijke kandidaat en de verdere operationele
+releasepoorten. De bronboom is gecommit; gegenereerde bewijsregisters blijven
+afzonderlijke werkuitvoer en vormen nog geen schone productievrijgave.
+Geen productie geactiveerd, geen secrets gebruikt en geen vrijgave ondertekend.

@@ -3520,6 +3520,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['test/ritreferentie.test.js', 'bewijst verse ritidentiteit, idempotente herhaling en actor-isolation via de echte duurzame SQLite-geldboeking'],
     ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen en niet tweemaal worden gecommit'],
     ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve sessieopslag, een andere domeinmutatie en audit samen in dezelfde duurzame bundel worden bevestigd'],
+    ['test/securitylog-rijopslag.test.js', 'bewijst dat twee beveiligingslogregels als enige werk binnen dezelfde duurzame auditbundel worden bevestigd; geen nieuwe productaanroeper'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['test/idem-takken.test.js', 'bewijst dat idem de duurzaam-vlag van de aanroeper ongewijzigd aan een NAGEMAAKTE bundel doorgeeft; er wordt niets gecommit'],
     ['test/idem-commit-pending.test.js', 'bewijst met de echte idem/bundellaag en bestuurbare opslagbevestiging dat retries geen succes krijgen voor commit of na rollback; geen nieuwe productaanroeper'],

@@ -59,7 +59,7 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
       mutaties.bevestig(nagekeken);
       return { alGelijk: !uitgesteld, collecties: [] };
     }
-    const { bump, huidig, lees, up, weg } = statements();
+    const { bump, huidig, versie, lees, up, weg } = statements();
     const vastgelegd = [], weggeschreven = [], overgenomenGrafstenen = [];
     const auditResultaten = [];
     let auditSnapshots;
@@ -67,7 +67,10 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
     try {
       for (const [k, jOns] of gewijzigd) {
         let j = jOns;
-        const rij = lees.get(k);
+        /* De oude inhoud is alleen nodig bij een externe wijziging. Haal voor
+           eigen versies geen grote JSON/ciphertext naar JS om die weg te gooien.
+           Beide lezingen vallen onder hetzelfde BEGIN IMMEDIATE-schrijfslot. */
+        const rij = versie.get(k);
         if (rij && rij.deleted) {
           /* Delete-wins ook wanneer DIT proces de grafsteen bij load() al heeft
              toegepast. Na een herstart zetten de vormdefaults ontbrekende
@@ -82,7 +85,7 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
         // in plaats van hun wijzigingen te overschrijven.
         if (rij && rij.ver > (toegepast.get(k) || 0)) {
           const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
-          const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)), melder(k));
+          const samen = merge3(base, db.data[k], JSON.parse(uitStore(lees.get(k).val)), melder(k));
           db.data[k] = samen;
           j = JSON.stringify(samen);
           // na een merge is de collectie een ANDER object: de maten van de

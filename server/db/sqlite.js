@@ -86,6 +86,7 @@ function statements() {
   stmt = {
     bump: kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'"),
     huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
+    versie: kvdb.prepare('SELECT ver, deleted FROM kv WHERE key = ?'),
     lees: kvdb.prepare('SELECT val, ver, deleted FROM kv WHERE key = ?'),
     versies: kvdb.prepare('SELECT key, ver FROM kv'),
     up: kvdb.prepare('INSERT INTO kv(key,val,ver,deleted) VALUES(?,?,?,0) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver, deleted=0'),

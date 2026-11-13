@@ -4,7 +4,8 @@ const fs = require('node:fs'), path = require('node:path'), crypto = require('no
 const {execFileSync} = require('node:child_process');
 const {exactStempel} = require('../stempel');
 const SOURCE_PATHS = ['server','public','experience','experience-architecture','scripts','test','.github/workflows',
-  'package.json','package-lock.json','.nvmrc','.node-version','Dockerfile','index.html','SCHERMEIGENAAR.json','APPWERKT.json'];
+  'package.json','package-lock.json','.nvmrc','.node-version','Dockerfile','index.html','SCHERMEIGENAAR.json','APPWERKT.json','APPWERKT-RAAKVLAK.json',
+  'docs/rtg-next/programma.json','docs/rtg-next/living-werkpakketten.json','docs/rtg-next/overige-werkpakketten.json'];
 const SOURCE_DIRECTORIES = new Set(['server','public','experience','experience-architecture','scripts','test','.github/workflows']);
 // Gegenereerde runtime-uitvoer is geen Experience-bron. public/dist wordt per
 // platform opnieuw gebouwd en mag de bronvingerafdruk daarom niet laten

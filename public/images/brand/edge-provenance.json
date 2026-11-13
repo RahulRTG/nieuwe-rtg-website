@@ -1,0 +1,68 @@
+{
+  "createdAt": "2026-11-12T23:10:14.293Z",
+  "method": "Built-in image_gen; referenced images; alpha preserved. Sharp used only for proportional resizing and WebP encoding.",
+  "approval": "Owner: Maak het precies zo, following approval of the painted Edge concept.",
+  "scope": "Public website Edge only; existing full logo, micro-mark and native Edge actions unchanged.",
+  "assets": [
+    {
+      "name": "rtg-edge-lips",
+      "source": "exec-78769c02-9f3b-4e29-bb10-8feddd61214d.png",
+      "width": 336,
+      "alpha": true,
+      "reference": "Owner supplied 6931B685-5819-4423-8544-3A60C1E69827/1-Foto-1.jpg",
+      "productionBrief": "Background extraction for an RTG Edge navigation asset. Preserve the original asymmetric burgundy painted lips, upward right corner, open mouth and dry-brush silhouette. Remove only the white background and the white mouth slit to genuine transparent alpha. No redesign, plate, shadow, text or added elements. Tightly framed with a small transparent margin.",
+      "file": "public/images/brand/rtg-edge-lips.webp",
+      "sourceDimensions": [
+        1536,
+        1024
+      ],
+      "dimensions": [
+        336,
+        224
+      ],
+      "hasAlpha": true,
+      "bytes": 21392,
+      "sha256": "f4e92edc76ba55fd55c13a86800fd62f19795050ccec5050f765cb2f542e91d4"
+    },
+    {
+      "name": "rtg-edge-paint",
+      "source": "exec-840ba452-20f0-438c-a9e5-9c92ba2e1e9d.png",
+      "width": 1440,
+      "alpha": false,
+      "reference": "Approved concept exec-7efd0832-a362-4662-9f8b-a57cfd0135f6.png",
+      "productionBrief": "Production material for the approved painted RTG Edge. A 3:1 rectangular full-bleed oil-brush texture, with no interface, icons, lips, lettering, border, scenery or rounded corners. Midnight navy at 0–20%, deep forest at 20–38%, warm ivory at 40–60%, burgundy at 64–82%, antique ochre at 84–100%. Fine brush bristles diagonally upward right, calm lightness within the five icon zones. No synthetic gradient or metallic chrome.",
+      "file": "public/images/brand/rtg-edge-paint.webp",
+      "sourceDimensions": [
+        2172,
+        724
+      ],
+      "dimensions": [
+        1440,
+        480
+      ],
+      "hasAlpha": false,
+      "bytes": 208970,
+      "sha256": "f82fed88b5a1b98a655d27d0126f17e713204cc8f7656739070b28131c28f981"
+    },
+    {
+      "name": "rtg-edge-garden",
+      "source": "exec-59022e06-b5ee-40f1-b6f3-5c81af804a9f.png",
+      "width": 880,
+      "alpha": false,
+      "reference": "Approved concept exec-7efd0832-a362-4662-9f8b-a57cfd0135f6.png",
+      "productionBrief": "Use case: precise-object-edit. Production asset extraction from the approved RTG Edge concept board, reference image 1. Recreate ONLY the painterly Mediterranean garden illustration shown on the LEFT side of the lower-left menu panel. Warm sunlit old ivory stone arch with closed green wooden door on the far left, pink/burgundy bougainvillea draped overhead, weathered terracotta pot and bowl of lemons near the bottom, distant quiet blue sea and green mountain coast through the right side, a soft deep-forest brush stroke in the bottom-left corner. Refined oil painting texture, antique ivory light, burgundy flowers, forest foliage, midnight blue sea, subtle ochre stones. A single full-bleed vertical 2:3 artwork, without any UI, text, words, lips, logos, menus, border, frame or rounded corners. Preserve the specific visual mood and composition of that menu illustration; do NOT return the whole concept board or a screenshot. This will be decorative art alongside live readable navigation.",
+      "file": "public/images/brand/rtg-edge-garden.webp",
+      "sourceDimensions": [
+        1024,
+        1536
+      ],
+      "dimensions": [
+        880,
+        1320
+      ],
+      "hasAlpha": false,
+      "bytes": 422902,
+      "sha256": "6436361adac01e374543dd204bbfa5c07c26e2a3db72188f8c1f2c6a4d2592b1"
+    }
+  ]
+}

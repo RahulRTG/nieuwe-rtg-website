@@ -7,13 +7,14 @@ const pw=laadPlaywright(),skip=geenBrowser(pw);let srv,browser,token;
 test.before(async()=>{if(skip)return;srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});
  const r=await fetch(srv.base+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Cookie presentatie',email:'cookie-ds@example.test',phone:'0612345827',password:'geheim12345',geboortedatum:'1990-01-01',tier:'rtg'})});assert.equal(r.status,200);token=(await r.json()).token;assert.ok(token);browser=await pw.chromium.launch(browserOpties(pw));});
 test.after(async()=>{if(browser)await browser.close();if(srv)await stop(srv.child);});
-for(const route of ['browser','wonen'])test('cookie DS '+route+(route==='wonen'?' expliciete hostfixture':''),{skip,timeout:45000},async()=>{
+for(const route of ['browser','wonen','404'])test('cookie DS '+route+(route==='wonen'?' expliciete hostfixture':''),{skip,timeout:45000},async()=>{
  const ctx=await browser.newContext({serviceWorkers:'block',locale:'nl-NL',viewport:{width:390,height:900},reducedMotion:'reduce'});
  await ctx.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_lang','nl');},token);
  const page=await ctx.newPage(),errors=[];letOpFouten(page,errors,{eigenZeef:true});
  try{
-  await page.goto(srv.base+'/apps/'+route+'.html',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.body.dataset.rtgDesktopState==='ready');
+  const ready=()=>page.waitForFunction(publicHost=>publicHost?document.body.dataset.publicEdgeReady==='true':document.body.dataset.rtgDesktopState==='ready',route==='404');
+  await page.goto(srv.base+(route==='404'?'/site/404.html':'/apps/'+route+'.html'),{waitUntil:'domcontentloaded'});
+  await ready();
   if(route==='wonen')await page.addScriptTag({url:srv.base+'/shared/cookie.js'});
   const melding=page.locator('.ds-cookie');await melding.waitFor({state:'visible'});
   assert.equal(await melding.count(),1);assert.equal(await melding.getAttribute('role'),'region');
@@ -28,15 +29,19 @@ for(const route of ['browser','wonen'])test('cookie DS '+route+(route==='wonen'?
   }
   const knop=melding.getByRole('button',{name:'Prima',exact:true});await knop.focus();assert.equal(await knop.evaluate(el=>document.activeElement===el),true);await page.keyboard.press('Enter');await melding.waitFor({state:'detached'});
   assert.ok(await page.evaluate(()=>!Number.isNaN(Date.parse(localStorage.getItem('rtg_cookieinfo_v1')))));
-  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.rtgDesktopState==='ready');if(route==='wonen')await page.addScriptTag({url:srv.base+'/shared/cookie.js'});assert.equal(await page.locator('.ds-cookie').count(),0);assert.deepEqual(errors,[]);
+  await page.reload({waitUntil:'domcontentloaded'});await ready();if(route==='wonen')await page.addScriptTag({url:srv.base+'/shared/cookie.js'});assert.equal(await page.locator('.ds-cookie').count(),0);assert.deepEqual(errors,[]);
  }finally{await ctx.close();}
 });
 
-test('cookie centrale owner op oudere 404-host',{skip,timeout:45000},async()=>{
+test('cookie centrale overlay-owner op expliciete legacy-hostfixture',{skip,timeout:45000},async()=>{
  const ctx=await browser.newContext({serviceWorkers:'block',locale:'nl-NL',viewport:{width:390,height:900},reducedMotion:'reduce'});
  const page=await ctx.newPage(),errors=[];letOpFouten(page,errors,{eigenZeef:true});
  try{
-  await page.goto(srv.base+'/site/404.html',{waitUntil:'domcontentloaded'});
+  // De echte 404 is nu een DS-host en wordt hierboven als zodanig gemeten.
+  // Deze afgebakende fixture behoudt de oudere cookie-owner en zijn observer-
+  // contract; ze stelt geen tweede publieke pagina of appkwalificatie voor.
+  await page.route('**/cookie-legacy-host.html',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html lang="nl"><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Cookie legacy hostfixture</title><link rel="stylesheet" href="/fonts/fonts.css"><link rel="stylesheet" href="/ds/tokens.css"><link rel="stylesheet" href="/ds/componenten/cookie.css"></head><body><main><h1>Expliciete legacy-hostfixture</h1></main><script src="/shared/cookie.js" defer></script></body></html>'}));
+  await page.goto(srv.base+'/cookie-legacy-host.html',{waitUntil:'domcontentloaded'});
   const melding=page.locator('.ds-cookie--overlay');await melding.waitFor({state:'visible'});
   assert.equal(await page.locator('html[data-ds]').count(),0);
   assert.equal(await page.locator('style').evaluateAll(xs=>xs.some(n=>n.textContent.includes('#rtg-cookie{'))),false);

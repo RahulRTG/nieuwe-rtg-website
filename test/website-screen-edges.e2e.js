@@ -47,10 +47,13 @@ const VIEWPORTS = [
 
 async function randmeting(page) {
   return page.evaluate(() => {
+    const reading = window.RTGPublicApp?.shell.context?.() || window.RTGPublicDetail?.context?.();
     const zichtbaar = el => {
       const s = getComputedStyle(el), r = el.getBoundingClientRect();
+      const leaf = el.closest('[data-issue-page],[data-reel-page]');
+      if (leaf && leaf !== reading?.node) return false; // de andere bladen worden afzonderlijk bezocht
       return s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) !== 0 &&
-        r.width > 0 && r.height > 0;
+        el.checkVisibility({checkVisibilityCSS:true,checkOpacity:true}) && r.width > 0 && r.height > 0;
     };
     const begrensd = [...document.querySelectorAll('h1,h2,h3,.story-inner,.scene-heading,.simulation,.world-room>div,.foundation-copy')]
       .filter(zichtbaar).map(el => {
@@ -83,24 +86,44 @@ test('publieke website houdt tekst, inhoud en Edge binnen alle schermranden',
           assert.equal(await page.evaluate(() => document.documentElement.dataset.websiteTruth), 'actueel',
             route + ' kon de actuele appwaarheid niet laden');
           if (route === '/') await page.waitForFunction(() => document.body.dataset.rtgAdaptiveReady === 'true');
-          const gemeten = await randmeting(page);
-          assert.ok(gemeten.overloop <= 1, route + ' loopt ' + gemeten.overloop + 'px buiten ' + viewport.width);
-          assert.deepEqual(gemeten.begrensd, [], route + ' knipt inhoud af: ' + JSON.stringify(gemeten.begrensd));
+          else await page.waitForFunction(() => document.body.dataset.publicEdgeReady === 'true');
+          await page.evaluate(() => document.fonts.ready);
+          const track = page.locator('[data-magazine-carousel],[data-reel-track]');
+          const ids = await track.count() ? await track.locator('[data-issue-page],[data-reel-page]').evaluateAll(nodes => nodes.map(n=>n.id)) : [];
+          if (ids.length) { await track.focus(); await page.keyboard.press('Home'); }
+          for (let index=0;index<Math.max(1,ids.length);index++) {
+            if (ids.length) await page.waitForFunction(i => (window.RTGPublicApp?.shell.context?.() || window.RTGPublicDetail?.context?.()).index === i,index);
+            const gemeten = await randmeting(page);
+            assert.ok(gemeten.overloop <= 1, route + ' loopt ' + gemeten.overloop + 'px buiten ' + viewport.width);
+            assert.deepEqual(gemeten.begrensd, [], route + ' blad ' + (index+1) + ' knipt inhoud af: ' + JSON.stringify(gemeten.begrensd));
+            if (ids.length) {
+              const active = track.locator('[data-issue-page],[data-reel-page]').nth(index);
+              const bounds = await active.boundingBox();
+              assert.ok(bounds.x>=-1&&bounds.x+bounds.width<=viewport.width+1,route+' actief blad is bereikbaar: '+index);
+              const preview = active.locator('[data-read-leaf]');
+              if (await active.evaluate(el=>el.classList.contains('ds-issue-condensed'))) {
+                assert.equal(await preview.evaluate(el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),true,'volledige inhoud blijft via de leesingang bereikbaar');
+              }
+              if(index<ids.length-1)await page.keyboard.press('ArrowRight');
+            }
+          }
+          if(ids.length){await page.keyboard.press('Home');await page.waitForFunction(()=>(window.RTGPublicApp?.shell.context?.()||window.RTGPublicDetail?.context?.()).index===0);}
 
           if (route !== '/') {
             await page.locator('.world-hero h1').evaluate(el => { el.textContent = 'Vertrouwensarchitectuur'; });
             const langWoord = await page.locator('.world-hero h1').boundingBox();
             assert.ok(langWoord.x >= -1 && langWoord.x + langWoord.width <= viewport.width + 1,
               route + ' houdt een lange Nederlandse samenstelling binnen de hero');
-            continue;
           }
 
           const rand = page.locator('.rtg-adaptive-edge');
           const bar = page.locator('.rtg-adaptive-bar');
+          assert.equal(await bar.isVisible(),false,'de publieke Edge begint gesloten');
+          await page.locator('.ds-public-edge-toggle').click();
           let vak = await rand.boundingBox();
           assert.ok(vak.x >= 5 && vak.x + vak.width <= viewport.width - 5,
             'Edge houdt een tastbare zijmarge op ' + viewport.width);
-          await bar.getByRole('button', { name: 'Werelden', exact: true }).click();
+          await bar.locator('[data-rtg-adaptive-action="worlds"]').click();
           const paneel = await page.locator('.rtg-adaptive-sheet').boundingBox();
           assert.equal(await bar.isVisible(),true,'the expanded screen grows from the still-reachable Edge bar');
           assert.ok(paneel.x >= vak.x - 1 && paneel.x + paneel.width <= vak.x + vak.width + 1,

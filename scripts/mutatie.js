@@ -574,6 +574,27 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // Publieke magazineproeven draaien een eigen read-only statische server.
+  // De API-liegpoort verandert daar niets; muteer de echte presentatie-owner.
+  // De motor blijft een groene nulproef en een werkelijk gezakte proef eisen.
+  ['public-brand-lockup.e2e.js', ['public/site/edge-door.js']],
+  ['public-colour-tabs.e2e.js', ['public/site/edge-door.js', 'public/site/edge-editorial.js']],
+  ['public-desktop-magazine.e2e.js', ['public/site/magazine-layout.js']],
+  ['public-discover-menu.e2e.js', ['public/site/platform-edge.js', 'public/site/edge-menu-pager.js']],
+  ['public-edge-editorial.e2e.js', ['public/site/edge-editorial.js']],
+  ['public-edge-quiet.e2e.js', ['public/site/edge-quiet.js']],
+  ['public-edge-tabs.e2e.js', ['public/site/edge-editorial.js', 'public/site/platform-edge.js']],
+  ['public-editorial-pages.e2e.js', ['public/site/platform-detail.js']],
+  ['public-editorial-pages.test.js', ['public/site/passen/rtg-pass.html']],
+  ['public-fixed-magazine.e2e.js', ['public/site/edge-menu-layout.js', 'public/site/edge-menu-pager.js']],
+  ['public-full-bleed.e2e.js', ['public/site/platform-magazine.js', 'public/site/platform-detail.js']],
+  ['public-magazine-navigation.e2e.js', ['public/site/magazine-history.js']],
+  ['public-magazine-search.e2e.js', ['public/site/start/command-index.js', 'public/site/start/experience-command.js']],
+  ['public-magazine.e2e.js', ['public/site/platform-magazine.js']],
+  ['public-painted-edge.e2e.js', ['public/site/edge-door.js']],
+  ['public-painted-site.e2e.js', ['public/site/platform-detail.js']],
+  ['public-travel-volume.e2e.js', ['public/site/platform-detail.js']],
+  ['public-website-edge.e2e.js', ['public/site/edge-door.js', 'public/site/platform-edge.js']],
   // De weerbaarheidstoetsen van WEERBAARHEID.md stap 2 laden de helper alleen
   // voor wachtOpWaarde; ze starten geen server en lezen niets van /api/.
   ['auditwacht-weerbaar.test.js', ['server/lib/auditwacht.js']],

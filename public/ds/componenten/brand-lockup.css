@@ -1,0 +1,24 @@
+/* Eén ongewijzigde merksignatuur: beeld, tekst en slogan zijn ondeelbaar.
+   Alleen de beschikbare grootte varieert; nooit een uitsnede of recoloring. */
+@layer rtg.component {
+  /* Het afzonderlijk goedgekeurde navigatiesubmerk vervangt nooit de volledige lockup. */
+  .ds-brand-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; inline-size: 44px; min-inline-size: 44px; min-block-size: 44px; text-decoration: none; line-height: 0; }
+  .ds-brand-mark__image { display: block; inline-size: 40px; block-size: 32px; max-inline-size: none; aspect-ratio: 40 / 32; object-fit: contain; }
+  .ds-brand-lockup { display: inline-block; max-inline-size: 100%; min-inline-size: 0; text-decoration: none; line-height: 0; }
+  .ds-brand-lockup__image { display: block; inline-size: 100%; block-size: auto; max-inline-size: 100%; aspect-ratio: 1280 / 470; object-fit: contain; }
+  .ds-brand-lockup--navigation { inline-size: 176px; }
+  .ds-brand-lockup--fallback { inline-size: min(176px, 100%); }
+  /* Legacy hosts still read world tokens on body > header. Bind those here
+     to the canonical neutral brand roles until the host migrates to full DS. */
+  .ds-brand-lockup-header { --rtg-world-card: var(--ds-oppervlak-sterk); --rtg-world-ink: var(--ds-inkt); position: relative; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 8px 24px; background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); }
+  .ds-brand-lockup-header :where(a, button) { color: inherit; }
+  .ds-brand-lockup-header__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px; min-inline-size: 0; }
+  .ds-brand-lockup-header__actions svg { inline-size: 20px; block-size: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  @media (max-width: 999px) {
+    /* De legacy publieke host reserveert nog 64px voor zijn oude fixed kop.
+       Deze normale documentkop trekt alleen die oude reservering terug. */
+    .ds-brand-lockup-header:not(.ds-public-site-header) { margin-block-start: -64px; padding: 8px 16px; }
+    .ds-brand-lockup-header .ds-brand-lockup--navigation, .ds-brand-lockup--fallback { inline-size: 152px; }
+    .ds-brand-lockup-header__actions .pp-context { display: none; }
+  }
+}

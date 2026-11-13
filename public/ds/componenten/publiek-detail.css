@@ -1,0 +1,701 @@
+/* One painted public magazine, including its articles, catalogue and recovery.
+   Existing scenes, commercial copy and Edge retain their actual DOM/controllers. */
+@layer rtg.component {
+  .ds-public-story { background: var(--ds-grond); color: var(--ds-inkt); font-family: var(--ds-letter-tekst); overflow-wrap: anywhere; }
+  .ds-public-story *, .ds-public-site-header * { box-sizing: border-box; min-inline-size: 0; }
+  .ds-public-story :where(h1, h2, h3, p, figure) { margin: 0; }
+  .ds-public-story :where(h1, h2) { font-family: var(--ds-letter-display); font-weight: 400; text-wrap: balance; letter-spacing: -.025em; }
+  .ds-public-story h1 { font-size: clamp(40px, 4.6cqi, 68px); line-height: 1.08; max-inline-size: 15ch; }
+  .ds-public-story h2 { font-size: clamp(32px, 3.3cqi, 48px); line-height: 1.14; }
+  .ds-public-story h3 { font-size: 19px; line-height: 1.4; font-weight: 500; }
+  .ds-public-story :where(p, li) { font-size: 16px; line-height: 1.85; }
+  .ds-public-story p + p { margin-block-start: 16px; }
+  .ds-public-story :where(a) { color: var(--ds-accent); text-underline-offset: 4px; }
+  .ds-public-story :where(a, button, input, select, summary):focus-visible, .ds-public-site-header :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 4px; }
+  .ds-public-story :where(button, input, select) { font: inherit; color: inherit; }
+  .ds-public-story :where(button, input, select) { min-block-size: 48px; max-inline-size: 100%; padding: 12px 16px; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); background: var(--ds-oppervlak-sterk); }
+  .ds-public-story button { cursor: pointer; }
+  .ds-public-story :where(button[aria-pressed=true], .button-primary) { background: var(--ds-accent); border-color: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-public-story :where(.button-primary:hover, button[aria-pressed=true]:hover) { background: var(--ds-accent-hover); }
+  .ds-public-story :where(.world-actions, .world-footer nav) { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .ds-public-story .world-actions { margin-block-start: 24px; }
+  .ds-public-story .button { display: inline-flex; align-items: center; justify-content: center; min-block-size: 48px; padding: 12px 24px; border: 1px solid var(--ds-accent); border-radius: var(--ds-radius-capsule); font-size: 14px; text-decoration: none; }
+  .ds-public-story :where(.world-label, .story-kicker, .overline, .outcome-number, #worldLabel) { color: var(--ds-metaal); font-size: 11px; letter-spacing: .13em; text-transform: uppercase; line-height: 1.7; margin-block-end: 20px; }
+  .ds-public-story .world-label span { margin-inline-start: 24px; }
+  .ds-public-story .world-shell { inline-size: 100%; }
+  .ds-public-site-header, .ds-public-story :where(.world-header, .explore-header) { min-block-size: 64px; padding: 8px max(24px, calc((100% - 1280px) / 2)); background: var(--ds-oppervlak-sterk); display: flex; align-items: center; justify-content: space-between; gap: 24px; border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-public-site-header :where(a, button) { font: 400 12px/1.4 var(--ds-letter-tekst); color: var(--ds-inkt); text-decoration: none; }
+  .ds-public-site-header button { border: 0; background: transparent; padding: 8px; min-block-size: 44px; cursor: pointer; }
+  .ds-public-site-nav { display: flex; align-items: center; gap: 32px; }
+  .ds-public-site-nav a { display: inline-flex; align-items: center; min-block-size: 44px; }
+  .ds-public-site-header .ds-brand-lockup-header__actions { gap: 16px; }
+  .ds-public-story :where(.world-header, .explore-header) { grid-column: 1 / -1; flex-wrap: wrap; }
+  .ds-public-story .world-header-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .ds-public-story .world-header-actions a { display: inline-flex; min-block-size: 44px; align-items: center; font-size: 13px; }
+  /* Editorial articles use a real cover, a chapter rail and a deliberate
+     alternation of narrative, imagery and practical information. */
+  .ds-public-story.ds-public-editorial { background: var(--ds-oppervlak-sterk); }
+  .ds-public-story.ds-public-editorial .world-hero { display: flex; flex-direction: column; gap: 0; padding: 0; text-align: center; }
+  .ds-public-story.ds-public-editorial .world-header { inline-size: 100%; }
+  .ds-public-story.ds-public-editorial .world-hero-inner { inline-size: 100%; max-inline-size: 1040px; padding: 64px 24px 0; }
+  .ds-public-story.ds-public-editorial h1 { max-inline-size: 20ch; margin-inline: auto; font-size: clamp(48px, 5.6cqi, 80px); font-weight: 500; line-height: 1.03; }
+  .ds-public-story.ds-public-editorial h1 em { color: var(--ds-accent); font-weight: 400; }
+  .ds-public-story.ds-public-editorial .world-lead { max-inline-size: 47ch; margin: 24px auto 0; font-size: 20px; line-height: 1.6; }
+  .ds-public-story.ds-public-editorial .world-actions { justify-content: center; }
+  .ds-public-story.ds-public-editorial .pass-price { justify-content: center; margin-block: 24px 12px; }
+  .ds-public-story.ds-public-editorial .pass-price strong { font: 500 25px/1.2 var(--ds-letter-tekst); }
+  .ds-public-story.ds-public-editorial .pass-note { margin-inline: auto; }
+  .ds-public-stroke { display: block; inline-size: min(640px, 100%); block-size: 128px; object-fit: contain; margin: 8px auto 0; pointer-events: none; }
+  .ds-public-cover { position: relative; margin: 0; inline-size: 100%; background: var(--ds-oppervlak); }
+  .ds-public-cover img { display: block; inline-size: 100%; block-size: clamp(400px, 38cqi, 620px); object-fit: cover; object-position: center 52%; }
+  .ds-public-cover figcaption { position: absolute; inset-inline-end: 16px; inset-block-end: 16px; margin: 0; padding: 8px 12px; max-inline-size: calc(100% - 32px); background: var(--ds-cover-grond); color: var(--ds-cover-inkt); font-size: 11px; line-height: 1.5; }
+  .ds-public-chapters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 32px; padding: 16px 24px; border-block-end: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak-sterk); }
+  .ds-public-chapters a { display: inline-flex; align-items: center; min-block-size: 44px; gap: 12px; text-decoration: none; font-size: 12px; color: var(--ds-inkt); }
+  .ds-public-chapters a:hover { color: var(--ds-accent); text-decoration: underline; }
+  .ds-public-chapters span { color: var(--ds-metaal); font-size: 10px; }
+  .ds-public-story.ds-public-editorial :where(section[id], h2[id]) { scroll-margin-block-start: 24px; }
+  .ds-public-story.ds-public-editorial :where(.story-section, .capability-section, .pass-fit, .story-try) { padding-block: 96px; }
+  .ds-public-story.ds-public-editorial .story-intro { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 96px; }
+  .ds-public-story.ds-public-editorial .story-intro h2 { max-inline-size: 16ch; font-size: clamp(36px, 3.8cqi, 56px); }
+  .ds-public-story.ds-public-editorial .outcomes { gap: 48px; margin-block-start: 64px; }
+  .ds-public-story.ds-public-editorial .outcome-number { font-size: 12px; margin-block-end: 24px; }
+  .ds-public-story.ds-public-editorial .outcome h3 { font-size: 20px; }
+  .ds-public-story.ds-public-editorial .pass-fit { background: var(--ds-cover-grond); color: var(--ds-cover-inkt); }
+  .ds-public-story.ds-public-editorial .pass-fit :where(.story-kicker, .pass-fit-item > span) { color: var(--ds-cover-metaal); }
+  .ds-public-story.ds-public-editorial .pass-fit-item p { color: var(--ds-cover-inkt); }
+  .ds-public-story.ds-public-editorial .pass-fit-item { border-color: color-mix(in srgb, var(--ds-cover-inkt) 24%, transparent); }
+  .ds-public-story.ds-public-editorial .moment-visual { position: relative; margin: 0; }
+  .ds-public-story.ds-public-editorial .moment-visual figcaption { position: absolute; inset-inline-start: 16px; inset-block-end: 16px; padding: 8px 12px; background: var(--ds-cover-grond); color: var(--ds-cover-inkt); font-size: 11px; }
+  .ds-public-story.ds-public-editorial .capability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 64px; }
+  .ds-public-story.ds-public-editorial .capability { display: grid; grid-template-columns: 1fr; align-content: start; padding-block-start: 24px; }
+  .ds-public-story.ds-public-editorial #beschikbaarheid { background: var(--ds-oppervlak); border-block: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story.ds-public-editorial #beschikbaarheid h2 { font-size: clamp(32px, 3cqi, 44px); }
+  .ds-public-art-interlude { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 64px; padding: 64px max(24px, calc((100% - 1120px) / 2)); background: var(--ds-oppervlak-sterk); }
+  .ds-public-art-interlude figure { margin: 0; }
+  .ds-public-art-interlude img { display: block; inline-size: 100%; max-block-size: 480px; object-fit: contain; }
+  .ds-public-art-interlude figcaption { font-size: 11px; color: var(--ds-inkt-zacht); text-align: center; }
+  .ds-public-art-interlude h2 { font-size: clamp(36px, 4cqi, 56px); }
+  .ds-public-art-interlude p { margin-block-start: 24px; max-inline-size: 42ch; }
+  .ds-public-story .skip-link { position: absolute; z-index: 80; inset-inline-start: 16px; inset-block-start: 8px; transform: translateY(-200%); padding: 16px; background: var(--ds-oppervlak-sterk); }
+  .ds-public-story .skip-link:focus { transform: none; }
+  .ds-public-story :where(.world-hero, .explore-intro) { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; gap: 0 64px; padding: 64px max(24px, calc((100% - 1280px) / 2)); background: var(--ds-oppervlak-sterk); }
+  .ds-public-story .world-hero-inner { padding-block: 32px; }
+  .ds-public-story .world-lead { max-inline-size: 48ch; margin-block-start: 28px; color: var(--ds-inkt-zacht); font-size: 18px; line-height: 1.7; }
+  .ds-public-story-art { margin: 0; align-self: center; }
+  .ds-public-story-art img { display: block; inline-size: 100%; block-size: auto; max-block-size: 760px; aspect-ratio: 4 / 5; object-fit: contain; }
+  .ds-public-story-art figcaption { margin-block-start: 16px; text-align: center; color: var(--ds-inkt-zacht); font-size: 10px; letter-spacing: .08em; line-height: 1.6; }
+  .ds-public-story :where(.story-section, .capability-section, .pass-fit, .story-try, .world-tools) { padding: 88px max(24px, calc((100% - 1200px) / 2)); }
+  .ds-public-story :where(.story-section:nth-child(even), .capability-section, .story-try) { background: var(--ds-oppervlak); }
+  .ds-public-story :where(.story-intro, .capability-heading, .pass-fit-grid) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: start; }
+  .ds-public-story :where(.story-intro-text, .capability-heading > p) { color: var(--ds-inkt-zacht); }
+  .ds-public-story :where(.outcomes, .capability-grid) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; margin-block-start: 48px; }
+  .ds-public-story :where(.outcome, .capability) { padding-block-start: 24px; border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story :where(.outcome, .capability) > p { color: var(--ds-inkt-zacht); margin-block-start: 16px; }
+  .ds-public-story .outcome-number { display: block; }
+  .ds-public-story :where(.pass-fit-item, .story-person, .story-line) { display: flex; gap: 20px; padding-block: 24px; border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story .pass-fit-item:first-child { padding-block-start: 0; }
+  .ds-public-story .pass-fit-item > span { flex: 0 0 24px; white-space: nowrap; font-size: 12px; color: var(--ds-metaal); }
+  .ds-public-story .pass-fit-item p { margin-block-start: 8px; color: var(--ds-inkt-zacht); }
+  .ds-public-story .pass-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; margin-block: 32px 16px; }
+  .ds-public-story .pass-price strong { font: 400 clamp(36px, 3.3cqi, 48px)/1.1 var(--ds-letter-display); }
+  .ds-public-story :where(.pass-price span, .pass-note) { font-size: 13px; line-height: 1.7; color: var(--ds-inkt-zacht); }
+  .ds-public-story .pass-note { max-inline-size: 62ch; }
+  .ds-public-story .story-inner > p { margin-block-start: 24px; max-inline-size: 85ch; }
+  .ds-public-story .principle { padding: 88px max(24px, calc((100% - 900px) / 2)) 0; text-align: center; background: var(--ds-oppervlak-sterk); }
+  .ds-public-story .principle > p { margin-block: 24px; }
+  .ds-public-story .principle .world-actions { justify-content: center; }
+  .ds-public-story .principle::after { content: ''; display: block; block-size: clamp(100px, 18cqi, 240px); margin-block-start: 40px; background: url('../../images/brand/rtg-painted-horizon.webp') center / contain no-repeat; }
+  .ds-public-story .principle.ds-public-art-interlude { padding: 64px max(24px, calc((100% - 1120px) / 2)); text-align: start; }
+  .ds-public-story .principle.ds-public-art-interlude::after { display: none; }
+  .ds-public-story .principle.ds-public-art-interlude .world-actions { justify-content: start; }
+  .ds-public-story.ds-public-notfound .world-hero { min-block-size: 70dvh; }
+  .ds-public-notfound h1 em { color: var(--ds-accent); }
+  .ds-public-story :where(.proof-detail, .app-truth-app-detail) { border-block-end: 1px solid var(--ds-lijnkleur); padding-block: 12px; }
+  .ds-public-story details summary { cursor: pointer; min-block-size: 44px; padding-block: 12px; font-size: 13px; line-height: 1.6; }
+  .ds-public-story details p { font-size: 14px; margin-block: 12px; }
+  .ds-public-story :where(.proof-source, .app-truth-note, .truth-note) { display: block; font-size: 12px; line-height: 1.7; color: var(--ds-inkt-zacht); }
+  .ds-public-story .app-truth-panel { margin-block-start: 24px; padding-block-start: 20px; border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story .app-truth-panel :where(p, li) { font-size: 13px; }
+  .ds-public-story .app-truth-panel :where(ul, h3, p) { margin-block: 8px; }
+  .ds-public-story .app-truth-groups { display: grid; gap: 24px; }
+  .ds-public-story .app-truth-groups :where(ul, li) { padding: 0; list-style: none; }
+  .ds-public-story .app-truth-groups h4 { font: 500 16px var(--ds-letter-tekst); }
+  .ds-public-story .app-truth-groups :where(h4 span, summary span) { display: block; font-size: 11px; font-weight: 400; color: var(--ds-inkt-zacht); }
+  .ds-public-story .app-truth-groups a { display: inline-flex; min-block-size: 44px; align-items: center; }
+  .ds-public-story .moment { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--ds-cover-grond); color: var(--ds-cover-inkt); }
+  .ds-public-story .moment-visual { grid-column: 1; grid-row: 1 / 3; }
+  .ds-public-story .moment-visual img { display: block; inline-size: 100%; block-size: 100%; max-block-size: 760px; object-fit: cover; }
+  .ds-public-story .moment-copy { grid-column: 2; grid-row: 1; padding: 64px; align-self: center; }
+  .ds-public-story .moment-copy p:not(.story-kicker) { margin-block-start: 24px; }
+  .ds-public-story .moment .story-kicker { color: var(--ds-cover-metaal); }
+  .ds-public-story .ds-public-image-credit { grid-column: 2; grid-row: 2; padding: 0 64px 32px; font-size: 11px; color: var(--ds-cover-inkt); }
+  .ds-public-story .story-try > header { max-inline-size: 680px; margin-block-end: 40px; }
+  .ds-public-story .story-try > header > p:last-child { margin-block-start: 20px; }
+  .ds-public-story .simulation { padding: 32px; background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story .simulation-head { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-block-end: 24px; }
+  .ds-public-story :where(.demo-label, .story-image-label, .simulation-disclaimer, .story-boundary) { font-size: 12px; line-height: 1.6; color: var(--ds-inkt-zacht); }
+  .ds-public-story .simulation-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; }
+  .ds-public-story .story-photo img { display: block; inline-size: 100%; block-size: 280px; object-fit: cover; }
+  .ds-public-story .story-photo figcaption { padding-block: 24px; }
+  .ds-public-story .story-photo :where(small, p) { font-size: 13px; }
+  .ds-public-story .story-photo h3 { margin-block: 8px; }
+  .ds-public-story :where(.story-person, .story-line) { gap: 12px; padding-block: 12px; font-size: 13px; }
+  .ds-public-story :where(.story-person small, .story-person strong) { display: block; }
+  .ds-public-story :where(.story-icon, .rahul-mark) { flex: 0 0 24px; }
+  .ds-public-story svg { inline-size: 24px; block-size: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .ds-public-story .demo-choice { display: grid; gap: 12px; margin-block: 16px; font-size: 13px; }
+  .ds-public-story select { inline-size: 100%; }
+  .ds-public-story .connection-steps { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding-inline-start: 20px; font-size: 13px; }
+  .ds-public-story .connection-steps li { font-size: 13px; padding: 16px 8px; border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story .connection-steps summary { display: grid; gap: 12px; align-items: start; }
+  .ds-public-story .story-widget-head { display: flex; align-items: center; gap: 8px; color: var(--ds-metaal); }
+  .ds-public-story .story-widget-more { color: var(--ds-inkt-zacht); font-size: 11px; }
+  .ds-public-story .story-permission { display: flex; align-items: center; gap: 12px; min-block-size: 44px; font-size: 13px; line-height: 1.6; }
+  .ds-public-story .story-permission input { flex: 0 0 24px; inline-size: 24px; min-block-size: 24px; block-size: 24px; padding: 0; accent-color: var(--ds-accent); }
+  .ds-public-story .rahul-note { display: flex; align-items: start; gap: 16px; padding-block: 24px; border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story .rahul-note p { font-size: 14px; }
+  .ds-public-story .ds-public-explore-copy > p:last-child { margin-block-start: 24px; max-inline-size: 48ch; }
+  .ds-public-story .ds-public-search { max-inline-size: 680px; margin: 48px auto 32px; padding-inline: 24px; }
+  .ds-public-story .ds-public-search label { display: grid; gap: 12px; font-size: 13px; }
+  .ds-public-story .world-orbit { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; max-inline-size: 1200px; margin-inline: auto; padding-inline: 24px; }
+  .ds-public-story .world-orbit button { display: grid; gap: 8px; text-align: start; padding: 24px; border-radius: var(--ds-radius-inhoud); }
+  .ds-public-story .world-orbit :where(span, small) { font-size: 11px; }
+  .ds-public-story.ds-public-explorer .explore-intro { padding-block: 56px 32px; }
+  .ds-public-explorer .explore-intro h1 em { color: var(--ds-accent); }
+  .ds-public-explorer .explore-intro .ds-public-story-art img { max-block-size: 400px; }
+  .ds-public-explorer .explore-intro .truth-note { margin: 24px 0 0; padding: 0; font-size: 12px; }
+  .ds-public-story.ds-public-explorer .world-orbit { gap: 24px; }
+  .ds-public-story.ds-public-explorer .world-orbit button { gap: 12px; padding: 0 0 20px; overflow: hidden; border: 0; border-block-end: 3px solid transparent; background: var(--ds-oppervlak); color: var(--ds-inkt); }
+  .ds-public-explorer .world-orbit button > :not(img) { margin-inline: 20px; }
+  .ds-public-explorer .world-orbit img { display: block; inline-size: 100%; block-size: 180px; object-fit: cover; }
+  .ds-public-story.ds-public-explorer .world-orbit button[aria-pressed=true] { border-color: var(--ds-accent); background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-public-explorer .world-orbit strong { font: 400 28px/1.2 var(--ds-letter-display); }
+  .ds-public-explorer .ds-public-explore-credit { max-inline-size: 1200px; margin: 16px auto 0; padding-inline: 24px; font-size: 11px; color: var(--ds-inkt-zacht); text-align: end; }
+  .ds-public-explorer .world-tools { margin-block-start: 64px; background: var(--ds-oppervlak); }
+  .ds-public-explorer .world-tools-head { max-inline-size: 60ch; }
+  .ds-public-story.ds-public-explorer .tool-grid a { background: var(--ds-oppervlak-sterk); padding: 24px; border: 0; }
+  .ds-public-story.ds-public-explorer .tool-grid a:hover { outline: 1px solid var(--ds-accent); }
+  .ds-public-story .orbit-core { display: none; }
+  .ds-public-story .tool-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-block-start: 40px; }
+  .ds-public-story .tool-grid a { display: grid; gap: 12px; padding: 24px; border-block-start: 1px solid var(--ds-lijnkleur); color: var(--ds-inkt); text-decoration: none; }
+  .ds-public-story .tool-grid a:hover { background: var(--ds-oppervlak); }
+  .ds-public-story .tool-grid :where(span, small) { font-size: 12px; line-height: 1.7; color: var(--ds-inkt-zacht); }
+  .ds-public-story .tool-grid strong { font-size: 18px; font-weight: 500; }
+  .ds-public-story .truth-note { max-inline-size: 1200px; margin: 0 auto 48px; padding-inline: 24px; }
+  .ds-public-story .world-footer { padding: 40px max(24px, calc((100% - 1200px) / 2)); background: var(--ds-oppervlak-sterk); border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-public-story .world-footer > p { font-size: 13px; margin-block: 20px; }
+  .ds-public-story .world-footer nav { gap: 8px 24px; border-block-start: 1px solid var(--ds-lijnkleur); padding-block-start: 16px; }
+  .ds-public-story .world-footer nav a { display: inline-flex; align-items: center; min-block-size: 44px; font-size: 12px; text-decoration: none; color: var(--ds-inkt); }
+  .ds-public-page-actions { display: grid; gap: 8px; border-block-start: 1px solid var(--ds-lijnkleur); padding-block-start: 24px; margin-block-start: 24px; }
+  .ds-public-edge .story-edge-panel nav { display: grid; gap: 8px; }
+  .ds-public-story .sr-only { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .ds-public-detail *, .ds-public-edge *, .ds-public-command * { box-sizing: border-box; min-inline-size: 0; }
+  .ds-public-detail { max-inline-size: 1280px; margin-inline: auto; padding: 0 clamp(20px, 5cqi, 64px) 80px; overflow-wrap: anywhere; }
+  .ds-public-detail .scene { padding-block: 48px; }
+  .ds-public-detail :where(h2, h3) { text-wrap: balance; }
+  .ds-public-detail h2 { font: 400 clamp(32px, 4cqi, 56px)/1.12 var(--ds-letter-display); }
+  .ds-public-detail h3 { font: 500 22px/1.3 var(--ds-letter-tekst); }
+  .ds-public-detail :where(p, li) { font-size: 16px; line-height: 1.85; }
+  .ds-public-detail :where(p, ul, ol) { max-inline-size: 72ch; }
+  .ds-public-detail :where(a) { color: var(--ds-accent); text-underline-offset: 4px; }
+  .ds-public-detail :where(button, select, input, textarea) { font: inherit; max-inline-size: 100%; }
+  .ds-public-detail :where(button, select, input:not([type=checkbox]):not([type=radio]), textarea) { border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); padding: 12px 16px; min-block-size: 48px; background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); }
+  .ds-public-detail button { cursor: pointer; }
+  .ds-public-detail :where(button[aria-pressed=true], button[aria-selected=true]) { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-public-detail label { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-block: 16px; }
+  .ds-public-detail :where(select, textarea) { inline-size: 100%; }
+  .ds-public-detail input:is([type=checkbox], [type=radio]) { inline-size: 24px; block-size: 24px; accent-color: var(--ds-accent); }
+  .ds-public-detail input[type=search] { inline-size: 100%; }
+  .ds-public-detail :where(.overline, .demo-label) { font-size: 11px; letter-spacing: .12em; color: var(--ds-accent); }
+  .ds-public-detail .scene-heading { max-inline-size: 840px; margin: 16px auto 48px; text-align: center; }
+  .ds-public-detail .scene-heading > p { margin: 24px auto; max-inline-size: 52ch; }
+  .ds-public-detail .scene-heading .overline { margin-block: 0 20px; }
+  .ds-public-detail .scene-heading h2 { font-size: clamp(40px, 5cqi, 72px); }
+  .ds-public-detail h2 em { color: var(--ds-accent); }
+  .ds-public-pass-index { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 32px 24px; margin-block: 40px 56px; }
+  .ds-public-detail .ds-public-offer-status { font-size: 13px; text-align: center; max-inline-size: none; }
+  .ds-public-pass-index a { grid-column: span 2; display: grid; align-content: start; gap: 12px; text-decoration: none; color: var(--ds-inkt); }
+  .ds-public-pass-index a:nth-child(-n+2) { grid-column: span 3; }
+  .ds-public-pass-index img { display: block; inline-size: 100%; block-size: 220px; object-fit: cover; }
+  .ds-public-pass-index strong { font: 400 30px/1.15 var(--ds-letter-display); }
+  .ds-public-pass-index span { font-size: 14px; line-height: 1.7; }
+  .ds-public-pass-index small { font-size: 12px; color: var(--ds-accent); }
+  .ds-public-detail .ds-public-index-credit { text-align: end; margin: -32px 0 48px; max-inline-size: none; font-size: 11px; color: var(--ds-inkt-zacht); }
+  .ds-public-detail .faq-search { display: grid; max-inline-size: 720px; margin-inline: auto; gap: 16px; }
+  .ds-public-detail :where(.faq-list, #faqCount) { max-inline-size: 900px; margin-inline: auto; }
+  .ds-public-detail .faq-list details { margin: 0; padding-block: 12px; }
+  .ds-public-detail .faq-list summary { font-size: 18px; font-weight: 400; }
+  .ds-public-detail .faq-list p { color: var(--ds-inkt-zacht); padding-block: 0 20px; }
+  .ds-public-detail :where(.intent-console, .permission-demo) { padding: 32px; background: var(--ds-oppervlak); }
+  .ds-public-detail .story-boundary { padding: 20px 24px; border-inline-start: 2px solid var(--ds-metaal); font-size: 13px; background: var(--ds-oppervlak); }
+  .ds-public-detail .scenario-choices { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 0; margin: 0 0 40px; border: 0; }
+  .ds-public-detail .scenario-choices label { display: flex; align-items: center; gap: 12px; margin: 0; padding: 20px 16px; border-block: 1px solid var(--ds-lijnkleur); cursor: pointer; font-size: 14px; }
+  .ds-public-detail .scenario-choices label:has(:checked) { background: var(--ds-oppervlak); border-color: var(--ds-accent); }
+  .ds-public-detail .scenario-choices input { flex: 0 0 24px; margin: 0; }
+  .ds-public-detail .scenario-choices small { display: block; margin-block-end: 8px; font-size: 10px; }
+  .ds-public-detail .simulation { padding: 32px; border: 1px solid var(--ds-lijnkleur); }
+  .ds-public-detail .simulation-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-block-end: 32px; }
+  .ds-public-detail .simulation-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; }
+  .ds-public-detail .simulation :where(p, li) { font-size: 14px; }
+  .ds-public-detail .simulation h3 { font-size: 22px; margin-block: 12px; }
+  .ds-public-detail .simulation .story-photo img { block-size: 280px; }
+  .ds-public-detail .story-people h4 { margin-block: 0 20px; font-size: 16px; }
+  .ds-public-detail .story-people > small { display: block; margin-block-end: 12px; }
+  .ds-public-detail .story-controls { border: 0; padding: 20px; }
+  .ds-public-detail .story-controls .story-boundary { padding: 12px; }
+  .ds-public-detail .demo-choice { display: grid; }
+  .ds-public-detail .story-image-label { display: block; padding-block: 8px; font-size: 11px; color: var(--ds-inkt-zacht); }
+  .ds-public-detail .connection-steps { grid-column: 1 / -1; max-inline-size: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; padding: 0; margin: 16px 0 0; list-style: none; }
+  .ds-public-detail .connection-steps details { margin: 0; border-block: 1px solid var(--ds-lijnkleur); block-size: 100%; }
+  .ds-public-detail .connection-steps summary { display: grid; gap: 12px; font-size: 13px; }
+  .ds-public-detail .story-widget-head { display: flex; align-items: center; gap: 12px; }
+  .ds-public-detail .story-widget-more { color: var(--ds-inkt-zacht); font-size: 11px; }
+  .ds-public-detail .rahul-note { padding-block: 16px; }
+  .ds-public-detail .simulation-disclaimer { font-size: 12px; color: var(--ds-inkt-zacht); max-inline-size: none; }
+  .ds-public-detail .intent-form { max-inline-size: 760px; padding: 32px; margin-inline: auto; background: var(--ds-oppervlak); }
+  .ds-public-detail .intent-form > div { display: flex; gap: 12px; margin-block: 16px; }
+  .ds-public-detail .intent-form input { flex: 1; inline-size: 100%; }
+  .ds-public-detail .intent-form button { background: var(--ds-accent); color: var(--ds-accent-inkt); border-color: var(--ds-accent); padding-inline: 24px; }
+  .ds-public-detail #intentFeedback { max-inline-size: 760px; margin: 20px auto 40px; font-size: 13px; color: var(--ds-inkt-zacht); }
+  .ds-public-detail .intent-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; padding: 0; margin-block: 48px; max-inline-size: none; list-style: none; }
+  .ds-public-detail .intent-steps li { padding-block-start: 24px; border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-public-detail .intent-steps span { display: block; color: var(--ds-metaal); font-size: 12px; margin-block-end: 24px; }
+  .ds-public-detail .intent-steps strong { font-size: 18px; font-weight: 500; }
+  .ds-public-detail .intent-steps p { font-size: 14px; color: var(--ds-inkt-zacht); }
+  .ds-public-detail :where(.large-principle, .trust-principle) { margin: 64px auto 0; max-inline-size: 24ch; text-align: center; font: 400 40px/1.25 var(--ds-letter-display); }
+  .ds-public-detail .large-principle em { color: var(--ds-accent); }
+  .ds-public-detail .permission-demo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 64px; padding: 40px; }
+  .ds-public-detail .permission-identity > span { display: grid; place-items: center; inline-size: 64px; block-size: 64px; border-radius: var(--ds-radius-cirkel); background: var(--ds-accent); color: var(--ds-accent-inkt); font: 400 32px var(--ds-letter-display); }
+  .ds-public-detail .permission-identity p { font: 400 32px/1.3 var(--ds-letter-display); margin-block: 24px; }
+  .ds-public-detail .permission-demo fieldset { border: 0; padding: 0; margin: 0; }
+  .ds-public-detail .permission-demo legend { font-size: 12px; margin-block-end: 16px; }
+  .ds-public-detail .permission-demo label { flex-wrap: nowrap; justify-content: space-between; margin: 0; padding-block: 20px; border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-public-detail .permission-demo label :where(strong, small) { display: block; }
+  .ds-public-detail .permission-demo label small { margin-block-start: 8px; }
+  .ds-public-detail .permission-demo input { flex: 0 0 24px; }
+  .ds-public-detail .permission-fixed { display: grid; gap: 8px; padding-block-start: 24px; font-size: 14px; }
+  .ds-public-detail .permission-result { padding-block: 16px; font-size: 14px; color: var(--ds-inkt-zacht); }
+  .ds-public-detail .ds-public-world-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-block: 0 40px; }
+  .ds-public-detail .world-room > div > a { display: inline-flex; align-items: center; min-block-size: 44px; margin-inline-end: 24px; font-size: 14px; }
+  .ds-public-detail .world-room h3 { font: 400 40px/1.2 var(--ds-letter-display); }
+  .ds-public-detail .world-position { font-size: 12px; color: var(--ds-inkt-zacht); }
+  .ds-public-detail :where(.proof-source, small) { font-size: 12px; color: var(--ds-inkt-zacht); }
+  .ds-public-detail :where(.role-layout, .simulation-layout, .world-room) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+  .ds-public-detail :where(.tech-facts, .entry-grid, .fragment-field, .permission-grid, .service-grid, .explore-map, .personal-worlds) { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px; }
+  .ds-public-detail :where(.tech-facts article, .entry-grid article, .simulation-card, .story-controls, .story-output, .permission-card) { padding: 24px; border: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak); }
+  .ds-public-detail :where(.role-switch, .scenario-picker, .world-tabs, .graph-topics, .flow-tabs, .faq-filters) { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 24px; }
+  .ds-public-detail :where(figure) { margin: 0; }
+  .ds-public-detail :where(.story-photo img, .world-room > img) { inline-size: 100%; max-block-size: 480px; object-fit: cover; }
+  .ds-public-detail .story-photo figcaption { padding: 24px; background: var(--ds-oppervlak); }
+  .ds-public-detail :where(.story-person, .story-line, .simulation-row) { display: flex; align-items: start; gap: 12px; padding-block: 12px; border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-public-detail :where(.story-icon, .simulation-row svg) { flex: 0 0 24px; }
+  .ds-public-detail svg { inline-size: 24px; block-size: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .ds-public-detail .stage-image:not(.is-active) { display: none; }
+  .ds-public-detail .stage-image img { inline-size: 100%; block-size: auto; }
+  .ds-public-detail :where(.stage-chrome, .stage-label) { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-block: 16px; font-size: 12px; }
+  .ds-public-detail .graph-map { display: flex; flex-wrap: wrap; gap: 16px; padding: 32px; background: var(--ds-oppervlak); }
+  .ds-public-detail .graph-map > span { padding: 16px; border: 1px solid var(--ds-lijnkleur); }
+  .ds-public-detail details { border-block-end: 1px solid var(--ds-lijnkleur); margin-block: 16px; }
+  .ds-public-detail summary { cursor: pointer; min-block-size: 48px; padding-block: 16px; font-weight: 500; }
+  .ds-public-detail .pass-table-wrap { overflow: auto; overscroll-behavior-inline: contain; margin-block: 32px; }
+  .ds-public-detail .pass-table { inline-size: 100%; min-inline-size: 64rem; border-collapse: collapse; font-size: 14px; text-align: start; overflow-wrap: normal; }
+  .ds-public-detail .pass-table :where(th, td) { min-inline-size: 12rem; overflow-wrap: normal; word-break: normal; }
+  .ds-public-detail :where(th, td) { padding: 24px 16px; border-block-end: 1px solid var(--ds-lijnkleur); vertical-align: top; line-height: 1.7; text-align: start; }
+  .ds-public-detail th { font-weight: 600; }
+  .ds-public-detail thead { background: var(--ds-oppervlak); }
+  .ds-public-detail caption { text-align: start; font-size: 13px; padding-block: 16px; }
+  .ds-public-detail dialog, .ds-public-command { border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); padding: 24px; inline-size: min(720px, calc(100% - 32px)); max-block-size: 85dvh; overflow: auto; background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); box-shadow: var(--ds-schaduw-systeem); }
+  .ds-public-detail dialog::backdrop, .ds-public-command::backdrop { background: var(--ds-cover-grond); opacity: .65; }
+  .ds-public-command :where(input, button) { font: inherit; min-block-size: 48px; max-inline-size: 100%; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); padding: 12px; background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); }
+  .ds-public-command .command-head { display: flex; gap: 16px; align-items: end; }
+  .ds-public-command label { flex: 1; display: grid; gap: 8px; }
+  .ds-public-command .command-result { display: grid; gap: 4px; padding-block: 16px; border-block-end: 1px solid var(--ds-lijnkleur); color: var(--ds-inkt); text-decoration: none; }
+  .ds-public-command :where(small, .command-hint) { color: var(--ds-inkt-zacht); font-size: 13px; }
+  .ds-public-edge { --ds-edge-paper: color-mix(in srgb, var(--ds-lippen-licht) 26%, var(--ds-oppervlak)); --ds-edge-raised: color-mix(in srgb, var(--ds-oppervlak-sterk) 70%, var(--ds-edge-paper)); --ds-edge-rule: color-mix(in srgb, var(--ds-metaal) 35%, var(--ds-edge-paper)); position: fixed; z-index: 60; inset-inline: 12px; inset-block-end: max(12px, env(safe-area-inset-bottom)); max-inline-size: 640px; margin-inline: auto; color: var(--ds-inkt); pointer-events: none; }
+  .ds-public-edge .rtg-adaptive-edge { position: relative; display: flex; flex-direction: column; gap: 8px; max-block-size: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(12px, env(safe-area-inset-bottom))); }
+  .ds-public-edge :where(.rtg-adaptive-bar, .rtg-adaptive-surface) { flex: 0 0 auto; }
+  .ds-public-edge .rtg-adaptive-edge:is([data-rtg-adaptive-state="dock"], [data-rtg-adaptive-state="peek"]) .rtg-adaptive-bar { display: none; }
+  .ds-public-edge .ds-public-edge-toggle { display: grid; place-items: center; align-self: center; inline-size: 64px; block-size: 48px; min-block-size: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; pointer-events: auto; }
+  .ds-public-edge .ds-public-edge-toggle img { display: block; inline-size: 56px; block-size: 40px; object-fit: contain; }
+  .ds-public-edge .ds-public-edge-toggle span { display: none; font-size: 24px; line-height: 1; }
+  .ds-public-edge .ds-public-edge-toggle[aria-expanded="true"] { position: absolute; inset-inline-end: 0; inset-block-end: calc(100% + 8px); inline-size: 44px; block-size: 44px; padding: 8px; border: 1px solid var(--ds-edge-rule); border-radius: var(--ds-radius-cirkel); background: var(--ds-edge-paper); color: var(--ds-accent); }
+  .ds-public-edge .ds-public-edge-toggle[aria-expanded="true"] img { display: none; }
+  .ds-public-edge .ds-public-edge-toggle[aria-expanded="true"] span { display: block; }
+  .ds-public-edge .rtg-adaptive-edge[data-rtg-adaptive-state="expanded"] .ds-public-edge-toggle { display: none; }
+  .ds-public-edge .ds-public-edge-toggle:focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 4px; }
+  .ds-public-edge :where(.rtg-adaptive-sheet, .rtg-adaptive-surface) { pointer-events: auto; background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); box-shadow: var(--ds-schaduw-systeem); }
+  /* The native app runtime wears the existing DS Edge component. No second
+     website bar: the host only supplies public navigation and original DOM. */
+  .ds-public-edge .rtg-adaptive-bar { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(5, minmax(44px, 1fr)); gap: 0; min-block-size: 64px; padding: 4px 8px; border: 1px solid var(--ds-lippen-diep); border-radius: var(--ds-radius-capsule); background: var(--ds-glas); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ds-lippen-licht) 65%, transparent), var(--ds-schaduw-systeem); backdrop-filter: none; pointer-events: auto; color: var(--ds-cover-inkt); }
+  .ds-public-edge .rtg-adaptive-bar::before, .ds-public-edge .rtg-adaptive-surface::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: var(--ds-radius-capsule); background: url('../../images/brand/rtg-edge-paint.webp') center / 100% 100% no-repeat; pointer-events: none; }
+  .ds-public-edge .rtg-adaptive-bar::before { background-image: linear-gradient(90deg, transparent 18%, color-mix(in srgb, var(--ds-inkt) 30%, transparent) 22%, color-mix(in srgb, var(--ds-inkt) 30%, transparent) 39%, transparent 43%, transparent 58%, color-mix(in srgb, var(--ds-inkt) 30%, transparent) 62%, color-mix(in srgb, var(--ds-inkt) 30%, transparent) 80%, transparent 84%), url('../../images/brand/rtg-edge-paint.webp'); }
+  .ds-public-edge:dir(rtl) .rtg-adaptive-bar::before, .ds-public-edge:dir(rtl) .rtg-adaptive-surface::before { transform: scaleX(-1); }
+  .ds-public-edge button { font: inherit; color: inherit; cursor: pointer; }
+  .ds-public-edge .rtg-adaptive-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-inline-size: 44px; min-block-size: 54px; padding: 4px; border: 0; border-radius: var(--ds-radius-capsule); background: transparent; color: var(--ds-cover-inkt); transition: background var(--ds-duur-kort), box-shadow var(--ds-duur-kort); }
+  .ds-public-edge .rtg-adaptive-bar .rtg-adaptive-item[data-rtg-adaptive-slot="2"] { color: var(--ds-inkt); }
+  @media (hover: hover) and (pointer: fine) {
+    .ds-public-edge .rtg-adaptive-item:hover { color: inherit; background: color-mix(in srgb, var(--ds-oppervlak-sterk) 10%, transparent); }
+  }
+  .ds-public-edge .rtg-adaptive-item[aria-expanded="true"] { box-shadow: inset 0 -2px 0 currentColor; }
+  .ds-public-edge .rtg-adaptive-item:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+  .ds-public-edge .rtg-adaptive-item-copy b, .ds-public-edge .rtg-adaptive-deck-dots { display: none; }
+  .ds-public-edge .rtg-adaptive-item-copy { min-inline-size: 0; max-inline-size: 100%; }
+  .ds-public-edge .rtg-adaptive-item-copy small { display: block; font: 500 .625rem/1.3 var(--ds-letter-tekst); text-align: center; white-space: normal; overflow-wrap: anywhere; hyphens: auto; }
+  .ds-public-edge .ds-edge-icon-only .rtg-adaptive-item-copy { display: none; }
+  .ds-public-edge .ds-edge-icon-only:focus-visible::after { content: attr(aria-label); position: absolute; z-index: 3; inset-block-end: calc(100% + 12px); inset-inline: -12px; inline-size: max-content; max-inline-size: min(180px, 48vw); padding: 8px 12px; border: 1px solid var(--ds-edge-rule); border-radius: var(--ds-radius-systeem); background: var(--ds-edge-paper); color: var(--ds-inkt); font: 500 .75rem/1.4 var(--ds-letter-tekst); text-align: center; pointer-events: none; }
+  .ds-public-edge .ds-edge-icon-only:last-of-type:focus-visible::after { inset-inline-start: auto; inset-inline-end: 0; }
+  .ds-public-edge .rtg-adaptive-bar svg[data-editorial-glyph] { inline-size: 27px; block-size: 27px; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+  .ds-public-edge svg { display: block; inline-size: 24px; block-size: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .ds-public-edge .rtg-adaptive-lips { inline-size: 40px; fill: var(--ds-cover-metaal); stroke: var(--ds-cover-metaal); }
+  .ds-public-edge .ds-edge-painted-lips { display: block; inline-size: 48px; block-size: 28px; object-fit: contain; flex: 0 0 auto; }
+  .ds-public-edge .rtg-adaptive-surface { position: relative; isolation: isolate; display: flex; align-items: center; gap: 16px; min-block-size: 72px; padding: 8px 16px; border-color: var(--ds-lippen-diep); border-radius: var(--ds-radius-capsule); background: var(--ds-glas); color: var(--ds-cover-inkt); }
+  .ds-public-edge .rtg-adaptive-surface[hidden] { display: none; }
+  .ds-public-edge .rtg-adaptive-surface :where(input, textarea) { min-inline-size: 0; min-block-size: 44px; border: 1px solid var(--ds-edge-rule); border-radius: var(--ds-radius-capsule); padding: 12px 16px; background: var(--ds-edge-paper); color: var(--ds-inkt); font: 400 1rem/1.4 var(--ds-letter-tekst); }
+  .ds-public-edge .rtg-adaptive-surface :where(input, textarea)::placeholder { color: var(--ds-inkt-zacht); opacity: 1; }
+  .ds-public-edge .rtg-adaptive-sheet { max-block-size: calc(100dvh - 120px - env(safe-area-inset-bottom)); overflow: auto; overscroll-behavior-block: contain; padding: 24px; }
+  .ds-public-edge .rtg-adaptive-sheet-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+  .ds-public-edge .rtg-adaptive-sheet-head h2 { font: 400 28px var(--ds-letter-display); }
+  .ds-public-edge :where(.rtg-adaptive-sheet button, .rtg-adaptive-sheet a) { display: inline-flex; align-items: center; gap: 12px; min-block-size: 48px; max-inline-size: 100%; padding: 12px; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); background: var(--ds-oppervlak-sterk); color: var(--ds-inkt); font-size: 14px; text-decoration: none; }
+  .ds-public-edge :where(.experience-panel nav, .pp-menu-panel) { display: grid; gap: 8px; }
+  .ds-public-edge :where(.rtg-adaptive-sheet p, .rtg-adaptive-sheet li) { font-size: 14px; line-height: 1.7; }
+  .ds-public-edge .rtg-adaptive-sheet[data-rtg-custom-panel] .rtg-adaptive-service { display: none; }
+  /* One gallery language across the existing public Edge, not a second shell.
+     Artwork is decorative; original service controls retain their owners. */
+  .ds-public-edge .rtg-adaptive-sheet { position: relative; isolation: isolate; padding: 0; background: linear-gradient(color-mix(in srgb, var(--ds-edge-paper) 93%, transparent), color-mix(in srgb, var(--ds-edge-paper) 93%, transparent)), url('../../images/brand/rtg-edge-paint.webp') center / cover no-repeat, var(--ds-edge-paper); color: var(--ds-inkt); border: 1px solid var(--ds-edge-rule); box-shadow: inset 0 1px 0 var(--ds-oppervlak-sterk), var(--ds-schaduw-systeem); scrollbar-width: thin; scrollbar-color: var(--ds-edge-rule) var(--ds-edge-paper); scroll-padding-block: 96px 24px; }
+  .ds-public-edge .rtg-adaptive-sheet::after { content: ''; position: absolute; z-index: -1; inset: 0; background: url('../../images/brand/rtg-edge-paint.webp') center / 100% 100% no-repeat; mask-image: linear-gradient(145deg, transparent 88%, var(--ds-inkt) 100%); border-radius: var(--ds-radius-systeem); pointer-events: none; }
+  .ds-public-edge .rtg-adaptive-sheet-head { position: sticky; inset-block-start: 0; z-index: 2; align-items: center; padding: 24px 24px 16px; background: transparent; }
+  .ds-public-edge .rtg-adaptive-sheet:not(:has(.ds-edge-pages)) .rtg-adaptive-sheet-head { background: var(--ds-edge-paper); }
+  .ds-public-edge .rtg-adaptive-sheet-head > div { min-inline-size: 0; }
+  .ds-public-edge .rtg-adaptive-sheet-head h2 { margin: 0; color: var(--ds-accent); font: 400 2.375rem/1.15 var(--ds-letter-display); letter-spacing: -.04em; overflow-wrap: anywhere; }
+  /* Compact orientation, not a second article heading. The full source title
+     stays in the accessible name and the horizontally paginated gallery. */
+  .ds-public-edge .ds-edge-reading-caption { display: block; max-inline-size: 100%; margin-block-end: 8px; color: var(--ds-inkt-zacht); font: 500 .6875rem/1.5 var(--ds-letter-tekst); letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ds-public-edge .ds-edge-reading-art { display: none; }
+  .ds-public-edge :where(.ds-edge-reading-links, .ds-edge-reading-actions) { display: grid; gap: 8px; padding: 8px 24px 24px; }
+  .ds-public-edge .ds-edge-reading-actions { padding: 0; }
+  .ds-public-edge :where(.ds-edge-reading-links, .ds-edge-reading-actions)[hidden] { display: none; }
+  .ds-public-edge .rtg-adaptive-sheet-mouth { display: none; }
+  .ds-public-edge [data-rtg-adaptive-close] { flex: 0 0 44px; justify-content: center; inline-size: 44px; block-size: 44px; min-block-size: 44px; padding: 8px; border: 0; border-radius: var(--ds-radius-cirkel); background: transparent; color: var(--ds-accent); font: 400 28px/1 var(--ds-letter-tekst); }
+  .ds-public-edge .rtg-adaptive-modes { display: flex; flex-wrap: nowrap; gap: 8px; margin: 0 24px 24px; padding: 0; border: 0; border-block-end: 1px solid var(--ds-edge-rule); border-radius: 0; background: transparent; overflow-x: auto; overflow-y: hidden; overscroll-behavior-inline: contain; scrollbar-width: none; }
+  .ds-public-edge .rtg-adaptive-modes button { flex: 1 0 auto; min-inline-size: 44px; min-block-size: 44px; padding: 8px 4px; border: 0; border-block-end: 2px solid transparent; border-radius: 0; background: transparent; color: var(--ds-inkt-zacht); font: 400 .75rem/1.5 var(--ds-letter-tekst); transition: color var(--ds-duur-kort), border-color var(--ds-duur-kort); }
+  .ds-public-edge .rtg-adaptive-modes button:hover { color: var(--ds-accent); border-block-end-color: var(--ds-edge-rule); }
+  .ds-public-edge .rtg-adaptive-sheet:not([data-rtg-custom-panel]) .rtg-adaptive-modes button[aria-pressed="true"] { background: transparent; color: var(--ds-accent); border-block-end-color: var(--ds-accent); font-weight: 500; text-decoration: none; }
+  .ds-public-edge .ds-edge-gallery { margin: 0 24px; }
+  .ds-edge-gallery img { display: block; inline-size: 100%; block-size: auto; aspect-ratio: 3 / 2; max-block-size: 240px; object-fit: contain; background: transparent; }
+  .ds-public-edge .ds-edge-gallery p { margin: 0; padding-block: 16px; color: var(--ds-inkt-zacht); font: 400 1rem/1.6 var(--ds-letter-tekst); }
+  .ds-edge-gallery p:empty { display: none; }
+  .ds-public-edge :where(.rtg-adaptive-service, .rtg-adaptive-controls, .ds-edge-now, .pp-menu-panel) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 8px 24px 32px; }
+  .ds-public-edge :where(.rtg-adaptive-service-action, .rtg-adaptive-sheet-action, .ds-edge-now a, .ds-edge-now button, .pp-menu-item) { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-inline-size: 0; inline-size: 100%; min-block-size: 56px; border: 0; border-block-end: 1px solid var(--ds-edge-rule); border-radius: 0; padding: 12px 4px; background: transparent; box-shadow: none; color: var(--ds-inkt); font: 400 1rem/1.5 var(--ds-letter-tekst); text-align: start; text-decoration: none; overflow-wrap: anywhere; transition: background var(--ds-duur-kort), border-color var(--ds-duur-kort); }
+  .ds-public-edge .rtg-adaptive-service-action b { flex: 0 0 auto; color: var(--ds-accent); font-weight: 400; }
+  .ds-public-edge :where(.rtg-adaptive-service-action, .rtg-adaptive-sheet-action, .ds-edge-now a, .ds-edge-now button, .pp-menu-item):hover { background: var(--ds-oppervlak); border-color: var(--ds-accent); color: var(--ds-accent); }
+  .ds-public-edge :where(.rtg-adaptive-service-action, .rtg-adaptive-sheet-action, .ds-edge-now a, .ds-edge-now button, .pp-menu-item):active { background: var(--ds-edge-paper); box-shadow: none; }
+  .ds-public-edge :where(.rtg-adaptive-service, .rtg-adaptive-controls):empty { padding: 0; }
+  .ds-public-edge .rtg-adaptive-media-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 8px; }
+  .ds-public-edge .rtg-adaptive-media-controls button { flex: 1 1 100px; inline-size: auto; justify-content: center; font-size: .8125rem; }
+  .ds-public-edge .ds-discover { padding: 0 24px 24px; }
+  .ds-public-edge .ds-discover-gallery { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .ds-public-edge .ds-discover .ds-discover-art { display: block; padding: 0; border: 0; border-radius: 0; background: transparent; }
+  .ds-discover-art img { display: block; inline-size: 100%; block-size: auto; aspect-ratio: 3 / 2; }
+  .ds-discover-art > span { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-block-size: 48px; padding: 12px 0 0; color: var(--ds-inkt); font: 400 .75rem/1.5 var(--ds-letter-tekst); letter-spacing: .04em; }
+  .ds-discover-art > span > span { display: grid; place-items: center; flex: 0 0 32px; block-size: 32px; color: var(--ds-accent); }
+  .ds-public-edge .ds-discover .ds-discover-routes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 12px; }
+  .ds-public-edge .ds-discover-routes a { display: flex; flex-direction: row; align-items: center; justify-content: start; gap: 16px; min-inline-size: 0; min-block-size: 52px; padding: 12px 4px; border: 0; border-block-end: 1px solid var(--ds-edge-rule); border-radius: 0; background: transparent; box-shadow: none; color: var(--ds-inkt); text-decoration: none; transition: background var(--ds-duur-kort), border-color var(--ds-duur-kort); }
+  .ds-discover-routes a > span { color: var(--ds-accent); font: 400 .625rem/1.5 var(--ds-letter-tekst); font-variant-numeric: tabular-nums; }
+  .ds-public-edge .ds-discover-routes strong { font: italic 400 1.75rem/1.2 var(--ds-letter-display); overflow-wrap: anywhere; }
+  .ds-public-edge .ds-discover .ds-discover-service { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-block-start: 24px; padding-block-start: 24px; border-block-start: 1px solid var(--ds-edge-rule); }
+  .ds-public-edge .ds-discover-service :where(a, button, summary) { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-block-size: 48px; padding: 12px 4px; border: 0; border-block-end: 1px solid var(--ds-edge-rule); border-radius: 0; background: transparent; color: var(--ds-inkt); font: 400 .8125rem/1.6 var(--ds-letter-tekst); text-align: start; text-decoration: none; cursor: pointer; }
+  .ds-discover-service summary::after { content: '+'; color: var(--ds-accent); }
+  .ds-discover-service details[open] > summary::after { content: '−'; }
+  .ds-discover-service details > div { display: grid; gap: 8px; padding: 12px 0 0 0; }
+  .ds-public-edge .ds-discover :where(a, button, summary):hover { color: var(--ds-accent); }
+  .ds-public-edge .ds-discover-routes a:hover { background: var(--ds-oppervlak); border-color: var(--ds-accent); }
+  .ds-public-edge .ds-discover-routes a:active { background: var(--ds-edge-paper); box-shadow: none; }
+  .ds-public-edge .ds-discover-routes a:hover strong, .ds-discover-art:hover > span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+  .ds-public-edge .rtg-adaptive-sheet :where(a, button, summary):focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  .ds-public-edge :where(.ds-edge-gallery, .ds-edge-now, .rtg-adaptive-service, .rtg-adaptive-controls)[hidden] { display: none; }
+  .ds-public-edge .rtg-adaptive-sheet[data-rtg-custom-panel] .rtg-adaptive-service { display: none; }
+  /* A fixed coloured folio: explicit leaves around ORIGINAL owner children.
+     No fragmented CSS columns, container-height units or cloned controls. */
+  .ds-public-edge .rtg-adaptive-sheet:has(.ds-edge-pages) { display: flex; flex-direction: column; flex: 0 1 auto; min-block-size: 0; block-size: min(760px, calc(100dvh - 120px - env(safe-area-inset-bottom))); overflow: hidden; overscroll-behavior: contain; }
+  .ds-public-edge .rtg-adaptive-sheet[hidden] { display: none; }
+  .ds-public-edge .rtg-adaptive-sheet-head, .ds-public-edge .rtg-adaptive-modes { flex: 0 0 auto; }
+  .ds-edge-pages { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; grid-template-rows: minmax(0, 1fr); column-gap: 24px; flex: 1 1 0; min-block-size: 0; min-inline-size: 0; margin-inline: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior: contain; scroll-snap-type: inline mandatory; scrollbar-width: none; }
+  .ds-edge-flow { display: contents; }
+  .ds-public-edge .rtg-adaptive-sheet .ds-edge-owner { display: contents; padding: 0; margin: 0; border: 0; }
+  .ds-edge-leaf { display: flex; flex-direction: column; align-items: stretch; gap: 12px; min-inline-size: 0; min-block-size: 0; overflow: hidden; scroll-snap-align: start; }
+  .ds-edge-leaf > * { flex: 0 0 auto; min-inline-size: 0; }
+  .ds-edge-leaf:not(.ds-edge-art-leaf) { padding-inline: 24px; }
+  .ds-public-edge .ds-edge-flow :where(.rtg-adaptive-service-action, .rtg-adaptive-sheet-action, .ds-edge-now a, .ds-edge-now button, .pp-menu-item, .ds-discover-routes a, .ds-discover-service a, .ds-discover-service button, .ds-discover-service summary) { margin: 0; }
+  /* A native summary is one action, not a column of text plus its disclosure
+     mark. Keep that mark beside the label when the action becomes a leaf. */
+  .ds-public-edge .ds-edge-summary-leaf { align-self: start; flex-direction: row; }
+  .ds-public-edge .ds-edge-details::details-content { display: contents; }
+  .ds-public-edge .ds-edge-details:not([open]) > :not(summary) { display: none; }
+  .ds-public-edge .ds-edge-art-leaf > :where(.ds-edge-gallery, .ds-discover-art) { display: flex; flex-direction: column; flex: 1 1 0; min-block-size: 0; margin: 0; padding: 0; }
+  .ds-public-edge .ds-edge-art-leaf :where(.ds-edge-gallery img, .ds-discover-art img) { flex: 1 1 0; min-block-size: 0; block-size: 0; max-block-size: none; aspect-ratio: auto; object-fit: contain; }
+  .ds-public-edge .ds-edge-art-leaf > .ds-discover-art { flex: 1 1 0; max-block-size: 100%; margin: 0; border: 0; }
+  .ds-public-edge .ds-discover .ds-edge-art-leaf > .ds-discover-art { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .ds-public-edge .ds-edge-art-leaf .ds-discover-art > span { padding: 12px 24px 16px; }
+  .ds-public-edge .ds-edge-art-leaf .ds-discover-art img { flex: 1 1 0; block-size: 0; aspect-ratio: auto; object-fit: cover; }
+  .ds-edge-art-leaf :where(figcaption, .ds-discover-art > span) { flex: 0 0 auto; }
+  .ds-public-edge .ds-edge-gallery-paged > .ds-edge-art-leaf > img { inline-size: 100%; block-size: 100%; min-block-size: 0; max-block-size: none; aspect-ratio: auto; object-fit: contain; }
+  .ds-public-edge .ds-edge-caption-leaf { display: block; padding-block: 16px; font: inherit; overflow-wrap: anywhere; }
+  .ds-public-edge .ds-edge-flow [hidden] { display: none; }
+  .ds-edge-pagination { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 12px 24px 16px; padding-block-start: 12px; border-block-start: 1px solid var(--ds-edge-rule); }
+  .ds-public-edge .ds-edge-pagination button { display: grid; place-items: center; inline-size: 44px; block-size: 44px; min-block-size: 44px; padding: 8px; border: 0; border-radius: var(--ds-radius-cirkel); background: transparent; color: var(--ds-accent); font: 400 24px/1 var(--ds-letter-tekst); }
+  .ds-public-edge .ds-edge-pagination button:disabled { opacity: 1; background: transparent; color: var(--ds-inkt-zacht); cursor: default; }
+  .ds-public-edge-page:has(.ds-public-edge .rtg-adaptive-sheet:not([hidden])) { overflow: hidden; }
+  .ds-edge-page-status { font: 400 .75rem/1.5 var(--ds-letter-tekst); font-variant-numeric: tabular-nums; }
+  @media (max-height: 700px) {
+    .ds-public-edge .rtg-adaptive-sheet-head { padding-block: 12px 8px; }
+    .ds-public-edge .rtg-adaptive-sheet-head h2 { font-size: 1.5rem; }
+    .ds-public-edge .rtg-adaptive-modes { margin-block-end: 16px; }
+    .ds-edge-pagination { margin-block: 8px; padding-block-start: 8px; }
+  }
+  @media (max-height: 480px) {
+    .ds-public-edge .rtg-adaptive-sheet-head { padding-block: 4px; }
+    .ds-public-edge .rtg-adaptive-sheet-head h2 { font-size: 1.25rem; }
+    .ds-public-edge .rtg-adaptive-modes { margin-block-end: 8px; }
+    .ds-edge-pagination { margin-block: 4px; padding-block-start: 4px; }
+  }
+
+  @media (min-width: 640px) {
+    .ds-public-edge .ds-discover-gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 32px; }
+    .ds-public-edge .ds-discover .ds-discover-routes { grid-template-columns: minmax(0, 1fr); }
+    .ds-public-edge .ds-discover-routes a { gap: 20px; min-block-size: 48px; padding: 12px 4px; }
+    .ds-public-edge .ds-discover .ds-discover-service { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .ds-discover-service > details { grid-column: 1 / -1; }
+    .ds-discover-service details > div { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  }
+
+  /* The quiet Edge overlays the page; only long reading needs an end clearance. */
+  .ds-public-edge-page { padding-block-end: 0; }
+  .ds-public-edge-page[data-magazine-view="article"], .ds-public-edge-page.ds-public-story:not(.ds-public-volume) .world-shell, .ds-public-edge-page.ds-public-volume :where(.ds-volume-library[open], .ds-volume-colophon[open]) { padding-block-end: calc(56px + max(12px, env(safe-area-inset-bottom))); }
+  .ds-public-edge-page > :where(.ds-public-site-header, .ds-magazine-masthead, .ds-magazine-footer) { display: none; }
+  .ds-public-edge-page .ds-issue-topline { display: none; }
+  .ds-public-edge .ds-public-info .world-footer { padding: 0; border: 0; background: transparent; }
+  .ds-public-edge .ds-public-reel-actions { display: grid; gap: 12px; }
+  .ds-public-edge .ds-issue-controls { inline-size: 100%; padding: 0; gap: 12px; grid-template-columns: 44px auto minmax(0, 1fr) 44px; background: transparent; border: 0; box-shadow: none; }
+  .ds-public-edge .ds-issue-controls p { display: none; }
+  .ds-public-edge .ds-issue-controls button { justify-content: center; padding: 0; min-block-size: 44px; }
+  .ds-public-edge .ds-issue-controls a { padding: 0; min-block-size: 44px; border: 0; background: transparent; justify-content: center; }
+  .ds-public-edge .rtg-edge-cinema { padding: 16px; background: var(--ds-oppervlak); }
+  .ds-public-edge :where(.rtg-edge-cinema__head, .rtg-edge-cinema__foot, .rtg-edge-cinema__story) { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .ds-public-edge .rtg-edge-cinema__story > div { flex: 1 1 200px; }
+  .ds-public-edge .rtg-edge-cinema__story h2 { font: 400 32px var(--ds-letter-display); }
+  .ds-magazine-page .sr-only { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* Five leaves, one native reading surface. No wheel hijack or locked body.
+     Overflow within a leaf remains available for text zoom and short screens.
+     Detailed product evidence is the original DOM, disclosed only on request. */
+  .ds-public-volume.ds-public-editorial { background: var(--ds-oppervlak-sterk); }
+  .ds-public-volume .ds-volume-magazine { background: var(--ds-oppervlak-sterk); }
+  .ds-volume-reel { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; block-size: calc(100svh - 140px); min-block-size: 440px; max-block-size: 1040px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: inline mandatory; scrollbar-width: none; }
+  .ds-public-edge-page.ds-public-volume .ds-volume-reel { block-size: 100dvh; min-block-size: 0; max-block-size: none; }
+  .ds-volume-reel::-webkit-scrollbar { display: none; }
+  .ds-volume-reel:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: -4px; }
+  .ds-public-volume.ds-public-editorial .ds-volume-sheet { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); align-items: stretch; block-size: 100%; overflow-y: auto; scroll-snap-align: start; padding: 0; gap: 0; background: var(--ds-oppervlak); color: var(--ds-inkt); text-align: start; }
+  .ds-public-volume.ds-public-editorial .ds-volume-sheet--rose { background: color-mix(in srgb, var(--ds-accent) 7%, var(--ds-oppervlak-sterk)); }
+  .ds-public-volume.ds-public-editorial .ds-volume-sheet--water { background: color-mix(in srgb, var(--ds-water) 25%, var(--ds-oppervlak-sterk)); }
+  .ds-public-volume.ds-public-editorial .ds-volume-sheet--sand { background: color-mix(in srgb, var(--ds-lippen-licht) 28%, var(--ds-oppervlak-sterk)); }
+  .ds-public-volume .ds-volume-image { margin: 0; min-block-size: 0; }
+  .ds-public-volume .ds-volume-image img { display: block; inline-size: 100%; block-size: 100%; max-block-size: none; object-fit: cover; }
+  .ds-public-volume .ds-volume-copy { display: flex; flex-direction: column; align-items: start; justify-content: center; padding: clamp(24px, 5cqi, 80px); min-block-size: min-content; }
+  .ds-public-volume .ds-volume-copy .world-label { margin: 0 0 20px; color: var(--ds-inkt-zacht); font-size: .6875rem; letter-spacing: .17em; }
+  .ds-public-volume.ds-public-editorial .ds-volume-copy :where(h1, h2) { max-inline-size: 16ch; margin: 0; font: 400 clamp(2.75rem, 5.6cqi, 6rem)/1.02 var(--ds-letter-display); letter-spacing: -.035em; text-wrap: balance; }
+  .ds-public-volume .ds-volume-copy :where(h1, h2) em { color: var(--ds-accent); font-weight: 400; }
+  .ds-public-volume .ds-volume-copy .world-actions { justify-content: start; margin-block-start: 28px; }
+  .ds-public-volume .button { gap: 16px; transition: background var(--ds-duur-kort), color var(--ds-duur-kort); }
+  .ds-public-volume .ds-volume-link { display: inline-flex; align-items: center; gap: 24px; min-block-size: 48px; margin-block-start: 24px; color: var(--ds-accent); font-size: .8125rem; text-decoration: none; border-block-end: 1px solid color-mix(in srgb, var(--ds-accent) 35%, transparent); }
+  .ds-public-volume .ds-volume-link:hover { border-color: currentColor; text-decoration: underline; text-underline-offset: 5px; }
+  .ds-public-volume .ds-volume-sheet--cover .ds-volume-image img { object-position: 45% center; }
+  .ds-public-volume .ds-volume-sheet--art .ds-volume-image img { object-fit: contain; }
+  .ds-public-volume.ds-public-editorial .ds-volume-sheet--panorama { grid-template-columns: 1fr; grid-template-rows: minmax(240px, 1fr) auto; }
+  .ds-public-volume .ds-volume-sheet--panorama .ds-volume-copy { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 4px 40px; padding: 28px max(32px, calc((100% - 1200px) / 2)); }
+  .ds-public-volume .ds-volume-sheet--panorama .world-label { grid-column: 1 / -1; margin-block-end: 8px; }
+  .ds-public-volume .ds-volume-sheet--panorama .ds-volume-link { margin: 0; }
+  .ds-public-volume .ds-volume-sheet--portrait .ds-volume-image img { object-position: 50% 65%; }
+  .ds-public-volume.ds-public-editorial .ds-volume-sheet--horizon { grid-template-columns: 1fr; grid-template-rows: minmax(200px, 1fr) auto; }
+  .ds-public-volume .ds-volume-sheet--horizon .ds-volume-image img { object-fit: cover; object-position: center; }
+  .ds-public-volume .ds-volume-sheet--horizon .ds-volume-copy { align-items: center; text-align: center; padding: 24px 24px 40px; }
+  .ds-public-volume .ds-volume-sheet--horizon .world-label { margin-block-end: 12px; }
+  .ds-volume-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 8px 24px; min-block-size: 76px; background: var(--ds-oppervlak-sterk); }
+  .ds-public-volume .ds-volume-bar > a { display: inline-flex; align-items: center; min-block-size: 44px; min-inline-size: 44px; inline-size: fit-content; color: var(--ds-inkt-zacht); font-size: .6875rem; text-decoration: none; }
+  .ds-public-volume .ds-volume-bar > a:last-child { grid-column: 3; justify-self: end; justify-content: end; }
+  .ds-public-volume .ds-volume-bar > a:hover { text-decoration: underline; }
+  .ds-volume-reel-controls:not([hidden]) { display: flex; align-items: center; gap: 16px; }
+  .ds-public-volume .ds-volume-reel-controls button { display: grid; place-items: center; inline-size: 44px; min-block-size: 44px; padding: 0; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-cirkel); background: transparent; color: var(--ds-inkt); font-size: 20px; line-height: 1; transition: background var(--ds-duur-kort), color var(--ds-duur-kort); }
+  .ds-public-volume .ds-volume-reel-controls button:not([aria-disabled=true]):hover { background: var(--ds-oppervlak); border-color: var(--ds-accent); color: var(--ds-accent); }
+  .ds-public-volume .ds-volume-reel-controls button[aria-disabled=true] { color: var(--ds-inkt-zacht); opacity: .45; cursor: default; }
+  .ds-volume-reel-controls [data-reel-status] { min-inline-size: 32px; font-size: .6875rem; font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
+  .ds-volume-reel-controls:dir(rtl) button > span { transform: scaleX(-1); }
+  .ds-volume-library, .ds-volume-colophon { max-inline-size: 1200px; margin: 0 auto; padding: 0 24px; border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-public-volume :where(.ds-volume-library, .ds-volume-colophon) > summary { padding-block: 16px; color: var(--ds-inkt-zacht); font-size: .75rem; }
+  .ds-volume-colophon > p { max-inline-size: 70ch; }
+  .ds-public-volume .ds-volume-return { display: inline-flex; align-items: center; min-block-size: 48px; margin-block: 8px 24px; font-size: .8125rem; }
+  .ds-volume-details { padding-block: 8px 32px; }
+  .ds-public-volume .ds-volume-details :where(.story-section, .capability-section, .story-try, .ds-volume-dossier-copy) { padding: 40px 0; background: transparent; }
+  .ds-public-volume .ds-volume-dossier { padding: 0; border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-public-volume .ds-volume-dossier > summary { display: flex; align-items: center; gap: 24px; list-style: none; padding: 24px 0; font-size: 1rem; line-height: 1.5; }
+  .ds-volume-dossier > summary::-webkit-details-marker { display: none; }
+  .ds-volume-dossier > summary > span:first-child { color: var(--ds-metaal); font-size: .6875rem; font-variant-numeric: tabular-nums; }
+  .ds-public-volume .ds-volume-toggle { margin-inline-start: auto; font-size: 28px; font-weight: 300; transition: transform var(--ds-duur-kort); }
+  .ds-volume-dossier[open] > summary .ds-volume-toggle { transform: rotate(45deg); }
+  .ds-public-volume .ds-volume-dossier > :not(summary) { margin-block: 16px 40px; }
+  .ds-public-volume .ds-volume-dossier .story-try { padding: 0; }
+  .ds-public-volume .ds-volume-dossier h2 { font-size: clamp(1.875rem, 3.3cqi, 2.625rem); }
+  .ds-public-volume .ds-volume-dossier .story-intro { gap: 40px; }
+  .ds-public-volume .ds-volume-dossier-copy { max-inline-size: 70ch; }
+  .ds-public-volume .ds-volume-dossier-copy p:not(.story-kicker) { margin-block-start: 24px; }
+  /* Desktop is an editorial spread, not an enlarged phone. Copy owns five
+     columns, photography seven; the next leaf reverses that visual weight. */
+  @container ds (min-width: 1100px) {
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-rows: auto minmax(min-content, 1fr) auto; align-items: stretch; min-block-size: 100dvh; text-align: start; background: var(--ds-oppervlak); }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero > .world-header { grid-column: 1 / -1; grid-row: 1; }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero-inner { grid-column: 1; grid-row: 2; align-self: center; max-inline-size: none; padding: clamp(48px, 4.4cqi, 96px); }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero h1 { margin: 0; max-inline-size: 14ch; font-size: clamp(3rem, 4.5cqi, 5.5rem); line-height: 1.02; font-weight: 400; letter-spacing: -.035em; }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero .world-lead { margin: 24px 0 0; max-inline-size: 36ch; font-size: 1.0625rem; line-height: 1.75; }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero .pass-price { justify-content: start; margin-block: 32px 12px; }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero > .ds-public-stroke { grid-column: 1; grid-row: 3; inline-size: 100%; block-size: clamp(64px, 7cqi, 128px); margin: 0; }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero > .ds-public-cover { grid-column: 2; grid-row: 2 / 4; min-block-size: 0; }
+    .ds-public-story.ds-public-editorial:not(.ds-public-volume) .world-hero > .ds-public-cover img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; max-block-size: none; object-fit: cover; }
+    .ds-public-volume.ds-public-editorial :where(.ds-volume-sheet--cover, .ds-volume-sheet--portrait) { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+    .ds-public-volume.ds-public-editorial .ds-volume-sheet--art { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+    .ds-public-volume .ds-volume-sheet--portrait .ds-volume-copy { grid-column: 1; grid-row: 1; }
+    .ds-public-volume .ds-volume-sheet--portrait .ds-volume-image { grid-column: 2; grid-row: 1; }
+    .ds-public-volume .ds-volume-copy { padding: clamp(48px, 4.4cqi, 96px); }
+    .ds-public-volume.ds-public-editorial .ds-volume-copy :where(h1, h2) { max-inline-size: 13ch; font-size: clamp(4rem, 5.4cqi, 7rem); line-height: 1.02; }
+    .ds-public-story.ds-public-editorial :where(.world-hero-copy, .ds-volume-copy) .world-label { display: flex; align-items: center; gap: 16px; margin-block-end: 32px; color: var(--ds-metaal); font-size: .6875rem; letter-spacing: .17em; }
+    .ds-public-story.ds-public-editorial :where(.world-hero-copy, .ds-volume-copy) .world-label::before { content: ''; flex: 0 0 32px; border-block-start: 1px solid currentColor; }
+    .ds-public-story.ds-public-editorial :where(.world-hero-copy, .ds-volume-copy) .world-actions { justify-content: start; gap: 16px 32px; margin-block-start: 32px; }
+    .ds-public-story.ds-public-editorial :where(.world-hero-copy, .ds-volume-copy) .button, .ds-public-volume .ds-volume-copy .ds-volume-link { align-self: start; justify-content: space-between; min-block-size: 48px; padding: 8px 0; gap: 32px; border: 0; border-block-end: 1px solid currentColor; border-radius: var(--ds-radius-inhoud); background: transparent; color: var(--ds-accent); font-size: .8125rem; text-decoration: none; }
+    .ds-public-story.ds-public-editorial :where(.world-hero-copy, .ds-volume-copy) .button-primary { font-weight: 500; }
+    .ds-public-story.ds-public-editorial :where(.world-hero-copy, .ds-volume-copy) .button-ghost { color: var(--ds-inkt-zacht); border-block-end-color: var(--ds-lijnkleur); }
+    .ds-public-story.ds-public-editorial :where(.world-hero-copy, .ds-volume-copy) .button:hover, .ds-public-volume .ds-volume-copy .ds-volume-link:hover { background: transparent; color: var(--ds-accent-hover); border-block-end-color: currentColor; text-decoration: underline; text-underline-offset: 5px; }
+    .ds-public-volume .ds-volume-sheet--panorama .ds-volume-copy { padding: 32px clamp(48px, 4.4cqi, 96px) 40px; }
+    .ds-public-volume .ds-volume-sheet--panorama .world-label { margin-block-end: 12px; }
+    .ds-public-volume.ds-public-editorial .ds-volume-sheet--panorama h2 { max-inline-size: 24ch; font-size: clamp(3.5rem, 4.4cqi, 5.5rem); }
+    .ds-public-volume .ds-volume-sheet--horizon .ds-volume-copy { padding: 32px 48px 72px; }
+    .ds-public-volume .ds-volume-sheet--horizon .ds-volume-link { align-self: center; }
+    .ds-public-edge { max-inline-size: 960px; }
+    .ds-public-edge .rtg-adaptive-bar { inline-size: 100%; max-inline-size: 640px; margin-inline: auto; }
+    .ds-public-edge .rtg-adaptive-item-copy small { font-size: .75rem; }
+    .ds-public-edge .rtg-adaptive-surface { inline-size: 100%; max-inline-size: 640px; margin-inline: auto; }
+    .ds-public-edge .rtg-adaptive-sheet { padding-inline-start: 40%; }
+    .ds-public-edge .rtg-adaptive-sheet:has(.ds-edge-pages) { block-size: min(620px, calc(100dvh - 120px - env(safe-area-inset-bottom))); }
+    .ds-public-edge .rtg-adaptive-sheet::before { content: ''; position: absolute; z-index: -1; inset-block: 0; inset-inline-start: 0; inline-size: 40%; background: url('../../images/brand/rtg-edge-garden.webp') center / cover no-repeat; border-start-start-radius: var(--ds-radius-systeem); border-end-start-radius: var(--ds-radius-systeem); pointer-events: none; }
+    .ds-public-edge .ds-edge-reading-art[data-editorial-ready] { display: block; position: absolute; z-index: 0; inset-block: 0; inset-inline-start: 0; inline-size: 40%; block-size: 100%; object-fit: contain; background: var(--ds-edge-paper); border-start-start-radius: var(--ds-radius-systeem); border-end-start-radius: var(--ds-radius-systeem); pointer-events: none; }
+    .ds-public-edge .ds-edge-gallery { display: none; }
+    .ds-public-edge .ds-discover-art img { display: none; }
+    .ds-public-edge .ds-discover-art > span { padding-block: 12px; }
+    .ds-public-edge .rtg-adaptive-sheet-head { padding: 32px 32px 16px; }
+    .ds-public-edge .rtg-adaptive-sheet-head h2 { font-size: clamp(2.375rem, 3.4cqi, 3.5rem); }
+    .ds-public-edge .rtg-adaptive-modes { margin-inline: 32px; }
+    .ds-public-edge .ds-edge-leaf:not(.ds-edge-art-leaf) { padding-inline: 32px; }
+    .ds-public-edge .ds-edge-pagination { margin-inline: 32px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ds-public-volume :where(.button, .ds-volume-toggle, .ds-volume-reel-controls button) { transition: none; }
+  }
+  @container ds (max-width: 760px) {
+    .ds-public-site-header { padding: 8px 16px; gap: 16px; min-block-size: 60px; }
+    .ds-public-site-nav { display: none; }
+    .ds-public-story :where(.world-hero, .explore-intro) { grid-template-columns: 1fr; gap: 32px; padding: 32px 24px 48px; }
+    .ds-public-story :where(.world-hero, .explore-intro)::before { content: ''; display: block; block-size: 88px; background: url('../../images/brand/rtg-painted-horizon.webp') center / contain no-repeat; }
+    .ds-public-story .world-hero:has(> .world-header)::before { display: none; }
+    .ds-public-story h1 { font-size: clamp(36px, 10.3cqi, 48px); }
+    .ds-public-story h2 { font-size: 34px; }
+    .ds-public-story .world-hero-inner { padding-block: 0; }
+    .ds-public-story .world-lead { font-size: 17px; }
+    .ds-public-story-art { inline-size: 100%; max-inline-size: 420px; margin-inline: auto; }
+    .ds-public-story-art img { max-block-size: 320px; }
+    .ds-public-story :where(.story-section, .capability-section, .pass-fit, .story-try, .world-tools) { padding: 48px 24px; }
+    .ds-public-story :where(.story-intro, .capability-heading, .pass-fit-grid, .outcomes, .capability-grid, .simulation-main, .connection-steps, .moment, .tool-grid) { grid-template-columns: 1fr; gap: 32px; }
+    .ds-public-story .simulation-main, .ds-public-story .connection-steps, .ds-public-story .moment, .ds-public-story .tool-grid { grid-template-columns: 1fr; }
+    .ds-public-story :where(.outcomes, .capability-grid) { gap: 24px; margin-block-start: 32px; }
+    .ds-public-story .principle { padding: 48px 24px 0; }
+    .ds-public-story .moment { gap: 0; }
+    .ds-public-story .moment-visual { grid-row: 1; }
+    .ds-public-story .moment-visual img { block-size: 320px; }
+    .ds-public-story .moment-copy { grid-column: 1; grid-row: 2; padding: 40px 24px 24px; }
+    .ds-public-story .ds-public-image-credit { grid-column: 1; grid-row: 3; padding: 0 24px 32px; }
+    .ds-public-story .simulation { padding: 20px; }
+    .ds-public-story .simulation-main { gap: 24px; }
+    .ds-public-story .story-people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .ds-public-story .story-people > :where(h4, p, small) { grid-column: 1 / -1; margin: 0; }
+    .ds-public-story .story-person { flex-wrap: wrap; }
+    .ds-public-story .explore-intro .ds-public-story-art { grid-column: 1; grid-row: auto; }
+    .ds-public-story .world-orbit { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ds-public-story .world-orbit button { padding: 16px; }
+    .ds-public-story.ds-public-explorer .explore-intro { padding: 40px 24px 0; gap: 16px; }
+    .ds-public-story.ds-public-explorer .explore-intro::before { display: none; }
+    .ds-public-explorer .explore-intro .ds-public-story-art img { max-block-size: 240px; }
+    .ds-public-story.ds-public-explorer .world-orbit { gap: 24px 16px; }
+    .ds-public-explorer .world-orbit img { block-size: 140px; }
+    .ds-public-explorer .world-orbit button > :not(img) { margin-inline: 12px; }
+    .ds-public-explorer .world-orbit strong { font-size: 24px; }
+    .ds-public-explorer .world-tools { margin-block-start: 40px; }
+    .ds-public-pass-index { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 16px; }
+    .ds-public-pass-index a, .ds-public-pass-index a:nth-child(-n+2) { grid-column: span 1; }
+    .ds-public-pass-index a:last-child { grid-column: 1 / -1; }
+    .ds-public-pass-index img { block-size: 160px; }
+    .ds-public-pass-index a:last-child img { block-size: 220px; }
+    .ds-public-pass-index strong { font-size: 26px; }
+    .ds-public-pass-index span { font-size: 13px; }
+    .ds-public-detail .scene-heading { margin-block: 0 32px; }
+    .ds-public-detail .scene-heading h2 { font-size: 42px; }
+    .ds-public-detail .scenario-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .ds-public-detail .scenario-choices label { padding: 16px 8px; gap: 8px; font-size: 12px; }
+    .ds-public-detail .simulation { padding: 20px; }
+    .ds-public-detail .simulation-head { flex-wrap: wrap; gap: 12px; }
+    .ds-public-detail .simulation-main, .ds-public-detail .connection-steps, .ds-public-detail .permission-demo { grid-template-columns: 1fr; }
+    .ds-public-detail .connection-steps { gap: 16px; }
+    .ds-public-detail .intent-form { padding: 20px; }
+    .ds-public-detail .intent-form > div { gap: 8px; }
+    .ds-public-detail .intent-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .ds-public-detail .permission-demo { gap: 32px; padding: 24px; }
+    .ds-public-detail :where(.large-principle, .trust-principle) { font-size: 32px; }
+    .ds-public-detail .world-room h3 { font-size: 32px; }
+    .ds-public-detail :where(.role-layout, .simulation-layout, .world-room) { grid-template-columns: 1fr; }
+    .ds-public-detail .scene { padding-block: 32px; }
+    .ds-public-detail .pass-table-wrap::before { content: 'Veeg horizontaal om alle kolommen te lezen.'; display: block; margin-block-end: 12px; font-size: 12px; }
+    .ds-public-story.ds-public-editorial .world-hero { padding: 0; gap: 0; }
+    .ds-public-story.ds-public-editorial .world-hero::before { display: none; }
+    .ds-public-story.ds-public-editorial .world-hero-inner { padding: 40px 24px 0; }
+    .ds-public-story.ds-public-editorial h1 { font-size: clamp(36px, 11.8cqi, 56px); max-inline-size: 15ch; }
+    .ds-public-story.ds-public-editorial .world-label { margin-block-end: 20px; }
+    .ds-public-story.ds-public-editorial .world-lead { font-size: 17px; line-height: 1.65; margin-block-start: 20px; }
+    .ds-public-story.ds-public-editorial .world-actions { gap: 8px; margin-block-start: 20px; }
+    .ds-public-story.ds-public-editorial .button { padding-inline: 20px; font-size: 13px; }
+    .ds-public-stroke { block-size: 100px; margin-block-start: 0; }
+    .ds-public-cover img { block-size: 360px; }
+    .ds-public-cover figcaption { inset-inline-end: 12px; inset-block-end: 12px; padding: 6px 8px; font-size: 10px; }
+    .ds-public-chapters { justify-content: start; gap: 4px 24px; padding: 12px 24px; }
+    .ds-public-chapters a { font-size: 12px; }
+    .ds-public-story.ds-public-editorial :where(.story-section, .capability-section, .pass-fit, .story-try) { padding: 56px 24px; }
+    .ds-public-story.ds-public-editorial .story-intro { grid-template-columns: 1fr; gap: 24px; }
+    .ds-public-story.ds-public-editorial .story-intro h2 { max-inline-size: 18ch; font-size: 36px; }
+    .ds-public-story.ds-public-editorial .outcomes { gap: 32px; margin-block-start: 40px; }
+    .ds-public-story.ds-public-editorial .capability-grid { grid-template-columns: 1fr; gap: 32px; }
+    .ds-public-art-interlude { grid-template-columns: 1fr; gap: 24px; padding: 48px 24px; }
+    .ds-public-art-interlude img { max-block-size: 320px; }
+    .ds-public-story .principle.ds-public-art-interlude { padding: 48px 24px; }
+    .ds-volume-reel { block-size: calc(100svh - 136px); min-block-size: 420px; }
+    .ds-public-volume.ds-public-editorial .ds-volume-sheet { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 1fr) auto; }
+    .ds-public-volume.ds-public-editorial .ds-volume-sheet--cover { grid-template-rows: auto minmax(220px, 1fr); }
+    .ds-public-volume .ds-volume-copy { padding: 24px; }
+    .ds-public-volume .ds-volume-copy .world-label { font-size: .625rem; margin-block-end: 14px; }
+    .ds-public-volume.ds-public-editorial .ds-volume-copy :where(h1, h2) { font-size: clamp(2.5rem, 12cqi, 3.5rem); }
+    .ds-public-volume .ds-volume-sheet--cover .ds-volume-copy { text-align: center; align-items: center; padding: 28px 20px 24px; }
+    .ds-public-volume .ds-volume-copy .world-actions { margin-block-start: 20px; }
+    .ds-public-volume .ds-volume-sheet--cover .ds-volume-image img { object-position: 43% 60%; }
+    .ds-public-volume .ds-volume-sheet--art .ds-volume-copy { padding-block: 20px 28px; }
+    .ds-public-volume .ds-volume-sheet--panorama .ds-volume-copy { display: flex; align-items: start; gap: 0; padding: 24px; }
+    .ds-public-volume .ds-volume-sheet--panorama .ds-volume-link { margin-block-start: 16px; }
+    .ds-public-volume .ds-volume-sheet--horizon .ds-volume-copy { padding: 24px 24px 32px; }
+    .ds-public-volume .ds-volume-link { margin-block-start: 16px; gap: 16px; }
+    .ds-volume-bar { padding-inline: 16px; gap: 8px; }
+    .ds-volume-reel-controls:not([hidden]) { gap: 8px; }
+    .ds-public-volume .ds-volume-dossier .story-intro { grid-template-columns: 1fr; }
+
+  }
+}

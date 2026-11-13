@@ -6,12 +6,31 @@ const path = require('node:path');
 const http = require('node:http');
 const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, letOpFouten } = require('./helper');
 const pw = laadPlaywright();
+const edgeUI = require('./public-edge-interactions');
 const root = path.resolve(__dirname, '..');
 const sourceFaqCount = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8')
  .matchAll(/<details\b[^>]*\bdata-faq=["'][^"']+["']/g)].length;
 async function ready(page){
  await page.waitForSelector('body[data-platform-role="organisatie"]');
- await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
+ await page.waitForFunction(()=>!!window.RTGPublicApp&&!!history.state?.rtgMagazine);
+ await page.locator('.ds-public-edge-toggle').waitFor({state:'visible'});
+ await page.evaluate(()=>document.fonts.ready);
+}
+async function publication(page){
+ await edgeUI.action(page,'context');
+ const button=page.locator(edgeUI.sheetSelector).getByRole('button',{name:'Service, informatie en colofon',exact:true});
+ await edgeUI.seek(page,button);await button.click();
+ await page.locator('#magazineDetailContent > .ds-magazine-footer').waitFor({state:'visible'});
+ const service=page.locator('#magazineService');
+ if(!await service.evaluate(el=>el.open))await service.locator(':scope > summary').click();
+}
+async function section(page,label){
+ await publication(page);
+ const directory=page.locator('.ds-magazine-directory > details');
+ if(!await directory.evaluate(el=>el.open))await directory.locator(':scope > summary').click();
+ const button=page.locator('#magazineDirectory').getByRole('button',{name:label,exact:true});
+ if(!await button.isVisible())await page.locator('[data-public-sections-more] > summary').click();
+ await button.click();
 }
 
 test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past op ieder scherm',
@@ -30,20 +49,17 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
    await page.waitForFunction(()=>document.documentElement.dataset.websiteTruth==='actueel');
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
-   assert.match(await page.locator('#platform-story-title').innerText(),/Technologie rondom mensen/i);
-   assert.equal(await page.locator('.pp-story[data-public-story]').count(),1);
-   assert.equal(await page.locator('.pp-stories').isHidden(),true);
-   assert.equal(await page.locator('.pp-library-tools').isHidden(),true);
-   assert.equal(new URL(await page.locator('.pp-secure-link').getAttribute('href')).pathname,'/apps/app.html');
-   assert.match(await page.locator('[data-public-world-facts="work"]').innerText(),/17 apps.*MAPPEN/i);
-   const dagdeel=await page.locator('html').getAttribute('data-dagdeel'),beelden={ochtend:'morning',middag:'afternoon',avond:'evening',nacht:'night'};
-   assert.match(await page.locator('.pp-feature-photo').getAttribute('src'),new RegExp('public-'+beelden[dagdeel]+'\\.webp$'));
-   await page.getByRole('button',{name:'Vertel Rahul wat u wilt bereiken'}).click();
+   assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false,'standaard gesloten, geen vaste websitebalk');
+   assert.equal(await page.locator('#issueTrack > [data-issue-page]').count(),18);
+   assert.match(await page.locator('#issue-cover-title').innerText(),/JOURNAL/);
+   assert.equal(await page.locator('.wd-shell').count(),0,'geen tweede desktop-eigenaar naast het magazine');
+   assert.equal(new URL(await page.locator('[aria-label="Mijn RTG"]').getAttribute('href')).pathname,'/apps/app.html');
+   await edgeUI.action(page,'ai');
    await page.locator('#intent').fill('Ik wil met mijn gezin op reis');
    await page.locator('#intentForm button').click();
    assert.match(await page.locator('#intentFeedback').innerText(),/Amsterdam naar Ibiza/);
-   await page.locator('.wd-focus-head .wd-text-button').click();
-   await page.locator('[data-public-widget="work"] .pp-widget-head').click();
+   await section(page,'Werelden');
+   await page.locator('.ds-public-world-choices [data-select-world="work"]').click();
    await page.locator('[data-room="work"] .app-truth-detail').click();
    assert.equal(await page.locator('[data-room="work"] .app-truth-groups a').count(),17);
    const eersteApp=page.locator('[data-room="work"] .app-truth-app-detail').first();
@@ -51,27 +67,25 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    assert.notEqual((await eersteApp.locator('.app-truth-app-summary').innerText()).trim(),'');
    assert.ok(await eersteApp.locator('.app-truth-actions li').count()>0);
    assert.notEqual((await eersteApp.locator('.app-truth-note').innerText()).trim(),'');
-   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
+   await edgeUI.action(page,'home');
    assert.equal(await page.locator('.arrival-interface img').count(),3);
    assert.equal(await page.locator('[data-stage-screen] img').count(),3);
-   assert.equal(await page.locator('.wd-catalog [data-public-widget]').count(),4);
-   await page.locator('[data-public-sections-more] summary').click();
-   assert.equal(await page.evaluate(()=>{const r=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}),true);
+   assert.equal(await page.locator('.ds-public-world-choices [data-select-world]').count(),4);
+   assert.equal(await edgeUI.hit(page.locator('.ds-public-edge-toggle')),true);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
-   await page.locator('.pp-section-index button', {hasText:'Organisatie, partner en gebruiker'}).click();
+   await section(page,'Organisatie, partner en gebruiker');
    await page.locator('.role-switch [data-role-select="partner"]').click();
    assert.equal(await page.locator('body').getAttribute('data-platform-role'),'partner');
-   assert.match(await page.locator('#roleTitle').innerText(),/Verbind uw bedrijf/);
+   assert.equal(await page.locator('#roleTitle').innerText(),'Uw zaak. Uw eigen karakter.');
+   assert.match(await page.locator('#roleBoundary').innerText(),/alleen de eigen zaak/);
    assert.equal(await page.locator('[data-stage-screen="partner"]').evaluate(node=>node.classList.contains('is-active')),true);
    await page.locator('.role-switch [data-role-select="gebruiker"]').click();
    assert.equal(await page.evaluate(()=>sessionStorage.getItem('rtg-www-role')),'gebruiker');
    assert.match(await page.locator('#roleCapabilities').innerText(),/Foundation/);
-   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
-   await page.locator('.pp-section-index button', {hasText:'De RTG Graph'}).click();
+   await section(page,'De RTG Graph');
    await page.locator('[data-graph-topic="werknemer"]').click();
    assert.match(await page.locator('#graphCaption').innerText(),/uren/i);
-   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
-   await page.locator('.pp-section-index button', {hasText:'Verken het RTG-platform'}).click();
+   await section(page,'Verken het RTG-platform');
    await page.keyboard.press('Control+k');
    await page.locator('#commandSearch').fill('personeel');
    await page.waitForSelector('.command-result');
@@ -81,7 +95,7 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    assert.deepEqual(mutations,[]);assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
    await context.close();
   });
- }finally{if(browser)await browser.close();await stop(srv);}
+ }finally{if(browser)await browser.close();await stop(srv.child);}
 });
 
 test('static project path and JavaScript-disabled visitors retain content and relative assets',
@@ -111,22 +125,23 @@ test('static project path and JavaScript-disabled visitors retain content and re
       if (javaScriptEnabled) {
         await ready(page);
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1713');
+        assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false);
+        await publication(page);
         assert.match(await page.locator('.pp-footer a[href$="/apps/juridisch/voorwaarden.html"]').innerText(), /bestaand/i,
           'ook de door JavaScript opgebouwde footer wijst herkenbaar naar bestaande voorwaarden');
-        await page.locator('.pp-section-index button', { hasText: 'Wat wilt u weten?' }).click();
+        await section(page,'Wat wilt u weten?');
         const faqPolicy = page.locator('[data-faq]').filter({ has: page.locator('a[href="#prijsbeleid"]') }).first();
         await faqPolicy.locator('summary').click();
         await faqPolicy.locator('a[href="#prijsbeleid"]').click();
-        await page.waitForFunction(() => document.querySelector('.pp-detail-content #prijsbeleid'));
+        await page.waitForFunction(() => document.querySelector('#magazineDetailContent #prijsbeleid'));
         assert.equal(await page.locator('#passen').isVisible(), true, 'een gewone nested ankerlink opent de canonieke passenscene');
         assert.equal(await page.locator('#prijsbeleid').isVisible(), true);
         await page.evaluate(() => { location.hash = 'commissie'; });
-        await page.waitForFunction(() => document.querySelector('.pp-detail-content #commissie')?.open === true);
+        await page.waitForFunction(() => document.querySelector('#magazineDetailContent #commissie')?.open === true);
         assert.equal(await page.locator('#commissie table').isVisible(), true, 'hashchange opent ook de doel-details');
         await page.goto('http://127.0.0.1:' + server.address().port + prefix + '#commissie', { waitUntil: 'networkidle' });
         await ready(page);
-        await page.waitForFunction(() => document.querySelector('.pp-detail-content #commissie')?.open === true);
+        await page.waitForFunction(() => document.querySelector('#magazineDetailContent #commissie')?.open === true);
         assert.equal(await page.locator('#commissie table').isVisible(), true, 'een rechtstreeks geopend nested fragment blijft bereikbaar');
       } else {
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
@@ -139,7 +154,7 @@ test('static project path and JavaScript-disabled visitors retain content and re
           assert.equal(await faq.locator('p').first().isVisible(), true, 'het native details-element ontsluit het antwoord');
           assert.notEqual((await faq.locator('p').first().innerText()).trim(), '');
         }
-        await page.getByRole('link', { name: 'Passen', exact: true }).click();
+        await page.locator('#service-gids a[href="#passen"]').click();
         assert.equal(new URL(page.url()).hash, '#passen');
       }
       assert.deepEqual(failed, []);
@@ -174,6 +189,7 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
   await context.route('**/api/vertaal/ui',r=>r.fulfill({status:503,body:'Deliberate translation outage'}));
   const page=await context.newPage(),errors=[];letOpFouten(page,errors);
   await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
+  await page.locator('.ds-public-edge-toggle').click();
   await veeg(page);
   await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState==='expanded');
   const landing=await blad(page);
@@ -181,12 +197,15 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
   assert.deepEqual(landing.kern,
     landing.kern.length ? ['Nu','Rahul','Connect','Media','Account'] : [],
     'als de kernlijst al zichtbaar is, bevat hij exact de vijf functionele Edge-schermen');
-  assert.deepEqual(landing.rijen.filter(r=>!['Nu','Rahul','Connect','Media','Account'].includes(r)),
-    ['Volgend hoofdstuk','Vorig hoofdstuk','Bekijk het voorstel','Waarom zie ik dit?','Wis mijn demokeuzes'],
-    'de acties van het publieke platform');
-  assert.equal(await page.locator('.rtg-adaptive-sheet .pp-menu-item').first().isVisible(),true);
+  for(const label of ['Inhoud van deze editie','Zoek in RTG','Service, informatie en colofon','Bekijk het voorstel','Waarom zie ik dit?','Wis mijn demokeuzes'])assert.ok(landing.rijen.includes(label),'oorspronkelijke magazineactie blijft bereikbaar: '+label);
+  assert.equal(await page.locator('.rtg-adaptive-sheet [data-carousel-prev]').count(),1);
+  assert.equal(await page.locator('.rtg-adaptive-sheet [data-carousel-next]').count(),1);
+  const original=page.locator('.rtg-adaptive-sheet').getByRole('button',{name:'Bekijk het voorstel',exact:true});
+  await edgeUI.seek(page,original);
+  assert.equal(await original.isVisible(),true);
   await page.goto(srv.base+'/site/werelden/livingos.html');
   await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+  await page.locator('.ds-public-edge-toggle').click();
   await veeg(page);
   await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState==='expanded');
   const site=await blad(page);
@@ -197,5 +216,5 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
   assert.ok(site.rijen.includes('Stel uw vraag over RTG'),'de rijen van de pagina: '+site.rijen.join(', '));
   assert.deepEqual(errors,[]);
   await context.close();
- }finally{if(browser)await browser.close();await stop(srv);}
+ }finally{if(browser)await browser.close();await stop(srv.child);}
 });

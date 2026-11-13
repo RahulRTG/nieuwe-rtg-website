@@ -65,7 +65,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `MAGNAATLAB.md` is Magnaat als testhal
 - `BEWIJSMACHINE.md` is de lat boven de testhal
 - `SERVICE.md` is de laag die de hulplijnen orkestreert
-- `ONTWERPSYSTEEM.md` is de afdwingbare visuele architectuur; lees het vóór elke regel CSS
+- `ONTWERPSYSTEEM.md` verplicht vóór CSS/merkwerk: visuele architectuur en §8 logo-lockup/A — Inkt
 - `ONTWERP.md` is het RTG Design System 2.0
 - `MATERIAAL.md` is de materialenleer
 - `WERELD.md` beschrijft het beginscherm
@@ -75,7 +75,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `GRAMMATICA.md` is de RTG Mobile Interaction Grammar
 - `EDGE.md` is RTG Edge 3.0
 - `WERKRUIMTE.md` is het desktopparadigma
-- `TRAVELOS-SPATIAL-VERTICAL-SLICE.md` is het TravelOS Spatial-plan
+- `TRAVELOS-SPATIAL-VERTICAL-SLICE.md`: TravelOS Spatial-plan
 - `ONDERHOUD.md` is de onderhoudslaag
 - `BETROUWBAARHEID.md` zegt wanneer een functie BESTAAT
 - `TIKKEN.md` zegt hoe diep het huis is
@@ -94,7 +94,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `CONSOLIDATIE.md` is het opruimbesluit van de eigenaar; lees het vóór elke PR
 - `AFBOUWPROGRAMMA.md` is het eigenaarsbesluit van 11 oktober 2026, en het is leidend
 - `CIVILIS.md` breidt RTG maatschappelijk uit
-- `CIVILIS-UITVOERING.md` is de traceerbare ketenarchitectuur en uitvoeringsaudit
+- `CIVILIS-UITVOERING.md`: ketenarchitectuur en uitvoeringsaudit
 
 ## Structuur en starten (kort)
 

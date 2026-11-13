@@ -1,0 +1,2609 @@
+{
+  "schemaVersion": 1,
+  "status": "PLANNING_ONLY",
+  "entries": [
+    {
+      "function": "link:wereldlaag",
+      "currentObservation": "wereld.html laadt de Salon-schil; de voltooiproef gebruikt /api/salon/plaats, feed, reacties en weg. De gedocumenteerde proefbelofte is publiceren, reageren en verwijderen; dit is geen actuele browserkwalificatie van alle wereldprojecties.",
+      "target": "Een rustige ingang naar het leven tussen mensen, met herkenbare bron, kring en volgende stap; iedere Salonhandeling blijft bij de canonieke Salon-eigenaar.",
+      "changes": [
+        "Maak contextkaarten voor bestaande Salon-objecten met herkomst, doelgroep en uitleg waarom ze zichtbaar zijn; laat openen teruggaan naar de canonieke eigenaar.",
+        "Verbind een expliciet gekozen gezamenlijke activiteit als referenties aan een Plan Dossier; deelname of uitnodiging vraagt bevestiging en verandert geen relatie automatisch.",
+        "Toets de scheiding met Pulse en Sociaal via SCHERMEIGENAAR voordat gedeelde bediening wordt aangepast."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "Een lid publiceert voor een besloten kring; een verbonden lid opent de post via de wereldkaart en reageert.",
+          "expected": "Beide ingangen tonen dezelfde post en reactie met dezelfde zichtrechten; een buitenstaander ontvangt geen inhoud of teller.",
+          "evidence": "scripts/lib/voltooi/wereldlaag.js — Voltooiproef uitbreiden met wereldkaart-tot-Salon-browserketen en negatieve kringtest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De maker verwijdert de post terwijl een ander de wereldkaart open heeft, waarna die ander herlaadt.",
+          "expected": "Post en bewaarde projectie verdwijnen of tonen een ingetrokken bron; oude links leveren geen postinhoud.",
+          "evidence": "scripts/lib/voltooi/wereldlaag.js — Verwijder-, herlaad- en cache-intrekkingstest; menselijke controle van lege en ingetrokken toestand. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "P0 sluit het bestaande eigenaarschapsvraagstuk rond Salon, Pulse en wereldprojecties; geen automatische samenvoeging van domeinen."
+      ],
+      "sourceRefs": [
+        "public/apps/wereld.html",
+        "scripts/lib/voltooi/wereldlaag.js",
+        "public/apps/saloon/saloon.js"
+      ],
+      "usesCapabilities": [
+        "tab:salon",
+        "link:sociaal"
+      ]
+    },
+    {
+      "function": "link:appdossier",
+      "currentObservation": "appstore-dossier.html leest kanaal en dossier via /api/appstore; de voltooiproef doorloopt inzending, menselijke publicatie en dossierinzage en vermeldt dat het scherm zelf niets schrijft.",
+      "target": "Een begrijpelijke vertrouwenskaart voor iedere toegelaten externe app: uitgever, concrete versie, rechten, toelatingsbesluit, intrekkingen en de grenzen van dat bewijs.",
+      "changes": [
+        "Projecteer het bestaande appstore-dossier in lagen: begrijpelijke samenvatting met daarachter versie, herkomst, rechten en ontbrekende controles.",
+        "Laat de kaart wijzigingen tussen twee versies verklaren vanuit het bestaande publicatiejournaal, met extra aandacht voor nieuwe gegevensrechten.",
+        "Koppel intrekking en blokkade aan de bestaande installatie/openen-grens, zodat een gelezen dossier geen nieuwe toelating verleent."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ceremony",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een uitgever dient een nieuwe versie in die nog geen mens heeft toegelaten; een lid opent het dossier.",
+          "expected": "Alleen de toegelaten versie krijgt een gebruiksstatus; de nieuwe versie wordt geen stilzwijgende toestemming of kwaliteitsgarantie.",
+          "evidence": "scripts/lib/voltooi/appdossier.js — Bestaande publicatieproef plus dossier- en versieverschil-browserproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een appversie wordt ingetrokken terwijl het dossier offline zichtbaar was; het lid probeert opnieuw te openen.",
+          "expected": "De oude weergave is als verouderd herkenbaar; uitvoering wacht op actuele toelating en blijft bij intrekking geblokkeerd.",
+          "evidence": "scripts/lib/voltooi/appdossier.js — Intrekkings-, cache- en fail-closed-integratietest; onafhankelijke beoordeling van tekst over garanties. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Externe uitgeverstoelating, licentievoorwaarden en eventuele onafhankelijke securitycontrole moeten aantoonbaar geldig zijn."
+      ],
+      "sourceRefs": [
+        "public/apps/appstore-dossier.html",
+        "scripts/lib/voltooi/appdossier.js"
+      ],
+      "usesCapabilities": []
+    },
+    {
+      "function": "tab:assets",
+      "currentObservation": "De assets-tab gebruikt de bestaande asset-aanvraagketen; de proef bevat aanvragen, kantoorbesluit, betalen, mijn tickets en herroepen. Tickets mogen volgens de proef pas na bevestigde betaling ontstaan.",
+      "target": "Een transparant dossier voor de bestaande objecttickets, waarin aanvraag, beoordeling, financiële verplichting, verkregen recht en herroepingsmogelijkheid strikt onderscheiden blijven.",
+      "changes": [
+        "Maak de bestaande aanvraagstatussen begrijpelijk in één tijdlijn met gekoppelde documentversie en menselijke beslissing.",
+        "Toon vóór betaling de prijs, het toe te kennen recht en de gevolgen van herroepen; voer betaling uit via bestaande betaalwaarheid.",
+        "Breid de bewijsroute uit met vertraagde providerbevestiging en tegenstrijdige callback zonder een tweede ticketadministratie te introduceren."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een lid vraagt tickets aan, kantoor keurt goed en de betaling blijft tijdelijk onbekend.",
+          "expected": "Er ontstaan nog geen toegekende tickets; de tijdlijn toont aanvraag en betaalonzekerheid afzonderlijk.",
+          "evidence": "scripts/lib/voltooi/assets.js — Bestaande asset-voltooiproef plus asynchrone betaaladapter en browserstatuscontrole. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Na bevestigde betaling valt de verbinding weg en wordt hetzelfde betaalverzoek opnieuw verstuurd.",
+          "expected": "Exact één betaling en één overeengekomen tickettoekenning; herroepen rapporteert alleen de werkelijk verwerkte toestand.",
+          "evidence": "scripts/lib/voltooi/assets.js — Idempotentie-, crash-, grootboek- en ticketreconciliatieproef met dezelfde sleutel. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Juridische aard van objecttickets, aanbiedingsvoorwaarden en mogelijke vergunningplicht expliciet valideren; geen nieuw beleggingsproduct of rendementbelofte uit dit plan."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/assets.js"
+      ],
+      "usesCapabilities": [
+        "link:pay"
+      ]
+    },
+    {
+      "function": "link:attenties",
+      "currentObservation": "De bestaande Lifestyle-routes beheren relaties en giftgeschiedenis; de proefbelofte noemt een venster van dertig dagen en het voorkomen van een herhaald cadeau.",
+      "target": "Een discrete persoonlijke attentie-assistent die bestaande eigen aantekeningen helpt terugvinden en voorstellen voorbereidt zonder contacten te profileren of vanzelf iets te verzenden.",
+      "changes": [
+        "Maak tijd, aanleiding en eerdere gift zichtbaar met bron en bewerkbaarheid; laat de gebruiker herinneringen dempen of verwijderen.",
+        "Laat een gekozen attentie als concept naar de bestaande commerce- of concierge-ingang gaan, met expliciete ontvanger-, prijs- en verzendbevestiging.",
+        "Leg bewaartermijnen en minimale gegevens voor persoonlijke relatieaantekeningen vast; deel ze niet automatisch met een sociaal profiel."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid noteert een verjaardag en een eerder cadeau en bereidt een nieuwe attentie voor.",
+          "expected": "Het eerdere cadeau is zichtbaar; er ontstaat alleen een eigen concept totdat het lid ontvanger en eventuele externe opdracht bevestigt.",
+          "evidence": "scripts/lib/voltooi/attenties.js — Bestaande attentieproef plus concept-overdracht en negatieve verzendtest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een relatieaantekening wordt verwijderd terwijl een attentieconcept nog openstaat.",
+          "expected": "Het concept verliest de ingetrokken gegevens en kan geen oude persoonsgegevens alsnog delen; de gebruiker krijgt een begrijpelijke herstelstap.",
+          "evidence": "scripts/lib/voltooi/attenties.js — Verwijderings- en contextintrekkingstest; privacyreview van persoonlijke aantekeningen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Een cadeauleverancier of bezorgdienst pas als uitvoerbare optie tonen na contract en providerbewijs."
+      ],
+      "sourceRefs": [
+        "public/apps/attenties.html",
+        "scripts/lib/voltooi/attenties.js",
+        "server/kern/rechterhand/attenties.js"
+      ],
+      "usesCapabilities": [
+        "link:commerce",
+        "link:rechterhand"
+      ]
+    },
+    {
+      "function": "link:balans",
+      "currentObservation": "Balans is een hashstand in geld.html, geen eigen geldmotor. De proef leest /api/balans uit de eigen agenda; eten, zorg, chatknoppen en toestelrecepten vallen buiten het gemelde proefbereik.",
+      "target": "Een kalm weekbeeld dat beschikbare tijd, afspraken en eigen voorkeuren uitlegt zonder een levensscore, medische conclusie of tweede agenda te maken.",
+      "changes": [
+        "Behoud het gedeelde Geld-scherm en toon bij ieder weekadvies welke bestaande agenda-items en tijdzone zijn gebruikt.",
+        "Maak het venster en uitzonderingen instelbaar, met een voorbeeld van het gevolg voordat de gebruiker een agenda-eigenaar opent.",
+        "Breid bewijs uit naar lokale dagen, zomertijd en ontbrekende bronnen; onbekende tijd wordt niet als vrije tijd gepresenteerd."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Horizon",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "Een lid heeft afspraken rond lokale middernacht en een zomertijdwissel en opent Balans.",
+          "expected": "Ieder item staat op de lokale juiste dag; adviezen verwijzen naar dezelfde agenda en maken geen nieuwe afspraken.",
+          "evidence": "scripts/lib/voltooi/balans.js — Bestaande balansproef uitbreiden met tijdzonematrix en browservergelijking met agenda. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een agendabron valt uit terwijl de vorige weekweergave nog beschikbaar is.",
+          "expected": "Het scherm vermeldt veroudering en onzekerheid; geen nieuw rustadvies wordt als actuele zekerheid getoond.",
+          "evidence": "scripts/lib/voltooi/balans.js — Bronuitval- en cacheproef; menselijke toets dat onzekerheid begrijpelijk blijft. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/balans.js",
+        "GELD.md"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand"
+      ]
+    },
+    {
+      "function": "link:bank",
+      "currentObservation": "Bank is de #bank-stand van geld.html. De proef omvat kantoor-livepoort, akkoord, rekening openen, storten, eigen overboekingen en afschrift; deze bron vormt geen bewijs van een operationele vergunninghoudende bankdienst.",
+      "target": "Een financieel scherm met ondubbelzinnige rechtspositie, saldoherkomst, rekeningstatus en herstelpad; werkelijke bankdiensten uitsluitend binnen aantoonbare provider- en juridische bevoegdheid.",
+      "changes": [
+        "Behoud de bestaande bankdomein- en Geld-eigenaar; voeg heldere uitleg over beschikbaar, gereserveerd, onderweg en onbekend toe vanuit de autoritatieve bron.",
+        "Gebruik het Plan Dossier voor voorbereiding en gevolgen van een toegestane opdracht, met actuele herauthenticatie en providerbewijs vóór een succesclaim.",
+        "Kwalificeer rekeningopening, betaling, storing en afschriftreconciliatie samen, inclusief verouderde of dubbele providerberichten."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Kantoor-livepoort of benodigde providerbevoegdheid ontbreekt; het lid probeert de Bank-stand te gebruiken.",
+          "expected": "De operationele handeling blijft gesloten met de echte reden; het scherm presenteert geen fictieve rekening of gegarandeerd saldo.",
+          "evidence": "scripts/lib/voltooi/bank.js — Bestaande bankproef plus configuratie-, vergunningstatus- en providerpoort-contracttest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een storting krijgt een time-out, daarna een bevestiging en vervolgens een herhaalde callback.",
+          "expected": "Het afschrift en saldo krijgen exact één bevestigde mutatie; tot bevestiging staat het resultaat onbekend of in behandeling.",
+          "evidence": "scripts/lib/voltooi/bank.js — Provider-sandbox-, idempotentie-, herstart- en grootboekreconciliatiebewijs; onafhankelijke financiële controle. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Vergunninghoudende bank-/betaalpartner, juridische productnaam, KYC/AML-verantwoordelijkheid en live-providercontract moeten worden vastgesteld; krediet en beleggingsadvies blijven buiten deze scope."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/bank.js",
+        "GELD.md",
+        "server/kern/betaalwaarheid/bewijs.js"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand",
+        "link:pay",
+        "link:verificatie"
+      ]
+    },
+    {
+      "function": "os:bellen",
+      "currentObservation": "Bellen gebruikt /api/member/call met de live-stroom. De proef controleert signalering, verbonden contacten en blokkades, maar benoemt geluid, echte toestellen en TURN als buiten bereik.",
+      "target": "Een eenvoudige betrouwbare spraakoproep met expliciete toestemming, begrijpelijke bereikbaarheidsstatus en aantoonbare beëindiging zonder opname of verborgen gespreksarchief.",
+      "changes": [
+        "Hergebruik bestaande oproepsignalering en contactrechten voor een uniforme belkaart met bellen, opnemen, weigeren en beëindigen.",
+        "Maak netwerk- en microfoonproblemen afzonderlijk herstelbaar, zonder een gestopte oproep automatisch opnieuw te starten.",
+        "Breid bewijs uit naar werkelijke audiopaden, toestelwissel en ongunstige netwerken; log alleen noodzakelijke technische metadata met retentiegrens."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Twee verbonden leden bellen, nemen op en beëindigen de oproep op verschillende browsers.",
+          "expected": "Audio gaat beide kanten op; microfoongebruik stopt na ophangen en een derde ontvangt geen signalen.",
+          "evidence": "scripts/lib/voltooi/bellen.js — Bestaande signaleringsproef plus tweebrowser-mediaproef en echte toestel-/audioacceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een contact wordt geblokkeerd terwijl een oproep wordt voorbereid en de verbinding valt weg.",
+          "expected": "De oproep kan niet alsnog tot stand komen; herladen herstelt geen oude oproep en de interface biedt een veilige nieuwe start.",
+          "evidence": "scripts/lib/voltooi/bellen.js — Blokkade-race-, netwerkuitval- en resource-opruimingstest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Productie-TURN, netwerkbereik, dataverwerking en operationele beschikbaarheid moeten zijn geregeld; geen noodtelefoniebelofte."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/bellen.js"
+      ],
+      "usesCapabilities": [
+        "link:relaties"
+      ]
+    },
+    {
+      "function": "link:berichten",
+      "currentObservation": "comm.html heeft een eigen berichtketen met begin, stuur, inbox, gesprek, lees, reactie, wijzig en wis. De proef onderzoekt bekende contacten, deelnemersrechten en herstart/dubbeltik/crash.",
+      "target": "Eén rustige communicatieomgeving met duidelijke concept-, verzend-, ontvangst- en leesstatus, betrouwbare bijlagen en overdracht naar een taak zonder een tweede berichtenbron.",
+      "changes": [
+        "Maak lange gesprekken, zoeken en relevante taakverwijzingen toegankelijk vanuit de bestaande comm-eigenaar, met een leesbare scheiding tussen eigen notities en gedeelde berichten.",
+        "Voeg versiegebonden conceptcontinuïteit toe; een Rahul-voorstel wordt pas na zichtbare gebruikersbevestiging verzonden.",
+        "Breid de bestaande berichtlus uit met bijlage-, intrekkings-, blokkade- en multi-device-races; definieer wat intrekken na lezen werkelijk betekent."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Een lid bewerkt op twee toestellen een concept, kiest een ontvanger en verzendt eenmaal.",
+          "expected": "De gebruiker ziet een conflict in plaats van stille overschrijving; exact één bericht bereikt alleen de gekozen deelnemers.",
+          "evidence": "scripts/lib/voltooi/berichten.js — Bestaande berichtenproef plus tweetoestel-concept- en verzendketen met browsertrace. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een bericht wordt gewijzigd of ingetrokken terwijl de ontvanger offline is en later terugkomt.",
+          "expected": "De ontvanger ziet de actuele toegestane versie en een eerlijke wijzigings-/intrekkingsstatus; cache en zoekresultaat lekken de ingetrokken inhoud niet.",
+          "evidence": "scripts/lib/voltooi/berichten.js — Versie-, offline-, cache- en objectautorisatieproef; menselijke begripstest van statuswoorden. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Een sterkere encryptie- of gegarandeerde verwijderbelofte vereist apart threat model en aantoonbare infrastructuur; dit plan claimt die eigenschappen niet."
+      ],
+      "sourceRefs": [
+        "public/apps/comm.html",
+        "scripts/lib/voltooi/berichten.js",
+        "server/kern/comm/bericht.js"
+      ],
+      "usesCapabilities": [
+        "link:relaties"
+      ]
+    },
+    {
+      "function": "tab:bestellen",
+      "currentObservation": "De bestellen-tab gebruikt de groothandelmarkt, bestel-, mijn- en annuleerroutes; de proef laat een bevoegde leverancier de orderstatus voortzetten en toetst voorraad en annuleren vóór bevestiging.",
+      "target": "Een volledige boodschappenbestelling met actuele leverbaarheid, aantoonbare orderstatus en een helder wijzigings- of annuleringspad bij voorraad- en leverproblemen.",
+      "changes": [
+        "Verbind bestaande orderregels, voorraadversie, levermoment en voorwaarden in een controleerbare samenvatting vóór bevestigen.",
+        "Laat wijzigingen of vervangingen als voorstel aan het lid zien; hergebruik de supplier-orderstatus als enige voortgangsbron.",
+        "Maak foutafhandeling voor gedeeltelijke levering, dubbele opdrachten en stale voorraad expliciet in het bestaande ordercontract."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Journey",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Twee leden bestellen tegelijk het laatste voorraadartikel; één bevestiging komt later terug.",
+          "expected": "Voorraad wordt niet dubbel beloofd; iedere order toont de echte bevestiging of een concrete niet-leverbare regel.",
+          "evidence": "scripts/lib/voltooi/bestellen.js — Bestaande bestelproef plus voorraadconcurrentie en vertraagde supplier-status. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een lid annuleert tijdens een gelijktijdige leveranciersbevestiging en herhaalt daarna het verzoek.",
+          "expected": "Eén geldige toestand wint volgens het contract; de klant ziet of annuleren is gelukt, zonder dubbele order of automatische terugbetalingsclaim.",
+          "evidence": "scripts/lib/voltooi/bestellen.js — Annulering/bevestiging-race en hersteltest; leveranciersacceptatie van statussemantiek. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Leveranciersafspraken over voorraad, bezorging, vervanging en restitutie bepalen welke operationele beloften mogen worden getoond."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/bestellen.js"
+      ],
+      "usesCapabilities": []
+    },
+    {
+      "function": "link:rtgcode",
+      "currentObservation": "Betaalcode is #rtgcode in geld.html; /api/code/dyn en scan leveren een ondertekende persoonlijke code met korte geldigheid. De proef sluit camera, QR-decoder en de latere kassahandeling uit.",
+      "target": "Een veilige betaal- of herkenningscode waarvan de gebruiker direct begrijpt wie hem mag lezen, waarvoor hij geldt en wanneer hij verlopen of verbruikt is.",
+      "changes": [
+        "Behoud de bestaande code- en Geld-eigenaar en toon doel, resterende geldigheid en veilige vervanging zonder codes of geheimen in logs te bewaren.",
+        "Koppel scannen aan de concrete zaak en de vervolghandeling; een scan is geen betalingsbevestiging.",
+        "Breid de proef uit met echte camera/decoder, klokafwijking, replay en gelijktijdige scanners."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ceremony",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een bevoegde kassa scant een geldige code, waarna dezelfde code op een tweede kassa wordt aangeboden.",
+          "expected": "De tweede poging kan geen tweede effect veroorzaken; het lid ziet welke handeling nog bevestiging nodig heeft.",
+          "evidence": "scripts/lib/voltooi/rtgcode.js — Bestaande dynamische-codeproef plus scanner-tot-kassa-ketentest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De camera is geweigerd of de code verloopt tijdens het scannen.",
+          "expected": "Geen identificatie- of betaalresultaat wordt verzonnen; er is een toegankelijke herstelstap en de verlopen code blijft ongeldig.",
+          "evidence": "scripts/lib/voltooi/rtgcode.js — Echte camera-/decoderproef met klokmatrix en permission-denied-browsertest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/rtgcode.js",
+        "GELD.md"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand",
+        "tab:betalen"
+      ]
+    },
+    {
+      "function": "tab:betalen",
+      "currentObservation": "De betalen-tab leest verzoeken en gebruikt betaal/verzoek/pay, direct en mijn. De proef vergelijkt ledenbetaling met zaakontvangsten en test weigering, duplicaten en crashes.",
+      "target": "Een korte, foutbestendige betaalervaring waarin ontvanger, bedrag, reden, kosten en uitkomst begrijpelijk zijn en onzekere betalingen nooit tot blind opnieuw betalen leiden.",
+      "changes": [
+        "Presenteer ieder betaalverzoek met verifieerbare ontvanger en onveranderlijke bedrag-/versiereferentie; laat gewijzigde verzoeken opnieuw bevestigen.",
+        "Gebruik bestaande betaalwaarheid voor in behandeling, geweigerd, bevestigd en controle nodig, met een traceerbaar ontvangstbewijs.",
+        "Voeg een herstelkaart toe die eerst de bestaande betaling opzoekt voordat een nieuwe opdracht mogelijk is."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Het lid bevestigt een betaalverzoek terwijl de zaak het bedrag wijzigt.",
+          "expected": "De oude toestemming betaalt niet het nieuwe bedrag; de gebruiker ziet een nieuw voorstel of een duidelijke versieconflictstatus.",
+          "evidence": "scripts/lib/voltooi/betalen.js — Bestaande betaalproef plus voorstel-fingerprint- en bedragwijzigingstest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Na betalen verliest het toestel de verbinding en het lid opent dezelfde opdracht opnieuw.",
+          "expected": "RTG toont de bestaande betaalstatus en precies één ontvangst bij de zaak; onbekend blijft onbekend tot reconciliatie.",
+          "evidence": "scripts/lib/voltooi/betalen.js — Dubbeltik-, disconnect-, providerreconciliatie- en browserherstelbewijs. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Live betaalprovider, betaalcertificering en overeengekomen operationele terugbetalingsroute blijven externe releasevoorwaarden."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/betalen.js"
+      ],
+      "usesCapabilities": [
+        "link:pay",
+        "link:rtgcode"
+      ]
+    },
+    {
+      "function": "link:camera",
+      "currentObservation": "camera.html heeft een browserproef met lokale JPEG-export, volledige resolutie, geen muterende netwerkverzending en begrijpelijke cameratoestemmingsweigering. De opgeslagen APPWERKT-belofte is niet automatisch gelijk aan de huidige proeftekst.",
+      "target": "Een snelle lokale camera en capturewerkplek die originele kwaliteit bewaart, privacy zichtbaar maakt en delen pas laat plaatsvinden via een afzonderlijk bevestigde bestemming.",
+      "changes": [
+        "Behoud lokale verwerking en geef een voorspelbare capture-, bekijken-, opnieuw maken- en exportlus met bestandsnaam en resolutie.",
+        "Voeg toegankelijke bediening en toestandherstel toe bij rotatie, camerawissel of onderbreking zonder beelden naar de server te sturen.",
+        "Laat een eventuele overdracht naar documenten of berichten via bestaande upload-/deelcontracten verlopen met expliciete keuze en gegevensuitleg."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Atelier",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een gebruiker maakt lokaal een foto, exporteert hem en opent het bestand na serveruitval.",
+          "expected": "Het bestand bevat de oorspronkelijke bedoelde pixelmaat en geldige beeldbytes; er is geen onverwacht uploadverzoek.",
+          "evidence": "scripts/lib/voltooi/camera.js — Bestaande camera-browserproef met bytecontrole en netwerkobservatie op de kandidaat. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Cameratoegang is geweigerd of wordt tijdens gebruik ingetrokken.",
+          "expected": "Sluiter en status blijven eerlijk; de gebruiker kan toestemming herstellen of veilig stoppen en alle cameratracks worden vrijgegeven.",
+          "evidence": "scripts/lib/voltooi/camera.js — Permission-, track-cleanup-, mobiel-rotatie- en toetsenbordtest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/camera.html",
+        "scripts/lib/voltooi/camera.js"
+      ],
+      "usesCapabilities": []
+    },
+    {
+      "function": "link:cellier",
+      "currentObservation": "De bestaande cellier-routes beheren kelder, flesregels en schenken; de proef controleert aantallen, waarde, drinkvenster en aftellen tot nul.",
+      "target": "Een verzorgde persoonlijke kelder met herkomst van schattingen, voorraadgeschiedenis, drinkvensters en voorbereiding van een diner zonder stille aankopen of onbewezen waardegarantie.",
+      "changes": [
+        "Maak per fles voorraadmutaties, locatie en bron van drinkvenster/waardering zichtbaar; onderscheid eigen invoer van deskundig advies.",
+        "Laat een dinerselectie naar Table verwijzen en reserveer hoogstens intern voorraad na een expliciete keuze.",
+        "Gebruik bestaande voorraadmutaties voor correctie en herstel, met conflictwaarschuwing bij twee toestellen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Het lid schenkt de laatste fles terwijl hetzelfde item op een tweede toestel is geopend.",
+          "expected": "Voorraad wordt niet negatief; de tweede gebruikerstaak krijgt de actuele toestand en een begrijpelijke correctieoptie.",
+          "evidence": "scripts/lib/voltooi/cellier.js — Bestaande cellierproef plus concurrentie- en browserconflicttest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een ingevoerde waarde of drinkdatum blijkt fout en het lid corrigeert die na herladen.",
+          "expected": "De correctie blijft behouden; afgeleide totalen veranderen herleidbaar en verschijnen nooit als gegarandeerde marktwaarde.",
+          "evidence": "scripts/lib/voltooi/cellier.js — Mutatie-, herstart- en schattingslabeltest; menselijke beoordeling van wijn-/waardetaal. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Externe prijs- of wijninformatie alleen met geldige bronlicentie; geen beleggings- of gegarandeerde drinkbaarheidsbelofte."
+      ],
+      "sourceRefs": [
+        "public/apps/cellier.html",
+        "scripts/lib/voltooi/cellier.js",
+        "server/kern/rechterhand/cellier.js"
+      ],
+      "usesCapabilities": [
+        "link:table"
+      ]
+    },
+    {
+      "function": "link:cercle",
+      "currentObservation": "Cercle heeft routes voor clubs, gastpassen en waarheen; de proef behandelt eigen lidmaatschappen en een boekhouding van uitgegeven/teruggenomen gastpassen.",
+      "target": "Een discreet lidmaatschaps- en toegangsboek waarin bestaande rechten, resterende gastmogelijkheden en aanvraagstatus duidelijk zijn zonder toegang tot externe clubs te beloven.",
+      "changes": [
+        "Maak per club de herkomst, geldigheid en voorwaarden van eigen geregistreerde rechten zichtbaar.",
+        "Verbind een bezoekwens aan een voorbereide aanvraag met reis-/agendareferentie; alleen een bevoegde club bevestigt externe toegang.",
+        "Hergebruik de gastpassenboekhouding voor intrekken, verval en concurrent gebruik met een begrijpelijk auditspoor."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ceremony",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een lid plant een bezoek met één resterende gastpas en doet tweemaal dezelfde aanvraag.",
+          "expected": "De administratieve gastpas wordt hoogstens eenmaal gebruikt; externe toegang blijft aangevraagd totdat de bevoegde bron bevestigt.",
+          "evidence": "scripts/lib/voltooi/cercle.js — Bestaande Cercle-proef plus aanvraag-/providerstatus- en idempotentietest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een clubrecht verloopt nadat een bezoekconcept is opgeslagen.",
+          "expected": "Hervatten toont het vervallen recht en blokkeert gebruik tot nieuwe verificatie; de afspraak wordt niet stilzwijgend bevestigd.",
+          "evidence": "scripts/lib/voltooi/cercle.js — Klok-, hervat- en autorisatie-op-uitvoertijdtest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Clubovereenkomsten en toegangsbewijs van de club zijn vereist voor daadwerkelijke toelating; geregistreerd lidmaatschap is geen partnerclaim."
+      ],
+      "sourceRefs": [
+        "public/apps/cercle.html",
+        "scripts/lib/voltooi/cercle.js",
+        "server/kern/rechterhand/cercle.js"
+      ],
+      "usesCapabilities": [
+        "link:reisboek"
+      ]
+    },
+    {
+      "function": "link:commerce",
+      "currentObservation": "Commerce heeft aanbod, mand en overdracht; de proefbelofte is prijs/btw per verkoper en een overdrachtsbriefje naar de bevestigende eigenaar. In deze keten wordt niet besteld of betaald.",
+      "target": "Een transparante aankoopvoorbereiding over meerdere verkopers waarin de gebruiker één overzicht krijgt en per domein de echte voorwaarden en bevestiging behoudt.",
+      "changes": [
+        "Behoud mand en overdracht als compositie; voeg prijsversies, levervoorwaarden, ontbrekende gegevens en afhankelijkheden per verkoper toe.",
+        "Maak gevolgen van een prijswijziging of uitgevallen verkoper zichtbaar voordat nieuwe toestemming wordt gevraagd.",
+        "Laat ieder overgedragen onderdeel naar de bestaande order-/boekings-/betaaleigenaar terugverwijzen; geen centrale tweede checkoutboekhouding."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een mand bevat artikelen van twee verkopers en één prijs verandert vóór overdracht.",
+          "expected": "De oude prijs wordt niet stil bevestigd; alleen de actuele, opnieuw aanvaarde voorwaarden gaan mee naar de juiste eigenaar.",
+          "evidence": "scripts/lib/voltooi/commerce.js — Bestaande commerceproef plus prijsversie- en tweeverkoper-overdrachtstest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Eén downstream-order is bevestigd en een andere mislukt.",
+          "expected": "Het overzicht toont gedeeltelijke voltooiing met afzonderlijke bewijzen en herstelopties; geen totale terugdraai- of betaalclaim zonder domeinbewijs.",
+          "evidence": "scripts/lib/voltooi/commerce.js — Ketenproef met gedeeltelijke uitkomst en expliciete compensatiegrenzen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Aansprakelijkheid, verkopersvoorwaarden en eventuele gecombineerde checkout zijn expliciete commerciële/juridische beslissingen."
+      ],
+      "sourceRefs": [
+        "public/apps/commerce.html",
+        "scripts/lib/voltooi/commerce.js",
+        "server/kern/commerce/overdracht.js"
+      ],
+      "usesCapabilities": [
+        "link:mall",
+        "link:mijnmall",
+        "link:pay"
+      ]
+    },
+    {
+      "function": "link:vonk",
+      "currentObservation": "De Vonk-proef bevat volwassenheidskeuring, eindige selectie, wederzijdse interesse, chat, beide betalingen, zaakbevestiging, blokkeren en melden; de poort gebruikt de bestaande verificatieketen.",
+      "target": "Een veilige, volwassen ontmoetingsdienst met vrijwillige keuzes, eindige selecties, wederzijdse toestemming en duidelijke tafel- en betaalstatus zonder engagementdruk.",
+      "changes": [
+        "Verbind match, gesprek en tafel als geautoriseerde verwijzingen met controle over wat iedere partij deelt; behoud leeftijds- en paspoortpoorten.",
+        "Ontwerp een heldere gezamenlijke besliskaart voor datum, bijdrage, annulering en wat er gebeurt als één partij niet doorgaat.",
+        "Maak blokkeren en melden onmiddellijk leidend over aanbevelingen, chat en reserveringsvoorstellen; voorkom zichtbaarheid van gevoelige profielkenmerken buiten het doel."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Eén persoon toont interesse, de ander nog niet; daarna stemmen beiden in met een tafel.",
+          "expected": "Er ontstaat pas een gedeelde ruimte na wederzijdse toestemming; tafelbevestiging verschijnt pas na de vereiste betalingen en zaakbeslissing.",
+          "evidence": "scripts/lib/voltooi/vonk.js — Bestaande Vonk-proef plus tweepersoons-browserketen en providerstatusasserties. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Eén deelnemer blokkeert de ander tijdens een open tafelvoorstel.",
+          "expected": "Nieuwe communicatie stopt direct; financiële/verblijvende verplichtingen krijgen een afgeschermd herstelpad zonder profielinformatie te lekken.",
+          "evidence": "scripts/lib/voltooi/vonk.js — Blokkade-race-, privacy-, annulerings- en moderatoracceptatieproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Menselijk moderatieproces, incidentrespons en voorwaarden voor annulering/terugbetaling moeten operationeel zijn; matching mag geen beschermde kenmerken ongeoorloofd profileren."
+      ],
+      "sourceRefs": [
+        "public/apps/vonk.html",
+        "scripts/lib/voltooi/vonk.js"
+      ],
+      "usesCapabilities": [
+        "link:verificatie",
+        "link:foodcourt",
+        "link:pay"
+      ]
+    },
+    {
+      "function": "link:entourage",
+      "currentObservation": "Entourage beheert eigen personen, documentmetadata en gezelschappen; de proef ordent verlopen documenten en toont wat bij een samengesteld gezelschap ontbreekt.",
+      "target": "Een zorgvuldig reisgezelschapsdossier dat de organisator alleen toegestane, noodzakelijke documentstatus toont en iedere reiziger controle over delen en intrekken houdt.",
+      "changes": [
+        "Koppel documenten via bestaande kluisreferenties en deelrechten in plaats van kopieën of echte identiteitsnummers naast operationele codenamen.",
+        "Maak reisafhankelijke volledigheid zichtbaar met herkomst en actualiteit; onbekende vereisten blijven onbekend.",
+        "Laat wijzigen of intrekken gevolgen voor voorbereide reisstappen tonen zonder reisboekingen zelfstandig te wijzigen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Journey",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een organisator voegt reizigers toe en één document vervalt vóór de geplande reisdatum.",
+          "expected": "Het dossier verklaart het ontbrekende of verlopen stuk per toegestane reiziger; het toont geen reisgeschiktheid als feit zonder geldige bron.",
+          "evidence": "scripts/lib/voltooi/entourage.js — Bestaande Entourage-proef plus reisdatum-, kluisrecht- en volledigheidstest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een reiziger trekt het delen van een document in terwijl een plan openstaat.",
+          "expected": "Documentinhoud en afgeleide gevoeligheden verdwijnen uit de organisatorprojectie; afhankelijke stappen vragen nieuwe toestemming.",
+          "evidence": "scripts/lib/voltooi/entourage.js — Intrekkings-, cache- en Plan-Dossier-contexttest; privacyreview voor minderjarige reizigers. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Actuele reisdocument-/visumregels en ouderlijke bevoegdheid vragen aangewezen bron en verantwoordelijke controle; dit plan verleent geen grens- of visumgarantie."
+      ],
+      "sourceRefs": [
+        "public/apps/entourage.html",
+        "scripts/lib/voltooi/entourage.js",
+        "server/kern/rechterhand/entourage.js"
+      ],
+      "usesCapabilities": [
+        "link:reisboek",
+        "link:relaties"
+      ]
+    },
+    {
+      "function": "link:theater",
+      "currentObservation": "Theater heeft kanaaltoelating door kantoor, bestand-upload, kijktickets, reacties, abonnement en melden; de proef vergelijkt aangeboden videobytes en beproeft ongeautoriseerd verwijderen/ondertitelen.",
+      "target": "Een hoogwaardige film- en seriezaal voor rechtmatig aangeboden materiaal, met toegankelijke speler, betrouwbare voortgang, ondertitels, rechten en contentmoderatie.",
+      "changes": [
+        "Breid de bestaande spelerervaring uit met hoofdstukken, ondertitelkwaliteit, expliciete afspeelhervatting en een eindige bibliotheekstructuur.",
+        "Maak rechten, kanaaltoelating en beschikbaarheidsvensters zichtbaar vanuit de bestaande publicatiebron; intrekking stopt nieuwe toegang.",
+        "Kwalificeer adaptive netwerkgedrag, range-verzoeken, verlopen tickets en grote uploads zonder een tweede mediacatalogus te bouwen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Een toegelaten maker publiceert een film met ondertitels en een lid hervat op een ander toestel.",
+          "expected": "Alleen toegestane bytes worden geleverd; voortgang en gekozen ondertitels zijn herkenbaar en toetsenbordbediening werkt.",
+          "evidence": "scripts/lib/voltooi/theater.js — Bestaande theaterproef plus echte browser-speler-, range- en toegankelijkheidsproeven. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een kijkticket verloopt of de film wordt tijdens een netwerkonderbreking ingetrokken.",
+          "expected": "Nieuwe toegang wordt geweigerd zonder titel- of inhoudslek buiten rechten; de speler toont de reden en start niet stil opnieuw.",
+          "evidence": "scripts/lib/voltooi/theater.js — Ticket-, intrekkings-, buffering- en cacheproef; licentie-/moderatiereview. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Distributie- en muzieklicenties, leeftijdsclassificatie en eventuele streaminginfrastructuur moeten per aanbod zijn geregeld."
+      ],
+      "sourceRefs": [
+        "public/apps/theater.html",
+        "scripts/lib/voltooi/theater.js"
+      ],
+      "usesCapabilities": [
+        "link:mediaos"
+      ]
+    },
+    {
+      "function": "link:labfonds",
+      "currentObservation": "Fonds is #labfonds binnen geld.html. De proef gebruikt overzicht, doneer, voorstel, stem en beslis en zegt expliciet dat bijdragen toezeggingen zijn en geen geld bewegen.",
+      "target": "Een begrijpelijke gezamenlijke fondsadministratie met herleidbare toezeggingen, stemregels, besluiten en gevolgen, zonder administratie als uitgevoerde donatie te presenteren.",
+      "changes": [
+        "Maak toezegging, beschikbaar bedrag, besluit en eventuele latere betaling afzonderlijke feiten uit de bestaande bronnen.",
+        "Toon bij ieder voorstel welke personen bevoegd zijn, welke stemregel geldt en welke uitkomst alleen advies van de scheidsrechter is.",
+        "Laat een gekozen uitvoering naar de bevoegde bestaande betaal-/giftprocedure gaan, geblokkeerd zolang besluit of externe voorwaarde ontbreekt."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Command",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Leden doen toezeggingen en stemmen over een voorstel; de indiener sluit de stemming.",
+          "expected": "Tellingen en besluit zijn reproduceerbaar; er ontstaat geen betaalboeking alleen door stemmen of sluiten.",
+          "evidence": "scripts/lib/voltooi/labfonds.js — Bestaande fondsproef plus besluitreconstructie en negatieve geldmutatietest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Twee sluitverzoeken en een late stem vallen samen, waarna de server herstart.",
+          "expected": "Eén geldige besluitversie blijft bestaan met verklaarde behandeling van de late stem; bedragen en stemmen verdubbelen niet.",
+          "evidence": "scripts/lib/voltooi/labfonds.js — Concurrentie-, tijdgrens-, idempotentie- en herstartproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Werkelijke geldinzameling, uitbetaling en fiscale status vereisen afzonderlijk geld-/giftbesluit en eventuele vergunning/ANBI-onderbouwing."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/labfonds.js",
+        "GELD.md"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand"
+      ]
+    },
+    {
+      "function": "link:foodcourt",
+      "currentObservation": "Food Court leest aanbod en tijden, vraagt via /api/reserveer een tafel en leest de zaakbeslissing terug; de proef laat de zaak de klant uitsluitend op codenaam zien.",
+      "target": "Een complete restaurantkeuze en tafelreservering met actuele tijd, gezelschap, toegankelijke voorkeuren en een eerlijk bevestigings- en wijzigingspad.",
+      "changes": [
+        "Verbind zoeken, vrije tijden, gezelschap en dieetvelden in één beknopt reserveertraject met doelgebonden delen.",
+        "Toon aangevraagd, bevestigd, gewijzigd en geannuleerd uitsluitend uit de bestaande reserveringseigenaar.",
+        "Laat een wijziging gevolgen voor agenda, vervoer of gedeelde kosten voorbereiden, met aparte bevestiging voor nieuwe externe effecten."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Journey",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een lid vraagt met gezelschap de laatste beschikbare tafel aan en de zaak beslist later.",
+          "expected": "De klant ziet aanvraag tot de zaak bevestigt; privacyvelden gaan alleen mee voor het afgesproken doel.",
+          "evidence": "scripts/lib/voltooi/foodcourt.js — Bestaande foodcourtproef plus concurrentie, late zaakbeslissing en gegevensminimalisatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een bevestigde tijd wijzigt en een klant probeert tegelijk te annuleren.",
+          "expected": "De eindstatus en eventuele voorwaarden zijn consistent bij lid en zaak; afgeleide agenda-acties blijven voorstellen totdat bevestigd.",
+          "evidence": "scripts/lib/voltooi/foodcourt.js — Wijzigings-/annuleringsrace en restaurant-tot-agenda-ketenproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Restaurantvoorwaarden, actuele capaciteit en verantwoordelijkheid voor allergeneninformatie moeten aantoonbaar worden beheerd."
+      ],
+      "sourceRefs": [
+        "public/apps/foodcourt.html",
+        "scripts/lib/voltooi/foodcourt.js",
+        "public/apps/foodcourt-intent.js",
+        "server/kern/reservering/providerbewijs.js"
+      ],
+      "usesCapabilities": [
+        "link:entourage",
+        "link:wbw"
+      ]
+    },
+    {
+      "function": "link:spelavond",
+      "currentObservation": "Game Night gebruikt spelscherm.html en de projectiekoppeling. De proef toetst schaakzetten, eenmalige schermcodes en een afzonderlijke gehashte schermsessie; geheime kaarten vallen onder een andere test.",
+      "target": "Een ontspannen gezamenlijke spelavond waarin een televisie uitsluitend de publieke spelstand toont en koppelen, ontkoppelen en hervatten vanzelfsprekend blijven.",
+      "changes": [
+        "Behoud de bestaande projectie als read-only schermrol; maak codegeldigheid, verbonden scherm en direct intrekken zichtbaar.",
+        "Bouw per bestaand spel een expliciete publieke projectie met een toegankelijke tekstvariant voor bord- of kleurinformatie.",
+        "Kwalificeer verloren koppelingen en herkoppelen zonder private spelerskaarten of accountrechten naar de televisie te brengen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Spatial",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Twee spelers koppelen een televisie en spelen een spel met geheime kaarten.",
+          "expected": "Alleen publieke informatie verschijnt op het scherm; spelershanden en accounttokens zijn nergens in de projectie aanwezig.",
+          "evidence": "scripts/lib/voltooi/spelavond.js — Bestaande spelavondproef en test/spelprojectie.test.js, aangevuld met browser- en netwerkinspectie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De koppeling wordt ingetrokken tijdens een netwerkstoring en een oude code wordt hergebruikt.",
+          "expected": "Het oude scherm ontvangt na herstel geen speldata; de code blijft ongeldig en nieuwe koppeling verloopt expliciet.",
+          "evidence": "scripts/lib/voltooi/spelavond.js — Intrekkings-, replay-, herstart- en televisiebrowserproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/spelscherm.html",
+        "scripts/lib/voltooi/spelavond.js",
+        "public/apps/spelscherm.js",
+        "server/kern/spellen/grens.js"
+      ],
+      "usesCapabilities": [
+        "link:spelen"
+      ]
+    },
+    {
+      "function": "link:garderobe",
+      "currentObservation": "Garde-robe beheert stukken, categorieën, locaties en vaklui. De proef noemt vaklui expliciet eigen contacten, niet accounts; een registratie stuurt geen opdracht naar een kleermaker.",
+      "target": "Een persoonlijke garderobebibliotheek met vindbare stukken, onderhoud, combinaties en reisselecties, waarbij suggesties eigen ordening blijven.",
+      "changes": [
+        "Maak stuklocatie, materiaal, foto en onderhoudsinformatie bewerkbaar en herleidbaar via de bestaande garderobebron.",
+        "Laat een outfit- of paklijst als eigen selectie naar een reisplan verwijzen zonder een tweede inventaris te bewaren.",
+        "Bied een voorbereide onderhoudsvraag aan de bestaande concierge/commerce-eigenaar; noem contactregistratie nooit een verzonden opdracht."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid selecteert kleding voor een reis en verplaatst één stuk naar een andere kast.",
+          "expected": "De reisselectie verwijst naar hetzelfde stuk en toont de actuele locatie; er ontstaat geen tweede kledingvoorraad.",
+          "evidence": "scripts/lib/voltooi/garderobe.js — Bestaande garderobeproef plus verwijzings- en locatieconsistentietest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een concept voor een stomerij wordt voorbereid en daarna geannuleerd.",
+          "expected": "De contactpersoon ontvangt niets; eigen notities en gekozen stukken blijven beheersbaar en na herladen consistent.",
+          "evidence": "scripts/lib/voltooi/garderobe.js — Negatieve verzendtest en concept-/herstartproef; privacycontrole op kledingfoto's. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Nieuwe onderhouds- of bestelverbindingen naar vaklui vragen provider- en voorwaardenbesluit."
+      ],
+      "sourceRefs": [
+        "public/apps/garderobe.html",
+        "scripts/lib/voltooi/garderobe.js",
+        "server/kern/rechterhand/garderobe.js"
+      ],
+      "usesCapabilities": [
+        "link:reisboek",
+        "link:rechterhand"
+      ]
+    },
+    {
+      "function": "link:geldcommand",
+      "currentObservation": "Geld is geld.html met meerdere hashstanden; de proef gebruikt cockpit, beleid, potten en actielog. Potten zijn oormerken; cockpitinhoud, gegronde Rahul en geldgrenzen vallen volgens de proeftekst buiten haar bereik.",
+      "target": "Een financieel commandocentrum dat rust geeft door één betrouwbaar beeld van feiten, verwachtingen en beslissingen, met explainability tot op de bron en zonder tweede boekhouding.",
+      "changes": [
+        "Verbind bestaande geldgraaf, cockpit en actielog in drie vaste vragen: beschikbare ruimte, komende verplichtingen en beslissingen; markeer verwachtingen apart.",
+        "Maak Consequence Graph-scenario's read-only: voorstel, aannames, onbekenden en effect op eigen potten; daadwerkelijke mutaties lopen via bestaande domeinen en bevestiging.",
+        "Kwalificeer alle hashstanden en Rahul-overdracht als één Geld-eigenaar; iedere financiële bewering krijgt bron, peildatum en geldige bevoegdheid."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Het lid vergelijkt een reisvoorstel met eigen potten en kiest een reservering binnen het eigen tegoed.",
+          "expected": "Scenario verandert geen saldo; de bevestigde interne reservering komt één keer bij de pot en het actielog terecht, met onderscheid tussen oormerk en geld.",
+          "evidence": "scripts/lib/voltooi/geldcommand.js — Bestaande geldcommand-proef plus scenario-tot-beleid-keten en vergelijking met autoritatieve grootboeken. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Eén financiële bron valt uit of een plan gebruikt een verlopen bevoegdheid.",
+          "expected": "Het totaal maakt de onvolledigheid zichtbaar en uitvoeren blijft gesloten; andere bekende bronnen blijven afzonderlijk leesbaar.",
+          "evidence": "scripts/lib/voltooi/geldcommand.js — Bronuitval-, ingetrokken-recht-, dubbelverzoek- en crashproef; onafhankelijke financiële review. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Geen uitbreiding naar krediet, beleggen of verzekeringsadvies zonder apart product-, vergunning- en compliancebesluit; live betaalrails blijven extern gekwalificeerd."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/geldcommand.js",
+        "server/kern/geldgraaf/index.js",
+        "GELD.md"
+      ],
+      "usesCapabilities": [
+        "link:pay",
+        "link:wallet",
+        "link:wbw"
+      ]
+    },
+    {
+      "function": "tab:gezin",
+      "currentObservation": "De gezin-tab gebruikt persoonlijke uitnodiging, overzicht, kanaal, bericht en ontkoppelen. De proef geeft een oppas beperkte inzage zonder ouderrechten; GezinRT/WebRTC en echte push worden niet meegenomen.",
+      "target": "Een veilige gezinsingang waarin ouder, kind, familielid en oppas precies zien wat voor hun geldige relatie nodig is en tijdelijke toegang begrijpelijk kan eindigen.",
+      "changes": [
+        "Verbind uitnodigingsacceptatie en bevoegdheden aan bestaande Foundation-relaties; toon doel, looptijd en verleende inzage vóór accepteren.",
+        "Maak de grens tussen lezen, berichten en ouderbeheer expliciet in de gezinsweergave en deel zo weinig mogelijk nood-/kindgegevens.",
+        "Bouw een direct intrek- en ontkoppelpad met herstel van onvoltooide uitnodigingen zonder nieuwe gezins- of agendasessie."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ceremony",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een ouder nodigt een oppas uit voor beperkte inzage en de oppas accepteert tweemaal dezelfde uitnodiging.",
+          "expected": "Er is één beperkte relatie; ouderbeheer en niet-gedeelde kindgegevens blijven onbereikbaar.",
+          "evidence": "scripts/lib/voltooi/gezin.js — Bestaande gezinsproef plus UI-rechtenmatrix voor ouder, oppas, kind en buitenstaander. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De ouder trekt toegang in terwijl de oppas een berichtconcept heeft en offline is.",
+          "expected": "Het concept wordt niet alsnog verzonden; na herstel verdwijnen gedeelde gegevens en blijft ontkoppelen duidelijk.",
+          "evidence": "scripts/lib/voltooi/gezin.js — Intrekking-/offline-race, cachecontrole en kindprivacyacceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Wettelijke vertegenwoordiging, bewaartermijnen en operationeel protocol bij conflicterende ouderlijke bevoegdheid moeten zijn vastgesteld."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/gezin.js"
+      ],
+      "usesCapabilities": [
+        "link:rtfportaal"
+      ]
+    },
+    {
+      "function": "link:vooruitzicht",
+      "currentObservation": "living-os.html gebruikt instant-reality en meerdere bestaande bronnen. De proef kent intentie, routekeuze, voorbereiding en versieconflict; haar expliciete grens meldt geen providerroute en weigert providerbevestiging door een lid.",
+      "target": "Een gecontroleerde vooruitblik op een gekozen bedoeling, met feitelijke huidige toestand, hypothetische mogelijkheden, onzekerheden en een hervatbaar Plan Dossier.",
+      "changes": [
+        "Hergebruik de huidige versiegebonden intentie- en gebeurtenisketen voor Plan Dossier-referenties; houd brondomeinen eigenaar van boekingen, geld en documenten.",
+        "Laat Consequence Graph alleen geautoriseerde, herleidbare afhankelijkheden tonen en onbekende gevolgen even expliciet als bekende.",
+        "Sluit uitvoerbare stappen gefaseerd aan op bestaande broker en providerbewijzen; een voorbereid plan blijft onderscheiden van externe bevestiging."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Horizon",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid verkent een reisverstoring en kiest een alternatief in de hypothetische vooruitblik.",
+          "expected": "Alleen het scenario en de planversie veranderen; geen boeking, betaling of providerstatus wordt door de simulatie bevestigd.",
+          "evidence": "scripts/lib/voltooi/vooruitzicht.js — Bestaande vooruitzichtproef plus negatieve-effect- en bronherkomsttest van Consequence Graph. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Twee toestellen wijzigen hetzelfde dossier en één bronrecht wordt intussen ingetrokken.",
+          "expected": "Geen stille overschrijving; de actuele versie en ingetrokken context worden uitgelegd en uitvoering vraagt een nieuw geldig voorstel.",
+          "evidence": "scripts/lib/voltooi/vooruitzicht.js — Versieconflict-, intrekkings-, herstart- en broker-fingerprintketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Providerintegratie is een afzonderlijk werkpakket met echte bevoegde bron; totdat die bestaat blijven externe statusovergangen geblokkeerd."
+      ],
+      "sourceRefs": [
+        "public/apps/living-os.html",
+        "scripts/lib/voltooi/vooruitzicht.js",
+        "public/apps/living-os.js",
+        "server/kern/experience/broker.js"
+      ],
+      "usesCapabilities": [
+        "link:rechterhand",
+        "link:reisboek",
+        "link:geldcommand"
+      ]
+    },
+    {
+      "function": "link:krant",
+      "currentObservation": "Krant leest gids, krant en artikel uit de redactie van nieuwsbedrijven. De proef behandelt concept, publicatie, openbare correctie en terughalen; de bron benoemt een historische open accountpoort die opnieuw moet worden gemeten.",
+      "target": "Een hoogwaardige, rustige krantenleeservaring met uitgeversidentiteit, publicatiedatum, zichtbare correcties, toegankelijke tekst en eerlijke toegang tot actuele versies.",
+      "changes": [
+        "Behoud de uitgever als redactie-eigenaar; toon versie en correctiegeschiedenis naast een leesstand met instelbare tekstgrootte.",
+        "Verbind bewaren en hervatten via bestaande media-/bibliotheekvoorzieningen zonder concepten of ingetrokken tekst in privézoekkopieën te laten leven.",
+        "Kwalificeer account-/publicatierechten en cache-invalidering expliciet; neem de oude proefnotitie niet over als actueel defect of als opgelost bewijs."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "De uitgever corrigeert een gepubliceerd artikel; een lezer opent een eerder bewaarde verwijzing.",
+          "expected": "De lezer krijgt de actuele tekst met zichtbare correctietoelichting en uitgever; het oude concept wordt niet openbaar.",
+          "evidence": "scripts/lib/voltooi/krant.js — Bestaande krantproef plus versie-/cache- en leesstand-browserproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een artikel wordt teruggetrokken terwijl het op een tweede toestel openstaat.",
+          "expected": "Na rechtmatige actualisatie is de inhoud niet opnieuw opvraagbaar; de gebruiker ziet een ingetrokken status en geen kapot leeg scherm.",
+          "evidence": "scripts/lib/voltooi/krant.js — Terugtrekking-, accountpoort- en offlinehersteltest; redactionele acceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Uitgeversrechten, correctiebeleid en eventueel offline leesrecht moeten per publicatieovereenkomst vaststaan."
+      ],
+      "sourceRefs": [
+        "public/apps/krant.html",
+        "scripts/lib/voltooi/krant.js",
+        "public/apps/redactie/publicatie.js"
+      ],
+      "usesCapabilities": [
+        "link:mediaos"
+      ]
+    },
+    {
+      "function": "link:podium",
+      "currentObservation": "Podium heeft goedgekeurde kanalen, live/kijk, chat, cadeau, blokkeren en melden. De proef loopt API-status en Pay-cadeaus; de daadwerkelijke WebRTC-videostroom en besloten zones vallen buiten haar bereik.",
+      "target": "Een betrouwbare live-omgeving voor makers en publiek met duidelijke livekwaliteit, toegankelijke deelname, gemodereerde chat en bewust bevestigde betalingen.",
+      "changes": [
+        "Maak de bestaande live-status en echte mediaverbinding afzonderlijk zichtbaar; een kanaal dat live gemarkeerd is bewijst nog geen ontvangen beeld.",
+        "Verbind chat, moderatie en cadeaus met bestaande kanaalrechten en betaalwaarheid; verwijder kunstmatige schaarste of impulsdruk.",
+        "Breid de speler/studio uit met ondertitel-/toegankelijkheidspaden, reconnect en duidelijke beëindiging zonder een oude uitzending te herleven."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Een toegelaten maker gaat live; een kijker ontvangt beeld, chat en bevestigt één cadeau.",
+          "expected": "Beeld wordt daadwerkelijk ontvangen; chat en cadeau horen bij hetzelfde toegestane kanaal en betaling verschijnt exact eenmaal.",
+          "evidence": "scripts/lib/voltooi/podium.js — Bestaande Podium-proef plus tweebrowser-mediatest, betaalbewijs en toegankelijkheidscontrole. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De maker blokkeert een kijker en de stream valt tijdens een betaalbevestiging weg.",
+          "expected": "Geblokkeerde toegang stopt; de betaling wordt via haar eigen bron hersteld en de uitgevallen stream veroorzaakt geen tweede afschrijving.",
+          "evidence": "scripts/lib/voltooi/podium.js — Blokkade-, media-uitval-, reconnect- en betaalreconciliatieketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Streamingcapaciteit, moderatiebezetting, contentrechten en regels voor giften/betalingen aan makers vragen aantoonbare operationele afspraken."
+      ],
+      "sourceRefs": [
+        "public/apps/podium.html",
+        "scripts/lib/voltooi/podium.js"
+      ],
+      "usesCapabilities": [
+        "link:pay",
+        "link:mediaos"
+      ]
+    },
+    {
+      "function": "link:logboek",
+      "currentObservation": "Logboek is een stand in geld.html en beheert objecten, onderhoudsregels, kosten en attenties. De proef zegt expliciet dat een regel een aantekening is, geen afspraak bij een werf of garage.",
+      "target": "Een onderhoudsdossier voor persoonlijk bezit met betrouwbare historie, documenten en toekomstige aandachtspunten, waarin een notitie nooit als uitgevoerde service geldt.",
+      "changes": [
+        "Hergebruik object- en regelreferenties voor een tijdlijn met documentbron, kostenherkomst, keurdatum en eigen correcties.",
+        "Laat onderhoudsvoorbereiding naar bestaande agenda of concierge verwijzen met een duidelijk aanvraagstadium.",
+        "Maak verwijderen en archiveren zorgvuldig: laat de gebruiker zien welke onderhoudsregels en gekoppelde verwijzingen geraakt worden."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid noteert een keuring met vervaldatum en koppelt een bestaand document.",
+          "expected": "Het dossier toont de herkomst en attentie; het document blijft in zijn kluis en er wordt geen werkplaatsafspraak geclaimd.",
+          "evidence": "scripts/lib/voltooi/logboek.js — Bestaande logboekproef plus documentrecht- en datumketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een object met regels wordt verwijderd terwijl een onderhoudsconcept openstaat.",
+          "expected": "Het scherm beschrijft de gevolgen, voorkomt verweesde regels en laat een stale concept niet alsnog als geldige opdracht uitvoeren.",
+          "evidence": "scripts/lib/voltooi/logboek.js — Verwijder-, referentie-, herstart- en conceptvalidatietest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Certificering en daadwerkelijk uitgevoerd onderhoud vereisen bewijs van de bevoegde uitvoerder; eigen invoer blijft als zodanig gelabeld."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/logboek.js",
+        "GELD.md",
+        "server/kern/rechterhand/logboek.js"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand",
+        "link:rechterhand"
+      ]
+    },
+    {
+      "function": "link:huis",
+      "currentObservation": "Logeren bij leden loopt via thuis.html met huis, aanvraag, hostbesluit, verblijf, berichten en review. De proef verplaatst geen geld en noemt annulering met terugbetaling, co-hosts en echte sleutels buiten bereik.",
+      "target": "Een complete ledenverblijfervaring met duidelijke beschikbaarheid, hostbesluit, huisregels, privacy en ondersteuning van aanvraag tot vertrek, binnen aantoonbare juridische en operationele grenzen.",
+      "changes": [
+        "Verbind aanvraag en verblijf als één leesbaar dossier met afzonderlijke host-, document- en eventuele betaalbewijzen.",
+        "Werk wijziging en annulering uit via bestaande reserveringseigenaar; maak prijs of vergoeding alleen uitvoerbaar na expliciet scope-/providerbesluit.",
+        "Beperk adres-/contactdeling tot het juiste stadium en kwalificeer overlap, blokkeren, klachten en vertrek zonder sleuteldienst te veinzen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Journey",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Twee gasten vragen dezelfde periode aan en de host accepteert één aanvraag.",
+          "expected": "De tweede aanvraag kan geen overlappend bevestigd verblijf worden; adres- en contactdeling volgen de vastgestelde rechten.",
+          "evidence": "scripts/lib/voltooi/huis.js — Bestaande huisproef plus concurrentie-, adresprivacy- en host/gast-browserketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een bevestigd verblijf wordt gewijzigd of afgezegd tijdens netwerkuitval.",
+          "expected": "Beide partijen zien dezelfde uiteindelijke verblijfstatus; het dossier zegt expliciet of geld buiten deze keten staat en welke hulp werkelijk beschikbaar is.",
+          "evidence": "scripts/lib/voltooi/huis.js — Wijzigings-, annulerings-, herstart- en menselijke supportacceptatieproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Verhuurrecht, verzekering, consumentenvoorwaarden, fiscale afhandeling en eventuele betaal-/terugbetalingsdienst vereisen afzonderlijke besluiten; geen automatische toevoeging van betaalde verhuur."
+      ],
+      "sourceRefs": [
+        "public/apps/thuis.html",
+        "scripts/lib/voltooi/huis.js"
+      ],
+      "usesCapabilities": [
+        "link:reisboek"
+      ]
+    },
+    {
+      "function": "link:maison",
+      "currentObservation": "Maison beheert stafcontacten, taken, klaarzetten/afvinken en huislog. Volgens de proef zijn stafleden geen accounts: een taak is een persoonlijke notitie, geen ontvangen opdracht.",
+      "target": "Een discreet huishoudboek waarin eigen planning, uitgevoerde taken en gedeelde opdrachten begrijpelijk gescheiden zijn en de bewoner minimale gegevens kan delegeren.",
+      "changes": [
+        "Verdiep de bestaande taakweergave met terugkerende planning, afhankelijkheden en historie voor eigen huishoudadministratie.",
+        "Toon bij iedere taak of het een eigen notitie is of, na apart besluit, een bevestigde overdracht via bestaande personeels-/accountrechten.",
+        "Koppel relevante documenten of onderhoud aan bestaande dossiers; bouw geen tweede HR- of personeelsdatabase."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Command",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een bewoner plant terugkerend tuinonderhoud en vinkt één uitvoering af.",
+          "expected": "Alleen de bedoelde taak wordt afgerond; toekomstige taken blijven intact en de genoemde tuinman krijgt geen impliciete accounttoegang of bericht.",
+          "evidence": "scripts/lib/voltooi/maison.js — Bestaande Maison-proef plus herhaling- en negatieve overdrachtstest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een stafcontact wordt verwijderd met open taken en het toestel herlaadt.",
+          "expected": "Taken worden niet aan een verkeerde persoon toegewezen; de bewoner ziet de verweesde toewijzing en kan die veilig herstellen.",
+          "evidence": "scripts/lib/voltooi/maison.js — Contactverwijdering-, verwijzings- en herstartproef; privacyreview. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Echte personeelsaccounts, werkgeversverantwoordelijkheid en opdrachtontvangst zijn aparte scope-/arbeidsrechtelijke besluiten."
+      ],
+      "sourceRefs": [
+        "public/apps/maison.html",
+        "scripts/lib/voltooi/maison.js",
+        "server/kern/rechterhand/maison.js"
+      ],
+      "usesCapabilities": [
+        "link:logboek"
+      ]
+    },
+    {
+      "function": "link:mall",
+      "currentObservation": "Mall heeft zoeken, lijsten, bewaren en appinstallaties in bestaande routes; de proef gebruikt synthetisch aanbod en sluit bestellen, betalen en prijswijziging uit. mall-experience.js en de bestaande winkelvoorzijde zijn aanwezig.",
+      "target": "Een overzichtelijke markt die relevant aanbod vindbaar maakt, herkomst en leverbaarheid verklaart en de gebruiker met behoud van context naar de echte verkoper en afhandeling brengt.",
+      "changes": [
+        "Kwalificeer volledige zoek-/filterdekking over de bestaande catalogus, met toegankelijke resultaten en geen verborgen afkap van beschikbare items.",
+        "Maak de stap van bewaren naar vergelijken en voorbereiden versiegebonden: prijs, beschikbaarheid, verkoper en voorwaarden worden opnieuw gecontroleerd.",
+        "Hergebruik lijsten en appinstallatiecontracten; externe apps krijgen hun bestaande dossier en bevestigde rechten vóór gebruik."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "Een gebruiker zoekt een item buiten de eerste resultaatpagina, bewaart het en opent later de verkoper.",
+          "expected": "Het item is vindbaar indien toegestaan; de overgang behoudt de keuze maar verifieert actuele prijs en voorwaarden opnieuw.",
+          "evidence": "scripts/lib/voltooi/mall.js — Bestaande Mall-proef plus zoekdekking-, paginering- en prijswijzigingsketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een bewaard item of geïnstalleerde app wordt ingetrokken.",
+          "expected": "De lijst bewaart hoogstens een veilige ingetrokken verwijzing; de gebruiker kan geen oude beschikbaarheid of apprecht alsnog gebruiken.",
+          "evidence": "scripts/lib/voltooi/mall.js — Catalogusintrekking-, installatiepoort-, cache- en browserhersteltest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Verkopersovereenkomsten, catalogusrechten en externe apppublicatie blijven noodzakelijke voorwaarden voor echt aanbod."
+      ],
+      "sourceRefs": [
+        "public/apps/mall.html",
+        "scripts/lib/voltooi/mall.js",
+        "public/apps/mall-experience.js"
+      ],
+      "usesCapabilities": [
+        "link:commerce",
+        "link:mijnmall",
+        "link:appdossier"
+      ]
+    },
+    {
+      "function": "link:mecenaat",
+      "currentObservation": "Mecenaat is #mecenaat in geld.html. Bestaande routes registreren doel, bedrag, gift en betaaldmarkering; de proef zegt dat betaald een eigen aantekening is en geen overboeking.",
+      "target": "Een betrouwbaar persoonlijk filantropiedossier dat toezegging, eigen betalingsnotitie en geverifieerd betaal-/ontvangstbewijs uit elkaar houdt en maatschappelijke resultaten niet verzint.",
+      "changes": [
+        "Maak de aard van elke giftregel zichtbaar: toegezegd, zelf gemarkeerd, of door een bevoegde bron onderbouwd.",
+        "Laat Foundation-relaties en betaalbewijzen als doelgebonden referenties zien, zonder een nieuwe donatieadministratie te bouwen.",
+        "Maak rapportage over gekozen doelen en eigen bijdragen exporteerbaar met bronstatus; fiscale conclusies volgen het bestaande zekerheidsbeleid."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een lid markeert een toezegging zelf als betaald.",
+          "expected": "Het overzicht zegt dat dit eigen registratie is en maakt geen betaaltransactie, ontvangersbevestiging of fiscale aftrekclaim.",
+          "evidence": "scripts/lib/voltooi/mecenaat.js — Bestaande Mecenaat-proef plus statuslabel- en negatieve grootboektest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een gekoppeld betaalbewijs wordt ongeldig of de giftregel wordt gecorrigeerd.",
+          "expected": "Afgeleide rapportage toont de gewijzigde bewijskracht; historie en verwijzingen blijven verklaarbaar na herladen.",
+          "evidence": "scripts/lib/voltooi/mecenaat.js — Bewijsintrekking-, correctie-, export- en herstartproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Donatie-executie, ANBI-status, incassomachtiging en fiscale behandeling vragen de bestaande GIFT- en fiscale beslispoorten."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/mecenaat.js",
+        "GELD.md",
+        "server/kern/rechterhand/mecenaat.js"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand",
+        "link:geven"
+      ]
+    },
+    {
+      "function": "link:mijnmall",
+      "currentObservation": "Mijn bestellingen heeft vraag, keuze en wijzigingsroutes voor Mall-aanvragen. De proef kwalificeert offertes van passende zaken en gunning zonder boeking/betaling; overige bestellingen, lijsten en dertigdagverval vallen buiten haar bereik.",
+      "target": "Een helder persoonlijk order- en aanvraagdossier dat een wens, antwoord, keuze, echte order en betaling nooit verwart en iedere leverancierstaak terugleidt naar haar bron.",
+      "changes": [
+        "Maak de huidige aanvraagketen visueel en semantisch apart van echte orders; pas de taaknamen aan zonder een nieuwe catalogusfunctie te maken.",
+        "Verbind gekozen reacties aan een Plan Dossier met versies, voorwaarden en expliciete overdracht naar de bevoegde order-/boekingsroute.",
+        "Breid tijdgestuurde scenario's uit met verlopen aanvragen, gewijzigde offertes en gedeeltelijke afhandeling."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Journey",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een lid kiest een reactie van een passende zaak op een eigen aanvraag.",
+          "expected": "Het dossier toont gekozen reactie, geen geboekt of betaald resultaat; alleen die zaak en de klant zien toegestane vervolgdetails.",
+          "evidence": "scripts/lib/voltooi/mijnmall.js — Bestaande mijnmall-proef plus statusbegrip- en aanvraag-tot-orderoverdrachtstest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De offerte verloopt terwijl het lid offline is en na terugkomst de oude keuze bevestigt.",
+          "expected": "De keuze wordt niet uitgevoerd op verlopen voorwaarden; de actuele status en benodigde herbevestiging zijn zichtbaar.",
+          "evidence": "scripts/lib/voltooi/mijnmall.js — Tijdmachine-, stale-offerte-, idempotentie- en browserherstelproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "P0 beslist de heldere presentatie van aanvragen versus orders; gunning mag geen nieuwe commerciële verplichting krijgen zonder expliciete voorwaarden."
+      ],
+      "sourceRefs": [
+        "public/apps/mijnmall.html",
+        "scripts/lib/voltooi/mijnmall.js",
+        "public/apps/mijnmall-aanvragen.js"
+      ],
+      "usesCapabilities": [
+        "link:mall",
+        "link:commerce"
+      ]
+    },
+    {
+      "function": "link:leven",
+      "currentObservation": "Mijn leven leest /api/leven/cockpit uit bestaande bronnen en agenda; de proef beschrijft een projectie zonder uitvoerknoppen of kopie. Schoolfasen, werkrollen, Entourage en gegevensgesprek vallen buiten haar huidige bereik.",
+      "target": "Een persoonlijke, rustige levenslijn met betekenisvolle eigen gebeurtenissen en transparante herkomst, zonder levensscore of sturende sociale rangorde.",
+      "changes": [
+        "Hergebruik de levensgraaf als geautoriseerde lezing en voeg expliciete brondekking, actualiteit en verberg-/voorkeursbediening toe.",
+        "Maak doorklikken naar de eigenaar en een bewust gekozen Plan Dossier mogelijk; de levenslijn gaat geen domeinprocessen bezitten.",
+        "Kwalificeer werk/privé- en Foundationgrenzen met intrekking, gevoelige velden en nieuwe levensfasen zonder stil gegevens te combineren."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Horizon",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "Een lid legt een afspraak en een privédoel in de bestaande bronnen vast.",
+          "expected": "De lijn toont alleen toegestane relevante feiten met bronverwijzing; er ontstaat geen gekopieerd dossier of score op het leven.",
+          "evidence": "scripts/lib/voltooi/leven.js — Bestaande levenproef plus bronprojectie- en gegevensminimalisatietest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een werkrol of gedeeld Foundationrecht vervalt terwijl de levenslijn openstaat.",
+          "expected": "De betreffende informatie verdwijnt na hercontrole; geen privé-/werkbron blijft via cache of samenvatting bereikbaar.",
+          "evidence": "scripts/lib/voltooi/leven.js — Rechtintrekking-, federatie-, cache- en privacyacceptatieproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/leven.html",
+        "scripts/lib/voltooi/leven.js",
+        "server/kern/levensgraaf/graaf.js",
+        "LIFE.md"
+      ],
+      "usesCapabilities": [
+        "link:entourage",
+        "link:vandaag"
+      ]
+    },
+    {
+      "function": "link:muziek",
+      "currentObservation": "Muziek heeft eigen-bestandpublicatie, luistertickets, waardering en samenluisterkamers. De proef gebruikt een korte WAV en toetst bytes; grote bestanden, ranges en synchronisatie van luisterklokken vallen buiten bereik.",
+      "target": "Een zorgvuldig gemaakte muziekervaring voor rechtmatig gedeeld werk, met goede spelerbediening, bibliotheek, hervatten en samen luisteren binnen expliciete rechten.",
+      "changes": [
+        "Behoud maker, bestand en lijst bij de bestaande media-eigenaren; bied een rustige queue en toegankelijke afspeelbediening.",
+        "Maak samen luisteren opt-in met duidelijke gastheer-/gastrollen en beperkt gedeelde afspeelstatus.",
+        "Kwalificeer grotere bestanden, seek/ranges, onderbreking en synchronisatie; vermeld eerlijk wanneer een bron niet beschikbaar is."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Een maker deelt eigen werk en twee leden luisteren samen terwijl één pauzeert en hervat.",
+          "expected": "Dezelfde toegestane bron klinkt; synchronisatie volgt de vastgelegde rolregels en persoonlijke luistergeschiedenis wordt niet ongevraagd gedeeld.",
+          "evidence": "scripts/lib/voltooi/muziek.js — Bestaande muziekproef plus echte audioplayer-, range- en tweebrowser-kloktest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De maker verwijdert een nummer tijdens een onderbroken sessie.",
+          "expected": "Nieuwe luistertickets of cacheherstel ontsluiten het ingetrokken werk niet; de queue toont de onbeschikbare bron begrijpelijk.",
+          "evidence": "scripts/lib/voltooi/muziek.js — Verwijder-, ticket-, offline- en queueherstelproef; rechtenreview. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Muzieklicenties en rechten op gedeeld werk zijn vereist; commerciële streamingcatalogi zijn geen impliciete uitbreiding."
+      ],
+      "sourceRefs": [
+        "public/apps/muziek.html",
+        "scripts/lib/voltooi/muziek.js",
+        "public/apps/muziek-feed.js"
+      ],
+      "usesCapabilities": [
+        "link:mediaos"
+      ]
+    },
+    {
+      "function": "link:nalatenschap",
+      "currentObservation": "Nalatenschap is een Geld-hashstand voor documentenlocaties, contacten en wensen. De proef vindt gevoelige velden niet leesbaar in opslag, maar kwalificeert sleutelbeheer/cryptografie en toegang na overlijden uitdrukkelijk niet.",
+      "target": "Een zorgvuldig privé-dossier voor wensen en vindplaatsen, met sterke herstelbaarheid en begrijpelijke vertrouwensgrenzen; het is geen automatisch testament of onbevoegde overdracht aan erfgenamen.",
+      "changes": [
+        "Behoud bestaande versleutelde velden en kluisreferenties; maak bewaartermijn, export en herstelverantwoordelijkheid begrijpelijk.",
+        "Voeg volledigheidscontrole voor eigen administratie en een contact-/documentoverzicht toe, zonder juridische geldigheid te suggereren.",
+        "Ontwerp eventuele toegang na overlijden alleen als afzonderlijk besloten, menselijk geverifieerd proces met onafhankelijk threat model en intrekbaarheid."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ceremony",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een lid bewaart wensen en documentvindplaatsen, exporteert een eigen dossier en herstelt het na uitval.",
+          "expected": "Alleen het lid krijgt de ontsleutelde inhoud; export is expliciet bevestigd en herstel behoudt de juiste gegevens zonder plaintextlogs.",
+          "evidence": "scripts/lib/voltooi/nalatenschap.js — Bestaande nalatenschapproef plus sleutel-/backupherstel, exportautorisatie en onafhankelijke securityreview. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een opgegeven vertrouwenspersoon probeert het dossier zonder een geldig vrijgavebesluit te openen.",
+          "expected": "Een contactregistratie verleent geen toegang; alle gevoelige velden blijven gesloten en de weigering lekt geen dossierinhoud.",
+          "evidence": "scripts/lib/voltooi/nalatenschap.js — Negatieve delegatie- en objectautorisatieproef; juridische toets van toegangsteksten. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Vrijgave na overlijden, executeursbevoegdheid en testamentaire betekenis vereisen expliciet juridisch en architectuurbesluit; blijven gesloten tot dat bewijs bestaat."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/nalatenschap.js",
+        "GELD.md",
+        "server/kern/rechterhand/nalatenschap.js"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand"
+      ]
+    },
+    {
+      "function": "link:nieuws",
+      "currentObservation": "Nieuws leest gepubliceerde RTG-redactieartikelen en een brongebonden AI-route. De proef gebruikt lokale samenvatting en bronzinnen, geen extern model, en sluit de redactionele schrijftafel uit.",
+      "target": "Een rustige nieuwslezer waarin bron, actualiteit en correcties direct zichtbaar zijn en Rahul uitsluitend onderbouwd over het geopende artikel kan antwoorden.",
+      "changes": [
+        "Maak artikelstructuur, rubriek, leestijd, bronversie en correctie zichtbaar met toegankelijke leesvoorkeuren.",
+        "Laat iedere Rahul-uitspraak naar passage en artikelversie verwijzen; niet-onderbouwde vragen krijgen een duidelijke grens.",
+        "Behoud publiceren en terugtrekken bij de redactie-eigenaar en invalideer samenvattingen zodra de bron verandert."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "Een lid vraagt naar een gegeven dat niet in het artikel staat.",
+          "expected": "Rahul zegt dat de bron het niet bevat; het antwoord verzint geen aanvullend nieuws en wijzigt het artikel niet.",
+          "evidence": "scripts/lib/voltooi/nieuws.js — Bestaande nieuwsproef plus brongebonden antwoordevaluatie voor gekozen model en handmatige fallback. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De redactie trekt een artikel terug nadat een samenvatting is bewaard.",
+          "expected": "De samenvatting wordt niet opnieuw als geldig artikelantwoord aangeboden en een geraden concept-id blijft gesloten.",
+          "evidence": "scripts/lib/voltooi/nieuws.js — Intrekking-, cache-, conceptautorisatie- en offlinehersteltest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Redactionele verantwoordelijkheid en bron-/herpublicatierechten blijven bij een aangewezen menselijke eigenaar."
+      ],
+      "sourceRefs": [
+        "public/apps/nieuws.html",
+        "scripts/lib/voltooi/nieuws.js"
+      ],
+      "usesCapabilities": []
+    },
+    {
+      "function": "link:ontdek",
+      "currentObservation": "Overzicht gebruikt dossier, sociale lijn, wereld, eigen agenda en persoonlijke beelden. De proef test eigen foto en lokale dag, maar noemt leeg reisdossier, lege wachtbronnen en chunked upload buiten bereik.",
+      "target": "Een persoonlijke Horizon die met weinig keuzes laat zien wat nu relevant is, waarom het er staat en waar verder te gaan, met vaste navigatie en volledig controleerbare personalisatie.",
+      "changes": [
+        "Gebruik PersonalOS en bestaande dossierprojecties voor prioriteit op basis van expliciete voorkeuren; toon geen verborgen gevoelige broncontext.",
+        "Maak de drie standen rustig, aandacht nodig en eigen keuze bewust ontwerpbaar via bestaande DS-/Experience-profielen.",
+        "Kwalificeer echte gevulde bronnen, afbeeldingsupload/-uitsnede en conflicterende voorkeuren op meerdere toestellen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Horizon",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "Een lid heeft een reiswijziging, een afspraak vandaag en een open eigen concept.",
+          "expected": "Overzicht prioriteert begrijpelijk met bron en vaste doorklik; er is geen onverwachte actie of verschuivende hoofdnav.",
+          "evidence": "scripts/lib/voltooi/ontdek.js — Bestaande overzichtproef plus gevulde-bronnenketen en taakacceptatie met nieuwe gebruikers. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een persoonlijke foto-upload breekt af en de gebruiker herstelt daarna het RTG-beeld.",
+          "expected": "Geen halve of andermans afbeelding verschijnt; keuze en uitsnede zijn na herstart consistent en herstellen is omkeerbaar waar mogelijk.",
+          "evidence": "scripts/lib/voltooi/ontdek.js — Chunked-upload-, beeldautorisatie-, conflict- en visuele regressieproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/rtg.html",
+        "scripts/lib/voltooi/ontdek.js",
+        "public/apps/rtg-dossier.js"
+      ],
+      "usesCapabilities": [
+        "link:leven",
+        "link:reisboek",
+        "link:sociaal"
+      ]
+    },
+    {
+      "function": "link:rechterhand",
+      "currentObservation": "Privékantoor gebruikt de bestaande bureau/lus-intake, case en beslisroutes. De proef laat een mens op kantoor een case oppakken en zegt dat vastzetten een case-afspraak is, geen reservering bij een zaak.",
+      "target": "Een persoonlijke regie-ervaring waarin één wens leidt tot een duidelijk dossier met menselijke verantwoordelijkheid, beslispunten, echte uitvoeringsstatus en herstel van misgelopen onderdelen.",
+      "changes": [
+        "Maak de bestaande concierge-case de bron voor Plan Dossier-weergave; hergebruik mandaat en bureau-eigenaar in plaats van een tweede casebackend.",
+        "Voeg per onderdeel bron, verantwoordelijke, voorwaarden en afhankelijkheden toe; toon het verschil tussen kantoorafspraak en providerbevestiging.",
+        "Breid intake, toelichting en herstel uit met versiegebonden besluiten en zichtbare consequenties van veranderde wensen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Command",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid geeft een wens met grenzen en kantoor doet een voorstel buiten die grenzen.",
+          "expected": "Uitvoering wacht op expliciet akkoord voor de concrete versie; een case-afspraak verschijnt niet als bevestigde externe boeking.",
+          "evidence": "scripts/lib/voltooi/rechterhand.js — Bestaande rechterhandproef plus scripts/conciergeproef.js en voorstel-fingerprintketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een provideronderdeel valt na een akkoord uit en kantoor bereidt een alternatief voor.",
+          "expected": "Het dossier toont de gedeeltelijke uitkomst, gevolgen en nieuwe keuze; het oude akkoord autoriseert geen ander bedrag of andere leverancier.",
+          "evidence": "scripts/lib/voltooi/rechterhand.js — Concierge-herstelketen, providerstatusproef en menselijke dienstverleningsacceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Lifestyle-toelating blijft menselijk; operationele bezetting, responstijden en leveranciersafspraken moeten de gecommuniceerde dienstbelofte dragen."
+      ],
+      "sourceRefs": [
+        "public/apps/lifestyle.html",
+        "scripts/lib/voltooi/rechterhand.js",
+        "public/apps/lifestyle-lus.js",
+        "scripts/conciergeproef.js"
+      ],
+      "usesCapabilities": [
+        "link:reisboek",
+        "link:commerce"
+      ]
+    },
+    {
+      "function": "link:pulse",
+      "currentObservation": "Pulse heeft feed, post, like, reactie, bewaren en dagstemming. De proef sluit volgen, melden, versiehistorie en tekstkeuring uit; de opgeslagen browserronde bevat een onvolledige bediening, geen actuele kandidaatmeting.",
+      "target": "Een eindige, veilige stroom korte berichten met een eigen herkenbaar ritme en gedeelde sociale rechten, zonder een dubbele sociale kern of verslavende engagementmechaniek.",
+      "changes": [
+        "Sluit eerst het eigenaarschapsbesluit Pulse/Salon en maak hergebruik van rechten, rapportage en publicatie expliciet.",
+        "Verdiep schrijven, bewerken, reageren, bewaren en melden met toegankelijke focus, begrip van zichtbaarheid en volledige verwijderlus.",
+        "Onderzoek de bekende overlay-interceptie op de actuele kandidaat en herstel zo nodig de gedeelde oorzaak in de werkruimteschil."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid schrijft, bewerkt en meldt een korte post via toetsenbord en mobiel.",
+          "expected": "Iedere bedoelde bediening is bereikbaar; zichtbaarheid, versies en moderatiestatus volgen de vastgestelde eigenaar zonder dubbele publicatie.",
+          "evidence": "scripts/lib/voltooi/pulse.js — Bestaande Pulse-proef plus browserbediening, versie- en moderatieketen; reproduceer overlaybevinding afzonderlijk. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De maker verwijdert een post terwijl deze in een bewaarde lijst en offline projectie staat.",
+          "expected": "De inhoud kan na rechten-/versiehercontrole niet terugkeren; een lege lijst krijgt een begrijpelijke volgende stap.",
+          "evidence": "scripts/lib/voltooi/pulse.js — Verwijder-, cache-, bewaar- en herstelproef; menselijke eindigheidstoets van de feed. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "P0 moet de bestaande overlap met Salon oplossen; moderatie en meldafhandeling vragen een operationele eigenaar."
+      ],
+      "sourceRefs": [
+        "public/apps/pulse.html",
+        "scripts/lib/voltooi/pulse.js"
+      ],
+      "usesCapabilities": [
+        "tab:salon"
+      ]
+    },
+    {
+      "function": "link:rendezvous",
+      "currentObservation": "Rendez-vous heeft profiel, kandidaten, like, overslaan, matches en blokkeren. De proef vereist Signature-pas en geverifieerd paspoort; tafels, introducties, concierge, foto's en berichten worden in deze proef niet doorlopen.",
+      "target": "Een discrete introductieomgeving voor de bedoelde doelgroep met wederzijdse keuze, minimale profielzichtbaarheid en gecontroleerde begeleiding zonder relatie- of statusladder.",
+      "changes": [
+        "Maak profielzichtbaarheid en vrijwillige introductie begrijpelijk vanuit de bestaande wederzijdse relatie- en toestemmingsregels.",
+        "Kwalificeer de nog apart te meten foto-, bericht- en conciergeoverdracht op dezelfde matchrechten; geen automatische sociale escalatie.",
+        "Laat blokkeren, verlaten en meldingen consequent gelden voor alle matchprojecties, ook in Plan Dossiers."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Twee gerechtigde leden kiezen elkaar, terwijl een derde de match-id kent.",
+          "expected": "Alleen de twee deelnemers zien de gedeelde match; eenzijdige interesse, privévoorkeuren en documenten blijven afgeschermd.",
+          "evidence": "scripts/lib/voltooi/rendezvous.js — Bestaande Rendez-vous-proef plus profiel-/foto-/berichtautorisatiematrix. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Eén deelnemer blokkeert de ander voordat een concierge-introductie wordt bevestigd.",
+          "expected": "De introductie wordt niet verstuurd op oude toestemming; beide kanten verliezen de afgesproken toegang zonder onnodige persoonsgegevens te behouden.",
+          "evidence": "scripts/lib/voltooi/rendezvous.js — Blokkade-, stale-plan-, verwijder- en privacyacceptatieproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "P0 moet Signature als bestaande toegangsterm koppelen aan de actuele pas-/toelatingsregels; geen nieuwe vierde commerciële pas zonder besluit. Moderatie en menselijke introductiedienst moeten operationeel zijn."
+      ],
+      "sourceRefs": [
+        "public/apps/rendezvous.html",
+        "scripts/lib/voltooi/rendezvous.js"
+      ],
+      "usesCapabilities": [
+        "link:relaties",
+        "link:verificatie",
+        "link:rechterhand"
+      ]
+    },
+    {
+      "function": "os:rtf",
+      "currentObservation": "De RTFoundation-ingang in app.html opent een leeftijdskeuze. De browserproef toetst keuze, toegangsstap en lokale terugkeer bij uitval; gezinsaanmaak en volledige menselijke Experience-kwaliteit zijn niet daarin gekwalificeerd.",
+      "target": "Een eenvoudige veilige overgang naar Foundation die leeftijd, rol en gezinscontext correct uitlegt zonder de keuze van een leeftijdswereld als bewijs van leeftijd of bevoegdheid te behandelen.",
+      "changes": [
+        "Gebruik de bestaande toegangsstap en Foundation-sessie; scheid presentatiewereld van geverifieerde bevoegdheid.",
+        "Behoud de gekozen context bij terugkeer en leg uit waarom een ouder-, gezins- of leerlingstap nodig is.",
+        "Maak taal, focus en herstelsituaties passend voor de doelgroep; deel geen LivingOS-profiel automatisch met Foundation."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ceremony",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een lid kiest een kinderwereld zonder passend gezinsrecht.",
+          "expected": "De bedoelde toegangsstap verschijnt; de keuze verleent geen kinderaccount, ouderrecht of geverifieerde leeftijd.",
+          "evidence": "scripts/lib/voltooi/rtfoundation-keuze.js — Bestaande RTFoundation-keuzebrowserproef plus toegangsmatrix voor lid, ouder, leerling en gast. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De server valt uit na keuze en de gebruiker keert terug terwijl een eerder recht is ingetrokken.",
+          "expected": "Lokale navigatiekeuze kan behouden blijven, maar actuele gevoelige gegevens en handelingen blijven dicht tot hercontrole.",
+          "evidence": "scripts/lib/voltooi/rtfoundation-keuze.js — Offlinekeuze-, intrekkings- en sessiegrensproef; leeftijdspassende menselijke acceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/rtfoundation-keuze.js"
+      ],
+      "usesCapabilities": [
+        "link:rtfportaal"
+      ]
+    },
+    {
+      "function": "link:mediaos",
+      "currentObservation": "RTG Media leest een wereldprojectie, bewaart items en beheert gedeelde leesbare lijsten. De proef speelt niets af en sluit smaakregelaars, aanwezigheid, meldingen en luisterkamer uit.",
+      "target": "Eén persoonlijk mediageschap met begrijpelijke selectie, eigen bibliotheek en naadloze overgang naar de passende speler, waarbij aanbevelingen controleerbaar en eindig blijven.",
+      "changes": [
+        "Hergebruik de bestaande mediawereld als projectie met bron, maker, rechten en uitleg waarom een stuk wordt getoond.",
+        "Verbind lijsten aan bestaande spelers met hervatcontext, zonder bestanden of contentrechten te kopiëren.",
+        "Kwalificeer delen, intrekken, smaakinstellingen en aanwezigheid afzonderlijk; delen blijft een bewuste keuze en ontvangersrechten blijven minimaal."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Library",
+      "budgetProfile": "browse",
+      "acceptance": [
+        {
+          "scenario": "Een lid maakt een gemengde lijst en deelt die leesbaar met één bekend contact.",
+          "expected": "De ontvanger kan de lijst niet wijzigen en krijgt per item alleen zijn eigen geldige afspeelrecht; derden zien niets.",
+          "evidence": "scripts/lib/voltooi/mediaos.js — Bestaande mediaos-proef plus lijst-tot-speler- en itemrechtenketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De maker trekt het delen in of een mediabron verdwijnt tijdens hervatten.",
+          "expected": "De gedeelde lijst of het item verliest de toegang; de speler toont onbeschikbaarheid en gebruikt geen oude gecachte rechten.",
+          "evidence": "scripts/lib/voltooi/mediaos.js — Intrekking-, spelerhandoff-, cache- en herstelproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Licenties voor afspelen, downloaden en delen blijven brongebonden; een lijst geeft geen nieuwe mediarechten."
+      ],
+      "sourceRefs": [
+        "public/apps/media.html",
+        "scripts/lib/voltooi/mediaos.js"
+      ],
+      "usesCapabilities": [
+        "link:theater",
+        "link:muziek",
+        "link:clips"
+      ]
+    },
+    {
+      "function": "link:pay",
+      "currentObservation": "RTG Pay heeft oplaad- en overzichtsroutes. De proef gebruikt een direct antwoordende simulatiebank en sluit echte providers, webhooks, PostgreSQL/Redis en de geldmotor expliciet uit.",
+      "target": "Een controleerbare wallet- en betaalbasis waarin ieder saldo en iedere status aan bewijs is gekoppeld en fouten een veilige, begrijpelijke herstelroute hebben.",
+      "changes": [
+        "Behoud Pay en betaalwaarheid als geldbronnen; maak pending, bevestigd, geweigerd, controle nodig en terugbetaling begrijpelijk.",
+        "Sluit echte provideradapters aan via bestaande bewijscontracten met replaybescherming, verificatie, idempotentie en reconciliatie.",
+        "Breid verificatie en apparaatbinding uit over de daadwerkelijke kandidaatopslag en geldmotor; simulatie blijft herkenbaar geïsoleerd."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een provider accepteert een opwaardering maar de webhook komt pas na een browser-time-out.",
+          "expected": "Geen vroegtijdige bijschrijving; na geldig providerbewijs ontstaat exact één boeking met dezelfde referentie en herleidbaar saldo.",
+          "evidence": "scripts/lib/voltooi/pay.js — Bestaande Pay-proef plus echte provider-sandbox, webhookverificatie en grootboekreconciliatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een callback wordt herhaald, de database herstart en een terugbetaling krijgt controle nodig.",
+          "expected": "Geen dubbel geld; de onzekere toestand is zichtbaar en alleen de bevoegde menselijke controle kan haar vrijgeven.",
+          "evidence": "scripts/lib/voltooi/pay.js — Herstel op de productie-equivalente opslag/motor, replaytest en onafhankelijke financiële/securityacceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Betaalprovider, certificering/PCI-scope, vergunningverantwoordelijkheid en geteste productieherstelprocedure zijn blokkerende externe voorwaarden."
+      ],
+      "sourceRefs": [
+        "public/apps/pay.html",
+        "scripts/lib/voltooi/pay.js",
+        "server/kern/betaalwaarheid/bewijs.js"
+      ],
+      "usesCapabilities": [
+        "link:verificatie"
+      ]
+    },
+    {
+      "function": "link:veilig",
+      "currentObservation": "RTG Veilig heeft veiligheidskring, locatie, alarm en afsluiten. De proef controleert zichtbaarheid voor gekozen contacten en mail in een postvanger; echte push/mailbezorging, thuiswacht, codewoord en rustoptie zijn daar niet bewezen.",
+      "target": "Een begrijpelijke persoonlijke veiligheidsvoorziening die exact vertelt wie wordt benaderd, welke informatie gedeeld wordt en wat daadwerkelijk is bezorgd, zonder alarmcentralegarantie.",
+      "changes": [
+        "Maak per contact gegevensdoel, kanaal, geldigheid en toegestane locatie zichtbaar en intrekbaar via bestaande kringrechten.",
+        "Scheid alarm geactiveerd, bericht aangeboden, bezorgd voor zover aantoonbaar en door contact gezien; gebruik expliciete onbekend-statussen.",
+        "Ontwerp een snelle maar toegankelijke start-/stoplus, oefenstand met herkenbare testcontext en een eerlijk alternatief bij lege kring of netwerkuitval."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ceremony",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een lid activeert een alarm met verschillende deelrechten voor twee contacten.",
+          "expected": "Ieder contact krijgt uitsluitend toegestane gegevens; RTG meldt alleen aantoonbare kanaalstatus en geen ongefundeerde hulpverlening.",
+          "evidence": "scripts/lib/voltooi/veilig.js — Bestaande Veilig-proef plus echte push-/mailtest, ontvangersmatrix en menselijke crisistoegankelijkheidstest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De kring is leeg, een kanaal valt uit of een contactrecht wordt ingetrokken tijdens het alarm.",
+          "expected": "Het lid ziet onmiddellijk de feitelijke beperking; oude rechten leiden niet tot extra locatielek en afsluiten stopt verdere toegestane verspreiding.",
+          "evidence": "scripts/lib/voltooi/veilig.js — Lege-kring-, netwerk-, intrekkings-, timer- en herstelproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Bezorginfrastructuur, operationele support en veiligheidsclaims moeten zijn getoetst; RTG blijft geen vervanging voor officiële noodhulp."
+      ],
+      "sourceRefs": [
+        "public/apps/veilig.html",
+        "scripts/lib/voltooi/veilig.js",
+        "public/apps/veilig/voorzijde.js"
+      ],
+      "usesCapabilities": [
+        "link:relaties"
+      ]
+    },
+    {
+      "function": "tab:salon",
+      "currentObservation": "De Salon-tab in app.html gebruikt state, like en comment met Salon-publicatie. De proef toetst besloten posts, codenamen en pasrechten; volgen, polls en partneraanbiedingen vallen buiten bereik.",
+      "target": "Een besloten sociale huiskamer met begrijpelijke kringen, eindige inhoud en consequente moderatie, waar delen en verwijderen op alle ingangen dezelfde betekenis hebben.",
+      "changes": [
+        "Verbind tab en wereldweergave aan dezelfde Salon-eigenaar en rechten; voorkom opnieuw opgebouwde feeds of berichtenopslag.",
+        "Verdiep publicatie, reageren en eventuele bestaande polls/partnerscenario's met zichtbaarheid vooraf en inhoudelijke meldafhandeling.",
+        "Kwalificeer de volledige gebruikerslus en toegankelijkheid van tab naar detail, inclusief onbekende/lege kring en ingetrokken inhoud."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid reageert op een vriendenpost vanuit de Salon-tab en opent later dezelfde post via de wereldweergave.",
+          "expected": "Reactie, teller en rechten zijn consistent; een niet-vriend kan de inhoud op geen ingang lezen.",
+          "evidence": "scripts/lib/voltooi/salon.js — Bestaande salonproef plus ingangsoverstijgende publicatie-/rechtenketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De maker wijzigt de kring of verwijdert een post tijdens een offline leesbeurt.",
+          "expected": "Na hercontrole is ingetrokken inhoud niet opnieuw opvraagbaar; reageren op een verdwenen post wordt begrijpelijk geweigerd zonder dubbele reactie.",
+          "evidence": "scripts/lib/voltooi/salon.js — Kringwijziging-, cache-, idempotentie- en browserherstelproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Moderatiecapaciteit en partnerpublicatieregels moeten de sociale productbelofte dragen; P0 sluit de overlap met Pulse."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/salon.js"
+      ],
+      "usesCapabilities": [
+        "link:wereldlaag"
+      ]
+    },
+    {
+      "function": "link:wbw",
+      "currentObservation": "Samen betalen is #wbw in Geld en gebruikt groep, uitgave en verreken. De proef rekent centnauwkeurig via RTG Pay; betaalverzoeken en de vriendenkiezer zijn nog geen onderdeel van haar bereik.",
+      "target": "Een helder gezamenlijk kostenboek met uitlegbare verdeling, correcties en afzonderlijk bevestigde verrekening, zonder privéfinanciën van deelnemers zichtbaar te maken.",
+      "changes": [
+        "Behoud wbw als eigenaar van groepsverdeling en Pay als eigenaar van geld; toon schuld, voorstel en betaalbewijs apart.",
+        "Verdiep verdelingen en correcties met transparante centafronding en herleidbare groepshistorie, binnen expliciete scopekeuze.",
+        "Laat een reis- of dinerplan alleen de noodzakelijke groepsreferentie lezen; persoonlijke saldi blijven afgeschermd."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Drie deelnemers verdelen een bedrag dat niet exact door drie deelbaar is en corrigeren één uitgave.",
+          "expected": "De som van de aandelen blijft exact gelijk aan de centenbron; correctie en nieuwe schuld zijn uitlegbaar zonder verborgen saldolek.",
+          "evidence": "scripts/lib/voltooi/wbw.js — Bestaande wbw-proef plus afrondings-, correctie- en groepsrechtenmatrix. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een deelnemer bevestigt verrekening, verliest verbinding en probeert opnieuw.",
+          "expected": "Eén Pay-betaling en één bijgewerkte groepsstand; een onzekere betaling wordt eerst gereconcilieerd en niet blind opnieuw uitgevoerd.",
+          "evidence": "scripts/lib/voltooi/wbw.js — Idempotentie-, crash-, Pay-keten- en groepsreconciliatiebewijs. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Nieuwe valuta-/wisselkoersfuncties vragen expliciete scope en bron; geen impliciete krediet- of incassodienst."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/wbw.js",
+        "GELD.md"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand",
+        "link:pay",
+        "tab:salon"
+      ]
+    },
+    {
+      "function": "os:snaps",
+      "currentObservation": "Snaps gebruikt send, lijst en view; de proef controleert eenmalig openen en verwijdering uit opslag, plus vriendschap/blokkades. Browserverkleining, verhalen en dagopdracht worden niet gelopen.",
+      "target": "Een bewust vluchtige manier om een foto met een bekende te delen, met eerlijke privacytaal, duidelijke ontvanger en aantoonbare serververwijdering na openen of verval.",
+      "changes": [
+        "Maak vóór versturen ontvanger, eenmaligheid, bewaartermijn en de beperking tegen screenshots helder.",
+        "Kwalificeer lokale beeldverwerking en expliciete verzendbevestiging, zonder beelden in telemetry of foutlogs te bewaren.",
+        "Verbind blokkeren, TTL en opslagopschoning aan bestaande snaprechten; laat een vernietigde snap nooit terugkomen uit herstelkopieën als actief item."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een vriend opent een snap gelijktijdig op twee toestellen.",
+          "expected": "De toegestane eenmalige weergave wordt volgens één eenduidig contract afgehandeld; de bron wordt niet opnieuw beschikbaar als gewone bijlage.",
+          "evidence": "scripts/lib/voltooi/snaps.js — Bestaande snapproef plus gelijktijdige open-, byteverwijder- en browsercachetest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De verbinding breekt tijdens openen en het account wordt daarna geblokkeerd.",
+          "expected": "Hervatten maakt geen vernietigde inhoud opnieuw leesbaar; de gebruiker krijgt een eerlijke verlopen/gelezen-status en geen hernieuwde verzending.",
+          "evidence": "scripts/lib/voltooi/snaps.js — Afgebroken-open-, blokkade-, retentie- en herstelkopiebeleidtest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "De privacybelofte moet uitsluiten dat RTG screenshots of kopieën op een ontvangend toestel kan garanderen te voorkomen."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/snaps.js"
+      ],
+      "usesCapabilities": [
+        "tab:salon"
+      ]
+    },
+    {
+      "function": "link:sociaal",
+      "currentObservation": "Sociaal leest wereld, command, lijn en object en bevestigt bestaande voorstellen. De proef bouwt een Genootschap-uitnodiging op; inbox en live-stroom worden niet doorlopen.",
+      "target": "Een sociale regieomgeving die openstaande keuzes samenbrengt en menselijke bevestiging centraal houdt, zonder relaties te sturen of eigen agenda-/berichtsystemen te creëren.",
+      "changes": [
+        "Projecteer bestaande openstaande sociale taken met reden, geldige kring en een concrete volgende stap.",
+        "Verbind een gekozen activiteit aan Plan Dossier en Consequence Graph, uitsluitend met toegestane bronverwijzingen.",
+        "Hercontroleer ontvangers, voorwaarden en rechten bij bevestigen; het voorstel is versiegebonden en verliest geldigheid bij gewijzigde context."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Command",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Rahul bereidt een antwoord op een bestaande groepsuitnodiging voor.",
+          "expected": "Er wordt niets verstuurd vóór bevestiging; daarna zien de bevoegde ontvangers exact het gekozen antwoord en staat het in het actielog.",
+          "evidence": "scripts/lib/voltooi/sociaal.js — Bestaande sociaalproef plus voorstel-tot-inbox/live-stroom-keten. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De groep wijzigt of de uitnodiging vervalt tussen voorbereiding en bevestiging.",
+          "expected": "Het oude voorstel kan niet uitvoeren; het scherm verklaart de gewijzigde situatie en laat opnieuw kiezen zonder onbedoeld contact.",
+          "evidence": "scripts/lib/voltooi/sociaal.js — Stale-context-, intrekking-, dubbelklik- en herstartproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [],
+      "sourceRefs": [
+        "public/apps/sociaal.html",
+        "scripts/lib/voltooi/sociaal.js",
+        "server/kern/socialecommand/voorstellen.js",
+        "LIFE.md"
+      ],
+      "usesCapabilities": [
+        "link:berichten",
+        "tab:salon"
+      ]
+    },
+    {
+      "function": "link:spelen",
+      "currentObservation": "Spelen gebruikt de bestaande spellenmotor met lidroutes. De proef speelt schaak en bewaart competitieve uitslagen alleen voor geverifieerde volwassenen; overige spellen, gezinsingang, toernooien en gedeeld scherm vallen buiten dat scenario.",
+      "target": "Een complete toegankelijke spelomgeving waarin samen spelen prettig is, spelregels helder zijn en de centrale 18+-grens voor blijvende competitie overal geldt.",
+      "changes": [
+        "Maak per bestaand spel starten, uitleg, beurt, pauze, verlaten en einde aantoonbaar consistent; voeg geen generieke ranglijst voor kinderen toe.",
+        "Hergebruik dezelfde spelmotor voor lid-, gezins- en schermprojecties en definieer welke informatie elke rol mag zien.",
+        "Kwalificeer iedere spelvariant met spelinvarianten, reconnect en centrale progressieMag in plaats van gekopieerde leeftijdslogica."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Spatial",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Een minderjarige of niet-gekeurde speler speelt een volledig spel via de gezinsingang.",
+          "expected": "Het spel is volledig speelbaar; geen competitieve uitslag, rang, seizoensscore of blijvend niveau wordt opgeslagen.",
+          "evidence": "scripts/lib/voltooi/spelen.js — Bestaande spelenproef plus spelvariant-/ingangsmatrix en centrale progressiegrenscontrole. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een speler verzendt dezelfde zet tweemaal tijdens een onderbreking en hervat later.",
+          "expected": "Het bord en de beurt blijven geldig; geheime informatie blijft geheim en een beëindigd potje wordt niet heropend.",
+          "evidence": "scripts/lib/voltooi/spelen.js — Spel-invariant-, dubbeltik-, disconnect-, projectie- en herstelproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Nieuwe competitiemodellen of prijzentoernooien vragen apart scope-/juridisch besluit; leeftijdsgrens blijft centraal en onverkort."
+      ],
+      "sourceRefs": [
+        "public/apps/spelen.html",
+        "scripts/lib/voltooi/spelen.js",
+        "server/kern/spellen/grens.js"
+      ],
+      "usesCapabilities": [
+        "link:spelavond"
+      ]
+    },
+    {
+      "function": "link:sport",
+      "currentObservation": "Sport gebruikt clubplattegrond, ticketkoop, tickets en entree-scan. De proef reserveert zonder betaling en vermeldt afrekenen aan de poort; een toegangscode wordt één keer gebruikt.",
+      "target": "Een heldere sport- en wedstrijddagervaring met toegankelijke vakkeuze, echte capaciteit, controleerbare toegangsrechten en zichtbare grens tussen reservering en betaling.",
+      "changes": [
+        "Maak plattegrondkeuze toegankelijk met een gelijkwaardige tekstlijst en relevante toegankelijkheids-/begeleidersinformatie.",
+        "Behoud ticket en scan bij de sporteigenaar; laat betaald, gereserveerd en toegang gebruikt nooit door elkaar lopen.",
+        "Verbind desgewenst vervoer en agenda via referenties in een dagplan zonder wedstrijd- of toegangsbewijs te kopiëren."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Journey",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een lid reserveert de laatste plaats in een vak via toetsenbord en toont het ticket bij de entree.",
+          "expected": "Capaciteit klopt, de code geeft één keer toegang en het scherm zegt eerlijk dat betaling buiten deze keten gebeurt.",
+          "evidence": "scripts/lib/voltooi/sport.js — Bestaande sportproef plus plattegrond-a11y-, concurrentie- en fysieke scanacceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een scanner heeft een verouderde stand of de wedstrijd wordt afgelast.",
+          "expected": "Het systeem belooft geen geldige entree of terugbetaling zonder bevoegde bron; de gebruiker ziet status en concrete herstelroute.",
+          "evidence": "scripts/lib/voltooi/sport.js — Scan-replay-, offlinegrens-, afgelastings- en supportketenproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Clubcontract, ticketvoorwaarden, actuele capaciteit en eventuele toekomstige online betaling/refund zijn externe of aparte scopevoorwaarden."
+      ],
+      "sourceRefs": [
+        "public/apps/sport.html",
+        "scripts/lib/voltooi/sport.js"
+      ],
+      "usesCapabilities": [
+        "link:reisboek"
+      ]
+    },
+    {
+      "function": "link:table",
+      "currentObservation": "Table beheert gelegenheid, gasten, dieet, tafelschikking en menu. De proef zegt dat gasten geen accounts zijn en er geen uitnodiging wordt verzonden.",
+      "target": "Een zorgvuldige privé-dinerplanner waarin voorbereiding, menu, zitplaatsen en dieetnotities samenkomen zonder persoonsgegevens ongevraagd te verspreiden.",
+      "changes": [
+        "Verdiep de bestaande dinercompositie met herbruikbare plannen, leesbare tafelschikking en wijzigingsgevolgen voor menu en voorraad.",
+        "Houd gastenlijst en dieet als private aantekeningen; een eventuele uitnodiging verloopt via bestaande sociale rechten en expliciete bevestiging.",
+        "Verbind Cellier en Food Court alleen via referenties; een menuvoorstel is geen gegarandeerd allergenenvrij advies of restaurantboeking."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Atelier",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid wijzigt een gast met een dieetnotitie en herschikt het diner.",
+          "expected": "Menu- en stoelprojecties blijven consistent; de dieetnotitie verschijnt uitsluitend waar het lid bevoegd en bewust deelt.",
+          "evidence": "scripts/lib/voltooi/table.js — Bestaande Table-proef plus verwijzings-, tafelschikking- en privacytest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een dinerconcept wordt gekopieerd en een contact wordt daarna verwijderd.",
+          "expected": "De kopie maakt geen uitnodiging of dubbel contact; verouderde persoonsgegevens zijn zichtbaar te corrigeren en worden niet stil verzonden.",
+          "evidence": "scripts/lib/voltooi/table.js — Conceptkopie-, verwijder-, herstart- en negatieve verzendproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Professionele catering, uitnodigingsbezorging en allergenenclaims vereisen expliciet provider-/veiligheidsbesluit."
+      ],
+      "sourceRefs": [
+        "public/apps/table.html",
+        "scripts/lib/voltooi/table.js",
+        "server/kern/rechterhand/table.js"
+      ],
+      "usesCapabilities": [
+        "link:cellier",
+        "link:foodcourt"
+      ]
+    },
+    {
+      "function": "link:tweedescherm",
+      "currentObservation": "Tweede scherm leest /api/supplier/state en schrijft zelf niets. De proef toont kassa-omzet uit een eigen zaak; keuken, bar, kamers en realtime spiegel vallen buiten het gemelde bereik.",
+      "target": "Een betrouwbare read-only projectie voor kassa, keuken, bar of reserveringen, met een afgebakende schermrol, frisse gegevens en onmiddellijk intrekbare toegang.",
+      "changes": [
+        "Maak per bestaand schermprofiel expliciet welke operationele velden nodig zijn; toon geen volledige personeelssessie of overbodige persoonsgegevens.",
+        "Gebruik de bestaande supplier-eigenaar en stream-/verversingsmechaniek met zichtbaar laatst bijgewerkt en een veilig stale-scherm.",
+        "Kwalificeer koppelen, intrekken, reconnect en resource-opruiming voor ieder bedoelde profiel, zonder lokale tweede orderstatus te schrijven."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Command",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Een zaak koppelt een keukenprofiel en voert een orderwijziging uit in de hoofdapp.",
+          "expected": "Het scherm toont de geautoriseerde actuele keukeninformatie en kan geen verkoop, rol of order muteren.",
+          "evidence": "scripts/lib/voltooi/tweedescherm.js — Bestaande tweedeschermproef plus keuken/bar/reservering-profielmatrix en realtime-browserketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De schermtoegang wordt ingetrokken tijdens netwerkuitval en later herstelt de verbinding.",
+          "expected": "Geen nieuwe zaakdata verschijnt; de oude weergave wordt veilig afgeschermd en een andere tenant blijft altijd onbereikbaar.",
+          "evidence": "scripts/lib/voltooi/tweedescherm.js — Intrekkings-, stale-data-, tenant- en reconnectproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "P0 verklaart de LivingOS-catalogusplaats van deze zakelijke projectie zonder het tenant- of WorkOS-eigenaarschap te verplaatsen."
+      ],
+      "sourceRefs": [
+        "public/apps/scherm.html",
+        "scripts/lib/voltooi/tweedescherm.js"
+      ],
+      "usesCapabilities": [
+        "link:horeca"
+      ]
+    },
+    {
+      "function": "link:uitgaan",
+      "currentObservation": "Uitgaan leest avonden en eigen deelname en gebruikt RSVP/annuleren. De proef behandelt aanmelden en vrijkomende capaciteit; een vol event en daadwerkelijke check-in worden niet gemeten.",
+      "target": "Een complete avondkeuze met gezelschap, voorwaarden, echte capaciteit en een aantoonbaar deelname- en entreeverloop, zonder automatische sociale druk.",
+      "changes": [
+        "Verbind evenement, gezelschap en RSVP in een compacte keuze met toegankelijkheid, tijd en voorwaarden vóór bevestiging.",
+        "Laat een avondplan agenda, vervoer en eventuele tafel als verwijzingen samenbrengen; iedere externe stap behoudt eigen toestemming.",
+        "Breid capaciteit, wijziging, annulering en check-in uit in de bestaande event-/supplierketen met duidelijke statuswoorden."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Journey",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een lid meldt een gezelschap aan terwijl de laatste plaatsen bijna vol zijn.",
+          "expected": "De capaciteit wordt niet overschreden; de zaak ziet alleen benodigde codenamen en de klant krijgt een eerlijke deelname-status.",
+          "evidence": "scripts/lib/voltooi/uitgaan.js — Bestaande uitgaanproef plus capaciteit-race en gezelschapsprivacy. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De avond wijzigt of wordt geannuleerd nadat een plan met vervoer is gemaakt.",
+          "expected": "De gevolgen worden zichtbaar als voorstellen; een RSVP-annulering verplaatst geen geld of vervoersboeking zonder eigen domeinbewijs.",
+          "evidence": "scripts/lib/voltooi/uitgaan.js — Evenement-tot-plan-keten, check-in- en annulerings-/herstelproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Organisatorvoorwaarden, entreebewijs en eventuele betalingen moeten van bevoegde bronnen komen."
+      ],
+      "sourceRefs": [
+        "public/apps/uitgaan.html",
+        "scripts/lib/voltooi/uitgaan.js"
+      ],
+      "usesCapabilities": [
+        "link:foodcourt",
+        "link:move"
+      ]
+    },
+    {
+      "function": "link:vandaag",
+      "currentObservation": "Vandaag is life.html met gewoonten, metingen, dagcheck-in en noodkaart. De proef sluit medicatie, toestellen, veiligheidskring en dagcoach uit en vermeldt dat de hulpvraaggrens niet is uitgelokt.",
+      "target": "Een rustige persoonlijke dagomgeving voor eigen ritmes en welzijn, met bronherkomst en veilige grenzen; geen prestatiedruk, diagnose of ongeoorloofd gedeeld gezondheidsprofiel.",
+      "changes": [
+        "Gebruik de bestaande Life-eigenaar voor een duidelijke daglijn met handmatige correctie, lokale dag en begrijpelijke meetherkomst.",
+        "Verbind medicatie-, veiligheids- en toestelgegevens uitsluitend als bevoegde bronprojecties en geef onbekende of verouderde waarden een duidelijke status.",
+        "Kwalificeer hulpvraaggrenzen, handmatige modus zonder AI, noodkaartdeling en gezondheidsteksten met onafhankelijke deskundigen."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Horizon",
+      "budgetProfile": "sensitive",
+      "acceptance": [
+        {
+          "scenario": "Een lid voert een meting met herkomst in, corrigeert deze en wisselt van lokale datum.",
+          "expected": "Correctie en dagindeling zijn herleidbaar; geen onverklaarde gezondheidsconclusie of competitieve score ontstaat.",
+          "evidence": "scripts/lib/voltooi/vandaag.js — Bestaande vandaagproef plus lokale-dag-, correctie-, bron- en offlinehersteltest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een dagcheck-in bevat een hulpvraag en de AI is niet beschikbaar.",
+          "expected": "De veiligheidsgrens werkt zonder model; de interface toont een passende echte hulproute en deelt de noodkaart niet zonder de geldige keuze van het lid.",
+          "evidence": "scripts/lib/voltooi/vandaag.js — Veiligheidsevaluatie met deskundige, negatieve deeltest en model-uit-browserketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Medische of behandelclaims, medicatieadvies en gekoppelde medische apparaten vereisen apart klinisch/juridisch besluit; actuele hulproutes hebben een onderhoudseigenaar nodig."
+      ],
+      "sourceRefs": [
+        "public/apps/life.html",
+        "scripts/lib/voltooi/vandaag.js"
+      ],
+      "usesCapabilities": [
+        "link:veilig"
+      ]
+    },
+    {
+      "function": "link:clips",
+      "currentObservation": "Video/Clips gebruikt metadata, eindige feed, volgen, reacties, melden, knippen en ondertitels. De proef zegt dat beeld op het toestel blijft en sluit de echte P2P-mediastroom expliciet uit.",
+      "target": "Een toegankelijke, eindige kortevideo-ervaring met lokale makerscontrole, betrouwbare P2P-beschikbaarheid en duidelijke grenzen aan publicatie, bewerken en verwijderen.",
+      "changes": [
+        "Maak beschikbaarheid van de echte beeldbron zichtbaar; een metadataregel mag geen afspeelbaarheid beloven.",
+        "Kwalificeer knippen, ondertitels en afspelen over bestaande clipdeler/WebRTC met duidelijke eigenaar- en meldrechten.",
+        "Behoud eindige selecties en bied bewuste vervolgstappen; geen oneindige-autoplaydruk of verborgen deelverkeer."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Atelier",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Een maker publiceert een lokale clip; een tweede browser bekijkt de clip met ondertitels.",
+          "expected": "Werkelijke beelden worden ontvangen van de bedoelde bron en alleen de maker kan de montagespecificatie wijzigen.",
+          "evidence": "scripts/lib/voltooi/clips.js — Bestaande clipsproef plus tweebrowser-P2P-, decoder- en ondertitel/a11y-proef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "De maker gaat offline of trekt de clip in terwijl de kijker reageert.",
+          "expected": "De kijker ziet onbeschikbaar of ingetrokken; een metadatarest veroorzaakt geen verzonnen afspelen en nieuwe reacties volgen de actuele publicatiestatus.",
+          "evidence": "scripts/lib/voltooi/clips.js — Bronuitval-, intrekkings-, cache-, moderatie- en herstelketen. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Productie-TURN/bandbreedte en moderatie moeten zijn geregeld; contentrechten blijven bij de maker aantoonbaar gecontroleerd."
+      ],
+      "sourceRefs": [
+        "public/apps/clips.html",
+        "scripts/lib/voltooi/clips.js"
+      ],
+      "usesCapabilities": [
+        "link:mediaos"
+      ]
+    },
+    {
+      "function": "os:videobellen",
+      "currentObservation": "De huidige videobelproef gebruikt twee Chromium-toestellen met synthetische camera/microfoon, loopback-ICE en echte gedecodeerde media. Echte apparaten, streng netwerk/TURN en peercrashes vallen buiten het expliciete bereik.",
+      "target": "Een voorspelbaar videogesprek met expliciete camera-/microfoonkeuze, veilige deelnemersrechten en aantoonbaar opruimen na stoppen, met eerlijke netwerkondersteuning.",
+      "changes": [
+        "Hergebruik de bestaande oproep, peer en contactrechten; laat camera, microfoon en verbinding apart bedienbaar en begrijpelijk zijn.",
+        "Maak onderbreken, toestemming intrekken, apparaat wisselen en gesprek beëindigen voorspelbaar zonder een afgesloten sessie te herstellen.",
+        "Breid kwalificatie uit naar echte toestel-/browsercombinaties, TURN, verliesnetwerk en toegankelijkheid van de belkaart."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Salon",
+      "budgetProfile": "realtime",
+      "acceptance": [
+        {
+          "scenario": "Twee verbonden leden videobellen op verschillende echte toestellen en wisselen één camera.",
+          "expected": "Voortlopende beelden en audio komen aantoonbaar aan; wisselen vraagt geen nieuwe ongeautoriseerde deelnemer of ongewenste opname.",
+          "evidence": "scripts/lib/voltooi/videobellen.js — Bestaande videobelbrowserproef plus echte apparaat-/browsermatrix en hoorbare audioacceptatie. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een deelnemer trekt microfoontoestemming in, sluit de tab en heropent de app.",
+          "expected": "Alle tracks en peerresources stoppen; de oude oproep herleeft niet en een nieuwe oproep vraagt een bewuste start.",
+          "evidence": "scripts/lib/voltooi/videobellen.js — Permission-, peercrash-, resourcecleanup-, TURN- en herlaadproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Productie-TURN en netwerkservice met privacy-/retentieafspraken zijn extern te regelen; geen medische consult- of noodhulpclaim uit deze functie."
+      ],
+      "sourceRefs": [
+        "public/apps/app.html",
+        "scripts/lib/voltooi/videobellen.js"
+      ],
+      "usesCapabilities": [
+        "link:relaties"
+      ]
+    },
+    {
+      "function": "link:wallet",
+      "currentObservation": "Wallet is een hashstand in Geld met kaarten, toevoegen/verwijderen en feestmunten kopen/inwisselen. De proef gebruikt de simulatiebank en sluit de ledenpas en het grote codescherm uit.",
+      "target": "Een overzichtelijke digitale portefeuille met herkenbare kaarttypen, geldige rechten en exacte financiële status, waarin een opgeslagen kaart nooit vanzelf een uitgeversgarantie krijgt.",
+      "changes": [
+        "Behoud kaart- en muntbronnen en onderscheid zelf toegevoegde kaart, uitgeversbewijs, betaaltegoed en toegangsbewijs.",
+        "Maak verlopen, ingetrokken, offline bruikbaar en online te verifiëren per kaart expliciet, met zo weinig mogelijk gevoelige velden.",
+        "Kwalificeer samenhang met RTG Pay, Betaalcode en ledenpas op dezelfde Geld-eigenaar; geen tweede saldo of uitgiftemotor."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Ledger",
+      "budgetProfile": "transaction",
+      "acceptance": [
+        {
+          "scenario": "Een lid koopt feestmunten, toont een kaart en wisselt een deel in.",
+          "expected": "Betaling en muntstand zijn exact herleidbaar en gaan niet onder nul; kaartweergave claimt uitsluitend het werkelijke uitgeversrecht.",
+          "evidence": "scripts/lib/voltooi/wallet.js — Bestaande walletproef plus Pay-/code-/pas-keten en bronclassificatietest. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een kaart wordt ingetrokken of inwisselen krijgt een time-out tijdens offlinegebruik.",
+          "expected": "Gevoelige uitvoering wacht op geldige verificatie; hetzelfde verzoek kan niet dubbel afschrijven en een oude kaart verschijnt als ongeldig.",
+          "evidence": "scripts/lib/voltooi/wallet.js — Intrekking-, offlinegrens-, idempotentie-, reconciliatie- en herstelbewijs. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Externe kaarten, digitale identiteitsbewijzen en eventuele geldvormen vragen geldige uitgever-/providercontracten; gesloten feestmunten worden geen publieke token."
+      ],
+      "sourceRefs": [
+        "public/apps/geld.html",
+        "scripts/lib/voltooi/wallet.js",
+        "GELD.md"
+      ],
+      "usesCapabilities": [
+        "link:geldcommand",
+        "link:pay",
+        "link:rtgcode"
+      ]
+    },
+    {
+      "function": "link:wonen",
+      "currentObservation": "Wonen heeft onderhoudsmelding en annuleren plus woningbestanden in de bestaande kluis. De proef noemt geen gekoppelde vakman en geen opgelost-route; slimme apparaten en virusscan vallen buiten bereik.",
+      "target": "Een betrouwbaar woningdossier met documenten, onderhoud en expliciete serviceaanvragen, waarin melding, uitvoerderacceptatie en opgelost bewijs afzonderlijk blijven.",
+      "changes": [
+        "Hergebruik bestanden/kluis voor woningdocumenten met versie, categorie, verval en doelgebonden delen; bouw geen tweede documentopslag.",
+        "Maak onderhoud van melding tot eigen afsluiting of later aantoonbaar uitvoerdersbewijs begrijpelijk; voeg uitvoerderswerk alleen na apart besluit toe.",
+        "Verbind woningplanning en gevolgen aan bestaande agenda/Plan Dossier; onderzoek de bekende overlaybediening op de actuele kandidaat vóór herontwerp."
+      ],
+      "dependsOn": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "signature": "Command",
+      "budgetProfile": "compose",
+      "acceptance": [
+        {
+          "scenario": "Een lid meldt een defect en uploadt een woningdocument.",
+          "expected": "De melding is opgeslagen zonder fictieve vakman of opgelost-status; het document is alleen via de bestaande kluisrechten bereikbaar.",
+          "evidence": "scripts/lib/voltooi/wonen.js — Bestaande wonenproef plus uploadscan-, bestandsrechten- en browserbedieningsproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        },
+        {
+          "scenario": "Een documentupload breekt af en de onderhoudsmelding wordt intussen geannuleerd.",
+          "expected": "Er ontstaat geen half toegankelijk bestand of herleefde melding; hervatten toont de actuele stand en een veilige retry.",
+          "evidence": "scripts/lib/voltooi/wonen.js — Chunked-upload-, annulering-, herstart-, cache- en overlayregressieproef. Vereist op de releasekandidaat; in dit plan niet uitgevoerd."
+        }
+      ],
+      "externalDecisions": [
+        "Echte vakmanopdrachten, service-SLA, woningbeveiliging en slimme-apparaatbediening zijn aparte provider-/veiligheidsbesluiten."
+      ],
+      "sourceRefs": [
+        "public/apps/wonen.html",
+        "scripts/lib/voltooi/wonen.js",
+        "public/apps/wonen.js"
+      ],
+      "usesCapabilities": [
+        "link:logboek"
+      ]
+    }
+  ]
+}

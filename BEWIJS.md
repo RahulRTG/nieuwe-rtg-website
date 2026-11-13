@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 3265 |
 | losse beweringen (`test(...)`) | 21831 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 591 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 3045 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 3047 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 187 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 33 |
+| niets van beide | 31 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -681,7 +681,7 @@ toets omvalt.
 | `experience-artifact.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-broker-evidence.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-configurations.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `experience-continuity.test.js` | 6 | -- | Hervatten valideert actuele context en objectbron, zonder querygegevens of navigatie van een andere wereld over te nemen. Inclusief een echte lokale HTTP-keten; geen productie-, provider- of volledige... |
+| `experience-continuity.test.js` | 6 | gezakt op `expliciete bronmutatie` | Hervatten valideert actuele context en objectbron, zonder querygegevens of navigatie van een andere wereld over te nemen. Inclusief een echte lokale HTTP-keten; geen productie-, provider- of volledige... |
 | `experience-coverage.test.js` | 17 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-dinner.test.js` | 5 | gezakt op `===->!==#0` | Werkelijke HTTP-keten, zonder betaal-, AI- of pushprovider. De agenda leest de reserveringsbron; bevestigd blijft een besluit van de juiste zaak. |
 | `experience-execution-matrix.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -690,7 +690,7 @@ toets omvalt.
 | `experience-juridisch.test.js` | 3 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-matrix-coverage.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-network-http.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `experience-network-recovery.test.js` | 8 | -- | Een bewaard netwerkplan blijft hetzelfde domeinobject na een fout voor action-evidence, ook na runtimeherstart. Geen boeking of betaling. |
+| `experience-network-recovery.test.js` | 8 | gezakt op `expliciete bronmutatie` | Een bewaard netwerkplan blijft hetzelfde domeinobject na een fout voor action-evidence, ook na runtimeherstart. Geen boeking of betaling. |
 | `experience-network-scale.test.js` | 2 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-network.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-observatory.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -1,3 +1,6 @@
+/* Hervatten valideert actuele context en objectbron, zonder querygegevens of
+   navigatie van een andere wereld over te nemen. Inclusief een echte lokale
+   HTTP-keten; geen productie-, provider- of volledige continuitykwalificatie. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -120,6 +123,8 @@ test('echte HTTP-herstelketen behoudt contextisolatie en slaat geen URL-geheim o
   const terug = await post('/api/experience/bootstrap', {}, token);
   assert.equal(terug.body.currentWorld, 'work');
   assert.equal(terug.body.resume.reconciled, false);
+  assert.equal(terug.body.resume.navigationState.length, 1);
+  assert.equal(terug.body.resume.navigationState[0], 'attention');
   const ander = await post('/api/experience/bootstrap', { world: 'living' }, token);
   assert.equal(ander.body.resume.surface, null);
   assert.deepEqual(ander.body.resume.navigationState, []);

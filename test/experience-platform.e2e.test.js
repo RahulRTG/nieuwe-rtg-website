@@ -20,6 +20,62 @@ test.before(async () => {
 });
 test.after(() => stop(server && server.child));
 
+test('dezelfde persoonlijke Agenda-intrekking geldt via direct HTTP en Experience', async () => {
+  const eigenaar = await post('/api/auth/login', {
+    login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business'
+  });
+  assert.equal(eigenaar.status, 200);
+  assert.ok(eigenaar.body.token);
+  const ander = await post('/api/auth/register', { name: 'Experience Ander', email: 'experience-ander@rtg.test',
+    phone: '0612345679', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
+  assert.equal(ander.status, 200);
+  assert.ok(ander.body.token);
+  const invoer = { intent: 'schedule.item.create', version: 1, world: 'work',
+    parameters: { title: 'HTTP actuele bevoegdheid', date: new Date(Date.now() + 86400000).toISOString().slice(0, 10) },
+    routeBeleid: { allowed: true }, canonicalRoute: '/api/experience/intent/execute' };
+  const preview = await post('/api/experience/intent/preview', invoer, token);
+  assert.equal(preview.status, 200, JSON.stringify(preview.body));
+  const opdracht = { previewId: preview.body.preview.id, idempotencyKey: 'authority-http-001', confirmed: true,
+    intent: 'attention.acknowledge', routeBeleid: { allowed: true } };
+  const zet = aan => post('/api/boardroom/zet', {
+    id: 'dom-agenda', persoon: 'experience@rtg.test', aan
+  }, eigenaar.body.token);
+  try {
+    assert.equal((await zet(false)).status, 200);
+    const direct = await post('/api/agenda/toevoegen', {
+      titel: invoer.parameters.title, datum: invoer.parameters.date
+    }, token);
+    assert.equal(direct.status, 503);
+    const dicht = await post('/api/experience/intent/preview', invoer, token);
+    assert.equal(dicht.status, direct.status);
+    assert.equal(dicht.body.code, 'DOMAIN_ACCESS_DENIED');
+    const geweigerd = await post('/api/experience/intent/execute', opdracht, token);
+    assert.equal(geweigerd.status, 503);
+    assert.equal(geweigerd.body.code, 'DOMAIN_ACCESS_DENIED');
+    const bewijs = await post('/api/experience/evidence', { limit: 100 }, token);
+    assert.equal(bewijs.body.evidence.some(e => e.previewId === preview.body.preview.id), false);
+    const gestolen = await post('/api/experience/intent/execute', opdracht, ander.body.token);
+    assert.equal(gestolen.status, 404);
+    assert.equal(gestolen.body.code, 'PREVIEW_NOT_FOUND');
+    assert.equal((await post('/api/experience/intent/preview', invoer, ander.body.token)).status, 200);
+    assert.equal((await zet(true)).status, 200);
+    const uitgevoerd = await post('/api/experience/intent/execute', opdracht, token);
+    assert.equal(uitgevoerd.status, 200, JSON.stringify(uitgevoerd.body));
+    assert.equal((await zet(false)).status, 200);
+    const replay = await post('/api/experience/intent/execute', opdracht, token);
+    assert.equal(replay.status, 200);
+    assert.equal(replay.body.evidence.id, uitgevoerd.body.evidence.id);
+    assert.equal((await zet(true)).status, 200);
+    const agenda = await post('/api/agenda/mijn-lijst', {}, token);
+    assert.equal(agenda.status, 200);
+    assert.equal(agenda.body.items.filter(i => i.titel === invoer.parameters.title).length, 1);
+    const eind = await post('/api/experience/evidence', { limit: 100 }, token);
+    assert.equal(eind.body.evidence.filter(e => e.previewId === preview.body.preview.id).length, 1);
+  } finally {
+    assert.equal((await zet(true)).status, 200, 'de persoonlijke proefpoort moet weer open');
+  }
+});
+
 test('de vier echte serversprojecties delen één contract zonder domeinwaarheid te kopiëren', async () => {
   let workContext;
   for (const world of ['living', 'travel', 'work', 'foundation']) {

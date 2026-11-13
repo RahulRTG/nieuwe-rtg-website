@@ -51,8 +51,8 @@ function maakExperience({ kern, db, save, crypto, bijeen, inBundel, nu }) {
     network: network.read,
     livingWorldView: (key, options) => kern.livingWorld.view(key, options),
     mediaExperiences: (key, id) => kern.livingWorld.mediaLinks(key, id),
-    preview: (key, body, economicPrincipalRef) => broker.preview(key, body, economicPrincipalRef),
-    execute: (key, body) => broker.execute(key, body),
+    preview: (key, body, economicPrincipalRef, routeBeleid) => broker.preview(key, body, economicPrincipalRef, routeBeleid),
+    execute: (key, body, routeBeleid) => broker.execute(key, body, routeBeleid),
     evidence: (key, limit) => ({ ok: true, evidence: opslag.bewijsVoor(key, limit),
       integrity: opslag.bewijsIntegriteitVoor(key) }),
     intentRegistry: broker.registry

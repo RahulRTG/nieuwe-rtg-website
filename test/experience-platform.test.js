@@ -59,9 +59,107 @@ function huis(opties) {
   };
   const experience = maakExperience({ kern, db, save: () => { saves++; },
     crypto: opties.crypto || crypto,
-    nu: opties.nu }).experience;
-  return { db, kern, experience, agendaItems, saves: () => saves };
+    nu: opties.nu, bijeen: opties.bijeen }).experience;
+  // Expliciete vertrouwde poort voor deze domeinfixture zonder HTTP-middleware.
+  const open = () => null;
+  return { db, kern, rawExperience: experience, experience: { ...experience,
+    preview: (key, body, principal, beleid = open) => experience.preview(key, body, principal, beleid),
+    execute: (key, body, beleid = open) => experience.execute(key, body, beleid)
+  }, agendaItems, saves: () => saves };
 }
+
+test('actueel domeinbeleid blokkeert preview en uitvoering, niet de eigen historische replay', async () => {
+  const h = huis(), functies = require('../server/functies'), staat = {};
+  const gezien = [];
+  const beleid = actor => pad => {
+    gezien.push(pad);
+    const dicht = functies.padGeblokkeerd(pad, staat, { doelgroep: 'rtg', persoon: actor });
+    return dicht ? { status: 503, antwoord: { error: 'Agenda ingetrokken', functie: dicht.id } } : null;
+  };
+  const alice = beleid('user-alice'), bob = beleid('user-bob');
+  const invoer = { intent: 'schedule.item.create', version: 1, world: 'work',
+    parameters: { title: 'Gezag blijft actueel', date: '2027-01-14' },
+    routeBeleid: null, canonicalRoute: '/api/experience/intent/execute' };
+  const eerste = h.experience.preview('alice', invoer, null, alice);
+  assert.equal(eerste.ok, true);
+  staat['dom-agenda'] = { aan: true, perPersoon: { 'user-alice': false } };
+  const geweigerd = h.experience.preview('alice', invoer, null, alice);
+  assert.equal(geweigerd.code, 'DOMAIN_ACCESS_DENIED');
+  assert.equal(geweigerd.status, 503);
+  const opdracht = { previewId: eerste.preview.id, idempotencyKey: 'authority-alice-001', confirmed: true,
+    intent: 'attention.acknowledge', routeBeleid: null };
+  const dicht = await h.experience.execute('alice', opdracht, alice);
+  assert.equal(dicht.code, 'DOMAIN_ACCESS_DENIED');
+  assert.equal(h.agendaItems.length, 0);
+  assert.equal(h.experience.evidence('alice').evidence.length, 0);
+  assert.equal((await h.experience.execute('bob', opdracht, bob)).code, 'PREVIEW_NOT_FOUND');
+  assert.equal(h.experience.preview('bob', invoer, null, bob).ok, true,
+    'een persoonlijke intrekking blokkeert niet het andere account');
+  assert.ok(gezien.every(pad => pad === '/api/agenda/toevoegen'));
+  staat['dom-agenda'].perPersoon['user-alice'] = true;
+  const heropend = await h.experience.execute('alice', opdracht, alice);
+  assert.equal(heropend.ok, true);
+  staat['dom-agenda'].perPersoon['user-alice'] = false;
+  const replay = await h.experience.execute('alice', opdracht, alice);
+  assert.equal(replay.replay, true);
+  assert.equal(replay.evidence.id, heropend.evidence.id);
+  assert.equal(h.agendaItems.length, 1);
+  assert.equal(h.experience.evidence('alice').evidence.length, 1);
+});
+
+test('ontbrekend of ongeldig serverbeleid kan geen nieuwe preview of domeinmutatie autoriseren', async () => {
+  const h = huis(), api = h.rawExperience;
+  const invoer = { intent: 'schedule.item.create', world: 'work',
+    parameters: { title: 'Geen clientgezag', date: '2027-01-14' }, routeBeleid: { allowed: true } };
+  const toegestaan = api.preview('alice', invoer, null, () => null);
+  for (const policy of [undefined, null, {}, () => undefined, () => true, () => ({}),
+    () => ({ status: 200, antwoord: { error: 'open' } }), () => { throw Error('beleid uitgevallen'); }]) {
+    assert.equal(api.preview('alice', invoer, null, policy).code, 'AUTHORITY_UNAVAILABLE');
+    const result = await api.execute('alice', { previewId: toegestaan.preview.id,
+      idempotencyKey: 'missing-policy-001', confirmed: true, routeBeleid: { allowed: true } }, policy);
+    assert.equal(result.code, 'AUTHORITY_UNAVAILABLE');
+  }
+  assert.equal(h.agendaItems.length, 0);
+  assert.equal(api.evidence('alice').evidence.length, 0);
+});
+
+test('de domeinpoort wordt binnen de commit opnieuw uit actuele servercontext gelezen', async () => {
+  let ingetrokken = false;
+  const h = huis({ bijeen: async fn => { ingetrokken = true; return fn(); } });
+  const policy = () => ingetrokken ? { status: 503, antwoord: { error: 'Ingetrokken na wachtrij' } } : null;
+  const p = h.experience.preview('alice', { intent: 'schedule.item.create', world: 'work',
+    parameters: { title: 'Geen oude poort', date: '2027-01-14' } }, null, policy);
+  assert.equal(p.ok, true);
+  const r = await h.experience.execute('alice', { previewId: p.preview.id,
+    idempotencyKey: 'queue-policy-001', confirmed: true }, policy);
+  assert.equal(r.code, 'DOMAIN_ACCESS_DENIED');
+  assert.equal(h.agendaItems.length, 0);
+  assert.equal(h.experience.evidence('alice').evidence.length, 0);
+});
+
+test('iedere geregistreerde brokerintentie heeft expliciete bestaande domeindeuren', () => {
+  const authority = require('../server/kern/experience/broker-authority');
+  const functies = require('../server/functies');
+  for (const definition of require('../server/kern/experience/intent-registry').publiek()) {
+    const routes = authority.canonicalRoutes(definition.id);
+    assert.ok(routes && routes.length, definition.id);
+    const expected = definition.id === 'schedule.item.create' ? 'dom-agenda'
+      : definition.id === 'network.plan.save' ? 'dom-mall' : 'experience-platform';
+    for (const route of routes) {
+      assert.equal(functies.functieVoorPad(route).id, expected);
+      const gezien = [];
+      const decision = authority.check(definition.id, pad => {
+        gezien.push(pad);
+        return pad === route ? { status: 403, antwoord: { error: 'Bron dicht' } } : null;
+      });
+      assert.equal(decision.code, 'DOMAIN_ACCESS_DENIED', definition.id + ': ' + route);
+      assert.equal(decision.status, 403);
+      assert.ok(gezien.includes(route));
+    }
+  }
+  assert.equal(authority.check('living-world.verzonnen', () => null).code, 'AUTHORITY_UNAVAILABLE');
+  assert.equal(authority.check('toString', () => null).code, 'AUTHORITY_UNAVAILABLE');
+});
 
 test('vier manifests voldoen aan hetzelfde harde World Contract', () => {
   assert.equal(WORLD_CONTRACT.projection.ownsSourceData, false);

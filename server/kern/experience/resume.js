@@ -16,8 +16,9 @@ function navigatieVoor(v) {
     v.every(x => typeof x === 'string' && /^[a-zA-Z0-9._-]{1,64}$/.test(x)) ? v.slice() : null;
 }
 function refVoor(ref, projection) {
-  if (!geldig(ref) || !projection.objects.some(o => sleutel(o.ref) === sleutel(ref))) return null;
-  return { domain: ref.domain, type: ref.type, id: ref.id };
+  if (!geldig(ref)) return null;
+  const bron = projection.objects.find(o => sleutel(o.ref) === sleutel(ref));
+  return bron ? { domain: bron.ref.domain, type: bron.ref.type, id: bron.ref.id } : null;
 }
 
 module.exports = function maakResume({ opslag, contexten, manifesten, projecteer }) {

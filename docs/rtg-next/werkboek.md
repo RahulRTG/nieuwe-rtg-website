@@ -4,7 +4,7 @@ Gegenereerde planningbijlage bij [het premium-afbouwplan](../rtg-premium-afbouwp
 
 **Planning, geen kwalificatiebewijs.** Dit werkboek inventariseert 114 bestaande MAPPEN-ingangen. Meerdere ingangen kunnen één domeineigenaar of scherm delen. De canonieke appbelofte en de hieronder voorgestelde premium-eindtoestand blijven afzonderlijk herkenbaar.
 
-Bronbaseline: `abd1eafdccd6865631d634d5899676c1c1e7fa68`. Inhoudshash van deze projectie: `836dfb88ac2ad4da6d1c2adf3659f9c6f3abf2b12199ce643e962338d66b6f00`.
+Bronbaseline: `abd1eafdccd6865631d634d5899676c1c1e7fa68`. Inhoudshash van deze projectie: `d26ba2817131dc1de9180720db92dda96b9e1dfdd435564c5aed6eb3e61e90a8`.
 
 Opgeslagen APPWERKT-meting: `d3a2cd8a66` op 2026-11-09T14:51:20.049Z; telling `{"BEWEZEN":114}`. Dit is geen verse uitvoering op de bronbaseline.
 
@@ -4505,9 +4505,9 @@ Structurele P0-dekking: READY_TO_BUILD. Dit is geen algemene sluiting van alle p
 |---|---|---|
 | SCHERMEIGENAAR.oordelen | `apps/gemeenteloket.html`, `apps/gemeentepda.html` | De meldinglogica staat twee keer inline. Trek hem uit tot een gedeelde component. |
 | SCHERMEIGENAAR.oordelen | `apps/rit.html`, `apps/ov.html` | rit.html wordt een aankomststand van ov.html (vlucht als vertrekpunt), of opent ov.html met die context; de eigen aanvraag- en volgcode vervalt. |
-| SCHERMEIGENAAR.oordelen | `apps/pulse.html`, `apps/salon.html` | Besluit nodig: is een open 9+-microblog een ander product dan De Salon (dan blijven ze, met een gedeelde feedcomponent), of is Pulse een stand van De Salon? |
-| SCHERMEIGENAAR.oordelen | `apps/wereld.html`, `apps/sociaal.html` | Besluit nodig: een van beide wordt het ene sociale overzicht; de andere een stand ervan. |
-| SCHERMEIGENAAR.oordelen | `apps/commerce.html`, `apps/mall.html` | Besluit nodig: Commerce is volgens COMMERCE.md een laag en geen etalage. Voor een lid hoort er een winkel te zijn; commerce.html wordt dan de verkoperskant of een stand van de Mall. |
+| SCHERMEIGENAAR.oordelen | `apps/pulse.html`, `apps/salon.html` | Eigenaarskeuze 13 november 2026: Salon/Pulse samenvoegen tot een ervaring, met extra migratie- en ontwerptraject (AFBOUWPROGRAMMA.md; premium-afbouwplan par. 20.13). Uitvoering blijft open: alle bestaande functies behouden, leeftijd/publiek/blokkades gescheiden bewaken, objectschrijvers en id-mapping vaststellen, migratie en rollback bewijzen voordat oude ingangen worden omgeleid. |
+| SCHERMEIGENAAR.oordelen | `apps/wereld.html`, `apps/sociaal.html` | Eigenaarskeuze 13 november 2026: Wereld/Sociaal samenvoegen tot een ervaring, met extra migratie- en ontwerptraject (AFBOUWPROGRAMMA.md; premium-afbouwplan par. 20.13). Uitvoering blijft open: contextoverzicht, publiceren, profiel/privacy, kringen en bevestigde plannen behouden; bestaande bron-, relatie- en Command-eigenaars blijven leidend. Oude ingangen pas omleiden na behoud-, autorisatie- en hervatproeven. |
+| SCHERMEIGENAAR.oordelen | `apps/commerce.html`, `apps/mall.html` | Eigenaarskeuze 13 november 2026: Mall/Commerce samenvoegen tot een ervaring, met extra migratie- en ontwerptraject (AFBOUWPROGRAMMA.md; premium-afbouwplan par. 20.13). Uitvoering blijft open: ontdekken, appcatalogus, lijsten, mand, overdracht, orderstatus en nazorg behouden. Domeinen blijven eigenaar van aanbod/order/voorraad en Pay van betalingsuitkomst; geen tweede handels- of betaalwaarheid. Oude ingangen pas omleiden na migratie-, herstel- en negatieve proeven. |
 | SCHERMEIGENAAR.oordelen | `apps/foundation/bieb.html`, `apps/foundation/geloofbieb.html`, `apps/foundation/schoolbieb.html`, `apps/foundation/beroepen.html` | Het patroon staat vier keer inline. Trek het uit tot een gedeelde bibliotheekcomponent. |
 | SCHERMEIGENAAR.oordelen | `apps/foundation/gevoel.html`, `apps/foundation/kompas.html` | Nagaan of dit een component met een leeftijdsregister kan zijn; de inline-code staat nu twee keer. |
 | SCHERMEIGENAAR.oordelen | `apps/rtmail.html`, `apps/leverancier-rtmail.html` | De zaakkant heeft een eigen inline-implementatie; laat die de rtmail-modules gebruiken. |

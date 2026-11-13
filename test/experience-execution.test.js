@@ -8,6 +8,7 @@ const evidence=require('../scripts/lib/experience/evidence');
 const artifact=require('../scripts/lib/experience/artifact');
 const coverage=require('../scripts/lib/experience/coverage');
 const contract=require('../experience-architecture/coverage-contract.json');
+const vm=require('node:vm');
 const canonical=value=>JSON.stringify(artifact.stable(value));
 function fixture(t,change={}) {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-execution-unit-'));
@@ -119,4 +120,89 @@ test('de configuratie van een ontvangstbewijs kan niet achteraf worden veranderd
   assert.equal(second.scope.configuration.viewport.width,390);
   assert.equal(second.scope.configuration.browser,'chromium');
   assert.notEqual(first.scope,second.scope);
+});
+
+// Protocol van de echte CLI, zonder subprocess of bewijsstatus te fabriceren
+// voor de repository. De echte ontvangstverificatie wordt hierboven getoetst.
+function cli(args,options={}) {
+  const proof={id:'protocol-proof',test:'test/protocol.test.js'}, writes=[], runs=[], calls=[];
+  const run={record:{passed:!options.failed,tests:1},coverage:{records:[{proof:proof.id}]}};
+  const proofs=options.multiple?[proof,{id:'untyped-proof',test:'test/untyped.test.js'}]:[proof];
+  const processStub={argv:['node','experience.js',...args],exitCode:0,
+    exit(code){this.exitCode=code;throw stop;}};
+  const stop={}, root=path.resolve(__dirname,'..');
+  const modules={
+    'node:fs':{mkdirSync(){writes.push('mkdir');},readdirSync(){return ['journey.json'];},
+      readFileSync(file){return file.endsWith('journey.json')?JSON.stringify({proofs}):
+        file.endsWith('.log')?'log':JSON.stringify({...run.record,logHash:'hash'});},
+      writeFileSync(file,body){writes.push({file,body});}},
+    'node:path':path,'node:child_process':{execFileSync(){return 'candidate';}},
+    './lib/experience/compiler':{compile(){return {valid:true,nodes:[]};}},
+    './lib/experience/evidence':{fingerprint(){return options.changedSource&&calls.length?'changed':'source';},outcome(){return !options.failed;},
+      state(){return options.failed?'FAILED':'PROVEN';},sha(){return 'hash';},
+      candidate(){return {ok:!options.dirty,commit:options.changedCommit&&calls.length?'changed':'candidate',reason:'DIRTY_WORKTREE'};}},
+    './lib/experience/observatory':{render(){return '<html></html>';}},
+    './lib/experience/execution':{select:execution.select,execute(){
+      const result=runs.length?{record:{passed:true,tests:1}}:run;
+      runs.push(result);return result;}},
+    './lib/experience/typed':{required(){return [];},covers(){return false;}},
+    './lib/experience/coverage':{build(){return {};},executionProjection(){return {scopedProofs:[],configurationCoverage:[]};}},
+    './lib/experience/qualification-gates':{assess(receivedRoot,received){calls.push({root:receivedRoot,options:received});
+      return {gate:received.gate,status:options.gateStatus||'BLOCKED',releaseAuthorized:false};}},
+    '../experience/constitution.json':{},'../experience-architecture/coverage-contract.json':{executedProofs:[]},
+    '../experience-architecture/signatures.json':{}
+  };
+  try {vm.runInNewContext(fs.readFileSync(path.join(root,'scripts/experience.js'),'utf8'),{
+    __dirname:path.join(root,'scripts'),process:processStub,console:{log(){},error(){}},
+    require(name){assert.ok(Object.hasOwn(modules,name),'onverwachte CLI-afhankelijkheid '+name);return modules[name];}
+  });} catch(error){if(error!==stop)throw error;}
+  const report=writes.find(w=>w.file?.endsWith('report.json'));
+  return {code:processStub.exitCode,runs,run,calls,writes,report:report&&JSON.parse(report.body)};
+}
+
+test('NEXT-CLI geeft originele volledige execute-objecten aan dezelfde procesbeoordelaar',()=>{
+  const r=cli(['--prove','--proof=protocol-proof','--next-gate=G1']);
+  assert.equal(r.calls.length,1);
+  assert.equal(r.calls[0].options.gate,'G1');
+  assert.equal(r.calls[0].options.executions[0],r.run);
+  assert.equal(r.calls[0].options.executions[0].coverage.records[0],r.run.coverage.records[0]);
+  assert.equal(r.report.nextGate.snapshotOnly,true);
+  assert.equal(r.report.nextGate.reusableEvidence,false);
+  assert.equal(r.report.releaseApproved,false);
+  assert.equal(r.code,1,'geslaagde proef heft geblokkeerde poort niet op');
+});
+
+test('NEXT-CLI valideert poortopties vóór uitvoering of schrijfactie',()=>{
+  for(const args of [ ['--next-gate=G1'],['--gate','--next-gate=G1'],['--check','--next-gate=G1'],
+    ['--prove','--next-gate'],['--prove','--next-gate='],['--prove','--next-gate=G5'],
+    ['--prove','--next-gate=g1'],['--prove','--next-gate=G1','--next-gate=G2'] ]) {
+    const r=cli(args);assert.equal(r.code,2,args.join(' '));
+    assert.equal(r.runs.length,0);assert.equal(r.calls.length,0);assert.equal(r.writes.length,0);
+  }
+});
+
+test('NEXT-CLI vereist proefsucces én poortsucces; bestaande modus verandert niet',()=>{
+  for(const gate of ['G1','G2','G3','G4']) {
+    const goed=cli(['--prove','--next-gate='+gate],{gateStatus:'PROVEN'});
+    assert.equal(goed.code,0);assert.equal(goed.calls[0].options.gate,gate);
+    const fout=cli(['--prove','--next-gate='+gate],{gateStatus:'PROVEN',failed:true});
+    assert.equal(fout.code,1);assert.equal(fout.calls[0].options.executions[0],fout.run);
+  }
+  const oud=cli(['--prove']);assert.equal(oud.code,0);assert.equal(oud.calls.length,0);
+  assert.equal(Object.hasOwn(oud.report,'nextGate'),false);
+  const vuil=cli(['--prove','--next-gate=G1'],{dirty:true});
+  assert.equal(vuil.code,2);assert.equal(vuil.runs.length,0);assert.equal(vuil.writes.length,0);
+});
+
+test('NEXT-CLI bewaart ook uitvoeringen zonder getypeerde coverage en weigert verandering tijdens beoordeling',()=>{
+  const r=cli(['--prove','--next-gate=G1'],{multiple:true});
+  assert.equal(r.runs.length,2);
+  assert.equal(r.calls[0].options.executions[0],r.runs[0]);
+  assert.equal(r.calls[0].options.executions[1],r.runs[1]);
+  assert.equal(Object.hasOwn(r.runs[1],'coverage'),false);
+  for(const option of ['changedCommit','changedSource']) {
+    const veranderd=cli(['--prove','--next-gate=G1'],{gateStatus:'PROVEN',[option]:true});
+    assert.equal(veranderd.calls.length,1);
+    assert.equal(veranderd.code,1,option+' mag niet groen eindigen');
+  }
 });

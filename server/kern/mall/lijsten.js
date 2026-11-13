@@ -61,12 +61,14 @@ module.exports = (ctx) => {
     if (!Array.isArray(t[key])) { if (!schrijf) return []; t[key] = []; }
     return t[key];
   }
-  const vind = (key, id) => bak(key).find(l => l.id === String(id || ''));
+  const herstel = require('./lijstherstel')({ crypto, bak });
+  const actief = key => bak(key).filter(herstel.actief);
+  const vind = (key, id) => actief(key).find(l => l.id === String(id || ''));
 
   function maak(key, data) {
     data = data || {};
     const lijsten = bak(key, true);
-    if (lijsten.length >= MAX_LIJSTEN) return { status: 409, error: 'U heeft het maximum van ' + MAX_LIJSTEN + ' lijsten bereikt.' };
+    if (actief(key).length >= MAX_LIJSTEN) return { status: 409, error: 'U heeft het maximum van ' + MAX_LIJSTEN + ' lijsten bereikt.' };
     const naam = schoon(data.naam, 60);
     if (!naam) return { status: 400, error: 'Geef de lijst een naam.' };
     const soort = SOORTEN.includes(data.soort) ? data.soort : 'lijst';
@@ -93,17 +95,17 @@ module.exports = (ctx) => {
       if (data.tot != null) l.tot = isDatum(data.tot) ? data.tot : null;
     }
     save();
-    return { ok: true, lijst: l };
+    return { ok: true, lijst: herstel.publiek(l) };
   }
 
   function weg(key, id) {
     const lijsten = bak(key);
-    const i = lijsten.findIndex(l => l.id === String(id || ''));
+    const i = lijsten.findIndex(l => herstel.actief(l) && l.id === String(id || ''));
     if (i < 0) return { status: 404, error: 'Lijst niet gevonden.' };
     if (lijsten[i].soort === BEWAARD) return { status: 409, error: 'Bewaard is uw vaste lijst; die kan niet weg. Haal er losse regels uit.' };
-    lijsten.splice(i, 1);
+    herstel.verwijder(lijsten, i, nu());
     save();
-    return { ok: true, aantal: lijsten.length };
+    return { ok: true, aantal: actief(key).length };
   }
 
   /* Een aanbod bewaren. De TITEL en de PRIJS gaan mee de regel in, en niet
@@ -137,37 +139,28 @@ module.exports = (ctx) => {
   function mijn(key) {
     return {
       ok: true,
-      lijsten: bak(key).map(l => ({ id: l.id, naam: l.naam, soort: l.soort, plek: l.plek,
+      lijsten: actief(key).map(l => ({ id: l.id, naam: l.naam, soort: l.soort, plek: l.plek,
         van: l.van, tot: l.tot, aantal: l.regels.length, at: l.at })),
       max: MAX_LIJSTEN
     };
   }
 
-  /* Eén domeinhandeling voor de hele selectie, aangeroepen binnen de duurzame
-     brokertransactie. Alle regels eerst controleren; nooit een halve lijst. */
-  function samenstellen(key, data) {
-    const naam = schoon(data && data.naam, 60), ids = data && data.ids;
-    if (!naam || !Array.isArray(ids) || !ids.length || ids.length > 8 || new Set(ids).size !== ids.length)
-      return { status: 400, error: 'Ongeldige selectie.' };
-    if (bak(key).length >= MAX_LIJSTEN) return { status: 409, error: 'U heeft het maximum aantal lijsten bereikt.' };
-    const gevraagd = new Set(ids), index = new Map(); let dubbel = false;
-    const bezoek = a => { if (gevraagd.has(a.id)) { if (index.has(a.id)) dubbel = true; index.set(a.id, a); } };
-    const aanbod = ctx.aanbodBezoek ? ctx.aanbodBezoek(bezoek) : ctx.aanbodAlles();
-    if (!ctx.aanbodBezoek) for (const a of aanbod.aanbod) bezoek(a);
-    if (dubbel || ids.some(id => !index.has(id) || (aanbod.stuk || []).some(s => s.bron === index.get(id).bron) ||
-        (index.get(id).beschikbaar && index.get(id).beschikbaar.uit)))
-      return { status: 409, error: 'Het aanbod is gewijzigd. Stel uw plan opnieuw samen.' };
-    const at = nu(), lijst = { id: crypto.randomBytes(12).toString('hex'), naam, soort: 'lijst',
-      plek: null, van: null, tot: null, at, regels: ids.map(id => lijstregel(index.get(id), at)) };
-    bak(key, true).unshift(lijst); save();
-    return { ok: true, lijst };
-  }
+  const samenstellen = require('./lijst-samenstellen')(ctx, {
+    bak, actief, herstel, schoon, nu, MAX_LIJSTEN });
 
   // de leeskant (een lijst uitwerken tegen het levende aanbod) staat apart
-  const { toon } = require('./lijsttonen')(ctx, { vind, REIS_ONDERDELEN });
-  const api = { mijn, maak, zet, weg, voegToe, haalWeg, toon, samenstellen, REIS_ONDERDELEN, MAX_LIJSTEN, BEWAARD };
+  const { toon: toonLevend } = require('./lijsttonen')(ctx, { vind, REIS_ONDERDELEN });
+  function toon(key, id) {
+    const uit = toonLevend(key, id);
+    if (uit.lijst) uit.lijst = herstel.publiek(uit.lijst);
+    return uit;
+  }
+  const api = { mijn, maak, zet, weg, voegToe, haalWeg, toon, samenstellen,
+    herstelSamenstelling: herstel.vind, REIS_ONDERDELEN, MAX_LIJSTEN, BEWAARD };
   // "Bewaard" en het volgen van prijzen staan in ./bewaard.js
-  Object.assign(api, require('./bewaard')(ctx, { bak, voegToe, haalWeg, toon, nu, BEWAARD }));
+  Object.assign(api, require('./bewaard')(ctx, {
+    bak: (key, schrijf) => schrijf ? bak(key, true) : actief(key),
+    voegToe, haalWeg, toon, nu, BEWAARD }));
   ctx.lijsten = api;
   return { mallLijsten: api };
 };

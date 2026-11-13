@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-13T03:34:24.582Z",
-    "commit": "1dbe116bd",
+    "op": "2026-11-13T05:34:26.666Z",
+    "commit": "107e602e4",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v26.13.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -5492,6 +5492,21 @@
       "gezakt": 23,
       "geprobeerd": 1
     },
+    "experience-continuity.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/experience/resume.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-next-qualification.0Kr4Cx/evidence/experience-continuity.test.js.evidence.json",
+        "sha256": "f80f5e2c75b96764ec97c739a8635d1bde3b9509e8434ded843414c2f241e3a9",
+        "commit": "107e602e4b0504e5757263ae0995482934473b47",
+        "sourceSha256": "0a0243c8f7da48718a6d2791f0df57ac231037f213596b9a5b68b990618e023d",
+        "testSha256": "120f4d6e89c707f327b45a4e8b4e2374159a91330ce9ac8e3c4a147a379814a9"
+      }
+    },
     "experience-coverage.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5562,6 +5577,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "experience-network-recovery.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/mall/lijstherstel.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-next-qualification.0Kr4Cx/evidence/experience-network-recovery.test.js.evidence.json",
+        "sha256": "97c3b6b5dacedc1c25137b80a1aa29b7e36ca2115a2bab099d6dd992902d6e30",
+        "commit": "107e602e4b0504e5757263ae0995482934473b47",
+        "sourceSha256": "ce79243088e6eb7221def328edc5498146d37f29e97c9c1cfb5ad1fa1b5ac5fb",
+        "testSha256": "1bc61c1ee15a38229def7b09a38074c06ce3d47623cccdc6c9003ff6524cb80f"
+      }
     },
     "experience-network-scale.test.js": {
       "soort": "puur",

@@ -4,8 +4,9 @@
 'use strict';
 const klok = require('../../lib/klok');
 
-const { hash, kopie } = require('./canon');
+const { kopie } = require('./canon');
 const registry = require('./intent-registry');
+const authority = require('./broker-authority');
 const { veiligGelijk } = require('../util');
 
 function fout(error, status, code, extra) { return { error, status, code, ...(extra || {}) }; }
@@ -13,7 +14,7 @@ function fout(error, status, code, extra) { return { error, status, code, ...(ex
 module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, kern, commit, network, trustPlane }) {
   const meting = require('./broker-meting')({ trustPlane, opslag });
   const evidence = require('./broker-evidence')({ trustPlane, opslag, crypto });
-  const { contextVoor, bevoegd, velden } = require('./broker-grenzen')({ contexten });
+  const { contextVoor, bevoegd } = require('./broker-grenzen')({ contexten });
   const handlers = {
     'attention.acknowledge': require('./action-attention')({ projecteer, opslag }),
     'schedule.item.create': require('./action-schedule')({ kern }),
@@ -23,52 +24,9 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     handlers['living-world.' + action] = require('./action-living-world')({ kern, action });
   }
 
-  function previewIntern(key, invoer, economicPrincipalRef) {
-    const b = invoer || {}, definition = registry.haal(b.intent, b.version);
-    if (!definition) return fout('Onbekende of verouderde intentie.', 400, 'UNKNOWN_INTENT');
-    const parameters = b.parameters || {};
-    const world = String(b.world || parameters.world || '').toLowerCase();
-    if (!definition.worlds.includes(world))
-      return fout('Deze intentie is in deze wereld niet beschikbaar.', 403, 'WORLD_NOT_ALLOWED');
-    const ontbreekt = velden(definition, parameters); if (ontbreekt) return ontbreekt;
-    const context = contextVoor(key, world, b.contextId); if (context.error) return context;
-    const geenGezag = bevoegd(context, definition); if (geenGezag) return geenGezag;
-    const handler = handlers[definition.id];
-    if (!handler) return fout('De runtime voor deze intentie is niet beschikbaar.', 503, 'RUNTIME_UNAVAILABLE');
-    const voorbereid = handler.prepare({ key, world, context, parameters, economicPrincipalRef });
-    if (!voorbereid || voorbereid.error)
-      return voorbereid || fout('De actie kon niet worden voorbereid.', 500, 'PREVIEW_FAILED');
+  const previewIntern = require('./broker-preview')({ crypto, opslag, contexten, handlers, evidence });
 
-    const createdAt = opslag.tijd();
-    const fingerprint = hash(crypto, { intent: definition.id, version: definition.version,
-      world, contextId: context.id, economicPrincipalRef: economicPrincipalRef || null,
-      parameters: voorbereid.parameters });
-    const policy = voorbereid.policy || {};
-    const policyDecision = {
-      decisionId: 'xpd_' + hash(crypto, { fingerprint, policy }).slice(0, 24),
-      policyId: policy.policyId || 'policy:experience-default',
-      policyVersion: policy.version || 'v1', inputHash: fingerprint,
-      decision: policy.decision || 'DENY', reasonCodes: kopie(policy.reasonCodes || []),
-      actor: opslag.actor(key), timestamp: createdAt
-    };
-    if (!String(policyDecision.decision).startsWith('ALLOW'))
-      return fout('De geldende policy staat deze actie niet toe.', 403, 'POLICY_DENIED', { policyDecision });
-    const expiresAt = new Date(Date.parse(createdAt) + 5 * 60000).toISOString();
-    const p = {
-      id: 'xpv_' + crypto.randomBytes(12).toString('hex'),
-      intent: definition.id, version: definition.version, runtime: definition.runtime,
-      world, contextId: context.id, parameters: kopie(voorbereid.parameters),
-      economicPrincipalRef: economicPrincipalRef || null,
-      objectRef: kopie(voorbereid.objectRef || null), fingerprint, createdAt, expiresAt,
-      policyDecision, confirmation: kopie(voorbereid.confirmation),
-      consequence: kopie(voorbereid.consequence)
-    };
-    opslag.previewZet(key, p);
-    evidence.preview(key, p);
-    return { ok: true, preview: p };
-  }
-
-  async function executeIntern(key, invoer) {
+  async function executeIntern(key, invoer, routeBeleid) {
     const b = invoer || {}, idemKey = String(b.idempotencyKey || '');
     if (!/^[a-zA-Z0-9._:-]{8,120}$/.test(idemKey))
       return fout('Een geldige idempotencyKey van minimaal acht tekens is verplicht.', 400, 'IDEMPOTENCY_REQUIRED');
@@ -97,8 +55,9 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     const geenGezag = bevoegd(context, definition); if (geenGezag) return geenGezag;
 
     return commit(async () => {
-      // Een tweede tab kan dezelfde preview gelijktijdig aanbieden. Buiten de
-      // transactie lezen is geen grendel: herlees onder dezelfde schrijverslot.
+      // Een tweede tab kan dezelfde preview gelijktijdig aanbieden. Herlees
+      // binnen de bundel; actieAfronden bewaakt daarnaast de synchrone finale
+      // toekenning, want bijeen is zelf geen serialiserende mutex.
       const replay = opslag.idemLees(key, idemKey);
       if (replay) return veiligGelijk(replay.fingerprint, p.fingerprint)
         ? { ...replay.result, replay: true }
@@ -111,8 +70,12 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
       const activeContext = contextVoor(key, p.world, p.contextId);
       if (activeContext.error) return activeContext;
       const denied = bevoegd(activeContext, definition); if (denied) return denied;
-      const uitgevoerd = await handler.execute({ key, context: activeContext, preview: current,
+      const domeinDicht = authority.check(definition.id, routeBeleid); if (domeinDicht) return domeinDicht;
+      const pending = handler.execute({ key, context: activeContext, preview: current,
         economicPrincipalRef: p.economicPrincipalRef });
+      // Een synchrone broncontrole + Experience-mutatie blijft één JS-turn.
+      // Alleen domeinen die echt asynchroon werken onderbreken deze stap.
+      const uitgevoerd = pending && typeof pending.then === 'function' ? await pending : pending;
       if (!uitgevoerd || uitgevoerd.error)
         return uitgevoerd || fout('De runtime kon de actie niet uitvoeren.', 500, 'EXECUTION_FAILED');
       const at = opslag.tijd();
@@ -125,15 +88,15 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
         policyDecision: p.policyDecision, confirmation: { confirmed: true, at },
         result: kopie(uitgevoerd.result || {})
       }, { ok: true, intent: p.intent, ...(uitgevoerd.result || {}), objectRef });
-      if (result) evidence.execute(key, p, objectRef, idemKey);
+      if (result && !result.error && !result.replay) evidence.execute(key, p, objectRef, idemKey);
       return result || fout('De actie kon niet atomair worden afgerond.', 500, 'FINALIZATION_FAILED');
     });
   }
 
-  function preview(key, invoer, economicPrincipalRef) {
+  function preview(key, invoer, economicPrincipalRef, routeBeleid) {
     const timer = meting.start(key);
     try {
-      const result = previewIntern(key, invoer, economicPrincipalRef), ok = !!(result && result.ok);
+      const result = previewIntern(key, invoer, economicPrincipalRef, routeBeleid), ok = !!(result && result.ok);
       meting.finish(timer, result, ok, ok ? 'PREVIEW_ALLOWED' : ((result && result.code) || 'PREVIEW_DENIED'),
         ok ? 'experience-preview:' + result.preview.id : null);
       return result;
@@ -143,10 +106,10 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     }
   }
 
-  async function execute(key, invoer) {
+  async function execute(key, invoer, routeBeleid) {
     const timer = meting.start(key);
     try {
-      const result = await executeIntern(key, invoer), ok = !!(result && result.ok);
+      const result = await executeIntern(key, invoer, routeBeleid), ok = !!(result && result.ok);
       const idemKey = invoer && invoer.idempotencyKey;
       meting.finish(timer, result, ok, ok ? 'ACTION_EXECUTED' : ((result && result.code) || 'ACTION_DENIED'),
         ok && idemKey ? 'experience-execute:' + idemKey : null);

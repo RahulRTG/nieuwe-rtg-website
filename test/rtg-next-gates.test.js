@@ -89,16 +89,31 @@ test('referentiecohort met elf taken kan geen twaalf claimen', t => {
   assert.equal(find(result, 'scope').apps, 11);
 });
 
-test('open Mall-eigenaarsbesluit blokkeert referentiekwalificatie, alle acht open punten blokkeren portfolio', t => {
+test('gekozen Mall-samenvoeging blijft ongekwalificeerd zolang de consolidatie openstaat', t => {
   const {model} = harness(t);
   const reference = find(gates.assess(root, {gate:'G1'}), 'ownership-decisions');
   assert.equal(reference.status, 'BLOCKED');
-  assert.ok(reference.unresolved.some(item => item.screens.includes('apps/mall.html') && item.kind === 'OWNER_DECISION_REQUIRED'));
+  assert.ok(reference.unresolved.some(item => item.screens.includes('apps/mall.html') && item.kind === 'CONSOLIDATION_REQUIRED'));
   const portfolio = find(gates.assess(root, {gate:'G2'}), 'ownership-decisions');
   assert.equal(portfolio.status, 'BLOCKED');
   assert.equal(portfolio.unresolved.length, model.owners.oordelen.filter(row => row.stand === 'open').length);
   assert.equal(portfolio.unresolved.length, 8);
   for (const item of portfolio.unresolved) assert.match(item.source, /^SCHERMEIGENAAR\.json#\/oordelen\/\d+$/);
+  for (const route of ['apps/pulse.html', 'apps/sociaal.html', 'apps/mall.html']) {
+    const besluit = portfolio.unresolved.find(item => item.screens.includes(route));
+    assert.equal(besluit.kind, 'CONSOLIDATION_REQUIRED', 'productkeuze is gemaakt, uitvoering niet');
+    assert.match(besluit.followUp, /Eigenaarskeuze 13 november 2026/);
+  }
+});
+
+test('een nog niet gemaakt eigenaarsbesluit blijft herkenbaar en blokkeert eveneens', t => {
+  harness(t, model => {
+    const mall = model.owners.oordelen.find(row => row.stand === 'open' && row.schermen.includes('apps/mall.html'));
+    mall.vervolg = 'Besluit nodig: kies eerst de productrichting.';
+  });
+  const reference = find(gates.assess(root, {gate:'G1'}), 'ownership-decisions');
+  assert.equal(reference.status, 'BLOCKED');
+  assert.ok(reference.unresolved.some(item => item.screens.includes('apps/mall.html') && item.kind === 'OWNER_DECISION_REQUIRED'));
 });
 
 test('uitsluitend opgelost eigenaarschap kan eigen poortvoorwaarde sluiten, niet productkwaliteit', t => {

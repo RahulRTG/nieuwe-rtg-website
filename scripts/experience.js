@@ -10,6 +10,11 @@ const {execute,select}=require('./lib/experience/execution');
 const typed=require('./lib/experience/typed');
 const {build}=require('./lib/experience/coverage');
 const root=path.resolve(__dirname,'..'), out=path.join(root,'artifacts/experience');
+const nextArgs=process.argv.slice(2).filter(arg=>arg.startsWith('--next-gate'));
+if(nextArgs.length&&(nextArgs.length!==1||!/^--next-gate=G[1-4]$/.test(nextArgs[0])||!process.argv.includes('--prove'))){
+  console.error('BLOCKED: --next-gate=G1..G4 vereist --prove en mag eenmaal worden opgegeven');process.exit(2);
+}
+const nextGate=nextArgs.length?nextArgs[0].slice('--next-gate='.length):null;
 if (['--prove','--check','--gate'].filter(arg=>process.argv.includes(arg)).length > 1) {
   console.error('BLOCKED: kies één Experience-pilotmodus'); process.exit(2);
 }
@@ -42,11 +47,13 @@ let typedRequired=[];
 try {typedRequired=typed.required(contract,signatures,proofs);}
 catch(error){console.error('BLOCKED: '+error.message);process.exit(2);}
 let commit='unknown'; try {commit=cp.execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();} catch(e) {}
-const typedEvidence=[];
+const typedEvidence=[], executions=[];
 if (process.argv.includes('--prove') && graph.valid) {
   for (const p of selected) {
     console.log('Experience proof: '+p.id+' ('+p.test+')');
-    const {record,coverage}=execute(root,p);
+    const run=execute(root,p);
+    executions.push(run); // Originele procesreceipts; geen import of reconstructie.
+    const {record,coverage}=run;
     if(coverage) typedEvidence.push(coverage);
     const passed=record.passed;
     console.log(p.id+': '+(passed?'passed':'FAILED')+' ('+record.tests+' tests)');
@@ -79,8 +86,15 @@ const report={version:1,at:new Date().toISOString(),commit,worktreeDirty:!curren
   scopedProofs,configurationCoverage,typedEvidenceBlockers:typedEvidence.filter(e=>!e.records.length).map(e=>e.reason),
   typedProofLifecycle:'Alleen --prove bouwt uitvoeringsgezag op. Imports en --gate zijn geen nieuwe uitvoering.',
   humanReview:'NOT_TESTED',releaseApproved:false};
+if(nextGate) {
+  const assessment=require('./lib/experience/qualification-gates').assess(root,{gate:nextGate,executions});
+  report.nextGate={...assessment,snapshotOnly:true,reusableEvidence:false};
+  console.log('RTG NEXT '+nextGate+': '+assessment.status+' (rapportsnapshot; geen releasegoedkeuring)');
+}
 fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 fs.writeFileSync(path.join(out,'index.html'),render(report));
 console.log('Experience selectie: '+selectionStatus+'; geheel: '+report.status);
 console.log('Experience: '+report.status+'; '+path.join(out,'index.html'));
-if (qualifying) { const after=candidate(root); process.exitCode=after.ok&&after.commit===commit&&(process.argv.some(arg=>arg.startsWith('--proof='))?selectionStatus:report.status)==='PROVEN_IN_SCOPE'?0:1; }
+if (qualifying) { const after=candidate(root); process.exitCode=after.ok&&after.commit===commit&&fingerprint(root)===sourceHash&&
+  (process.argv.some(arg=>arg.startsWith('--proof='))?selectionStatus:report.status)==='PROVEN_IN_SCOPE'&&
+  (!nextGate||report.nextGate.status==='PROVEN')?0:1; }

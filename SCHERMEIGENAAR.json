@@ -611,7 +611,7 @@
       "stand": "open",
       "eigenaar": null,
       "reden": "Twee zelfstandige feeds met dezelfde workflow (plaatsen, reageren, volgen, bewaren) op twee opslagen: Pulse (9+ microblog) en De Salon (besloten beeldnetwerk).",
-      "vervolg": "Besluit nodig: is een open 9+-microblog een ander product dan De Salon (dan blijven ze, met een gedeelde feedcomponent), of is Pulse een stand van De Salon?"
+      "vervolg": "Eigenaarskeuze 13 november 2026: Salon/Pulse samenvoegen tot een ervaring, met extra migratie- en ontwerptraject (AFBOUWPROGRAMMA.md; premium-afbouwplan par. 20.13). Uitvoering blijft open: alle bestaande functies behouden, leeftijd/publiek/blokkades gescheiden bewaken, objectschrijvers en id-mapping vaststellen, migratie en rollback bewijzen voordat oude ingangen worden omgeleid."
     },
     {
       "schermen": [
@@ -632,7 +632,7 @@
       "stand": "open",
       "eigenaar": null,
       "reden": "Twee overzichten van het sociale leven in hetzelfde menu: \"Alles bij elkaar\" (wereld.html, een tijdlijn over Salon, Pulse en Zakelijk) en \"Sociaal\" (sociaal.html, kring en momenten volgens LIFE.md).",
-      "vervolg": "Besluit nodig: een van beide wordt het ene sociale overzicht; de andere een stand ervan."
+      "vervolg": "Eigenaarskeuze 13 november 2026: Wereld/Sociaal samenvoegen tot een ervaring, met extra migratie- en ontwerptraject (AFBOUWPROGRAMMA.md; premium-afbouwplan par. 20.13). Uitvoering blijft open: contextoverzicht, publiceren, profiel/privacy, kringen en bevestigde plannen behouden; bestaande bron-, relatie- en Command-eigenaars blijven leidend. Oude ingangen pas omleiden na behoud-, autorisatie- en hervatproeven."
     },
     {
       "schermen": [
@@ -643,7 +643,7 @@
       "stand": "open",
       "eigenaar": "apps/mall.html",
       "reden": "Twee winkelingangen voor een lid: RTG Mall en RTG Commerce, elk met een eigen mand of aanvraagweg.",
-      "vervolg": "Besluit nodig: Commerce is volgens COMMERCE.md een laag en geen etalage. Voor een lid hoort er een winkel te zijn; commerce.html wordt dan de verkoperskant of een stand van de Mall."
+      "vervolg": "Eigenaarskeuze 13 november 2026: Mall/Commerce samenvoegen tot een ervaring, met extra migratie- en ontwerptraject (AFBOUWPROGRAMMA.md; premium-afbouwplan par. 20.13). Uitvoering blijft open: ontdekken, appcatalogus, lijsten, mand, overdracht, orderstatus en nazorg behouden. Domeinen blijven eigenaar van aanbod/order/voorraad en Pay van betalingsuitkomst; geen tweede handels- of betaalwaarheid. Oude ingangen pas omleiden na migratie-, herstel- en negatieve proeven."
     },
     {
       "schermen": [

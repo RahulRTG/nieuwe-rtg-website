@@ -22,11 +22,12 @@ module.exports = ({ A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save })
       viaUitnodiging: !!b.viaUitnodiging, bedrijf: bedrijfMod.normaliseer(b.bedrijf) };
   }
 
-  // De geautomatiseerde reis opbouwen in de toon van de pas. Elke stap is meteen
-  // 'gedaan': de AI verzorgt hem automatisch. Alleen het besluit blijft open.
+  // Automatisch klaargezette uitleg is geen bewijs dat een stap is uitgevoerd.
+  // Vooral een aanvraag mag nooit gelden als akkoord, handtekening of betaling.
   function bouwReis(stem) {
     const t = nu();
-    return REIS.map(s => ({ id: s.id, naam: s.naam, tekst: stem === 'u' ? s.u : s.je, auto: true, at: t }));
+    return REIS.map(s => ({ id: s.id, naam: s.naam, tekst: stem === 'u' ? s.u : s.je,
+      auto: true, status: 'uitleg', at: t }));
   }
 
   function beeld(a) {
@@ -38,8 +39,8 @@ module.exports = ({ A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save })
       besluit: a.besluit || null, at: a.at, bijgewerkt: a.bijgewerkt };
   }
 
-  /* Een nieuwe aanmelding. De AI verzorgt meteen de hele reis (berichten,
-     onboarding-bevestiging, rondleiding, RTF, veiligheid, privacy). De status
+  /* Een nieuwe aanmelding. De uitleg voor de reis wordt klaargezet (berichten,
+     onboarding, rondleiding, RTF, veiligheid, privacy). De status
      komt op 'in behandeling': klaar voor de menselijke ja of nee. Voor Lifestyle
      en Business wordt NOOIT toegang beloofd of gezet -- de reis is voorbereiding,
      geen toelating. */

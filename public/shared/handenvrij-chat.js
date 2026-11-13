@@ -86,13 +86,15 @@
     if (!t) return null;
     tikt(false);
     var ik = van === 'member';
-    var mens = !ik && van !== 'rahul';
+    var service = van === 'service';
+    var mens = !ik && van !== 'rahul' && !service;
     var rij = document.createElement('div');
     rij.className = 'ds-handenvrij__beurt hv-beurt ' + (ik ? 'ik' : 'hij') + (mens ? ' mens' : '');
     if (!ik) rij.appendChild(kopje());
     var bel = document.createElement('div');
     bel.className = 'ds-handenvrij__bericht hv-bel';
-    bel.innerHTML = (mens ? '<div class="ds-handenvrij__afzender hv-wie">RTG Concierge</div>' : '') +
+    bel.innerHTML = (service ? '<div class="ds-handenvrij__afzender hv-wie">RTG Service · automatisch bericht</div>'
+      : mens ? '<div class="ds-handenvrij__afzender hv-wie">RTG Concierge</div>' : '') +
       esc(t) + '<div class="ds-handenvrij__tijd hv-tijd">' + esc(klok(at || Date.now())) + '</div>';
     rij.appendChild(bel);
     vak.appendChild(rij);

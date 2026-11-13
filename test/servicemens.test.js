@@ -18,7 +18,11 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 const { startServer, stop, kantoorAlsPersoon, elevateTier } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 const mens = require('../server/kern/service/mens');
 
 const post = (base) => async (pad, body, tok) => {
@@ -73,26 +77,39 @@ test('vanaf de derde keer mag de AI niet meer afweren', () => {
 /* ---------------------------------------------------------- de hele keten -- */
 
 async function opzet(pas) {
-  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-servicemens-'));
+  if (pas === 'rtg') historischAccount(dir, { email: 'menslidrtg@x.nl', name: 'Mens Lid', tier: 'rtg' });
+  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE', RTG_DATA_DIR: dir } });
   const p = post(srv.base);
-  const reg = await p('/api/auth/register', { name: 'Mens Lid', email: 'menslid' + pas + '@x.nl',
+  const reg = pas === 'rtg'
+    ? await p('/api/auth/login', { login: 'menslidrtg@x.nl', password: 'geheim123', pasApp: 'rtg' })
+    : await p('/api/auth/register', { name: 'Mens Lid', email: 'menslid' + pas + '@x.nl',
     phone: '061234' + (1000 + pas.length), password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  assert.equal(reg.body.state.user.tier, pas === 'rtg' ? 'rtg' : 'guest');
   let token = reg.body.token;
-  if (pas !== 'rtg') {
+  if (pas === 'lifestyle' || pas === 'business') {
     await elevateTier(srv.base, token, pas);
     const her = await p('/api/auth/login', { login: 'menslid' + pas + '@x.nl', password: 'geheim123', pasApp: pas });
     token = her.body.token || token;
   }
-  return { srv, p, token, balie: await kantoorAlsPersoon(srv.base) };
+  return { srv, p, token, balie: await kantoorAlsPersoon(srv.base),
+    async sluit() { await stop(srv); fs.rmSync(dir, { recursive: true, force: true }); } };
 }
 
-test('een RTG-lid dat in de chat om een mens vraagt, komt in de wachtrij', async () => {
-  const o = await opzet('rtg');
+for (const pas of ['guest', 'rtg']) test(pas + ': vanuit de chat een mens vragen komt in de wachtrij', async () => {
+  const o = await opzet(pas);
   try {
     /* DE ECHTE WEG: de gewone chat, niet de service-route. Dit is de plek waar
        `needsConcierge = false` stond en waar het verzoek verdween. */
     const chat = await o.p('/api/chat/send', { text: 'Dit lukt me niet, ik wil een mens spreken.' }, o.token);
     assert.equal(chat.status, 200, JSON.stringify(chat.body).slice(0, 200));
+    assert.equal(chat.body.mode, pas === 'guest' ? 'service' : 'rahul');
+    assert.equal((await o.p('/api/chat/history', {}, o.token)).body.mode, chat.body.mode);
+    if (pas === 'guest') {
+      assert.equal((await o.p('/api/ai', { messages: [{ role: 'user', content: 'reisadvies' }] }, o.token)).status, 403);
+      assert.equal(chat.body.messages.at(-1).from, 'service');
+    }
 
     const rij = await o.p('/api/office/service/wachtrij', { mensGevraagd: true }, o.balie);
     assert.equal(rij.status, 200, JSON.stringify(rij.body).slice(0, 200));
@@ -104,13 +121,13 @@ test('een RTG-lid dat in de chat om een mens vraagt, komt in de wachtrij', async
     /* En de concierge-inbox blijft leeg: die is en blijft van Lifestyle en
        Business, en dat is de merkregel die overeind moet blijven. */
     const inbox = await o.p('/api/office/conversations', {}, o.balie);
-    const rtgErin = (inbox.body.conversations || []).filter(c => c.tier === 'rtg');
+    const rtgErin = (inbox.body.conversations || []).filter(c => c.tier === pas);
     assert.equal(rtgErin.length, 0, 'een RTG-lid belandde in de concierge-inbox');
-  } finally { await stop(o.srv); }
+  } finally { await o.sluit(); }
 });
 
-test('drie keer vragen geeft drie regels in een tijdlijn en niet drie zaken', async () => {
-  const o = await opzet('rtg');
+for (const pas of ['guest', 'rtg']) test(pas + ': drie keer vragen geeft drie regels en niet drie zaken', async () => {
+  const o = await opzet(pas);
   try {
     for (let i = 0; i < 3; i++) await o.p('/api/chat/send', { text: 'ik wil een medewerker spreken' }, o.token);
     const mijn = await o.p('/api/service/mijn', {}, o.token);
@@ -119,7 +136,7 @@ test('drie keer vragen geeft drie regels in een tijdlijn en niet drie zaken', as
     const d = await o.p('/api/service/zaak', { id: mijn.body.zaken[0].id }, o.token);
     const vragen = d.body.zaak.tijdlijn.filter(r => r.wat === 'mensGevraagd');
     assert.equal(vragen.length, 3, 'niet elk verzoek staat in de tijdlijn: ' + vragen.length);
-  } finally { await stop(o.srv); }
+  } finally { await o.sluit(); }
 });
 
 test('een Lifestyle-lid komt bij De Rechterhand uit en niet bij de balie', async () => {
@@ -131,7 +148,7 @@ test('een Lifestyle-lid komt bij De Rechterhand uit en niet bij de balie', async
     assert.equal(r.body.zaak.team, 'concierge');
     assert.match(r.body.let, /Rechterhand/,
       'het lid hoort te horen naar wie hij wordt doorgezet');
-  } finally { await stop(o.srv); }
+  } finally { await o.sluit(); }
 });
 
 test('de doorzetting belooft dat RTG ondertussen doorkijkt', async () => {
@@ -144,5 +161,5 @@ test('de doorzetting belooft dat RTG ondertussen doorkijkt', async () => {
     assert.match(r.body.let, /ondertussen/i,
       'de doorzetting belooft niet dat er ondertussen wordt gekeken');
     assert.equal(r.body.afwerenMag, true);
-  } finally { await stop(o.srv); }
+  } finally { await o.sluit(); }
 });

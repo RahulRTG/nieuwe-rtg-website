@@ -10,7 +10,7 @@
    1. SSO GEEFT NOOIT EEN BETAALDE PAS. De merkregel is dat Lifestyle en Business
       uitsluitend na een MENSELIJK besluit worden verleend. Een inlog via de
       provider van een klant is geen menselijk besluit van RTG. Een nieuw account
-      krijgt dus hooguit RTG -- precies zoals zelf-registreren (routes/auth/
+      krijgt dus gratis/guest -- precies zoals zelf-registreren (routes/auth/
       account.js) -- en van een BESTAAND account blijft de pas onaangeroerd. Er
       staat hier met opzet nergens een aanroep van accounts.setTier.
 
@@ -149,10 +149,11 @@ async function aanmelden(accounts, koppeling, claims) {
     return { user: bestaand, nieuw: false, gekoppeld: true };
   }
 
-  /* 3. nieuw account. Hooguit RTG, nooit een betaalde pas (regel 1 hierboven). */
+  /* 3. Identiteit is geen koop: een nieuw account krijgt de gratis laag.
+     Zakelijke Werk OS-rechten komen afzonderlijk uit de tenantbrug. */
   const user = await accounts.createUser({
     email, username: null, password: onbruikbaarWachtwoord(),
-    tier: 'rtg', realName: naam, phone: null
+    tier: 'guest', realName: naam, phone: null
   });
   /* Het adres is door de provider bevestigd; dat is precies wat onze eigen
      bevestigingsmail ook zou vaststellen, dus die stap slaan we over. */

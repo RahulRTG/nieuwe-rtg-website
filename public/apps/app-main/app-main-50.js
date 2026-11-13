@@ -64,11 +64,28 @@
   }
 
   /* ---------- doorlopend gesprek in de app voor echte accounts ---------- */
-  function renderChatMsgs(msgs, concierge){
+  function eigenChatMode(){
+    return user.tier === 'rtg' ? 'rahul'
+      : user.tier === 'lifestyle' || user.tier === 'business' ? 'concierge' : 'service';
+  }
+  function renderChatMsgs(msgs, mode){
+    const concierge = mode === 'concierge';
+    // Ook een al geopend scherm volgt de actuele servermodus na pasverval.
+    $('#aiTitle').textContent = mode === 'service' ? T('chat.service.title','RTG Service.')
+      : concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','Rahul.');
+    const deck = document.querySelector('.view[data-view="ai"] .sub');
+    if (deck) deck.textContent = mode === 'service' ? T('chat.service.deck','Ondersteuning bij uw account, betaling en nazorg. Geen persoonlijke AI of concierge.') : concierge
+      ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
+      : T('chat.rahul.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
+    if (mode !== 'service'){
+      $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
+      const bc = $('#aiBetaalChip'); if (bc) bc.addEventListener('click', () => kiesPartnerEnBetaal('ai'));
+    } else { $('#chips').innerHTML = ''; }
     const chat = $('#chat');
     if (!msgs.length){
       chat.innerHTML = '';
-      bubble(concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier in de app; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
+      bubble(mode === 'service' ? T('chat.service.hi','Hulp bij uw account, betaling of nazorg vindt u via Hulp in de app. U kunt daar een medewerker vragen.')
+        : concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier in de app; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
       return;
     }
     // Met Util.el: de berichttekst (van de gast of de concierge) gaat structureel
@@ -76,7 +93,7 @@
     const E = Util.el;
     const bubbels = msgs.map(m => E('div', { class: 'bubble ' + (m.from === 'member' ? 'user' : 'ai') },
       null,
-      m.text));
+      (m.from === 'service' ? T('chat.service.automatisch','RTG Service · automatisch bericht: ') : '') + m.text));
     const last = msgs[msgs.length - 1];
     if (concierge && last && last.from === 'member'){
       bubbels.push(E('div', { class: 'bubble ai pending' }, T('chat.concierge.pending', 'Uw concierge is ingelicht en reageert zo.')));
@@ -85,20 +102,10 @@
     $('#content').scrollTop = $('#content').scrollHeight;
   }
   async function renderChat(){
-    const concierge = user.tier !== 'rtg';
-    $('#aiTitle').textContent = concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','Rahul.');
-    const deck = document.querySelector('.view[data-view="ai"] .sub');
-    if (deck) deck.textContent = concierge
-      ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
-      : T('chat.rahul.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
-    // Vaste snelactie: alles regelen én afrekenen kan hier. Face ID, direct naar de partner.
-    if (user.tier !== 'guest'){
-      $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
-      const bc = $('#aiBetaalChip'); if (bc) bc.addEventListener('click', () => kiesPartnerEnBetaal('ai'));
-    } else { $('#chips').innerHTML = ''; }
-    if (!API.live){ $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); return; }
-    try { const d = await API.call('/chat/history'); renderChatMsgs(d.messages, concierge); }
-    catch (e) { $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); }
+    const mode = eigenChatMode();
+    if (!API.live){ renderChatMsgs([], mode); return; }
+    try { const d = await API.call('/chat/history'); renderChatMsgs(d.messages, d.mode || mode); }
+    catch (e) { renderChatMsgs([], mode); }
   }
   // Kies een partner en reken direct met Face ID af (vanuit de AI/concierge).
   function kiesPartnerEnBetaal(bron){

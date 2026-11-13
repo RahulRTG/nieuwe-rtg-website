@@ -7,6 +7,8 @@ module.exports = (kern) => {
     memberSays, accounts, ledenInhoudVan } = kern;
   const aiStatus = () => require('../../ai-stand').beschikbaarheid(anthropic);
   const meting = require('../../kern/ai/routermeting');
+  const chatMode = tier => tier === 'rtg' ? 'rahul'
+    : tier === 'lifestyle' || tier === 'business' ? 'concierge' : 'service';
 
   app.post('/api/ai/status', auth, (req, res) => res.json(aiStatus()));
 
@@ -74,7 +76,7 @@ module.exports = (kern) => {
     // het lid leest alles (ook concierge-antwoorden) in de eigen taal
     trChat(convOf(req.session.account.id), talen.taalVan(req.body.lang)).then(messages => res.json({
       messages,
-      mode: req.session.tier === 'rtg' ? 'rahul' : 'concierge',
+      mode: chatMode(req.session.tier),
       phone: accounts.phoneOf(req.session.account)
     }));
   });
@@ -84,8 +86,9 @@ module.exports = (kern) => {
     const text = String(req.body.text || '').trim();
     if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
     const taal = talen.taalVan(req.body.lang);
-    await memberSays(req.session.account, text, 'app', taal);
+    // De effectieve sessiepas kan beperkter zijn dan de opgeslagen oude pas.
+    await memberSays({ ...req.session.account, tier: req.session.tier }, text, 'app', taal);
     const messages = await trChat(convOf(req.session.account.id), taal);
-    res.json({ ok: true, messages, mode: req.session.tier === 'rtg' ? 'rahul' : 'concierge' });
+    res.json({ ok: true, messages, mode: chatMode(req.session.tier) });
   });
 };

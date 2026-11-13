@@ -1316,7 +1316,12 @@ de actuele werking te beoordelen.
 Voor verkoop: servicecapaciteit, personeelsrooster/vervanging, bereikbaarheid,
 inclusies/exclusies, upgradeprijzen, zakelijke/huishouddekking, provider- en
 partnerafspraken en echte kostendata. Autonome betalingen en externe communicatie
-zijn **niet** besloten. Nieuwe beloften gaan via bestaande scopebesluiten;
+waren in deze conceptuitwerking **niet** besloten. Het aanvullende besluit van
+13 november 2026 in `AFSPRAAK.md` §17 staat automatische abonnementsafhandeling
+toe voor gratis, RTG en Lite, met expliciete klantondertekening en aantoonbaar
+betaalmandaat; Business/Lifestyle houden menselijke toelating. Dat is geen
+algemene machtiging voor andere uitgaande betalingen of externe communicatie.
+Nieuwe beloften gaan via bestaande scopebesluiten;
 bestaande verplichtingen mogen ondertussen niet worden uitgekleed.
 
 Dit sluit het **ontwerp van de lus**, niet de uitvoering. Alleen documentatie

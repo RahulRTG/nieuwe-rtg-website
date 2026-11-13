@@ -11,7 +11,7 @@
    5. een geplande overgang gebeurt op de einddatum, niet ervoor;
    6. met alle schakelaars uit gebeurt er automatisch niets;
    7. `afgelopen` beeindigt het contract en zet de pas; `wacht` kondigt eerst aan;
-   8. `onbetaald` telt vervallen open termijnen; een lid zonder contract nooit.
+   8. `onbetaald` kan geen brede sanctie meer activeren, ook niet uit oude data.
 
    Draai: node --test test/naargast.test.js */
 'use strict';
@@ -20,6 +20,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 
 let srv, base, eig, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-naargast-'));
@@ -29,16 +30,17 @@ async function api(pad, body, token) {
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
   return { status: r.status, body: await r.json().catch(() => ({})) };
 }
-async function registreer() {
+async function bestaandLid() {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const reg = (await api('/api/auth/register', { name: 'Gast ' + u, email: u + '@x.nl',
-    phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
+  historischAccount(TMP, { name: 'Bestaand ' + u, email: u + '@x.nl', tier: 'rtg' });
+  const reg = (await api('/api/auth/login', { login: u + '@x.nl',
+    password: 'geheim123', pasApp: 'rtg' })).body;
   assert.ok(reg.token);
+  assert.equal(reg.state.user.tier, 'rtg');
   return { token: reg.token, id: reg.state.user.id, u };
 }
 async function metContract() {
-  const lid = await registreer();
+  const lid = await bestaandLid();
   const a = (await api('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'rtg', naam: 'Gast ' + lid.u, contact: lid.u + '@x.nl' }, lid.token)).body;
   const b = await api('/api/aanmelding/beslis', { id: a.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, office);
   assert.equal(b.status, 200);
@@ -55,7 +57,7 @@ test.before(async () => {
 test.after(() => { stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } });
 
 test('1. zonder afspraak geen eind, wel nu -- en de oude sessie is daarna weg', async () => {
-  const lid = await registreer();
+  const lid = await bestaandLid();
   const einde = await api('/api/mijn/pas/gast', { wanneer: 'einde' }, lid.token);
   assert.equal(einde.status, 409);
   assert.match(einde.body.error, /geen afspraak met een einddatum/);
@@ -78,7 +80,7 @@ test('2. met een contract kiest het lid het eind van zijn periode: opgezegd, en 
 });
 
 test('3. het kantoor alleen met een reden', async () => {
-  const lid = await registreer();
+  const lid = await bestaandLid();
   const zonder = await api('/api/office/pas/gast', { accountId: lid.id }, eig);
   assert.equal(zonder.status, 400);
   const met = await api('/api/office/pas/gast', { accountId: lid.id, reden: 'op verzoek van het lid per telefoon' }, eig);
@@ -94,6 +96,9 @@ test('4. de schakelaars staan standaard uit, en alleen de eigenaar zet ze', asyn
   const z = await api('/api/office/pas/gast/regels/zet', { regel: 'wacht', aan: true, dagen: 14 }, eig);
   assert.equal(z.status, 200, JSON.stringify(z.body));
   assert.equal(z.body.regels.wacht.dagen, 14);
+  const onbetaald = await api('/api/office/pas/gast/regels/zet', { regel: 'onbetaald', aan: true, termijnen: 2 }, eig);
+  assert.equal(onbetaald.status, 409);
+  assert.match(onbetaald.body.error, /herstel/);
   const ronde = await api('/api/office/pas/gast/ronde', {}, eig);
   assert.equal(ronde.status, 200);
   assert.equal(typeof ronde.body.gepland, 'number', 'de ronde geeft tellingen en geen namen');
@@ -115,7 +120,7 @@ function wereld({ contractStatus, eindigtOp, termijnen, tier = 'rtg', metContrac
   const berichten = [];
   const ng = require('../server/kern/aanmeldingen/naargast')({ db, save: () => {}, A, B, contracten, accounts,
     zegOpZelf: () => ({ ok: true, eindigtOp }), meldLid: (k, n) => berichten.push(k), nu: () => new Date(klok).toISOString() }).naarGast;
-  return { ng, c, user, berichten, zet: (iso) => { klok = Date.parse(iso); } };
+  return { db, ng, c, user, berichten, zet: (iso) => { klok = Date.parse(iso); } };
 }
 
 test('5. een geplande overgang gebeurt op de einddatum en niet ervoor', () => {
@@ -156,18 +161,22 @@ test('7. afgelopen beeindigt en zet de pas; wacht kondigt eerst aan en wint van 
   assert.equal(w.user.tier, 'guest');
 });
 
-test('8. onbetaald telt vervallen open termijnen, en zonder contract nooit', () => {
+test('8. onbetaald weigert brede sancties, ook met eerder opgeslagen aan=true', () => {
   const t = [{ status: 'gepland', vervalt: '2026-08-01' }, { status: 'voldaan', vervalt: '2026-08-15' }, { status: 'gepland', vervalt: '2026-09-01' }];
   const w = wereld({ contractStatus: 'ACTIEF', eindigtOp: null, termijnen: t });
-  w.ng.regelZet('onbetaald', { aan: true, termijnen: 3 }, 'eigenaar');
-  w.ng.ronde();
-  assert.equal(w.user.tier, 'rtg', 'twee open is geen drie');
-  w.ng.regelZet('onbetaald', { aan: true, termijnen: 2 }, 'eigenaar');
-  assert.equal(w.ng.ronde().onbetaald, 1);
-  assert.equal(w.user.tier, 'guest');
+  assert.equal(w.ng.regelZet('onbetaald', { aan: true, termijnen: 2 }, 'eigenaar').status, 409);
+  w.db.data.pasNaarGast = { regels: { onbetaald: { aan: true, termijnen: 1 } } };
+  assert.equal(w.ng.regels().onbetaald.gevraagdAan, true);
+  assert.equal(w.ng.regels().onbetaald.aan, false);
+  assert.match(w.ng.regels().onbetaald.reden, /herstel/);
+  assert.equal(w.ng.ronde().onbetaald, 0);
+  assert.equal(w.user.tier, 'rtg');
+  assert.equal(w.user.grens, undefined, 'sessies blijven geldig');
+  assert.equal(w.c.status, 'ACTIEF', 'contract blijft intact');
+  assert.deepEqual(w.berichten, []);
 
   const z = wereld({ contractStatus: 'ACTIEF', eindigtOp: null, termijnen: t, metContract: false });
-  z.ng.regelZet('onbetaald', { aan: true, termijnen: 1 }, 'eigenaar');
+  z.db.data.pasNaarGast = { regels: { onbetaald: { aan: true, termijnen: 1 } } };
   z.ng.ronde();
   assert.equal(z.user.tier, 'rtg', 'een lid zonder vastgelegd contract gaat nooit automatisch');
 });

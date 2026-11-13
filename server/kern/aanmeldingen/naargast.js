@@ -12,7 +12,7 @@
       staan -- alleen de eigenaar zet ze aan:
         afgelopen   een opgezegd contract bereikt zijn einddatum;
         wacht       hetzelfde, maar pas N dagen later, met een bericht vooraf;
-        onbetaald   N vervallen termijnen staan nog open.
+        onbetaald   vervallen legacy-regel; blijft effectief UIT (AFSPRAAK 17).
       Staan `afgelopen` en `wacht` allebei aan, dan wint `wacht`: bij twijfel de
       zachtste. Een lid zonder vastgelegd contract gaat NOOIT automatisch -- "ik
       vind geen afspraak" is geen "er is niets afgesproken" (AFSPRAAK.md).
@@ -34,6 +34,7 @@ const REGELS = Object.freeze({
   onbetaald: { standaard: { aan: false, termijnen: 2 } }
 });
 const DAG = 86400000;
+const ONBETAALD_REDEN = 'Geen automatische pasverlaging wegens geplande termijnen. Eerst betaalbewijs, herinnering en aangekondigd herstel; alleen nieuwe betaalde diensten mogen daarna worden beperkt.';
 
 module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/aanmeldingen/naargast', bezit: { [NAAM]: 'kaart' } });
@@ -44,6 +45,11 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
     const k = eigen.kijk(NAAM), r = k.regels || {};
     const uit = {};
     for (const [id, d] of Object.entries(REGELS)) uit[id] = Object.assign({}, d.standaard, r[id] || {});
+    // Ook een eerder opgeslagen aan=true is geen toestemming voor de oude
+    // brede sanctie. Bewaar die instelling als historie, niet als uitvoerrecht.
+    uit.onbetaald = Object.assign({}, uit.onbetaald, {
+      gevraagdAan: uit.onbetaald.aan === true, aan: false, reden: ONBETAALD_REDEN
+    });
     return uit;
   }
 
@@ -102,6 +108,8 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
   /* 3. De schakelaars. Alleen de eigenaar, en elke wijziging draagt wie en wanneer. */
   function regelZet(id, patch, door) {
     if (!REGELS[id]) return { status: 400, error: 'Onbekende regel.' };
+    if (id === 'onbetaald' && patch && patch.aan === true)
+      return { status: 409, error: ONBETAALD_REDEN };
     const p = patch || {}, nieuw = { aan: p.aan === true, door: String(door || '').slice(0, 80), op: new Date(klok()).toISOString() };
     if (id === 'wacht') { const d = Math.round(Number(p.dagen)); if (!(d >= 1 && d <= 365)) return { status: 400, error: 'Een wachttijd van 1 tot 365 dagen.' }; nieuw.dagen = d; }
     if (id === 'onbetaald') { const t = Math.round(Number(p.termijnen)); if (!(t >= 1 && t <= 12)) return { status: 400, error: 'Van 1 tot 12 open termijnen.' }; nieuw.termijnen = t; }
@@ -122,7 +130,7 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
     }
     const wacht = r.wacht.aan, dagen = r.wacht.dagen;
     for (const a of A().filter(x => x.status === 'geaccepteerd' && x.accountId != null)) {
-      const { rij, c } = lopendContract(a);
+      const { c } = lopendContract(a);
       if (!c) continue;   // geen vastgelegde afspraak: nooit automatisch
       if ((wacht || r.afgelopen.aan) && c.status === contracten.STATUS.OPZEGGEND && c.eindigtOp && Date.parse(c.eindigtOp) <= t) {
         if (wacht && Date.parse(c.eindigtOp) + dagen * DAG > t) {
@@ -138,10 +146,8 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
         if (naarGast(a.accountId, wacht ? 'regel-wacht' : 'regel-afgelopen').ok) uit[wacht ? 'wacht' : 'afgelopen'] += 1;
         continue;
       }
-      if (r.onbetaald.aan && contracten.LOPEND.has(c.status) && rij) {
-        const open = (rij.termijnen || []).filter(x => x.status === 'gepland' && Date.parse(x.vervalt) < t).length;
-        if (open >= r.onbetaald.termijnen && naarGast(a.accountId, 'regel-onbetaald').ok) uit.onbetaald += 1;
-      }
+      // Een geplande termijn is geen bewezen mislukte incasso. Niet hier de
+      // hele pas of sessie intrekken; betaalherstel hoort bij de betaalzaak.
     }
     if (Object.values(uit).some(n => n > 0)) save();
     return uit;

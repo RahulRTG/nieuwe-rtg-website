@@ -93,29 +93,17 @@ function maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToO
     const md = accounts.getMemberState(user.id) || {};
     md.conversation = md.conversation || [];
     md.conversation.push({ from: 'member', text: String(text).slice(0, 1000), lang: lang || 'nl', at: new Date().toISOString(), channel });
-    if (user.tier === 'rtg') {
-      // Rahul (AI) antwoordt meteen, in de taal van het lid.
-      const reply = await generateAiReply(user.tier, md.conversation, lang, 'user-' + user.id);
-      md.conversation.push({ from: 'rahul', text: reply.text, lang: reply.lang, at: new Date().toISOString(), channel: 'rahul' });
+    const concierge = user.tier === 'lifestyle' || user.tier === 'business';
+    if (!concierge) {
+      // Gratis/nazorg krijgt service, niet stilzwijgend een betaald AI-model.
+      const reply = user.tier === 'rtg'
+        ? await generateAiReply(user.tier, md.conversation, lang, 'user-' + user.id)
+        : { text: 'Voor hulp bij uw account, betaling of nazorg kunt u een medewerker vragen. Bekijk uw hulpvragen via Hulp in de app.', lang: 'nl' };
+      md.conversation.push({ from: user.tier === 'rtg' ? 'rahul' : 'service', text: reply.text,
+        lang: reply.lang, at: new Date().toISOString(), channel: user.tier === 'rtg' ? 'rahul' : 'service' });
 
-      /* HIER STOND `md.needsConcierge = false;` EN VERDER NIETS.
-
-         Dat was geen bug maar de merkregel, eerlijk uitgevoerd: de RTG Pass
-         krijgt De Rechterhand niet. Het GEVOLG was wel een gebrek -- een
-         RTG-lid dat in de chat om een mens vroeg, kwam nergens uit. Er was een
-         mens voor hem (de ledenbalie helpt elk lid), en de melder was de enige
-         die niet bij hem kon.
-
-         De regel blijft dus staan, met de betekenis die hij hoorde te hebben:
-         geen CONCIERGE. Dat is iets anders dan geen mens. Vraagt het lid om
-         een mens, dan gaat dat verzoek naar RTG Service, dat er een zaak van
-         maakt en hem bij het team Leden neerlegt. De concierge-inbox blijft
-         onaangeroerd -- die is en blijft van Lifestyle en Business.
-
-         WAAROM DE ANDERS-TAK LUID IS. Zonder haak zou dit stilletjes terugvallen
-         op precies het gedrag dat hersteld moest worden, en niemand zou het
-         merken. Een lid dat om een mens vraagt en niets hoort, is de duurste
-         stille breuk die deze laag kan hebben (LAT.md regel 5). */
+      // Een mens is een ondergrens; concierge-uitvoering blijft van B/L.
+      // Zonder servicehaak niet doen alsof het verzoek is aangekomen.
       md.needsConcierge = false;
       if (mensLaag.vraagtOmMens(text)) {
         if (overdracht) {
@@ -133,7 +121,7 @@ function maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToO
     md.conversation = md.conversation.slice(-120);
     accounts.saveMemberState(user.id, md);
     broadcastSync([user.tier], 'chat');
-    if (user.tier !== 'rtg') sseToOffice('sync', { scope: 'concierge' });
+    if (concierge) sseToOffice('sync', { scope: 'concierge' });
   }
 
   /* Een uitwisseling die AL heeft plaatsgevonden vastleggen in het gesprek.

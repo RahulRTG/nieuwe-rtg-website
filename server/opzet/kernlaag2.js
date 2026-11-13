@@ -129,8 +129,8 @@ Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, 
   // laat gebonden: geld-regie en meldingen (naar gast, C5) staan er pas later
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
   meldLid: (...a) => kern.meldLid && kern.meldLid(...a) }));
-/* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
-   vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
+/* De pestgrens stopt de verdachte beurt. Een trefwoord geeft geen langdurige
+   schorsing; daarvoor en voor betwisting blijft een menselijke beoordeling nodig. */
 Object.assign(kern, require('../kern/pestgrens')({ db, save }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije

@@ -6,7 +6,7 @@
   }
   async function chatSend(q){
     if (!API.live){ bubble(q, 'user'); setTimeout(() => bubble(aiAnswer(q), 'ai'), 400); return; }
-    try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, user.tier !== 'rtg'); }
+    try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, d.mode || eigenChatMode()); }
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 
@@ -30,7 +30,7 @@
     try {
       const d = await API.call('/chat/send', { text: regels.join('\n') });
       openTab('ai');
-      renderChatMsgs(d.messages, user.tier !== 'rtg');
+      renderChatMsgs(d.messages, d.mode || eigenChatMode());
       websiteAanvraag = null;
       history.replaceState(null, '', location.pathname + location.search);
       toast(T('aanvraag.app.ok','Uw aanvraag staat in uw beveiligde RTG-lijn.'));

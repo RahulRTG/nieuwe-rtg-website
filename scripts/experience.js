@@ -26,10 +26,18 @@ if (process.argv.includes('--check')) {
   process.exit(graph.valid?0:1);
 }
 fs.mkdirSync(out,{recursive:true});
-const sourceHash=fingerprint(root), proofs=journeys.flatMap(j=>j.proofs.map(p=>({...p,journey:j.id})));
+const contract=require('../experience-architecture/coverage-contract.json'),signatures=require('../experience-architecture/signatures.json');
+const sourceHash=fingerprint(root), journeyProofs=journeys.flatMap(j=>j.proofs.map(p=>({...p,journey:j.id})));
+const proofById=new Map(journeyProofs.map(proof=>[proof.id,proof]));
+for(const binding of contract.executedProofs||[]) {
+  const known=proofById.get(binding.proof);
+  if(known&&known.test!==binding.instrument) {console.error('BLOCKED: Experience-proef heeft twee instrumenten: '+binding.proof);process.exit(2);}
+  if(!known) proofById.set(binding.proof,{id:binding.proof,test:binding.instrument,timeoutMs:binding.timeoutMs,journey:'experience-contract',
+    layer:'EXPERIENCE',scope:'Getypeerde contractproducer; de binding bepaalt de exacte onderwerpen en grenzen.'});
+}
+const proofs=[...proofById.values()];
 let selected;
 try {selected=select(proofs,process.argv.slice(2));} catch(error) {console.error('BLOCKED: '+error.message);process.exit(2);}
-const contract=require('../experience-architecture/coverage-contract.json'),signatures=require('../experience-architecture/signatures.json');
 let typedRequired=[];
 try {typedRequired=typed.required(contract,signatures,proofs);}
 catch(error){console.error('BLOCKED: '+error.message);process.exit(2);}
@@ -55,9 +63,7 @@ const rows=proofs.map(p=>{
   return {...p,...record,state:result,log:record?p.id+'.log':null};
 });
 const combined=build(root,{evidence:{records:typedEvidence.flatMap(e=>e.records)},commit});
-const scopedProofs=combined.screens.flatMap(screen=>screen.dimensions.flatMap(d=>d.scopedProofs||[]));
-const configurationCoverage=combined.screens.flatMap(screen=>screen.dimensions.flatMap(d=>(d.configurationCoverage||[])
-  .filter(matrix=>matrix.runs?.length).map(matrix=>({subjectId:screen.id,dimension:d.id,...matrix}))));
+const {scopedProofs,configurationCoverage}=require('./lib/experience/coverage').executionProjection(combined);
 const covered=binding=>scopedProofs.some(p=>typed.covers(p.scope,binding));
 const typedComplete=typedRequired.every(covered);
 const currentCandidate=candidate(root),current=clean.ok&&currentCandidate.ok&&currentCandidate.commit===commit&&fingerprint(root)===sourceHash;

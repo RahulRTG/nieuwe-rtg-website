@@ -1,6 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8'),html=read('index.html');
+const reader=()=>['platform-magazine.js','magazine-layout.js','magazine-history.js'].map(name=>read('public/site/'+name)).join('\n');
 const home=html.split('id="magazineHome"')[1].split('id="magazineDetail"')[0];
 const pages=['editie','inhoudsopgave','interview','bedoeling','reisverhaal','reisnotities','goedeleven','salon-verhaal','ondernemen','foundation-verhaal','atelier','werelden-gids','code','vertrouwen','eigen-regie','lid-worden','service-gids','tot-ziens'];
 const articles=['artikel-interview','artikel-reizen','artikel-leven','artikel-ondernemers','artikel-foundation','artikel-atelier','artikel-code','artikel-vertrouwen'];
@@ -16,7 +17,7 @@ test('de canonieke voordeur heeft één editorial main, huisletters en beide onv
  assert.match(header,/width="40" height="32"/);assert.match(header,/aria-label="Rahul Travel Group, naar het begin"/);
  const footer=html.match(/<footer[^>]*class="ds-magazine-[\s\S]*?<\/footer>/)[0];
  assert.match(footer,/class="ds-brand-lockup__image"/);assert.match(footer,/src="\.\/public\/images\/brand\/rahul-travel-group-logo\.jpg"/);
- assert.match(footer,/width="1280" height="470"/);assert.match(footer,/alt="Rahul Travel Group — EXPERIENCE THE ELITE CLASS" translate="no"/);
+ assert.match(footer,/width="1280" height="470"/);assert.match(footer,/alt="Rahul Travel Group - EXPERIENCE THE ELITE CLASS" translate="no"/);
  assert.equal((html.match(/fetchpriority="high"/g)||[]).length,1);
 });
 test('achttien eindige bladen hebben native ankers, inhoudsopgave en handmatige horizontale bediening',()=>{
@@ -39,11 +40,11 @@ test('achttien eindige bladen hebben native ankers, inhoudsopgave en handmatige 
  assert.match(css,/\.ds-issue-condensed > :not\(\.ds-issue-preview\)/,'een te vol blad heeft een expliciete leesingang');
  assert.doesNotMatch(css,/!important|#[0-9a-f]{3,8}\b|(?:rgb|hsl)a?\(|url\(https?:/i);
  assert.doesNotMatch(home,/<style\b|\sstyle=/i);
- const script=read('public/site/platform-magazine.js');
+ const script=reader();
  assert.match(script,/function readingNode\(id\)/);assert.match(script,/open\.dataset\.readLeaf=card\.id/);
  assert.match(script,/card\.scrollHeight>card\.clientHeight\+2\|\|card\.scrollWidth>card\.clientWidth\+2/,'ook vergrote tekst wordt gemeten in plaats van afgeknipt');
  assert.doesNotMatch(script,/setInterval|(?:setTimeout|requestAnimationFrame)\s*\(\s*(?:next|move)\b/,'geen automatisch doorbladeren');
- assert.match(script,/Math\.max\(0,Math\.min\(cards\.length-1,index\)\)/);
+ assert.match(script,/Math\.max\(0,Math\.min\(s\.cards\.length-1,index\)\)/);
  assert.match(script,/e\.key==='Home'/);assert.match(script,/e\.key==='End'/);
 });
 test('iedere lokale magazine-ingang verwijst naar één bestaande eigenaar, nooit naar een dood anker',()=>{
@@ -112,7 +113,7 @@ test('Inkt blijft één apart lazy-loaded kunstmoment in het atelier, met origin
  assert.doesNotMatch(section('interview'),/rtg-ink-artwork/);
  assert.match(read('public/ds/componenten/magazine.css'),/\.ds-issue-ink img \{[^}]*object-fit: contain/);
  const provenance=JSON.parse(read('public/images/brand/ink-provenance.json'));
- assert.equal(provenance.selectedDirection,'A — Inkt');assert.equal(provenance.tool,'built-in image_gen');
+ assert.equal(provenance.selectedDirection,'A \u2014 Inkt');assert.equal(provenance.tool,'built-in image_gen');
  const bytes=fs.readFileSync(path.join(root,provenance.path));
  assert.ok(bytes.length<200000);assert.equal(digest(bytes),provenance.sha256);
 });
@@ -146,11 +147,11 @@ test('het kunstenaarscitaat bewaart naam, primaire bron, taal en eigen vertaling
  assert.match(article,/Eigen vertaling:/);
 });
 test('de reader verplaatst de oorspronkelijke scène en bewaart pagina en focus zonder tweede toestand',()=>{
- const script=read('public/site/platform-magazine.js');
- assert.match(script,/moved\.marker\.replaceWith\(moved\.el\)/);assert.match(script,/detail\.append\(content\)/);
+ const script=reader();
+ assert.match(script,/moved\.marker\.replaceWith\(s\.moved\.el\)/);assert.match(script,/detail\.append\(content\)/);
  assert.doesNotMatch(script,/cloneNode|fetch\(|XMLHttpRequest|sendBeacon|localStorage/);
  assert.match(script,/title\.dataset\.i18n=/);assert.match(script,/function next\(delta\)/);
- assert.match(script,/savedPage=closest\(\)/);assert.match(script,/move\(savedPage,true\)/);
+ assert.match(script,/savedPage=a\.closest\(\)/);assert.match(script,/move\(s\.savedPage,true\)/);
  assert.match(script,/lastFocus\.focus\(\{preventScroll:true\}\)/);
  assert.match(read('public/site/platform-shell.js'),/o\.kind==='app'&&w\.RTGPublicMagazine/);
 });

@@ -158,4 +158,18 @@ function serializeRegistry(report) {
   return lines.join('\n') + '\n';
 }
 
-module.exports = {build,validate,registryView,serializeRegistry,appInventory,interactionInventory,screenInventory,requirements,evidenceStatus,sourceHash,DIMENSION_ORDER,stable,sha};
+/* De uitvoeringsprojectie omvat beide soorten Experience-onderwerpen. De
+   eerste pilot projecteerde uitsluitend schermen; daardoor kon een werkelijk
+   uitgevoerde app-signature wel integer zijn, maar nooit de selectiestatus van
+   dezelfde run bereiken. Dit is alleen een projectie van reeds beoordeelde
+   cellen en maakt zelf geen bewijs. */
+function executionProjection(report) {
+  const subjects=(report.logicalApps||[]).concat(report.screens||[]);
+  return {
+    scopedProofs:subjects.flatMap(subject=>subject.dimensions.flatMap(d=>d.scopedProofs||[])),
+    configurationCoverage:subjects.flatMap(subject=>subject.dimensions.flatMap(d=>(d.configurationCoverage||[])
+      .filter(matrix=>matrix.runs?.length).map(matrix=>({subjectId:subject.id,dimension:d.id,...matrix}))))
+  };
+}
+
+module.exports = {build,validate,registryView,serializeRegistry,executionProjection,appInventory,interactionInventory,screenInventory,requirements,evidenceStatus,sourceHash,DIMENSION_ORDER,stable,sha};

@@ -1,5 +1,9 @@
 {
   "kind": "Schermafbeeldingen uit de echte RTG-app in een lokale wegwerpomgeving",
+  "browser": {
+    "versie": "156.0.8078.4",
+    "infrastructuur": "de gepinde Playwright-build"
+  },
   "viewport": {
     "width": 390,
     "height": 844
@@ -9,22 +13,25 @@
       "id": "organisatie",
       "route": "/apps/werk.html",
       "file": "organisatie.png",
-      "sourceHash": "d32e48fbd37a8f1c975b42f7ff2b045f63a6deb36cc0d7c7fa8967645d4fa13f",
-      "imageHash": "ec9dfbdd21a862c0beb1f22034ae40aa9aacead7b3c4a748adc195750e4bb95e"
+      "weergave": "Bestaande ingelogde werkplek met proefgegevens",
+      "sourceHash": "fe9d606907d5317db72a794b001ce312a1601e3295d198539eade6aa9f94a808",
+      "imageHash": "373bf5679d7c4a91f20d2cfc0ee3972fd7ef762ed07c116b46f5e0420520d89a"
     },
     {
       "id": "partner",
       "route": "/apps/leverancier.html",
       "file": "partner.png",
-      "sourceHash": "d636d9decb88aeefc2463fb99e16f9a17c4788019d1b98bc2bb239bc1fad4724",
-      "imageHash": "f2f53361f90921f6f52ebeb8c53a886cd179721f56bb7c704f2a873b8784c10f"
+      "weergave": "Bestaande ingelogde werkplek met proefgegevens",
+      "sourceHash": "67ac7c93203db6d525ebe34a90b6648a2b5bc6ee64e81e6576154fa1b106a481",
+      "imageHash": "eb0a1b4c6dd032664c093de356aebec7448b8f0010399b1936a0ffff1fd7144a"
     },
     {
       "id": "gebruiker",
       "route": "/apps/app.html",
       "file": "gebruiker.png",
-      "sourceHash": "b7e5cf3219fe35181913dd518f9151a4e81e85b949fcb16bf3bdf97ea6be54ff",
-      "imageHash": "64cfa7d2d4c72494a49923153bf66ec51e85fd4864a60806ac7d10ac60fb5197"
+      "weergave": "Standaard Home, zonder extra bediening",
+      "sourceHash": "956d6bad2175353ef54cea78c91e67a2f5647020c08347e1d819e59b74ef9c70",
+      "imageHash": "a59544156e3226553ecdc2856181080e1c4249daf9ba1badcbb5b62eb96887c9"
     }
   ]
 }

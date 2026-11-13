@@ -34,7 +34,7 @@
     const aan = heeftKamers() || heeftOpdrachten() || heeftClubdorp();
     const tabNaam = heeftKamers() ? T('pd.t.kamers','Kamers') : heeftClubdorp() ? T('pd.t.dorp','Afdelingen') : T('pd.t.opdr','Opdrachten');
     if (tabBtn){
-      tabBtn.style.display = aan ? '' : 'none';
+      tabBtn.classList.toggle('h-weg', !aan);
       const lbl = tabBtn.querySelector('span');
       if (lbl) lbl.textContent = tabNaam;
     }

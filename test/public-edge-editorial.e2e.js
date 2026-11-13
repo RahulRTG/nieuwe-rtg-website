@@ -3,7 +3,7 @@
 // provider or mutation traffic is permitted in this browser proof.
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
 const edge = '.ds-public-edge.ds-edge', host = edge + ' .rtg-adaptive-edge';
@@ -59,7 +59,7 @@ async function fixture(width, route = '/') {
     return route.continue();
   });
   const page = await context.newPage(); page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => { if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url()); });
   await page.goto(base + route, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.body.classList.contains('ds-public-edge-page') && document.body.dataset.rtgAdaptiveReady === 'true' && !!document.querySelector('.ds-public-edge[data-edge-reading]'));

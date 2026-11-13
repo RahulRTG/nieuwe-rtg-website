@@ -88,6 +88,10 @@
     // De Edge opent dezelfde beeldbediening wanneer de mobiele schil het sfeerbeeld verbergt.
     var imageAction = atmosphere.querySelector('.pi-change');
     if (d.body.classList.contains('ds-wereldwerkruimte') && imageAction) {
+      /* Bron en Edge-kloon zijn dezelfde handeling. Geef ze daarom dezelfde
+         toegankelijke naam; anders ziet bediening (en een schermlezer) twee
+         verschillende functies terwijl beide exact dezelfde editor openen. */
+      imageAction.setAttribute('aria-label', 'Beelden aanpassen');
       imageAction.setAttribute('data-ds-actie', 'Beelden aanpassen');
       /* Het sfeerbeeld is op de kleine compositie bewust verborgen. Markeer
          zijn bestaande handeling daarom expliciet als Edge-bediening; de DS
@@ -98,7 +102,17 @@
     var scene = d.body.dataset.worldHome && !d.body.dataset.publicPlatform ? homeScene(o.home, o.root) : null;
     responsive(o, scene);
     function toolbar() {
-      var top = d.querySelector('.rtg-edge-top'); if (!P || !top || top.querySelector('.wp-edit-images')) return;
+      var top = d.querySelector('.rtg-v4-header-actions') || d.querySelector('.rtg-edge-top'); if (!P || !top) return;
+      /* De sfeerknop woonde in een decoratieve laag achter de werkruimte. Op
+         middelbrede schermen ving de kop of de titel daardoor de muis af. Het
+         is dezelfde bestaande handeling, nu in de bestaande gereedschapskop. */
+      if (imageAction && imageAction.parentNode !== top) {
+        imageAction.classList.remove('pi-change'); imageAction.classList.add('wp-edit-atmosphere');
+        imageAction.setAttribute('data-rtg-edge-controls', ''); top.appendChild(imageAction);
+      }
+      var bestaand = d.querySelector('.wp-edit-images');
+      if (bestaand && bestaand.parentNode !== top) top.appendChild(bestaand);
+      if (bestaand) return;
       var b = U.el('button', 'wp-edit-images'); b.append(U.icon('camera'), U.el('span', '', 'Beelden aanpassen')); b.type = 'button'; b.onclick = function () { w.RTGPersonalImageEditor.open(world + '/hoofd'); };
       // The header action remains available through the single mobile Edge.
       b.setAttribute('data-rtg-edge-controls', '');

@@ -3,7 +3,8 @@
 // account-route, media, form-identity and repeated-navigation regression proofs.
 const test = require('node:test'), assert = require('node:assert/strict');
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
+const edgeUI = require('./public-edge-interactions');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
 const sheetSelector = '.ds-public-edge .rtg-adaptive-sheet';
@@ -47,7 +48,7 @@ async function fixture(width, height = 844, largeText = false) {
   });
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => {
     if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url());
   });
@@ -55,8 +56,7 @@ async function fixture(width, height = 844, largeText = false) {
   await page.waitForFunction(() => !!window.RTGPublicApp && !!history.state?.rtgMagazine);
   await page.evaluate(() => document.fonts.ready);
   if (largeText) await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
-  await page.locator('[data-magazine-menu]').click();
-  await page.locator('#explorePanel').waitFor({ state: 'visible' });
+  await edgeUI.menu(page);
   return { context, page, errors, missing, sheet: page.locator(sheetSelector) };
 }
 
@@ -121,7 +121,7 @@ async function inspect(sheet, options = {}) {
     return {
       paperToken: style.getPropertyValue('--ds-edge-paper').trim(),
       journalToken: style.getPropertyValue('--ds-journal-paper').trim(), journalPaper: colour(style.getPropertyValue('--ds-journal-paper').trim()),
-      paper: colour(style.backgroundColor), header: header ? colour(getComputedStyle(header).backgroundColor) : null,
+      paper: colour(style.backgroundColor), painting: style.backgroundImage, header: header ? background(header) : null,
       controls, activeTab, fields, readability, width: node.clientWidth, scrollWidth: node.scrollWidth,
       documentWidth: document.documentElement.scrollWidth, viewport: innerWidth
     };
@@ -131,8 +131,7 @@ async function inspect(sheet, options = {}) {
 test('Rahul behoudt gekleurd papier, leesbaar formulier en capsulebediening', async () => {
   const { context, page, sheet, errors, missing } = await fixture(390);
   try {
-    await sheet.locator('[data-rtg-adaptive-mode="rahul"]').click();
-    await sheet.waitFor({ state: 'hidden' });
+    await edgeUI.mode(page, 'rahul');
     const studio = page.locator('#magazineDetailContent > #rahul.ds-rahul-studio');
     await studio.waitFor({ state: 'visible' });
     await studio.locator('#intent').fill('Een reis met kunst en gesprekken');
@@ -183,11 +182,10 @@ for (const [width, height, largeText] of [[320, 844, false], [390, 844, false], 
   test('zacht gekleurde Edge met klassieke onderstreepte tabs op ' + width + ' × ' + height + (largeText ? ' / 200% tekst' : ''), async () => {
     const { context, page, sheet, errors, missing } = await fixture(width, height, largeText);
     try {
-      const palette = [];
+      const paintings = [];
       for (const name of ['discover', 'connect', 'media', 'account', 'now']) {
         if (name !== 'discover') {
-          await sheet.locator('[data-rtg-adaptive-mode="' + name + '"]').click();
-          await sheet.locator('.ds-edge-gallery[data-mode="' + name + '"] img').waitFor({ state: 'visible' });
+          await edgeUI.mode(page, name);
           assert.equal(await sheet.locator('[data-rtg-adaptive-mode="' + name + '"]').getAttribute('aria-pressed'), 'true');
         }
         const state = await inspect(sheet);
@@ -201,6 +199,7 @@ for (const [width, height, largeText] of [[320, 844, false], [390, 844, false], 
           assert.ok(control.height >= 43.9 && control.width >= 43.9, name + ': minstens 44 × 44px voor ' + control.label + ' (' + control.selector + '): ' + JSON.stringify(control.rect));
           assert.ok(control.contrast >= 4.5, name + ': tekstcontrast minstens 4.5:1 voor ' + control.label + ', gemeten ' + control.contrast.toFixed(2));
         }
+        for (const control of await sheet.locator('button:visible, .ds-edge-now a:visible, .ds-discover-service a:visible, .ds-discover-service summary:visible, .ds-discover-routes a:visible, .ds-discover-art:visible').all()) await edgeUI.seek(page, control);
         if (name !== 'discover') {
           assert.ok(state.activeTab && state.activeTab.radii.every(radius => radius === 0), name + ': de actieve tab heeft geen capsulehoeken');
           assert.equal(state.activeTab.background[3], 0, name + ': de actieve tab blijft transparant');
@@ -209,15 +208,23 @@ for (const [width, height, largeText] of [[320, 844, false], [390, 844, false], 
           assert.deepEqual(state.activeTab.lineColour, state.activeTab.accent, name + ': onderstreping gebruikt hetzelfde accent');
           assert.equal(state.activeTab.weight, '500', name + ': ingetogen medium typografie');
         }
-        palette.push(state.paper.slice(0, 3).join(','));
+        assert.match(state.painting, /rtg-edge-paint\.webp/, name + ': het hele tabblad draagt het goedgekeurde meerkleurige penseelbeeld');
+        assert.match(state.painting, /linear-gradient/, name + ': de leesbare warme papierlaag ligt over de schildering');
+        paintings.push(state.painting);
         await snapshot(page, sheet, width, name, largeText);
       }
-      assert.ok(new Set(palette).size >= 3, 'de tabs gebruiken minstens drie eigen kleurfamilies, niet één herhaald wit paneel');
+      assert.equal(new Set(paintings).size, 1, 'de tabs delen de goedgekeurde geschilderde Edge-taal; geen terugkeer naar losse pastelkleurige capsules');
       assert.equal(await page.locator('.rtg-adaptive-edge').count(), 1, 'de presentatie blijft in de oorspronkelijke Edge');
       await sheet.locator('[data-rtg-adaptive-close]').click();
       await sheet.waitFor({ state: 'hidden' });
-      for (const selector of ['.ds-magazine-masthead', '.ds-issue-topline', '.ds-issue-controls']) await warmChrome(page, selector);
-      await page.locator('.ds-magazine-imprint[data-read-leaf="publicatie"]').click();
+      for (const selector of ['.ds-magazine-masthead', '.ds-issue-topline', '.ds-issue-controls']) assert.equal(await page.locator(selector).first().isVisible(), false, 'geen teruggekeerde vaste boven- of onderbalk: ' + selector);
+      const door = page.locator('.ds-public-edge-toggle');
+      assert.equal(await edgeUI.hit(door), true, 'de gesloten ingang blijft bereikbaar');
+      const quietPaint = await door.evaluate(node => ({ background: getComputedStyle(node).backgroundColor, image: getComputedStyle(node).backgroundImage, shadow: getComputedStyle(node).boxShadow }));
+      assert.deepEqual(quietPaint, { background: 'rgba(0, 0, 0, 0)', image: 'none', shadow: 'none' }, 'gesloten toont de Edge alleen het geschilderde merk zonder capsule');
+      await edgeUI.menu(page);
+      const info = sheet.locator('#explorePanel').getByRole('button', { name: 'Service, informatie en colofon', exact: true });
+      await edgeUI.seek(page, info); await info.click();
       await page.locator('#magazineDetailContent > .ds-magazine-footer').waitFor({ state: 'visible' });
       await warmChrome(page, '#magazineDetailContent > .ds-magazine-footer');
       assert.deepEqual(errors, []); assert.deepEqual(missing, []);

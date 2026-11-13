@@ -3,7 +3,8 @@
 // provider or mutation request can leave this read-only fixture.
 const test = require('node:test'), assert = require('node:assert/strict');
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
+const edgeUI = require('./public-edge-interactions');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
 const sheetSelector = '.ds-public-edge .rtg-adaptive-sheet';
@@ -56,7 +57,7 @@ async function fixture(width = 390, height = 844) {
   });
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => {
     if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url());
   });
@@ -65,22 +66,10 @@ async function fixture(width = 390, height = 844) {
   return { context, page, errors, missing, appVisits, denied };
 }
 async function openMenu(page) {
-  await page.locator('[data-magazine-menu]').click();
-  await page.locator('#explorePanel').waitFor({ state: 'visible' });
-  return page.locator(sheetSelector);
+  return edgeUI.menu(page);
 }
 async function mode(page, name) {
-  const sheet = page.locator(sheetSelector);
-  await sheet.locator('[data-rtg-adaptive-mode="' + name + '"]').click();
-  if (name === 'rahul') {
-    await page.locator('#magazineDetailContent > #rahul').waitFor({ state: 'visible' });
-    await sheet.waitFor({ state: 'hidden' });
-  } else {
-    await sheet.locator('.ds-edge-gallery[data-mode="' + name + '"] img').waitFor({ state: 'visible' });
-    assert.equal(await sheet.locator('[data-rtg-adaptive-mode="' + name + '"]').getAttribute('aria-pressed'), 'true');
-    assert.equal(await sheet.locator('[data-rtg-adaptive-mode][aria-pressed="true"]').count(), 1, 'één actieve tab');
-  }
-  return sheet;
+  return edgeUI.mode(page, name);
 }
 async function noOverflow(page, sheet, label) {
   const bounds = await sheet.evaluate(node => ({ width: node.clientWidth, scrollWidth: node.scrollWidth, body: document.documentElement.scrollWidth, viewport: innerWidth }));
@@ -98,6 +87,7 @@ async function closeStaysReachable(sheet, height, label) {
 }
 async function controlsHaveRoom(sheet, label) {
   for (const control of await sheet.locator('button:visible, a:visible, summary:visible').all()) {
+    await edgeUI.seek(sheet.page(), control);
     const box = await control.boundingBox();
     assert.ok(box && box.height >= 43.9 && box.width >= 43.9, label + ': aanraakdoel minstens 44 × 44px: ' + (await control.innerText()).trim());
   }
@@ -114,7 +104,7 @@ for (const [width, height] of [[320, 844], [390, 844], [768, 900], [1440, 900], 
         await mode(page, name);
         const gallery = sheet.locator('.ds-edge-gallery');
         assert.equal(await gallery.count(), 1);
-        const image = gallery.locator('img');
+        const image = width >= 1100 ? sheet.locator('.ds-edge-reading-art') : gallery.locator('img');
         await image.evaluate(node => node.decode());
         assert.equal(await image.getAttribute('alt'), '', 'redactionele decoratie vormt geen extra bediening');
         assert.equal(await image.evaluate(node => node.complete && node.naturalWidth > 0), true);
@@ -169,16 +159,15 @@ test('herhaald tabwisselen behoudt dezelfde toelichting, één galerij en het oo
   } finally { await context.close(); }
 });
 
-test('Nu opent de inhoud en de bestaande actielijst zonder een tweede eigenaar', async () => {
+test('Menu opent de inhoud en de contextactie opent de bestaande actielijst zonder een tweede eigenaar', async () => {
   const { context, page, errors } = await fixture();
   try {
     const sheet = await openMenu(page);
-    await mode(page, 'now');
-    await sheet.locator('.ds-edge-now a[href="#inhoudsopgave"]').click();
+    const contents = sheet.locator('#explorePanel').getByRole('button', { name: 'Inhoud van deze editie', exact: true });
+    await edgeUI.seek(page, contents); await contents.click();
     await page.waitForFunction(() => !document.getElementById('magazineHome').hidden && history.state?.rtgMagazine.id === 'inhoudsopgave');
     await sheet.waitFor({ state: 'hidden' });
-    await openMenu(page); await mode(page, 'now');
-    await sheet.locator('.ds-edge-now button').click();
+    await edgeUI.action(page, 'context');
     await page.locator('.pp-menu-panel').waitFor({ state: 'visible' });
     assert.equal(await sheet.locator('.ds-edge-gallery').isVisible(), false, 'een eigen actiespaneel stapelt geen extra schilderij');
     assert.equal(await sheet.locator('.rtg-adaptive-service button:visible').count(), 0, 'Nu naar Acties laat geen oude serviceknoppen door');
@@ -201,8 +190,7 @@ test('Connect, Media en Account laten na sluiten geen serviceknoppen achter in O
       assert.equal(await sheet.locator('#explorePanel').isVisible(), true);
       assert.equal(await sheet.locator('.rtg-adaptive-service button:visible').count(), 0, name + ' naar sluiten naar Ontdek: geen achtergebleven serviceknoppen');
       assert.equal(await sheet.locator('.ds-edge-gallery').isVisible(), false, name + ': Ontdek behoudt alleen zijn eigen kunstbeeld');
-      await mode(page, 'now');
-      await sheet.locator('.ds-edge-now button').click();
+      await edgeUI.action(page, 'context');
       await page.locator('.pp-menu-panel').waitFor({ state: 'visible' });
       assert.equal(await sheet.locator('.rtg-adaptive-service button:visible').count(), 0, name + ' naar Nu naar Acties: alleen bediening van het actiespaneel');
       assert.equal(await sheet.locator('.ds-edge-gallery').isVisible(), false);
@@ -229,9 +217,11 @@ test('Connect, Media en Account behouden hun echte appbestemmingen zonder een ac
     for (const [name, label, expected] of routes) {
       const sheet = await openMenu(page);
       await mode(page, name);
+      const destination = sheet.locator('.rtg-adaptive-service button').filter({ hasText: label });
+      await edgeUI.seek(page, destination);
       await Promise.all([
         page.waitForURL(base + expected),
-        sheet.locator('.rtg-adaptive-service button').filter({ hasText: label }).click()
+        destination.click()
       ]);
       assert.equal(new URL(page.url()).pathname, expected);
       assert.equal(appVisits.at(-1), expected, 'de app wordt door de fixture onderschept');
@@ -252,12 +242,15 @@ test('een actieve mediaspeler behoudt de oorspronkelijke vorige-, speel- en volg
     const sheet = await openMenu(page);
     await mode(page, 'media');
     for (const label of ['Vorige', 'Speel of pauzeer', 'Volgende']) {
-      await sheet.locator('.rtg-adaptive-media-controls button').filter({ hasText: label }).click();
+      const control = sheet.locator('.rtg-adaptive-media-controls button').filter({ hasText: label });
+      await edgeUI.seek(page, control); await control.click();
     }
     assert.deepEqual(await page.evaluate(() => window.edgeMediaCalls), ['prev', 'toggle', 'next']);
-    assert.match(await sheet.locator('.ds-edge-gallery figcaption').innerText(), /actieve media/);
+    const sourceTitle = await page.locator('#editie').getAttribute('data-issue-label');
+    assert.equal((await sheet.locator('.ds-edge-gallery figcaption').innerText()).trim(), sourceTitle, 'ook tijdens afspelen blijft de caption bij het echte huidige blad');
     await mode(page, 'connect'); await mode(page, 'media');
-    await sheet.locator('.rtg-adaptive-media-controls button').filter({ hasText: 'Speel of pauzeer' }).click();
+    const toggle = sheet.locator('.rtg-adaptive-media-controls button').filter({ hasText: 'Speel of pauzeer' });
+    await edgeUI.seek(page, toggle); await toggle.click();
     assert.deepEqual(await page.evaluate(() => window.edgeMediaCalls), ['prev', 'toggle', 'next', 'toggle']);
     assert.equal(await sheet.locator('.rtg-adaptive-media-controls').count(), 1);
     assert.deepEqual(errors, []);

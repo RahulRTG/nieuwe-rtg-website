@@ -3,7 +3,7 @@
 // Static fixtures only: accounts, providers and all mutations remain blocked.
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
 const edge = '.ds-public-edge.ds-edge', sheet = edge + ' .rtg-adaptive-sheet';
@@ -55,7 +55,7 @@ async function fixture(width, { height = 844, route = '/', rtl = false, largeTex
   });
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => { if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url()); });
   await page.goto(base + route, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.body.classList.contains('ds-public-edge-page') && document.body.dataset.rtgAdaptiveReady === 'true');
@@ -207,6 +207,10 @@ async function scanOriginals(page, key, targetIndex) {
         count: viewport.querySelectorAll('.ds-edge-leaf').length,
         status: document.querySelector('.ds-edge-page-status').textContent.match(/\d+/g).map(Number),
         overflow: viewport.querySelectorAll('[data-edge-page-overflow]').length,
+        overflowDetails: Array.from(viewport.querySelectorAll('[data-edge-page-overflow]')).map(node => ({
+          text: node.textContent, height: node.scrollHeight, available: viewport.clientHeight,
+          children: Array.from(node.children).map(child => ({ tag: child.tagName, className: child.className, height: child.getBoundingClientRect().height }))
+        })),
         originals: window[key].map((node, id) => {
           const b = node.getBoundingClientRect();
           return { id, connected: node.isConnected, hit: b.width >= 43.9 && b.height >= 43.9 && b.left >= bounds.left - 1 && b.right <= bounds.right + 1 && b.top >= bounds.top - 1 && b.bottom <= bounds.bottom + 1 && node.contains(document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2)) };
@@ -214,7 +218,7 @@ async function scanOriginals(page, key, targetIndex) {
       };
     }, key);
     assert.deepEqual(state.status, [index + 1, state.count], 'de teller beschrijft de echte menubladen');
-    assert.equal(state.overflow, 0, 'geen oorspronkelijke bediening wordt stil afgeknipt');
+    assert.equal(state.overflow, 0, 'geen oorspronkelijke bediening wordt stil afgeknipt: ' + JSON.stringify(state.overflowDetails));
     for (const item of state.originals) { assert.equal(item.connected, true, 'het oorspronkelijke element blijft verbonden'); if (item.hit) found.add(item.id); }
     assert.equal(await hit(page.locator(sheet + ' [data-rtg-adaptive-close]')), true);
     await noCoverOverflow(page);

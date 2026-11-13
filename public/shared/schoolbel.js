@@ -34,13 +34,13 @@
     if (el) return el;
     el = document.createElement('div');
     el.id = 'sbel';
+    el.className = 'ds-schoolbel';
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Schoolgesprek');
-    el.style.cssText = 'display:none;position:fixed;inset:auto 1rem 1rem 1rem;z-index:80;background:#151312;color:#F4F1EC;' +
-      'border:1px solid rgba(255,255,255,.14);border-radius:0;padding:1rem;box-shadow:0 12px 40px rgba(0,0,0,.5);font-family:Inter,system-ui,sans-serif;';
-    el.innerHTML = '<div id="sbelWie" style="font-weight:600;margin-bottom:.6rem;"></div>' +
-      '<div style="display:flex;gap:.5rem;">' +
-      '<button id="sbelNeem" type="button" style="display:none;flex:1;padding:.55rem;border:0;border-radius:0;background:#69B891;color:#0C0C0B;font:inherit;font-weight:600;cursor:pointer;">Opnemen</button>' +
-      '<button id="sbelWeg" type="button" style="flex:1;padding:.55rem;border:0;border-radius:0;background:#7F1634;color:#fff;font:inherit;font-weight:600;cursor:pointer;">Ophangen</button></div>' +
+    el.hidden = true;
+    el.innerHTML = '<div id="sbelWie" class="sbel-wie"></div>' +
+      '<div class="sbel-acties">' +
+      '<button id="sbelNeem" class="sbel-neem" type="button" hidden>Opnemen</button>' +
+      '<button id="sbelWeg" class="sbel-weg" type="button">Ophangen</button></div>' +
       '<audio id="sbelAudio" autoplay></audio>';
     document.body.appendChild(el);
     /* DE TEKSTBAAN. Dit gesprek is ALLEEN GELUID -- er valt niet eens van te
@@ -58,16 +58,16 @@
   }
   function toon(tekst, metNeem) {
     var el = ui();
-    el.style.display = 'block';
+    el.hidden = false;
     el.querySelector('#sbelWie').textContent = tekst;
-    el.querySelector('#sbelNeem').style.display = metNeem ? 'block' : 'none';
+    el.querySelector('#sbelNeem').hidden = !metNeem;
   }
   function stop() {
     if (pc) { try { pc.close(); } catch (e) {} pc = null; }
     if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
     call = null; iceQ = [];
     if (mee) mee.leeg();          // een volgend gesprek begint met een lege baan
-    var el = document.getElementById('sbel'); if (el) el.style.display = 'none';
+    var el = document.getElementById('sbel'); if (el) el.hidden = true;
   }
 
   /* ---------- WebRTC (alleen audio; de kamer blijft binnen het huis) ---------- */

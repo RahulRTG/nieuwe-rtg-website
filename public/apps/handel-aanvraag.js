@@ -46,9 +46,9 @@
     };
     function zetModus() {
       var best = modus.value === 'bestelling';
-      document.getElementById('hGenre').style.display = best ? 'none' : '';
-      document.getElementById('hZaak').style.display = best ? '' : 'none';
-      document.getElementById('hPrijs').style.display = best ? '' : 'none';
+      document.getElementById('hGenre').hidden = best;
+      document.getElementById('hZaak').hidden = !best;
+      document.getElementById('hPrijs').hidden = !best;
       document.getElementById('hUitleg').textContent = UITLEG[modus.value];
       document.getElementById('hZet').textContent = best ? 'Bestelling plaatsen' : 'Aanvraag uitzetten';
     }

@@ -145,11 +145,55 @@
     }
   }
 
+  /* Alleen de reiswerktafels: geen antwoord of herhaling uit een vorige
+     sessie. Een authfout maakt beide panelen en hun lopende antwoorden oud. */
+  function maakReisApi(el){
+    const token = API.token;
+    const panelen = ['#zaakReisContracten', '#zaakReisOpdrachten'].map(s => el.querySelector(s)).filter(Boolean);
+    let geldig = true;
+    function actueel(){
+      try { return geldig && !!token && API.token === token && localStorage.getItem('rtg_sup_token') === token; }
+      catch (_) { return false; }
+    }
+    function wis(){
+      geldig = false;
+      window.removeEventListener('storage', sessieWissel);
+      panelen.forEach(p => {
+        p._reisGeneratie = (p._reisGeneratie || 0) + 1;
+        p._reisOpdrachtGeneratie = (p._reisOpdrachtGeneratie || 0) + 1;
+        p.replaceChildren('Uw reissessie is niet meer bevoegd. Open uw werkplek opnieuw.');
+      });
+    }
+    function sessieWissel(e){
+      if (e.key !== 'rtg_sup_token' && e.key !== null) return;
+      if (!actueel()) wis();
+    }
+    // Eén bewaker per werkplek. Vernieuwen vervangt de vorige bewaker;
+    // een ander tabblad mag zijn nieuwe token behouden terwijl dit beeld wist.
+    if (el._reisStop) el._reisStop();
+    el._reisStop = () => window.removeEventListener('storage', sessieWissel);
+    window.addEventListener('storage', sessieWissel);
+    const verlopen = () => Object.assign(new Error('De reissessie is gewijzigd. Open uw werkplek opnieuw.'), { status: 401 });
+    return async (pad, body) => {
+      try {
+        if (!actueel()) throw verlopen();
+        const r = await API.call('/supplier/reisbureau/' + pad, body);
+        if (!actueel()) throw verlopen();
+        return r;
+      } catch (e) {
+        if ([401, 403].includes(e.status)) wis();
+        throw e;
+      }
+    };
+  }
+
   // Wissel van gebruiker: sessie loslaten, terug naar het inlogscherm.
   function switchUser(){
     if (source){ try{ source.close(); }catch(_){} source = null; }
     stationMode = null; pendingStation = null;
     $('#station').classList.remove('on');
+    // Verbergen alleen houdt oude dossiers en pending reishosts verbonden.
+    $('#stBody').replaceChildren();
     API.token = null; state = null; S = null; notifs = [];
     try { localStorage.removeItem('rtg_sup_token'); localStorage.removeItem('rtg_sup_station'); } catch(e){}
     $('#app').classList.remove('active');

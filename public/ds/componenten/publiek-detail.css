@@ -367,7 +367,9 @@
   .ds-public-edge .rtg-adaptive-sheet:not(:has(.ds-edge-pages)) .rtg-adaptive-sheet-head { background: var(--ds-edge-paper); }
   .ds-public-edge .rtg-adaptive-sheet-head > div { min-inline-size: 0; }
   .ds-public-edge .rtg-adaptive-sheet-head h2 { margin: 0; color: var(--ds-accent); font: 400 2.375rem/1.15 var(--ds-letter-display); letter-spacing: -.04em; overflow-wrap: anywhere; }
-  .ds-public-edge .ds-edge-reading-caption { display: block; margin-block-end: 8px; color: var(--ds-inkt-zacht); font: 500 .6875rem/1.5 var(--ds-letter-tekst); letter-spacing: .02em; overflow-wrap: anywhere; }
+  /* Compact orientation, not a second article heading. The full source title
+     stays in the accessible name and the horizontally paginated gallery. */
+  .ds-public-edge .ds-edge-reading-caption { display: block; max-inline-size: 100%; margin-block-end: 8px; color: var(--ds-inkt-zacht); font: 500 .6875rem/1.5 var(--ds-letter-tekst); letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ds-public-edge .ds-edge-reading-art { display: none; }
   .ds-public-edge :where(.ds-edge-reading-links, .ds-edge-reading-actions) { display: grid; gap: 8px; padding: 8px 24px 24px; }
   .ds-public-edge .ds-edge-reading-actions { padding: 0; }
@@ -424,7 +426,9 @@
   .ds-edge-leaf > * { flex: 0 0 auto; min-inline-size: 0; }
   .ds-edge-leaf:not(.ds-edge-art-leaf) { padding-inline: 24px; }
   .ds-public-edge .ds-edge-flow :where(.rtg-adaptive-service-action, .rtg-adaptive-sheet-action, .ds-edge-now a, .ds-edge-now button, .pp-menu-item, .ds-discover-routes a, .ds-discover-service a, .ds-discover-service button, .ds-discover-service summary) { margin: 0; }
-  .ds-public-edge .ds-edge-summary-leaf { align-self: start; }
+  /* A native summary is one action, not a column of text plus its disclosure
+     mark. Keep that mark beside the label when the action becomes a leaf. */
+  .ds-public-edge .ds-edge-summary-leaf { align-self: start; flex-direction: row; }
   .ds-public-edge .ds-edge-details::details-content { display: contents; }
   .ds-public-edge .ds-edge-details:not([open]) > :not(summary) { display: none; }
   .ds-public-edge .ds-edge-art-leaf > :where(.ds-edge-gallery, .ds-discover-art) { display: flex; flex-direction: column; flex: 1 1 0; min-block-size: 0; margin: 0; padding: 0; }

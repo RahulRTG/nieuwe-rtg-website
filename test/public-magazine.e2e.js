@@ -2,7 +2,7 @@
 // Presentation and navigation proof only; no real provider or purchase qualification.
 const test=require('node:test'),assert=require('node:assert/strict');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
-const {laadPlaywright,startBrowser}=require('./helper');
+const {laadPlaywright,startBrowser,letOpFouten}=require('./helper');
 const root=path.join(__dirname,'..');let server,browser,base;
 const edge='.ds-public-edge.ds-edge',edgeSheet=edge+' .rtg-adaptive-sheet';
 const pages=['editie','inhoudsopgave','interview','bedoeling','reisverhaal','reisnotities','goedeleven','salon-verhaal','ondernemen','foundation-verhaal','atelier','werelden-gids','code','vertrouwen','eigen-regie','lid-worden','service-gids','tot-ziens'];
@@ -24,7 +24,7 @@ async function pageFor(width,hash='',options={}){
  await context.addInitScript(()=>localStorage.setItem('rtg_lang','nl'));
  await context.route('**/*',r=>new URL(r.request().url()).origin===base&&['GET','HEAD'].includes(r.request().method())?r.continue():r.fulfill({status:503,body:'Read-only presentation proof; external providers excluded'}));
  const page=await context.newPage(),errors=[],missing=[];page.setDefaultTimeout(12000);
- page.on('pageerror',e=>errors.push(e.message));
+ letOpFouten(page, errors);
  page.on('response',r=>{if(r.status()>=400&&['image','script','stylesheet','font'].includes(r.request().resourceType()))missing.push(r.url());});
  await page.goto(base+'/'+hash,{waitUntil:'networkidle'});
  if(options.javaScriptEnabled!==false)await page.waitForFunction(()=>!!window.RTGPublicApp);
@@ -40,19 +40,42 @@ async function showPage(page,id){await page.evaluate(id=>window.RTGPublicApp.she
 async function overflow(page){assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'alleen het magazine, niet het document, schuift horizontaal');}
 async function decode(image){await image.evaluate(e=>e.decode());}
 async function settle(page){await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));}
+async function surfaceSettled(page,selector){
+ // The live page counter changes when a leaf is nearest, before native smooth
+ // scrolling ends. Test hit targets after actual motion, not a fixed timeout.
+ await page.evaluate(selector=>new Promise((resolve,reject)=>{
+  const node=document.querySelector(selector);
+  const position=()=>{const r=node.getBoundingClientRect();return [node.scrollLeft,r.left,r.top];};
+  let previous=position(),stable=performance.now(),started=stable;
+  function sample(now){
+   const next=position();if(next.some((value,index)=>Math.abs(value-previous[index])>.1))stable=now;previous=next;
+   if(now-stable>=220)return resolve();
+   if(now-started>4000)return reject(new Error('het oorspronkelijke leesvlak blijft bewegen'));
+   requestAnimationFrame(sample);
+  }
+  requestAnimationFrame(sample);
+ }),selector);
+}
 async function hit(control){return control.evaluate(node=>{const r=node.getBoundingClientRect();return r.width>=43.9&&r.height>=43.9&&r.left>=-.5&&r.right<=innerWidth+.5&&r.top>=-.5&&r.bottom<=innerHeight+.5&&node.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2));});}
 function edgeButton(page,action){return page.locator(edge+' .rtg-adaptive-bar [data-rtg-adaptive-action="'+action+'"]');}
-async function edgeAction(page,action){if(!await page.locator(edge+' .rtg-adaptive-bar').isVisible()){await page.locator('.ds-public-edge-toggle').click();await settle(page);}const button=edgeButton(page,action);assert.equal(await hit(button),true,action+' is echte bereikbare Edge-bediening');await button.focus();await page.keyboard.press('Enter');await settle(page);}
+async function edgeAction(page,action){
+ await surfaceSettled(page,'#issueTrack');
+ if(!await page.locator(edge+' .rtg-adaptive-bar').isVisible()){await page.locator('.ds-public-edge-toggle').click();await settle(page);}
+ await surfaceSettled(page,edge+' .rtg-adaptive-bar');
+ const button=edgeButton(page,action);assert.equal(await hit(button),true,action+' is echte bereikbare Edge-bediening');await button.focus();await page.keyboard.press('Enter');await settle(page);
+}
 async function seekEdge(page,target){
  const sheet=page.locator(edgeSheet),previous=sheet.locator('[data-edge-page="-1"]'),next=sheet.locator('[data-edge-page="1"]');
- async function turn(button){const before=await sheet.locator('.ds-edge-page-status').innerText();await button.click();await page.waitForFunction(before=>document.querySelector('.ds-edge-page-status').textContent!==before,before);await settle(page);}
+ await surfaceSettled(page,'.ds-edge-pages');
+ async function turn(button){const before=await sheet.locator('.ds-edge-page-status').innerText();await button.click();await page.waitForFunction(before=>document.querySelector('.ds-edge-page-status').textContent!==before,before);await surfaceSettled(page,'.ds-edge-pages');}
  for(let n=0;n<80&&!await previous.isDisabled();n++)await turn(previous);
  for(let n=0;n<80;n++){if(await hit(target))return;if(await next.isDisabled())break;await turn(next);}
  assert.fail('de bediening is op geen werkelijk menublad bereikbaar: '+await target.textContent());
 }
 async function openActions(page){
  await edgeAction(page,'context');
- assert.equal(await page.locator(edgeSheet+' .rtg-adaptive-sheet-head h2').innerText(),'Deze editie');
+ const reading=await page.locator('body').getAttribute('data-magazine-view');
+ assert.equal(await page.locator(edgeSheet+' .rtg-adaptive-sheet-head h2').innerText(),reading==='article'?'Bij dit verhaal':'Op dit blad','de actiekop volgt de oorspronkelijke leeseigenaar');
  assert.equal(await page.evaluate(()=>document.querySelector('.pp-menu-panel .ds-issue-controls')===window.__originalMagazinePager),true,'de oorspronkelijke pager blijft dezelfde node bij heropenen');
 }
 async function editionAction(page,label){await openActions(page);const button=page.locator(edgeSheet).getByRole('button',{name:label,exact:true});await seekEdge(page,button);await button.click();await settle(page);}
@@ -120,7 +143,7 @@ for(const width of [320,390,768,1024,1440,1920])test('magazine: achttien complet
   await openInfo(page);
   const footer=page.locator('.ds-magazine-footer-brand img');await decode(footer);
   assert.match(await footer.getAttribute('src'),/rahul-travel-group-logo\.jpg$/);
-  assert.equal(await footer.getAttribute('alt'),'Rahul Travel Group — EXPERIENCE THE ELITE CLASS');
+  assert.equal(await footer.getAttribute('alt'),'Rahul Travel Group - EXPERIENCE THE ELITE CLASS');
   assert.equal(await footer.evaluate(e=>Math.abs(e.getBoundingClientRect().width/e.getBoundingClientRect().height-1280/470)<.01),true);
   await page.locator('#magazineBack').click();await status(page,pages.length);
   await edgeAction(page,'menu');
@@ -267,7 +290,7 @@ test('skiplink, taalkeuze, menu en bestaande actielijst blijven bedienbaar',asyn
   assert.equal(await menu.getAttribute('aria-expanded'),'false');await page.keyboard.press('Escape');
   await edgeAction(page,'menu');const actions=page.locator('[data-magazine-actions]');await seekEdge(page,actions);await actions.click();await settle(page);
   assert.equal(await page.locator('#explorePanel').isVisible(),false,'de actielijst vervangt het menu binnen dezelfde native Edge');
-  assert.equal(await page.locator(edgeSheet+' .rtg-adaptive-sheet-head h2').innerText(),'Deze editie');
+  assert.equal(await page.locator(edgeSheet+' .rtg-adaptive-sheet-head h2').innerText(),'Op dit blad');
   assert.equal(await page.evaluate(()=>document.querySelector('.pp-menu-panel .ds-issue-controls')===window.__originalMagazinePager),true);
   for(const label of ['Inhoud van deze editie','Zoek in RTG','Service, informatie en colofon','Bekijk het voorstel','Waarom zie ik dit?']){
    const action=page.locator(edgeSheet).getByRole('button',{name:label,exact:true});await seekEdge(page,action);assert.equal(await hit(action),true,label+' blijft bedienbaar via de bestaande actielijst');

@@ -17,6 +17,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `GELD.md`, `LEVEN.md` en `LIFE.md` zijn de diepte-documenten per wereld.
 - `REIZEN.md` is het diepte-document van RTG Reizen
 - `TRAVELCOMMERCE.md` is de handelskant daarvan
+- `TRAVELOS-UITVOERING.md`: uitvoering
 - `KAARTEN.md` is de kaartlaag onder de navigatie
 - `NAVIGATIE.md` is de plaats-these
 - `FOUNDATION.md` is het diepte-document van de RTFoundation als platform
@@ -64,7 +65,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `MAGNAATLAB.md` is Magnaat als testhal
 - `BEWIJSMACHINE.md` is de lat boven de testhal
 - `SERVICE.md` is de laag die de hulplijnen orkestreert
-- `ONTWERPSYSTEEM.md` is de afdwingbare visuele architectuur; lees het vóór elke regel CSS
+- `ONTWERPSYSTEEM.md` verplicht vóór CSS/merkwerk: visuele architectuur en §8 logo-lockup/A — Inkt
 - `ONTWERP.md` is het RTG Design System 2.0
 - `MATERIAAL.md` is de materialenleer
 - `WERELD.md` beschrijft het beginscherm
@@ -74,7 +75,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `GRAMMATICA.md` is de RTG Mobile Interaction Grammar
 - `EDGE.md` is RTG Edge 3.0
 - `WERKRUIMTE.md` is het desktopparadigma
-- `TRAVELOS-SPATIAL-VERTICAL-SLICE.md` is het TravelOS Spatial-plan
+- `TRAVELOS-SPATIAL-VERTICAL-SLICE.md`: TravelOS Spatial-plan
 - `ONDERHOUD.md` is de onderhoudslaag
 - `BETROUWBAARHEID.md` zegt wanneer een functie BESTAAT
 - `TIKKEN.md` zegt hoe diep het huis is
@@ -93,7 +94,7 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 - `CONSOLIDATIE.md` is het opruimbesluit van de eigenaar; lees het vóór elke PR
 - `AFBOUWPROGRAMMA.md` is het eigenaarsbesluit van 11 oktober 2026, en het is leidend
 - `CIVILIS.md` breidt RTG maatschappelijk uit
-- `CIVILIS-UITVOERING.md` is de traceerbare ketenarchitectuur en uitvoeringsaudit
+- `CIVILIS-UITVOERING.md`: ketenarchitectuur en uitvoeringsaudit
 
 ## Structuur en starten (kort)
 
@@ -109,17 +110,6 @@ Samenvattingen staan woordelijk in `DOCUMENTENKAART.md`, dat niet vanzelf laadt.
 De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/chat.js`) is vervangen door deze Express-versie. De laatste stand ervan staat in de git-historie (commit `b0baef8`, juli 2026) — niet terughalen tenzij expliciet gevraagd.
 
 ## Merkregels — ALTIJD toepassen
-
-### Vaste logo-lockup (eigenaarsbesluit 12 november 2026)
-
-- Gebruik het aangeleverde logo als één ongewijzigd geheel: `public/images/brand/rahul-travel-group-logo.jpg`.
-- De bordeaux balk met de witte naam **Rahul Travel Group** en de gouden slogan **EXPERIENCE THE ELITE CLASS** eronder blijven altijd samen, in hun oorspronkelijke verhouding van 1280 × 470.
-- De volledige lockup niet opnieuw zetten met webfonts, bijsnijden, uitrekken, inkleuren, filteren of de slogan op mobiel verbergen. Alleen proportioneel schalen.
-- **Goedgekeurd navigatiesubmerk**, volgens het aanvullende eigenaarsbesluit van 12 november 2026: de eigenaar koos **A — Inkt**, de expressieve geschilderde Rahul-lippen. `public/images/brand/rtg-mark.svg` is de optische microreductie daarvan in exact logo-bordeaux, met asymmetrische cupidoboog, oplopende rechter mondhoek en een open mondspleet. Het vervangt het eerdere RTG-letterblok en mag zonder slogan in navigatie en favicon staan. De centrale component `ds-brand-mark` toont het op 40 × 32px binnen een klikdoel van minimaal 44 × 44px, op een lichte navigatiegrond. Het navigatiemerk gaat naar Home; hulp van Rahul houdt een afzonderlijk herkenbaar actielabel.
-- **Klein en minimaal**: één submerk in de navigatie, geen grote gecentreerde merkbanner. De volledige oorspronkelijke lockup blijft in de publieke footer staan, proportioneel op 176px breed.
-- De centrale DS-componenten `ds-brand-lockup` en `ds-brand-mark` bewaken de presentatie. Gebruik deze twee canonieke logo-assets; dit besluit geeft geen toestemming voor willekeurige andere varianten. De gekozen geschilderde uitvoering `public/images/brand/rtg-ink-artwork.webp` mag daarnaast eenmaal als vrijstaand redactioneel kunstmoment op de homepage staan: volledig in beeld, niet als watermerk, achtergrondpatroon of knop. Herkomst en productieprompt staan bij het asset in `ink-provenance.json`. Het volledige oorspronkelijke naamlogo blijft ongewijzigd.
-- **Terugkerende schildertaal**, aanvullend eigenaarsbesluit 12 november 2026: “Ik wil dat geverfde look, vaker terug komen, maak het lekker chique kleurrijk.” De homepage gebruikt daarnaast `rtg-painted-horizon.webp` bij de opening en afsluiting, en `rtg-painted-colourfield.webp` als zelfstandige kleurspread. Dit zijn redactionele penseelbeelden in de bestaande bordeaux-, goud-, blauw- en groenfamilies, geen nieuwe logo's. Het citaat en het RTG-kunstbeeld hebben afzonderlijke bronvermelding. Tekst, knoppen, prijzen en formulieren blijven op egale leesbare vlakken; navigatie en volledige lockup blijven ongewijzigd. Productieprompts, afmetingen, optimalisatie en hashes staan in hetzelfde `ink-provenance.json`.
-- **Hele www (12 november 2026):** A — Inkt en de LivingOS-kleuren gelden voor alle dertien publieke bronnen in `public/ds/contract.json`: homepage, passen, werelden, techniek, Explore en 404. Alleen `fonts.css` + `ds/rtg-ds.css`, met `html[data-ds]`; geen legacy CSS. Domeinidentiteit en controllers blijven behouden. De bewijsverwijzing is geen geslaagde proef.
 
 ### Kleuren (exact uit het logo, nooit wijzigen zonder expliciete opdracht)
 ```css

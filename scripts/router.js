@@ -51,6 +51,7 @@
 const fs = require('fs');
 const path = require('path');
 const { stempel } = require('./lib/stempel');
+const substitutie = require('../server/kern/ai/substitutie');
 
 /* Bij de rest van de runtime-staat, en met RTG_DATA_DIR mee als die gezet is --
    anders schrijft een installatie met een eigen datamap alsnog in de repo. */
@@ -84,14 +85,16 @@ function beoordeel(v, sinds, nu) {
 }
 
 function vak(v, sinds, nu) {
+  const rijpheid = beoordeel(v, sinds, nu);
   return Object.assign({}, v, {
     /* De twee getallen die nooit worden opgeteld, en het verschil ertussen. */
     spoorPct: pct(v.spoor, v.gewogen),
     bewezenGedektPct: pct(v.bewezenGedekt, v.gewogen),
     routerEensPct: pct(v.gewogen - v.spoorZonderDekking - v.dekkingZonderSpoor, v.gewogen),
     modelNodigPct: pct(v.modelNodig, v.gewogen),
-    nietsGafAntwoordPct: pct(v.nietsGafAntwoord, v.gewogen)
-  }, beoordeel(v, sinds, nu));
+    nietsGafAntwoordPct: pct(v.nietsGafAntwoord, v.gewogen),
+    substitutie: substitutie.beoordeel(v, { dagen: rijpheid.dagen || 0 })
+  }, rijpheid);
 }
 
 function main() {
@@ -132,11 +135,13 @@ function main() {
         nietsGafAntwoord: 'geen goedkope dekking en geen model -- hier viel het gesprek terug op ' +
           'een algemene zin.',
         perIngang: 'niet vergelijkbaar met elkaar zonder na te denken: elke ingang heeft zijn ' +
-          'eigen goedkope laag (kern/fluister op /api/fluister, cannedAnswer op de andere twee).'
+          'eigen goedkope laag (kern/fluister op /api/fluister, cannedAnswer op de andere twee).',
+        substitutie: 'promotie vereist een onafhankelijke oracle, nul veiligheidsregressie, genoeg ' +
+          'gevallen en dagen, plus een menselijk besluit. De meter activeert nooit zelf een techniek.'
       },
       nietGemeten: [
-        'of een goedkoper antwoord ook GOED was. Geteld wordt of de goedkope laag iets anders dan ' +
-          'haar standaardzin gaf, niet of dat het juiste antwoord was.',
+        'of een goedkoper antwoord ook GOED was, tenzij de aanroeper expliciet een onafhankelijke ' +
+          'oracle-vergelijking meegaf. Zonder die vergelijking blijft substitutie NIET_BEPROEFD.',
         'de technieken algoritme, optimalisatie en voorspelling: die motoren zijn niet vanuit een ' +
           'kale vraag te draaien (ze willen een register, een lid of argumenten).',
         'of het model beter was dan de goedkope laag -- beide draaien niet op dezelfde vraag.',

@@ -49,7 +49,7 @@
   <input class="ds-invoer veld s-4t7hy3 ds-dag-breed" id="zoek" type="search" placeholder="Zoek in uw notities" data-i18n-ph="daily.noteSearch" aria-label="Zoeken"
  data-i18n-aria="dailyField.search">
   <div id="bord" aria-live="polite"></div>
-  <div id="gedeeldKop" class="kop ds-dag-kop" style="display:none;" data-i18n="dailyField.sharedEditing">Met mij gedeeld · samen bewerken</div>
+  <div id="gedeeldKop" class="kop ds-dag-kop" hidden data-i18n="dailyField.sharedEditing">Met mij gedeeld · samen bewerken</div>
   <div id="gedeeldBord"></div>
   <div class="daily-foot ds-dag-daily-foot"><button type="button" class="daily-action ds-knop ds-dag-actie" data-daily-target="nieuwNotitie"><span data-i18n="daily.newNote">Nieuwe notitie</span> <span aria-hidden="true">→</span></button></div>
   <p class="stil ds-dag-marge ds-dag-stil" data-i18n="dailyField.noteHelp">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
@@ -63,7 +63,7 @@
     <p id="ntMelding" role="status" class="ds-dag-stil"></p>
     <input class="ds-invoer titel ds-dag-titel" id="ntTitel" maxlength="120" placeholder="Titel" data-i18n-ph="dailyField.title">
     <div id="ntTekstWrap"><textarea class="ds-invoer" id="ntTekst" rows="7" maxlength="4000" placeholder="Schrijf hier." data-i18n-ph="dailyField.writeHere"></textarea></div>
-    <div id="ntLijstWrap" style="display:none;">
+    <div id="ntLijstWrap" hidden>
       <div id="ntTaken"></div>
       <div class="rij ds-dag-marge ds-dag-rij">
         <input class="ds-invoer gewoon ds-dag-rek ds-dag-gewoon" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe" data-i18n-ph="dailyField.newItem">

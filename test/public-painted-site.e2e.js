@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
-const {laadPlaywright,browserOpties}=require('./helper');
+const {laadPlaywright,browserOpties,letOpFouten}=require('./helper');
 const {voorNode}=require('../server/middleware/landing');
 const root=path.join(__dirname,'..'),details=[...['community','rtg-pass','business-lite','business-pass','lifestyle-pass'].map(id=>'/public/site/passen/'+id+'.html'),...['livingos','travelos','workos','foundationos'].map(id=>'/public/site/werelden/'+id+'.html'),'/public/site/techniek/techniek.html','/explore/index.html'];
 const hosts=['/',...details,'/public/site/404.html'],truth=JSON.parse(fs.readFileSync(path.join(root,'public/site/website-truth.json'),'utf8'));
@@ -15,7 +15,7 @@ async function session(width,javaScriptEnabled=true){
  const context=await browser.newContext({viewport:{width,height:900},locale:'nl-NL',reducedMotion:'reduce',serviceWorkers:'block',javaScriptEnabled});
  if(javaScriptEnabled)await context.addInitScript(()=>localStorage.setItem('rtg_lang','nl'));
  await context.route('**/*',route=>new URL(route.request().url()).origin===base?route.continue():route.fulfill({status:503,body:'External providers excluded from this public-presentation proof'}));
- const page=await context.newPage(),errors=[],missing=[];page.on('pageerror',error=>errors.push(error.stack||error.message));page.on('response',response=>{if(response.url().startsWith(base)&&response.status()>=400&&['stylesheet','script','image','font'].includes(response.request().resourceType()))missing.push(response.status()+' '+response.url());});
+ const page=await context.newPage(),errors=[],missing=[];letOpFouten(page, errors);page.on('response',response=>{if(response.url().startsWith(base)&&response.status()>=400&&['stylesheet','script','image','font'].includes(response.request().resourceType()))missing.push(response.status()+' '+response.url());});
  return {context,page,errors,missing};
 }
 async function loadedPictures(page,host){

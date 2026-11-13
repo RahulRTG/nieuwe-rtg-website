@@ -2,7 +2,7 @@
 // Presentation proof only; no provider, production or purchase qualification.
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {laadPlaywright,startBrowser}=require('./helper');
+const {laadPlaywright,startBrowser,letOpFouten}=require('./helper');
 const ROOT=path.resolve(__dirname,'..');
 const OUT=process.env.RTG_VOLUME_OUTPUT||path.join(ROOT,'output/brand/travel-volume');
 const CASES=[
@@ -30,7 +30,7 @@ async function visit(c,width,options={}){
   await context.addInitScript(rtl=>{localStorage.setItem('rtg_lang','nl');if(rtl)document.addEventListener('DOMContentLoaded',()=>document.documentElement.dir='rtl');},rtl);
   await context.route('**/*',r=>new URL(r.request().url()).origin===base&&['GET','HEAD'].includes(r.request().method())?r.continue():r.fulfill({status:503,body:'Read-only presentation proof'}));
   const page=await context.newPage(),errors=[],missing=[];page.setDefaultTimeout(10000);
-  page.on('pageerror',e=>errors.push(e.message));
+  letOpFouten(page, errors);
   page.on('response',r=>{if(r.status()>=400&&['image','script','stylesheet','font'].includes(r.request().resourceType()))missing.push(r.url());});
   await page.goto(base+'/public/site/werelden/'+c.file+'.html'+hash,{waitUntil:'networkidle'});
   await page.evaluate(()=>document.fonts.ready);return{page,context,errors,missing};

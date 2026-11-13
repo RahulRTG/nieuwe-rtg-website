@@ -169,9 +169,9 @@
     }).join('');
   }
   function tekenLijsten() {
-    $('#bewaardKop').style.display = vast.length ? '' : 'none';
+    $('#bewaardKop').hidden = !vast.length;
     $('#bewaard').innerHTML = lijstHtml(vast.slice(0, 10));
-    $('#histKop').style.display = hist.length ? '' : 'none';
+    $('#histKop').hidden = !hist.length;
     $('#historie').innerHTML = lijstHtml(hist.slice(0, 10));
     Array.prototype.forEach.call(document.querySelectorAll('#bewaard [data-zin], #historie [data-zin]'), function (el) {
       el.addEventListener('click', function () {

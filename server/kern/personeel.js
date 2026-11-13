@@ -7,6 +7,7 @@
 
 const { maakInplanbaar } = require('./payroll/inplanbaar');
 const tijdzone = require('./tijdzone');
+const klok = require('../lib/klok');
 const SHIFT_NAMES = ['Ochtend 07:00-15:00', 'Avond 15:00-23:00', 'Vrij'];
 
 function maakPersoneel({ db, accounts, afwezigOp }) {
@@ -14,12 +15,12 @@ function maakPersoneel({ db, accounts, afwezigOp }) {
   const urenVan = ms => Math.round(ms / 360000) / 10; // uren met een decimaal
 
   function klokVan(code, staffId) {
-    const nu = Date.now();
-    const week = new Date(nu - 6 * 86400000).toISOString().slice(0, 10);
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const nu = klok.datum();
+    const vandaag = tijdzone.datumIn(nu);
+    const week = tijdzone.plusDagen(vandaag, -6);
     // String aan beide kanten: een staffId komt als getal uit de sessie en als tekst uit een leen
     const mijn = (db.data.klok[code] || []).filter(e => e && e.in && String(e.staffId) === String(staffId));
-    const duur = e => (e.out ? new Date(e.out) : new Date()) - new Date(e.in);
+    const duur = e => (e.out ? new Date(e.out) : nu) - new Date(e.in);
     const uit = mijn.filter(e => e.out).map(e => e.out).sort();
     return {
       open: !!mijn.find(e => !e.out),
@@ -29,8 +30,8 @@ function maakPersoneel({ db, accounts, afwezigOp }) {
          veld al en spreidt dit antwoord eroverheen, en daar betekent het de
          uitklok van de NIEUWSTE regel (null = nu binnen). */
       laatsteUitklok: uit.length ? uit[uit.length - 1] : null,
-      vandaagUren: urenVan(mijn.filter(e => e.in.slice(0, 10) === vandaag).reduce((s, e) => s + duur(e), 0)),
-      weekUren: urenVan(mijn.filter(e => e.in.slice(0, 10) >= week).reduce((s, e) => s + duur(e), 0))
+      vandaagUren: urenVan(mijn.filter(e => tijdzone.datumVan(e.in) === vandaag).reduce((s, e) => s + duur(e), 0)),
+      weekUren: urenVan(mijn.filter(e => tijdzone.datumVan(e.in) >= week).reduce((s, e) => s + duur(e), 0))
     };
   }
 

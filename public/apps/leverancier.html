@@ -40,7 +40,7 @@
     --burgundy:#C23A5E; --burgundy-deep:#7F1634; --gold:#A98F1C; --green:#4C9A75; --amber:#C99A2E;
     --knop:#fff; --knop-txt:#000;
   }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  *{margin:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:#000;font-family:'Inter',sans-serif;color:var(--txt);display:flex;justify-content:center;-webkit-font-smoothing:antialiased;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-0.01em;}
   button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
@@ -100,13 +100,9 @@
   #app{display:none;flex:1;flex-direction:column;min-height:0;}
   #app.active{display:flex;}
   .topbar{padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.4rem 0.9rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);}
-  .topbar .who{display:flex;align-items:center;gap:0.7rem;}
-  .topbar .who .ic{font-size:1.5rem;}
-  .topbar .who b{display:block;font-size:0.92rem;font-weight:600;}
-  .topbar .who span{font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .bell{position:relative;background:none;border:none;color:var(--muted);width:34px;height:34px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;}
   .bell svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;}
-  .bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:var(--burgundy);color:#fff;border-radius:0;font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:var(--burgundy);color:#fff;border-radius:0;font-size:0.6rem;font-weight:700;text-align:center;}
 
   .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 6rem);}
   .view{display:none;}
@@ -636,7 +632,7 @@
   .tkc h3{font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));font-weight:600;}
   .ev-bar{height:5px;border-radius:0;background:var(--card2);overflow:hidden;}
   .ev-bar i{display:block;height:100%;background:var(--gold);}
-  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:rgba(12,12,11,0.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;padding:0.55rem 0.4rem calc(env(safe-area-inset-bottom,0px) + 0.55rem);overflow-x:auto;scrollbar-width:none;}
+  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:rgba(12,12,11,0.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:0.55rem 0.4rem calc(env(safe-area-inset-bottom,0px) + 0.55rem);overflow-x:auto;scrollbar-width:none;}
   .tabbar::-webkit-scrollbar{display:none;}
   .tabbar button{flex:1;min-width:64px;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:0.25rem;font-size:0.56rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);}
   .tabbar button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;}
@@ -1186,9 +1182,14 @@
 </style>
 <link href="/ds/componenten/werkos.css" rel="stylesheet">
 <link href="/ds/tokens.css" rel="stylesheet">
+<link href="/ds/componenten/focus.css" rel="stylesheet">
+<link href="/ds/componenten/melding.css" rel="stylesheet">
+<link href="/ds/componenten/verbinding.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
+<link href="/ds/componenten/meelezen.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -1251,13 +1252,7 @@
   </div>
 
   <div id="app">
-    <div class="topbar" role="banner">
-      <div class="who"><span class="ic" id="supIcon"></span><div><b id="supName"></b><span id="supType"></span></div></div>
-      <button class="actor-chip" id="actorChip" aria-label="Wissel gebruiker"><span class="av" id="actorAv"></span><span class="nm" id="actorName"></span></button>
-      <button class="bell" id="bell" aria-label="Meldingen">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-        <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
-      </button>
+    <div class="topbar" role="banner" data-rtg-edge-2-contextual="native-header">
     </div>
 
     <div class="notif-scrim" id="notifScrim"></div>
@@ -1267,6 +1262,18 @@
     </aside>
 
     <div class="content" id="content" role="main">
+      <!-- Deze persoonsbediening blijft binnen de sessiepoort van #app.
+           De V4-kop vervangt alleen de oude merkbalk, niet de actorgrens. -->
+      <div class="ds-presentatie-beschermd-uitleg ds-presentatie-keuzekolom">
+        <div class="who"><span class="ic" id="supIcon" hidden aria-hidden="true"></span><div class="ds-presentatie-keuzekolom"><b id="supName"></b><span class="ds-presentatie-tekst-compact" id="supType"></span></div></div>
+        <div class="ds-presentatie-verdeelrij">
+          <button class="actor-chip" id="actorChip" aria-label="Wissel gebruiker"><span class="av" id="actorAv"></span><span class="nm" id="actorName"></span></button>
+          <button class="bell" id="bell" aria-label="Meldingen">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span class="bell-badge ds-presentatie-toestand" id="bellBadge" hidden>0</span>
+          </button>
+        </div>
+      </div>
       <div class="view" data-view="home">
         <h2 id="homeH">Vandaag.</h2>
         <p class="sub" id="homeSub"></p>
@@ -1581,7 +1588,7 @@
     <div id="station">
       <div class="st-head">
         <div class="t"><b id="stBiz"></b><span id="stLabel"></span></div>
-        <div style="display:flex;align-items:center;gap:0.9rem;">
+        <div class="ds-presentatie-gespreksrij">
           <span class="st-clock" id="stClock"></span>
           <button class="st-exit" id="stExit" data-i18n="st.exit">Werkplek sluiten</button>
         </div>
@@ -1647,6 +1654,10 @@
 <!-- De 788 KB hoofdbundel heeft alle bovenstaande poorten nodig, maar niet de
      HTML-parser. Defer laat hem parallel laden en voert hem vóór
      DOMContentLoaded uit, wanneer de complete leveranciers-shell bestaat. -->
+<script src="/apps/reisketen-nazorg.js" defer></script>
+<script src="/apps/reisketen-offerte.js" defer></script>
+<script src="/apps/reisketen-werktafel.js" defer></script>
+<script src="/apps/reisketen-leverancier.js" defer></script>
 <script src="/apps/leverancier.js" defer></script>
 <script>
 window.I18N = { en: {

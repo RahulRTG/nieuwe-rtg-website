@@ -96,8 +96,12 @@
       return true;
     }
     if (/^(licht|donker|lichte modus|donkere modus)$/.test(q)) {
-      const b = $('#rtg-thema-knop');
-      if (b) { b.click(); bannerToon('✦', 'Rahul', 'De weergave is omgezet.'); return true; }
+      if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
+        const licht = /^(licht|lichte modus)$/.test(q);
+        RTGOSThema.zet(licht ? 'parelmoer' : 'standaard');
+        bannerToon('✦', 'Rahul', 'De weergave staat op ' + (licht ? 'licht' : 'donker') + '.');
+        return true;
+      }
       return false;
     }
     m = q.match(/^(?:open|start|ga naar)\s+(.+)$/);

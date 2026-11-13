@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 107 delen, 10295 regels in de delen
+`public/apps/app-main/` -- 107 delen, 10313 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -127,7 +127,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 10 delen, 1163 regels in de delen
+`public/apps/backoffice/` -- 10 delen, 1162 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -242,7 +242,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9856 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9921 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -395,7 +395,7 @@ omlaag.
 
 ## `apps/notities/app.js`
 
-`public/apps/notities/app/` -- 2 delen, 253 regels in de delen
+`public/apps/notities/app/` -- 2 delen, 252 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -404,7 +404,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 9 delen, 1028 regels in de delen
+`public/apps/office/app/` -- 9 delen, 1034 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -698,7 +698,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 108 regels in de delen
+`public/shared/cookie/` -- 2 delen, 133 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -1025,7 +1025,7 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 373 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 359 regels in de delen
 
 | deel | onderwerp |
 |---|---|

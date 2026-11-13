@@ -38,6 +38,43 @@ test('publieke platformowners gebruiken native media/ankers en geen runtime-scri
   assert.match(detail, /setAttribute\('href',url\)/);
 });
 
+test('iedere publieke fragmentroute heeft na integratie precies één inhoudseigenaar', () => {
+  for (const [bestand] of hosts) {
+    const html = fs.readFileSync(bestand, 'utf8');
+    const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+    const dubbel = ids.filter((id, index) => ids.indexOf(id) !== index);
+    assert.deepEqual(dubbel, [], bestand + ': geen dubbel prijsblok of dubbel routedoel');
+    if (bestand.includes('/passen/')) {
+      assert.equal(ids.filter(id => id === 'beschikbaarheid').length, 1,
+        bestand + ': de redactionele indeling verplaatst het bestaande beleidsblok, niet de inhoud kopiëren');
+    }
+  }
+});
+
+test('publieke Edge-modules zijn begrensd en iedere host laadt de gedeelde ingang precies eenmaal', () => {
+  const modules = ['edge-door', 'edge-menu-layout', 'edge-menu-pager', 'platform-edge',
+    'storyline-edge', 'platform-shell', 'platform-elements'];
+  for (const naam of modules) {
+    const bestand = 'public/site/' + naam + '.js';
+    assert.ok(fs.statSync(bestand).size <= 10000, bestand + ': één afgebakende verantwoordelijkheid per bron');
+  }
+  for (const [bestand] of [...hosts, ['public/site/404.html']]) {
+    const html = fs.readFileSync(bestand, 'utf8');
+    const scripts = [...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^>]*>/g)]
+      .map(match => match[1].split('/').pop());
+    const ingang = scripts.indexOf('edge-door.js');
+    const adapter = scripts.indexOf(bestand === 'index.html' ? 'platform-edge.js' : 'storyline-edge.js');
+    assert.equal(scripts.filter(naam => naam === 'edge-door.js').length, 1, bestand);
+    assert.ok(ingang >= 0 && ingang < adapter, bestand + ': ingang vóór de adapter');
+    for (const naam of ['edge-menu-layout.js', 'edge-menu-pager.js']) {
+      assert.equal(scripts.filter(script => script === naam).length, bestand === 'index.html' ? 1 : 0,
+        bestand + ': magazinepaginering wordt alleen door haar bestaande host geladen');
+    }
+    if (bestand === 'index.html') assert.ok(scripts.indexOf('edge-menu-layout.js') < scripts.indexOf('edge-menu-pager.js') &&
+      scripts.indexOf('edge-menu-pager.js') < adapter, 'layout vóór pager, beide vóór de ene Edge-adapter');
+  }
+});
+
 /* De echte bestaande hostcode met een smalle DOM-adapter. Dit bewijst routering
    en doelkeuze; de browsertoets bewijst apart zichtbaarheid en native klikken. */
 function publicHost(hash = '') {

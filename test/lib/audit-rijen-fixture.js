@@ -15,7 +15,7 @@ module.exports = (t, data = {}, enc = '') => {
     const m = conn.prepare('SELECT * FROM audit_meta WHERE naam=?').get(naam);
     if (!m) return JSON.parse(kluis.ontsleutel(conn.prepare('SELECT val FROM kv WHERE key=?').get(naam).val));
     const l = conn.prepare('SELECT waarde FROM audit_rij WHERE naam=? ORDER BY nr').all(naam).map(r => JSON.parse(kluis.ontsleutel(r.waarde)));
-    return naam === 'handelingLog' ? l.reverse() : { ...JSON.parse(kluis.ontsleutel(m.extra)), commandJournaal: l, commandJournaalTotaal: m.totaal };
+    return ['handelingLog', 'securityLog'].includes(naam) ? l.reverse() : { ...JSON.parse(kluis.ontsleutel(m.extra)), commandJournaal: l, commandJournaalTotaal: m.totaal };
   };
   const kind = bron => spawnSync(process.execPath, ['-e', bron], { cwd: root, env: process.env, encoding: 'utf8' });
   const handeling = () => require('../../server/lib/handelingsspoor')({ db: p.db, save: p.save });

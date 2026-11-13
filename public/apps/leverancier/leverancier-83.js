@@ -96,4 +96,4 @@
   // ---- meldingen ----
   function renderBell(){
     const unread = notifs.filter(n=>!n.read).length;
-    const b = $('#bellBadge'); b.style.display = unread>0?'flex':'none'; b.textContent = unread>9?'9+':unread;
+    const b = $('#bellBadge'); b.hidden = unread <= 0; b.textContent = unread>9?'9+':unread;

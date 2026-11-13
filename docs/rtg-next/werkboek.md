@@ -4,11 +4,11 @@ Gegenereerde planningbijlage bij [het premium-afbouwplan](../rtg-premium-afbouwp
 
 **Planning, geen kwalificatiebewijs.** Dit werkboek inventariseert 114 bestaande MAPPEN-ingangen. Meerdere ingangen kunnen één domeineigenaar of scherm delen. De canonieke appbelofte en de hieronder voorgestelde premium-eindtoestand blijven afzonderlijk herkenbaar.
 
-Bronbaseline: `abd1eafdccd6865631d634d5899676c1c1e7fa68`. Inhoudshash van deze projectie: `d36a8d5024e45f57fa59735f340b96602952346539cf9354ee25314369a28605`.
+Bronbaseline: `abd1eafdccd6865631d634d5899676c1c1e7fa68`. Inhoudshash van deze projectie: `8b3013bf244195d4b2bd4b47750ef964b3fe0d015e4967e807b4a5fcfe84f30e`.
 
-Opgeslagen APPWERKT-meting: `c970100004` op 2026-11-05T11:55:56.129Z; telling `{"NIET_GETEST":114}`. Dit is geen verse uitvoering op de bronbaseline.
+Opgeslagen APPWERKT-meting: `d3a2cd8a66` op 2026-11-09T14:51:20.049Z; telling `{"BEWEZEN":114}`. Dit is geen verse uitvoering op de bronbaseline.
 
-Opgeslagen Experience-status: `NOT_TESTED`; kandidaat `null`. Actuele declaratieve signatures: 1 app en 10 schermen. Een declaratie is geen uitgevoerd bewijs.
+Opgeslagen Experience-status: `NOT_TESTED`; kandidaat `null`. Actuele declaratieve signatures: 114 app en 316 schermen. Een declaratie is geen uitgevoerd bewijs.
 
 Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privacy-, rol-, herstel-, toegankelijkheids- en menselijke acceptatie uit het premium-afbouwplan. De scenario’s hieronder zijn specifieke aanvullingen, geen uitputtende testset. Nieuwe scope wordt eerst bij de bestaande scopebron besloten.
 
@@ -31,7 +31,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 ## LivingOS
 
-### 1. Het Vooruitzicht — `link:vooruitzicht`
+### 1. Het Vooruitzicht - `link:vooruitzicht`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -47,7 +47,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/living-os.html` → `leven.vooruitzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een gecontroleerde vooruitblik op een gekozen bedoeling, met feitelijke huidige toestand, hypothetische mogelijkheden, onzekerheden en een hervatbaar Plan Dossier.
 
@@ -64,7 +64,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Providerintegratie is een afzonderlijk werkpakket met echte bevoegde bron; totdat die bestaat blijven externe statusovergangen geblokkeerd.
 
-### 2. Vandaag — `link:vandaag`
+### 2. Vandaag - `link:vandaag`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -80,7 +80,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/life.html` → `dag.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een rustige persoonlijke dagomgeving voor eigen ritmes en welzijn, met bronherkomst en veilige grenzen; geen prestatiedruk, diagnose of ongeoorloofd gedeeld gezondheidsprofiel.
 
@@ -97,7 +97,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Medische of behandelclaims, medicatieadvies en gekoppelde medische apparaten vereisen apart klinisch/juridisch besluit; actuele hulproutes hebben een onderhoudseigenaar nodig.
 
-### 3. Mijn leven — `link:leven`
+### 3. Mijn leven - `link:leven`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -113,7 +113,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/leven.html` → `leven.werkblad` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijke, rustige levenslijn met betekenisvolle eigen gebeurtenissen en transparante herkomst, zonder levensscore of sturende sociale rangorde.
 
@@ -130,7 +130,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 4. Sociaal — `link:sociaal`
+### 4. Sociaal - `link:sociaal`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -146,7 +146,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/sociaal.html` → `sociaal.leven` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een sociale regieomgeving die openstaande keuzes samenbrengt en menselijke bevestiging centraal houdt, zonder relaties te sturen of eigen agenda-/berichtsystemen te creëren.
 
@@ -163,7 +163,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 5. Geld — `link:geldcommand`
+### 5. Geld - `link:geldcommand`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -179,7 +179,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een financieel commandocentrum dat rust geeft door één betrouwbaar beeld van feiten, verwachtingen en beslissingen, met explainability tot op de bron en zonder tweede boekhouding.
 
@@ -196,7 +196,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen uitbreiding naar krediet, beleggen of verzekeringsadvies zonder apart product-, vergunning- en compliancebesluit; live betaalrails blijven extern gekwalificeerd.
 
-### 6. RTG Media — `link:mediaos`
+### 6. RTG Media - `link:mediaos`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -212,7 +212,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/media.html` → `media.centrum` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Eén persoonlijk mediageschap met begrijpelijke selectie, eigen bibliotheek en naadloze overgang naar de passende speler, waarbij aanbevelingen controleerbaar en eindig blijven.
 
@@ -229,7 +229,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Licenties voor afspelen, downloaden en delen blijven brongebonden; een lijst geeft geen nieuwe mediarechten.
 
-### 7. RTG Veilig — `link:veilig`
+### 7. RTG Veilig - `link:veilig`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -245,7 +245,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/veilig.html` → `veilig.noodcontacten` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrijpelijke persoonlijke veiligheidsvoorziening die exact vertelt wie wordt benaderd, welke informatie gedeeld wordt en wat daadwerkelijk is bezorgd, zonder alarmcentralegarantie.
 
@@ -262,7 +262,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Bezorginfrastructuur, operationele support en veiligheidsclaims moeten zijn getoetst; RTG blijft geen vervanging voor officiële noodhulp.
 
-### 8. RTFoundation — `os:rtf`
+### 8. RTFoundation - `os:rtf`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -278,7 +278,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een eenvoudige veilige overgang naar Foundation die leeftijd, rol en gezinscontext correct uitlegt zonder de keuze van een leeftijdswereld als bewijs van leeftijd of bevoegdheid te behandelen.
 
@@ -295,7 +295,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 9. Betalen — `tab:betalen`
+### 9. Betalen - `tab:betalen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -311,7 +311,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een korte, foutbestendige betaalervaring waarin ontvanger, bedrag, reden, kosten en uitkomst begrijpelijk zijn en onzekere betalingen nooit tot blind opnieuw betalen leiden.
 
@@ -328,7 +328,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Live betaalprovider, betaalcertificering en overeengekomen operationele terugbetalingsroute blijven externe releasevoorwaarden.
 
-### 10. Wallet — `link:wallet`
+### 10. Wallet - `link:wallet`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -344,7 +344,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een overzichtelijke digitale portefeuille met herkenbare kaarttypen, geldige rechten en exacte financiële status, waarin een opgeslagen kaart nooit vanzelf een uitgeversgarantie krijgt.
 
@@ -361,7 +361,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Externe kaarten, digitale identiteitsbewijzen en eventuele geldvormen vragen geldige uitgever-/providercontracten; gesloten feestmunten worden geen publieke token.
 
-### 11. Bank — `link:bank`
+### 11. Bank - `link:bank`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -377,7 +377,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een financieel scherm met ondubbelzinnige rechtspositie, saldoherkomst, rekeningstatus en herstelpad; werkelijke bankdiensten uitsluitend binnen aantoonbare provider- en juridische bevoegdheid.
 
@@ -394,7 +394,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Vergunninghoudende bank-/betaalpartner, juridische productnaam, KYC/AML-verantwoordelijkheid en live-providercontract moeten worden vastgesteld; krediet en beleggingsadvies blijven buiten deze scope.
 
-### 12. Samen betalen — `link:wbw`
+### 12. Samen betalen - `link:wbw`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -410,7 +410,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een helder gezamenlijk kostenboek met uitlegbare verdeling, correcties en afzonderlijk bevestigde verrekening, zonder privéfinanciën van deelnemers zichtbaar te maken.
 
@@ -427,7 +427,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe valuta-/wisselkoersfuncties vragen expliciete scope en bron; geen impliciete krediet- of incassodienst.
 
-### 13. Betaalcode — `link:rtgcode`
+### 13. Betaalcode - `link:rtgcode`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -443,7 +443,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een veilige betaal- of herkenningscode waarvan de gebruiker direct begrijpt wie hem mag lezen, waarvoor hij geldt en wanneer hij verlopen of verbruikt is.
 
@@ -460,7 +460,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 14. Balans — `link:balans`
+### 14. Balans - `link:balans`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -476,7 +476,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een kalm weekbeeld dat beschikbare tijd, afspraken en eigen voorkeuren uitlegt zonder een levensscore, medische conclusie of tweede agenda te maken.
 
@@ -493,7 +493,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 15. Assets — `tab:assets`
+### 15. Assets - `tab:assets`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -509,7 +509,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een transparant dossier voor de bestaande objecttickets, waarin aanvraag, beoordeling, financiële verplichting, verkregen recht en herroepingsmogelijkheid strikt onderscheiden blijven.
 
@@ -526,7 +526,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Juridische aard van objecttickets, aanbiedingsvoorwaarden en mogelijke vergunningplicht expliciet valideren; geen nieuw beleggingsproduct of rendementbelofte uit dit plan.
 
-### 16. Fonds — `link:labfonds`
+### 16. Fonds - `link:labfonds`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -542,7 +542,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrijpelijke gezamenlijke fondsadministratie met herleidbare toezeggingen, stemregels, besluiten en gevolgen, zonder administratie als uitgevoerde donatie te presenteren.
 
@@ -559,7 +559,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Werkelijke geldinzameling, uitbetaling en fiscale status vereisen afzonderlijk geld-/giftbesluit en eventuele vergunning/ANBI-onderbouwing.
 
-### 17. Mecenaat — `link:mecenaat`
+### 17. Mecenaat - `link:mecenaat`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -575,7 +575,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een betrouwbaar persoonlijk filantropiedossier dat toezegging, eigen betalingsnotitie en geverifieerd betaal-/ontvangstbewijs uit elkaar houdt en maatschappelijke resultaten niet verzint.
 
@@ -592,7 +592,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Donatie-executie, ANBI-status, incassomachtiging en fiscale behandeling vragen de bestaande GIFT- en fiscale beslispoorten.
 
-### 18. Nalatenschap — `link:nalatenschap`
+### 18. Nalatenschap - `link:nalatenschap`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -608,7 +608,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een zorgvuldig privé-dossier voor wensen en vindplaatsen, met sterke herstelbaarheid en begrijpelijke vertrouwensgrenzen; het is geen automatisch testament of onbevoegde overdracht aan erfgenamen.
 
@@ -625,7 +625,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Vrijgave na overlijden, executeursbevoegdheid en testamentaire betekenis vereisen expliciet juridisch en architectuurbesluit; blijven gesloten tot dat bewijs bestaat.
 
-### 19. Logboek — `link:logboek`
+### 19. Logboek - `link:logboek`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -641,7 +641,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/geld.html` → `geld.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een onderhoudsdossier voor persoonlijk bezit met betrouwbare historie, documenten en toekomstige aandachtspunten, waarin een notitie nooit als uitgevoerde service geldt.
 
@@ -658,7 +658,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Certificering en daadwerkelijk uitgevoerd onderhoud vereisen bewijs van de bevoegde uitvoerder; eigen invoer blijft als zodanig gelabeld.
 
-### 20. Salon — `tab:salon`
+### 20. Salon - `tab:salon`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -674,7 +674,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een besloten sociale huiskamer met begrijpelijke kringen, eindige inhoud en consequente moderatie, waar delen en verwijderen op alle ingangen dezelfde betekenis hebben.
 
@@ -691,7 +691,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Moderatiecapaciteit en partnerpublicatieregels moeten de sociale productbelofte dragen; P0 sluit de overlap met Pulse.
 
-### 21. Alles bij elkaar — `link:wereldlaag`
+### 21. Alles bij elkaar - `link:wereldlaag`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -707,7 +707,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/wereld.html` → `sociaal.alles` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een rustige ingang naar het leven tussen mensen, met herkenbare bron, kring en volgende stap; iedere Salonhandeling blijft bij de canonieke Salon-eigenaar.
 
@@ -724,7 +724,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** P0 sluit het bestaande eigenaarschapsvraagstuk rond Salon, Pulse en wereldprojecties; geen automatische samenvoeging van domeinen.
 
-### 22. Pulse — `link:pulse`
+### 22. Pulse - `link:pulse`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -740,7 +740,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/pulse.html` → `sociaal.pulse` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een eindige, veilige stroom korte berichten met een eigen herkenbaar ritme en gedeelde sociale rechten, zonder een dubbele sociale kern of verslavende engagementmechaniek.
 
@@ -757,7 +757,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** P0 moet de bestaande overlap met Salon oplossen; moderatie en meldafhandeling vragen een operationele eigenaar.
 
-### 23. Snaps — `os:snaps`
+### 23. Snaps - `os:snaps`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -773,7 +773,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een bewust vluchtige manier om een foto met een bekende te delen, met eerlijke privacytaal, duidelijke ontvanger en aantoonbare serververwijdering na openen of verval.
 
@@ -790,7 +790,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** De privacybelofte moet uitsluiten dat RTG screenshots of kopieën op een ontvangend toestel kan garanderen te voorkomen.
 
-### 24. Camera — `link:camera`
+### 24. Camera - `link:camera`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Atelier. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -806,7 +806,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/camera.html` → `media.camera` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een snelle lokale camera en capturewerkplek die originele kwaliteit bewaart, privacy zichtbaar maakt en delen pas laat plaatsvinden via een afzonderlijk bevestigde bestemming.
 
@@ -823,7 +823,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 25. Berichten — `link:berichten`
+### 25. Berichten - `link:berichten`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -839,7 +839,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/comm.html` → `comm.berichten` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Eén rustige communicatieomgeving met duidelijke concept-, verzend-, ontvangst- en leesstatus, betrouwbare bijlagen en overdracht naar een taak zonder een tweede berichtenbron.
 
@@ -856,7 +856,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Een sterkere encryptie- of gegarandeerde verwijderbelofte vereist apart threat model en aantoonbare infrastructuur; dit plan claimt die eigenschappen niet.
 
-### 26. Bellen — `os:bellen`
+### 26. Bellen - `os:bellen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -872,7 +872,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een eenvoudige betrouwbare spraakoproep met expliciete toestemming, begrijpelijke bereikbaarheidsstatus en aantoonbare beëindiging zonder opname of verborgen gespreksarchief.
 
@@ -889,7 +889,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Productie-TURN, netwerkbereik, dataverwerking en operationele beschikbaarheid moeten zijn geregeld; geen noodtelefoniebelofte.
 
-### 27. Videobellen — `os:videobellen`
+### 27. Videobellen - `os:videobellen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -905,7 +905,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een voorspelbaar videogesprek met expliciete camera-/microfoonkeuze, veilige deelnemersrechten en aantoonbaar opruimen na stoppen, met eerlijke netwerkondersteuning.
 
@@ -922,7 +922,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Productie-TURN en netwerkservice met privacy-/retentieafspraken zijn extern te regelen; geen medische consult- of noodhulpclaim uit deze functie.
 
-### 28. Daten — `link:vonk`
+### 28. Daten - `link:vonk`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -938,7 +938,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/vonk.html` → `daten.vonk` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een veilige, volwassen ontmoetingsdienst met vrijwillige keuzes, eindige selecties, wederzijdse toestemming en duidelijke tafel- en betaalstatus zonder engagementdruk.
 
@@ -955,7 +955,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Menselijk moderatieproces, incidentrespons en voorwaarden voor annulering/terugbetaling moeten operationeel zijn; matching mag geen beschermde kenmerken ongeoorloofd profileren.
 
-### 29. Cercle — `link:cercle`
+### 29. Cercle - `link:cercle`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -971,7 +971,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/cercle.html` → `leven.cercle` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een discreet lidmaatschaps- en toegangsboek waarin bestaande rechten, resterende gastmogelijkheden en aanvraagstatus duidelijk zijn zonder toegang tot externe clubs te beloven.
 
@@ -988,7 +988,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Clubovereenkomsten en toegangsbewijs van de club zijn vereist voor daadwerkelijke toelating; geregistreerd lidmaatschap is geen partnerclaim.
 
-### 30. Entourage — `link:entourage`
+### 30. Entourage - `link:entourage`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1004,7 +1004,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/entourage.html` → `leven.entourage` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een zorgvuldig reisgezelschapsdossier dat de organisator alleen toegestane, noodzakelijke documentstatus toont en iedere reiziger controle over delen en intrekken houdt.
 
@@ -1021,7 +1021,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Actuele reisdocument-/visumregels en ouderlijke bevoegdheid vragen aangewezen bron en verantwoordelijke controle; dit plan verleent geen grens- of visumgarantie.
 
-### 31. Rendez-vous — `link:rendezvous`
+### 31. Rendez-vous - `link:rendezvous`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1037,7 +1037,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/rendezvous.html` → `sociaal.ontmoeten` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een discrete introductieomgeving voor de bedoelde doelgroep met wederzijdse keuze, minimale profielzichtbaarheid en gecontroleerde begeleiding zonder relatie- of statusladder.
 
@@ -1054,7 +1054,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** P0 moet Signature als bestaande toegangsterm koppelen aan de actuele pas-/toelatingsregels; geen nieuwe vierde commerciële pas zonder besluit. Moderatie en menselijke introductiedienst moeten operationeel zijn.
 
-### 32. Attenties — `link:attenties`
+### 32. Attenties - `link:attenties`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1070,7 +1070,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/attenties.html` → `relaties.attenties` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een discrete persoonlijke attentie-assistent die bestaande eigen aantekeningen helpt terugvinden en voorstellen voorbereidt zonder contacten te profileren of vanzelf iets te verzenden.
 
@@ -1087,7 +1087,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Een cadeauleverancier of bezorgdienst pas als uitvoerbare optie tonen na contract en providerbewijs.
 
-### 33. Overzicht — `link:ontdek`
+### 33. Overzicht - `link:ontdek`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1103,7 +1103,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/rtg.html` → `wereld.living` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijke Horizon die met weinig keuzes laat zien wat nu relevant is, waarom het er staat en waar verder te gaan, met vaste navigatie en volledig controleerbare personalisatie.
 
@@ -1120,7 +1120,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 34. Commerce — `link:commerce`
+### 34. Commerce - `link:commerce`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1136,7 +1136,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/commerce.html` → `winkel.commerce` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een transparante aankoopvoorbereiding over meerdere verkopers waarin de gebruiker één overzicht krijgt en per domein de echte voorwaarden en bevestiging behoudt.
 
@@ -1153,7 +1153,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Aansprakelijkheid, verkopersvoorwaarden en eventuele gecombineerde checkout zijn expliciete commerciële/juridische beslissingen.
 
-### 35. Bestellen — `tab:bestellen`
+### 35. Bestellen - `tab:bestellen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1169,7 +1169,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een volledige boodschappenbestelling met actuele leverbaarheid, aantoonbare orderstatus en een helder wijzigings- of annuleringspad bij voorraad- en leverproblemen.
 
@@ -1186,7 +1186,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Leveranciersafspraken over voorraad, bezorging, vervanging en restitutie bepalen welke operationele beloften mogen worden getoond.
 
-### 36. Gezin — `tab:gezin`
+### 36. Gezin - `tab:gezin`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1202,7 +1202,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een veilige gezinsingang waarin ouder, kind, familielid en oppas precies zien wat voor hun geldige relatie nodig is en tijdelijke toegang begrijpelijk kan eindigen.
 
@@ -1219,7 +1219,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Wettelijke vertegenwoordiging, bewaartermijnen en operationeel protocol bij conflicterende ouderlijke bevoegdheid moeten zijn vastgesteld.
 
-### 37. Privekantoor — `link:rechterhand`
+### 37. Privekantoor - `link:rechterhand`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1235,7 +1235,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/lifestyle.html` → `concierge.privekantoor` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijke regie-ervaring waarin één wens leidt tot een duidelijk dossier met menselijke verantwoordelijkheid, beslispunten, echte uitvoeringsstatus en herstel van misgelopen onderdelen.
 
@@ -1252,7 +1252,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Lifestyle-toelating blijft menselijk; operationele bezetting, responstijden en leveranciersafspraken moeten de gecommuniceerde dienstbelofte dragen.
 
-### 38. Wonen — `link:wonen`
+### 38. Wonen - `link:wonen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1268,7 +1268,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/wonen.html` → `woning.overzicht` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een betrouwbaar woningdossier met documenten, onderhoud en expliciete serviceaanvragen, waarin melding, uitvoerderacceptatie en opgelost bewijs afzonderlijk blijven.
 
@@ -1285,7 +1285,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Echte vakmanopdrachten, service-SLA, woningbeveiliging en slimme-apparaatbediening zijn aparte provider-/veiligheidsbesluiten.
 
-### 39. Maison — `link:maison`
+### 39. Maison - `link:maison`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1301,7 +1301,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/maison.html` → `woning.huishouden` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een discreet huishoudboek waarin eigen planning, uitgevoerde taken en gedeelde opdrachten begrijpelijk gescheiden zijn en de bewoner minimale gegevens kan delegeren.
 
@@ -1318,7 +1318,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Echte personeelsaccounts, werkgeversverantwoordelijkheid en opdrachtontvangst zijn aparte scope-/arbeidsrechtelijke besluiten.
 
-### 40. Table — `link:table`
+### 40. Table - `link:table`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Atelier. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1334,7 +1334,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/table.html` → `leven.tafel-gelegenheid` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een zorgvuldige privé-dinerplanner waarin voorbereiding, menu, zitplaatsen en dieetnotities samenkomen zonder persoonsgegevens ongevraagd te verspreiden.
 
@@ -1351,7 +1351,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Professionele catering, uitnodigingsbezorging en allergenenclaims vereisen expliciet provider-/veiligheidsbesluit.
 
-### 41. Cellier — `link:cellier`
+### 41. Cellier - `link:cellier`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1367,7 +1367,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/cellier.html` → `leven.cellier` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een verzorgde persoonlijke kelder met herkomst van schattingen, voorraadgeschiedenis, drinkvensters en voorbereiding van een diner zonder stille aankopen of onbewezen waardegarantie.
 
@@ -1384,7 +1384,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Externe prijs- of wijninformatie alleen met geldige bronlicentie; geen beleggings- of gegarandeerde drinkbaarheidsbelofte.
 
-### 42. Garde-robe — `link:garderobe`
+### 42. Garde-robe - `link:garderobe`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1400,7 +1400,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/garderobe.html` → `leven.garderobe` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijke garderobebibliotheek met vindbare stukken, onderhoud, combinaties en reisselecties, waarbij suggesties eigen ordening blijven.
 
@@ -1417,7 +1417,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe onderhouds- of bestelverbindingen naar vaklui vragen provider- en voorwaardenbesluit.
 
-### 43. Muziek — `link:muziek`
+### 43. Muziek - `link:muziek`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1433,7 +1433,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/muziek.html` → `media.luisteren` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een zorgvuldig gemaakte muziekervaring voor rechtmatig gedeeld werk, met goede spelerbediening, bibliotheek, hervatten en samen luisteren binnen expliciete rechten.
 
@@ -1450,7 +1450,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Muzieklicenties en rechten op gedeeld werk zijn vereist; commerciële streamingcatalogi zijn geen impliciete uitbreiding.
 
-### 44. Live — `link:podium`
+### 44. Live - `link:podium`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1466,7 +1466,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/podium.html` → `media.podium` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een betrouwbare live-omgeving voor makers en publiek met duidelijke livekwaliteit, toegankelijke deelname, gemodereerde chat en bewust bevestigde betalingen.
 
@@ -1483,7 +1483,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Streamingcapaciteit, moderatiebezetting, contentrechten en regels voor giften/betalingen aan makers vragen aantoonbare operationele afspraken.
 
-### 45. Films en series — `link:theater`
+### 45. Films en series - `link:theater`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1499,7 +1499,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/theater.html` → `media.theater` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een hoogwaardige film- en seriezaal voor rechtmatig aangeboden materiaal, met toegankelijke speler, betrouwbare voortgang, ondertitels, rechten en contentmoderatie.
 
@@ -1516,7 +1516,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Distributie- en muzieklicenties, leeftijdsclassificatie en eventuele streaminginfrastructuur moeten per aanbod zijn geregeld.
 
-### 46. Video — `link:clips`
+### 46. Video - `link:clips`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Atelier. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1532,7 +1532,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/clips.html` → `media.clips` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een toegankelijke, eindige kortevideo-ervaring met lokale makerscontrole, betrouwbare P2P-beschikbaarheid en duidelijke grenzen aan publicatie, bewerken en verwijderen.
 
@@ -1549,7 +1549,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Productie-TURN/bandbreedte en moderatie moeten zijn geregeld; contentrechten blijven bij de maker aantoonbaar gecontroleerd.
 
-### 47. Spelen — `link:spelen`
+### 47. Spelen - `link:spelen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1565,7 +1565,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/spelen.html` → `spelen.bordspel` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een complete toegankelijke spelomgeving waarin samen spelen prettig is, spelregels helder zijn en de centrale 18+-grens voor blijvende competitie overal geldt.
 
@@ -1582,7 +1582,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe competitiemodellen of prijzentoernooien vragen apart scope-/juridisch besluit; leeftijdsgrens blijft centraal en onverkort.
 
-### 48. Nieuws — `link:nieuws`
+### 48. Nieuws - `link:nieuws`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1598,7 +1598,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/nieuws.html` → `nieuws.lezen` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een rustige nieuwslezer waarin bron, actualiteit en correcties direct zichtbaar zijn en Rahul uitsluitend onderbouwd over het geopende artikel kan antwoorden.
 
@@ -1615,7 +1615,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Redactionele verantwoordelijkheid en bron-/herpublicatierechten blijven bij een aangewezen menselijke eigenaar.
 
-### 49. Krant — `link:krant`
+### 49. Krant - `link:krant`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1631,7 +1631,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/krant.html` → `media.krant` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een hoogwaardige, rustige krantenleeservaring met uitgeversidentiteit, publicatiedatum, zichtbare correcties, toegankelijke tekst en eerlijke toegang tot actuele versies.
 
@@ -1648,7 +1648,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Uitgeversrechten, correctiebeleid en eventueel offline leesrecht moeten per publicatieovereenkomst vaststaan.
 
-### 50. Sport — `link:sport`
+### 50. Sport - `link:sport`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1664,7 +1664,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/sport.html` → `sport.wedstrijd` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een heldere sport- en wedstrijddagervaring met toegankelijke vakkeuze, echte capaciteit, controleerbare toegangsrechten en zichtbare grens tussen reservering en betaling.
 
@@ -1681,7 +1681,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Clubcontract, ticketvoorwaarden, actuele capaciteit en eventuele toekomstige online betaling/refund zijn externe of aparte scopevoorwaarden.
 
-### 51. Mall — `link:mall`
+### 51. Mall - `link:mall`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1697,7 +1697,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mall.html` → `winkel.mall` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een overzichtelijke markt die relevant aanbod vindbaar maakt, herkomst en leverbaarheid verklaart en de gebruiker met behoud van context naar de echte verkoper en afhandeling brengt.
 
@@ -1714,7 +1714,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Verkopersovereenkomsten, catalogusrechten en externe apppublicatie blijven noodzakelijke voorwaarden voor echt aanbod.
 
-### 52. Mijn bestellingen — `link:mijnmall`
+### 52. Mijn bestellingen - `link:mijnmall`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1730,7 +1730,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mijnmall.html` → `winkel.bestellingen` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een helder persoonlijk order- en aanvraagdossier dat een wens, antwoord, keuze, echte order en betaling nooit verwart en iedere leverancierstaak terugleidt naar haar bron.
 
@@ -1747,7 +1747,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** P0 beslist de heldere presentatie van aanvragen versus orders; gunning mag geen nieuwe commerciële verplichting krijgen zonder expliciete voorwaarden.
 
-### 53. RTG Pay — `link:pay`
+### 53. RTG Pay - `link:pay`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1763,7 +1763,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/pay.html` → `betalen.rtgpay` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een controleerbare wallet- en betaalbasis waarin ieder saldo en iedere status aan bewijs is gekoppeld en fouten een veilige, begrijpelijke herstelroute hebben.
 
@@ -1780,7 +1780,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Betaalprovider, certificering/PCI-scope, vergunningverantwoordelijkheid en geteste productieherstelprocedure zijn blokkerende externe voorwaarden.
 
-### 54. App-dossier — `link:appdossier`
+### 54. App-dossier - `link:appdossier`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1796,7 +1796,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/appstore-dossier.html` → `appstore.dossier` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrijpelijke vertrouwenskaart voor iedere toegelaten externe app: uitgever, concrete versie, rechten, toelatingsbesluit, intrekkingen en de grenzen van dat bewijs.
 
@@ -1813,7 +1813,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Externe uitgeverstoelating, licentievoorwaarden en eventuele onafhankelijke securitycontrole moeten aantoonbaar geldig zijn.
 
-### 55. Logeren bij leden — `link:huis`
+### 55. Logeren bij leden - `link:huis`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1829,7 +1829,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/thuis.html` → `verblijf.logeren-bij-leden` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een complete ledenverblijfervaring met duidelijke beschikbaarheid, hostbesluit, huisregels, privacy en ondersteuning van aanvraag tot vertrek, binnen aantoonbare juridische en operationele grenzen.
 
@@ -1846,7 +1846,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Verhuurrecht, verzekering, consumentenvoorwaarden, fiscale afhandeling en eventuele betaal-/terugbetalingsdienst vereisen afzonderlijke besluiten; geen automatische toevoeging van betaalde verhuur.
 
-### 56. Uitgaan — `link:uitgaan`
+### 56. Uitgaan - `link:uitgaan`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1862,7 +1862,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/uitgaan.html` → `leven.uitgaan` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een complete avondkeuze met gezelschap, voorwaarden, echte capaciteit en een aantoonbaar deelname- en entreeverloop, zonder automatische sociale druk.
 
@@ -1879,7 +1879,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Organisatorvoorwaarden, entreebewijs en eventuele betalingen moeten van bevoegde bronnen komen.
 
-### 57. Food Court — `link:foodcourt`
+### 57. Food Court - `link:foodcourt`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1895,7 +1895,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foodcourt.html` → `horeca.reserveren` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een complete restaurantkeuze en tafelreservering met actuele tijd, gezelschap, toegankelijke voorkeuren en een eerlijk bevestigings- en wijzigingspad.
 
@@ -1912,7 +1912,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Restaurantvoorwaarden, actuele capaciteit en verantwoordelijkheid voor allergeneninformatie moeten aantoonbaar worden beheerd.
 
-### 58. Game Night — `link:spelavond`
+### 58. Game Night - `link:spelavond`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1928,7 +1928,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/spelscherm.html` → `spelen.projectiescherm` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een ontspannen gezamenlijke spelavond waarin een televisie uitsluitend de publieke spelstand toont en koppelen, ontkoppelen en hervatten vanzelfsprekend blijven.
 
@@ -1945,7 +1945,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 59. Tweede scherm — `link:tweedescherm`
+### 59. Tweede scherm - `link:tweedescherm`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1961,7 +1961,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/scherm.html` → `horeca.tweedescherm` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een betrouwbare read-only projectie voor kassa, keuken, bar of reserveringen, met een afgebakende schermrol, frisse gegevens en onmiddellijk intrekbare toegang.
 
@@ -1981,7 +1981,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 ## Instellingen
 
-### 60. Wie ben ik — `link:ik`
+### 60. Wie ben ik - `link:ik`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -1997,7 +1997,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/ik.html` → `instellingen.profiel` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een eenvoudige persoonlijke voorkeurenervaring voor aanspreekvorm, leesbaarheid en beweging.
 
@@ -2013,7 +2013,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 61. Identiteit aantonen — `link:verificatie`
+### 61. Identiteit aantonen - `link:verificatie`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2029,7 +2029,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/verificatie.html` → `identiteit.verificatie` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een toegankelijke identiteitsceremonie met minimale inzameling en herleidbaar menselijk besluit.
 
@@ -2045,7 +2045,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Operationele keuring, documentherkenning, versleuteling en bewaarbeleid vragen onafhankelijke veiligheids- en privacyacceptatie.
 
-### 62. Passkeys — `link:passkeys`
+### 62. Passkeys - `link:passkeys`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2061,7 +2061,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/passkeys.html` → `account.passkeys` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Eenvoudige veilige toegang met meerdere sleutels en voorspelbaar herstel bij toestelverlies.
 
@@ -2077,7 +2077,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Echte iOS-, Android-, macOS- en Windows-authenticators en herstelbeleid vragen onafhankelijke acceptatie.
 
-### 63. Accountbescherming — `link:bescherming`
+### 63. Accountbescherming - `link:bescherming`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2093,7 +2093,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mijn-isolatie.html` → `account.bescherming` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrijpelijk veiligheidsdashboard met aantoonbare afdwinging en zorgvuldig herstel.
 
@@ -2109,7 +2109,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 64. Waar ben ik aanwezig — `link:sessies`
+### 64. Waar ben ik aanwezig - `link:sessies`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2125,7 +2125,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mijn-sessies.html` → `account.sessies` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een duidelijk toestel-/sessieoverzicht met betrouwbare directe intrekking op elk kanaal.
 
@@ -2141,7 +2141,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 65. Wie heeft toegang tot mij — `link:relaties`
+### 65. Wie heeft toegang tot mij - `link:relaties`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2157,7 +2157,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mijn-relaties.html` → `privacy.toegang` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrijpelijk toegangsoverzicht met doel, bereik, termijn en gevolgen per partij.
 
@@ -2173,7 +2173,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 66. Wat weet RTG van mij — `link:gegevens`
+### 66. Wat weet RTG van mij - `link:gegevens`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2189,7 +2189,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mijn-gegevens.html` → `privacy.gegevens` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een datadossier met controleerbare bron, doel, inzage, export en toepasselijke verwijdergrenzen.
 
@@ -2205,7 +2205,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Bewaarplichten en verwijdergrenzen moeten door gegevensverantwoordelijken en juridische/privacybeoordelaar zijn vastgesteld.
 
-### 67. Mijn neigingen — `link:neigingen`
+### 67. Mijn neigingen - `link:neigingen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2221,7 +2221,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mijn-neigingen.html` → `privacy.voorkeuren` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een controleerbaar persoonlijk geheugen waarin ieder gegeven uitlegbaar, begrensd en verwijderbaar is.
 
@@ -2237,7 +2237,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 68. Post van RTG — `link:post`
+### 68. Post van RTG - `link:post`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2253,7 +2253,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/mijn-post.html` → `instellingen.postvoorkeuren` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een voorkeurencentrum waarvan commerciële toestemming aantoonbaar tot de verzendpoort doorwerkt.
 
@@ -2269,7 +2269,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Werkelijke e-mail/smslevering en kanaalvoorwaarden vragen providerbewijs; toestemming opslaan is geen bezorgbewijs.
 
-### 69. Juridisch — `link:juridisch`
+### 69. Juridisch - `link:juridisch`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2285,7 +2285,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/juridisch.html` → `site.juridisch` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een leesbaar juridisch centrum met herkenbare versies, toepasselijkheid en altijd bereikbare originele tekst.
 
@@ -2304,7 +2304,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 ## WorkOS
 
-### 70. RTG Werk OS — `link:werkos`
+### 70. RTG Werk OS - `link:werkos`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2320,7 +2320,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/werk.html` → `werk.organisatie` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een eenvoudige bedrijfswerkruimte met relevante taken per rol en harde tenantgrenzen.
 
@@ -2336,7 +2336,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Gereguleerde bedrijfstypen houden beroeps-/vergunningsvoorwaarden; algemene WorkOS-toegang is geen beroepsvergunning.
 
-### 71. RTG One — `link:rtgone`
+### 71. RTG One - `link:rtgone`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2352,7 +2352,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/rtgone.html` → `werk.rtgone` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijke werkdag met concrete beloften, rustige prioriteit en gecontroleerde overdracht.
 
@@ -2368,7 +2368,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 72. Decision Room — `link:decisionroom`
+### 72. Decision Room - `link:decisionroom`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2384,7 +2384,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/decision-room.html` → `werk.besluit` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een besluitruimte met onderbouwde opties, gevolgen en herleidbare uitvoering na geldige goedkeuring.
 
@@ -2400,7 +2400,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 73. Project Room — `link:projectroom`
+### 73. Project Room - `link:projectroom`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2416,7 +2416,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/project-room.html` → `werk.project` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een uitvoeringsdossier met taken, besluiten, afhankelijkheden en versiegebonden opleverbewijs.
 
@@ -2432,7 +2432,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 74. RTMail — `link:rtmail`
+### 74. RTMail - `link:rtmail`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2448,7 +2448,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/rtmail.html` → `comm.mail` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een premium werkpostvak met heldere ontvangers, veilige concepten en controleerbare taakoverdracht.
 
@@ -2464,7 +2464,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Publieke e-mail vraagt expliciet productbesluit, provider-/domeininrichting, misbruikbeleid en aflever-/bouncebewijs.
 
-### 75. Magnaat — `link:magnaat`
+### 75. Magnaat - `link:magnaat`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2480,7 +2480,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/magnaat.html` → `spel.magnaat` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een realistische geïsoleerde oefenwereld met reproduceerbare scenario's en eerlijk bewijsbereik.
 
@@ -2496,7 +2496,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Magnaat bewijst uitsluitend gedeclareerd experiment; release vraagt onafhankelijke keten-, veiligheids- en menselijke acceptatie.
 
-### 76. RTDocs — `link:office`
+### 76. RTDocs - `link:office`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Atelier. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2512,7 +2512,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/office.html` → `docs.office` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een volwaardige rustige productiviteitservaring met betrouwbare bewerking, samenwerking, versieherstel en uitwisseling.
 
@@ -2528,7 +2528,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Formaatcompatibiliteit/externe samenwerking vraagt expliciete ondersteunde matrix; geen universele Office-compatibiliteit zonder fixtures.
 
-### 77. Werk — `os:werk`
+### 77. Werk - `os:werk`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2544,7 +2544,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Voorspelbare werktoegang vanuit één account naar juiste organisatie en rol zonder contextverwarring.
 
@@ -2560,7 +2560,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 78. Onderneming — `link:onderneming`
+### 78. Onderneming - `link:onderneming`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2576,7 +2576,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/onderneming.html` → `werk.onderneming` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een ondernemingsdossier met begrijpelijke fasen en zichtbare juridische/financiële onzekerheid.
 
@@ -2592,7 +2592,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Externe inschrijving, rechtsvormadvies en registerverificatie vragen scopebesluit, bevoegde partijen en dataovereenkomst.
 
-### 79. Loon — `link:loonstrook`
+### 79. Loon - `link:loonstrook`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2608,7 +2608,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/loonstrook.html` → `loon.strook` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrijpelijk loondossier met herleidbare berekening, periode en correcties.
 
@@ -2624,7 +2624,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Tabellen, arbeids-/fiscale interpretatie, aangifte en uitbetaling vragen onafhankelijke vakvalidatie en bevoegde rails.
 
-### 80. School — `link:school`
+### 80. School - `link:school`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2640,7 +2640,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/rtgschool.html` → `leren.school` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een pedagogisch verantwoorde leerervaring met individuele feedback en veilige voortgang.
 
@@ -2656,7 +2656,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Leerstof, voorbeelden en pedagogische veiligheid vragen bevoegde review/gebruiksrechten; softwaretest bewijst geen onderwijskwaliteit.
 
-### 81. Web — `link:browser`
+### 81. Web - `link:browser`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2672,7 +2672,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/browser.html` → `web.browser` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een veilige ontdek- en bezoekervaring voor gepubliceerde RTG-sites met duidelijke contactstatus.
 
@@ -2688,7 +2688,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Willekeurige externe websites ondersteunen is nieuwe scope met sandbox-/privacybesluit; bestaande ingang mag dit niet suggereren.
 
-### 82. Website — `link:sitemaker`
+### 82. Website - `link:sitemaker`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Atelier. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2704,7 +2704,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/sitemaker.html` → `werk.website-maker` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een hoogwaardige site-editor voor toegankelijke sites met bewuste preview, publicatie en herstel.
 
@@ -2720,7 +2720,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Eigen domeinen/externe hosting en distributierechten vragen ondersteunde scope en providerinrichting.
 
-### 83. Horeca — `link:horeca`
+### 83. Horeca - `link:horeca`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2736,7 +2736,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/horeca.html` → `horeca.dashboard` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een rustige rolgerichte gast- en bedrijfsservice van aankomst tot rekening en herstel.
 
@@ -2752,7 +2752,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Echte betaalrail/-terminal en allergeneninformatie vragen leverancierskoppeling en operationele inhoudseigenaar.
 
-### 84. Partner Network — `link:partnernetwerk`
+### 84. Partner Network - `link:partnernetwerk`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2768,7 +2768,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/partner-network.html` → `zaak.partnernetwerk` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een partnercockpit met bronvaste vragen, beloften, capaciteit en opvolging per eigen organisatie.
 
@@ -2784,7 +2784,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe netwerken/commerciële prestatieclaims vragen contracten en brondata; nul blijft verschillend van niet gemeten.
 
-### 85. Mijn team — `link:vertegenwoordiging`
+### 85. Mijn team - `link:vertegenwoordiging`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2800,7 +2800,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/vertegenwoordiging.html` → `mandaat.beheer` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrensd team waarin de gebruiker vooraf begrijpt wat een ander mag en elke uitvoering opnieuw wordt getoetst.
 
@@ -2816,7 +2816,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Juridische vertegenwoordiging, voogdij en uitbetaling aan vertegenwoordigers vragen geldende besluiten en vaktoets.
 
-### 86. Mijn loopbaan — `link:loopbaan`
+### 86. Mijn loopbaan - `link:loopbaan`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2832,7 +2832,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/loopbaan.html` → `loopbaan.ledger` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijk loopbaandossier met herkomst en tijdelijk deelbare feiten zonder persoonsrangorde.
 
@@ -2851,7 +2851,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 ## TravelOS
 
-### 87. Reizen — `tab:reizen`
+### 87. Reizen - `tab:reizen`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2867,7 +2867,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een eenvoudige TravelOS-ingang met actueel reisplan en volgende beslisbare stap boven bestaande eigenaren.
 
@@ -2883,7 +2883,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Commerciële reisdiensten vragen werkelijk bevoegde aanbieders en contracten; demo-autoverkoop is geen echte levering.
 
-### 88. Reizen & Veilig — `link:reizen`
+### 88. Reizen & Veilig - `link:reizen`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2899,7 +2899,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/reizen-veilig.html` → `reizen.veilig` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een reisveiligheidslaag waarin exact zichtbaar is wat met wie wordt gedeeld en wanneer het stopt.
 
@@ -2915,7 +2915,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Professionele veiligheid/noodhulp vereist beschikbare uitvoerder en verantwoordelijkheid; vrijwillige statusdeling is geen gegarandeerde hulpverlening.
 
-### 89. Ter plaatse — `tab:terplaatse`
+### 89. Ter plaatse - `tab:terplaatse`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2931,7 +2931,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een contextuele ter-plaatsescène met relevante beschikbare diensten en compleet dossier per taak.
 
@@ -2947,7 +2947,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Werkelijke huur, verzekering, ticket en transfer vragen contracten/providerbewijs; SOS mag geen onbewezen hulp beloven.
 
-### 90. Vluchten — `link:vluchten`
+### 90. Vluchten - `link:vluchten`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2963,7 +2963,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/vluchten.html` → `reizen.vluchten` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een premium vluchtdossier met echte herkomst van opties, reservering, ticket, check-in en herstel.
 
@@ -2979,7 +2979,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Echte distributie, prijs/beschikbaarheid, ticketing en check-in vragen bevoegde aanbieders, overeenkomsten en eventuele certificering.
 
-### 91. Openbaar vervoer — `link:ov`
+### 91. Openbaar vervoer - `link:ov`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -2995,7 +2995,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/ov.html` → `vervoer.rit` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een volledige vervoerervaring met geldige bewijzen, providerstatus en verstoringsherstel.
 
@@ -3011,7 +3011,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Verkoop/controle vragen daadwerkelijke vervoerderovereenkomst, tarief-/controleprotocol en bewezen betaalrail.
 
-### 92. Navigatie — `link:navigatie`
+### 92. Navigatie - `link:navigatie`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3027,7 +3027,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/navigatie.html` → `navigatie.route` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een toegankelijke route-ervaring met aantoonbare gebiedsdekking en voorspelbare offlinegrenzen.
 
@@ -3043,7 +3043,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Echte kaartbouw, bronlicenties en toegestane ophaalomgeving zijn externe voorwaarden; fixtures bewijzen geen wereldwijde dekking.
 
-### 93. Haal ik het? — `link:move`
+### 93. Haal ik het? - `link:move`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3059,7 +3059,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/move.html` → `reizen.haalbaarheid` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een verklaarbare haalbaarheidsassistent met reistijdbuffers, gevolgen en zichtbare onzekerheid.
 
@@ -3075,7 +3075,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Live verkeers-, vlucht- en dienstregelingdata vragen bevoegde bronnen en gebruiksrechten.
 
-### 94. Verkeer — `link:flits`
+### 94. Verkeer - `link:flits`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3091,7 +3091,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/flits.html` → `navigatie.verkeersmeldingen` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een verkeerscontext met herkomst en houdbaarheid zonder schijn van officiële realtime dekking.
 
@@ -3107,7 +3107,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Landspecifieke regels en officiële feeds vragen inhoudseigenaar en toegestane actuele bron vóór uitrol.
 
-### 95. Stad — `link:stad`
+### 95. Stad - `link:stad`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3123,7 +3123,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/stad.html` → `reizen.stad` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een begrijpelijke bewonersservice met bronvaste meldstatus en veilige locatiekeuze.
 
@@ -3139,7 +3139,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Echte gemeentelijke service/responstijd vraagt bevoegde operationele partner; simulatiestad is geen gemeentelijke aansluiting.
 
-### 96. Reisboek — `link:reisboek`
+### 96. Reisboek - `link:reisboek`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3155,7 +3155,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/reisboek.html` → `reizen.reisboek` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijk reisboek met herkomst per onderdeel, deelrechten en wijzigingshistorie.
 
@@ -3171,7 +3171,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Live bewaking/import vragen uitgevers-/providerbronnen; Lifestyle-toegang blijft herleidbaar menselijk besluit.
 
-### 97. Hangar — `link:hangar`
+### 97. Hangar - `link:hangar`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3187,7 +3187,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/hangar.html` → `reizen.vliegtuig` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een toesteldossier dat eigen registratie, planning en externe operationele waarheid onderscheidt.
 
@@ -3203,7 +3203,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Onderhoudsvalidatie, operationele luchtvaartplanning en live tracking vragen nieuw scopebesluit, bevoegde partijen en bronnen.
 
-### 98. Verblijven — `link:residentie`
+### 98. Verblijven - `link:residentie`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3219,7 +3219,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/residentie.html` → `sociaal.residentie` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een hoogwaardige toegankelijke virtuele ontvangstruimte met eigen inrichting en beheerste sociale aanwezigheid.
 
@@ -3235,7 +3235,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe VR-, spraak- of commerciële vastgoedfuncties vragen eigen scope-/veiligheidsbesluit; huidige capability is een virtuele suite.
 
-### 99. Aankomst — `link:aankomst`
+### 99. Aankomst - `link:aankomst`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Journey. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3251,7 +3251,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/arrival.html` → `reizen.aankomst` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een discrete aankomstervaring met verifieerbare afspraken en vrijwillige statusdeling.
 
@@ -3267,7 +3267,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Aanbieders moeten operationele bevestiging en uitvoerbare servicevoorwaarden leveren; gegenereerd plan is geen leveringsgarantie.
 
-### 100. Routedossier — `link:routedossier`
+### 100. Routedossier - `link:routedossier`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3283,7 +3283,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/routedossier.html` → `kantoor.routedossier` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een inspectievenster met herleidbaar bewijsbereik, versheid en wijzigingsimpact per technische route.
 
@@ -3299,7 +3299,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 101. OV-routes — `link:ovroutes`
+### 101. OV-routes - `link:ovroutes`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Spatial. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3315,7 +3315,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/ovroutes.html` → `zaak.ovroutes` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een operationele lijneditor met toegankelijke invoer, versiebeheer en impact vóór publicatie.
 
@@ -3334,7 +3334,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 ## FoundationOS
 
-### 102. RTFoundation in jouw buurt — `link:rtfbuurt`
+### 102. RTFoundation in jouw buurt - `link:rtfbuurt`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3350,7 +3350,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/os-publiek.html` → `wereld.foundation` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een heldere lokale voordeur met actuele activiteiten en eerlijke beschikbaarheid.
 
@@ -3366,7 +3366,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** P0 moet RTFoundation Winkel aan een bestaande eigenaar/ingang koppelen of expliciet blokkeren; deze pagina wordt niet stil winkeleigenaar en er ontstaat geen 115e app.
 
-### 103. Zorg — `link:foundationzorg`
+### 103. Zorg - `link:foundationzorg`
 
 **Bouwcohort:** eerste twaalf, poort G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3382,7 +3382,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/zorg.html` → `rtf.hulp-zorg` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een gezinszorgdossier met rustige afsprakenweergave, strikt gescheiden rechten en een veilige hulpuitweg.
 
@@ -3398,7 +3398,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Zorginhoud, bijzondere-persoonsgegevensbeleid en actuele hulproutes vereisen onafhankelijke inhoudelijke en privacyacceptatie.
 
-### 104. Zorgaanbod — `tab:zorg`
+### 104. Zorgaanbod - `tab:zorg`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ceremony. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3414,7 +3414,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/app.html` → `kern.app` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een rustige zorgafspraakervaring met actuele broninformatie en afzonderlijke medische toestemming.
 
@@ -3430,7 +3430,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Zorgverlening en medische beslisondersteuning vragen bevoegde professionals en passende externe toets; RTG belooft geen diagnose.
 
-### 105. RTFoundation portaal — `link:rtfportaal`
+### 105. RTFoundation portaal - `link:rtfportaal`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3446,7 +3446,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/os-portaal.html` → `portaal.toegang` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een professioneel samenwerkingsportaal met eigen afspraken en navolgbare voortgang binnen harde gegevensgrenzen.
 
@@ -3462,7 +3462,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Uitwisseling vraagt gegevensafspraken, bewaartermijnen en toets op herleidbaarheid.
 
-### 106. Ontdekken — `link:connect`
+### 106. Ontdekken - `link:connect`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3478,7 +3478,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/connect.html` → `ontdekken.connect` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een eindige, uitlegbare ontdekervaring met eigen richting en betekenisvolle vervolgacties.
 
@@ -3494,7 +3494,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 107. LibraryOS — `link:library`
+### 107. LibraryOS - `link:library`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Library. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3510,7 +3510,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/library.html` → `library.werk` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een hoogwaardige publicatie- en leesomgeving met editie-integriteit, samenwerking en duidelijke rechten.
 
@@ -3526,7 +3526,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe externe distributie en betaalde uitgeefcontracten vragen auteursrechten, licenties en commercieel besluit.
 
-### 108. Het bord — `link:rtfbord`
+### 108. Het bord - `link:rtfbord`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Atelier. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3542,7 +3542,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/bord.html` → `rtf.bord` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een toegankelijke live lesruimte met veilige leerlingrechten en betrouwbare gezamenlijke voortgang.
 
@@ -3558,7 +3558,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 109. Het schrift — `link:rtfschrift`
+### 109. Het schrift - `link:rtfschrift`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Atelier. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3574,7 +3574,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/schrift.html` → `leren.livesles` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een persoonlijk leerschrift met veilige concepten, revisies en begrijpelijke individuele feedback.
 
@@ -3590,7 +3590,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 110. Klimaatfonds — `link:klimaat`
+### 110. Klimaatfonds - `link:klimaat`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Horizon. **Budgetverwijzing:** browse → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3606,7 +3606,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/klimaatfonds.html` → `gemeenschap.klimaatfonds` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een onderbouwd lokaal duurzaamheidsvenster dat metingen en verwachtingen helder onderscheidt.
 
@@ -3622,7 +3622,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe impactberekeningen en publieke duurzaamheidsclaims vragen methodiek, datarechten en inhoudelijke verificatie.
 
-### 111. Buurtruil — `link:buurtruil`
+### 111. Buurtruil - `link:buurtruil`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** compose → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3638,7 +3638,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/buurtruil.html` → `gemeenschap.buurtruil` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een veilige lokale weggeef- en zoekervaring met duidelijke overdracht en eigenaarscontrole.
 
@@ -3654,7 +3654,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Geen aanvullend extern besluit benoemd; de bestaande toezegklasse en gemeenschappelijke scopepoort blijven gelden.
 
-### 112. Wat speelt er — `link:kwesties`
+### 112. Wat speelt er - `link:kwesties`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P4, P5, P6, P7. **Ontwerpfamilie:** Command. **Budgetverwijzing:** sensitive → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3670,7 +3670,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/kwesties.html` → `democratie.kwestie` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een transparant maatschappelijk dossier met herleidbare behandeling en zeggenschap over eigen bijdrage.
 
@@ -3686,7 +3686,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Nieuwe politieke bevoegdheden blijven achter POLITIEK-besluiten en externe voorwaarden; geen overtuigings-API of persoonlijke politieke score.
 
-### 113. Geven — `link:geven`
+### 113. Geven - `link:geven`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P2, P3, P4, P5, P6, P7. **Ontwerpfamilie:** Ledger. **Budgetverwijzing:** transaction → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3702,7 +3702,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/geven.html` → `geven.doneren` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een transparant giftdossier met bestemming, voorwaarden, bevestiging en controleerbare verwerking.
 
@@ -3718,7 +3718,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Externe voorwaarden / besluiten:** Productie-openstelling vraagt het GIFT-besluit, ontvangende wallet, juridische machtigingstekst en bevoegde betaal-/incassorail; ANBI alleen na aantoonbare beschikking.
 
-### 114. Vrienden — `link:vrienden`
+### 114. Vrienden - `link:vrienden`
 
 **Bouwcohort:** brede afbouw na G1. **Pakketafhankelijkheden bij volledige acceptatie:** P0, P1, P4, P5, P6, P7. **Ontwerpfamilie:** Salon. **Budgetverwijzing:** realtime → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.
 
@@ -3734,7 +3734,7 @@ Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privac
 
 **Scherm-/ingangseigenaar volgens SCHERMEIGENAAR:** `apps/foundation/vrienden.html` → `rtf.contacten` (eigenaar). Dit is geen extra domeineigenaar.
 
-**Opgeslagen bewijs:** APPWERKT `NIET_GETEST`; 1 schermkoppelingen in de Experience-snapshot. Geen app-signature in de huidige signature-overlay. Geen verse kwalificatie uitgevoerd.
+**Opgeslagen bewijs:** APPWERKT `BEWEZEN`; 1 schermkoppelingen in de Experience-snapshot. App-signature declaratief aanwezig. Geen verse kwalificatie uitgevoerd.
 
 **Gewenste premium-eindtoestand:** Een beschermde contactwereld voor kinderen met begrijpelijke ouderregie en directe hulp bij ongewenst contact.
 
@@ -4398,7 +4398,7 @@ De IDs hieronder verwijzen naar qualificationPlanning in het bestaande Experienc
 
 ## Premium Experience Gate
 
-Vijf afzonderlijke voorwaarden binnen G1–G4; alle moeten slagen. Nieuwe en ervaren gebruikers worden apart getoetst. Samenhang, verzorging en vertrouwen vragen gestructureerde onafhankelijke menselijke beoordeling. De bestaande human-quality-blokkade blijft actief totdat bevoegd bewijs beschikbaar is.
+Vijf afzonderlijke voorwaarden binnen G1-G4; alle moeten slagen. Nieuwe en ervaren gebruikers worden apart getoetst. Samenhang, verzorging en vertrouwen vragen gestructureerde onafhankelijke menselijke beoordeling. De bestaande human-quality-blokkade blijft actief totdat bevoegd bewijs beschikbaar is.
 
 | Vraag / ID | Vereiste dimensies | Meetbare acceptatie | Bewijscontracten |
 |---|---|---|---|

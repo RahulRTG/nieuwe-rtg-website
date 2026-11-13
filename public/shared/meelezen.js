@@ -58,20 +58,16 @@
   function maak(opties) {
     opties = opties || {};
     var wrap = d.createElement('div');
-    wrap.className = 'meelees';
+    wrap.className = 'meelees ds-meelezen';
     wrap.setAttribute('data-meelees', '1');
-    wrap.style.cssText = 'margin-top:.6rem;font-family:Inter,system-ui,sans-serif;';
 
     var kop = d.createElement('div');
     kop.className = 'meelees-kop';
-    kop.style.cssText = 'display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;';
     var knop = d.createElement('button');
     knop.type = 'button';
     knop.className = 'meelees-knop';
     knop.textContent = 'Meelezen';
     knop.setAttribute('aria-expanded', 'false');
-    knop.style.cssText = 'padding:.35rem .7rem;border:1px solid rgba(255,255,255,.22);border-radius:0;' +
-      'background:transparent;color:inherit;font:inherit;font-size:.85rem;cursor:pointer;';
     kop.appendChild(knop);
 
     /* De ondertitelknop hoort bij de LUISTERAAR en wordt daar gemaakt
@@ -95,26 +91,21 @@
     baan.setAttribute('role', 'log');
     baan.setAttribute('aria-live', 'polite');
     baan.setAttribute('aria-label', 'Meelezen: wat er getypt wordt in dit gesprek');
-    baan.style.cssText = 'max-height:9rem;overflow-y:auto;padding:.5rem .6rem;border-radius:0;' +
-      'background:rgba(255,255,255,.06);font-size:.9rem;line-height:1.45;';
     wrap.appendChild(baan);
 
     var rij = d.createElement('form');
     rij.hidden = true;
     rij.className = 'meelees-rij';
-    rij.style.cssText = 'display:flex;gap:.4rem;margin-top:.4rem;';
     var veld = d.createElement('input');
     veld.type = 'text';
     veld.className = 'meelees-veld';
     veld.maxLength = MAX;
     veld.placeholder = 'Typ mee zodat iedereen meeleest';
     veld.setAttribute('aria-label', 'Typ een regel mee in dit gesprek');
-    veld.style.cssText = 'flex:1;min-width:0;padding:.45rem .6rem;border-radius:0;border:1px solid rgba(255,255,255,.22);' +
-      'background:rgba(0,0,0,.25);color:inherit;font:inherit;';
     var zend = d.createElement('button');
     zend.type = 'submit';
+    zend.className = 'meelees-zend';
     zend.textContent = 'Stuur';
-    zend.style.cssText = 'padding:.45rem .8rem;border:0;border-radius:0;background:#7F1634;color:#fff;font:inherit;cursor:pointer;';
     rij.appendChild(veld); rij.appendChild(zend);
     wrap.appendChild(rij);
 
@@ -131,7 +122,7 @@
     if (luister) {
       w.RTGMeeluister.knop({
         kop: kop, wrap: wrap, luister: luister,
-        stroom: opties.stroom, stijl: knop.style.cssText,
+        stroom: opties.stroom,
         open: function () { zetOpen(true); }
       });
     }
@@ -146,18 +137,17 @@
       info = info || {};
       var r = d.createElement('p');
       r.className = 'meelees-regel';
-      r.style.cssText = 'margin:0 0 .3rem;';
       if (info.wie) {
         var wie = d.createElement('strong');
+        wie.className = 'meelees-wie';
         wie.textContent = String(info.wie).slice(0, 60) + ': ';
-        wie.style.cssText = 'font-weight:600;';
         r.appendChild(wie);
       }
       r.appendChild(d.createTextNode(t));      // NOOIT innerHTML: dit komt van een ander
       if (info.bron === 'machine') {
         var merk = d.createElement('span');
+        merk.className = 'meelees-machine';
         merk.textContent = ' (automatisch)';
-        merk.style.cssText = 'opacity:.6;font-size:.85em;';
         r.appendChild(merk);
       }
       baan.appendChild(r);

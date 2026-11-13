@@ -103,11 +103,20 @@ test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets
     /* 1. HET AANBOD KOMT, EN ZOLANG NIEMAND TIKT GEBEURT ER NIETS. Dit is het
        stuk dat een servertoets niet kan zien: een app die stilletjes zelf ja
        zegt, zou daar precies zo doorheen komen. */
-    await page.waitForSelector('.rtgdienst', { timeout: 20000 });
-    const tekst = await page.locator('.rtgdienst p').textContent();
+    await page.waitForSelector('.ds-plaatsdienst', { timeout: 20000 });
+    const tekst = await page.locator('.ds-plaatsdienst__uitleg').textContent();
     assert.match(tekst, /dienst bij/, 'het aanbod noemt de dienst: ' + tekst);
     assert.match(tekst, /niet waar je bent geweest/,
       'en het zegt wat er NIET gebeurt, vóórdat iemand ja zegt');
+    assert.equal(await page.locator('style').evaluateAll(stijlen => stijlen.some(stijl =>
+      stijl.textContent.includes('.rtgdienst') || stijl.textContent.includes('.ds-plaatsdienst'))), false,
+    'de toestemmingskaart injecteert geen runtime-stijl');
+    const bediening = await page.locator('.ds-plaatsdienst__actie').evaluateAll(knoppen =>
+      knoppen.map(knop => ({ breedte: knop.getBoundingClientRect().width, hoogte: knop.getBoundingClientRect().height })));
+    assert.ok(bediening.every(knop => knop.breedte >= 44 && knop.hoogte >= 44),
+      'beide keuzes behouden minimaal 44 bij 44 px bedieningsruimte: ' + JSON.stringify(bediening));
+    assert.equal(await page.evaluate(() => document.activeElement && document.activeElement.textContent), 'Aanzetten',
+      'de primaire keuze krijgt direct toetsenbordfocus');
 
     await wachtOpRust(page);
     const voor = await api(base, '/api/plaats/stand', {}, reg.token);
@@ -122,7 +131,7 @@ test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets
 
     // 2. NA DE TIK: venster open, motor aan, waarneming binnen
     const waargenomen = page.waitForResponse(r => r.url().includes('/api/plaats/waarneem') && r.status()===200);
-    await page.click('.rtgdienst .ja');
+    await page.click('.ds-plaatsdienst__actie--aan');
     await page.waitForFunction(() => window.RTGPlaats && window.RTGPlaats.stand().binnen.length > 0,
       null, { timeout: 15000 });
     await waargenomen; // Local GPS state precedes the persisted server observation.

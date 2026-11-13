@@ -4,5 +4,14 @@
   .ds-collectie { padding: 0 var(--ds-ruimte-4) calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12)); max-inline-size: var(--ds-breedte-max); margin-inline: auto; }
   .ds-collectie__kop { display: grid; gap: var(--ds-ruimte-1); margin-block: var(--ds-ruimte-4) var(--ds-ruimte-2); }
   .ds-collectie__raster { display: grid; gap: var(--ds-ruimte-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); margin-block-start: var(--ds-ruimte-3); }
+  /* Meenemen krijgt op telefoon een vaste plaats boven de Edge. Alleen
+     collecties die die host echt hebben reserveren ook de knophoogte uit
+     het bestaande knopcontract en zijn tussenruimte; de laatste schermactie
+     blijft daardoor bij de onderste scrollstand volledig bereikbaar. */
+  @media (max-width: 760px) {
+    .ds-collectie:has(.ds-uitvoer-host > .ds-uitvoer-knop) {
+      padding-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-12) + 52px + var(--ds-ruimte-3) + env(safe-area-inset-bottom, 0px));
+    }
+  }
   @container ds (min-width: 48rem) { .ds-collectie { padding-inline: var(--ds-goot); } .ds-collectie__raster { gap: var(--ds-ruimte-6); } }
 }

@@ -114,6 +114,10 @@ test('de Magnaat-proef blijft zichtbaar een proef en raakt de API niet', { skip 
   await page.goto(srv.base + '/apps/chauffeur.html?magnaat=1', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#werkstapel [data-rit="nieuw"]');
   assert.equal(await page.locator('#rtgMagnaatTestMark').isVisible(), true, 'het keurmerk Magnaat Test staat in beeld');
+  assert.equal(await page.locator('#rtgMagnaatTestMark').getAttribute('class'), 'ds-magnaatproef',
+    'de trainingsgrens gebruikt op de echte host de centrale eigenaar');
+  assert.equal(await page.locator('style').evaluateAll((stijlen) => stijlen.some((s) => s.textContent.includes('#rtgMagnaatTestMark'))), false,
+    'de trainingsgrens injecteert geen eigen presentatie');
   assert.equal((await page.textContent('#modusLabel')).trim(), 'MAGNAAT TEST');
   assert.match(await page.textContent('#werkstapel'), /Ibiza Airport/, 'de synthetische rit');
   await page.locator('[data-naar="hulp"]').click();

@@ -188,7 +188,7 @@ function report(model) {
     productQualification: 'NOT_ASSESSED', releaseAuthorized: false,
     baselineCommit: model.program.baselineCommit,
     buildReadiness:{status:errors.length ? 'BLOCKED' : 'READY_TO_BUILD',scope:'planning-traceability',blockers:errors,
-      limits:['Geen productkwalificatie; G1–G4 beoordelen bewijs afzonderlijk.','Onbesliste consolidaties en externe voorwaarden geven geen bevoegdheid tot nieuwe effecten of scopewijziging.']},
+      limits:['Geen productkwalificatie; G1-G4 beoordelen bewijs afzonderlijk.','Onbesliste consolidaties en externe voorwaarden geven geen bevoegdheid tot nieuwe effecten of scopewijziging.']},
     openConsolidation,
     qualificationDependencies:q?.openDecisions || [],
     counts: {canonicalEntries: model.inventory.length, workPackages: model.entries.length,
@@ -246,7 +246,7 @@ function render(model) {
     const scope = model.experienceEvidence.logicalApps.find(entry => entry.function === item.function);
     const owners = screenOwners(model, item);
     const reference = model.program.referenceCohort.some(entry => entry.function === item.function);
-    lines.push('### ' + (++count) + '. ' + item.name + ' — `' + item.function + '`', '',
+    lines.push('### ' + (++count) + '. ' + item.name + ' - `' + item.function + '`', '',
       '**Bouwcohort:** ' + (reference ? 'eerste twaalf, poort G1' : 'brede afbouw na G1') + '. **Pakketafhankelijkheden bij volledige acceptatie:** ' + work.dependsOn.join(', ') + '. **Ontwerpfamilie:** ' + work.signature + '. **Budgetverwijzing:** ' + work.budgetProfile + ' → bestaand coverage-contract; schermrisico en taak bepalen de meetnorm.', '',
       '**Samenwerkende capabilities:** ' + (work.usesCapabilities.length ? work.usesCapabilities.map(id => '`' + id + '`').join(', ') : 'geen aanvullende taakafhankelijkheid benoemd') + '. Deze verwijzingen geven geen toegang tot het andere domein.', '',
       '**Bestaande ingang:** ' + (item.entry || 'interne keuze; zie appcontract') + '.', '',
@@ -279,7 +279,7 @@ function render(model) {
   }
   const q = model.coverageContract.qualificationPlanning;
   lines.push('', '## Premium Experience Gate', '',
-    'Vijf afzonderlijke voorwaarden binnen G1–G4; alle moeten slagen. Nieuwe en ervaren gebruikers worden apart getoetst. Samenhang, verzorging en vertrouwen vragen gestructureerde onafhankelijke menselijke beoordeling. De bestaande human-quality-blokkade blijft actief totdat bevoegd bewijs beschikbaar is.', '',
+    'Vijf afzonderlijke voorwaarden binnen G1-G4; alle moeten slagen. Nieuwe en ervaren gebruikers worden apart getoetst. Samenhang, verzorging en vertrouwen vragen gestructureerde onafhankelijke menselijke beoordeling. De bestaande human-quality-blokkade blijft actief totdat bevoegd bewijs beschikbaar is.', '',
     '| Vraag / ID | Vereiste dimensies | Meetbare acceptatie | Bewijscontracten |', '|---|---|---|---|');
   for (const criterion of q.premiumExperienceGate?.checks || []) lines.push('| ' + [criterion.question+' ('+criterion.id+')',criterion.dimensions.join(', '),JSON.stringify(criterion.measurableAcceptance),criterion.evidenceRequirements.join(', ')].map(cell).join(' | ') + ' |');
   lines.push('', '## Gedeelde acceptatiescenario’s', '',

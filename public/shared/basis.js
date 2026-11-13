@@ -171,9 +171,9 @@
      even staan. Vandaar hier, boven de service worker, en niet in de opstart
      onderaan.
 
-     De sleutel is rtg_thema_v2 en die staat los van de oude donker/licht-keuze
-     in shared/thema.js. Een pagina die nog niet om is, merkt niets: zonder
-     attribuut geldt gewoon wat de UI-kit al zei. */
+     De sleutel is rtg_thema_v2. De oude gedeelde donker/licht-eigenaar is na
+     migratie van zijn laatste host verwijderd. Een pagina die nog niet om is,
+     merkt niets: zonder attribuut geldt gewoon wat de UI-kit al zei. */
   if (!ds && !document.documentElement.hasAttribute('data-rtg-thema') && !document.getElementById('rtgThemasJs')) {
     var th = document.createElement('script');
     th.id = 'rtgThemasJs';

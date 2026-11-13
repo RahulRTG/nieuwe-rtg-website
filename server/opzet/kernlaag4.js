@@ -149,20 +149,7 @@ Object.assign(kern, require('../kern/aanmeldkanaal')({ db, save,
 Object.assign(kern, require('../kern/rtgcampagne')({ db, save, kanalen: () => kern.AANMELDKANALEN }));
 // het boek van RTG zelf, gevuld door Financien op naam (besluiten C8-C11)
 Object.assign(kern, require('../kern/rtgboek')({ db, save, kanalen: kern.AANMELDKANALEN, campagnes: kern.rtgCampagnesInMaand }));
-kern.bedrijfsmaat = require('../kern/bedrijfsmaat/stand')({
-  lees: { ritten: () => db.data.rides, bestellingen: () => db.data.orders,
-    betaalschemas: () => db.data.lidmaatschapBetalingen,
-    /* klantwaarde per wereld (besluit C3): drie lezers erbij, niets schrijvends */
-    reizen: () => db.data.reisAanvragen, loonruns: () => db.data.payrollRunsV2,
-    casussen: () => (db.data.rtfos && db.data.rtfos.casussen) },
-  pasgeschiedenis: kern.pasgeschiedenis, aanwezigheid: kern.aanwezigheid,
-  kosten: () => kern.kosten, bank: kern.bankpositie, boek: kern.rtgBoek, kanalen: kern.aanmeldkanaalStand,
-  ledentegoed: () => (kern.pay && kern.pay.ledentegoed ? kern.pay.ledentegoed() : null),
-  later: { omzetPerPas: () => kern.ledenregister.omzetPerPas(),
-    betalingen: () => (kern.betaalWaarheid ? kern.betaalWaarheid.openstaand() : null),
-    /* een collectie die nog niet bestaat, is nog leeg (ze ontstaan bij de eerste rij) */
-    zaken: () => db.data.suppliers || [], contracten: () => db.data.contracten || [], facturen: () => db.data.facturen || [],
-    aanmeldingen: () => db.data.aanmeldingen || [], betaalschemas: () => db.data.lidmaatschapBetalingen || [] } });
+require('./kernlaag4-bedrijfsmaat')(kern, db.data);
 // het streefbeeld (besluit C7): de machine stelt voor uit de bedrijfsmaten, de eigenaar tekent
 Object.assign(kern, require('../kern/streefbeeld')({ db, save, bedrijfsmaat: kern.bedrijfsmaat }));
 // het beslisgeheugen (besluit C13): besluit, gronden van toen, verwachting en de uitkomst na de termijn

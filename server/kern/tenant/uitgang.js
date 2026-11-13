@@ -35,19 +35,7 @@ const { datum: klokDatum } = require('../../lib/klok');
 const crypto = require('crypto');
 
 const VERSIE = 1;
-
-/* Wat er nooit in een uitvoer terechtkomt, op NAAM en niet op een patroon.
-   `rtgKey` staat er niet vanwege geheimhouding maar vanwege het
-   codenaam-ontwerp: hij legt buiten de kluis om een verband tussen een
-   werkruimtelid en een RTG-account, en om die reden staat hij ook in de
-   VERBORGEN-lijst van kern/command/object.js. Op naam en recursief, dus ook
-   een sleutel die morgen ergens dieper opduikt gaat eruit -- te veel weghalen
-   is hier de goede kant om fout te gaan. */
-const GEHEIM = ['beheerToken', 'token', 'lidToken', 'rtgKey', 'beheerSessies', 'sessies', 'beheerEpoch', 'sessieEpoch'];
-
-/* Metadata van de werkruimte zelf: die staat in de kop van de uitvoer en hoeft
-   niet nog een keer in de inhoud. */
-const KOPVELDEN = ['code', 'naam', 'land', 'valuta', 'taal', 'moeder', 'kvk', 'btwNummer', 'at'];
+const { GEHEIM, KOPVELDEN, zonderGeheim, reisverklaring, herstelInhoud } = require('./uitgang-grens');
 
 /* Canonieke JSON: sleutels op volgorde, zodat dezelfde inhoud op elke machine
    dezelfde tekst en dus dezelfde checksum geeft. JSON.stringify houdt de
@@ -58,16 +46,6 @@ function canoniek(v) {
   return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canoniek(v[k])).join(',') + '}';
 }
 const som = (v) => crypto.createHash('sha256').update(canoniek(v)).digest('hex');
-
-function zonderGeheim(v) {
-  if (Array.isArray(v)) return v.map(zonderGeheim);
-  if (v && typeof v === 'object') {
-    const uit = {};
-    for (const k of Object.keys(v)) { if (!GEHEIM.includes(k)) uit[k] = zonderGeheim(v[k]); }
-    return uit;
-  }
-  return v;
-}
 
 const tel = (v) => (Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : (v == null ? 0 : 1)));
 
@@ -95,6 +73,8 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const schoon = zonderGeheim(w);
     const inhoud = {};
     for (const k of Object.keys(schoon)) { if (!KOPVELDEN.includes(k)) inhoud[k] = schoon[k]; }
+    // Deze gereserveerde scopeverklaring wordt berekend, nooit uit een import vertrouwd.
+    inhoud.reisketenUitgang = reisverklaring();
 
     const kop = {};
     for (const k of KOPVELDEN) kop[k] = schoon[k] == null ? null : schoon[k];
@@ -102,6 +82,7 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const cat = catalogus(inhoud);
     const uitvoer = {
       versie: VERSIE,
+      status: 'gedeeltelijk',
       at: (opties && opties.at) || klokDatum().toISOString(),
       tenant: t ? { org: t.org, naam: t.naam, modus: t.modus } : null,
       merk: t && merkVan ? merkVan(t.org) : null,
@@ -115,7 +96,9 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
       recept: 'checksum per soort = sha256(canonieke JSON van die soort); ' +
         'checksum van de uitvoer = sha256(canonieke JSON van de catalogus). ' +
         'Canoniek = JSON met de sleutels van elk object alfabetisch gesorteerd, zonder witruimte.',
-      let: 'Dit is de volledige inhoud van deze werkruimte, met de sleutels eruit (' + GEHEIM.join(', ') + '). ' +
+      let: 'Dit is de inhoud van deze werkruimte, met de sleutels eruit (' + GEHEIM.join(', ') + '). ' +
+        'De uitvoer is gedeeltelijk: tenantbrede reiscontracten en leverancieropdrachten vallen buiten de bewezen werkruimtebevoegdheid. ' +
+        'Dit is geen volledige tenant- of reisexport. De begrenzing staat checksum-gedekt in reisketenUitgang. ' +
         'Reken de catalogus na met het recept hierboven; wij hoeven daar niet bij te zijn.'
     };
     return { ok: true, uitvoer };
@@ -124,28 +107,7 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
   /* Klopt een uitvoer met zichzelf? Los aanroepbaar, want dit is de vraag die
      de ontvanger stelt en niet alleen wij. */
   function controleer(uitvoer) {
-    const u = uitvoer;
-    if (!u || typeof u !== 'object') return { ok: false, reden: 'Geen uitvoer meegegeven.' };
-    if (u.versie !== VERSIE) return { ok: false, reden: 'Onbekende uitvoerversie: ' + u.versie + '.' };
-    if (!u.inhoud || typeof u.inhoud !== 'object') return { ok: false, reden: 'De uitvoer draagt geen inhoud.' };
-    /* DE VOLGORDE IS HIER HET ANTWOORD, en dat is bij het bouwen misgegaan.
-       Eerst de totale checksum leggen betekent dat elke afwijking als "de
-       catalogus komt niet overeen met de inhoud" naar buiten komt -- waar
-       staat, weet de ontvanger dan nog niet, en die zit met een bestand van
-       tientallen megabytes. Dus eerst PER SOORT, want daar staat het, en pas
-       daarna de totale som (die vangt een catalogus die zelf is bijgewerkt om
-       een wijziging te dekken). */
-    const opnieuw = catalogus(u.inhoud);
-    const was = new Map((u.catalogus || []).map(r => [r.soort, r.checksum]));
-    const nu = new Map(opnieuw.map(r => [r.soort, r.checksum]));
-    const ontbreekt = [...was.keys()].filter(k => !nu.has(k));
-    const erbij = [...nu.keys()].filter(k => !was.has(k));
-    const anders = opnieuw.filter(r => was.has(r.soort) && was.get(r.soort) !== r.checksum).map(r => r.soort);
-    const scheef = [...anders, ...ontbreekt.map(k => k + ' (weg)'), ...erbij.map(k => k + ' (erbij)')];
-    if (scheef.length) return { ok: false, reden: 'Deze soorten kloppen niet met de catalogus: ' + scheef.join(', ') + '.' };
-    if (som(u.catalogus || []) !== u.checksum)
-      return { ok: false, reden: 'De catalogus klopt met de inhoud, maar de eindsom van de uitvoer niet -- de catalogus zelf is aangeraakt.' };
-    return { ok: true, catalogus: opnieuw };
+    return require('./uitgang-validatie').controleer(uitvoer, { versie: VERSIE, catalogus, som });
   }
 
   /* Inlezen. Altijd een NIEUWE werkruimte, met een nieuw beheer-token, en de
@@ -155,6 +117,8 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const c = controleer(uitvoer);
     if (!c.ok) return { error: c.reden, status: 400 };
     const o = opties || {};
+    if (o.naam != null && typeof o.naam !== 'string')
+      return { error: 'De naam van de nieuwe werkruimte moet tekst zijn.', status: 400 };
     const W = opslag.werkruimtes();
     let code; do { code = 'W' + munt.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (W[code]);
 
@@ -163,7 +127,10 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
       land: kop.land || 'NL', valuta: kop.valuta || 'EUR', taal: kop.taal || 'nl',
       moeder: null, kvk: kop.kvk || null, btwNummer: kop.btwNummer || null,
       at: klokDatum().toISOString() };
-    for (const k of Object.keys(uitvoer.inhoud)) w[k] = JSON.parse(JSON.stringify(uitvoer.inhoud[k]));
+    /* Een checksum bewijst samenhang, geen betrouwbare afzender. Ook een
+       zelf nagerekend importbestand mag dus geen RTG-koppeling of oude sleutel
+       herstellen, en de inhoud mag de NIEUWE code/moedergrens niet vervangen. */
+    herstelInhoud(w, uitvoer.inhoud);
 
     w.leden = w.leden || {};
     for (const l of Object.values(w.leden)) sluit(l);
@@ -172,7 +139,8 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     save();
     const antwoord = { ok: true, werkruimte: code, catalogus: c.catalogus,
       let: 'De leden zijn hersteld ZONDER sleutel: toegang teruggeven is een besluit en geen bijwerking van een herstel. ' +
-        'De moederwerkruimte reist niet mee -- die verwijst naar een code die hier niet hoeft te bestaan.' };
+        'De moederwerkruimte reist niet mee -- die verwijst naar een code die hier niet hoeft te bestaan. ' +
+        'Deze gedeeltelijke werkruimte-invoer activeert geen reiscontracten, leveranciersacceptaties of betaalbewijzen.' };
     if (!PRODUCTIE) antwoord.beheerToken = beheerToken;
     return antwoord;
   }
@@ -182,5 +150,6 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
      waarheden ontstaan. */
   const leesbaar = (uitvoer) => require('./uitgang-leesbaar').maak(uitvoer);
 
-  return { exporteer, controleer, lees, leesbaar, catalogus, som, canoniek, GEHEIM, VERSIE };
+  const reisarchief = archief => require('./uitgang-reis').maak({ archief, catalogus, som, versie: VERSIE });
+  return { exporteer, controleer, lees, leesbaar, reisarchief, catalogus, som, canoniek, GEHEIM, VERSIE };
 };

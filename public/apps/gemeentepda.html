@@ -77,6 +77,7 @@
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -100,7 +101,7 @@
 </main>
 
 <div class="melding" id="melding" role="status"></div>
-<button class="rahulfab" id="rahulFab" type="button" style="display:none;">Vraag Rahul</button>
+<button class="rahulfab ds-presentatie-toestand" id="rahulFab" type="button" hidden>Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>
   <div class="rahulkop"><b>Rahul · buitendienst</b><button type="button" id="rahulSluit" aria-label="Sluiten" class="s-m756vp">✕</button></div>
   <div class="rahulsug" id="rahulSug"></div>
@@ -175,7 +176,7 @@ function start(){
   $('#ploegen').innerHTML = PLOEGEN.map(p => '<button class="chip'+(p===ploeg?' aan':'')+'" data-p="'+esc(p)+'">'+esc(p)+'</button>').join('');
   $('#ploegen').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { ploeg = b.dataset.p; $('#ploegen').querySelectorAll('.chip').forEach(x => x.classList.toggle('aan', x===b)); laad(); }));
   laad();
-  $('#rahulFab').style.display = '';
+  $('#rahulFab').hidden = false;
 }
 // Rahul, de AI-assistent voor de buitendienst
 const RSUG = ['Wat zijn de urgente meldingen?', 'Vat de meldingen voor mijn ploeg samen', 'Wat pak ik het eerst op?'];
@@ -188,8 +189,8 @@ async function rahulVraag(q){
   try { const d = await api('/api/supplier/ai', { q }); $('#rahulUit').textContent = (d && (d.reply || d.error)) || 'Ik kwam er niet uit.'; const v=(d.goedkeuringen||[])[0]; if(v&&confirm('Controleer deze exacte actie:\n\n'+(v.samenvatting||v.pad)+'\n\nWilt u dit eenmalige voorstel uitvoeren?')){const b=await api('/api/supplier/doe/bevestig',{goedkeuringId:v.id,akkoord:true});if(b.ok){$('#rahulUit').textContent+=' Uitgevoerd na uw bevestiging.';laad();}} else if (d && d.did) laad(); }
   catch(e){ $('#rahulUit').textContent = e.message; }
 }
-document.getElementById('rahulFab').addEventListener('click',function(){ $('#rahulSheet').hidden=false; this.style.display='none'; rahulVul(); $('#rahulIn').focus(); if(!$('#rahulUit').textContent) $('#rahulUit').textContent='Vraag me om een overzicht of tik een suggestie. Ik lees mee met de meldingen.'; });
-document.getElementById('rahulSluit').addEventListener('click',function(){ $('#rahulSheet').hidden=true; $('#rahulFab').style.display=''; });
+document.getElementById('rahulFab').addEventListener('click',function(){ $('#rahulSheet').hidden=false; this.hidden=true; rahulVul(); $('#rahulIn').focus(); if(!$('#rahulUit').textContent) $('#rahulUit').textContent='Vraag me om een overzicht of tik een suggestie. Ik lees mee met de meldingen.'; });
+document.getElementById('rahulSluit').addEventListener('click',function(){ $('#rahulSheet').hidden=true; $('#rahulFab').hidden=false; });
 document.getElementById('rahulForm').addEventListener('submit',function(ev){ ev.preventDefault(); var q=$('#rahulIn').value.trim(); if(q) rahulVraag(q); });
 $('#ververs').addEventListener('click', laad);
 /* Meenemen (shared/uitvoer.js): de werklijst van deze ploeg is het register dat

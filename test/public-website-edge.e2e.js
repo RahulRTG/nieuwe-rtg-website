@@ -3,7 +3,7 @@
 // mutate application state or replace the original magazine/detail owners.
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
 const details = [...['community', 'rtg-pass', 'business-lite', 'business-pass', 'lifestyle-pass'].map(id => '/public/site/passen/' + id + '.html'), ...['livingos', 'travelos', 'workos', 'foundationos'].map(id => '/public/site/werelden/' + id + '.html'), '/public/site/techniek/techniek.html', '/explore/index.html', '/public/site/404.html'];
@@ -60,7 +60,7 @@ async function fixture(width, route = '/') {
   });
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => { if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url()); });
   await page.goto(base + route, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.body.classList.contains('ds-public-edge-page') && document.body.dataset.rtgAdaptiveReady === 'true');
@@ -205,7 +205,7 @@ for (const route of details) test(route + ': dezelfde app-Edge, oorspronkelijke 
       await logo.scrollIntoViewIfNeeded();
       const mark = await logo.evaluate(async node => { await node.decode(); const box = node.getBoundingClientRect(); return { width: box.width, height: box.height, fit: getComputedStyle(node).objectFit, alt: node.alt }; });
       assert.ok(mark.width > 0 && mark.height > 0 && Math.abs(mark.width / mark.height - 1280 / 470) < .01, 'volledige lockup blijft proportioneel zichtbaar in Info');
-      assert.equal(mark.fit, 'contain'); assert.equal(mark.alt, 'Rahul Travel Group — EXPERIENCE THE ELITE CLASS');
+      assert.equal(mark.fit, 'contain'); assert.equal(mark.alt, 'Rahul Travel Group - EXPERIENCE THE ELITE CLASS');
       await escapeToEdge(page); await chrome(page, route + ': Info gesloten');
     }
     assert.deepEqual(errors, []); assert.deepEqual(missing, []); safeTraffic(denied);

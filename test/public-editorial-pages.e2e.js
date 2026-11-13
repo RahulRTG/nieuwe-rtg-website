@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
 const ROOT = path.resolve(__dirname, '..');
 const CASES = [
   { file: 'passen/rtg-pass', pass: true, pilot: true },
@@ -51,7 +51,7 @@ async function session(width, javaScriptEnabled = true) {
   await context.route('**/*', route => new URL(route.request().url()).origin === base ? route.continue() : route.fulfill({ status: 503, body: 'Externe diensten vallen buiten deze presentatieproef.' }));
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.stack || error.message));
+  letOpFouten(page, errors);
   page.on('response', response => {
     if (response.url().startsWith(base) && response.status() >= 400 && ['stylesheet', 'script', 'image', 'font'].includes(response.request().resourceType())) missing.push(response.status() + ' ' + response.url());
   });
@@ -184,7 +184,7 @@ async function menuEscape(page, label) {
 }
 
 for (const c of CASES) for (const width of (c.volume ? [320, 390, 768, 1440] : c.pilot ? [320, 390, 1440] : [390, 1440])) {
-  test(c.file + ' — ' + width + 'px: beelden, hoofdstukken, toetsenbord en menu', async () => {
+  test(c.file + ' - ' + width + 'px: beelden, hoofdstukken, toetsenbord en menu', async () => {
     const { context, page, errors, missing } = await session(width);
     try {
       const response = await page.goto(base + '/public/site/' + c.file + '.html', { waitUntil: 'networkidle' });
@@ -201,7 +201,7 @@ for (const c of CASES) for (const width of (c.volume ? [320, 390, 768, 1440] : c
     } finally { await context.close(); }
   });
 }
-for (const c of CASES.filter(row => row.pilot)) test(c.file + ' — 390px zonder JavaScript: echte leesbare inhoud en ankers', async () => {
+for (const c of CASES.filter(row => row.pilot)) test(c.file + ' - 390px zonder JavaScript: echte leesbare inhoud en ankers', async () => {
   const { context, page, missing } = await session(390, false);
   try {
     await page.goto(base + '/public/site/' + c.file + '.html', { waitUntil: 'networkidle' });

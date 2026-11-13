@@ -1,6 +1,6 @@
 'use strict';
 
-/* Alleen de bestaande wegwerpserver van rolproef-route gebruikt deze opbouw.
+/* Alleen de bestaande wegwerpservers van rolproef-route en de storm gebruiken deze opbouw.
    De twee standaard-uit functies gaan langs hun gewone eigenaarbesluit; er
    verandert geen servervlag of productiestandaard. De positieve controles
    gebeuren VOOR de vingerafdruk, met hetzelfde lijf als de latere kruisproef.
@@ -82,13 +82,26 @@ async function maakRolfixtures({ post, basis, tokens, proeflid, kantoorVoor }) {
     for (const [rol, prefix, token] of [['member', '/api/site', proeflid?.token],
       ['supplier', '/api/supplier/site', tokens.supplier]]) {
       if (!token) throw new Error('geen eigen ' + rol + ' voor domein');
-      const site = eis(await post(prefix + '/bewaar', { design: { titel: 'Lokale rolproef ' + rol,
-        blokken: [{ type: 'kop', tekst: 'Lokale rolproef' }] } }, token), 'site bewaren ' + rol);
+      // De storm kan de voorraad van deze actor al hebben gevuld. De deur
+      // toetst domeinkoppeling, niet het recht op een dertiende website. Lees
+      // daarom eerst de EIGEN voorraad en behoud een bestaand ontwerp intact.
+      const mijn = eis(await post(prefix + '/mijn', {}, token), 'sites lezen ' + rol);
+      if (!Array.isArray(mijn.lijst)) throw new Error('geen eigen sitelijst voor ' + rol);
+      let site;
+      if (mijn.lijst.length) {
+        if (!mijn.lijst[0]?.id) throw new Error('geen eigen site-id voor ' + rol);
+        site = eis(await post(prefix + '/haal', { id: mijn.lijst[0].id }, token), 'site lezen ' + rol);
+        if (site.design?.id !== mijn.lijst[0].id) throw new Error('afwijkend eigen site-id voor ' + rol);
+      } else {
+        site = eis(await post(prefix + '/bewaar', { design: { titel: 'Lokale rolproef ' + rol,
+          blokken: [{ type: 'kop', tekst: 'Lokale rolproef' }] } }, token), 'site bewaren ' + rol);
+      }
       if (!site.design?.id) throw new Error('geen eigen site-id voor ' + rol);
       const id = site.design.id;
-      eis(await post(prefix + '/publiceer', { id, adres: 'rolproef-' + rol }, token), 'site publiceren ' + rol);
+      const naam = 'rolproef-' + rol + '-' + id;
+      eis(await post(prefix + '/publiceer', { id, adres: site.design.adres || naam }, token), 'site publiceren ' + rol);
       // Een gereserveerde testnaam: geen DNS, certificaat of extern verzoek.
-      await positief(prefix + '/domein', { id, domein: 'rolproef-' + rol + '.example.test' }, token);
+      await positief(prefix + '/domein', { id, domein: naam + '.example.test' }, token);
     }
   });
   return fixtures;

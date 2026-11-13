@@ -2,7 +2,7 @@
 // Reader-only proof. A static local fixture, with no provider or mutation traffic.
 const test=require('node:test'),assert=require('node:assert/strict');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
-const {laadPlaywright,startBrowser}=require('./helper');
+const {laadPlaywright,startBrowser,letOpFouten}=require('./helper');
 const root=path.join(__dirname,'..');let server,browser,base;
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.jpg':'image/jpeg','.png':'image/png','.woff2':'font/woff2'};
 test.before(async()=>{
@@ -22,7 +22,7 @@ async function reader(hash='',blockedStorage=false){
   if(blocked)Object.defineProperty(window,'sessionStorage',{get(){throw new DOMException('Storage refused','SecurityError');}});
  },blockedStorage);
  await context.route('**/*',route=>new URL(route.request().url()).origin===base&&['GET','HEAD'].includes(route.request().method())?route.continue():route.fulfill({status:503,body:'Reader fixture: external traffic excluded'}));
- const page=await context.newPage(),errors=[];page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push(error.message));
+ const page=await context.newPage(),errors=[];page.setDefaultTimeout(10000);letOpFouten(page, errors);
  await page.goto(base+'/'+hash,{waitUntil:'networkidle'});await ready(page);
  return {context,page,errors};
 }

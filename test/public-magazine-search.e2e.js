@@ -2,7 +2,7 @@
 // Public text retrieval and reader routing only. This is not an AI or service qualification.
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), http = require('node:http'), path = require('node:path');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
 let server, browser, base;
@@ -25,7 +25,7 @@ async function fixture() {
   await context.addInitScript(() => localStorage.setItem('rtg_lang', 'nl'));
   await context.route('**/*', route => new URL(route.request().url()).origin === base && ['GET', 'HEAD'].includes(route.request().method()) ? route.continue() : route.fulfill({ status: 503, body: 'Read-only public search proof' }));
   const page = await context.newPage(), errors = [];
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   await page.goto(base, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => !!window.RTGPublicApp && !!window.RTGCommand);
   return { page, context, errors };

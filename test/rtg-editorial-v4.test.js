@@ -78,6 +78,16 @@ test('de nieuwe laag definieert header, Edge en alle apparaatbreekpunten', () =>
     'reduced motion schakelt overgangen werkelijk uit');
 });
 
+test('basisacties houden toestandsfilters uit hun cascade-specificiteit', () => {
+  const css = read('public/shared/rtg-editorial-v4.css');
+  assert.match(css,
+    /:is\(\.knop,\.btn,button\[type="submit"\],a\.button,\.primary,\.primair,\.hoofd,\.rtg-dashboard-hero-cta,\.daily-action\):where\(:not\(\[hidden\],\.h-weg,\.rtg-command-form button\)\)\{/,
+    'de generieke actie-eigenaar mag latere primaire en secundaire varianten niet overstemmen');
+  assert.doesNotMatch(css,
+    /:is\(\.knop,\.btn,button\[type="submit"\],a\.button,\.primary,\.primair,\.hoofd,\.rtg-dashboard-hero-cta,\.daily-action\):not\(\[hidden\]\):not\(\.h-weg\):not\(\.rtg-command-form button\)/,
+    'drie afzonderlijke :not-filters verhogen de specificiteit en veroorzaken contrastregressies');
+});
+
 test('de ene schil sluit oude koppen, uitrekkende randen en Edge-overlap af', () => {
   const css = read('public/shared/rtg-editorial-v4.css');
   assert.match(css, /--v4-header:58px!important/);

@@ -16,6 +16,7 @@
    en veldnamen mag ontstaan (LAT-regel 4): een reis die hier EUR 2200 kost en
    in de Mall EUR 22 is precies het soort verschil dat niemand ziet aankomen. */
 const maakReisOpslag = require('./reisbureau-opslag');
+const { maakPrijsgrond, lidPrijsbeeld } = require('./reisbureau-prijsgrond');
 function reisAanbod(db) {
   return maakReisOpslag({ db }).reizen().map(t => ({
     id: t.id, titel: t.title, bestemming: t.dest, dates: t.dates || null,
@@ -26,7 +27,7 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, reisbetalingVan }) {
+function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, reisbetalingVan, bewerkCollectie }) {
   const nu = () => new Date().toISOString();
   const opslag = maakReisOpslag({ db }); // de deur naar aanbod en aanvragen (./reisbureau-opslag.js)
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
@@ -72,13 +73,14 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
     const pp = Math.max(0, Number(trip.netto) || 0);
     const rij = opslag.pakAanvragen();
     // dubbele aanvraag remmen: dezelfde reis, nog open, van hetzelfde lid
-    if (rij.some(a => a.status === 'aangevraagd' && a.customerKey === sess.key && a.tripId === trip.id))
+    if (rij.some(a => !a.keten && a.status === 'aangevraagd' && a.customerKey === sess.key && a.tripId === trip.id))
       return { status: 409, error: 'Je aanvraag voor deze reis staat al open. Een reisadviseur neemt contact met je op.' };
     const entry = {
       ref: 'RTG-R-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
       tripId: trip.id, titel: trip.title, bestemming: trip.dest,
       customerKey: sess.key, codename, personen, vertrek, notitie,
       prijs: { pp, totaal: Math.round(pp * personen * 100) / 100, valuta: 'EUR' },
+      prijsgrond: maakPrijsgrond(trip),
       status: 'aangevraagd', at: nu()
     };
     rij.unshift(entry);
@@ -91,7 +93,7 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
        een reisdossier ONTSTAAT: hiervoor kwam de enige reis die een lid ooit
        had uit de demo-seed (zie kern/lid/reisdossier.js). */
     if (dossier) dossier.zetAanvraag(sess.key, { ...entry, dates: trip.dates || null });
-    return { ok: true, aanvraag: entry, visumtaak: taak };
+    return { ok: true, aanvraag: lidPrijsbeeld(entry), visumtaak: taak };
   }
 
   /* WAT HET LID VAN EEN BESLUIT ZIET: de stand, wanneer het genomen is en het
@@ -101,18 +103,18 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
      bericht genoeg. Het besluit zelf staat wel op de aanvraag, want het kantoor
      leest dezelfde rij. */
   function mijn(key) {
-    return opslag.aanvragen().filter(a => a.customerKey === key).slice(0, 50)
+    return opslag.aanvragen().filter(a => !a.keten && a.customerKey === key).slice(0, 50)
       .map(a => a.besluit
         ? Object.assign({}, a, { besluit: { at: a.besluit.at, bericht: a.besluit.bericht } })
         : a)
       // en de geschiedenis van de nazorg langs dezelfde zeef: wat en wanneer wel,
       // wie er in het kantoor op de knop drukte niet (zie ./reisbureau-nazorg.js)
-      .map(a => nazorg.lidBeeld(a));
+      .map(a => lidPrijsbeeld(nazorg.lidBeeld(a)));
   }
 
   // een lid trekt zijn eigen aanvraag in zolang die nog openstaat
   async function annuleer(key, ref) {
-    const a = opslag.aanvragen().find(x => x.ref === String(ref || '') && x.customerKey === key);
+    const a = opslag.aanvragen().find(x => !x.keten && x.ref === String(ref || '') && x.customerKey === key);
     if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
     if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
     a.status = 'geannuleerd';
@@ -123,12 +125,12 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
     // niet doorgaat is ruis in de agenda
     const vt = visum();
     if (vt) await vt.bijAnnulering(key, a.ref);
-    return { ok: true, aanvraag: a };
+    return { ok: true, aanvraag: lidPrijsbeeld(a) };
   }
 
   // het reisbureau-kantoor: de openstaande aanvragen (codenamen, nooit echte namen)
   function aanvragen() {
-    return { ok: true, aanvragen: opslag.aanvragen().slice(0, 200) };
+    return { ok: true, aanvragen: opslag.aanvragen().filter(a => !a.keten).slice(0, 200) };
   }
   /* Het BESLUIT van de reisadviseur (bevestigen, afwijzen, en de kantooringang
      besluit()) staat in ./reisbureau-besluit.js -- zie de kop daar voor de naad. */
@@ -148,30 +150,25 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
   /* De deur voor kern/reisbureau-betaling.js: twee lezers en EEN schrijver, zodat
      die laag niet in deze bak hoeft te graaien. Waarom, staat in de kop daar. */
   function aanvraagVan(ref) {
-    return opslag.aanvragen().find(a => a.ref === String(ref || '')) || null;
+    return opslag.aanvragen().find(a => !a.keten && a.ref === String(ref || '')) || null;
   }
   function tripVan(id) {
     return opslag.reizen().find(t => t.id === String(id || '')) || null;
   }
   /* Een tweede betaling wordt geweigerd en niet overschreven: dat zou een
      eerdere boeking onvindbaar maken. */
-  function markeerBetaald(ref, betaling) {
-    const a = aanvraagVan(ref);
-    if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
-    if (a.betaald) return { status: 409, error: 'Deze reis is al betaald.', betaald: a.betaald };
-    a.betaald = betaling;
-    save();
-    return { ok: true, betaald: a.betaald };
-  }
+  const { reserveerInning, stopInning, markeerBetaald, bewerkAanvraag } =
+    require('./reisbureau-inning')({ opslag, save, bewerkCollectie, nu });
+  const nazorgTransactie = require('./reisbureau-nazorgtransactie')({
+    bewerkAanvraag, nazorg, nu, dossier, visum, meldLid });
 
   /* De reisaanvraag als soort in een gesprek met Rahul: ./reisbureau-context.js. */
   const contextDomein = require('./reisbureau-context')({ aanvraagVan });
 
   return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen, contextDomein,
-    aanvraagVan, tripVan, markeerBetaald,
+    aanvraagVan, tripVan, reserveerInning, stopInning, markeerBetaald,
     bevestig, wijsAf, besluit,
-    vraagWijziging: nazorg.vraagWijziging, besluitWijziging: nazorg.besluitWijziging,
-    zegAf: nazorg.zegAf, markeerThuis: nazorg.markeerThuis } };
+    ...nazorgTransactie } };
 }
 
 module.exports = { maakReisbureau, reisAanbod };

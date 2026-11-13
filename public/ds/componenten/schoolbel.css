@@ -1,0 +1,10 @@
+@layer rtg.component {
+  .ds-schoolbel { position: fixed; inset: auto 1rem 1rem; z-index: 80; padding: 1rem; border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: var(--ds-cover-grond); color: var(--ds-cover-inkt); box-shadow: var(--ds-schaduw-systeem); font-family: var(--ds-letter-tekst); }
+  .ds-schoolbel[hidden] { display: none; }
+  .ds-schoolbel .sbel-wie { margin-block-end: .6rem; font-weight: 600; }
+  .ds-schoolbel .sbel-acties { display: flex; gap: .5rem; }
+  .ds-schoolbel :is(.sbel-neem, .sbel-weg) { flex: 1; min-block-size: var(--ds-doel); padding: .55rem; border: 0; border-radius: 0; font: inherit; font-weight: 600; cursor: pointer; }
+  .ds-schoolbel .sbel-neem { background: var(--ds-metaal); color: var(--ds-cover-grond); }
+  .ds-schoolbel .sbel-weg { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-schoolbel .sbel-neem[hidden] { display: none; }
+}

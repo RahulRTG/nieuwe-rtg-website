@@ -37,7 +37,7 @@ function caps() {
    ['dia.weg', '#diaWeg', 'Dia verwijderen', '✕', ['lade'], ['knop']]
   ].forEach(function (r) {
     var knop = $(r[1]);
-    if (!knop || knop.style.display === 'none') return;
+    if (!knop || getComputedStyle(knop).display === 'none') return;
     var id = 'office.pres.' + r[0];
     A.declareer({ id: id, naam: r[2], label: r[3], groep: 'Dia',
       telefoon: r[4], tablet: r[4], bureau: ['werkbalk'],

@@ -3,12 +3,15 @@
 // explicitly opened article/detail. No app, account or mutation traffic.
 const test = require('node:test'), assert = require('node:assert/strict');
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
 const ids = ['editie', 'inhoudsopgave', 'interview', 'bedoeling', 'reisverhaal', 'reisnotities', 'goedeleven', 'salon-verhaal', 'ondernemen', 'foundation-verhaal', 'atelier', 'werelden-gids', 'code', 'vertrouwen', 'eigen-regie', 'lid-worden', 'service-gids', 'tot-ziens'];
 const sizes = [[320, 844, false], [390, 844, false], [768, 900, false], [1440, 900, false], [390, 600, false], [390, 600, true], [391, 650, false], [393, 600, false], [320, 600, true]];
 const sheetSelector = '.ds-public-edge .rtg-adaptive-sheet';
+const doorSelector = '.ds-public-edge .ds-public-edge-toggle';
+const barSelector = '.ds-public-edge .rtg-adaptive-bar';
+const longCaption = 'Een zorgvuldig gelezen verhaal over reizen, ontmoetingen, persoonlijke aandacht en de ruimte om het goede leven op uw eigen manier te ontdekken.';
 let server, browser, base;
 
 test.before(async () => {
@@ -47,7 +50,7 @@ async function fixture(width, height, largeText) {
   });
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => { if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url()); });
   await page.goto(base, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => !!window.RTGPublicApp && !!history.state?.rtgMagazine && document.body.dataset.magazineView === 'cover');
@@ -86,6 +89,57 @@ async function fixed(page, scope, label) {
 async function leaf(page, id) {
   await page.waitForFunction(id => !document.getElementById('magazineHome').hidden && document.querySelector('[data-issue-caption]').textContent === document.getElementById(id).dataset.issueLabel, id);
   await settle(page);
+}
+async function openEdge(page, name) {
+  // Real reading movement closes the quiet doorway. Wait for that original
+  // owner to settle before opening, rather than retrying an interrupted click.
+  await page.evaluate(() => new Promise((resolve, reject) => {
+    const track = document.getElementById('issueTrack');
+    let position = track.scrollLeft, stable = performance.now(), started = stable;
+    function sample(now) {
+      const next = track.scrollLeft;
+      if (Math.abs(next - position) > .1) stable = now;
+      position = next;
+      if (now - stable >= 220) return resolve();
+      if (now - started > 4000) return reject(new Error('het oorspronkelijke magazine blijft bewegen'));
+      requestAnimationFrame(sample);
+    }
+    requestAnimationFrame(sample);
+  }));
+  if (!await page.locator(barSelector).isVisible()) {
+    const door = page.locator(doorSelector);
+    assert.equal(await hit(door), true, 'de oorspronkelijke Edge-ingang blijft bereikbaar');
+    await door.focus(); await page.keyboard.press('Enter'); await settle(page);
+  }
+  const control = page.locator(barSelector + ' [data-rtg-adaptive-action="' + name + '"]');
+  assert.equal(await hit(control), true, name + ': de native Edge-actie blijft bereikbaar');
+  await control.focus(); await page.keyboard.press('Enter');
+  await page.locator(sheetSelector).waitFor({ state: 'visible' });
+  await page.waitForFunction(() => /^\d+\s*\/\s*\d+$/.test(document.querySelector('.ds-edge-page-status').textContent));
+  await settle(page);
+}
+async function seek(page, control) {
+  await firstMenuPage(page);
+  for (let index = 0; index < 80; index++) {
+    if (await hit(control)) return;
+    if (!await turnMenu(page, 1)) break;
+  }
+  assert.fail('de oorspronkelijke actie is nergens volledig bereikbaar: ' + await control.textContent());
+}
+async function contentsPage(page) {
+  await openEdge(page, 'context');
+  const contents = page.locator(sheetSelector).getByRole('button', { name: 'Inhoud van deze editie', exact: true });
+  await seek(page, contents); await contents.click(); await leaf(page, 'inhoudsopgave');
+}
+async function sourceCaption(page) {
+  // Exercise a legitimate long title at its original reader owner. The Edge
+  // must derive and paginate it; never replace the generated caption itself.
+  await page.evaluate(title => {
+    document.getElementById('editie').dataset.issueLabel = title;
+    window.dispatchEvent(new Event('rtg-public-reading-change'));
+    window.fixedCaptionSource = document.querySelector('.ds-edge-gallery figcaption p');
+  }, longCaption);
+  await page.waitForFunction(title => document.querySelector('.ds-edge-gallery figcaption p').textContent === title, longCaption);
 }
 async function back(page) {
   await page.locator('#magazineBack').click();
@@ -152,7 +206,7 @@ async function scanMenu(page, key, targetIndex) {
 
 for (const [width, height, largeText] of sizes) {
   const label = width + ' × ' + height + (largeText ? ' / 200% tekst' : '');
-  test('18 viewportvaste bladen, inhoud en Info; alleen een geopend verhaal scrollt op ' + label, async () => {
+  test('18 viewportvaste bladen, inhoud en colofon via Edge; alleen een geopend verhaal scrollt op ' + label, async () => {
     const { context, page, errors, missing } = await fixture(width, height, largeText);
     try {
       assert.deepEqual(await page.locator('#issueTrack > [data-issue-page]').evaluateAll(nodes => nodes.map(node => node.id)), ids);
@@ -161,23 +215,26 @@ for (const [width, height, largeText] of sizes) {
         await leaf(page, ids[index]);
         const card = page.locator('#' + ids[index]);
         await fixed(page, card, ids[index]);
-        assert.equal(await page.locator('[data-carousel-status]').innerText(), (index + 1) + ' / 18');
+        assert.equal(await page.locator('[data-carousel-status]').textContent(), (index + 1) + ' / 18');
         const preview = card.locator('[data-read-leaf="' + ids[index] + '"]');
         if (await card.evaluate(node => node.classList.contains('ds-issue-condensed'))) assert.equal(await hit(preview), true, ids[index] + ': volledige inhoud heeft een bereikbare opening');
-        assert.equal(await hit(page.locator('.ds-magazine-imprint[data-read-leaf="publicatie"]')), true, 'Info blijft vanaf ieder blad bereikbaar');
+        await openEdge(page, 'context');
+        const publication = page.locator(sheetSelector).getByRole('button', { name: 'Service, informatie en colofon', exact: true });
+        await seek(page, publication);
+        assert.equal(await hit(publication), true, 'de oorspronkelijke colofonroute blijft vanaf ieder blad bereikbaar via Edge');
         if (index < ids.length - 1) {
           const next = page.locator('[data-carousel-next]');
+          await seek(page, next);
           assert.equal(await hit(next), true, 'volgende bladzijde blijft binnen het scherm');
           await next.click();
         }
       }
       assert.equal(await page.locator('[data-carousel-next]').getAttribute('aria-disabled'), 'true', 'de editie is eindig');
-      await page.locator('.ds-magazine-imprint[data-read-leaf="publicatie"]').click();
+      await page.locator(sheetSelector).getByRole('button', { name: 'Service, informatie en colofon', exact: true }).click();
       await page.waitForFunction(() => document.body.dataset.magazineView === 'article' && document.getElementById('magazineDetailContent').contains(window.fixedSourceFooter));
       assert.equal(await page.evaluate(() => document.querySelector('#magazineDetailContent .ds-magazine-footer') === window.fixedSourceFooter), true, 'Info opent de oorspronkelijke footer, geen kopie');
       await back(page);
-      await page.locator('.ds-issue-controls a[href="#inhoudsopgave"]').click();
-      await leaf(page, 'inhoudsopgave');
+      await contentsPage(page);
       const contents = page.locator('#inhoudsopgave');
       if (await contents.evaluate(node => node.classList.contains('ds-issue-condensed'))) {
         await contents.locator('[data-read-leaf="inhoudsopgave"]').click();
@@ -202,7 +259,7 @@ for (const [width, height, largeText] of sizes) {
     try {
       assert.deepEqual(await page.locator('#explorePanel .ds-discover-routes a').evaluateAll(nodes => nodes.map(node => node.dataset.go)), ['reisverhaal', 'goedeleven', 'journal', 'ondernemen', 'passen', 'rahul']);
       if (width === 320 && largeText) {
-        const skip = page.locator('.ds-magazine-skip'), menu = page.locator('[data-magazine-menu]');
+        const skip = page.locator('.ds-magazine-skip'), menu = page.locator(doorSelector);
         assert.ok(await skip.evaluate(node => node.getBoundingClientRect().bottom <= 0), 'de hogere 200%-skiplink blijft in rust volledig buiten beeld');
         assert.equal(await hit(menu), true, 'de verborgen skiplink onderschept het mobiele menu niet');
         // macOS Safari includes links with Option-Tab; ordinary Tab follows
@@ -217,7 +274,7 @@ for (const [width, height, largeText] of sizes) {
         assert.equal(await hit(menu), true, 'het menu is na de toetsenbordfocus opnieuw vrij bereikbaar');
         await fixed(page, page.locator('#magazineHome'), '200%-skiplinkfocus');
       }
-      await page.locator('[data-magazine-menu]').click();
+      await openEdge(page, 'menu');
       const sheet = page.locator(sheetSelector);
       await sheet.waitFor({ state: 'visible' });
       await page.waitForFunction(() => /^\d+\s*\/\s*\d+$/.test(document.querySelector('.ds-edge-page-status').textContent));
@@ -236,17 +293,17 @@ for (const [width, height, largeText] of sizes) {
         await tab.focus(); await settle(page);
         assert.equal(await hit(tab), true, name + ': tab blijft zonder verticale scroll bereikbaar');
         await tab.click();
-        await sheet.locator('.ds-edge-gallery[data-mode="' + name + '"] img').waitFor({ state: 'visible' });
+        await sheet.locator(width >= 1100 ? '.ds-edge-reading-art[data-editorial-ready]' : '.ds-edge-gallery[data-mode="' + name + '"] img').waitFor({ state: 'visible' });
         await settle(page);
         assert.equal(await hit(tab), true, name + ': actieve tab blijft zichtbaar in de horizontale rij');
         const tabTops = await sheet.locator('[data-rtg-adaptive-mode]').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().top));
         assert.ok(Math.max(...tabTops) - Math.min(...tabTops) <= 1, 'alle servicetabs blijven op één regel');
         const count = await page.evaluate(name => {
-          const selector = name === 'now' ? '.ds-edge-now a, .ds-edge-now button' : '.rtg-adaptive-service button';
+          const selector = name === 'now' ? '.ds-edge-reading-links a, .ds-edge-reading-links button' : '.rtg-adaptive-service button';
           window.fixedServiceNodes = Array.from(document.querySelectorAll('.ds-public-edge ' + selector.split(', ').join(', .ds-public-edge ')));
           return window.fixedServiceNodes.length;
         }, name);
-        assert.equal(count, name === 'account' ? 3 : 2, name + ': oorspronkelijke acties zijn aanwezig');
+        assert.equal(count, name === 'account' ? 3 : name === 'now' ? 1 : 2, name + ': oorspronkelijke serviceacties of de actuele zoekingang zijn aanwezig');
         const accessible = await scanMenu(page, 'fixedServiceNodes');
         assert.equal(accessible.size, count, name + ': alle acties zijn volledig horizontaal bereikbaar');
         assert.equal(await page.locator('.rtg-adaptive-edge').count(), 1, 'één canonieke Edge');
@@ -262,16 +319,20 @@ for (const [width, height, largeText] of sizes) {
 test('lange native captions blijven exact en volledig leesbaar na tekstvergroting, tabwissel en resize', async () => {
   const { context, page, errors, missing } = await fixture(320, 600, true);
   try {
-    await page.evaluate(() => { window.fixedCaptionSource = document.querySelector('.ds-edge-gallery figcaption p'); });
-    await page.locator('[data-magazine-menu]').click();
+    await sourceCaption(page);
+    await openEdge(page, 'menu');
     const sheet = page.locator(sheetSelector);
-    const captions = { connect: 'Berichten, bellen en videobellen blijven bij de persoon en het gesprek.', account: 'Uw identiteit, gegevens, apparaten en veiligheidskeuzes op één plaats.' };
+    const captions = { connect: longCaption, account: longCaption };
     let sawFragments = false;
     for (const [mode, expected] of Object.entries(captions)) {
       const tab = sheet.locator('[data-rtg-adaptive-mode="' + mode + '"]');
-      await tab.focus(); await settle(page); await tab.click();
+      await tab.focus(); await settle(page);
+      assert.equal(await hit(tab), true, mode + ': de lange bronkop bedekt de native tab niet');
+      await tab.click();
       await page.waitForFunction(mode => document.querySelector('.ds-edge-gallery').dataset.mode === mode, mode);
       await sheet.locator('.ds-edge-gallery[data-mode="' + mode + '"] img').waitFor({ state: 'visible' });
+      assert.equal(await sheet.locator('.ds-edge-reading-caption').textContent(), expected, 'de compacte oriëntatiekop bewaart de volledige brontekst');
+      assert.equal(await sheet.locator('.ds-edge-reading-caption').getAttribute('aria-label'), 'Blad 1 · 18: ' + expected, 'de volledige bronkop blijft toegankelijk benoemd');
       for (const [width, height, largeText] of [[320, 600, true], [390, 844, false], [320, 600, true]]) {
         await page.setViewportSize({ width, height });
         await page.evaluate(largeText => { document.documentElement.style.fontSize = largeText ? '200%' : ''; }, largeText);
@@ -320,11 +381,14 @@ test('lange native captions blijven exact en volledig leesbaar na tekstvergrotin
 test('een vertraagd kunstbeeld behoudt het gelezen captionblad en zijn logische tekstpositie', async () => {
   const { context, page, errors, missing } = await fixture(320, 600, true);
   try {
-    const expected = 'Berichten, bellen en videobellen blijven bij de persoon en het gesprek.';
+    const expected = longCaption;
+    await sourceCaption(page);
     await page.evaluate(() => { window.fixedDelayedCaptionSource = document.querySelector('.ds-edge-gallery figcaption p'); });
-    await page.locator('[data-magazine-menu]').click();
+    await openEdge(page, 'menu');
     const sheet = page.locator(sheetSelector), tab = sheet.locator('[data-rtg-adaptive-mode="connect"]');
-    await tab.focus(); await settle(page); await tab.click();
+    await tab.focus(); await settle(page);
+    assert.equal(await hit(tab), true, 'de lange bronkop bedekt de Connect-tab niet');
+    await tab.click();
     await page.waitForFunction(() => {
       const gallery = document.querySelector('.ds-edge-gallery'), image = gallery.querySelector('img');
       return gallery.dataset.mode === 'connect' && image.complete && image.naturalWidth > 0 && gallery.querySelectorAll('.ds-edge-caption-leaf').length > 1;
@@ -401,8 +465,7 @@ test('directe blad-links herladen in dezelfde leesstand en keren zonder kopie te
 test('browser-terug en vooruit herstellen het compacte inhoudsblad, zijn originele knop en de echte leesplek', async () => {
   const { context, page, errors } = await fixture(390, 600, true);
   try {
-    await page.locator('.ds-issue-controls a[href="#inhoudsopgave"]').click();
-    await leaf(page, 'inhoudsopgave');
+    await contentsPage(page);
     const opener = page.locator('#inhoudsopgave [data-read-leaf="inhoudsopgave"]');
     assert.equal(await hit(opener), true);
     await opener.click();
@@ -428,7 +491,7 @@ test('RTL-menu heeft begrensde horizontale scroll, logische bladknoppen en passe
   const { context, page, errors } = await fixture(320, 600, false);
   try {
     await page.evaluate(() => { document.documentElement.dir = 'rtl'; });
-    await page.locator('[data-magazine-menu]').click();
+    await openEdge(page, 'menu');
     const sheet = page.locator(sheetSelector), pages = sheet.locator('.ds-edge-pages');
     await page.waitForFunction(() => /^1\s*\/\s*\d+$/.test(document.querySelector('.ds-edge-page-status').textContent));
     assert.ok(await pages.evaluate(node => node.scrollWidth > node.clientWidth + 10), 'het kleine RTL-menu heeft meerdere bladen');

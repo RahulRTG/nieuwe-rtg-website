@@ -312,18 +312,22 @@ async function controleerContextlade(page, label, route) {
     document.querySelector('.rtg-edge-2-context').hidden);
 }
 
+function v4PresentatieStabiel() {
+  const body = document.body;
+  const zichtbaar = el => !!(el && el.getClientRects().length &&
+    getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden');
+  // De wereld monteert Edge onder haar laadlaag; afmetingen zijn nog geen presentatiecommit.
+  const wereldKlaar = !body.hasAttribute('data-rtg-world-start') || body.dataset.rtgWorldStart === 'ready';
+  const klaar = wereldKlaar && getComputedStyle(body).getPropertyValue('--rtg-editorial-version').trim() === '20261016' &&
+    zichtbaar(document.querySelector('body>.rtg-v4-header')) && zichtbaar(document.querySelector('.rtg-adaptive-bar'));
+  if (!klaar) { window.__rtgV4EdgeStabiel = 0; return false; }
+  if (!window.__rtgV4EdgeStabiel) { window.__rtgV4EdgeStabiel = performance.now(); return false; }
+  return performance.now() - window.__rtgV4EdgeStabiel >= 300;
+}
+
 async function controleerV4Route(page, route, scherm) {
   const label = route.naam + ' · ' + scherm.naam;
-  await page.waitForFunction(() => {
-    const header = document.querySelector('body>.rtg-v4-header');
-    const bar = document.querySelector('.rtg-adaptive-bar');
-    const klaar = getComputedStyle(document.body).getPropertyValue('--rtg-editorial-version').trim() === '20261016' &&
-      header && header.getClientRects().length && getComputedStyle(header).display !== 'none' &&
-      bar && bar.getClientRects().length && getComputedStyle(bar).display !== 'none';
-    if (!klaar) { window.__rtgV4EdgeStabiel = 0; return false; }
-    if (!window.__rtgV4EdgeStabiel) { window.__rtgV4EdgeStabiel = performance.now(); return false; }
-    return performance.now() - window.__rtgV4EdgeStabiel >= 300;
-  }, null, { timeout:15000 });
+  await page.waitForFunction(v4PresentatieStabiel, null, { timeout:15000 });
   const staat = await page.evaluate(() => {
     const zichtbaar = el => !!(el && el.getClientRects().length &&
       getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden');
@@ -536,6 +540,55 @@ test('Edge 2: acht routes hebben één adaptieve rand en embeds nooit een tweede
         });
       }
     }
+
+    await t.test('V4-readiness weigert een gemonteerde kop onder de echte wereldlaadlaag', async () => {
+      const page = await context.newPage();
+      try {
+        await page.setViewportSize({ width: 390, height: 844 });
+        // Een lege nieuwe pagina heeft een opaque origin: CORP same-origin blokkeert
+        // daar onze echte CSS/JS. Neem eerst dezelfde origin zonder app-runtime.
+        await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
+        // De bestaande stijlen/runtime, met één nog niet gecommitteerde presentatiebron.
+        // Geen eigen visibilityregel of timer die de race kunstmatig nabootst.
+        await page.setContent(`<!doctype html><html><head>
+          <link rel="stylesheet" href="${base}/shared/rtg-editorial-v4.css">
+          <link rel="stylesheet" href="${base}/shared/rtg-world-start.css">
+          <script src="${base}/shared/rtg-world-start.js" defer></script>
+          </head><body data-rtg-editorial-v4="true" data-rtg-world-start="loading"
+            data-rtg-layout="standard" data-rtg-desktop-state="loading" aria-busy="true"
+            data-rtg-edge-2-rendered="true" data-rtg-world-dashboard-ready="true">
+          <div class="rtg-world-start">LivingOS wordt klaargezet…</div>
+          <header class="rtg-v4-header">RTG</header><div class="rtg-adaptive-bar">Edge</div>
+          </body></html>`, { waitUntil: 'domcontentloaded' });
+        // De meting vraagt de echte schilstijlen, niet alle subverzoeken van de pagina.
+        await page.waitForFunction(() => [...document.querySelectorAll('link[rel="stylesheet"]')].every(link => !!link.sheet) &&
+          getComputedStyle(document.body).getPropertyValue('--rtg-editorial-version').trim() === '20261016');
+        const laden = await page.evaluate(() => {
+          const header = document.querySelector('body>.rtg-v4-header'), bar = document.querySelector('.rtg-adaptive-bar');
+          window.__rtgV4EdgeStabiel = performance.now() - 1000;
+          const oudKlaar = getComputedStyle(document.body).getPropertyValue('--rtg-editorial-version').trim() === '20261016' &&
+            header && header.getClientRects().length && getComputedStyle(header).display !== 'none' &&
+            bar && bar.getClientRects().length && getComputedStyle(bar).display !== 'none';
+          return { wereld: document.body.dataset.rtgWorldStart, hoogte: header.getBoundingClientRect().height,
+            versie: getComputedStyle(document.body).getPropertyValue('--rtg-editorial-version').trim(),
+            header: getComputedStyle(header).visibility, bar: getComputedStyle(bar).visibility,
+            oudStabiel: !!oudKlaar && performance.now() - window.__rtgV4EdgeStabiel >= 300 };
+        });
+        assert.equal(laden.versie, '20261016', 'de echte schilstijl is geladen vanaf dezelfde origin');
+        assert.equal(laden.wereld, 'loading');
+        assert.ok(laden.hoogte > 0, 'de kop is gemonteerd en heeft echte afmetingen');
+        assert.equal(laden.header, 'hidden');
+        assert.equal(laden.bar, 'hidden');
+        assert.equal(laden.oudStabiel, true, 'de oude predicate zag verborgen montage ten onrechte als gereed');
+        assert.equal(await page.evaluate(v4PresentatieStabiel), false, 'een laadfase is geen zichtbare schil');
+        assert.equal(await page.evaluate(() => window.__rtgV4EdgeStabiel), 0, 'verborgen tijd telt niet als stabiliteit');
+        await page.evaluate(() => { document.body.dataset.rtgDesktopState = 'ready'; });
+        await page.waitForFunction(v4PresentatieStabiel, null, { timeout:15000 });
+        assert.equal(await page.locator('body').getAttribute('data-rtg-world-start'), 'ready');
+        assert.equal(await page.locator('.rtg-v4-header').isVisible(), true);
+        assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(), true);
+      } finally { await page.close(); }
+    });
 
     await t.test('dezelfde acht routes als echt iframe', async (st) => {
       const page = await context.newPage();

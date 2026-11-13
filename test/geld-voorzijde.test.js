@@ -35,8 +35,13 @@ test('de nieuwe Geld-schermen lezen bestaande bronnen en verzinnen geen bedragen
 
 test('de primaire Geld-navigatie gebruikt Meer als actieve ingang voor een detailstand', () => {
   const schil = lees('public/apps/geld/schil.js');
+  const stijl = lees('public/shared/rtg-geld-2026.css');
+  const editorial = lees('public/shared/rtg-editorial-v4.css');
   assert.match(schil, /navId = hoofd\.indexOf\(s\.id\) >= 0 \? s\.id : 'meer'/);
   assert.match(schil, /class="gx-plus" href="\/apps\/pay\.html"/);
+  assert.match(stijl, /\.rtg-geld-nieuw \.standen\{[^}]*left:max\(10px,[^}]*right:max\(10px/);
+  assert.match(editorial, /body\[data-rtg-editorial-v4="true"\]:not\(\.rtg-geld-nieuw\) \.standen/,
+    'de globale 100%-breedte mag de eigen vaste Geld-bediening niet overnemen');
 });
 
 test('het beleidspaneel declareert zijn vervolgstand voor volledige bedieningsreplay', () => {

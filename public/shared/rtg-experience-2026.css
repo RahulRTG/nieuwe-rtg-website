@@ -78,7 +78,6 @@ body.rtg-music-experience .speler{left:.7rem;right:.7rem;bottom:calc(env(safe-ar
 body.rtg-music-experience .speler .titel{font-family:'Bodoni Moda',Georgia,serif;font-size:1rem}
 body.rtg-music-experience .speler .rij{height:3rem!important;min-height:3rem!important;flex-wrap:nowrap!important;align-items:center!important}
 body.rtg-music-experience .speler .info{flex:1 1 auto!important;min-width:0!important;height:auto!important}
-body.rtg-music-experience .speler button{flex:0 0 2.5rem!important;width:2.5rem!important;min-width:2.5rem!important;padding:0!important}
 body.rtg-music-experience .speler .afspeel{flex-basis:3rem!important;width:3rem!important;height:3rem!important;border-radius:50%;background:linear-gradient(135deg,#a7254b,#651229);box-shadow:0 .4rem 1.4rem rgba(127,22,52,.5)}
 body.rtg-music-experience canvas.golf{bottom:5.9rem;opacity:.28}
 

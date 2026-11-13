@@ -2,7 +2,8 @@
 // Presentation and native navigation only. No provider, account or mutation traffic.
 const test = require('node:test'), assert = require('node:assert/strict');
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
+const edgeUI = require('./public-edge-interactions');
 const root = path.join(__dirname, '..');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
 let server, browser, base;
@@ -38,7 +39,7 @@ async function fixture(width = 390, height = 844) {
   await context.route('**/*', route => new URL(route.request().url()).origin === base && ['GET', 'HEAD'].includes(route.request().method()) ? route.continue() : route.fulfill({ status: 503, body: 'Read-only discover fixture: external traffic excluded' }));
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(10000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => {
     if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url());
   });
@@ -48,17 +49,11 @@ async function fixture(width = 390, height = 844) {
   return { context, page, errors, missing };
 }
 async function openMenu(page) {
-  // Native WebKit pointer clicks need not focus a button. Start with the
-  // keyboard when proving return-to-opener, so the focus owner is explicit.
-  await page.locator('[data-magazine-menu]').focus();
-  await page.keyboard.press('Enter');
-  await page.locator('#explorePanel').waitFor({ state: 'visible' });
-  assert.equal(await page.locator('[data-magazine-menu]').getAttribute('aria-expanded'), 'true');
-  return page.locator('.ds-public-edge .rtg-adaptive-sheet').filter({ has: page.locator('#explorePanel') });
+  return edgeUI.menu(page);
 }
-async function closed(page) {
+async function closed(page, nextPanel = false) {
   await page.locator('#explorePanel').waitFor({ state: 'hidden' });
-  assert.equal(await page.locator('[data-magazine-menu]').getAttribute('aria-expanded'), 'false');
+  if (!nextPanel) assert.equal(await page.locator('.ds-public-edge-toggle').getAttribute('aria-expanded'), 'false');
 }
 async function leaf(page, id) {
   await page.waitForFunction(id => !document.getElementById('magazineHome').hidden && history.state?.rtgMagazine.id === id && document.querySelector('[data-issue-caption]').textContent === document.getElementById(id).dataset.issueLabel, id);
@@ -90,7 +85,7 @@ async function seekMenuControl(page, sheet, control) {
 }
 
 for (const [width, height] of [[320, 844], [390, 844], [768, 900], [1440, 900], [390, 600]]) {
-  test('Ontdek: compleet kunstbeeld, ruime doelen en bereikbare sluitknop op ' + width + ' × ' + height, async () => {
+  test('Ontdek: oorspronkelijk kunstbeeld, ruime doelen en bereikbare sluitknop op ' + width + ' × ' + height, async () => {
     const { context, page, errors, missing } = await fixture(width, height);
     try {
       const sheet = await openMenu(page), panel = page.locator('#explorePanel');
@@ -104,14 +99,23 @@ for (const [width, height] of [[320, 844], [390, 844], [768, 900], [1440, 900], 
         return { complete: image.complete && image.naturalWidth > 0, ratio: box.width / box.height, naturalRatio: image.naturalWidth / image.naturalHeight, fit: style.objectFit, anchor: image.closest('a')?.getAttribute('href') };
       });
       assert.equal(imageState.complete, true);
-      assert.ok(Math.abs(imageState.ratio - imageState.naturalRatio) < .02 || imageState.fit === 'contain', 'het schilderij is volledig zichtbaar');
+      if (width < 1100) {
+        assert.ok(['cover', 'contain'].includes(imageState.fit), 'het kunstbeeld vult zijn vaste blad volgens het randloze beeldcontract');
+        assert.equal(await art.isVisible(), true);
+      } else {
+        const contextArt = sheet.locator('.ds-edge-reading-art');
+        await contextArt.evaluate(image => image.decode());
+        assert.equal(await contextArt.isVisible(), true, 'de desktopfolio toont het actuele kunstbeeld naast de oorspronkelijke Ontdek-links');
+      }
       assert.equal(imageState.anchor, '#journal');
       assert.deepEqual(await panel.locator('.ds-discover-routes a[data-go]').evaluateAll(nodes => nodes.map(node => node.dataset.go)), ['reisverhaal', 'goedeleven', 'journal', 'ondernemen', 'passen', 'rahul']);
       assert.deepEqual(await sheet.locator('[data-rtg-adaptive-mode]').evaluateAll(nodes => nodes.map(node => node.dataset.rtgAdaptiveMode)), ['now', 'rahul', 'connect', 'media', 'account']);
       const more = panel.locator('details').first();
+      await seekMenuControl(page, sheet, more.locator('summary'));
       await more.locator('summary').click();
       assert.equal(await more.evaluate(node => node.open), true);
       for (const control of await sheet.locator('a:visible, button:visible, summary:visible').all()) {
+        await edgeUI.seek(page, control);
         const size = await control.boundingBox();
         assert.ok(size && size.height >= 43.9, 'aanraakdoel minstens 44px: ' + (await control.innerText()).trim());
       }
@@ -123,21 +127,23 @@ for (const [width, height] of [[320, 844], [390, 844], [768, 900], [1440, 900], 
       assert.ok(closeBox && closeBox.y >= 0 && closeBox.y + closeBox.height <= height + 1, 'sluiten blijft ook onderaan het menu in het zicht');
       await close.click();
       await closed(page);
-      await page.waitForFunction(() => document.activeElement === document.querySelector('[data-magazine-menu]'));
+      await page.waitForFunction(() => document.activeElement === document.querySelector('.ds-public-edge-toggle'));
       assert.deepEqual(errors, []); assert.deepEqual(missing, []);
     } finally { await context.close(); }
   });
 }
 
-test('Ontdek vanaf het toetsenbord sluiten via Escape of dezelfde menuknop herstelt openerfocus', async () => {
+test('Ontdek vanaf het toetsenbord sluiten via Escape of de oorspronkelijke sluitknop herstelt openerfocus', async () => {
   const { context, page, errors } = await fixture();
   try {
     await openMenu(page);
-    assert.equal(await page.locator('#explorePanel').evaluate(node => node.contains(document.activeElement)), true);
+    assert.equal(await page.locator('.rtg-adaptive-edge').evaluate(node => node.contains(document.activeElement)), true);
     await page.keyboard.press('Escape'); await closed(page);
-    await page.waitForFunction(() => document.activeElement === document.querySelector('[data-magazine-menu]'));
-    await openMenu(page); await page.locator('[data-magazine-menu]').click(); await closed(page);
-    await page.waitForFunction(() => document.activeElement === document.querySelector('[data-magazine-menu]'));
+    await page.waitForFunction(() => document.activeElement === document.querySelector('.ds-public-edge-toggle'));
+    await openMenu(page);
+    const close = page.locator('.ds-public-edge [data-rtg-adaptive-close]');
+    await close.focus(); await page.keyboard.press('Enter'); await closed(page);
+    await page.waitForFunction(() => document.activeElement === document.querySelector('.ds-public-edge-toggle'));
     assert.deepEqual(errors, []);
   } finally { await context.close(); }
 });
@@ -145,9 +151,8 @@ test('Ontdek vanaf het toetsenbord sluiten via Escape of dezelfde menuknop herst
 test('Ontdek opent ook via een echte pointerklik en sluit via de bestaande sluitknop', async () => {
   const { context, page, errors, missing } = await fixture();
   try {
-    await page.locator('[data-magazine-menu]').click();
-    await page.locator('#explorePanel').waitFor({ state: 'visible' });
-    assert.equal(await page.locator('[data-magazine-menu]').getAttribute('aria-expanded'), 'true');
+    await edgeUI.menu(page, true);
+    assert.equal(await page.locator('.ds-public-edge-toggle').getAttribute('aria-expanded'), 'true');
     const art = page.locator('#explorePanel img[src$="rtg-discover-salon.webp"]');
     await art.evaluate(image => image.decode());
     assert.equal(await art.evaluate(image => image.complete && image.naturalWidth > 0), true);
@@ -162,15 +167,18 @@ test('alle redactionele menu-ingangen en het schilderij openen hun bestaande mag
   try {
     for (const [route, expected] of [['reisverhaal', 'reisverhaal'], ['goedeleven', 'goedeleven'], ['journal', 'inhoudsopgave'], ['ondernemen', 'ondernemen']]) {
       await openMenu(page);
-      await page.locator('#explorePanel .ds-discover-routes a[data-go="' + route + '"]').click();
+      const link = page.locator('#explorePanel .ds-discover-routes a[data-go="' + route + '"]');
+      await edgeUI.seek(page, link); await link.click();
       await closed(page); await leaf(page, expected);
     }
     await openMenu(page);
-    await page.locator('#explorePanel a[href="#journal"]').first().click();
+    const artLink = page.locator('#explorePanel a[href="#journal"]').first();
+    await edgeUI.seek(page, artLink); await artLink.click();
     await closed(page); await leaf(page, 'inhoudsopgave');
     for (const route of ['passen', 'rahul']) {
       await openMenu(page);
-      await page.locator('#explorePanel .ds-discover-routes a[data-go="' + route + '"]').click();
+      const link = page.locator('#explorePanel .ds-discover-routes a[data-go="' + route + '"]');
+      await edgeUI.seek(page, link); await link.click();
       await closed(page);
       assert.equal(await page.locator('#magazineDetailContent > #' + route).isVisible(), true);
     }
@@ -183,9 +191,10 @@ test('zoeken, taalkeuze en de actielijst behouden hun bestaande eigenaren vanuit
   try {
     await openMenu(page);
     const details = page.locator('#explorePanel details').first();
+    await edgeUI.seek(page, details.locator('summary'));
     await details.locator('summary').click();
     const search = page.locator('#explorePanel [data-command-open]');
-    await search.focus();
+    await edgeUI.seek(page, search);
     await page.keyboard.press('Enter');
     await page.locator('#commandDialog').waitFor({ state: 'visible' });
     await page.locator('#commandDialog button[type="submit"]').click();
@@ -197,12 +206,14 @@ test('zoeken, taalkeuze en de actielijst behouden hun bestaande eigenaren vanuit
     await page.locator('#commandResults a[href="#artikel-interview"]').first().click();
     await closed(page);
     assert.equal(await page.locator('#magazineDetailContent > #artikel-interview').isVisible(), true);
-    await openMenu(page); await page.locator('#experienceLanguage').click();
+    await openMenu(page);
+    const language = page.locator('#experienceLanguage');
+    await edgeUI.seek(page, language); await language.click();
     await closed(page);
     assert.ok(await page.locator('[role=dialog]:visible, dialog:visible').count() > 0);
     await page.keyboard.press('Escape');
-    await openMenu(page); await page.locator('[data-magazine-actions]').click();
-    await closed(page);
+    await openMenu(page); await edgeUI.action(page, 'context');
+    await closed(page, true);
     assert.equal(await page.locator('.pp-menu-panel').isVisible(), true);
     assert.ok(await page.locator('.pp-menu-panel button').count() >= 5);
     assert.deepEqual(errors, []);
@@ -236,7 +247,7 @@ test('Ontdek blijft bereikbaar met 200% tekst op een kort scherm en bij RTL op 3
       const close = sheet.locator('[data-rtg-adaptive-close]'), closeBox = await close.boundingBox();
       assert.ok(closeBox && closeBox.y >= 0 && closeBox.y + closeBox.height <= height + 1, mode + ': sluitknop blijft zichtbaar');
       await close.click(); await closed(page);
-      await page.waitForFunction(() => document.activeElement === document.querySelector('[data-magazine-menu]'));
+      await page.waitForFunction(() => document.activeElement === document.querySelector('.ds-public-edge-toggle'));
       assert.deepEqual(errors, []);
     } finally { await context.close(); }
   }

@@ -2,7 +2,7 @@
 // Read-only GitHub evidence collection. Never runs tests, commits, pushes or deploys.
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
-const { verifyUpload, githubBytes } = require('./lib/outputartifact');
+const { verifyUpload, githubBytes, requiredJournals: required } = require('./lib/outputartifact');
 const source = path.resolve(process.argv[2] || '');
 const repo = process.env.GITHUB_REPOSITORY;
 const sha = process.argv[3], runId = process.argv[4];
@@ -26,17 +26,6 @@ function pages(endpoint, key) {
     if (page[key].length < 100) return result;
   }
 }
-const required = [
-  ...[1, 2, 3, 4].map(n => ({ artifact: 'routejournaal-scherf-' + n,
-    job: 'Toetsscherf ' + n + ' van 4', step: 'Deze scherf, met dekking als lcov',
-    upload: 'Het routejournaal van deze scherf bewaren', member: 'routejournaal.log', nonempty: true })),
-  ...['boot-smoke', 'grens-sweep', 'keuring', 'klok', 'meterijk', 'zaakdoos'].map(n => ({ artifact: 'routejournaal-ijking-' + n,
-    job: 'De ijking - ' + n, step: 'De ijking draaien (een bestand, alleen op deze machine)',
-    upload: 'Het routejournaal van deze ijking bewaren', member: 'routejournaal.log' })),
-  ...[1, 2, 3, 4, 5].map(n => ({ artifact: 'schermjournaal-deel-' + n,
-    job: 'Schermtoetsen deel ' + n + ' van 5', step: 'Scherm-tests (PDA in de browser)',
-    upload: 'Schermjournaal van dit deel bewaren', member: '.schermjournaal', nonempty: true }))
-];
 try {
   if (git(['rev-parse', 'HEAD']) !== sha || git(['status', '--porcelain', '--untracked-files=no']))
     throw Error('Candidate checkout must be exact and clean.');
@@ -111,7 +100,7 @@ try {
   const provenance = { commit: sha, sourceTree: candidateTree, sha256: hash(bytes), complete: true,
     createdAt: new Date().toISOString(), repository: repo, runId: Number(runId), runAttempt: run.run_attempt,
     workflowHeadSha: run.head_sha, workflowStatus: run.status, workflowConclusion: run.conclusion,
-    scope: 'All four unit shards, six calibration journals, and four browser shards; their test execution completed successfully.',
+    scope: 'All four unit shards, six calibration journals, and five browser shards; their test execution completed successfully.',
     sourceEquivalence: 'Actual checkout commits remain recorded. A PR merge checkout is accepted only when its complete Git tree equals the candidate tree.',
     limitations: ['This collection does not claim the entire workflow is green.', 'Journals identify test-to-route attribution, not successful output invariants.'],
     sources: records };

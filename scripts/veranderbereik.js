@@ -697,7 +697,7 @@ function main() {
     console.log('  direct herleidbare afbouwschermen    ' + String(r.afbouw.directScreens.length).padStart(5));
     console.log('  mogelijke schermscope (volle ring)  ' + String(r.afbouw.possibleScreens.length).padStart(5));
     console.log('  afbouwwerkpakketten                  ' + r.afbouw.workPackages.join(', '));
-    console.log('  afbouwprojectie                     ' + r.afbouw.status + ' — geen uitvoeringsbewijs');
+    console.log('  afbouwprojectie                     ' + r.afbouw.status + ' - geen uitvoeringsbewijs');
     if (r.afbouw.errors.length) console.log('  ontbrekende afbouwinformatie         ' + r.afbouw.errors.length);
     console.log('\n  ' + r.samen.slice(0, 25).join('\n  ') + (r.samen.length > 25 ? '\n  ... en ' + (r.samen.length - 25) + ' meer' : ''));
     console.log('');

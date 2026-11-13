@@ -47,7 +47,7 @@ test('Vertaler: live vertalen, een reiszin aantikken en bewaren op het toestel',
 
     /* bewaren blijft op het toestel */
     await page.evaluate(() => { document.querySelector('#bewaarZin').click(); });
-    await page.waitForFunction(() => !document.querySelector('#bewaardKop').style.display &&
+    await page.waitForFunction(() => !document.querySelector('#bewaardKop').hidden &&
       /hallo/.test(document.querySelector('#bewaard').textContent), null, { timeout: 8000 });
     assert.ok(await page.evaluate(() => (localStorage.getItem('rtg_vertaal_vast') || '').includes('hallo')),
       'de bewaarde zin staat in localStorage, niet op de server');

@@ -30,13 +30,6 @@
 (function (w, d) {
   'use strict';
 
-  if (!document.documentElement.hasAttribute('data-ds') && !document.getElementById('rtgDsRuntimeCss')) {
-    var ondertitelStijlLink = document.createElement('link');
-    ondertitelStijlLink.id = 'rtgDsRuntimeCss';
-    ondertitelStijlLink.rel = 'stylesheet';
-    ondertitelStijlLink.href = '/ds/rtg-ds.css';
-    document.head.appendChild(ondertitelStijlLink);
-  }
   if (w.RTGOndertitelband) return;
 
   function bandVan(vlak) {

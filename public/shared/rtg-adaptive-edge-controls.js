@@ -2,7 +2,7 @@
   'use strict';
   var APP='.wd-output,.connection-edge,.wos-dock,.wos-rail,.rtgdeel-balk,.rv-tabs,body>nav.balk,.wd-page>nav.balk,.rtg-edge-owned-bar,.rtm-nav,.mv-navigatie,.roomrail,.rolechoice,.rtd-dossieracties,.rtd-besluitacties,.rtg-v4-route-actions,[data-rtg-platform-chrome]';
   var R=APP+',.cmd-balk,[data-rtg-edge-controls],.rtgsprong-greep,.ios-nav-acties,.ios-nav-extra'
-  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
+  function lbl(el){return(el.getAttribute('aria-label')||el.title||el.textContent||el.innerText||'').replace(/\s+/g,' ').trim()}
   function avail(el,root){
     var view=el.ownerDocument.defaultView||w;
     for(var p=el;p;p=p.parentElement){

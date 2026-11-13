@@ -48,7 +48,7 @@
   function enterApp(){
     $('#gate').style.display = 'none';
     $('#app').classList.add('on');
-    $('#liveInd').style.display = 'inline-flex';
+    $('#liveInd').classList.remove('h-weg');
     startWerkOS();
     render();
     loadHandelsRegels();

@@ -57,9 +57,9 @@
   <div id="mappen"></div>
   <h2 class="kop ds-dag-kop" data-i18n="daily.files">Uw documenten</h2>
   <div id="lijst" aria-live="polite"></div>
-  <div id="gedeeldKop" class="kop ds-dag-kop" style="display:none;" data-i18n="dailyField.sharedWithMe">Met mij gedeeld</div>
+  <div id="gedeeldKop" class="kop ds-dag-kop" data-i18n="dailyField.sharedWithMe" hidden>Met mij gedeeld</div>
   <div id="gedeeldLijst"></div>
-  <div id="officeKop" class="kop ds-dag-kop" style="display:none;" data-i18n="dailyField.officeSource">Uit RTG Office · werken doet u daar</div>
+  <div id="officeKop" class="kop ds-dag-kop" data-i18n="dailyField.officeSource" hidden>Uit RTG Office · werken doet u daar</div>
   <div id="officeLijst"></div>
   <div class="daily-foot ds-dag-daily-foot"><button type="button" class="daily-action ds-knop ds-dag-actie" data-daily-target="kies"><span data-i18n="daily.addFile">Bestand toevoegen</span> <span aria-hidden="true">→</span></button></div>
 <div class="daily-storage ds-dag-daily-storage">  <div class="rij s-15e9keb ds-dag-rij ds-dag-verdeel">
@@ -80,16 +80,16 @@
   <div class="paneel ds-dag-paneel">
     <input class="ds-invoer titel ds-dag-titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam" data-i18n-aria="dailyField.filename">
     <p class="stil ds-dag-marge ds-dag-stil" id="bkMeta"></p>
-    <div id="bkKijk" style="display:none;"></div>
+    <div id="bkKijk" hidden></div>
     <label for="bkMap" data-i18n="dailyField.inFolder">In map</label>
-    <select class="ds-invoer veld ds-invoer" id="bkMap" style="width:100%;"></select>
+    <select class="ds-invoer veld ds-dag-breed" id="bkMap"></select>
     <div id="bkDeelWrap">
       <label for="bkCode" data-i18n="dailyField.shareFile">Delen op codenaam (kijken en nieuwe versies)</label>
       <div class="rij ds-dag-rij"><input class="ds-invoer veld ds-dag-rek ds-invoer" id="bkCode" maxlength="60" placeholder="Codenaam" data-i18n-ph="dailyField.codename">
         <button class="knop ds-knop" id="bkDeel" type="button" data-i18n="dailyField.share">Deel</button></div>
       <p class="stil ds-dag-stil" id="bkGedeeld"></p>
     </div>
-    <div id="bkVersieWrap" style="display:none;">
+    <div id="bkVersieWrap" hidden>
       <label data-i18n="dailyField.versions">Versies</label>
       <div id="bkVersies"></div>
     </div>
@@ -103,7 +103,7 @@
       <button class="knop ds-knop" id="bkDicht" type="button" data-i18n="dailyField.close">Sluit</button>
     </div>
     <div class="rij ds-dag-marge ds-dag-rij">
-      <button class="knop ds-knop" id="bkHerstel" type="button" style="display:none;" data-ds-actie data-ds-actie-id="documents.restore" data-i18n="dailyField.restore">Herstel</button>
+      <button class="knop ds-knop" id="bkHerstel" type="button" data-ds-actie data-ds-actie-id="documents.restore" data-i18n="dailyField.restore" hidden>Herstel</button>
       <input class="ds-invoer" type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen" data-i18n-aria="dailyField.chooseVersion">
     </div>
   </div>

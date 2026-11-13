@@ -298,7 +298,13 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
         await volgVerzoeken(page);
         try {
           await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-          await wachtOpRust(page);
+          /* Deze census bewijst de systeemdeur, niet dat ieder achtergronddeel
+             van ieder scherm klaar is. `wachtOpRust` koppelde hem toch aan alle
+             fetches van een pagina. Na ruim 250 routes kon daardoor een traag
+             chat-history-verzoek op Rijksloket de hele menubewijsvoering rood
+             maken, terwijl de systeemdeur al aantoonbaar klaarstond. Hieronder
+             wachten we rechtstreeks op de toepasselijke deur of veilige uitweg;
+             redirects krijgen aansluitend hun eigen expliciete aankomstbewijs. */
           /* EEN DOORVERWIJSPAGINA HEEFT GEEN MENU NODIG, WEL EEN AANKOMST.
              kantoorpda.html en zorgbalie.html sturen met een meta-refresh door
              naar de personeels-app. Dat gebeurt pas na het laden (lokaal 0,8 tot

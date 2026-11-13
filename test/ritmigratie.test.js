@@ -29,6 +29,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const WORTEL = path.join(__dirname, '..');
 const M = require('../scripts/ritmigratie');
@@ -39,6 +40,24 @@ const M = require('../scripts/ritmigratie');
    tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
    Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
 const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
+test('de bronmeter ziet zowel db.data.rides als een doorgegeven data.rides', (t) => {
+  const wortel = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ritlezer-'));
+  t.after(() => fs.rmSync(wortel, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(wortel, 'server'));
+  fs.writeFileSync(path.join(wortel, 'server', 'direct.js'), 'const lees = () => db.data.rides;');
+  fs.writeFileSync(path.join(wortel, 'server', 'doorgegeven.js'), 'module.exports = data => () => data.rides;');
+  fs.writeFileSync(path.join(wortel, 'server', 'anders.js'), 'const lees = () => [metadata.rides, data.ridesLater];');
+  assert.deepEqual([...M.tel(wortel)].sort(), [
+    ['server/direct.js', 1], ['server/doorgegeven.js', 1]
+  ]);
+});
+
+test('de uitgehaalde bedrijfsmaat blijft een historische ritlezer', () => {
+  const u = M.meet();
+  assert.ok(u.perSoort.historie.some(r => r.bestand === 'server/opzet/kernlaag4-bedrijfsmaat.js'),
+    'een verplaatste data.rides-lezer mag niet uit de migratiekaart verdwijnen');
+});
+
 test('0. de kaart loopt gelijk met de code', () => {
   const u = M.meet();
   assert.deepEqual(u.onbekend, [],

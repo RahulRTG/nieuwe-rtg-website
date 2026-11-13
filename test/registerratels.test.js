@@ -8,7 +8,7 @@ const { RATELS, controleer } = require('../scripts/registerratels');
 // Elke mutation verandert een werkelijk dragende claim, niet alleen een label.
 const MUTANTEN = {
   'SLO.json': [r => { r.minimumVerzoeken = 0; }, r => { r.doelen[0].streef--; }, r => { r.reizen.find(x => x.pad === '/api/auth/login').verwacht = [200]; }],
-  'SUITE.json': [r => { r.gemeten.groen = true; }, r => { r.gemeten.groen = true; r.gemeten.afsluitcode = 0; }, r => { r.gemeten.geslaagdeTests++; }],
+  'SUITE.json': [r => { r.gemeten.groen = !r.gemeten.groen; }, r => { r.gemeten.groen = true; r.gemeten.afsluitcode = 0; r.gemeten.volledig = false; }, r => { r.gemeten.geslaagdeTests++; }],
   'HANDELINGPROEF.json': [r => { r.gemeten.ketenOk = false; }, r => { r.perRoute.find(x => x.audit === 'bewezen').status = 403; }, r => { r.perRoute[0] = structuredClone(r.perRoute[1]); }],
   'KERNHERKOMST.json': [r => { r.perNaam[0].herkomsten = []; }, r => { r.perNaam[0].herkomsten.push({ bestand: 'server/andere-herkomst.js', hoe: 'toewijzing' }); }, r => { r.onopgelost.pop(); }, r => { r.onopgelost[0].reden = ''; }],
   'SCHRIJFANALYSE.json': [r => {
@@ -45,6 +45,7 @@ for (const naam of Object.keys(RATELS)) {
     for (const mutatie of MUTANTEN[naam]) {
       const fout = structuredClone(origineel);
       mutatie(fout);
+      assert.notDeepEqual(fout, origineel, 'de negatieve controle moet de invoer veranderen');
       assert.throws(() => controleer(naam, fout), 'een verslechterde claim moet de ratel laten zakken');
     }
     assert.doesNotThrow(() => controleer(naam, origineel), 'de tegenproef mag het register niet wijzigen');
@@ -68,6 +69,21 @@ test('SUITE: alleen volledige ononderbroken PASS mag groen heten; eerlijke mislu
   for (const veld of ['volledig', 'tapVolledig']) {
     const fout = structuredClone(r); fout.gemeten[veld] = false;
     assert.throws(() => controleer('SUITE.json', fout));
+  }
+});
+
+test('SUITE: negatieve controles verslechteren zowel een groene als een eerlijke rode basis', () => {
+  const groen = { gemeten: { volledig:true, bestanden:1, afsluitcode:0, groen:true,
+    tapVolledig:true, tests:1, geslaagdeTests:1, mislukt:0, geannuleerd:0, overgeslagen:0, todo:0 } };
+  const rood = structuredClone(groen);
+  Object.assign(rood.gemeten, {groen:false, afsluitcode:1, geslaagdeTests:0, mislukt:1});
+  for (const origineel of [groen, rood]) {
+    assert.doesNotThrow(() => controleer('SUITE.json', origineel));
+    for (const mutatie of MUTANTEN['SUITE.json']) {
+      const fout = structuredClone(origineel); mutatie(fout);
+      assert.notDeepEqual(fout, origineel, 'de negatieve controle moet de invoer veranderen');
+      assert.throws(() => controleer('SUITE.json', fout), 'elke mutant moet vanuit beide geldige kleuren zakken');
+    }
   }
 });
 

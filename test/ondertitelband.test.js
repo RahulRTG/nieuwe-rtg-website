@@ -38,12 +38,12 @@ test('alle mediaschermen gebruiken de centrale DS-ondertitelcomponent', () => {
     const html = fs.readFileSync('public/apps/' + app + '.html', 'utf8');
     assert.equal((html.match(/\/shared\/ondertitelband\.css/g) || []).length, 0, app);
     assert.equal((html.match(/\/shared\/ondertitelband\.js/g) || []).length, 1, app);
+    assert.equal((html.match(/\/ds\/componenten\/ondertitelband\.css/g) || []).length, 1, app);
   }
   const css = fs.readFileSync('public/ds/componenten/ondertitelband.css', 'utf8');
   assert.match(css, /\.ds-ondertitelband/);
   assert.doesNotMatch(css, /!important|#[0-9a-f]{3,8}\b/i);
-  assert.doesNotMatch(bron, /createElement\(['"]style['"]\)|ondertitelband\.css/);
-  assert.match(bron, /ondertitelStijlLink\.href = '\/ds\/rtg-ds\.css'/);
+  assert.doesNotMatch(bron, /createElement\(['"](?:style|link)['"]\)|ondertitelband\.css|rtgDsRuntimeCss/);
 });
 
 test('cues volgen tijd en sprongen, tekst blijft tekst en einde ruimt de band', () => {
@@ -54,7 +54,7 @@ test('cues volgen tijd en sprongen, tekst blijft tekst en einde ruimt de band', 
   ]);
   const band = f.vlak.querySelector('.ondert');
   assert.match(band.className, /ds-ondertitelband/);
-  assert.equal(f.document.getElementById('rtgDsRuntimeCss').href, '/ds/rtg-ds.css');
+  assert.equal(f.document.getElementById('rtgDsRuntimeCss'), null);
   assert.equal(band.getAttribute ? band.getAttribute('aria-live') : band['aria-live'], 'off');
   f.video.currentTime = 2; f.video.fire('timeupdate');
   assert.equal(band.textContent, '<img src=x onerror=alert(1)>');

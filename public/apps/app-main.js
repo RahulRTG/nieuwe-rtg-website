@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '08f57861';
+var RTG_BOUW = 'c1db8933';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -343,14 +343,25 @@ var RTG_BOUW = '08f57861';
     if (window.RTGLevend) RTGLevend.familie();
   }
   function pasThemaZet(t){
+    if (t !== 'standaard' && t !== 'bordeaux' && t !== 'parelmoer') return;
     try { localStorage.setItem(pasThemaKey(), t); } catch(e){}
     pasThemaToepassen();
+  }
+  function pasThemaWissel(){
+    const t = pasThemaHuidig() === 'parelmoer' ? 'standaard' : 'parelmoer';
+    pasThemaZet(t);
+    return t;
   }
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
   // seam voor de OS-schil (bedieningspaneel): thema lezen/zetten zonder de
   // logica hierboven te dupliceren. Iedereen mag kiezen.
-  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => true };
+  window.RTGOSThema = {
+    huidig: pasThemaHuidig,
+    zet: pasThemaZet,
+    wissel: pasThemaWissel,
+    keuzeMogelijk: () => true
+  };
 
   /* DE PAS AANNEMEN ZONDER HERLADEN. Een kale /apps/app.html (zonder ?pas=) is
      de deur waar bijna elk scherm naar terugwijst. Tot hier herlaadde de
@@ -5304,7 +5315,7 @@ var RTG_BOUW = '08f57861';
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
   function osActies() {
     const uit = [
-      { naam: 'Licht of donker', glyf: 'thema', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Licht of donker', glyf: 'thema', doe: () => { if (window.RTGOSThema) RTGOSThema.wissel(); } },
       { naam: 'Meldingen', glyf: 'meldingen', doe: () => { const b = $('#bell'); if (b) b.click(); } },
       { naam: 'Bedieningspaneel', glyf: 'paneel', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
       { naam: 'Taal kiezen', glyf: 'taal', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
@@ -5533,9 +5544,12 @@ var RTG_BOUW = '08f57861';
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
   if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
-  // licht/donker: de (verborgen) gedeelde themaknop blijft de motor
+  // licht/donker is een korte ingang naar dezelfde OS-themamotor als de drie
+  // zichtbare keuzes hierboven; er is geen tweede opslag of verborgen knop.
   const ccLicht = $('#osCcLicht');
-  if (ccLicht) ccLicht.addEventListener('click', () => { const b = $('#rtg-thema-knop'); if (b) b.click(); });
+  if (ccLicht) ccLicht.addEventListener('click', () => {
+    if (window.RTGOSThema) { RTGOSThema.wissel(); ccSync(); }
+  });
   const ccUit = $('#osCcUit');
   if (ccUit) ccUit.addEventListener('click', () => { sluitScrims(); const b = $('#logoutBtn'); if (b) b.click(); });
   // helderheid: puur visueel, onthouden per browser
@@ -5889,8 +5903,12 @@ var RTG_BOUW = '08f57861';
       return true;
     }
     if (/^(licht|donker|lichte modus|donkere modus)$/.test(q)) {
-      const b = $('#rtg-thema-knop');
-      if (b) { b.click(); bannerToon('✦', 'Rahul', 'De weergave is omgezet.'); return true; }
+      if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
+        const licht = /^(licht|lichte modus)$/.test(q);
+        RTGOSThema.zet(licht ? 'parelmoer' : 'standaard');
+        bannerToon('✦', 'Rahul', 'De weergave staat op ' + (licht ? 'licht' : 'donker') + '.');
+        return true;
+      }
       return false;
     }
     m = q.match(/^(?:open|start|ga naar)\s+(.+)$/);
@@ -7651,9 +7669,9 @@ var RTG_BOUW = '08f57861';
     $('#gcCode').textContent = o.pickup ? T('app.gc.bon','Bon') + ' ' + o.pickup : '';
     const qh = $('#gcQr');
     if (qh){
-      qh.innerHTML = ''; qh.style.display = 'none';
+      qh.innerHTML = ''; qh.classList.add('h-weg');
       if (window.RTGQRteken && d && d.code){
-        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.classList.remove('h-weg'); } catch(e){}
       }
     }
     $('#glowCode').classList.add('open');
@@ -7850,7 +7868,7 @@ var RTG_BOUW = '08f57861';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
     const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
-    const gtab = $('#tabGezin'); if (gtab) gtab.style.display='none';
+    const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
     // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten
 /* de betaalgeschiedenis van de gratis gebruiker */
     if (user.account) loadSocial(); else { const c = $('#homeContacts'); if (c) c.style.display='none'; }
@@ -7891,11 +7909,11 @@ var RTG_BOUW = '08f57861';
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function renderFoundation(){
     const homeEl = $('#homeFoundation'), tab = $('#tabGezin'), dot = $('#tabGezinDot');
-    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.style.display='none'; return; }
+    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.classList.add('h-weg'); return; }
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     const ongelezen = m.filter(x=>!x.gelezen).length;
-    if (tab) tab.style.display = g.length ? '' : 'none';
-    if (dot) dot.style.display = (g.length && ongelezen) ? 'block' : 'none';
+    if (tab) tab.classList.toggle('h-weg', !g.length);
+    if (dot) dot.classList.toggle('h-weg', !(g.length && ongelezen));
     // compacte ingang op Home
     if (homeEl){
       homeEl.style.display='';

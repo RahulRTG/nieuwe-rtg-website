@@ -2,7 +2,7 @@
 // Presentation geometry only: static sources, read-only requests, no live providers.
 const test = require('node:test'), assert = require('node:assert/strict');
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
-const { laadPlaywright, startBrowser } = require('./helper');
+const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
 const ROOT = path.resolve(__dirname, '..');
 const VIEWPORTS = [{ width: 390, height: 844 }, { width: 1440, height: 1000 }];
 const PHOTOS = [
@@ -45,7 +45,7 @@ async function visit(route, viewport) {
     ? route.continue() : route.fulfill({ status: 503, body: 'Read-only presentation proof; external providers excluded' }));
   const page = await context.newPage(), errors = [], missing = [];
   page.setDefaultTimeout(12000);
-  page.on('pageerror', error => errors.push(error.message));
+  letOpFouten(page, errors);
   page.on('response', response => {
     if (response.status() >= 400 && ['image', 'script', 'stylesheet', 'font'].includes(response.request().resourceType())) missing.push(response.url());
   });

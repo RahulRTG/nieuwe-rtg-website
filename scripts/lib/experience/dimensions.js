@@ -52,8 +52,15 @@ function assessCells(root,kind,subject,dimension,requirement,matches,evidence,so
     const {record,live}=group[0];
     const configurationHash=live?sha(JSON.stringify(stable(live.configuration))):
       evidence.configuration?sha(JSON.stringify(stable(evidence.configuration))):record.configurationHash;
-    results.push(artifact.assessment(record,source,candidate,dimension,
-      {root,subjectType:kind,subjectId:subject.id,requirement,configurationHash}));
+    const assessment=artifact.assessment(record,source,candidate,dimension,
+      {root,subjectType:kind,subjectId:subject.id,requirement,configurationHash});
+    /* Alleen het proces dat de getypeerde ontvangstbewijzen zojuist heeft
+       gemaakt bezit de WeakMap-receipt. Voor eisen zonder aanvullende
+       configuratiematrix is die exacte, onveranderde procesbinding volledig
+       uitvoeringsbewijs. Een geïmporteerd bestand krijgt deze promotie nooit;
+       destination-cellen moeten daarnaast nog steeds hun hele matrix sluiten. */
+    if(live&&assessment.scopedStatus==='PROVEN_IN_SCOPE') assessment.status='PROVEN';
+    results.push(assessment);
   }
   if(!results.length)results.push(artifact.assessment(undefined,source,candidate,dimension));
   const scopedProofs=results.filter(row=>row.scopedStatus).map(row=>({requirement,status:row.scopedStatus,scope:row.scope}));

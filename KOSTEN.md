@@ -20,6 +20,13 @@ verdelen en doorbelasten staat, gaat langs die firewall: in de grondstand is er
 geen enkele relatie vastgelegd en wordt er tussen twee werelden dus **niets**
 doorbelast. Dat is geen storing maar de veilige stand.
 
+**Begrotingsbesluit, 13 november 2026:** `PRIJZEN.md` §7.7 legt vast dat alleen
+abonnementen de basisexploitatie moeten dragen, inclusief alle gratis RTG-accounts,
+na de 30%-maatschappelijke reservering. De negen technische kostensoorten hieronder
+zijn geen volledige ondernemingsbegroting: ook personeel, acquisitie, overhead,
+risico, opstart en financiering horen daarin. De zichtbare aannames in §7.7.1
+zijn geen gemeten kostprijzen en veranderen geen meters of doorbelastingsrechten.
+
 ---
 
 ## 1. De drie grenzen

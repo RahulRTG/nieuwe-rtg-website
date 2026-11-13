@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 3263 |
 | losse beweringen (`test(...)`) | 21788 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 591 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 3036 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 3045 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 187 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 40 |
+| niets van beide | 31 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -3111,21 +3111,21 @@ toets omvalt.
 | `premium.e2e.js` | 7 | gezakt op `liegpoort /api/` | Scherm-test voor de premium-laag: meenemen (shared/uitvoer.js) en sneltoetsen (shared/sneltoets.js). Waarom deze twee. |
 | `prijsgarantie.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE MELDKNOP, end-to-end. test/prijsmelding.test.js toetst de kern; dit bestand toetst dat de knop er ECHT is -- dat het lid hem kan indienen en dat de zaak hem ziet. |
 | `public-brand-lockup.e2e.js` | 1 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-colour-tabs.e2e.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-colour-tabs.e2e.js` | 2 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `public-desktop-magazine.e2e.js` | 2 | gezakt op `browser-export-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-discover-menu.e2e.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-edge-editorial.e2e.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-discover-menu.e2e.js` | 6 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-edge-editorial.e2e.js` | 7 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `public-edge-quiet.e2e.js` | 4 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-edge-tabs.e2e.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-editorial-pages.e2e.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-fixed-magazine.e2e.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-edge-tabs.e2e.js` | 7 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-editorial-pages.e2e.js` | 2 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-fixed-magazine.e2e.js` | 7 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `public-full-bleed.e2e.js` | 3 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `public-magazine-navigation.e2e.js` | 8 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `public-magazine-search.e2e.js` | 6 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-magazine.e2e.js` | 14 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-magazine.e2e.js` | 14 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `public-painted-edge.e2e.js` | 3 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-painted-site.e2e.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `public-travel-volume.e2e.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-painted-site.e2e.js` | 8 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `public-travel-volume.e2e.js` | 5 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `public-website-edge.e2e.js` | 2 | gezakt op `expliciete bronmutatie` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rahul-escape.e2e.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rahul-header-ds.e2e.js` | 1 | gezakt op `liegpoort /api/` | Een DS-Edge draagt de bestaande Rahul-owner, zonder een tweede kopknop. Vier echte renders; de negatieve toestanden toetsen de presentatiegrens. |

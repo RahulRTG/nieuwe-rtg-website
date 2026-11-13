@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-11-13T01:59:48.589Z",
-    "commit": "28c4fe5e3",
+    "op": "2026-11-13T03:34:24.582Z",
+    "commit": "1dbe116bd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15423,6 +15423,21 @@
       "gezakt": 1,
       "geprobeerd": 15
     },
+    "public-colour-tabs.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/ds/componenten/publiek-detail.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 5,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-final-directed-evidence/public-colour-tabs.e2e.js.evidence.json",
+        "sha256": "034886e0af52fff605016fbe78dd235212d1b8b1d9d7cdf60deb936e3fa4019c",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "6de24162316fff8c8d5d0b4e19a46d6b8fcc2f48291a87a825da9a9e0acd58a6",
+        "testSha256": "a1ed06c1b79ceadadea26ab995d54f2d3695097926b4b198b1fd062d37da2454"
+      }
+    },
     "public-desktop-magazine.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15430,6 +15445,36 @@
       "operator": "browser-export-weg#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "public-discover-menu.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/ds/componenten/publiek-detail.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-last-four-evidence/public-discover-menu.e2e.js.evidence.json",
+        "sha256": "f7483c6efa21ba367e8cb25e5097798a5295b4c1c2bb3dd6e2cf92dfc8e13c2e",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "6de24162316fff8c8d5d0b4e19a46d6b8fcc2f48291a87a825da9a9e0acd58a6",
+        "testSha256": "f3e9b70a1463640bc605eabd29aad9db90f7335afc24b7deed421c2a93e2eb04"
+      }
+    },
+    "public-edge-editorial.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/edge-editorial.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 10,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-final-directed-evidence/public-edge-editorial.e2e.js.evidence.json",
+        "sha256": "85b1aafeba9b76f7dea624404d1ca08f4de48f9b5aef728d52902437d4a22f04",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "0f632cbb43f5859e14c5d5a773b1daa5979d9b8639a6b37f2104c9bce8d960ad",
+        "testSha256": "a6bfc462879175a349b51219fcb11135425569419f25220995d5c7a310740af6"
+      }
     },
     "public-edge-quiet.e2e.js": {
       "soort": "gericht",
@@ -15446,6 +15491,36 @@
         "testSha256": "076054d6339cb9b741e0447a6104fdbb1256cd874890a2acedfbf959f15c8dca"
       }
     },
+    "public-edge-tabs.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/edge-editorial.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-final-directed-evidence/public-edge-tabs.e2e.js.evidence.json",
+        "sha256": "7e342a40692b37bdb94a3a96e831ede13693d112149a4453e4ca3dfd61e25df6",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "0f632cbb43f5859e14c5d5a773b1daa5979d9b8639a6b37f2104c9bce8d960ad",
+        "testSha256": "d3452af0e53655366e338514820eaebe7910c2eb56f4dcab54c4d448ba596df9"
+      }
+    },
+    "public-editorial-pages.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/passen/rtg-pass.html",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-final-directed-evidence/public-editorial-pages.e2e.js.evidence.json",
+        "sha256": "3edc686beac4d07da76dbb6d90206904a5af5fc74b175ebf8f29a3cf52b46bcf",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "cc5c4a6bb5b29f9bbd9400c66eb0ca3c3cac784338db7f812e3dc20c8aa672fb",
+        "testSha256": "86e63716be1fb58237d1b008954f8ca703c459b74a7e2e68f26a187a737256a9"
+      }
+    },
     "public-editorial-pages.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15453,6 +15528,21 @@
       "operator": "html-hoofdinhoud-weg#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "public-fixed-magazine.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/ds/componenten/magazine.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 23,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-fixed-viewport-mutant-evidence/public-fixed-magazine.e2e.js.evidence.json",
+        "sha256": "5f722ea70097f466bf04327395d4947cf290f28dfa17ae0435cdb8a2a48001ce",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "15e1cc23f7ae0534cb2df59940cb4d4514aaa1470d61a4df66143bf1dd12e812",
+        "testSha256": "cd323b5dea9474df8cae1d4dde9dc2eb7b4a1e808cbd98254320bf0fe32bbee4"
+      }
     },
     "public-full-bleed.e2e.js": {
       "soort": "gericht",
@@ -15499,6 +15589,21 @@
         "testSha256": "cfa611afbf8f554729e01c57e285477fd1733158ac0d63441f839e4a4083e7ec"
       }
     },
+    "public-magazine.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/platform-edge.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 12,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-last-four-evidence/public-magazine.e2e.js.evidence.json",
+        "sha256": "a3681d138713ac2a2591b820ead71748cc051c17722b24ab96562b90e3bdc080",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "18dcf389b94a3ebf3b22533b1e901f4399cc6e26bc5d60b8f34842ed5bc6276c",
+        "testSha256": "1281a8ba77f780345cda8d466af4d1395b0961b2edb7494e516bd3e08e759f91"
+      }
+    },
     "public-magazine.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15520,6 +15625,21 @@
         "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
         "sourceSha256": "6de24162316fff8c8d5d0b4e19a46d6b8fcc2f48291a87a825da9a9e0acd58a6",
         "testSha256": "a35470f829cf36b181339408b3c775c60e9a28a29f1254d677da2eabe3eebf7a"
+      }
+    },
+    "public-painted-site.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/passen/community.html",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-final-directed-evidence/public-painted-site.e2e.js.evidence.json",
+        "sha256": "b7a638419dabe1442900c8abf98a48c9110166ff69c4e2a6357d4e15fc720e8c",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "f32ca098df3762c5c4055b84e64b2247b43966d6dac07fbc8e6d8d8e25a03d77",
+        "testSha256": "42d05d026aad6524e708cd427dcc58e22ae1bf8ecf0e4726c929e05bc3f6b7b5"
       }
     },
     "public-painted-site.test.js": {
@@ -15563,6 +15683,21 @@
         "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
         "sourceSha256": "a2d6f4dd91f13b39c89719bb93b6d494a55821e19935c18865805cd5f6ef699b",
         "testSha256": "8d5490d2ca357997934e33dccb66e66fca6ef4121126227f4b80e1c8f9deb458"
+      }
+    },
+    "public-travel-volume.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/platform-detail.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-last-four-evidence/public-travel-volume.e2e.js.evidence.json",
+        "sha256": "b8f23e837c09d005d2661fdd095eced90038a31df4f655e1ec29b975b8d4fb8d",
+        "commit": "1dbe116bd406b495c501ea76fbe1701921ef3d9f",
+        "sourceSha256": "c70ba476e9f86f40f2ff619cbe869e8b3db71293b4267629e3eb63c63346493c",
+        "testSha256": "e51e638004eebf0411d0ea5199f8ee2c1ded2d8ce902a0c44bb3f3bf4a2b1906"
       }
     },
     "public-website-edge.e2e.js": {

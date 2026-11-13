@@ -26,7 +26,7 @@ const PATRONEN = Object.freeze({
 const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
 const tekstVan = (o) => schoon([o && o.titel, o && o.tekst].filter(Boolean).join(' '), 4200).toLowerCase();
 
-function herken(o) {
+function herkenOnderwerp(o) {
   const expliciet = schoon(o && o.onderwerp, 30);
   if (Object.prototype.hasOwnProperty.call(ONDERWERPEN, expliciet) && expliciet !== 'anders') {
     return { onderwerp: expliciet, zekerheid: 'expliciet', signalen: ['gekozen onderwerp'] };
@@ -47,7 +47,7 @@ function herken(o) {
 }
 
 function triage(o) {
-  const h = herken(o || {});
+  const h = herkenOnderwerp(o || {});
   const route = router.routeer({ doelgroep: o && o.doelgroep, onderwerp: h.onderwerp,
     soort: o && o.soort, prioriteit: o && o.prioriteit });
   return { versie: VERSIE, onderwerp: h.onderwerp, zekerheid: h.zekerheid,
@@ -84,4 +84,5 @@ function maakRahulConcept(z) {
     grens: 'Concept. Alleen een medewerker kan dit na controle versturen.' });
 }
 
-module.exports = { triage, advies: maakRahulAdvies, concept: maakRahulConcept, herken, VERSIE, PATRONEN };
+module.exports = { triage, advies: maakRahulAdvies, concept: maakRahulConcept,
+  herken: herkenOnderwerp, VERSIE, PATRONEN };

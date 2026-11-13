@@ -144,6 +144,24 @@ test('werkboek toont iedere ingang, actuele declaraties en opgeslagen bewijs afz
   assert.equal(report(baseline).counts.screensAwaitingP0Assignment, 0);
 });
 
+test('werkboektabel ontsnapt bestaande backslashes vóór de kolomscheiding', () => {
+  const model = fixture();
+  const examples = [
+    ['keuze | alternatief', String.raw`keuze \| alternatief`],
+    [String.raw`voor \| na`, String.raw`voor \\\| na`],
+    [String.raw`voor \\| na`, String.raw`voor \\\\\| na`],
+    [String.raw`pad\map\bestand`, String.raw`pad\\map\\bestand`],
+    ['eerste\nvolgende | einde', String.raw`eerste volgende \| einde`]
+  ];
+  examples.forEach(([source], index) => { model.program.referenceCohort[index].purpose = source; });
+  const lines = render(model).split('\n');
+  examples.forEach(([, expected], index) => {
+    const prefix = '| `' + model.program.referenceCohort[index].function + '` | ';
+    const row = lines.find(line => line.startsWith(prefix));
+    assert.ok(row?.startsWith(prefix + expected + ' | '), 'Tabelcel behoudt letterlijke tekst zonder extra kolom: ' + index);
+  });
+});
+
 test('Geld en presets behouden dezelfde fysieke eigenaar', () => {
   const money = screenOwners(baseline, baseline.inventory.find(item => item.function === 'link:geldcommand'));
   const bank = screenOwners(baseline, baseline.inventory.find(item => item.function === 'link:bank'));

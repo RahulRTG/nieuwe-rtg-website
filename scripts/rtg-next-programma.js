@@ -236,7 +236,7 @@ function render(model) {
     'Opgeslagen Experience-status: `' + model.experienceEvidence.status + '`; kandidaat `' + model.experienceEvidence.candidateCommit + '`. Actuele declaratieve signatures: ' + result.counts.appSignatureDeclarations + ' app en ' + result.counts.screenSignatureDeclarations + ' schermen. Een declaratie is geen uitgevoerd bewijs.', '',
     'Alle werkpakketten doorlopen daarnaast de gemeenschappelijke levensloop-, privacy-, rol-, herstel-, toegankelijkheids- en menselijke acceptatie uit het premium-afbouwplan. De scenario’s hieronder zijn specifieke aanvullingen, geen uitputtende testset. Nieuwe scope wordt eerst bij de bestaande scopebron besloten.', '',
     '## Twaalf referentie-ervaringen', '', '| Ingang | Taak | Storingen | Vereiste uitkomst |', '|---|---|---|---|'];
-  const cell = value => String(value).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  const cell = value => String(value).replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\n/g, ' ');
   for (const item of model.program.referenceCohort) lines.push('| `' + item.function + '` | ' + cell(item.purpose) + ' | ' + cell(item.failureCases.join('; ')) + ' | ' + cell(item.requiredOutcome) + ' |');
   let world = null, count = 0;
   for (const item of model.inventory) {

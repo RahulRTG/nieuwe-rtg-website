@@ -246,6 +246,43 @@ test('geschilderde Edge op een detailbron gebruikt dezelfde vrijstaande ingang e
   finally { await context.close(); }
 });
 
+for (const width of [390, 1440]) test('standaardcontrole meet de echte publieke native Edge op ' + width + 'px', async () => {
+  const result = await fixture(width), { context, page } = result;
+  try {
+    const row = { route: '/', http: 200 };
+    await require('../scripts/lib/desktop-ds')(page, row, result.errors);
+    assert.deepEqual(row.failures, [], 'de standaardcontrole bewijst de goedgekeurde publieke Edge');
+    assert.equal(row.state.publicNative, true);
+    assert.equal(row.state.transparent, true);
+    assert.equal(row.publicOpen.actions.length, 5);
+    assert.equal(row.publicRestored.state, 'dock');
+    await collapsed(page); clean(result);
+  } finally { await context.close(); }
+});
+
+test('standaardcontrole weigert een ondoorzichtige, onbereikbare of dubbele publieke Edge', async () => {
+  const result = await fixture(390), { context, page } = result;
+  const audit = require('../scripts/lib/desktop-ds');
+  try {
+    const door = page.locator('.ds-public-edge-toggle');
+    await door.evaluate(node => node.style.setProperty('background-color', 'var(--ds-inkt)'));
+    const opaque = { route: '/', http: 200 }; await audit(page, opaque, result.errors);
+    assert.ok(opaque.failures.includes('public-edge-not-transparent'), 'de meetpoort weigert een gekleurde gesloten knop');
+    await door.evaluate(node => { node.style.removeProperty('background-color'); node.disabled = true; });
+    const disabled = { route: '/', http: 200 }; await audit(page, disabled, result.errors);
+    assert.ok(disabled.failures.includes('public-edge-door-unreachable'), 'een zichtbare maar uitgeschakelde ingang is niet bruikbaar');
+    await door.evaluate(node => { node.disabled = false; });
+    const duplicate = await page.evaluateHandle(() => {
+      const clone = document.querySelector('.ds-public-edge').cloneNode(true); document.body.append(clone); return clone;
+    });
+    try {
+      const doubled = { route: '/', http: 200 }; await audit(page, doubled, result.errors);
+      assert.ok(doubled.failures.includes('duplicate-or-missing-public-edge-owner'), 'een tweede eigenaar mag niet groen worden gemeten');
+    } finally { await duplicate.evaluate(node => node.remove()); await duplicate.dispose(); }
+    clean(result);
+  } finally { await context.close(); }
+});
+
 for (const [width,height,rtl,largeText] of [[320,600,false,false],[320,600,true,false],[390,600,false,true],[1440,900,false,false]]) test('geschilderd menu behoudt Nu, Rahul, Connect, Media en Account op '+width+'px' + (rtl ? ' in RTL' : '') + (largeText ? ' / 200% tekst' : ''), async () => {
   const result = await fixture(width, { height, rtl, largeText }), { context, page } = result;
   try {

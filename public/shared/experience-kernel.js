@@ -14,7 +14,9 @@
       'Content-Type': 'application/json', Authorization: 'Bearer ' + token
     }, body: JSON.stringify(body || {}), keepalive: pad === 'resume' }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
-        if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j;
+        if (!r.ok) { var fout = new Error(j.error || 'Er ging iets mis.');
+          fout.status = r.status; fout.code = j.code; throw fout; }
+        return j;
       });
     });
   }
@@ -27,7 +29,7 @@
   }
 
   var state = { bootstrap: null, actionEvidence: null, dialog: null, trigger: null,
-    pending: null, flash: null };
+    pending: null, flash: null, staleAttention: false };
   function statusTekst(p) {
     if (p.completeness.status !== 'COMPLETE') return { text: 'Beeld gedeeltelijk', mobile: '!', level: 'action' };
     if (p.attentionSummary.actionRequired) return { text: p.attentionSummary.actionRequired + ' vraagt actie', mobile: String(p.attentionSummary.actionRequired), level: 'action' };
@@ -77,7 +79,7 @@
       tekst.appendChild(element('b', '', a.title));
       if (a.explanation) tekst.appendChild(element('p', '', a.explanation));
       rij.appendChild(tekst);
-      var knop = element('button', 'xp-action', 'Gezien');
+      var knop = element('button', 'xp-action', state.staleAttention ? 'Vernieuw aandacht' : 'Gezien');
       knop.type = 'button';
       knop.addEventListener('click', function () { bevestig(a, knop); });
       rij.appendChild(knop); lijst.appendChild(rij);
@@ -95,7 +97,18 @@
       : 'Onvolledig beeld · bron niet beschikbaar: ' + p.completeness.missingSources.join(', ');
     dlg.appendChild(meta);
   }
+  function vernieuwAandacht(knop) {
+    knop.disabled = true; knop.textContent = 'Vernieuwen…';
+    return laad(state.bootstrap.currentContext.id).then(function () {
+      state.flash = 'Dit aandachtspunt is gewijzigd. Bekijk de actuele informatie en bevestig opnieuw.';
+      tekenDialog();
+    }, function () {
+      state.flash = 'Dit aandachtspunt is gewijzigd. De actuele informatie kon niet worden opgehaald. Vernieuw aandacht om verder te gaan.';
+      tekenDialog();
+    });
+  }
   function bevestig(a, knop) {
+    if (state.staleAttention) { vernieuwAandacht(knop); return; }
     if (!state.pending || state.pending.attentionId !== a.id) {
       knop.disabled = true;
       api('intent/preview', { intent: 'attention.acknowledge', version: 1,
@@ -104,14 +117,26 @@
       }).then(function (r) {
         state.pending = { attentionId: a.id, previewId: r.preview.id, idem: idem() };
         knop.disabled = false; knop.dataset.confirm = '1'; knop.textContent = 'Bevestig gezien';
-      }).catch(function (e) { knop.disabled = false; knop.textContent = e.message; });
+      }).catch(function (e) {
+        if (e.code === 'STALE_ATTENTION') {
+          state.pending = null; state.staleAttention = true; return vernieuwAandacht(knop);
+        }
+        knop.disabled = false; knop.textContent = e.message;
+      });
       return;
     }
     knop.disabled = true; knop.textContent = 'Vastleggen…';
-    api('intent/execute', { previewId: state.pending.previewId,
-      idempotencyKey: state.pending.idem, confirmed: true }).then(function () {
+    var pending = state.pending;
+    api('intent/execute', { previewId: pending.previewId,
+      idempotencyKey: pending.idem, confirmed: true }).then(function () {
       state.pending = null; return laad(state.bootstrap.currentContext.id);
-    }).then(function () { tekenDialog(); }).catch(function (e) { knop.disabled = false; knop.textContent = e.message; });
+    }).then(function () { tekenDialog(); }).catch(function (e) {
+      if (e.code === 'STALE_ATTENTION' && state.pending === pending) {
+        state.pending = null; state.staleAttention = true;
+        return vernieuwAandacht(knop);
+      }
+      knop.disabled = false; knop.textContent = e.message;
+    });
   }
   function bewaarResume() {
     if (!state.bootstrap || !state.bootstrap.currentContext) return;
@@ -120,7 +145,7 @@
   }
   function laad(contextId) {
     return api('bootstrap', { world: world, contextId: contextId }).then(function (b) {
-      state.bootstrap = b; werkTriggerBij();
+      state.bootstrap = b; state.staleAttention = false; werkTriggerBij();
       return api('evidence', { limit: 5 }).then(function (e) { state.actionEvidence = e; return b; },
         function () { state.actionEvidence = null; return b; });
     });

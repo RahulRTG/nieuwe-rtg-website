@@ -707,6 +707,28 @@ coveragecontract. Onbevoegde externe effecten blijven geblokkeerd.
 
 Alle wijzigingen blijven lokaal tot expliciete integratiegoedkeuring.
 
+### 19.1 Echte uitvoering aan een NEXT-poort aanbieden
+
+De bestaande Experience-uitvoerder kan zijn eigen resultaten onmiddellijk
+aan de NEXT-beoordelaar doorgeven, op een schone kandidaat:
+
+```sh
+node scripts/experience.js --prove --proof=experience-signatures --next-gate=G1
+```
+
+`--next-gate=G1`, `G2`, `G3` of `G4` mag uitsluitend eenmaal samen met
+`--prove`. De originele uitvoerobjecten blijven in hetzelfde proces; een
+opgeslagen of gekopieerd rapport krijgt geen uitvoeringsgezag. De snapshot in
+`artifacts/experience/report.json` is uitsluitend ter inzage. Exitcode nul
+vereist zowel geslaagde geselecteerde proeven als een geslaagde gevraagde
+poort op dezelfde schone kandidaat. Een geslaagde deelproef kan dus terecht
+eindigen met een geblokkeerde G1.
+
+De signatureproef controleert de bestaande app-/scherminventaris, geen
+werkende gebruikersketen, premiumkwaliteit of menselijke acceptatie. De
+voorwaarden voor volledige onafhankelijke builds, providerbewijs en productie
+blijven ongewijzigd. Dit commando is geen deploymentopdracht.
+
 ## 20. RTG NEXT — aantrekkingskracht en snelle zakelijke waarde
 
 **Uitgewerkt productconcept, 12 november 2026.** Gebaseerd op het voorstel van

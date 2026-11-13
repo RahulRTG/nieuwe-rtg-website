@@ -83,6 +83,47 @@ test('een echte agendaregel wordt attention en loopt gebrokerd naar evidence', a
   assert.equal(evidence.body.evidence.filter(e => e.id === uitgevoerd.body.evidence.id).length, 1);
 });
 
+test('bronwijziging tussen preview en bevestiging blokkeert ook over HTTP', async () => {
+  const datum = new Date().toISOString().slice(0, 10);
+  const gemaakt = await post('/api/agenda/toevoegen',
+    { titel: 'NEXT broncontrole', datum, tijd: '19:30' }, token);
+  assert.equal(gemaakt.status, 200);
+  const afspraak = gemaakt.body.items.find(i => i.titel === 'NEXT broncontrole');
+  assert.ok(afspraak);
+  const lees = async () => {
+    const r = await post('/api/experience/projection', { world: 'work' }, token);
+    assert.equal(r.status, 200);
+    return r.body.attention.find(a => a.title === 'NEXT broncontrole');
+  };
+  const item = await lees();
+  assert.ok(item);
+  const bereid = () => post('/api/experience/intent/preview', {
+    intent: 'attention.acknowledge', version: 1,
+    parameters: { world: 'work', attentionId: item.id }
+  }, token);
+  const oud = await bereid();
+  assert.equal(oud.status, 200);
+  const gewijzigd = await post('/api/agenda/wijzig', { id: afspraak.id, tijd: '17:00' }, token);
+  assert.equal(gewijzigd.status, 200);
+  const stale = await post('/api/experience/intent/execute', {
+    previewId: oud.body.preview.id, idempotencyKey: 'next-http-stale', confirmed: true
+  }, token);
+  assert.equal(stale.status, 409);
+  assert.equal(stale.body.code, 'STALE_ATTENTION');
+  assert.equal((await lees()).lifecycle, 'PRESENTED');
+  const bewijs = await post('/api/experience/evidence', {}, token);
+  assert.equal(bewijs.body.evidence.some(e => e.previewId === oud.body.preview.id), false);
+  const vers = await bereid();
+  const akkoord = await post('/api/experience/intent/execute', {
+    previewId: vers.body.preview.id, idempotencyKey: 'next-http-fresh', confirmed: true
+  }, token);
+  assert.equal(akkoord.status, 200);
+  assert.equal((await lees()).lifecycle, 'ACKNOWLEDGED');
+  assert.notEqual(akkoord.body.attention.revision, item.revision);
+  await post('/api/agenda/wijzig', { id: afspraak.id, tijd: '16:00' }, token);
+  assert.equal((await lees()).lifecycle, 'PRESENTED');
+});
+
 test('Tap, Search en Rahul kunnen dezelfde gebrokerde agenda-intentie veilig gebruiken', async () => {
   const boot = await post('/api/experience/bootstrap', { world: 'work' }, token);
   const definition = boot.body.intents.find(i => i.id === 'schedule.item.create');

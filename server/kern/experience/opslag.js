@@ -4,6 +4,7 @@
 const klok = require('../../lib/klok');
 
 const { hash, kopie } = require('./canon');
+const { veiligGelijk } = require('../util');
 
 module.exports = function maakOpslag({ db, save, crypto, nu }) {
   const tijd = () => (nu ? nu() : klok.datum().toISOString());
@@ -77,6 +78,20 @@ module.exports = function maakOpslag({ db, save, crypto, nu }) {
   function actieAfronden(key, previewId, idemKey, fingerprint, inhoud, basisResultaat) {
     const r = experienceWortel(), p = r.previews[previewId], wie = actor(key);
     if (!p || p.actor !== wie) return null;
+    // bijeen bundelt writes, maar is geen mutex. Na de async runtime mag
+    // uitsluitend deze synchrone finalizer het ontvangstbewijs toekennen.
+    const eerder = idemLees(key, idemKey);
+    if (eerder) return veiligGelijk(eerder.fingerprint, fingerprint)
+      ? { ...eerder.result, replay: true }
+      : { error: 'Deze sleutel hoort bij een andere actie.', status: 409, code: 'IDEMPOTENCY_CONFLICT' };
+    if (p.executedAt) return { error: 'Deze preview is al uitgevoerd.', status: 409, code: 'PREVIEW_USED' };
+    const attention = p.intent === 'attention.acknowledge' ? kopie(basisResultaat.attention) : null;
+    if (p.intent === 'attention.acknowledge' && (!attention || attention.id !== p.parameters.attentionId ||
+      !attention.revision || attention.revision !== p.parameters.attentionRevision || attention.lifecycle !== 'ACKNOWLEDGED'))
+      return null;
+    const gezien = attention && attentionLees(key, attention.id);
+    if (gezien && gezien.revision === attention.revision && gezien.lifecycle === 'ACKNOWLEDGED')
+      return { error: 'Dit aandachtspunt is al gezien.', status: 409, code: 'ATTENTION_ALREADY_ACKNOWLEDGED' };
     if (!r.lastEvidenceHashByActor[wie]) {
       const laatste = r.evidence.slice().reverse().find(e => e.actor === wie && e.version === 2);
       if (laatste) r.lastEvidenceHashByActor[wie] = laatste.hash;
@@ -90,6 +105,12 @@ module.exports = function maakOpslag({ db, save, crypto, nu }) {
     /* Nooit stil afkappen: retentie of archivering moet een expliciete,
        bewezen overdracht zijn; een drukke actor mag andermans bewijs niet uit
        een globale ringbuffer duwen. */
+    if (attention) {
+      const a = r.attention[wie] || (r.attention[wie] = {});
+      a[attention.id] = { lifecycle: 'ACKNOWLEDGED', revision: attention.revision,
+        acknowledgedAt: attention.acknowledgedAt, world: p.world,
+        objectRef: kopie(attention.objectRef), updatedAt: body.recordedAt };
+    }
     r.evidence.push(body);
     r.lastEvidenceHashByActor[wie] = body.hash;
     p.executedAt = body.recordedAt;

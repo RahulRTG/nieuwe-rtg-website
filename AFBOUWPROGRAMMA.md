@@ -7821,3 +7821,41 @@ Het werkboek is uitsluitend opnieuw gegenereerd; scope-lock, acht pakketten,
 vier beslispoorten en `PLANNING_ONLY` zijn behouden. Rekensommen en bronpaden
 in §9.3 zijn gecontroleerd. Getest op Node v24.18.0, niet op de vereiste Node 26;
 geen releasekwalificatie of bewijs dat de nieuwe commerciële keten al werkt.
+
+## RTG NEXT — eerste runtime- en bewijsaansluiting, 13 november 2026
+
+De opdracht om NEXT af te bouwen en te integreren wordt uitgevoerd op een
+afzonderlijke ontwikkeltak. De lopende publieke website-release en de bestaande
+productiebackend blijven buiten deze wijziging. De 114 bestaande ingangen,
+twaalf referentietaken, scope-lock en acht open eigenaarsbesluiten blijven staan.
+
+**P1/P2, begrensde runtimeverbetering:** de bestaande Experience-broker bindt
+een aandachtbevestiging nu aan een serverberekende bronrevisie. Een gewijzigde
+vluchttijd, datum, status of andere domeininhoud maakt een oude preview ongeldig
+vóór de wijziging naar gezien. Een eerder gezien item wordt bij gewijzigde
+inhoud opnieuw zichtbaar. Alleen presentatiemetadata is uitgezonderd; oude
+previews en acknowledgements zonder revisie verlenen geen stil akkoord.
+Historische replay behoudt het oude ontvangstbewijs en bevestigt geen nieuwe
+inhoud. Gezien, evidence en idempotentieresultaat worden samen gefinaliseerd
+na foutgevoelige voorbereiding. De synchrone eindcontrole bewaakt ook twee
+gelijktijdige previews; save-bundeling wordt niet als mutex voorgesteld.
+De app herstelt een expliciet `STALE_ATTENTION` met een verse projectie
+en nieuw menselijk akkoord; bij een onzekere netwerkuitkomst blijft de bestaande
+herhaalsleutel behouden. Dit is geen voltooide PlanDossier-implementatie en geen
+provider-, boekings- of betaalbevestiging.
+
+**P6, begrensde integratie:** `scripts/experience.js --prove --next-gate=G1`
+kan echte uitvoerresultaten rechtstreeks aan de bestaande NEXT-beoordelaar
+doorgeven. De originele objecten blijven in hetzelfde proces. Gekopieerde of
+ingelezen rapporten krijgen geen uitvoeringsgezag. Een geselecteerde deelproef
+kan slagen terwijl de aangevraagde poort terecht blokkeert. De verifier,
+menselijke bewijsgrens en twee volledige onafhankelijke G3-builds zijn niet
+afgezwakt. Gebruiksinstructies staan in het premium-afbouwplan §19.1.
+
+De regressies voor gewijzigde broninhoud faalden op de oude runtime en slagen
+na de reparatie. De echte lokale HTTP-keten controleert een agendatijdwijziging
+tussen voorbereiding en akkoord. Dit zijn gerichte lokale proeven, geen
+integrale APPWERKT-, browser-, menselijke of productiekwalificatie. Geen
+completion-register, providerconfiguratie, productiedatabase of vrijgavebesluit
+is opgewaardeerd. De afbouw van de overige referentietaken en kwalificatiepoorten
+blijft vereist.

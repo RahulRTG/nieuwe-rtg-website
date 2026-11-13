@@ -148,6 +148,145 @@ test('attention loopt via preview, bevestiging, idempotency en append-only evide
   assert.equal(experience.evidence('member-key').evidence.length, 1);
 });
 
+test('gewijzigde vluchttijd maakt oud akkoord ongeldig en vraagt een nieuw akkoord', async () => {
+  const h = huis(), key = 'member-key', bron = h.kern.mijnReizen();
+  h.kern.mijnReizen = () => bron;
+  const vlucht = bron.reizen[0].onderdelen[0];
+  const lees = () => h.experience.projection({ key, world: 'travel' }).attention[0];
+  const bereid = () => h.experience.preview(key, { intent: 'attention.acknowledge', version: 1,
+    parameters: { world: 'travel', attentionId: lees().id } }).preview;
+  const bevestig = (p, idempotencyKey) => h.experience.execute(key,
+    { previewId: p.id, idempotencyKey, confirmed: true });
+  const oud = bereid();
+  vlucht.tijd = '17:00'; // Titel en status blijven gelijk; de broninhoud niet.
+  const stale = await bevestig(oud, 'flight-before-change');
+  assert.equal(stale.status, 409);
+  assert.equal(stale.code, 'STALE_ATTENTION');
+  assert.equal(lees().lifecycle, 'PRESENTED');
+  assert.equal(h.experience.evidence(key).evidence.length, 0);
+  const vers = bereid(), eerste = await bevestig(vers, 'flight-after-change');
+  assert.equal(eerste.ok, true);
+  assert.equal(lees().lifecycle, 'ACKNOWLEDGED');
+  assert.equal(lees().revision, eerste.attention.revision);
+  assert.notEqual(vers.fingerprint, oud.fingerprint);
+  vlucht.tijd = '16:00';
+  assert.equal(lees().lifecycle, 'PRESENTED');
+  assert.equal(lees().acknowledgedAt, null);
+  const replay = await bevestig(vers, 'flight-after-change');
+  assert.equal(replay.replay, true);
+  assert.equal(replay.evidence.id, eerste.evidence.id);
+  assert.equal(lees().lifecycle, 'PRESENTED', 'historische replay bevestigt geen nieuwe inhoud');
+  assert.equal((await bevestig(bereid(), 'flight-after-change')).code, 'IDEMPOTENCY_CONFLICT');
+  assert.equal(h.experience.evidence(key).evidence.length, 1);
+});
+
+test('aandachtrevisie bindt betekenisvolle bronvelden maar geen presentatietijd', async t => {
+  for (const [veld, waarde] of Object.entries({ titel: 'Nieuwe titel', uitleg: 'Gate gewijzigd',
+    status: 'geannuleerd', van: '2026-08-30', tot: '2026-08-31', wanneer: '2026-08-30',
+    tijd: '18:00', bestemming: 'Rome', gate: 'C42', expiresAt: '2026-08-30T00:00:00Z' })) {
+    await t.test(veld, async () => {
+      const h = huis(), bron = h.kern.mijnReizen();
+      h.kern.mijnReizen = () => bron;
+      const lees = () => h.experience.projection({ key: 'k', world: 'travel' }).attention[0];
+      const item = lees();
+      const preview = h.experience.preview('k', { intent: 'attention.acknowledge', version: 1,
+        parameters: { world: 'travel', attentionId: item.id, attentionRevision: 'client-keuze' } });
+      bron.reizen[0].onderdelen[0][veld] = waarde;
+      assert.equal(lees().id, item.id);
+      const result = await h.experience.execute('k', { previewId: preview.preview.id,
+        idempotencyKey: 'changed-field-' + veld, confirmed: true });
+      assert.equal(result.code, 'STALE_ATTENTION');
+      assert.equal(h.experience.evidence('k').evidence.length, 0);
+    });
+  }
+  const h = huis(), bron = h.kern.mijnReizen();
+  h.kern.mijnReizen = () => bron;
+  const lees = () => h.experience.projection({ key: 'k', world: 'travel' }).attention[0];
+  const eerst = lees();
+  assert.match(eerst.revision, /^[a-f0-9]{64}$/);
+  const preview = h.experience.preview('k', { intent: 'attention.acknowledge', version: 1,
+    parameters: { world: 'travel', attentionId: eerst.id } }).preview;
+  bron.reizen[0].onderdelen[0].generatedAt = '2026-08-29T10:01:00Z';
+  assert.equal(lees().revision, eerst.revision);
+  assert.equal((await h.experience.execute('k', { previewId: preview.id,
+    idempotencyKey: 'same-source-revision', confirmed: true })).ok, true);
+  bron.reizen[0].onderdelen[0].generatedAt = '2026-08-29T10:02:00Z';
+  assert.equal(lees().lifecycle, 'ACKNOWLEDGED');
+});
+
+test('twee voorbereidingen van dezelfde aandacht schrijven niet tweemaal bewijs', async () => {
+  const h = huis(), key = 'member-key';
+  const item = h.experience.projection({ key, world: 'travel' }).attention[0];
+  const bereid = () => h.experience.preview(key, { intent: 'attention.acknowledge', version: 1,
+    parameters: { world: 'travel', attentionId: item.id } }).preview;
+  const a = bereid(), b = bereid();
+  const eerste = await h.experience.execute(key, { previewId: a.id,
+    idempotencyKey: 'attention-first-preview', confirmed: true });
+  assert.equal(eerste.ok, true);
+  const tweede = await h.experience.execute(key, { previewId: b.id,
+    idempotencyKey: 'attention-second-preview', confirmed: true });
+  assert.equal(tweede.code, 'ATTENTION_ALREADY_ACKNOWLEDGED');
+  assert.equal(h.experience.evidence(key).evidence.length, 1);
+});
+
+test('attention-finalizationfout laat geen gezien zonder bewijs achter en is herhaalbaar', async () => {
+  let willekeur = 0;
+  const h = huis({ crypto: { ...crypto, randomBytes(n) {
+    if (++willekeur === 2) throw new Error('evidencevoorbereiding mislukt');
+    return crypto.randomBytes(n);
+  } } }), key = 'member-key';
+  const lees = () => h.experience.projection({ key, world: 'travel' }).attention[0];
+  const preview = h.experience.preview(key, { intent: 'attention.acknowledge', version: 1,
+    parameters: { world: 'travel', attentionId: lees().id } }).preview;
+  const invoer = { previewId: preview.id, idempotencyKey: 'attention-finalization-retry', confirmed: true };
+  await assert.rejects(h.experience.execute(key, invoer), /evidencevoorbereiding mislukt/);
+  assert.equal(lees().lifecycle, 'PRESENTED');
+  assert.equal(h.experience.evidence(key).evidence.length, 0);
+  const hersteld = await h.experience.execute(key, invoer);
+  assert.equal(hersteld.ok, true);
+  assert.equal(lees().lifecycle, 'ACKNOWLEDGED');
+  assert.equal(h.experience.evidence(key).evidence.length, 1);
+  assert.equal((await h.experience.execute(key, invoer)).evidence.id, hersteld.evidence.id);
+});
+
+test('gelijktijdige aandachtbevestigingen finaliseren dezelfde revisie maximaal eenmaal', async () => {
+  for (const zelfdeSleutel of [false, true]) {
+    const h = huis(), key = 'member-key';
+    const item = h.experience.projection({ key, world: 'travel' }).attention[0];
+    const bereid = () => h.experience.preview(key, { intent: 'attention.acknowledge', version: 1,
+      parameters: { world: 'travel', attentionId: item.id } }).preview;
+    const a = bereid(), b = bereid();
+    const resultaten = await Promise.all([a, b].map((p, i) => h.experience.execute(key, {
+      previewId: p.id, idempotencyKey: 'attention-concurrent-' + (zelfdeSleutel ? 0 : i), confirmed: true
+    })));
+    assert.equal(h.experience.evidence(key).evidence.length, 1);
+    assert.equal(resultaten[0].ok, true);
+    if (zelfdeSleutel) {
+      assert.equal(resultaten[1].replay, true);
+      assert.equal(resultaten[1].evidence.id, resultaten[0].evidence.id);
+    } else assert.equal(resultaten[1].code, 'ATTENTION_ALREADY_ACKNOWLEDGED');
+  }
+});
+
+test('oude aandachtstaat en previews zonder revisie geven geen stil akkoord', async () => {
+  const h = huis(), key = 'member-key';
+  const item = h.experience.projection({ key, world: 'travel' }).attention[0];
+  const preview = h.experience.preview(key, { intent: 'attention.acknowledge', version: 1,
+    parameters: { world: 'travel', attentionId: item.id } }).preview;
+  const opslag = require('../server/kern/experience/opslag')({ db: h.db, save() {}, crypto });
+  opslag.attentionZet(key, item.id, { lifecycle: 'ACKNOWLEDGED', acknowledgedAt: '2026-08-29T10:00:00Z' });
+  assert.equal(h.experience.projection({ key, world: 'travel' }).attention[0].lifecycle, 'PRESENTED');
+  delete preview.parameters.attentionRevision;
+  opslag.previewZet(key, preview);
+  const oud = await h.experience.execute(key, { previewId: preview.id,
+    idempotencyKey: 'legacy-attention', confirmed: true });
+  assert.equal(oud.code, 'STALE_ATTENTION');
+  assert.equal(h.experience.evidence(key).evidence.length, 0);
+  const vreemd = await h.experience.execute('ander-account', { previewId: preview.id,
+    idempotencyKey: 'foreign-attention', confirmed: true });
+  assert.equal(vreemd.code, 'PREVIEW_NOT_FOUND');
+});
+
 test('resume accepteert alleen server-afgeleide context en veilige surfaces', () => {
   const { experience } = huis();
   const b = experience.bootstrap({ key: 'member-key', world: 'work' });

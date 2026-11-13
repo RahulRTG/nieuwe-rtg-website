@@ -97,8 +97,9 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
     const geenGezag = bevoegd(context, definition); if (geenGezag) return geenGezag;
 
     return commit(async () => {
-      // Een tweede tab kan dezelfde preview gelijktijdig aanbieden. Buiten de
-      // transactie lezen is geen grendel: herlees onder dezelfde schrijverslot.
+      // Een tweede tab kan dezelfde preview gelijktijdig aanbieden. Herlees
+      // binnen de bundel; actieAfronden bewaakt daarnaast de synchrone finale
+      // toekenning, want bijeen is zelf geen serialiserende mutex.
       const replay = opslag.idemLees(key, idemKey);
       if (replay) return veiligGelijk(replay.fingerprint, p.fingerprint)
         ? { ...replay.result, replay: true }
@@ -111,8 +112,11 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
       const activeContext = contextVoor(key, p.world, p.contextId);
       if (activeContext.error) return activeContext;
       const denied = bevoegd(activeContext, definition); if (denied) return denied;
-      const uitgevoerd = await handler.execute({ key, context: activeContext, preview: current,
+      const pending = handler.execute({ key, context: activeContext, preview: current,
         economicPrincipalRef: p.economicPrincipalRef });
+      // Een synchrone broncontrole + Experience-mutatie blijft één JS-turn.
+      // Alleen domeinen die echt asynchroon werken onderbreken deze stap.
+      const uitgevoerd = pending && typeof pending.then === 'function' ? await pending : pending;
       if (!uitgevoerd || uitgevoerd.error)
         return uitgevoerd || fout('De runtime kon de actie niet uitvoeren.', 500, 'EXECUTION_FAILED');
       const at = opslag.tijd();
@@ -125,7 +129,7 @@ module.exports = function maakBroker({ crypto, opslag, projecteer, contexten, ke
         policyDecision: p.policyDecision, confirmation: { confirmed: true, at },
         result: kopie(uitgevoerd.result || {})
       }, { ok: true, intent: p.intent, ...(uitgevoerd.result || {}), objectRef });
-      if (result) evidence.execute(key, p, objectRef, idemKey);
+      if (result && !result.error && !result.replay) evidence.execute(key, p, objectRef, idemKey);
       return result || fout('De actie kon niet atomair worden afgerond.', 500, 'FINALIZATION_FAILED');
     });
   }

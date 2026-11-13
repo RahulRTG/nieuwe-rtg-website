@@ -407,7 +407,9 @@ const KAART = [
     ['schrijft', 'wereld:s', 'wereld op body per verhaal', 'd.body.dataset.rtgWorld=story.world;'],
     ['schrijft', 'wereld:s', 'wereld op body bij een keuze', 'd.body.dataset.rtgWorld=selected.world;']]],
   ['public/site/platform-app.js', 'afnemer', 'wereld:s', [
-    ['schrijft', 'wereld:s', 'wereld op body in de werelden-scene', "if(id==='werelden'){d.body.dataset.rtgWorld=X.currentWorld();"]]]
+    ['schrijft', 'wereld:s', 'wereld op body in de werelden-scene, buiten de magazine-eigenaar', "if(!d.body.classList.contains('ds-magazine-page'))d.body.dataset.rtgWorld=X.currentWorld();"]]],
+  ['public/site/platform-magazine.js', 'afnemer', 'wereld:s', [
+    ['schrijft', 'wereld:s', 'terug naar het openbare magazine herstelt de living-wereld', "d.body.dataset.rtgWorld='living';"]]]
 ];
 
 /* Waarom een dubbele eigenaar dubbel is. Afgeleid wordt WIE; dit zegt WAAROM.

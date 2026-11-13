@@ -151,6 +151,14 @@
     } catch(e){ return null; }
   }
   let websiteAanvraag = websiteAanvraagUitAdres();
+  /* RTG Direct-links bevatten alleen een gekozen onderwerp, nooit vrije tekst
+     of persoonsgegevens. De gebruiker schrijft zijn vraag pas NA aanmelden in
+     de beveiligde app. */
+  const rtgDirectUitAdres = () => {
+    const v = String(new URLSearchParams(location.hash.replace(/^#/, '')).get('rtg-direct') || '').toLowerCase();
+    return ['algemeen', 'passen', 'organisatie', 'techniek'].includes(v) ? v : null;
+  };
+  let rtgDirect = rtgDirectUitAdres();
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';

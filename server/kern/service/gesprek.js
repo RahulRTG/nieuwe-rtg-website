@@ -70,6 +70,7 @@ module.exports = function maakGesprekken({ db, save, crypto, zaken, loop, sseToC
   }
   const vind = (id) => G().find(g => g.id === String(id || '')) || null;
   const kort = (g) => ({ id: g.id, zaak: g.zaak, melder: g.melder, video: !!g.video,
+    ondersteuning: !!g.ondersteuning,
     status: stand(g), at: g.at, mens: g.mens || null, aangenomenAt: g.aangenomenAt || null,
     beeindigdAt: g.beeindigdAt || null, seconden: g.seconden == null ? null : g.seconden });
 

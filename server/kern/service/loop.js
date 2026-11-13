@@ -158,6 +158,19 @@ module.exports = function maakLoop({ zaken, save, notify }) {
     return { ok: true, zaak: kort(z) };
   }
 
+  /* Een Rahul-advies is pas onderdeel van de zaak als een medewerker het
+     opvraagt. Alleen type, versie en uitkomst worden vastgelegd; geen tweede
+     kopie van de gesprekstekst. */
+  function rahulAdvies(id, { door, soort, versie, volgendeStap } = {}) {
+    const z = vind(id);
+    if (!z) return { status: 404, error: 'Deze zaak kennen wij niet.' };
+    noteer(z, { wat: 'rahulAdvies', door: schoon(door, 60) || 'onbekend',
+      soort: schoon(soort, 20) || 'advies', versie: schoon(versie, 40),
+      volgendeStap: schoon(volgendeStap, 300) || null });
+    save();
+    return { ok: true, zaak: kort(z) };
+  }
+
   /* Bericht aan de melder, langs het kanaal dat hij al leest. Faalt dit, dan
      valt de zaak niet om: een melding die niet aankomt is vervelend, een zaak
      die daardoor verdwijnt is erger. Zelfde afweging als in kern/envelop.js --
@@ -168,5 +181,5 @@ module.exports = function maakLoop({ zaken, save, notify }) {
     catch (e) { console.error('[service] melden', e && e.message); }
   }
 
-  return { bericht, stand, mensVraag, eigenaar, weeg, koppel, zetStand, noteer };
+  return { bericht, stand, mensVraag, eigenaar, weeg, koppel, rahulAdvies, zetStand, noteer };
 };

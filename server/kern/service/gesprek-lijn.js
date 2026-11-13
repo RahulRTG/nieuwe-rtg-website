@@ -22,10 +22,18 @@ module.exports = function maakGesprekLijn(c) {
      kan een collega het overnemen. Is er geen zaak, dan wordt er een geopend --
      dat is geen administratie maar precies de reden dat dit beter is dan
      telefonie. */
-  function bel({ melder, tier, zaakId, video, titel } = {}) {
-    const m = magBellen(tier);
-    if (!m.mag) return { status: 403, error: m.waarom, wel: m.wel };
+  function bel({ melder, tier, zaakId, video, titel, ondersteuning = false } = {}) {
     if (!melder) return { status: 400, error: 'Een gesprek zonder melder kan niemand aannemen.' };
+
+    /* Een meekijksessie is geen premium telefoondienst. Zij bestaat alleen bij
+       een bestaande eigen zaak, start zichtbaar door de melder en deelt pas na
+       de browsertoestemming een scherm. */
+    const bestaand = zaakId ? zaken.vind(zaakId) : null;
+    if (ondersteuning && (!bestaand || bestaand.melder !== String(melder))) {
+      return { status: 404, error: 'Start een meekijksessie vanuit uw eigen zaak.' };
+    }
+    const m = magBellen(tier);
+    if (!ondersteuning && !m.mag) return { status: 403, error: m.waarom, wel: m.wel };
 
     /* EERST KIJKEN OF ER AL EEN OPROEP LOOPT, EN PAS DAARNA EEN ZAAK MAKEN.
        Andersom stond het hier, en dat kostte een zaak per druk: de tweede druk
@@ -36,7 +44,7 @@ module.exports = function maakGesprekLijn(c) {
     const lopend = G().find(g => g.melder === String(melder) && stand(g) === 'rinkelt');
     if (lopend) return { ok: true, gesprek: kort(lopend), zaak: lopend.zaak, let: 'Uw oproep stond al klaar.' };
 
-    let z = zaakId ? zaken.vind(zaakId) : null;
+    let z = bestaand;
     if (z && z.melder !== String(melder)) return { status: 404, error: 'Deze zaak kennen wij niet.' };
     if (!z) {
       const r = zaken.open({ melder, doelgroep: 'lid', soort: 'ondersteuning', kanaal: 'gesprek',
@@ -46,18 +54,20 @@ module.exports = function maakGesprekLijn(c) {
     }
 
     const g = { id: 'GSP-' + crypto.randomBytes(4).toString('hex').toUpperCase(),
-      zaak: z.id, melder: String(melder), video: !!video, status: 'rinkelt',
+      zaak: z.id, melder: String(melder), video: !!video, ondersteuning: !!ondersteuning, status: 'rinkelt',
       at: nu(), mens: null, aangenomenAt: null, beeindigdAt: null, seconden: null };
     G().unshift(g);
     if (G().length > 5000) G().pop();
-    loop.noteer(z, { wat: 'gesprek', naar: 'rinkelt', gesprek: g.id, video: !!video });
+    loop.noteer(z, { wat: ondersteuning ? 'meekijksessie' : 'gesprek', naar: 'rinkelt',
+      gesprek: g.id, video: !!video, toestemming: ondersteuning ? 'nog niet gedeeld' : null });
     save();
     /* Het kantoor hoort dat er iemand belt. Alleen het NUMMER van het gesprek en
        de zaak -- geen naam, geen codenaam, geen onderwerp: wie opneemt ziet de
        zaak vanzelf, en een rinkel in een open kantoor hoeft niet te vertellen
        waar het over gaat. */
     if (typeof sseToOffice === 'function') {
-      try { sseToOffice('servicebel', { kind: 'rinkelt', gesprek: g.id, zaak: z.id, video: !!video }); } catch (e) {}
+      try { sseToOffice('servicebel', { kind: 'rinkelt', gesprek: g.id, zaak: z.id,
+        video: !!video, ondersteuning: !!ondersteuning }); } catch (e) {}
     }
     return { ok: true, gesprek: kort(g), zaak: z.id,
       let: 'Wij laten uw oproep in het kantoor rinkelen. Neemt er niemand op, dan blijft uw zaak staan en ' +

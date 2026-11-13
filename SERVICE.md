@@ -225,10 +225,12 @@ de prioriteit is uitgerekend, waarom de zaak bij dit team ligt, en — het
 belangrijkste veld — wat er **niet** is gewogen. Een zaak op P4 omdat niemand de
 omvang inschatte, is iets anders dan een zaak die aantoonbaar klein is.
 
-En het bord **stelt geen oorzaak vast**. Er is geen onderzoekende AI, en dat
-staat er met zoveel woorden bij in plaats van dat er een waarschijnlijke oorzaak
-wordt getoond. Een gok in de vorm van een diagnose is precies de bewering die dit
-huis nergens anders accepteert.
+En het bord **stelt geen oorzaak vast**. Rahul AI herkent een onderwerp, vat de
+zaak samen, noemt een controleerbare volgende stap en kan een antwoordconcept
+maken. Dat is advies: de medewerker controleert en verstuurt. De signalen,
+versie en medewerker die het advies opvroeg staan in de tijdlijn; gesprekstekst
+wordt niet nog eens in een AI-log gekopieerd. Een gok in de vorm van een
+diagnose is nog steeds precies de bewering die dit huis nergens accepteert.
 
 Twee dingen die de browsertoets blootlegde en die je nergens anders moet
 herhalen. Een functie `open()` op het hoogste niveau van een klassiek script
@@ -660,6 +662,31 @@ melding komt aan via de gids, in de app-lijst staan ze niet. Bewijs:
 `test/servicemelder.test.js` leest de bak via de eigen route en sessie van de
 melder, ook voor een ander lid en een andere zaak.
 
+## 13i. RTG Direct, Rahul AI en de meekijksessie
+
+De publieke website opent geen mailprogramma meer. Iedere contactknop gaat naar
+`#rtg-direct=<onderwerp>` in de eigen app. Het fragment bevat alleen een
+onderwerp uit een vaste lijst; de vrije vraag wordt pas na aanmelden geschreven.
+De app opent vervolgens een gewone Servicezaak en vraagt expliciet menselijke
+overname. Naam, e-mailadres en telefoon worden niet in de zaaktekst gedupliceerd:
+de sessie is de identiteit en de zaak blijft de gemeenschappelijke envelop.
+
+Rahul AI triageert bij het openen op een kleine, zichtbare woordenkaart. Een
+expliciet gekozen onderwerp wint; bij een gelijkspel valt de zaak terug op
+`anders`. De bestaande router blijft de enige bron voor teamtoewijzing en zijn
+veiligheidsuitzonderingen. In de cockpit kan een medewerker een samenvatting,
+volgende stap of antwoordconcept vragen. Rahul AI verzendt en sluit niets. Elke
+opvraag schrijft via `loop.js` een minimale auditregel in de tijdlijn; het
+controlebeeld toont handeling, versie, zaak en actor, niet de gesprekstekst.
+
+Vanuit een eigen lopende zaak kan ieder lid een **veilige meekijksessie**
+starten. Dit is geen permanent recht en geen stil beheerpad: het lid start de
+sessie, de medewerker neemt haar aan en daarna tekent de browser zelf de keuze
+voor welk scherm gedeeld wordt. De videotrack loopt rechtstreeks over WebRTC,
+RTG biedt geen opnamepad en stoppen sluit de track. Een ander account kan de
+sessie niet aan de zaak hangen. De betaalde beldienst blijft apart; schriftelijke
+menselijke hulp en zaakgebonden meekijken zijn geen premiumgrendel.
+
 ## 14. Wat er staat, en wat er niet staat
 
 **Staat** (gemeten, met toetsen die zijn zien zakken):
@@ -674,6 +701,10 @@ melder, ook voor een ander lid en een andere zaak.
 - de AI-onderzoeker: dezelfde weg als een medewerker, met de machine als
   zichtbare aanvrager, zonder zwaar werk, zonder lenen, en met de eerste echte
   aanroeper van `magNu()` ernaast (par. 13b);
+- Rahul AI voor uitlegbare triage, samenvatting, volgende stap en concept, met
+  medewerkerbesluit en tijdlijnaudit (par. 13i);
+- RTG Direct als interne contactlijn en de zaakgebonden, expliciet gestarte
+  WebRTC-meekijksessie zonder opname (par. 13i);
 - de ledenkant in de app-gids-la (Core, op elk scherm) en de kantoorkant achter
   de balie-zetel;
 - de klacht van de ledenbalie krijgt een envelop en blijft een klacht;

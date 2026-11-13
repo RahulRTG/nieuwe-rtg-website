@@ -39,7 +39,7 @@ const zaakregiebeeld = require('../zaakregiebeeld');
 
 const MAX = 20000;
 
-module.exports = function maakZaken({ db, save, crypto }) {
+module.exports = function maakZaken({ db, save, crypto, rahul = require('./rahul') }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/service', bezit: { serviceZaken: 'lijst' } });
   const Z = () => eigen.bak('serviceZaken');
   const nu = () => klok.datum().toISOString();
@@ -74,7 +74,9 @@ module.exports = function maakZaken({ db, save, crypto }) {
     if (!g.melder) return { status: 400, error: 'Een zaak zonder melder kan niemand beantwoorden.' };
 
     const p = prioriteit.bereken(g.termen || {});
-    const route = router.routeer({ doelgroep, onderwerp: g.onderwerp, soort, prioriteit: p.prioriteit });
+    const triage = rahul.triage({ doelgroep, onderwerp: g.onderwerp, soort,
+      prioriteit: p.prioriteit, titel, tekst: g.tekst });
+    const route = router.routeer({ doelgroep, onderwerp: triage.onderwerp, soort, prioriteit: p.prioriteit });
     const at = nu();
     const z = {
       id: nummer(),
@@ -82,19 +84,23 @@ module.exports = function maakZaken({ db, save, crypto }) {
       /* De melder is een SLEUTEL of een codenaam, nooit een naam. Deze laag
          kent geen mensen -- zie de kop van kern/ledenbalie.js, dezelfde regel. */
       melder: schoon(g.melder, 120),
-      onderwerp: schoon(g.onderwerp, 30) || 'anders',
+      onderwerp: triage.onderwerp,
       titel,
       betrokken: verwijzing(g.betrokken),
       stand: 'nieuw',
       prioriteit: p,
       team: route.team, routeWaarom: route.waarom, routeVia: route.via,
+      rahul: { versie: triage.versie, zekerheid: triage.zekerheid,
+        signalen: triage.signalen.slice(0, 4) },
       eigenaar: null,
       /* Waar deze zaak aan vastzit in de lagen die de BETEKENIS bezitten. Leeg
          bij een zaak die alleen zichzelf is. */
       koppelingen: [],
       mensVerzoeken: 0,
       at, bron: schoon(g.bron, 60) || 'lid',
-      tijdlijn: [{ wat: 'geopend', at, door: 'melder', tekst: titel }]
+      tijdlijn: [{ wat: 'geopend', at, door: 'melder', tekst: titel },
+        { wat: 'rahulTriage', at, door: 'rahul-ai', onderwerp: triage.onderwerp,
+          team: route.team, zekerheid: triage.zekerheid, signalen: triage.signalen.slice(0, 4) }]
     };
     const tekst = schoon(g.tekst, 4000);
     if (tekst) z.tijdlijn.push({ wat: 'bericht', at, van: 'melder', tekst });
@@ -104,7 +110,7 @@ module.exports = function maakZaken({ db, save, crypto }) {
     Z().unshift(z);
     if (Z().length > MAX) Z().pop();
     save();
-    return { ok: true, zaak: kort(z) };
+    return { ok: true, zaak: g.voorMelder ? kortMelder(z) : kort(z) };
   }
 
   /* De korte vorm: wat een lijst nodig heeft. Veld voor veld opgebouwd en nooit
@@ -120,6 +126,31 @@ module.exports = function maakZaken({ db, save, crypto }) {
       mensGevraagd: z.mensVerzoeken > 0, koppelingen: z.koppelingen.length };
   }
 
+  /* Een melder ziet de voortgang, niet de interne besturing. Team, eigenaar en
+     prioriteitsweging blijven in het kantoorbeeld. Zo kan Rahul AI de zaak
+     geruisloos naar de juiste afdeling sturen zonder een verborgen proces als
+     klantbelofte of als label in de app te lekken. */
+  function kortMelder(z) {
+    const k = kort(z);
+    delete k.team;
+    delete k.eigenaar;
+    delete k.prioriteit;
+    delete k.prioriteitNaam;
+    return k;
+  }
+
+  function tijdlijnVoorMelder(z) {
+    const intern = new Set(['rahulTriage', 'rahulAdvies', 'team', 'eigenaar', 'prioriteit']);
+    return z.tijdlijn.filter(r => !intern.has(r.wat)).map(r => {
+      const regel = Object.assign({}, r);
+      if (regel.wat === 'stand' && regel.door === 'systeem' &&
+          /^Zaak aangemaakt en toegewezen aan /.test(regel.notitie || '')) {
+        delete regel.notitie;
+      }
+      return regel;
+    });
+  }
+
   /* Het dossier. `voorMelder` laat de interne kant weg -- niet omdat het geheim
      is, maar omdat de routeringsuitleg en de prioriteitsopbouw voor de melder
      ruis zijn die op een verontschuldiging gaat lijken. */
@@ -127,14 +158,15 @@ module.exports = function maakZaken({ db, save, crypto }) {
     const z = vind(id);
     if (!z) return { status: 404, error: 'Deze zaak kennen wij niet.' };
     const klokken = require('./klok').klokken(z);
-    const basis = Object.assign(kort(z), {
-      tijdlijn: z.tijdlijn.map(r => Object.assign({}, r)),
+    const basis = Object.assign(voorMelder ? kortMelder(z) : kort(z), {
+      tijdlijn: voorMelder ? tijdlijnVoorMelder(z) : z.tijdlijn.map(r => Object.assign({}, r)),
       klokken,
       regiebeeld: zaakregiebeeld.service(z)
     });
     if (voorMelder) return { ok: true, zaak: basis };
     return { ok: true, zaak: Object.assign(basis, {
       melder: z.melder, bron: z.bron, routeWaarom: z.routeWaarom, routeVia: z.routeVia,
+      rahul: z.rahul ? Object.assign({}, z.rahul, { signalen: z.rahul.signalen.slice() }) : null,
       prioriteitOpbouw: z.prioriteit, mensVerzoeken: z.mensVerzoeken,
       koppelingenLijst: z.koppelingen.slice() }) };
   }
@@ -147,7 +179,7 @@ module.exports = function maakZaken({ db, save, crypto }) {
     if (o.soort) a = a.filter(z => z.soort === String(o.soort));
     if (o.alleenOpen) a = a.filter(z => !(STANDEN[z.stand] || {}).eind);
     if (o.mensGevraagd) a = a.filter(z => z.mensVerzoeken > 0);
-    return a.slice(0, Number(o.max || 100)).map(kort);
+    return a.slice(0, Number(o.max || 100)).map(o.voorMelder ? kortMelder : kort);
   }
 
   /* De wachtrij per team, met wat een cockpit nodig heeft om te weten waar het
@@ -163,5 +195,5 @@ module.exports = function maakZaken({ db, save, crypto }) {
       wachtOpMelder: a.filter(z => z.stand === 'wachtOpMelder').length };
   }
 
-  return { open, lijst, dossier, tel, vind, kort, verwijzing, bak: Z, nu, schoon, inhoud };
+  return { open, lijst, dossier, tel, vind, kort, kortMelder, verwijzing, bak: Z, nu, schoon, inhoud };
 };

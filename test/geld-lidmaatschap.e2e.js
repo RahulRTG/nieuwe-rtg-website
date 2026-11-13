@@ -47,8 +47,8 @@ async function registreer(base) {
 
 /* De enige weg waarlangs een contract ontstaat: een aanvraag die het kantoor
    goedkeurt. Zelfde opbouw als test/lidabonnement-deur.test.js. */
-async function lidMetAbonnement(base, office) {
-  const lid = await registreer(base);
+async function lidMetAbonnement(base, office, bestaand) {
+  const lid = bestaand || await registreer(base);
   const aanvraag = (await api(base, '/api/aanmelding/aanvraag',
     { idem: randomUUID(), pas: 'rtg', naam: 'Lid ' + lid.u, contact: lid.u + '@x.nl' }, lid.token)).body;
   const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
@@ -80,6 +80,48 @@ async function pagina(browser, base, token) {
 const stand = (page) => page.evaluate(() => {
   const el = document.getElementById('lmStand');
   return el ? el.dataset.stand : null;
+});
+
+test('een oud opzegscherm weigert een nieuw contract en laat een nieuw voorbeeld toe',
+  { skip: geenBrowser(pw) }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldlid-oud-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+    const lid = await lidMetAbonnement(base, office);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const { page, fouten } = await pagina(browser, base, lid.token);
+    await page.waitForSelector('#lmVoorbeeld');
+    await page.click('#lmVoorbeeld');
+    await page.waitForSelector('#lmBevestig');
+    const oud = (await api(base, '/api/mijn/abonnement', {}, lid.token)).body.abonnement;
+    await lidMetAbonnement(base, office, lid);
+    const nieuw = (await api(base, '/api/mijn/abonnement', {}, lid.token)).body.abonnement;
+    assert.notEqual(oud.contractId, nieuw.contractId);
+    const antwoord = page.waitForResponse(r => r.url().endsWith('/api/mijn/abonnement/opzeggen'));
+    await page.click('#lmBevestig');
+    const geweigerd = await antwoord;
+    assert.equal(geweigerd.status(), 409);
+    assert.equal(geweigerd.request().postDataJSON().contractId, oud.contractId);
+    await page.waitForSelector('#lmBevestig', { state: 'detached' });
+    assert.equal(await stand(page), 'ACTIEF');
+    assert.equal((await api(base, '/api/mijn/abonnement', {}, lid.token)).body.abonnement.stand, 'ACTIEF');
+    assert.equal(await page.locator('#lmUitslag').innerText(), '', 'geen valse succesmelding');
+    await page.click('#lmVoorbeeld');
+    await page.waitForSelector('#lmBevestig');
+    const opnieuw = page.waitForResponse(r => r.url().endsWith('/api/mijn/abonnement/opzeggen'));
+    await page.click('#lmBevestig');
+    const bevestigd = await opnieuw;
+    assert.equal(bevestigd.status(), 200);
+    assert.equal(bevestigd.request().postDataJSON().contractId, nieuw.contractId);
+    assert.equal((await api(base, '/api/mijn/abonnement', {}, lid.token)).body.abonnement.stand, 'OPZEGGEND');
+    assert.deepEqual(fouten.filter(f => !/favicon/i.test(f) && !/Failed to load resource:.*409/.test(f)), []);
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  }
 });
 
 test('RTG Geld, stand Lidmaatschap: zien, lezen wat opzeggen doet, opzeggen, en het blijft staan',

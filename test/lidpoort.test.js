@@ -310,7 +310,8 @@ test('13. over de echte server: contract voorbij -> basislaag, zonder opnieuw in
   const nu = await api('/api/mijn/abonnement', {}, reg.token);
   assert.equal(nu.status, 200);
   assert.equal(nu.kop.get('rtg-contract'), null, 'een lopend contract draagt geen basislaagkop');
-  assert.equal((await api('/api/mijn/abonnement/opzeggen', {}, reg.token)).status, 200, 'het lid zegt op');
+  const opzeg = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, reg.token)).body;
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', opzeg, reg.token)).status, 200, 'het lid zegt op');
   const nogLopend = await api('/api/mijn/abonnement', {}, reg.token);
   assert.equal(nogLopend.kop.get('rtg-contract'), null, 'een opzegging met einddatum in de toekomst loopt nog');
 
@@ -346,7 +347,8 @@ test('14. dezelfde bearer na een verstreken afspraak: de betaalde capability wei
   const lid = await lidMetContract();
   const voor = await api(BETAALD, {}, lid.token);
   assert.ok(!isBetaaldGeweigerd(voor), 'met een lopende afspraak is de capability open: ' + JSON.stringify(voor.body));
-  assert.equal((await api('/api/mijn/abonnement/opzeggen', {}, lid.token)).status, 200);
+  const opzeg = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, lid.token)).body;
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', opzeg, lid.token)).status, 200);
   stop(srv);
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: '+400d' } }); base = srv.base;
   const na = await api(BETAALD, {}, lid.token);   // DEZELFDE token, niet opnieuw ingelogd

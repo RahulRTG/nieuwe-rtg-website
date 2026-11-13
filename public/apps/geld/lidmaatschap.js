@@ -8,8 +8,8 @@
    gebruikt (`bediening-recht.js`: "Eigen lidmaatschap") -- en niet Afspraken.
 
    DRIE ROUTES, ALLE DRIE OP DE SESSIE: /api/mijn/abonnement, /opzegvoorbeeld en
-   /opzeggen. Er is met opzet geen parameter om het lidmaatschap van iemand anders
-   op te vragen, en dit scherm stuurt er ook geen mee.
+   /opzeggen. De bevestiging stuurt uitsluitend de referentie uit het eigen
+   voorbeeld mee, zodat een oud scherm nooit een nieuw contract kan opzeggen.
 
    GEEN DARK PATTERN, en dat volgt de server: eerst lezen wat opzeggen doet (het
    voorbeeld verandert niets), dan EEN bevestiging. Wat er BLIJFT staat even groot
@@ -23,6 +23,7 @@
   var V = w.RTGGeld = w.RTGGeld || { standen: [] };
   var $ = function (s) { return d.querySelector(s); };
   var ABO = null;
+  var VOORBEELD = null;
 
   function esc(s) { return w.Geld.esc(s); }
   /* DE STEM VAN DE PAS (CLAUDE.md): "je" bij de RTG Pass, "u" bij Lifestyle en
@@ -88,6 +89,7 @@
   }
 
   async function laad() {
+    VOORBEELD = null;
     var vak = $('#lmHoofd');
     if (!vak) return;
     try {
@@ -100,9 +102,19 @@
   }
 
   async function voorbeeld() {
+    VOORBEELD = null;
     var vak = $('#lmGevolg');
     vak.innerHTML = '<p class="stil h-mt40">Laden...</p>';
-    try { vak.innerHTML = gevolgHtml(await w.Geld.api('/api/mijn/abonnement/opzegvoorbeeld')); }
+    try {
+      var v = await w.Geld.api('/api/mijn/abonnement/opzegvoorbeeld');
+      if (!ABO || v.contractId !== ABO.contractId) {
+        await laad();
+        w.Geld.melding('Je afspraak is gewijzigd. Bekijk opnieuw wat opzeggen doet.');
+        return;
+      }
+      VOORBEELD = { contractId: v.contractId, opzegVersie: v.opzegVersie };
+      vak.innerHTML = gevolgHtml(v);
+    }
     catch (e) { vak.innerHTML = '<p class="h-mt40">' + esc(e.message) + '</p>'; }
   }
 
@@ -112,7 +124,8 @@
   async function bevestig(knop) {
     knop.disabled = true;
     try {
-      var r = await w.Geld.api('/api/mijn/abonnement/opzeggen');
+      if (!VOORBEELD) throw new Error('Bekijk eerst opnieuw wat opzeggen doet.');
+      var r = await w.Geld.api('/api/mijn/abonnement/opzeggen', VOORBEELD);
       await laad();
       var uit = $('#lmUitslag');
       if (uit) {
@@ -124,6 +137,7 @@
       }
       w.Geld.melding(z('Je opzegging is vastgelegd.', 'Uw opzegging is vastgelegd.'));
     } catch (e) {
+      if (e.status === 409) await laad();
       knop.disabled = false;
       w.Geld.melding(e.message);
     }
@@ -134,7 +148,7 @@
     if (!b) return;
     if (b.id === 'lmVoorbeeld') voorbeeld();
     else if (b.id === 'lmBevestig') bevestig(b);
-    else if (b.id === 'lmLaat') $('#lmGevolg').innerHTML = '';
+    else if (b.id === 'lmLaat') { VOORBEELD = null; $('#lmGevolg').innerHTML = ''; }
   }
 
   V.standen.push({

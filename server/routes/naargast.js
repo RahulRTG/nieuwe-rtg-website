@@ -22,8 +22,8 @@ module.exports = (kern) => {
     const id = ikBen(req);
     if (id == null) return res.status(404).json({ error: 'Deze sessie hangt niet aan een RTG-account.' });
     const wanneer = String((req.body || {}).wanneer || '');
-    if (wanneer === 'nu') return stuur(res, ng().lidNu(id));
-    if (wanneer === 'einde') return stuur(res, ng().lidEinde(id));
+    if (wanneer === 'nu') return stuur(res, ng().lidNu(id, req.body));
+    if (wanneer === 'einde') return stuur(res, ng().lidEinde(id, req.body));
     res.status(400).json({ error: 'Kies nu, of aan het eind van je periode (einde).' });
   });
 

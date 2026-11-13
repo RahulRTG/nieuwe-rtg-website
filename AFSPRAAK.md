@@ -777,12 +777,37 @@ reden en spoor. De pestgrens mag daarom geen herhaalbare 24-uursban of verplicht
 excusespoort opleggen. Een tegengehouden bericht krijgt uitleg en een verwijzing
 naar de bestaande RTG Service; dat is niet hetzelfde als een al verzonden melding.
 
-### 17.4 Wat nog aangesloten en bewezen moet worden
+### 17.4 Directe upgrades met verrekening
 
-De prijsbasis staat in `PRIJZEN.md` §7.3, de begrotingsregel in §7.7. Er is nog
-geen besluit over de verrekening en nieuwe looptijd van een tussentijdse
-upgrade. Nieuwe servicecapaciteiten, live-ingangsdatum en migratie van bestaande
-leden zijn door de automatiseringsopdracht niet automatisch vastgesteld.
+De eigenaar koos op 13 november 2026 **direct ingaan met verrekening**, uit de
+voorgelegde keuze direct na tekenen/betalen met een nieuwe jaartermijn versus
+wachten tot het einde van de bestaande periode. Het uitvoeringscontract is:
+
+- De upgrade gaat direct in zodra de klant het specifieke aanbod heeft getekend
+  en de eerste verschuldigde betaling aantoonbaar is voldaan. Voor Business en
+  Lifestyle is daarnaast menselijke toelating vereist. Pending, requires_action
+  en een algemene onboardinghandtekening geven geen nieuwe betaalde rechten.
+- Er begint een nieuwe termijn van twaalf maanden. Prijs, btw, betaalwijze,
+  begin/einddatum, verrekening en eerst te betalen bedrag staan vóór tekenen
+  in het aanbod. Een gewijzigde afspraak vraagt een nieuw akkoord.
+- Alleen aantoonbaar betaald, nog ongebruikt abonnementsgeld wordt naar rato
+  van de oorspronkelijke betaalde periode verrekend, met oorspronkelijke
+  korting en reeds toegepaste credits/restituties. Een open factuur of een
+  handmatig afgevinkte termijn levert geen bewezen vooruitbetaling op.
+- Iedere gebruikte credit blijft aan bronfactuur en doelcontract gebonden;
+  dezelfde betaling mag niet tweemaal worden gebruikt. Geen fictieve provider-
+  betaling bij een volledig verrekend bedrag van nul en geen automatische
+  terugbetaling buiten het overeengekomen aanbod.
+- De oude overeenkomst en betaalhistorie blijven bewaard. De vervanging sluit
+  toekomstige oude verplichtingen af op de aanvaarde grens, niet door oude
+  factuurbedragen te herschrijven. Oude opzegopdrachten mogen nieuwe rechten
+  niet intrekken. Herstart en gelijktijdige aanvragen mogen niet dubbel innen.
+
+De prijsbasis staat in `PRIJZEN.md` §7.3, de begrotingsregel in §7.7, inclusief
+de maatschappelijke reservering na omzetcorrecties. Nieuwe servicecapaciteiten,
+live-ingangsdatum en migratie van bestaande leden zijn hiermee niet vastgesteld.
+
+### 17.5 Wat nog aangesloten en bewezen moet worden
 
 Broninspectie op 13 november 2026 toont nog deze concrete aansluitgaten:
 
@@ -798,9 +823,13 @@ Broninspectie op 13 november 2026 toont nog deze concrete aansluitgaten:
 - De RTG-acceptatie door kantoor maakt nog wel een contractplanning, maar
   verleent een nieuw gratis account geen betaalde pas. Dat gat mag niet met
   alleen `setTier` worden gedicht: klantinstemming en betaling blijven vereist.
-- Een oude geplande opzegging is nog accountgebonden. Voor upgrades moet zij
-  aan haar eigen contract worden gebonden, zodat het einde van afspraak A een
-  nieuwe geldige afspraak B niet intrekt.
+- Nieuwe geplande opzeggingen zijn aan hun contract en aanvraag gebonden.
+  Bevestigen vereist de referentie uit het getoonde voorbeeld; een ander contract,
+  gewijzigde prijs/termijn of verschoven getoonde opzegdatum vraagt een nieuw
+  voorbeeld. Zowel de geplande ronde als afgelopen/wacht beschermen een andere
+  op dat moment geldige afspraak. Oude ongebonden plannen worden alleen bij een
+  unieke consistente bron gekoppeld; anders blijven zij zichtbaar tegengehouden.
+  Dit is bescherming tegen oude opdrachten, nog geen upgrade-activatieketen.
 - `tekenVast` gebruikt nu ook voor leden de bestaande collectiepoort. De
   SQLite-herstartproef bewijst ontvangstbehoud, niet alle opslagsoorten of
   stroomuitval. JSON/geheugen gebruiken daar nog gewone `save()`; een volledige

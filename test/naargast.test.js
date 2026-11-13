@@ -70,7 +70,9 @@ test('1. zonder afspraak geen eind, wel nu -- en de oude sessie is daarna weg', 
 
 test('2. met een contract kiest het lid het eind van zijn periode: opgezegd, en nog lid', async () => {
   const lid = await metContract();
-  const r = await api('/api/mijn/pas/gast', { wanneer: 'einde' }, lid.token);
+  assert.equal((await api('/api/mijn/pas/gast', { wanneer: 'einde' }, lid.token)).status, 409);
+  const voorbeeld = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, lid.token)).body;
+  const r = await api('/api/mijn/pas/gast', { ...voorbeeld, wanneer: 'einde' }, lid.token);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.gepland, true);
   assert.ok(r.body.gastOp);
@@ -109,23 +111,36 @@ function wereld({ contractStatus, eindigtOp, termijnen, tier = 'rtg', metContrac
   const db = { data: {} };
   let klok = Date.parse('2026-10-01T00:00:00Z');
   const STATUS = { OPZEGGEND: 'OPZEGGEND', GEEINDIGD: 'GEEINDIGD' };
-  const c = { id: 'c1', status: contractStatus, eindigtOp };
-  const contracten = { STATUS, LOPEND: new Set(['ACTIEF', 'VERLENGD']), vind: () => c,
+  const c = { id: 'c1', aanmeldingId: 'a1', startAt: '2026-01-01T00:00:00Z', status: contractStatus, eindigtOp };
+  const contractlijst = [c];
+  const contracten = { STATUS, LOPEND: new Set(['ACTIEF', 'VERLENGD', 'OPZEGGEND']), vind: id => contractlijst.find(x => x.id === id),
     beeindig: (x) => { x.status = STATUS.GEEINDIGD; return x; } };
   const user = { id: 7, tier };
   const accounts = { getUserById: (id) => (id === 7 ? user : null),
     setTier: (id, t) => { user.tier = t; return user; }, zetSessiegrens: () => { user.grens = true; } };
-  const A = () => [{ id: 'a1', accountId: 7, status: 'geaccepteerd' }];
-  const B = () => [{ aanmeldingId: 'a1', contractId: metContract ? 'c1' : null, termijnen: termijnen || [] }];
+  const aanmeldingen = [{ id: 'a1', accountId: 7, status: 'geaccepteerd' }];
+  const schemas = [{ aanmeldingId: 'a1', contractId: metContract ? 'c1' : null, termijnen: termijnen || [] }];
+  const A = () => aanmeldingen, B = () => schemas;
   const berichten = [];
-  const ng = require('../server/kern/aanmeldingen/naargast')({ db, save: () => {}, A, B, contracten, accounts,
-    zegOpZelf: () => ({ ok: true, eindigtOp }), meldLid: (k, n) => berichten.push(k), nu: () => new Date(klok).toISOString() }).naarGast;
-  return { db, ng, c, user, berichten, zet: (iso) => { klok = Date.parse(iso); } };
+  const saves = { n: 0 };
+  const ng = require('../server/kern/aanmeldingen/naargast')({ db, save: () => saves.n++, A, B, contracten, accounts,
+    zegOpZelf: () => { c.status = 'OPZEGGEND'; return { ok: true, eindigtOp }; },
+    meldLid: (k, n) => berichten.push(k), nu: () => new Date(klok).toISOString() }).naarGast;
+  function voegContractToe(patch = {}) {
+    const nieuw = { id: 'c2', aanmeldingId: 'a2', status: 'ACTIEF', startAt: '2026-09-01T00:00:00Z', eindigtOp: null, ...patch };
+    contractlijst.push(nieuw);
+    aanmeldingen.unshift({ id: nieuw.aanmeldingId, accountId: 7, status: 'geaccepteerd' });
+    schemas.unshift({ aanmeldingId: nieuw.aanmeldingId, contractId: nieuw.id, termijnen: [] });
+    return nieuw;
+  }
+  return { db, ng, c, user, berichten, schemas, saves, voegContractToe, zet: (iso) => { klok = Date.parse(iso); } };
 }
 
 test('5. een geplande overgang gebeurt op de einddatum en niet ervoor', () => {
   const w = wereld({ contractStatus: 'ACTIEF', eindigtOp: '2026-12-01T00:00:00Z' });
   assert.equal(w.ng.lidEinde(7).gepland, true);
+  assert.equal(w.db.data.pasNaarGast.gepland['7'].contractId, 'c1');
+  assert.equal(w.db.data.pasNaarGast.gepland['7'].aanmeldingId, 'a1');
   w.ng.ronde();
   assert.equal(w.user.tier, 'rtg', 'voor de einddatum blijft hij lid');
   w.zet('2026-12-01T00:00:01Z');
@@ -179,4 +194,78 @@ test('8. onbetaald weigert brede sancties, ook met eerder opgeslagen aan=true', 
   z.db.data.pasNaarGast = { regels: { onbetaald: { aan: true, termijnen: 1 } } };
   z.ng.ronde();
   assert.equal(z.user.tier, 'rtg', 'een lid zonder vastgelegd contract gaat nooit automatisch');
+});
+
+test('9. een contractgebonden oude opdracht raakt geen nieuw lopend contract of sessie', () => {
+  const w = wereld({ contractStatus: 'ACTIEF', eindigtOp: '2026-12-01T00:00:00Z' });
+  w.ng.lidEinde(7);
+  const nieuw = w.voegContractToe();
+  w.zet('2026-12-01T00:00:00Z');
+  assert.equal(w.ng.ronde().tegengehouden, 1);
+  assert.equal(w.user.tier, 'rtg');
+  assert.equal(w.user.grens, undefined);
+  assert.equal(nieuw.status, 'ACTIEF');
+  assert.ok(w.db.data.pasNaarGast.gepland['7'], 'oude opdracht blijft herkenbaar voor herstel');
+});
+
+test('10. afgelopen en wacht beschermen een nieuwe afspraak, ook na een eerdere aankondiging', () => {
+  for (const regel of ['afgelopen', 'wacht']) {
+    const w = wereld({ contractStatus: 'OPZEGGEND', eindigtOp: '2026-09-25T00:00:00Z' });
+    w.ng.regelZet(regel, { aan: true, dagen: 30 }, 'eigenaar');
+    if (regel === 'wacht') assert.equal(w.ng.ronde().aangekondigd, 1);
+    const nieuw = w.voegContractToe(), berichten = w.berichten.length;
+    assert.equal(w.ng.ronde().tegengehouden, 1);
+    w.zet('2026-11-01T00:00:00Z');
+    assert.equal(w.ng.ronde().tegengehouden, 1);
+    assert.equal(w.user.tier, 'rtg');
+    assert.equal(w.user.grens, undefined);
+    assert.equal(nieuw.status, 'ACTIEF');
+    assert.equal(w.berichten.length, berichten);
+  }
+});
+
+test('11. legacyplanning wordt alleen bij een unieke consistente bron uitgevoerd', () => {
+  const eind = '2026-09-01T00:00:00Z';
+  for (const fout of ['datum', 'ontbrekend', 'andere-aanvraag', 'dubbel', 'verkeerd-doel']) {
+    const w = wereld({ contractStatus: 'OPZEGGEND', eindigtOp: eind });
+    const g = { op: eind, sinds: '2026-08-01T00:00:00Z' };
+    w.db.data.pasNaarGast = { gepland: { '7': g } };
+    if (fout === 'datum') g.op = 'geen datum';
+    if (fout === 'ontbrekend') w.schemas[0].contractId = 'niet-bestaand';
+    if (fout === 'andere-aanvraag') w.c.aanmeldingId = 'andermans-aanvraag';
+    if (fout === 'dubbel') w.voegContractToe({ status: 'OPZEGGEND', eindigtOp: eind });
+    if (fout === 'verkeerd-doel') Object.assign(g, { contractId: 'ander', aanmeldingId: 'a1' });
+    assert.equal(w.ng.ronde().tegengehouden, 1, fout);
+    assert.equal(w.user.tier, 'rtg', fout);
+    assert.equal(w.user.grens, undefined, fout);
+    assert.ok(w.db.data.pasNaarGast.gepland['7'], fout);
+  }
+  const w = wereld({ contractStatus: 'OPZEGGEND', eindigtOp: eind });
+  w.db.data.pasNaarGast = { gepland: { '7': { op: eind } } };
+  w.voegContractToe({ status: 'GEEINDIGD', eindigtOp: '2026-08-01T00:00:00Z' });
+  w.schemas.push({ ...w.schemas[1] }); // dezelfde contractbron is geen tweede kandidaat
+  assert.equal(w.ng.ronde().gepland, 1);
+  assert.equal(w.user.tier, 'guest');
+  assert.ok(w.saves.n > 0, 'ook de afhandeling wordt opgeslagen');
+});
+
+test('12. beschermde legacybinding blijft vast en start/eindgrenzen zijn expliciet', () => {
+  const eind = '2026-09-01T00:00:00Z';
+  for (const [startAt, eindigtOp, beschermd] of [
+    ['2026-10-01T00:00:00Z', null, true],
+    ['2026-10-02T00:00:00Z', null, false],
+    ['2026-08-01T00:00:00Z', '2026-10-01T00:00:00Z', false],
+    ['ongeldig', null, true]
+  ]) {
+    const w = wereld({ contractStatus: 'OPZEGGEND', eindigtOp: eind });
+    w.db.data.pasNaarGast = { gepland: { '7': { op: eind } } };
+    w.voegContractToe({ startAt, eindigtOp });
+    const uit = w.ng.ronde();
+    assert.equal(uit.tegengehouden, beschermd ? 1 : 0);
+    assert.equal(w.user.tier, beschermd ? 'rtg' : 'guest');
+    if (beschermd) {
+      assert.equal(w.db.data.pasNaarGast.gepland['7'].contractId, 'c1');
+      assert.ok(w.saves.n > 0, 'de afgeleide binding wordt bewaard voordat een latere ronde kan kiezen');
+    }
+  }
 });

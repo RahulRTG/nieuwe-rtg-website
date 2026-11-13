@@ -25,6 +25,18 @@
    Dat hoort een eigen stap te zijn; zie AFSPRAAK.md par. 14. Tot dan zegt het
    antwoord eerlijk dat terugkomen een nieuwe afspraak is. */
 'use strict';
+const { createHash } = require('node:crypto');
+
+// De referentie is geen bevoegdheid: de sessie bepaalt steeds de eigenaar.
+// Bind ook de getoonde kalenderdatum. Bij een retry telt de vastgelegde datum,
+// niet een nieuwe berekening vanaf vandaag; de eigen opzegging breekt geen retry.
+function referentie(c, einddatumTekst) {
+  const velden = ['id', 'aanmeldingId', 'pas', 'startAt', 'periode', 'minimumMaanden',
+    'frequentie', 'verlenging', 'opzegMaanden', 'afgesprokenCenten', 'prijsVastTot', 'btwProfiel'];
+  return { contractId: c.id, opzegVersie: createHash('sha256')
+    .update(JSON.stringify([einddatumTekst,
+      ...velden.map(k => c[k] ?? null)])).digest('hex') };
+}
 
 module.exports = ({ contracten, zegOpLidmaatschap, lezer }) => {
   const { aanmeldingVan, contractVan, komende, beeld, datum } = lezer;
@@ -52,7 +64,7 @@ module.exports = ({ contracten, zegOpLidmaatschap, lezer }) => {
     if (!contracten.LOPEND.has(c.status))
       return { status: 409, error: 'Dit lidmaatschap loopt niet meer; er is niets op te zeggen.' };
     if (c.status === contracten.STATUS.OPZEGGEND)
-      return { ok: true, alOpgezegd: true, eindigtOp: c.eindigtOp,
+      return { ...referentie(c, datum(c.eindigtOp)), ok: true, alOpgezegd: true, eindigtOp: c.eindigtOp,
         eindigtOpTekst: datum(c.eindigtOp) };
 
     const eind = contracten.opzegEinde(c);
@@ -60,7 +72,7 @@ module.exports = ({ contracten, zegOpLidmaatschap, lezer }) => {
 
     const weg = komende(a.id).filter(t => new Date(t.vervalt) >= new Date(eind));
     const blijft = komende(a.id).filter(t => new Date(t.vervalt) < new Date(eind));
-    return { ok: true, alOpgezegd: false,
+    return { ...referentie(c, datum(eind)), ok: true, alOpgezegd: false,
       eindigtOp: eind, eindigtOpTekst: datum(eind),
       opzegMaanden: c.opzegMaanden,
       nogTeBetalen: blijft.length,
@@ -82,17 +94,20 @@ module.exports = ({ contracten, zegOpLidmaatschap, lezer }) => {
      einddatum terug in plaats van een fout. Twee tikken op een telefoon zijn
      geen twee opzeggingen, en een foutmelding op de tweede laat een lid denken
      dat de eerste niet is aangekomen. */
-  function zegOpZelf(accountId) {
+  function zegOpZelf(accountId, bevestiging) {
     const a = aanmeldingVan(accountId);
     if (!a) return { status: 404, error: 'Er is voor dit account geen lidmaatschapsafspraak vastgelegd.' };
     const c = contractVan(a.id);
     if (!c) return { status: 404, error: 'Er staat geen contract bij deze aanmelding.' };
+    if (!contracten.LOPEND.has(c.status))
+      return { status: 409, error: 'Dit lidmaatschap loopt niet meer; er is niets op te zeggen.' };
+    const verwacht = referentie(c, datum(c.status === contracten.STATUS.OPZEGGEND ? c.eindigtOp : contracten.opzegEinde(c)));
+    const b = bevestiging || {};
+    if (b.contractId !== verwacht.contractId || b.opzegVersie !== verwacht.opzegVersie)
+      return { status: 409, error: 'De afspraak ontbreekt in de bevestiging of is gewijzigd. Bekijk opnieuw wat opzeggen doet.' };
     if (c.status === contracten.STATUS.OPZEGGEND)
       return { ok: true, alOpgezegd: true, eindigtOp: c.eindigtOp,
         eindigtOpTekst: datum(c.eindigtOp), abonnement: beeld(a, c) };
-    if (!contracten.LOPEND.has(c.status))
-      return { status: 409, error: 'Dit lidmaatschap loopt niet meer; er is niets op te zeggen.' };
-
     const r = zegOpLidmaatschap(a.id);
     if (r.error) return r;
     const na = contractVan(a.id);

@@ -49,12 +49,12 @@ module.exports = (kern) => {
      staan achter de LEDENdeur, en het verschil is niet de deur maar de SLEUTEL:
 
        kantoor   zegOpLidmaatschap(req.body.id)      -- een id uit het lichaam
-       lid       lidAbonnement.zegOpZelf(account.id) -- de sessie, nooit het lichaam
+       lid       lidAbonnement.zegOpZelf(account.id, referentie) -- eigenaar uit sessie
 
      De kantoorroute achter een ledendeur hangen zou betekenen dat elk lid elk
-     willekeurig lidmaatschap kan opzeggen. Daarom neemt geen van deze drie iets
-     uit `req.body`; `aanvragerVan` geeft het accountId uit het geverifieerde
-     token, dezelfde weg als bij de aanvraag hierboven.
+     willekeurig lidmaatschap kan opzeggen. `aanvragerVan` geeft het accountId uit
+     het geverifieerde token. De bevestiging bindt alleen aan het eigen vooraf
+     getoonde contract; een referentie uit de body verleent geen bevoegdheid.
 
      `auth` en niet `officeAuth`: auth weigert een leverancier- en kantoorsessie,
      want die hebben geen lidmaatschap. Zie de kop van opzet/diensten2.js.
@@ -87,7 +87,7 @@ module.exports = (kern) => {
   }));
   app.post('/api/mijn/abonnement/opzeggen', auth, (req, res) => veilig(res, () => {
     const id = ikBen(req);
-    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.zegOpZelf(id);
+    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.zegOpZelf(id, req.body);
   }));
 
   app.post('/api/aanmelding/beslis', officeAuth, (req, res) => veilig(res, () =>

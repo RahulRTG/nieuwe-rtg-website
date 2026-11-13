@@ -33,7 +33,6 @@ const REGELS = Object.freeze({
   wacht: { standaard: { aan: false, dagen: 30 } },
   onbetaald: { standaard: { aan: false, termijnen: 2 } }
 });
-const DAG = 86400000;
 const ONBETAALD_REDEN = 'Geen automatische pasverlaging wegens geplande termijnen. Eerst betaalbewijs, herinnering en aangekondigd herstel; alleen nieuwe betaalde diensten mogen daarna worden beperkt.';
 
 module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu }) => {
@@ -73,10 +72,12 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
 
   /* 1a. Het lid: nu. Een lopend contract wordt opgezegd (de verplichting loopt tot
      de einddatum), en de pas gaat meteen. */
-  function lidNu(accountId) {
+  function lidNu(accountId, bevestiging) {
     const a = mijnAanmelding(accountId);
     let eindigtOp = null;
-    if (a) { const z = zegOpZelf(accountId); if (z.error) return z; eindigtOp = z.eindigtOp; }
+    if (a) { const z = zegOpZelf(accountId, bevestiging); if (z.error) return z; eindigtOp = z.eindigtOp; }
+    else if (bevestiging && bevestiging.contractId)
+      return { status: 409, error: 'Deze afspraak loopt niet meer. Bekijk je huidige lidmaatschap opnieuw.' };
     const r = naarGast(accountId, 'lid-nu');
     if (r.error) return r;
     delete kaart().gepland[String(accountId)]; save();
@@ -86,12 +87,14 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
   }
 
   /* 1b. Het lid: aan het eind van zijn periode. Zonder afspraak is er geen eind. */
-  function lidEinde(accountId) {
+  function lidEinde(accountId, bevestiging) {
     const a = mijnAanmelding(accountId);
     if (!a) return { status: 409, error: 'Er is geen afspraak met een einddatum. Wil je gast worden, kies dan voor nu.' };
-    const z = zegOpZelf(accountId);
+    const z = zegOpZelf(accountId, bevestiging);
     if (z.error) return z;
-    kaart().gepland[String(accountId)] = { op: z.eindigtOp, sinds: new Date(klok()).toISOString() };
+    const { c } = lopendContract(a);
+    kaart().gepland[String(accountId)] = { op: z.eindigtOp, sinds: new Date(klok()).toISOString(),
+      contractId: c.id, aanmeldingId: String(a.id) };
     save();
     return { ok: true, gepland: true, gastOp: z.eindigtOp, let: 'Je blijft lid tot ' + String(z.eindigtOp).slice(0, 10) + ' en wordt daarna gast.' };
   }
@@ -118,40 +121,8 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
     return { ok: true, regels: naarGastRegels() };
   }
 
-  /* DE RONDE. Voert de geplande overgangen uit en, waar een schakelaar aan staat,
-     de automatische. Geeft tellingen terug en geen namen. */
-  function ronde() {
-    const t = klok(), r = naarGastRegels(), uit = { gepland: 0, afgelopen: 0, wacht: 0, aangekondigd: 0, onbetaald: 0 };
-    const k = eigen.kijk(NAAM);
-    for (const [id, g] of Object.entries(k.gepland || {})) {
-      if (Date.parse(g.op) > t) continue;
-      const x = naarGast(id, 'lid-gepland');
-      if (x.ok || x.status === 409 || x.status === 404) { delete kaart().gepland[id]; if (x.ok) uit.gepland += 1; }
-    }
-    const wacht = r.wacht.aan, dagen = r.wacht.dagen;
-    for (const a of A().filter(x => x.status === 'geaccepteerd' && x.accountId != null)) {
-      const { c } = lopendContract(a);
-      if (!c) continue;   // geen vastgelegde afspraak: nooit automatisch
-      if ((wacht || r.afgelopen.aan) && c.status === contracten.STATUS.OPZEGGEND && c.eindigtOp && Date.parse(c.eindigtOp) <= t) {
-        if (wacht && Date.parse(c.eindigtOp) + dagen * DAG > t) {
-          const kk = kaart(); kk.aangekondigd = kk.aangekondigd || {};
-          if (!kk.aangekondigd[a.id] && typeof meldLid === 'function') {
-            try { meldLid('user-' + a.accountId, { icon: 'pas', title: 'Je lidmaatschap is afgelopen',
-              body: 'Over ' + dagen + ' dagen word je gast. Was dit een vergissing, neem dan contact op.' }); } catch (e) { /* bericht is een extra */ }
-            kk.aangekondigd[a.id] = new Date(t).toISOString(); uit.aangekondigd += 1;
-          }
-          continue;
-        }
-        contracten.beeindig(c);
-        if (naarGast(a.accountId, wacht ? 'regel-wacht' : 'regel-afgelopen').ok) uit[wacht ? 'wacht' : 'afgelopen'] += 1;
-        continue;
-      }
-      // Een geplande termijn is geen bewezen mislukte incasso. Niet hier de
-      // hele pas of sessie intrekken; betaalherstel hoort bij de betaalzaak.
-    }
-    if (Object.values(uit).some(n => n > 0)) save();
-    return uit;
-  }
+  const ronde = require('./naargast-ronde')({ A, B, contracten, eigen, kaart, save, klok,
+    regels: naarGastRegels, naarGast, meldLid });
 
   /* Elk uur: de geplande overgangen van leden, en de regels alleen als ze aan staan.
      NAARGAST_RONDE_MS=0 zet de klok uit (voor toetsen die zelf de ronde draaien). */

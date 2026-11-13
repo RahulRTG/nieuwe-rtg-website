@@ -141,7 +141,7 @@
   function bewaarResume() {
     if (!state.bootstrap || !state.bootstrap.currentContext) return;
     api('resume', { world: state.bootstrap.currentWorld, contextId: state.bootstrap.currentContext.id,
-      surface: location.pathname + location.search }).catch(function () {});
+      surface: location.pathname }).catch(function () {});
   }
   function laad(contextId) {
     return api('bootstrap', { world: world, contextId: contextId }).then(function (b) {

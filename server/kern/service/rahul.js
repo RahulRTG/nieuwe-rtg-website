@@ -59,7 +59,7 @@ function laatsteVraag(z) {
   return (z.tijdlijn || []).slice().reverse().find(r => r.wat === 'bericht' && r.van === 'melder');
 }
 
-function advies(z) {
+function maakRahulAdvies(z) {
   if (!z) return { status: 404, error: 'Deze zaak kennen wij niet.' };
   const laatste = laatsteVraag(z);
   const actie = !z.eigenaar ? 'Neem de zaak op naam.'
@@ -73,8 +73,8 @@ function advies(z) {
     grens: 'Advies. Een medewerker controleert en beslist; Rahul AI verstuurt niets.' };
 }
 
-function concept(z) {
-  const a = advies(z);
+function maakRahulConcept(z) {
+  const a = maakRahulAdvies(z);
   if (a.error) return a;
   const opening = 'Dank u. Uw vraag staat bij RTG als ' + z.id + '.';
   const vervolg = z.stand === 'wachtOpMelder'
@@ -84,4 +84,4 @@ function concept(z) {
     grens: 'Concept. Alleen een medewerker kan dit na controle versturen.' });
 }
 
-module.exports = { triage, advies, concept, herken, VERSIE, PATRONEN };
+module.exports = { triage, advies: maakRahulAdvies, concept: maakRahulConcept, herken, VERSIE, PATRONEN };

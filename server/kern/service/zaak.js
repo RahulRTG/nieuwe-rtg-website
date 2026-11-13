@@ -126,30 +126,7 @@ module.exports = function maakZaken({ db, save, crypto, rahul = require('./rahul
       mensGevraagd: z.mensVerzoeken > 0, koppelingen: z.koppelingen.length };
   }
 
-  /* Een melder ziet de voortgang, niet de interne besturing. Team, eigenaar en
-     prioriteitsweging blijven in het kantoorbeeld. Zo kan Rahul AI de zaak
-     geruisloos naar de juiste afdeling sturen zonder een verborgen proces als
-     klantbelofte of als label in de app te lekken. */
-  function kortMelder(z) {
-    const k = kort(z);
-    delete k.team;
-    delete k.eigenaar;
-    delete k.prioriteit;
-    delete k.prioriteitNaam;
-    return k;
-  }
-
-  function tijdlijnVoorMelder(z) {
-    const intern = new Set(['rahulTriage', 'rahulAdvies', 'team', 'eigenaar', 'prioriteit']);
-    return z.tijdlijn.filter(r => !intern.has(r.wat)).map(r => {
-      const regel = Object.assign({}, r);
-      if (regel.wat === 'stand' && regel.door === 'systeem' &&
-          /^Zaak aangemaakt en toegewezen aan /.test(regel.notitie || '')) {
-        delete regel.notitie;
-      }
-      return regel;
-    });
-  }
+  const { kortMelder, tijdlijnVoorMelder } = require('./zaak-melder')(kort);
 
   /* Het dossier. `voorMelder` laat de interne kant weg -- niet omdat het geheim
      is, maar omdat de routeringsuitleg en de prioriteitsopbouw voor de melder
@@ -195,5 +172,6 @@ module.exports = function maakZaken({ db, save, crypto, rahul = require('./rahul
       wachtOpMelder: a.filter(z => z.stand === 'wachtOpMelder').length };
   }
 
-  return { open, lijst, dossier, tel, vind, kort, kortMelder, verwijzing, bak: Z, nu, schoon, inhoud };
+  return { open, lijst, dossier, tel, vind, kort, kortMelder, verwijzing, bak: Z, nu, schoon, inhoud,
+    rahul: { advies: rahul.advies, concept: rahul.concept } };
 };

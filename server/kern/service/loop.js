@@ -35,6 +35,8 @@ module.exports = function maakLoop({ zaken, save, notify }) {
     if (z.tijdlijn.length > MAX_REGELS) z.tijdlijn.splice(1, z.tijdlijn.length - MAX_REGELS);
   }
 
+  const rahulAdvies = require('./rahul-lijn')({ vind, kort, schoon, noteer, save });
+
   const VAN = ['melder', 'ai', 'mens', 'systeem'];
 
   /* Een bericht. `van` is niet cosmetisch: de klokken in ./klok.js rekenen erop
@@ -154,19 +156,6 @@ module.exports = function maakLoop({ zaken, save, notify }) {
     if (z.koppelingen.some(k => k.soort === v.soort && k.code === v.code)) return { ok: true, zaak: kort(z), let: 'Al gekoppeld.' };
     z.koppelingen.push(v);
     noteer(z, { wat: 'koppeling', soort: v.soort, code: v.code, door: schoon(door, 60) || 'systeem' });
-    save();
-    return { ok: true, zaak: kort(z) };
-  }
-
-  /* Een Rahul-advies is pas onderdeel van de zaak als een medewerker het
-     opvraagt. Alleen type, versie en uitkomst worden vastgelegd; geen tweede
-     kopie van de gesprekstekst. */
-  function rahulAdvies(id, { door, soort, versie, volgendeStap } = {}) {
-    const z = vind(id);
-    if (!z) return { status: 404, error: 'Deze zaak kennen wij niet.' };
-    noteer(z, { wat: 'rahulAdvies', door: schoon(door, 60) || 'onbekend',
-      soort: schoon(soort, 20) || 'advies', versie: schoon(versie, 40),
-      volgendeStap: schoon(volgendeStap, 300) || null });
     save();
     return { ok: true, zaak: kort(z) };
   }

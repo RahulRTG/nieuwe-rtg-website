@@ -92,7 +92,6 @@ module.exports = function maakService({ db, save, crypto, inzagelog, notify, sse
     serviceMachtiging: machtigingen, serviceBevestiging: bevestiging,
     servicePatronen: patronen, servicePersoonlijk: persoonlijk, serviceFoutsignaal: foutsignalen,
     serviceKwaliteit: kwaliteit, serviceGesprek: gesprekken, serviceOnderzoeker: onderzoeker,
-    serviceRahul: rahul,
     servicePost: post,
     serviceMens: mens, serviceRouter: router, servicePrioriteit: prioriteit,
     serviceKlassen: klassen, serviceKeuzes: keuzes

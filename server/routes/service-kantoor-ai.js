@@ -16,12 +16,12 @@
 'use strict';
 
 module.exports = (kern, { veilig, lijf, kort, balieAuth }) => {
-  const { app, officeAuth, serviceOnderzoeker, serviceRahul, serviceZaken, serviceLoop } = kern;
+  const { app, officeAuth, serviceOnderzoeker, serviceZaken, serviceLoop } = kern;
 
   const voorZaak = (req, soort) => {
     const z = serviceZaken.vind(kort(lijf(req).id, 40));
     if (!z) return { status: 404, error: 'Deze zaak kennen wij niet.' };
-    const uit = soort === 'concept' ? serviceRahul.concept(z) : serviceRahul.advies(z);
+    const uit = soort === 'concept' ? serviceZaken.rahul.concept(z) : serviceZaken.rahul.advies(z);
     if (!uit.error) serviceLoop.rahulAdvies(z.id, { door: req.balieKey, soort,
       versie: uit.versie, volgendeStap: uit.volgendeStap });
     return uit;

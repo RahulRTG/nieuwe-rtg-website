@@ -353,23 +353,27 @@ test('a shared projector never loads the signed-in member’s personal desktop w
   } finally { await ctx.close(); }
 });
 
-test('the public website opens existing content inside the quiet one-column experience', { skip }, async () => {
+test('the public website retains its original article owner and one Edge without a second desktop shell', { skip }, async () => {
   const ctx = await context(null), page = await ctx.newPage();
   try {
-    await page.goto(srv.base + '/');
-    await page.waitForSelector('body[data-public-platform="app"] .wd-shell');
-    await page.evaluate(() => window.RTGPublicApp.open('platform'));
-    assert.equal(await page.locator('#platform').isVisible(), true);
-    assert.equal(await page.locator('.wd-people').isVisible(), false);
-    assert.equal(await page.locator('.wd-favorites').isVisible(), false);
-    assert.equal(await page.locator('.wd-focus').isVisible(), true);
-    const frame = await page.locator('.pp-shell').evaluate(e => {
+    await page.goto(srv.base + '/#interview');
+    await page.waitForSelector('body[data-public-platform="app"][data-magazine-view="cover"]');
+    await page.evaluate(() => { window.desktopSourceArticle = document.getElementById('artikel-interview'); });
+    await page.locator('#interview a[href="#artikel-interview"]').last().click();
+    await page.locator('#magazineDetailContent > #artikel-interview').waitFor({state:'visible'});
+    assert.equal(await page.evaluate(() => document.querySelector('#magazineDetailContent > #artikel-interview') === window.desktopSourceArticle),true);
+    assert.equal(await page.locator('.wd-shell,.wd-people,.wd-favorites').count(), 0);
+    const frame = await page.locator('#platform-home').evaluate(e => {
       const r=e.getBoundingClientRect(); return {x:r.x,width:r.width,viewport:innerWidth};
     });
-    assert.equal(frame.width, Math.min(1280,frame.viewport-80));
-    assert.equal(frame.x, (frame.viewport-frame.width)/2);
+    assert.equal(frame.width, frame.viewport);
+    assert.equal(frame.x, 0);
     assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
+    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false);
+    await page.locator('.ds-public-edge-toggle').click();
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
-    assert.equal(await page.locator('.wd-home').isVisible(), true);
+    assert.equal(await page.locator('#magazineHome').isVisible(), true);
+    assert.equal(await page.locator('#magazineDetail').isVisible(), false);
+    assert.equal(await page.locator('#inhoud > #artikel-interview').count(),1,'de oorspronkelijke bron keert terug');
   } finally { await ctx.close(); }
 });

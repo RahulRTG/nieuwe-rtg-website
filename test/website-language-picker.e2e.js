@@ -16,8 +16,16 @@ test('de nieuwe taalkeuze volgt de RTG-stijl en blijft binnen elke schermrand',
         const page = await context.newPage();
         await page.goto(base + '/site/werelden/livingos.html', { waitUntil: 'domcontentloaded' });
         await page.waitForFunction(() => window.RTGi18n && Array.isArray(window.RTGi18n._alleTalen) && window.RTGi18n._alleTalen.length === 114);
+        await page.waitForFunction(() => document.body.dataset.publicEdgeReady === 'true');
+        const openLanguage = async () => {
+          const door = page.locator('.ds-public-edge-toggle');
+          assert.equal(await door.getAttribute('aria-expanded'), 'false', 'de taalingang begint bij de gesloten Edge');
+          await door.click();
+          await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+          await page.locator('.story-edge-panel [data-language-picker]').click();
+        };
 
-        await page.locator('.pp-language').click();
+        await openLanguage();
         const kaart = page.locator('.rtg-lang-card');
         const vak = await kaart.boundingBox();
         assert.ok(vak.x >= 0 && vak.x + vak.width <= viewport.width,
@@ -37,7 +45,7 @@ test('de nieuwe taalkeuze volgt de RTG-stijl en blijft binnen elke schermrand',
         await voorstel.click();
         await page.waitForFunction(() => document.documentElement.lang === 'ar' && document.documentElement.dir === 'rtl');
 
-        await page.locator('.pp-language').click();
+        await openLanguage();
         await page.getByRole('heading', { name: 'Choose your language', exact: true }).waitFor();
         const rtlVak = await kaart.boundingBox();
         assert.ok(rtlVak.x >= 0 && rtlVak.x + rtlVak.width <= viewport.width,

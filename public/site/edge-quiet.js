@@ -11,7 +11,10 @@
   function clear() { w.clearTimeout(idle); idle = null; }
   function protectedInteraction() {
     var active = d.activeElement;
-    return pressed || host.dataset.rtgSurface || d.querySelector('dialog[open],[aria-modal="true"]:not([hidden])') ||
+    // Native dialogs remain in the DOM after closing. aria-modal describes
+    // their semantics, not their open state; only a visible modal protects UI.
+    var modal = d.querySelector('dialog[open]') || Array.from(d.querySelectorAll('[aria-modal="true"]:not(dialog):not([hidden])')).some(function(node){return node.getClientRects().length>0;});
+    return pressed || host.dataset.rtgSurface || modal ||
       active && (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName) || keyboard && root.contains(active));
   }
   function close() {

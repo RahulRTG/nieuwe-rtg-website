@@ -8,6 +8,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { laadPlaywright, startBrowser, letOpFouten } = require('./helper');
+const { action: edgeAction, focusVisible } = require('./public-edge-interactions');
 const ROOT = path.resolve(__dirname, '..');
 const CASES = [
   { file: 'passen/rtg-pass', pass: true, pilot: true },
@@ -131,7 +132,8 @@ async function structure(page, c, runtime = true) {
 async function chapterKeyboard(page, label, runtime = true) {
   if (await page.locator('body.ds-public-volume').count()) {
     for (const id of ['werelddetails', 'colofon']) {
-      const link = page.locator('[data-editorial-reel] a[href="#' + id + '"]').first();
+      if (runtime) await edgeAction(page, 'context');
+      const link = page.locator('.ds-volume-bar a[href="#' + id + '"]').first();
       assert.equal(await link.count(), 1, label + ': native link naar ' + id);
       await link.scrollIntoViewIfNeeded();
       const rect = await link.boundingBox();
@@ -174,13 +176,13 @@ async function chapterKeyboard(page, label, runtime = true) {
 async function menuEscape(page, label) {
   const menu = page.locator('[data-public-menu]');
   assert.equal(await menu.count(), 1, label + ': één menu-eigenaar');
-  await menu.focus(); await page.keyboard.press('Enter');
+  await edgeAction(page, 'menu');
   await page.waitForFunction(() => document.querySelector('[data-public-menu]').getAttribute('aria-expanded') === 'true');
   assert.ok(await page.getByRole('navigation', { name: 'Ontdek RTG', exact: true }).isVisible(), label + ': het menu opent echt');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => document.querySelector('[data-public-menu]').getAttribute('aria-expanded') === 'false');
   assert.equal(await page.getByRole('navigation', { name: 'Ontdek RTG', exact: true }).isVisible(), false, label + ': Escape sluit het menu');
-  assert.equal(await page.evaluate(() => document.activeElement !== document.body && !!document.activeElement.getClientRects().length), true, label + ': Escape laat focus niet achter in verborgen inhoud');
+  await focusVisible(page);
 }
 
 for (const c of CASES) for (const width of (c.volume ? [320, 390, 768, 1440] : c.pilot ? [320, 390, 1440] : [390, 1440])) {
@@ -190,7 +192,8 @@ for (const c of CASES) for (const width of (c.volume ? [320, 390, 768, 1440] : c
       const response = await page.goto(base + '/public/site/' + c.file + '.html', { waitUntil: 'networkidle' });
       assert.equal(response.status(), 200);
       await page.evaluate(() => document.fonts.ready);
-      await page.locator('.ds-public-site-header').waitFor();
+      await page.locator('.ds-public-edge-toggle').waitFor();
+      assert.equal(await page.locator('.ds-public-site-header').isVisible(), false, 'Edge vervangt de statische navigatie');
       await structure(page, c);
       await images(page, c.file);
       await noOverflow(page, c.file);

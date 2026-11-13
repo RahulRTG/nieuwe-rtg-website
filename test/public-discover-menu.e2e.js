@@ -93,18 +93,22 @@ for (const [width, height] of [[320, 844], [390, 844], [768, 900], [1440, 900], 
       assert.equal(await page.locator('.rtg-adaptive-edge').count(), 1, 'de bestaande Edge blijft de enige eigenaar');
       const art = panel.locator('img[src$="rtg-discover-salon.webp"]');
       assert.equal(await art.count(), 1, 'één origineel kunstbeeld, geen extra logo of beeldstapel');
-      await art.evaluate(image => image.decode());
+      // Desktop intentionally keeps the original image lazy and hidden while
+      // its original link stays visible. Decode the actual reading artwork,
+      // not an unrequested hidden image whose decode promise never settles.
+      if (width < 1100) await art.evaluate(image => image.decode());
       const imageState = await art.evaluate(image => {
         const box = image.getBoundingClientRect(), style = getComputedStyle(image);
         return { complete: image.complete && image.naturalWidth > 0, ratio: box.width / box.height, naturalRatio: image.naturalWidth / image.naturalHeight, fit: style.objectFit, anchor: image.closest('a')?.getAttribute('href') };
       });
-      assert.equal(imageState.complete, true);
       if (width < 1100) {
+        assert.equal(imageState.complete, true);
         assert.ok(['cover', 'contain'].includes(imageState.fit), 'het kunstbeeld vult zijn vaste blad volgens het randloze beeldcontract');
         assert.equal(await art.isVisible(), true);
       } else {
         const contextArt = sheet.locator('.ds-edge-reading-art');
         await contextArt.evaluate(image => image.decode());
+        assert.equal(await contextArt.evaluate(image => image.complete && image.naturalWidth > 0), true);
         assert.equal(await contextArt.isVisible(), true, 'de desktopfolio toont het actuele kunstbeeld naast de oorspronkelijke Ontdek-links');
       }
       assert.equal(imageState.anchor, '#journal');

@@ -236,6 +236,9 @@ for (const width of [390, 1440]) {
       // its value. Test modal dismissal from a real result, not that native
       // input-clearing shortcut, which differs between browser engines.
       await resultLink.focus();
+      // Initial dialog focus must not steal a reader's subsequent choice.
+      // Cross the old 20ms deferred-focus boundary before observing it.
+      await page.waitForTimeout(40);
       assert.equal(await resultLink.evaluate(node => document.activeElement === node), true, 'de echte zoekuitkomst heeft toetsenbordfocus');
       await page.keyboard.press('Escape'); await page.locator('#commandDialog').waitFor({ state: 'hidden' });
       await settle(page); await quiet(page);

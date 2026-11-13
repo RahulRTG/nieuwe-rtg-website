@@ -4,7 +4,7 @@
   var lipsUrl = new URL('../images/brand/rtg-edge-lips.webp', d.currentScript.src).href;
   function mount(runtime, root) {
     var edge = w.RTGAdaptiveEdge, door = d.createElement('button');
-    var mark = d.createElement('img'), close = d.createElement('span');
+    var mark = document.createElement('img'), close = d.createElement('span');
     door.type = 'button'; door.className = 'ds-public-edge-toggle';
     mark.src = lipsUrl; mark.alt = ''; mark.width = 56; mark.height = 38;
     close.textContent = '×'; close.setAttribute('aria-hidden', 'true'); door.append(mark, close);
@@ -40,7 +40,7 @@
       button.classList.toggle('ds-edge__knop--rahul', rahul);
       // Keep the original button, native handlers and accessible name.
       if (rahul && !button.querySelector('.ds-edge-painted-lips')) {
-        var lips = d.createElement('img'), icon = button.querySelector('svg');
+        var lips = document.createElement('img'), icon = button.querySelector('svg');
         lips.className = 'rtg-adaptive-lips ds-edge-painted-lips'; lips.src = lipsUrl;
         lips.alt = ''; lips.width = 56; lips.height = 38;
         if (icon) icon.replaceWith(lips); else button.prepend(lips);

@@ -75,6 +75,38 @@ test('publieke Edge-modules zijn begrensd en iedere host laadt de gedeelde ingan
   }
 });
 
+test('Edge-lippen blijven aantoonbaar native beelden met dezelfde asset op Pages en diepe Node-routes', () => {
+  const bron = fs.readFileSync('public/site/edge-door.js', 'utf8');
+  const analyse = require('../scripts/ontwerpsysteem').scriptLaadAnalyse(bron, { ds: true });
+  assert.deepEqual(analyse.onzeker, [], 'de afbeelding is geen onbesliste script- of stijllader');
+  assert.deepEqual(analyse.verwijzingen, []);
+  assert.equal(analyse.injecties + analyse.mogelijkeInjecties, 0);
+  for (const [script, verwacht] of [
+    ['https://voorbeeld.test/rtg/public/site/edge-door.js', 'https://voorbeeld.test/rtg/public/images/brand/rtg-edge-lips.webp'],
+    ['https://voorbeeld.test/site/edge-door.js', 'https://voorbeeld.test/images/brand/rtg-edge-lips.webp']
+  ]) {
+    const beelden = [];
+    function node(tag) {
+      const attrs = {};
+      const el = { dataset: {}, classList: { add() {}, toggle() {} }, append() {}, prepend() {},
+        addEventListener() {}, querySelector() { return null; },
+        setAttribute(key, value) { attrs[key] = value; }, getAttribute(key) { return attrs[key]; } };
+      if (tag === 'img') beelden.push(el);
+      return el;
+    }
+    const document = { currentScript: { src: script }, createElement: node, addEventListener() {}, activeElement: null };
+    const window = { RTGAdaptiveEdge: {}, location: { href: 'https://voorbeeld.test/onbekend/diep/' } };
+    vm.runInNewContext(bron, { window, document, URL, MutationObserver: class { observe() {} } });
+    const host = { ...node('div'), dataset: { rtgAdaptiveState: 'dock' }, contains() { return false; } };
+    window.RTGPublicEdgeDoor.mount({ bar: {}, host }, {});
+    const button = { ...node('button'), dataset: { rtgAdaptiveSlot: '2', rtgAdaptiveAction: 'ai' } };
+    const bar = { ...node('nav'), querySelectorAll() { return [button]; } };
+    window.RTGPublicEdgeDoor.dress({ querySelector() { return bar; } });
+    assert.deepEqual(beelden.map(beeld => beeld.src), [verwacht, verwacht],
+      'ingang en Rahul gebruiken hetzelfde script-relatieve merkasset, onafhankelijk van het documentpad');
+  }
+});
+
 /* De echte bestaande hostcode met een smalle DOM-adapter. Dit bewijst routering
    en doelkeuze; de browsertoets bewijst apart zichtbaarheid en native klikken. */
 function publicHost(hash = '') {

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-11-12T02:38:49.361Z",
-    "commit": "f368dcd70",
+    "op": "2026-11-13T01:59:48.589Z",
+    "commit": "28c4fe5e3",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10,374 +10,6 @@
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
-    "assets-waarheid-saveherstel.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/assets/aanvraag-betaal.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 3,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-klant/assets-waarheid-saveherstel.test.js.evidence.json",
-        "sha256": "19e33c1d28adcf56458be7c54567bd7270629a1ce5131660ee0144b4f8bbcb1f",
-        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
-        "sourceSha256": "a0858a96c1f1269857b9f92714ed85da8f08db514a9301d7749a81ecfc5063fd",
-        "testSha256": "9e8ab33a8243f867c45dd6bfa100eb4421f6c655911e5fb516ef6c92a99bded5"
-      }
-    },
-    "bankregie-audit.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/bankregie/index.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 3,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-b24dfb/bankregie-audit.test.js.evidence.json",
-        "sha256": "33d16a287aed1809b3414b325eac7ba198b85ceb217cd9c591e8447987ce76d0",
-        "commit": "b24dfbf813d31149b327dcc927819f9ddd1f2591",
-        "sourceSha256": "80e0be799b8759b11aa0748fbfa8c9fd2c5dd245dbd8cb84907638267c0b5fc5",
-        "testSha256": "4f1e176c953a2db4191fb1f141266619f55ed34ee4ceae4f4b5be6786124a9b2"
-      }
-    },
-    "bankregie-http-crash.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/bankregie/index.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-b24dfb/bankregie-http-crash.test.js.evidence.json",
-        "sha256": "d028759355ed9c768ac72d7070c290f0ac74c1f2b1aba3050523348d62cd2618",
-        "commit": "b24dfbf813d31149b327dcc927819f9ddd1f2591",
-        "sourceSha256": "80e0be799b8759b11aa0748fbfa8c9fd2c5dd245dbd8cb84907638267c0b5fc5",
-        "testSha256": "5a0f70f073b515fa64aeba881ecdbd02aa28fe04d409e88d09616e2a22c5f27b"
-      }
-    },
-    "communication-trust-scope.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/opzet/trust-bewijs.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-klant/communication-trust-scope.test.js.evidence.json",
-        "sha256": "f1d381c7574a98080646ac06fae3a1098c55c039ec5a31be2e94acee1f57e948",
-        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
-        "sourceSha256": "18a2366f7a2dd857ef948b5c4ebb200ca559dc38779fbc13ec5e0dcc06bf1eab",
-        "testSha256": "a6a522a88d4db47ae51fbce39007b53c59809d57eb966b3cf13a7258c63e4cf5"
-      }
-    },
-    "cpu-profile-hook.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "scripts/save-profile-correlation.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-cc0603/cpu-profile-hook.test.js.evidence.json",
-        "sha256": "5ca02437e9fc2234a21d03f88d51c21d2250f8d2ca1c6a890148bf1c7be2d393",
-        "commit": "cc06037ec58f1148d2e39e151476b1e75ee7e83d",
-        "sourceSha256": "37989754ad554be36f6586408d70bcca950028bae112d1f49d3d43cb921195db",
-        "testSha256": "2ecea4830781472cab9bf745e60b0d6ac93c12ad67a53561968c6fd6ccbe77aa"
-      }
-    },
-    "directpay-waarheid-saveherstel.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/directpay/betalen.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 3,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-klant/directpay-waarheid-saveherstel.test.js.evidence.json",
-        "sha256": "2ff6766f704414dacbf0f8004b718d7cc68de94a35402307dcd6c7dc395c7ddd",
-        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
-        "sourceSha256": "88d09cc681697a56d8235e7caeec00722e5aed9b520529da5e87f00a8fabc5da",
-        "testSha256": "e2f8415b51366f4b80c75cb7b5f61c4cf35a0ff72d4b8021d7861646ad9e008f"
-      }
-    },
-    "facturatie-opslagvorm.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/facturatie/motor.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/facturatie-opslagvorm.test.js.evidence.json",
-        "sha256": "79c7da02e54148d123812ff3749d114196bfbb2dcef208da226f8d8ebb189b57",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "acdbf0913e259cadef25e9c998a56ba143101f98ce076f473e41782fadba1114",
-        "testSha256": "29905bea753a3d4be4c67c4a8a33f4ffbaf0ebc043e724116446c9fca5ce02da"
-      }
-    },
-    "geldbeleid-opslag.pg.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "geldbeleid-opslagvlak.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/geldbeleid/index.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 5,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-558fc5/geldbeleid-opslagvlak.test.js.evidence.json",
-        "sha256": "3b70d074dbfa7522a5c308f7302f4d74c89ace5f40c8879f727d421f2cee1ae3",
-        "commit": "558fc52dc0e4e02f6ed9551946c6a1ed8d80b47d",
-        "sourceSha256": "b78dd1492b8158ba291586b79b4510b37227ba791e2621f53d01b9cb11f5d6f4",
-        "testSha256": "34b7033d314b0d146f41c8634a227c070308805cec583cb2a758299333a2f743"
-      }
-    },
-    "geldbeleid-opslagvorm.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/db/snapshot.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 3,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-f1d10e/geldbeleid-opslagvorm.test.js.evidence.json",
-        "sha256": "c7cdc0276fed33f4853e250f5d99589362d8881ddeb7b45f8d204cb4fc5bbdc6",
-        "commit": "f1d10e08fbc0c9c089343194ca398e3d66179e68",
-        "sourceSha256": "4ea170a2d84e786e9ed774b22722f3fe0d171553a717b5cf68787a3d1d3f25e8",
-        "testSha256": "1cd085e936095b73b0a23c7c3fef4c80a0c460b02b4e286d2a76e0c65a615936"
-      }
-    },
-    "gezondheid-daggrens.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/gewoonten.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 4,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/day-boundary-5d400d/gezondheid-daggrens.test.js.evidence.json",
-        "sha256": "aacacc1267c5d21d654aa77c975ad389c224e1ac4c890178c37ed41e5642d54a",
-        "commit": "5d400d11060b6336340b1605243f533e397332fd",
-        "sourceSha256": "81179845676107255ccd277bf7852877f46282caf347fd01451325106f05fd7b",
-        "testSha256": "c63d0217aea578ec12aea34dc04be46a055e7f06fea0f73852ca6d6e45ceeadc"
-      }
-    },
-    "immutable-json.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/lib/immutable-json.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/immutable-json.test.js.evidence.json",
-        "sha256": "08c398f89cbdbc98a7f6ebfeea3adb3d65bd0d099646c5d656dd83e5e7b0a698",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "e019c0349d63a93a9e623727d763368807fef3aa6dee37f2ebc78a91711a2045",
-        "testSha256": "782050dcd558eb9d046156b2845493f13169dab47c436bd996fe4429ba30ecf0"
-      }
-    },
-    "json-duurzaam-rand.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/db/opslag.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-f1d10e/json-duurzaam-rand.test.js.evidence.json",
-        "sha256": "265bbb5562e3fb8a00a5656ac890b7136783ffdcea4d8d2520b720e639706045",
-        "commit": "f1d10e08fbc0c9c089343194ca398e3d66179e68",
-        "sourceSha256": "8b273d60a15cd2b5d2b89bcf175f7dad962934a6afa1f769d33a9068f09217c2",
-        "testSha256": "a87a307141d281e756d4f7403fdce5ead4cabf16e32e34d26cbe71d2dce565dd"
-      }
-    },
-    "lidbetaling-crash.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/lidacties/betalen.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/lidbetaling-crash.test.js.evidence.json",
-        "sha256": "7e09bb43ca0971bdc1d275f341b7364c66fce7425851250688b66aff4b6c87d4",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "73c60c6cd31f31f0111d9f270352470b4465233718ccaac1916a19f80d01d804",
-        "testSha256": "e52e0715ebf89f49d2d1e6623a2e9355342d8cafdfefbdc94c2573a84d3c40f3"
-      }
-    },
-    "markt-waarheid-saveherstel.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/markt/handel/dealbetaal.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-owner/markt-waarheid-saveherstel.test.js.evidence.json",
-        "sha256": "951adb70bf2ed6080e4636c34c74f282b61c6443c93a1702d9ad9e6522bb11e1",
-        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
-        "sourceSha256": "963dc1180cab320c31eee3fd2f8edf0d9ec104bebe35e79a7880da2a59052ce0",
-        "testSha256": "62b3a5946efab155d389e9aa0525ae54155d3fdfba9f01355fc4e7f2200fe003"
-      }
-    },
-    "securitylog-backup-herstel.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/opzet/backup.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-cc0603/securitylog-backup-herstel.test.js.evidence.json",
-        "sha256": "606607414f5d4abca97049fe081e3eb64590c11a3877f4bedf580246a6903a3b",
-        "commit": "cc06037ec58f1148d2e39e151476b1e75ee7e83d",
-        "sourceSha256": "973dc0edd2bb475c7b5d5ea264c26dd360191ddabfba1ef78c4aa480311649da",
-        "testSha256": "a12606fda3bd4a2061c7e7702aba54d58188b81ab8b2eb5aff9ffdaef1b879a7"
-      }
-    },
-    "securitylog-rijopslag.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/identiteit/inlogherkomst.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 11,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/securitylog-rijopslag.test.js.evidence.json",
-        "sha256": "ebdc99b67e1bb4c61fb86877ec5360e886aeee4fa7a9b5b30fa52bb9adad5a49",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "3a96aa3c32e03c13f2bc90495e0777b438d7046a08dec6d2e4ddd2e40680f251",
-        "testSha256": "410a452ec4d0f88a86906a8e38b1fd58ac1676a76dd45e8fbbf7230a84cde145"
-      }
-    },
-    "sqlite-noop-barriere.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/db/sqlite.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/sqlite-noop-barriere.test.js.evidence.json",
-        "sha256": "aa47f67af7aa3c136f66c134da202ba3869fa90d9a3647dc771e299ba471fefb",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "60d46f3a363c1ed71a7d52e857c1d96aabc5b94c0102c327dc4591aba6cba04b",
-        "testSha256": "e4cc7555dba4ad29e06d97d7b74e4f87e840e3639979cd4e7a8d37307eeb2ee5"
-      }
-    },
-    "sqlite-profile-phases.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "scripts/sqlite-profile-phases.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-cc0603/sqlite-profile-phases.test.js.evidence.json",
-        "sha256": "48a67d92c8a1cacf97746286a041242ec733902f3d407c7f2757c95fd5018d0c",
-        "commit": "cc06037ec58f1148d2e39e151476b1e75ee7e83d",
-        "sourceSha256": "59d17d2456c6ec8cc4fec7ecf7f2ade0d8b2c03a7cdc09b70e50bb0a845602f5",
-        "testSha256": "285045d6e67eaafeef802a1fce85b43dcb22378e96acc3502481d827c8ed1882"
-      }
-    },
-    "sqlite-save-versie.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/db/sqlite-save.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 6,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/metadata-read-1e57/sqlite-save-versie.test.js.evidence.json",
-        "sha256": "c1f2f25d484b479d7fab4e84db1576e0575b96f467c521cc289e776f8c24dd84",
-        "commit": "1e57a34b09e6cecb745a47bb303a973d2ad4f6e3",
-        "sourceSha256": "5199665d30ba8ff4ad3c9f113707cec77beb0260a65c5ecee7efbf1304bb962c",
-        "testSha256": "d7801615674ef1026c948ccdb67bc2ac322af0af652ef1d41c828fec82858adf"
-      }
-    },
-    "supplier-logboekzicht-daggrens.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/leverancier/logboekzicht.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 4,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/day-boundary-5d400d/supplier-logboekzicht-daggrens.test.js.evidence.json",
-        "sha256": "8f2631cd9ec504420635fb06857b8afd20d99f682b7d96dcb7b1698ef10f3854",
-        "commit": "5d400d11060b6336340b1605243f533e397332fd",
-        "sourceSha256": "7fc9e4305954ce7fe02fa7c4a12e27f3e4035a16af1dfbfb34ce42fdbf0dd934",
-        "testSha256": "f7469e2fd0605391f6a697add664d51955db09b0ff1cf95f19aad728283b07cc"
-      }
-    },
-    "trust-evidence-tracker-rollback.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/kern/bewijsvlak/v3-store.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/trust-evidence-tracker-rollback.test.js.evidence.json",
-        "sha256": "54b079a103abe5e0147438c84df0fc79fb3928c712cb3d25f83cee874c299acd",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "2bedc00094e177814b5c2e3e3196650394fdcffeda8ae39a7364ac327498eeb9",
-        "testSha256": "e837888f52dd81c31e7f2a7a21972201b58662c18731e55ec47ce69806de1410"
-      }
-    },
-    "trust-json-cache.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/db/mutatietracker.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/trust-json-cache.test.js.evidence.json",
-        "sha256": "7e31549d0bd29241f500b499eeb7003d30fd205993b70cfa106719dc7b51a802",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "8436cae6c5ae8037ac8be713a286854983640efcb4721bfcbd4902e27de267d4",
-        "testSha256": "914240d7025089702e6dddae5f174761867bc812e4aff137517e5f577e0174a6"
-      }
-    },
-    "trust-json-opslag.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": "server/db/sqlite-saveplan.js",
-      "operator": "expliciete bronmutatie",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "bewijs": {
-        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/trust-json-opslag.test.js.evidence.json",
-        "sha256": "05d1386f8b7b8bbc1306a50e597c290c56f824b487c7e68b394d6a05c4bc9296",
-        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
-        "sourceSha256": "f4137bb6e28783ad547cd7553e1813ff5e159f968113cf02e24d4a81312a8e0e",
-        "testSha256": "0eebeac56306a09f70226b0b8b46ce71a9e7f68238f81a7d1fa85e577a714a55"
-      }
-    },
-    "pages-publicatie.test.js": {
-      "soort": "gericht",
-      "staat": "gezakt",
-      "module": ".github/workflows/pages.yml",
-      "operator": "expliciete YAML-contractmutaties: push-main-terug; main-branchguard-weg",
-      "gezakt": 2,
-      "geprobeerd": 2,
-      "reden": "Twee afzonderlijke bronmutanten: elk precies een ERR_ASSERTION en een groene toets; baseline en elk exact herstel 2/2 groen. Dit is statische contractgevoeligheid, geen uitgevoerde GitHub-publicatie. De generieke mutatiemotor ondersteunt deze YAML-bron niet en is niet gewijzigd.",
-      "bewijs": {
-        "bestand": "/private/tmp/rtg-pages-mutatie.AYTsze/pages-publicatie.test.js.evidence.json",
-        "sha256": "cbaa3e3e87cc15e5a35bad0d3f1b12ce961f41cf6beef8943cb1959c3f29d6a8",
-        "commit": "2018bdba8033d18b7f46b0fba7002be928f94ab6",
-        "sourceSha256": "42d369cddf37ff9849b6f62bc0558267e4a0c68f6007be4726f6148adc4ffbe4",
-        "testSha256": "8d881a148f9fe01b94de3620eceb90e3d6a1e6ba6e492ae53966d471048a8ce2"
-      }
-    },
     "a11y-hermeet.e2e.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -1651,6 +1283,21 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "assets-waarheid-saveherstel.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/assets/aanvraag-betaal.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-klant/assets-waarheid-saveherstel.test.js.evidence.json",
+        "sha256": "19e33c1d28adcf56458be7c54567bd7270629a1ce5131660ee0144b4f8bbcb1f",
+        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
+        "sourceSha256": "a0858a96c1f1269857b9f92714ed85da8f08db514a9301d7749a81ecfc5063fd",
+        "testSha256": "9e8ab33a8243f867c45dd6bfa100eb4421f6c655911e5fb516ef6c92a99bded5"
+      }
+    },
     "assets.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -1970,6 +1617,36 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "bankregie-audit.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/bankregie/index.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-b24dfb/bankregie-audit.test.js.evidence.json",
+        "sha256": "33d16a287aed1809b3414b325eac7ba198b85ceb217cd9c591e8447987ce76d0",
+        "commit": "b24dfbf813d31149b327dcc927819f9ddd1f2591",
+        "sourceSha256": "80e0be799b8759b11aa0748fbfa8c9fd2c5dd245dbd8cb84907638267c0b5fc5",
+        "testSha256": "4f1e176c953a2db4191fb1f141266619f55ed34ee4ceae4f4b5be6786124a9b2"
+      }
+    },
+    "bankregie-http-crash.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/bankregie/index.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-b24dfb/bankregie-http-crash.test.js.evidence.json",
+        "sha256": "d028759355ed9c768ac72d7070c290f0ac74c1f2b1aba3050523348d62cd2618",
+        "commit": "b24dfbf813d31149b327dcc927819f9ddd1f2591",
+        "sourceSha256": "80e0be799b8759b11aa0748fbfa8c9fd2c5dd245dbd8cb84907638267c0b5fc5",
+        "testSha256": "5a0f70f073b515fa64aeba881ecdbd02aa28fe04d409e88d09616e2a22c5f27b"
+      }
     },
     "bankscherm.e2e.js": {
       "soort": "server",
@@ -4047,6 +3724,21 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "communication-trust-scope.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/opzet/trust-bewijs.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-klant/communication-trust-scope.test.js.evidence.json",
+        "sha256": "f1d381c7574a98080646ac06fae3a1098c55c039ec5a31be2e94acee1f57e948",
+        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
+        "sourceSha256": "18a2366f7a2dd857ef948b5c4ebb200ca559dc38779fbc13ec5e0dcc06bf1eab",
+        "testSha256": "a6a522a88d4db47ae51fbce39007b53c59809d57eb966b3cf13a7258c63e4cf5"
+      }
+    },
     "compressie-weerbaar.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4506,6 +4198,21 @@
       "gezakt": 4,
       "geprobeerd": 6
     },
+    "cpu-profile-hook.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/save-profile-correlation.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-cc0603/cpu-profile-hook.test.js.evidence.json",
+        "sha256": "5ca02437e9fc2234a21d03f88d51c21d2250f8d2ca1c6a890148bf1c7be2d393",
+        "commit": "cc06037ec58f1148d2e39e151476b1e75ee7e83d",
+        "sourceSha256": "37989754ad554be36f6586408d70bcca950028bae112d1f49d3d43cb921195db",
+        "testSha256": "2ecea4830781472cab9bf745e60b0d6ac93c12ad67a53561968c6fd6ccbe77aa"
+      }
+    },
     "crashas.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4861,6 +4568,21 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "directpay-waarheid-saveherstel.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/directpay/betalen.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-klant/directpay-waarheid-saveherstel.test.js.evidence.json",
+        "sha256": "2ff6766f704414dacbf0f8004b718d7cc68de94a35402307dcd6c7dc395c7ddd",
+        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
+        "sourceSha256": "88d09cc681697a56d8235e7caeec00722e5aed9b520529da5e87f00a8fabc5da",
+        "testSha256": "e2f8415b51366f4b80c75cb7b5f61c4cf35a0ff72d4b8021d7861646ad9e008f"
+      }
     },
     "directpay-workers.pg.test.js": {
       "soort": "puur",
@@ -5985,6 +5707,21 @@
       "gezakt": 1,
       "geprobeerd": 16
     },
+    "facturatie-opslagvorm.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/facturatie/motor.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/facturatie-opslagvorm.test.js.evidence.json",
+        "sha256": "79c7da02e54148d123812ff3749d114196bfbb2dcef208da226f8d8ebb189b57",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "acdbf0913e259cadef25e9c998a56ba143101f98ce076f473e41782fadba1114",
+        "testSha256": "29905bea753a3d4be4c67c4a8a33f4ffbaf0ebc043e724116446c9fca5ce02da"
+      }
+    },
     "facturatie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6964,6 +6701,43 @@
       "gezakt": 1,
       "scherp": "overleefd"
     },
+    "geldbeleid-opslag.pg.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "geldbeleid-opslagvlak.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/geldbeleid/index.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 5,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-558fc5/geldbeleid-opslagvlak.test.js.evidence.json",
+        "sha256": "3b70d074dbfa7522a5c308f7302f4d74c89ace5f40c8879f727d421f2cee1ae3",
+        "commit": "558fc52dc0e4e02f6ed9551946c6a1ed8d80b47d",
+        "sourceSha256": "b78dd1492b8158ba291586b79b4510b37227ba791e2621f53d01b9cb11f5d6f4",
+        "testSha256": "34b7033d314b0d146f41c8634a227c070308805cec583cb2a758299333a2f743"
+      }
+    },
+    "geldbeleid-opslagvorm.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/snapshot.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-f1d10e/geldbeleid-opslagvorm.test.js.evidence.json",
+        "sha256": "c7cdc0276fed33f4853e250f5d99589362d8881ddeb7b45f8d204cb4fc5bbdc6",
+        "commit": "f1d10e08fbc0c9c089343194ca398e3d66179e68",
+        "sourceSha256": "4ea170a2d84e786e9ed774b22722f3fe0d171553a717b5cf68787a3d1d3f25e8",
+        "testSha256": "1cd085e936095b73b0a23c7c3fef4c80a0c460b02b4e286d2a76e0c65a615936"
+      }
+    },
     "geldbeleid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7499,6 +7273,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "gezondheid-daggrens.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/gewoonten.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/day-boundary-5d400d/gezondheid-daggrens.test.js.evidence.json",
+        "sha256": "aacacc1267c5d21d654aa77c975ad389c224e1ac4c890178c37ed41e5642d54a",
+        "commit": "5d400d11060b6336340b1605243f533e397332fd",
+        "sourceSha256": "81179845676107255ccd277bf7852877f46282caf347fd01451325106f05fd7b",
+        "testSha256": "c63d0217aea578ec12aea34dc04be46a055e7f06fea0f73852ca6d6e45ceeadc"
+      }
     },
     "gezondheid.test.js": {
       "soort": "server",
@@ -8736,6 +8525,21 @@
       "operator": "!==->===",
       "gezakt": 9
     },
+    "immutable-json.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/lib/immutable-json.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/immutable-json.test.js.evidence.json",
+        "sha256": "08c398f89cbdbc98a7f6ebfeea3adb3d65bd0d099646c5d656dd83e5e7b0a698",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "e019c0349d63a93a9e623727d763368807fef3aa6dee37f2ebc78a91711a2045",
+        "testSha256": "782050dcd558eb9d046156b2845493f13169dab47c436bd996fe4429ba30ecf0"
+      }
+    },
     "incident.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9198,6 +9002,21 @@
       "operator": "getal+1#0",
       "gezakt": 3,
       "geprobeerd": 6
+    },
+    "json-duurzaam-rand.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/opslag.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-f1d10e/json-duurzaam-rand.test.js.evidence.json",
+        "sha256": "265bbb5562e3fb8a00a5656ac890b7136783ffdcea4d8d2520b720e639706045",
+        "commit": "f1d10e08fbc0c9c089343194ca398e3d66179e68",
+        "sourceSha256": "8b273d60a15cd2b5d2b89bcf175f7dad962934a6afa1f769d33a9068f09217c2",
+        "testSha256": "a87a307141d281e756d4f7403fdce5ead4cabf16e32e34d26cbe71d2dce565dd"
+      }
     },
     "juridisch-ds.e2e.js": {
       "soort": "server",
@@ -10514,6 +10333,21 @@
       "operator": "===->!==#0",
       "gezakt": 7,
       "geprobeerd": 1
+    },
+    "lidbetaling-crash.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/lidacties/betalen.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/lidbetaling-crash.test.js.evidence.json",
+        "sha256": "7e09bb43ca0971bdc1d275f341b7364c66fce7425851250688b66aff4b6c87d4",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "73c60c6cd31f31f0111d9f270352470b4465233718ccaac1916a19f80d01d804",
+        "testSha256": "e52e0715ebf89f49d2d1e6623a2e9355342d8cafdfefbdc94c2573a84d3c40f3"
+      }
     },
     "lidboard.test.js": {
       "soort": "server",
@@ -11833,6 +11667,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "markt-waarheid-saveherstel.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/markt/handel/dealbetaal.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-eb4070-owner/markt-waarheid-saveherstel.test.js.evidence.json",
+        "sha256": "951adb70bf2ed6080e4636c34c74f282b61c6443c93a1702d9ad9e6522bb11e1",
+        "commit": "eb4070d27d9b1707bf5f98a3fe244d934641e21e",
+        "sourceSha256": "963dc1180cab320c31eee3fd2f8edf0d9ec104bebe35e79a7880da2a59052ce0",
+        "testSha256": "62b3a5946efab155d389e9aa0525ae54155d3fdfba9f01355fc4e7f2200fe003"
+      }
     },
     "markt-zaak.test.js": {
       "soort": "server",
@@ -14225,6 +14074,22 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "pages-publicatie.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": ".github/workflows/pages.yml",
+      "operator": "expliciete YAML-contractmutaties: push-main-terug; main-branchguard-weg",
+      "gezakt": 2,
+      "geprobeerd": 2,
+      "reden": "Twee afzonderlijke bronmutanten: elk precies een ERR_ASSERTION en een groene toets; baseline en elk exact herstel 2/2 groen. Dit is statische contractgevoeligheid, geen uitgevoerde GitHub-publicatie. De generieke mutatiemotor ondersteunt deze YAML-bron niet en is niet gewijzigd.",
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-pages-mutatie.AYTsze/pages-publicatie.test.js.evidence.json",
+        "sha256": "cbaa3e3e87cc15e5a35bad0d3f1b12ce961f41cf6beef8943cb1959c3f29d6a8",
+        "commit": "2018bdba8033d18b7f46b0fba7002be928f94ab6",
+        "sourceSha256": "42d369cddf37ff9849b6f62bc0558267e4a0c68f6007be4726f6148adc4ffbe4",
+        "testSha256": "8d881a148f9fe01b94de3620eceb90e3d6a1e6ba6e492ae53966d471048a8ce2"
+      }
+    },
     "paginaroutes.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15535,6 +15400,143 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "public-brand-lockup.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/ds/componenten/publiek-detail.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-browser-directed-evidence/public-brand-lockup.e2e.js.evidence.json",
+        "sha256": "5e1fb99c798b6a6d0e305413526c136d9c756cb7b00525f3efc3299f3bd98f20",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "6de24162316fff8c8d5d0b4e19a46d6b8fcc2f48291a87a825da9a9e0acd58a6",
+        "testSha256": "398645e1dfc6ab39a3cb8127c638de05ac3336eed401aa6e51d79b55883354da"
+      }
+    },
+    "public-brand-lockup.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/platform-elements.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 15
+    },
+    "public-desktop-magazine.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/magazine-layout.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "public-edge-quiet.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/edge-quiet.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 8,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-browser-directed-evidence/public-edge-quiet.e2e.js.evidence.json",
+        "sha256": "2f897ac2c02384853d64c99cfd8408a4eaa1c470be8398cf7c533f086db53e84",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "4702bbf7f9bfbc3b5e44b42cca1f31f545e7d55d5410acfc6f821a641be4eae1",
+        "testSha256": "076054d6339cb9b741e0447a6104fdbb1256cd874890a2acedfbf959f15c8dca"
+      }
+    },
+    "public-editorial-pages.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/passen/rtg-pass.html",
+      "operator": "html-hoofdinhoud-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "public-full-bleed.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/ds/componenten/publiek-detail.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 6,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-browser-directed-evidence/public-full-bleed.e2e.js.evidence.json",
+        "sha256": "9ba08cf28a742912cc5bdbeac95ec31621ce185a4820b5ed405b01232b3080a5",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "6de24162316fff8c8d5d0b4e19a46d6b8fcc2f48291a87a825da9a9e0acd58a6",
+        "testSha256": "118fc46674f64eeee2a14211f46e3a198a0307abe6c946a00a760947f1e5f88d"
+      }
+    },
+    "public-magazine-navigation.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/magazine-history.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-browser-directed-evidence/public-magazine-navigation.e2e.js.evidence.json",
+        "sha256": "edcf2356eefb40b3cb8c4c5d998ab4b875874634d5238532d104e3a550e92057",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "38d884a1eec216f403fb24ffda18be545aecb9271abb7ecabe2b8b882390145c",
+        "testSha256": "6253ef0bffcd3c558d624288cc6f2924af8ad7c133fe34d37eb69f45897abddf"
+      }
+    },
+    "public-magazine-search.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/start/command-index.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-browser-directed-evidence/public-magazine-search.e2e.js.evidence.json",
+        "sha256": "12b4901f5d0b8e0c89f25ebf856c89cdfaf91dcafe75d89acd46929e2494a1fa",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "e8d53dbdd2ea1065d1529f6200df0470a6778a5eec5b9b6e1d33a9c18776685e",
+        "testSha256": "cfa611afbf8f554729e01c57e285477fd1733158ac0d63441f839e4a4083e7ec"
+      }
+    },
+    "public-magazine.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/platform-shell.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "public-painted-edge.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/ds/componenten/publiek-detail.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 8,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-browser-directed-evidence/public-painted-edge.e2e.js.evidence.json",
+        "sha256": "ca1d41b4e3160cdecc171827dde81ae040dc3e72ed8f65c7ba1eeaee7079abf1",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "6de24162316fff8c8d5d0b4e19a46d6b8fcc2f48291a87a825da9a9e0acd58a6",
+        "testSha256": "a35470f829cf36b181339408b3c775c60e9a28a29f1254d677da2eabe3eebf7a"
+      }
+    },
+    "public-painted-site.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/passen/rtg-pass.html",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-unit-directed-evidence/public-painted-site.test.js.evidence.json",
+        "sha256": "4a84e7bc772d66a53c17e66389f6cd65546b180bfd0c2760d46f98e27be7ff86",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "cc5c4a6bb5b29f9bbd9400c66eb0ca3c3cac784338db7f812e3dc20c8aa672fb",
+        "testSha256": "a6c399ac6f26a1b21f290cd83035d025fac48bd62f7a00a6ec15be69a62acca2"
+      }
+    },
     "public-platform-owner.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -15547,6 +15549,36 @@
       "operator": "browser-export-weg#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "public-storyline.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/platform-data.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-unit-directed-evidence/public-storyline.test.js.evidence.json",
+        "sha256": "3e335de110bd62052b408e4d024072bfef37cd2bc3022eae0784a98f72471a68",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "a2d6f4dd91f13b39c89719bb93b6d494a55821e19935c18865805cd5f6ef699b",
+        "testSha256": "8d5490d2ca357997934e33dccb66e66fca6ef4121126227f4b80e1c8f9deb458"
+      }
+    },
+    "public-website-edge.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/edge-door.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 15,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/private/tmp/rtg-merge-browser-directed-evidence/public-website-edge.e2e.js.evidence.json",
+        "sha256": "13fdb74119d585d940ef9fba77ad13830b7083cab78110aa74ff8818e164d4aa",
+        "commit": "28c4fe5e3ad1ed388c11a7a96b088b44a6e25d96",
+        "sourceSha256": "af879dd0387608e01f40ae2bf8caa2dc7d630bdea28e01a90a3d8f869ca4d9d4",
+        "testSha256": "87dc904a39f2364a325c622ea14665f7fc7351e3cb87c5b7875e4353d6ea48f4"
+      }
     },
     "publieke-adressen.test.js": {
       "soort": "server",
@@ -17506,6 +17538,78 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "rtg-next-app-proof-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsraakvlak.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "rtg-next-coverage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/coverage.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "rtg-next-gates.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/qualification-gates.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 4
+    },
+    "rtg-next-impact.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/veranderbereik.js",
+      "operator": "optie-uit#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
+    "rtg-next-planning-guards.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/rtg-next-programma.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-next-premium-experience.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/coverage.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 3
+    },
+    "rtg-next-programma.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/rtg-next-programma.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-next-release-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/release-gate.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "rtg-next-specific-acceptance.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/coverage.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "rtg-operation.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -18615,12 +18719,42 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "securitylog-backup-herstel.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/opzet/backup.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-cc0603/securitylog-backup-herstel.test.js.evidence.json",
+        "sha256": "606607414f5d4abca97049fe081e3eb64590c11a3877f4bedf580246a6903a3b",
+        "commit": "cc06037ec58f1148d2e39e151476b1e75ee7e83d",
+        "sourceSha256": "973dc0edd2bb475c7b5d5ea264c26dd360191ddabfba1ef78c4aa480311649da",
+        "testSha256": "a12606fda3bd4a2061c7e7702aba54d58188b81ab8b2eb5aff9ffdaef1b879a7"
+      }
+    },
     "securitylog-keten.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "securitylog-rijopslag.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/inlogherkomst.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 11,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/securitylog-rijopslag.test.js.evidence.json",
+        "sha256": "ebdc99b67e1bb4c61fb86877ec5360e886aeee4fa7a9b5b30fa52bb9adad5a49",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "3a96aa3c32e03c13f2bc90495e0777b438d7046a08dec6d2e4ddd2e40680f251",
+        "testSha256": "410a452ec4d0f88a86906a8e38b1fd58ac1676a76dd45e8fbbf7230a84cde145"
+      }
     },
     "selfhost.test.js": {
       "soort": "puur",
@@ -19662,6 +19796,21 @@
         "testSha256": "b334086d44d42bd3eed6ecc39c55f1b47d2d8dbdc033d197b64c205e962e8df5"
       }
     },
+    "sqlite-noop-barriere.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/sqlite.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/sqlite-noop-barriere.test.js.evidence.json",
+        "sha256": "aa47f67af7aa3c136f66c134da202ba3869fa90d9a3647dc771e299ba471fefb",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "60d46f3a363c1ed71a7d52e857c1d96aabc5b94c0102c327dc4591aba6cba04b",
+        "testSha256": "e4cc7555dba4ad29e06d97d7b74e4f87e840e3639979cd4e7a8d37307eeb2ee5"
+      }
+    },
     "sqlite-poll-selectief.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -19675,6 +19824,36 @@
         "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
         "sourceSha256": "98de88afa86a695be86e6343f76010a2ec31794db93e520f03db1ebc53066826",
         "testSha256": "48518910aa94be61aa99ed6ebfab7308ec1c2ea740cdfe7d0578f9ebbb1e58ae"
+      }
+    },
+    "sqlite-profile-phases.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/sqlite-profile-phases.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/mutations-cc0603/sqlite-profile-phases.test.js.evidence.json",
+        "sha256": "48a67d92c8a1cacf97746286a041242ec733902f3d407c7f2757c95fd5018d0c",
+        "commit": "cc06037ec58f1148d2e39e151476b1e75ee7e83d",
+        "sourceSha256": "59d17d2456c6ec8cc4fec7ecf7f2ade0d8b2c03a7cdc09b70e50bb0a845602f5",
+        "testSha256": "285045d6e67eaafeef802a1fce85b43dcb22378e96acc3502481d827c8ed1882"
+      }
+    },
+    "sqlite-save-versie.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/sqlite-save.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 6,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/metadata-read-1e57/sqlite-save-versie.test.js.evidence.json",
+        "sha256": "c1f2f25d484b479d7fab4e84db1576e0575b96f467c521cc289e776f8c24dd84",
+        "commit": "1e57a34b09e6cecb745a47bb303a973d2ad4f6e3",
+        "sourceSha256": "5199665d30ba8ff4ad3c9f113707cec77beb0260a65c5ecee7efbf1304bb962c",
+        "testSha256": "d7801615674ef1026c948ccdb67bc2ac322af0af652ef1d41c828fec82858adf"
       }
     },
     "sqlite-tombstone-restart.test.js": {
@@ -20373,6 +20552,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "supplier-logboekzicht-daggrens.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/leverancier/logboekzicht.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/day-boundary-5d400d/supplier-logboekzicht-daggrens.test.js.evidence.json",
+        "sha256": "8f2631cd9ec504420635fb06857b8afd20d99f682b7d96dcb7b1698ef10f3854",
+        "commit": "5d400d11060b6336340b1605243f533e397332fd",
+        "sourceSha256": "7fc9e4305954ce7fe02fa7c4a12e27f3e4035a16af1dfbfb34ce42fdbf0dd934",
+        "testSha256": "f7469e2fd0605391f6a697add664d51955db09b0ff1cf95f19aad728283b07cc"
+      }
     },
     "supplier-logboekzicht.test.js": {
       "soort": "server",
@@ -21422,6 +21616,21 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "trust-evidence-tracker-rollback.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/bewijsvlak/v3-store.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/trust-evidence-tracker-rollback.test.js.evidence.json",
+        "sha256": "54b079a103abe5e0147438c84df0fc79fb3928c712cb3d25f83cee874c299acd",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "2bedc00094e177814b5c2e3e3196650394fdcffeda8ae39a7364ac327498eeb9",
+        "testSha256": "e837888f52dd81c31e7f2a7a21972201b58662c18731e55ec47ce69806de1410"
+      }
+    },
     "trust-evidence-v2-migration.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -21429,6 +21638,36 @@
       "operator": "return-weg#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "trust-json-cache.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/mutatietracker.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/trust-json-cache.test.js.evidence.json",
+        "sha256": "7e31549d0bd29241f500b499eeb7003d30fd205993b70cfa106719dc7b51a802",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "8436cae6c5ae8037ac8be713a286854983640efcb4721bfcbd4902e27de267d4",
+        "testSha256": "914240d7025089702e6dddae5f174761867bc812e4aff137517e5f577e0174a6"
+      }
+    },
+    "trust-json-opslag.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/sqlite-saveplan.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-11-11/kan-je-alle-agenten-die-vast/validation/securitylog-84989f/mutations/trust-json-opslag.test.js.evidence.json",
+        "sha256": "05d1386f8b7b8bbc1306a50e597c290c56f824b487c7e68b394d6a05c4bc9296",
+        "commit": "84989f4e3faecb9f85689dbcceac0c8ebef792b0",
+        "sourceSha256": "f4137bb6e28783ad547cd7553e1813ff5e159f968113cf02e24d4a81312a8e0e",
+        "testSha256": "0eebeac56306a09f70226b0b8b46ce71a9e7f68238f81a7d1fa85e577a714a55"
+      }
     },
     "turn-inrichting.test.js": {
       "soort": "puur",

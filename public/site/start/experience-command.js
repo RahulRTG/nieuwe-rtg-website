@@ -48,7 +48,9 @@
     sourceIndex.build();
     if (!dialog.open) dialog.showModal();
     input.value = typeof query === 'string' ? query.slice(0, 160) : ''; render(input.value);
-    w.setTimeout(function () { input.focus(); }, 20);
+    // Modal contents are ready now. A delayed focus would steal the user's
+    // focus back after they have already moved to a search result.
+    input.focus();
   }
 
   var announcement = d.createElement('p');

@@ -3,6 +3,8 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {laadPlaywright,startBrowser,letOpFouten}=require('./helper');
+const {action:edgeAction,focusVisible}=require('./public-edge-interactions');
+const door='.ds-public-edge .ds-public-edge-toggle';
 const ROOT=path.resolve(__dirname,'..');
 const OUT=process.env.RTG_VOLUME_OUTPUT||path.join(ROOT,'output/brand/travel-volume');
 const CASES=[
@@ -67,9 +69,15 @@ for(const c of CASES)for(const width of [320,390,768,1440])test(c.file+': five s
     const heroTop=await page.locator('.world-hero .ds-public-cover img').evaluate(e=>e.getBoundingClientRect().top);
     assert.ok(heroTop<470,'First image before an essay: '+heroTop);
     await status(page,1);await sources(page);await overflow(page);await first(page);
-    for(const action of await page.locator('[data-reel-page] a,[data-reel-controls] button,[data-editorial-reel] a[href="#werelddetails"],[data-editorial-reel] a[href="#colofon"]').all()){
+    for(const action of await page.locator('[data-reel-page] a').all()){
       const r=await action.boundingBox();assert.ok(r&&r.height>=44&&r.width>=44,'44px target '+await action.textContent()+' '+JSON.stringify(r));
     }
+    await edgeAction(page,'context');
+    for(const action of await page.locator('.ds-volume-bar a,[data-reel-controls] button').all()){
+      await action.scrollIntoViewIfNeeded();const r=await action.boundingBox();
+      assert.ok(r&&r.height>=44&&r.width>=44,'44px original Edge target '+await action.textContent()+' '+JSON.stringify(r));
+    }
+    await page.keyboard.press('Escape');await focusVisible(page);
     for(const id of c.sections){
       await reveal(page,id);assert.equal(await page.locator('#werelddetails').getAttribute('open')!==null,true);
       assert.equal(await page.locator('#'+id).isVisible(),true,id+' reachable');await overflow(page);
@@ -94,12 +102,17 @@ for(const c of CASES)for(const rtl of [false,true])test(c.file+': '+(rtl?'RTL':'
     const track=page.locator('[data-reel-track]'),prev=page.locator('[data-reel-prev]'),next=page.locator('[data-reel-next]');
     assert.match(await track.evaluate(e=>getComputedStyle(e).scrollSnapType),/mandatory/);
     assert.notEqual(await track.evaluate(e=>getComputedStyle(e).touchAction),'none');
-    await next.scrollIntoViewIfNeeded();const y=await page.evaluate(()=>scrollY);await next.focus();
-    for(let n=2;n<=5;n++){await page.keyboard.press('Enter');await status(page,n);}
-    assert.equal(await next.getAttribute('aria-disabled'),'true');assert.equal(await next.evaluate(e=>e===document.activeElement),true);
-    assert.equal(await next.getAttribute('disabled'),null);await page.keyboard.press('Enter');await status(page,5);
+    const y=await page.evaluate(()=>scrollY);
+    async function turn(button,n){
+      await edgeAction(page,'context');await button.scrollIntoViewIfNeeded();await button.focus();await page.keyboard.press('Enter');await status(page,n);
+      await page.waitForFunction(selector=>document.querySelector(selector).getAttribute('aria-expanded')==='false',door);
+      await focusVisible(page);
+    }
+    for(let n=2;n<=5;n++)await turn(next,n);
+    assert.equal(await next.getAttribute('aria-disabled'),'true','Eindblad begrenst de oorspronkelijke volgende-knop');
+    assert.equal(await next.getAttribute('disabled'),null);await turn(next,5);
     assert.ok(Math.abs(await page.evaluate(()=>scrollY)-y)<=2,'Reel navigation leaves document scroll unchanged');
-    await prev.focus();for(let n=4;n>=1;n--){await page.keyboard.press('Enter');await status(page,n);}
+    for(let n=4;n>=1;n--)await turn(prev,n);
     assert.equal(await prev.getAttribute('aria-disabled'),'true');
     await track.focus();await page.keyboard.press(rtl?'ArrowLeft':'ArrowRight');await status(page,2);
     await page.keyboard.press('End');await status(page,5);await page.keyboard.press('Home');await status(page,1);
@@ -121,7 +134,8 @@ for(const c of CASES)test(c.file+': links, deep links, demo continuity and menu'
     await page.waitForURL(u=>u.hash==='#verhaal');
     await page.waitForFunction(()=>document.activeElement===document.querySelector('#verhaal'));
     assert.equal(await page.locator('#verhaal').evaluate(e=>e===document.activeElement),true,'Back link restores magazine focus');
-    await page.locator('[data-editorial-reel] a[href="#werelddetails"]').first().click();
+    await edgeAction(page,'context');
+    await page.locator('.ds-volume-bar a[href="#werelddetails"]').first().click();
     await page.waitForURL(u=>u.hash==='#werelddetails');
     // URL observation can precede the hashchange handler and native fragment
     // focus. Wait for the actual accessibility outcome, not only navigation.
@@ -136,8 +150,9 @@ for(const c of CASES)test(c.file+': links, deep links, demo continuity and menu'
     if(await page.locator('#werelddetails').evaluate(e=>e.open))await page.locator('#werelddetails>summary').click();
     await reveal(page,'proberen');
     assert.equal(await select.inputValue(),selected,'Closing the library preserves the demonstration state');
-    await page.locator('[data-public-menu]').click();await page.keyboard.press('Escape');
+    await edgeAction(page,'menu');assert.equal(await page.getByRole('navigation',{name:'Ontdek RTG',exact:true}).isVisible(),true);await page.keyboard.press('Escape');
     assert.equal(await page.locator('[data-public-menu]').getAttribute('aria-expanded'),'false');
+    await focusVisible(page);
     await overflow(page);assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
@@ -183,7 +198,15 @@ for(const c of CASES)for(const mode of ['large-text','landscape'])test(c.file+':
         const r=await action.boundingBox();assert.ok(r&&r.y>=-1&&r.y+r.height<=height+1,'Action reachable in viewport '+JSON.stringify(r));
       }
     }
-    await overflow(page);await page.locator('.world-footer').scrollIntoViewIfNeeded();
-    assert.ok((await page.locator('.world-footer').boundingBox()).y<height,'Document can escape to the footer');assert.deepEqual(errors,[]);
+    await overflow(page);await edgeAction(page,'menu');
+    await page.locator('[data-public-info]').click();
+    const footer=page.locator('#publicPageInfo .world-footer');
+    assert.equal(await footer.count(),1,'The one original service footer lives in Edge Info');
+    assert.equal(await footer.isVisible(),true,'Information remains reachable at enlarged text and in landscape');
+    for(const link of await footer.locator('a').all()){
+      await link.scrollIntoViewIfNeeded();await link.focus();const r=await link.boundingBox();
+      assert.ok(r&&r.y>=-1&&r.y+r.height<=height+1,'Original service link remains reachable '+JSON.stringify(r));
+    }
+    await overflow(page);assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });

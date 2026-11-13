@@ -40,7 +40,7 @@
   /* Paint leads. A single supporting photograph remains at its existing moment. */
   var moment=source.querySelector('.moment-visual');
   var image={living:'living-table-story',travel:'discover-travel',work:'discover-work',foundation:'foundation-family'}[d.body.dataset.world];
-  if(moment&&image&&!moment.querySelector('img')){var img=node('img');img.src=new URL('images/editorial/'+image+'.webp',base).href;img.alt='';img.width=1448;img.height=1086;img.loading='lazy';img.decoding='async';moment.append(img);moment.setAttribute('aria-hidden','true');var credit=node('p','ds-public-image-credit','RTG-sfeerbeeld · AI-gegenereerd');moment.after(credit);}
+  if(moment&&image&&!moment.querySelector('img')){var img=document.createElement('img');img.src=new URL('images/editorial/'+image+'.webp',base).href;img.alt='';img.width=1448;img.height=1086;img.loading='lazy';img.decoding='async';moment.append(img);moment.setAttribute('aria-hidden','true');var credit=node('p','ds-public-image-credit','RTG-sfeerbeeld · AI-gegenereerd');moment.after(credit);}
 
   /* The folio only scrolls itself. No wheel interception, autoplay, duplicate
      content or hidden slides. Touch and no-JS keep the native scroll surface. */

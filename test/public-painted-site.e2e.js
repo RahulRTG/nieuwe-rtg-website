@@ -1,6 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
-const {laadPlaywright,browserOpties,letOpFouten}=require('./helper');
+const {laadPlaywright,startBrowser,letOpFouten}=require('./helper');
+const {action:edgeAction,focusVisible,seek}=require('./public-edge-interactions');
 const {voorNode}=require('../server/middleware/landing');
 const root=path.join(__dirname,'..'),details=[...['community','rtg-pass','business-lite','business-pass','lifestyle-pass'].map(id=>'/public/site/passen/'+id+'.html'),...['livingos','travelos','workos','foundationos'].map(id=>'/public/site/werelden/'+id+'.html'),'/public/site/techniek/techniek.html','/explore/index.html'];
 const hosts=['/',...details,'/public/site/404.html'],truth=JSON.parse(fs.readFileSync(path.join(root,'public/site/website-truth.json'),'utf8'));
@@ -8,7 +9,7 @@ const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json
 test.before(async()=>{
  server=http.createServer((req,res)=>{let route=new URL(req.url,'http://localhost').pathname;if(route==='/node-preview'){res.writeHead(200,{'Content-Type':'text/html'});return res.end(voorNode(fs.readFileSync(path.join(root,'index.html'),'utf8')));}if(route==='/')route='/index.html';else if(/^\/(ds|fonts|images|shared|site)\//.test(route))route='/public'+route;const file=path.resolve(root,'.'+route);if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}fs.readFile(file,(error,bytes)=>{if(error){res.writeHead(404,{'Content-Type':'text/html'});return res.end(fs.readFileSync(path.join(root,'public/site/404.html')));}res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream'});res.end(bytes);});});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base='http://127.0.0.1:'+server.address().port;
- const pw=laadPlaywright();assert.ok(pw,'een echte browserdriver is verplicht');browser=await pw.chromium.launch(browserOpties(pw));
+ const pw=laadPlaywright({eigenDriver:false});assert.ok(pw,'een echte browserdriver is verplicht');browser=await startBrowser(pw);
 });
 test.after(async()=>{if(browser)await browser.close();if(server)await new Promise(resolve=>server.close(resolve));});
 async function session(width,javaScriptEnabled=true){
@@ -22,21 +23,36 @@ async function loadedPictures(page,host){
  for(const image of await page.locator('img:visible').all()){
   await image.scrollIntoViewIfNeeded();const state=await image.evaluate(async el=>{await el.decode();const r=el.getBoundingClientRect();return {source:el.getAttribute('src'),loaded:el.complete&&el.naturalWidth>0,width:r.width,height:r.height,fit:getComputedStyle(el).objectFit};});
   assert.equal(state.loaded,true,host+' '+state.source);assert.ok(state.width>0&&state.height>0,host+' beeld heeft zichtbare afmetingen');
-  if(/rtg-painted-|rahul-travel-group-logo|rtg-mark\.svg/.test(state.source))assert.equal(state.fit,'contain',host+' hele merkelement blijft zichtbaar');
+  if(/rahul-travel-group-logo|rtg-mark\.svg|rtg-ink-artwork|rtg-edge-lips/.test(state.source))assert.equal(state.fit,'contain',host+' hele merkelement blijft zichtbaar');
+  if(/rtg-painted-/.test(state.source))await paintedFit(image,host);
  }
+}
+async function paintedFit(image,label){
+ const state=await image.evaluate(el=>({fit:getComputedStyle(el).objectFit,bleed:!!el.closest('.ds-cover-art,.ds-issue-index-images,.ds-volume-sheet--horizon')&&!el.closest('.ds-issue-reader'),ratio:el.getBoundingClientRect().width/el.getBoundingClientRect().height,natural:el.naturalWidth/el.naturalHeight,source:el.getAttribute('src')}));
+ if(state.fit==='fill'&&!state.bleed){assert.ok(Math.abs(state.ratio-state.natural)<.01,label+': natuurlijke afbeelding blijft volledig en proportioneel '+JSON.stringify(state));return;}
+ assert.equal(state.fit,state.bleed?'cover':'contain',label+': redactionele uitsnede tot de rand, vrijstaande kunst volledig');
 }
 for(const width of [390,1440])for(const javaScriptEnabled of [true,false])test('hele www: '+width+'px, dertien bronnen '+(javaScriptEnabled?'met runtime':'zonder JavaScript'),async()=>{
  const {context,page,errors,missing}=await session(width,javaScriptEnabled);
  try{for(const host of hosts){
   await page.goto(base+host,{waitUntil:'networkidle'});await page.evaluate(()=>document.fonts.ready);
-  if(javaScriptEnabled&&details.includes(host))await page.locator('.ds-brand-lockup-header').waitFor();
+  if(javaScriptEnabled)await page.locator('.ds-public-edge-toggle').waitFor();
   assert.equal(await page.locator('html').getAttribute('data-ds')!==null,true,host+' DS-host');
   assert.equal(await page.locator('body').getAttribute('data-rtg-world'),'living',host+' publieke merkkleur');
   const styles=await page.locator('link[rel="stylesheet"]').evaluateAll(links=>links.map(el=>new URL(el.href).pathname));
   assert.equal(styles.length,2,host+' geen dynamisch toegevoegde legacy CSS');assert.ok(styles[0].endsWith('/fonts/fonts.css')&&styles[1].endsWith('/ds/rtg-ds.css'),host+' uitsluitend huisletters en DS');
   const h1=await page.locator('h1:visible').count();if(javaScriptEnabled)assert.equal(h1,1,host+' één zichtbare hoofdtitel');else assert.ok(h1>=1,host+' leesbare fallbacktitel');
-  const brand=page.locator('a.ds-brand-mark').first();assert.equal(await brand.isVisible(),true,host+' klein navigatiemerk');
-  const mark=await brand.locator('img').evaluate(el=>({width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height}));assert.equal(mark.width,40);assert.equal(mark.height,32);
+  const brand=page.locator('a.ds-brand-mark').first();
+  if(javaScriptEnabled){
+   assert.equal(await brand.isVisible(),false,host+' Edge vervangt de statische header');
+   const door=page.locator('.ds-public-edge-toggle');assert.equal(await door.isVisible(),true,host+' geschilderd navigatiemerk');
+   assert.match(await door.locator('img').getAttribute('src'),/rtg-edge-lips\.webp$/);
+   const mark=await door.boundingBox();assert.ok(mark.width>=44&&mark.height>=44,host+' transparante ingang heeft een volwaardig klikdoel');
+   assert.equal(await door.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)',host+' standaard gesloten ingang is transparant');
+  }else{
+   assert.equal(await brand.isVisible(),true,host+' no-JS houdt het navigatiemerk');
+   const mark=await brand.locator('img').evaluate(el=>({width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height}));assert.equal(mark.width,40);assert.equal(mark.height,32);
+  }
   assert.equal(await page.locator('footer img[src$="rahul-travel-group-logo.jpg"]').count(),1,host+' volledige lockup in footer');
   await loadedPictures(page,host);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,host+' geen horizontale overflow');
@@ -45,19 +61,18 @@ for(const width of [390,1440])for(const javaScriptEnabled of [true,false])test('
    assert.equal(await page.locator('.world-shell').count(),1);
    assert.ok(await page.locator('img[src*="rtg-painted-"]').count()>0,'een statisch geschilderd signatuurbeeld');
    if(host==='/explore/index.html'){assert.equal(await page.locator('.ds-public-story-art img').count(),1);assert.match(await page.locator('.ds-public-story-art figcaption').innerText(),/RTG[\s\S]*AI-gegenereerd/);}
-   else {assert.equal(await page.locator('.ds-public-cover img').count(),1);assert.match(await page.locator('.ds-public-cover figcaption').innerText(),/RTG|AI/);assert.equal(await page.locator('.ds-public-stroke').count(),1);}
+   else {assert.equal(await page.locator('.ds-public-cover img').count(),1);if(await page.locator('body.ds-public-volume').count()){const credit=await page.locator('#colofon').textContent();assert.match(credit,/RTG/);assert.match(credit,/AI-gegenereerd/);assert.ok(await page.locator('#colofon a[href*="provenance" i]').count()>0);}else{assert.match(await page.locator('.ds-public-cover figcaption').innerText(),/RTG|AI/);assert.equal(await page.locator('.ds-public-stroke').count(),1);}}
   }
   if(javaScriptEnabled){
-   if(host==='/')await page.locator('[data-magazine-menu]').click();
+   await edgeAction(page,'menu');
    const language=host==='/'?page.locator('#experienceLanguage'):page.locator('[data-language-picker]').filter({visible:true}).first();
-   assert.equal(await language.isVisible(),true,host+' taalkiezer behouden');await language.focus();await page.keyboard.press('Enter');assert.ok(await page.locator('[role=dialog],dialog').filter({visible:true}).count()>0,host+' taal opent via toetsenbord');await page.keyboard.press('Escape');
+   assert.equal(await language.isVisible(),true,host+' taalkiezer behouden');await seek(page,language);await page.keyboard.press('Enter');assert.ok(await page.locator('[role=dialog],dialog').filter({visible:true}).count()>0,host+' taal opent via toetsenbord');await page.keyboard.press('Escape');
    // De bestaande i18n-owner geeft focus in een volgende event-loop terug.
    // Bewijs eerst die herstelstap voordat de volgende toetsenbordhandeling begint.
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    assert.equal(await page.locator('[role=dialog],dialog').filter({visible:true}).count(),0,host+' Escape sluit de taalkeuze');
-   if(host==='/'){const active=await page.evaluate(()=>({tag:document.activeElement.tagName,html:document.activeElement.outerHTML.slice(0,350),visible:!!document.activeElement.getClientRects().length}));assert.ok(active.visible&&active.tag!=='BODY',host+' gesloten taalmenu geeft focus aan zichtbare bediening: '+JSON.stringify(active));}
-   else assert.equal(await language.evaluate(el=>el===document.activeElement),true,host+' taalkeuze geeft focus terug');
-   try{await brand.focus();await page.keyboard.press('Enter');await page.waitForURL(url=>url.pathname==='/');}catch(error){throw new Error(host+' merklink-toetsenbordroute mislukt op '+page.url(),{cause:error});}assert.equal(await page.locator('#magazineHome').isVisible(),true,host+' merklink herstelt de voordeur via toetsenbord');
+   await focusVisible(page);
+   try{await edgeAction(page,'home',false,url=>url.pathname==='/');}catch(error){throw new Error(host+' Edge-home-toetsenbordroute mislukt op '+page.url(),{cause:error});}assert.equal(await page.locator('#magazineHome').isVisible(),true,host+' Edge-home herstelt de voordeur via toetsenbord');
   }
   assert.deepEqual(errors,[],host+' runtimefouten');assert.deepEqual(missing,[],host+' lokale assets');
  }}finally{await context.close();}
@@ -104,7 +119,7 @@ test('mobiele prijzen houden leesbare kolommen in een toetsenbord-scrollbare tab
 test('Living-demostappen gebruiken de volle desktopgridbreedte en één mobiele kolom',async()=>{
  for(const width of [390,1440]){
   const {context,page,errors}=await session(width);try{
-   await page.goto(base+'/public/site/werelden/livingos.html',{waitUntil:'networkidle'});await page.waitForFunction(()=>!!window.RTGWorldStory);
+   await page.goto(base+'/public/site/werelden/livingos.html#proberen',{waitUntil:'networkidle'});await page.waitForFunction(()=>!!window.RTGWorldStory);await page.locator('[data-story-demo]').waitFor({state:'visible'});
    const layout=await page.locator('[data-story-demo] .simulation-main').evaluate(main=>{const steps=main.querySelector('.connection-steps'),m=main.getBoundingClientRect(),s=steps.getBoundingClientRect(),ms=getComputedStyle(main),ss=getComputedStyle(steps);return {main:{left:m.left,right:m.right,width:m.width,columns:ms.gridTemplateColumns.split(/\s+/).length},steps:{left:s.left,right:s.right,width:s.width,columns:ss.gridTemplateColumns.split(/\s+/).length,start:ss.gridColumnStart,end:ss.gridColumnEnd}};});
    assert.ok(Math.abs(layout.main.left-layout.steps.left)<=1,width+'px: stappen beginnen aan de linkerrand van de demogrid');assert.ok(Math.abs(layout.main.right-layout.steps.right)<=1,width+'px: stappen eindigen aan de rechterrand van de demogrid');
    assert.equal(layout.steps.start,'1');assert.equal(layout.steps.end,'-1');assert.equal(layout.main.columns,width<768?1:3,width+'px: hoofdgridkolommen');assert.equal(layout.steps.columns,width<768?1:3,width+'px: stappenpaneelkolommen');
@@ -121,9 +136,9 @@ test('geïsoleerde Node-HTML-projectie via echte voorNode laadt kunst en DS met 
    assert.deepEqual(await page.locator('link[rel="stylesheet"]').evaluateAll(links=>links.map(el=>new URL(el.href).pathname)),['/fonts/fonts.css','/ds/rtg-ds.css']);
    const art=page.locator('#magazineHome img[src*="rtg-painted-"]');assert.equal(await art.count(),3);
    for(const image of await art.all()){
-    await image.scrollIntoViewIfNeeded();const state=await image.evaluate(async el=>{await el.decode();return {source:el.getAttribute('src'),loaded:el.complete&&el.naturalWidth>0,fit:getComputedStyle(el).objectFit};});assert.match(state.source,/^\/images\/brand\/rtg-painted-/);assert.equal(state.loaded,true);assert.equal(state.fit,'contain');
+    await image.scrollIntoViewIfNeeded();const state=await image.evaluate(async el=>{await el.decode();return {source:el.getAttribute('src'),loaded:el.complete&&el.naturalWidth>0};});assert.match(state.source,/^\/images\/brand\/rtg-painted-/);assert.equal(state.loaded,true);await paintedFit(image,'Node-projectie');
    }
-   assert.equal(await page.locator('#magazineHome [data-app-path="/apps/app.html"]').first().evaluate(el=>el.href),base+'/apps/app.html','de app-link blijft na runtimeherleiding op dezelfde origin');
+   assert.equal(await page.locator('[data-app-path="/apps/app.html"]').first().evaluate(el=>el.href),base+'/apps/app.html','de oorspronkelijke app-link blijft na runtimeherleiding op dezelfde origin, ook buiten de cover');
    await page.evaluate(()=>window.RTGPublicApp.open('world:travel'));assert.equal(await page.evaluate(()=>window.RTGExperience.currentWorld()),'travel');assert.equal(await page.locator('body').getAttribute('data-rtg-world'),'living');assert.equal(await page.evaluate(()=>getComputedStyle(document.body).getPropertyValue('--ds-accent').trim().toUpperCase()),'#7F1634');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);
   }finally{await context.close();}
@@ -131,7 +146,7 @@ test('geïsoleerde Node-HTML-projectie via echte voorNode laadt kunst en DS met 
 });
 for(const [world,scenario] of [['living','dinner'],['travel','travel'],['work','work'],['foundation','family']])test(world+' behoudt zijn eigen demonstratie, keuze, toestemming en herstel',async()=>{
  const {context,page,errors}=await session(390);try{
-  await page.goto(base+'/public/site/werelden/'+world+'os.html',{waitUntil:'networkidle'});await page.waitForFunction(()=>!!window.RTGWorldStory);
+  await page.goto(base+'/public/site/werelden/'+world+'os.html#proberen',{waitUntil:'networkidle'});await page.waitForFunction(()=>!!window.RTGWorldStory);await page.locator('[data-story-demo]').waitFor({state:'visible'});
   const demo=page.locator('[data-story-demo]'),select=demo.locator('select'),initial=await select.inputValue();assert.equal(await demo.locator('[data-story-scenario]').getAttribute('data-story-scenario'),scenario);
   const options=await select.locator('option').evaluateAll(rows=>rows.map(row=>row.value));assert.equal(options.length,2);const before=await demo.locator('.connection-steps').innerText();
   await demo.locator('.connection-steps summary').first().click();await select.selectOption(options[1]);assert.notEqual(await demo.locator('.connection-steps').innerText(),before);assert.equal(await demo.locator('.connection-steps details').first().getAttribute('open'),'');

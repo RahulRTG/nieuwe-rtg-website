@@ -7,6 +7,8 @@ const http = require('node:http');
 const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, letOpFouten } = require('./helper');
 const pw = laadPlaywright();
 const root = path.resolve(__dirname, '..');
+const sourceFaqCount = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8')
+ .matchAll(/<details\b[^>]*\bdata-faq=["'][^"']+["']/g)].length;
 async function ready(page){
  await page.waitForSelector('body[data-platform-role="organisatie"]');
  await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
@@ -102,6 +104,7 @@ test('static project path and JavaScript-disabled visitors retain content and re
     browser = await pw.chromium.launch(browserOpties(pw));
     for (const javaScriptEnabled of [true, false]) {
       const context = await browser.newContext({ javaScriptEnabled, viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+      await context.addInitScript(() => localStorage.setItem('rtg_lang', 'nl'));
       const page = await context.newPage(), failed = [];
       page.on('response', r => { if (r.status() >= 400) failed.push(r.url()); });
       await page.goto('http://127.0.0.1:' + server.address().port + prefix, { waitUntil: 'networkidle' });
@@ -109,9 +112,33 @@ test('static project path and JavaScript-disabled visitors retain content and re
         await ready(page);
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
         assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1713');
+        assert.match(await page.locator('.pp-footer a[href$="/apps/juridisch/voorwaarden.html"]').innerText(), /bestaand/i,
+          'ook de door JavaScript opgebouwde footer wijst herkenbaar naar bestaande voorwaarden');
+        await page.locator('.pp-section-index button', { hasText: 'Wat wilt u weten?' }).click();
+        const faqPolicy = page.locator('[data-faq]').filter({ has: page.locator('a[href="#prijsbeleid"]') }).first();
+        await faqPolicy.locator('summary').click();
+        await faqPolicy.locator('a[href="#prijsbeleid"]').click();
+        await page.waitForFunction(() => document.querySelector('.pp-detail-content #prijsbeleid'));
+        assert.equal(await page.locator('#passen').isVisible(), true, 'een gewone nested ankerlink opent de canonieke passenscene');
+        assert.equal(await page.locator('#prijsbeleid').isVisible(), true);
+        await page.evaluate(() => { location.hash = 'commissie'; });
+        await page.waitForFunction(() => document.querySelector('.pp-detail-content #commissie')?.open === true);
+        assert.equal(await page.locator('#commissie table').isVisible(), true, 'hashchange opent ook de doel-details');
+        await page.goto('http://127.0.0.1:' + server.address().port + prefix + '#commissie', { waitUntil: 'networkidle' });
+        await ready(page);
+        await page.waitForFunction(() => document.querySelector('.pp-detail-content #commissie')?.open === true);
+        assert.equal(await page.locator('#commissie table').isVisible(), true, 'een rechtstreeks geopend nested fragment blijft bereikbaar');
       } else {
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
-        assert.equal(await page.locator('[data-faq]:visible').count(), 23);
+        assert.ok(sourceFaqCount > 0, 'de broninventaris bevat werkelijk veelgestelde vragen');
+        assert.equal(await page.locator('[data-faq]:visible').count(), sourceFaqCount,
+          'iedere actuele bronvraag blijft zichtbaar zonder JavaScript');
+        for (const faq of await page.locator('[data-faq]').all()) {
+          assert.equal(await faq.locator('summary').count(), 1);
+          await faq.locator('summary').click();
+          assert.equal(await faq.locator('p').first().isVisible(), true, 'het native details-element ontsluit het antwoord');
+          assert.notEqual((await faq.locator('p').first().innerText()).trim(), '');
+        }
         await page.getByRole('link', { name: 'Passen', exact: true }).click();
         assert.equal(new URL(page.url()).hash, '#passen');
       }

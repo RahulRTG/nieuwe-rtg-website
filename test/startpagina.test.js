@@ -16,11 +16,23 @@ const start = require('../public/site/start/start.js');
 const ROOT = path.join(__dirname, '..');
 const HTML = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 
+function assertPubliekeDS(html, naam) {
+  const bladen = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)]
+    .map(match => match[1]);
+  assert.deepEqual(bladen, ['../../fonts/fonts.css', '../../ds/rtg-ds.css'],
+    naam + ' laadt uitsluitend de huisletters en de centrale DS-root');
+  assert.match(html, /<html\b[^>]*\bdata-ds(?:\s|>)/, naam + ' activeert de DS-poort');
+  assert.match(html, /<body\b[^>]*data-rtg-world="living"/, naam + ' behoudt de publieke LivingOS-merkkleur');
+  assert.doesNotMatch(html, /<style\b|\sstyle="/i, naam + ' heeft geen eigen inline stijllaag');
+}
+
 test('de nieuwe voordeur draagt het RTG-merk en niet het vervangen scherm', () => {
   assert.match(HTML, /data-page="rtg-landing"/);
   assert.match(HTML, /Vier werelden\.<br>Één samenhangend geheel\./);
-  assert.ok((HTML.match(/EXPERIENCE THE ELITE CLASS/g) || []).length >= 2,
-    'de exacte slogan staat in de kop én de voet');
+  assert.match(HTML, /<header[\s\S]*?images\/brand\/rtg-mark\.svg[\s\S]*?<\/header>/,
+    'de kop draagt uitsluitend het goedgekeurde compacte navigatiemerk');
+  assert.match(HTML, /<footer[\s\S]*?rahul-travel-group-logo\.jpg[\s\S]*?EXPERIENCE THE ELITE CLASS[\s\S]*?<\/footer>/,
+    'de volledige oorspronkelijke lockup met exacte slogan blijft in de voet');
   assert.doesNotMatch(HTML, /Uw RTG-omgeving begint|Geen voorbeelddata|Nog geen eigen informatie/,
     'de oude witte onboarding is volledig vervangen');
   assert.match(HTML, /name="rtg-api-base" content="https:\/\/app\.rahultravelgroup\.com"/,
@@ -34,8 +46,11 @@ test('de nieuwe voordeur draagt het RTG-merk en niet het vervangen scherm', () =
     'de openbare pagina laadt niet stil de ingelogde commandtab vanaf een fout rootpad');
 });
 
-test('de voordeur presenteert RTG eerst als B2B2C-platform', () => {
-  assert.match(HTML, /B2B2C-platform/);
+test('de reisvoordeur begint bij mensen en houdt de drie platformkanten bereikbaar', () => {
+  assert.match(HTML, /<title>Rahul Travel Group \| Reizen\. Verbinden\. Leven\./);
+  assert.ok(HTML.indexOf('id="magazineHome"') < HTML.indexOf('id="inhoud"'));
+  assert.match(HTML, /id="hoofdtitel"[^>]*>Het begint bij een reis\.<br><em>En bij de mensen\.<\/em>/,
+    'het verhaal begint bij reizen en mensen; het platform ondersteunt dat verhaal');
   assert.match(HTML, /organisaties, partners en mensen/);
   assert.match(HTML, /data-scene="Organisatie, partner en gebruiker"/);
   assert.match(HTML, /data-app-truth-screen="organisatie"/);
@@ -115,10 +130,9 @@ test('iedere wereld heeft vanaf de startpagina een eigen verhaalpagina', () => {
     const bestand = path.join(ROOT, 'public/site/werelden', wereld + '.html');
     assert.ok(fs.existsSync(bestand), relatiefPad + ' bestaat');
     const wereldHtml = fs.readFileSync(bestand, 'utf8');
-    assert.match(wereldHtml, /href="\.\.\/start\/start-base\.css"/,
-      wereld + ' gebruikt de gedeelde merkbasis');
-    assert.match(wereldHtml, /href="\.\/world\.css\?v=[A-Za-z0-9._-]+"/,
-      wereld + ' gebruikt het gedeelde wereldontwerp');
+    assertPubliekeDS(wereldHtml, wereld);
+    assert.match(wereldHtml, new RegExp('data-world="' + wereld.replace(/os$/, '') + '"'),
+      wereld + ' behoudt zijn inhoudelijke domeinidentiteit');
     assert.match(wereldHtml, /href="\.\.\/\.\.\/\.\.\/#werelden"/,
       wereld + ' wijst terug naar het wereldenoverzicht');
     assert.ok(wereldHtml.includes('https://app.rahultravelgroup.com' + appPad),
@@ -127,15 +141,9 @@ test('iedere wereld heeft vanaf de startpagina een eigen verhaalpagina', () => {
 });
 
 test('iedere pas heeft vanaf de startpagina een eigen verhaalpagina', () => {
-  const passen = {
-    community: '/apps/app.html?pas=guest',
-    'rtg-pass': '/apps/app.html?pas=rtg',
-    'business-lite': '/apps/kantoor.html',
-    'business-pass': '/apps/app.html?pas=business',
-    'lifestyle-pass': '/apps/app.html?pas=lifestyle'
-  };
+  const passen = ['community', 'rtg-pass', 'business-lite', 'business-pass', 'lifestyle-pass'];
 
-  for (const [pas, appPad] of Object.entries(passen)) {
+  for (const pas of passen) {
     const relatiefPad = './public/site/passen/' + pas + '.html';
     assert.ok(HTML.includes('href="' + relatiefPad + '"'),
       pas + ' is vanaf zijn prijskaart bereikbaar');
@@ -143,16 +151,18 @@ test('iedere pas heeft vanaf de startpagina een eigen verhaalpagina', () => {
     const bestand = path.join(ROOT, 'public/site/passen', pas + '.html');
     assert.ok(fs.existsSync(bestand), relatiefPad + ' bestaat');
     const pasHtml = fs.readFileSync(bestand, 'utf8');
-    assert.match(pasHtml, /href="\.\.\/start\/start-base\.css"/,
-      pas + ' gebruikt de gedeelde merkbasis');
-    assert.match(pasHtml, /href="\.\.\/werelden\/world\.css\?v=[A-Za-z0-9._-]+"/,
-      pas + ' gebruikt het gedeelde verhaalontwerp');
-    assert.match(pasHtml, /href="\.\/pass\.css\?v=[A-Za-z0-9._-]+"/,
-      pas + ' gebruikt het gedeelde pasontwerp');
+    assertPubliekeDS(pasHtml, pas);
+    const pasId = { 'rtg-pass': 'rtg', 'business-pass': 'business', 'lifestyle-pass': 'lifestyle' }[pas] || pas;
+    assert.match(pasHtml, new RegExp('data-pass="' + pasId + '"'),
+      pas + ' behoudt zijn eigen productidentiteit');
     assert.match(pasHtml, /href="\.\.\/\.\.\/\.\.\/#passen"/,
       pas + ' wijst terug naar het passenoverzicht');
-    assert.ok(pasHtml.includes('https://app.rahultravelgroup.com' + appPad),
-      pas + ' opent zijn passende RTG-ingang');
+    assert.match(pasHtml, /data-commercial-policy="2026-11-12\.1"/,
+      pas + ' benoemt de gepubliceerde beleidsversie');
+    assert.match(pasHtml, /href="#beschikbaarheid"/,
+      pas + ' verklaart eerst de beschikbaarheid; beleidspublicatie is geen checkout');
+    assert.match(pasHtml, /id="beschikbaarheid"/,
+      pas + ' heeft een werkend lokaal doel voor die uitleg');
   }
 });
 
@@ -162,8 +172,8 @@ test('de techniek heeft vanaf de startpagina een eigen verhaalpagina', () => {
   const bestand = path.join(ROOT, 'public/site/techniek/techniek.html');
   assert.ok(fs.existsSync(bestand));
   const html = fs.readFileSync(bestand, 'utf8');
-  assert.match(html, /href="\.\.\/start\/start-base\.css"/, 'gebruikt de gedeelde merkbasis');
-  assert.match(html, /href="\.\.\/werelden\/world\.css\?v=[A-Za-z0-9._-]+"/, 'gebruikt het gedeelde verhaalontwerp');
+  assertPubliekeDS(html, 'Techniek');
+  assert.match(html, /data-world="tech"/, 'behoudt de inhoudelijke techniekidentiteit');
   assert.match(html, /href="\.\.\/\.\.\/\.\.\/#techniek"/, 'wijst terug naar de technieksectie');
   assert.match(html, /data-language-picker/, 'draagt de taalknop');
   for (const m of html.matchAll(/(?:src|href)="(\.\.\/[^"?#]+)["?#]/g)) {
@@ -180,11 +190,12 @@ test('alle lokale HTML- en stylesheetassets zijn projectpad-relatief en bestaan'
   }
 
   for (const cssRelatief of [
-    'public/site/start/start-base.css',
-    'public/site/start/start-layout.css',
-    'public/site/start/start-responsive.css',
-    'public/site/werelden/world.css',
-    'public/site/passen/pass.css'
+    'public/ds/rtg-ds.css',
+    'public/ds/bediening.css',
+    'public/ds/thema/living.css',
+    'public/ds/componenten/magazine.css',
+    'public/ds/componenten/publiek-detail.css',
+    'public/ds/componenten/brand-lockup.css'
   ]) {
     const bestand = path.join(ROOT, cssRelatief);
     const css = fs.readFileSync(bestand, 'utf8');

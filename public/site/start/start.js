@@ -73,7 +73,7 @@
       link.href = new URL(link.getAttribute('data-app-path'), appBasis).href;
     });
 
-    var heroLagen = [d.getElementById('heroPhotoA'), d.getElementById('heroPhotoB')].filter(Boolean);
+    var heroLagen = d.getElementById('magazineHome') ? [] : [d.getElementById('heroPhotoA'), d.getElementById('heroPhotoB')].filter(Boolean);
     var actieveHero = 0;
     var huidigDagdeel = null;
     var wisselNummer = 0;

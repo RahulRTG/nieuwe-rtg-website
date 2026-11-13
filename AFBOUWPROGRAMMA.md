@@ -3967,3 +3967,220 @@ laatste integrale tegenproef**. Opgelost sinds vorige meting: **2**. Nieuwe
 regressies: **0 in de gerichte tegenproeven**. Eerder verborgen fouten ontdekt:
 **0 extra**. Niet-uitgevoerde verplichte controles: **3 samengestelde
 uitkomsten**. Deep Green: **GEBLOKKEERD**.
+
+## RTG NEXT — technisch uitvoeringsprogramma van 11 november 2026
+
+De eigenaar kiest voor verdere uitwerking van The Living System tot één
+bouw- en kwalificatieprogramma voor alle bestaande 114 MAPPEN-ingangen.
+De volledige afbouw blijft staan. De gedeelde Living Runtime wordt eerst
+bewezen met twaalf representatieve ervaringen, vóór uitrol over de overige
+ingangen. Dit vervangt de eerdere drie referenties in de premiumbijlage.
+
+De uitvoering staat in `docs/rtg-premium-afbouwplan.md` §13–19, de
+machineleesbare planning in `docs/rtg-next/programma.json` en de afgeleide
+capabilitydossiers in `docs/rtg-next/werkboek.md`. De werkpakketbestanden zijn
+een delta-overlay op bestaande functie-id's, geen tweede catalogus,
+autorisatiebron of completion-register. Nieuwe premiumbeloften worden eerst
+per eigenaar als scopewijziging beoordeeld; bestaande externe voorwaarden en
+besluitklassen blijven gelden. RTFoundation Winkel blijft binnen de bestaande
+schermscope met eigenaar rtf.winkel; een nieuwe menu-ingang of productbelofte
+vereist een expliciet scopebesluit, geen ongemerkt toegevoegde app.
+
+Plan Dossier, Consequence Graph en Provider Truth Gateway worden verbonden aan
+de bestaande plancompiler, broker, gevolgcontracten, domeinbronnen en
+providerbewijzen. Constitution, Experience Budgets en Change Impact bouwen
+voort op bestaande regels en meetinstrumenten. De Premium Acceptance Council
+vraagt een bevoegde, onafhankelijke menselijke reviewketen; de huidige
+`human-quality`-blokkade wordt pas na bewezen implementatie opgeheven.
+
+P0 legt de bouwbasis vast; P1/P4/P6 kunnen daarna parallel starten, met de
+overige afhankelijkheden uit de planning. G1 kwalificeert de twaalf taken,
+G2 de volledige actuele scope, G3 onafhankelijke kwalificatie en G4 productie. Ontwerp en
+veiligheidsreparaties mogen parallel doorgaan; onveilige of onbewezen
+fundamenten worden niet over de catalogus verspreid.
+
+Deze aanvulling wijzigt geen bewijsstand. APPWERKT, EXPERIENCEWERKT, de
+bestaande keten-/releasepoorten en afzonderlijk eigenaar-go/no-go blijven
+bepalend. De planning-validator levert uitsluitend consistentiecontrole.
+Er is hiermee geen runtimewijziging, productievrijgave of externe handeling
+goedgekeurd of uitgevoerd.
+
+### P0-toewijzing en afdwingbare poorten — 12 november 2026
+
+Alle 316 apps-schermen hebben in het bestaande SCHERMEIGENAAR-register een
+eigenaar, werkpakketten, scènefamilie, risico en taakfamilies. De bestaande
+Experience-contracten leveren twaalf premiumcriteria, 48 aanvullende scenario's
+en twaalf risico-/apparaatbudgetcellen bovenop de 228 specifieke scenario's.
+Alle 114 premiumdossiers en productbeloften blijven behouden met een scope-lock.
+De afgeleide Experience-bewijslast groeit mee; niets wordt hierdoor PROVEN.
+
+De vier poorten worden technisch gelezen en vóór bestaande release-/activatie-
+effecten afgedwongen. Acht oude consolidatieoordelen blijven open, waaronder
+drie productbesluiten. De structurele routeplanning is bouwgereed; dit is geen
+onvoorwaardelijke P0-sluiting, kwalificatie of toestemming tot integratie.
+Het werkboek toont alle schermkoppelingen en resterende beslispunten.
+Alle wijzigingen blijven lokaal tot expliciete integratiegoedkeuring.
+
+Aanvullend eist de eigenaar een Premium Experience Gate: nieuwe gebruiker
+zonder uitleg, efficiënte ervaren gebruiker, begrepen gevolgen vóór akkoord,
+veilig hervatten en menselijke beoordeling van samenhang/verzorging/vertrouwen.
+Alle vijf moeten afzonderlijk slagen. Deze kwaliteitsvoorwaarde gebruikt het
+bestaande Experience-contract en blokkeert G1–G4 bij ontbrekend bewijs;
+zij verleent geen uitvoering-, scope- of productiebevoegdheid.
+
+#### Controleerbare lokale oplevering
+
+| Bestanden | Wijziging |
+|---|---|
+| `SCHERMEIGENAAR.json` | 316 afbouwbindingen; twee verouderde/ontbrekende doelbeschrijvingen gecorrigeerd; bestaande eigenaars, rollen en open oordelen behouden. |
+| `experience-architecture/coverage-contract.json` | Premiumcriteria, 48 gedeelde scenario's, taak-/risico-/apparaatbudgetten, bewijsroutes en vijfdelige Premium Experience Gate. |
+| `docs/rtg-next/programma.json` | Scope-lock, bronverwijzingen, P0-bouwvoorwaarde en G1–G4. De twee bestaande `*-werkpakketten.json`-bronnen behouden alle 114 beloften en 228 scenario's. |
+| `scripts/rtg-next-programma.js`, `scripts/lib/experience/qualification-planning.js` | Volledige koppeling-/normvalidatie, specifieke scenario-ID's, vijfdelige kwaliteitsbeoordeling en werkboekprojectie. |
+| `scripts/lib/experience/coverage.js`, `scripts/lib/experience/dimensions.js` | Aanvullende eisen tellen mee in de werkelijke bestaande bewijsnoemer; ontbrekende koppelingen of verkleinde projecties worden geweigerd. |
+| `scripts/lib/experience/evidence.js`, `scripts/veranderbereik.js` | Programmabronnen en APPWERKT-raakvlak opgenomen in kandidaatbinding; conservatieve impactprojectie zonder kleinere testring. |
+| `scripts/lib/experience/qualification-gates.js` | Alleen-lezen G1–G4, kandidaat-/scopebinding, open eigendomsoordelen, menselijke bewijsgrens en afzonderlijke Premium Experience-check. |
+| `scripts/release-gate.js`, `scripts/live-vrijgave.js`, `scripts/native-activate.js` | G3 vóór productiereleasebewijs en G4 vóór OCI/native activatie; bestaande geautoriseerde rollback blijft behouden. |
+| `test/rtg-next-programma.test.js`, `test/rtg-next-planning-guards.test.js`, `test/rtg-next-coverage.test.js`, `test/rtg-next-specific-acceptance.test.js` | Dekking, scopebehoud, negatieve mutaties en echte koppeling van acceptatie aan requirements. |
+| `test/rtg-next-gates.test.js`, `test/rtg-next-release-binding.test.js`, `test/rtg-next-app-proof-binding.test.js`, `test/rtg-next-premium-experience.test.js`, `test/rtg-next-impact.test.js`, `test/schermeigenaar.test.js` | Poort-/vrijgaveprotocol, echte Git-bronbinding, vijf conjunctieve kwaliteitsvragen, impact en behoud van alias-eigenaarschap. |
+| `EXPERIENCEWERKT.json`, `docs/rtg-next/werkboek.md` | Opnieuw gegenereerde bestaande projecties; geen bewijsstatus opgewaardeerd. |
+| `AFBOUWPROGRAMMA.md`, `DOCUMENTENKAART.md`, `docs/rtg-premium-afbouwplan.md` | Scope, uitvoeringsgrenzen, open besluiten en leeswijzer bijgewerkt. |
+
+Open blijven drie productbesluiten (Pulse/Salon, Wereld/Sociaal, Commerce/Mall)
+en vijf bestaande consolidatieopdrachten. Daarnaast ontbreken actuele volledige
+productbewijzen, de gezaghebbende menselijke bewijsinvoer, echte onafhankelijke
+deelnemers/reviewers en toepasselijke provider-/privacy-/productiegoedkeuringen.
+Een complete inventaris en groene protocoltest zijn geen bewijs dat de apps
+premium functioneren. Het normale CLI-poortoordeel blijft daarom BLOCKED.
+
+Validatie van deze lokale oplevering (12 november): **412/412 gerichte tests
+geslaagd, nul mislukt of overgeslagen**, inclusief de oorspronkelijke planning-
+en registertests. Twee integratiefouten zijn vóór afsluiting gerepareerd en
+opnieuw beproefd: een routerafhankelijke testfixture en de exportvolgorde van
+de directe poort-CLI. De definitieve gezamenlijke run duurde circa 59 seconden.
+
+```sh
+node --test test/rtg-next-*.test.js test/wereldregister.test.js test/schermeigenaar.test.js test/experience-artifact.test.js test/experience-execution.test.js test/experience-typed.test.js test/experience-matrix-coverage.test.js test/experience-configurations.test.js test/experience-coverage.test.js test/experience-artifact-matrix.test.js test/experience-execution-matrix.test.js test/veranderbereik.test.js test/release-hardening.test.js test/afbouwpoort.test.js test/servicecaps-releasepoort.test.js test/appwerkt-vers-releasepoort.test.js test/bewijsraakvlak.test.js test/connection-constitution.test.js test/loop-fabric-constitution.test.js test/website-truth.test.js test/website-codeproof.test.js test/public-platform-owner.test.js
+```
+
+`node scripts/rtg-next-programma.js --check` en
+`node scripts/experience-coverage.js --check` slagen; `git diff --check` is
+schoon. De echte `--gate=G4`-aanroep herbeoordeelt G1–G4, eindigt verwacht met
+exitcode 1 en BLOCKED, en wijzigt APPWERKT, APPWERKT-RAAKVLAK en EXPERIENCEWERKT
+niet (voor/na-hashes gecontroleerd). G1 telt twaalf ingangen en 44 gekoppelde
+schermen; G2 telt 114 en 316. Alle vijf Premium Experience-vragen blijven
+zonder bevoegd uitvoeringsbewijs geblokkeerd.
+
+Dit is lokale protocol-/integratievalidatie op Node v24.18.0; `.nvmrc` vereist
+Node 26 voor het kwalificatietraject. Volledige CI op die runtime, echte
+browser-/gebruikersproeven, onafhankelijke securityacceptatie en productie-
+herstelproeven zijn hiermee niet uitgevoerd. HEAD blijft
+`abd1eafdccd6865631d634d5899676c1c1e7fa68`; niets gecommit, gepusht of uitgerold.
+
+## RTG NEXT — product- en marktconcept van 12 november 2026
+
+Op verzoek van de eigenaar is het concept Salon/Pulse, Wereld/Sociaal en
+Mall/Commerce uitgewerkt in `docs/rtg-premium-afbouwplan.md` §20. De broninspectie
+richt zich op deze zes capabilities en bestaande zakelijke onboarding; zij
+is geen nieuwe integrale audit of kwalificatie van de overige 108.
+
+De aanbevolen richting behoudt zes eigen premiumervaringen: Salon voor
+relaties en rijke publicatie, Pulse voor korte actuele gesprekken, Wereld
+voor persoonlijke samenhang, Sociaal voor gecontroleerde voorbereiding,
+Mall voor ontdekken/kiezen en Commerce voor transactie-/herstelregie.
+Commerce neemt geen domeinorders of betaalwaarheid over. Publiceren vanuit
+Wereld blijft via de sociale broneigenaar bestaan. Gemeenschappelijke sociale
+schrijf-/rechtenpaden consolideren vraagt aantoonbare migratie, niet alleen
+een nieuwe vormgeving.
+
+De aanvulling werkt consumentenwaarde en zakelijke eerste waarde uit voor de
+hele bestaande portfolio, zonder een tweede catalogus of nieuwe architectuur-
+laag. Zij bevat zes ervaringssignaturen als ontwerpvoorstel, concrete bron-
+afwijkingen, drie zakelijke instaproutes, onboarding/pilotdoelen, een
+vergelijkingsprotocol en de terugkoppeling naar P0–P7 en G1–G4. Aanbevolen
+eerste zakelijke doelgroep is horeca/hospitality binnen het bestaande
+netwerk, naast RTG's eigen reisbedrijf als demonstrator. Dit is een te toetsen
+marktkeuze, geen klanten-, omzet- of tijdsgarantie.
+
+**Beslisstatus:** uitgewerkt concept, nog geen nieuw scope- of prijsbesluit.
+De drie productrichtingen zijn gespecificeerd, maar de bestaande acht open
+SCHERMEIGENAAR-oordelen zijn niet als uitgevoerd of toegestaan aangemerkt.
+De voorstellen voor extra productbeloften, gewijzigde signaturen en eventuele
+organisatiepublicatie op Pulse worden pas na expliciete vaststelling in de
+bestaande werkpakket-/contractbronnen verwerkt. De huidige scope-lock blijft
+ongewijzigd. Bouw, menselijke acceptatie, providerkwalificatie en technische
+P0-sluiting worden niet geclaimd.
+
+In deze conceptfase wijzigen uitsluitend deze uitvoeringsbijlage, dit
+programmahoofdstuk en de leeswijzer in DOCUMENTENKAART. Eerdere lokale code-
+en registerwijzigingen uit de P0-fase blijven behouden; geen nieuwe runtime,
+stijl, catalogus, bewijsstatus of deployment is toegevoegd. Alles blijft lokaal.
+
+### Controle van deze conceptoplevering
+
+Op 12 november zijn **167/167 gerichte tests geslaagd**, nul mislukt of
+overgeslagen: 89 planning-/register-/documentinstructietoetsen en 78 bestaande
+Commerce-/Saloon-/poorttoetsen. Uitgevoerde opdrachten:
+
+```sh
+node --test test/rtg-next-programma.test.js test/rtg-next-planning-guards.test.js test/wereldregister.test.js test/schermeigenaar.test.js test/agentinstructies.test.js
+node --test test/commerce-kern.test.js test/commerce-overdracht.test.js test/commerce-retour.test.js test/saloon-projectie.test.js test/saloon-zicht.test.js test/rtg-next-gates.test.js
+node scripts/rtg-next-programma.js --check
+node scripts/experience-coverage.js --check
+git diff --check
+```
+
+Planning en gegenereerd werkboek zijn actueel; de Experience-projectie houdt
+114 apps en 316 schermen in scope. De 30 expliciete server-/script-/public-
+bronverwijzingen in het nieuwe hoofdstuk bestaan. De poorttoetsen bevestigen
+ook dat open besluiten en ontbrekend bewijs blijven blokkeren. Geen generator
+of productmutatie uitgevoerd; de bestaande registraties zijn niet opgewaardeerd.
+
+Deze controle liep op Node v24.18.0 en vervangt geen kwalificatie op de vereiste
+Node 26, browser-/gebruikersproeven, provideracceptatie, marktonderzoek of
+productiecontrole. De nieuwe conceptbeloften zelf zijn niet getest als werkende
+software. De drie product-/consolidatiebesluiten, nieuwe scopedelta en
+operationele afhankelijkheden blijven zichtbaar open tot bevoegde besluitvorming
+en daadwerkelijke uitvoering met bewijs.
+
+## RTG NEXT — definitief intern commercieel besluit van 12 november 2026
+
+Op de expliciete eigenaarsopdracht "Maak het definitief" is `PRIJZEN.md` §9.3
+de vastgestelde beleidsbron voor commissiegrondslag, reisverantwoordelijkheid,
+btw-inrichting, providerkeuze/kostenverdeling en correcties. Beleidsversie,
+inwerkingtreding, bescherming van bestaande rechten en de resterende externe
+bewijsvoorwaarden staan daar; geen tweede prijslijst of contractregister.
+
+De bestaande P0/P3/P4/P6/P7 krijgen gerichte verwijzingen naar dit besluit voor
+scope/migratie, uitvoering, begrijpelijkheid, ketenproeven en vrijgave. Dat is
+een uitvoeringsopdracht, geen bewijs dat de nieuwe regels al zijn afgedwongen.
+De vastgestelde commerciële regels worden bij implementatie gericht in de
+bestaande capability-/acceptatiecontracten verwerkt met een traceerbare scopedelta.
+Deze verwijzingsronde herschrijft de per-capability scope-lock niet en keurt
+geen onbepaalde §8-servicecapaciteit, catalogusuitbreiding of upgrade goed.
+
+Partner-/provideracceptatie, fiscale dossierbeoordeling, toepasselijke
+reisdekking en kandidaatgebonden technische/menselijke kwalificatie blijven
+afzonderlijk aantoonbaar vereist. Geen externe overeenkomst getekend, geen
+runtime- of groene bewijsstatus gewijzigd en geen productieactivering.
+Alle wijzigingen blijven lokaal tot expliciete integratiegoedkeuring.
+
+**Controle van deze vaststelling:** 188 gerichte toetsen geslaagd, 0 mislukt
+in de afsluitende runs: 87 bestaande commerciële/betaaltoetsen, 9
+documentinstructietoetsen en 92 planning-/impact-/poorttoetsen. De
+documentinstructietoets vond eerst drie gewijzigde historische tekstblokken;
+de actualiseringen zijn los daarvan geplaatst en de woordelijke historie is
+hersteld, zonder de controle of inventarishashes af te zwakken.
+
+```sh
+node --test test/commercie.test.js test/claims-btw.test.js test/betaaldienstfee.test.js test/connect-afrekening.test.js test/connect-takken.test.js test/connect-grootboek.test.js test/vrijgave-baseline.test.js
+node --test test/agentinstructies.test.js
+node --test test/rtg-next-programma.test.js test/rtg-next-planning-guards.test.js test/rtg-next-gates.test.js test/rtg-next-release-binding.test.js test/rtg-next-impact.test.js
+node scripts/rtg-next-programma.js --write
+node scripts/rtg-next-programma.js --check
+git diff --check
+```
+
+Het werkboek is uitsluitend opnieuw gegenereerd; scope-lock, acht pakketten,
+vier beslispoorten en `PLANNING_ONLY` zijn behouden. Rekensommen en bronpaden
+in §9.3 zijn gecontroleerd. Getest op Node v24.18.0, niet op de vereiste Node 26;
+geen releasekwalificatie of bewijs dat de nieuwe commerciële keten al werkt.

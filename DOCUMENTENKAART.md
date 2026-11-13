@@ -45,6 +45,15 @@ bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
 de grenzen: een relatie is geen trechter, en er komt geen score op het leven
 tussen mensen.
 
+**Actualisering, 12 november 2026:** `TRAVELCOMMERCE.md` verwijst voor het
+definitieve interne commerciële reisbeleid naar `PRIJZEN.md` §9.3, met eigen
+beleidsversie en inwerkingtredingsvoorwaarden. RTG is verantwoordelijk voor zijn
+eigen aangeboden/samengestelde reizen; zelfstandig elders gekochte reizen en
+documentimport zijn geen RTG-verkoop. De partnercommissie is geen commissie aan
+RTG zelf. De onderstaande meting van september is historisch: samenstelling en
+een betaalmodule bestaan inmiddels, maar hun bestaan bewijst geen externe
+provideracceptatie, pakketreisdekking of verkoopvrijgave.
+
 **`REIZEN.md` is het diepte-document van RTG Reizen** — het Travel OS: niet een
 reisbureau met een boekingssite, maar een wereld die reizen beheert, ook de reis
 die RTG niet verkocht heeft. Het werkwoord daar is **vóór zijn**: opmerken en
@@ -1091,6 +1100,14 @@ bovenkwam: het antwoord van
 `/api/office/payroll/run/open` is een samenvatting zonder stroken, dus wie
 daarin naar loonregels zoekt meet altijd nul.
 
+**Commerciële leesstatus, 12 november 2026:** de twee historische samenvattingen
+van COMMERCIE en PRIJZEN hieronder blijven woordelijk bewaard. Hun universele
+nulcommissie en oude ladderbedragen beschrijven de historische/runtimebasis,
+niet het nieuwe beleid. `PRIJZEN.md` §7 bevat de actuele prijsbesluiten; §9.3
+het definitieve interne commissie-/reisbeleid. De migratie van bestaande
+rechten en uitvoering blijft een afzonderlijke voorwaarde, geen stilzwijgende
+wijziging van die oude afspraken.
+
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
 PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden
@@ -1129,6 +1146,53 @@ staat op één plek, `kern/pasladder.js`; `test/pasladder.test.js` handhaaft de 
 regels die machinaal te handhaven zijn. Paragraaf 4 is de eerlijke lijst open
 gaten — waaronder drie plekken waar de code iets anders doet dan de
 partnervoorwaarden beloven.
+
+**PRIJZEN.md §7** legt op 12 november 2026 het **nieuwe eigenaarsbesluit over
+basisprijzen** voor Travel & Lifestyle vast, met afzonderlijk herkenbare voorstellen
+voor service en voorwaarden. De eerste jaarlooptijd en keuze tussen twaalf
+maandtermijnen of één vooruitbetaling met een halve maand korting zijn gekozen.
+RTG Pass, Business Lite en Business mogen uitbreidbaar zijn; concrete upgrades,
+servicecapaciteit en tarieven staan nog open. Gratis leden moeten als cohort
+zelfstandig winstgevend zijn, zonder subsidie uit betaalde passen. De kostentoets
+behoudt de bestaande 30%-verdeling. Marktankers bewijzen niet dat de gekozen
+bedragen marktconform of rendabel zijn. Maandtermijnen betekenen geen maandelijkse
+opzegbaarheid. De runtime-ladder, contracten en publieke voorwaarden zijn nog
+niet omgezet. Lees de migratieconflicten en verkoopblokkades in §7.8–7.9.
+
+**PRIJZEN.md §8** werkt dezelfde vijf passen uit tot één leden- en
+dienstverleningslus: voorgestelde inbegrepen resultaten, meerwaarde, onboarding,
+toelating, overeenkomst, uitvoering, herstel, afrekening en vertrek. Automatisch
+voorbereiden en verwerken met menselijke besluitmacht; geen opheffing van de
+grens op geld en externe handelingen. Fraudebestendigheid, betekenisvolle
+controle, kostendekking en taakbudgetten zijn aan bestaande eigenaren en P0–P7
+gekoppeld. §8.10 bevat gerichte statische aansluitingsbevindingen, geen volledige
+audit. Serviceprofielen, capaciteit en upgrades zijn nog voorstellen;
+documentatie sluit het ontwerp, niet de software of Deep Green.
+
+**PRIJZEN.md §9** bevat het aanvullende eigenaarsbesluit: ondernemers kunnen
+zonder abonnement Salon gebruiken, producten verkopen en een eigen klantenbestand
+beheren. Eén bestaande gratis toegang met zakelijke context, geen zesde pas.
+Lite verdient €150 ex btw met extra samenhang, werkbesparing en bedrijfsprocessen;
+capaciteit en exacte inclusies zijn nog voorstel. De gratis ondernemer betaalt
+15% commissie over afgesproken verkopen via RTG, ook bij een betaald RTG-lid
+als koper. Betaalde ondernemers betalen 5% bij gratis leden en 0% bij betaalde
+leden binnen de afgesproken dekking. Dit beperkt expliciet de eerdere
+nulcommissiebelofte. §9.3 is op 12 november definitief vastgesteld als intern
+commercieel beleid en legt ook de nettoverkoopgrondslag, uitsluitingen,
+btw-routes, Stripe/Connect-kostenverdeling en retour-/annuleringscorrecties vast.
+De reisuitwerking betreft RTG's eigen aangeboden/samengestelde reizen en eigen
+verantwoordelijkheid; zelfstandig elders gekochte reizen vallen buiten die
+verkoop en afrekening. Geen fictieve commissie aan RTG zelf. De concrete regels
+vervangen geen partneracceptatie, fiscale dossierbeoordeling of geaccepteerde
+providerovereenkomst; §9.3.5 benoemt implementatiegaten, vereiste proeven en
+verantwoordelijke rollen voor nog te verifiëren feiten. Commissie wordt verdiend
+over het aantoonbaar geleverde én betaald ontvangen gedeelte; het fiscale
+factuur-/btw-tijdstip blijft afzonderlijk bepaald. De finalisering keurt geen
+onbepaalde servicecapaciteit of upgrade goed en verandert geen bestaande order.
+Gratis moet zelfstandig
+rendabel zijn, zonder gedwongen conversie of gegevensgevangenis. De huidige
+betaalde partnerpoort en Business-legacyterugval vragen gerichte aanpassing en
+ketenbewijs vóór activering; deze documentatie wijzigt geen runtime-rechten.
 
 **`CONTROLPLANE.md` is het Economic Control Plane** — de laag die vóór iedere
 economische handeling bepaalt of zij mag, en achteraf kan bewijzen waarom. Lees
@@ -2832,11 +2896,34 @@ de broninventaris wordt niet als kwaliteitsclaim gelezen, iedere canonieke
 capability krijgt één contract voor diepte, breedte, inhoud, vormgeving,
 bediening en continuïteit, en de 17 catalogusfamilies plus beheer-, partner-,
 enterprise- en specialistische schermen worden in fasen afgebouwd. Eerst komen
-drie referentie-ervaringen (wereldstart, compact taakscherm en TravelOS in Flow
-en Spatial), daarna de lanceerbare kern, alle families, de ketens tussen apps en
-één gezamenlijke eindkwalificatie. `AFBOUWPROGRAMMA.md` blijft de scopebron en
+twaalf referentie-ervaringen volgens de uitvoeringsaanvulling van 11 november
+2026, daarna de lanceerbare kern, alle families, de ketens tussen apps en
+één gezamenlijke eindkwalificatie. `docs/rtg-next/programma.json` is de
+machineleesbare planningoverlay met P0–P7, architectuur-crosswalk, budgetverwijzingen
+en G1–G4; P0 is de afzonderlijke bouwvoorwaarde. De twee `*-werkpakketten.json`-bestanden voegen per bestaande functie-id
+de voorgenomen delta toe; `docs/rtg-next/werkboek.md` is hun gegenereerde projectie
+met huidige bronnen en acceptatie. Alle 316 schermkoppelingen staan bij hun
+bestaande SCHERMEIGENAAR-record, criteria en budgetten in het bestaande
+Experience-contract. `scripts/rtg-next-programma.js` controleert dekking en
+planningconsistentie; `--gate=G1..G4` leest de bestaande bewijsvoorzieningen en
+weigert ontbrekend bewijs. Planning is nooit productkwaliteit. `AFBOUWPROGRAMMA.md` blijft de scopebron en
 `APPWERKT.json` de bewijsbron; de bijlage is geen tweede register en geeft geen
 livegoedkeuring.
+
+De commerciële aanvulling van 12 november verwijst vanuit AFBOUWPROGRAMMA en
+de bestaande P0/P3/P4/P6/P7 naar het definitieve interne besluit `PRIJZEN.md`
+§9.3. Dit koppelt beleid aan de uitvoering, zonder een nieuwe catalogus,
+prijsbron of bewijsstatus. De per-capability scope-lock blijft ongewijzigd;
+de commerciële ketenproeven moeten nog gericht worden geïmplementeerd en bewezen.
+
+Paragraaf 20 van dezelfde bijlage bevat het op 12 november uitgewerkte
+**product- en marktconcept voor Salon/Pulse, Wereld/Sociaal en Mall/Commerce**:
+zes zelfstandige premiumervaringen, consumentenwaarde, snelle zakelijke eerste
+waarde, brongebonden afwijkingen, migratiegrenzen, pilotdoelen en vergelijkende
+taakproeven. Het is een voorstel voor de volgende expliciete scopedelta, geen
+aanpassing van de bevroren 114 beloften of een verklaring dat de drie open
+product-/consolidatiebesluiten al technisch gesloten zijn. Lees dit vóór
+verdere uitwerking van deze zes producten of zakelijke onboarding.
 
 **`CONSOLIDATIE.md` is het opruimbesluit van de eigenaar** (12 oktober 2026) —
 lees het vóór elke PR. De lanceerbare kern is RTG Pass, TravelOS, WorkOS,

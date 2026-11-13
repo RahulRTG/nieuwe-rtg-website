@@ -2,17 +2,18 @@
  var D=w.RTGPublicContent,P=w.RTGPublicPlatform;
  var node=P.node,icon=P.icon,button=P.button,copy=P.copy,photo=P.photo;
  function init(o){
+  if(o.kind==='app'&&w.RTGPublicMagazine)return w.RTGPublicMagazine(o);
   var kind=o.kind,data=D[kind],company=kind==='company',source=o.source,selected=data.stories[0],controller;
   function select(id,notify){return controller.select(id,notify);}
   function collapse(){return controller.collapse();}
   function menu(){return controller.menu();}
   function refresh(){return controller.refresh();}
-  var header=node('header',null,'rtg-edge-top pp-header'), brand=node('a',null,'rtg-edge-mark pp-brand');brand.textContent='RTG';brand.href='#platform-home';brand.addEventListener('click',function(e){e.preventDefault();collapse();w.scrollTo({top:0,behavior:'instant'});});
+  var header=node('header',null,'ds-brand-lockup-header'), brand=P.brand('#platform-home');brand.addEventListener('click',function(e){e.preventDefault();collapse();w.scrollTo({top:0,behavior:'instant'});});
   var context=button(company?'company':'app',function(){menu();},'pp-context');context.append(icon('next'));
   var searchButton=button(null,function(){collapse();search.focus();search.scrollIntoView({block:'center'});},'pp-icon-button');searchButton.append(icon('search'));searchButton.setAttribute('aria-label',copy('search'));searchButton.dataset.i18nAria='public.search';
   var language=button(null,function(){w.RTGi18n&&w.RTGi18n.openModal();},'pp-icon-button pp-language');language.setAttribute('aria-label',copy('language'));language.dataset.i18nAria='public.language';
   var profile=button(null,function(){o.open(company?'support':'begin');},'pp-icon-button pp-profile');profile.append(icon('people'));profile.setAttribute('aria-label',copy(company?'contact':'profile'));profile.dataset.i18nAria='public.'+(company?'contact':'profile');
-  header.append(brand,context,node('span','tagline','pp-tagline'),searchButton,language,profile);
+  var headerActions=node('div',null,'ds-brand-lockup-header__actions');headerActions.append(context,node('span','tagline','pp-tagline'),searchButton,language,profile);header.append(brand,headerActions);
   var root=node('main',null,'wd-shell pp-shell');root.id='platform-home';
   var greeting=node('header',null,'wd-greeting');greeting.append(node('h1',company?'companyKicker':'welcomeApp'),node('span',company?'subCompany':'subApp','pp-subtitle'),node('p','tagline'));
   var people=node('aside',null,'wd-people'), home=node('section',null,'wd-home pp-home'), favorites=node('aside',null,'wd-favorites'), library=node('section',null,'wd-library');

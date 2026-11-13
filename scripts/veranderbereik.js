@@ -417,6 +417,85 @@ function meet(paden, rondePaden) {
 /* DE OMGEKEERDE VRAAG, en de eigenlijke bedoeling van deze laag: als DIT
    bestand verandert, welke toetsen hebben er dan aantoonbaar iets mee te
    maken -- en, even hard, over hoeveel toetsen zegt dit niets. */
+/* Een aanvullende PLANNINGprojectie, geen derde bewijsas en geen selector.
+   Eigenaarschap maakt directe schermverbanden herleidbaar, maar bewijst niet
+   dat dynamische compositie of een gedeelde bron geen andere schermen raakt.
+   Daarom blijft de mogelijke schermscope altijd de volledige verse inventaris.
+   Ook bij ontbrekende metadata wordt niets uit die conservatieve ring gehaald. */
+function afbouwImpact(bestand, sluiting = new Set([bestand]), options = {}) {
+  const root = options.root || WORTEL;
+  const { resolveOwner, binding, acceptanceSource, sceneFamilies, taskFamilies, riskRank } = require('./lib/experience/qualification-planning');
+  const onzekerheden = ['DYNAMIC_SCREEN_DEPENDENCIES_NOT_PROVEN'];
+  const fouten = [];
+  const lees = (naam, fallback) => {
+    try { return JSON.parse(fs.readFileSync(path.join(root, naam), 'utf8')); }
+    catch (_) { fouten.push('SOURCE_UNREADABLE:' + naam); return fallback; }
+  };
+  const owners = options.owners || lees('SCHERMEIGENAAR.json', {schermen:{},capabilities:{}});
+  const contract = options.contract || lees('experience-architecture/coverage-contract.json', {});
+  const acceptance = acceptanceSource(root);
+  if (acceptance.status !== 'CONTRACT_DEFINED') fouten.push('SPECIFIC_ACCEPTANCE_SOURCE_MISSING');
+  let routes = options.routes;
+  if (!routes) {
+    try { routes = require('./lib/experience/subjects').screenInventory(root).map(s => s.route); }
+    catch (_) { fouten.push('SCREEN_INVENTORY_UNREADABLE'); routes = []; }
+  }
+  routes = [...new Set(routes.map(route => String(route).replace(/^\//, '')))].sort();
+  if (!routes.length) fouten.push('SCREEN_INVENTORY_EMPTY');
+  const normaliseer = name => {
+    const value = String(name).replace(/\\/g, '/');
+    return (path.isAbsolute(value) ? path.relative(root, value) : value).replace(/\\/g, '/').replace(/^\.\//, '');
+  };
+  const bronnen = new Set([bestand, ...sluiting].map(normaliseer));
+  const eigenaren = new Map(routes.map(route => {
+    try { return [route, resolveOwner(owners, route)]; }
+    catch (_) { return [route, {error:'OWNER_REGISTER_INVALID'}]; }
+  }));
+  const direct = new Set(routes.filter(route => bronnen.has('public/' + route)));
+  const canoniek = new Set([...direct].map(route => eigenaren.get(route).canonical).filter(Boolean));
+  for (const [route, owner] of eigenaren) if (canoniek.has(owner.canonical)) direct.add(route);
+  if (!direct.size) onzekerheden.push('NO_DIRECT_SCREEN_MAPPING');
+  const schermen = routes.map(route => {
+    const owner = eigenaren.get(route), record = owners.schermen?.[route];
+    if (owner.error) fouten.push(owner.error + ':' + route);
+    if (!record?.afbouw) fouten.push('DELIVERY_MISSING:' + route);
+    else {
+      const delivery = record.afbouw;
+      const strings = value => Array.isArray(value) && value.every(v => typeof v === 'string' && v.trim()) && new Set(value).size === value.length;
+      if (!strings(delivery.workPackages) || !delivery.workPackages.length || !strings(delivery.workFunctions) ||
+          !strings(delivery.scenarioFamilies) || !delivery.scenarioFamilies.length || !delivery.scenarioFamilies.every(id => taskFamilies.includes(id)) ||
+          !sceneFamilies.includes(delivery.sceneFamily) || !Object.hasOwn(riskRank, delivery.riskClass)) {
+        fouten.push('DELIVERY_INVALID:' + route);
+      }
+    }
+    let eisen = {status:'NOT_DEFINED',criteria:[],scenarios:[],budgets:[],evidenceContracts:[]};
+    try { eisen = binding(contract, record, record?.rol === 'alias' ? 'redirect' : 'interface', acceptance.entries); }
+    catch (_) { fouten.push('DELIVERY_CONTRACT_INVALID:' + route); }
+    if (eisen.status !== 'CONTRACT_DEFINED') fouten.push('REQUIREMENTS_NOT_DEFINED:' + route);
+    const lijst = value => Array.isArray(value) ? [...new Set(value.filter(v => typeof v === 'string'))].sort() : [];
+    return {
+      route: '/' + route, relation: direct.has(route) ? 'direct-owner' : 'conservative',
+      canonicalOwner: owner.canonical || null, capability: owner.capability || null,
+      workPackages: lijst(record?.afbouw?.workPackages), workFunctions: lijst(record?.afbouw?.workFunctions),
+      sceneFamily: record?.afbouw?.sceneFamily || null, riskClass: record?.afbouw?.riskClass || null,
+      scenarioFamilies: lijst(record?.afbouw?.scenarioFamilies), criteria: lijst(eisen.criteria),
+      scenarios: lijst(eisen.scenarios), acceptanceRequirements:lijst(eisen.acceptanceRequirements), budgets: lijst(eisen.budgets), evidenceContracts: lijst(eisen.evidenceContracts),
+      qualification: 'NOT_TESTED'
+    };
+  });
+  const uniek = field => [...new Set(schermen.flatMap(screen => screen[field] || []))].sort();
+  return {
+    status: fouten.length ? 'INCOMPLETE_PLANNING_IMPACT' : 'PLANNING_IMPACT',
+    scope: 'conservative-all', fullRingRequired: true, qualification: 'NOT_TESTED',
+    source: 'SCHERMEIGENAAR.json#schermen.afbouw', requirementsSource: 'experience-architecture/coverage-contract.json#qualificationPlanning',
+    directScreens: [...direct].sort().map(route => '/' + route),
+    possibleScreens: routes.map(route => '/' + route),
+    workPackages: uniek('workPackages'), scenarioFamilies: uniek('scenarioFamilies'),
+    scenarios: uniek('scenarios'), acceptanceRequirements:uniek('acceptanceRequirements'), evidenceContracts: uniek('evidenceContracts'),
+    uncertainties: onzekerheden, errors: [...new Set(fouten)].sort(), screens: schermen
+  };
+}
+
 function raakt(u, bestand) {
   const { omgekeerd, kaart, perToets, statisch } = u._intern;
   const sluiting = afhankelijken(omgekeerd, bestand);
@@ -457,7 +536,8 @@ function raakt(u, bestand) {
     samen: [...samen].sort(),
     /* Dit getal is het hele punt. Zolang het niet nul is, dekt "samen" de vraag
        niet en mag er niets worden overgeslagen. */
-    volleRing: volleRing.length
+    volleRing: volleRing.length,
+    afbouw: afbouwImpact(bestand, sluiting)
   };
 }
 
@@ -598,6 +678,10 @@ function main() {
   const raaktArg = argv.indexOf('--raakt');
   if (raaktArg > -1 && argv[raaktArg + 1]) {
     const r = raakt(u, argv[raaktArg + 1]);
+    if (argv.includes('--json')) {
+      console.log(JSON.stringify(r, null, 1));
+      return 0;
+    }
     console.log('\nRAAKT  ' + r.bestand + '\n');
     console.log('  bestanden in de omgekeerde sluiting  ' + String(r.inSluiting).padStart(5));
     console.log('  toetsen langs de statische as        ' + String(r.langsStatisch.length).padStart(5));
@@ -610,6 +694,11 @@ function main() {
     console.log('  samen                                ' + String(r.samen.length).padStart(5));
     console.log('  ' + K.geel + 'toetsen met een volle ring           ' + String(r.volleRing).padStart(5) +
       K.reset + '   -> hierover zegt dit niets');
+    console.log('  direct herleidbare afbouwschermen    ' + String(r.afbouw.directScreens.length).padStart(5));
+    console.log('  mogelijke schermscope (volle ring)  ' + String(r.afbouw.possibleScreens.length).padStart(5));
+    console.log('  afbouwwerkpakketten                  ' + r.afbouw.workPackages.join(', '));
+    console.log('  afbouwprojectie                     ' + r.afbouw.status + ' — geen uitvoeringsbewijs');
+    if (r.afbouw.errors.length) console.log('  ontbrekende afbouwinformatie         ' + r.afbouw.errors.length);
     console.log('\n  ' + r.samen.slice(0, 25).join('\n  ') + (r.samen.length > 25 ? '\n  ... en ' + (r.samen.length - 25) + ' meer' : ''));
     console.log('');
     return 0;
@@ -690,8 +779,10 @@ function main() {
   return 0;
 }
 
-if (require.main === module) process.exit(main());
-module.exports = { meet, raakt, alleToetsen, afhankelijken, routeKaart,
+// Grote JSON-projecties moeten volledig door stdout kunnen lopen. Een directe
+// process.exit kapt een pipe anders na het eerste bufferblok af.
+if (require.main === module) process.exitCode = main();
+module.exports = { meet, raakt, afbouwImpact, alleToetsen, afhankelijken, routeKaart,
   kennisVan, rondeVan, KENNIS, RONDE,
   /* ook voor scripts/toetsroutes.js: een journaal en een ronde worden op EEN
      plek gelezen, en niet in een tweede parser opnieuw bedacht */

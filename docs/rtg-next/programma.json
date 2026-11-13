@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "status": "PLANNING_ONLY",
+  "title": "RTG NEXT technisch bouw- en kwalificatieprogramma",
+  "baselineCommit": "abd1eafdccd6865631d634d5899676c1c1e7fa68",
+  "baselineDate": "2026-11-11",
+  "scopeAuthority": "AFBOUWPROGRAMMA.md",
+  "scopeSource": "scripts/lib/wereldregister.js",
+  "scopeLock": {"status":"LOCKED","sha256":"913c478168814a2ab98d8659c0dd4df903fdcb8bca4e3b34aeb80d51f8942d9c","authority":"AFBOUWPROGRAMMA.md","policy":"Bevroren 114 canonieke beloften plus premiumdoelen, wijzigingen en specifieke acceptatie-uitkomsten. Een gewijzigde hash vereist een expliciet scopebesluit; nooit automatisch opnieuw vastzetten."},
+  "buildPrecondition": {"id":"P0","scope":"planning-traceability","source":"SCHERMEIGENAAR.json","contract":"experience-architecture/coverage-contract.json","exit":"Alle actuele ingangen en schermen hebben eigenaar, werkpakket, scènefamilie, risicoklasse, acceptatie en bewijsroute; open productbesluiten blijven beperkingen op de betreffende wijziging. Bouwgereed is geen kwalificatie."},
+  "completionSources": ["APPWERKT.json", "EXPERIENCEWERKT.json"],
+  "workPackageFiles": ["docs/rtg-next/living-werkpakketten.json", "docs/rtg-next/overige-werkpakketten.json"],
+  "scopePolicy": "Alle actuele MAPPEN-ingangen krijgen precies één werkpakket. Dit bestand kent geen producten, routes, rechten of releasebewijs toe. Nieuwe productbeloften gaan via AFBOUWPROGRAMMA en bestaande toezegklassen; extern en vraagt-besluit blijven geblokkeerd.",
+  "architectureRules": [
+    {"id":"single-catalog","ownerSource":"scripts/lib/wereldregister.js","enforcementRefs":["test/wereldregister.test.js"],"implementationGap":"De programma-validator vergelijkt exacte dekking. Verboden alternatieve runtimecatalogi blijven onderwerp van de bestaande architectuurpoort."},
+    {"id":"domain-owner","ownerSource":"SCHERMEIGENAAR.json","enforcementRefs":["test/schermeigenaar.test.js"],"implementationGap":"Schermbinding is niet automatisch een domeinschrijfgrens; verbind verboden imports en schrijvers met negatieve architectuurproeven."},
+    {"id":"live-authority","ownerSource":"server/kern/experience/broker.js","enforcementRefs":["test/experience-broker-evidence.test.js"],"implementationGap":"Bewijs intrekking en object-/tenantgrenzen voor iedere nieuwe adapter en samengestelde keten."},
+    {"id":"provider-truth","ownerSource":"server/kern/betaalwaarheid/bewijs.js","enforcementRefs":["test/betaalwaarheid.test.js","test/hospitality-providerbewijs.test.js"],"implementationGap":"Kwalificeer iedere echte provider en callbackvolgorde; een synthetische rail bewijst de externe rail niet."},
+    {"id":"no-inferred-execution","ownerSource":"experience/constitution.json","enforcementRefs":["test/stuur-plan.test.js","test/experience-intent.test.js"],"implementationGap":"Intentie, gevolg en bronfeit blijven onderscheiden; nieuw adapterbereik vraagt live beleids- en uitvoeringstoetsen."},
+    {"id":"candidate-bound-proof","ownerSource":"scripts/lib/experience/evidence.js","enforcementRefs":["test/experience-artifact.test.js","test/experience-execution.test.js"],"implementationGap":"Koppel nieuw impactbereik aan conservatieve ongeldigheid en twee onafhankelijke uitvoeringen; testselectie is geen releasekwalificatie."},
+    {"id":"independent-human-review","ownerSource":"scripts/lib/experience/artifact.js","enforcementRefs":["test/experience-artifact.test.js"],"implementationGap":"human-quality wordt nu BLOCKED. Bouw bevoegde kandidaat-/scope-/artefactgebonden reviewreceipts met onafhankelijkheid, audit en intrekking; behoud weigering van zelf ingevulde reviewers."},
+    {"id":"connection-constitution","ownerSource":"server/kern/connection-policy.js","enforcementRefs":["test/connection-constitution.test.js"],"implementationGap":"De bestaande runtimepolicy blijft eigenaar; deze crosswalk verleent geen rechten."},
+    {"id":"learning-constitution","ownerSource":"server/kern/loop-fabric/constitution.js","enforcementRefs":["test/loop-fabric-constitution.test.js"],"implementationGap":"Bestaande leergrenzen blijven gelden bij iedere adapter; geen tweede leer- of toestemmingseigenaar."},
+    {"id":"public-projection","ownerSource":"scripts/websitewaarheid.js","enforcementRefs":["test/website-truth.test.js","test/website-codeproof.test.js","test/public-platform-owner.test.js"],"implementationGap":"De bestaande generator voedt website-truth; afbouwmetadata bewijst nooit beschikbaarheid of productkwaliteit. Fictieve demo's vereisen afzonderlijk geïsoleerd uitvoeringsbewijs."}
+  ],
+  "packages": [
+    {
+      "id": "P0",
+      "title": "Scope, eigenaarschap en Constitution",
+      "ownerRole": "Integrator met domeineigenaren",
+      "dependsOn": [],
+      "sourceRefs": ["AFBOUWPROGRAMMA.md", "CONSOLIDATIE.md", "SCHERMEIGENAAR.json", "scripts/lib/appcontract.js", "experience/constitution.json", "CONNECTION_CONSTITUTION.json", "scripts/lib/loop-fabric-constitution-policy.js", "PRIJZEN.md"],
+      "changes": ["Verbind bestaande constitutions via verwijzingen naar regels en hun bevoegde eigenaar; verplaats geen autorisatie naar dit programma.", "Maak eigenaarschap en toegestane import-/schrijfgrenzen afdwingbaar met bestaande architectuurcontroles; voeg negatieve mutatietests voor ontbrekende grenzen toe.", "Beslis RTFoundation Winkel, productnamen versus runtimewerelden, gedeelde Geld-presets en de samengestelde reistab; bevries per taak de bestaande belofte en goedgekeurde premiumdelta.", "Leg basiscommit, bronhashes, rollen, doelapparaten, risicoklasse en Experience Budget vast voordat de twaalf referenties worden gebouwd.", "Verbind het definitieve interne commerciële eigenaarsbesluit in PRIJZEN.md §9.3 aan de bestaande scopebesluitvorming en migratie van partnerrechten; houd vereiste externe partner-/provideracceptatie en fiscale dossierbeoordeling afzonderlijk open."],
+      "acceptance": ["Elke canonieke ingang heeft één gekoppeld werkpakket; iedere scherm-/domeineigenaar is herleidbaar of expliciet onbeslist.", "Een geïnjecteerde tweede autorisatiebron, betaalbron of verboden domeinschrijver laat de relevante bestaande architectuurpoort falen.", "Alle nieuwe beloften hebben een expliciet scopebesluit; afgewezen of externe onderdelen worden niet ongemerkt geactiveerd.", "PRIJZEN.md §9.3 is herleidbaar als intern besluit, niet als extern akkoord, gewijzigde runtimebevoegdheid of productbewijs; bestaande ondertekende rechten worden niet stilzwijgend gewijzigd."],
+      "testRefs": ["test/wereldregister.test.js", "test/schermeigenaar.test.js", "test/connection-constitution.test.js", "test/loop-fabric-constitution.test.js"]
+    },
+    {
+      "id": "P1",
+      "title": "Authority, toestemming en Trust Lens",
+      "ownerRole": "Beveiligings- en privacyverantwoordelijke",
+      "dependsOn": ["P0"],
+      "sourceRefs": ["server/kern/connection-consent.js", "server/kern/experience/broker-grenzen.js", "server/kern/experience/broker.js", "server/kern/envelop.js"],
+      "changes": ["Koppel ieder planstaptype aan bestaande live autorisatie, object-/tenantgrens, doelbinding en intrekkingscontrole.", "Projecteer begrijpelijk wie gegevens gebruikt, waarom en hoelang; de projectie bezit geen rechten.", "Hercontroleer identiteit, delegatie, actuele toestemming en bronversie vlak vóór uitvoering; verlopen voorbereiding vereist nieuwe voorbereiding en zo nodig nieuwe bevestiging.", "Voorkom dat gevoelige context, promptinhoud of gezondheidsgegevens standaard in auditlogs, analyse of gedeelde graaf terechtkomen."],
+      "acceptance": ["Intrekking tussen voorbereiden en uitvoeren blokkeert de mutatie en laat nul ongeoorloofde domeineffecten achter.", "Dezelfde taak wordt gekruist met ander account, andere organisatie, onbevoegde rol, verlopen sessie en waar toepasselijk minderjarige; alle ongeoorloofde paden weigeren.", "Een gebruiker kan gegevensdeling begrijpen en intrekken; na intrekking verdwijnen afgeleide zichtrechten en caches volgens het vastgelegde beleid."],
+      "testRefs": ["test/experience-broker-evidence.test.js", "test/experience-platform.test.js"]
+    },
+    {
+      "id": "P2",
+      "title": "Plan Dossier en Consequence Graph",
+      "ownerRole": "Experience Kernel en domeineigenaren",
+      "dependsOn": ["P1"],
+      "sourceRefs": ["server/kern/stuur/plan.js", "server/kern/stuur/gevolgcontract.js", "server/kern/experience/intent-registry.js", "server/kern/experience/broker.js", "server/kern/levensgraaf/graaf.js", "server/kern/personalos/catalog.js"],
+      "changes": ["Maak het dossier een versieerbare projectie van doel, noodzakelijke invoer, taakstappen, domeinverwijzingen, beslissingen en ontvangstbewijzen boven de bestaande plancompiler en broker.", "Voeg alleen ontbrekende typed adapters toe aan het bestaande intentregister; onbekende intenties blijven geweigerd. PersonalOS blijft naar canonieke bestemmingen verwijzen.", "Bereken gevolgen uit geautoriseerde domeinverwijzingen en bestaande gevolgcontracten; toon bevestigd, afgeleid en onbekend afzonderlijk met bron en geldigheidsduur.", "Modelleer herstel als exact herstel, compensatie, geen herstel, niet beproefd of testwereld ontbreekt; invalideer een voorstel wanneer prijs, bronversie, bevoegdheid of gevolg wezenlijk verandert.", "Behandel gedeeltelijk geslaagde ketens als duurzame domeinresultaten met expliciete herstelstappen; claim geen transactie over onafhankelijke externe providers."],
+      "acceptance": ["Een onbekende capability of cyclisch plan wordt vóór uitvoering geweigerd; voorbereiden heeft geen extern effect.", "Herhaald uitvoeren met dezelfde sleutel levert binnen de bewezen scope maximaal één domeinmutatie; onbekende provideruitkomst leidt tot reconciliatie in plaats van blind herhalen.", "Een gewijzigde bron maakt oud akkoord ongeldig; een gebruiker ziet het verschil en bevestigt alleen de nieuwe gevolgen.", "Een verwijderd of ingetrokken graafverband onthult geen onzichtbaar object, titel of bestaan via de gevolgprojectie."],
+      "testRefs": ["test/stuur-plan.test.js", "test/experience-intent.test.js", "test/experience-platform.test.js", "test/personalos-contract.test.js"]
+    },
+    {
+      "id": "P3",
+      "title": "Provider Truth Gateway en reisorkestratie",
+      "ownerRole": "Reis- en betaaldomeineigenaren met operationeel beheer",
+      "dependsOn": ["P2"],
+      "sourceRefs": ["server/kern/reservering/providerbewijs.js", "server/kern/pay/bewijs.js", "server/kern/betaalwaarheid/bewijs.js", "scripts/lib/voltooi/vluchten.js", "scripts/lib/voltooi/reistab.js", "PRIJZEN.md"],
+      "changes": ["Normaliseer providerontvangstbewijzen bij de bestaande adapters zonder een tweede boekings- of geldadministratie.", "Toon aanvraag, beschikbaarheid, reservering, betaalstatus, bevestiging, annulering en terugbetaling afzonderlijk volgens het eigenaarscontract.", "Koppel correlation/idempotency, bronmoment, providerreferentie, voorwaardenversie, retrybeleid en reconciliatie aan de taakstap.", "Laat reisboek, agenda, documenten en Wallet uitsluitend geautoriseerde projecties van bevestigde resultaten tonen; toon partial success en benodigde menselijke opvolging.", "Bouw foutinjectie voor late, dubbele en omgekeerd ontvangen callbacks, verlopen aanbod en gedeeltelijke uitval; kwalificeer echte providers apart van fixtures.", "Werk de in PRIJZEN.md §9.3 intern definitief vastgestelde commissie-, reisrol-, btw-, providerkosten- en correctieregels uit via de bestaande Commercial Core, reisgeldbronnen en Stripe/Connect; geen tweede geld- of orderadministratie."],
+      "acceptance": ["Na een timeout ná provideracceptatie ontstaat bij retry geen tweede boeking of afschrijving; onbekend blijft zichtbaar tot ontvangstbewijs of reconciliatie.", "Prijs-/voorwaardenwijziging vraagt nieuw akkoord. Een reservering met financiële of juridische gevolgen vraagt reeds vóór reserveren bevoegdheid en bevestiging.", "Annulering, restitutie en administratieve correctie zijn afzonderlijk aantoonbaar; een lokaal geannuleerd verzoek heet niet automatisch terugbetaald.", "De toepasselijke uitwerking van PRIJZEN.md §9.3 vereist bronbewijs van de aanvaarde order naar aanspraak en afrekening; commissiecredit, klantrefund, transfer en payout blijven afzonderlijke feiten en ontbrekend vereist bewijs geeft geen betaalclaim."],
+      "testRefs": ["test/hospitality-providerbewijs.test.js", "test/betaal-providerbewijs.test.js", "test/betaalwaarheid.test.js", "test/experience-travel.test.js"]
+    },
+    {
+      "id": "P4",
+      "title": "Experience Signatures en meetbare eenvoud",
+      "ownerRole": "Productontwerp, toegankelijkheid en frontend",
+      "dependsOn": ["P0"],
+      "sourceRefs": ["experience-architecture/signatures.json", "experience-architecture/coverage-contract.json", "experience/travel.json", "public/shared/interface/workspace-composer.js", "scripts/lib/experience/configurations.js", "index.html", "server/middleware/landing.js", "public/site/start/start.js", "scripts/websitewaarheid.js", "public/site/website-truth.json", "PRIJZEN.md"],
+      "changes": [
+        "Ontwerp negen visuele taakfamilies als declaratieve varianten van bestaande DS/composer; behoud vaste oriëntatie, focus, terugkeer en zichtbare hoofdactie.",
+        "Maak per canonieke taak een signature voor doel, compositie, interacties, dichtheid, beweging, toestanden en menselijke taken; werk gedeelde schermen gezamenlijk af.",
+        "Verfijn bestaande effortBudget-declaraties en releasebudgetten met taakprofielen en echte meting van lokale reactietijd, overbodige stappen, informatiebelasting, invoerbehoud en begrijpelijk wachten.",
+        "Laat context alleen relevante elementen prioriteren; bied stabiele navigatie en een toegankelijke handmatige route zonder Rahul.",
+        "Vervang alle actueel ontdekte schermen gefaseerd met bron-/gedragspariteit, featureflags, voor/na-beelden en een geteste terugval; ook beheer-, partner- en specialistische schermen buiten directe MAPPEN-koppelingen.",
+        "Maak Public Projection in de bestaande publieke voordeur: gecontroleerde capabilitycontracten leveren uitleg en beschikbaarheid; herkenbaar fictieve scenario's gebruiken geïsoleerde data en kunnen geen echte effecten uitvoeren.",
+        "Vertaal het definitieve interne besluit in PRIJZEN.md §9.3 naar de bestaande offerte-, akkoord- en afrekenervaring met zichtbare verkoper, grondslag, btw, kosten en retourgevolgen."
+      ],
+      "acceptance": [
+        "Elke referentietaak is met touch, toetsenbord en schermlezer te voltooien; focus en invoer blijven bij hercompositie behouden.",
+        "Iedere vereiste toestand × apparaat × netwerkconfiguratie heeft uitvoeringsbewijs; een signature of screenshot alleen is onvoldoende.",
+        "De vastgelegde taakbudgets en menselijke acceptatie worden gehaald; afwijkingen hebben geen stilzwijgende vrijstelling.",
+        "De gedeelde DS houdt wereldidentiteit en domeineigenaarschap intact; er ontstaat geen tweede shell of losse themalaag.",
+        "De publieke demonstratie deelt geen echte persoonsgegevens, secrets of productiebevoegdheden; ontbrekende providerbeschikbaarheid blijft eerlijk zichtbaar. De landing blijft één bron voor Pages en Node.",
+        "Nieuwe en ervaren gebruikers begrijpen vóór akkoord de toepasselijke rollen en financiële gevolgen uit PRIJZEN.md §9.3; hiervoor is bewijs via de bestaande menselijke Premium Experience-beoordeling vereist."
+      ],
+      "testRefs": ["test/experience-coverage.test.js", "test/experience-configurations.test.js", "test/experience-surface.e2e.js", "test/startpagina.test.js", "test/website-truth.test.js", "test/website-codeproof.test.js", "test/public-platform-owner.test.js"]
+    },
+    {
+      "id": "P5",
+      "title": "Continuity en gecontroleerd hervatten",
+      "ownerRole": "Workspace Runtime met opslag- en beveiligingseigenaren",
+      "dependsOn": ["P2", "P4"],
+      "sourceRefs": ["public/shared/interface/workspace-continuity.js", "public/shared/interface/modules/travel-continuity.js", "server/kern/experience/opslag.js"],
+      "changes": ["Behoud de bestaande lay-outcontinuïteit; ontwerp conceptopslag en taakherstel afzonderlijk per gegevenstype, account en apparaat.", "Voeg alleen voor toegestane concepten versies, conflictweergave, bewaartermijn en expliciete synchronisatiestatus toe; gevoelige inhoud staat standaard niet in browseropslag.", "Scheid lokaal voorbereid van serverontvangen en providerbevestigd; online-effecten blijven wachten op serverautorisatie en herbevestiging waar nodig.", "Hervat na accountwissel, crash, rolintrekking en netwerkherstel vanuit geverifieerde domeinstatus; een overdrachtstoken is kortlevend en geen nieuwe bevoegdheid."],
+      "acceptance": ["Een offline concept wordt nooit als boeking of betaling weergegeven; reconnect veroorzaakt geen dubbel effect.", "Twee apparaten die dezelfde versie wijzigen tonen een conflict of expliciet domeinmergebeleid; er is geen stil verlies door last-write-wins.", "Logout/intrekking verwijdert toegankelijke tijdelijke gevoelige data; een volgend account kan het eerdere dossier niet openen.", "Crash vóór bevestiging, na domeincommit en vóór ontvangst van antwoord heeft telkens een apart bewezen hervatpad."],
+      "testRefs": ["test/workspace-continuity.test.js", "test/experience-travel.e2e.js"]
+    },
+    {
+      "id": "P6",
+      "title": "Proof Engine en Change Impact Simulator",
+      "ownerRole": "Testinfrastructuur en onafhankelijke kwaliteitsbewaking",
+      "dependsOn": ["P0"],
+      "sourceRefs": ["scripts/veranderbereik.js", "AANROEPGRAAF.json", "scripts/lib/appcontract.js", "scripts/appwerkt-vers.js", "scripts/lib/experience/evidence.js", "scripts/lib/experience/execution.js", "scripts/lib/experience/coverage.js", "PRIJZEN.md"],
+      "changes": ["Breid het bestaande veranderbereik uit met capability-, scherm-, rechten-, providercontract- en ketenverwijzingen; rapporteer onzekerheid en niet-geanalyseerde dynamische koppelingen.", "Leid per diff verplichte gerichte tests, menselijke reviews en bewijsonvalidatie af; de selectie vervangt de volledige releasekwalificatie nooit.", "Bewaar kandidaatcommit, instrumentversie, omgeving, fixtureversie, bronhashes, logs en werkelijke waarnemingen per bewijs.", "Voeg negatieve controles toe die gewijzigde bronnen, ontbrekende configuraties, onderbroken processen en hergebruikte logs afwijzen.", "Laat Magnaat adversariële scenario's aanleveren; onafhankelijke instrumenten controleren de uitkomst.", "Koppel bij uitvoering de acceptatiegevallen van het definitieve interne besluit in PRIJZEN.md §9.3 gericht aan bestaande capability- en ketenproeven; deze planningsverwijzing vervangt geen machinegebonden bewijscontract."],
+      "acceptance": ["Gezaaide wijzigingen in toestemming, prijsstatus, gedeelde component en provideradapter verschijnen met hun getroffen schermen/ketens in het impactrapport.", "Een ontbrekend of onzeker graafpad vergroot de testscope conservatief; het levert geen groen bewijs.", "Een wijziging na bewijsuitvoering maakt dat bewijs ongeldig; een oude groene run kan de nieuwe kandidaat niet kwalificeren.", "Alle toepasselijke acceptatiegevallen uit PRIJZEN.md §9.3 vereisen kandidaatgebonden uitvoeringsbewijs; bestaande nulcommissieproeven of gesimuleerde providerinteractie kwalificeren de nieuwe regels of externe betaalinfrastructuur niet."],
+      "testRefs": ["test/veranderbereik.test.js", "test/experience-artifact.test.js", "test/experience-execution.test.js", "test/experience-matrix-coverage.test.js"]
+    },
+    {
+      "id": "P7",
+      "title": "Onafhankelijke premiumacceptatie en release",
+      "ownerRole": "Integrator, onafhankelijke reviewers en eigenaar",
+      "repeatableByGate": ["G1", "G2", "G3", "G4"],
+      "gateAcceptance": {
+        "G1": "Alleen de twaalf referentietaken en hun noodzakelijke ketengrenzen kwalificeren; bevoegde menselijke review en toepasselijk providerbewijs vereist. Geen volledige-catalogusclaim of productie-uitrol.",
+        "G2": "De volledige actuele catalogus met gedeelde schermen, uitzonderingen en integrale ketens kwalificeren na G1; onafhankelijk oordeel over alle toepasselijke beloften.",
+        "G3": "Twee onafhankelijke evidence-builds met dezelfde build-identiteit, commit en bronhash; afzonderlijke technische, beveiligings-, toegankelijkheids-, visuele en menselijke kwalificatie, staging, provider/externe rapporten en herstelproeven.",
+        "G4": "Bestaande productie-status en getekende eigenaar-go/no-go op dezelfde kandidaat, operationele gereedheid en rollback; uitvoering uitsluitend via de bestaande activatiepaden."
+      },
+      "dependsOn": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "sourceRefs": ["AFBOUWPROGRAMMA.md", "BETROUWBAARHEID.md", "PRODUCTION.md", "scripts/productie-status.js", "scripts/lib/productie-vrijgave.js", "scripts/lib/experience/artifact.js", "PRIJZEN.md"],
+      "changes": ["Laat techniek, beveiliging/privacy, toegankelijkheid, visuele kwaliteit en menselijke taakervaring afzonderlijk oordelen over dezelfde kandidaat en scope.", "Registreer reviewer, onafhankelijkheid, onderzochte configuraties, bewijsverwijzingen, bevindingen en expliciet oordeel in de bestaande kwalificatieketen.", "Kwalificeer eerst de twaalf referenties; rol daarna de overige werkpakketten per gedeelde eigenaar/familie uit en herhaal regressie.", "Voer twee onafhankelijke groene runs op dezelfde schone kandidaat uit, plus staging, herstel, rollback en operationele overdracht.", "Laat livegang uitsluitend door de bestaande productiepoort en een afzonderlijk eigenaar-go/no-go verlopen.", "Neem de uitvoerings- en vrijgavevoorwaarden van het definitieve interne besluit in PRIJZEN.md §9.3 mee in de bestaande onafhankelijke acceptatie, zonder externe overeenkomsten of fiscale dossiergoedkeuring uit dit besluit af te leiden."],
+      "acceptance": ["Alle toepasselijke beloften en kwaliteitsvoorwaarden BINNEN DE GEKOZEN POORTSCOPE zijn bewezen; onbekend, verlopen en externe blokkades blijven zichtbaar en blokkeren de toepasselijke acceptatie.", "Geen kritieke open bevindingen binnen die scope; onafhankelijke menselijke en toepasselijke externe beoordelingen hebben herleidbare rapporten.", "De afzonderlijke gateAcceptance is bindend: G1 verlangt twaalf referenties, G2 de volledige catalogus, G3 onafhankelijke kwalificatie en G4 de productievoorwaarden. 100% premium betekent volledige afgesproken acceptatie, niet onfeilbaarheid.", "Voor de toepasselijke scope van PRIJZEN.md §9.3 moeten vereiste partner-/provideracceptatie, fiscale beoordeling, operationele gereedheid en ketenbewijs aantoonbaar zijn; ontbrekende voorwaarden blijven blokkades en het interne besluit is geen G1–G4-goedkeuring."],
+      "testRefs": ["test/rtg-next-gates.test.js", "test/rtg-next-release-binding.test.js", "test/rtg-next-premium-experience.test.js", "test/rtg-next-app-proof-binding.test.js"]
+    }
+  ],
+  "referenceCohort": [
+    {"function":"tab:reizen","purpose":"Reisoriëntatie en geautoriseerde agenda als projectie; behoud de bestaande autoshowroomtaak tot expliciet herplaatsingsbesluit.","failureCases":["vlucht wijzigt na dossierakkoord","andere reiziger krijgt geen ongeautoriseerde agenda"],"requiredOutcome":"Dossier toont bronstatus en gevolgen voor agenda/reisboek; onbevestigde stappen blijven herkenbaar."},
+    {"function":"link:vluchten","purpose":"Providerafhankelijke aanvraag, bevestiging, betaling en verstoring.","failureCases":["provider accepteert maar antwoord raakt kwijt","prijs verandert vóór bevestiging"],"requiredOutcome":"Geen tweede reservering of afschrijving; gewijzigde voorwaarden vragen nieuw akkoord."},
+    {"function":"link:geldcommand","purpose":"Geld als canonieke eigenaar van financiële standen en projecties.","failureCases":["dubbele bevestiging op twee workers","onzekere externe betaaluitkomst"],"requiredOutcome":"Grootboek en ontvangstbewijs verzoenen; saldo/aanvraag/definitieve betaling blijven onderscheiden."},
+    {"function":"link:passkeys","purpose":"Sterke toegang, herstel en toestelintrekking.","failureCases":["laatste bruikbare toegang dreigt te verdwijnen","intrekking tijdens actief plan"],"requiredOutcome":"Geen stil accountverlies; ingetrokken toestel kan geen effect uitvoeren."},
+    {"function":"link:berichten","purpose":"Communicatie met juiste ontvanger, bezorgstatus en privacy.","failureCases":["antwoord ontbreekt na verzenden","ontvangerstoegang ingetrokken"],"requiredOutcome":"Concept/bevestigd verzonden/bezorgd/gelezen volgen werkelijke bronnen; geen ongeoorloofde levering."},
+    {"function":"link:mall","purpose":"Ontdekken tot bestelling en commercieel herstel.","failureCases":["voorraad of prijs verandert","slechts een deel van bestelling bevestigd"],"requiredOutcome":"Voorwaarden en verkoper zichtbaar; deelresultaten en restitutie volgen de domeinbron."},
+    {"function":"link:vandaag","purpose":"Relevantie en rustige dagelijkse regie zonder verborgen acties.","failureCases":["verouderde bron levert verkeerde aanbeveling","gebruiker zet adaptieve voorkeur uit"],"requiredOutcome":"Uitlegbare prioriteit met bronmoment; vaste navigatie en handmatige bediening blijven beschikbaar."},
+    {"function":"link:veilig","purpose":"Veiligheid, sessie-/gegevensgrenzen en begrijpelijk herstel.","failureCases":["verdachte sessie heeft open concept","offline toestel ontvangt intrekking later"],"requiredOutcome":"Geen nieuwe bevoegdheid uit cache; onzekerheid, herauthenticatie en herstelpad zijn zichtbaar."},
+    {"function":"link:office","purpose":"Langdurige documentbewerking, delen en versieconflicten.","failureCases":["twee apparaten wijzigen dezelfde versie","toegang ingetrokken tijdens editorwerk"],"requiredOutcome":"Geen stil invoerverlies; versieconflict en rechtmatige export/deling aantoonbaar."},
+    {"function":"link:decisionroom","purpose":"Menselijke besluitvorming, rollen en twee-persoonsgoedkeuring.","failureCases":["aanvrager probeert eigen besluit goed te keuren","stemmer verliest rol vóór uitvoering"],"requiredOutcome":"Besluit, uitvoering en onderbouwing blijven gescheiden; live rolcontrole voorkomt ongeoorloofde uitvoering."},
+    {"function":"link:horeca","purpose":"Operationele bestelling/reservering met medewerkers, gast en betaalgrens.","failureCases":["laatste capaciteit gelijktijdig aangevraagd","verbinding valt uit na betaling"],"requiredOutcome":"Geen overselling binnen bewezen scope; personeel en gast zien dezelfde bevestigde status."},
+    {"function":"link:foundationzorg","purpose":"Gezinszorg met gescheiden Care- en gezondheidsbronnen.","failureCases":["oudertoestemming wordt ingetrokken","ander gezin vraagt hetzelfde object op"],"requiredOutcome":"Geen gegevenslek; afspraken/betaling en gezondheidskaart behouden eigen eigenaar; Rahul stelt geen medische diagnose."}
+  ],
+  "budgetProfiles": {
+    "browse": {"status":"CONTRACT_REFERENCE","source":"experience-architecture/coverage-contract.json","families":["orientation","public","learning"]},
+    "compose": {"status":"CONTRACT_REFERENCE","source":"experience-architecture/coverage-contract.json","families":["content","travel"]},
+    "transaction": {"status":"CONTRACT_REFERENCE","source":"experience-architecture/coverage-contract.json","families":["transaction","travel"]},
+    "sensitive": {"status":"CONTRACT_REFERENCE","source":"experience-architecture/coverage-contract.json","families":["identity","care","governance"]},
+    "realtime": {"status":"CONTRACT_REFERENCE","source":"experience-architecture/coverage-contract.json","families":["communication","operations"]}
+  },
+  "gates": [
+    {"id":"G1","title":"Twaalf referenties gekwalificeerd","scope":"reference-cohort","dependsOnGates":[],"requires":["P0","P1","P2","P3","P4","P5","P6","P7"],"exit":"Alle twaalf taken op één kandidaat met toepasselijke acht appbewijzen, experiencebewijs, failure/recovery-ketens en onafhankelijk menselijk oordeel; externe effecten alleen binnen gekwalificeerde scope."},
+    {"id":"G2","title":"Volledige premiumafbouw gekwalificeerd","scope":"catalog","dependsOnGates":["G1"],"requires":["P7"],"exit":"Alle actuele MAPPEN-werkpakketten én alle ontdekte schermen uit de bestaande Experience-inventaris voldoen, inclusief beheer-, partner- en specialistische schermen zonder directe appkoppeling; gedeelde patronen en elke specifieke uitzondering opnieuw gemeten. P0-toewijzingen mogen niet onbeslist blijven."},
+    {"id":"G3","title":"Onafhankelijke kwalificatie","scope":"independent-qualification","dependsOnGates":["G2"],"requires":["P7"],"exit":"Twee onafhankelijke groene runs op dezelfde kandidaat, afzonderlijke kwaliteitsdisciplines, operationele repetitie, herstel/rollback en externe rapporten via bestaande bewijsvoorzieningen."},
+    {"id":"G4","title":"Productie vrijgegeven","scope":"production","dependsOnGates":["G3"],"requires":["P7"],"exit":"G3 opnieuw beoordeeld plus bestaande productie-status, getekend eigenaar-go/no-go en geteste terugval voor dezelfde kandidaat. Geen automatische goedkeuring door dit programma."}
+  ]
+}

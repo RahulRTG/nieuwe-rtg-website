@@ -39,9 +39,9 @@
     var plek = kaart.querySelector('[data-app-truth-detail]');
     if (!plek) return;
     var summary = document.createElement('summary');
-    summary.textContent = 'Alle apps in ' + wereld.name;
+    summary.textContent = 'Onderdelen van ' + wereld.name;
     var telling = document.createElement('p');
-    telling.textContent = wereld.featureCount + ' actuele apps, verdeeld over ' + wereld.groupCount + ' appvormen. Deze productkaart komt rechtstreeks uit MAPPEN in de app.';
+    telling.textContent = wereld.featureCount + ' onderdelen in de app-indeling. Bekijk per onderdeel de functie en toegangsgrenzen; een vermelding is geen beschikbaarheidsgarantie.';
     plek.replaceChildren(summary, telling, maakAppgroepen(wereld));
   }
 
@@ -95,7 +95,7 @@
 
   function bindPubliekeWereld(id, wereld) {
     document.querySelectorAll('[data-public-world-facts="' + id + '"]').forEach(function (element) {
-      element.textContent = wereld.featureCount + ' apps · ' + wereld.groupCount + ' appvormen · rechtstreeks uit MAPPEN';
+      element.textContent = wereld.featureCount + ' onderdelen · toegang verschilt per functie';
       var kaart = element.closest('[data-public-widget]');
       if (kaart) kaart.dataset.search = wereld.groups.map(function (groep) {
         return groep.name + ' ' + groep.apps.map(function (app) {
@@ -106,20 +106,19 @@
   }
 
   function bindWereldpagina(wereld) {
-    var kopie = document.querySelector('.world-hero-copy');
+    var kopie = document.querySelector('[data-world-truth-slot]') || document.querySelector('.world-hero-copy');
     if (!kopie || kopie.querySelector('[data-app-truth-panel]')) return;
     var blok = document.createElement('aside');
     blok.className = 'app-truth-panel';
     blok.dataset.appTruthPanel = '';
     var titel = document.createElement('strong');
-    titel.textContent = 'Actueel in ' + wereld.name;
+    titel.textContent = 'Verken ' + wereld.name;
     var tekst = document.createElement('p');
-    tekst.textContent = wereld.featureCount + ' onderdelen in ' + wereld.groupCount + ' appvormen: ' +
-      wereld.groups.map(function (groep) { return groep.name; }).join(', ') + '.';
+    tekst.textContent = 'Bekijk de onderwerpen en hun mogelijkheden. Toegang en beschikbaarheid verschillen per onderdeel.';
     var catalogus = document.createElement('details');
     catalogus.className = 'app-truth-detail app-truth-catalog';
     var samenvatting = document.createElement('summary');
-    samenvatting.textContent = 'Bekijk alle ' + wereld.featureCount + ' apps';
+    samenvatting.textContent = 'Bekijk de ' + wereld.featureCount + ' onderdelen';
     catalogus.append(samenvatting, maakAppgroepen(wereld));
     var link = document.createElement('a');
     link.setAttribute('href', naarApp(wereld.publicRoute));
@@ -129,6 +128,9 @@
   }
 
   function bindPas(element, pas) {
+    // Runtimewaarheid blijft voor bestaande producten. De aangekondigde prijzen
+    // uit PRIJZEN.md §7.3/§9.3 gebruiken data-policy-price/billing, met zichtbare
+    // beschikbaarheidsgrens; publicatie migreert geen contract of factuurtarief.
     zetTekst(element.querySelector('[data-app-truth-pass-name]'), pas.name);
     zetTekst(element.querySelector('[data-app-truth-price]'), pas.priceLabel);
     zetTekst(element.querySelector('[data-app-truth-billing]'), pas.billingNote);

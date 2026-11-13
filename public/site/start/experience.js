@@ -51,9 +51,10 @@
   }
   function renderWorld() {
     d.querySelectorAll('[data-room]').forEach(function (room) { room.hidden = room.dataset.room !== currentWorld; });
+    d.querySelectorAll('.ds-public-world-choices [data-select-world]').forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.selectWorld === currentWorld)); });
     var index = Object.keys(C.WORLDS).indexOf(currentWorld);
     $('worldPosition').textContent = '0' + (index + 1) + ' / 04 ' + C.WORLDS[currentWorld].name;
-    if ($('werelden').getBoundingClientRect().top < innerHeight && $('werelden').getBoundingClientRect().bottom > 0) d.body.dataset.rtgWorld = currentWorld;
+    if (!d.body.classList.contains('ds-magazine-page') && $('werelden').getBoundingClientRect().top < innerHeight && $('werelden').getBoundingClientRect().bottom > 0) d.body.dataset.rtgWorld = currentWorld;
   }
   function permissions() {
     [['calendar', 'allowCalendar'], ['work', 'allowWork'], ['location', 'allowLocation']].forEach(function (row) { C.permission(s, row[0], $(row[1]).checked); });
@@ -97,7 +98,7 @@
   });
   $('confirmExample').addEventListener('click', function () { if (C.proposal(s).conflict) return; s.confirmed = true; renderProposal(); });
   $('accessGoal').addEventListener('change', function () {
-    var messages = { explore: 'Begin met de kosteloze Community of FoundationOS. Vergelijk rustig de mogelijkheden.', personal: 'Voor het persoonlijke platform kunt u de RTG Pass bekijken. FoundationOS blijft ook voor uw gezin 100% gratis.', business: 'Bekijk Business Lite voor een compacte zakelijke basis, of Business voor uw organisatie. Vergelijk de inrichting en afspraken.', service: 'Lifestyle voegt persoonlijke uitvoering toe. Bespreek eerst welke dienstverlening en afspraken bij uw situatie passen.' };
+    var messages = { explore: 'Begin met de kosteloze Community of FoundationOS. Vergelijk rustig de mogelijkheden.', personal: 'De nieuwe RTG Pass heeft een jaarbasis van € 65 per maand inclusief btw. Bekijk de betaalkeuze en beschikbaarheid; u sluit hier niets af.', business: 'Bekijk de gratis zakelijke instap met 15% commissie, Business Lite à € 150 of Business vanaf € 3.500 per maand exclusief btw. De nieuwe formules moeten nog worden vrijgegeven.', service: 'De nieuwe Lifestyle-basis is € 14.000 per maand inclusief btw bij een jaarcontract. Bespreek eerst het serviceprofiel en de menselijke toelating; deze formule is nog niet boekbaar.' };
     $('passSuggestion').textContent = messages[this.value] || messages.explore;
   });
   var touch = null;

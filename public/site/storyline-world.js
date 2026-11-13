@@ -17,6 +17,6 @@
   check.addEventListener('change', function () { C.permission(state, 'calendar', this.checked); render(); });
   w.RTGWorldStory = Object.freeze({
     reset: function () { state = C.state(); C.choose(state, initial); check.checked = true; render(); },
-    proposal: function () { host.scrollIntoView({ behavior: w.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); root.querySelector('select').focus({ preventScroll: true }); }
+    proposal: function () { var detail=host.closest('details');while(detail){detail.open=true;detail=detail.parentElement.closest('details');}host.scrollIntoView({ behavior: w.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); root.querySelector('select').focus({ preventScroll: true }); }
   });
 }(window, document));

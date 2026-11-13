@@ -26,6 +26,9 @@ const stappen = [
   ['Sentinel-procesgrens', process.execPath, ['--test', 'test/sentinel.test.js']],
   ['Rust-migratieregister', process.execPath, ['scripts/rust-migraties.js', '--controle']],
   ['Bron- en securityregels', process.execPath, ['scripts/check.js']],
+  // Een sluitende planning is een bouwvoorwaarde; deze stap claimt geen
+  // productkwalificatie. Hetzelfde bestaande programma levert de projectie.
+  ['RTG NEXT-planning', process.execPath, ['scripts/rtg-next-programma.js', '--check']],
   /* De tijdelijke accountsgrendel is alleen betrouwbaar als iedere lokale
      users/staff-write aantoonbaar door die gevel loopt. */
   ['Accountschrijfgrens', process.execPath, ['scripts/accountschrijvers.js']],
@@ -59,9 +62,16 @@ const stappen = [
    met haar eigen naam zakt en niet verdwijnt tussen twintig andere blokkades.
    In de releaseconfiguratie (NODE_ENV=production): de lokale sandbox bestaat
    daar niet, en een stand die niemand zette is dicht. */
-if (process.argv.includes('--productie')) stappen.splice(9, 0,
-  ['Vrijgavebaseline V1', process.execPath, ['scripts/vrijgave-stand.js', '--controle']],
-  ['Productieconfiguratie en papierwerk', process.execPath, ['scripts/golive.js']]);
+if (process.argv.includes('--productie')) {
+  stappen.splice(stappen.findIndex(([naam]) => naam === 'Mutatiecontracten'), 0,
+    ['Vrijgavebaseline V1', process.execPath, ['scripts/vrijgave-stand.js', '--controle']],
+    ['Productieconfiguratie en papierwerk', process.execPath, ['scripts/golive.js']]);
+  // G3 controleert G1 en G2 opnieuw, vóór er nieuw releasebewijs ontstaat.
+  // G4 hoort bij daadwerkelijke activatie: deze poort kan haar eigen nog te
+  // maken productie-/promotiebewijs niet als voorwaarde consumeren.
+  stappen.splice(stappen.findIndex(([naam]) => naam === 'Releasebewijs maken'), 0,
+    ['RTG NEXT-onafhankelijke kwalificatie', process.execPath, ['scripts/rtg-next-programma.js', '--gate=G3']]);
+}
 
 const controles = [];
 for (const [naam, commando, args] of stappen) {

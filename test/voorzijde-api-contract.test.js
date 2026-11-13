@@ -65,14 +65,15 @@ function experienceScherm(verwerk, token = 'lid-a') {
 function experienceBeeld(titel = 'Vlucht om 19:30') {
   return { currentWorld: 'travel', currentContext: { id: 'persoonlijk' },
     contexts: [{ id: 'persoonlijk', label: 'Persoonlijk' }], manifests: { travel: { name: 'Reizen' } },
-    projection: { attention: [{ id: 'aandacht-1', title: titel, lifecycle: 'OPEN', severity: 'INFO' }],
+    projection: { attention: [{ id: 'aandacht-1', revision: 'rev-' + titel, title: titel, lifecycle: 'OPEN', severity: 'INFO' }],
       attentionSummary: { open: 1 }, completeness: { status: 'COMPLETE' }, provenance: { sources: ['reis'] } } };
 }
 function experienceAntwoord(call, calls, execute, bootstrap = () => experienceBeeld()) {
   if (call.route === 'bootstrap') return { body: bootstrap() };
   if (call.route === 'evidence') return { body: { evidence: [] } };
   if (call.route === 'intent/preview') return { body: { preview: {
-    id: 'preview-' + calls.filter(c => c.route === 'intent/preview').length } } };
+    id: 'preview-' + calls.filter(c => c.route === 'intent/preview').length,
+    parameters: { attentionRevision: bootstrap().projection.attention[0].revision } } } };
   assert.equal(call.route, 'intent/execute'); return execute(call);
 }
 test('Experience: serverstatus en foutcode blijven beschikbaar voor gericht herstel', async () => {
@@ -114,6 +115,32 @@ test('Experience: verdwenen aandacht vóór preview vernieuwt zonder uitvoering'
   assert.equal(s.calls.filter(c => c.route === 'bootstrap').length, 2);
   assert.equal(s.calls.filter(c => c.route === 'intent/execute').length, 0);
   assert.match(s.vind('xp-flash').textContent, /gewijzigd/);
+});
+test('Experience: bronwijziging tussen getoond beeld en preview vraagt eerst een nieuw beeld', async () => {
+  let gewijzigd = false, uitvoeringen = 0;
+  const s = experienceScherm((call, calls) => {
+    if (call.route === 'intent/preview') gewijzigd = true;
+    return experienceAntwoord(call, calls, () => { uitvoeringen++; return { body: { ok: true } }; },
+      () => experienceBeeld(gewijzigd ? 'Vlucht om 17:00' : 'Vlucht om 19:30'));
+  });
+  await s.open(); await s.klik();
+  assert.equal(s.api.bootstrap().projection.attention[0].title, 'Vlucht om 17:00');
+  assert.equal(s.vind('xp-action').textContent, 'Gezien', 'de ongelezen revisie is geen bevestigbare preview');
+  assert.equal(uitvoeringen, 0);
+  await s.klik();
+  assert.equal(s.vind('xp-action').textContent, 'Bevestig gezien');
+  assert.equal(uitvoeringen, 0);
+  await s.klik();
+  assert.equal(uitvoeringen, 1);
+  assert.equal(s.calls.find(c => c.route === 'intent/execute').body.previewId, 'preview-2');
+});
+test('Experience: preview zonder bronrevisie kan geen gezien bevestigen', async () => {
+  const s = experienceScherm((call, calls) => call.route === 'intent/preview'
+    ? { body: { preview: { id: 'oud-protocol', parameters: {} } } }
+    : experienceAntwoord(call, calls, () => { throw new Error('mag niet uitvoeren'); }));
+  await s.open(); await s.klik(); await s.klik();
+  assert.equal(s.calls.filter(c => c.route === 'intent/execute').length, 0);
+  assert.equal(s.vind('xp-action').textContent, 'Gezien');
 });
 test('Experience: na mislukte bronvernieuwing mag de oude getoonde aandacht geen nieuwe preview krijgen', async () => {
   let gewijzigd = false, herladen = 0;

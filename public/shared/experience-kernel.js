@@ -107,6 +107,9 @@
       tekenDialog();
     });
   }
+  function aandachtGewijzigd(knop) {
+    state.pending = null; state.staleAttention = true; return vernieuwAandacht(knop);
+  }
   function bevestig(a, knop) {
     if (state.staleAttention) { vernieuwAandacht(knop); return; }
     if (!state.pending || state.pending.attentionId !== a.id) {
@@ -115,12 +118,12 @@
         contextId: state.bootstrap.currentContext.id,
         parameters: { world: state.bootstrap.currentWorld, attentionId: a.id }
       }).then(function (r) {
+        if (!a.revision || (r.preview.parameters || {}).attentionRevision !== a.revision)
+          return aandachtGewijzigd(knop);
         state.pending = { attentionId: a.id, previewId: r.preview.id, idem: idem() };
         knop.disabled = false; knop.dataset.confirm = '1'; knop.textContent = 'Bevestig gezien';
       }).catch(function (e) {
-        if (e.code === 'STALE_ATTENTION') {
-          state.pending = null; state.staleAttention = true; return vernieuwAandacht(knop);
-        }
+        if (e.code === 'STALE_ATTENTION') return aandachtGewijzigd(knop);
         knop.disabled = false; knop.textContent = e.message;
       });
       return;
@@ -131,10 +134,7 @@
       idempotencyKey: pending.idem, confirmed: true }).then(function () {
       state.pending = null; return laad(state.bootstrap.currentContext.id);
     }).then(function () { tekenDialog(); }).catch(function (e) {
-      if (e.code === 'STALE_ATTENTION' && state.pending === pending) {
-        state.pending = null; state.staleAttention = true;
-        return vernieuwAandacht(knop);
-      }
+      if (e.code === 'STALE_ATTENTION' && state.pending === pending) return aandachtGewijzigd(knop);
       knop.disabled = false; knop.textContent = e.message;
     });
   }

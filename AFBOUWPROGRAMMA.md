@@ -7840,7 +7840,9 @@ inhoud. Gezien, evidence en idempotentieresultaat worden samen gefinaliseerd
 na foutgevoelige voorbereiding. De synchrone eindcontrole bewaakt ook twee
 gelijktijdige previews; save-bundeling wordt niet als mutex voorgesteld.
 De app herstelt een expliciet `STALE_ATTENTION` met een verse projectie
-en nieuw menselijk akkoord; bij een onzekere netwerkuitkomst blijft de bestaande
+en nieuw menselijk akkoord. Ook een bronwijziging tussen het getoonde beeld en
+de eerste preview vraagt eerst een nieuw beeld; een preview zonder dezelfde
+bronrevisie wordt niet bevestigbaar. Bij een onzekere netwerkuitkomst blijft de bestaande
 herhaalsleutel behouden. Dit is geen voltooide PlanDossier-implementatie en geen
 provider-, boekings- of betaalbevestiging.
 

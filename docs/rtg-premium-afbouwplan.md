@@ -731,6 +731,11 @@ blijven ongewijzigd. Dit commando is geen deploymentopdracht.
 
 ## 20. RTG NEXT — aantrekkingskracht en snelle zakelijke waarde
 
+**Actuele eigenaarskeuze, 13 november 2026:** de drie paren worden elk één
+ervaring. Dit vervangt het onderstaande advies om zes aparte ervaringen te
+behouden, niet de behoudslijst of de veiligheidsgrenzen. §20.13 legt de
+overgang vast; de oorspronkelijke broninspectie blijft herkenbaar staan.
+
 **Uitgewerkt productconcept, 12 november 2026.** Gebaseerd op het voorstel van
 de eigenaar en een nieuwe broninspectie van de zes betrokken capabilities.
 Dit hoofdstuk specificeert de aanbevolen keuzes; het is geen stilzwijgende
@@ -1196,3 +1201,111 @@ Per nieuw stuk runtime volgen gerichte tests op geïsoleerde
 fixtures. Brede generators, providerproeven, staging en productiecommando's
 worden uitsluitend binnen hun afzonderlijke bouw- en kwalificatieopdracht
 uitgevoerd. De Node-versie voor dat traject volgt `.nvmrc` (26).
+
+### 20.13 Eigenaarsbesluit: drie gezamenlijke ervaringen
+
+Op 13 november 2026 koos de eigenaar expliciet: **“Per paar samenvoegen:
+drie ervaringen, met een extra migratie- en ontwerptraject om bestaande
+functies en gegevens zorgvuldig over te zetten.”** Dit vervangt het eerdere
+advies van zes afzonderlijke ervaringen in §20.2, §20.3 en §20.11. De
+onderzochte functies en productgrenzen uit die paragrafen blijven behouden.
+
+| Gezamenlijke ervaring | Te behouden routes binnen de ervaring | Bestaande bron blijft eigenaar |
+|---|---|---|
+| Salon / Pulse | Beeldverhalen, korte gesprekken, reageren, volgen, bewaren, kringen, moderatie; privé Dagstemming en Mijn week | Bestaande publicatie-, media-, relatie- en moderatie-eigenaars totdat een afzonderlijk geteste schrijfmigratie is uitgevoerd. Een besloten Salon-bericht wordt niet openbaar door deze samenvoeging. |
+| Wereld / Sociaal | Persoonlijk overzicht, bronkeuze, publiceren, profielprivacy, kringen, ontmoeten en bevestigde plannen | PersonalOS, bestaande Wereld-voorkeuren, Salon, sociale relaties en Command; geen nieuwe sociale database of werkgeversinzage in privécontext. |
+| Mall / Commerce | Ontdekken, vergelijken, apps, lijsten, mand, controle, overdracht, orderstatus en nazorg | Mall/Commerce voor hun bestaande eigen objecten; productdomeinen voor aanbod en orders; Pay/provider voor betalingsuitkomst. |
+
+Dit zijn werktitels voor de drie composities, geen besluit over nieuwe merknamen.
+De zes bestaande capability-id's blijven traceerbaar. De 114 bevroren
+capabilitybeloften en hun acceptatiecriteria worden niet verkleind omdat de
+gebruiker minder losse ingangen krijgt. Een presentatie kan twee capabilities
+ontsluiten zonder hun bevoegdheden, gegevens of bewijs gelijk te stellen.
+
+**Migratievolgorde per paar:**
+
+1. Leg de bestaande taken, endpoints, objectschrijvers, doelgroepen en privacy-
+   grenzen vast. Elke taak krijgt een bestemming in de gezamenlijke ervaring;
+   geen omleiding zolang een bestaande taak onbereikbaar zou worden.
+2. Bouw de gezamenlijke compositie boven de bestaande eigenaars. Oude links
+   blijven werken. Selectie van een stand neemt doel/context mee, niet extra
+   rechten. Geen automatische kruispublicatie of wijziging van publiek.
+3. Alleen waar objecten werkelijk dubbel zijn: bepaal het canonieke schema en
+   de schrijver, behoud oude ids via expliciete mapping en voer een geïsoleerde
+   migratieproef met herhaling, uitval en vergelijking uit. Geen productie-
+   backfill als bijwerking van een pagina laden.
+4. Toets behoud, account/tenant-isolatie, leeftijd, blokkades, intrekking,
+   media, tellingen en herstel. Toets order-/betaalstatus bij hun bron; een
+   onbekende externe uitkomst blijft onbekend. Rollback mag geen intrekking,
+   verwijdering of nieuw domeinresultaat ongedaan maken.
+5. Leid oude ingangen pas om na de geslaagde behouds- en migratieproeven en
+   een passende vormgevings-/gebruikstoets op mobiel en desktop. De bestaande
+   G1–G4- en productievoorwaarden blijven gelden.
+
+`SCHERMEIGENAAR.oordelen` legt de keuze vast maar houdt de drie uitvoerings-
+oordelen op `open`. De vijf andere componentconsolidaties blijven eveneens
+open. Dit besluit is geen voltooide migratie, nieuwe scope-lock, externe
+toestemming of opdracht om de huidige productiebackend te vervangen.
+
+### 20.14 Minder apps en schermen; volledige taken behouden
+
+De aanvullende eigenaarsopdracht van 13 november trekt de consolidatie door
+naar heel NEXT. Het doel is **zo weinig zelfstandige apps en schermovergangen
+als de volledige taken verantwoord toelaten**. Niet het minste aantal
+mogelijkheden, niet uitsluitend een kleiner menu en niet één overvol scherm.
+
+De huidige 114 capabilities zijn de te behouden functionele baseline, geen
+minimum voor 114 zichtbare apps. Het huidige schermbestand is evenmin een
+doelaantal. Een app heeft één helder gebruikersdoel met brede samenhangende
+mogelijkheden en verdieping. Een aparte pagina blijft alleen waar een taak,
+rol, veiligheid of informatiedichtheid dat rechtvaardigt; anders hoort de
+bediening als stand, tab, detail of stap bij de bestaande eigenaar.
+
+Per consolidatiecluster legt het bestaande werkpakket vast:
+
+- welke volledige taken en gegevens nu bestaan en waar ze straks terechtkomen;
+- welke app de gezamenlijke ervaring wordt en welke domeinen blijven schrijven;
+- welke oude ingangen compatibele verwijzingen worden, met behoud van context;
+- hoe leeftijd, privé/werk, actor/tenant en toestemming gescheiden blijven;
+- hoe behoud, herhaling, uitval, intrekking en rollback worden getest;
+- hoe een gebruiker de brede én diepe mogelijkheden vindt zonder onnodige
+  appwissels, herinvoer of een verplicht gesprek met Rahul.
+
+Pas na bewezen overname worden canonieke app-/schermregistraties aangepast.
+De bewijsrapportage toont de mapping van oude taken naar nieuwe eigenaars;
+een kleinere inventaris wordt nooit gebruikt om ongekwalificeerde taken te
+laten verdwijnen. De drie paren uit §20.13 zijn de eerste clusters. Er is nog
+geen doelgetal vastgesteld en niet ieder technisch domein hoeft een losse
+zichtbare app te zijn. De huidige scope-lock wordt niet automatisch herrekend.
+
+### 20.15 Eén magazine-ervaring voor website en apps
+
+De eigenaarsaanvulling van 13 november gebruikt de www.-website als visuele
+basis voor NEXT: fotografisch, redactioneel, slim bladeren, clean en quotes.
+Dit is de vormtaal van de geconsolideerde producten, niet uitsluitend een
+nieuwe openingspagina vóór de oude schermen.
+
+- **Binnenkomen:** een herkenbaar hoofdstuk met beeld, korte kop en de relevante
+  actuele informatie. Geen lange uitleg of kunstmatige urgentie.
+- **Bladeren:** horizontaal tussen betekenisvolle hoofdstukken/standen. Een
+  paginawissel bewaart context en concept; zij bevestigt of publiceert niets.
+  Vooruit/terug werkt ook zonder swipe. Geen eindeloze feed als standaard.
+- **Verdiepen:** een beeld, verhaal, gegeven of actie opent zijn echte detail-
+  of taakweergave. Langere inhoud mag daar verticaal leesbaar zijn. Niet ieder
+  onderdeel krijgt een losse app of onnodige nieuwe pagina.
+- **Handelen:** formulieren, tabellen, gevolgen en bevestigingen blijven rustig
+  en exact. Prijs, rechten, fouten en onzekere status zijn niet verstopt achter
+  een foto. Foto's en quotes geven betekenis waar zij inhoudelijk passen.
+- **Bedienen:** de gedeelde Edge blijft standaard dicht en transparant in rust;
+  geen extra permanente headers/footers. Contextuele bediening blijft bereikbaar
+  met toegankelijk benoemde iconen, toetsenbord en schermlezer.
+- **Desktop:** redactionele spreads met naast elkaar passende informatie en
+  handelingen; geen uitgerekte mobiele pagina. Mobiel krijgt een heldere
+  taakvolgorde, veilige klikdoelen en respect voor toestelranden en toetsenbord.
+
+Gebruik bestaande goedgekeurde merk-/kunstassets en rechtmatig beschikbaar
+beeld. Citaten moeten herleidbaar en toegestaan zijn; geen verzonnen
+interviews of automatische openbaarmaking van persoonlijke inhoud. De
+canonieke DS, Heritage-geometrie, fonts en kleurregels blijven van toepassing.
+De menselijke kwaliteitstoets beoordeelt naast schoonheid ook vindbaarheid,
+leesbaarheid, volledige taakvoltooiing, contextbehoud en herstel.

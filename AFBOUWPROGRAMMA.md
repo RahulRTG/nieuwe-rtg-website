@@ -7861,3 +7861,86 @@ integrale APPWERKT-, browser-, menselijke of productiekwalificatie. Geen
 completion-register, providerconfiguratie, productiedatabase of vrijgavebesluit
 is opgewaardeerd. De afbouw van de overige referentietaken en kwalificatiepoorten
 blijft vereist.
+
+## RTG NEXT — drie gezamenlijke ervaringen, 13 november 2026
+
+De eigenaar kiest expliciet: **“Per paar samenvoegen: drie ervaringen, met een
+extra migratie- en ontwerptraject om bestaande functies en gegevens zorgvuldig
+over te zetten.”** Dit betreft Salon/Pulse, Wereld/Sociaal en Mall/Commerce.
+Het vervangt het eerdere advies voor zes zelfstandige productervaringen in
+het premium-afbouwplan §20; de actuele uitvoering staat in §20.13.
+
+De gezamenlijke presentatie behoudt alle bestaande functies, gegevens en
+traceerbare capability-id's. Leeftijd, publiek, blokkade, actor, organisatie en
+domeinbevoegdheid blijven afzonderlijke grenzen. Geen automatische
+kruispublicatie, bredere inzage, dubbele order- of betaalwaarheid. Bestaande
+ingangen blijven werken tot een geteste gezamenlijke route hun taken
+overneemt. Een eventuele schema-/schrijfmigratie vraagt expliciete mapping,
+geïsoleerde migratie- en herstelproeven en controle op intrekking/verwijdering.
+
+De drie productkeuzes zijn hiermee gemaakt; de drie technische consolidaties
+zijn niet voltooid verklaard. `SCHERMEIGENAAR.oordelen` houdt hun stand op
+`open` en vermeldt de gekozen richting. De vijf overige open consolidaties,
+114 capabilitybeloften, scope-lock en G1–G4-bewijsgrenzen blijven intact.
+Dit besluit verleent geen providerrecht of productieautorisatie. De bestaande
+backend blijft live terwijl NEXT afzonderlijk wordt afgebouwd en getoetst.
+
+## RTG NEXT — portfolio consolideren, 13 november 2026
+
+Aanvullende opdracht van de eigenaar: **“Ik wil ook dat next de apps en
+schermen consolideert. Alles moet naar minimaal, clean en volledige, brede
+en diepe apps/functies.”** Dit geldt voor het gehele portfolio, niet alleen
+de drie hierboven gekozen paren.
+
+Doel is minder zelfstandige gebruikersproducten en minder onnodige scherm-
+overgangen, met volledige taken en verdieping binnen de juiste app. Alleen
+menu-items verbergen of oude schermen in een nieuwe omhulling plaatsen is
+geen consolidatie. Ook niet: elke functie op één dicht scherm proppen.
+Een aparte app of scherm heeft een aantoonbaar eigen gebruikersdoel; anders
+wordt het een stand, tab, detail of stap binnen de eigenaar van die taak.
+
+De huidige capabilitybeloften vormen de behoudslijst, niet een minimumaantal
+apps, schermen of tegels. Iedere bestaande taak krijgt een traceerbare
+bestemming en behoudt gegevens, rechten en relevante historie. Canonieke
+catalogus-/schermtellingen mogen pas dalen wanneer de overname en oude links
+zijn getest. Rapporteer dan het oude bereik én de nieuwe bestemming, zodat
+een kleiner aantal schermen nooit een kleinere kwaliteitsverplichting maskeert.
+Geen nieuw vast streefaantal zonder inhoudelijke inventarisatie.
+
+Per cluster worden gebruikersdoel, bestaande taken, bron-/schrijfeigenaars,
+doelcompositie, migratie, terugval en behoudsproeven uitgewerkt in de bestaande
+NEXT-werkpakketten en SCHERMEIGENAAR, niet in een tweede appcatalogus. Menselijke
+kwaliteit wordt ook getoetst op vindbaarheid, taakvoltooiing en benodigde
+overgangen; minder klikken alleen bewijst geen verbetering. De drie gekozen
+paren zijn het begin. Andere samenvoegingen vragen een concrete afweging van
+doelgroepen en bevoegdheden; gegevens of functies worden niet alvast gewist.
+
+Dit is een productrichting en bouwopdracht, geen voltooiings- of
+productievrijgave. De bestaande backend blijft behouden tot de afzonderlijke
+releasevoorwaarden voor een vervanging zijn vervuld.
+
+## RTG NEXT — website als magazinebasis voor apps, 13 november 2026
+
+De eigenaar vult de consolidatieopdracht aan: **“de schermen moeten lijken
+op de www. Website. Als een magazine. Slimme swipe dingen. Clean etc etc.
+Fotografisch, quotes”**. De bestaande RTG-website is de visuele basis voor
+de gezamenlijke apps: redactionele composities, fotografie tot aan de rand,
+geverfde merkbeelden, Bodoni/Inter, korte tekst en herleidbare citaten.
+Geen nieuwe merkidentiteit of parallel ontwerpsysteem.
+
+Horizontaal bladeren verbindt begrijpelijke hoofdstukken of taakstanden;
+verdieping opent doelgericht en mag waar nodig verticaal leesbaar zijn.
+Verschillende swipes hebben herkenbare betekenis en zichtbare alternatieven
+voor toetsenbord, schermlezer en mensen die niet kunnen vegen. De Edge blijft
+het gedeelde bedieningspunt, standaard gesloten en transparant in rust.
+Geen terugkeer van volle boven-/onderbalken of losse menusystemen per app.
+
+De magazinevorm is een werkende app en geen stapel artikelcovers. Bij
+zoekresultaten, gegevens, formulieren, rechten, prijzen, planning en akkoord
+blijft de functionele hiërarchie leidend: egale leesbare vlakken, expliciete
+bediening en een duidelijke terugweg. Geen foto of quote die kritieke
+informatie of een onvoltooide handeling verdringt. Citaten worden niet
+verzonnen en beeldrechten/publieksgrenzen blijven gelden; privébeelden worden
+niet automatisch campagnebeeld. Mobiel en desktop delen de taal, niet een
+geforceerd identieke indeling. Uitwerking binnen de bestaande DS/Heritage-
+componenten en de NEXT-kwalificatie, zonder bestaande functies te schrappen.

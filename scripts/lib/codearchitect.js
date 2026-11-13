@@ -423,6 +423,8 @@ function waarom(lezer, onderwerp) {
 const TAAKKLASSEN = {
   'toets-toevoegen': { eist: ['onderwerp', 'toetsen'],
     waarom: 'een toets toevoegen vraagt waar het ding staat en welke toetsen er al naar kijken' },
+  'scherm-wijzigen': { eist: ['onderwerp', 'toetsen'],
+    waarom: 'een schermwijziging vraagt het scherm en zijn toetsen; de Proof Envelope mag ontbrekende toetscontext alleen aanvullen met deterministisch gevonden bron- en regressierelaties' },
   'code-wijzigen': { eist: ['onderwerp', 'wetten', 'grenzen', 'toetsen'],
     waarom: 'code wijzigen vraagt ook welke wetten er gelden en wat het domein mag' },
   'geldregel-wijzigen': { eist: ['onderwerp', 'wettenGenoemd', 'grenzen', 'toetsenWaargenomen', 'vers'],

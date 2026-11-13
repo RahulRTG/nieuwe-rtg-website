@@ -27,8 +27,16 @@ module.exports = () => {
   }
   function pagina(rijen, dicht) {
     const tekst = rijen.map(r => r.tekst);
-    return { nummers: rijen.map(r => r.nr), refs: rijen.find(r => r.refs)?.refs || new Map(), ...(dicht
-      ? { bytes: deflateRawSync('[' + tekst.join(',') + ']') } : { tekst }) };
+    let inhoud = { tekst };
+    if (dicht) {
+      const geperst = deflateRawSync('[' + tekst.join(',') + ']');
+      // zlib kan een kleine view op een grote werkbuffer teruggeven. De
+      // snapshot bewaart alleen de inhoud, niet die ongebruikte capaciteit.
+      const bytes = Buffer.alloc(geperst.length);
+      geperst.copy(bytes);
+      inhoud = { bytes };
+    }
+    return { nummers: rijen.map(r => r.nr), refs: rijen.find(r => r.refs)?.refs || new Map(), ...inhoud };
   }
   function volgende(oud, nieuw, minimum) {
     if (minimum === null) { oud = null; nieuw = []; }

@@ -344,7 +344,7 @@
       "hex": 18
     },
     "public/shared/rtg-editorial-v4.css": {
-      "bytes": 117576,
+      "bytes": 117228,
       "important": 1076,
       "hex": 213
     },
@@ -474,7 +474,7 @@
       "hex": 21
     },
     "public/shared/rtg-media-2026.css": {
-      "bytes": 10029,
+      "bytes": 9992,
       "important": 15,
       "hex": 21
     },
@@ -549,7 +549,7 @@
       "hex": 70
     },
     "public/shared/rtg-veilig-2026.css": {
-      "bytes": 10226,
+      "bytes": 10225,
       "important": 4,
       "hex": 44
     },
@@ -569,7 +569,7 @@
       "hex": 27
     },
     "public/shared/rtg-world-desktop.css": {
-      "bytes": 12769,
+      "bytes": 12752,
       "important": 58,
       "hex": 0
     },
@@ -812,7 +812,7 @@
   "blokken": {
     "public/apps/app.html": {
       "blokken": 2,
-      "bytes": 129154,
+      "bytes": 129137,
       "important": 5,
       "hex": 200
     },
@@ -1706,7 +1706,7 @@
     },
     "public/apps/merken.html": {
       "blokken": 2,
-      "bytes": 2788,
+      "bytes": 2784,
       "important": 0,
       "hex": 7
     },
@@ -1802,7 +1802,7 @@
     },
     "public/apps/partner-worden.html": {
       "blokken": 2,
-      "bytes": 5239,
+      "bytes": 4963,
       "important": 6,
       "hex": 11
     },
@@ -1832,7 +1832,7 @@
     },
     "public/apps/platformregister.html": {
       "blokken": 1,
-      "bytes": 4504,
+      "bytes": 4500,
       "important": 0,
       "hex": 1
     },
@@ -1946,7 +1946,7 @@
     },
     "public/apps/sitemaker.html": {
       "blokken": 2,
-      "bytes": 8774,
+      "bytes": 8665,
       "important": 0,
       "hex": 8
     },
@@ -2122,7 +2122,6 @@
   "injectie": {
     "public/apps/app-main.js": 1,
     "public/apps/app-main/app-main-55.js": 1,
-    "public/apps/boardroom-eigenaar.js": 1,
     "public/apps/foundation/gezin-rt.js": 1,
     "public/apps/foundation/gezin-rt/gezin-rt-03.js": 1,
     "public/apps/foundation/palet.js": 1,
@@ -2131,16 +2130,12 @@
     "public/apps/foundation/sessie/sessie-02.js": 1,
     "public/apps/foundation/sessie/sessie-03.js": 2,
     "public/apps/foundation/sw.js": 40,
-    "public/apps/lab-pro.js": 1,
     "public/apps/leverancier.js": 1,
     "public/apps/leverancier/leverancier-78.js": 1,
-    "public/apps/livinglab-observatorium.js": 1,
-    "public/apps/magnaat-sandbox.js": 1,
     "public/shared/appmenu.js": 1,
     "public/shared/appmenu/appmenu-02.js": 1,
     "public/shared/basis.js": 5,
     "public/shared/basis/basis-01.js": 3,
-    "public/shared/basis/basis-01b.js": 2,
     "public/shared/bediening.js": 1,
     "public/shared/bediening/bediening-01.js": 1,
     "public/shared/borden.js": 1,
@@ -2151,11 +2146,9 @@
     "public/shared/deelmenu/deelmenu-02.js": 1,
     "public/shared/deur.js": 1,
     "public/shared/edge/conceptwerk.js": 1,
-    "public/shared/focus.js": 1,
-    "public/shared/gebaar.js": 2,
-    "public/shared/gebaar/gebaar-01.js": 2,
+    "public/shared/gebaar.js": 1,
+    "public/shared/gebaar/gebaar-01.js": 1,
     "public/shared/i18n.js": 1,
-    "public/shared/i18n/i18n-03.js": 1,
     "public/shared/inlogkleur.js": 1,
     "public/shared/ios.js": 1,
     "public/shared/kaart.js": 1,
@@ -2168,11 +2161,7 @@
     "public/shared/levendekleur.js": 1,
     "public/shared/levendekleur/levendekleur-02.js": 1,
     "public/shared/ondernemerpoort.js": 1,
-    "public/shared/ondertitelband.js": 1,
     "public/shared/overdracht.js": 1,
-    "public/shared/paspoortscan.js": 1,
-    "public/shared/plaatsdienst.js": 1,
-    "public/shared/plaatsnadering.js": 1,
     "public/shared/plek.js": 1,
     "public/shared/poortgesprek.js": 1,
     "public/shared/rahul-mond.js": 1,
@@ -2192,7 +2181,6 @@
     "public/shared/sprong/sprong-02.js": 1,
     "public/shared/teamcall.js": 1,
     "public/shared/teamcall/teamcall-01.js": 1,
-    "public/shared/thema.js": 1,
     "public/shared/toegang.js": 1,
     "public/shared/uitvoer.js": 1,
     "public/shared/uitvoer/uitvoer-02.js": 1,

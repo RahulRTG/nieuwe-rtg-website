@@ -42,12 +42,12 @@
 
     // opbouw: een doek voor de code + een dunne aftel-ring eronder
     el.innerHTML = '';
-    el.style.textAlign = 'center';
+    el.classList.add('ds-dyncode');
     var doek = root.document.createElement('div');
     doek.setAttribute('role', 'img');
     doek.setAttribute('aria-label', 'RTG-code, ververst automatisch');
     var ring = root.document.createElement('canvas'); ring.width = 120; ring.height = 6;
-    ring.style.cssText = 'width:min(15rem,60%);height:4px;margin:.6rem auto 0;display:block;border-radius:0;';
+    ring.className = 'ds-dyncode__ring';
     el.appendChild(doek); el.appendChild(ring);
 
     function tekenRing(frac) {
@@ -60,7 +60,7 @@
     function toon(token, exp) {
       try {
         var cv = root.RTGQRteken.tekenRTG(token, { merk: merk, schaal: opts.schaal || 7 });
-        cv.style.cssText = 'width:min(16rem,80vw);height:auto;image-rendering:pixelated;border-radius:0;';
+        cv.className = 'ds-dyncode__beeld';
         doek.innerHTML = ''; doek.appendChild(cv);
       } catch (e) { doek.textContent = 'Kon de code niet tekenen.'; }
       huidig = { token: token, exp: exp };

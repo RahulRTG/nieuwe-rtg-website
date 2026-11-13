@@ -3,16 +3,16 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-11-10T20:13:40.124Z",
-  "commit": "0c97e3f7e",
+  "op": "2026-11-12T22:01:15.871Z",
+  "commit": "b99fd4c8ab",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 17,
   "instrument": "scripts/afgeleid.js",
-  "node": "v24.18.0"
+  "node": "v26.12.1"
  },
  "gemeten": {
-  "artefacten": 399,
-  "bron": 59,
+  "artefacten": 400,
+  "bron": 60,
   "afgeleid": 209,
   "fragmenten": 28,
   "momentopname": 1,
@@ -21,7 +21,7 @@
   "metEigenaar": 238,
   "afgeleidEigenaarHard": 209,
   "afgeleidGrendelt": 70,
-  "metStempel": 132,
+  "metStempel": 133,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -4196,11 +4196,11 @@
    "naam": "SCHRIJFANALYSE.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/schrijfanalyse.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/schrijfanalyse.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/schrijfanalyse.js",
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
@@ -4690,6 +4690,18 @@
   },
   {
    "naam": "TRAVELOS-SPATIAL-VERTICAL-SLICE.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TRAVELOS-UITVOERING.md",
    "soort": "BRON",
    "eigenaar": null,
    "graad": null,

@@ -89,12 +89,16 @@ test('Vandaag leren op school.html en de schoolpunten alleen-lezen op de gezinsa
     });
     await page.waitForSelector('#afScrim.open', { timeout: 5000 });
     assert.equal(await page.evaluate(() => document.querySelector('#afKop').textContent), 'Van school');
-    assert.ok(await page.evaluate(() => document.querySelector('#afSchool').style.display !== 'none'),
+    const schoolBediening = await page.evaluate(() => Object.fromEntries(['afSchool', 'afBewaar', 'afWeg'].map(id => {
+      const el = document.getElementById(id);
+      return [id, { klasse: el.className, display: getComputedStyle(el).display }];
+    })));
+    assert.ok(schoolBediening.afSchool.display !== 'none',
       'het paneel legt uit dat dit punt van school komt');
-    assert.equal(await page.evaluate(() => document.querySelector('#afBewaar').style.display), 'none',
-      'bewaren kan niet: de agenda herschrijft school niet');
-    assert.equal(await page.evaluate(() => document.querySelector('#afWeg').style.display), 'none',
-      'weghalen kan ook niet');
+    assert.equal(schoolBediening.afBewaar.display, 'none',
+      'bewaren kan niet: de agenda herschrijft school niet; ' + JSON.stringify(schoolBediening.afBewaar));
+    assert.equal(schoolBediening.afWeg.display, 'none',
+      'weghalen kan ook niet; ' + JSON.stringify(schoolBediening.afWeg));
 
     /* ---- de ouder nodigt een kind uit: de kindkeuze komt uit de eigen sessie ---- */
     /* Tot 4 oktober 2026 vulde school.html deze keuze via /gezin/inloggen zonder

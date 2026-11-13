@@ -48,7 +48,7 @@
   }
   function renderVaart(){
     const tabBtn = document.getElementById('tabVaart');
-    if (tabBtn) tabBtn.style.display = heeftCharter() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftCharter());
     const wrap = $('#vaartWrap');
     if (!wrap) return;
     if (!heeftCharter()){ wrap.innerHTML = ''; return; }
@@ -109,7 +109,7 @@
   }
   function renderVerkoop(){
     const tabBtn = document.getElementById('tabVerkoop');
-    if (tabBtn) tabBtn.style.display = (heeftVerkoop() && pdVerkoop && pdVerkoop.aan) ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !(heeftVerkoop() && pdVerkoop && pdVerkoop.aan));
     const wrap = $('#verkoopWrap'); if (!wrap) return;
     if (!heeftVerkoop()){ wrap.innerHTML = ''; return; }
     if (!pdVerkoop){ wrap.innerHTML = '<div class="card">…</div>'; laadVerkoop(); return; }

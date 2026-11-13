@@ -149,6 +149,33 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.match(await page.textContent('#homeSub'), /lid sinds|member since/i,
         'de passregel is niet gevuld; dan is de sessie niet echt hersteld');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
+
+      /* De oude gedeelde licht/donkerlaag is weg. De zichtbare tegel, de drie
+         knoppen en Rahul delen nu de ene OS-controller. Bewijs hier in de echte
+         browser dat de korte tegel beide kanten op gaat, de opslag meereist en
+         een onbekende waarde niet stil in het contract terechtkomt. */
+      const thema = await page.evaluate(() => {
+        RTGOSThema.zet('bordeaux');
+        document.getElementById('osCcLicht').click();
+        const licht = {
+          huidig: RTGOSThema.huidig(),
+          bewaard: localStorage.getItem('rtg_ros_thema'),
+          attribuut: document.documentElement.getAttribute('data-pas-thema')
+        };
+        document.getElementById('osCcLicht').click();
+        const donker = {
+          huidig: RTGOSThema.huidig(),
+          bewaard: localStorage.getItem('rtg_ros_thema'),
+          attribuut: document.documentElement.getAttribute('data-pas-thema')
+        };
+        RTGOSThema.zet('neon');
+        return { licht, donker, naOngeldig: RTGOSThema.huidig(), oud: typeof window.RTGThema };
+      });
+      assert.deepEqual(thema, {
+        licht: { huidig: 'parelmoer', bewaard: 'parelmoer', attribuut: 'parelmoer' },
+        donker: { huidig: 'standaard', bewaard: 'standaard', attribuut: null },
+        naOngeldig: 'standaard', oud: 'undefined'
+      }, 'de ledenapp heeft niet precies één geldige OS-thema-eigenaar');
     }
   });
 });
@@ -580,17 +607,17 @@ test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwij
        elk lettertype te wachten; dit is dezelfde garantie zonder die omweg --
        en zonder de brosheid die eraan vastzit (TAKEN.md 4.39). */
     await page.waitForFunction(() => !!window.RTGNet, null, { timeout: 15000 });
-    // offline -> de banner schuift in beeld met een melding
+    // offline -> het centrale DS-contract maakt de banner zichtbaar
     await context.setOffline(true);
     await page.waitForFunction(() => {
       const b = document.getElementById('rtg-net-banner');
-      return !!(b && /translateY\(0/.test(b.style.transform) && b.textContent.length > 0);
+      return !!(b && !b.hidden && b.textContent.length > 0);
     }, undefined, { timeout: 8000 });
-    // weer online -> de banner schuift weg
+    // weer online -> de semantische verborgen toestand keert terug
     await context.setOffline(false);
     await page.waitForFunction(() => {
       const b = document.getElementById('rtg-net-banner');
-      return !!(b && /-100/.test(b.style.transform));
+      return !!(b && b.hidden);
     }, undefined, { timeout: 8000 });
   } finally {
     if (browser) await browser.close();

@@ -3502,6 +3502,7 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
 {
   const TOEGESTAAN = new Map([
+    ['server/kern/bankregie/index.js', 'een bevestigde bankregieschakeling en haar uitvoeringsaudit moeten samen de procesherstart overleven; een menselijke noodstop mag niet alleen in write-behind staan'],
     ['server/bedrijf/praktijk.js', 'Werk van een organisatie en de herhaalsleutel worden samen duurzaam bevestigd; verlies na een geslaagde reactie zou dubbel werk veroorzaken.'],
     ['server/bedrijf/praktijk-leverancier-routes.js', 'Leveranciersbeslissing en eenmalig gebruik moeten duurzaam staan vóór bevestiging.'],
     ['server/bedrijf/praktijk-betalen-routes.js', 'Betaalopdracht, ontvanger en hervatopties moeten duurzaam staan vóór extern netwerkverkeer.'],
@@ -3513,10 +3514,15 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
     ['test/sqlite-duurzaam-sync.test.js', 'bewijst FULL vóór dezelfde atomaire commit, fouten zonder schijnsucces en duurzame herhaling zonder dubbel effect'],
+    ['test/sqlite-noop-barriere.test.js', 'bewijst de echte FULL-noopbarrière met een actieve actuele lezer en behoud van de TRUNCATE-backupgrens'],
+    ['test/geldbeleid-opslagvlak.test.js', 'bewijst eigenaargerichte geldbeleidopslag binnen dezelfde duurzame buitenbundel, echte FULL-noopbarrières en fouten zonder vals succes; geen nieuwe productaanroeper'],
+    ['test/trust-json-opslag.test.js', 'bewijst met echte SQLite dat gecertificeerde JSON-fragmenten FULL, rollback, encryptie en herstart niet veranderen; geen productaanroeper'],
+    ['test/lib/lidbetaling-crashkind.js', 'geïsoleerd kindproces observeert de echte financiële FULL-commit en stopt op de lokale paid/punten-grens; geen productaanroeper'],
     ['test/sqlite-audit-publicatie.test.js', 'bewijst dat onpubliceerbare auditresultaten vóór de duurzame commit worden geweigerd, zodat vastgelegd werk niet als mislukt terugkomt'],
     ['test/ritreferentie.test.js', 'bewijst verse ritidentiteit, idempotente herhaling en actor-isolation via de echte duurzame SQLite-geldboeking'],
     ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen en niet tweemaal worden gecommit'],
     ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve sessieopslag, een andere domeinmutatie en audit samen in dezelfde duurzame bundel worden bevestigd'],
+    ['test/securitylog-rijopslag.test.js', 'bewijst dat twee beveiligingslogregels als enige werk binnen dezelfde duurzame auditbundel worden bevestigd; geen nieuwe productaanroeper'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['test/idem-takken.test.js', 'bewijst dat idem de duurzaam-vlag van de aanroeper ongewijzigd aan een NAGEMAAKTE bundel doorgeeft; er wordt niets gecommit'],
     ['test/idem-commit-pending.test.js', 'bewijst met de echte idem/bundellaag en bestuurbare opslagbevestiging dat retries geen succes krijgen voor commit of na rollback; geen nieuwe productaanroeper'],

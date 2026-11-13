@@ -22,7 +22,7 @@
       de kop van scripts/lib/a11yoordeel.js.
 
    Gebruik:
-     node scripts/a11y-oordeel.js <map-met-metingen> [--delen=4]
+     node scripts/a11y-oordeel.js <map-met-metingen> [--delen=4] [--meting=hele-ronde.json]
    ========================================================================== */
 
 const fs = require('fs');
@@ -33,6 +33,7 @@ const oordeel = require('./lib/a11yoordeel');
 const ROOT = path.join(__dirname, '..');
 const argv = process.argv.slice(2);
 const verwachteDelen = Number((argv.find(a => a.startsWith('--delen=')) || '').slice(8)) || 0;
+const metingUit = (argv.find(a => a.startsWith('--meting=')) || '').slice(9);
 const paden = argv.filter(a => !a.startsWith('--'));
 
 function metingen(paden) {
@@ -67,11 +68,26 @@ if (verwachteDelen && delen.length !== verwachteDelen) {
 }
 
 const samen = oordeel.telOp(delen);
-const verwachteSchermen = alleSchermen().length + 1;   // + /site/404.html, zie a11y.js
+const verwachteRoutes = alleSchermen().concat(['/site/404.html']).sort();
+const verwachteSchermen = verwachteRoutes.length;
 if (samen.paginas !== verwachteSchermen) {
   console.error('[a11y] de delen samen zagen ' + samen.paginas + ' schermen, en er zijn er ' +
     verwachteSchermen + '. Er is een deel dat minder heeft gemeten dan het beloofde;');
   console.error('       een oordeel over een gat is geen oordeel.');
+  process.exit(1);
+}
+if (samen.routeIssues.length) {
+  console.error('[a11y] de per-schermmeting is ongeldig: ' + samen.routeIssues.join(', '));
+  console.error('       een totaaltelling zonder unieke schermwaarnemingen is geen schermbewijs.');
+  process.exit(1);
+}
+const gemetenRoutes = Object.keys(samen.routes).sort();
+const ontbrekend = verwachteRoutes.filter(route => !Object.prototype.hasOwnProperty.call(samen.routes, route));
+const onbekend = gemetenRoutes.filter(route => !verwachteRoutes.includes(route));
+if (ontbrekend.length || onbekend.length) {
+  console.error('[a11y] per-schermdekking wijkt af: ' + ontbrekend.length + ' ontbrekend, ' + onbekend.length + ' onbekend.');
+  if (ontbrekend.length) console.error('       ontbrekend: ' + ontbrekend.slice(0, 10).join(', '));
+  if (onbekend.length) console.error('       onbekend: ' + onbekend.slice(0, 10).join(', '));
   process.exit(1);
 }
 
@@ -88,3 +104,12 @@ if (uit.fouten.length) {
 }
 for (const m of uit.meldingen) console.log(m);
 console.log(uit.samenvatting);
+/* EXPERIENCEWERKT heeft de routegebonden ruwe ronde nodig. Schrijf die pas
+   NADAT deelgetal, routebereik, browseridentiteit en het gezamenlijke budget
+   geldig zijn bevonden. Een half oordeel mag nooit een bewijsbestand worden. */
+if (metingUit) {
+  const tijdelijk = metingUit + '.tmp-' + process.pid;
+  fs.writeFileSync(tijdelijk, JSON.stringify(samen, null, 1) + '\n');
+  fs.renameSync(tijdelijk, metingUit);
+  console.log('[a11y] samengevoegde meting: ' + metingUit);
+}

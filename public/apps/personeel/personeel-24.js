@@ -51,7 +51,7 @@
   }
   function renderZorgbalie(){
     const tabBtn = document.getElementById('tabZorgbalie');
-    if (tabBtn) tabBtn.style.display = zbData ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !zbData);
     const wrap = $('#zorgbalieWrap');
     if (!wrap) return;
     if (!zbData){ wrap.innerHTML = ''; return; }
@@ -106,7 +106,7 @@
   }
   function renderMeldkamerPda(){
     const tabBtn = document.getElementById('tabMeldkamer');
-    if (tabBtn) tabBtn.style.display = (mkHulp || mkZorg) ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !(mkHulp || mkZorg));
     const wrap = $('#meldkamerWrap');
     if (!wrap) return;
     if (!mkHulp && !mkZorg){ wrap.innerHTML = ''; return; }

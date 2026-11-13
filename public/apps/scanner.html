@@ -65,6 +65,7 @@
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -80,7 +81,7 @@
      verhuizen als PAAR, want ze horen bij elkaar. -->
 <div class="rtg-duimbalk">
       <button class="knop vol" id="cameraKnop" type="button" data-hoofdactie>Open de camera</button>
-      <button class="knop" id="cameraStop" type="button" style="display:none;">Camera dicht</button>
+      <button class="knop ds-presentatie-toestand" id="cameraStop" type="button" hidden>Camera dicht</button>
       <label class="knop kieslabel">Kies foto's<input type="file" id="kies" accept="image/*" multiple></label>
     </div>
     <div id="beeldWrap"><video id="beeld" playsinline muted></video></div>
@@ -92,7 +93,7 @@
   <p class="stil" id="leegTip">Nog geen pagina's. Leg vast met de camera of kies foto's; je kunt meerdere
     pagina's stapelen voor een document.</p>
   <div id="strook"></div>
-  <div class="rij" id="bewaarRij" style="margin-top:0.75rem;display:none;">
+  <div class="rij ds-presentatie-toestand ds-presentatie-boven-drie-kwart" id="bewaarRij" hidden>
     <button class="knop vol" id="bewaarPdf" type="button">Bewaar als PDF</button>
     <button class="knop" id="bewaarFotos" type="button">Bewaar als losse foto's</button>
   </div>

@@ -625,10 +625,12 @@ wat het model mág vragen, de lus handelt het af. En mijn eerste versie van toet
 geen `stuurRoep` in zit. Commentaar gaat er nu eerst af — dezelfde les als bij de
 noemer, waar een verwijzing in commentaar werd aangezien voor een import.
 
-**Wat PLAN nog niet doet:** simuleren (blok 4), en de uitkomst van een stap
-doorgeven aan de volgende. Dat tweede is met opzet: zodra een stap de invoer van
-de volgende bepaalt, gaat de compiler over gegevens in plaats van over
-bevoegdheid, en dan is hij niet meer klein.
+**Wat PLAN zelf nog niet doet:** een domeinmodel met actuele waarden simuleren,
+en de uitkomst van een stap doorgeven aan de volgende. Dat tweede is met opzet:
+zodra een stap de invoer van de volgende bepaalt, gaat de compiler over gegevens
+in plaats van over bevoegdheid, en dan is hij niet meer klein. De schrijfvrije
+Plan Twin uit blok 4 hangt daarom NAAST PLAN en projecteert alleen wat de
+bestaande gevolgmeting en contracten werkelijk dragen.
 
 ### Blok 4 — Simulatie en droogloop · **de gevolgvoorspelling STAAT, en de droogloop nu ook**
 
@@ -974,7 +976,7 @@ wanneer een diagnostische vlag aanstaat, dan heeft dit huis geen causale runtime
 meetopstelling** — en dan is elke voorspelling in productie onweerlegbaar.
 
 `server/effectbon.js` staat daarom altijd aan (`RTG_EFFECTBON=0` zet hem uit, voor het
-geval dat en niet als normale stand) en draagt zeven velden en niet meer:
+geval dat en niet als normale stand) en draagt acht velden en niet meer:
 
 | veld | waar het uit komt |
 |---|---|
@@ -984,6 +986,7 @@ geval dat en niet als normale stand) en draagt zeven velden en niet meer:
 | `objectrefs` | de collecties die bewogen — **namen, nooit rijen of sleutels** |
 | `at` | wanneer |
 | `dekking` | wat deze bon wél en níét kon zien, bij naam |
+| `waarborg` | de nameting van de negatieve invarianten uit hetzelfde gevolgcontract; `NIET_MEETBAAR` blijft zichtbaar |
 
 **Hij bouwt niets na.** Alle drie de bronnen bestonden: `staatlog.stand()` is in de
 ondiepe stand alleen `.length` per array (O(1) per collectie), de effectmeter telt op drie
@@ -1120,6 +1123,37 @@ te tellen.
 `herstel-onbevestigd` is bewust `instrument` en geen `meetwerk`: de droogloop
 meet één stap, niet een paar met een tussenstand. Dat gereedschap bestaat niet,
 en tot het er is blijft compenserend handelen onbewezen.
+
+#### Het waarborgcontract en de Plan Twin (11 november 2026)
+
+De capability-contracten hadden de drie bouwstenen al: `voorwaarden` zegt wat
+vooraf moet gelden, `streefstand` wat na succes waar hoort te zijn, en `nooit`
+welke effectklassen tijdens en na de handeling niet mogen optreden. Er is daarom
+geen tweede assurance-register gemaakt. `server/kern/stuur/waarborgcontract.js`
+projecteert exact die bestaande bron naar **precondities, postcondities en
+invarianten**.
+
+De projectie maakt de belangrijkste grens structureel: iedere pre- en
+postconditie komt terug met `getoetst: false`. Een verklaring met een bron is
+geen geslaagde live controle. De domeinpoort blijft eigenaar van de
+voorcontrole en de positieve nameting. De universele effectbon kan wél de
+negatieve invarianten controleren. Ziet zij een klasse uit `nooit`, dan staat
+de uitslag op `GESCHONDEN`; ontbreekt het choke point, dan heet zij
+`NIET_VOLLEDIG_MEETBAAR` en nooit stil `BEHOUDEN`.
+
+`server/kern/stuur/plantweeling.js` legt die waarborgen samen met de bestaande
+gevolgvoorspelling naast iedere gewogen planstap. De Twin is tijdelijk,
+geïsoleerd en heeft door zijn bouw geen database, `save`, netwerk of
+uitvoerder. Hij gebruikt de drie bestaande woorden voor simuleerbaarheid:
+`exact`, `benaderend`, `niet-beschikbaar`. De generieke projectie claimt nooit
+`exact`, omdat zij collecties en verklaringen kent maar geen actuele waarden.
+Een domeinsimulator kan dat later alleen via een expliciete, geteste adapter
+verdienen.
+
+De Rahul-planstap geeft de Twin in hetzelfde antwoord aan Edge terug en schrijft
+een aparte `PLAN_TWIN_EVALUATED`-fase in het spoor. Zij verleent niets: vlak voor
+uitvoering blijven een nieuwe live toestandlezing, bevoegdheidscontrole en de
+gewone bevestigingsroute verplicht.
 
 ### Blok 5 — Transactie- en compensatiesemantiek · **de herhaling staat, en het herstel is nu UITGEVOERD in plaats van afgeleid**
 
@@ -1456,6 +1490,31 @@ bewaarplek de registratie laten klappen.
 
 **Wat open blijft: de omkering zelf.** Die hoort te wachten tot het getal er is,
 en dat is nu voor het eerst een getal dat kan blijven bestaan.
+
+#### Intelligence Substitution Protocol — gebouwd, beslist niets (11 november 2026)
+
+Dekking alleen beantwoordt niet of het goedkope antwoord ook juist was. Daarom
+kan de routerschaduw nu naast `spoor` en `bewezenGedekt` drie
+privacyarme correctheidsuitkomsten tellen: `juist`, `onjuist` en `afgezien`.
+Zij bewaart nog steeds uitsluitend aantallen; geen vraag, antwoord, codenaam of
+sessiesleutel landt in de meter.
+
+`server/kern/ai/substitutie.js` beoordeelt die tellers met vier harde grenzen:
+
+1. iedere vergelijking komt van een expliciet onafhankelijke oracle —
+   overeenstemming met Rahul is geen bewijs;
+2. minimaal 200 geautoriseerde, geanonimiseerde of synthetische gevallen over
+   minimaal zeven dagen;
+3. nul veiligheidsfouten en 100% juistheid in de behandelde, begrensde
+   deelcategorie;
+4. onthouden is toegestaan en valt terug op Rahul; een fout antwoord promoveert
+   niet.
+
+Zelfs de hoogste uitslag heet `KLAAR_VOOR_BESLUIT` en draagt `activeert: false`.
+Promotie blijft een versiegebonden menselijke wijziging met toetsen, terugval en
+rollback. Zonder oracle heet de taak `NIET_BEPROEFD`; dat is geen nulscore en
+geen toestemming om de volgorde om te draaien. `npm run router` neemt deze
+uitslag op in het bestaande runtime-rapport en maakt geen tweede register.
 
 ### Blok 9 — Commandbalk · **bewust niet gebouwd, en dit is waarom**
 

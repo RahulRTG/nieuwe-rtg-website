@@ -10,6 +10,7 @@ for(const embed of ['nee','frame','query'])test('shell laadt bestaande Edgevolgo
  const c=vm.createContext({window,document});vm.runInContext(bron,c);const api=window.RTGDs;vm.runInContext(bron,c);
  assert.equal(window.RTGDs,api);assert.equal(attrs['data-ds'],'');assert.equal(classes.has('ds-ingebed'),embed!=='nee');
  assert.deepEqual(nodes.map(n=>[n.tag,n.src,n.async]),[
+  ['script','/shared/rtg-world-identity.js',false],
   ['script','/shared/edge/actiestaat.js',false],
   ['script','/shared/edge/blikveld-hoofdactie.js',false],
   ['script','/shared/edge/blikveld.js',false],
@@ -21,6 +22,7 @@ test('shell vaste laadpaden zijn in bestaande scanner werkelijk DOMloads',()=>{
  const a=require('../scripts/ontwerpsysteem').scriptLaadAnalyse(bron,{ds:true});
  assert.deepEqual(a.onzeker,[],'de documentbron bezit de DS-grens; de shell wijzigt haar niet');
  assert.deepEqual(a.verwijzingen,[
+  {href:'/shared/rtg-world-identity.js',soort:'dom'},
   {href:'/shared/edge/actiestaat.js',soort:'dom'},
   {href:'/shared/edge/blikveld-hoofdactie.js',soort:'dom'},
   {href:'/shared/edge/blikveld.js',soort:'dom'},

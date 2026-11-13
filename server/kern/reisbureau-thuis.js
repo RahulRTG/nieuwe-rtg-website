@@ -22,6 +22,7 @@
    Een tweede melding wordt geweigerd (409, de reis is al thuis): dat is een
    toestandscontrole, en de stand verandert er niet door. */
 'use strict';
+const { lidPrijsbeeld } = require('./reisbureau-prijsgrond');
 
 module.exports = ({ pak, spoor, schoon, nu, save }) => {
   function markeerThuis({ ref, doorLid, key, door }) {
@@ -39,7 +40,7 @@ module.exports = ({ pak, spoor, schoon, nu, save }) => {
     a.thuis = { door: doorLid ? 'lid' : 'reisbureau', at: nu() };
     spoor(a, 'thuis', wie);
     save();
-    return { ok: true, aanvraag: a };
+    return { ok: true, aanvraag: doorLid ? lidPrijsbeeld(a) : a };
   }
   return { markeerThuis };
 };

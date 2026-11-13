@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-23T11:28:46.668Z",
-    "commit": "4447f3f6f5",
+    "op": "2026-11-12T21:27:12.078Z",
+    "commit": "a06d1852a0",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
-    "node": "v24.18.0"
+    "node": "v26.12.1"
   },
   "soort": "triage",
   "uitleg": "Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast. Gelezen is elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die daar met de hand omheen gaat; lexicaal, dus zonder iets uit te voeren.",
@@ -668,7 +668,7 @@
     },
     {
       "bestand": "server/kern/directpay/betalen.js",
-      "regel": 77,
+      "regel": 81,
       "opzoeker": "idemZoek",
       "gevondenAls": "b",
       "vergeleken": [

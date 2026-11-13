@@ -164,6 +164,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-neiging').SLEUTELS,
   /* Reisbetalingen verklaren hun eigen replay-antwoorden in het deelbestand. */
   require('./idemsleutels-reisherkomst').SLEUTELS,
+  require('./idemsleutels-reisketen').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS,
   require('./idemsleutels-personeel').SLEUTELS,
   require('./idemsleutels-magnaatleven').SLEUTELS,

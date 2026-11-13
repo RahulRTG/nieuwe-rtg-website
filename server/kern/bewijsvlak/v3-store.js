@@ -51,8 +51,9 @@ function maakStore(opties) {
       op.collection === collection && !op.replay).length : 0;
     if (Object.keys(doos).length + pendingNew >= limits[collection]) throw vol(collection, limits[collection]);
     const vast = bevries(kopie(record));
+    require('../../lib/immutable-json').certifieer(vast);
     if (transaction && transaction.active()) {
-      let existed = false, previous;
+      let existed = false, previous, toegepast;
       transaction.stage({ type: 'v3-store', collection, key, record: vast, replay: false,
         validate() {
           if (doos[id] && hash(doos[id]) !== hash(vast))
@@ -64,14 +65,18 @@ function maakStore(opties) {
             throw new Error('bewijsvlak v3: immutable-recordconflict ' + id);
           existed = Object.prototype.hasOwnProperty.call(doos, id); previous = doos[id];
           doos[id] = vast;
+          toegepast = doos[id];
         },
-        rollback() { if (existed) doos[id] = previous; else if (doos[id] === vast) delete doos[id]; }
+        rollback() { if (existed) doos[id] = previous; else if (doos[id] === toegepast) delete doos[id]; }
       });
       return bevries(kopie(vast));
     }
     doos[id] = vast;
+    // De opslagtracker kan bij teruglezen een eigen Proxy aanbieden. Vergelijk
+    // bij herstel de zichtbare identiteit, niet de ongewikkelde input.
+    const toegepast = doos[id];
     try { save(); }
-    catch (error) { if (doos[id] === vast) delete doos[id]; throw error; }
+    catch (error) { if (doos[id] === toegepast) delete doos[id]; throw error; }
     return bevries(kopie(vast));
   }
   const get = (collection, id) => {

@@ -1,5 +1,5 @@
 /* SQLite/WAL: collecties hebben versies; de poll leest externe wijzigingen.
-   Schrijvers delen dezelfde transactionele store.db. De twee auditjournalen
+   Schrijvers delen dezelfde transactionele store.db. De auditjournalen
    hebben eigen rijen; db.data blijft de leesprojectie van dezelfde opslag.
    Een verwijderde collectie wordt een tombstone (kolom `deleted`), zodat een
    tweede instance haar niet uit een verouderde werkkopie laat herrijzen. */
@@ -86,6 +86,7 @@ function statements() {
   stmt = {
     bump: kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'"),
     huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
+    versie: kvdb.prepare('SELECT ver, deleted FROM kv WHERE key = ?'),
     lees: kvdb.prepare('SELECT val, ver, deleted FROM kv WHERE key = ?'),
     versies: kvdb.prepare('SELECT key, ver FROM kv'),
     up: kvdb.prepare('INSERT INTO kv(key,val,ver,deleted) VALUES(?,?,?,0) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver, deleted=0'),
@@ -96,7 +97,7 @@ function statements() {
 // Plan, transactie en publicatie na de commit: ./sqlite-save.js.
 const saveSqlite = require('./sqlite-save')({ db, verbinding: () => { sqliteInit(); return kvdb; },
   statements, auditMotor, mutaties, voorcheck, merge3, uitStore, naarStore, laatsteJson, toegepast,
-  vouwWal: () => vouwWalSqlite() });
+  vouwWal: () => bevestigWalSqlite() });
 
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
 // en zet ze in db.data. Zo blijven losse domeinprocessen bij elkaar in de pas.
@@ -117,7 +118,7 @@ function startSqliteSync() {
    hun eigen volledige flush; de WAL-grens staat naast de transactielaag. Bij
    afsluiten vervalt de geplande vangrail: de laatste save is zelf volledig. */
 const wal = require('./sqlite-checkpoint')({ verbinding: () => kvdb, saveSqlite });
-const { checkpointSqlite, vouwWalSqlite } = wal;
+const { checkpointSqlite, vouwWalSqlite, bevestigWalSqlite } = wal;
 function afrondSqlite() { saveSqlite.stopVangrail(); wal.afrondSqlite(); }
 
 const persistentieStandSqlite = require('./sqlite-persistentie')({

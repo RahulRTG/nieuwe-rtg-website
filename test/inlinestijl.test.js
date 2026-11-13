@@ -85,6 +85,29 @@ test('GRENS 1: display:none is toestand en wordt nooit omgezet', () => {
   });
 });
 
+test('de rapportage telt toestand mee in de werkelijke markupnoemer', () => {
+  const lijf = '<div style="display:none">toestand</div><p style="color:green">presentatie</p>';
+  metBestand('t.html', PAGINA(lijf), (p) => {
+    const r = draai(p, ['--toon']);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /werkelijke attributen\s+: 2/);
+    assert.match(r.stdout, /toestand \(bewust overgeslagen\): 1/);
+    assert.match(r.stdout, /presentatie-attributen\s+: 1/);
+  });
+});
+
+test('de werkelijke ledenapp heeft geen statische style-attributen meer', () => {
+  const app = path.join(WORTEL, 'public', 'apps', 'app.html');
+  const r = draai(app, ['--toon']);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /werkelijke attributen\s+: 0/);
+  for (const deel of ['app-main-41.js', 'app-main-42.js', 'app-main-43.js']) {
+    const bron = fs.readFileSync(path.join(WORTEL, 'public', 'apps', 'app-main', deel), 'utf8');
+    assert.doesNotMatch(bron, /\b(?:qh|gtab|tab|dot)\.style\.display/,
+      deel + ' gebruikt opnieuw een inline presentatieschakelaar');
+  }
+});
+
 test('GRENS 1b: visibility:hidden ook niet', () => {
   const lijf = '<div style="visibility:hidden">a</div><div style="visibility:hidden">b</div>';
   metBestand('t.html', PAGINA(lijf), (p) => {
@@ -122,6 +145,22 @@ test('een style-attribuut BINNEN een <script> blijft staan', () => {
     const uit = fs.readFileSync(p, 'utf8');
     assert.equal((uit.match(/<i style="color:red">/g) || []).length, 2,
       'de omzetting is in een JavaScript-string gaan schrijven');
+  });
+});
+
+test('style-voorbeeldtekst in CSS en HTML-commentaar is geen DOM-attribuut', () => {
+  const pagina = '<!doctype html><html><head><style>\n' +
+    '/* Als klassen, niet als style="..." op elk element. */\n.x{color:red}\n</style></head><body>' +
+    '<!-- Voorbeeld: <p style="..."></p><p style="..."></p> -->' +
+    '<p style="color:blue">a</p><p style="color:blue">b</p></body></html>';
+  metBestand('t.html', pagina, (p) => {
+    const r = draai(p);
+    assert.equal(r.status, 0, r.stderr);
+    const uit = fs.readFileSync(p, 'utf8');
+    assert.match(uit, /style="\.\.\."/, 'uitleg in de CSS of het commentaar is gewijzigd');
+    assert.doesNotMatch(uit, /\.i-[0-9a-z-]+\{\.\.\.\}/, 'voorbeeldtekst werd ongeldige CSS');
+    assert.doesNotMatch(uit, /<p style="color:blue">/, 'de twee echte attributen zijn niet omgezet');
+    assert.match(uit, /\.i-[0-9a-z-]+\{color:blue\}/, 'de echte DOM-stijl kreeg geen klasse');
   });
 });
 

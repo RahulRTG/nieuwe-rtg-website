@@ -97,8 +97,10 @@ test('appbediening die de Edge overneemt behoudt haar app-herkomst', () => {
   assert.doesNotMatch(CONTROLS, /RTGDesktopFrame\.controls\(c, srcButtons\)\) return/,
     'een actieve desktopwerkplek mag de bediening van haar host niet verdringen');
   assert.match(CONTROLS, /'aria-haspopup'/, 'een gekloonde dialoogopener behoudt zijn semantiek');
-  assert.match(CONTROLS, /el\.innerText\|\|el\.textContent/,
-    'Edge-labels behouden zichtbare woordgrenzen tussen geneste tekstelementen');
+  assert.match(CONTROLS, /el\.textContent\|\|el\.innerText/,
+    'Edge-labels behouden de semantische brontekst vóór CSS-transformaties');
+  assert.doesNotMatch(CONTROLS, /el\.innerText\|\|el\.textContent/,
+    'visuele text-transform mag de toegankelijke naam van een Edge-actie niet herschrijven');
   assert.match(CONTROLS, /el\.href\?'route:'\+el\.href:'control:'\+lbl\(el\)/,
     'een gekloonde navigatielink behoudt een route-identiteit over tekst- en framewissels');
   assert.match(APPWERKT, /el\.id \|\| el\.getAttribute\('data-rtg-adaptive-source'\)/,

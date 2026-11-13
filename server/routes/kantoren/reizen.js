@@ -12,7 +12,7 @@
    toezegging aan een lid. De AI doet in dit huis geen van beide. */
 module.exports = (ctx) => {
   const { app, officeAuth, veilig, kern } = ctx;
-  const wie = (req) => String(((req.body || {}).door) || 'reisadviseur');
+  const wie = (req) => kern.boardroomWie(req) || 'backoffice (gedeelde code)';
 
   /* ---- het aanbod: de samengestelde reizen van RTG ----
      Lezen doet iedereen die is ingelogd (het reisbureau, het partnerkanaal, de

@@ -47,7 +47,7 @@ on:
         type: string
         default: ''
       ci_run:
-        description: Volledige CI-run voor deze kandidaat met alle 14 routejournals
+        description: Volledige CI-run voor deze kandidaat met alle 15 routejournals
         type: string
         default: ''
       profile:
@@ -128,7 +128,7 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: candidate/.nvmrc
-      - name: Verifieer de veertien GitHub-journals en hun echte checkout
+      - name: Verifieer de vijftien GitHub-journals en hun echte checkout
         working-directory: tooling
         env:
           GH_TOKEN: ${{ github.token }}

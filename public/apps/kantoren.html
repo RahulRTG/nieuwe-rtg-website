@@ -249,6 +249,7 @@
   .rzWens{font-size:.78rem;color:var(--soft);margin:-.3rem 0 .5rem;}
   .veld.rzVeld{flex:1;}
 </style>
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -601,6 +602,7 @@
     </div>
     <!-- de reisbalie: alleen in de kamer 'reisbureau' -->
     <div class="kaart" id="kReisbureau" hidden>
+      <section id="kReisContracten" aria-label="Eigen reiscontracten"></section>
       <h4 class="s-30otbc">Aanvragen bevestigen</h4>
       <p class="stil s-1fcmbqj">Een aanvraag heet "aangevraagd" tot u hem bevestigt, en dat is precies wat het lid op zijn scherm leest. Bevestig dus pas als het verblijf, het vervoer en de datum echt rond zijn. Afwijzen kan alleen met een reden, want die reden leest het lid. Onder uw besluit staat uw eigen inlog; die komt uit uw sessie en is niet mee te sturen.</p>
       <div id="kReisOpen"><div class="leeg">Laden...</div></div>
@@ -655,10 +657,10 @@
       <div id="kRegBriefing"><div class="leeg">Laden...</div></div>
       <h4 class="s-tafq05">Kabinetsbesluiten (twee handtekeningen)</h4>
       <div id="kRegBesluiten"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
-        <span><label for="kRegNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Wie bent u?</label><input id="kRegNaam" placeholder="minister-president" class="s-k43idi"></span>
-        <span><label for="kRegPort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Portefeuille</label><select id="kRegPort"></select></span>
-        <span class="s-1cv9qgt"><label for="kRegTitel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Besluit</label><input id="kRegTitel" placeholder="Bijv. 500 extra opvangplekken vrijmaken" class="s-186m9vs"></span>
+      <div class="ds-presentatie-velden">
+        <span><label for="kRegNaam" class="ds-presentatie-veldlabel">Wie bent u?</label><input id="kRegNaam" placeholder="minister-president" class="s-k43idi"></span>
+        <span><label for="kRegPort" class="ds-presentatie-veldlabel">Portefeuille</label><select id="kRegPort"></select></span>
+        <span class="s-1cv9qgt"><label for="kRegTitel" class="ds-presentatie-veldlabel">Besluit</label><input id="kRegTitel" placeholder="Bijv. 500 extra opvangplekken vrijmaken" class="s-186m9vs"></span>
         <button class="knop" id="kRegNieuw" type="button">Voorgenomen besluit</button>
       </div>
     </div>
@@ -666,19 +668,19 @@
     <div class="kaart" id="kOpvang" hidden>
       <h4 class="s-ndyzcf">Locaties en bezetting</h4>
       <div id="kOpvLocaties"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
-        <span><label for="kOpvNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Nieuwe locatie</label><input id="kOpvNaam" placeholder="Naam" class="s-k43idi"></span>
-        <span><label for="kOpvPlaats" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Plaats</label><input id="kOpvPlaats" placeholder="Plaats" class="s-186ss1h"></span>
-        <span><label for="kOpvSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Soort</label><select id="kOpvSoort"></select></span>
-        <span><label for="kOpvCap" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Plekken</label><input id="kOpvCap" type="number" min="0" value="200" class="s-186qv2w"></span>
+      <div class="ds-presentatie-velden">
+        <span><label for="kOpvNaam" class="ds-presentatie-veldlabel">Nieuwe locatie</label><input id="kOpvNaam" placeholder="Naam" class="s-k43idi"></span>
+        <span><label for="kOpvPlaats" class="ds-presentatie-veldlabel">Plaats</label><input id="kOpvPlaats" placeholder="Plaats" class="s-186ss1h"></span>
+        <span><label for="kOpvSoort" class="ds-presentatie-veldlabel">Soort</label><select id="kOpvSoort"></select></span>
+        <span><label for="kOpvCap" class="ds-presentatie-veldlabel">Plekken</label><input id="kOpvCap" type="number" min="0" value="200" class="s-186qv2w"></span>
         <button class="knop stil" id="kOpvZet" type="button">Open locatie</button>
       </div>
       <h4 class="s-tafq05">Dossiers (op nummer, nooit op naam)</h4>
       <div id="kOpvDossiers"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
-        <span><label for="kOpvDosLoc" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Locatie</label><select id="kOpvDosLoc"></select></span>
-        <span><label for="kOpvPers" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Personen</label><input id="kOpvPers" type="number" min="1" max="12" value="1" class="s-1l3ksya"></span>
-        <span><label for="kOpvKind" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Kinderen</label><input id="kOpvKind" type="number" min="0" max="10" value="0" class="s-1l3ksya"></span>
+      <div class="ds-presentatie-velden">
+        <span><label for="kOpvDosLoc" class="ds-presentatie-veldlabel">Locatie</label><select id="kOpvDosLoc"></select></span>
+        <span><label for="kOpvPers" class="ds-presentatie-veldlabel">Personen</label><input id="kOpvPers" type="number" min="1" max="12" value="1" class="s-1l3ksya"></span>
+        <span><label for="kOpvKind" class="ds-presentatie-veldlabel">Kinderen</label><input id="kOpvKind" type="number" min="0" max="10" value="0" class="s-1l3ksya"></span>
         <button class="knop stil" id="kOpvDos" type="button">Meld aan</button>
       </div>
     </div>
@@ -686,11 +688,11 @@
     <div class="kaart" id="kHotel" hidden>
       <h4 class="s-ndyzcf" id="kHotelNaam">Het huis van deze afdeling</h4>
       <div id="kHotelVak"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
-        <span><label for="kHotSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Kamertype</label><select id="kHotSoort"></select></span>
-        <span><label for="kHotVoor" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Voor (codenaam)</label><input id="kHotVoor" placeholder="codenaam" class="s-186ss1h"></span>
-        <span><label for="kHotVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Van</label><input id="kHotVan" type="date"></span>
-        <span><label for="kHotTot" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Tot</label><input id="kHotTot" type="date"></span>
+      <div class="ds-presentatie-velden">
+        <span><label for="kHotSoort" class="ds-presentatie-veldlabel">Kamertype</label><select id="kHotSoort"></select></span>
+        <span><label for="kHotVoor" class="ds-presentatie-veldlabel">Voor (codenaam)</label><input id="kHotVoor" placeholder="codenaam" class="s-186ss1h"></span>
+        <span><label for="kHotVan" class="ds-presentatie-veldlabel">Van</label><input id="kHotVan" type="date"></span>
+        <span><label for="kHotTot" class="ds-presentatie-veldlabel">Tot</label><input id="kHotTot" type="date"></span>
         <button class="knop stil" id="kHotBoek" type="button">Reserveer</button>
       </div>
     </div>
@@ -817,7 +819,7 @@
     <h3 class="sec">De Salon-curatie: wat is maatschappelijk belangrijk?</h3>
     <div class="kaart" id="bSalonBelang">
       <p class="stil s-6gjhqa">De Salon laat alleen door wat viraal gaat of maatschappelijk belangrijk is. Viraliteit rekent zichzelf uit; belang niet. Rahul leest de posts die nog geen oordeel hebben en zet er ja of nee bij. Dit gebeurt nooit automatisch en nooit tijdens het lezen van de feed: u geeft de opdracht, per ronde, en ziet wat het opleverde. Zonder oordeel blijft de vaste woordencheck gelden.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:0.75rem;">
+      <div class="ds-presentatie-actierij">
         <button class="knop" id="bSalonKnop" type="button">Beoordeel deze ronde</button>
         <span class="stil s-1gpodpu" id="bSalonStand">Laden…</span>
       </div>
@@ -829,7 +831,7 @@
     <h3 class="sec">De eigen-AI-dataset: alle logs voor het trainen van een eigen model</h3>
     <div class="kaart" id="bAidata">
       <p class="stil s-1qfvjzt">Eén knop bewaart alles wat RTG nodig heeft om later een eigen AI te trainen: de Rahul-gesprekken, de ballotage-intakes, het auditlog, de transacties en de kantoorchat, als JSONL-bestand. Alles op codenamen; de identiteitskluis blijft dicht.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:0.75rem;">
+      <div class="ds-presentatie-actierij">
         <button class="knop" id="bAidataKnop" type="button">Bewaar de AI-dataset</button>
         <span class="stil s-1gpodpu" id="bAidataStand"></span>
       </div>
@@ -837,12 +839,12 @@
 
     <h3 class="sec">De geld-regie: pasprijzen, partnervergoeding en ledenvoordeel</h3>
     <div class="kaart" id="bGeld">
-      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">
+      <div class="rij ds-presentatie-velden-zonder-marge">
         <span class="s-1cv7ti8">
-          <label for="gPasKeuze" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Pasprijs per maand (ex btw); de gratis app blijft gratis, Business is op maat</label>
+          <label for="gPasKeuze" class="ds-presentatie-veldlabel">Pasprijs per maand (ex btw); de gratis app blijft gratis, Business is op maat</label>
           <select id="gPasKeuze"><option value="rtg">RTG Pass</option><option value="lifestyle">Lifestyle Pass</option></select>
         </span>
-        <span><label for="gPasEuro" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Bedrag (€)</label>
+        <span><label for="gPasEuro" class="ds-presentatie-veldlabel">Bedrag (€)</label>
           <input id="gPasEuro" type="number" min="0" step="0.01" class="s-186s51y"></span>
         <button class="knop stil" id="gPasZet" type="button">Zet de pasprijs</button>
         <span class="stil s-1gpodpu" id="gPasNu"></span>
@@ -851,12 +853,12 @@
         <div class="s-tuzshu">Partnervergoeding over omzet</div>
         <div id="gVergoeding" class="stil s-ohzj7x"></div>
       </div>
-      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
+      <div class="rij ds-presentatie-velden-ruim">
         <span class="s-1cv7ti8">
-          <label for="gKorGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Ledenvoordeel per genre (RTG legt bij; de zaak houdt het volle bedrag)</label>
+          <label for="gKorGenre" class="ds-presentatie-veldlabel">Ledenvoordeel per genre (RTG legt bij; de zaak houdt het volle bedrag)</label>
           <select id="gKorGenre"></select>
         </span>
-        <span><label for="gKorPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">%</label>
+        <span><label for="gKorPct" class="ds-presentatie-veldlabel">%</label>
           <input id="gKorPct" type="number" min="0" max="50" step="0.5" class="s-1l3ksya"></span>
         <button class="knop stil" id="gKorZet" type="button">Zet het voordeel</button>
       </div>
@@ -872,7 +874,7 @@
     <h3 class="sec">Het ledenregister: alle leden per stad, land, geslacht en pas</h3>
     <div class="kaart" id="bLeden">
       <p class="stil s-1qfvjzt">Alle leden op codenaam (de echte naam blijft in de kluis), gesplitst per pas, geslacht, land en stad. Van elke maandbijdrage gaat 30% naar de RTFoundation: 20% blijft lokaal, 10% naar de foundation zelf. Cijfers zijn een rapportage, geen verwerkte betaling.</p>
-      <div class="rijveld" style="display:flex;gap:.5rem;flex-wrap:wrap;margin:0.75rem 0;">
+      <div class="rijveld ds-presentatie-rijveld">
         <select id="lrPas" class="veld s-jv64vw"><option value="">Alle passen</option></select>
         <select id="lrGeslacht" class="veld s-1v3dw5a"><option value="">m/v/x</option><option value="v">Vrouw</option><option value="m">Man</option><option value="x">X</option></select>
         <select id="lrLand" class="veld s-jv4uwu"><option value="">Alle landen</option></select>
@@ -891,13 +893,13 @@
     <h3 class="sec">De leveranciers-regie: welke werk-apps per genre zaken</h3>
     <div class="kaart" id="bGenreRegie">
       <p class="stil s-1qfvjzt">Standaard staat elke werk-app open voor elk genre; hier sluit u een functie gericht voor een genre (bijv. RTG Eye niet voor horeca). De vaste vak-poorten (OV-functies alleen voor OV-zaken) blijven altijd gelden.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.5rem;">
+      <div class="ds-presentatie-velden-compact">
         <span class="s-1cv8ghr">
-          <label for="lrFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Functie</label>
+          <label for="lrFunctie" class="ds-presentatie-veldlabel">Functie</label>
           <select id="lrFunctie"></select>
         </span>
         <span class="s-1cv76ip">
-          <label for="lrGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Genre</label>
+          <label for="lrGenre" class="ds-presentatie-veldlabel">Genre</label>
           <select id="lrGenre"></select>
         </span>
         <button class="knop stil s-1wz6eca" id="lrUit" type="button">Sluit voor dit genre</button>
@@ -909,11 +911,11 @@
     <h3 class="sec">De AI-regie: het karakter en verhaal van Rahul</h3>
     <div class="kaart" id="bRahul">
       <p class="stil s-1qfvjzt">De vaste kern van Rahuls karakter en levensverhaal ligt vast in de code en wordt door tests bewaakt. Hier vult de boardroom hem aan of stuurt hem bij; de aanvulling komt live mee in elke assistent (leden, zaken, personeel, boardroom). Leeg laten = alleen de vaste kern.</p>
-      <label for="rKarakter" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het karakter (max 2000 tekens)</label>
+      <label for="rKarakter" class="ds-presentatie-veldlabel-ruim">Aanvulling op het karakter (max 2000 tekens)</label>
       <textarea id="rKarakter" rows="3" maxlength="2000" placeholder="Bijv. extra eigenschappen, voorkeuren of omgangsregels" class="s-rc84f6"></textarea>
-      <label for="rVerhaal" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het verhaal (max 2000 tekens)</label>
+      <label for="rVerhaal" class="ds-presentatie-veldlabel-ruim">Aanvulling op het verhaal (max 2000 tekens)</label>
       <textarea id="rVerhaal" rows="4" maxlength="2000" placeholder="Bijv. nieuwe hoofdstukken of details van het levensverhaal" class="s-rc84f6"></textarea>
-      <div style="display:flex;gap:.6rem;align-items:center;margin-top:.7rem;flex-wrap:wrap;">
+      <div class="ds-presentatie-actierij-na">
         <button class="knop stil" id="rBewaar" type="button">Bewaar de aanvulling</button>
         <span class="stil s-1gpodpu" id="rStand"></span>
       </div>
@@ -945,7 +947,7 @@
           <option value="uit">Alleen zaakserver</option>
         </select>
         <input class="veld s-1v3dw5a" id="dSsid" placeholder="SSID" maxlength="32">
-        <label class="stil" style="font-size:.78rem;display:flex;align-items:center;gap:.3rem;"><input type="checkbox" id="dGast"> gastwifi</label>
+        <label class="stil ds-presentatie-vinklabel"><input type="checkbox" id="dGast"> gastwifi</label>
         <button class="knop stil" id="dNetwerkZet" type="button">Zet de netwerkrol</button>
       </div>
       <div class="stil s-11pdvvi" id="dStand" aria-live="polite"></div>
@@ -955,13 +957,13 @@
     <h3 class="sec">Gericht schakelen: per stad of dorp, land of persoon</h3>
     <div class="kaart" id="bFijn">
       <p class="stil s-1qfvjzt">Een functie gericht sluiten voor één plaats (stad of dorp), één land of één persoon, of die beperking weer weghalen. De plaats is de woonplaats van het lid; een persoon mag u op codenaam of e-mail intikken. Wat hier dicht staat ziet u als chips onder de functie op het schakelbord.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.5rem;">
+      <div class="ds-presentatie-velden-compact">
         <span class="s-hhkyth">
-          <label for="fjFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Functie</label>
+          <label for="fjFunctie" class="ds-presentatie-veldlabel">Functie</label>
           <select id="fjFunctie"></select>
         </span>
         <span class="s-6xd6up">
-          <label for="fjAs" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">As</label>
+          <label for="fjAs" class="ds-presentatie-veldlabel">As</label>
           <select id="fjAs">
             <option value="plaats">Plaats (stad/dorp)</option>
             <option value="land">Land (2 letters)</option>
@@ -969,7 +971,7 @@
           </select>
         </span>
         <span class="s-1cv76ip">
-          <label for="fjSleutel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Plaats, landcode of codenaam</label>
+          <label for="fjSleutel" class="ds-presentatie-veldlabel">Plaats, landcode of codenaam</label>
           <input class="veld" id="fjSleutel" maxlength="60" placeholder="bijv. Zaandam, ES of een codenaam">
         </span>
         <button class="knop stil s-1wz6eca" id="fjUit" type="button">Sluit gericht</button>
@@ -985,12 +987,12 @@
     </div>
 
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" class="s-mfhf3b"></span></h3>
-    <div class="kaart" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+    <div class="kaart ds-presentatie-inline-acties">
       <span class="s-uwrx9b">De grote hendel: alles bij iedereen beschikbaar zetten, of alles in een keer sluiten. De interne backoffice-functies blijven altijd open, zodat u de hendel kunt terugzetten.</span>
       <button class="knop stil" id="bAllesAan" type="button">Alles aan</button>
       <button class="knop stil s-1wz6eca" id="bAllesUit" type="button">Alles uit</button>
     </div>
-    <div class="kaart" id="bFases" style="display:flex;gap:.6rem;align-items:flex-start;flex-wrap:wrap;">
+    <div class="kaart ds-presentatie-fases" id="bFases">
       <span class="s-hq5gq9">De uitrolfases: alles is gebouwd en staat klaar; lanceren is een fase kiezen. Eén klik zet de hele kast in die stand (per-pas-fijnregeling blijft staan; intern blijft altijd open).</span>
     </div>
     <div class="schakels" id="bSchakels"></div>
@@ -1006,20 +1008,20 @@
     <p class="s-la7pgq"><button class="knop stil ideeKnop s-ohjkjq" type="button">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="aKpi"></div>
     <div class="kaart" id="atelier3dKaart">
-      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;justify-content:space-between;">
+      <div class="ds-presentatie-verdeelrij">
         <h3 class="sec s-40wpk4">Het Ontwerp-podium (3D)</h3>
-        <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">
+        <div class="ds-presentatie-mini-acties">
           <button class="knop stil s-1igs0oj" id="atelier3dShow" type="button" hidden>Modeshow</button>
           <button class="knop stil s-1igs0oj" id="aBoek" type="button">Collectieboek</button>
           <select class="veld s-g58y6l" id="atelier3dKies" aria-label="Kies een ontwerp voor het podium"></select>
         </div>
       </div>
-      <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:0;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
+      <canvas id="atelier3d" class="ds-presentatie-atelier-canvas" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
       <p class="s-12rbczi" id="atelier3dUitleg"></p>
     </div>
     <h3 class="sec">Nieuw ontwerp briefen</h3>
     <div class="kaart">
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="ds-presentatie-keuzerij">
         <select class="veld s-jv6rvf" id="aCat" aria-label="Categorie"></select>
         <input class="veld s-1cv7ti8" id="aNaam" placeholder="Naam, bijv. Bordeaux Top-Handle No.2" maxlength="100">
         <input class="veld s-jv5hwd" id="aHuis" placeholder="Huis / maison (optioneel)" maxlength="80">
@@ -1041,7 +1043,7 @@
     <div class="kpis" id="wpKpi"></div>
     <h3 class="sec">Nieuwe opdracht</h3>
     <div class="kaart">
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="ds-presentatie-keuzerij">
         <select class="veld s-jv64vw" id="wpSoort" aria-label="Soort opdracht">
           <option value="nieuw">Nieuwe app bedenken</option>
           <option value="verbeter">Bestaand onderdeel verbeteren</option>
@@ -1072,7 +1074,7 @@
     <div class="kpis" id="sKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="ds-presentatie-keuzerij">
         <select class="veld s-jv6rvf" id="sCat" aria-label="Discipline"></select>
         <input class="veld s-1cv7ti8" id="sNaam" placeholder="Naam, bijv. Meridiaan GT" maxlength="100">
         <input class="veld s-jv5hwd" id="sHuis" placeholder="Huis / programma (optioneel)" maxlength="80">
@@ -1082,7 +1084,7 @@
     </div>
     <h3 class="sec">Programma's <span class="stil s-1xjigpi">wijs concepten toe en exporteer een lookbook</span></h3>
     <div class="kaart">
-      <div class="rij" style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="rij ds-presentatie-keuzerij">
         <input class="veld s-jwtsuz" id="sProgNaam" placeholder="Programmanaam, bijv. Horizon" maxlength="80">
         <input class="veld s-1v3d95r" id="sProgSeizoen" placeholder="Seizoen" maxlength="40">
         <button class="knop stil" id="sProgMaak">Programma aanmaken</button>
@@ -1104,7 +1106,7 @@
     <div class="kpis" id="hKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="ds-presentatie-keuzerij">
         <select class="veld s-jv6rvf" id="hCat" aria-label="Discipline"></select>
         <input class="veld s-1cv7ti8" id="hNaam" placeholder="Naam, bijv. RTG PDA One" maxlength="100">
         <input class="veld s-jv5hwd" id="hHuis" placeholder="Huis / serie (optioneel)" maxlength="80">
@@ -1114,7 +1116,7 @@
     </div>
     <h3 class="sec">Series <span class="stil s-1xjigpi">wijs concepten toe en exporteer een productblad</span></h3>
     <div class="kaart">
-      <div class="rij" style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="rij ds-presentatie-keuzerij">
         <input class="veld s-jwtsuz" id="hSerieNaam" placeholder="Serienaam, bijv. RTG One" maxlength="80">
         <input class="veld s-1v3d95r" id="hSerieSeizoen" placeholder="Generatie" maxlength="40">
         <button class="knop stil" id="hSerieMaak">Serie aanmaken</button>
@@ -1136,7 +1138,7 @@
     <div class="kpis" id="gKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="ds-presentatie-keuzerij">
         <select class="veld s-jv6rvf" id="gCat" aria-label="Discipline"></select>
         <input class="veld s-1cv7ti8" id="gNaam" placeholder="Naam, bijv. Villa Meridiaan" maxlength="100">
         <input class="veld s-jv5hwd" id="gHuis" placeholder="Huis / project (optioneel)" maxlength="80">
@@ -1146,7 +1148,7 @@
     </div>
     <h3 class="sec">Projecten <span class="stil s-1xjigpi">wijs concepten toe en exporteer een portfolio</span></h3>
     <div class="kaart">
-      <div class="rij" style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+      <div class="rij ds-presentatie-keuzerij">
         <input class="veld s-jwtsuz" id="gProjNaam" placeholder="Projectnaam, bijv. Kustlijn" maxlength="80">
         <input class="veld s-1v3d95r" id="gProjSeizoen" placeholder="Fase / jaar" maxlength="40">
         <button class="knop stil" id="gProjMaak">Project aanmaken</button>
@@ -1254,7 +1256,7 @@
       <button class="terug" id="techTerug">← alle kamers</button>
       <h1 id="techH1">Techniek &amp; De Wacht</h1>
     </div>
-    <p class="deck">De controlekamer onder de motorkap. Hier zie je in één oogopslag of het geld op de cent sluit, of de Rust-motor (het autoritatieve grootboek) meedraait en met de JS-spiegel in lockstep is, en hoe het immuunsysteem - De Wacht - het huis onder druk beschermt. Alles live; het volledige technische bord (zekeringen, health-checks, AI-fix) staat op <a href="/apps/techniek.html" style="color:var(--burgundy-on-dark);">de technische pagina</a>.</p>
+    <p class="deck">De controlekamer onder de motorkap. Hier zie je in één oogopslag of het geld op de cent sluit, of de Rust-motor (het autoritatieve grootboek) meedraait en met de JS-spiegel in lockstep is, en hoe het immuunsysteem - De Wacht - het huis onder druk beschermt. Alles live; het volledige technische bord (zekeringen, health-checks, AI-fix) staat op <a href="/apps/techniek.html" class="ds-presentatie-accentlink">de technische pagina</a>.</p>
 
     <h3 class="sec">Het grootboek - sluit het op de cent?</h3>
     <div class="kpis" id="techGrootboek"><div class="leeg">Laden…</div></div>
@@ -1411,21 +1413,46 @@
 <script src="/apps/reisprogramma-velden.js"></script>
 <script src="/apps/reisprogramma-weergave.js"></script>
 <script src="/apps/reisprogramma-editor.js"></script>
+<script src="/apps/reisketen-nazorg.js"></script>
+<script src="/apps/reisketen-offerte.js"></script>
+<script src="/apps/reisketen-werktafel.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-const api = (pad, body) => fetch('/api/office/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+function sessieActueel(token) {
+  if (!token || TOKEN !== token) return false;
+  try { return localStorage.getItem('rtg_office_token') === token; } catch (e) { return false; }
+}
+window.addEventListener('storage', e => {
+  if ((e.key === 'rtg_office_token' && e.oldValue !== e.newValue) || e.key === null) {
+    TOKEN = null; document.body.hidden = true; location.reload();
+  }
+});
+const api = (pad, body) => {
+  const gevraagdMet = TOKEN;
+  if (!sessieActueel(gevraagdMet)) return Promise.reject(Object.assign(new Error('Deze kantoorsessie is niet meer actief.'), { status: 401 }));
+  return fetch('/api/office/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + gevraagdMet },
   body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { if (r.status === 401) uitgelogd(gevraagdMet); const e = new Error(d.error || 'Er ging iets mis.'); e.status = r.status; throw e; }
+  if (!sessieActueel(gevraagdMet)) { uitgelogd(gevraagdMet); throw Object.assign(new Error('Deze kantoorsessie is niet meer actief.'), { status: 401 }); }
+  return d;
+});
+};
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
 function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vIntegraties','vBalie','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
-function uitgelogd(){
-  TOKEN = null; try { localStorage.removeItem('rtg_office_token'); } catch (e) {}
+function uitgelogd(afgewezenToken){
+  // Ook .catch(uitgelogd) gebruikt deze deur: een Error is geen credential.
+  // Een laat A-antwoord sluit dit oude scherm, maar wist nooit opgeslagen B.
+  const token = typeof afgewezenToken === 'string' ? afgewezenToken : TOKEN;
+  TOKEN = null;
+  try { if (token && localStorage.getItem('rtg_office_token') === token) localStorage.removeItem('rtg_office_token'); } catch (e) {}
   var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search);
   if (!window.RTGDeur) { location.replace(naar); return; }
   /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
@@ -1434,6 +1461,8 @@ function uitgelogd(){
      netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
      zodra de pagina klaar is met opbouwen. */
   setTimeout(function () {
+    clearInterval(chatTimer); clearInterval(wereldTimer); clearInterval(techTimer); clearInterval(boardTimer);
+    clearTimeout(osseT); if (osse) { osse.close(); osse = null; }
     var el = document.getElementById('main') || document.body;
     RTGDeur.toon(el, { soort: 'personeel', naar: naar });
   }, 0);
@@ -1565,6 +1594,7 @@ async function openKamer(id){
   $('#kReisbureau').hidden = (id !== 'reisbureau');
   if (id === 'reisbureau') {
     laadReisbalie();
+    if (window.RTGReisketenWerktafel) RTGReisketenWerktafel.mount($('#kReisContracten'), function (pad, body) { return api('reisbureau/' + pad, body); });
     RTGReisPlanner.mount(api);
     /* De knoppen een KEER bedraden. Twee keer dezelfde luisteraar erop zetten
        levert twee klaargezette reizen per klik op -- en die tweede staat dan
@@ -1802,11 +1832,13 @@ const volgendeFase = (fasen, nu) => fasen[Math.min(fasen.length - 2, fasen.index
 
 /* ---------- het eigen huis van elke afdeling ---------- */
 async function laadAfdHotel(kamerId, kamerNaam){
+  const vak = $('#kHotelVak'); if (!vak) return;
   try {
     const d = await api('afdelingshotel', { kamer: kamerId });
+    if (!vak.isConnected) return;
     $('#kHotelNaam').textContent = d.hotel.naam;
     $('#kHotSoort').innerHTML = d.kamers.map(k => '<option value="' + esc(k.soort) + '">' + esc(k.naam) + ' (' + k.vrij + ' vrij)</option>').join('');
-    $('#kHotelVak').innerHTML =
+    vak.innerHTML =
       '<div class="s-13sojn1">' + esc(d.hotel.motto) + '</div>' +
       '<div class="s-oi0t6z">' + d.eenheden + ' kamers · vannacht ' + d.vannacht + ' bezet (' + d.bezettingPct + '%)</div>' +
       d.kamers.map(k => '<div style="display:flex;gap:.6rem;font-size:.82rem;padding:.2rem 0;"><span class="s-6xdtu8">' + esc(k.naam) + '</span>' +
@@ -1814,7 +1846,7 @@ async function laadAfdHotel(kamerId, kamerNaam){
       (d.komend.length ? '<div class="s-v8r6w1">' + d.komend.slice(0, 6).map(b =>
         '<div class="s-1pv2lmv">' + esc(b.van) + ' → ' + esc(b.tot) + ' · ' + esc(b.soortNaam) + ' · ' + esc(b.voor) + '</div>').join('') + '</div>' : '') +
       '<div class="s-1e3l51k">' + esc(d.verrekening) + '</div>';
-  } catch (e) { $('#kHotelVak').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  } catch (e) { if (vak.isConnected) vak.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
   const boek = $('#kHotBoek');
   if (boek && !boek._b) { boek._b = 1; boek.addEventListener('click', async () => {
     try { await api('afdelingshotel/boek', { kamer: KAMER, soort: $('#kHotSoort').value, voor: $('#kHotVoor').value, van: $('#kHotVan').value, tot: $('#kHotTot').value });
@@ -3607,11 +3639,12 @@ const BALIE_DICHTE_STANDEN = ['opgelost', 'gesloten'];
    betekent "geen zetel" en verdient de uitleg in plaats van een rode regel bij
    een knop; elke andere fout hoort wel bij de knop waarop u drukte. */
 async function balieApi(pad, body){
+  const gevraagdMet = TOKEN;
   const r = await fetch('/api/office/balie/' + pad, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + gevraagdMet },
     body: JSON.stringify(body || {}) });
   const d = await r.json().catch(() => ({}));
-  if (r.status === 401) { uitgelogd(); throw new Error(BALIE_DICHT); }
+  if (r.status === 401) { uitgelogd(gevraagdMet); throw new Error(BALIE_DICHT); }
   if (r.status === 403) { balieDeur(true, d.error); throw new Error(BALIE_DICHT); }
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
   return d;
@@ -4539,7 +4572,7 @@ $('#bAllesUit').addEventListener('click', async () => {
 });
 
 /* de boardroom ververst zichzelf zolang hij openstaat */
-setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }, 30000);
+const boardTimer = setInterval(() => { const bord = $('#vBoard'); if (TOKEN && bord && !bord.hidden && !document.hidden) openBoard(); }, 30000);
 
 /* Live: het office-kanaal (SSE). De bank-kern geeft bij elke boeking een
    gedempt seintje (scope 'bank') en de stad bij elke schakeling of meting

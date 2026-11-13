@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-11-10T22:46:37.533Z",
-    "commit": "f2324f24a",
-    "routesToen": 5558
+    "op": "2026-11-12T23:32:47.340Z",
+    "commit": "6d1683f05b",
+    "routesToen": 5573
   },
   "aangeraakt": [
     "GET /",
@@ -2755,6 +2755,10 @@
     "POST /api/office/reisbureau/afzeggen",
     "POST /api/office/reisbureau/besluit",
     "POST /api/office/reisbureau/bevestig",
+    "POST /api/office/reisbureau/keten",
+    "POST /api/office/reisbureau/keten/afronden",
+    "POST /api/office/reisbureau/keten/nazorg/antwoord",
+    "POST /api/office/reisbureau/keten/offerte",
     "POST /api/office/reisbureau/klaarzetten",
     "POST /api/office/reisbureau/lees",
     "POST /api/office/reisbureau/terugboeking",
@@ -3323,6 +3327,11 @@
     "POST /api/reisbureau/annuleer",
     "POST /api/reisbureau/betaal",
     "POST /api/reisbureau/boek",
+    "POST /api/reisbureau/keten",
+    "POST /api/reisbureau/keten/akkoord",
+    "POST /api/reisbureau/keten/betaal",
+    "POST /api/reisbureau/keten/nazorg",
+    "POST /api/reisbureau/keten/start",
     "POST /api/reisbureau/mijn",
     "POST /api/reisbureau/thuis",
     "POST /api/reisbureau/wijzig",
@@ -4838,6 +4847,12 @@
     "POST /api/supplier/redactie/snel",
     "POST /api/supplier/redactie/staat",
     "POST /api/supplier/refund",
+    "POST /api/supplier/reisbureau/keten",
+    "POST /api/supplier/reisbureau/keten/afronden",
+    "POST /api/supplier/reisbureau/keten/nazorg/antwoord",
+    "POST /api/supplier/reisbureau/keten/offerte",
+    "POST /api/supplier/reisbureau/opdracht/besluit",
+    "POST /api/supplier/reisbureau/opdrachten",
     "POST /api/supplier/reservering/beslis",
     "POST /api/supplier/reservering/doorzetten",
     "POST /api/supplier/reservering/komst",

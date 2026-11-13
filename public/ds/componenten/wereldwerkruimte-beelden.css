@@ -29,13 +29,29 @@
     outline-offset: 3px;
   }
   .ds-wereldwerkruimte .pi-change:hover { border-color: var(--ds-cover-metaal); }
-  .ds-wereldwerkruimte .wp-edit-images {
+  /* Het sfeerbeeld ligt bewust achter de werkruimte. Zijn bronactie blijft het
+     contract voor de contextuele Edge, maar is daar de enige zichtbare en
+     focusbare presentatie; zo bestaat geen bedekte tweede knop. */
+  .ds-wereldwerkruimte .wp-atmosphere > .pi-change { display: none; }
+  .ds-wereldwerkruimte :is(.wp-edit-images,.wp-edit-atmosphere) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--ds-ruimte-2);
+    order: 0;
+    margin-inline-start: var(--ds-ruimte-4);
     min-block-size: var(--ds-doel);
-    font: inherit;
+    max-inline-size: 100%;
+    font: 400 var(--ds-maat-meta)/1.4 var(--ds-letter-tekst);
+    white-space: nowrap;
+  }
+  @media (max-width: 999px) {
+    .ds-wereldwerkruimte :is(.wp-edit-images,.wp-edit-atmosphere) {
+      inline-size: var(--ds-doel);
+      margin-inline-start: auto;
+      font-size: 0;
+    }
+    .ds-wereldwerkruimte :is(.wp-edit-images,.wp-edit-atmosphere) > span:not(.wd-icon) { display: none; }
   }
 
   /* Zonder display-regel op de dialoog zelf behoudt een gesloten native

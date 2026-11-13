@@ -127,7 +127,7 @@ const LEZERS = {
   'server/kern/ervaring/leden/spaarpot.js': { soort: 'historie',
     wat: 'ritten die punten of spaargeld opleverden',
     naOmzetting: 'na het besluit. Punten die verdwijnen zijn een belofte die het huis terugneemt zonder het te zeggen' },
-  'server/opzet/kernlaag4.js': { soort: 'historie',
+  'server/opzet/kernlaag4-bedrijfsmaat.js': { soort: 'historie',
     wat: 'afgeronde ritten als geslaagde uitkomst voor activatie en retentie (kern/bedrijfsmaat/stand.js, als lezer)',
     naOmzetting: 'na het besluit. Een rit die uit de telling valt, maakt een geactiveerd lid stil tot een niet-geactiveerd lid' }
 };
@@ -141,7 +141,7 @@ const GEEN_LEZER = {
   'server/lib/mutatiecontracten-kantoorstuur.js': 'tekst in een contract: de bedrijfsmaat leest de ritten via een lezer en schrijft niet'
 };
 
-function tel() {
+function tel(wortel = WORTEL) {
   const gevonden = new Map();
   function loop(map) {
     for (const naam of fs.readdirSync(map)) {
@@ -149,13 +149,17 @@ function tel() {
       const st = fs.statSync(p);
       if (st.isDirectory()) { if (naam !== 'node_modules' && naam !== 'data') loop(p); continue; }
       if (!naam.endsWith('.js')) continue;
-      const rel = path.relative(WORTEL, p).replace(/\\/g, '/');
+      const rel = path.relative(wortel, p).replace(/\\/g, '/');
       const bron = fs.readFileSync(p, 'utf8');
-      const n = (bron.match(/db\.data\.rides/g) || []).length;
+      /* Een uitgehaalde montage kan db.data als parameter `data` ontvangen.
+         Ook die concrete rittoegang hoort in de kaart; verplaatsen is geen
+         migreren. Dit blijft een lexicale inventaris, geen aliasanalyse:
+         de handgeschreven indeling verklaart wat iedere gevonden plek leest. */
+      const n = (bron.match(/\b(?:db\.)?data\.rides\b/g) || []).length;
       if (n) gevonden.set(rel, n);
     }
   }
-  loop(path.join(WORTEL, 'server'));
+  loop(path.join(wortel, 'server'));
   return gevonden;
 }
 
@@ -231,7 +235,7 @@ function druk(u) {
     ' (' + t.historie + ' historie, ' + t.schrijver + ' schrijvers, in die volgorde).');
 }
 
-module.exports = { meet, LEZERS, GEEN_LEZER, DOEL };
+module.exports = { meet, tel, LEZERS, GEEN_LEZER, DOEL };
 
 if (require.main === module) {
   const u = meet();

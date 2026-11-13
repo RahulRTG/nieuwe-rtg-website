@@ -21,7 +21,14 @@ jobs:
     # koude GitHub-run kan alleen die gecontroleerde installatie al ruim twintig
     # minuten kosten; de kwaliteitsproeven mogen daardoor niet onuitgevoerd
     # worden geannuleerd.
-    timeout-minutes: 45
+    # Op een koude runner kost installatie circa 13 minuten. De mobiele en
+    # WebKit-proeven daarna circa 8 minuten. De brongebonden Experience-a11y-
+    # producer meet dezelfde inventaris nu in twee fail-closed delen; zijn
+    # contract laat maximaal 60 minuten toe. De interne scan gebruikt die hele
+    # grens: de nulmeting op Node 26.13.0 bereikte 55 minuten zonder oordeel.
+    # De proef of haar norm wordt niet verkleind; de omringende job houdt ruimte
+    # voor installatie, de voorproeven en het bewaren van de bewijsartefacten.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

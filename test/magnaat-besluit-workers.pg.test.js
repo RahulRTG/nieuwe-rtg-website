@@ -39,6 +39,13 @@ test('Magnaat-besluit: twee workers, herstart, conflict en actorisolatie', { ski
     const r = await api(w, 'login', { tier }, null);
     assert.equal(r.status, 200, JSON.stringify(r)); return r.body.token;
   }
+  function samenvatting(antwoorden) {
+    return antwoorden.map(({ status, body }) => ({
+      status,
+      fout: body && (body.error || body.fout || body.message),
+      code: body && body.code
+    }));
+  }
   try {
     const a = await start('a');
     a.token = await demo(a, 'rtg');
@@ -47,8 +54,8 @@ test('Magnaat-besluit: twee workers, herstart, conflict en actorisolatie', { ski
 
     const opdracht = { lening: 1000, idem: 'workers-lening-1' };
     const tegelijk = await Promise.all([api(a, 'member/magnaat/economie/beslis', opdracht), api(b, 'member/magnaat/economie/beslis', opdracht)]);
-    assert.ok(tegelijk.every(r => [200, 409, 503].includes(r.status)), JSON.stringify(tegelijk));
-    assert.ok(tegelijk.some(r => r.status === 200), JSON.stringify(tegelijk));
+    assert.ok(tegelijk.every(r => [200, 409, 503].includes(r.status)), JSON.stringify(samenvatting(tegelijk)));
+    assert.ok(tegelijk.some(r => r.status === 200), JSON.stringify(samenvatting(tegelijk)));
     for (const r of tegelijk.filter(r => r.status !== 200)) {
       const herstel = await api(r === tegelijk[0] ? a : b, 'member/magnaat/economie/beslis', opdracht);
       assert.equal(herstel.status, 200, JSON.stringify(herstel));

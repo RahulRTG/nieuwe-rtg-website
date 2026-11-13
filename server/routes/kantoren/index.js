@@ -56,6 +56,7 @@ module.exports = (kern) => {
 
   // het reisbureau (aanvragen, het besluit, en de klaargezette reizen): ./reisbureau.js
   require('./reisbureau')({ app, officeAuth, veilig, stuur, afdelingen, kern });
+  require('./reisketen')(kern);
 
   /* Het vraagbeeld van de Mall: waar wordt naar gezocht en niets gevonden. Per
      WOORD geteld en nooit per persoon, en pas zichtbaar boven een drempel; zie

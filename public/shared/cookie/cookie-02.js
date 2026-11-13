@@ -40,8 +40,26 @@
       meetRuimte();
     });
     if (window.ResizeObserver) {
-      var maatkijker = new window.ResizeObserver(meetRuimte);
+      maatkijker = new window.ResizeObserver(meetRuimte);
       maatkijker.observe(el);
+    }
+    /* Browsertekstvergroting verandert normaal de viewport en wordt hierboven
+       al gemeten. Ook hosts die hun basistekstmaat rechtstreeks aanpassen,
+       moeten de gereserveerde ruimte onmiddellijk en idempotent vernieuwen. */
+    if (window.MutationObserver) {
+      tekstmaatkijker = new window.MutationObserver(function () {
+        if (!el.isConnected) return;
+        var tekstmaat = document.documentElement.style.fontSize;
+        /* De reservering zelf staat ook in het style-attribuut. Reageer alleen
+           op de tekstmaat, anders veroorzaakt de owner zijn eigen meetlus. */
+        if (tekstmaat === laatsteTekstmaat) return;
+        laatsteTekstmaat = tekstmaat;
+        /* De nieuwe tekst kan al vóór de volgende frame worden uitgelezen.
+           Reserveer daarom in deze microtaskronde; de maatkijker blijft
+           latere font- en layoutwijzigingen volgen. */
+        meetRuimte();
+      });
+      tekstmaatkijker.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
     }
   }
   if (document.body) plaats(); else document.addEventListener('DOMContentLoaded', plaats);

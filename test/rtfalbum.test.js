@@ -9,6 +9,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-album-'));
@@ -20,8 +21,7 @@ const api = (pad, body) => fetch(BASE + (pad.startsWith('/api/') ? pad : '/api/f
 const baby = (actie, body) => fetch(BASE + (actie.startsWith('/api/') ? actie : '/api/rtf/baby/' + actie), {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const dag = n => { const d = new Date(Date.now() + n * 86400000);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const dag = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 let g, ouder, kind, gast;
 

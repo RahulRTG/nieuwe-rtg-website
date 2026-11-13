@@ -3,6 +3,7 @@ const GS = require('../geschikt');
 const ConnectionPartner = require('../connection-partner');
 const logboekzicht = require('./logboekzicht');
 const personeelzicht = require('./personeelzicht');
+const tijdzone = require('../tijdzone');
 module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
@@ -14,7 +15,7 @@ module.exports = (ctx) => {
   function supplierState(s, actor) {
     const kijker = actor || { name: 'Beheer', role: 'manager', manager: true };
     const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = tijdzone.datumIn();
     const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1, 'bezorgd': 1, 'opgehaald': 1 };
     const alleOrders = ordersVanZaak(s.code).filter(o => o.status !== 'wacht-op-betaling');
     const zichtOrders = alleOrders.filter(o => !ORDER_KLAAR[o.status] || String(o.at).slice(0, 10) === vandaag).slice(0, 80);
@@ -131,8 +132,8 @@ module.exports = (ctx) => {
       events: s.events || null,
       dailyMeps: (() => {
         if (!s.dailyMeps) return null;
-        const vandaag = new Date().toISOString().slice(0, 10);
-        const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+        const vandaag = tijdzone.datumIn();
+        const morgen = tijdzone.plusDagen(vandaag, 1);
         const out = {};
         if (s.dailyMeps[vandaag]) out[vandaag] = s.dailyMeps[vandaag];
         if (s.dailyMeps[morgen]) out[morgen] = s.dailyMeps[morgen];

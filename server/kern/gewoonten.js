@@ -15,28 +15,26 @@
    WAT ER NIET IS: een percentage, een score, een ranglijst, en een "beste week
    ooit". Er staat een toets op die faalt zodra dat er alsnog in kruipt. */
 
-const DAG = 86400000;
+const klok = require('../lib/klok');
+const { datumIn: dagVan, plusDagen } = require('./tijdzone');
 const MAX_GEWOONTEN = 12;
 const MAX_DAGEN = 400;
 const VENSTER = 14;               // hoeveel dagen het scherm terugkijkt
 
-const dagVan = d => new Date(d).toISOString().slice(0, 10);
-
 /* De reeks: hoeveel dagen op rij tot en met vandaag (of tot en met gisteren,
    want de dag is nog niet voorbij). Puur, en alleen gebruikt als het lid de
    teller aan heeft gezet. */
-function reeksVan(dagen, nu = new Date()) {
+function reeksVan(dagen, nu = klok.datum()) {
   const gedaan = new Set(dagen || []);
   const vandaag = dagVan(nu);
   let teller = 0;
-  let d = new Date(nu.getTime());
+  let d = vandaag;
   // vandaag telt alleen mee als hij al af is; anders begint de reeks gisteren
-  if (!gedaan.has(vandaag)) d = new Date(nu.getTime() - DAG);
+  if (!gedaan.has(vandaag)) d = plusDagen(vandaag, -1);
   for (;;) {
-    const s = dagVan(d);
-    if (!gedaan.has(s)) break;
+    if (!gedaan.has(d)) break;
     teller++;
-    d = new Date(d.getTime() - DAG);
+    d = plusDagen(d, -1);
   }
   return teller;
 }
@@ -50,7 +48,7 @@ module.exports = ({ db, save, schoon, crypto }) => {
 
   function toon(g, nu) {
     const vandaag = dagVan(nu);
-    const vanaf = dagVan(new Date(nu.getTime() - (VENSTER - 1) * DAG));
+    const vanaf = plusDagen(vandaag, -(VENSTER - 1));
     const recent = (g.dagen || []).filter(d => d >= vanaf).sort();
     return {
       id: g.id, naam: g.naam, waarom: g.waarom || '',
@@ -65,11 +63,11 @@ module.exports = ({ db, save, schoon, crypto }) => {
     };
   }
 
-  function gewoontenVan(key, nu = new Date()) {
+  function gewoontenVan(key, nu = klok.datum()) {
     return { ok: true, gewoonten: mijne(key).map(g => toon(g, nu)) };
   }
 
-  function gewoonteMaak(key, body, nu = new Date()) {
+  function gewoonteMaak(key, body, nu = klok.datum()) {
     if (mijne(key).length >= MAX_GEWOONTEN) {
       return { status: 409, error: 'U heeft er al ' + MAX_GEWOONTEN + '. Dat is meer dan genoeg om aan te werken.' };
     }
@@ -84,7 +82,7 @@ module.exports = ({ db, save, schoon, crypto }) => {
 
   /* Afvinken en weer afvinken: een tik zet hem aan, dezelfde tik zet hem uit.
      Geen aparte "toch niet"-knop, want dan is een vergissing een handeling. */
-  function gewoonteTik(key, body, nu = new Date()) {
+  function gewoonteTik(key, body, nu = klok.datum()) {
     const g = mijne(key).find(x => x.id === String(body.id || ''));
     if (!g) return { status: 404, error: 'Deze gewoonte staat niet op uw naam.' };
     const op = /^\d{4}-\d{2}-\d{2}$/.test(String(body.op || '')) ? String(body.op) : dagVan(nu);
@@ -103,7 +101,7 @@ module.exports = ({ db, save, schoon, crypto }) => {
 
   /* De teller aan of uit. Uitzetten gooit NIETS weg: de afvinkjes blijven, en
      wie hem later weer aanzet, ziet de reeks die er dan is. */
-  function gewoonteReeks(key, body, nu = new Date()) {
+  function gewoonteReeks(key, body, nu = klok.datum()) {
     const g = mijne(key).find(x => x.id === String(body.id || ''));
     if (!g) return { status: 404, error: 'Deze gewoonte staat niet op uw naam.' };
     g.reeksAan = body.aan === true;

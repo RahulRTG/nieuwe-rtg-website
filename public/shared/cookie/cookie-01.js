@@ -42,12 +42,19 @@
 
   var RUIMTE = '--rtg-cookieruimte';
   var BODEM = '--ds-cookie-bodem';
+  var maatkijker, tekstmaatkijker;
+  var laatsteTekstmaat = document.documentElement.style.fontSize;
   function meetRuimte() {
     if (ds || !el.isConnected) return;
     var h = Math.ceil(el.getBoundingClientRect().height) + 12;
-    document.documentElement.style.setProperty(RUIMTE, h + 'px');
+    var waarde = h + 'px';
+    if (document.documentElement.style.getPropertyValue(RUIMTE) !== waarde) {
+      document.documentElement.style.setProperty(RUIMTE, waarde);
+    }
   }
   function geefRuimteTerug() {
+    if (maatkijker) maatkijker.disconnect();
+    if (tekstmaatkijker) tekstmaatkijker.disconnect();
     document.documentElement.style.removeProperty(RUIMTE);
     document.documentElement.style.removeProperty(BODEM);
     if (document.body && document.body.classList) document.body.classList.remove('ds-cookie-host');

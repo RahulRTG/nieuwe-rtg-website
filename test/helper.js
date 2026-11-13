@@ -1181,7 +1181,7 @@ async function wachtOpZichtbaar(page, selector, opties) {
    valse alarmbel. Slaat hij twee keer om, dan is er iets anders aan de hand en
    hoort de toets gewoon te zakken. */
 async function binnenEenDag(werk) {
-  const dag = () => new Date().toISOString().slice(0, 10);
+  const dag = () => require('../server/kern/tijdzone').datumIn();
   const voor = dag();
   const uit = await werk();
   if (dag() === voor) return uit;

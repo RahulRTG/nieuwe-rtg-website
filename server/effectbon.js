@@ -16,6 +16,7 @@
      objectrefs   de COLLECTIES die bewogen -- namen, nooit rijen en nooit sleutels
      at           wanneer
      dekking      wat deze bon wel en niet kon zien, bij naam
+     waarborg     controle van meetbare negatieve invarianten; blind blijft blind
 
    EN WAT ER NOOIT IN KOMT: geen momentopnames, geen lijven, geen payload, geen diff,
    geen codenaam, geen enkele rij-id. Een bon die de inhoud draagt is een gedragslogboek
@@ -48,6 +49,7 @@ const staatlog = require('./staatlog');
 const effectmeter = require('./effectmeter');
 const { classificeerEffectcollecties } = require('./effectbon-classificatie');
 const { nameet } = require('./kern/stuur/gevolgcontract/nameting');
+const { controleerInvarianten } = require('./kern/stuur/waarborgcontract');
 /* de begrensde ring van de laatste bonnen, met opzet geen journaal: ./effectbon-ring.js */
 const { bewaar, bonnen, laatste, RING_MAX } = require('./effectbon-ring');
 
@@ -117,6 +119,8 @@ function maak({ envelop, voor, na, teller }) {
     })
   };
   if (Array.isArray(voorspeld)) bon.nameting = nameet(voorspeld, bon);
+  // Een ontbrekend of blind contract wordt nooit stil als geslaagd aangemerkt.
+  bon.waarborg = controleerInvarianten(bon.capability, bon);
   return Object.freeze(bon);
 }
 

@@ -31,18 +31,28 @@ let saveTimer = null, saveVuil = false, saveDuur = 0, saveKlaar = 0;
 // omvang. Zodra de data weer past, herstelt het zichzelf.
 let snapshotVol = false, snapshotWaarschuwing = 0;
 
-function schrijfSnapshotNu() {
+function schrijfSnapshotNu(opties) {
+  const vereist = opties?.vereist === true;
   saveVuil = false;
-  if (snapshotVol && klok.nu() - snapshotWaarschuwing < 60000) { saveKlaar = klok.nu(); return; }
+  if (snapshotVol && klok.nu() - snapshotWaarschuwing < 60000) {
+    saveKlaar = klok.nu();
+    if (vereist) throw new Error('De JSON-snapshot is te groot; de opslag heeft niets bevestigd.');
+    return;
+  }
   const t0 = klok.nu();
   try {
     beslotenMap(DATA_DIR);
     // compact (geen pretty-print): bij grote data scheelt dat ~40% tijd en ruimte
     const uit = kluis.AAN ? kluis.versleutel(rtgjson.stringify(db.data)) : rtgjson.stringify(db.data);
-    schrijfDuurzaam(DB_FILE, uit, 0o600);
+    schrijfDuurzaam(DB_FILE, uit, 0o600, { vereist });
     besloten(DB_FILE);
-    if (STORE !== 'postgres') redis.spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis
     snapshotVol = false;
+    // De lokale snapshot staat nu vast. Een optionele mirror mag die bekende
+    // uitkomst niet achteraf in een schijnmislukking veranderen.
+    if (STORE !== 'postgres') {
+      try { redis.spiegelNaarRedis(); }
+      catch (e) { console.warn('[db] snapshot vastgelegd, Redis-spiegel mislukt:', e.message); }
+    }
   } catch (e) {
     if (/Invalid string length|string longer than|Cannot create a string/i.test(e.message || '')) {
       snapshotVol = true; snapshotWaarschuwing = klok.nu();
@@ -51,9 +61,14 @@ function schrijfSnapshotNu() {
     } else {
       console.warn('[db] snapshot schrijven mislukt:', e.message);
     }
+    // De achtergrondweg blijft write-behind. Een duurzame aanroeper mag
+    // dezelfde fout niet als succes teruggeven omdat JSON geen teller heeft.
+    if (vereist) throw e;
+    return;
+  } finally {
+    saveDuur = klok.nu() - t0;
+    saveKlaar = klok.nu();
   }
-  saveDuur = klok.nu() - t0;
-  saveKlaar = klok.nu();
 }
 function planSnapshot() {
   saveVuil = true;

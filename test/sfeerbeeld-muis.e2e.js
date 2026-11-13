@@ -25,13 +25,24 @@ for (const breedte of [1440, 1100]) test('de muis bereikt "Sfeerbeeld wijzigen" 
   await ctx.addInitScript((t) => { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_member_token', t); }, token);
   const page = await ctx.newPage(), fouten = []; letOpFouten(page, fouten);
   try {
-    await page.goto(srv.base + '/apps/rtg.html'); await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
+    /* De bewering wacht hieronder op twee inhoudelijke gereedtekens. Wachten
+       op ieder lettertype en beeld (`load`) maakte dezelfde groene bediening
+       onder parallelle CI-belasting na dertig seconden rood. */
+    await page.goto(srv.base + '/apps/rtg.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
     await page.waitForFunction(() => document.body.dataset.rtgWorldStart === 'ready');
-    const knop = page.locator('.wp-atmosphere > .pi-change');
+    const knop = page.locator(':is(.rtg-v4-header-actions,.rtg-edge-top) > .wp-edit-atmosphere');
     await knop.waitFor({ state: 'attached' });
     const vak = await knop.boundingBox(); assert.ok(vak && vak.width > 0, 'de knop heeft geen plek op het scherm');
     await page.mouse.move(vak.x + vak.width / 2, vak.y + vak.height / 2);
-    assert.equal(await knop.evaluate((el) => getComputedStyle(el).opacity), '1', 'onder de muis hoort de knop zichtbaar te zijn');
+    const muis = await page.evaluate(({ x, y }) => {
+      const raak = document.elementFromPoint(x, y);
+      const knop = document.querySelector(':is(.rtg-v4-header-actions,.rtg-edge-top) > .wp-edit-atmosphere');
+      return { opacity: getComputedStyle(knop).opacity,
+        geraakt: raak && (raak.id || raak.className || raak.tagName),
+        knopGeraakt: !!(raak && (raak === knop || knop.contains(raak))) };
+    }, { x: vak.x + vak.width / 2, y: vak.y + vak.height / 2 });
+    assert.equal(muis.opacity, '1', 'onder de muis hoort de knop zichtbaar te zijn: ' + JSON.stringify(muis));
     await knop.click({ timeout: 4000 });
     await page.waitForSelector('.pi-editor[open]', { timeout: 4000 });
     assert.deepEqual(fouten, []);

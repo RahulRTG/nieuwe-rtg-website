@@ -1,0 +1,90 @@
+/* Onderzoekslab: centrale presentatie voor de KPI-band, projectfasen en
+   rustige statusmelding. De onderzoekslogica, gegevens en bevoegdheden blijven
+   eigendom van lab.html, lab-pro.js en de bestaande serverroutes. */
+@layer rtg.component {
+  .ds-onderzoekslab .labkpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: var(--ds-ruimte-3);
+  }
+
+  .ds-onderzoekslab .labkpi {
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    background: var(--ds-oppervlak);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+  }
+
+  .ds-onderzoekslab .labkpi b {
+    display: block;
+    font: 500 1.5rem/1.1 var(--ds-letter-display);
+  }
+
+  .ds-onderzoekslab .labkpi span {
+    color: var(--ds-inkt-zacht);
+    font-size: var(--ds-maat-meta);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .ds-onderzoekslab .labkpi.let b { color: var(--ds-status-fout); }
+
+  .ds-onderzoekslab .faseband {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--ds-ruimte-1);
+    margin: var(--ds-ruimte-1) 0;
+  }
+
+  .ds-onderzoekslab .faseband .fs {
+    padding: var(--ds-ruimte-1) var(--ds-ruimte-2);
+    color: var(--ds-inkt-zacht);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    font-size: var(--ds-maat-meta);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .ds-onderzoekslab .faseband .fs.was {
+    color: var(--ds-metaal);
+    border-color: var(--ds-metaal);
+  }
+
+  .ds-onderzoekslab .faseband .fs.nu {
+    background: var(--ds-metaal);
+    color: var(--ds-grond);
+    border-color: var(--ds-metaal);
+    font-weight: 600;
+  }
+
+  .ds-onderzoekslab .labmeld {
+    position: fixed;
+    inset-inline-start: 50%;
+    inset-block-end: calc(env(safe-area-inset-bottom, 0px) + var(--ds-edge-hoogte) + var(--ds-ruimte-4));
+    z-index: 80;
+    max-inline-size: min(92vw, 30rem);
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    transform: translateX(-50%) translateY(var(--ds-ruimte-4));
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border: 1px solid var(--ds-metaal);
+    border-radius: var(--ds-radius-inhoud);
+    box-shadow: var(--ds-schaduw-systeem);
+    opacity: 0;
+    transition: opacity 250ms ease, transform 250ms ease;
+    font-size: var(--ds-maat-klein);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ds-onderzoekslab .labmeld.aan {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds-onderzoekslab .labmeld { transition: none; }
+  }
+}

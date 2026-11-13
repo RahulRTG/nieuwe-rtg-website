@@ -19,7 +19,8 @@
    en een kopie op montagemoment zou undefined bevriezen. */
 
 const DAG = 86400000;
-const dagVan = d => new Date(d).toISOString().slice(0, 10);
+const klok = require('../lib/klok');
+const { datumIn: dagVan, plusDagen } = require('./tijdzone');
 
 /* Een signaal is of gemeten, of eerlijk niet gemeten. Er is geen derde vorm, en
    vooral geen nul die zich voordoet als een meting. */
@@ -41,7 +42,7 @@ module.exports = ({ kern }) => {
     try { return { waarde: fn() }; } catch (e) { return { fout: 'De laag ' + naam + ' gaf een fout.' }; }
   }
 
-  function lifeVoor(key, codenaam, nu = new Date()) {
+  function lifeVoor(key, codenaam, nu = klok.datum()) {
     const vandaag = dagVan(nu);
     const signalen = [];
     const storingen = [];
@@ -173,7 +174,7 @@ function winstVan({ beeld, lopend, komend, vandaag }) {
   if (bijna) {
     return { kop: 'Uw eerstvolgende stap', tekst: bijna.titel + ': ' + bijna.bericht.replace(/^Volgende stap: /, '') };
   }
-  const straks = komend.find(a => a.datum === vandaag || a.datum === dagVan(new Date(new Date(vandaag).getTime() + DAG)));
+  const straks = komend.find(a => a.datum === vandaag || a.datum === plusDagen(vandaag, 1));
   if (straks) {
     return { kop: straks.datum === vandaag ? 'Vandaag' : 'Morgen',
       tekst: straks.wat + ' bij ' + straks.waar + ', ' + straks.tijd + '.' };

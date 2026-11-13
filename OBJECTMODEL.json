@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-11-10",
+  "vastgelegd": "2026-11-12",
   "gemeten": {
-    "bestanden": 3034,
-    "vormen": 1625,
-    "velden": 2327,
-    "modules": 915,
-    "domeinen": 325,
+    "bestanden": 3056,
+    "vormen": 1630,
+    "velden": 2336,
+    "modules": 918,
+    "domeinen": 328,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1627,
-    "veldenGedeeldVanafVier": 237,
+    "veldenDomeineigen": 1635,
+    "veldenGedeeldVanafVier": 239,
     "gelijkendeVormparen": 64
   },
   "envelop": [
@@ -58,6 +58,18 @@
       ]
     },
     {
+      "veld": "supplierCode",
+      "domeinen": 19,
+      "waar": [
+        "kern/arrivalpas",
+        "kern/autoverkoop",
+        "kern/beveiliging",
+        "kern/comm",
+        "kern/commercie",
+        "kern/ervaring"
+      ]
+    },
+    {
       "veld": "code",
       "domeinen": 19,
       "waar": [
@@ -91,18 +103,6 @@
         "kern/gemeente",
         "kern/instant-reality",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "supplierCode",
-      "domeinen": 17,
-      "waar": [
-        "kern/arrivalpas",
-        "kern/autoverkoop",
-        "kern/beveiliging",
-        "kern/comm",
-        "kern/commercie",
-        "kern/ervaring"
       ]
     },
     {
@@ -957,9 +957,9 @@
     },
     {
       "gelijkenis": 0.91,
-      "a": "server/kern/reisbureau-betaling.js",
+      "a": "server/kern/reisbureau-betalingsrijen.js",
       "b": "server/kern/reisbureau-teruggave.js",
-      "domeinA": "kern/reisbureau-betaling",
+      "domeinA": "kern/reisbureau-betalingsrijen",
       "domeinB": "kern/reisbureau-teruggave",
       "gedeeld": [
         "bedragCenten",

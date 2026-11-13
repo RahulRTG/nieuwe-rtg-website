@@ -752,11 +752,55 @@
     }
   }
 
+  /* Alleen de reiswerktafels: geen antwoord of herhaling uit een vorige
+     sessie. Een authfout maakt beide panelen en hun lopende antwoorden oud. */
+  function maakReisApi(el){
+    const token = API.token;
+    const panelen = ['#zaakReisContracten', '#zaakReisOpdrachten'].map(s => el.querySelector(s)).filter(Boolean);
+    let geldig = true;
+    function actueel(){
+      try { return geldig && !!token && API.token === token && localStorage.getItem('rtg_sup_token') === token; }
+      catch (_) { return false; }
+    }
+    function wis(){
+      geldig = false;
+      window.removeEventListener('storage', sessieWissel);
+      panelen.forEach(p => {
+        p._reisGeneratie = (p._reisGeneratie || 0) + 1;
+        p._reisOpdrachtGeneratie = (p._reisOpdrachtGeneratie || 0) + 1;
+        p.replaceChildren('Uw reissessie is niet meer bevoegd. Open uw werkplek opnieuw.');
+      });
+    }
+    function sessieWissel(e){
+      if (e.key !== 'rtg_sup_token' && e.key !== null) return;
+      if (!actueel()) wis();
+    }
+    // Eén bewaker per werkplek. Vernieuwen vervangt de vorige bewaker;
+    // een ander tabblad mag zijn nieuwe token behouden terwijl dit beeld wist.
+    if (el._reisStop) el._reisStop();
+    el._reisStop = () => window.removeEventListener('storage', sessieWissel);
+    window.addEventListener('storage', sessieWissel);
+    const verlopen = () => Object.assign(new Error('De reissessie is gewijzigd. Open uw werkplek opnieuw.'), { status: 401 });
+    return async (pad, body) => {
+      try {
+        if (!actueel()) throw verlopen();
+        const r = await API.call('/supplier/reisbureau/' + pad, body);
+        if (!actueel()) throw verlopen();
+        return r;
+      } catch (e) {
+        if ([401, 403].includes(e.status)) wis();
+        throw e;
+      }
+    };
+  }
+
   // Wissel van gebruiker: sessie loslaten, terug naar het inlogscherm.
   function switchUser(){
     if (source){ try{ source.close(); }catch(_){} source = null; }
     stationMode = null; pendingStation = null;
     $('#station').classList.remove('on');
+    // Verbergen alleen houdt oude dossiers en pending reishosts verbonden.
+    $('#stBody').replaceChildren();
     API.token = null; state = null; S = null; notifs = [];
     try { localStorage.removeItem('rtg_sup_token'); localStorage.removeItem('rtg_sup_station'); } catch(e){}
     $('#app').classList.remove('active');
@@ -1142,6 +1186,12 @@
     const el = $('#stBody'); if (!el || !state) return;
     $('#stBiz').textContent = S ? S.name : '';
     $('#stLabel').textContent = stationLabel(stationMode) + (stationMode === 'keuken' ? ' \u00b7 ' + T('ks.'+keukenSectie, (KSECTIES[keukenSectie]||['',''])[1]) : '');
+    // Alleen het bewerkte reiscontract behoudt zijn vluchtige concept en
+    // mutatieslot; de bestaande reispoort controleert opnieuw de bevoegdheid.
+    const reis = el.querySelector('#zaakReisContracten');
+    if (stationMode === 'kantoor' && kantoorSec === 'reiscontracten' && reis && reis.querySelector('form') && reis._reisControle) {
+      reis._reisControle(); return;
+    }
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     let html = '';
     if (stationMode === 'keuken' || stationMode === 'bar'){ laadWerkvloer(); html += werkvloerBalk(); }
@@ -2223,6 +2273,7 @@
       ['vandaag','\u2600\uFE0F',T('kt.vandaag','Vandaag')],
       ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
     );
+    secs.push(['reiscontracten', '', 'Reisopdrachten']);
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
     /* TREASURY voor elke zaak, ongeacht genre. Geld dat binnenkomt is niet
        hetzelfde als geld dat van u is: er zit btw in en er komt een loonrun aan.
@@ -2233,7 +2284,10 @@
     let html = '<div class="st-chips">'+secs.map(s2 =>
       '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';
     if (kantoorMsg){ html += '<div class="tkc s-9ncju4">'+kantoorMsg+'</div>'; }
-
+    if (kantoorSec === 'reiscontracten') {
+      if (type === 'reisbureau') html += '<div class="tkc h-volbreed" id="zaakReisContracten"></div>';
+      html += '<div class="tkc h-volbreed" id="zaakReisOpdrachten"></div>';
+    }
 /* de eigen backoffice van de zaak */
     if (kantoorSec === 'bo'){
       // de eigen backoffice van de zaak, met dezelfde patronen als het
@@ -3178,6 +3232,9 @@
   }
 
   function bindKantoor(el){
+    const reisApi = maakReisApi(el);
+    if (window.RTGReisketenWerktafel) window.RTGReisketenWerktafel.mount(el.querySelector('#zaakReisContracten'), reisApi);
+    if (window.RTGReisketenLeverancier) window.RTGReisketenLeverancier.mount(el.querySelector('#zaakReisOpdrachten'), reisApi);
     el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; thuisData = null; wvData = null; tresData = null; tresGraaf = null; tresMsg = ''; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
@@ -3917,7 +3974,15 @@
     laadTijdKaart(el);
   }
 
-  async function refresh(){ try { applyState((await API.call('/supplier/state')).state); renderAll(); } catch(e){} }
+  async function refresh(){
+    try { applyState((await API.call('/supplier/state')).state); renderAll(); }
+    catch(e){
+      // Een geweigerde algemene lezing bereikt renderStation niet. Alleen
+      // de geopende reiswerktafel hercontroleert dan zijn eigen sessiepoort.
+      const reis = $('#zaakReisContracten');
+      if (stationMode === 'kantoor' && kantoorSec === 'reiscontracten' && reis && reis._reisControle) reis._reisControle();
+    }
+  }
 
   /* Het werkvenster (werkgever): wanneer mag personeel de werkomgeving in
      (leverancier-app en PDA), en wanneer niet. Per weekdag een tijdslot of de
@@ -9641,7 +9706,7 @@
   // ---- meldingen ----
   function renderBell(){
     const unread = notifs.filter(n=>!n.read).length;
-    const b = $('#bellBadge'); b.style.display = unread>0?'flex':'none'; b.textContent = unread>9?'9+':unread;
+    const b = $('#bellBadge'); b.hidden = unread <= 0; b.textContent = unread>9?'9+':unread;
 /* de meldingenlijst van de zaak */
     $('#notifList').innerHTML = notifs.length ? notifs.map(n =>
       '<div class="notif-item'+(n.read?'':' unread')+'"><div class="ic">'+(window.RTGGlyf&&RTGGlyf.heeft(n.icon)?RTGGlyf.svgHTML(n.icon,{klasse:'gl-inline'}):(n.icon||'•'))+'</div><div class="tx"><b>'+n.title+'</b><span>'+n.body+'</span><time>'+timeAgo(n.at)+'</time></div></div>'

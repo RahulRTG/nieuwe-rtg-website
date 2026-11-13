@@ -5,7 +5,7 @@
     $('#tekst').innerHTML = (inhoud && inhoud.tekst) || '';
     $('#tekst').contentEditable = magBewerken ? 'true' : 'false';
     if (magBewerken) {
-      $('#tekstTools').style.display = 'flex';
+      $('#tekstTools').classList.remove('h-weg');
       RTGOfficeTekst.bouwBalk($('#tekstTools'), $('#tekst'), markeer);
     }
     telBij();
@@ -18,28 +18,28 @@
 
   /* ---------- rekenblad ---------- */
   function toonBlad(inhoud) {
-    $('#bladWrap').style.display = '';
+    $('#bladWrap').classList.remove('h-weg');
     if (!blad) blad = RTGOfficeBlad.maak({ tabel: $('#blad'), refVak: $('#celRef'), invoer: $('#celInvoer'),
       voet: $('#voetbalk'), onWijzig: markeer });
     blad.laad(inhoud, magBewerken);
-    if (magBewerken) { $('#bladTools').style.display = 'flex'; blad.bouwBalk($('#bladTools')); }
+    if (magBewerken) { $('#bladTools').classList.remove('h-weg'); blad.bouwBalk($('#bladTools')); }
   }
 
   /* ---------- formulier en schets ---------- */
   function toonFormulier(inhoud) {
-    $('#formWrap').style.display = '';
+    $('#formWrap').classList.remove('h-weg');
     if (!formulier) formulier = RTGOfficeFormulier.maak({ wrap: $('#formWrap'), api: api, onWijzig: markeer, meld: zeg });
     formulier.laad(inhoud, magBewerken, open.id);
     var n = ((inhoud && inhoud.vragen) || []).length;
     $('#voetbalk').textContent = n + (n === 1 ? ' vraag' : ' vragen');
   }
   function toonSchets(inhoud) {
-    $('#schetsWrap').style.display = '';
+    $('#schetsWrap').classList.remove('h-weg');
     if (!schets) schets = RTGOfficeSchets.maak({ wrap: $('#schetsWrap'), onWijzig: markeer, meld: zeg, voet: $('#voetbalk') });
     schets.laad(inhoud, magBewerken);
   }
   function toonBord(inhoud) {
-    $('#bordWrap').style.display = '';
+    $('#bordWrap').classList.remove('h-weg');
     if (!bord) bord = RTGOfficeBord.maak({ wortel: $('#bordWrap'), onWijzig: markeer, meld: zeg });
     bord.laad(inhoud, magBewerken);
     var n = ((inhoud && inhoud.lijsten) || []).reduce(function (a, l) { return a + ((l.kaarten || []).length); }, 0);
@@ -48,7 +48,7 @@
 
   /* ---------- presentatie ---------- */
   function toonPres(inhoud) {
-    $('#presWrap').style.display = 'grid';
+    $('#presWrap').classList.remove('h-weg');
     if (!pres) pres = RTGOfficePres.maak({ rail: $('#diaRail'), vlak: $('#diaVlak'), onWijzig: markeer, meld: zeg });
     pres.laad(inhoud, magBewerken);
     $('#voetbalk').textContent = pres.dias().length + ' dia\'s';

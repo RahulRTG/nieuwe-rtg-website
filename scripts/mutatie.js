@@ -1369,6 +1369,19 @@ const EIGEN_MODULE = new Map([
      wel degelijk kunnen zakken (vier zijn er met de hand op nagemeten). */
   ['moveproef.test.js', ['public/apps/move.html', 'scripts/moveproef.js']],
   ['rtg-edge-appbar.test.js', ['public/shared/rtg-edge-appbar.js', 'public/shared/rtg-edge-smart-menu.js']],
+  /* Deze statische regressietoets leest de gedeelde aanraakmaat en de twee
+     concrete mobiele correcties rechtstreeks met fs. Zonder expliciete
+     bronkoppeling ziet de require-scanner geen productmodule en zou het nieuwe
+     veiligheidsbewijs als ongemeten meetellen. De gerichte mutatieronde moet
+     deze koppeling bevestigen voordat de uitslag als bewijs geldt. */
+  ['premium-raakdoelen.test.js', [
+    'public/ds/componenten/basis.css',
+    'public/shared/rtg-editorial-v4.css',
+    'public/shared/rtg-experience-2026.css',
+    'public/apps/muziek-heritage.css',
+    'public/ds/tokens.css',
+    'public/apps/life.html'
+  ]],
   /* Deze regressietoets raakt drie achtergrondschrijvers via hun facades en
      een directe meter-import. modulesVan() ziet daardoor alleen de dunne
      gevels, terwijl de geteste retry-, pending- en serialisatielogica hier
@@ -1427,6 +1440,12 @@ const GEEN_BRONMUTATIE = new Map([
   ['teamcall-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
   ['werkos-presentatie.test.js', 'CSS-contract; alle safe-area-inset-bottom-verwijzingen hernoemen laat de toets zakken'],
   ['zaakcommand-presentatie.test.js', 'CSS-contract; alle :focus-visible-selectors hernoemen laat de toets zakken'],
+  /* De generieke operatoren raakten geen van de letterlijke CSS-contracten:
+     122 geldige mutaties overleefden op 11 november 2026. Twee gerichte
+     handmutaties zijn daarna afzonderlijk uitgevoerd en teruggezet:
+     --ds-doel 48px -> 47px en Life min-width 0 -> 1px lieten de toets beide
+     rood worden. */
+  ['premium-raakdoelen.test.js', 'letterlijke CSS-contracten; 122 generieke mutaties raakten geen assertion, handmutaties --ds-doel 48px -> 47px en Life min-width 0 -> 1px laten de toets zakken'],
   /* Statische scherm- en broncontracten zonder rechtstreeks requirepad. Ook
      deze zijn op 5 november 2026 gericht gemuteerd en na iedere proef hersteld. */
   ['aankomst-chauffeur-voorzijde.test.js', 'HTML-contract; data-ds-schermtype taak hernoemen laat de toets zakken'],
@@ -1550,6 +1569,17 @@ const GEEN_BRONMUTATIE = new Map([
      laat rtg-heritage zakken. */
   ['rtg-edge-accessibility.test.js', 'CSS-contract; handmutatie 44px naar 40px liet de raakdoeltoets zakken'],
   ['rtg-heritage.test.js', 'CSS-contract; handmutatie inhoudsradius 2px naar 8px liet de geometriepoort zakken'],
+  /* Deze twee nieuwe consolidatietoetsen bewaken namen en laadcontracten in
+     statische bron. De rekenoperatoren raken die foutklasse niet: de eerste
+     kreeg nul bruikbare mutaties, de tweede overleefde 587 mutaties in
+     uitvoerlogica die buiten zijn bewering ligt. Op 10 november 2026 daarom de
+     eigen foutklasse aangebracht en direct teruggezet. RTGOSThema hernoemen
+     naar RTGOSThemaOud liet de eerste thema-eigenaarstoets zakken; het centrale
+     presentatierolblad uit Clips verwijderen liet precies de Clips-toets
+     zakken. */
+  ['app-thema-eigenaar.test.js', 'broncontract over een eigenaarnaam en drie letterlijke themawaarden; 0 bruikbare rekenmutaties. Handmutatie RTGOSThema naar RTGOSThemaOud liet de eigenaarstoets zakken'],
+  ['presentatierol-markup.test.js', 'statische HTML- en CSS-eigenaarschapscensus; 587 rekenmutaties in uitvoerlogica raken die foutklasse niet. Handmutatie die presentatierol.css uit Clips verwijderde liet uitsluitend de Clips-toets zakken'],
+  ['schermrust.e2e.js', 'browsercontract over berekende CSS en bediening; de serverliegpoort raakt geen presentatie. Handmutatie position fixed naar absolute in schermrust.css liet de venstertoets zakken'],
   /* Deze ratel staat op NUL, en dat is precies wat hem onmeetbaar maakt voor de
      motor: meet() leest de echte testmap, telt daar nul wachten, en elke
      gedragsmatige mutatie in scripts/klokwacht.js laat dat nul. Nul in, nul uit.

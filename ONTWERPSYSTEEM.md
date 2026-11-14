@@ -289,3 +289,18 @@ Plaatsnadering delen de niet-modale locatiekaart, zodat zoeken bruikbaar
 blijft. De legacy-presentatie voor werkelijke niet-DS-consumenten blijft
 apart bestaan totdat die consumenten bewezen zijn gemigreerd. Een lege
 uitzonderingslijst is geen bewijs dat alle schermen of laadpaden zijn afgesloten.
+
+## 8. Vaste logo-lockup (eigenaarsbesluit 12 november 2026)
+
+Dit besluit is bij de main-integratie woordelijk uit `AGENTS.md` verplaatst;
+de verplichte leesverwijzing blijft daar staan. Zo blijft de startinstructie
+binnen haar bestaande omvanggrens zonder merkregels te laten vervallen.
+
+- Gebruik het aangeleverde logo als één ongewijzigd geheel: `public/images/brand/rahul-travel-group-logo.jpg`.
+- De bordeaux balk met de witte naam **Rahul Travel Group** en de gouden slogan **EXPERIENCE THE ELITE CLASS** eronder blijven altijd samen, in hun oorspronkelijke verhouding van 1280 × 470.
+- De volledige lockup niet opnieuw zetten met webfonts, bijsnijden, uitrekken, inkleuren, filteren of de slogan op mobiel verbergen. Alleen proportioneel schalen.
+- **Goedgekeurd navigatiesubmerk**, volgens het aanvullende eigenaarsbesluit van 12 november 2026: de eigenaar koos **A — Inkt**, de expressieve geschilderde Rahul-lippen. `public/images/brand/rtg-mark.svg` is de optische microreductie daarvan in exact logo-bordeaux, met asymmetrische cupidoboog, oplopende rechter mondhoek en een open mondspleet. Het vervangt het eerdere RTG-letterblok en mag zonder slogan in navigatie en favicon staan. De centrale component `ds-brand-mark` toont het op 40 × 32px binnen een klikdoel van minimaal 44 × 44px, op een lichte navigatiegrond. Het navigatiemerk gaat naar Home; hulp van Rahul houdt een afzonderlijk herkenbaar actielabel.
+- **Klein en minimaal**: één submerk in de navigatie, geen grote gecentreerde merkbanner. De volledige oorspronkelijke lockup blijft in de publieke footer staan, proportioneel op 176px breed.
+- De centrale DS-componenten `ds-brand-lockup` en `ds-brand-mark` bewaken de presentatie. Gebruik deze twee canonieke logo-assets; dit besluit geeft geen toestemming voor willekeurige andere varianten. De gekozen geschilderde uitvoering `public/images/brand/rtg-ink-artwork.webp` mag daarnaast eenmaal als vrijstaand redactioneel kunstmoment op de homepage staan: volledig in beeld, niet als watermerk, achtergrondpatroon of knop. Herkomst en productieprompt staan bij het asset in `ink-provenance.json`. Het volledige oorspronkelijke naamlogo blijft ongewijzigd.
+- **Terugkerende schildertaal**, aanvullend eigenaarsbesluit 12 november 2026: “Ik wil dat geverfde look, vaker terug komen, maak het lekker chique kleurrijk.” De homepage gebruikt daarnaast `rtg-painted-horizon.webp` bij de opening en afsluiting, en `rtg-painted-colourfield.webp` als zelfstandige kleurspread. Dit zijn redactionele penseelbeelden in de bestaande bordeaux-, goud-, blauw- en groenfamilies, geen nieuwe logo's. Het citaat en het RTG-kunstbeeld hebben afzonderlijke bronvermelding. Tekst, knoppen, prijzen en formulieren blijven op egale leesbare vlakken; navigatie en volledige lockup blijven ongewijzigd. Productieprompts, afmetingen, optimalisatie en hashes staan in hetzelfde `ink-provenance.json`.
+- **Hele www (12 november 2026):** A — Inkt en de LivingOS-kleuren gelden voor alle dertien publieke bronnen in `public/ds/contract.json`: homepage, passen, werelden, techniek, Explore en 404. Alleen `fonts.css` + `ds/rtg-ds.css`, met `html[data-ds]`; geen legacy CSS. Domeinidentiteit en controllers blijven behouden. De bewijsverwijzing is geen geslaagde proef.

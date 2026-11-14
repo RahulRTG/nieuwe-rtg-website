@@ -78,6 +78,53 @@ test('DS-domein verhuist met dezelfde nodes en invoer; gedeelde bediening blijft
   assert.equal(controls.some(c => c.parentNode === surface), false, 'een frame verbergt geen globale bediening');
 });
 
+for (const ds of [true, false]) for (const vooraf of [true, false]) {
+  test((ds ? 'DS' : 'legacy') + ': Rahul ' + (vooraf ? 'vóór' : 'na') + ' prepare blijft buiten de inhoudsverhuizing', () => {
+    const f = fixture(ds), main = f.body.appendChild(new f.Node('main'));
+    const menu = main.appendChild(new f.Node('nav', 'eigen-menu'));
+    const keuze = menu.appendChild(new f.Node('button'));
+    const invoer = main.appendChild(new f.Node('input'));
+    invoer.value = 'onbewaard schermconcept';
+    let keuzes = 0; const kies = () => ++keuzes; keuze.onclick = kies;
+    const edge = f.body.appendChild(new f.Node('div', 'rtg-edge-chrome'));
+    const wereldmenu = edge.appendChild(new f.Node('button'));
+    wereldmenu.onclick = kies;
+    // De echte Rahul-owner hangt deze bestaande klassen direct onder body.
+    // Deze proef meet DOM-eigendom, geen hit-testing, focus of CSS-stapeling.
+    const rahul = new f.Node('section', 'rtg-rahul-page ds-rahul');
+    const sluit = rahul.appendChild(new f.Node('button', 'rtg-command-close'));
+    rahul.hidden = false; sluit.onclick = () => { rahul.hidden = true; };
+    if (vooraf) f.body.appendChild(rahul);
+    vm.runInNewContext(lees('public/shared/interface/world-desktop-surface.js'), f);
+    // De toegangspoort heeft zijn eigen tegenproef hieronder; hier draait de
+    // echte prepare/move-owner plus de echte montage van de wereldpanelen.
+    f.window.RTGDesktopSurface.guard = () => {};
+    f.window.RTGDesktopUI = { el: (tag, cls) => new f.Node(tag, cls), label: n => n, taal: () => 'nl' };
+    f.window.RTGWorldPresentation = { start() {} };
+    f.window.fetch = () => new Promise(() => {});
+    vm.runInNewContext(lees('public/shared/interface/world-desktop-home.js'), f);
+    f.window.RTGDesktopHome.start();
+    if (!vooraf) f.body.appendChild(rahul);
+    const root = f.body.querySelector('.wd-shell'), home = root.querySelector('.wd-home');
+    const panelen = ['wd-people', 'wd-favorites', 'wd-library', 'wd-focus'].map(cls => root.querySelector('.' + cls));
+    assert.equal(main.parentNode, home, 'de bestaande hoofdinhoud verhuist wel');
+    assert.equal(menu.parentNode, main); assert.equal(menu.children[0], keuze);
+    assert.equal(keuze.onclick, kies); assert.equal(invoer.value, 'onbewaard schermconcept');
+    keuze.onclick(); wereldmenu.onclick(); assert.equal(keuzes, 2);
+    assert.equal(edge.parentNode, f.body, 'het bestaande wereldmenu blijft globaal');
+    assert.ok(panelen.every(p => p && p.parentNode === root), 'alle bestaande wereldpanelen blijven gemonteerd');
+    assert.equal(rahul.parentNode, f.body, 'Rahul is globale bediening, ook op een legacy-host');
+    assert.equal(home.querySelector('.rtg-rahul-page'), null, 'Rahul is geen inhoud van het verbergbare werkvlak');
+    home.hidden = true; home.inert = true; root.dataset.mobilePanel = 'people';
+    assert.equal(rahul.hidden, false, 'een verborgen of inert werkvlak verbergt de globale owner niet');
+    sluit.onclick(); assert.equal(rahul.hidden, true, 'dezelfde sluit-handler blijft aan de bestaande node');
+    f.window.RTGDesktopHome.start();
+    assert.equal(f.body.querySelector('.wd-shell'), root, 'geen tweede wereldschil');
+    for (const paneel of panelen) assert.equal(paneel.parentNode, root, 'wereldpanelen worden niet vervangen');
+    assert.equal(rahul.parentNode, f.body); assert.equal(edge.parentNode, f.body);
+  });
+}
+
 for (const ds of [true, false]) test((ds ? 'DS' : 'legacy') + ': gewone domeinwrapper houdt dezelfde move-owner', () => {
   const f = fixture(ds), main = f.body.appendChild(new f.Node('main'));
   const legacyEdge = f.body.appendChild(new f.Node('div', 'rtg-edge-chrome'));

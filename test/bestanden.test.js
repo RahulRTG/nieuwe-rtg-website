@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lidA, lidB, codeB;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bestanden-'));
@@ -29,6 +29,8 @@ async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Kluislid ' + seq, email: 'bf' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1988-03-03', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, 'de positieve kluispersona is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 'bf' + u + '@x.nl');
   const st = await api('/api/state', {}, reg.body.token);
   return { token: reg.body.token, codenaam: st.body.state.user.codename };
 }

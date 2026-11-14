@@ -19,8 +19,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, kantoorAlsPersoon } = require('./helper');
-const { profielVan } = require('../scripts/inhoudskaart');
+const { startServer, stopHard, kantoorAlsPersoon } = require('./helper');
+const { profielVan, MEETOMGEVING } = require('../scripts/inhoudskaart');
+const { accountRolVoor } = require('../scripts/lib/accountroutes');
+const { MUNTERS } = require('../scripts/lib/proefsleutels');
 
 const KAART = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'INHOUDSKAART.json'), 'utf8'));
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-inhoud-'));
@@ -38,7 +40,7 @@ async function doe(methode, pad, lijf, tok) {
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: {
-    RTG_DATA_DIR: TMP, RTG_DEMO: '1', SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE-PROEF' } }));
+    ...MEETOMGEVING, RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   tokens.member = (await doe('POST', '/api/login', { tier: 'rtg' })).data.token;
   tokens.office = (await doe('POST', '/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token;
   tokens.supplier = (await doe('POST', '/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;
@@ -48,10 +50,15 @@ test.before(async () => {
      sleutel niet zet, meet de dichte deur in plaats van het antwoordcontract,
      en dan zakt de toets op een 403 die niets over de vorm zegt. */
   tokens['kantoor-op-naam'] = await kantoorAlsPersoon(BASE, 'RTG-OFFICE-PROEF');
+  // Dezelfde gratis accountmunter als de generator, zonder andere proefrollen aan te maken.
+  const account = MUNTERS.find(([rol]) => rol === 'member-account');
+  assert.ok(account, 'de sleutelbos bevat de member-accountfixture');
+  tokens['member-account'] = await account[2]((pad, lijf, tok) => doe('POST', pad, lijf, tok));
+  assert.ok(tokens['member-account'], 'de gratis accountfixture moet bestaan; geen terugval naar de demo-pas');
 });
-test.after(() => {
-  if (child) try { child.kill('SIGKILL'); } catch (e) {}
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+test.after(async () => {
+  await stopHard(child);
+  fs.rmSync(TMP, { recursive: true, force: true });
 });
 
 /* plausibelLijf komt uit dezelfde bron als waarmee de kaart is opgenomen:
@@ -65,7 +72,9 @@ const rij = Object.values(KAART.perRoute || {})
 
 for (const p of rij) {
   test('vormcontract ' + p.methode + ' ' + p.pad, async () => {
-    const uit = await doe(p.methode, p.pad, plausibelLijf(p.pad), tokens[p.rol]);
+    // Verfijn alleen de identiteit van member, nooit de rol of het verwachte antwoord (ook403).
+    const rol = accountRolVoor(p.rol, p.pad).rol || p.rol;
+    const uit = await doe(p.methode, p.pad, plausibelLijf(p.pad), tokens[rol]);
     assert.equal(uit.status, p.status,
       'de status hoort ' + p.status + ' te zijn (kaart), kreeg ' + uit.status +
       ': ' + JSON.stringify(uit.data).slice(0, 120));

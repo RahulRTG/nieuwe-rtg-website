@@ -11,7 +11,7 @@
    Een tweede weg om een rit op 'voltooid' te zetten zou de keten precies zo
    lang laten kloppen als de discipline van de volgende route.
 
-   WIE WAT MAG staat hier en niet in de kern: de kern rekent, de route bewaakt.
+   De route bewaakt de ingang; werktoegang deelt zij met de reizigerskern.
    De reiziger komt alleen bij zijn eigen ritten, de chauffeur alleen bij de rit
    van zijn eigen zaak, de dispatcher alleen bij zijn eigen vervoerder, en het
    moduleregister alleen achter de kantoordeur.
@@ -22,7 +22,7 @@
    boven wie een rit vraagt, onder wie hem uitvoert. */
 module.exports = (kern) => {
   const { app, auth, supplierAuth, accounts, schoon, gegevensStop,
-    mobAanbod, mobMijn, mobVraag, mobAnnuleer,
+    mobAanbod, mobMijn, mobVraag, mobAnnuleer, mobToegang,
     plekLijst, favZet, favLijst,
     opdrachtMet, opdrachtBeeld, opdrachtNaar, opdrachtPositie,
     dispatchBeeld, pendelReserveer, pendelVoorMedewerker,
@@ -31,6 +31,11 @@ module.exports = (kern) => {
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error, ...r }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Vervoer is voor leden.' }); return true; }
+    return false;
+  };
+  const eigenStop = (req, res) => {
+    const r = mobToegang.mobEigenToegang(req.session);
+    if (r.error) { stuur(res, r); return true; }
     return false;
   };
   // waar staat deze reiziger, voor het moduleregister
@@ -51,16 +56,17 @@ module.exports = (kern) => {
      vindt. Dezelfde poort als bij een tafel of een charter ('reservering'
      vraagt om een telefoonnummer). */
   app.post('/api/mob/vraag', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    const toegang = mobToegang.mobVraagToegang(req.session, req.body || {});
+    if (toegang.error) return stuur(res, toegang);
     if (gegevensStop(req, res, 'reservering')) return;
     stuur(res, mobVraag(req.session, req.body || {}));
   });
   app.post('/api/mob/mijn', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (eigenStop(req, res)) return;
     stuur(res, mobMijn(req.session));
   });
   app.post('/api/mob/annuleer', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (eigenStop(req, res)) return;
     stuur(res, mobAnnuleer(req.session, req.body || {}));
   });
   app.post('/api/mob/favoriet', auth, (req, res) => {
@@ -73,12 +79,12 @@ module.exports = (kern) => {
      melding dat er iets niet klopt. De rit beweegt er niet van. */
   // dezelfde gegevenspoort als /api/mob/vraag: wat hier staat, ziet de vervoerder
   app.post('/api/mob/ontvangst', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (eigenStop(req, res)) return;
     if (gegevensStop(req, res, 'reservering')) return;
     stuur(res, kern.ontvangstBevestig(req.session, req.body || {}));
   });
   app.post('/api/mob/ontvangst/probleem', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (eigenStop(req, res)) return;
     if (gegevensStop(req, res, 'reservering')) return;
     stuur(res, kern.ontvangstProbleem(req.session, req.body || {}));
   });
@@ -87,7 +93,7 @@ module.exports = (kern) => {
      /mijn: de app vraagt dit elke paar seconden op tijdens een rit, en dan wil
      je niet elke keer de hele geschiedenis en de favorieten meesturen. */
   app.post('/api/mob/volg', auth, (req, res) => {
-    if (geenGast(req, res)) return;
+    if (eigenStop(req, res)) return;
     const o = opdrachtMet(schoon(req.body.ref, 30));
     if (!o) return res.status(404).json({ error: 'Opdracht niet gevonden.' });
     if (o.reiziger !== req.session.key) return res.status(403).json({ error: 'Dit is uw rit niet.' });

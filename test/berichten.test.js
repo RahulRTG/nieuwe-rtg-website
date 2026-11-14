@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-berichten-'));
@@ -28,7 +28,8 @@ test.after(() => {
 let teller = 0;
 async function lid() {
   const t = Date.now() + '' + (teller++);
-  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'm' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' }));
+  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'm' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1990-02-02' }));
+  maakBetaaldRtgTestaccount(TMP, 'm' + t + '@v.test');
   return r.token;
 }
 

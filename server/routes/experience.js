@@ -31,13 +31,13 @@ module.exports = (app, auth, experience) => {
     stuur(res, experience.livingWorldView(req.session.key, req.body || {})));
 
   app.post('/api/experience/resume', auth, lid, (req, res) =>
-    stuur(res, experience.resumeZet(req.session.key, req.body || {})));
+    stuur(res, experience.resumeZet(req.session.key, req.body || {}, principalVoorSession(req.session))));
 
   app.post('/api/experience/intent/preview', auth, lid, (req, res) =>
-    stuur(res, experience.preview(req.session.key, req.body || {}, principalVoorSession(req.session))));
+    stuur(res, experience.preview(req.session.key, req.body || {}, principalVoorSession(req.session), req.routeBeleid)));
 
   app.post('/api/experience/intent/execute', auth, lid, async (req, res) => {
-    try { stuur(res, await experience.execute(req.session.key, req.body || {})); }
+    try { stuur(res, await experience.execute(req.session.key, req.body || {}, req.routeBeleid)); }
     catch (e) { res.status(500).json({ error: 'De actie kon niet betrouwbaar worden afgerond.' }); }
   });
 

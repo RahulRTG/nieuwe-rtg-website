@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody, keurLidGoed, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, keurLidGoed, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisteruggave-'));
@@ -57,10 +57,12 @@ test.after(() => {
 });
 
 test('1. afzeggen na betalen zet een recht klaar; vanaf duizend euro tekent een tweede mens, en dan beweegt het geld', async () => {
-  const reg = await api('/api/auth/register', { name: 'Reis Terug', email: 'reisterug' + Date.now() + '@voorbeeld.test',
+  const email = 'reisterug' + Date.now() + '@voorbeeld.test';
+  const reg = await api('/api/auth/register', { name: 'Reis Terug', email,
     phone: telefoon(), password: 'Geheim123!', geboortedatum: '1990-01-01', pasApp: 'rtg' });
   const lid = reg.body.token;
   assert.ok(lid, JSON.stringify(reg.body).slice(0, 200));
+  maakBetaaldRtgTestaccount(TMP, email); // Alleen de reiziger; de kantoorrollen en identiteitskeuring blijven echte routes.
   await keurLidGoed(base, lid, reg.body.state.user.codename, '1990-01-01');
   assert.equal((await api('/api/pay/oplaad', { centen: 300000, idem: 'rt-op-' + Date.now() }, lid)).status, 200);
 

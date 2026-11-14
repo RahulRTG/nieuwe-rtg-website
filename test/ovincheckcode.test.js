@@ -10,7 +10,7 @@ const nodeCrypto = require('node:crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 /* Een gedeelde opslag voor twee "instances": elk verzoek leest de collectie
    opnieuw uit de JSON, zoals bewerkCollectie in PostgreSQL doet. Staat er iets
@@ -115,6 +115,7 @@ test('8. echte server: intrekken via de route, en een code start alleen bij de e
   const u = Date.now().toString().slice(-8);
   const lid = (await api('/api/auth/register', { name: 'OV Lid', email: 'ovi' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'ovi' + u + '@x.nl');
   const roster = await api('/api/supplier/roster', { code: 'TRANSIT' });
   const ch = (roster.body.staff || []).find(x => x.role !== 'manager');
   const pda = (await api('/api/supplier/login', { code: 'TRANSIT', staffId: ch.id, pin: '5678' })).body.token;

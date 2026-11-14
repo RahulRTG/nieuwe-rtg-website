@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const { splitsBruto } = require('../server/kern/fiscaal/digitaal');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-geld-'));
@@ -269,6 +269,7 @@ test('8. intrekken laat een RECHT achter, geen automatische terugboeking', async
 test('9. RTG Pay-poorten gelden ook hier: een echt account laat eerst zijn paspoort zien', async () => {
   const reg = await api('/api/auth/register', { name: 'Echt Lid', email: 'echt@x.nl', phone: '0612345675',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'echt@x.nl');
   assert.ok(reg.body.token);
   await publiceer({ versie: '1.1.0', _extra: [{ pad: 'extra.txt', inhoud: 'v11' }] });
   const k = await api('/api/appstore/koop', { sleutel: 'derden-betaald', land: 'NL' }, reg.body.token);

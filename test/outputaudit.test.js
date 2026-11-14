@@ -222,6 +222,111 @@ test('2b. een antwoord dat GELIJK is aan de leugen is geen dekkingsgat', () => {
   assert.equal(uit.telling.bewezen, 0);
 });
 
+test('inhoudskaart: standaard meet blind/onbeslist, hermeten ook bestaande waarneembare profielen', () => {
+  const { kiesMeetdoel } = require('../scripts/inhoudskaart');
+  const { DEUREN } = require('../scripts/mutatie');
+  const sleutel = pad => 'POST ' + pad;
+  const paden = ['/api/blind', '/api/onbeslist', '/api/bewezen', '/api/zonder-profiel',
+    '/api/kaal', '/api/auth/register', '/api/login', '/api/webauthn/opties', '/pagina'];
+  const inventaris = paden.map(pad => ({ methode: 'POST', pad }));
+  const output = Object.fromEntries([...paden, '/api/verdwenen'].map(pad => [sleutel(pad),
+    { staat: pad === '/api/blind' ? 'blind' : pad === '/api/onbeslist' ? 'onbeslist' : 'bewezen' }]));
+  const kaart = Object.fromEntries(paden.filter(pad => pad !== '/api/zonder-profiel')
+    .map(pad => [sleutel(pad), { onwaarneembaar: pad === '/api/kaal' }]));
+  kaart['POST /api/verdwenen'] = { status: 403, sleutels: ['error'] };
+  const voor = JSON.stringify({ output, kaart });
+  assert.deepEqual([...kiesMeetdoel(output, kaart, inventaris, DEUREN)],
+    ['POST /api/blind', 'POST /api/onbeslist']);
+  assert.deepEqual([...kiesMeetdoel(output, kaart, inventaris, DEUREN, true)],
+    ['POST /api/blind', 'POST /api/onbeslist', 'POST /api/bewezen']);
+  assert.equal(JSON.stringify({ output, kaart }), voor, 'hermeten wijzigt geen bewijsstatus of profiel');
+});
+
+test('inhoudskaart: de vormproef gebruikt expliciet ongebonden meetsessies, niet de productie-default', () => {
+  const { MEETOMGEVING } = require('../scripts/inhoudskaart');
+  const { gereedschapsomgeving } = require('../scripts/lib/wegwerpserver');
+  const voor = process.env.RTG_BEZITSBEWIJS;
+  assert.equal(MEETOMGEVING.RTG_BEZITSBEWIJS, 'aanbevolen');
+  assert.equal(Object.isFrozen(MEETOMGEVING), true);
+  const env = gereedschapsomgeving({ poort: 12345, datamap: '/tmp/inhoudskaart-pure-proef' }, MEETOMGEVING);
+  assert.equal(env.RTG_BEZITSBEWIJS, 'aanbevolen');
+  assert.equal(env.RTG_MAGNAAT_TEST, '1');
+  assert.equal(env.RTG_BIND, '127.0.0.1');
+  assert.equal(process.env.RTG_BEZITSBEWIJS, voor, 'de meetopstelling wijzigt geen proces- of productieomgeving');
+});
+
+test('inhoudskaart: aanbevolen laat alleen de ongebonden proef door, nooit een ontbrekend gebonden bewijs', async () => {
+  const { MEETOMGEVING } = require('../scripts/inhoudskaart');
+  const { maakBezitsbewijs } = require('../server/kern/identiteit/bezitsbewijs');
+  const poort = maakBezitsbewijs({ db: { data: {} }, save() {} });
+  const vraag = { sess: { account: 'synthetisch' }, methode: 'POST', pad: '/api/pay/graaf',
+    stand: MEETOMGEVING.RTG_BEZITSBEWIJS };
+  assert.equal((await poort.controleer(vraag)).stand, 'onbeschermd');
+  const gebonden = await poort.controleer({ ...vraag,
+    sess: { account: 'synthetisch', sessieContext: { sleutelbinding: { keyRef: 'toestel' } } } });
+  assert.equal(gebonden.stand, 'geweigerd');
+  assert.equal(gebonden.code, 401);
+  const verplicht = await poort.controleer({ ...vraag, stand: 'verplicht' });
+  assert.equal(verplicht.stand, 'geweigerd');
+  assert.equal(verplicht.code, 403);
+});
+
+test('inhoudskaart: uitsluitend de intern bewaakte push-sleutel krijgt de expliciete ledensessie', () => {
+  const { meetRolVoor, eisMeetsleutels } = require('../scripts/inhoudskaart');
+  const route = { methode: 'GET', pad: '/api/push/key', bewakers: [] };
+  assert.equal(meetRolVoor(route), 'member');
+  assert.equal(meetRolVoor({ ...route, methode: 'POST' }), null);
+  assert.equal(meetRolVoor({ ...route, pad: '/api/push/key/anders' }), null);
+  assert.equal(meetRolVoor({ ...route, pad: '/api/andere-interne-poort' }), null);
+  assert.equal(meetRolVoor({ ...route, bewakers: ['officeAuth'] }), 'office');
+  assert.equal(meetRolVoor({ ...route, bewakers: ['supplierAuth'] }), 'supplier');
+  assert.equal(meetRolVoor({ ...route, bewakers: ['nieuweOnbekendePoort'] }), null);
+  assert.throws(() => eisMeetsleutels([{ rol: meetRolVoor(route) }], {}), /member/,
+    'een ontbrekende ledensleutel wordt geen anonieme meting');
+});
+
+test('inhoudskaart: elke geselecteerde rol vereist zijn eigen sleutel, zonder demo-terugval', () => {
+  const { eisMeetsleutels } = require('../scripts/inhoudskaart');
+  const routes = [{ rol: 'publiek' }, { rol: 'member-account' }, { rol: 'office' }];
+  assert.throws(() => eisMeetsleutels(routes, { member: 'demo', office: 'kantoor' }), /member-account/);
+  assert.throws(() => eisMeetsleutels(routes, { 'member-account': 'eigen' }), /office/);
+  assert.throws(() => eisMeetsleutels(routes, { 'member-account': '', office: 'kantoor' }), /member-account/);
+  assert.doesNotThrow(() => eisMeetsleutels(routes, { 'member-account': 'eigen', office: 'kantoor' }));
+  assert.doesNotThrow(() => eisMeetsleutels([{ rol: 'publiek' }], {}));
+});
+
+test('inhoudskaart: ruim de wegwerpmap pas op nadat het kind echt is gestopt', async () => {
+  const { ruimMeetserverOp } = require('../scripts/inhoudskaart');
+  const { EventEmitter } = require('node:events');
+  const kind = new EventEmitter();
+  kind.exitCode = null; kind.signalCode = null;
+  let opgeruimd = false;
+  kind.kill = signaal => {
+    assert.equal(signaal, 'SIGKILL');
+    assert.equal(opgeruimd, false);
+    queueMicrotask(() => { kind.signalCode = 'SIGKILL'; kind.emit('exit', null, 'SIGKILL'); });
+    return true;
+  };
+  await ruimMeetserverOp({ kind, klaar() { assert.equal(kind.signalCode, 'SIGKILL'); opgeruimd = true; } });
+  assert.equal(opgeruimd, true);
+  let opnieuwGedood = false;
+  kind.kill = () => { opnieuwGedood = true; };
+  await ruimMeetserverOp({ kind, klaar() {} });
+  assert.equal(opnieuwGedood, false, 'een reeds gestopt kind wordt niet nog eens gedood');
+});
+
+test('inhoudskaart: een niet gestopte server verliest zijn datamap niet', async () => {
+  const { ruimMeetserverOp } = require('../scripts/inhoudskaart');
+  const { EventEmitter } = require('node:events');
+  const kind = new EventEmitter();
+  kind.exitCode = null; kind.signalCode = null;
+  let opgeruimd = false;
+  kind.kill = () => false;
+  await assert.rejects(ruimMeetserverOp({ kind, klaar() { opgeruimd = true; } }), /niet stoppen/);
+  assert.equal(opgeruimd, false);
+  assert.equal(kind.listenerCount('exit'), 0, 'ook de mislukte stop laat geen luisteraar achter');
+});
+
 test('4b. de VERKLAARD-kaart verplaatst wel, maar bewijst nooit', () => {
   /* De sluitweg van de schuldpost audit-wisselend was "uitzoeken WAARVAN het
      afhangt". Wat daaruit kwam staat als kaart in de bron van de auditproef.

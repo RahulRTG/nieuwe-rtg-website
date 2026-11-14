@@ -29,9 +29,9 @@ test.after(() => {
 test('dezelfde reactie met dezelfde sleutel staat er na een herstart een keer; een andere tekst is 409', async () => {
   await start();
   const t = Date.now() + '' + Math.floor(Math.random() * 1e4);
-  const reg = await roep('/api/auth/register', { name: 'Lid ' + t, email: 'sr' + t + '@v.test',
-    phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1980-05-05', tier: 'rtg' });
-  const tok = reg.d.token;
+  /* Reageren in De Salon vraagt een betaalde pas. Registreren levert bewust
+     alleen het gratis account; de expliciete testpersona draagt de RTG Pass. */
+  const tok = (await roep('/api/login', { tier: 'rtg', pasApp: 'rtg' })).d.token;
   const posts = async () => (((await roep('/api/state', {}, tok)).d || {}).state || {}).posts || [];
   const doel = (await posts()).find((p) => p.canEngage && !p.partner);
   assert.ok(doel, 'geen post om op te reageren in de testomgeving');

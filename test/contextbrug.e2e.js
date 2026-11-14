@@ -26,7 +26,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 const MERK = 'NOTITIEMERK' + Math.random().toString(36).slice(2, 8);
@@ -58,7 +58,8 @@ async function post(base, pad, body, token) {
 test('een aangewezen reisaanvraag reist van het scherm tot in de prompt, en alleen als verwijzing',
   { skip: geenBrowser(pw) }, async () => {
   const model = await nepModel();
-  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cb-e2e-')),
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cb-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1' } });
   const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
@@ -72,6 +73,7 @@ test('een aangewezen reisaanvraag reist van het scherm tot in de prompt, en alle
       password: 'geheim12345', geboortedatum: '1990-01-01', phone: '0612345679', tier: 'rtg', pasApp: 'rtg' });
     const token = reg.body.token;
     assert.ok(token, 'registratie');
+    maakBetaaldRtgTestaccount(TMP, 'brug' + u + '@voorbeeld.test');
     const status = await post(srv.base, '/api/onboarding/status', {}, token);
     assert.equal((await post(srv.base, '/api/onboarding/teken', { naam: 'Brug Proef', akkoord: true,
       contractVersion: status.body.contract.versie }, token)).status, 200, 'de overeenkomst is getekend');
@@ -138,7 +140,8 @@ test('een aangewezen reisaanvraag reist van het scherm tot in de prompt, en alle
     assert.deepEqual(fouten, [], 'geen fouten in de console');
   } finally {
     await browser.close();
-    await stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
     model.srv.close();
   }
 });

@@ -249,7 +249,7 @@ test('10. een keuze voor een gebied dat de bron niet meer aanbiedt, verdwijnt ni
       lid niet bij het andere terechtkomt.
    --------------------------------------------------------------------------- */
 
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kaartroutes-'));
@@ -266,6 +266,8 @@ async function nieuwLid() {
   const reg = await post('/api/auth/register', { name: 'Kaartlid ' + seq, email: 'kl' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v',
     tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  maakBetaaldRtgTestaccount(TMP, 'kl' + u + '@x.nl');
   return reg.body.token;
 }
 
@@ -376,6 +378,7 @@ test('14. de keuze hangt aan het LID en niet aan de sessie: na opnieuw inloggen 
     tier: 'rtg', pasApp: 'rtg' });
   const eerste = reg.body.token;
   assert.ok(eerste, 'ingeschreven');
+  maakBetaaldRtgTestaccount(TMP, email);
   await post('/api/nav/gebied/kies', { code: 'frankrijk' }, eerste);
   assert.deepEqual((await post('/api/nav/gebieden', {}, eerste)).body.mijn, ['frankrijk']);
 

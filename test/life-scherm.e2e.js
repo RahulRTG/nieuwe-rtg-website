@@ -10,7 +10,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -38,6 +38,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
         password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
     }).then(r => r.json());
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    maakBetaaldRtgTestaccount(TMP, 'lifescherm@x.nl');
 
     // een doel via de API, precies zoals Doelen dat doet
     const api = (pad, body) => fetch(base + '/api/' + pad, {

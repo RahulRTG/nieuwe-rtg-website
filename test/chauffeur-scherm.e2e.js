@@ -45,7 +45,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -75,6 +75,7 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
         phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1990-03-03',
         tier: 'rtg', pasApp: 'rtg' });
       assert.ok(reg.body.token, 'het lid is aangemeld: ' + JSON.stringify(reg.body).slice(0, 160));
+      maakBetaaldRtgTestaccount(TMP, 'ch' + u + '@x.nl');
       const lid = reg.body.token;
 
       const roster = await post(base, '/api/supplier/roster', { code: 'MKKX' });

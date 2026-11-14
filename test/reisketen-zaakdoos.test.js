@@ -4,7 +4,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path'), net = require('node:net');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 const { SLEUTELS } = require('../server/lib/idemsleutels-reisketen');
 const { journaalPadOk, metZegel } = require('../server/kern/zaakdoos/journaal');
@@ -35,6 +35,7 @@ test('koude doosstart weigert de actuele reisketen zonder dossier, mutatie of jo
   try {
     srv = await startServer({ env });
     const x = await maakReisketenFixture(() => srv.base);
+    maakBetaaldRtgTestaccount(map, 'reisketen-81@voorbeeld.test');
     const reis = goed(await x.api('/api/reisbureau/keten/start', { titel: 'Vertrouwelijke offlinegrens',
       bestemming: 'Ibiza', supplierCode: x.bureau.code, idem: 'doos-reis-start' }, x.reiziger.token), 'reis').reis;
     await stop(srv); srv = null;
@@ -77,6 +78,7 @@ test('online doos geeft de echte cloud door; lijnuitval in het volgende verzoek 
   try {
     cloud = await startServer({ env: { RTG_DATA_DIR: cloudMap, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
     const x = await maakReisketenFixture(cloud.base);
+    maakBetaaldRtgTestaccount(cloudMap, 'reisketen-81@voorbeeld.test');
     const reis = goed(await x.api('/api/reisbureau/keten/start', { titel: 'Uitsluitend in de cloud', bestemming: 'Ibiza',
       idem: 'doos-cloud-start' }, x.reiziger.token), 'cloudreis').reis;
     doos = await startServer({ env: { RTG_DATA_DIR: doosMap, SMTP_URL: '', RTG_DOOS_CLOUD: cloud.base,

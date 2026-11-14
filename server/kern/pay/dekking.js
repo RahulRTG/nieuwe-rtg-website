@@ -24,6 +24,9 @@ module.exports = ({ boekAsync, zorgSaldo, reserveerSleutel }) =>
     const sleutel = boeking.economischeSleutel || reserveerSleutel();
     const metSleutel = sleutel ? Object.assign({}, boeking, { economischeSleutel: sleutel }) : boeking;
     const eerst = await boekAsync(metSleutel);
+    // Dit is geen saldotekort. De boeking heeft bestaand motorbewijs al gelezen;
+    // zonder dat bewijs mag deze nieuwe dienst geen enkele oplading starten.
+    if (eerst?.code === 'ABONNEMENT_NIEUWE_DIENST') return { z: eerst, b: eerst };
     if (!eerst || eerst.status !== 402) return { z: { ok: true, bijgeladen: 0 }, b: eerst };
     const z = await zorgSaldo({ codenaam, centen, idem });
     if (z.error) return { z, b: eerst };

@@ -140,7 +140,7 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
       antwoord: auth.loginAntwoord(lOpties.body.opties.challenge, origin, 3), pasApp: 'rtg' });
   assert.equal(sessie.status, 200, 'de handtekening wordt aanvaard: ' + JSON.stringify(sessie.body).slice(0, 200));
   assert.ok(sessie.body.token, 'en er komt een echte sessie uit, net als bij een wachtwoord');
-  assert.equal(sessie.body.state.user.tier, 'rtg', 'op de pas van het lid zelf');
+  assert.equal(sessie.body.state.user.tier, 'guest', 'een passkey logt in op het eigen gratis account en koopt geen pas');
 
   /* De RTG PIN gebruikt diezelfde passkey voor een action-bound step-up. Een
      gestolen open sessie mag een noodslot wel AAN zetten (veilig), maar niet

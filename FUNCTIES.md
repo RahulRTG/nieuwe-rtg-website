@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2944** |
+| Kernmodules (`server/kern/**`) | **2981** |
 | App-pagina's (`public/apps/**.html`) | **316** |
-| Testbestanden | **3233** |
+| Testbestanden | **3329** |
 
 ## De vier werelden
 
@@ -551,7 +551,7 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **De gegevenspoort** (`tg-gegevens`) — Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Aanmelden voor een pas** (`tg-aanmeld`) — Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.  
+- **Aanmelden voor een pas** (`tg-aanmeld`) — Nieuwe aanmeldingen en aanbiedingen; Business en Lifestyle behouden menselijke toelating.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 
 ### Festival — 3

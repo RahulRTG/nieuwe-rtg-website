@@ -86,9 +86,20 @@ test('leeftijdslaag: registratie leidt de leeftijdsgroep uit de geboortedatum af
   const r = await api('/auth/register', { name: 'Jeugd Lid', email, phone: '+31611223344', password: 'geheim12', tier: 'rtg', geboortedatum: jong });
   assert.equal(r.status, 200);
   const j = await r.json();
-  // De leeftijdsgroep 15-17 zit in de state van het lid.
-  const zichtbaar = JSON.stringify(j.state);
-  assert.ok(zichtbaar.includes('15-17'), 'jeugdlid valt in groep 15-17');
+  // Eigen leeftijdsinzage is geen betaalde pas of geverifieerde toegangsclaim.
+  const controleerGratisJeugd = state => {
+    assert.equal(state.user.tier, 'guest', 'registratie koopt geen RTG-pas');
+    assert.equal(state.user.leeftijd, 16, 'het account ziet de eigen leeftijd');
+    assert.equal(state.user.leeftijdsgroep, '15-17', 'de eigen groep staat bij de gebruiker');
+    assert.equal(Object.hasOwn(state, 'foundation'), false, 'geen Foundation-inhoud door leeftijdsinzage');
+    assert.equal(Object.hasOwn(state, 'trip'), false, 'geen reisinhoud door leeftijdsinzage');
+    assert.equal(state.creatorCredit, 0, 'geen creator-tegoed door leeftijdsinzage');
+    assert.equal(state.creatorLikes, 0, 'geen creator-likes door leeftijdsinzage');
+  };
+  controleerGratisJeugd(j.state);
+  const opnieuw = await api('/state', {}, j.token);
+  assert.equal(opnieuw.status, 200);
+  controleerGratisJeugd((await opnieuw.json()).state);
 
   // Een geboortedatum onder de 15 wordt geweigerd.
   const teJong = new Date(nu.getFullYear() - 12, nu.getMonth(), nu.getDate()).toISOString().slice(0, 10);

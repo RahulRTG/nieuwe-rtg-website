@@ -9,17 +9,18 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**75 bundels, 530 delen, 0 zonder onderwerp.**
+**75 bundels, 531 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 107 delen, 10360 regels in de delen
+`public/apps/app-main/` -- 108 delen, 10448 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `app-main-01.js` | de bouwstempel-controle en de start van de app-bundel: html en script van dezelfde bouw |
 | `app-main-01b.js` | De synthetische inhoud woont uitsluitend in magnaat-data.js |
 | `app-main-02.js` | de API-laag van de app: elke aanroep met token, taal en foutafhandeling |
+| `app-main-02_state.js` | Eén eigenaar voor de app-API en volledige accountprojecties |
 | `app-main-02a.js` | de trainingsmelding: een proef is een toestand, geen terugval na een storing |
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
@@ -127,7 +128,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 10 delen, 1162 regels in de delen
+`public/apps/backoffice/` -- 10 delen, 1169 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -199,7 +200,7 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 3 delen, 208 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 238 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -698,7 +699,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 133 regels in de delen
+`public/shared/cookie/` -- 2 delen, 137 regels in de delen
 
 | deel | onderwerp |
 |---|---|

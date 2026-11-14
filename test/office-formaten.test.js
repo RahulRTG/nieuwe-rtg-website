@@ -14,7 +14,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 const { lees } = require('../server/kern/office/zip');
 const M = require('../public/shared/rekenmotor.js');
 
@@ -30,8 +30,11 @@ function api(pad, body, token) {
 let seq = 0;
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  const reg = await api('/api/auth/register', { name: 'Formaat ' + seq, email: 'fm' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  const email = 'fm' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: 'Formaat ' + seq, email, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v' });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, email); // De Office-exportproef begint bij twee bevoegde leden, niet bij pasverkoop.
   const st = await api('/api/state', {}, reg.body.token);
   return { token: reg.body.token, codenaam: st.body.state.user.codename };
 }

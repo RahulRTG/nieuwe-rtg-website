@@ -10,8 +10,11 @@
   function grtMsgHtml(m){ var mij=m.vanMij; var inner = mij ? esc(m.tekst) : '<span class="xlate">'+esc(m.tekst)+'</span>'; return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:80%;padding:.4rem .7rem;border-radius:0;'+(mij?'background:var(--gold);color:#1a1710;':'background:var(--card2,#1B1817);border:1px solid var(--line);')+'white-space:pre-wrap;">'+inner+'</div>'; }
   function scrollGrt(){ var m=$('#grtMsgs'); if(m) m.scrollTop=m.scrollHeight; }
   async function openGrtThread(id, lid){
+    const epoch=grtEpoch, nummer=++grtThreadLaad;
+    if(!gezinGeldig(epoch)) return;
     grtActief=id; var t=$('#grtThread'); t.style.display='';
     var d={berichten:[]}; try{ d=await GezinRT.thread(id); }catch(e){}
+    if(!gezinGeldig(epoch) || nummer!==grtThreadLaad || t!==$('#grtThread')) return;
     t.innerHTML='<div class="s-gl2mqk">Gesprek met '+esc(lid?lid.naam:'')+'</div>'+
       '<div id="grtMsgs" style="max-height:14rem;overflow:auto;display:flex;flex-direction:column;gap:.3rem;">'+(d.berichten||[]).map(grtMsgHtml).join('')+'</div>'+
       '<div style="display:flex;gap:.5rem;margin-top:.5rem;"><input id="grtIn" placeholder="Bericht..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.5rem .7rem;color:var(--txt);"><button class="go" id="grtStuur">Stuur</button></div>';
@@ -19,14 +22,17 @@
     vertaalBubbels($('#grtMsgs'));
     scrollGrt();
   }
-  async function grtStuur(){ var inp=$('#grtIn'); if(!inp) return; var t=(inp.value||'').trim(); if(!t||!grtActief) return; inp.value=''; try{ var r=await GezinRT.stuur(grtActief,t); var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:r.bericht.tekst,vanMij:true})); scrollGrt(); } }catch(e){ toast(e.message); } }
+  async function grtStuur(){ var inp=$('#grtIn'); if(!inp) return; const epoch=grtEpoch,id=grtActief; var t=(inp.value||'').trim(); if(!t||!id||!gezinGeldig(epoch)) return; inp.value=''; try{ var r=await GezinRT.stuur(id,t); if(!gezinGeldig(epoch)||id!==grtActief) return; var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:r.bericht.tekst,vanMij:true})); scrollGrt(); } }catch(e){ if(gezinGeldig(epoch)) toast(e.message); } }
   function onGrtChat(m){ if(grtActief && m.van===grtActief){ var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:m.tekst,vanMij:false})); vertaalBubbels(el); scrollGrt(); } } }
   const telHref = t => 'tel:' + String(t||'').replace(/[^0-9+]/g,'');
   function geleden(iso){ const s=Math.floor((Date.now()-new Date(iso).getTime())/1000); if(s<60)return 'net nu'; if(s<3600)return Math.floor(s/60)+' min geleden'; if(s<86400)return Math.floor(s/3600)+' uur geleden'; return Math.floor(s/86400)+' dag(en) geleden'; }
   function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString(lang(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
   async function laadGezinInfo(){
     const box = $('#gezinInfo'); if(!box) return;
-    let d; try{ d = await API.call('/api/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
+    const epoch=grtEpoch,nummer=++grtInfoLaad,geldig=()=>gezinGeldig(epoch)&&nummer===grtInfoLaad;
+    if(!geldig()) return;
+    let d; try{ d = await API.call('/api/rtf/overzicht'); }catch(e){ if(geldig()) box.innerHTML=''; return; }
+    if(!geldig()) return;
     box.innerHTML = (d.gezinnen||[]).map(gz=>{
       const o = gz.oppasinfo||{};
       const meerdan1 = (d.gezinnen||[]).length>1;
@@ -56,11 +62,23 @@
   function infoRij(titel, tekst){ return tekst ? '<div class="h-mt50"><div class="meta s-aekzga">'+esc(titel)+'</div><div class="s-yztz7f">'+esc(tekst)+'</div></div>' : ''; }
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
-    const g=(rtf.gekoppeld||[]); if(!g.length) return;
+    const g=(rtf.gekoppeld||[]),epoch=grtEpoch; if(!gezinGeldig(epoch)) return;
     // een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht
     if(inp.dataset.idemTekst!==t){ inp.dataset.idem=RTGId('gezin-bericht'); inp.dataset.idemTekst=t; }
-    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
-    catch(e){ toast(e.message); }
+    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); if(!gezinGeldig(epoch)) return; inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    catch(e){ if(gezinGeldig(epoch)) toast(e.message); }
+  }
+  async function rtfOntkoppel(keuze){
+    const [code,profielId]=keuze.split('|'),epoch=grtEpoch,token=API.token;
+    if(!gezinGeldig(epoch)||!confirm('Dit gezin niet meer volgen?')) return;
+    try{
+      await API.call('/api/rtf/ontkoppel',{code,profielId}); if(!gezinGeldig(epoch)) return;
+      rtf.gekoppeld=rtf.gekoppeld.filter(x=>x.code!==code||x.profielId!==profielId);
+      syncGezinContext(); renderFoundation(); toast('Ontkoppeld.');
+      if(!rtf.gekoppeld.length) openTab('home');
+      const na=grtEpoch,r=await API.call('/api/state'); if(token!==API.token||na!==grtEpoch) return;
+      applyState(r.state); renderFoundation();
+    }catch(e){ if(token===API.token) toast(e.message); }
   }
   async function rtfKoppelStart(){
     const uitnodiging = prompt('Plak de persoonlijke uitnodigingslink of code die je van het gezin kreeg:');

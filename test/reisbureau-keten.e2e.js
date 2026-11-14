@@ -12,11 +12,11 @@ let srv, browser, x;
 test.before(async () => {
   assert.ok(pw && pw.chromium, 'de echte Playwright Chromium-installatie is verplicht; geen skip of vervangende driver');
   srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE', RTG_AI_UIT: '1' } });
-  x = await maakReisketenFixture(srv.base); browser = await h.startBrowser(pw);
+  x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] }); browser = await h.startBrowser(pw);
   const pakket = JSON.parse(fs.readFileSync(path.join(__dirname, '../node_modules/playwright/package.json'), 'utf8'));
   console.log('Reisketen Chromium: ' + browser.version() + '; Playwright: ' + pakket.version);
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await h.stop(srv); fs.rmSync(map, { recursive: true, force: true }); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await h.stopHard(srv.child); fs.rmSync(map, { recursive: true, force: true }); });
 async function open(token, soort, width = 390) {
   const ctx = await browser.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
   await ctx.addInitScript(({ token: t, soort: s }) => {

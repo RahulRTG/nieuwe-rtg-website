@@ -24,7 +24,7 @@
       } catch (e) { bubble(T('direct.mis','Versturen lukte nog niet. Uw tekst blijft hieronder staan.'), 'ai'); const i = $('#askInput'); if (i) i.value = q; }
       return;
     }
-    try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, user.tier !== 'rtg'); }
+    try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, d.mode || eigenChatMode()); }
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 

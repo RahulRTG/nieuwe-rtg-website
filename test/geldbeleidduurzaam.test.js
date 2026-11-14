@@ -25,6 +25,7 @@ const { startServer, stop } = require('./helper');
 
 const mappen = [];
 const verseMap = () => { const m = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gbd-')); mappen.push(m); return m; };
+const mapVan = new Map();
 
 function api(base, pad, body, token) {
   return fetch(base + '/api/' + pad, { method: 'POST',
@@ -35,16 +36,21 @@ function api(base, pad, body, token) {
 let seq = 0;
 async function lid(base) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  const reg = await api(base, 'auth/register', { name: 'Geldbeleid ' + seq, email: 'gbd' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
-  assert.ok(reg.body.token, 'registreren hoort een token te geven: ' + JSON.stringify(reg.body).slice(0, 160));
+  const email = 'gbd' + u + '@x.nl', dir = mapVan.get(base);
+  assert.ok(dir, 'de testserver hoort zijn eigen opslagmap te hebben');
+  require('./lib/historisch-account')(dir, { name: 'Geldbeleid ' + seq, email,
+    phone: '06' + u, password: 'geheim123', tier: 'rtg' });
+  const reg = await api(base, 'auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' });
+  assert.ok(reg.body.token, 'het historische regressielid hoort een token te geven: ' + JSON.stringify(reg.body).slice(0, 160));
   return reg.body.token;
 }
 
 let eerlijk, leugen;
 test.before(async () => {
-  eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap() } });
-  leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), RTG_VERRAAD: 'schrijf-verloren' } });
+  const eerlijkMap = verseMap(), leugenMap = verseMap();
+  eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: eerlijkMap } });
+  leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, RTG_VERRAAD: 'schrijf-verloren' } });
+  mapVan.set(eerlijk.base, eerlijkMap); mapVan.set(leugen.base, leugenMap);
 });
 test.after(() => {
   stop(eerlijk && eerlijk.child);
@@ -69,6 +75,9 @@ test('1. zonder verraad zetten en weghalen het lid zijn grens en regel gewoon', 
   assert.equal(r.body.ok, true);
   const id = (r.body.regel && r.body.regel.id) || null;
   assert.ok(id, 'de regel hoort zijn id terug te geven');
+  const voor = await api(eerlijk.base, 'geld/beleid', {}, tok);
+  assert.equal(voor.body.regels.length, 1);
+  assert.equal(voor.body.regels[0].id, id, 'de te verwijderen regel bestaat echt');
   const weg = await api(eerlijk.base, 'geld/beleid/weg', { id }, tok);
   assert.equal(weg.status, 200);
   assert.equal(weg.body.ok, true);
@@ -100,6 +109,13 @@ test('3. een weigering van de schrijver blijft zijn eigen weigering', async () =
 });
 
 test('4. de lezer blijft werken onder een liegende opslag', async () => {
+  const eigenaar = await lid(eerlijk.base);
+  const gezet = await api(eerlijk.base, 'geld/grens/zet', { periode: 'maand', centen: 42000 }, eigenaar);
+  assert.equal(gezet.status, 200);
+  const gevuld = await api(eerlijk.base, 'geld/grens', {}, eigenaar);
+  assert.equal(gevuld.status, 200);
+  assert.equal(gevuld.body.grenzen.length, 1, 'de eerlijke lezer vindt een werkelijk opgeslagen grens');
+  assert.equal(gevuld.body.grenzen[0].centen, 42000);
   const tok = await lid(leugen.base);
   const r = await api(leugen.base, 'geld/grens', {}, tok);
   assert.equal(r.status, 200);

@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -37,11 +37,17 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     const api = (pad, lijf, token) => fetch(base + pad, { method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
       body: JSON.stringify(lijf || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+    // Deze byteproef gebruikt een betaalde maker en twee afzonderlijke RTG-leden.
     const lid = async (naam, n) => {
       const u = (Date.now() + n).toString().slice(-8);
       const r = await api('/api/auth/register', { name: naam, email: 'cd' + u + '@x.nl', phone: '06' + u,
         password: 'geheim12345', geboortedatum: '1988-08-08', tier: 'rtg', pasApp: 'rtg' });
+      assert.equal(r.status, 200, naam + ' is geregistreerd: ' + JSON.stringify(r.body));
       assert.ok(r.body.token, naam + ' is ingelogd');
+      assert.equal(r.body.state.user.tier, 'guest', 'registratie geeft alleen een gratis account');
+      maakBetaaldRtgTestaccount(TMP, 'cd' + u + '@x.nl');
+      const feed = await api('/api/clips/feed', {}, r.body.token);
+      assert.equal(feed.status, 200, naam + ' heeft RTG Clips-toegang: ' + JSON.stringify(feed.body));
       return r.body.token;
     };
     const maker = await lid('Clipmaker', 1);
@@ -146,7 +152,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     assert.deepEqual(foutenClips, [], 'geen fout in Clips zelf');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

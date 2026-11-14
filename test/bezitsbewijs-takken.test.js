@@ -78,14 +78,18 @@ test('zonder meegegeven stand telt de omgeving: leeg is verplicht, schaduw laat 
   });
 });
 
-test('verplicht zonder binding: een gast of een sessie zonder account krijgt de accountweg', async () => {
+test('verplicht zonder binding: een accountsloze gast of sessie krijgt de accountweg', async () => {
   const { b } = await opzet();
-  for (const sess of [null, { key: 'g', tier: 'guest', account: 'x' }, { key: 'p', tier: 'rtg' }]) {
+  for (const sess of [null, { key: 'g', tier: 'guest' }, { key: 'p', tier: 'rtg' }]) {
     const uit = await b.controleer({ sess, methode: 'POST', pad: PAD, stand: 'verplicht' });
     assert.equal(uit.stand, 'geweigerd');
     assert.equal(uit.code, 403);
     assert.match(uit.reden, /eigen RTG-account/);
   }
+  const gratis = await b.controleer({ sess: { key: 'user-1', tier: 'guest', account: 'acc' }, methode: 'POST', pad: PAD, stand: 'verplicht' });
+  assert.equal(gratis.stand, 'geweigerd');
+  assert.equal(gratis.code, 403);
+  assert.match(gratis.reden, /Waar ben ik aanwezig/, 'ook het eigen gratis account moet zijn toestel bevestigen');
 });
 
 test('een onleesbaar register sluit, ook in aanbevolen; in de schaduw niet', async () => {

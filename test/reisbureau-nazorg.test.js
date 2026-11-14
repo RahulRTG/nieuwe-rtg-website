@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -59,6 +59,8 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Reiziger', email: 'n' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, 'n' + u + '@x.nl');
   lidToken = reg.body.token;
   const kantoor = await api(base, '/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   office = kantoor.body.token;

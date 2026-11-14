@@ -8,11 +8,26 @@
  function button(key,run,cls){var el=node('button',null,cls||'pp-button');if(key)el.append(node('span',key));el.type='button';el.addEventListener('click',run);return el;}
  function photo(path,cls,eager){var img=document.createElement('img'),file=/\.[a-z0-9]+$/i.test(path)?path:path+'.webp';if(cls)img.className=cls;img.src=new URL('images/'+file,asset()).href;img.alt='';img.loading=eager?'eager':'lazy';if(eager)img.fetchPriority='high';return img;}
  function asset(){var meta=d.querySelector('meta[name="rtg-asset-base"]');return new URL(((meta&&meta.content)||'/').replace(/\/?$/,'/'),d.baseURI);}
+ function brand(href){var link=node('a',null,'ds-brand-mark'),brandImage=document.createElement('img');link.setAttribute('href',href);link.setAttribute('aria-label','Rahul Travel Group, naar het begin');link.setAttribute('translate','no');brandImage.className='ds-brand-mark__image';brandImage.src=new URL('images/brand/rtg-mark.svg',asset()).href;brandImage.alt='Rahul Travel Group';brandImage.width=40;brandImage.height=32;link.appendChild(brandImage);return link;}
  function lips(){var el=node('span',null,'pp-lips');el.setAttribute('aria-hidden','true');el.innerHTML='<svg class="rtg-adaptive-lips" viewBox="0 0 100 58"><path d="M2 30C18 28 30 18 43 10C48 7 52 13 56 15C60 13 65 7 70 10C82 18 91 27 98 30C80 34 68 34 55 31C42 34 23 35 2 30Z"/><path d="M3 31C22 34 39 33 55 31C71 34 84 34 97 31C85 42 73 51 55 52C36 50 17 42 3 31Z"/><path d="M8 31C25 35 40 33 55 31C70 34 83 34 92 31"/></svg>';return el;}
  function frontDoor(company,target){var out={signal:null,world:null,count:null};if(company)return out;var meta=d.querySelector('meta[name="rtg-app-base"]'),secure=document.createElement('a'),root=new URL(meta&&meta.content?meta.content:'/',d.baseURI).href;secure.className='pp-secure-link';secure.dataset.i18n='public.secureOpen';secure.dataset.i18nSource=(D.words.secureOpen||['secureOpen'])[0];secure.textContent=copy('secureOpen');secure.setAttribute('href',new URL('apps/app.html',root).href);target.append(secure);var signal=node('p',null,'pp-technology-signal'),world=node('strong'),count=node('span','currentMap'),label=node('small',null,'pp-signal-label');label.textContent='RTG / SOCIAL TECHNOLOGY';signal.append(node('span',null,'pp-signal-pulse'),label,world,count);out.signal=signal;out.world=world;out.count=count;return out;}
+ /* Library controls share the public element vocabulary; the controller owns
+    filtering/view state and is only called by the original click handlers. */
+ function libraryControls(company,library,setView){
+  var libraryHead=node('div',null,'wd-library-heading'), libraryTitle=node('div');libraryTitle.append(node('h2',company?'companyLibrary':'libraryApp'),node('p',company?'companyLibraryIntro':'libraryDemo'));
+  var filters=node('div',null,'pp-library-tools'), searchLabel=node('label',null,'pp-search-label'),search=node('input',null,'wd-search');search.type='search';search.id='platform-search';searchLabel.htmlFor=search.id;searchLabel.append(node('span','search'),search);
+  var filter=node('select',null,'pp-filter');filter.setAttribute('aria-label',copy('worlds'));filter.dataset.i18nAria='public.worlds';
+  (company?['all','favorites','living','travel','work','foundation']:['all','living','travel','work','foundation']).forEach(function(value){var opt=node('option',value==='all'?'all':value==='favorites'?'companyFavorites':null);opt.value=value;if(!['all','favorites'].includes(value))opt.textContent={living:'LivingOS',travel:'TravelOS',work:'WorkOS',foundation:'FoundationOS'}[value];filter.append(opt);});
+  var gridButton=button(null,function(){setView(false);},'pp-icon-button'),listButton=button(null,function(){setView(true);},'pp-icon-button');
+  gridButton.append(icon('grid'));gridButton.dataset.i18nAria='public.grid';gridButton.setAttribute('aria-label',copy('grid'));listButton.append(icon('list'));listButton.dataset.i18nAria='public.list';listButton.setAttribute('aria-label',copy('list'));
+  filters.append(searchLabel,filter,gridButton,listButton);libraryHead.append(libraryTitle,filters);
+  var catalog=node('div',null,'wd-catalog'),empty=node('p','noResults','pp-empty');empty.hidden=true;empty.setAttribute('role','status');
+  library.append(libraryHead,catalog,empty);
+  return {search:search,filter:filter,catalog:catalog,empty:empty,gridButton:gridButton,listButton:listButton};
+ }
  /* De kopietaal is een statische documentafhankelijkheid. Alle hosts laden
     haar vóór platform-shell/detail; zo blijft de volgorde zichtbaar in HTML
     en ontstaat geen tweede runtime-loader met een berekende basis. */
  function desktop(){return w.RTGDesktopUI||null;}
- w.RTGPublicPlatform={node:node,icon:icon,button:button,copy:copy,photo:photo,lips:lips,asset:asset,frontDoor:frontDoor,desktop:desktop};
+ w.RTGPublicPlatform={node:node,icon:icon,button:button,copy:copy,photo:photo,lips:lips,asset:asset,brand:brand,frontDoor:frontDoor,libraryControls:libraryControls,desktop:desktop};
 })(window,document);

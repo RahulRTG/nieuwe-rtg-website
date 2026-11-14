@@ -103,8 +103,7 @@
           if (data.tweedeFactorNodig) return data;
           if (data.aanmeldkanaalVraag) aanmeldkanaalVraag = data.aanmeldkanaalVraag;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
-          API.token = data.token;
-          applyState(data.state);           // user = het echte account
+          aanvaardSessie(data);             // token en echt account samen aannemen
           tier = user.tier;
           if(cred.register&&cred.personalOS){
             try{await API.call('/personalos/complete',cred.personalOS);}catch(personalFout){
@@ -156,8 +155,7 @@
       if (API.enabled){
         try {
           const data = await API.call('/login', {tier, pasApp: vastePas || undefined});
-          API.token = data.token;
-          applyState(data.state);
+          aanvaardSessie(data);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
       } else if (magnaatKopie) {
         user = {...PERSONAS[tier]}; laadMagnaatData();

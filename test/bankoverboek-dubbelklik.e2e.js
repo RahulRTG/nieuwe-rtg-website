@@ -9,9 +9,12 @@
    ziet. Het antwoord wordt hier vertraagd, zodat de tweede klik zeker valt
    terwijl de eerste nog loopt. Draait alleen waar een browser is. */
 'use strict';
+const fixtureFs = require('node:fs'), fixtureOs = require('node:os'), fixturePath = require('node:path');
+const betaaldData = fixtureFs.mkdtempSync(fixturePath.join(fixtureOs.tmpdir(), 'rtg-'+'bankoverboek-dubbelklik'+'-'));
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser,
+const { startServer, maakBetaaldRtgTestaccount, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser,
   volgVerzoeken, wachtOpWaarde, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
@@ -38,7 +41,7 @@ async function dubbelklikEnWacht(page, selector, pad) {
 }
 
 test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boekt een keer', { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: betaaldData } });
   let browser;
   try {
     const kantoor = await kantoorAlsPersoon(base);
@@ -47,6 +50,7 @@ test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boek
     const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
     const tok = (await post(base, '/api/auth/register', { name: 'Banklid', email: 'dk' + u + '@x.nl', phone: '06' + u.slice(0, 8),
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' })).token;
+  maakBetaaldRtgTestaccount(betaaldData, 'dk' + u + '@x.nl');
     await post(base, '/api/bank/akkoord', {}, tok);
     await post(base, '/api/bank/rekening/open', { soort: 'spaar', idem: 'spaar-' + u }, tok);
     const ov = await post(base, '/api/bank/overzicht', {}, tok);

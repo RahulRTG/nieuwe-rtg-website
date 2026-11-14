@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const http = require('node:http'), { randomUUID } = require('node:crypto');
 const { Pool } = require('../server/pgwire');
-const { startServer, stopHard } = require('./helper');
+const { startServer, stopHard, stopNet } = require('./helper');
 const bewijs = require('./operationeel-journaal');
 const bron = process.env.DATABASE_URL || process.env.PG_URL;
 const pauze = ms => new Promise(r => setTimeout(r, ms));
@@ -58,9 +58,20 @@ module.exports = async function bewijsMallPostgres() {
     try {
       await beheer.query('CREATE DATABASE ' + naam); gemaakt = true;
       A = await startServer({ env: { ...env, RTG_DATA_DIR: path.join(tmp, 'a') } });
-      const lid = (await api(A.base, '/api/auth/register', { name: 'PG Aanvraag', email: 'pg@example.test',
-        password: 'geheim123', phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' })).token;
+      const registratie = await api(A.base, '/api/auth/register', { name: 'PG Aanvraag', email: 'pg@example.test',
+        password: 'geheim123', phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' });
+      const lid = registratie.token;
       assert.ok(lid);
+      assert.equal(registratie.state.user.tier, 'guest');
+      // Historisch betaalde persona, uitsluitend in deze eigen UUID-database.
+      // Geen bewijs van de abonnementketen: die wordt afzonderlijk beproefd.
+      // Spoel eerst de registratie in teststand; herstart leest PG, niet een
+      // lokale fixture. De echte crashproeven verderop blijven SIGKILL gebruiken.
+      await stopNet(A.child); A = null;
+      const betaald = await pool.query("UPDATE users SET tier='rtg' WHERE codename=$1 AND tier='guest'",
+        [registratie.state.user.codename]);
+      assert.equal(betaald.rowCount, 1, 'precies de geregistreerde testpersona krijgt bestaande betaalrechten');
+      A = await startServer({ env: { ...env, RTG_DATA_DIR: path.join(tmp, 'a') } });
       const roster = await api(A.base, '/api/supplier/roster', { code: 'SERENA' });
       const zaak = (await api(A.base, '/api/supplier/login', { code: 'SERENA', pin: '1234',
         staffId: roster.staff.find(s => s.role === 'manager').id })).token;

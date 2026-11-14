@@ -45,8 +45,11 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
-  token = (await post('/api/auth/register', { name: 'Stad Lid', email: 'stad-' + now + '@e.test',
-    phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  const reg = await post('/api/auth/register', { name: 'Stad Lid', email: 'stad-' + now + '@e.test',
+    phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null);
+  token = reg.token;
+  assert.equal(reg.state.user.tier, 'guest');
+  await require('./helper').keurLidGoed(srv.base, token, reg.state.user.codename, '1980-01-01');
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
 

@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-huisstijl-'));
 let srv, base, office;
@@ -38,8 +38,9 @@ async function lid(naam) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const email = 'hs' + u + '@x.nl', wachtwoord = 'geheim12345';
   const reg = await api('/api/auth/register', { name: naam, email, phone: '06' + u,
-    password: wachtwoord, geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    password: wachtwoord, geboortedatum: '1990-01-01' });
   assert.ok(reg.body.token, naam + ' is aangemeld');
+  maakBetaaldRtgTestaccount(TMP, email); // Een pas geeft geen werkgeversrol; werkBij() en de tenantgrenzen blijven leidend.
   return { token: reg.body.token, email, wachtwoord, naam };
 }
 async function zaakVan(code) {

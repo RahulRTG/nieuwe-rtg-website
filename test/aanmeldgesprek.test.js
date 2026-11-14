@@ -65,7 +65,9 @@ test('de poort is van Rahul: aanmelden en inloggen als gesprek', async () => {
     assert.equal(r.klaar, true, 'het gesprek is rond');
     assert.equal(r.woonplaats, 'Rotterdam');
     assert.equal(r.velden.geboortedatum, '1992-03-14');
-    assert.equal(r.velden.tier, 'rtg', 'het accounttype is voor je bepaald');
+    assert.equal(r.velden.tier, 'guest', 'registratie is gratis, geen betaalde pas');
+    assert.match(r.tekst, /zelf de overeenkomst/);
+    assert.doesNotMatch(r.tekst, /RTG Pass staat vanaf dit moment/);
     // precies vier gevraagde velden: naam, geboortedatum, e-mail, wachtwoord
     assert.deepEqual(Object.keys(r.velden).sort(), ['email', 'geboortedatum', 'name', 'password', 'tier'],
       'een gratis account vraagt niets meer dan dit');

@@ -26,8 +26,10 @@ async function api(pad, body, token) {
 }
 async function versLid() {
   const u = Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-  const r = await api('/api/auth/register', { name: 'Kaart Toets', email: 'gc-' + u + '@toets.example',
-    password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg' });
+  const email = 'gc-' + u + '@toets.example';
+  require('./lib/historisch-account')(TMP, { name: 'Kaart Toets', email,
+    password: 'geheim123', tier: 'rtg' });
+  const r = await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' });
   assert.equal((await api('/api/verify/upload', { image: MINI_PNG }, r.body.token)).status, 200);
   return r.body.token;
 }

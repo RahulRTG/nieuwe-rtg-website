@@ -15,9 +15,12 @@
         Arabisch staat dir="rtl" zonder overloop.
    Zet RTG_DS_BEELDEN=<map> om schermafbeeldingen te bewaren. */
 'use strict';
+const fixtureFs = require('node:fs'), fixtureOs = require('node:os'), fixturePath = require('node:path');
+const betaaldData = fixtureFs.mkdtempSync(fixturePath.join(fixtureOs.tmpdir(), 'rtg-'+'dispatch-ds'+'-'));
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { alleenDs, edgeLabels, edgeActies, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
@@ -44,7 +47,7 @@ async function open(breedte, hoogte, taal = 'nl', token = zaak) {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: betaaldData } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const roster = await post('/api/supplier/roster', { code: 'MKKX' });
   const m = (roster.body.staff || []).find(x => x.role === 'manager');
@@ -54,6 +57,7 @@ test.before(async () => {
   lid = (await post('/api/auth/register', { name: 'Reiziger', email: 'dsd' + u + '@x.nl', phone: '06' + u,
     password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   assert.ok(lid, 'het lid is aangemeld');
+  maakBetaaldRtgTestaccount(betaaldData, 'dsd' + u + '@x.nl');
   const a = await post('/api/supplier/mob/voertuig', { categorie: 'taxi', naam: 'Wagen A', loc: { lat: 38.909, lng: 1.433 },
     energieNiveau: 80, bestuurder: 'chauffeur-a', papieren: PAPIEREN_OK }, zaak);
   assert.equal(a.body.asset && a.body.asset.inzetbaar, true, 'Wagen A mag rijden');

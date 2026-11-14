@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, elevateTier } = require('./helper');
+const { startServer, stop, elevateTier, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ovoperatie-'));
 let srv, base, rtgLid, zakelijk, ander;
@@ -35,11 +35,13 @@ const api = (pad, body, token) => fetch(base + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 let n = 0;
-async function lid() {
+async function lid(betaaldeRtgPas = false) {
   const u = Date.now() + '-' + (n++);
-  const r = await api('/api/auth/register', { name: 'Reiziger ' + u, email: 'ovop' + u + '@x.nl',
-    password: 'geheim123', geboortedatum: '1980-05-05', tier: 'rtg', pasApp: 'rtg' });
+  const email = 'ovop' + u + '@x.nl';
+  const r = await api('/api/auth/register', { name: 'Reiziger ' + u, email,
+    password: 'geheim123', geboortedatum: '1980-05-05' });
   assert.ok(r.body.token, JSON.stringify(r.body).slice(0, 160));
+  if (betaaldeRtgPas) maakBetaaldRtgTestaccount(TMP, email); // Business blijft uitsluitend het menselijke besluit hieronder.
   return r.body.token;
 }
 async function business() {
@@ -54,7 +56,7 @@ async function business() {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  rtgLid = await lid();
+  rtgLid = await lid(true);
   zakelijk = await business();
   ander = await business();
 });

@@ -2,7 +2,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const pw = require('playwright');
-const { startServer, stopHard, browserOpties, geenBrowser, letOpFouten, edgeActies, edgeBediening, wachtOpSchil } = require('./helper');
+const { startServer, stopNet, stopHard, maakBetaaldRtgTestaccount, browserOpties, geenBrowser, letOpFouten, edgeActies, edgeBediening, wachtOpSchil } = require('./helper');
 const bewijs = require('./operationeel-journaal');
 
 test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge', async () => {
@@ -18,7 +18,8 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
       const url = new URL(bron); url.pathname = '/' + pgNaam;
       Object.assign(opslag, { RTG_STORE: 'postgres', DATABASE_URL: url.toString() });
     }
-    srv = await startServer({ env: { ...opslag, RTG_DATA_DIR: tmp, SMTP_URL: '', RTG_OWNER_EMAIL: 'beleid-eigenaar@example.test', RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_PUSH_UIT: '1' } });
+    const env = { ...opslag, RTG_DATA_DIR: tmp, SMTP_URL: '', RTG_OWNER_EMAIL: 'beleid-eigenaar@example.test', RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_PUSH_UIT: '1' };
+    srv = await startServer({ env });
     const api = async (pad, body, token) => {
       const r = await fetch(srv.base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
         Authorization: 'Bearer ' + (token || '') }, body: JSON.stringify(body || {}) });
@@ -26,6 +27,17 @@ test('lid en zaak sluiten de aanvraaglus via echte schermknoppen en één Edge',
     };
     const lid = await api('/api/auth/register', { name: 'Schermproef', email: 'scherm@example.test', password: 'geheim123',
       phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' });
+    if (bron) {
+      // Alleen de zojuist gemaakte wegwerp-PG-database; geen producttoelating.
+      await stopNet(srv.child); srv = null;
+      const persona = new (require('../server/pgwire').Pool)({ connectionString: opslag.DATABASE_URL, max: 1 });
+      try {
+        const betaald = await persona.query("UPDATE users SET tier='rtg' WHERE codename=$1 AND tier='guest'", [lid.state.user.codename]);
+        assert.equal(betaald.rowCount, 1, 'uitsluitend de eigen geregistreerde klant krijgt de betaalde testpersona');
+      } finally { await persona.end(); }
+      srv = await startServer({ env });
+    } else maakBetaaldRtgTestaccount(tmp, 'scherm@example.test');
+    assert.equal((await api('/api/state', {}, lid.token)).state.user.tier, 'rtg');
     const roster = await api('/api/supplier/roster', { code: 'SERENA' });
     const zaak = await api('/api/supplier/login', { code: 'SERENA', staffId: roster.staff.find(x => x.role === 'manager').id, pin: '1234' });
     const eigenaar = await api('/api/techniek/inloggen', { login: 'beleid-eigenaar@example.test', wachtwoord: 'Imran' });

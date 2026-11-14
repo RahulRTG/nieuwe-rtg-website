@@ -409,7 +409,7 @@ test('gedeeltelijke Stripe-refunds zijn idempotent; cross-provider refund boekt 
   let refundNr = 0;
   const betaal = {
     async maakBetaling(o) {
-      const adyen = o.referentie && String(o.referentie).includes('ADYEN');
+      const adyen = o.aanbieder === 'adyen'; // referentie is de gehashte BW-id, niet ORDER-ADYEN
       return { id: adyen ? 'PL_MISMATCH' : 'pi_refunds', status: adyen ? 'active' : 'processing',
         aanbieder: adyen ? 'adyen' : 'stripe', bedrag: o.bedrag, valuta: o.valuta };
     },

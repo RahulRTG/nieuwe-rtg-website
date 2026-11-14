@@ -7,14 +7,20 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisketen-nazorg-'));
 const env = { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' };
 const MP = '/api/reisbureau/keten', OP = '/api/office/reisbureau/keten';
 const SP = '/api/supplier/reisbureau/keten', DP = '/api/supplier/reisbureau/opdracht/besluit';
 let srv, x, herstel;
-test.before(async () => { srv = await startServer({ env }); x = await maakReisketenFixture(() => srv.base); });
+test.before(async () => {
+  srv = await startServer({ env });
+  x = await maakReisketenFixture(() => srv.base);
+  // Twee betalende reizigers: de ander blijft buiten het eigen reisdossier.
+  // Dit is geen bewijs van contractacceptatie of een providerbetaling.
+  for (const n of ['81', '82']) maakBetaaldRtgTestaccount(map, 'reisketen-' + n + '@voorbeeld.test');
+});
 test.after(async () => { await stop(srv); fs.rmSync(map, { recursive: true, force: true }); });
 const lees = async (ref, token = x.reiziger.token) => goed(await x.api(MP, { ref }, token), 'eigen reis').reizen[0];
 const verkoper = async (ref, rtg = false) => goed(await x.api(rtg ? OP : SP, { ref }, rtg ? x.office : x.bureau.token), 'verkoper leest').reizen[0];

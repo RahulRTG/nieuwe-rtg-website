@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard } = require('./helper');
 const inzagelog = require('../server/inzagelog');
 const maakKaart = require('../server/kern/inzagekaart');
 
@@ -149,22 +149,31 @@ const api = (pad, t) => fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, t ? { Authorization: 'Bearer ' + t } : {}),
   body: '{}' }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-test('de deur: een lid krijgt zijn kaart, een gast en een vreemde niet', async (t) => {
+test('de deur: een gratis account krijgt zijn eigen kaart, een accountsloze demo en een vreemde niet', async (t) => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  t.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
+  t.after(async () => { await stopHard(srv && srv.child); fs.rmSync(TMP, { recursive: true, force: true }); });
 
   assert.equal((await api('/api/inzagekaart')).status, 401, 'zonder inlog geen kaart');
 
-  const gastToken = await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tier: 'guest', pasApp: 'rtg' }) }).then(r => r.json()).then(d => d.token);
-  assert.equal((await api('/api/inzagekaart', gastToken)).status, 403, 'een gast heeft geen dossier');
+  for (const tier of ['guest', 'rtg']) {
+    const demo = await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tier, pasApp: 'rtg' }) });
+    assert.equal(demo.status, 200);
+    const gastToken = (await demo.json()).token;
+    assert.ok(gastToken);
+    assert.equal((await api('/api/inzagekaart', gastToken)).status, 403, 'een accountsloze demo heeft geen persoonlijk dossier, ook niet met tier ' + tier);
+  }
 
-  const lidToken = await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tier: 'rtg' }) }).then(r => r.json()).then(d => d.token);
-  const r = await api('/api/inzagekaart', lidToken);
+  const registratie = await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Eigen Inzage', email: 'eigen-inzage@x.nl', phone: '0612345678', password: 'geheim12345', geboortedatum: '1990-01-01' }) });
+  const account = await registratie.json();
+  assert.equal(registratie.status, 200, JSON.stringify(account));
+  assert.equal(account.state.user.tier, 'guest', 'eigen privacy-inzage vraagt geen betaald abonnement');
+  assert.ok(account.token);
+  const r = await api('/api/inzagekaart', account.token);
   assert.equal(r.status, 200);
-  assert.ok(Array.isArray(r.body.kaart), 'een lid krijgt een kaart, ook als hij leeg is');
+  assert.ok(Array.isArray(r.body.kaart), 'een echt account krijgt een kaart, ook als hij leeg is');
   assert.deepEqual(r.body.storingen, [], 'en alle bronnen zijn in een echte server bereikbaar');
   assert.ok(r.body.nietZichtbaar.length >= 1, 'met de grens van de lijst erbij');
 });

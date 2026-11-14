@@ -105,14 +105,59 @@ test('4. de kaart groeit niet stil: onverklaarde lezers mogen alleen omlaag', ()
     ONVERKLAARD_MAX + '. Deel de nieuwe in (scripts/refundmigratie.js) in plaats van de ratel te verhogen.');
 });
 
-test('5. de telling spreekt zichzelf niet tegen', () => {
+function controleerTelling() {
   const u = M.meet();
-  assert.equal(u.telling.verklaard + u.telling.onbekend, u.telling.bestanden - Object.keys(M.GEEN_LEZER).length,
+  /* Een benoemde uitzondering hoeft geen treffer te zijn: app-main-45.js
+     noemt alleen de vertaling `app.paid` en geen betrokken collectie. Vraag
+     DEZELFDE scanner welke bestanden hij vindt, tijdelijk zonder uitsluitingen;
+     geen tweede kopie van zijn zoekregels en geen blind aftrekken van de lijst. */
+  const uitsluitingen = { ...M.GEEN_LEZER };
+  let alles;
+  try {
+    for (const rel of Object.keys(uitsluitingen)) delete M.GEEN_LEZER[rel];
+    alles = M.meet();
+  } finally { Object.assign(M.GEEN_LEZER, uitsluitingen); }
+  assert.equal(alles.telling.bestanden, u.telling.bestanden, 'indelen verandert de gevonden bronbestanden niet');
+  const gevonden = new Set(alles.verklaard.concat(alles.onbekend).map(r => r.bestand));
+  assert.equal(gevonden.size, alles.telling.bestanden, 'zonder uitsluitingen heeft elk gevonden bestand één rij');
+  const uitgesloten = Object.keys(uitsluitingen).filter(rel => gevonden.has(rel));
+  assert.equal(u.telling.verklaard + u.telling.onbekend, u.telling.bestanden - uitgesloten.length,
     'verklaard + onbekend dekt niet alle gevonden bestanden');
   assert.equal(u.telling.scherp + u.telling.ruim, u.telling.verklaard + u.telling.onbekend,
     'elke rij hoort een leesbreedte te dragen (venster of bestand)');
   assert.equal(u.telling.server + u.telling.scherm, u.telling.verklaard + u.telling.onbekend,
     'elke rij hoort een laag te dragen (server of scherm)');
+  return { u, uitgesloten };
+}
+
+test('5. de telling spreekt zichzelf niet tegen', () => {
+  controleerTelling();
+});
+
+test('5b. alleen een werkelijk gevonden uitsluiting verandert het aantal lezers', () => {
+  const voor = controleerTelling();
+  const vertaling = 'public/apps/app-main/app-main-45.js';
+  const gevonden = 'server/kern/mall/bestellingen.js';
+  assert.ok(M.GEEN_LEZER[vertaling] && M.GEEN_LEZER[gevonden]);
+  assert.ok(!voor.uitgesloten.includes(vertaling), 'een vertaalsleutel zonder collectie is geen scanner-treffer');
+  assert.ok(voor.uitgesloten.includes(gevonden), 'de positieve tegenproef heeft werkelijk een treffer');
+  const bewaard = { ...M.GEEN_LEZER };
+  try {
+    delete M.GEEN_LEZER[vertaling];
+    const zonderVertaling = controleerTelling();
+    assert.deepEqual(zonderVertaling.u.telling, voor.u.telling,
+      'een niet-gevonden uitzondering verwijderen verandert geen enkele telling');
+    assert.deepEqual(zonderVertaling.uitgesloten, voor.uitgesloten);
+
+    delete M.GEEN_LEZER[gevonden];
+    const zonderTreffer = controleerTelling();
+    assert.equal(zonderTreffer.u.telling.bestanden, voor.u.telling.bestanden);
+    assert.equal(zonderTreffer.u.telling.verklaard, voor.u.telling.verklaard);
+    assert.equal(zonderTreffer.u.telling.onbekend, voor.u.telling.onbekend + 1,
+      'een gevonden uitzondering verwijderen levert precies één onverklaarde lezer op');
+    assert.ok(zonderTreffer.u.onbekend.some(r => r.bestand === gevonden));
+    assert.equal(zonderTreffer.uitgesloten.length, voor.uitgesloten.length - 1);
+  } finally { Object.assign(M.GEEN_LEZER, bewaard); }
 });
 
 test('6. het register bestaat en klopt met een verse meting', () => {

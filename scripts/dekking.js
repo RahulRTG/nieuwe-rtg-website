@@ -41,11 +41,17 @@
      node scripts/dekking.js --vastleggen
      node scripts/dekking.js              (draait de suite zelf)
      node scripts/dekking.js --lees <bestand> [--lees <bestand>]
+     node scripts/dekking.js --lees <bestand> --broncommit=<volledige-commit>
      node scripts/dekking.js --json
      node scripts/dekking.js --vastleggen
 
    In CI draait de suite toch al: die stap krijgt RTG_ROUTELOG mee en deze stap
    leest het journaal met --lees. Dat kost dus niets extra's.
+
+   --lees importeert een waarnemingsunie, geen bewijs dat alle suites slaagden.
+   --broncommit noemt de opgegeven bron; de meter attesteert die koppeling niet.
+   Zonder die vlag blijft de broncommit onbekend. De meetcommit is apart: die
+   bepaalt tegen welke huidige routekaart de aanroepen zijn gehouden.
 
    DE EENHEID IS METHODE + PATROON, OVER ALLE ROUTES
 
@@ -86,6 +92,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { createHash } = require('crypto');
 const { execFileSync, spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
@@ -112,14 +119,46 @@ const vastleggen = process.argv.includes('--vastleggen');
 
    `npm test` schrijft .routejournaal, `npm run e2e` schrijft .schermjournaal.
    Bij elkaar dekken ze wat node kan bereiken en wat alleen een browser kan. */
-const journalenUitArgv = () => {
+const journalenUitArgv = (argv = process.argv) => {
   const uit = [];
-  for (let i = 0; i < process.argv.length; i++) {
-    if (process.argv[i] !== '--lees') continue;
-    for (const p of String(process.argv[i + 1] || '').split(',')) if (p.trim()) uit.push(p.trim());
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] !== '--lees') continue;
+    for (const p of String(argv[i + 1] || '').split(',')) if (p.trim()) uit.push(p.trim());
   }
   return uit;
 };
+
+function broncommitUitArgv(argv = process.argv) {
+  const waarden = [];
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--broncommit') waarden.push(argv[++i] || '');
+    else if (argv[i].startsWith('--broncommit=')) waarden.push(argv[i].slice('--broncommit='.length));
+  }
+  if (!waarden.length) return null;
+  if (waarden.length !== 1) throw new Error('--broncommit mag maar eenmaal worden opgegeven.');
+  if (!journalenUitArgv(argv).length) throw new Error('--broncommit mag alleen samen met --lees.');
+  if (!/^[a-f0-9]{40}$/i.test(waarden[0])) throw new Error('--broncommit vereist een volledige commit van 40 hextekens.');
+  const broncommit = waarden[0].toLowerCase();
+  try {
+    const echt = execFileSync('git', ['rev-parse', '--verify', broncommit + '^{commit}'],
+      { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    if (echt === broncommit) return broncommit;
+  } catch (e) { /* onbekend object is geen opgegeven broncommit */ }
+  throw new Error('--broncommit verwijst niet naar een beschikbare commit.');
+}
+
+/* Eenmalig lezen: de hash beschrijft precies de bytes waaruit de unie komt.
+   Alleen de bestandsnaam gaat het register in, geen persoonlijk lokaal pad. */
+function leesWaarnemingen(journalen) {
+  const geraakt = new Set(), invoer = [];
+  for (const pad of journalen) {
+    const bytes = fs.readFileSync(pad);
+    invoer.push({ pad: path.basename(pad), bytes: bytes.length,
+      sha256: createHash('sha256').update(bytes).digest('hex') });
+    for (const regel of routedekking.geraaktUit(bytes.toString('utf8'))) geraakt.add(regel);
+  }
+  return { geraakt, invoer };
+}
 
 /* Het journaal van een suite die hier zelf gedraaid wordt. Zonder --lees
    draaien we de tests alsnog: lokaal wil je een cijfer kunnen halen zonder
@@ -156,29 +195,36 @@ function routekaart() {
    ook zegt, is de tweede plek waar een waarheid gaat schuiven (LAT.md regel 4).
    Wat er wel in staat is wat je NIET kunt herrekenen: wanneer, op welke commit,
    en hoeveel routes de router toen had. */
-function schrijfBewijs(meting, kaart) {
-  let commit = null;
-  try {
-    commit = execFileSync('git', ['rev-parse', '--short', 'HEAD'],
-      { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || null;
-  } catch (e) { commit = null; }
+function bewijsVan(meting, kaart, { meetcommit, broncommit = null, geimporteerd, invoer, suiteStatus = null,
+  op = new Date().toISOString() }) {
   const ongeraakt = new Set(meting.ongeraakt.map(r => r.methode + ' ' + r.pad));
   const aangeraakt = [];
   for (const r of routedekking.inventaris(kaart).routes) {
     const s = r.methode + ' ' + r.pad;
     if (!ongeraakt.has(s)) aangeraakt.push(s);
   }
-  fs.writeFileSync(DEKKINGBESTAND, JSON.stringify({
-    uitleg: 'Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, ' +
-      'uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. ' +
+  return {
+    uitleg: 'Elke route (METHODE + patroon) in deze waarnemingsunie is volgens de meegetelde ' +
+      'routejournalen aangeroepen, niet afgeleid uit de tekst van de toetsen. ' +
+      'Dit bewijst geen volledige geslaagde testsuite, actuele kandidaatkwalificatie of veilige werking. ' +
       'De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. ' +
       'Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server ' +
       'op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. ' +
       'Bijwerken met: npm run dekking:vast',
-    gemeten: { op: new Date().toISOString(), commit, routesToen: meting.totaal },
+    // commit blijft voor bestaande lezers de MEETcommit, nooit de importbron.
+    gemeten: { op, commit: meetcommit, broncommit, routesToen: meting.totaal },
+    herkomst: { soort: geimporteerd ? 'geimporteerde-waarnemingsunie' : 'lokale-waarnemingsunie',
+      broncommitStatus: broncommit ? 'opgegeven-niet-zelfstandig-gekoppeld' : 'onbekend',
+      aantalBestanden: invoer.length, bestanden: invoer, suiteStatus: geimporteerd ? null : suiteStatus },
+    kwalificatie: { status: 'NIET_VASTGESTELD',
+      reden: 'Aanroepdekking vervangt geen complete actuele CI-ronde met alle vereiste journalen en geslaagde controles.' },
     aangeraakt
-  }, null, 2) + '\n');
-  return aangeraakt.length;
+  };
+}
+
+function schrijfBewijs(bewijs) {
+  fs.writeFileSync(DEKKINGBESTAND, JSON.stringify(bewijs, null, 2) + '\n');
+  return bewijs.aangeraakt.length;
 }
 
 /* ---- IS HET JOURNAAL VAN DE LAATSTE SUITE NOG BRUIKBAAR? ----
@@ -226,6 +272,10 @@ const JOURNALEN = [
 
 function main() {
   let journalen = journalenUitArgv(), suite = null;
+  const geimporteerd = journalen.length > 0;
+  let broncommit;
+  try { broncommit = broncommitUitArgv(); }
+  catch (e) { console.error(e.message); return 2; }
   /* PER JOURNAAL: IS HIJ MEEGETELD, EN ZO NIET WAAROM. Zonder deze lijst zegt
      het rapport alleen een cijfer, en dan is "0%" niet te onderscheiden van
      "de suite draaide zonder RTG_ROUTELOG". Hij kwam met b3f0d83e en raakte bij
@@ -303,9 +353,7 @@ function main() {
     }
   }
 
-  const routelog = require(path.join(WORTEL, 'server', 'routelog'));
-  const geraakt = new Set();
-  for (const p of journalen) for (const regel of routelog.lees(p)) geraakt.add(regel);
+  const { geraakt, invoer } = leesWaarnemingen(journalen);
   const kaart = routekaart();
 
   /* EEN LEEG JOURNAAL IS EEN KAPOTTE METING, GEEN NUL PROCENT.
@@ -326,19 +374,29 @@ function main() {
   const pct = m.pct;
   const ongeraakt = m.ongeraakt.map(r => r.methode + ' ' + r.pad);
   const onmeetbaar = m.onmeetbaar.map(r => r.methode + ' ' + r.pad);
+  let meetcommit = null;
+  try {
+    meetcommit = execFileSync('git', ['rev-parse', 'HEAD'],
+      { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || null;
+  } catch (e) { /* onbekende meetcommit blijft onbekend */ }
+  const bewijs = bewijsVan(m, kaart, { meetcommit, broncommit, geimporteerd, invoer,
+    suiteStatus: suite ? suite.status : null });
 
   const norm = fs.existsSync(NORMBESTAND) ? JSON.parse(fs.readFileSync(NORMBESTAND, 'utf8')) : null;
 
   if (jsonUit) {
     process.stdout.write(JSON.stringify({ routes: m.totaal, geraakt: m.geraakt, pct,
       nooitAangeraakt: m.nooitAangeraakt, onmeetbaar, gaten: m.gaten, ongeraakt, vreemd: m.vreemd,
-      journalen: herkomst, suiteStatus: suite ? suite.status : null }) + '\n');
+      journalen: herkomst, suiteStatus: suite ? suite.status : null,
+      gemeten: bewijs.gemeten, herkomst: bewijs.herkomst, kwalificatie: bewijs.kwalificatie }) + '\n');
   } else {
     console.log('\n\x1b[1mWAARGENOMEN DEKKING\x1b[0m \x1b[2m(uit het routejournaal, niet uit de tekst van de tests)\x1b[0m\n');
     console.log('  routes op de routekaart    : ' + m.totaal + '  \x1b[2m(methode + patroon, alles inbegrepen)\x1b[0m');
     console.log('  daarvan echt aangeroepen   : ' + m.geraakt + '  (' + pct + '%)');
     console.log('  nooit aangeraakt           : ' + m.nooitAangeraakt);
     console.log('  niet te meten              : ' + onmeetbaar.length);
+    console.log('  herkomst                    : ' + bewijs.herkomst.soort + '; broncommit ' + (broncommit || 'onbekend'));
+    console.log('  kwalificatie                : niet vastgesteld; aanroepdekking is geen volledige groene CI-ronde');
     if (m.vreemd.length) {
       console.log('\n  \x1b[33m' + m.vreemd.length + ' route(s) geraakt die niet op de routekaart staan:\x1b[0m');
       for (const v of m.vreemd.slice(0, 10)) console.log('    ' + v);
@@ -365,7 +423,7 @@ function main() {
      een gat en heet dat voortaan de norm; dat is hoe een ratel losraakt. */
   if (m.gaten > 0) {
     console.error('\n  \x1b[31mDE DEKKING IS GEEN 100%.\x1b[0m ' + m.gaten + ' van de ' + m.totaal +
-      ' routes zijn tijdens de hele suite niet aangeraakt of niet te meten.');
+      ' routes zijn in de meegetelde journalen niet aangeraakt of niet te meten.');
     for (const r of ongeraakt.slice(0, 20)) console.error('    ' + r);
     if (ongeraakt.length > 20) console.error('    ... en nog ' + (ongeraakt.length - 20));
     for (const r of onmeetbaar) console.error('    ' + r + '   \x1b[2m(app.all(): registreer hem met een eigen methode)\x1b[0m');
@@ -390,7 +448,7 @@ function main() {
     nieuw.meters[METER_N] = m.nooitAangeraakt;
     nieuw.vastgelegd = new Date().toISOString().slice(0, 10);
     fs.writeFileSync(NORMBESTAND, JSON.stringify(nieuw, null, 2) + '\n');
-    const n = schrijfBewijs(m, kaart);
+    const n = schrijfBewijs(bewijs);
     if (!jsonUit) console.log('\n  \x1b[32m' + METER + ' vastgelegd op ' + pct + '%, ' + METER_N +
       ' op ' + m.nooitAangeraakt + '; ' + n + ' routes als bewezen aangeraakt in DEKKING.json.\x1b[0m\n');
     return 0;
@@ -409,4 +467,5 @@ function main() {
    kapotte meter (test/dekking.test.js zakte erop met "Unterminated string in
    JSON at position 65536"). Met exitCode loopt de proceslus leeg, spoelt stdout,
    en eindigt Node vanzelf met dezelfde code. */
+module.exports = { broncommitUitArgv, leesWaarnemingen, bewijsVan };
 if (require.main === module) process.exitCode = main();

@@ -59,6 +59,7 @@ function maakGastLijsten({ db, comm, lijnSleutel, codeVan, zaakVan, kantVan, oud
       const kern = comm.gesprekVan(g.id);
       if (!kern || !kern.meta || kern.meta.bron !== 'Zaak') continue;
       const lidKey = kern.deelnemers.find((d) => d !== mij) || '';
+      if (!lidKey) continue; // Een verwijderde klant laat geen actieve zaakrelatie achter.
       const lijst = comm.berichtenVan(g.id).filter((m) => !m.weg);
       if (!lijst.length) continue;
       const laatste = lijst[lijst.length - 1];

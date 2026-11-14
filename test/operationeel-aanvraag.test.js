@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, maakBetaaldRtgTestaccount } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const bewijs = require('./operationeel-journaal');
 
@@ -22,8 +22,13 @@ test('aanvraag gaat via twee bevoegde werkplekken terug naar Saloon, ook zonder 
   };
   try {
     srv = await startServer({ env });
-    const registreer = async n => (await api('/api/auth/register', { name: 'Proef ' + n, email: 'operationeel' + n + '@example.test',
-      password: 'geheim123', phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' }, null)).token;
+    const registreer = async n => {
+      const email = 'operationeel' + n + '@example.test';
+      const reg = await api('/api/auth/register', { name: 'Proef ' + n, email,
+        password: 'geheim123', phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' }, null);
+      maakBetaaldRtgTestaccount(tmp, email);
+      return reg.token;
+    };
     lid = await registreer(1); const ander = await registreer(2); zaak = await login('SERENA');
     assert.ok(lid && ander && zaak);
     const invoer = { sleutel: 'aanvraag-1', wat: 'Behandeling op zaterdag', plek: 'Ibiza', verdieping: 'beauty' };

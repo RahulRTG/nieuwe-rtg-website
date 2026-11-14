@@ -185,7 +185,7 @@ const { trustPlane, bewijsHospitalityBesluit, markeerHospitalityRequest } =
     vindReservering: id => (db.data.reserveringen || []).find(r => r.id === id) });
 
 const { betaalWaarheid, betaalRegie } = require('./opzet/betaalketen')({
-  db, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log, env: process.env
+  db, save, bewerkCollectie, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log, env: process.env
 });
 
 /* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde
@@ -1648,18 +1648,13 @@ const fonds = maakFonds({ db, save, bijeen, inBundel, betaal, log, env: process.
 muntbetaal.koppelStore(maakIdemRing({ data: () => db.data, naam: 'muntIdem', save }));
 const munten = maakMunten({ db, save, muntbetaal });
 
-/* Een bevestigde munt-ontvangst settelt de bijbehorende factuur langs de gewone
-   weg: gemarkeerd als betaald, en voor abonnementen de 30%-afdracht aan de
-   RTFoundation geboekt. Zo maakt het niet uit of een lid met kaart of met munten
-   betaalt: de rest van het systeem ziet hetzelfde. */
-/* De afwikkeling van een bevestigde betaling (munt EN kaart) staat in
-   kern/settlement.js, zodat hij los te toetsen is -- dat was hier niet mogelijk
-   en juist daar zat de fout: de kaartkant werd nooit afgewikkeld. */
+/* Munt en kaart delen dezelfde getoetste factuurafwikkeling. */
 const { maakSettlement } = require('./kern/settlement');
 /* payOplaadAfronden als LATE binding: de betaalkern wordt pas verderop gebouwd
    (kernlaag), maar deze functie draait pas als er een webhook binnenkomt -- dan
    staat hij er. Sinds MONEY-012 alleen nog voor oude kaartWachtend-rijen. */
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd,
+  naAbonnementsbetaling: (ctx) => kern.aanmeldingen.automatisch.afgewikkeld(ctx.accountId, ctx.contractId, ctx.termijn),
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null),
   // bevestigt het IBAN waarvandaan is opgeladen, zodat de wachttijd op DIE rekening vervalt
   payIbanBevestigd: (a) => (kern.pay && kern.pay.ibanBevestigd ? kern.pay.ibanBevestigd(a) : null) });

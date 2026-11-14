@@ -9,7 +9,7 @@ module.exports = (kern) => {
   // de sleutelwoorden horen bij een echt account; we sleutelen op het stabiele
   // gebruikers-id, niet op de sessiesleutel
   const echtId = (req, res) => {
-    if (req.session.tier === 'guest' || !req.session.account) {
+    if (!req.session.account) {
       res.status(403).json({ error: 'Sleutelwoorden horen bij een echt RTG-account.' });
       return null;
     }

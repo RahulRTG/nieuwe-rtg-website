@@ -11,7 +11,7 @@ test('reiziger en eigen partner wisselen nazorg uit zonder reis/geldwijziging, o
   const srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   let browser;
   try {
-    const x = await maakReisketenFixture(srv.base);
+    const x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] });
     let reis = goed(await x.api('/api/reisbureau/keten/start', { titel: 'Browsernazorg zonder uitvoering',
       bestemming: 'Ibiza', supplierCode: x.bureau.code, idem: 'nazorg-browser-start' }, x.reiziger.token), 'aanvraag').reis;
     const bron = async () => goed(await x.api('/api/supplier/reisbureau/keten', { ref: reis.ref }, x.bureau.token), 'bron').reizen[0];
@@ -109,5 +109,5 @@ test('reiziger en eigen partner wisselen nazorg uit zonder reis/geldwijziging, o
     await lid.page.screenshot({ path: path.join(uit, 'reisketen-nazorg-390.png') });
     assert.deepEqual([...lid.fouten, ...partner.fouten], []);
     await lid.ctx.close(); await partner.ctx.close();
-  } finally { if (browser) await browser.close(); await h.stop(srv); fs.rmSync(map, { recursive: true, force: true }); }
+  } finally { if (browser) await browser.close(); await h.stopHard(srv.child); fs.rmSync(map, { recursive: true, force: true }); }
 });

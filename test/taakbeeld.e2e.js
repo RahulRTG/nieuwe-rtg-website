@@ -18,7 +18,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 const PLAN = { doel: 'Uw reis naar Rome klaarzetten', stappen: [
@@ -53,7 +53,8 @@ const post = (base, pad, body, token) => fetch(base + pad, { method: 'POST',
 test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de bewering van het model',
   { skip: geenBrowser(pw) }, async () => {
   const model = await nepModel();
-  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taak-e2e-')),
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taak-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1' } });
   const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block', locale: 'nl-NL' });
@@ -61,9 +62,12 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
   const fouten = [];
   letOpFouten(page, fouten);
   try {
-    const reg = await post(srv.base, '/api/auth/register', { name: 'Taak Proef', email: 'taake2e' + Date.now() + '@voorbeeld.test',
+    const email = 'taake2e' + Date.now() + '@voorbeeld.test';
+    const reg = await post(srv.base, '/api/auth/register', { name: 'Taak Proef', email,
       password: 'geheim12345', geboortedatum: '1990-01-01', phone: '0612345601', tier: 'rtg', pasApp: 'rtg' });
     const token = reg.body.token;
+    assert.ok(token, 'registratie');
+    maakBetaaldRtgTestaccount(TMP, email);
     const st = await post(srv.base, '/api/onboarding/status', {}, token);
     await post(srv.base, '/api/onboarding/teken', { naam: 'Taak Proef', akkoord: true, contractVersion: st.body.contract.versie }, token);
     const reizen = (await post(srv.base, '/api/reisbureau', {}, token)).body.reizen;
@@ -117,7 +121,8 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
     assert.deepEqual(fouten, [], 'geen fouten in de console');
   } finally {
     await browser.close();
-    await stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
     model.srv.close();
   }
 });

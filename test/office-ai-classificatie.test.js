@@ -24,7 +24,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-office-ai-'));
 const MERK = 'Overnamebod-Zilverreiger-7731';
@@ -73,6 +73,7 @@ test.before(async () => {
     body: JSON.stringify({ name: 'Lid AI', email: 'ai' + u + '@x.nl', phone: '06' + u, password: 'geheim123',
       geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
   token = reg.token;
+  maakBetaaldRtgTestaccount(TMP, 'ai' + u + '@x.nl');
   assert.ok(token, 'lid ingelogd');
 });
 test.after(() => {

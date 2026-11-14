@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-fases-'));
 let srv, base, office, lid;
@@ -27,6 +27,7 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await api('/api/auth/register', { name: 'Faselid', email: 'fa' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'fa' + u + '@x.nl');
   assert.ok(office && lid, 'backoffice en lid ingelogd');
 });
 test.after(() => {

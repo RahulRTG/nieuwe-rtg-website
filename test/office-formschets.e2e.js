@@ -13,16 +13,21 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 const pw = laadPlaywright();
-const api = async (base, pad, body, token) => (await fetch(base + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-  body: JSON.stringify(body || {})
-})).json();
+const api = async (base, pad, body, token) => {
+  const r = await fetch(base + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {})
+  });
+  const data = await r.json();
+  assert.equal(r.status, 200, pad + ' tijdens voorbereiding: ' + JSON.stringify(data));
+  return data;
+};
 
 test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en herladen',
   { skip: geenBrowser(pw) }, async () => {
@@ -33,9 +38,14 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
     const t = Date.now();
     const regA = await api(base, '/api/auth/register', { name: 'Bouwer E2E', email: 'fa' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1985-03-03', tier: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, 'fa' + t + '@e.test');
     const regB = await api(base, '/api/auth/register', { name: 'Invuller Echt', email: 'fb' + t + '@e.test',
       phone: '07' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1991-09-09', tier: 'rtg' });
+    assert.equal(regB.state.user.tier, 'guest', 'registratie verleent nog geen betaalrechten');
+    // Ook B gebruikt hier persoonlijke RTG Office; dit is geen publieke formulierlink.
+    maakBetaaldRtgTestaccount(TMP, 'fb' + t + '@e.test');
     const stB = await api(base, '/api/state', {}, regB.token);
+    assert.equal(stB.state.user.tier, 'rtg', 'de bedoelde RTG-accountinvuller is voorbereid');
     const codeB = stB.state.user.codename;
 
     browser = await pw.chromium.launch(browserOpties(pw));
@@ -45,6 +55,7 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
     // een pagina, twee stoelen: het token wisselt, zoals twee leden na elkaar
     // op hetzelfde toestel (addInitScript zou bij elke navigatie A terugzetten)
     const als = async (token) => {
+      await api(base, '/api/kantoorpakket/mijn', {}, token);
       await page.goto(base + '/apps/office.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate((tok) => {
         localStorage.setItem('rtg_member_token', tok);
@@ -196,7 +207,7 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

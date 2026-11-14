@@ -96,7 +96,7 @@ test('5. zonder collectietransactie start de pinlaag niet', () => {
     /niet atomair/);
 });
 
-test('6. over HTTP: de tweede aanvraag maakt de eerste link dood, en het antwoord gaat geen cache in', async () => {
+test('6. over HTTP: gratis account herstelt alleen zijn eigen pin; heruitgifte trekt in en antwoorden worden niet gecachet', async () => {
   const srv = await startServer({ env: { SMTP_URL: '' } });
   const p = (pad, body, tok) => fetch(srv.base + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
@@ -104,18 +104,71 @@ test('6. over HTTP: de tweede aanvraag maakt de eerste link dood, en het antwoor
   try {
     const reg = await p('/api/auth/register', { name: 'Herstel Lid', email: 'herstelsleutel@x.nl', phone: '0612345791',
       password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+    assert.equal(reg.status, 200, JSON.stringify(reg.body));
+    assert.equal(reg.body.state.user.account, true);
+    assert.equal(reg.body.state.user.tier, 'guest', 'pinbeveiliging vraagt een echt account, geen betaalde pas');
     const tok = reg.body.token;
     assert.ok(tok);
-    assert.equal((await p('/api/pin/zet', { pin: '4321' }, tok)).status, 200);
-    const v1 = await p('/api/pin/vergeten', {}, tok);
+    const ander = await p('/api/auth/register', { name: 'Ander Herstel Lid', email: 'ander-herstel@x.nl', phone: '0612345792',
+      password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+    assert.equal(ander.status, 200, JSON.stringify(ander.body));
+    assert.equal(ander.body.state.user.account, true);
+    assert.equal(ander.body.state.user.tier, 'guest');
+    assert.ok(ander.body.token);
+    const anderDoel = { account: ander.body.state.user, accountId: ander.body.state.user.id,
+      key: 'user-' + ander.body.state.user.id, email: ander.body.state.user.email };
+
+    const beschermd = [
+      ['/api/pin/status', {}], ['/api/pin/zet', { pin: '4321' }],
+      ['/api/pin/check', { pin: '4321' }], ['/api/pin/vergeten', {}]
+    ];
+    for (const [pad, body] of beschermd)
+      assert.equal((await p(pad, { ...anderDoel, ...body })).status, 401, pad + ': een account in de body is geen sessie');
+    for (const tier of ['guest', 'rtg']) {
+      const demo = await p('/api/login', { tier, pasApp: 'rtg' });
+      assert.equal(demo.status, 200, JSON.stringify(demo.body));
+      assert.ok(demo.body.token);
+      assert.notEqual(demo.body.state.user.account, true, 'de negatieve persona heeft geen echt account');
+      for (const [pad, body] of beschermd)
+        assert.equal((await p(pad, { ...anderDoel, ...body }, demo.body.token)).status, 403,
+          pad + ': ook een demo-pas vervangt geen eigen account');
+    }
+
+    assert.equal((await p('/api/pin/zet', { pin: '8765' }, ander.body.token)).status, 200);
+    const leeg = await p('/api/pin/status', anderDoel, tok);
+    assert.equal(leeg.status, 200);
+    assert.equal(leeg.body.gezet, false, 'de status leest de sessie, niet het meegestuurde andere account');
+    const zonderPin = await p('/api/pin/check', { ...anderDoel, pin: '8765' }, tok);
+    assert.equal(zonderPin.status, 200);
+    assert.equal(zonderPin.body.gezet, false);
+    assert.equal((await p('/api/pin/zet', { ...anderDoel, pin: '4321' }, tok)).status, 200);
+    const gezet = await p('/api/pin/status', {}, tok);
+    assert.equal(gezet.status, 200);
+    assert.equal(gezet.body.gezet, true);
+    assert.equal((await p('/api/pin/check', { ...anderDoel, pin: '8765' }, tok)).status, 401,
+      'de pincode van een ander bewijst niets voor deze sessie');
+    assert.equal((await p('/api/pin/zet', { ...anderDoel, pin: '1111', oud: '8765' }, tok)).status, 401,
+      'de oude pin van een ander mag de eigen pin niet wijzigen');
+    assert.equal((await p('/api/pin/check', { pin: '4321' }, tok)).status, 200);
+    assert.equal((await p('/api/pin/check', { pin: '8765' }, ander.body.token)).status, 200,
+      'instellen met een ander doel in de body raakt het andere account niet');
+
+    const v1 = await p('/api/pin/vergeten', anderDoel, tok);
     assert.equal(v1.status, 200);
+    assert.equal(v1.body.verstuurd, true);
+    assert.equal(v1.body.email, undefined, 'het herstelantwoord onthult geen hersteladres');
     assert.match(v1.koppen.get('cache-control') || '', /no-store/);
     const v2 = await p('/api/pin/vergeten', {}, tok);
+    assert.equal(v2.status, 200);
+    assert.match(v2.koppen.get('cache-control') || '', /no-store/);
     const s1 = String(v1.body.devPinUrl).split('pinherstel=')[1], s2 = String(v2.body.devPinUrl).split('pinherstel=')[1];
     assert.ok(s1 && s2 && s1 !== s2);
     assert.equal((await p('/api/pin/herstel', { sleutel: s1, pin: '1111' })).status, 400, 'de link uit de eerste mail is dood');
-    assert.equal((await p('/api/pin/herstel', { sleutel: s2, pin: '2222' })).status, 200);
+    assert.equal((await p('/api/pin/herstel', { ...anderDoel, sleutel: s2, pin: '2222' })).status, 200,
+      'de herstelsleutel bepaalt het account, niet de body en niet een betaalde pas');
     assert.equal((await p('/api/pin/herstel', { sleutel: s2, pin: '3333' })).status, 400, 'en de nieuwe werkt een keer');
     assert.equal((await p('/api/pin/check', { pin: '2222' }, tok)).status, 200);
-  } finally { stop(srv.child); }
+    assert.equal((await p('/api/pin/check', { pin: '8765' }, ander.body.token)).status, 200,
+      'herstel van de eigen pin laat de pin van het andere account intact');
+  } finally { await stop(srv.child); }
 });

@@ -13,7 +13,7 @@
    Draai los: node --test test/poortgesprek.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 const pw = laadPlaywright();
@@ -30,6 +30,7 @@ test('Rahul vraagt het in beeld, en daarna gaat de handeling vanzelf door',
       body: JSON.stringify({ name: 'Pia Poort', email: 'poort-e2e@voorbeeld.test',
         password: 'poortgeheim12', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
     assert.ok(reg.token, 'aanmelden lukt met vier velden');
+    maakBetaaldRtgTestaccount(TMP, 'poort-e2e@voorbeeld.test');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();

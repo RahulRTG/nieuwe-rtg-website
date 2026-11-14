@@ -74,6 +74,14 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: geenBrow
       assert.equal(await zichtbaar(), false);
     });
 
+    await t.test('een automatisch servicebericht doet zich niet voor als concierge', async () => {
+      await page.evaluate(() => window.__handenvrijKamer.beurt('service', 'Uw hulpvragen staan in Hulp.'));
+      const rij = page.locator('.hv-beurt').last();
+      assert.equal(await rij.locator('.hv-wie').textContent(), 'RTG Service · automatisch bericht');
+      assert.equal(await rij.evaluate(el => el.classList.contains('mens')), false);
+      await page.evaluate(() => window.RTGChatScherm.zet('min'));
+    });
+
     await t.test('zegt Rahul iets, dan komt hij vanzelf omhoog', async () => {
       await page.evaluate(() => window.__handenvrijKamer.beurt('rahul', 'Je taxi staat om zeven uur voor.'));
       await page.waitForFunction(() => window.RTGChatScherm.stand() !== 'min', null, { timeout: 5000 });

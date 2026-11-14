@@ -9,7 +9,7 @@ const os = require('os');
 const path = require('path');
 const { TALEN, KERN_TAALCODES, STANDAARD, STANDAARD_VERSIE, bestaat, naamEn, isKerntaal, maakTalen } = require('../server/talen');
 const vertaal = require('../server/translate');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const OWNER = 'talen-owner@x.nl';
 
@@ -123,15 +123,17 @@ test('translate: de batch stuurt alleen toegestane UI-bronnen naar het model', a
 });
 
 // ---- 3. end-to-end: Boardroom-schakelaars + chatten in je eigen taal ----
-let srv, base, owner, lid, winkel;
+let srv, base, owner, lid, winkel, TMP;
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-talen-'));
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-talen-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_OWNER_EMAIL: OWNER, ANTHROPIC_API_KEY: '', DEMO_SUPPLIER: 'KIKUNOI' } });
   base = srv.base;
   owner = (await api(base, '/api/techniek/inloggen', { login: OWNER, wachtwoord: 'Imran' })).body.token;
   const u = Date.now().toString().slice(-8);
   lid = (await api(base, '/api/auth/register', { name: 'Taal Lid', email: 't' + u + '@x.nl',
-    phone: '069' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+    phone: '069' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid);
+  maakBetaaldRtgTestaccount(TMP, 't' + u + '@x.nl');
   winkel = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
 });
 test.after(() => stop(srv && srv.child));
@@ -193,6 +195,8 @@ test('Rahul/concierge: antwoordt in de taal van het lid en de geschiedenis leest
   const u = Date.now().toString().slice(-8);
   const rtg = (await api(base, '/api/auth/register', { name: 'Rahul Lid', email: 'b' + u + '@x.nl',
     phone: '061' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(rtg);
+  maakBetaaldRtgTestaccount(TMP, 'b' + u + '@x.nl');
 
   /* HET ANTWOORD DRAAGT DE TAAL DIE HET ECHT HEEFT.
 

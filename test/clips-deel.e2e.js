@@ -14,7 +14,7 @@
    beide beweringen zakken. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtTot, volgVerzoeken, wachtOpRust } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtTot, volgVerzoeken, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -34,6 +34,7 @@ test('Clips delen: de duur is die van de opname, en een dubbele tik is een kaart
     const t = Date.now();
     const reg = await api(base, '/api/auth/register', { name: 'Clip Deel', email: 'cd' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1995-05-05', tier: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, 'cd' + t + '@e.test');
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
@@ -95,6 +96,7 @@ test('Clips delen: de duur is die van de opname, en een dubbele tik is een kaart
     assert.deepEqual(fouten, []);
   } finally {
     if (browser) await browser.close();
-    child.kill('SIGKILL');
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });

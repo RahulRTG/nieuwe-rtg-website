@@ -144,7 +144,7 @@ async function nieuwLid(vraag) {
   const u = 'r' + crypto.randomBytes(8).toString('hex');
   const reg = await vraag('POST', '/api/auth/register', null, {
     name: 'Rolronde ' + u, email: 'rolronde' + u + '@voorbeeld.test', phone: '0612345678',
-    password: 'Geheim' + u + '!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    password: 'Geheim' + u + '!', geboortedatum: '1990-01-01', tier: 'guest', pasApp: 'rtg' });
   const tok = reg.data && reg.data.token;
   if (tok) await vraag.bindToestel(tok);
   if (tok) await vraag('POST', '/api/verify/upload', tok, { image: KYC });
@@ -313,7 +313,10 @@ async function main() {
   let srv = null, basis = BASIS_EXTERN;
   if (!basis) {
     srv = await require('./lib/wegwerpserver').start({ naam: 'rolronde', poort: PORT, gereed: 'ready',
-      env: { NODE_ENV: 'test', ...require('./lib/voltooiwereld').KANTOORWERELD, OFFICE_CODE: 'RTG-OFFICE' } });
+      // Een synthetische HTTPS-terugkeer maakt bestaande abonnementsbediening
+      // toetsbaar; zelfbedieningsverkoop blijft standaard gesloten.
+      env: { NODE_ENV: 'test', ...require('./lib/voltooiwereld').KANTOORWERELD,
+        OFFICE_CODE: 'RTG-OFFICE', APP_URL: 'https://rtg.example' } });
     basis = srv.basis;
   }
   const vraag = maakVraag(basis);
@@ -388,9 +391,9 @@ async function main() {
     }
     if (fixtures.past(r.methode, pad)) {
       const f = await fixtures.meet(r.methode, pad, lid, lijf);
-      rolproeven.push({ route: r.methode + ' ' + r.pad, rol: 'rtg-pas', ...f.proef, oordeel: f.oordeel });
+      rolproeven.push({ route: r.methode + ' ' + r.pad, rol: 'gratis-account', ...f.proef, oordeel: f.oordeel });
       if (f.oordeel.stand !== 'bewezen') {
-        const rij = { route: r.methode + ' ' + r.pad, rol: 'rtg-pas', reden: f.oordeel.reden };
+        const rij = { route: r.methode + ' ' + r.pad, rol: 'gratis-account', reden: f.oordeel.reden };
         if (f.oordeel.stand === 'gat') gaten.push(rij);
         else onbekend.push(rij);
         continue;

@@ -104,6 +104,8 @@
   // en solliciteren. Geen ledenpas, geen reis, geen Rahul. Wat hij wel en niet
   // kan staat bij Ter plaatse -- dat is zijn app.
   function renderHomeGuest(){
+    // Een gratis eigen account kan ook aan een gezin gekoppeld zijn.
+    renderFoundation();
     document.documentElement.setAttribute('data-stem', 'rtg');
     stemKoppen();
     $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');
@@ -127,6 +129,9 @@
         '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
-    const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
-    const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
+    if (user.account && ((rtf.gekoppeld || []).length || (rtf.meldingen || []).length)) renderFoundation();
+    else {
+      const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
+      const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
+    }
     // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten

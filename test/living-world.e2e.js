@@ -1,21 +1,24 @@
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const h=require('./helper');let srv,browser;const pw=h.laadPlaywright();
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const h=require('./helper');let srv,browser,tmp;const pw=h.laadPlaywright();
 async function post(route,body,token){
  const r=await fetch(srv.base+route,{method:'POST',headers:{'content-type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{})});
  const out=await r.json();assert.equal(r.status,200,JSON.stringify(out));return out;
 }
 test.before(async()=>{
  assert.ok(pw,'Een echte browser is vereist.');
- srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1',RTG_BETALEN_UIT:'1'}});
+ tmp=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-living-world-browser-'));
+ srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1',RTG_BETALEN_UIT:'1',RTG_DATA_DIR:tmp}});
  browser=await pw.chromium.launch(h.browserOpties(pw));
 });
-test.after(async()=>{if(browser)await browser.close();if(srv)await h.stop(srv.child);});
+test.after(async()=>{if(browser)await browser.close();if(srv)await h.stopHard(srv.child);if(tmp)fs.rmSync(tmp,{recursive:true,force:true});});
 for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, hervat en toont de RTG Edge',async()=>{
  const owner=(await post('/api/auth/register',{name:'Maker',email:'world-maker-'+width+'@example.test',phone:'0612345678',
   password:'VeiligWachtwoord123!',geboortedatum:'1990-01-01',tier:'rtg'})).token;
  const member=(await post('/api/auth/register',{name:'Reiziger',email:'world-member-'+width+'@example.test',phone:'0612345678',
   password:'VeiligWachtwoord123!',geboortedatum:'1990-01-01',tier:'rtg'})).token;
+ h.maakBetaaldRtgTestaccount(tmp,'world-maker-'+width+'@example.test');
+ h.maakBetaaldRtgTestaccount(tmp,'world-member-'+width+'@example.test');
  const context=await browser.newContext({viewport:{width,height:900},timezoneId:'UTC'});
  // De opslagmelding (shared/cookie.js) ligt over de Edge tot ze is gezien; hier is ze gezien, zoals in hotels-ds.e2e.js.
  await context.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_cookieinfo_v1','1');},owner);

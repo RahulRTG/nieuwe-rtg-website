@@ -1,15 +1,20 @@
 {
-  "schema": 4,
+  "schema": 5,
   "source": [
     "public/apps/app-main.js",
     "public/shared/rtg-edge-worlds.js",
+    "public/shared/interface/world-presentation.js",
     "server/kern/pasladder.js",
     "server/kern/appgids.js",
+    "public/ds/thema/living.css",
+    "public/ds/thema/travel.css",
+    "public/ds/thema/work.css",
+    "public/ds/thema/foundation.css",
     "public/apps/werk.html",
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "67c1934dabc787fad0131f389170ebec9a45a1d22bbe5f1a522e839cd3a25f14",
+  "sourceHash": "8d5f9ec8ca51ea99edf30620c1e85f9188f13896c1e5cfd7cbce4e93769b8a1a",
   "platform": [
     {
       "id": "organisatie",
@@ -25,7 +30,7 @@
         "Kies een module en zie de lijst plus wat aandacht vraagt; koppel eenmalig uw RTG-account voor agenda, postvak en kluis"
       ],
       "note": "Wat u niet mag zien, staat er niet als lege doos; en wat nergens wordt gemeten, staat er met de reden erbij.",
-      "sourceHash": "1b4398ff90135c1933f2e0b25a0d64c9a7666cb1d04a321fb3bc1305a0e3d57b"
+      "sourceHash": "374168a9cc8ae8e993a98966da07d079cc201d178189d614b7fdca8aa6bc55d6"
     },
     {
       "id": "partner",
@@ -40,7 +45,7 @@
         "Stuur uw team aan met rooster en taken"
       ],
       "note": "Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.",
-      "sourceHash": "5e2cd97ed0cc5c822cbb5d2bf211aa93a40131522e5a315df116f0252fc97f45"
+      "sourceHash": "b2f9c22dc1bc41e34139075517febfe8b1a92544e50d7c9999ec1f3d876e2c0d"
     },
     {
       "id": "gebruiker",
@@ -56,11 +61,12 @@
         "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
       ],
       "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
-      "sourceHash": "d87abf059228017ba390ae90452f2d592cccd5bd6b38c1ca4c30f32461abbd46"
+      "sourceHash": "9f10c24de8574ea65164ba10cd10d28fc544306052c0a3d8297875c8d1e1e120"
     }
   ],
   "worlds": {
     "living": {
+      "id": "living",
       "name": "LivingOS",
       "appName": "LIVING OS",
       "publicRoute": "/apps/rtg.html",
@@ -69,6 +75,12 @@
       "action": "Vergelijk werelden",
       "groupCount": 3,
       "featureCount": 59,
+      "theme": {
+        "source": "public/ds/thema/living.css",
+        "selector": "[data-rtg-world=\"living\"]",
+        "sourceHash": "cc5e9f393154eb2827e7e7341b8ebd9527533be77543ff19f6af8feaafd2c06f",
+        "image": "/images/world-homes/living-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",
@@ -907,6 +919,7 @@
       ]
     },
     "travel": {
+      "id": "travel",
       "name": "TravelOS",
       "appName": "TRAVEL OS",
       "publicRoute": "/apps/reizen.html",
@@ -915,6 +928,12 @@
       "action": "Open reisdetail",
       "groupCount": 2,
       "featureCount": 15,
+      "theme": {
+        "source": "public/ds/thema/travel.css",
+        "selector": "[data-rtg-world=\"travel\"]",
+        "sourceHash": "996b713d1e2b25b4d679a89883972925d2ed459ee1abfa652af2eef4c90a56e3",
+        "image": "/images/world-homes/travel-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",
@@ -1173,6 +1192,7 @@
       ]
     },
     "work": {
+      "id": "work",
       "name": "WorkOS",
       "appName": "WORK OS",
       "publicRoute": "/apps/kantoor.html",
@@ -1181,6 +1201,12 @@
       "action": "Open werkbank",
       "groupCount": 2,
       "featureCount": 17,
+      "theme": {
+        "source": "public/ds/thema/work.css",
+        "selector": "[data-rtg-world=\"work\"]",
+        "sourceHash": "f04b7fe91dfc75ab1cc186efe60a5be5d9b52bb06c4db6157d70a6f386062f0c",
+        "image": "/images/world-homes/work-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",
@@ -1467,6 +1493,7 @@
       ]
     },
     "foundation": {
+      "id": "foundation",
       "name": "FoundationOS",
       "appName": "RTFOUNDATION",
       "publicRoute": "/apps/foundation/os-publiek.html",
@@ -1475,6 +1502,12 @@
       "action": "Ga verder",
       "groupCount": 2,
       "featureCount": 13,
+      "theme": {
+        "source": "public/ds/thema/foundation.css",
+        "selector": "[data-rtg-world=\"foundation\"]",
+        "sourceHash": "9e39c173fd63c4473328ceeb380f2ecbc3b07af17646c70de65d4640f7b52e7e",
+        "image": "/images/world-homes/foundation-warm.jpg"
+      },
       "groups": [
         {
           "name": "Appschermen",

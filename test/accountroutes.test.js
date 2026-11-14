@@ -64,3 +64,38 @@ test('member op een gedekt pad krijgt de accountsessie', () => {
   assert.equal(accountRolVoor('member', '/api/webauthn/lijst').rol, 'member-account');
   assert.equal(accountRolVoor('member', '/api/mall/bestel').rol, null);
 });
+
+test('eigen inzage, plaats en beoordeling verfijnen alleen de ledensessie naar een gratis account', () => {
+  const paden = ['/api/inzagekaart', '/api/gast/eten/beoordeel', '/api/plaats/dienst',
+    '/api/plaats/hekken', '/api/plaats/stand', '/api/plaats/venster',
+    '/api/plaats/venster/sluit', '/api/plaats/waarneem'];
+  for (const pad of paden) {
+    assert.equal(accountRolVoor('member', pad).rol, 'member-account', pad);
+    for (const rol of ['office', 'supplier', 'boardroom', 'publiek', 'openbaar', 'member-account']) {
+      assert.equal(accountRolVoor(rol, pad).rol, null, rol + ' verandert niet op ' + pad);
+    }
+  }
+});
+
+test('de nieuwe accountdeuren trekken geen naburige of onbekende domeinen mee', () => {
+  for (const pad of ['/api/inzagekaart/ander', '/api/gast/eten/bestel',
+    '/api/gast/eten/beoordeel/ander', '/api/plaatsing/stand', '/api/plaatsen/stand']) {
+    assert.equal(dektPad(pad), false, pad);
+  }
+});
+
+test('de bestaande accountmunter registreert gratis zonder pas-, identiteit- of kantoorverhoging', async () => {
+  const { MUNTERS } = require('../scripts/lib/proefsleutels');
+  const rij = MUNTERS.find(([rol]) => rol === 'member-account');
+  assert.ok(rij, 'de gedeelde sleutelbos kent de accountfixture');
+  const verzoeken = [];
+  const token = await rij[2](async (pad, lijf) => {
+    verzoeken.push({ pad, lijf });
+    return { status: 200, data: { token: 'gratis-account-proef' } };
+  });
+  assert.equal(token, 'gratis-account-proef');
+  assert.equal(verzoeken.length, 1);
+  assert.equal(verzoeken[0].pad, '/api/auth/register');
+  assert.equal(verzoeken[0].lijf.pasApp, 'rtg');
+  assert.equal(verzoeken[0].lijf.tier, undefined, 'registratie verleent geen betaalde pas');
+});

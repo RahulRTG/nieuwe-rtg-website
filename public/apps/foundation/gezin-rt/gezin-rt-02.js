@@ -7,13 +7,15 @@
   function pakMedia(video) { return window.RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }).catch(function () { return null; }); }
   var iceConfig = null;
   // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
-  function haalIce() { return fetch(S.base + '/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: S.code, token: S.token }) }).then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
+  function haalIce() { var n = epoch; if (!actief(n)) return Promise.resolve(null); return fetch(S.base + '/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: S.code, token: S.token }) }).then(function (r) { return r.json(); }).then(function (d) { if (!actief(n)) return null; iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { if (!actief(n)) return null; iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
   function maakPc() {
+    var gesprek = call;
     var pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(function (t) { pc.addTrack(t, call.stream); });
-    pc.onicecandidate = function (ev) { if (ev.candidate && call) seinNaar(call.met, 'ice', ev.candidate); };
-    pc.ontrack = function (ev) { var v = document.getElementById('grt-remote'); if (v && v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0]; };
+    pc.onicecandidate = function (ev) { if (ev.candidate && call === gesprek) seinNaar(gesprek.met, 'ice', ev.candidate); };
+    pc.ontrack = function (ev) { if (call !== gesprek) return; var v = document.getElementById('grt-remote'); if (v && v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0]; };
     pc.onconnectionstatechange = function () {
+      if (call !== gesprek) return;
       if (pc.connectionState === 'connected' && call && !call.t0) { call.t0 = Date.now(); call.timer = setInterval(tijdTik, 1000); var st = document.getElementById('grt-status'); if (st) st.textContent = ''; }
       if (['failed', 'closed'].indexOf(pc.connectionState) >= 0) eindeGesprek(false);
     };
@@ -30,9 +32,11 @@
     belUI(true);
   }
   function beginGesprek(naarId, video) {
-    if (call) { return; }
+    var n = epoch;
+    if (call || !actief(n)) { return; }
     haalIce();
     pakMedia(video).then(function (stream) {
+      if (!actief(n)) { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); return; }
       if (!stream) { alert('Geen toegang tot microfoon of camera.'); return; }
       call = { met: naarId, video: video, richting: 'uit', pendingIce: [], stream: stream, t0: 0 };
       document.getElementById('grt-local').srcObject = stream;
@@ -43,8 +47,9 @@
   function neemOp() {
     document.getElementById('grt-incoming').style.display = 'none';
     if (!inkomend) return;
-    var inb = inkomend;
+    var inb = inkomend, n = epoch;
     pakMedia(inb.video).then(function (stream) {
+      if (!actief(n) || inkomend !== inb) { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); return; }
       if (!stream) { seinNaar(inb.van, 'decline'); inkomend = null; return; }
       call = { met: inb.van, video: inb.video, richting: 'in', pendingIce: [], stream: stream, t0: 0 };
       document.getElementById('grt-local').srcObject = stream;
@@ -54,19 +59,21 @@
     });
   }
   function eindeGesprek(zeggen) {
-    if (call) {
-      if (zeggen) seinNaar(call.met, 'hangup');
-      clearInterval(call.timer);
-      try { call.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
-      try { if (call.pc) call.pc.close(); } catch (e) {}
-      call = null;
+    var gesprek = call; call = null; inkomend = null;
+    if (gesprek) {
+      if (zeggen) seinNaar(gesprek.met, 'hangup');
+      clearInterval(gesprek.timer);
+      try { gesprek.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+      try { if (gesprek.pc) gesprek.pc.close(); } catch (e) {}
     }
+    var inv = document.getElementById('grt-incoming'); if (inv) inv.style.display = 'none';
+    ['grt-naam','grt-inaam','grt-av','grt-iav','grt-status','grt-isoort','grt-tijd'].forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = ''; });
     if (mee) mee.leeg();
     belUI(false);
   }
   function flushIce() { if (!call || !call.pc || !call.pc.remoteDescription) return Promise.resolve(); var ps = call.pendingIce.splice(0).map(function (c) { return call.pc.addIceCandidate(c).catch(function () {}); }); return Promise.all(ps); }
   function opBelsignaal(d) {
-    if (d.naar !== S.mijnId) return;
+    if (!actief(epoch) || d.naar !== S.mijnId) return;
     if (d.kind === 'ring') {
       if (call) { seinNaar(d.van, 'busy'); return; }
       inkomend = { van: d.van, video: d.video };
@@ -77,14 +84,16 @@
       return;
     }
     if (!call || d.van !== call.met) return;
+    var gesprek = call, n = epoch;
+    function geldig() { return actief(n) && call === gesprek; }
     if (d.kind === 'accept') {
       var pc = maakPc();
-      pc.createOffer().then(function (o) { return pc.setLocalDescription(o).then(function () { seinNaar(call.met, 'offer', o); }); });
+      pc.createOffer().then(function (o) { if (!geldig()) return; return pc.setLocalDescription(o).then(function () { if (geldig()) seinNaar(gesprek.met, 'offer', o); }); }).catch(function () { if (geldig()) eindeGesprek(false); });
     } else if (d.kind === 'offer') {
       var pc2 = maakPc();
-      pc2.setRemoteDescription(d.payload).then(flushIce).then(function () { return pc2.createAnswer(); }).then(function (a) { return pc2.setLocalDescription(a).then(function () { seinNaar(call.met, 'answer', a); }); });
+      pc2.setRemoteDescription(d.payload).then(function () { if (geldig()) return flushIce(); }).then(function () { if (geldig()) return pc2.createAnswer(); }).then(function (a) { if (!geldig()) return; return pc2.setLocalDescription(a).then(function () { if (geldig()) seinNaar(gesprek.met, 'answer', a); }); }).catch(function () { if (geldig()) eindeGesprek(false); });
     } else if (d.kind === 'answer') {
-      call.pc.setRemoteDescription(d.payload).then(flushIce);
+      call.pc.setRemoteDescription(d.payload).then(function () { if (geldig()) return flushIce(); }).catch(function () { if (geldig()) eindeGesprek(false); });
     } else if (d.kind === 'ice') {
       if (call.pc && call.pc.remoteDescription) { call.pc.addIceCandidate(d.payload).catch(function () {}); } else call.pendingIce.push(d.payload);
     } else if (d.kind === 'tekst') {

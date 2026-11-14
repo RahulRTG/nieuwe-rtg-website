@@ -35,7 +35,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 const STIL = 'zeg-niets-proef';
 const LEES = 'alleen-lezen-proef';
@@ -92,7 +92,8 @@ async function vraag(lid, q, context) {
 
 test.before(async () => {
   model = await nepModel();
-  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taak-')),
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taak-'));
+  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dataDir,
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1' } });
   base = server.base;
   const u = Date.now().toString(36);
@@ -100,6 +101,7 @@ test.before(async () => {
     const reg = await api('/api/auth/register', { name: 'Taak ' + n, email: 'taak-' + n + u + '@voorbeeld.test',
       password: 'geheim-' + n + '-123', geboortedatum: '1988-04-04', phone: tel, pasApp: 'rtg' });
     assert.equal(reg.status, 200);
+    maakBetaaldRtgTestaccount(dataDir, 'taak-' + n + u + '@voorbeeld.test');
     return { token: reg.body.token };
   };
   A = await lid('a', '0612340001'); B = await lid('b', '0612340002');

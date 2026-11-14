@@ -18,7 +18,7 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust, pasAppAdres } = require('./helper');
+const { laadScherm, startServer, maakBetaaldRtgTestaccount, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -46,6 +46,8 @@ async function metLid(breedte, hoogte, fn) {
       email: 'adaptief' + process.pid + breedte + '@x.nl', phone: '0612345799',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    maakBetaaldRtgTestaccount(TMP, 'adaptief' + process.pid + breedte + '@x.nl');
+
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: breedte, height: hoogte } });
     await ctx.route('**/api/onboarding/status', (r) => r.fulfill({

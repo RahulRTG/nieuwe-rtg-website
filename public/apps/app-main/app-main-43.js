@@ -34,8 +34,25 @@
   }
 
   /* ---------- RTFoundation: eigen gezinsruimte voor gekoppelde oppas/opa/oma ---------- */
+  let grtInit=false, grtActief=null, grtContext='', grtEpoch=0, grtChatLaad=0, grtInfoLaad=0, grtThreadLaad=0;
+  function gezinSleutel(){
+    const g=rtf.gekoppeld||[];
+    return user && user.account && API.token && g.length ? JSON.stringify([user.id,API.token,g.map(x=>[x.code,x.profielId])]) : '';
+  }
+  function syncGezinContext(){
+    const g=user && user.account && API.token ? (rtf.gekoppeld||[]) : [];
+    rtf.gekoppeld=g; rtf.meldingen=(rtf.meldingen||[]).filter(x=>g.some(y=>y.code===x.code));
+    const sleutel=gezinSleutel(); if(sleutel===grtContext) return;
+    grtContext=sleutel; grtEpoch++; verwerpOudeState(); grtInit=false; grtActief=null;
+    if(window.GezinRT) GezinRT.stop();
+    for(const id of ['homeFoundation','gezinFamilies','gezinFeed','gezinInfo','gezinChat']){ const el=$('#'+id); if(el) el.replaceChildren(); }
+    const chat=$('#gezinChat'); if(chat) chat.style.display='none';
+    for(const id of ['tabGezin','tabGezinDot']){ const el=$('#'+id); if(el) el.classList.add('h-weg'); }
+  }
+  function gezinGeldig(epoch){ return !!grtContext && epoch===grtEpoch && grtContext===gezinSleutel(); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function renderFoundation(){
+    syncGezinContext();
     const homeEl = $('#homeFoundation'), tab = $('#tabGezin'), dot = $('#tabGezinDot');
     if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.classList.add('h-weg'); return; }
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
@@ -67,6 +84,7 @@
       '<div class="s-1qms1gn">'+esc(x.tekst)+'</div></div>';
   }
   function renderGezin(){
+    syncGezinContext();
     const fam = $('#gezinFamilies'), feed = $('#gezinFeed'); if (!fam || !feed) return;
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     $('#gezinSub').textContent = g.length ? 'De RTFoundation-gezinnen die je als oppas of familie volgt.' : 'Je volgt nog geen gezin.';
@@ -76,21 +94,23 @@
     feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
       (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
       (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');
-    fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', async ()=>{ const [code,pid]=b.dataset.los.split('|'); if(!confirm('Dit gezin niet meer volgen?')) return; try{ await API.call('/api/rtf/ontkoppel',{code,profielId:pid}); toast('Ontkoppeld.'); await refreshState(); renderFoundation(); if(!(rtf.gekoppeld||[]).length) openTab('home'); }catch(e){ toast(e.message); } }));
+    fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', ()=> rtfOntkoppel(b.dataset.los)));
     const kb=$('#rtfKoppelBtn2'); if(kb) kb.addEventListener('click', rtfKoppelStart);
     const pb=$('#rtfPushBtn'); if(pb) pb.addEventListener('click', ()=> ensurePush(true));
     const rb=$('#rtfReplyBtn'); if(rb) rb.addEventListener('click', rtfReply);
     const ri=$('#rtfReplyIn'); if(ri) ri.addEventListener('keydown', e=>{ if(e.key==='Enter') rtfReply(); });
     if (m.filter(x=>!x.gelezen).length) API.call('/api/rtf/meldingen/gelezen').catch(()=>{});
-    if (g.length){ laadGezinInfo(); laadGezinChat(); } else { const gc=$('#gezinChat'); if(gc) gc.style.display='none'; }
+    if (g.length){ laadGezinInfo(); laadGezinChat(); }
   }
-  let grtInit=false, grtActief=null;
   async function laadGezinChat(){
     const box=$('#gezinChat'); if(!box) return;
-    const g=(rtf.gekoppeld||[]); if(!g.length){ box.style.display='none'; return; }
+    const epoch=grtEpoch, nummer=++grtChatLaad, geldig=()=>gezinGeldig(epoch)&&nummer===grtChatLaad;
+    const g=(rtf.gekoppeld||[]); if(!geldig()) return;
     box.style.display='';
-    let kan; try{ kan=await API.call('/api/rtf/kanaal',{ code:g[0].code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
-    if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:onGrtChat }); grtInit=true; }
+    let kan; try{ kan=await API.call('/api/rtf/kanaal',{ code:g[0].code }); }catch(e){ if(geldig()) box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
+    if(!geldig() || kan.code!==g[0].code || kan.profielId!==g[0].profielId) return;
+    if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:m=>{if(gezinGeldig(epoch)) onGrtChat(m);} }); grtInit=true; }
     else if (window.GezinRT){ GezinRT.setLeden(kan.leden); if (GezinRT.setToken) GezinRT.setToken(kan.token); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
+    if(!geldig()) return;
     const byId={}; chats.forEach(c=> byId[c.id]=c);

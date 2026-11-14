@@ -10,7 +10,7 @@ const os = require('node:os');
 const path = require('node:path');
 const Beeld = require('../server/kern/connection-image');
 const { padVorm } = require('../server/kern/journaalvorm');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 const ID_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const FOTO = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAADHRFWHRHUFMANTIuMSw0LjMwjiV2AAAAFUlEQVR4nGOokNP4D8IMJxZE/QdhAEXMCP2u5XZBAAAAAElFTkSuQmCC', 'base64');
@@ -35,6 +35,8 @@ async function lid() {
   const reg = await json('/api/auth/register', { name:'Fotolid ' + volg, email:'foto' + n + '@x.nl', phone:'06' + String(n).slice(-8),
     password:'geheim123', geboortedatum:'1990-05-05', geslacht:'v', tier:'rtg', pasApp:'rtg' });
   let token = reg.body.token;
+  assert.ok(token);
+  maakBetaaldRtgTestaccount(TMP, 'foto' + n + '@x.nl');
   let staat = await json('/api/state', {}, token); let codenaam = staat.body.state.user.codename;
   await json('/api/verify/upload', { image:ID_PNG }, token);
   await json('/api/verify/selfie', { image:ID_PNG }, token);

@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisagenda-'));
 let srv, base, lid, lucht, vluchtId, boekCode, verblijfId, verblijfRef, reisRef;
@@ -34,6 +34,8 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Reis Lid', email: 'reis@x.nl', phone: '0611122334',
     password: 'geheim123', geboortedatum: '1990-01-15', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
+  assert.ok(lid);
+  maakBetaaldRtgTestaccount(TMP, 'reis@x.nl');
   const rooster = await api('/api/supplier/roster', { code: 'LUCHT' });
   const manager = (rooster.body.staff || []).find(s => s.role === 'manager');
   lucht = (await api('/api/supplier/login', { code: 'LUCHT', staffId: manager && manager.id, pin: '1234' })).body.token;

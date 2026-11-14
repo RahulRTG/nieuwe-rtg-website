@@ -13,7 +13,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -33,6 +33,7 @@ test('Rekenblad: formules, functies zoeken, sorteren, filteren en een grafiek',
     const t = Date.now();
     const reg = await api(base, '/api/auth/register', { name: 'Blad E2E', email: 'bl' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1988-01-01', tier: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, 'bl' + t + '@e.test');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
@@ -181,7 +182,7 @@ test('Rekenblad: formules, functies zoeken, sorteren, filteren en een grafiek',
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -34,6 +34,7 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
     const t = Date.now();
     const reg = await api(base, '/api/auth/register', { name: 'Klank E2E', email: 'kw' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, 'kw' + t + '@e.test');
 
     browser = await pw.chromium.launch(browserOpties(pw, { args: ['--autoplay-policy=no-user-gesture-required'] }));
     const page = await browser.newPage();
@@ -132,7 +133,7 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

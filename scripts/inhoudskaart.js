@@ -57,11 +57,25 @@ const { start } = require('./lib/wegwerpserver');
 const { alleRoutes, rolVan } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
-const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
+const { haalSleutels, meldSleutels } = require('./lib/proefsleutels');
+const { accountRolVoor } = require('./lib/accountroutes');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INHOUDSKAART.json');
 const OUTPUT = path.join(WORTEL, 'OUTPUTPROEF.json');
+
+/* De generator en inhoudswacht meten dezelfde ongebonden synthetische sessies.
+   Dit is antwoordvorm, geen bewijs van de productie-toestelpoort. */
+const MEETOMGEVING = Object.freeze({ RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1',
+  OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_BEZITSBEWIJS: 'aanbevolen' });
+
+function meetRolVoor(route) {
+  const rol = rolVan(route.bewakers);
+  if (rol) return rol;
+  /* Deze intern bewaakte sessie heeft geen benoemde middleware. */
+  if (!(route.bewakers || []).length && route.methode === 'GET' && route.pad === '/api/push/key') return 'member';
+  return null;
+}
 
 /* Het profiel van een antwoord: pure functie, los toetsbaar. */
 function profielVan(data) {
@@ -100,7 +114,39 @@ function grondVan(status, profiel) {
   return null;
 }
 
-module.exports = { profielVan, onwaarneembaar, grondVan };
+function kiesMeetdoel(output, kaart, inventaris, deuren, hermeetKaart = false) {
+  const kandidaten = new Set(Object.entries(output)
+    .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist').map(([k]) => k));
+  if (hermeetKaart) {
+    for (const [k, p] of Object.entries(kaart)) if (!p.onwaarneembaar) kandidaten.add(k);
+  }
+  const dicht = deuren.split(',').filter(Boolean);
+  return new Set(inventaris.filter(r => r.pad.startsWith('/api/') &&
+    !dicht.some(d => r.pad === d || r.pad.startsWith(d)) && kandidaten.has(r.methode + ' ' + r.pad))
+    .map(r => r.methode + ' ' + r.pad));
+}
+
+function eisMeetsleutels(routes, tokens) {
+  const missen = [...new Set(routes.map(r => r.rol))]
+    .filter(rol => rol !== 'publiek' && !tokens[rol]);
+  if (missen.length) throw new Error('De inhoudskaart mist sleutels voor ' + missen.join(', ') +
+    '; geen terugval naar een demo-pas of anonieme meting.');
+}
+
+async function ruimMeetserverOp({ kind, klaar }) {
+  if (kind.exitCode === null && kind.signalCode === null) {
+    await new Promise((resolve, reject) => {
+      kind.once('exit', resolve);
+      try {
+        if (!kind.kill('SIGKILL')) throw new Error('De inhoudskaart kon de meetserver niet stoppen.');
+      } catch (e) { kind.removeListener('exit', resolve); reject(e); }
+    });
+  }
+  await klaar();
+}
+
+module.exports = { profielVan, onwaarneembaar, grondVan, kiesMeetdoel, eisMeetsleutels, ruimMeetserverOp,
+  MEETOMGEVING, meetRolVoor };
 if (require.main !== module) return;
 
 (async () => {
@@ -111,14 +157,13 @@ if (require.main !== module) return;
      inhoudstoets, en voor allebei is een vormcontract de sluitweg. DEUREN
      doen niet mee: die worden in elke lie-run gespaard (RTG_LIEG_NIET), dus
      een contract erop kan nooit tot een gerichte meting leiden. */
+  let oud = {};
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; }
   const { DEUREN } = require('./mutatie');
-  const isDeur = (pad) => DEUREN.split(',').some(d => pad === d || pad.startsWith(d));
-  const doel = new Set(Object.entries(reg.perRoute || {})
-    .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist')
-    .filter(([k]) => !isDeur(k.split(' ')[1]))
-    .filter(([k]) => k.split(' ')[1].startsWith('/api/'))
-    .map(([k]) => k));
-  if (!doel.size) { console.log('geen blinde of onbesliste routes; de kaart heeft niets te doen'); return; }
+  const inventaris = alleRoutes();
+  const doel = kiesMeetdoel(reg.perRoute || {}, oud, inventaris, DEUREN, process.argv.includes('--hermeet-kaart'));
+  if (!doel.size) { console.log('geen te meten routes binnen de huidige bron en selectie'); return; }
 
   /* De rolverdeling, met de PUBLIEKE routes erbij: rolVan() geeft daar niets
      terug en verdeelOpRol zou ze wegleggen, maar een route zonder poort is
@@ -134,12 +179,13 @@ if (require.main !== module) return;
   const KENT = new Set(['member', 'office', 'supplier', 'kantoor-op-naam']);
   const routes = [];
   let zonderSleutel = 0;
-  for (const r of alleRoutes()) {
+  for (const r of inventaris) {
     const s = r.methode + ' ' + r.pad;
     if (!doel.has(s)) continue;
-    const rol = rolVan(r.bewakers);
+    const rol = meetRolVoor(r);
     if (!rol) routes.push({ methode: r.methode, pad: r.pad, rol: 'publiek' });
-    else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad, rol });
+    else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad,
+      rol: accountRolVoor(rol, r.pad).rol || rol });
     else zonderSleutel++;
   }
   const verdeling = { metRol: routes, zonderRol: { length: zonderSleutel } };
@@ -147,7 +193,7 @@ if (require.main !== module) return;
   console.log('  blinde + onbesliste routes (geen deur): ' + doel.size);
   console.log('  bereikbaar (publiek of bekende rol)   : ' + verdeling.metRol.length);
 
-  const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const server = await start({ naam: 'inhoudskaart', env: MEETOMGEVING });
   const { basis, klaar } = server;
   const doe = async (methode, pad, lijf, tok) => {
     try {
@@ -163,6 +209,7 @@ if (require.main !== module) return;
   const bos = await haalSleutels({ post: (pad, lijf, tok) => doe('POST', pad, lijf, tok) });
   const { tokens } = bos;
   meldSleutels(bos);
+  eisMeetsleutels(routes, tokens);
 
   /* Vaste volgorde: de wacht roept straks in dezelfde volgorde aan, zodat de
      opgebouwde toestand (route A maakte iets dat route B ziet) gelijk loopt. */
@@ -204,8 +251,6 @@ if (require.main !== module) return;
   klaar();
 
   /* Stapelen: vers wint, de rest blijft. */
-  let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   /* Snoeien bij het stapelen: geen niet-/api/-paden (buiten bereik van de
      liegpoort) en geen waarneembaar profiel zonder sleutels -- dat zou een
      wacht zijn die niets wacht. */

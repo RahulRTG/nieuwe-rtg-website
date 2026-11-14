@@ -12,7 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopHard } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop, stopHard } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -31,6 +31,7 @@ test.before(async () => {
     phone: '06' + n + u.slice(1), password: 'geheim123', geboortedatum: '1992-03-03', tier: 'rtg' });
   lid = (await maak('1')).body.token;
   ander = (await maak('2')).body.token;
+  for (const n of ['1', '2']) maakBetaaldRtgTestaccount(TMP, 'cm' + n + u + '@x.nl');
 });
 test.after(() => stop(srv && srv.child));
 

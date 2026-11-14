@@ -4,7 +4,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path'), crypto = require('node:crypto');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisexport-http-'));
 const MP = '/api/reisbureau/keten', SP = '/api/supplier/reisbureau/keten', AP = '/api/supplier/reisbureau/opdrachten';
@@ -12,6 +12,8 @@ let srv, x, eigen, anders, eersteHash, uitvoer;
 test.before(async () => {
   srv = await startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   x = await maakReisketenFixture(srv.base);
+  // De bestaande gekeurde reiziger krijgt uitsluitend de bedoelde betaalpas.
+  maakBetaaldRtgTestaccount(map, 'reisketen-81@voorbeeld.test');
   const start = async (supplierCode, titel) => goed(await x.api(MP + '/start', {
     supplierCode, titel, bestemming: 'Exportproef', idem: 'reisexport-start-' + titel
   }, x.reiziger.token), 'aanvraag').reis;

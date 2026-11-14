@@ -26,7 +26,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const { haversine } = require('../server/lib/geo');
 
 const schoon = (t, n) => String(t == null ? '' : t).slice(0, n);
@@ -190,6 +190,7 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await api('/api/auth/register', { name: 'N21 Lid', email: 'n21' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'n21' + u + '@x.nl');
   const roster = await api('/api/supplier/roster', { code: 'GEMEENTE' });
   const man = roster.body.staff.find(x => x.role === 'manager');
   gem = (await api('/api/supplier/login', { code: 'GEMEENTE', staffId: man.id, pin: '1234' })).body.token;

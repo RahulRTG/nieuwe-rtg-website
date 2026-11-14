@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stop, stopNet, stopHard } = require('./helper');
+const { startServer, stop, stopNet, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 const bewijs = require('./operationeel-journaal');
 
 test('aanvraag: ingetrokken personeel, verloren opslag, harde crash en herstel zonder dubbele gevolgen', async () => {
@@ -21,6 +21,7 @@ test('aanvraag: ingetrokken personeel, verloren opslag, harde crash en herstel z
     lid = (await api('/api/auth/register', { name: 'Herstelproef', email: 'herstel@example.test',
       password: 'geheim123', phone: '0612345678', geboortedatum: '1990-01-01', tier: 'rtg' }, null)).token;
     assert.ok(lid);
+    maakBetaaldRtgTestaccount(tmp, 'herstel@example.test');
     const roster = await api('/api/supplier/roster', { code: 'SERENA' }, null);
     const baas = (await api('/api/supplier/login', { code: 'SERENA',
       staffId: roster.staff.find(s => s.role === 'manager').id, pin: '1234' }, null)).token;

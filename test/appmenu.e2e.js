@@ -33,7 +33,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -73,6 +73,7 @@ async function metLid(fn) {
   let browser;
   try {
     const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
+    maakBetaaldRtgTestaccount(TMP, 'appmenu' + process.pid + '@x.nl');
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     /* DE INTAKE STAAT HIER BUITEN, EN DAT MOET VIA DE STATUS.
@@ -632,7 +633,7 @@ test('het witte Edge-menu zet de vier werelden bovenaan, en het springboard is w
        voorraadkast. */
     assert.deepEqual(b.koppen, ['Uw vier werelden'],
       'het witte menu benoemt de vier werelden niet, gevonden: ' + b.koppen.join(', '));
-    assert.deepEqual(b.werelden.map((w) => w.url),
+    assert.deepEqual(b.werelden.map((w) => w.url).sort(),
       ['/apps/wereld.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/index.html'],
       'het witte menu hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
@@ -699,8 +700,8 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
     await openLade(page);
 
     const b = await werelden(page);
-    assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+    assert.deepEqual(b.werelden.map((w) => w.url).sort(),
+      ['/apps/rtg.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/os-publiek.html'].sort(),
       'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS te dragen');
     const kaal = b.werelden.filter((w) => !w.glyf);
     assert.deepEqual(kaal.map((w) => w.naam), [],

@@ -4,7 +4,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { alleenDs, beeld } = require('./lib/ds-toets');
 const pw = laadPlaywright();
 const opPad = (response, pad) => new URL(response.url()).pathname === pad && response.request().method() === 'POST';
@@ -44,6 +44,7 @@ test('Hotels: echte 428 boven verblijfBlad, herstel, focus en één hervatte aan
     const lid = await post('/api/auth/register', { name: 'Pia Gegevenspoort', email: 'poort-ds@voorbeeld.test',
       password: 'poortgeheim12', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(lid.token);
+    maakBetaaldRtgTestaccount(tmp, 'poort-ds@voorbeeld.test');
     const nodig = () => post('/api/gegevens/nodig', { soort: 'reservering' }, lid.token);
     const mijn = () => post('/api/verblijf/mijn', {}, lid.token);
     assert.deepEqual((await nodig()).ontbreekt.map(v => v.veld), ['telefoon']);

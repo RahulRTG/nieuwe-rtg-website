@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 let srv, base, zaak, kassa, buurzaak, lid, lid2;
 let kaartCode = null, postId = null, dealCode = null;
@@ -46,8 +46,11 @@ async function inlog(code, rol) {
 }
 async function nieuwLid(naam) {
   const u = String(Date.now() + Math.round(performance.now())).slice(-9);
-  return (await api('/api/auth/register', { name: naam, email: 'ui' + u + '@voorbeeld.test',
-    password: 'inwisselen123', geboortedatum: '1987-07-07', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = await api('/api/auth/register', { name: naam, email: 'ui' + u + '@voorbeeld.test',
+    password: 'inwisselen123', geboortedatum: '1987-07-07', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, 'ui' + u + '@voorbeeld.test');
+  return reg.body.token;
 }
 
 test.before(async () => {

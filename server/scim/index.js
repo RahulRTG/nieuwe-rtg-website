@@ -20,7 +20,7 @@
       Echt wissen blijft de AVG-route (accounts.deleteUser), met een mens erbij.
 
    En de merkregel die overal geldt: SCIM geeft NOOIT een betaalde pas. Een via
-   SCIM aangemaakt account krijgt hooguit RTG, net als zelf-registreren en net
+   SCIM aangemaakt account krijgt gratis/guest, net als zelf-registreren en net
    als SSO. Er staat hier geen setTier.
    ========================================================================== */
 'use strict';
@@ -116,7 +116,7 @@ async function maak(accounts, org, gegevens, gebruikersync) {
 
   const user = await accounts.createUser({
     email, username: null, password: sso.onbruikbaarWachtwoord(),
-    tier: 'rtg', realName: naam, phone: null   // nooit een betaalde pas -- zie de kop
+    tier: 'guest', realName: naam, phone: null   // identiteit is geen betaald abonnement
   });
   if (typeof accounts.setEmailVerified === 'function') accounts.setEmailVerified(user.id);
   /* Vastleggen dat dit account van deze organisatie is. Het subject is hier de

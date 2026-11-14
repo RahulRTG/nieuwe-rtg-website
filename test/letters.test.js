@@ -61,8 +61,11 @@ test('2. het staat ONDER de andere Bodoni-blokken, want later wint', () => {
 test('3. het bestand dat de glief levert, bestaat ook echt', () => {
   for (const b of BLOKKEN) {
     const u = bron(b);
-    if (!u.startsWith('/fonts/')) continue;
-    assert.ok(fs.existsSync(path.join(ROOT, 'public', u)), 'ontbreekt: ' + u);
+    assert.match(u,/^\.\/[\w-]+\.woff2$/,'ieder font resolveert naast zijn stylesheet, ook onder een projectpad');
+    assert.ok(fs.existsSync(path.join(ROOT, 'public/fonts', u)), 'ontbreekt: ' + u);
+    for(const base of ['https://rtg.test/fonts/fonts.css','https://rtg.test/nieuwe-rtg-website/public/fonts/fonts.css']) {
+      assert.equal(new URL(u,base).href,new URL('.',base).href+u.slice(2),'dezelfde bestaande asset blijft onder de juiste webroot');
+    }
   }
 });
 

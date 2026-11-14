@@ -118,7 +118,17 @@ async function doorloop() {
     return r;
   };
   try {
-    const login = await post('/api/login', { tier: 'rtg' });
+    // De plaatsdeur vereist een eigen account; de betaalde pas is uitsluitend
+    // een fixture in deze tijdelijke database, geen verkoop of productiedeur.
+    const email = 'positieproef@voorbeeld.test';
+    const login = await post('/api/auth/register', { name: 'Positieproef', email,
+      password: 'ProefWachtwoord-2026!', geboortedatum: '1990-01-01' });
+    const fixture = require('node:child_process').spawnSync(process.execPath,
+      [path.join(WORTEL, 'test/fixtures/betaald-rtg-account.cjs'), email], {
+        encoding: 'utf8', env: { ...process.env, NODE_ENV: 'test',
+          RTG_DATA_DIR: srv.datamap, SMTP_URL: '' }
+      });
+    if (fixture.status !== 0) throw new Error('RTG-proefaccount niet gereed: ' + fixture.stderr);
     const lid = login.data && login.data.token;
     if (!lid) throw new Error('geen ledensessie (status ' + login.status + ') -- dan meet deze proef niets');
 

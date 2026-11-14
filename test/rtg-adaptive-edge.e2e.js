@@ -432,18 +432,36 @@ test('de balk flikkert niet bij een scroll van de software, en een wiel werkt zo
       } finally { await page.close(); }
     });
 
-    await t.test('landing: een wiel omlaag geeft peek, ook zonder Edge 2', async () => {
+    await t.test('publiek magazine: alleen het artikel scrollt en een geopende Edge wordt daarbij weer transparant', async () => {
       const page = await context.newPage();
       await page.clock.install(); // volgBalk laat de nepklok springen
       try {
         await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
-        await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
-        await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'dock');
+        await page.waitForSelector('body[data-magazine-view="cover"] .ds-public-edge-toggle');
+        assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false);
         await page.mouse.move(195, 420);
-        const m = await volgBalk(page, () => page.mouse.wheel(0, 700), 700);
+        const cover = await volgBalk(page, () => page.mouse.wheel(0, 700), 700);
+        assert.equal(cover.y,0,'het vaste magazine krijgt geen verticale scroll door een wiel');
+        await page.goto(base + '/#artikel-interview', { waitUntil: 'domcontentloaded' });
+        await page.locator('#magazineDetailContent > #artikel-interview').waitFor({state:'visible'});
+        await page.waitForSelector('.ds-public-edge[data-public-quiet-bound="true"]');
+        await page.evaluate(()=>document.fonts.ready);
+        await page.locator('#rtg-lang-modal[aria-modal="true"]').waitFor({state:'attached'});
+        assert.equal(await page.locator('#rtg-lang-modal').evaluate(el=>el.open),false,'de echte taalcatalogus heeft een gesloten dialoog klaargezet');
+        await page.locator('.ds-public-edge-toggle').click();
+        assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),true,'de echte lippenknop opent de Edge');
+        await page.mouse.move(195,420);
+        const before=await page.evaluate(()=>{window.__publicWheelDelivered=false;document.addEventListener('scroll',()=>{window.__publicWheelDelivered=true;},{once:true});return scrollY;});
+        const m = await volgBalk(page, async () => {
+          await page.mouse.wheel(0,700);await page.clock.runFor(350);
+          await page.waitForFunction(()=>window.__publicWheelDelivered===true);
+        }, 700);
         assert.equal(m.edge2, false, 'de landing hoort zonder Edge 2 te draaien; dan meet deze proef de verkeerde weg');
-        assert.ok(m.y > 100, 'het wiel scrolde de landing niet (' + m.y + ')');
-        assert.ok(m.standen.includes('peek'), 'een wiel op de landing gaf geen peek: ' + m.standen.join(' > '));
+        assert.ok(m.y > before+100, 'het wiel scrolde het geopende artikel niet (' + before+' -> '+m.y + ')');
+        assert.ok(m.standen.includes('dock'),'een gesloten taaldialoog blokkeert geen native Edge-sluiting: '+m.standen.join(' > '));
+        assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false);
+        assert.equal(await page.locator('.ds-public-edge-toggle').getAttribute('aria-expanded'),'false');
+        assert.equal(await page.locator('.ds-public-edge-toggle').evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
       } finally { await page.close(); }
     });
   } finally {

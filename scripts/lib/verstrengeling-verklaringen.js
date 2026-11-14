@@ -4,6 +4,8 @@
    alleen een melding onderdrukken is onvoldoende. LEGACY betekent: bekend,
    fout en nog niet opgelost. Noem zo'n relatie geen DOMEINRELATIE. */
 module.exports = [
+  { van: 'domein:aanmeldingen', naar: 'domein:onboarding', soort: 'DOMEINRELATIE',
+    reden: 'de automatische abonnementsovereenkomst gebruikt de bestaande versiegebonden onboarding-ondertekening als ontvangstbewijs; onboarding beslist niet over prijs, betaling, rechten of contractstand' },
   { van: 'domein:personalos', naar: 'domein:toegankelijk', soort: 'GEDEELDE_PRIMITIEF',
     reden: 'PersonalOS projecteert het bestaande toegankelijkheidsprofiel in de persoonlijke compositie; kern/toegankelijk blijft eigenaar en PersonalOS maakt geen tweede profiel of bevoegdheid' },
   /* HET REISAANBOD EN HET REISBUREAU DELEN EEN DEUR. kern/reisaanbod.js schrijft

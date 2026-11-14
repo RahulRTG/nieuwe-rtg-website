@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -25,9 +25,11 @@ test.before(async () => {
   const ra = await api(base, '/api/auth/register', { name: 'Taal Een', email: 'ta' + u + '@x.nl',
     phone: '065' + u.slice(1), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lidA = ra.body.token;
+  maakBetaaldRtgTestaccount(TMP, 'ta' + u + '@x.nl');
   const rb = await api(base, '/api/auth/register', { name: 'Taal Twee', email: 'tb' + u + '@x.nl',
     phone: '066' + u.slice(1), password: 'geheim123', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg' });
   lidB = rb.body.token;
+  maakBetaaldRtgTestaccount(TMP, 'tb' + u + '@x.nl');
   keyA = (await api(base, '/api/member/connections', {}, lidA)).body.me;
   keyB = (await api(base, '/api/member/connections', {}, lidB)).body.me;
   // de demo-zaak, ingelogd als manager (mag de instellingen zetten)

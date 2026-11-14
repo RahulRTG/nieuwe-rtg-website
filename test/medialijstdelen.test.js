@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lijstdelen-'));
 let srv, base, office;
@@ -38,9 +38,11 @@ function api(pad, body, token) {
 let seq = 0;
 async function lid(naam) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  const reg = await api('/api/auth/register', { name: naam, email: 'ld' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x', tier: 'rtg', pasApp: 'rtg' });
+  const email = 'ld' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: naam, email, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x' });
   assert.ok(reg.body.token, naam + ' is aangemeld');
+  maakBetaaldRtgTestaccount(TMP, email); // Delen, vriendschap en kaartjes worden afzonderlijk beproefd.
   const st = await api('/api/state', {}, reg.body.token);
   return { token: reg.body.token, codenaam: st.body.state.user.codename };
 }

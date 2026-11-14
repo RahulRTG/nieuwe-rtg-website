@@ -28,11 +28,11 @@ module.exports = (kern) => {
 
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
-  /* Een vakbewijs hoort bij een ECHT account. Een gast heeft geen werk en dus
-     ook geen stuk -- en zonder deze regel zou een gastsessie rijen achterlaten
-     die aan niemand hangen. */
+  /* Een vakbewijs hoort bij een ECHT account, ook zonder betaalde persoonlijke
+     pas. Een accountsloze gast of demo mag geen rijen achterlaten die aan
+     niemand hangen; werkrelatie en aftekening blijven afzonderlijke grenzen. */
   function eigenSleutel(req, res) {
-    if (req.session.tier === 'guest' || !req.session.account) {
+    if (!req.session.account) {
       res.status(403).json({ error: 'Een vakbewijs hoort bij een echt RTG-account.' });
       return null;
     }

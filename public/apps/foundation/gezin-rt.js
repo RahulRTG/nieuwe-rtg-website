@@ -7,17 +7,28 @@
   var S = { base: '/api/foundation', code: '', token: '', mijnId: '', mijnNaam: '', leden: {} };
   var es = null, onChat = null, onBelStatus = null;
   var call = null, inkomend = null, ingezet = false, mee = null;   // mee: de tekstbaan (shared/meelezen.js)
+  var epoch = 0;
+  function actief(n) { return n === epoch && !!S.code && !!S.token; }
 
   function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
   function post(pad, body) {
+    var n = epoch;
+    if (!actief(n)) return Promise.reject(new Error('De gezinssessie is gesloten.'));
     return fetch(S.base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ code: S.code, token: S.token }, body || {})) })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!actief(n)) throw new Error('De gezinssessie is gesloten.'); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   }
   function lidNaam(id) { var l = S.leden[id]; return l ? l.naam : 'Gezinslid'; }
   function lidAvatar(id) { var l = S.leden[id]; return l ? (l.avatar || 'emo-blij') : 'emo-blij'; }
+  function lees(pad) {
+    var n = epoch;
+    if (!actief(n)) return Promise.reject(new Error('De gezinssessie is gesloten.'));
+    return fetch(S.base + '/gezin/' + S.code + pad, { headers: { Authorization: 'Bearer ' + S.token } })
+      .then(function (r) { return r.json(); }).then(function (d) { if (!actief(n)) throw new Error('De gezinssessie is gesloten.'); return d; });
+  }
 
   var GezinRT = {
     init: function (opts) {
+      GezinRT.stop();
       S.base = opts.base || S.base; S.code = opts.code; S.token = opts.token;
       S.mijnId = opts.mijnId; S.mijnNaam = opts.mijnNaam || 'ik';
       GezinRT.setLeden(opts.leden || []);
@@ -29,14 +40,19 @@
     setLeden: function (arr) { S.leden = {}; (arr || []).forEach(function (l) { S.leden[l.id] = l; }); },
     /* Een verse gezinssessie (de RTG-app haalt per keer een nieuwe van 12 uur via
        /api/rtf/kanaal). Het kanaal verbindt opnieuw, behalve midden in een gesprek. */
-    setToken: function (t) { if (!t || t === S.token) return; S.token = t; if (!call) verbind(); },
+    setToken: function (t) { if (!actief(epoch) || !t || t === S.token) return; S.token = t; if (!call) verbind(); },
     // chat
     stuur: function (naarId, tekst) { return post('/gezin/chat', { naar: naarId, tekst: tekst }); },
-    thread: function (metId) { return fetch(S.base + '/gezin/' + S.code + '/chat/' + metId, { headers: { Authorization: 'Bearer ' + S.token } }).then(function (r) { return r.json(); }); },
-    chats: function () { return fetch(S.base + '/gezin/' + S.code + '/chats', { headers: { Authorization: 'Bearer ' + S.token } }).then(function (r) { return r.json(); }); },
+    thread: function (metId) { return lees('/chat/' + metId); },
+    chats: function () { return lees('/chats'); },
     // bellen
     bel: function (naarId, video) { beginGesprek(naarId, video); },
-    stop: function () { clearTimeout(wacht); try { if (es) es.close(); } catch (e) {} es = null; eindeGesprek(false); }
+    stop: function () {
+      epoch++; clearTimeout(wacht); wacht = null;
+      try { if (es) es.close(); } catch (e) {} es = null;
+      S.code = ''; S.token = ''; S.mijnId = ''; S.mijnNaam = ''; S.leden = {};
+      onChat = null; onBelStatus = null; iceConfig = null; eindeGesprek(false);
+    }
   };
 
   /* De sessie gaat niet in de URL (B18): eerst een eenmalig stroomticket van een
@@ -46,20 +62,25 @@
   function verbind() {
     try { if (es) es.close(); } catch (e) {}
     es = null; clearTimeout(wacht);
-    var token = S.token;
+    var token = S.token, n = epoch;
+    function geldig() { return actief(n) && token === S.token; }
+    function later(ms) { if (actief(n)) wacht = setTimeout(function () { if (actief(n)) verbind(); }, ms); }
+    if (!geldig()) return;
     fetch(S.base + '/gezin/stroom/ticket', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify({ code: S.code, kanaal: 'gezin' }) })
       .then(function (r) { return r.ok ? r.json() : (r.status === 403 ? 'weg' : null); })
       .then(function (t) {
-        if (t === 'weg' || token !== S.token) return;
-        if (!t || !t.ticket) { wacht = setTimeout(verbind, 30000); return; }
-        es = new EventSource(S.base + '/gezin/' + S.code + '/kanaal?ticket=' + encodeURIComponent(t.ticket));
-        es.addEventListener('chat', function (e) { try { var d = JSON.parse(e.data); if (onChat) onChat(d); } catch (x) {} });
-        es.addEventListener('bel', function (e) { try { opBelsignaal(JSON.parse(e.data)); } catch (x) {} });
-        es.onerror = function () { if (es && es.readyState === 2) { es = null; wacht = setTimeout(verbind, 3000); } };
-      }, function () { wacht = setTimeout(verbind, 10000); });
+        if (t === 'weg' || !geldig()) return;
+        if (!t || !t.ticket) { later(30000); return; }
+        var kanaal = new EventSource(S.base + '/gezin/' + S.code + '/kanaal?ticket=' + encodeURIComponent(t.ticket)); es = kanaal;
+        // Tokenverversing onderbreekt een actief gesprek niet. Het geopende
+        // kanaal blijft eigendom van deze epoch, niet van het oude ticket-token.
+        function eigenaar() { return actief(n) && es === kanaal; }
+        kanaal.addEventListener('chat', function (e) { if (!eigenaar()) return; try { var d = JSON.parse(e.data); if (onChat) onChat(d); } catch (x) {} });
+        kanaal.addEventListener('bel', function (e) { if (!eigenaar()) return; try { opBelsignaal(JSON.parse(e.data)); } catch (x) {} });
+        kanaal.onerror = function () { if (eigenaar() && kanaal.readyState === 2) { es = null; later(3000); } };
+      }, function () { if (geldig()) later(10000); });
   }
-
   /* ---------- WebRTC bellen ---------- */
   function seinNaar(naar, kind, payload, video) { post('/gezin/bel', { naar: naar, kind: kind, payload: payload || null, video: !!video }).catch(function () {}); }
   function belUI(open) { var s = document.getElementById('grt-call'); if (s) s.style.display = open ? 'flex' : 'none'; if (!open) { var r = document.getElementById('grt-remote'), l = document.getElementById('grt-local'); if (r) r.srcObject = null; if (l) l.srcObject = null; } }
@@ -69,13 +90,15 @@
   function pakMedia(video) { return window.RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }).catch(function () { return null; }); }
   var iceConfig = null;
   // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
-  function haalIce() { return fetch(S.base + '/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: S.code, token: S.token }) }).then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
+  function haalIce() { var n = epoch; if (!actief(n)) return Promise.resolve(null); return fetch(S.base + '/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: S.code, token: S.token }) }).then(function (r) { return r.json(); }).then(function (d) { if (!actief(n)) return null; iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { if (!actief(n)) return null; iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
   function maakPc() {
+    var gesprek = call;
     var pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(function (t) { pc.addTrack(t, call.stream); });
-    pc.onicecandidate = function (ev) { if (ev.candidate && call) seinNaar(call.met, 'ice', ev.candidate); };
-    pc.ontrack = function (ev) { var v = document.getElementById('grt-remote'); if (v && v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0]; };
+    pc.onicecandidate = function (ev) { if (ev.candidate && call === gesprek) seinNaar(gesprek.met, 'ice', ev.candidate); };
+    pc.ontrack = function (ev) { if (call !== gesprek) return; var v = document.getElementById('grt-remote'); if (v && v.srcObject !== ev.streams[0]) v.srcObject = ev.streams[0]; };
     pc.onconnectionstatechange = function () {
+      if (call !== gesprek) return;
       if (pc.connectionState === 'connected' && call && !call.t0) { call.t0 = Date.now(); call.timer = setInterval(tijdTik, 1000); var st = document.getElementById('grt-status'); if (st) st.textContent = ''; }
       if (['failed', 'closed'].indexOf(pc.connectionState) >= 0) eindeGesprek(false);
     };
@@ -92,9 +115,11 @@
     belUI(true);
   }
   function beginGesprek(naarId, video) {
-    if (call) { return; }
+    var n = epoch;
+    if (call || !actief(n)) { return; }
     haalIce();
     pakMedia(video).then(function (stream) {
+      if (!actief(n)) { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); return; }
       if (!stream) { alert('Geen toegang tot microfoon of camera.'); return; }
       call = { met: naarId, video: video, richting: 'uit', pendingIce: [], stream: stream, t0: 0 };
       document.getElementById('grt-local').srcObject = stream;
@@ -105,8 +130,9 @@
   function neemOp() {
     document.getElementById('grt-incoming').style.display = 'none';
     if (!inkomend) return;
-    var inb = inkomend;
+    var inb = inkomend, n = epoch;
     pakMedia(inb.video).then(function (stream) {
+      if (!actief(n) || inkomend !== inb) { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); return; }
       if (!stream) { seinNaar(inb.van, 'decline'); inkomend = null; return; }
       call = { met: inb.van, video: inb.video, richting: 'in', pendingIce: [], stream: stream, t0: 0 };
       document.getElementById('grt-local').srcObject = stream;
@@ -116,19 +142,21 @@
     });
   }
   function eindeGesprek(zeggen) {
-    if (call) {
-      if (zeggen) seinNaar(call.met, 'hangup');
-      clearInterval(call.timer);
-      try { call.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
-      try { if (call.pc) call.pc.close(); } catch (e) {}
-      call = null;
+    var gesprek = call; call = null; inkomend = null;
+    if (gesprek) {
+      if (zeggen) seinNaar(gesprek.met, 'hangup');
+      clearInterval(gesprek.timer);
+      try { gesprek.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+      try { if (gesprek.pc) gesprek.pc.close(); } catch (e) {}
     }
+    var inv = document.getElementById('grt-incoming'); if (inv) inv.style.display = 'none';
+    ['grt-naam','grt-inaam','grt-av','grt-iav','grt-status','grt-isoort','grt-tijd'].forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = ''; });
     if (mee) mee.leeg();
     belUI(false);
   }
   function flushIce() { if (!call || !call.pc || !call.pc.remoteDescription) return Promise.resolve(); var ps = call.pendingIce.splice(0).map(function (c) { return call.pc.addIceCandidate(c).catch(function () {}); }); return Promise.all(ps); }
   function opBelsignaal(d) {
-    if (d.naar !== S.mijnId) return;
+    if (!actief(epoch) || d.naar !== S.mijnId) return;
     if (d.kind === 'ring') {
       if (call) { seinNaar(d.van, 'busy'); return; }
       inkomend = { van: d.van, video: d.video };
@@ -139,14 +167,16 @@
       return;
     }
     if (!call || d.van !== call.met) return;
+    var gesprek = call, n = epoch;
+    function geldig() { return actief(n) && call === gesprek; }
     if (d.kind === 'accept') {
       var pc = maakPc();
-      pc.createOffer().then(function (o) { return pc.setLocalDescription(o).then(function () { seinNaar(call.met, 'offer', o); }); });
+      pc.createOffer().then(function (o) { if (!geldig()) return; return pc.setLocalDescription(o).then(function () { if (geldig()) seinNaar(gesprek.met, 'offer', o); }); }).catch(function () { if (geldig()) eindeGesprek(false); });
     } else if (d.kind === 'offer') {
       var pc2 = maakPc();
-      pc2.setRemoteDescription(d.payload).then(flushIce).then(function () { return pc2.createAnswer(); }).then(function (a) { return pc2.setLocalDescription(a).then(function () { seinNaar(call.met, 'answer', a); }); });
+      pc2.setRemoteDescription(d.payload).then(function () { if (geldig()) return flushIce(); }).then(function () { if (geldig()) return pc2.createAnswer(); }).then(function (a) { if (!geldig()) return; return pc2.setLocalDescription(a).then(function () { if (geldig()) seinNaar(gesprek.met, 'answer', a); }); }).catch(function () { if (geldig()) eindeGesprek(false); });
     } else if (d.kind === 'answer') {
-      call.pc.setRemoteDescription(d.payload).then(flushIce);
+      call.pc.setRemoteDescription(d.payload).then(function () { if (geldig()) return flushIce(); }).catch(function () { if (geldig()) eindeGesprek(false); });
     } else if (d.kind === 'ice') {
       if (call.pc && call.pc.remoteDescription) { call.pc.addIceCandidate(d.payload).catch(function () {}); } else call.pendingIce.push(d.payload);
     } else if (d.kind === 'tekst') {

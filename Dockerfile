@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # Bouw de Rust-motor los van de kleine Node-runtime-image. Cargo gebruikt het
 # vastgezette Cargo.lock; de uiteindelijke container krijgt alleen de binary.
-FROM rust:1.99-slim@sha256:2752b332db73fdbb7dc576f06c82ed1f312005784ef913d7e04a28f5f55dc581 AS motor-builder
+FROM rust:1.99-slim@sha256:b8e062b1c3a80183df83d9ba187cadd2b5ab84bc78d453dbfeb2fccd5f982247 AS motor-builder
 WORKDIR /src/motor
 COPY motor/Cargo.toml motor/Cargo.lock ./
 COPY motor/src ./src
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
 # De back-upsidecar gebruikt pg_dump uit het officiële PostgreSQL-image en
 # alleen de OpenSSL-CLI extra. Daarmee kan hij naar een publieke sleutel
 # versleutelen zonder ooit de offline privésleutel te bezitten.
-FROM postgres:18-alpine@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873 AS backup-runtime
+FROM postgres:18-alpine@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5 AS backup-runtime
 RUN apk add --no-cache openssl
 COPY scripts/docker/backup.sh /usr/local/bin/rtg-backup
 COPY scripts/docker/herstel.sh /usr/local/bin/rtg-herstel
@@ -30,7 +30,7 @@ RUN chmod 0555 /usr/local/bin/rtg-backup /usr/local/bin/rtg-herstel
 # vandaar dat --experimental-sqlite uit de hele boom is); de ondergrens staat
 # in package.json (engines) en wordt afgedwongen in server/server.js, vóór
 # het eerste require.
-FROM node:26-slim@sha256:0d1e33586362bb9e608c4e751e7a9e7edb55c9ac11461ed5666af696cc461dd4
+FROM node:26-slim@sha256:e4db4c914bf8ad241bd24804fc25d272d89bad97e68cdc8a1414862790a02c39
 
 # Alleen productie-afhankelijkheden; de dev-tools (terser, axe) horen niet in de
 # runtime-image. npm ci is reproduceerbaar op basis van de lockfile.

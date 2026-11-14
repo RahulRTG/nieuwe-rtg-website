@@ -29,7 +29,12 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Kluis Testlid', email: 'kluis' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1991-03-03', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  assert.equal(reg.body.state.user.account, true);
+  assert.equal(reg.body.state.user.tier, 'guest', 'de identiteitskluis bestaat ook voor een gratis account');
   const st = await api('/api/state', {}, reg.body.token);
+  assert.equal(st.status, 200);
+  assert.equal(st.body.state.user.tier, 'guest');
   lidCodenaam = st.body.state.user.codename;
   assert.ok(office && lidCodenaam, 'kantoor ingelogd en lid met codenaam in de gids');
 });
@@ -100,7 +105,7 @@ test('4. de identiteitskluis: kamers met inzagerecht zien de naam, andere niet, 
   assert.equal(ok.status, 200);
   assert.equal(ok.body.inzage.naam, 'Kluis Testlid');
   assert.equal(ok.body.inzage.codenaam, lidCodenaam);
-  assert.equal(ok.body.inzage.pas, 'rtg');
+  assert.equal(ok.body.inzage.pas, 'guest', 'inzage toont de werkelijke gratis tier, zonder betaalfixture');
   // de boardroom mag ook
   const bd = await api('/api/office/inzage', { kamer: 'boardroom', codenaam: lidCodenaam }, office);
   assert.equal(bd.status, 200);

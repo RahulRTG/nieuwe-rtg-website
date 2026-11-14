@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, wachtOpWaarde } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop, wachtOpWaarde } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-flits-'));
@@ -29,6 +29,8 @@ async function lid(tier) {
     name: 'Lid ' + seq, email: 'f' + u + '@x.nl', phone: '06' + u, password: 'geheim123',
     geboortedatum: '1990-05-05', geslacht: 'v', tier: tier || 'rtg', pasApp: tier || 'rtg'
   });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, 'f' + u + '@x.nl');
   return reg.body.token;
 }
 

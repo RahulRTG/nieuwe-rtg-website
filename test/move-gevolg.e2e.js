@@ -18,7 +18,10 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, stopNet, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { startServer, stopHard, stopNet, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 
 const pw = laadPlaywright();
 const SCHERM = '/apps/move.html';
@@ -31,11 +34,12 @@ async function post(base, pad, lijf, tok) {
   return { status: r.status, data: await r.json().catch(() => null) };
 }
 
-async function proeflid(base) {
+async function proeflid(base, datamap) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const r = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvg' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
   assert.equal(r.status, 200, 'proeflid: ' + JSON.stringify(r.data));
+  maakBetaaldRtgTestaccount(datamap, 'mvg' + u + '@voorbeeld.nl');
   return r.data.token;
 }
 
@@ -48,12 +52,13 @@ async function boek(base, tok, code, dienst, d, tijd) {
 
 test('Move rekent een gekozen uitloop door en zet een voorstel klaar zonder iets te verzetten',
   { skip: geenBrowser(pw) }, async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-move-gevolg-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1', RTG_DATA_DIR: TMP } });
   let browser;
   let gestopt = false;
   try {
     const base = srv.base;
-    const tok = await proeflid(base);
+    const tok = await proeflid(base, TMP);
     const d = morgen();
     /* Drie soorten overgang in een reis, zodat het scherm ze moet ONDERSCHEIDEN:
        training 10:00-11:00 en massage 11:15 (krap, wordt door uitloop
@@ -136,6 +141,7 @@ test('Move rekent een gekozen uitloop door en zet een voorstel klaar zonder iets
     await ctx.close();
   } finally {
     if (browser) await browser.close();
-    if (!gestopt) stop(srv);
+    if (!gestopt) await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });

@@ -1,5 +1,343 @@
 # Het afbouwprogramma — wat RTG heeft toegezegd, afbouwen en bewijzen
 
+## Actuele uitvoeringsvolgorde — 14 november 2026
+
+### Productrichting: minder schermen mag, minder overzicht of veiligheid niet
+
+Aanvullend eigenaarsbesluit: 316 (of 330) schermen is geen bouwdoel. Bestaande
+overlap mag worden samengevoegd tot minder, heldere plekken met een rustige,
+clean, natuurlijke en high-end magazinebeleving. Cover en Collectie dragen
+de redactionele ervaring; taken, contracten, geld en herstel gebruiken dezelfde
+vormtaal met een compacte, ondubbelzinnige bediening.
+
+De canonieke inventaris blijft alle bestaande routes en verschijningsvormen
+verantwoorden. Per item volgt expliciet: behouden, samenvoegen naar een
+genoemde screenId, redirect/alias, fragment of server-side gesloten. Een
+samengevoegde ingang houdt een veilige bestemming, passende rol-/tenantgrens,
+hervatting en bewijs; functies of gebruikersrechten verdwijnen niet door een
+kleiner schermgetal. Het aantal bereikbare schermen, route-ingangen en
+toestanden wordt apart benoemd en overal uit dezelfde inventaris afgeleid.
+
+De eerdere schatting op basis van 243 losse schermmigraties is geen
+uitvoeringsprognose meer. Eerst consolideren en de informatiearchitectuur
+vaststellen, daarna het werk meten per herbruikbare schermfamilie en journey.
+Geen routes verwijderen of schermen herontwerpen vóór Poort 0 en Poort 1.
+
+### Uitvoering
+
+Het definitieve eigenaarsplan van 14 november vervangt de losse
+vervolgopdrachten. De eigenaar staat een efficiëntere volgorde toe, zonder
+de Definition of Done te verlagen. Oudere voortgangsmetingen hieronder zijn
+historie en geen bewijs voor de huidige kandidaat.
+
+1. **Eerst Poort 0:** PR #725 en #727 beschermd afhandelen, mergeboom en
+   uitrolstatus verifiëren. Daarna één finale integratielijn vanaf die main.
+   Geen schermmigratie in #727 en geen productie-uitrol door deze integratie.
+2. **Daarna Poort 1:** één canonieke inventaris met stabiele screenIds,
+   eigenaars, launchstatus en migratiematrix. Alle bestaande meetlagen
+   consumeren diezelfde inventaris. Geen tweede voortgangsregister en geen
+   ontwerp/migratie zolang noemerdrift of eigenaarconflicten bestaan.
+3. **Na die basis: verticale tranches per schermfamilie.** Eerst het gedeelde
+   component- en contextcontract vastleggen en op een representatieve
+   kritieke journey beproeven. Daarna binnen iedere tranche UX-contract,
+   DS-migratie, Edge, functionele proeven, toegankelijkheid en Experience
+   samen afronden. Poorten 2 t/m 6 behouden hun volledige eindvoorwaarden;
+   een groene tranche betekent niet dat een hele poort gereed is. Geen
+   afzonderlijke herontwerpronde langs alle schermen, gevolgd door meerdere
+   nieuwe rondes voor styling, Edge en herstel. Tijdelijke werkverdeling
+   heeft exclusieve bestanden en één integrator; geen autonome varianten.
+4. **Externe doorlooptijd vroeg zichtbaar maken.** Eigenaars, benodigde
+   besluiten, configuratie en acceptatieproeven uit Poort 7 voorbereiden
+   naast de technische tranches. Dit autoriseert geen externe opdracht,
+   betaling of livegang. Kandidaatgebonden eindbewijs ontstaat pas op de
+   uiteindelijke configuratie en artefactbytes.
+5. **Bron bevriezen vóór eindkwalificatie.** Pas bij stabiele bron de
+   afgeleide bewijsbestanden verversen, vervolgens alle verplichte checks
+   en twee onafhankelijke integrale runs op dezelfde immutable kandidaat.
+   Een latere codewijziging maakt nieuw toepasselijk bewijs noodzakelijk.
+   Beschermde main en een afzonderlijk getekend GO/NO-GO blijven verplicht.
+
+### Minder dubbel werk tijdens Poort 0
+
+- Eén volledige foutinventaris per gekozen testselectie; reparaties bundelen
+  per aangetoonde oorzaak in plaats van telkens stoppen bij de eerste fout.
+- Tijdens reparaties de getroffen tests en hun grenzen gericht uitvoeren.
+  De bestaande eindselectie, skips/todos-verboden en normen blijven intact.
+- Testpersona's hergebruiken. Openbare registratie geeft geen betaalde pas;
+  een fixture voor een al betalend lid is geen bewijs van contractsluiting,
+  betaling of menselijke Business/Lifestyle-goedkeuring.
+- Kleine verklaarde commits behouden; remote CI en afgeleide rapporten niet
+  na iedere losse fixture opnieuw starten. Push per gecontroleerde tranche.
+- Een diagnostische run waarin de werkboom veranderde geldt uitsluitend als
+  foutinventaris, nooit als commitgebonden kwalificatiebewijs.
+
+### Goedgekeurde contractbediening — 14 november 2026
+
+De eigenaar heeft expliciet ingestemd met de grens 155 → 159, uitsluitend
+voor `/api/mijn/abonnement/automatisch/betalen`, `/herstel`, `/intrekken` en
+`/stand` onder diezelfde automatische abonnementprefix. Dit zijn vier
+bestaande-contractrechten, geen vier nieuwe schermen. Nieuwe aanbiedingen en
+ondertekening blijven instroom en afzonderlijk uitschakelbaar. Identiteit,
+eigen-contractbinding, veilige betaalconfiguratie en opslagpoorten blijven
+onverkort gelden; een leesactie mag niets innen of rechten toekennen.
+
+De regressiecontrole bewaakt de zes routes uitputtend en houdt voor alle
+andere bedieningsroutes de oude grens 155 aan. Een toekomstige route erft
+de uitzondering niet. Deze expliciete keuze is geen algemene toestemming
+om normen of meetgrenzen te verruimen. De lokale implementatie is gericht
+beproefd: 30 route-/registerproeven, 10 component-/browserproeven en 15
+HTTP-/activeringsproeven slagen zonder skip of todo. Ook na een echte
+serverherstart met gesloten instroom blijven eigen betalen, herstel en
+intrekken werken, zonder dubbele inning; een vreemd account wordt geweigerd.
+Daarnaast slagen 86 bredere abonnementsregressies voor onder meer menselijke
+toelating, organisatie-/zaakgrenzen, jaarvervolg, verrekening en herstel.
+Dit gebruikt een lokale providerfixture en is geen bewijs van een live
+betaalrail. De volledige consolidatie en remote checks blijven afzonderlijk.
+
+**Actuele open poort: 0; integrator is eigenaar.** De lokale reparatie van
+het contractleespad voorkomt dat `/api/state` lege aanmeldings-/betaallijsten
+aanmaakt zonder opslagbevestiging. De gerichte contractgroep slaagt 24/24;
+de echte PostgreSQL-ledengidsproef slaagt op een schone testdatabase.
+Negen verdere fixturebestanden slagen gericht met 57/57, nul skips/todos.
+De volledige diagnostische selectie `test:deel -- --deel=4/4
+--zonder-ijkingen --zonder-zware` is afgelopen: 38 bestanden met fouten;
+37 daarvan zijn inmiddels gericht groen, inclusief de hierboven benoemde
+schakelaarcontrole. De 27 volgende bestanden gaven eerst 223/228 groen;
+na herstel van de expliciete historische factuurfixture slaagt die volledige
+betrokken factuursaldogroep 6/6. Dit zijn deelruns, geen nieuwe volledige
+scherfrun. De resterende mutatiesemantiekcontrole vraagt een verse afleiding
+na bronintegratie. Dit is uitsluitend scherf 4, niet de totale
+platformachterstand.
+De machineleesbare foutinventaris staat in `.release/unit-test-fouten.json`
+(14 november, 09:34:46 UTC); de werkboom veranderde tijdens deze diagnose.
+De twee gerichte PostgreSQL-opslagbestanden slagen 3/3. De tweeserverproef
+GRAND met echte lokale PostgreSQL en Redis slaagt 11/11 na expliciete
+testpersona-/clustersleutelvoorbereiding en herstel van gelijktijdige
+schaduwmetingen. De meetmerge, requestcommitgrenzen en flushpublicatie slagen
+samen 56/56; beheerwijzigingen blijven conflictgevoelig en het meetvenster
+verschijnt pas na geslaagde opslag. De alternatieve flushbaan publiceert ook
+pas na COMMIT, bewaart later lokaal werk en blokkeert herschrijven bij een
+onopgelost publicatieconflict. De echte PostgreSQL-adapterproef slaagt 6/6;
+GRAND is na deze verharding opnieuw 11/11 groen. Dit is deelbewijs, geen
+groene volledige scherf, APPWERKT of Deep Green.
+De resterende testfouten, verplichte PostgreSQL/Redis-runs, beschermde remote
+checks en samenvoeging zijn nog open. De inventaris/migratiematrix volgt pas
+na de geverifieerde consolidatie; er wordt nog geen schermmigratie gestart.
+
+**Integratietranche 14 november, na PR #725.** De main-commit
+`fdb376b90fe7b9e6ffe2f9579d9f532ee3a6e151` is lokaal in de werkbranch
+geïntegreerd, met behoud van de Direct-/Service-overdracht en de eigen
+chatmodus. Dit is geen samenvoeging van #727 naar main. De bestaande
+generatoren hebben conflicterende bundels, route-/functieafleidingen en echte
+website-schermafbeeldingen opnieuw opgebouwd. De taalproeven slagen 27/27;
+Experience blijft eerlijk `NOT_TESTED` en de inventarisverschillen blijven
+voor Poort 1 open.
+
+De eerste CI-scherf is per oorzaak hersteld: expliciete betaalpersona's voor
+betaalde functies (29 bestanden), echte identiteitskeuring waar vereist en
+een gratis account dat eigen leeftijd en veilige hersteluitleg behoudt. De
+gerichte fixture-/accountgroep slaagt 224/224; de aanvullende
+identiteits-/reisherkomstgroep 32/32 en de profiel-/communicatiegroep 29/29.
+De contactreparatie is nadrukkelijk productiegedrag, geen verborgen testfix:
+gratis accounts kunnen over hun eigen aankoop communiceren, geschiedenis
+opvragen schept geen klantrelatie, herhaalde orders gebruiken de oorspronkelijke
+zaak en oude archieven herstellen geen ingetrokken deelnemers. Onderbroken
+historie-import hervat zonder dubbele berichten of veranderde tijdstempels;
+een gebleven lid behoudt zijn eigen historische gegevensuitvoer. De gerichte
+contact-/identiteitsgroep slaagt 61/61; de twee nieuwe migratieregressies
+zijn ook tegen hun foutvariant gezien. De afleidings-/communicatiekernproeven
+slagen 75/75. Al deze aantallen zijn lokale deelruns op Node 26, zonder skips
+of todos, geen opgeteld platformtotaal of kandidaatkwalificatie.
+
+De tweede gerichte fixturegroep slaagt in deelruns 123/123 en 122/122; de
+derde groep (38 bestanden) 220/220. Identiteitskeuring blijft los van betalen,
+gratis werknemers en negatieve account-/tenantproeven zijn niet opgewaardeerd.
+Historische factuurcorrectie gebruikt een expliciete bestaande factuur en de
+echte HTTP-betaalroute (17/17 met factuursaldo); de gezelschapsproeven slagen
+3/3. PIN-herstel en beoordelingen bij de eigen afgeronde bestelling zijn als
+aparte productreparatie vastgelegd (`d097dafcb`), met 46/46 gerichte
+regressies en 2/2 echte PIN-browserproeven. Eigen privacy-inzage is eveneens
+een accountrecht, geen betaalrecht (`8270f145f`): de oude fout is eerst
+gereproduceerd, een gevulde vreemde kaart blijft ondanks gespoofte IDs dicht.
+De aanvullende inzage-, Leerhuis-, kantoor-, refundmeter- en Experience-groep
+slaagt 45/45. De refundmeter trekt alleen werkelijk gevonden uitzonderingen
+af, met een positieve en negatieve tegenproef; norm en scanner blijven gelijk.
+Dit zijn lokale ontwikkelproeven op de gewijzigde boom, niet de vier volledige
+CI-scherven en niet samen een platformtotaal.
+
+De oude browserfouten zijn op oorzaak gegroepeerd: betaalpersona's, gratis
+identiteitskeuring, inmiddels herstelde eigen accountrechten en afzonderlijke
+werk-/privacy-/UI-fouten. Gedeelde fixtures mogen geen betaalrecht aan gratis
+medewerkers, kijkers of negatieve persona's geven. Schermproeven draaien pas
+na bevriezing van hun tranche, centraal en met begrensde paralleliteit.
+
+De daaropvolgende browsertranche corrigeert 66 browserbestanden en de bestaande
+reisketenhelper met expliciete persona's; de helper geeft standaard niemand
+een betaalde pas. De leden-/KYC-/Experience-groep slaagt 88/88. De media- en
+Office-groep gaf eerst 21/25; de vier herstelde bestanden slagen vervolgens
+6/6. Negen bestanden wachten nu op serverexit vóór het opruimen van hun eigen
+datamap; de volledige betrokken herproef slaagt 26/26. De aanvraagjourney is
+ook met een echte browser op haar eigen PostgreSQL-database geslaagd, inclusief
+de server-side uitschakeling en het behoud van resultaatbewijs. Dit is geen
+externe betaalrail: het historische factuur-/settlementscenario gebruikt de
+lokale Magnaat-testprovider en zaait geen betaald bewijs.
+
+De productreparaties zijn afzonderlijk vastgelegd. Eigen werkbewijzen en
+locatietoestemming blijven voor gratis werknemers bereikbaar (`0d27d17e9`):
+46/46 gerichte proeven en 8/8 browserproeven. Een werkelijk aanvaarde
+gezinsbinding blijft zichtbaar voor het eigen gratis account (`d7157aeb1`),
+zonder nieuwe bevoegdheid of Foundation-vrijgave: 26/26 inclusief de
+productiepoort. Rahul blijft een globale laag, buiten beide classifiers voor
+scherminhoud (`59fac4ea5`); 35/35 met werkelijk openen/sluiten/heropenen op
+desktop en mobiel. Werkgeversritten volgen dezelfde actuele account-,
+personeels- en centrale contractpoort in route én kern (`4d4313c53`); privéritten,
+menselijke goedkeuring en objectgebonden nazorg behouden hun grenzen. De
+reisbrowsergroep gaf eerst 83/85; beide gratis werkgeversscenario's slagen
+na deze oorzaakreparatie in de gezamenlijke mobiliteitsgroep van 64/64.
+Iedere oorzaak is eerst rood gereproduceerd. Deze deelruns zijn niet op te
+tellen tot een actuele integrale kwalificatie of Deep Green.
+
+De volledige lokale PostgreSQL/Redis-groep is daarna geslaagd: 60 bestanden,
+180 tests, nul fail/skip/todo. Ook de volledige statische controle en build
+sloten groen. Deze lokale ontwikkelronde liep tijdens het afronden van
+metadata-/buildcommits en is geen immutable eindkwalificatie.
+
+**CI-vervolg op `dc85cfc48`.** De gepushte consolidatie startte een volledige
+remote ronde. De statische huisregels slagen, maar de deltapoort weigert vier
+registers die vóór de broncommit waren gemeten. Daardoor draaide de remote
+PostgreSQL-stap nog niet. De norm meldt bovendien een omvangsbandoverschrijding,
+één extra globale kernnaam, zeven te veel ongemeten toetsbestanden en twaalf
+nieuwe vermoedens van lege-verzamelingbewijs (twee pasten nog onder de oude
+norm). De adversarial-groep meldt geen rollek, maar drie onbekende
+503-antwoorden voor bestaande abonnementsbediening. Deze uitslagen blijven
+rood totdat de oorzaak en de bijbehorende volledige controle zijn hersteld.
+
+De rolwereld is nu expliciet geïsoleerd op SQLite, met een test-terugkeer-URL,
+gesloten nieuwe instroom en zonder geërfde provider-, mail- of databaseverbinding.
+De nieuwe regressie is eerst rood gezien; de gerichte rolproeven slagen 21/21.
+Dit bewijst de actuele account-/rolpoort en gecontroleerde domeinweigeringen,
+niet een echte betaling. Positieve controles versterken de nieuwe lege-lijst-
+asserties zonder de meter of norm te veranderen: de zes HTTP-/browserbestanden
+slagen 38/38. De pure contact-/mobiliteits-/domeingrensgroep slaagt 32/32.
+Contactlijnresolutie heeft een eigen samenhangende module; gedeelde
+accountcontrole hoeft geen globale kernexport meer te zijn. Bron wordt eerst
+vastgelegd, daarna pas opnieuw gemeten.
+
+**Lokale herproef op bron `8380a6852`.** Alle negen nieuw gemeten
+mutatieproeven herkennen een ingebrachte fout; daarna is de bron hersteld.
+De vier vuile bewijsregisters zijn opnieuw uit de vastgelegde bron gegenereerd.
+De canonieke rolronde, inclusief invoerspoor, bewijst nu 2.055 ledenroutes:
+nul rolscheidingsgaten en geen onbekende antwoorden. Negen vooraf benoemde
+routes blijven niet meetbaar met deze generieke fixture en tellen niet als
+bewijs. Norm, alle 78 statische huisregels en deltapoort slagen lokaal.
+
+Testscherf 2 van de remote ronde faalde op drie achtergelopen registers.
+Na regeneratie slagen de betrokken registerproeven lokaal 44/44.
+`EXPERIENCEWERKT.json` kreeg uitsluitend een actuele bronhash; 114 apps,
+316 schermen, nul bewezen dimensies en `NOT_TESTED` blijven ongewijzigd.
+De andere drie remote unit-scherven en schermdeel 1 zijn nog rood;
+schermdeel 2 werd geannuleerd. Schermdelen 3/4/5 en alle vier
+toegankelijkheidsdelen zijn groen. De resterende fouten krijgen per
+oorzaak een begrensde herstelgroep, geen bredere vrijstelling.
+
+**Volledige foutinventaris en tweede hersteltranche.** De remote ronde op
+`dc85cfc48` is voltooid, niet groen. CodeQL, WebKit, 1440px en alle vier
+toegankelijkheidsdelen slagen. De mislukte 390px-job bevat wel 309 geslaagde
+schermcontroles, 17 mobiele inhoudsproeven en 1.542 toegankelijkheidsproeven;
+zijn achterliggende `living-world-http`-proef gebruikte nog een gratis
+registratie waar een expliciet betaald lid nodig is. Dat onderscheid is
+hersteld, niet de productpoort versoepeld. Schermdeel 1 had één mislukte
+Gezin-proef bij 286 geslaagde proeven. In het geannuleerde schermdeel 2 staan
+ook echte testfouten; annulering geldt niet als verklaring of vrijstelling.
+
+De acht geld-/accountbestanden slagen samen 54/54, nul skip/todo. Een latere
+opruimverharding in de bankproef slaagt opnieuw 2/2. De volgende gecombineerde
+groep van 27 bestanden slaagt 629/631; uitsluitend twee oude vormprofielen
+verwachten nog de weigering van een accountloze sessie. Met een echt gratis
+account bereiken zij nu de bedoelde ongeldige uitnodiging (404) en ontbrekend
+bevestigingsdoel (400). Die profielen moeten via een echte hermeting worden
+bijgewerkt, niet door hun verwachte status met de hand groen te maken.
+Geld, navigatie, Travel, Office en media gebruiken bestaande geïsoleerde
+betaalfixtures uitsluitend voor de betreffende persoon. Gratis ontvangers,
+kantooridentiteiten, gezinsrechten en negatieve account-/tenantcontroles
+blijven gratis. Passkey-login verleent geen betaalrechten. Dit zijn lokale
+ontwikkelruns, geen opgeteld platformtotaal en geen immutable eindbewijs.
+
+De dertien beschikbare echte routejournalen uit CI-run `43593395245` raken
+alle 5.582 huidige methode-/patroonparen: nul onbekende routes en nul gaten.
+Deze hermeting bewijst aanroepdekking, niet dat alle genoemde CI-tests slagen;
+de bron van de journalen blijft `dc85cfc48`. De opgeslagen routekaart en
+overige afgeleide registers worden pas na de bronfreeze vernieuwd.
+
+De gratis Gezin-bediening vraagt een afzonderlijke productreparatie: een
+servergebonden gratis account werd in het scherm ten onrechte verborgen.
+Ook het wissen van ingetrokken context en het afwijzen van late antwoorden
+wordt gericht beproefd. Dit opent geen server-side gesloten Foundation- of
+minderjarigenpropositie en telt niet als volledige gezinskwalificatie.
+
+**Vervolgcontrole zonder lokale beheerdersbevestiging.** Alle ontwikkelproeven
+lopen expliciet op de aparte Node 26.13.1-runtime; de vervanging van de
+systeeminstallatie van Node 24 wacht nog op de eigenaar. De instrumenttranche
+heeft 44/44 geslaagde pure regressies. De vier bestaande gezinsbeveiligingssuites
+slagen samen 14/14, nul fail/skip/todo. De lokale normvoormeting slaagt zonder
+verlaagde grens; dit is geen gedrags- of releasekwalificatie. De zeven
+browserfixturebestanden gaven 30/32; één navigatietimeout op `appcel.html`
+liet ook de bovenliggende test zakken. Er wordt geen timeout verruimd of
+automatische retry toegevoegd: een volledige herproef legt bij herhaling
+alleen begrensde, persoonsgegevensvrije navigatiediagnostiek vast. De review
+van de Gezin-reparatie omvat ook late volledige accountprojecties,
+accountwisseling, intrekken en tokenverversing tijdens een lopend gesprek;
+deze begrenzingen zijn afzonderlijk beoordeeld. De volledige app-schilgroep
+gaf 9/10: de nieuwe gezinsproef wachtte ten onrechte op een zichtbare maar
+lege berichtenlijst zonder hoogte. De proef verstuurt nu eerst via de echte
+route een privébericht, bewijst zichtbaarheid en controleert dat ook dit
+bericht na intrekken en vertraagde antwoorden niet terugkomt. De gerichte
+herproef slaagt 3/3, nul skip/todo. De volledige app-menuherproef slaagt
+11/11, nul skip/todo; de navigatietimeout reproduceert niet. De begrensde
+diagnostiek blijft behouden en de oude mislukte run blijft verklaard. Dit
+vervangt geen verse volledige CI-run. De daaropvolgende volledige
+app-schilherproef slaagt 10/10, nul fail/skip/todo, inclusief Gezin,
+accountwisseling/intrekking, School, Zorg en Navigatie.
+
+De definitieve frontendbundels komen bytegelijk overeen met hun brondelen.
+De buildvolgorde is rood-groen gerepareerd: eerst de definitieve bouwstempel,
+dan minify en service-worker, daarna de onverminderd harde beeldbewijscontrole.
+Drie pure regressies bewaken stale bewijs en bytegelijke herbuilds. Eén echt
+websitebeeld is opnieuw gemeten, twee ongewijzigde beelden zijn hergebruikt.
+Een echte herbuild slaagt en verandert nul van 3.098 frontendbestanden.
+De taal-/aanmeldgroep slaagt op deze bron 27/27; niet-gemeten talenkwaliteit en
+productiegereedheid blijven expliciet onbewezen. De volledige lokale
+PostgreSQL-/Redis-groep slaagt opnieuw: 60 bestanden, 180 tests, nul
+fail/skip/todo. Tijdens die ontwikkelrun werden nog bouw-/bewijswijzigingen
+vastgelegd; het rapport meldt daarom terecht `boomVuil: true` en is geen
+immutable eindkwalificatie.
+
+De definitieve antwoordvormhermeting op broncommit `49eb24cfb` is schoon:
+409/409 meetbare profielen, geen onbereikbare route of ontbrekende meetrol.
+Vier onwaarneembare historische profielen blijven als zodanig gemarkeerd.
+Generator en wacht delen nu expliciet de synthetische, ongebonden
+toestelsleutelopstelling; de verplichte productiepoort blijft ongewijzigd.
+Dit herstelt een meetverschil dat anders werkende antwoorden door weigeringen
+zou hebben vervangen. Geen bestaande 200, sleutel of dragend veld verdwijnt.
+De twee balieprofielen bereiken met een medewerker-op-naam de invoercontrole;
+de gratis accountprofielen bereiken de bestaande uitnodigings-/ceremoniegrens.
+De volledige instrumentgroep slaagt daarna 448/448, nul fail/skip/todo.
+De geïmporteerde routeunie vermeldt nu haar dertien bronbestanden en hashes,
+broncommit `dc85cfc48` en `kwalificatie: NIET_VASTGESTELD`: aanroepdekking
+maakt een oude rode CI-ronde niet alsnog tot een groene kandidaatkwalificatie.
+
+Automatisch samenvoegen op #727 is uitgezet: de vier beschermde checks alleen
+wachten niet op alle aanvullende scherm- en dekkingsuitslagen. De integrator
+controleert de volledige ronde en kandidaatboom vóór een normale beschermde
+merge. Geen productie-uitrol is gestart.
+
+Nog open: een verse volledige vierdelige suite, remote PostgreSQL/Redis,
+schermproeven en beschermde remote checks. De uit #725 overgenomen Direct-/Service-start is
+nog niet bewezen tegen een verloren antwoord met herhaling; dat herstelpunt
+blijft zichtbaar en wordt niet als idempotent afgevinkt. De systeemvervanging
+van Node 24 wacht apart op macOS-beheerdersgoedkeuring; dit blokkeert de
+repo-proeven met de geverifieerde tijdelijke Node 26 niet.
+
 *Eigenaarsbesluit van 11 oktober 2026. Dit document legt het besluit vast, de
 grenzen die eruit volgen, de vier werkstromen die het uitvoeren, en de
 inventaris die zegt wat er binnen de scope valt. Het is LEIDEND voor de verdere
@@ -7604,3 +7942,343 @@ De twee contracttoetsen in pages-publicatie.test.js falen op de oude
 werkstroom (2 rood) en slagen met deze begrenzing (2 groen). Handmatig
 publiceren blijft een afzonderlijk besluit; deze integratie start het niet.
 De hierboven genoemde open technische kwalificatiepunten blijven bestaan.
+
+## RTG NEXT — technisch uitvoeringsprogramma van 11 november 2026
+
+De eigenaar kiest voor verdere uitwerking van The Living System tot één
+bouw- en kwalificatieprogramma voor alle bestaande 114 MAPPEN-ingangen.
+De volledige afbouw blijft staan. De gedeelde Living Runtime wordt eerst
+bewezen met twaalf representatieve ervaringen, vóór uitrol over de overige
+ingangen. Dit vervangt de eerdere drie referenties in de premiumbijlage.
+
+De uitvoering staat in `docs/rtg-premium-afbouwplan.md` §13–19, de
+machineleesbare planning in `docs/rtg-next/programma.json` en de afgeleide
+capabilitydossiers in `docs/rtg-next/werkboek.md`. De werkpakketbestanden zijn
+een delta-overlay op bestaande functie-id's, geen tweede catalogus,
+autorisatiebron of completion-register. Nieuwe premiumbeloften worden eerst
+per eigenaar als scopewijziging beoordeeld; bestaande externe voorwaarden en
+besluitklassen blijven gelden. RTFoundation Winkel blijft binnen de bestaande
+schermscope met eigenaar rtf.winkel; een nieuwe menu-ingang of productbelofte
+vereist een expliciet scopebesluit, geen ongemerkt toegevoegde app.
+
+Plan Dossier, Consequence Graph en Provider Truth Gateway worden verbonden aan
+de bestaande plancompiler, broker, gevolgcontracten, domeinbronnen en
+providerbewijzen. Constitution, Experience Budgets en Change Impact bouwen
+voort op bestaande regels en meetinstrumenten. De Premium Acceptance Council
+vraagt een bevoegde, onafhankelijke menselijke reviewketen; de huidige
+`human-quality`-blokkade wordt pas na bewezen implementatie opgeheven.
+
+P0 legt de bouwbasis vast; P1/P4/P6 kunnen daarna parallel starten, met de
+overige afhankelijkheden uit de planning. G1 kwalificeert de twaalf taken,
+G2 de volledige actuele scope, G3 onafhankelijke kwalificatie en G4 productie. Ontwerp en
+veiligheidsreparaties mogen parallel doorgaan; onveilige of onbewezen
+fundamenten worden niet over de catalogus verspreid.
+
+Deze aanvulling wijzigt geen bewijsstand. APPWERKT, EXPERIENCEWERKT, de
+bestaande keten-/releasepoorten en afzonderlijk eigenaar-go/no-go blijven
+bepalend. De planning-validator levert uitsluitend consistentiecontrole.
+Er is hiermee geen runtimewijziging, productievrijgave of externe handeling
+goedgekeurd of uitgevoerd.
+
+### P0-toewijzing en afdwingbare poorten — 12 november 2026
+
+Alle 316 apps-schermen hebben in het bestaande SCHERMEIGENAAR-register een
+eigenaar, werkpakketten, scènefamilie, risico en taakfamilies. De bestaande
+Experience-contracten leveren twaalf premiumcriteria, 48 aanvullende scenario's
+en twaalf risico-/apparaatbudgetcellen bovenop de 228 specifieke scenario's.
+Alle 114 premiumdossiers en productbeloften blijven behouden met een scope-lock.
+De afgeleide Experience-bewijslast groeit mee; niets wordt hierdoor PROVEN.
+
+De vier poorten worden technisch gelezen en vóór bestaande release-/activatie-
+effecten afgedwongen. Acht oude consolidatieoordelen blijven open, waaronder
+drie productbesluiten. De structurele routeplanning is bouwgereed; dit is geen
+onvoorwaardelijke P0-sluiting, kwalificatie of toestemming tot integratie.
+Het werkboek toont alle schermkoppelingen en resterende beslispunten.
+Alle wijzigingen blijven lokaal tot expliciete integratiegoedkeuring.
+
+Aanvullend eist de eigenaar een Premium Experience Gate: nieuwe gebruiker
+zonder uitleg, efficiënte ervaren gebruiker, begrepen gevolgen vóór akkoord,
+veilig hervatten en menselijke beoordeling van samenhang/verzorging/vertrouwen.
+Alle vijf moeten afzonderlijk slagen. Deze kwaliteitsvoorwaarde gebruikt het
+bestaande Experience-contract en blokkeert G1–G4 bij ontbrekend bewijs;
+zij verleent geen uitvoering-, scope- of productiebevoegdheid.
+
+#### Controleerbare lokale oplevering
+
+| Bestanden | Wijziging |
+|---|---|
+| `SCHERMEIGENAAR.json` | 316 afbouwbindingen; twee verouderde/ontbrekende doelbeschrijvingen gecorrigeerd; bestaande eigenaars, rollen en open oordelen behouden. |
+| `experience-architecture/coverage-contract.json` | Premiumcriteria, 48 gedeelde scenario's, taak-/risico-/apparaatbudgetten, bewijsroutes en vijfdelige Premium Experience Gate. |
+| `docs/rtg-next/programma.json` | Scope-lock, bronverwijzingen, P0-bouwvoorwaarde en G1–G4. De twee bestaande `*-werkpakketten.json`-bronnen behouden alle 114 beloften en 228 scenario's. |
+| `scripts/rtg-next-programma.js`, `scripts/lib/experience/qualification-planning.js` | Volledige koppeling-/normvalidatie, specifieke scenario-ID's, vijfdelige kwaliteitsbeoordeling en werkboekprojectie. |
+| `scripts/lib/experience/coverage.js`, `scripts/lib/experience/dimensions.js` | Aanvullende eisen tellen mee in de werkelijke bestaande bewijsnoemer; ontbrekende koppelingen of verkleinde projecties worden geweigerd. |
+| `scripts/lib/experience/evidence.js`, `scripts/veranderbereik.js` | Programmabronnen en APPWERKT-raakvlak opgenomen in kandidaatbinding; conservatieve impactprojectie zonder kleinere testring. |
+| `scripts/lib/experience/qualification-gates.js` | Alleen-lezen G1–G4, kandidaat-/scopebinding, open eigendomsoordelen, menselijke bewijsgrens en afzonderlijke Premium Experience-check. |
+| `scripts/release-gate.js`, `scripts/live-vrijgave.js`, `scripts/native-activate.js` | G3 vóór productiereleasebewijs en G4 vóór OCI/native activatie; bestaande geautoriseerde rollback blijft behouden. |
+| `test/rtg-next-programma.test.js`, `test/rtg-next-planning-guards.test.js`, `test/rtg-next-coverage.test.js`, `test/rtg-next-specific-acceptance.test.js` | Dekking, scopebehoud, negatieve mutaties en echte koppeling van acceptatie aan requirements. |
+| `test/rtg-next-gates.test.js`, `test/rtg-next-release-binding.test.js`, `test/rtg-next-app-proof-binding.test.js`, `test/rtg-next-premium-experience.test.js`, `test/rtg-next-impact.test.js`, `test/schermeigenaar.test.js` | Poort-/vrijgaveprotocol, echte Git-bronbinding, vijf conjunctieve kwaliteitsvragen, impact en behoud van alias-eigenaarschap. |
+| `EXPERIENCEWERKT.json`, `docs/rtg-next/werkboek.md` | Opnieuw gegenereerde bestaande projecties; geen bewijsstatus opgewaardeerd. |
+| `AFBOUWPROGRAMMA.md`, `DOCUMENTENKAART.md`, `docs/rtg-premium-afbouwplan.md` | Scope, uitvoeringsgrenzen, open besluiten en leeswijzer bijgewerkt. |
+
+Open blijven drie productbesluiten (Pulse/Salon, Wereld/Sociaal, Commerce/Mall)
+en vijf bestaande consolidatieopdrachten. Daarnaast ontbreken actuele volledige
+productbewijzen, de gezaghebbende menselijke bewijsinvoer, echte onafhankelijke
+deelnemers/reviewers en toepasselijke provider-/privacy-/productiegoedkeuringen.
+Een complete inventaris en groene protocoltest zijn geen bewijs dat de apps
+premium functioneren. Het normale CLI-poortoordeel blijft daarom BLOCKED.
+
+Validatie van deze lokale oplevering (12 november): **412/412 gerichte tests
+geslaagd, nul mislukt of overgeslagen**, inclusief de oorspronkelijke planning-
+en registertests. Twee integratiefouten zijn vóór afsluiting gerepareerd en
+opnieuw beproefd: een routerafhankelijke testfixture en de exportvolgorde van
+de directe poort-CLI. De definitieve gezamenlijke run duurde circa 59 seconden.
+
+```sh
+node --test test/rtg-next-*.test.js test/wereldregister.test.js test/schermeigenaar.test.js test/experience-artifact.test.js test/experience-execution.test.js test/experience-typed.test.js test/experience-matrix-coverage.test.js test/experience-configurations.test.js test/experience-coverage.test.js test/experience-artifact-matrix.test.js test/experience-execution-matrix.test.js test/veranderbereik.test.js test/release-hardening.test.js test/afbouwpoort.test.js test/servicecaps-releasepoort.test.js test/appwerkt-vers-releasepoort.test.js test/bewijsraakvlak.test.js test/connection-constitution.test.js test/loop-fabric-constitution.test.js test/website-truth.test.js test/website-codeproof.test.js test/public-platform-owner.test.js
+```
+
+`node scripts/rtg-next-programma.js --check` en
+`node scripts/experience-coverage.js --check` slagen; `git diff --check` is
+schoon. De echte `--gate=G4`-aanroep herbeoordeelt G1–G4, eindigt verwacht met
+exitcode 1 en BLOCKED, en wijzigt APPWERKT, APPWERKT-RAAKVLAK en EXPERIENCEWERKT
+niet (voor/na-hashes gecontroleerd). G1 telt twaalf ingangen en 44 gekoppelde
+schermen; G2 telt 114 en 316. Alle vijf Premium Experience-vragen blijven
+zonder bevoegd uitvoeringsbewijs geblokkeerd.
+
+Dit is lokale protocol-/integratievalidatie op Node v24.18.0; `.nvmrc` vereist
+Node 26 voor het kwalificatietraject. Volledige CI op die runtime, echte
+browser-/gebruikersproeven, onafhankelijke securityacceptatie en productie-
+herstelproeven zijn hiermee niet uitgevoerd. HEAD blijft
+`abd1eafdccd6865631d634d5899676c1c1e7fa68`; niets gecommit, gepusht of uitgerold.
+
+## RTG NEXT — product- en marktconcept van 12 november 2026
+
+Op verzoek van de eigenaar is het concept Salon/Pulse, Wereld/Sociaal en
+Mall/Commerce uitgewerkt in `docs/rtg-premium-afbouwplan.md` §20. De broninspectie
+richt zich op deze zes capabilities en bestaande zakelijke onboarding; zij
+is geen nieuwe integrale audit of kwalificatie van de overige 108.
+
+De aanbevolen richting behoudt zes eigen premiumervaringen: Salon voor
+relaties en rijke publicatie, Pulse voor korte actuele gesprekken, Wereld
+voor persoonlijke samenhang, Sociaal voor gecontroleerde voorbereiding,
+Mall voor ontdekken/kiezen en Commerce voor transactie-/herstelregie.
+Commerce neemt geen domeinorders of betaalwaarheid over. Publiceren vanuit
+Wereld blijft via de sociale broneigenaar bestaan. Gemeenschappelijke sociale
+schrijf-/rechtenpaden consolideren vraagt aantoonbare migratie, niet alleen
+een nieuwe vormgeving.
+
+De aanvulling werkt consumentenwaarde en zakelijke eerste waarde uit voor de
+hele bestaande portfolio, zonder een tweede catalogus of nieuwe architectuur-
+laag. Zij bevat zes ervaringssignaturen als ontwerpvoorstel, concrete bron-
+afwijkingen, drie zakelijke instaproutes, onboarding/pilotdoelen, een
+vergelijkingsprotocol en de terugkoppeling naar P0–P7 en G1–G4. Aanbevolen
+eerste zakelijke doelgroep is horeca/hospitality binnen het bestaande
+netwerk, naast RTG's eigen reisbedrijf als demonstrator. Dit is een te toetsen
+marktkeuze, geen klanten-, omzet- of tijdsgarantie.
+
+**Beslisstatus:** uitgewerkt concept, nog geen nieuw scope- of prijsbesluit.
+De drie productrichtingen zijn gespecificeerd, maar de bestaande acht open
+SCHERMEIGENAAR-oordelen zijn niet als uitgevoerd of toegestaan aangemerkt.
+De voorstellen voor extra productbeloften, gewijzigde signaturen en eventuele
+organisatiepublicatie op Pulse worden pas na expliciete vaststelling in de
+bestaande werkpakket-/contractbronnen verwerkt. De huidige scope-lock blijft
+ongewijzigd. Bouw, menselijke acceptatie, providerkwalificatie en technische
+P0-sluiting worden niet geclaimd.
+
+In deze conceptfase wijzigen uitsluitend deze uitvoeringsbijlage, dit
+programmahoofdstuk en de leeswijzer in DOCUMENTENKAART. Eerdere lokale code-
+en registerwijzigingen uit de P0-fase blijven behouden; geen nieuwe runtime,
+stijl, catalogus, bewijsstatus of deployment is toegevoegd. Alles blijft lokaal.
+
+### Controle van deze conceptoplevering
+
+Op 12 november zijn **167/167 gerichte tests geslaagd**, nul mislukt of
+overgeslagen: 89 planning-/register-/documentinstructietoetsen en 78 bestaande
+Commerce-/Saloon-/poorttoetsen. Uitgevoerde opdrachten:
+
+```sh
+node --test test/rtg-next-programma.test.js test/rtg-next-planning-guards.test.js test/wereldregister.test.js test/schermeigenaar.test.js test/agentinstructies.test.js
+node --test test/commerce-kern.test.js test/commerce-overdracht.test.js test/commerce-retour.test.js test/saloon-projectie.test.js test/saloon-zicht.test.js test/rtg-next-gates.test.js
+node scripts/rtg-next-programma.js --check
+node scripts/experience-coverage.js --check
+git diff --check
+```
+
+Planning en gegenereerd werkboek zijn actueel; de Experience-projectie houdt
+114 apps en 316 schermen in scope. De 30 expliciete server-/script-/public-
+bronverwijzingen in het nieuwe hoofdstuk bestaan. De poorttoetsen bevestigen
+ook dat open besluiten en ontbrekend bewijs blijven blokkeren. Geen generator
+of productmutatie uitgevoerd; de bestaande registraties zijn niet opgewaardeerd.
+
+Deze controle liep op Node v24.18.0 en vervangt geen kwalificatie op de vereiste
+Node 26, browser-/gebruikersproeven, provideracceptatie, marktonderzoek of
+productiecontrole. De nieuwe conceptbeloften zelf zijn niet getest als werkende
+software. De drie product-/consolidatiebesluiten, nieuwe scopedelta en
+operationele afhankelijkheden blijven zichtbaar open tot bevoegde besluitvorming
+en daadwerkelijke uitvoering met bewijs.
+
+## RTG NEXT — definitief intern commercieel besluit van 12 november 2026
+
+Op de expliciete eigenaarsopdracht "Maak het definitief" is `PRIJZEN.md` §9.3
+de vastgestelde beleidsbron voor commissiegrondslag, reisverantwoordelijkheid,
+btw-inrichting, providerkeuze/kostenverdeling en correcties. Beleidsversie,
+inwerkingtreding, bescherming van bestaande rechten en de resterende externe
+bewijsvoorwaarden staan daar; geen tweede prijslijst of contractregister.
+
+De bestaande P0/P3/P4/P6/P7 krijgen gerichte verwijzingen naar dit besluit voor
+scope/migratie, uitvoering, begrijpelijkheid, ketenproeven en vrijgave. Dat is
+een uitvoeringsopdracht, geen bewijs dat de nieuwe regels al zijn afgedwongen.
+De vastgestelde commerciële regels worden bij implementatie gericht in de
+bestaande capability-/acceptatiecontracten verwerkt met een traceerbare scopedelta.
+Deze verwijzingsronde herschrijft de per-capability scope-lock niet en keurt
+geen onbepaalde §8-servicecapaciteit, catalogusuitbreiding of upgrade goed.
+
+Partner-/provideracceptatie, fiscale dossierbeoordeling, toepasselijke
+reisdekking en kandidaatgebonden technische/menselijke kwalificatie blijven
+afzonderlijk aantoonbaar vereist. Geen externe overeenkomst getekend, geen
+runtime- of groene bewijsstatus gewijzigd en geen productieactivering.
+Alle wijzigingen blijven lokaal tot expliciete integratiegoedkeuring.
+
+**Controle van deze vaststelling:** 188 gerichte toetsen geslaagd, 0 mislukt
+in de afsluitende runs: 87 bestaande commerciële/betaaltoetsen, 9
+documentinstructietoetsen en 92 planning-/impact-/poorttoetsen. De
+documentinstructietoets vond eerst drie gewijzigde historische tekstblokken;
+de actualiseringen zijn los daarvan geplaatst en de woordelijke historie is
+hersteld, zonder de controle of inventarishashes af te zwakken.
+
+```sh
+node --test test/commercie.test.js test/claims-btw.test.js test/betaaldienstfee.test.js test/connect-afrekening.test.js test/connect-takken.test.js test/connect-grootboek.test.js test/vrijgave-baseline.test.js
+node --test test/agentinstructies.test.js
+node --test test/rtg-next-programma.test.js test/rtg-next-planning-guards.test.js test/rtg-next-gates.test.js test/rtg-next-release-binding.test.js test/rtg-next-impact.test.js
+node scripts/rtg-next-programma.js --write
+node scripts/rtg-next-programma.js --check
+git diff --check
+```
+
+Het werkboek is uitsluitend opnieuw gegenereerd; scope-lock, acht pakketten,
+vier beslispoorten en `PLANNING_ONLY` zijn behouden. Rekensommen en bronpaden
+in §9.3 zijn gecontroleerd. Getest op Node v24.18.0, niet op de vereiste Node 26;
+geen releasekwalificatie of bewijs dat de nieuwe commerciële keten al werkt.
+
+## RTG NEXT — eerste runtime- en bewijsaansluiting, 13 november 2026
+
+De opdracht om NEXT af te bouwen en te integreren wordt uitgevoerd op een
+afzonderlijke ontwikkeltak. De lopende publieke website-release en de bestaande
+productiebackend blijven buiten deze wijziging. De 114 bestaande ingangen,
+twaalf referentietaken, scope-lock en acht open eigenaarsbesluiten blijven staan.
+
+**P1/P2, begrensde runtimeverbetering:** de bestaande Experience-broker bindt
+een aandachtbevestiging nu aan een serverberekende bronrevisie. Een gewijzigde
+vluchttijd, datum, status of andere domeininhoud maakt een oude preview ongeldig
+vóór de wijziging naar gezien. Een eerder gezien item wordt bij gewijzigde
+inhoud opnieuw zichtbaar. Alleen presentatiemetadata is uitgezonderd; oude
+previews en acknowledgements zonder revisie verlenen geen stil akkoord.
+Historische replay behoudt het oude ontvangstbewijs en bevestigt geen nieuwe
+inhoud. Gezien, evidence en idempotentieresultaat worden samen gefinaliseerd
+na foutgevoelige voorbereiding. De synchrone eindcontrole bewaakt ook twee
+gelijktijdige previews; save-bundeling wordt niet als mutex voorgesteld.
+De app herstelt een expliciet `STALE_ATTENTION` met een verse projectie
+en nieuw menselijk akkoord. Ook een bronwijziging tussen het getoonde beeld en
+de eerste preview vraagt eerst een nieuw beeld; een preview zonder dezelfde
+bronrevisie wordt niet bevestigbaar. Bij een onzekere netwerkuitkomst blijft de bestaande
+herhaalsleutel behouden. Dit is geen voltooide PlanDossier-implementatie en geen
+provider-, boekings- of betaalbevestiging.
+
+**P6, begrensde integratie:** `scripts/experience.js --prove --next-gate=G1`
+kan echte uitvoerresultaten rechtstreeks aan de bestaande NEXT-beoordelaar
+doorgeven. De originele objecten blijven in hetzelfde proces. Gekopieerde of
+ingelezen rapporten krijgen geen uitvoeringsgezag. Een geselecteerde deelproef
+kan slagen terwijl de aangevraagde poort terecht blokkeert. De verifier,
+menselijke bewijsgrens en twee volledige onafhankelijke G3-builds zijn niet
+afgezwakt. Gebruiksinstructies staan in het premium-afbouwplan §19.1.
+
+De regressies voor gewijzigde broninhoud faalden op de oude runtime en slagen
+na de reparatie. De echte lokale HTTP-keten controleert een agendatijdwijziging
+tussen voorbereiding en akkoord. Dit zijn gerichte lokale proeven, geen
+integrale APPWERKT-, browser-, menselijke of productiekwalificatie. Geen
+completion-register, providerconfiguratie, productiedatabase of vrijgavebesluit
+is opgewaardeerd. De afbouw van de overige referentietaken en kwalificatiepoorten
+blijft vereist.
+
+## RTG NEXT — drie gezamenlijke ervaringen, 13 november 2026
+
+De eigenaar kiest expliciet: **“Per paar samenvoegen: drie ervaringen, met een
+extra migratie- en ontwerptraject om bestaande functies en gegevens zorgvuldig
+over te zetten.”** Dit betreft Salon/Pulse, Wereld/Sociaal en Mall/Commerce.
+Het vervangt het eerdere advies voor zes zelfstandige productervaringen in
+het premium-afbouwplan §20; de actuele uitvoering staat in §20.13.
+
+De gezamenlijke presentatie behoudt alle bestaande functies, gegevens en
+traceerbare capability-id's. Leeftijd, publiek, blokkade, actor, organisatie en
+domeinbevoegdheid blijven afzonderlijke grenzen. Geen automatische
+kruispublicatie, bredere inzage, dubbele order- of betaalwaarheid. Bestaande
+ingangen blijven werken tot een geteste gezamenlijke route hun taken
+overneemt. Een eventuele schema-/schrijfmigratie vraagt expliciete mapping,
+geïsoleerde migratie- en herstelproeven en controle op intrekking/verwijdering.
+
+De drie productkeuzes zijn hiermee gemaakt; de drie technische consolidaties
+zijn niet voltooid verklaard. `SCHERMEIGENAAR.oordelen` houdt hun stand op
+`open` en vermeldt de gekozen richting. De vijf overige open consolidaties,
+114 capabilitybeloften, scope-lock en G1–G4-bewijsgrenzen blijven intact.
+Dit besluit verleent geen providerrecht of productieautorisatie. De bestaande
+backend blijft live terwijl NEXT afzonderlijk wordt afgebouwd en getoetst.
+
+## RTG NEXT — portfolio consolideren, 13 november 2026
+
+Aanvullende opdracht van de eigenaar: **“Ik wil ook dat next de apps en
+schermen consolideert. Alles moet naar minimaal, clean en volledige, brede
+en diepe apps/functies.”** Dit geldt voor het gehele portfolio, niet alleen
+de drie hierboven gekozen paren.
+
+Doel is minder zelfstandige gebruikersproducten en minder onnodige scherm-
+overgangen, met volledige taken en verdieping binnen de juiste app. Alleen
+menu-items verbergen of oude schermen in een nieuwe omhulling plaatsen is
+geen consolidatie. Ook niet: elke functie op één dicht scherm proppen.
+Een aparte app of scherm heeft een aantoonbaar eigen gebruikersdoel; anders
+wordt het een stand, tab, detail of stap binnen de eigenaar van die taak.
+
+De huidige capabilitybeloften vormen de behoudslijst, niet een minimumaantal
+apps, schermen of tegels. Iedere bestaande taak krijgt een traceerbare
+bestemming en behoudt gegevens, rechten en relevante historie. Canonieke
+catalogus-/schermtellingen mogen pas dalen wanneer de overname en oude links
+zijn getest. Rapporteer dan het oude bereik én de nieuwe bestemming, zodat
+een kleiner aantal schermen nooit een kleinere kwaliteitsverplichting maskeert.
+Geen nieuw vast streefaantal zonder inhoudelijke inventarisatie.
+
+Per cluster worden gebruikersdoel, bestaande taken, bron-/schrijfeigenaars,
+doelcompositie, migratie, terugval en behoudsproeven uitgewerkt in de bestaande
+NEXT-werkpakketten en SCHERMEIGENAAR, niet in een tweede appcatalogus. Menselijke
+kwaliteit wordt ook getoetst op vindbaarheid, taakvoltooiing en benodigde
+overgangen; minder klikken alleen bewijst geen verbetering. De drie gekozen
+paren zijn het begin. Andere samenvoegingen vragen een concrete afweging van
+doelgroepen en bevoegdheden; gegevens of functies worden niet alvast gewist.
+
+Dit is een productrichting en bouwopdracht, geen voltooiings- of
+productievrijgave. De bestaande backend blijft behouden tot de afzonderlijke
+releasevoorwaarden voor een vervanging zijn vervuld.
+
+## RTG NEXT — website als magazinebasis voor apps, 13 november 2026
+
+De eigenaar vult de consolidatieopdracht aan: **“de schermen moeten lijken
+op de www. Website. Als een magazine. Slimme swipe dingen. Clean etc etc.
+Fotografisch, quotes”**. De bestaande RTG-website is de visuele basis voor
+de gezamenlijke apps: redactionele composities, fotografie tot aan de rand,
+geverfde merkbeelden, Bodoni/Inter, korte tekst en herleidbare citaten.
+Geen nieuwe merkidentiteit of parallel ontwerpsysteem.
+
+Horizontaal bladeren verbindt begrijpelijke hoofdstukken of taakstanden;
+verdieping opent doelgericht en mag waar nodig verticaal leesbaar zijn.
+Verschillende swipes hebben herkenbare betekenis en zichtbare alternatieven
+voor toetsenbord, schermlezer en mensen die niet kunnen vegen. De Edge blijft
+het gedeelde bedieningspunt, standaard gesloten en transparant in rust.
+Geen terugkeer van volle boven-/onderbalken of losse menusystemen per app.
+
+De magazinevorm is een werkende app en geen stapel artikelcovers. Bij
+zoekresultaten, gegevens, formulieren, rechten, prijzen, planning en akkoord
+blijft de functionele hiërarchie leidend: egale leesbare vlakken, expliciete
+bediening en een duidelijke terugweg. Geen foto of quote die kritieke
+informatie of een onvoltooide handeling verdringt. Citaten worden niet
+verzonnen en beeldrechten/publieksgrenzen blijven gelden; privébeelden worden
+niet automatisch campagnebeeld. Mobiel en desktop delen de taal, niet een
+geforceerd identieke indeling. Uitwerking binnen de bestaande DS/Heritage-
+componenten en de NEXT-kwalificatie, zonder bestaande functies te schrappen.

@@ -13,7 +13,7 @@ test('reiziger verwerpt oud sessieantwoord en wisselt via een echt tweede tabbla
   const srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   let browser, vrij;
   try {
-    const x = await maakReisketenFixture(srv.base), pad = '/api/reisbureau/keten';
+    const x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81', '82'] }), pad = '/api/reisbureau/keten';
     const a = goed(await x.api(pad + '/start', { titel: 'Alleen van eerste reiziger', bestemming: 'Ibiza',
       idem: 'sessie-a' }, x.reiziger.token), 'eerste aanvraag').reis;
     const b = goed(await x.api(pad + '/start', { titel: 'Alleen van tweede reiziger', bestemming: 'Utrecht',
@@ -67,6 +67,6 @@ test('reiziger verwerpt oud sessieantwoord en wisselt via een echt tweede tabbla
   } finally {
     if (vrij) vrij();
     if (browser) await browser.close();
-    await h.stop(srv); fs.rmSync(map, { recursive: true, force: true });
+    await h.stopHard(srv.child); fs.rmSync(map, { recursive: true, force: true });
   }
 });

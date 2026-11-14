@@ -108,15 +108,16 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
      fsync voor de 200) de herhaling herkent die de JS-opslag na een crash niet
      meer kent. Pas na zijn bevestiging neemt de spiegel de saldi over. Weigert
      de motor of is hij onbereikbaar, dan verandert er NIETS aan de JS-saldi. */
-  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed, economischeSleutel }) {
+  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed, economischeSleutel, nieuweDienstFout }) {
     if (betalingenUit) return uitFout();
     const k = sleutelVan(economischeSleutel);
     if (geldModus !== 'motor') {
+      if (nieuweDienstFout) return nieuweDienstFout;
       const args = { van, naar, centen, soort, oms, ref, genre, dagBesteed };
       if (!k) return boek(args);
       return boekOpSleutel({ domein: 'pay', grootboek, boek, boekEenmaal, sleutel: k.sleutel, args });
     }
-    const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
+    const dicht = nieuweDienstFout || waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
     /* Een weigering van de poort kan een HERHALING zijn: na een crash staat de
        spiegel al op het afgeboekte saldo. Kent de motor deze sleutel met deze
        beweging, dan is de boeking er al en komt het eerste antwoord terug --

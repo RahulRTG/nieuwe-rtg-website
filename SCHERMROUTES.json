@@ -2,8 +2,8 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-11-12",
-  "commit": "b99fd4c8ab",
+  "op": "2026-11-14",
+  "commit": "d8c5a59d5",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -23,6 +23,7 @@
     "public/apps/app-main/app-main-01.js",
     "public/apps/app-main/app-main-01b.js",
     "public/apps/app-main/app-main-02.js",
+    "public/apps/app-main/app-main-02_state.js",
     "public/apps/app-main/app-main-02a.js",
     "public/apps/app-main/app-main-02b.js",
     "public/apps/app-main/app-main-03.js",
@@ -400,6 +401,10 @@
     "public/apps/geld/kosten.js",
     "public/apps/geld/labfonds.js",
     "public/apps/geld/labfondsb.js",
+    "public/apps/geld/lidmaatschap-aanbod-beeld.js",
+    "public/apps/geld/lidmaatschap-aanbod-intake.js",
+    "public/apps/geld/lidmaatschap-aanbod-kaart.js",
+    "public/apps/geld/lidmaatschap-aanbod.js",
     "public/apps/geld/lidmaatschap.js",
     "public/apps/geld/logboek.js",
     "public/apps/geld/logboekb.js",
@@ -2118,15 +2123,13 @@
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-11-12T22:00:48.520Z",
-   "commit": "b99fd4c8ab",
+   "op": "2026-11-14T14:37:02.656Z",
+   "commit": "d8c5a59d5",
    "invoer": {
     "meting": "invoerspoor",
     "versie": 1,
     "boomVuil": false,
-    "ongecommitteInvoer": [
-     "SCHRIJFANALYSE.json"
-    ],
+    "ongecommitteInvoer": [],
     "bestanden": [
      "SCHRIJFANALYSE.json",
      "scripts/lib/bewakers.js",
@@ -2154,6 +2157,7 @@
      "server/accounts/publiekmail.js",
      "server/accounts/registratie.js",
      "server/accounts/sessiegrens.js",
+     "server/accounts/staff-eigenaar.js",
      "server/accounts/staff-sessie.js",
      "server/accounts/staff.js",
      "server/accounts/state.js",
@@ -2275,9 +2279,12 @@
      "server/betaal/naslag.js",
      "server/betaal/ontvangst.js",
      "server/betaal/providerbewijs.js",
+     "server/betaal/stripe-afspraak.js",
      "server/betaal/stripe-gehost.js",
+     "server/betaal/stripe-klantactie.js",
      "server/betaal/synthetisch-naslag.js",
      "server/betaal/synthetisch.js",
+     "server/betaal/terugkerend.js",
      "server/betaal/uitbetaalgrendel.js",
      "server/betaal/uitbetaling.js",
      "server/betaal/webhook.js",
@@ -2492,15 +2499,35 @@
      "server/kern/aanmeldgesprek.js",
      "server/kern/aanmeldingen.js",
      "server/kern/aanmeldingen/aanvraag.js",
+     "server/kern/aanmeldingen/abonnementen.js",
+     "server/kern/aanmeldingen/abonnementsaanbod-intrekken.js",
+     "server/kern/aanmeldingen/abonnementsaanbod-ontvangst.js",
+     "server/kern/aanmeldingen/abonnementsaanbod-vorm.js",
+     "server/kern/aanmeldingen/abonnementsaanbod.js",
+     "server/kern/aanmeldingen/abonnementsactivering.js",
+     "server/kern/aanmeldingen/abonnementsbetaalgrens.js",
+     "server/kern/aanmeldingen/abonnementsbetaling.js",
+     "server/kern/aanmeldingen/abonnementscontext.js",
+     "server/kern/aanmeldingen/abonnementsdiensten.js",
+     "server/kern/aanmeldingen/abonnementsfactuur.js",
+     "server/kern/aanmeldingen/abonnementsherstel.js",
+     "server/kern/aanmeldingen/abonnementsmeldingen.js",
+     "server/kern/aanmeldingen/abonnementssettlement.js",
+     "server/kern/aanmeldingen/abonnementstermijn.js",
      "server/kern/aanmeldingen/bedoeling.js",
+     "server/kern/aanmeldingen/bedrijf-automatisch.js",
+     "server/kern/aanmeldingen/bedrijf-plan.js",
      "server/kern/aanmeldingen/bedrijf.js",
      "server/kern/aanmeldingen/besluit.js",
+     "server/kern/aanmeldingen/betaalschema-opzeg.js",
      "server/kern/aanmeldingen/betaalschema.js",
      "server/kern/aanmeldingen/bewijs.js",
      "server/kern/aanmeldingen/catalogus.js",
      "server/kern/aanmeldingen/klaarzetten.js",
      "server/kern/aanmeldingen/lidabonnement-opzeg.js",
+     "server/kern/aanmeldingen/lidabonnement-termijnen.js",
      "server/kern/aanmeldingen/lidabonnement.js",
+     "server/kern/aanmeldingen/naargast-ronde.js",
      "server/kern/aanmeldingen/naargast.js",
      "server/kern/aanmeldkanaal.js",
      "server/kern/aanwezigheid.js",
@@ -2772,14 +2799,17 @@
      "server/kern/betaalregie-waarheid.js",
      "server/kern/betaalregie.js",
      "server/kern/betaalwaarheid/aanmaken.js",
+     "server/kern/betaalwaarheid/actueel.js",
      "server/kern/betaalwaarheid/afhandeling.js",
      "server/kern/betaalwaarheid/beeld.js",
      "server/kern/betaalwaarheid/bewijs.js",
      "server/kern/betaalwaarheid/controle.js",
+     "server/kern/betaalwaarheid/herstartgrens.js",
      "server/kern/betaalwaarheid/hervat.js",
      "server/kern/betaalwaarheid/inbox.js",
      "server/kern/betaalwaarheid/index.js",
      "server/kern/betaalwaarheid/inkomend.js",
+     "server/kern/betaalwaarheid/klantactie.js",
      "server/kern/betaalwaarheid/staten.js",
      "server/kern/betaalwaarheid/terug.js",
      "server/kern/betaalwaarheid/terugveeg.js",
@@ -2874,6 +2904,7 @@
      "server/kern/bureau/cases.js",
      "server/kern/bureau/collectie.js",
      "server/kern/bureau/delegatie.js",
+     "server/kern/bureau/diensten.js",
      "server/kern/bureau/dieren.js",
      "server/kern/bureau/index.js",
      "server/kern/bureau/kamers.js",
@@ -2926,6 +2957,7 @@
      "server/kern/comm/collega.js",
      "server/kern/comm/deelnemer.js",
      "server/kern/comm/dm.js",
+     "server/kern/comm/gast-lijn.js",
      "server/kern/comm/gast-lijsten.js",
      "server/kern/comm/gast-verhuizing.js",
      "server/kern/comm/gast.js",
@@ -3026,6 +3058,9 @@
      "server/kern/commerce/verkoopweglijst.js",
      "server/kern/commerce/werkwoorden.js",
      "server/kern/commerce/werkwoordlijst.js",
+     "server/kern/commercie/abonnementsbewijs.js",
+     "server/kern/commercie/abonnementscredit.js",
+     "server/kern/commercie/abonnementsverrekening.js",
      "server/kern/commercie/allocatie.js",
      "server/kern/commercie/allocatie/regels.js",
      "server/kern/commercie/besluit.js",
@@ -3041,6 +3076,7 @@
      "server/kern/commercie/claims/open.js",
      "server/kern/commercie/claims/poort.js",
      "server/kern/commercie/contract.js",
+     "server/kern/commercie/contract/abonnement.js",
      "server/kern/commercie/contract/verplichting.js",
      "server/kern/commercie/contract/vorm.js",
      "server/kern/commercie/fee.js",
@@ -3051,6 +3087,7 @@
      "server/kern/commercie/handhaving/spoken.js",
      "server/kern/commercie/handhaving/tekst.js",
      "server/kern/commercie/lidpoort.js",
+     "server/kern/commercie/organisatieabonnement.js",
      "server/kern/commercie/prijsmelding.js",
      "server/kern/commercie/rechten.js",
      "server/kern/commercie/risicouitzondering.js",
@@ -4148,6 +4185,7 @@
      "server/kern/mobiliteit/vergeten.js",
      "server/kern/mobiliteit/voertuigcatalogus.js",
      "server/kern/mobiliteit/voortgang.js",
+     "server/kern/mobiliteit/werktoegang.js",
      "server/kern/mobiliteit/zakelijk.js",
      "server/kern/modebezorg.js",
      "server/kern/modebezorg/bezorgcode.js",
@@ -4828,8 +4866,11 @@
      "server/kern/service/persoonlijk.js",
      "server/kern/service/post.js",
      "server/kern/service/prioriteit.js",
+     "server/kern/service/rahul-lijn.js",
+     "server/kern/service/rahul.js",
      "server/kern/service/router.js",
      "server/kern/service/teams.js",
+     "server/kern/service/zaak-melder.js",
      "server/kern/service/zaak.js",
      "server/kern/servicekosten.js",
      "server/kern/ses-ontvangst.js",
@@ -5127,6 +5168,7 @@
      "server/kern/tenant/index.js",
      "server/kern/tenant/journaal.js",
      "server/kern/tenant/levensloop.js",
+     "server/kern/tenant/lezen.js",
      "server/kern/tenant/merkkern.js",
      "server/kern/tenant/opslag.js",
      "server/kern/tenant/register.js",
@@ -5589,6 +5631,7 @@
      "server/lib/losvanverzoek.js",
      "server/lib/luisteradres.js",
      "server/lib/mutatiecontracten-aankomst.js",
+     "server/lib/mutatiecontracten-abonnementen.js",
      "server/lib/mutatiecontracten-afhaalcode.js",
      "server/lib/mutatiecontracten-afleidrest-b.js",
      "server/lib/mutatiecontracten-afleidrest-c.js",
@@ -5979,6 +6022,7 @@
      "server/pg/verzoekmerge.js",
      "server/pg/verzoekmeters.js",
      "server/pg/verzoekrtgai.js",
+     "server/pg/verzoekschaduw.js",
      "server/pg/verzoekschrijf.js",
      "server/pg/verzoekspoor-wissing.js",
      "server/pg/verzoeksporen.js",
@@ -6004,6 +6048,7 @@
      "server/routes/aanmeldgesprek.js",
      "server/routes/aanmeldingen.js",
      "server/routes/aanmeldingen/aanvraag.js",
+     "server/routes/aanmeldingen/automatisch.js",
      "server/routes/account.js",
      "server/routes/adres.js",
      "server/routes/agenda.js",
@@ -6844,6 +6889,7 @@
      "server/betaal/connect",
      "server/betaal/uitbetaalgate.json",
      "server/config",
+     "server/data",
      "server/db",
      "server/db/tx",
      "server/foundation",
@@ -8104,14 +8150,14 @@
     "nodeHoofdversie": 26
    }
   },
-  "bekendePaden": 5551
+  "bekendePaden": 5560
  },
  "gemeten": {
-  "schermenMetPad": 495,
+  "schermenMetPad": 497,
   "nietGelezen": 0,
-  "exactePaden": 1883,
-  "verwijzingen": 2197,
-  "voorvoegsels": 90,
+  "exactePaden": 1864,
+  "verwijzingen": 2181,
+  "voorvoegsels": 91,
   "basisPaden": 1,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -8316,6 +8362,16 @@
    "aantal": 5
   },
   {
+   "pad": "/api/state",
+   "schermen": [
+    "public/apps/app-main/app-main-02_state.js",
+    "public/apps/app-main/app-main-11.js",
+    "public/apps/app-main/app-main-44.js",
+    "public/apps/geld/wallet.js"
+   ],
+   "aantal": 4
+  },
+  {
    "pad": "/api/account/rollen",
    "schermen": [
     "public/apps/app-main/app-main-24a3.js",
@@ -8384,15 +8440,6 @@
     "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 4
-  },
-  {
-   "pad": "/api/state",
-   "schermen": [
-    "public/apps/app-main/app-main-02.js",
-    "public/apps/app-main/app-main-11.js",
-    "public/apps/geld/wallet.js"
-   ],
-   "aantal": 3
   },
   {
    "pad": "/api/member/call",
@@ -9050,6 +9097,22 @@
    "schermen": [
     "public/apps/geld/bankc.js",
     "public/apps/geld/voorzijde.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/mijn/abonnement/opzeggen",
+   "schermen": [
+    "public/apps/geld/lidmaatschap-aanbod.js",
+    "public/apps/geld/lidmaatschap.js"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/mijn/abonnement/opzegvoorbeeld",
+   "schermen": [
+    "public/apps/geld/lidmaatschap-aanbod.js",
+    "public/apps/geld/lidmaatschap.js"
    ],
    "aantal": 2
   },
@@ -10320,14 +10383,14 @@
    "aantal": 1
   },
   {
-   "pad": "/api/rtf/ontkoppel",
+   "pad": "/api/rtf/bericht",
    "schermen": [
-    "public/apps/app-main/app-main-43.js"
+    "public/apps/app-main/app-main-44.js"
    ],
    "aantal": 1
   },
   {
-   "pad": "/api/rtf/bericht",
+   "pad": "/api/rtf/ontkoppel",
    "schermen": [
     "public/apps/app-main/app-main-44.js"
    ],
@@ -13771,21 +13834,14 @@
    "aantal": 1
   },
   {
+   "pad": "/api/aanmelding/aanvraag",
+   "schermen": [
+    "public/apps/geld/lidmaatschap-aanbod-intake.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/mijn/abonnement",
-   "schermen": [
-    "public/apps/geld/lidmaatschap.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/mijn/abonnement/opzeggen",
-   "schermen": [
-    "public/apps/geld/lidmaatschap.js"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/mijn/abonnement/opzegvoorbeeld",
    "schermen": [
     "public/apps/geld/lidmaatschap.js"
    ],
@@ -19357,139 +19413,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/office/service/ai/vraag",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/bericht",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/bevestiging/code",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/bevestiging/vraag",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/bundel",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/eigenaar",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/foutsignalen",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/gesprek/eind",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/gesprek/neem",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/gesprek/signaal",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/gesprekken",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/incident/hersteld",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/kanalen",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/kwaliteit",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/patronen",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/stand",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/wachtrij",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/weeg",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/service/zaak",
-   "schermen": [
-    "public/apps/service.html"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/salon/promo",
    "schermen": [
     "public/apps/sitemaker.html"
@@ -21233,13 +21156,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/service/keuzes",
-   "schermen": [
-    "public/shared/basis/basis-02b.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/service/open",
    "schermen": [
     "public/shared/basis/basis-02b.js"
@@ -21636,7 +21552,7 @@
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/app-main/app-main-02.js",
+   "bestand": "public/apps/app-main/app-main-02_state.js",
    "exact": [
     "/api/state"
    ],
@@ -21878,8 +21794,7 @@
     "/api/order/pay",
     "/api/orders/mine",
     "/api/rtf/kanaal",
-    "/api/rtf/meldingen/gelezen",
-    "/api/rtf/ontkoppel"
+    "/api/rtf/meldingen/gelezen"
    ],
    "voorvoegsels": []
   },
@@ -21887,8 +21802,10 @@
    "bestand": "public/apps/app-main/app-main-44.js",
    "exact": [
     "/api/rtf/bericht",
+    "/api/rtf/ontkoppel",
     "/api/rtf/overzicht",
-    "/api/rtf/uitnodiging/accepteer"
+    "/api/rtf/uitnodiging/accepteer",
+    "/api/state"
    ],
    "voorvoegsels": []
   },
@@ -23781,6 +23698,23 @@
     "/api/labfonds/voorstel/maak"
    ],
    "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/geld/lidmaatschap-aanbod-intake.js",
+   "exact": [
+    "/api/aanmelding/aanvraag"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/geld/lidmaatschap-aanbod.js",
+   "exact": [
+    "/api/mijn/abonnement/opzeggen",
+    "/api/mijn/abonnement/opzegvoorbeeld"
+   ],
+   "voorvoegsels": [
+    "/api/mijn/abonnement/automatisch/"
+   ]
   },
   {
    "bestand": "public/apps/geld/lidmaatschap.js",
@@ -26348,55 +26282,10 @@
   {
    "bestand": "public/apps/service.html",
    "exact": [
-    "/api/office/service/ai/vraag",
-    "/api/office/service/bericht",
-    "/api/office/service/bevestiging/code",
-    "/api/office/service/bevestiging/vraag",
-    "/api/office/service/bundel",
-    "/api/office/service/eigenaar",
-    "/api/office/service/foutsignalen",
-    "/api/office/service/gesprek/eind",
-    "/api/office/service/gesprek/neem",
-    "/api/office/service/gesprek/signaal",
-    "/api/office/service/gesprekken",
-    "/api/office/service/incident/hersteld",
-    "/api/office/service/kanalen",
-    "/api/office/service/kwaliteit",
-    "/api/office/service/patronen",
-    "/api/office/service/stand",
-    "/api/office/service/wachtrij",
-    "/api/office/service/weeg",
-    "/api/office/service/zaak",
     "/api/stream"
    ],
-   "voorvoegsels": [],
-   "verfijndeHelpers": [
-    {
-     "naam": "api",
-     "prefix": "/api/office/service/",
-     "exactePaden": [
-      "/api/office/service/ai/vraag",
-      "/api/office/service/bericht",
-      "/api/office/service/bevestiging/code",
-      "/api/office/service/bevestiging/vraag",
-      "/api/office/service/bundel",
-      "/api/office/service/eigenaar",
-      "/api/office/service/foutsignalen",
-      "/api/office/service/gesprek/eind",
-      "/api/office/service/gesprek/neem",
-      "/api/office/service/gesprek/signaal",
-      "/api/office/service/gesprek/signaal",
-      "/api/office/service/gesprekken",
-      "/api/office/service/incident/hersteld",
-      "/api/office/service/kanalen",
-      "/api/office/service/kwaliteit",
-      "/api/office/service/patronen",
-      "/api/office/service/stand",
-      "/api/office/service/wachtrij",
-      "/api/office/service/weeg",
-      "/api/office/service/zaak"
-     ]
-    }
+   "voorvoegsels": [
+    "/api/office/service/"
    ]
   },
   {
@@ -27203,7 +27092,6 @@
     "/api/service/bevestig",
     "/api/service/bevestiging/toon",
     "/api/service/bevestigingen",
-    "/api/service/keuzes",
     "/api/service/mens",
     "/api/service/mijn",
     "/api/service/open",
@@ -27502,8 +27390,7 @@
    "bestand": "public/shared/kantoorgesprek.js",
    "exact": [],
    "voorvoegsels": [
-    "/api/account/",
-    "/api/kantoor/gesprek/"
+    "/api/account/"
    ]
   },
   {

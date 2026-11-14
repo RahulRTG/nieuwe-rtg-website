@@ -9,7 +9,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tr-'));
@@ -28,6 +28,7 @@ test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   const reg = await json(await api('/api/auth/register', { name: 'Transfer Lid', email: 'transfer@x.nl', phone: '0612345697',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
+  maakBetaaldRtgTestaccount(TMP, 'transfer@x.nl');
   lidToken = reg.token;
   const roster = await json(await api('/api/supplier/roster', { code: 'ESVEDRA' }));
   const man = roster.staff.find(x => x.role === 'manager');

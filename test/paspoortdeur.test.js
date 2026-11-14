@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, keurLidGoed } = require('./helper');
+const { startServer, stop, keurLidGoed, maakBetaaldRtgTestaccount } = require('./helper');
 const { maakPaspoortdeur } = require('../server/kern/onvervreemdbaar');
 
 function api(base, pad, body, token) {
@@ -39,18 +39,24 @@ const DEUREN = ['/api/gemeente/afspraak', '/api/overheid/aangifte', '/api/care/i
   '/api/stad/melding', '/api/stad/raadpleging/reageer', '/api/neiging/intake'];
 const DICHT = new Set([401, 403]);
 
-let srv, base, seq = 0;
+let srv, base, testData, seq = 0;
 
 async function registreer(tier) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const r = await api(base, '/api/auth/register', { name: 'Proef Genoot', email: 'pd' + u + '@voorbeeld.nl',
     phone: '06' + u, password: 'geheim12345', geboortedatum: '1988-04-04', tier });
   assert.ok(r.body.token, 'registreren als ' + tier + ' leverde geen token: ' + JSON.stringify(r.body).slice(0, 120));
+  if (tier === 'rtg') {
+    maakBetaaldRtgTestaccount(testData, 'pd' + u + '@voorbeeld.nl');
+    const huidig = await api(base, '/api/state', {}, r.body.token);
+    return { token: r.body.token, codenaam: huidig.body.state.user.codename, tier: huidig.body.state.user.tier };
+  }
   return { token: r.body.token, codenaam: r.body.state.user.codename, tier: r.body.state.user.tier };
 }
 
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-paspoortdeur-'));
+  testData = TMP;
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_ENC_KEY: 'test-encryptiesleutel-1234567890' } });
   base = srv.base;
 });

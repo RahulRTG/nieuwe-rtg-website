@@ -6,7 +6,7 @@
    een echte betaling is verwerkt -- een betaalprovider zou het schema uitvoeren.
    Draait op de gedeelde context die kern/aanmeldingen.js opbouwt. */
 module.exports = (ctx) => {
-  const { B, geldPasprijzen, rid, nu, eur, PASSEN, db, save } = ctx;
+  const { B, geldPasprijzen, rid, nu, eur, PASSEN, db, save, bewerkCollectie } = ctx;
   const { maandCentenUit } = require('../pasprijs');
   const contracten = require('../commercie/contract').maakContracten({ db, save, nu });
   const allocatie = require('../commercie/allocatie');
@@ -108,10 +108,13 @@ module.exports = (ctx) => {
      het contract en achter de bestaande termijnen geplakt -- de oude blijven
      staan, want die zijn gebeurd. */
   function verlengLidmaatschap(aanmeldingId, nieuwEuro) {
-    const rijtje = B().find(r => r.aanmeldingId === String(aanmeldingId || ''));
+    const rijen = B().filter(r => r.aanmeldingId === String(aanmeldingId || ''));
+    if (rijen.length > 1) return { status: 409, error: 'Deze aanmelding heeft meerdere overeenkomsten; verlengen vereist controle.' };
+    const rijtje = rijen[0];
     if (!rijtje || !rijtje.contractId) return { status: 404, error: 'Voor dit lidmaatschap loopt geen contract.' };
     const c = contracten.vind(rijtje.contractId);
     if (!c) return { status: 404, error: 'Dit contract bestaat niet meer.' };
+    if (c.automatischAbonnement) return { status: 409, error: 'Een automatisch abonnement volgt de getekende voorwaarden. Een nieuwe prijs of jaarvooruitbetaling vereist een nieuw getekend aanbod.' };
     const voor = contracten.eindeVerbintenis(c);
     const r = contracten.verleng(c, Number.isFinite(Number(nieuwEuro)) ? Math.round(Number(nieuwEuro) * 100) : undefined);
     if (r.error) return { status: 400, error: r.error };
@@ -124,22 +127,7 @@ module.exports = (ctx) => {
     return { ok: true, contract: contracten.publiek(c), erbij: extra.length };
   }
 
-  /* OPZEGGEN: de termijnen na de einddatum vervallen. Ze worden verwijderd en
-     niet op 'vervallen' gezet -- een geplande termijn die nooit komt, is geen
-     termijn met een andere status maar een termijn die er niet is. */
-  function zegOpLidmaatschap(aanmeldingId) {
-    const rijtje = B().find(r => r.aanmeldingId === String(aanmeldingId || ''));
-    if (!rijtje || !rijtje.contractId) return { status: 404, error: 'Voor dit lidmaatschap loopt geen contract.' };
-    const c = contracten.vind(rijtje.contractId);
-    if (!c) return { status: 404, error: 'Dit contract bestaat niet meer.' };
-    const r = contracten.zegOp(c);
-    if (r.error) return { status: 400, error: r.error };
-    const voor = rijtje.termijnen.length;
-    rijtje.termijnen = rijtje.termijnen.filter(t => new Date(t.vervalt) < new Date(c.eindigtOp));
-    save();
-    return { ok: true, contract: contracten.publiek(c), eindigtOp: c.eindigtOp,
-      vervallen: voor - rijtje.termijnen.length };
-  }
+  const zegOpLidmaatschap = require('./betaalschema-opzeg')({ db, save, nu, bewerkCollectie });
 
   function betalingBeeld(rij) {
     return { aanmeldingId: rij.aanmeldingId, pas: rij.pas, pasNaam: (PASSEN[rij.pas] || {}).naam || rij.pas,

@@ -5,7 +5,8 @@
   "ingangen": {
     "rtg-ds.css": "Volledige Design-System-root voor gemigreerde schermen.",
     "taalkeuze-standalone.css": "Minimale tijdelijke ingang voor de centrale taalkeuze op nog niet gemigreerde hosts.",
-    "uurwerk.css": "Minimale tijdelijke ingang voor de centrale huisbrede uurwerkpresentatie op nog niet gemigreerde hosts."
+    "uurwerk.css": "Minimale tijdelijke ingang voor de centrale huisbrede uurwerkpresentatie op nog niet gemigreerde hosts.",
+    "brand-lockup.css": "Minimale tijdelijke ingang voor de ongewijzigde logo-lockup op publieke legacy-hosts; verdwijnt bij migratie van de laatste host naar rtg-ds.css."
   },
   "lagen": [
     "rtg.reset",
@@ -74,6 +75,9 @@
     "vel",
     "beeldsnede",
     "beleving",
+    "brand-lockup",
+    "magazine",
+    "publiek-detail",
     "accountdeur",
     "rahul",
     "samen",
@@ -196,6 +200,19 @@
   },
   "bewijs": {
     "uitleg": "Per scherm op het Design System de browsertoets die in een echte browser bewijst dat er geen erfenisblad actief is, dat de ds-poort van de basis klopt en dat de kernhandeling slaagt.",
+    "index.html": "test/public-painted-site.e2e.js",
+    "explore/index.html": "test/public-painted-site.e2e.js",
+    "public/site/passen/community.html": "test/public-painted-site.e2e.js",
+    "public/site/passen/rtg-pass.html": "test/public-painted-site.e2e.js",
+    "public/site/passen/business-lite.html": "test/public-painted-site.e2e.js",
+    "public/site/passen/business-pass.html": "test/public-painted-site.e2e.js",
+    "public/site/passen/lifestyle-pass.html": "test/public-painted-site.e2e.js",
+    "public/site/werelden/livingos.html": "test/public-painted-site.e2e.js",
+    "public/site/werelden/travelos.html": "test/public-painted-site.e2e.js",
+    "public/site/werelden/workos.html": "test/public-painted-site.e2e.js",
+    "public/site/werelden/foundationos.html": "test/public-painted-site.e2e.js",
+    "public/site/techniek/techniek.html": "test/public-painted-site.e2e.js",
+    "public/site/404.html": "test/public-painted-site.e2e.js",
     "public/apps/hotels.html": "test/hotels-ds.e2e.js",
     "public/apps/hangar.html": "test/hangar-ds.e2e.js",
     "public/apps/zakelijk.html": "test/zakelijk-ds.e2e.js",

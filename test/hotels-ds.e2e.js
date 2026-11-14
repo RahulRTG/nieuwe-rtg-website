@@ -18,13 +18,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { decodeer, PAD } = require('../server/middleware/stijlbundel-rij');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const BEELDEN = process.env.RTG_DS_BEELDEN || '';
-let srv, browser, token, memberEmail;
+let srv, browser, token, memberEmail, TMP;
 
 async function post(url, data, auth = token) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -64,14 +65,17 @@ async function bladen(page) {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-hotels-ds-'));
+  srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_AI_UIT: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
   memberEmail='verblijf-' + now + '@e.test';
   token = (await post('/api/auth/register', { name: 'Verblijf Lid', email: memberEmail,
     phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  assert.ok(token);
+  maakBetaaldRtgTestaccount(TMP, memberEmail);
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (TMP) fs.rmSync(TMP, { recursive: true, force: true }); });
 
 
 test('Hotels destination: aangemeld lid bereikt de Travel-collectie', {skip}, t =>

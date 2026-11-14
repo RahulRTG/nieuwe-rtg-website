@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stopHard, stopNet, elevateTier } = require('./helper');
+const { startServer, stopHard, stopNet, elevateTier, maakBetaaldRtgTestaccount } = require('./helper');
 const bewijs = require('./operationeel-journaal');
 test('de aanvraag gebruikt persoonlijke werkaccounts met testdeuren uit en intrekking werkt onmiddellijk', async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-aanvraag-productie-'));
@@ -22,7 +22,8 @@ test('de aanvraag gebruikt persoonlijke werkaccounts met testdeuren uit en intre
     const roster = await api('/api/supplier/roster', { code: 'SERENA' });
     const seed = await api('/api/supplier/login', { code: 'SERENA', staffId: roster.staff.find(x => x.role === 'manager').id, pin: '1234' });
     assert.ok(seed.token);
-    await registreer('vrager');
+    assert.ok((await registreer('vrager')).token);
+    maakBetaaldRtgTestaccount(tmp, 'vrager@example.test'); // Alleen de betalende klant, vóór de herstart zonder testdeuren.
     const eigenaar = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran' })).token;
     const beheerder = await registreer('beheerder');
     await elevateTier(srv.base, beheerder.token, 'business', eigenaar);

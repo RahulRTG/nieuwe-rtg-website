@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, maakBetaaldRtgTestaccount } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitvoeren-'));
@@ -209,6 +209,7 @@ test('6. P0b: de eigenaar tekent een vakbewijs af onder zijn eigen sleutel, niet
   const u = (Date.now() + 1).toString(36);
   const lid = (await api('/api/auth/register', { name: 'Vakmens Proef', email: 'vk' + u + '@voorbeeld.test',
     phone: telefoon(), password: 'Geheim123!', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'vk' + u + '@voorbeeld.test');
   assert.equal((await api('/api/vakbewijs/zet', { wat: 'vog', nummer: 'VOG-P0B-1', tot: '2030-01-01' }, lid)).status, 200);
   const sleutel = (await api('/api/vakbewijs', {}, lid)).body.vakbewijzen.find(v => v.wat === 'vog').sleutel;
   const t = await api('/api/office/vakbewijs/teken', { sleutel, wat: 'vog', door: 'Iemand Anders' }, eigenaar);

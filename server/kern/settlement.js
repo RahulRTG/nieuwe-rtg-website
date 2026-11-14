@@ -19,7 +19,8 @@
    db, accounts en fonds kan meegeven. */
 module.exports = { maakSettlement };
 
-function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd, payOplaadAfronden, payIbanBevestigd }) {
+function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd, payOplaadAfronden, payIbanBevestigd, naAbonnementsbetaling }) {
+  const settleAbonnement = require('./aanmeldingen/abonnementssettlement')({ accounts, db, fonds, naAbonnementsbetaling });
   return async function settleFactuur(ctx, betaling) {
   if (!ctx) return { status: 400, error: 'Settlementcontext ontbreekt.' };
   // Een rechtstreekse betaling aan een partner: pas na een geverifieerde
@@ -87,9 +88,11 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRe
     }
   }
   if (ctx.soort !== 'factuur') return { ok: true };
+  if (ctx.contractId) return settleAbonnement(ctx, betaling);
   const md = ctx.own ? accounts.getMemberState(ctx.accountId) : db.data;
   if (!md) return { status: 404, error: 'Ledenstaat ontbreekt.' };
   const inv = (md.invoices || []).find(i => i.id === ctx.invoiceId);
+  if (inv && inv.abonnement) return settleAbonnement(ctx, betaling);
   if (!inv || inv.status === 'paid') return { ok: true };
   /* DEZELFDE PROVIDERBETALING IS EEN BEWIJS, GEEN TWEEDE DEELBETALING.
 

@@ -38,6 +38,7 @@ app.post('/api/supplier/giftcard/sell', supplierAuth, async (req, res) => {
   const r = await metIdem(idem, 'gc|' + req.supplier.code + '|' + bedrag, async () => {
     const u = await cadeaukaart.uitgeef({ supplierCode: req.supplier.code, supplierName: req.supplier.name,
       bedrag, kocht: req.actor.name + ' (kassa)', customerKey: null, issuer: 'zaak:' + req.supplier.code,
+      magNieuweUitgifte: () => kern.zaakAbonnement?.magDienst?.(req.supplier.code, { nieuweBetaaldeDienst: true }) !== false,
       idem: req.body.idem ? String(req.body.idem).slice(0, 60) : null });
     if (!u.ok) return u;
     doos.code = u.code;

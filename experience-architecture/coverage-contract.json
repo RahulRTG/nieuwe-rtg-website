@@ -87,6 +87,2498 @@
       "humanCriticalFindingsMax": 0
     }
   },
+  "qualificationPlanning": {
+    "version": 1,
+    "status": "CONTRACT_DEFINED",
+    "purpose": "P0-kwalificatieplanning op bestaande schermen en beloften; geen catalogus, bewijsregister, Experience Signature of productgoedkeuring.",
+    "scopeAuthority": "AFBOUWPROGRAMMA.md",
+    "application": {
+      "screenBindingSource": "SCHERMEIGENAAR.json",
+      "inventorySource": "scripts/lib/experience/subjects.js",
+      "capabilityPlanningSource": "docs/rtg-next/programma.json",
+      "preserveExistingCapabilityScenarios": true,
+      "scenarioInheritance": "Een scherm erft de toegewezen familietaken plus zijn capability-specifieke scenario's; een uitvoerende fixture benoemt de echte eigenaar, persona, bestaande objecten, handelingen en bronstatussen.",
+      "noInventedActions": "Een alleen-lezen scherm krijgt geen verzonnen mutatie. Toets de projectie van een werkelijk door de canonieke eigenaar verrichte handeling. Ontbreekt zo'n toegepaste fixture, dan blijft de betreffende bewijsroute NOT_TESTED.",
+      "redirectProfile": "Het bestaande profiles.redirect bepaalt toepasselijkheid. Toets veilige overdracht en de bestaande bestemming; kwalificatie van de bestemming blijft afzonderlijk verplicht.",
+      "scopeChange": "Een gewijzigde productbelofte vereist een expliciet eigenaarsbesluit. Ontbrekende provider, review of fixture verlaagt geen premiumbelofte.",
+      "riskSelection": "Het zwaarste uitvoerbare effect bepaalt de risicoklasse; geld, boekingen, contracten, zorgveiligheid en gezag zijn critical; identiteit, communicatie, persoonsgegevens en kindgegevens minstens sensitive. Een wrapper of redirect erft het risico van de bestemming.",
+      "decisionStatus": "Deze normen zijn vastgelegde uitvoeringseisen voor P0; de scores en kwalificatie blijven onbekend tot uitvoering op de kandidaat."
+    },
+    "evidencePolicy": {
+      "definitionIsEvidence": false,
+      "defaultEvidenceStatus": "NOT_TESTED",
+      "missingAuthorizedHumanReview": "BLOCKED",
+      "unknownProviderOutcome": "BLOCKED",
+      "sameCandidateAndSourceRequired": true,
+      "independentRunsRequired": 2,
+      "zeroSkippedRequired": true,
+      "existingMatricesRemainRequired": true,
+      "instrumentRefsMeaning": "Bestaande startpunten voor uitbreiding; het noemen van een bestand is geen bewijs dat dit nieuwe scenario al door dat instrument wordt gemeten.",
+      "sourceRefs": [
+        "scripts/lib/experience/artifact.js",
+        "scripts/lib/experience/typed.js",
+        "scripts/lib/experience/execution.js",
+        "scripts/lib/appcontract.js",
+        "scripts/lib/bewijsbron.js"
+      ],
+      "artifactRequirements": [
+        "subjectType",
+        "subjectId",
+        "dimension",
+        "requirement",
+        "sourceHash",
+        "commit",
+        "configurationHash",
+        "instrument",
+        "configuration",
+        "checks",
+        "result",
+        "log"
+      ],
+      "plannedAdapterRule": "Elk nieuw scenario vereist een echte producer en een toegelaten getypeerde binding via de bestaande Experience-executor; tot die binding en uitvoering bestaan blijft de route ongekwalificeerd. Een planningcontrole schrijft geen executedProofs."
+    },
+    "evidenceContracts": [
+      {
+        "id": "browser-state-trace",
+        "method": "browser",
+        "sourceRefs": [
+          "scripts/lib/experience/artifact.js",
+          "scripts/lib/experience/configurations.js"
+        ],
+        "requires": "Echte route met juiste sessie; toestand, UI, focus, netwerk, browserconfiguratie en bronresultaat vastgelegd op kandidaat."
+      },
+      {
+        "id": "domain-state-readback",
+        "method": "contract",
+        "sourceRefs": [
+          "scripts/lib/appcontract.js",
+          "scripts/lib/bewijsbron.js"
+        ],
+        "requires": "Voor/na-lezing bij canonieke eigenaar en na verse sessie; effecten en versie-ID's tellen, niet uitsluitend HTTP-ok."
+      },
+      {
+        "id": "authorization-negative",
+        "method": "contract",
+        "sourceRefs": [
+          "scripts/bevoegdronde.js",
+          "scripts/lib/rolproef.js"
+        ],
+        "requires": "Andere actor, gezin, tenant en ingetrokken of verlopen recht worden bij lezen en uitvoeren geweigerd; geen datalek of neveneffect."
+      },
+      {
+        "id": "recovery-trace",
+        "method": "browser",
+        "sourceRefs": [
+          "scripts/lib/experience/execution.js",
+          "scripts/lib/experience/artifact.js"
+        ],
+        "requires": "Verzoek- en antwoordverlies, herhaling, refresh, onderbreking en bronreconciliatie met exact effectaantal en toegestane bewaarde gegevens."
+      },
+      {
+        "id": "provider-confirmation",
+        "method": "contract",
+        "sourceRefs": [
+          "server/kern/reservering/providerbewijs.js",
+          "server/kern/pay/bewijs.js"
+        ],
+        "requires": "Echt providerantwoord met correlatie, tijd, status, scope en herkomst. Synthetische rail is uitdrukkelijk simulatie en bewijst geen productieprovider."
+      },
+      {
+        "id": "privacy-storage-audit",
+        "method": "contract",
+        "sourceRefs": [
+          "server/accounts/kluis.js",
+          "server/kern/connection-consent.js"
+        ],
+        "requires": "Opslag, cache, logs, projecties en intrekking per actor, doel, data-klasse en TTL; identiteitskluis niet naar operationele kopie verplaatsen."
+      },
+      {
+        "id": "accessibility-observation",
+        "method": "accessibility",
+        "sourceRefs": [
+          "scripts/a11y.js",
+          "scripts/a11ykeuring.js"
+        ],
+        "requires": "Toetsenbord, focus, contrast, 200% zoom, 320px-reflow, 44px-doelen, schermlezer, reduced-motion en echte aanraakbediening; scan alleen sluit menselijke bediening niet."
+      },
+      {
+        "id": "performance-samples",
+        "method": "performance",
+        "sourceRefs": [
+          "scripts/lib/experience/artifact.js",
+          "scripts/lib/experience/configurations.js"
+        ],
+        "requires": "Ruwe, herhaalbare metingen per netwerk/apparaat/risico; samples, percentielen, toestel en browser vastleggen; geen gemiddelde over falende cellen."
+      },
+      {
+        "id": "visual-review",
+        "method": "visual",
+        "sourceRefs": [
+          "experience-architecture/signatures.json",
+          "scripts/lib/experience/artifact.js"
+        ],
+        "requires": "Bestaande DS-tokens en expliciete signature per toestand; nul onverklaarde regressies; onafhankelijke visuele acceptatie zonder signatures te genereren uit deze planning."
+      },
+      {
+        "id": "human-observation",
+        "method": "human",
+        "sourceRefs": [
+          "scripts/lib/experience/artifact.js"
+        ],
+        "requires": "Echte deelnemers, onverholpen taakuitvoering en terugvertellen, afzonderlijke onafhankelijke beoordelaar en gezaghebbende bevestiging op dezelfde kandidaat. Huidige adapter blokkeert deze categorie totdat die koppeling werkelijk gebouwd is."
+      },
+      {
+        "id": "scope-and-impact",
+        "method": "contract",
+        "sourceRefs": [
+          "AFBOUWPROGRAMMA.md",
+          "SCHERMEIGENAAR.json",
+          "scripts/lib/experience/coverage.js"
+        ],
+        "requires": "Belofte, canonieke eigenaar, appliceerbare schermen, rechten, provider- en ketenafhankelijkheden en impact volledig herleidbaar; onbekend bereik blokkeert."
+      },
+      {
+        "id": "execution-integrity",
+        "method": "contract",
+        "sourceRefs": [
+          "scripts/lib/experience/evidence.js",
+          "scripts/lib/experience/execution.js",
+          "scripts/lib/experience/typed.js"
+        ],
+        "requires": "Werkelijk testproces, schone onveranderde kandidaat, levende receipt, getypeerde waarnemingen en loghash; een losse json, metadata-matrix of planningtest levert geen groen bewijs."
+      }
+    ],
+    "premiumCriteria": [
+      {
+        "id": "purpose",
+        "dimensions": [
+          "identity",
+          "restraint"
+        ],
+        "lifecycle": [
+          "start"
+        ],
+        "acceptance": "De bevoegde persona kan doel, eigenaar en volgende stap herkennen; de route voert naar de bestaande productbelofte zonder een tweede proces.",
+        "evidenceRequirements": [
+          "browser-state-trace",
+          "scope-and-impact",
+          "human-observation"
+        ]
+      },
+      {
+        "id": "task-lifecycle",
+        "dimensions": [
+          "continuity",
+          "human-quality"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "cancel",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Alle toepasselijke taakfasen en terminale domeinstatussen hebben zichtbaar gedrag. Niet-toepasselijkheid vraagt bestaand profiel of gemotiveerd scopebesluit.",
+        "evidenceRequirements": [
+          "browser-state-trace",
+          "domain-state-readback",
+          "recovery-trace"
+        ]
+      },
+      {
+        "id": "truth",
+        "dimensions": [
+          "continuity",
+          "human-quality"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Concept, aangevraagd, ontvangen, bevestigd, geweigerd en onzeker blijven onderscheiden op basis van domein- of providerbewijs.",
+        "evidenceRequirements": [
+          "domain-state-readback",
+          "provider-confirmation",
+          "human-observation"
+        ]
+      },
+      {
+        "id": "authorization",
+        "dimensions": [
+          "continuity",
+          "accessibility"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "cancel",
+          "resume",
+          "recover"
+        ],
+        "acceptance": "Authority en domeinpoort controleren de echte actor bij elke gevoelige lezing en mutatie; intrekking en tenantgrenzen gelden ook bij hervatten.",
+        "evidenceRequirements": [
+          "authorization-negative",
+          "privacy-storage-audit"
+        ]
+      },
+      {
+        "id": "data-minimization",
+        "dimensions": [
+          "continuity",
+          "adaptability"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "cancel",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Alleen toegestane gegevens met doel, actor, TTL en bron worden bewaard; geen gekopieerd geld-, identiteits-, zorg- of eigendomsregister.",
+        "evidenceRequirements": [
+          "privacy-storage-audit",
+          "authorization-negative"
+        ]
+      },
+      {
+        "id": "persistence-recovery",
+        "dimensions": [
+          "continuity",
+          "adaptability"
+        ],
+        "lifecycle": [
+          "change",
+          "complete",
+          "cancel",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Bewaard betekent duurzaam bevestigd; ontbrekend antwoord blijft onzeker. Crash en herhalen geven geen stille overschrijving, dubbele externe handeling of verboden offline-effect.",
+        "evidenceRequirements": [
+          "domain-state-readback",
+          "recovery-trace",
+          "privacy-storage-audit"
+        ]
+      },
+      {
+        "id": "interaction",
+        "dimensions": [
+          "restraint",
+          "composition",
+          "continuity"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "cancel",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Een herkenbare hoofdactie en nul onnodige contextwissels; verplichte veiligheidskeuzes blijven zichtbaar. De familietaak haalt zijn meetbare actiebudget.",
+        "evidenceRequirements": [
+          "browser-state-trace",
+          "human-observation"
+        ]
+      },
+      {
+        "id": "visual-identity",
+        "dimensions": [
+          "identity",
+          "composition",
+          "restraint"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "error"
+        ],
+        "acceptance": "De expliciete Experience Signature ondersteunt de echte taak en gebruikt het centrale DS; nul onverklaarde visuele regressies.",
+        "evidenceRequirements": [
+          "visual-review",
+          "browser-state-trace"
+        ]
+      },
+      {
+        "id": "accessibility",
+        "dimensions": [
+          "accessibility",
+          "adaptability"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "cancel",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Iedere toepasselijke taak is uitvoerbaar met toetsenbord en ondersteunende technologie, zonder uitsluitend kleur, beweging, geluid of gebaar.",
+        "evidenceRequirements": [
+          "accessibility-observation",
+          "human-observation"
+        ]
+      },
+      {
+        "id": "performance",
+        "dimensions": [
+          "fluidity",
+          "adaptability"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Alle globale budgetten blijven gelden; iedere apparaat-risicocel haalt haar aanvullende respons-, wacht- en herstelbudget met ruwe meetgegevens.",
+        "evidenceRequirements": [
+          "performance-samples",
+          "browser-state-trace"
+        ]
+      },
+      {
+        "id": "human-comprehension",
+        "dimensions": [
+          "human-quality",
+          "restraint"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "cancel",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "De gebruiker begrijpt doel, ontvanger, gevolg, status en herstel zonder hulp; geen kritieke misvattingen en geen autonome toekenning van gezag.",
+        "evidenceRequirements": [
+          "human-observation",
+          "authorization-negative"
+        ]
+      },
+      {
+        "id": "evidence-integrity",
+        "dimensions": [
+          "identity",
+          "composition",
+          "continuity",
+          "restraint",
+          "adaptability",
+          "accessibility",
+          "fluidity",
+          "human-quality"
+        ],
+        "lifecycle": [
+          "start",
+          "change",
+          "complete",
+          "cancel",
+          "resume",
+          "error",
+          "recover"
+        ],
+        "acceptance": "Een bewijs is exact aan subject, kandidaat, bron, scenario en configuratie gebonden; ontbrekend, verlopen, gesimuleerd of onbevoegd bewijs geeft geen productvrijgave.",
+        "evidenceRequirements": [
+          "execution-integrity",
+          "scope-and-impact"
+        ]
+      }
+    ],
+    "measurementProtocol": {
+      "status": "CONTRACT_DEFINED",
+      "sourceOfGlobalLimits": "release.experienceBudgets",
+      "configurationSource": "configurationCoverage.continuity:destination.deviceConfigurations",
+      "stateAndNetworkSource": "states + networks + expliciete additions in de bestaande signature; planning verkleint die matrix niet.",
+      "minimumIndependentSamplesPerCell": 30,
+      "performanceStatistics": {
+        "webVitals": "p75",
+        "localFeedback": "p95",
+        "recovery": "p95",
+        "sampleDisclosure": "Ruwe samples, cold/warm onderscheid en alle uitschieters bewaren; geen pool over apparaten of risicoklassen."
+      },
+      "networkProfiles": {
+        "normal": {
+          "roundTripMs": 50,
+          "downloadKbps": 10000,
+          "uploadKbps": 2000
+        },
+        "constrained": {
+          "roundTripMs": 150,
+          "downloadKbps": 1600,
+          "uploadKbps": 750
+        },
+        "offline": {
+          "online": false,
+          "remoteRequestsAllowed": false
+        }
+      },
+      "networkProfileBoundary": "Dit zijn expliciete labinstellingen voor nieuwe performanceproducers. Bestaande destination-normal-bewijzen worden niet hernoemd of als throttled netwerkbewijs geteld.",
+      "offlineBoundary": "Offline meet de veilige lokale of onbeschikbare toestand; deze cijfers beloven geen offline transactie, gevoelige cache of providerbevestiging.",
+      "performanceBoundary": "Labpercentielen zijn uitsluitend labbewijs; veldprestatie en fysieke apparaten krijgen afzonderlijke waarnemingen en blijven zonder meting NOT_TESTED.",
+      "interactionCounting": "Vanaf geopende bevoegde scène met vastgelegde fixture. Elke betekenisvolle keuze, open/sluit, navigatie, bevestiging of herstelklik telt; invoerveld invullen telt als één handeling. Verplichte veiligheidsstappen tellen mee en worden nooit geschrapt om het budget te halen. Domeincomplexiteit buiten de referentietaak krijgt vooraf een expliciet aanvullend taakbudget.",
+      "navigationHopsFromPersonaHomeMax": 5,
+      "navigationExceptionsSource": "TIKKEN.md en bestaande MET_REDEN in scripts/tikken.js; geen nieuwe stilzwijgende uitzonderingen.",
+      "humanProtocol": {
+        "participantsPerRiskDeviceCohortMin": 5,
+        "recruitment": "Echte representatieve deelnemers per risicoklasse en apparaatgroep; taakverdeling dekt alle toegewezen schermtaken. Kinderen alleen met passende toestemming en veilige testdata. Minstens één relevante ondersteunde-technologiegebruiker per getoetste interactieklasse; afwezigheid blijft een blokkade.",
+        "independence": "Beoordelaar van veiligheid, toegankelijkheid, visueel ontwerp en taakbegrip is niet de maker van het getoetste onderdeel; rollen en belangen afzonderlijk vastleggen.",
+        "procedure": [
+          "Leg taak, begintoestand, persona en succescriterium vooraf vast.",
+          "Laat de deelnemer zonder coaching starten, uitvoeren, onderbreken en hervatten.",
+          "Vraag vóór externe gevolgen naar ontvanger, prijs of gegevensdeling en wat nog onzeker is.",
+          "Vraag na afloop wat de bron bevestigt en hoe annuleren of herstel werkt.",
+          "Leg foutpogingen, hulpvragen, taakvoltooiing, begrip en belemmeringen geanonimiseerd vast."
+        ],
+        "coverage": "Een cohortgemiddelde kan een onbeoordeeld scherm, ontbrekende persona of kritieke bevinding niet vrijstellen.",
+        "evidenceBoundary": "Dit is een acceptatieprotocol, geen uitgevoerd onderzoek of statistische marktclaim; gezaghebbende menselijke bewijsinvoer blijft vereist."
+      }
+    },
+    "taskFamilies": {
+      "orientation": {
+        "referenceTask": "Een bekende taak vinden, de juiste canonieke scène openen en de bronstatus begrijpen.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 4,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "orientation-execute",
+          "orientation-negative",
+          "orientation-recover",
+          "orientation-understand"
+        ]
+      },
+      "identity": {
+        "referenceTask": "Een bestaande beveiligingsinstelling bekijken, één wijziging controleren en met vereiste herauthenticatie afronden.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 6,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "identity-execute",
+          "identity-negative",
+          "identity-recover",
+          "identity-understand"
+        ]
+      },
+      "transaction": {
+        "referenceTask": "Eén bestaande order of betaling controleren, ontvanger en bedrag bevestigen en de werkelijke uitkomst lezen.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 7,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "transaction-execute",
+          "transaction-negative",
+          "transaction-recover",
+          "transaction-understand"
+        ]
+      },
+      "travel": {
+        "referenceTask": "Een vaste reisaanvraag met bekende bestemming, datum en reizigers controleren, indienen en terugvinden.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 8,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "travel-execute",
+          "travel-negative",
+          "travel-recover",
+          "travel-understand"
+        ]
+      },
+      "content": {
+        "referenceTask": "Een bestaand document openen, één veld wijzigen, opslaan en de bevestigde versie terugvinden.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 6,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "content-execute",
+          "content-negative",
+          "content-recover",
+          "content-understand"
+        ]
+      },
+      "communication": {
+        "referenceTask": "Een bestaande bevoegde conversatie openen, ontvanger controleren, één bericht versturen en de ontvangststatus lezen.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 5,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "communication-execute",
+          "communication-negative",
+          "communication-recover",
+          "communication-understand"
+        ]
+      },
+      "care": {
+        "referenceTask": "Een bestaande hulp- of zorgvraag openen, bevoegd delen controleren en de status of veilige vervolgroute terugvinden.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 7,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "care-execute",
+          "care-negative",
+          "care-recover",
+          "care-understand"
+        ]
+      },
+      "learning": {
+        "referenceTask": "Een passende les openen, één oefening uitvoeren, feedback begrijpen en het toegestane eigen leerdossier hervatten.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 6,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "learning-execute",
+          "learning-negative",
+          "learning-recover",
+          "learning-understand"
+        ]
+      },
+      "operations": {
+        "referenceTask": "Een toegewezen werkitem openen, bevoegdheid en actuele versie controleren, één statuswijziging verwerken en overdracht lezen.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 8,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "operations-execute",
+          "operations-negative",
+          "operations-recover",
+          "operations-understand"
+        ]
+      },
+      "governance": {
+        "referenceTask": "Een bestaand besluitvoorstel openen, mandaat en quorum controleren, een toegestane beslissing geven en de besluitgrond lezen.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 8,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "governance-execute",
+          "governance-negative",
+          "governance-recover",
+          "governance-understand"
+        ]
+      },
+      "public": {
+        "referenceTask": "Van een publieke ingang de juiste bestaande uitleg of voorwaarden openen en zien wat werkelijk beschikbaar is.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 3,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 3
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "public-execute",
+          "public-negative",
+          "public-recover",
+          "public-understand"
+        ]
+      },
+      "redirect": {
+        "referenceTask": "Een bestaande alias volgen en zonder lus of bevoegdheidsverandering op de vaste canonieke bestemming uitkomen.",
+        "interactionBudget": {
+          "meaningfulActionsMax": 1,
+          "unnecessaryContextSwitchesMax": 0,
+          "simultaneousPrimaryActionsMax": 1,
+          "extraActionsForRecoveryMax": 1
+        },
+        "exceptionRule": "Complexere beloofde taken vereisen een expliciet aanvullend taakbudget vóór uitvoering; de belofte en verplichte veiligheidsstappen blijven behouden.",
+        "scenarioIds": [
+          "redirect-execute",
+          "redirect-negative",
+          "redirect-recover",
+          "redirect-understand"
+        ]
+      }
+    },
+    "riskClasses": {
+      "standard": {
+        "description": "Omkeerbare oriëntatie en lokale inhoud zonder gevoelig of extern effect.",
+        "localFeedbackP95MsMax": 200,
+        "unassistedTaskSuccessRatioMin": 0.9,
+        "teachBackCorrectRatioMin": 0.9,
+        "criticalMisunderstandingsMax": 0
+      },
+      "sensitive": {
+        "description": "Identiteit, privécommunicatie, kindgegevens of delen van persoonsgegevens; toestemming en intrekking gelden bij elk gebruik.",
+        "localFeedbackP95MsMax": 150,
+        "unassistedTaskSuccessRatioMin": 0.95,
+        "teachBackCorrectRatioMin": 0.95,
+        "criticalMisunderstandingsMax": 0
+      },
+      "critical": {
+        "description": "Geld, boekingen, handtekeningen, zorgveiligheid, bestuurs- of toegangsbesluiten en onomkeerbare externe effecten.",
+        "localFeedbackP95MsMax": 100,
+        "unassistedTaskSuccessRatioMin": 1,
+        "teachBackCorrectRatioMin": 1,
+        "criticalMisunderstandingsMax": 0
+      }
+    },
+    "deviceBudgets": {
+      "mobile-small": {
+        "deviceGroup": "phone",
+        "viewportSource": "configurationCoverage.continuity:destination.deviceConfigurations.mobile-small",
+        "localFeedbackP95MsMax": 200,
+        "resumeToSafeStateP95MsMax": 2000,
+        "physicalChecks": [
+          "portrait-landscape",
+          "safe-area",
+          "one-hand-left",
+          "one-hand-right",
+          "touch",
+          "screen-reader"
+        ],
+        "limit": "Chromium 320px is reflowbewijs en geen fysieke telefoonmeting."
+      },
+      "mobile-large": {
+        "deviceGroup": "phone",
+        "viewportSource": "configurationCoverage.continuity:destination.deviceConfigurations.mobile-large",
+        "localFeedbackP95MsMax": 200,
+        "resumeToSafeStateP95MsMax": 2000,
+        "physicalChecks": [
+          "portrait-landscape",
+          "safe-area",
+          "one-hand-left",
+          "one-hand-right",
+          "touch",
+          "screen-reader"
+        ],
+        "limit": "Chromium 430px is formaatbewijs en geen fysieke telefoonmeting."
+      },
+      "tablet": {
+        "deviceGroup": "tablet",
+        "viewportSource": "configurationCoverage.continuity:destination.deviceConfigurations.tablet",
+        "localFeedbackP95MsMax": 150,
+        "resumeToSafeStateP95MsMax": 1500,
+        "physicalChecks": [
+          "portrait-landscape",
+          "split-view",
+          "touch",
+          "keyboard",
+          "screen-reader"
+        ],
+        "limit": "Touch, toetsenbord en gedeelde vensterruimte apart werkelijk opwekken."
+      },
+      "desktop": {
+        "deviceGroup": "desktop",
+        "viewportSource": "configurationCoverage.continuity:destination.deviceConfigurations.desktop",
+        "localFeedbackP95MsMax": 100,
+        "resumeToSafeStateP95MsMax": 1000,
+        "physicalChecks": [
+          "keyboard",
+          "screen-reader",
+          "zoom-200",
+          "window-resize"
+        ],
+        "limit": "Werkruimte, focus en meerdere vensters toetsen zonder autorisatie of objectversie over te slaan."
+      }
+    },
+    "budgetMatrix": [
+      {
+        "id": "standard:mobile-small",
+        "riskClass": "standard",
+        "device": "mobile-small",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 200,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 2000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "safe-area",
+            "one-hand-left",
+            "one-hand-right",
+            "touch",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.9,
+          "teachBackCorrectRatioMin": 0.9,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "standard:mobile-large",
+        "riskClass": "standard",
+        "device": "mobile-large",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 200,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 2000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "safe-area",
+            "one-hand-left",
+            "one-hand-right",
+            "touch",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.9,
+          "teachBackCorrectRatioMin": 0.9,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "standard:tablet",
+        "riskClass": "standard",
+        "device": "tablet",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 150,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 1500,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "split-view",
+            "touch",
+            "keyboard",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.9,
+          "teachBackCorrectRatioMin": 0.9,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "standard:desktop",
+        "riskClass": "standard",
+        "device": "desktop",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 100,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 1000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "keyboard",
+            "screen-reader",
+            "zoom-200",
+            "window-resize"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.9,
+          "teachBackCorrectRatioMin": 0.9,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "sensitive:mobile-small",
+        "riskClass": "sensitive",
+        "device": "mobile-small",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 150,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 2000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "safe-area",
+            "one-hand-left",
+            "one-hand-right",
+            "touch",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.95,
+          "teachBackCorrectRatioMin": 0.95,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "sensitive:mobile-large",
+        "riskClass": "sensitive",
+        "device": "mobile-large",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 150,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 2000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "safe-area",
+            "one-hand-left",
+            "one-hand-right",
+            "touch",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.95,
+          "teachBackCorrectRatioMin": 0.95,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "sensitive:tablet",
+        "riskClass": "sensitive",
+        "device": "tablet",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 150,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 1500,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "split-view",
+            "touch",
+            "keyboard",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.95,
+          "teachBackCorrectRatioMin": 0.95,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "sensitive:desktop",
+        "riskClass": "sensitive",
+        "device": "desktop",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 100,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 1000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "keyboard",
+            "screen-reader",
+            "zoom-200",
+            "window-resize"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 0.95,
+          "teachBackCorrectRatioMin": 0.95,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "critical:mobile-small",
+        "riskClass": "critical",
+        "device": "mobile-small",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 100,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 2000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "safe-area",
+            "one-hand-left",
+            "one-hand-right",
+            "touch",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 1,
+          "teachBackCorrectRatioMin": 1,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "critical:mobile-large",
+        "riskClass": "critical",
+        "device": "mobile-large",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 100,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 2000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "safe-area",
+            "one-hand-left",
+            "one-hand-right",
+            "touch",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 1,
+          "teachBackCorrectRatioMin": 1,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "critical:tablet",
+        "riskClass": "critical",
+        "device": "tablet",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 100,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 1500,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "portrait-landscape",
+            "split-view",
+            "touch",
+            "keyboard",
+            "screen-reader"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 1,
+          "teachBackCorrectRatioMin": 1,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      },
+      {
+        "id": "critical:desktop",
+        "riskClass": "critical",
+        "device": "desktop",
+        "status": "CONTRACT_DEFINED",
+        "performance": {
+          "lcpP75MsMax": 2500,
+          "inpP75MsMax": 200,
+          "clsP75Max": 0.1,
+          "localFeedbackP95MsMax": 100,
+          "pendingStatusVisibleMsMax": 1000,
+          "stalledExplanationVisibleMsMax": 5000,
+          "providerCompletionDeadline": "Per bevoegde provider expliciet vastleggen; ontbrekend betekent BLOCKED, nooit automatisch geslaagd."
+        },
+        "interruption": {
+          "duplicateExternalEffectsMax": 0,
+          "unconfirmedAutoReplayMax": 0,
+          "acknowledgedDataLossMax": 0,
+          "accountSwitchSensitiveResidueMax": 0,
+          "offlineSensitiveWritesAllowed": false,
+          "unsavedDataPolicy": "Zichtbaar onderscheid tussen bevestigd bewaard, tijdelijk toegelaten concept en niet bewaard. Geen garantie buiten vooraf goedgekeurde gegevens- en bewaartermijn."
+        },
+        "recovery": {
+          "resumeToSafeStateP95MsMax": 1000,
+          "mutationsBeforeReauthorizationMax": 0,
+          "sourceConflictSilentOverwritesMax": 0,
+          "unknownOutcomeRule": "Toon onzeker en lees bij de bron; geen nieuwe betaling, boeking of extern bericht op uitsluitend timeout. Kritieke bron blijft dicht tot reconciliatie.",
+          "localDraftExpirySource": "Bestaande domein-/consent-/veldpolicy; geen nieuwe generieke TTL."
+        },
+        "accessibility": {
+          "interactiveTargetPxMin": 44,
+          "criticalFindingsMax": 0,
+          "unexplainedExemptionsMax": 0,
+          "keyboardAllApplicableTasks": true,
+          "focusVisibleAndRestored": true,
+          "zoomPercentMin": 200,
+          "reflowWidthCssPx": 320,
+          "reducedMotionHonored": true,
+          "screenReaderTaskRequired": true,
+          "physicalChecks": [
+            "keyboard",
+            "screen-reader",
+            "zoom-200",
+            "window-resize"
+          ]
+        },
+        "humanComprehension": {
+          "unassistedTaskSuccessRatioMin": 1,
+          "teachBackCorrectRatioMin": 1,
+          "criticalFindingsMax": 0,
+          "criticalMisunderstandingsMax": 0,
+          "questions": [
+            "Wat gaat er gebeuren?",
+            "Voor wie en met welke gegevens of kosten?",
+            "Wat is bevestigd en wat blijft onzeker?",
+            "Hoe kunt u annuleren, hervatten of veilig hulp vragen?"
+          ],
+          "assessment": "Per taak en cohort, geen platformgemiddelde; zie measurementProtocol.humanProtocol."
+        }
+      }
+    ],
+    "scenarioFamilies": {
+      "orientation": [
+        {
+          "id": "orientation-execute",
+          "given": "Een echte lid-, medewerker-, partner- of Foundation-persona opent zijn eigen ingang met geldige rechten.",
+          "when": "De persona zoekt een toegewezen taak, opent het scherm en keert terug.",
+          "then": "De route bereikt de juiste canonieke eigenaar binnen het bestaande navigatiebudget; zichtbare bron, rol en taakcontext blijven gelijk.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "scope-and-impact"
+          ],
+          "instrumentRefs": [
+            "scripts/tikken.js",
+            "scripts/vindbaar.js"
+          ]
+        },
+        {
+          "id": "orientation-negative",
+          "given": "Een persona heeft geen recht op de taak of de bron is onbeschikbaar.",
+          "when": "De persona gebruikt zoekresultaat, directe URL en eerder geopende projectie.",
+          "then": "Geen verborgen inhoud of mutatie; de echte deur en concrete reden verschijnen zonder een andere app als voltooiing te tonen.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "browser-state-trace"
+          ],
+          "instrumentRefs": [
+            "scripts/bevoegdronde.js"
+          ]
+        },
+        {
+          "id": "orientation-recover",
+          "given": "Een legale zoek-/leescontext bestaat en het netwerk valt weg.",
+          "when": "De gebruiker gaat terug, herlaadt en wisselt daarna van account.",
+          "then": "Alleen toegestane context wordt hersteld; oude en offline bron zijn herkenbaar, andere account ontvangt geen context.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/personalos-experience.e2e.js"
+          ]
+        },
+        {
+          "id": "orientation-understand",
+          "given": "Een deelnemer krijgt een concrete vindtaak zonder de schermnaam als hint.",
+          "when": "De deelnemer kiest een ingang en legt doel, bron en volgende stap uit.",
+          "then": "De taak haalt het familiebudget en het risicogebonden begripcriterium; hulp, verkeerde ingang en onduidelijke bron worden als bevinding vastgelegd.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": [
+            "scripts/vindbaar.js"
+          ]
+        }
+      ],
+      "identity": [
+        {
+          "id": "identity-execute",
+          "given": "Een bevoegde actor heeft een bestaande credential of toegangsinstelling en de vereiste verificatie.",
+          "when": "De actor controleert en bevestigt één wijziging via de echte domeinpoort.",
+          "then": "Alleen de bedoelde credential of bevoegdheid wijzigt; de nieuwe sessie leest dezelfde bronstatus en auditverwijzing.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "scripts/lib/voltooi/passkeys.js"
+          ]
+        },
+        {
+          "id": "identity-negative",
+          "given": "Een andere actor, verlopen sessie of onbevestigd stuk probeert dezelfde handeling.",
+          "when": "De handeling wordt rechtstreeks en via hervatte UI uitgevoerd.",
+          "then": "Lezen of wijzigen is geweigerd zonder identiteitslek; AI verleent geen Lifestyle/Business-toegang en een ingediend bewijs is niet goedgekeurd.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/kantoor-koppel-passkey.test.js",
+            "test/persoonseis.test.js"
+          ]
+        },
+        {
+          "id": "identity-recover",
+          "given": "Tijdens credentialwijziging of herauthenticatie gaat het antwoord verloren.",
+          "when": "De gebruiker vernieuwt, leest bij de bron en probeert veilig verder te gaan.",
+          "then": "Geen dubbele credential, onbevoegde hervatting of onzichtbare lock-out; herstel volgt de bestaande accountprocedure en toont onzekere status.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/passkeys-weg.e2e.js"
+          ]
+        },
+        {
+          "id": "identity-understand",
+          "given": "Een gebruiker krijgt een toegangs- of intrekkingsbesluit voorgelegd.",
+          "when": "De gebruiker benoemt betrokken apparaat/persoon, gevolgen voor sessies en herstel.",
+          "then": "Alle kritieke gevolgen zijn begrepen vóór bevestiging; toetsenbord en schermlezer tonen dezelfde beslissing en veilige uitweg.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "transaction": [
+        {
+          "id": "transaction-execute",
+          "given": "Een bevoegde actor ziet een bestaande order/betaling met definitieve ontvanger, bedrag, valuta en voorwaarden.",
+          "when": "De actor bevestigt expliciet en controleert daarna de domein- en railstatus.",
+          "then": "Maximaal één bedoeld effect; order, ledger en UI verwijzen naar dezelfde transactie. Ontvangen of aangevraagd wordt niet als betaald of geleverd getoond.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback",
+            "provider-confirmation"
+          ],
+          "instrumentRefs": [
+            "scripts/lib/voltooi/pay.js",
+            "test/pay-grootboek.test.js"
+          ]
+        },
+        {
+          "id": "transaction-negative",
+          "given": "Ontvanger, prijs, versie, saldo, mandaat of tenant is gewijzigd na het tonen van de samenvatting.",
+          "when": "De oude bevestiging en een herhaling worden ingestuurd.",
+          "then": "De actuele domeinpoort weigert of vraagt herbevestiging; geen geldbeweging en geen stille wijziging van voorwaarden.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/bevoegdheid-keten.test.js",
+            "test/paybudget.test.js"
+          ]
+        },
+        {
+          "id": "transaction-recover",
+          "given": "De provider heeft mogelijk verwerkt terwijl het antwoord uitvalt.",
+          "when": "De gebruiker herlaadt en herhaalt met dezelfde domeinsleutel of vraagt annulering.",
+          "then": "Bronreconciliatie bepaalt de uitkomst; maximaal één effect, geen automatische retry met nieuwe sleutel en geen terugbetaling zonder railbewijs.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "provider-confirmation",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/payout-terugboeking.test.js"
+          ]
+        },
+        {
+          "id": "transaction-understand",
+          "given": "Een deelnemer ziet een transactie met onzeker resultaat en eventuele annuleringsbeperking.",
+          "when": "De deelnemer legt ontvanger, bedrag, huidige status en veilige vervolgstap uit.",
+          "then": "Geen deelnemer begrijpt 'aangevraagd' als definitief betaald; iedere kritieke misvatting blokkeert acceptatie.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "travel": [
+        {
+          "id": "travel-execute",
+          "given": "Een lid, adviseur of bevoegde gast gebruikt de toegewezen reisroute met bestaande brongegevens.",
+          "when": "Een reiswens wordt gecontroleerd, aangevraagd en volgens bevoegdheid verwerkt.",
+          "then": "Reisoverzicht, documenten en gedeelde programma's lezen dezelfde bevestigde status; adviseursverklaring en providerbevestiging blijven herkenbaar verschillend.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback",
+            "provider-confirmation"
+          ],
+          "instrumentRefs": [
+            "test/workspace-travel-request.e2e.js",
+            "test/reisprogramma.e2e.js"
+          ]
+        },
+        {
+          "id": "travel-negative",
+          "given": "Een oude prijs, ingetrokken gastlink of andere reisgenoot probeert details of een reservering te gebruiken.",
+          "when": "De directe route en een eerder geladen plan worden opnieuw geopend of bevestigd.",
+          "then": "Actuele rechten, voorwaarden en beschikbaarheid gelden; geen privé-inhoud of boeking via oude toestemming.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/reisprogramma.test.js",
+            "test/reservering-beleid.test.js"
+          ]
+        },
+        {
+          "id": "travel-recover",
+          "given": "Een aanvraagantwoord gaat verloren of een bevestigd reisonderdeel verandert.",
+          "when": "De reiziger heropent het plan en de adviseur controleert herstelopties.",
+          "then": "Onzekere verwerking wordt bij de bron opgelost; gevolgen noemen geraakte onderdelen en onbekenden. Geen automatische nieuwe boeking of betaalhandeling.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "provider-confirmation",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/workspace-travel-recovery.e2e.js",
+            "test/reisbureau-nazorg.test.js"
+          ]
+        },
+        {
+          "id": "travel-understand",
+          "given": "Een reiziger ontvangt een voorstel, aanvraag en later een gewijzigd reisprogramma.",
+          "when": "De reiziger benoemt wat vaststaat, wat nog ontbreekt, wie handelt en welke hulp beschikbaar is.",
+          "then": "De volledige reistaak blijft begrijpelijk met schermlezer en op het gekozen apparaat; een voorbeeld of PDF wordt niet voor live ticket aangezien.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "content": [
+        {
+          "id": "content-execute",
+          "given": "Een bevoegde maker opent een bestaand document of inhoudsobject met bekende versie.",
+          "when": "De maker wijzigt, bewaart, heropent en leest een eerdere versie.",
+          "then": "De bedoelde inhoud en versie blijven duurzaam bij de canonieke opslag; de UI claimt alleen de werkelijk bevestigde bewaring.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "scripts/lib/voltooi/office.js",
+            "test/document-persistence.e2e.js"
+          ]
+        },
+        {
+          "id": "content-negative",
+          "given": "Een andere actor of tenant, ingetrokken deelrecht of oudere versie probeert het object te lezen of schrijven.",
+          "when": "Directe API en geopend venster voeren de handeling uit.",
+          "then": "Geen gegevenslek of stille overschrijving; bronversie en geweigerd recht zijn zichtbaar zonder gevoelige inhoud te onthullen.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/document-revocation.test.js",
+            "test/office-save-atomic.test.js"
+          ]
+        },
+        {
+          "id": "content-recover",
+          "given": "Een bewerking is deels lokaal en een opslagantwoord ontbreekt.",
+          "when": "De browser wordt onderbroken, heropend en met de bron vergeleken.",
+          "then": "Bevestigd bewaarde inhoud blijft intact; niet-bewaarde inhoud wordt alleen volgens expliciet bewaarcontract hervat, met conflictkeuze zonder dataverliesclaim.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "domain-state-readback",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/document-persistence.e2e.js"
+          ]
+        },
+        {
+          "id": "content-understand",
+          "given": "Een maker ziet lokale wijzigingen, een bevestigde versie en een deelkeuze.",
+          "when": "De maker legt uit wat bewaard is en wie de inhoud mag zien, en hervat een onderbroken bewerking.",
+          "then": "Deelnemer kan bewaarstatus en rechten correct onderscheiden en de taak zonder hulp met toegestane bediening voltooien.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "communication": [
+        {
+          "id": "communication-execute",
+          "given": "Een lid, collega of toegelaten gast opent een bestaande toegestane conversatie.",
+          "when": "Na ontvangercontrole wordt één bericht bewust verzonden.",
+          "then": "Afzender, ontvanger en inhoud zijn correct; maximaal één bericht, met werkelijk ontvangen/afgeleverd/gelezen status voor zover de bron die bewijst.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/berichten.e2e.js",
+            "scripts/lib/voltooi/berichten.js"
+          ]
+        },
+        {
+          "id": "communication-negative",
+          "given": "Een gesprek is privé, de deelnemer is ingetrokken of de tenant is anders.",
+          "when": "De actor leest oude links, reconnectgegevens en verzendroutes.",
+          "then": "Geen inhoud, bijlage, aanwezigheid of verzending buiten de actuele deelnemersgrens; ingetrokken toegang sluit ook nieuwe leveringen.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/comm-deelnemer.test.js",
+            "test/comm-werk.test.js"
+          ]
+        },
+        {
+          "id": "communication-recover",
+          "given": "Een berichtantwoord of live verbinding valt weg.",
+          "when": "De gebruiker reconnecteert, herlaadt en vraagt naar de bronstatus.",
+          "then": "Geen dubbele verzending of onterechte ontvangstclaim; verbindingsverlies en veilige tekst-/handmatige terugval zijn zichtbaar zonder ongemerkt nieuw extern bericht.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/gezin-bericht-herhaal.test.js",
+            "test/comm-gast.test.js"
+          ]
+        },
+        {
+          "id": "communication-understand",
+          "given": "Een deelnemer moet een bericht delen en een gesprek volgen zonder geluid.",
+          "when": "De deelnemer controleert ontvangers, begrijpt de verzendstatus en gebruikt de beschikbare tekstbaan.",
+          "then": "De taak is uitvoerbaar zonder kleur/geluid als enige signaal; ontbrekende live tekstbaan is expliciet een blokkade voor die beloofde taak.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": [
+            "test/meelezen.test.js"
+          ]
+        }
+      ],
+      "care": [
+        {
+          "id": "care-execute",
+          "given": "Een bevoegde gebruiker opent een bestaande hulpvraag, zorgafspraak of relevante projectie.",
+          "when": "De gebruiker voert de toegezegde taak uit of opent de rechtmatige canonieke vervolgroute.",
+          "then": "Hulpinformatie, intake en afspraak blijven onderscheidbaar; geen verzonnen dossier, zorgverlener, medische beoordeling of toezegging.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "scripts/lib/voltooi/foundationzorg.js",
+            "test/foundation-hulp-zorg.test.js"
+          ]
+        },
+        {
+          "id": "care-negative",
+          "given": "Een andere actor, kind zonder passende relatie of niet-gekwalificeerde beroepspersoon probeert gevoelige inzage of een voorbehouden handeling.",
+          "when": "Directe route en hervatte projectie worden gebruikt.",
+          "then": "Dossier blijft gesloten of de voorbehouden handeling geweigerd; kwalificatie wordt actueel gecontroleerd en bewijsnummer blijft in de kluis.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/persoonseis.test.js",
+            "test/care-intake-versleuteld.test.js"
+          ]
+        },
+        {
+          "id": "care-recover",
+          "given": "Een zorgstatus is onzeker, de toestemming is ingetrokken of het netwerk valt weg.",
+          "when": "De gebruiker hervat of probeert eerdere gegevens opnieuw te delen.",
+          "then": "Geen automatische zorgactie of gevoelige cacheherstel; toegestane bronstatus en passende menselijke vervolgroute blijven zichtbaar.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/zorgketen.test.js"
+          ]
+        },
+        {
+          "id": "care-understand",
+          "given": "Een deelnemer ziet een hulpinterface met grenzen en een onbeschikbare dienst.",
+          "when": "De deelnemer beschrijft wat RTG wel doet, wat geen diagnose of ontvangstbevestiging is en waar veilige hulp bereikbaar is.",
+          "then": "Geen kritieke misvatting over zorgverlening of noodhulp; rol- en toegankelijkheidsbelemmeringen blokkeren acceptatie.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "learning": [
+        {
+          "id": "learning-execute",
+          "given": "Een leerling heeft een geldige les- of gezinsrelatie en een passende eigen oefening.",
+          "when": "De leerling opent, oefent, ontvangt feedback en hervat het toegestane eigen leerdossier.",
+          "then": "Eigen voortgang blijft persoonlijk, zonder vergelijking of blijvend niveau-label; handmatige lesmodus werkt zonder model.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "scripts/lib/voltooi/school.js",
+            "test/rtfschool.test.js"
+          ]
+        },
+        {
+          "id": "learning-negative",
+          "given": "Een andere leerling, onbevoegde ouder of onder-18-gebruiker probeert een dossier of competitieve prestatie te bewaren.",
+          "when": "Lezen, ranglijst, niveau of toernooihandeling wordt rechtstreeks geprobeerd.",
+          "then": "Dossiergrenzen worden afgedwongen; competitieve opslag vraagt de bestaande 18+/A3-poort, terwijl veilig persoonlijk leren niet onnodig wordt geblokkeerd.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/rtfschool.test.js"
+          ]
+        },
+        {
+          "id": "learning-recover",
+          "given": "Een tijdelijke schoolpas verloopt of een oefenantwoord gaat verloren.",
+          "when": "De leerling hervat de les met juiste relatie en controleert zijn eigen resultaat.",
+          "then": "Geen stille resultaatverdubbeling, openbaar niveau of andere leerlingdata; ontbrekende rechten geven begrijpelijke herstart en de toegestane eigen voortgang blijft correct.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "scripts/lib/schoolproefsessies.js",
+            "test/proefsessies-school.test.js"
+          ]
+        },
+        {
+          "id": "learning-understand",
+          "given": "Een leerling of begeleider voert een vooraf vastgelegde veilige leertaak uit.",
+          "when": "De deelnemer vindt uitleg, maakt één oefening en legt uit wie het resultaat kan zien.",
+          "then": "Taak is leeftijds- en toegankelijk passend; geen druk tot competitie, geen coaching om een mislukte taak als succes te tellen.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "operations": [
+        {
+          "id": "operations-execute",
+          "given": "Een bevoegde medewerker, partner of beheerder heeft een toegewezen werkitem in de juiste organisatie.",
+          "when": "Een bestaande toegestane statuswijziging wordt gecontroleerd en uitgevoerd.",
+          "then": "Eén actuele bronuitkomst, begrijpelijke overdracht en auditspoor; partner-, personeel- en kantoorprojecties tonen dezelfde status binnen hun rechten.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/partner-ds.e2e.js",
+            "test/kantoordeur.e2e.js"
+          ]
+        },
+        {
+          "id": "operations-negative",
+          "given": "Een andere tenant, vervallen werkvergunning of onvoldoende persoonsbevoegdheid opent dezelfde taak.",
+          "when": "De gebruiker probeert directe URL, API en oude werkruimtetab.",
+          "then": "Geen cross-tenant inzage of mutatie; werk- en handelingsgrenzen blijven verschillend en worden op het juiste moment toegepast.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit"
+          ],
+          "instrumentRefs": [
+            "test/persoonseis.test.js",
+            "test/kantoor-productiedeur.test.js"
+          ]
+        },
+        {
+          "id": "operations-recover",
+          "given": "Twee collega's bewerken hetzelfde item terwijl een netwerkantwoord uitvalt.",
+          "when": "De tweede bevestiging, refresh en overdracht worden uitgevoerd.",
+          "then": "Geen stille overschrijving of dubbele opdracht; versieconflict, actor en verantwoordelijke vervolgstap blijven zichtbaar.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/office-save-atomic.test.js",
+            "test/reisprogramma.test.js"
+          ]
+        },
+        {
+          "id": "operations-understand",
+          "given": "Een medewerker krijgt een echte taak met één noodzakelijke overdracht en een fouttoestand.",
+          "when": "De medewerker voltooit, benoemt verantwoordelijkheid en hervat de taak zonder hulp.",
+          "then": "Taken halen hun familiebudget; kritieke status of bevoegdheid wordt niet alleen met kleur uitgelegd, ook niet in een drukke beheercockpit.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "governance": [
+        {
+          "id": "governance-execute",
+          "given": "Een bestaand besluitvoorstel heeft rechtmatige deelnemers, mandaten en vastgelegde quorumregels.",
+          "when": "Bevoegde deelnemers besluiten en lezen de uitkomst bij de canonieke bron.",
+          "then": "Besluitversie, stem-/goedkeuringsgrond, quorumnoemer en audit zijn consistent; het scherm verleent geen nieuwe bevoegdheid.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/rtfosgovernance.e2e.js",
+            "scripts/lib/voltooi/decisionroom.js"
+          ]
+        },
+        {
+          "id": "governance-negative",
+          "given": "Quorum ontbreekt, een belanghebbende stemt mee of een mandaat is verlopen.",
+          "when": "Het besluit wordt bevestigd via UI en directe route.",
+          "then": "De bestaande governance- of Authority-poort weigert; geen geld-, toegangs- of organisatie-effect ontstaat door alleen een UI-goedkeuring.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "test/rtfosgovernance.e2e.js",
+            "test/stuur-mandaat.test.js"
+          ]
+        },
+        {
+          "id": "governance-recover",
+          "given": "Een besluitantwoord ontbreekt of de voorstelversie wijzigt tijdens beoordeling.",
+          "when": "Een deelnemer heropent en probeert de eerdere bevestiging opnieuw te gebruiken.",
+          "then": "De exacte contract/voorstelversie blijft gebonden; oude toestemming mag niet voor gewijzigde inhoud gelden en een dubbel verzoek geeft geen tweede besluit.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "domain-state-readback"
+          ],
+          "instrumentRefs": [
+            "scripts/lib/voltooi/decisionroom.js"
+          ]
+        },
+        {
+          "id": "governance-understand",
+          "given": "Een onafhankelijke beoordelaar ziet een besluit met onthouding, ontbrekend quorum of belangenconflict.",
+          "when": "De beoordelaar verklaart noemer, bevoegdheid, gevolgen en reden voor weigering.",
+          "then": "Geen onduidelijkheid over besluitgeldigheid of gezag; tekst, toetsenbord en ondersteunende technologie dragen dezelfde betekenis.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "public": [
+        {
+          "id": "public-execute",
+          "given": "Een anonieme bezoeker opent de bestaande openbare of juridische app-ingang met fictieve demonstratiegegevens.",
+          "when": "De bezoeker volgt uitleg naar de bestaande capability en de juiste toegangsdeur.",
+          "then": "Beschikbaarheid en productbelofte volgen dezelfde gecontroleerde bron; er ontstaat geen account, boeking of betaling door demonstratie.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "scope-and-impact"
+          ],
+          "instrumentRefs": [
+            "test/startpagina.test.js",
+            "test/juridisch-ds.e2e.js"
+          ]
+        },
+        {
+          "id": "public-negative",
+          "given": "Een bron is niet gekwalificeerd, bevat privégegevens of heeft geen bevestigde providerrelatie.",
+          "when": "De publieke projectie wordt opgebouwd en bezocht.",
+          "then": "Geen onbewezen liveclaim, echt dossier of verzonnen partner; ontbrekende status blijft expliciet en de server weigert privé-inzage.",
+          "evidenceRequirements": [
+            "privacy-storage-audit",
+            "authorization-negative",
+            "scope-and-impact"
+          ],
+          "instrumentRefs": [
+            "test/juridisch-ds.e2e.js"
+          ]
+        },
+        {
+          "id": "public-recover",
+          "given": "Een eerste bezoek, offline netwerk of oude publieke uitleg wordt gevolgd door herladen.",
+          "when": "De bezoeker probeert de handmatige terugweg en opent actuele voorwaarden.",
+          "then": "Geen verdwenen cookiebalkbediening, dode terugweg of schijnbaar actuele bron; versie en onbeschikbaarheid blijven begrijpelijk.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "browser-state-trace"
+          ],
+          "instrumentRefs": [
+            "test/startpagina.test.js",
+            "test/raakvlak.test.js"
+          ]
+        },
+        {
+          "id": "public-understand",
+          "given": "Een nieuwe bezoeker ziet een demonstratie en een beperkt beschikbare capability.",
+          "when": "De bezoeker beschrijft wat direct beschikbaar is, wat een voorbeeld is en welke stap toestemming vraagt.",
+          "then": "Geen verwarring tussen demonstratie, aanvraag en werkelijke dienst; uitleg is bereikbaar zonder account en bruikbaar met ondersteunende technologie.",
+          "evidenceRequirements": [
+            "human-observation",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": []
+        }
+      ],
+      "redirect": [
+        {
+          "id": "redirect-execute",
+          "given": "Een bestaande alias heeft één canonieke bestemming en vastgelegde query-/fragmentregels.",
+          "when": "De gebruiker opent de alias en gaat daarna terug.",
+          "then": "Exact de bestaande bestemming, toegestane stand en vervangende geschiedenis; nul extra mutaties en geen redirectlus.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "scope-and-impact"
+          ],
+          "instrumentRefs": [
+            "test/redirect-ds.e2e.js"
+          ]
+        },
+        {
+          "id": "redirect-negative",
+          "given": "Een alias krijgt externe retour-URL, onverwachte parameters of een bestemming waarvoor de actor geen rechten heeft.",
+          "when": "JavaScript- en meta/handmatige routes worden gebruikt.",
+          "then": "Geen open redirect, bevoegdheidsverruiming of gevoelige overdracht; de canonieke bestemmingspoort beslist zelf.",
+          "evidenceRequirements": [
+            "authorization-negative",
+            "privacy-storage-audit",
+            "browser-state-trace"
+          ],
+          "instrumentRefs": [
+            "test/redirect-ds.e2e.js",
+            "test/voordeur-nonce-weerbaar.test.js"
+          ]
+        },
+        {
+          "id": "redirect-recover",
+          "given": "Scriptuitvoering is geblokkeerd of de vaste bestemming is tijdelijk onbereikbaar.",
+          "when": "De gebruiker opent de bestaande terugvalactie en herhaalt de navigatie.",
+          "then": "Een benoemde, toegankelijke link gebruikt dezelfde vaste bestemming zonder oneindige lus of verloren toepasselijke context.",
+          "evidenceRequirements": [
+            "recovery-trace",
+            "accessibility-observation"
+          ],
+          "instrumentRefs": [
+            "test/redirect-ds.e2e.js"
+          ]
+        },
+        {
+          "id": "redirect-understand",
+          "given": "De technische redirect toont kort een terugvaltekst of bereikt de bestemmingsscène.",
+          "when": "De gebruiker of onafhankelijke review volgt de benoemde overdracht.",
+          "then": "De alias claimt geen eigen productvoltooiing. Menselijke taakkwalificatie valt onder de afzonderlijke bestemming volgens EXP-REDIRECT-001; de zichtbare terugval heeft een begrijpelijke naam.",
+          "evidenceRequirements": [
+            "browser-state-trace",
+            "accessibility-observation",
+            "scope-and-impact"
+          ],
+          "instrumentRefs": [
+            "test/redirect-ds.e2e.js"
+          ]
+        }
+      ]
+    },
+    "premiumExperienceGate": {
+      "version": 1,
+      "status": "CONTRACT_DEFINED",
+      "name": "Premium Experience Gate",
+      "purpose": "Aanvullende menselijke acceptatie binnen de bestaande G1-G4-beslispoorten: vijf gelijktijdige productvoorwaarden, geen vijfde beslispoort, nieuw register of uitgevoerd onderzoek.",
+      "applicability": {
+        "profiles": [
+          "interface"
+        ],
+        "allApplicableChecksRequired": true,
+        "taskScopeSource": "De bestaande schermbinding, capability-beloften, toegewezen taakfamilies en acceptatiescenario's; selecteer vooraf de belangrijkste beloofde taak en alle veiligheidskritieke varianten. Een prettige neventaak vervangt nooit de hoofdtaak.",
+        "readOnlyBoundary": "De bestaande qualificationPlanning.application.noInventedActions blijft gelden; beoordeel bij alleen-lezen interfaces het vinden, begrijpen en veilig gebruiken van de werkelijke projectie zonder een mutatie te verzinnen.",
+        "redirect": {
+          "decisionRef": "EXP-REDIRECT-001",
+          "ownHumanExperienceRequired": false,
+          "destinationInterfaceRequiresAllChecks": true,
+          "preserveExistingApplicableDimensions": true,
+          "rule": "De bestaande redirect-N/A blijft uitsluitend voor de door het profiel vrijgestelde dimensies gelden. Overdracht, zichtbare terugval en toegankelijkheid blijven verplicht; een onbewezen of ontbrekende doelinterface wordt niet door de redirect gekwalificeerd."
+        }
+      },
+      "aggregation": {
+        "operator": "ALL",
+        "checksRequired": 5,
+        "compensationAllowed": false,
+        "crossCohortPoolingAllowed": false,
+        "crossRiskPoolingAllowed": false,
+        "crossDevicePoolingAllowed": false,
+        "crossTaskPoolingAllowed": false,
+        "criticalFailuresAllowed": 0,
+        "sameCandidateAndSourceRequired": true,
+        "missingEvidenceStatus": "NOT_TESTED",
+        "missingAuthorizedHumanReviewStatus": "BLOCKED",
+        "rule": "Alle vijf controles moeten afzonderlijk voldoen voor iedere toepasselijke taak-, persona-, risico-, apparaat- en cohortcel op dezelfde kandidaat. Een gemiddelde, sterke andere controle of geslaagde herhaling wist geen kritieke bevinding uit; na herstel is nieuwe, volledige toepasselijke kwalificatie nodig."
+      },
+      "budgetSelection": {
+        "taskFamilySource": "qualificationPlanning.taskFamilies",
+        "riskAndDeviceSource": "qualificationPlanning.budgetMatrix",
+        "riskSelectionSource": "qualificationPlanning.application.riskSelection",
+        "referenceSyntax": "taskFamily is iedere toegewezen bestaande taakfamilie; budgetCell is de bestaande budgetMatrix-rij voor het werkelijke risico en apparaat. Iedere Ref hieronder wordt vóór uitvoering naar die concrete rij opgelost en bij het bewijs bewaard.",
+        "noUniformTaskDeadline": true,
+        "missingOrInapplicableBudget": "BLOCKED: leg vóór uitvoering een passend taakbudget vast met expliciete scopebevestiging; kies nooit een lichter risico, ander apparaat of eenvoudiger taak om te slagen.",
+        "globalLimitsRemainRequired": "release.experienceBudgets en qualificationPlanning.measurementProtocol blijven onverminderd van kracht."
+      },
+      "cohortProtocol": {
+        "cohorts": [
+          "novice",
+          "experienced"
+        ],
+        "separateCohortResults": true,
+        "minimumParticipantsPerRiskDeviceCohortRef": "qualificationPlanning.measurementProtocol.humanProtocol.participantsPerRiskDeviceCohortMin",
+        "participantAndAccessibilitySource": "qualificationPlanning.measurementProtocol.humanProtocol",
+        "sampling": "Werf echte representatieve nieuwe en ervaren gebruikers afzonderlijk; het bestaande minimum geldt per cohort, risicoklasse en apparaat. Leg per taak en persona de deelnemersdekking vooraf vast, inclusief relevante ondersteunde technologie. Geen synthetische gebruiker, medewerker die het ontwerp al kent of gemiddelde over cohorten vervangt ontbrekende deelnemers.",
+        "novice": {
+          "eligibility": "De deelnemer heeft de getoetste RTG-taak en interface niet eerder uitgevoerd of uitgelegd gekregen; voorkennis van het domein wordt vastgelegd, niet verward met RTG-ervaring.",
+          "coachingAllowed": false,
+          "neutralTaskPromptRequired": true,
+          "builtInGuidanceAllowed": true,
+          "guidanceBoundary": "De taakprompt noemt het doel en de vooraf bekende gegevens, geen knopnaam, route of oplossing. Normale productuitleg en ingebouwde hulp mogen worden gebruikt en worden als interactie vastgelegd. Hints, demonstratie of tussenkomst door de onderzoeker maken de poging niet-onbegeleid en tellen niet als onbegeleid succes; veiligheidsingrijpen blijft altijd toegestaan."
+        },
+        "experienced": {
+          "eligibility": "Leg aantoonbare eerdere zelfstandige uitvoering van dezelfde taak of een vooraf vastgelegde, gescheiden oefenfase vast; de beoordeelde poging is nieuw en wordt niet gecoacht.",
+          "coachingAllowed": false,
+          "baselinePolicy": "Gebruik voor een verbeterclaim een vooraf bevroren, verifieerbare nulmeting van dezelfde bevoegde taak, fixture, persona, apparaat, netwerk en veiligheidsstappen. Vergelijk betekenisvolle handelingen en taakduur afzonderlijk; geen universele secondegrens of weglaten van toestemming. Zonder vergelijkbare nulmeting kan alleen voldoen aan de bestaande absolute taak- en apparaatbudgetten worden beoordeeld, nooit een bewezen efficiëntiewinst.",
+          "absoluteTaskBudgetRequired": true,
+          "improvementClaimRequiresComparableBaseline": true
+        },
+        "independentReviewRequired": true,
+        "independenceSource": "qualificationPlanning.measurementProtocol.humanProtocol.independence",
+        "recording": "Bewaar gepseudonimiseerde observaties per poging met taakfixture, cohort, persona, apparaat, risico, kandidaat/bron, hulp, fouten, handelingen, uitkomst, teach-back, rubric en reviewer. Beperk persoonsgegevens en leg toestemming en bewaartermijn vast via bestaand beleid.",
+        "criticalFailureHandling": "Stop een onveilige poging, registreer de bevinding en blokkeer de toepasselijke kwalificatie. Verwijder mislukte of geholpen pogingen niet uit de noemer. Hertesten na herstel krijgen een nieuwe expliciete kandidaat- en bewijsbinding.",
+        "evidenceBoundary": "Dit protocol is een afgesproken acceptatienorm, geen reeds uitgevoerde gebruikerstest, representatieve marktuitspraak of statistische betrouwbaarheidsgarantie. De bestaande human-observation-bewijsroute vereist nog gezaghebbende menselijke bewijsinvoer."
+      },
+      "checks": [
+        {
+          "id": "novice-task",
+          "question": "Kan een nieuwe gebruiker zonder uitleg de belangrijkste taak zelfstandig vinden en voltooien?",
+          "dimensions": [
+            "identity",
+            "composition",
+            "restraint",
+            "accessibility",
+            "human-quality"
+          ],
+          "evidenceRequirements": [
+            "human-observation",
+            "browser-state-trace",
+            "accessibility-observation",
+            "execution-integrity"
+          ],
+          "budgetRefs": [
+            "qualificationPlanning.taskFamilies[taskFamily].interactionBudget",
+            "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension",
+            "qualificationPlanning.budgetMatrix[budgetCell].accessibility",
+            "qualificationPlanning.measurementProtocol.navigationHopsFromPersonaHomeMax"
+          ],
+          "measurableAcceptance": {
+            "cohorts": [
+              "novice"
+            ],
+            "unassistedTaskSuccessRatioMinRef": "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension.unassistedTaskSuccessRatioMin",
+            "meaningfulActionsMaxRef": "qualificationPlanning.taskFamilies[taskFamily].interactionBudget.meaningfulActionsMax",
+            "navigationHopsMaxRef": "qualificationPlanning.measurementProtocol.navigationHopsFromPersonaHomeMax",
+            "navigationExceptionsSource": "qualificationPlanning.measurementProtocol.navigationExceptionsSource",
+            "criticalFindingsMax": 0,
+            "successDefinition": "De bedoelde taak is vanuit de vooraf vastgelegde persona-ingang in de juiste canonieke scène afgerond, de werkelijke bronuitkomst klopt en de gebruiker kan die uitkomst aanwijzen; niet alleen de juiste knop vinden. Geholpen, afgebroken en fout afgeronde pogingen zijn geen onbegeleid succes.",
+            "interactionBudgetAppliesToEverySuccessfulAttempt": true
+          },
+          "procedure": [
+            "Bevries vooraf de belangrijkste taak, relevante varianten, bevoegde persona, startpunt en bronuitkomst.",
+            "Geef alleen de neutrale taakprompt; registreer navigatie, ingebouwde hulp, handelingen, fouten, hulpvragen en uiteindelijke bronuitkomst.",
+            "Beoordeel iedere taak- en apparaatcel apart tegen de bestaande risicodrempel en behoud alle pogingen in de noemer."
+          ]
+        },
+        {
+          "id": "expert-efficiency",
+          "question": "Kan een ervaren gebruiker de belangrijkste taak efficiënt uitvoeren zonder onnodige stappen of verlies van controle?",
+          "dimensions": [
+            "composition",
+            "restraint",
+            "adaptability",
+            "accessibility",
+            "fluidity",
+            "human-quality"
+          ],
+          "evidenceRequirements": [
+            "human-observation",
+            "browser-state-trace",
+            "performance-samples",
+            "execution-integrity"
+          ],
+          "budgetRefs": [
+            "qualificationPlanning.taskFamilies[taskFamily].interactionBudget",
+            "qualificationPlanning.budgetMatrix[budgetCell].performance",
+            "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension",
+            "qualificationPlanning.measurementProtocol.interactionCounting"
+          ],
+          "measurableAcceptance": {
+            "cohorts": [
+              "experienced"
+            ],
+            "unassistedTaskSuccessRatioMinRef": "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension.unassistedTaskSuccessRatioMin",
+            "meaningfulActionsMaxRef": "qualificationPlanning.taskFamilies[taskFamily].interactionBudget.meaningfulActionsMax",
+            "unnecessaryContextSwitchesMaxRef": "qualificationPlanning.taskFamilies[taskFamily].interactionBudget.unnecessaryContextSwitchesMax",
+            "simultaneousPrimaryActionsMaxRef": "qualificationPlanning.taskFamilies[taskFamily].interactionBudget.simultaneousPrimaryActionsMax",
+            "performanceLimitsRef": "qualificationPlanning.budgetMatrix[budgetCell].performance",
+            "criticalFindingsMax": 0,
+            "interactionBudgetAppliesToEverySuccessfulAttempt": true,
+            "baselinePolicyRef": "qualificationPlanning.premiumExperienceGate.cohortProtocol.experienced.baselinePolicy",
+            "safetyStepsMayBeRemovedForEfficiency": false,
+            "taskDurationRule": "Leg werkelijke taakduur en wachtoorzaken vast; de grens komt uit een vooraf vastgesteld passend taakbudget indien van toepassing, niet uit één nieuw platformbreed aantal seconden. De bestaande feedback-, wachtstatus- en herstelbudgetten blijven harde grenzen."
+          },
+          "procedure": [
+            "Gebruik dezelfde vooraf vastgelegde taakfixture voor elke vergelijkbare poging en leg ervaring en eventuele nulmeting apart vast.",
+            "Tel alle betekenisvolle handelingen volgens het bestaande telprotocol, inclusief veiligheidsbevestigingen; meet respons en wachttijd met de bestaande apparaat-risicocel.",
+            "Toets absolute budgetten per taak en ervaren cohort; publiceer uitsluitend een verbeterclaim als de vergelijkbare brongebonden nulmeting die werkelijk ondersteunt."
+          ]
+        },
+        {
+          "id": "informed-decision",
+          "question": "Begrijpt de gebruiker vóór een beslissing wat er gebeurt, voor wie, met welke gevolgen en wat nog onzeker is?",
+          "dimensions": [
+            "identity",
+            "continuity",
+            "restraint",
+            "accessibility",
+            "human-quality"
+          ],
+          "evidenceRequirements": [
+            "human-observation",
+            "browser-state-trace",
+            "authorization-negative",
+            "domain-state-readback",
+            "execution-integrity"
+          ],
+          "budgetRefs": [
+            "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension",
+            "qualificationPlanning.budgetMatrix[budgetCell].interruption"
+          ],
+          "measurableAcceptance": {
+            "cohorts": [
+              "novice",
+              "experienced"
+            ],
+            "teachBackCorrectRatioMinRef": "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension.teachBackCorrectRatioMin",
+            "questionsRef": "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension.questions",
+            "criticalMisunderstandingsMax": 0,
+            "criticalFindingsMax": 0,
+            "assessmentMoment": "Vóór de eerste beslissende bevestiging met mogelijk extern of gevoelig gevolg; bij alleen-lezen taken vóór de gebruiker de getoonde status als grond voor verder handelen gebruikt.",
+            "correctTeachBack": "De deelnemer benoemt in eigen woorden alle toepasselijke onderdelen: handeling en ontvanger, gegevens/kosten, bevestigde versus onzekere bronstatus en mogelijkheid of grens van annuleren/herstel. Een cruciaal onjuist onderdeel is een kritieke misvatting, ook wanneer een totaalscore hoog is.",
+            "leadingPromptsAllowed": false,
+            "unconfirmedOutcomePresentedAsConfirmedAllowed": false
+          },
+          "procedure": [
+            "Toon de echte kandidaatinterface met veilige, brongebonden fixtures en leg de weergegeven gevolgen en onzekerheden vast.",
+            "Vraag neutraal om uitleg in eigen woorden vóór bevestiging; geef geen goede antwoorden of extra gevolgen die de interface niet toont.",
+            "Vergelijk de uitleg met de werkelijke domeinstatus en bevoegdheidsgrenzen; beoordeel nieuwe en ervaren gebruikers afzonderlijk."
+          ]
+        },
+        {
+          "id": "safe-resumption",
+          "question": "Kan de gebruiker na een fout of onderbreking veilig verder, met begrijpelijke status en zonder verlies, duplicatie of ongeoorloofde handeling?",
+          "dimensions": [
+            "continuity",
+            "adaptability",
+            "accessibility",
+            "fluidity",
+            "human-quality"
+          ],
+          "evidenceRequirements": [
+            "human-observation",
+            "recovery-trace",
+            "domain-state-readback",
+            "authorization-negative",
+            "privacy-storage-audit",
+            "performance-samples",
+            "execution-integrity"
+          ],
+          "budgetRefs": [
+            "qualificationPlanning.taskFamilies[taskFamily].interactionBudget.extraActionsForRecoveryMax",
+            "qualificationPlanning.budgetMatrix[budgetCell].interruption",
+            "qualificationPlanning.budgetMatrix[budgetCell].recovery",
+            "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension"
+          ],
+          "measurableAcceptance": {
+            "cohorts": [
+              "novice",
+              "experienced"
+            ],
+            "unassistedTaskSuccessRatioMinRef": "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension.unassistedTaskSuccessRatioMin",
+            "teachBackCorrectRatioMinRef": "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension.teachBackCorrectRatioMin",
+            "extraActionsForRecoveryMaxRef": "qualificationPlanning.taskFamilies[taskFamily].interactionBudget.extraActionsForRecoveryMax",
+            "interruptionLimitsRef": "qualificationPlanning.budgetMatrix[budgetCell].interruption",
+            "recoveryLimitsRef": "qualificationPlanning.budgetMatrix[budgetCell].recovery",
+            "criticalFindingsMax": 0,
+            "successDefinition": "De gebruiker bereikt zelfstandig een aantoonbaar veilige vervolgtoestand, begrijpt wat wel/niet bewaard of bevestigd is en kan hervatten of passende hulp kiezen. Wachten op bronreconciliatie mag de juiste veilige uitkomst zijn, maar is geen afgeronde boeking of betaling.",
+            "unconfirmedExternalReplayAllowed": false
+          },
+          "procedure": [
+            "Leg vooraf alle toepasselijke fout- en onderbrekingspunten vast, waaronder vóór/na bewaren, onzekere provideruitkomst, netwerkverlies en verlopen of gewijzigde rechten.",
+            "Wek elke toepasselijke toestand echt op in de toegestane testomgeving; leg bronstatus, eventuele gevoelige lokale data en aantallen externe effecten vóór en na herstel vast.",
+            "Laat beide cohorten zonder coaching hervatten, annuleren of veilig hulp vragen; toets de bestaande nulgrenzen, herstelbudgetten en het begrip afzonderlijk."
+          ]
+        },
+        {
+          "id": "coherent-trust",
+          "question": "Ervaart de gebruiker de interface als samenhangend, zorgvuldig afgewerkt en betrouwbaar, passend bij de eigen identiteit van deze RTG-ervaring?",
+          "dimensions": [
+            "identity",
+            "composition",
+            "restraint",
+            "adaptability",
+            "accessibility",
+            "human-quality"
+          ],
+          "evidenceRequirements": [
+            "human-observation",
+            "visual-review",
+            "accessibility-observation",
+            "browser-state-trace",
+            "execution-integrity"
+          ],
+          "budgetRefs": [
+            "qualificationPlanning.taskFamilies[taskFamily].interactionBudget",
+            "qualificationPlanning.budgetMatrix[budgetCell].accessibility",
+            "qualificationPlanning.budgetMatrix[budgetCell].humanComprehension",
+            "release.experienceBudgets"
+          ],
+          "measurableAcceptance": {
+            "cohorts": [
+              "novice",
+              "experienced"
+            ],
+            "criticalFindingsMax": 0,
+            "rubric": {
+              "scaleMin": 1,
+              "scaleMax": 5,
+              "scoreMinPerCriterion": 4,
+              "independentHumanAssessmentRequired": true,
+              "everyObservedRatingMustMeetMinimum": true,
+              "averagingAllowed": false,
+              "criticalFindingsMax": 0,
+              "scaleAnchors": {
+                "1": "Onbruikbaar of misleidend: de taak of het vertrouwen breekt.",
+                "2": "Ernstige onduidelijkheid of inconsistentie: hulp of omwegen zijn nodig.",
+                "3": "Bruikbaar, maar merkbare twijfel, onverklaarde afwijking of onafgewerkte toestand blijft bestaan.",
+                "4": "Zelfstandig duidelijk, consistent en verzorgd in de hele getoetste taak, inclusief fouten en herstel; concrete waarnemingen onderbouwen de score.",
+                "5": "Voldoet aan 4 en ondersteunt ook de getoetste veeleisende variant uitzonderlijk helder en zorgvuldig, zonder extra complexiteit of misleidende zekerheid."
+              },
+              "criteria": [
+                {
+                  "id": "orientation",
+                  "label": "Oriëntatie",
+                  "observable": "De gebruiker kan doel, huidige plaats, hoofdhandeling, bronstatus en veilige terugweg aanwijzen zonder verborgen navigatiekennis."
+                },
+                {
+                  "id": "consistency",
+                  "label": "Samenhang en consistentie",
+                  "observable": "Benamingen, bediening en statusbetekenis blijven herkenbaar binnen en tussen de bezochte scènes; een Experience Signature mag verschillen in sfeer, niet willekeurig in betekenis of veiligheidsgrens."
+                },
+                {
+                  "id": "craft",
+                  "label": "Zorgvuldige afwerking",
+                  "observable": "Inhoud, hiërarchie, typografie, uitlijning, focus, laden, lege toestanden en foutmeldingen zijn leesbaar en af; geen afsnijding, springende betekenis, onafgemaakte tekst of onverklaarde visuele regressie."
+                },
+                {
+                  "id": "trust",
+                  "label": "Betrouwbaarheid en eerlijkheid",
+                  "observable": "De interface maakt bron, toestemming, kosten, bewaren, onzekerheid en herstel begrijpelijk zonder onbewezen zekerheid, kunstmatige urgentie of tegenstrijdige belofte."
+                }
+              ],
+              "ratingRule": "Nieuwe gebruikers, ervaren gebruikers en de onafhankelijke beoordelaar geven per criterium een gemotiveerde score met waargenomen voorbeeld. Iedere toepasselijke score is minstens 4; geen gemiddelde over criteria, personen of apparaten. Een kritieke veiligheids-, toegankelijkheids- of waarheidsbevinding blokkeert ongeacht de scores.",
+              "disagreementRule": "Bewaar afwijkende beoordelingen en onderzoek de concrete oorzaak. Alleen aantoonbare meetfout met onafhankelijke motivering mag worden gecorrigeerd; onwelgevallige deelnemers of lage scores mogen niet worden verwijderd. Een productwijziging vereist herbeoordeling op de nieuwe kandidaat."
+            }
+          },
+          "procedure": [
+            "Laat de vooraf vastgelegde hoofdtaak, relevante nevenscènes en fout/hersteltoestanden op het echte apparaat doorlopen; gebruik geen geïsoleerde mooie screenshot als vervanging.",
+            "Verzamel per cohort de vier rubricbeoordelingen en laat een onafhankelijke beoordelaar de waarnemingen, visuele kwaliteit, toegankelijkheid en eerlijkheid afzonderlijk toetsen.",
+            "Pas de conjunctieve ondergrens per criterium toe en verbind bevindingen aan het concrete scherm, de taak, bron en kandidaat; een verklaring van premiumkwaliteit zonder deze waarnemingen is geen bewijs."
+          ]
+        }
+      ]
+    },
+    "openDecisions": [
+      {
+        "id": "human-evidence-authority",
+        "owner": "P6/P7 en onafhankelijke menselijke acceptatie",
+        "blocks": "P0-uitvoeringsgereedheid legt de bewijsroute vast; G1 referentie-ervaringen, G2 portfolio, G3 onafhankelijke kwalificatie en G4 productie blijven zonder gezaghebbend menselijk bewijs geblokkeerd",
+        "decision": "Sluit menselijke beoordelingen aan op een gezaghebbende bestaande reviewvoorziening; benoem echte onafhankelijke beoordelaars. De huidige artifact-ontvanger blokkeert human-quality.",
+        "sourceRef": "scripts/lib/experience/artifact.js"
+      },
+      {
+        "id": "provider-deadline-and-cancellation",
+        "owner": "Canonieke provider- en domeineigenaar, P3",
+        "blocks": "Uitvoering en vrijgave van iedere betrokken externe handeling",
+        "decision": "Leg per echte provider de harde deadline, statusreconciliatie, annuleringstermijn en compensatie vast. Een generiek UX-wachtbudget vervangt dit contract niet.",
+        "sourceRef": "server/kern/reservering/providerbewijs.js"
+      },
+      {
+        "id": "sensitive-draft-retention",
+        "owner": "Authority, domeineigenaar en P5",
+        "blocks": "Offline of herstelbelofte die gevoelige velden lokaal bewaart",
+        "decision": "Gebruik bestaande toestemming, veldbeleid en TTL; voor nieuwe bewaarbelofte is een expliciet scope- en privacybesluit nodig. Tot die tijd geen nieuwe gevoelige lokale opslag.",
+        "sourceRef": "server/kern/connection-consent.js"
+      },
+      {
+        "id": "representative-human-cohorts",
+        "owner": "Onafhankelijke menselijke acceptatie",
+        "blocks": "Menselijke kwalificatie op de releasekandidaat",
+        "decision": "Plan echte deelnemers, ondersteunde technologie, fysieke apparaten en veilige kind-/zorgscenario's; planningcijfers zijn geen deelnemersbewijs.",
+        "sourceRef": "TOEGANKELIJK.md"
+      }
+    ]
+  },
   "executedProofs": [
     {
       "proof": "hotels-destination",

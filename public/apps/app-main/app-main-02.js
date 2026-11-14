@@ -13,29 +13,9 @@
     } catch(e){ toast(T('fin.dlfout','Downloaden lukte niet.')); }
   }
 
-  // API-client uit de gedeelde app-shell (public/shared/appshell.js).
-  const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
+  // De app-eigen statebinding gebruikt de gedeelde API-client (02_state).
+  const { API, applyState, refreshState, verwerpOudeState, aanvaardSessie } = maakAppState();
   let magnaatProef = false;
-  // Een 403 met kyc:true (bijv. een gratis lid dat RTG Pay gebruikt zonder
-  // paspoort) laat Rahul meteen de paspoort-stap van de onboarding tonen.
-  const _apiCall = API.call.bind(API);
-  API.call = function (pad, body) {
-    return _apiCall(pad, body).catch(function (e) {
-      if (e && e.data && e.data.kyc && typeof checkOnboarding === 'function') { try { checkOnboarding(); } catch (x) {} }
-      throw e;
-    });
-  };
-
-  function applyState(state){
-    if (!state) return;
-    if (state.user) user = state.user;
-    if (state.invoices) invoices = state.invoices;
-    if (state.trip) trip = state.trip;
-    if (state.posts) posts = state.posts;
-    if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
-    if (state.myApplications) myApps = state.myApplications;
-    if (state.foundation) rtf = state.foundation;
-  }
 
   /* Meenemen: de app kent zijn eigen model, dus geeft hij dat door in plaats
      van de gedeelde laag naar het scherm te laten raden. Facturen zijn hier het
@@ -55,11 +35,6 @@
       })
     };
   });
-
-  // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
-  async function refreshState(){
-    try { applyState((await API.call('/api/state')).state); } catch(e){}
-  }
 
   let toastTimer;
   function toast(msg){

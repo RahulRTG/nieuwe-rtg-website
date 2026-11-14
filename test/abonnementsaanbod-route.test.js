@@ -1,6 +1,14 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const { fixture, body, tekenen } = require('./abonnementsaanbod-fixture.cjs');
+const PADEN = Object.freeze({
+  stand: '/api/mijn/abonnement/automatisch/stand',
+  aanbod: '/api/mijn/abonnement/automatisch/aanbod',
+  teken: '/api/mijn/abonnement/automatisch/teken',
+  betalen: '/api/mijn/abonnement/automatisch/betalen',
+  herstel: '/api/mijn/abonnement/automatisch/herstel',
+  intrekken: '/api/mijn/abonnement/automatisch/intrekken'
+});
 function deur(env = {}) {
   const f = fixture(), handlers = new Map(), calls = [];
   const automatisch = { ...f.motor,
@@ -11,7 +19,7 @@ function deur(env = {}) {
     aanvragerVan: req => req.tokenAccount, aanmeldingen: { automatisch },
     app: { post(pad, ...rij) { handlers.set(pad, rij); } } });
   async function api(pad, input, accountId) {
-    const rij = handlers.get('/api/mijn/abonnement/automatisch/' + pad);
+    const rij = handlers.get(PADEN[pad]);
     const req = { tokenAccount: accountId, body: input }, uit = { status: 200, headers: {} };
     const res = { set(k, v) { uit.headers[k] = v; return this; }, status(s) { uit.status = s; return this; },
       json(data) { uit.body = data; return this; } };
@@ -25,7 +33,7 @@ test('alle nieuwe schrijfroutes zijn standaard dicht; stand zegt beschikbaar=fal
   const f = deur();
   assert.equal((await f.api('stand', {}, 1)).body.beschikbaar, false);
   for (const pad of ['aanbod', 'teken', 'betalen', 'herstel', 'intrekken'])
-    assert.equal((await f.api(pad, body(), 1)).status, 503);
+    assert.equal((await f.api(pad, body(), 1)).status, 409);
   assert.deepEqual(f.db.data, {}); assert.deepEqual(f.calls, []);
   assert.equal((await f.api('stand', {}, null)).status, 401);
 });

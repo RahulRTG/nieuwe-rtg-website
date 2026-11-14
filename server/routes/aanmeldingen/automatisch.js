@@ -10,7 +10,7 @@ module.exports = ({ app, auth, aanvragerVan, aanmeldingen, env = process.env }) 
           return res.status(401).json({ error: 'Log in met uw eigen RTG-account.' });
         if (env.RTG_ABONNEMENTEN_ZELFSERVICE !== '1') {
           if (methode === 'mijn') return res.json({ ok: true, beschikbaar: false, contracten: [] });
-          return res.status(503).json({ error: 'Nieuwe abonnementen via zelfbediening zijn nog niet vrijgegeven.' });
+          return res.status(409).json({ error: 'Nieuwe abonnementen via zelfbediening zijn nog niet vrijgegeven.' });
         }
         const motor = aanmeldingen && aanmeldingen.automatisch;
         if (!motor || typeof motor[methode] !== 'function')

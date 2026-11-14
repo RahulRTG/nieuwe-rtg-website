@@ -53,6 +53,8 @@ module.exports = ({ accounts, werktBij, findSupplier, zaakAbonnement }) => {
       return { ok: true, organisatie: org };
     } catch (_) { return onbeschikbaar(); }
   }
-  return { mobVraagToegang };
+  /* Beide ingangen krijgen dezelfde actuele accountcontrole. De routeadapter
+     ontvangt de gefabriceerde domeininterface, dus deze functie moet hier
+     worden aangeboden en niet alleen als eigenschap van de factory-export. */
+  return { mobVraagToegang, mobEigenToegang: session => mobEigenToegang(accounts, session) };
 };
-module.exports.mobEigenToegang = mobEigenToegang;

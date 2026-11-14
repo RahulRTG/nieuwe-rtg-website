@@ -38,7 +38,7 @@
     var rol = o.rol === 'opnemer' ? 'opnemer' : 'beller';
     var video = !!o.video;
     var opStand = typeof o.opStand === 'function' ? o.opStand : function () {};
-    var pc = null, stream = null, ijs = null, dood = false;
+    var pc = null, stream = null, scherm = null, schermZender = null, ijs = null, dood = false;
     /* Kandidaten die binnenkomen VOORDAT de verbinding een beschrijving heeft,
        moeten wachten. Zonder deze rij gooit addIceCandidate en valt precies het
        eerste gesprek van een verbinding weg -- de klassieke WebRTC-val. */
@@ -109,6 +109,29 @@
       await stuur('offer', d);
     }
 
+    /* SCHERM DELEN IS ALTIJD EEN ZICHTBARE HANDELING VAN DE GEBRUIKER. De
+       browser tekent zijn eigen keuzescherm; deze code kan dat niet omzeilen.
+       De track rijdt rechtstreeks over dezelfde WebRTC-verbinding en wordt
+       niet naar de RTG-server geupload of opgenomen. */
+    async function deelScherm() {
+      if (dood || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        meld('geenscherm', 'Deze browser kan geen scherm delen.'); return false;
+      }
+      try { scherm = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false }); }
+      catch (e) { meld('geenscherm', e && e.name); return false; }
+      var v = await verbinding();
+      var track = scherm.getVideoTracks()[0];
+      if (!track) return false;
+      schermZender = v.getSenders().find(function (s) { return s.track && s.track.kind === 'video'; });
+      if (schermZender) await schermZender.replaceTrack(track);
+      else schermZender = v.addTrack(track, scherm);
+      if (o.elLokaal) { try { o.elLokaal.hidden = false; o.elLokaal.srcObject = scherm; } catch (e) {} }
+      track.onended = function () { meld('schermgestopt'); };
+      if (rol === 'beller') await aanbod();
+      meld('schermgedeeld');
+      return true;
+    }
+
     async function leegWachtrij() {
       while (wachtrij.length) {
         var k = wachtrij.shift();
@@ -161,10 +184,11 @@
       if (zeghet !== false) { try { stuur('hangup', null); } catch (e) {} }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
       if (stream) { stream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); stream = null; }
+      if (scherm) { scherm.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); scherm = null; }
       meld('gestopt');
     }
 
-    return { start: start, ontvang: ontvang, stop: stop,
+    return { start: start, ontvang: ontvang, stop: stop, deelScherm: deelScherm,
       get actief() { return !dood; },
       /* De eigen microfoonstroom, voor shared/meeluister.js. Een getter en geen
          tweede aanvraag: nog een getUserMedia voor dezelfde microfoon zet een

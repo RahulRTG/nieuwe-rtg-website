@@ -3679,6 +3679,16 @@ ging. De helper rekent nu na dat de intake echt is gezet.
 per organisatie (holdings met dochters eronder), met eigen leden, rollen,
 journaal en startscherm -- zodat dit ook aan een andere organisatie te geven is.
 
+**De gewone RTG-inlog is ook de Work OS-inlog.** Bij het openen probeert het
+scherm eerst `viaLid()` met `rtg_member_token`: de gekoppelde werkruimte en
+persoonlijke werksleutel worden uit de accountbrug gehaald en de gebruiker komt
+zonder tweede login binnen. Alleen een externe medewerker die nog geen
+gekoppeld RTG-account heeft ziet de bestaande werkruimtecode plus persoonlijke
+werksleutel; dat is een andere identiteit, geen terugval naar een gedeelde
+kantoorcode. De RTG-kantoorschermen zelf hebben die code-terugval niet meer:
+zij vragen een gewone accountlogin, een kantoorrol en daarna de bestaande
+passkey/pin-ceremonie.
+
 | Module | Wat erin zit |
 | --- | --- |
 | Werkruimte | leden (aanmelden is niet binnen zijn), rollen met een venster van/tot, journaal, uit dienst |

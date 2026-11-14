@@ -20,6 +20,19 @@ test('office bank: dezelfde bedoeling over twee workers en na procesverlies', {s
   RTG_OWNER_BOOTSTRAP:'office-bank-workers-fixture',RTG_OWNER_EMAIL:'bank-owner@fixture.test',DEMO_PASS:'BankFixtureOnly123!',
   STRIPE_SECRET_KEY:'',MOLLIE_API_KEY:'',ADYEN_API_KEY:'',SMTP_URL:''};
  async function api(w,p,b={},token=w.token){const r=await fetch(w.base+'/api/'+p,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(b),signal:AbortSignal.timeout(30000)});return{status:r.status,body:await r.json()};}
+ async function herhaalNaGedeeldeCommit(w,p,b){
+  // Een gelijktijdige schrijver mag 503 teruggeven terwijl LISTEN/NOTIFY de
+  // winnende, atomair bewaarde ontvangst nog naar deze worker kopieert. Een
+  // ongeldige ontvangst wordt nooit succes: na de begrensde observatiewacht
+  // moet exact dezelfde bedoeling alsnog het oorspronkelijke antwoord geven.
+  let r;
+  for(let poging=0;poging<100;poging++){
+   r=await api(w,p,b);
+   if(r.status!==503)return r;
+   await new Promise(klaar=>setTimeout(klaar,25));
+  }
+  return r;
+ }
  async function login(w){
   const r=await api(w,'auth/login',{login:env.RTG_OWNER_EMAIL,password:env.DEMO_PASS},null);assert.equal(r.status,200,JSON.stringify(r));w.token=r.body.token;
   const me=await api(w,'auth/me');assert.equal(me.status,200,JSON.stringify(me));return me.body.user;
@@ -47,7 +60,7 @@ test('office bank: dezelfde bedoeling over twee workers en na procesverlies', {s
   assert.ok(beide.some(x=>x.status===200),JSON.stringify(beide));
   assert.ok(beide.every(x=>[200,409,503].includes(x.status)),JSON.stringify(beide));
   const eerste=beide.find(x=>x.status===200).body.rekening.iban;
-  for(const w of [a,b]) {const r=await api(w,pad,body);assert.equal(r.status,200,JSON.stringify(r));assert.equal(r.body.rekening.iban,eerste);}
+  for(const w of [a,b]) {const r=await herhaalNaGedeeldeCommit(w,pad,body);assert.equal(r.status,200,JSON.stringify(r));assert.equal(r.body.rekening.iban,eerste);}
   const voor=await opgeslagen();
   assert.equal(Object.values(voor.bankRekeningen||{}).filter(x=>x.codenaam===body.codenaam&&x.naam==='Workerproef').length,1);
   assert.equal(Object.keys(voor.bankIdem||{}).filter(x=>x.startsWith('rekopen-kantoor:')).length,1);

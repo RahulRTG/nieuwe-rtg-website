@@ -32,6 +32,10 @@
   async function ask(qIn){
     const q = String(qIn || '').trim();
     if (!q) return;
+    /* Een RTG Direct-vraag gaat rechtstreeks naar de interne Servicezaak. De
+       algemene Rahul-motor krijgt hem niet eerst: de gebruiker koos hier
+       expliciet voor contact met een medewerker. */
+    if (user.account && rtgDirect){ chatSend(q); return; }
     // eerst Rahul-motor: geheugen, seintjes, zoeken en echt regelen
     // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
     // vraag niet, dan neemt de gewone gesprekslaag het over

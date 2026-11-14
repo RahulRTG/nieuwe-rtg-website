@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5569,
-    "mutationContracts": 5440,
+    "mutationContracts": 5443,
     "screens": 328
   },
   "classifications": [
@@ -3165,6 +3165,7 @@
       "server/routes/samen.js",
       "server/routes/scim-groepen.js",
       "server/routes/scim.js",
+      "server/routes/service-kantoor-ai.js",
       "server/routes/service-kantoor-zaakbeeld.js",
       "server/routes/service-kantoor.js",
       "server/routes/service-zaak.js",
@@ -5688,6 +5689,7 @@
       "server/kern/service/machtiging.js",
       "server/kern/service/mens.js",
       "server/kern/service/onderzoeker.js",
+      "server/kern/service/zaak.js",
       "server/kern/sleutelwoorden.js",
       "server/kern/socialebeleid/index.js",
       "server/kern/socialecommand/actielog.js",
@@ -17069,8 +17071,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 696,
-        "mutationRoutes": 676,
-        "declaredMutationSemantics": 407,
+        "mutationRoutes": 679,
+        "declaredMutationSemantics": 410,
         "sourceFileCount": 115,
         "kernelDependencyCount": 163,
         "screenCount": 21,

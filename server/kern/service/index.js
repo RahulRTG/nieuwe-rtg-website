@@ -21,7 +21,8 @@
 'use strict';
 
 module.exports = function maakService({ db, save, crypto, inzagelog, notify, sseToCustomer, sseToOffice, accounts, bewerkCollectie }) {
-  const zaken = require('./zaak')({ db, save, crypto });
+  const rahul = require('./rahul');
+  const zaken = require('./zaak')({ db, save, crypto, rahul });
   const loop = require('./loop')({ zaken, save, notify });
   const machtigingen = require('./machtiging')({ db, save, crypto, zaken, inzagelog });
   const bevestiging = require('./bevestiging')({ db, save, crypto, zaken, machtigingen, bewerkCollectie });

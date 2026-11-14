@@ -165,21 +165,37 @@ test('de knop "ik wil een mens" staat er, en zet echt door', { skip: geenBrowser
   });
 });
 
-/* HET MAILADRES STAAT ER, EN KOMT VAN DE SERVER. Een kanaal dat niemand kent
-   bestaat niet; en een adres dat in dit scherm was overgetypt, zou de tweede
-   plek zijn die uitrekent welk adres de servicebus is (kern/service/post.js
-   legt uit waarom dat bij post een lek is en geen schoonheidsfout). */
-test('wie iets meldt, ziet ook waar hij het naartoe kan mailen', { skip: geenBrowser(pw) }, async () => {
-  await metLid(async (page, base) => {
+/* EEN INTERNE LIJN, MET ONZICHTBARE ROUTERING. De melder kiest geen afdeling
+   en hoeft geen e-mailadres te verlaten. Rahul AI herkent het onderwerp, de
+   vaste router zet de zaak bij het juiste team en alleen het kantoor ziet die
+   interne verdeling. Dit bewijst de hele grens, niet alleen het formulier. */
+test('een melding blijft in de app en Rahul AI routeert intern naar het juiste team', { skip: geenBrowser(pw) }, async () => {
+  await metLid(async (page, base, token) => {
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
     await laHelemaalOpen(page);
-    await page.click('.bss-hulp button');            // "Iets melden"
-    await page.waitForFunction(() => /Liever mailen\?/.test(document.body.textContent), null, { timeout: 20000 });
+    await page.locator('.bss-hulp button', { hasText: 'Iets melden' }).click();
+    await page.fill('.bss-veld', 'Mijn betaling staat vast en mijn terugbetaling komt niet aan');
+    await page.click('.bss-zaak button.bss-ja');
+    await page.waitForFunction(() => /Genoteerd als SUP-/.test(document.body.textContent), null, { timeout: 20000 });
 
-    /* Uit de BRON en niet overgetypt: verhuist het domein, dan verhuist deze
-       toets mee in plaats van stil te blijven staan op het oude adres. */
-    const adres = 'hulp@' + require('../server/kern/rtmail-adres').domeinVoor('kantoor');
-    const tekst = await page.evaluate(() => document.body.textContent);
-    assert.ok(tekst.includes(adres), 'het serviceadres staat niet in de hulp-la: ' + adres);
+    const hulpTekst = await page.textContent('.bss-hulp');
+    assert.doesNotMatch(hulpTekst, /Liever mailen|hulp@/i, 'de interne servicelijn verwijst alsnog naar e-mail');
+    assert.equal(await page.locator('.bss-hulp a[href^="mailto:"]').count(), 0, 'de hulp-la bevat een mailto-uitgang');
+
+    const eigen = await api(base, '/api/service/mijn', {}, token);
+    assert.equal(eigen.zaken.length, 1, JSON.stringify(eigen).slice(0, 250));
+    assert.equal(Object.hasOwn(eigen.zaken[0], 'team'), false, 'de melder ziet de interne afdelingskeuze');
+
+    const balie = await kantoorAlsPersoon(base);
+    const rij = await api(base, '/api/office/service/wachtrij', {}, balie);
+    assert.equal(rij.zaken.length, 1, JSON.stringify(rij).slice(0, 300));
+    assert.equal(rij.zaken[0].kanaal, 'app');
+    assert.equal(rij.zaken[0].onderwerp, 'betaling');
+    assert.equal(rij.zaken[0].team, 'betalingen');
+
+    const dossier = await api(base, '/api/office/service/zaak', { id: rij.zaken[0].id }, balie);
+    assert.equal(dossier.zaak.rahul.versie, 'rahul-service-1');
+    assert.equal(dossier.zaak.routeVia, 'onderwerp');
+    assert.match(dossier.zaak.routeWaarom, /betaling/i);
   });
 });

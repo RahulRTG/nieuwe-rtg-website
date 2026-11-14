@@ -70,6 +70,16 @@ const CONTRACTEN = Object.assign({},
     'app van het lid bij. De tijdlijnregel hangt aan de nieuwe bevestiging en wordt dus niet ' +
     'herhaald'),
 
+  /* Rahul AI leest voor het advies uitsluitend de zaak. Advies en concept
+     schrijven ieder een nieuwe auditregel: een tweede opvraag is een tweede
+     medewerkerhandeling. Het controlebeeld zelf leest die regels alleen. */
+  TWEEDE('POST /api/office/service/rahul/advies', 'office.service.rahul.advies',
+    'Iedere opvraag schrijft via serviceLoop een Rahul-adviesregel met actor en versie in de tijdlijn.'),
+  TWEEDE('POST /api/office/service/rahul/concept', 'office.service.rahul.concept',
+    'Ieder nieuw concept is een nieuwe medewerkerhandeling en krijgt daarom een eigen auditregel.'),
+  LEEST('POST /api/office/service/rahul/controle', 'office.service.rahul.controle',
+    'de handler filtert uitsluitend bestaande rahulTriage- en rahulAdviesregels en kopieert geen gesprekstekst'),
+
   /* ---- de patroon-, status- en foutlaag ---- */
   LEEST('POST /api/office/service/patronen', 'office.service.patronen',
     'patronen.vermoedens() en perIncident(); allebei groeperen ze over bestaande zaken'),

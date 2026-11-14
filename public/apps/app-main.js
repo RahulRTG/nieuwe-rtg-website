@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'c1db8933';
+var RTG_BOUW = '13834956';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -284,6 +284,14 @@ var RTG_BOUW = 'c1db8933';
     } catch(e){ return null; }
   }
   let websiteAanvraag = websiteAanvraagUitAdres();
+  /* RTG Direct-links bevatten alleen een gekozen onderwerp, nooit vrije tekst
+     of persoonsgegevens. De gebruiker schrijft zijn vraag pas NA aanmelden in
+     de beveiligde app. */
+  const rtgDirectUitAdres = () => {
+    const v = String(new URLSearchParams(location.hash.replace(/^#/, '')).get('rtg-direct') || '').toLowerCase();
+    return ['algemeen', 'passen', 'organisatie', 'techniek'].includes(v) ? v : null;
+  };
+  let rtgDirect = rtgDirectUitAdres();
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';
@@ -8749,6 +8757,10 @@ var RTG_BOUW = 'c1db8933';
   async function ask(qIn){
     const q = String(qIn || '').trim();
     if (!q) return;
+    /* Een RTG Direct-vraag gaat rechtstreeks naar de interne Servicezaak. De
+       algemene Rahul-motor krijgt hem niet eerst: de gebruiker koos hier
+       expliciet voor contact met een medewerker. */
+    if (user.account && rtgDirect){ chatSend(q); return; }
     // eerst Rahul-motor: geheugen, seintjes, zoeken en echt regelen
     // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
     // vraag niet, dan neemt de gewone gesprekslaag het over
@@ -8839,31 +8851,66 @@ var RTG_BOUW = 'c1db8933';
   }
   async function chatSend(q){
     if (!API.live){ bubble(q, 'user'); setTimeout(() => bubble(aiAnswer(q), 'ai'), 400); return; }
+    if (rtgDirect) {
+      bubble(q, 'user');
+      try {
+        const titels = { algemeen: T('direct.titel.algemeen','Contact via RTG Direct'),
+          passen: T('direct.titel.passen','Vraag over een RTG-formule'),
+          organisatie: T('direct.titel.organisatie','Vraag over RTG voor een organisatie'),
+          techniek: T('direct.titel.techniek','Vraag over de techniek van RTG') };
+        const d = await API.call('/service/open', { onderwerp: rtgDirect === 'techniek' ? 'app' : 'anders',
+          titel: titels[rtgDirect] || titels.algemeen, tekst: q });
+        await API.call('/service/mens', { id: d.zaak.id,
+          tekst: T('direct.mens','Contact via RTG Direct') });
+        bubble(T('direct.ok','Uw vraag staat veilig bij RTG als') + ' ' + d.zaak.id + '. ' +
+          T('direct.react','Een medewerker reageert hier in de app.'), 'ai');
+        rtgDirect = null;
+        history.replaceState(null, '', location.pathname + location.search);
+      } catch (e) { bubble(T('direct.mis','Versturen lukte nog niet. Uw tekst blijft hieronder staan.'), 'ai'); const i = $('#askInput'); if (i) i.value = q; }
+      return;
+    }
     try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, user.tier !== 'rtg'); }
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 
   /* De websitebrief gaat pas naar de server NADAT de gebruiker in deze app is
      ingelogd. Geen externe berichtendienst of openbaar aanvraag-endpoint:
-     dezelfde ingelogde /chat/send-lijn die de app zelf gebruikt. We wissen het
+     de ingelogde Service-lijn. We wissen het
      fragment pas na een geslaagde aanname, zodat een netwerkstoring de aanvraag
      niet stil laat verdwijnen en een herlaad hem opnieuw kan proberen. */
   let websiteAanvraagBezig = false;
   async function verwerkWebsiteAanvraag(){
-    if (!websiteAanvraag || websiteAanvraagBezig || !user.account || !API.live) return;
+    if ((!websiteAanvraag && !rtgDirect) || websiteAanvraagBezig || !user.account || !API.live) return;
     websiteAanvraagBezig = true;
+    if (rtgDirect && !websiteAanvraag) {
+      openTab('ai');
+      const invoer = $('#askInput');
+      if (invoer) {
+        const onderwerp = { algemeen: T('direct.algemeen','Ik wil contact opnemen over: '),
+          passen: T('direct.passen','Ik heb een vraag over een RTG-formule: '),
+          organisatie: T('direct.organisatie','Ik wil RTG voor mijn organisatie bespreken: '),
+          techniek: T('direct.techniek','Ik heb een technische vraag: ') };
+        invoer.value = onderwerp[rtgDirect] || onderwerp.algemeen;
+        invoer.focus();
+      }
+      toast(T('direct.schrijf','Schrijf uw vraag. Deze gaat rechtstreeks naar een RTG-medewerker.'));
+      websiteAanvraagBezig = false;
+      return;
+    }
     const regels = [
       'Aanvraag via rtravelgroup.store', '',
       'Wereld / behoefte: ' + websiteAanvraag.requirement,
-      'Naam: ' + websiteAanvraag.name,
-      'E-mail: ' + websiteAanvraag.email,
-      websiteAanvraag.phone ? 'Telefoon: ' + websiteAanvraag.phone : null,
       '', 'Brief:', websiteAanvraag.message
     ].filter(regel => regel !== null);
     try {
-      const d = await API.call('/chat/send', { text: regels.join('\n') });
+      const d = await API.call('/service/open', { onderwerp: 'anders',
+        titel: 'Aanvraag via rtravelgroup.store · ' + websiteAanvraag.requirement,
+        tekst: regels.join('\n') });
+      await API.call('/service/mens', { id: d.zaak.id,
+        tekst: T('aanvraag.service.mens','Aanvraag via de publieke website') });
       openTab('ai');
-      renderChatMsgs(d.messages, user.tier !== 'rtg');
+      bubble(T('aanvraag.service.ok','Uw aanvraag staat veilig bij RTG als') + ' ' + d.zaak.id + '. ' +
+        T('aanvraag.service.react','Een medewerker reageert in de app.'), 'ai');
       websiteAanvraag = null;
       history.replaceState(null, '', location.pathname + location.search);
       toast(T('aanvraag.app.ok','Uw aanvraag staat in uw beveiligde RTG-lijn.'));

@@ -7,7 +7,8 @@
    zegt het hard: een verhindering draagt altijd een reden.
 
    Deze toets houdt de reparaties vast die de meeste mensen raken:
-   - de kantoor-inlog (shared/kantoorgesprek.js) staat voor dertien schermen;
+   - de kantoor-inlog (shared/kantoorgesprek.js) legt bij een gewoon account
+     zonder kantoorrol uit waarom de deur dicht blijft;
    - de drie kaarten op de FoundationOS-home sprongen zonder open afdeling
      naar boven zonder te zeggen waarom;
    - Labfonds, Veilig en Vertaler weigerden een lege invoer zonder woord;
@@ -68,10 +69,14 @@ test('een knop die niet kan, zegt waarom', { skip: geenBrowser(pw) }, async () =
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
 
-    // Kantoor-inlog: Verder met een leeg veld.
+    // Kantoor-inlog: het gewone account is de ingang, maar zonder kantoorrol
+    // blijft de knop dicht en staat de reden er meteen bij.
     await naar('/apps/command.html');
-    await page.locator('.kg-rij button').click();
-    assert.match(await tekstVan('.kg-fout'), /antwoord/i, 'Verder met een leeg veld zegt niet wat er ontbreekt');
+    const kantoorVerder = page.locator('.kg-rij button');
+    await kantoorVerder.waitFor({ state: 'visible' });
+    assert.equal(await kantoorVerder.isDisabled(), true, 'een gewoon account zonder kantoorrol kon verder');
+    assert.match(await tekstVan('.kg-fout'), /eigenaar.*werkrol/i,
+      'de dichte kantoordeur legt niet uit wie de werkrol kan koppelen');
 
     // FoundationOS-home zonder open afdeling: de kaart blijft staan en zegt het.
     await naar('/apps/foundation/os-publiek.html');

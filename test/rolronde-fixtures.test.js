@@ -80,6 +80,9 @@ test('rolwereld meet bestaande contractbediening met gesloten instroom en levend
  const {start}=require('../scripts/lib/wegwerpserver');
  const {nieuwLid}=require('../scripts/lib/voltooiwereld');
  const {ROLWERELD,maakVraag,meetRol,beoordeelRoute}=require('../scripts/rolronde');
+ for(const sleutel of ['DATABASE_URL','PG_URL','REDIS_URL','STRIPE_SECRET_KEY','MOLLIE_API_KEY','ADYEN_API_KEY','MUNT_PROVIDER_KEY'])
+  assert.equal(ROLWERELD[sleutel],'',sleutel+' kan niet uit de draaiomgeving worden geërfd');
+ assert.equal(ROLWERELD.MUNT_AAN,'0');
  const srv=await start({naam:'rolronde-contract',env:ROLWERELD,gereed:'ready'});t.after(()=>srv.klaar());
  const vraag=maakVraag(srv.basis),w={post:(p,b,tok)=>vraag('POST',p,tok,b)};
  const lid=await nieuwLid(w,'rolcontract','guest');await vraag.bindToestel(lid.token);

@@ -81,7 +81,8 @@ const ROLWERELD = Object.freeze({ NODE_ENV: 'test',
   RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '', REDIS_URL: '',
   APP_URL: 'https://rolronde.invalid', RTG_ABONNEMENTEN_ZELFSERVICE: '0',
   STRIPE_SECRET_KEY: '', STRIPE_PUBLIC_KEY: '', STRIPE_WEBHOOK_SECRET: '',
-  MOLLIE_API_KEY: '', ADYEN_API_KEY: '', PAYMENT_PROVIDER: '', RTG_BETALEN_UIT: '0' });
+  MOLLIE_API_KEY: '', ADYEN_API_KEY: '', PAYMENT_PROVIDER: '', RTG_BETALEN_UIT: '0',
+  MUNT_AAN: '0', MUNT_PROVIDER_KEY: '', MUNT_WEBHOOK_SECRET: '' });
 
 /* ---- DE METERS ----
    `rolscheidingGaten` telt de leden-endpoints die een niet-leden-token

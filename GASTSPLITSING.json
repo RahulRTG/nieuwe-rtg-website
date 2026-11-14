@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-11-14T07:12:47.345Z",
-    "commit": "1c1abb561",
+    "op": "2026-11-14T14:37:10.307Z",
+    "commit": "d8c5a59d5",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 6,
     "instrument": "scripts/gastsplitsing.js",
-    "node": "v24.18.0"
+    "node": "v26.13.1"
   },
   "graad": "vermoed",
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
-    "bestanden": 127,
-    "plekken": 136,
+    "bestanden": 122,
+    "plekken": 135,
     "perSoort": {
-      "vertakt": 23,
+      "vertakt": 27,
       "onderscheidt": 33,
       "pas-eis": 12,
-      "leden": 68
+      "leden": 63
     },
     "tegenspraak": 0
   },
@@ -79,11 +79,6 @@
       "zegt": null
     },
     {
-      "plek": "server/kern/identiteit/bezitsbewijs.js:131",
-      "soort": "onderscheidt",
-      "zegt": null
-    },
-    {
       "plek": "server/kern/lid.js:68",
       "soort": "vertakt",
       "zegt": null
@@ -96,6 +91,16 @@
     {
       "plek": "server/kern/lid.js:116",
       "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lid.js:132",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lid.js:134",
+      "soort": "onderscheidt",
       "zegt": null
     },
     {
@@ -119,9 +124,19 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/kern/mobiliteit/reiziger.js:40",
-      "soort": "leden",
-      "zegt": "RTG Vervoer is voor leden."
+      "plek": "server/kern/mobiliteit/reiziger.js:39",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/mobiliteit/werktoegang.js:27",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/mobiliteit/werktoegang.js:37",
+      "soort": "vertakt",
+      "zegt": null
     },
     {
       "plek": "server/kern/onvervreemdbaar.js:37",
@@ -160,11 +175,6 @@
     },
     {
       "plek": "server/opzet/kernlaag4.js:16",
-      "soort": "onderscheidt",
-      "zegt": null
-    },
-    {
-      "plek": "server/routes/algpin.js:13",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -224,11 +234,6 @@
       "zegt": null
     },
     {
-      "plek": "server/routes/gast/eten.js:81",
-      "soort": "leden",
-      "zegt": "Beoordelen is voor leden."
-    },
-    {
       "plek": "server/routes/gast/geldschild-checkout.js:7",
       "soort": "vertakt",
       "zegt": null
@@ -242,11 +247,6 @@
       "plek": "server/routes/geldrahul.js:102",
       "soort": "leden",
       "zegt": "RTG Geld is voor leden."
-    },
-    {
-      "plek": "server/routes/inzagekaart.js:8",
-      "soort": "leden",
-      "zegt": "Een inzagekaart hoort bij een ledendossier; gasten hebben er geen."
     },
     {
       "plek": "server/routes/kantoorpakket-formaten.js:35",
@@ -364,8 +364,8 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/handel.js:10",
-      "soort": "vertakt",
+      "plek": "server/routes/member/handel.js:11",
+      "soort": "onderscheidt",
       "zegt": null
     },
     {
@@ -499,17 +499,22 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/terplaatse.js:28",
+      "plek": "server/routes/member/terplaatse.js:40",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/terplaatse.js:52",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/terplaatse.js:64",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
-      "plek": "server/routes/member/terplaatse.js:86",
+      "plek": "server/routes/member/terplaatse.js:71",
+      "soort": "vertakt",
+      "zegt": null
+    },
+    {
+      "plek": "server/routes/member/terplaatse.js:105",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -564,7 +569,7 @@
       "zegt": null
     },
     {
-      "plek": "server/routes/mobiliteit.js:33",
+      "plek": "server/routes/mobiliteit.js:34",
       "soort": "leden",
       "zegt": "RTG Vervoer is voor leden."
     },
@@ -614,11 +619,6 @@
       "zegt": null
     },
     {
-      "plek": "server/routes/plaats.js:23",
-      "soort": "leden",
-      "zegt": "De plaatslaag is voor leden."
-    },
-    {
       "plek": "server/routes/podium.js:20",
       "soort": "onderscheidt",
       "zegt": null
@@ -661,11 +661,6 @@
     {
       "plek": "server/routes/thuis.js:12",
       "soort": "vertakt",
-      "zegt": null
-    },
-    {
-      "plek": "server/routes/vakbewijs.js:35",
-      "soort": "onderscheidt",
       "zegt": null
     },
     {

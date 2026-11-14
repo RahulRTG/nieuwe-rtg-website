@@ -2,52 +2,13 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-11-14T11:03:08.420Z",
-  "commit": "01319f65b",
+  "op": "2026-11-14T14:37:02.656Z",
+  "commit": "d8c5a59d5",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": true,
-   "ongecommitteInvoer": [
-    "server/kern/comm/gast.js",
-    "server/kern/identiteit/bezitsbewijs.js",
-    "server/kern/lid.js",
-    "server/kern/service/gesprek-lijn.js",
-    "server/kern/service/gesprek.js",
-    "server/kern/service/index.js",
-    "server/kern/service/loop.js",
-    "server/kern/service/onderzoeker.js",
-    "server/kern/service/rahul-lijn.js",
-    "server/kern/service/rahul.js",
-    "server/kern/service/zaak-melder.js",
-    "server/kern/service/zaak.js",
-    "server/lib/mutatiecontracten-service-kantoor.js",
-    "server/routes/member/handel.js",
-    "server/routes/member/handel/winkel.js",
-    "server/routes/member/terplaatse.js",
-    "server/routes/service-kantoor-ai.js",
-    "server/routes/service-kantoor.js",
-    "server/routes/service.js",
-    "server/kern/comm/gast.js",
-    "server/kern/identiteit/bezitsbewijs.js",
-    "server/kern/lid.js",
-    "server/kern/service/gesprek-lijn.js",
-    "server/kern/service/gesprek.js",
-    "server/kern/service/index.js",
-    "server/kern/service/loop.js",
-    "server/kern/service/onderzoeker.js",
-    "server/kern/service/rahul-lijn.js",
-    "server/kern/service/rahul.js",
-    "server/kern/service/zaak-melder.js",
-    "server/kern/service/zaak.js",
-    "server/lib/mutatiecontracten-service-kantoor.js",
-    "server/routes/member/handel.js",
-    "server/routes/member/handel/winkel.js",
-    "server/routes/member/terplaatse.js",
-    "server/routes/service-kantoor-ai.js",
-    "server/routes/service-kantoor.js",
-    "server/routes/service.js"
-   ],
+   "boomVuil": false,
+   "ongecommitteInvoer": [],
    "bestanden": [
     "SCHRIJFANALYSE.json",
     "scripts/lib/bewakers.js",
@@ -875,6 +836,7 @@
     "server/kern/comm/collega.js",
     "server/kern/comm/deelnemer.js",
     "server/kern/comm/dm.js",
+    "server/kern/comm/gast-lijn.js",
     "server/kern/comm/gast-lijsten.js",
     "server/kern/comm/gast-verhuizing.js",
     "server/kern/comm/gast.js",
@@ -2102,6 +2064,7 @@
     "server/kern/mobiliteit/vergeten.js",
     "server/kern/mobiliteit/voertuigcatalogus.js",
     "server/kern/mobiliteit/voortgang.js",
+    "server/kern/mobiliteit/werktoegang.js",
     "server/kern/mobiliteit/zakelijk.js",
     "server/kern/modebezorg.js",
     "server/kern/modebezorg/bezorgcode.js",
@@ -19604,7 +19567,7 @@
   {
    "route": "POST /api/inzagekaart",
    "bestand": "server/routes/inzagekaart.js",
-   "regel": 7,
+   "regel": 8,
    "samengesteld": false
   },
   {
@@ -25040,7 +25003,7 @@
   {
    "route": "POST /api/mob/aanbod",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 41,
+   "regel": 47,
    "samengesteld": false
   },
   {
@@ -25064,19 +25027,19 @@
   {
    "route": "POST /api/mob/annuleer",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 62,
+   "regel": 69,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/beleid",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 128,
+   "regel": 135,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/favoriet",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 66,
+   "regel": 73,
    "samengesteld": false
   },
   {
@@ -25106,37 +25069,37 @@
   {
    "route": "POST /api/mob/mijn",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 58,
+   "regel": 65,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/ontvangst",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 75,
+   "regel": 82,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/ontvangst/probleem",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 80,
+   "regel": 87,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/pendel",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 113,
+   "regel": 120,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/pendel/reserveer",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 118,
+   "regel": 125,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/plekken",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 45,
+   "regel": 51,
    "samengesteld": false
   },
   {
@@ -25166,13 +25129,13 @@
   {
    "route": "POST /api/mob/volg",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 89,
+   "regel": 96,
    "samengesteld": false
   },
   {
    "route": "POST /api/mob/vraag",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 53,
+   "regel": 59,
    "samengesteld": false
   },
   {
@@ -31202,37 +31165,37 @@
   {
    "route": "POST /api/plaats/dienst",
    "bestand": "server/routes/plaats.js",
-   "regel": 83,
+   "regel": 84,
    "samengesteld": false
   },
   {
    "route": "POST /api/plaats/hekken",
    "bestand": "server/routes/plaats.js",
-   "regel": 34,
+   "regel": 35,
    "samengesteld": false
   },
   {
    "route": "POST /api/plaats/stand",
    "bestand": "server/routes/plaats.js",
-   "regel": 61,
+   "regel": 62,
    "samengesteld": false
   },
   {
    "route": "POST /api/plaats/venster",
    "bestand": "server/routes/plaats.js",
-   "regel": 40,
+   "regel": 41,
    "samengesteld": false
   },
   {
    "route": "POST /api/plaats/venster/sluit",
    "bestand": "server/routes/plaats.js",
-   "regel": 46,
+   "regel": 47,
    "samengesteld": false
   },
   {
    "route": "POST /api/plaats/waarneem",
    "bestand": "server/routes/plaats.js",
-   "regel": 55,
+   "regel": 56,
    "samengesteld": false
   },
   {
@@ -36254,19 +36217,19 @@
   {
    "route": "POST /api/staff/mob/mijn",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 153,
+   "regel": 160,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/mob/positie",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 149,
+   "regel": 156,
    "samengesteld": false
   },
   {
    "route": "POST /api/staff/mob/status",
    "bestand": "server/routes/mobiliteit.js",
-   "regel": 145,
+   "regel": 152,
    "samengesteld": false
   },
   {

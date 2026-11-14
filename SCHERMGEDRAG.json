@@ -3,7 +3,7 @@
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
   "op": "2026-11-14",
-  "commit": "01319f65b"
+  "commit": "d8c5a59d5"
  },
  "grond": [
   "SCHERMROUTES.json",
@@ -2142,11 +2142,11 @@
    "reden": null
   },
   {
-   "bestand": "public/apps/app-main/app-main-43.js",
-   "padenGenoemd": 6,
+   "bestand": "public/apps/app-main/app-main-44.js",
+   "padenGenoemd": 5,
    "voorvoegsels": 0,
    "routesGeraakt": 5,
-   "schrijft": "ja",
+   "schrijft": "onbekend",
    "bewijs": "verzwakt",
    "rollen": [
     "member"
@@ -2737,6 +2737,22 @@
   {
    "bestand": "public/apps/app-main/app-main-20.js",
    "padenGenoemd": 4,
+   "voorvoegsels": 0,
+   "routesGeraakt": 4,
+   "schrijft": "ja",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-43.js",
+   "padenGenoemd": 5,
    "voorvoegsels": 0,
    "routesGeraakt": 4,
    "schrijft": "ja",
@@ -3385,21 +3401,6 @@
   },
   {
    "bestand": "public/apps/app-main/app-main-32a.js",
-   "padenGenoemd": 3,
-   "voorvoegsels": 0,
-   "routesGeraakt": 3,
-   "schrijft": "onbekend",
-   "bewijs": "verzwakt",
-   "rollen": [
-    "member"
-   ],
-   "herhaling": [
-    "ongemeten"
-   ],
-   "reden": null
-  },
-  {
-   "bestand": "public/apps/app-main/app-main-44.js",
    "padenGenoemd": 3,
    "voorvoegsels": 0,
    "routesGeraakt": 3,
@@ -5010,7 +5011,7 @@
    "reden": null
   },
   {
-   "bestand": "public/apps/app-main/app-main-02.js",
+   "bestand": "public/apps/app-main/app-main-02_state.js",
    "padenGenoemd": 1,
    "voorvoegsels": 0,
    "routesGeraakt": 1,

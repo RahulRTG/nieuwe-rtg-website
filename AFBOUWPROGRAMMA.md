@@ -240,6 +240,92 @@ schermdeel 2 werd geannuleerd. Schermdelen 3/4/5 en alle vier
 toegankelijkheidsdelen zijn groen. De resterende fouten krijgen per
 oorzaak een begrensde herstelgroep, geen bredere vrijstelling.
 
+**Volledige foutinventaris en tweede hersteltranche.** De remote ronde op
+`dc85cfc48` is voltooid, niet groen. CodeQL, WebKit, 1440px en alle vier
+toegankelijkheidsdelen slagen. De mislukte 390px-job bevat wel 309 geslaagde
+schermcontroles, 17 mobiele inhoudsproeven en 1.542 toegankelijkheidsproeven;
+zijn achterliggende `living-world-http`-proef gebruikte nog een gratis
+registratie waar een expliciet betaald lid nodig is. Dat onderscheid is
+hersteld, niet de productpoort versoepeld. Schermdeel 1 had één mislukte
+Gezin-proef bij 286 geslaagde proeven. In het geannuleerde schermdeel 2 staan
+ook echte testfouten; annulering geldt niet als verklaring of vrijstelling.
+
+De acht geld-/accountbestanden slagen samen 54/54, nul skip/todo. Een latere
+opruimverharding in de bankproef slaagt opnieuw 2/2. De volgende gecombineerde
+groep van 27 bestanden slaagt 629/631; uitsluitend twee oude vormprofielen
+verwachten nog de weigering van een accountloze sessie. Met een echt gratis
+account bereiken zij nu de bedoelde ongeldige uitnodiging (404) en ontbrekend
+bevestigingsdoel (400). Die profielen moeten via een echte hermeting worden
+bijgewerkt, niet door hun verwachte status met de hand groen te maken.
+Geld, navigatie, Travel, Office en media gebruiken bestaande geïsoleerde
+betaalfixtures uitsluitend voor de betreffende persoon. Gratis ontvangers,
+kantooridentiteiten, gezinsrechten en negatieve account-/tenantcontroles
+blijven gratis. Passkey-login verleent geen betaalrechten. Dit zijn lokale
+ontwikkelruns, geen opgeteld platformtotaal en geen immutable eindbewijs.
+
+De dertien beschikbare echte routejournalen uit CI-run `43593395245` raken
+alle 5.582 huidige methode-/patroonparen: nul onbekende routes en nul gaten.
+Deze hermeting bewijst aanroepdekking, niet dat alle genoemde CI-tests slagen;
+de bron van de journalen blijft `dc85cfc48`. De opgeslagen routekaart en
+overige afgeleide registers worden pas na de bronfreeze vernieuwd.
+
+De gratis Gezin-bediening vraagt een afzonderlijke productreparatie: een
+servergebonden gratis account werd in het scherm ten onrechte verborgen.
+Ook het wissen van ingetrokken context en het afwijzen van late antwoorden
+wordt gericht beproefd. Dit opent geen server-side gesloten Foundation- of
+minderjarigenpropositie en telt niet als volledige gezinskwalificatie.
+
+**Vervolgcontrole zonder lokale beheerdersbevestiging.** Alle ontwikkelproeven
+lopen expliciet op de aparte Node 26.13.1-runtime; de vervanging van de
+systeeminstallatie van Node 24 wacht nog op de eigenaar. De instrumenttranche
+heeft 44/44 geslaagde pure regressies. De vier bestaande gezinsbeveiligingssuites
+slagen samen 14/14, nul fail/skip/todo. De lokale normvoormeting slaagt zonder
+verlaagde grens; dit is geen gedrags- of releasekwalificatie. De zeven
+browserfixturebestanden gaven 30/32; één navigatietimeout op `appcel.html`
+liet ook de bovenliggende test zakken. Er wordt geen timeout verruimd of
+automatische retry toegevoegd: een volledige herproef legt bij herhaling
+alleen begrensde, persoonsgegevensvrije navigatiediagnostiek vast. De review
+van de Gezin-reparatie omvat ook late volledige accountprojecties,
+accountwisseling, intrekken en tokenverversing tijdens een lopend gesprek;
+deze begrenzingen zijn afzonderlijk beoordeeld. De volledige app-schilgroep
+gaf 9/10: de nieuwe gezinsproef wachtte ten onrechte op een zichtbare maar
+lege berichtenlijst zonder hoogte. De proef verstuurt nu eerst via de echte
+route een privébericht, bewijst zichtbaarheid en controleert dat ook dit
+bericht na intrekken en vertraagde antwoorden niet terugkomt. De gerichte
+herproef slaagt 3/3, nul skip/todo. De volledige app-menuherproef slaagt
+11/11, nul skip/todo; de navigatietimeout reproduceert niet. De begrensde
+diagnostiek blijft behouden en de oude mislukte run blijft verklaard. Dit
+vervangt geen verse volledige CI-run. De daaropvolgende volledige
+app-schilherproef slaagt 10/10, nul fail/skip/todo, inclusief Gezin,
+accountwisseling/intrekking, School, Zorg en Navigatie.
+
+De definitieve frontendbundels komen bytegelijk overeen met hun brondelen.
+De buildvolgorde is rood-groen gerepareerd: eerst de definitieve bouwstempel,
+dan minify en service-worker, daarna de onverminderd harde beeldbewijscontrole.
+Drie pure regressies bewaken stale bewijs en bytegelijke herbuilds. Eén echt
+websitebeeld is opnieuw gemeten, twee ongewijzigde beelden zijn hergebruikt.
+Een echte herbuild slaagt en verandert nul van 3.098 frontendbestanden.
+De taal-/aanmeldgroep slaagt op deze bron 27/27; niet-gemeten talenkwaliteit en
+productiegereedheid blijven expliciet onbewezen. De volledige lokale
+PostgreSQL-/Redis-groep slaagt opnieuw: 60 bestanden, 180 tests, nul
+fail/skip/todo. Tijdens die ontwikkelrun werden nog bouw-/bewijswijzigingen
+vastgelegd; het rapport meldt daarom terecht `boomVuil: true` en is geen
+immutable eindkwalificatie.
+
+De definitieve antwoordvormhermeting op broncommit `49eb24cfb` is schoon:
+409/409 meetbare profielen, geen onbereikbare route of ontbrekende meetrol.
+Vier onwaarneembare historische profielen blijven als zodanig gemarkeerd.
+Generator en wacht delen nu expliciet de synthetische, ongebonden
+toestelsleutelopstelling; de verplichte productiepoort blijft ongewijzigd.
+Dit herstelt een meetverschil dat anders werkende antwoorden door weigeringen
+zou hebben vervangen. Geen bestaande 200, sleutel of dragend veld verdwijnt.
+De twee balieprofielen bereiken met een medewerker-op-naam de invoercontrole;
+de gratis accountprofielen bereiken de bestaande uitnodigings-/ceremoniegrens.
+De volledige instrumentgroep slaagt daarna 448/448, nul fail/skip/todo.
+De geïmporteerde routeunie vermeldt nu haar dertien bronbestanden en hashes,
+broncommit `dc85cfc48` en `kwalificatie: NIET_VASTGESTELD`: aanroepdekking
+maakt een oude rode CI-ronde niet alsnog tot een groene kandidaatkwalificatie.
+
 Automatisch samenvoegen op #727 is uitgezet: de vier beschermde checks alleen
 wachten niet op alle aanvullende scherm- en dekkingsuitslagen. De integrator
 controleert de volledige ronde en kandidaatboom vóór een normale beschermde

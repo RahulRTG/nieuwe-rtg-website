@@ -44,7 +44,7 @@
    var state=o.state&&o.state();if(state){
     d.querySelectorAll('[data-public-calendar]').forEach(function(input){input.checked=state.permissions.calendar;});
     d.querySelectorAll('.pp-calendar-status').forEach(function(el){var key=state.permissions.calendar?'calendarOn':'unknown';el.dataset.i18n='public.'+key;el.dataset.i18nSource=D.words[key][0];el.textContent=copy(key);});
-    summary.hidden=state.scenario!=='travel';summary.textContent='Amsterdam → Ibiza · '+(state.option==='late'?'17:50 → 20:50':'17:50');
+    summary.hidden=!company||state.scenario!=='travel';summary.textContent='Amsterdam → Ibiza · '+(state.option==='late'?'17:50 → 20:50':'17:50');
    }
    language.textContent=(w.RTGi18n?w.RTGi18n.lang:d.documentElement.lang||'nl').toUpperCase();
   }

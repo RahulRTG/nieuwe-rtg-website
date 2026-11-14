@@ -32,7 +32,8 @@ test('publieke platformowners gebruiken native media/ankers en geen runtime-scri
   const elementen = fs.readFileSync('public/site/platform-elements.js', 'utf8');
   const detail = fs.readFileSync('public/site/platform-detail.js', 'utf8');
   assert.match(elementen, /document\.createElement\('img'\)/);
-  assert.match(elementen, /secure=document\.createElement\('a'\)/);
+  assert.match(elementen, /link=node\('a',null,cls\)/);
+  assert.match(elementen, /link\.href=new URL\('apps\/app\.html',root\)\.href/);
   assert.doesNotMatch(elementen, /createElement\('script'\)/);
   assert.doesNotMatch(detail, /createElement\('script'\)/);
   assert.match(detail, /setAttribute\('href',url\)/);

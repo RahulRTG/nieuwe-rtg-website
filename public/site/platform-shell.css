@@ -136,8 +136,6 @@ body[data-public-platform][data-rtg-layout][data-rtg-desktop][data-rtg-skin] .pp
 body[data-public-platform="app"]{background:var(--ds-public-bg,#100e0b)!important}
 body[data-public-platform="app"] .pp-header>.pp-tagline+.pp-icon-button,
 body[data-public-platform="app"] .pp-shell :is(.pp-stories,.pp-stepper,.pp-technology-signal,.pp-library-tools){display:none}
-.pp-secure-link{display:inline-flex;min-height:44px;align-items:center;margin-top:8px;text-decoration:none;font-size:13px}
-.pp-secure-link::after{content:'\2197';margin-inline-start:12px}
 .pp-world-facts{padding-top:.65rem;border-top:1px solid var(--wd-line);color:var(--wh-gold)!important;font-size:.72rem!important;line-height:1.55!important}
 body[data-public-platform="app"] .pp-widget{position:relative;overflow:hidden;border:0;background:var(--ds-public-card,transparent)}
 body[data-public-platform="app"] .pp-widget-head{padding:var(--ds-beleving-inzet);border-bottom:0;font-size:1rem}

@@ -25,8 +25,6 @@
  shell=P.init({kind:'app',source:d.getElementById('inhoud'),open:open,state:X.snapshot,
   select:function(story){X.choose(story.id==='overview'?'dinner':story.id==='travelWorld'?'travel':story.id,false);},
   calendar:function(value){X.permission('calendar',value);}});
- function momentbeeld(){var dag=d.documentElement.dataset.dagdeel||'avond',naam={ochtend:'morning',middag:'afternoon',avond:'evening',nacht:'night'}[dag]||'evening',beeld=d.querySelector('.pp-feature-photo');if(beeld)beeld.src=new URL('images/editorial/public-'+naam+'.webp',P.asset()).href;}
- momentbeeld();w.addEventListener('rtg-website-truth',momentbeeld);
  w.RTGPublicApp={shell:shell,open:open};
  var sections=P.node('nav',null,'pp-section-index ds-beleving-navigatie');sections.setAttribute('aria-label','Meer over RTG');
  var hoofdsecties=['platform','verhaal','regie','techniek','passen','vragen'],overig=d.createElement('details'),overigLijst=P.node('div',null,'pp-section-index');

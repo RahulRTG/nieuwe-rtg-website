@@ -9,28 +9,28 @@
   var DAGDELEN = ['ochtend', 'middag', 'avond', 'nacht'];
   var BEELDEN = {
     ochtend: {
-      hero: 'images/editorial/public-morning.webp',
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
       living: 'images/worlds/owner-20261114/living.jpg',
       travel: 'images/worlds/owner-20261114/travel.jpg',
       work: 'images/worlds/owner-20261114/work.jpg',
       foundation: 'images/worlds/owner-20261114/foundation.jpg'
     },
     middag: {
-      hero: 'images/editorial/public-afternoon.webp',
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
       living: 'images/worlds/owner-20261114/living.jpg',
       travel: 'images/worlds/owner-20261114/travel.jpg',
       work: 'images/worlds/owner-20261114/work.jpg',
       foundation: 'images/worlds/owner-20261114/foundation.jpg'
     },
     avond: {
-      hero: 'images/editorial/public-evening.webp',
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
       living: 'images/worlds/owner-20261114/living.jpg',
       travel: 'images/worlds/owner-20261114/travel.jpg',
       work: 'images/worlds/owner-20261114/work.jpg',
       foundation: 'images/worlds/owner-20261114/foundation.jpg'
     },
     nacht: {
-      hero: 'images/editorial/public-night.webp',
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
       living: 'images/worlds/owner-20261114/living.jpg',
       travel: 'images/worlds/owner-20261114/travel.jpg',
       work: 'images/worlds/owner-20261114/work.jpg',

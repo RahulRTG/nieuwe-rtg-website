@@ -65,6 +65,17 @@ test('de vier wereldfoto’s bewaren de originele bytes en de expliciete fotokeu
   }
   const landing = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   assert.match(landing, /<link rel="icon" href="\.\/public\/images\/brand\/owner-20261114\/lips\.jpg" type="image\/jpeg">/);
+  const hero = landing.match(/<img\b[^>]*\bid="heroPhotoA"[^>]*>/)?.[0];
+  assert.ok(hero, 'de statische entree heeft ook zonder JavaScript de reisfoto');
+  assert.match(hero, /\bsrc="\.\/public\/images\/worlds\/heritage\/travel-heritage-v2\.jpg"/);
+  const context = vm.createContext({ window: {} });
+  for (const file of ['platform-data.js', 'platform-stories.js']) {
+    vm.runInContext(fs.readFileSync(path.join(ROOT, 'public/site', file), 'utf8'), context, { filename: file });
+  }
+  const stories = context.window.RTGPublicContent.app.stories;
+  assert.equal(stories.length, 1, 'de rustige entree heeft één reiscompositie');
+  assert.equal(stories[0].id, 'overview');
+  assert.equal(stories[0].photo, 'worlds/heritage/travel-heritage-v2.jpg', 'ook selectie en reset verwijzen naar hetzelfde geregistreerde reisbeeld');
 });
 
 test('de vier wereldpanelen op de publieke voordeur tonen de toegewezen foto', () => {
@@ -87,6 +98,14 @@ test('de vier verhaalpagina’s behouden hun eigen wereldnaam en thema-identitei
     assert.match(html, new RegExp('<body\\b[^>]*data-rtg-world="' + expected.world + '"'));
     assert.match(html, new RegExp('<body\\b[^>]*data-world="' + expected.world + '"'));
     assert.match(html, new RegExp('<body\\b[^>]*data-public-world="' + expected.world + '"'));
+    const cover = html.match(/<section\b[^>]*class="[^"]*\bds-reiscover\b[^"]*"[^>]*>/)?.[0];
+    assert.ok(cover, expected.name + ' heeft de gedeelde cover-layout');
+    const main = html.match(/<main\b[^>]*id="verhaal"[^>]*>/)?.[0];
+    assert.ok(main, expected.name + ' behoudt zijn verhaal');
+    for (const tag of [cover, main]) {
+      const theme = tag.match(/\bdata-public-world="([^"]+)"/)?.[1];
+      assert.ok(theme === undefined || theme === expected.world, expected.name + ' krijgt geen geforceerd ander wereldpalet');
+    }
   }
 });
 
@@ -163,6 +182,7 @@ test('de zichtbare cataloguskaarten koppelen dezelfde foto en naam aan iedere we
   }
   const content = context.window.RTGPublicContent;
   assert.equal(content.app.primary.length, 4);
+  assert.equal(content.app.primary[0].world, 'travel', 'het reisbureau is de eerste publieke wereld');
   for (const expected of EXPECTED) {
     const cards = content.app.primary.filter(card => card.world === expected.world);
     assert.equal(cards.length, 1, expected.name + ' komt één keer voor in de catalogus');
@@ -190,7 +210,7 @@ function projectDetail(html) {
       dataset: {}, children: [], classList: { add() {} },
       append(...children) { this.children.push(...children); },
       appendChild(child) { this.children.push(child); },
-      setAttribute() {}, before() {},
+      setAttribute() {}, before() {}, querySelector() { return null; }, hasAttribute() { return false; },
       get firstChild() { return this.children[0]; }
     };
   }
@@ -199,15 +219,17 @@ function projectDetail(html) {
     body.dataset[key.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = value;
   }
   body.classList.contains = name => (bodyTag.match(/class="([^"]*)"/)?.[1] || '').split(/\s+/).includes(name);
-  const source = element(), hero = /class="world-hero"/.test(html) ? element() : null;
-  source.querySelector = selector => selector === '.world-hero' ? hero : null;
+  const source = element(), hero = /class="world-hero"|data-public-cover/.test(html) ? element() : null;
+  const coverPhoto = html.match(/class="ds-reiscover__beeld"><img\b[^>]*src="([^"]+)"/)?.[1];
+  if (hero) hero.querySelector = selector => selector === '.ds-reiscover__beeld' && coverPhoto ? {} : null;
+  source.querySelector = selector => selector === '.world-hero,[data-public-cover]' ? hero : null;
   source.querySelectorAll = () => [];
   const document = { body, title: '', createElement: element, querySelector: () => source };
   vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'public/site/platform-detail.js'), 'utf8'), {
     window: { RTGPublicPlatform: { asset: () => 'https://example.test/project/public/', brand: element } },
     document, URL, getComputedStyle: () => ({ getPropertyValue: () => '' })
   });
-  return { image: hero?.children[0]?.children[0]?.src, world: body.dataset.publicWorld };
+  return { image: coverPhoto ? new URL(coverPhoto, 'https://example.test/project/public/site/werelden/travelos.html').href : hero?.children[0]?.children[0]?.src, world: body.dataset.publicWorld };
 }
 
 test('de detailprojectie gebruikt wereldfoto’s alleen voor de vier echte wereldpagina’s', () => {

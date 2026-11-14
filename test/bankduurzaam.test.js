@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopHard } = require('./helper');
+const { startServer, stopNet, stopHard } = require('./helper');
 const historischAccount = require('./lib/historisch-account');
 
 const mappen = [];
@@ -82,10 +82,11 @@ test.before(async () => {
     historischAccount(dir, { name: 'Bank Duurzaam', email: 'bankduurzaam@example.test' });
   }
   const voor = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2' } });
-  await bankLive(voor.base, 'KANTOOR-BNKD-2');
-  const weg = new Promise(r => voor.child.once('exit', r));
-  stop(voor.child);
-  await weg;
+  try {
+    await bankLive(voor.base, 'KANTOOR-BNKD-2');
+  } finally {
+    await stopNet(voor.child);
+  }
   leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2',
     RTG_VERRAAD: 'schrijf-verloren' } });
   eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: eerlijkMap, OFFICE_CODE: 'KANTOOR-BNKD-1' } });

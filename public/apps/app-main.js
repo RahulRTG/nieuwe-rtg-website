@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'ddf4fb56';
+var RTG_BOUW = 'c06f51b1';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -146,29 +146,9 @@ var RTG_BOUW = 'ddf4fb56';
     } catch(e){ toast(T('fin.dlfout','Downloaden lukte niet.')); }
   }
 
-  // API-client uit de gedeelde app-shell (public/shared/appshell.js).
-  const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
+  // De app-eigen statebinding gebruikt de gedeelde API-client (02_state).
+  const { API, applyState, refreshState, verwerpOudeState, aanvaardSessie } = maakAppState();
   let magnaatProef = false;
-  // Een 403 met kyc:true (bijv. een gratis lid dat RTG Pay gebruikt zonder
-  // paspoort) laat Rahul meteen de paspoort-stap van de onboarding tonen.
-  const _apiCall = API.call.bind(API);
-  API.call = function (pad, body) {
-    return _apiCall(pad, body).catch(function (e) {
-      if (e && e.data && e.data.kyc && typeof checkOnboarding === 'function') { try { checkOnboarding(); } catch (x) {} }
-      throw e;
-    });
-  };
-
-  function applyState(state){
-    if (!state) return;
-    if (state.user) user = state.user;
-    if (state.invoices) invoices = state.invoices;
-    if (state.trip) trip = state.trip;
-    if (state.posts) posts = state.posts;
-    if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
-    if (state.myApplications) myApps = state.myApplications;
-    if (state.foundation) rtf = state.foundation;
-  }
 
   /* Meenemen: de app kent zijn eigen model, dus geeft hij dat door in plaats
      van de gedeelde laag naar het scherm te laten raden. Facturen zijn hier het
@@ -188,11 +168,6 @@ var RTG_BOUW = 'ddf4fb56';
       })
     };
   });
-
-  // verse state van de server (bijv. na volgen, claimen of stemmen op De Salon)
-  async function refreshState(){
-    try { applyState((await API.call('/api/state')).state); } catch(e){}
-  }
 
   let toastTimer;
   function toast(msg){
@@ -306,6 +281,60 @@ var RTG_BOUW = 'ddf4fb56';
     document.title = 'RTG, log in';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
+  }
+/* Eén eigenaar voor de app-API en volledige accountprojecties. De factory is
+   gehoist binnen de bestaande bundel; 02 initialiseert haar vóór pasconfiguratie
+   en de vroege verify-email-aanroep. Geen tweede client of globale testdeur. */
+  function maakAppState(){
+    const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
+    const bindingen = new WeakMap(), apiCall = API.call.bind(API);
+    let generatie = 0;
+    function verwerpOudeState(){ generatie++; }
+    API.call = function(pad, body, herkans){
+      const token = API.token, begonnen = generatie;
+      return apiCall(pad, body, herkans).then(function(data){
+        if (data.state){
+          if (token !== API.token || begonnen !== generatie) throw new Error('Deze accountprojectie is niet meer actueel.');
+          // Login levert het nieuwe token; aanvaardSessie neemt token en state samen aan.
+          bindingen.set(data.state, { token: data.token || token, bronToken: token, generatie: begonnen });
+        }
+        return data;
+      }).catch(function(e){
+        // Een echte KYC-weigering blijft de bestaande onboarding openen.
+        if (e && e.data && e.data.kyc && typeof checkOnboarding === 'function') { try { checkOnboarding(); } catch (x) {} }
+        throw e;
+      });
+    };
+    function aanvaardSessie(data){
+      const binding = data && bindingen.get(data.state);
+      // Ontvangst kan vóór een andere login zijn voltooid. Controleer opnieuw
+      // vóór token én projectie samen veranderen, niet pas na de tokenwissel.
+      if (!binding || !data.token || binding.token !== data.token ||
+          binding.bronToken !== API.token || binding.generatie !== generatie) {
+        throw new Error('Deze accountprojectie is niet meer actueel.');
+      }
+      API.token = data.token;
+      applyState(data.state);
+    }
+    function applyState(state){
+      if (!state) return false;
+      const binding = bindingen.get(state);
+      if (!binding || binding.token !== API.token || binding.generatie !== generatie) return false;
+      if (state.user) user = state.user;
+      if (state.invoices) invoices = state.invoices;
+      if (state.trip) trip = state.trip;
+      if (state.posts) posts = state.posts;
+      if (typeof state.creatorLikes === 'number') creatorLikes = state.creatorLikes;
+      if (state.myApplications) myApps = state.myApplications;
+      // stateFor is volledig; ontbreken trekt de vorige gezinsprojectie in.
+      rtf = state.foundation || { gekoppeld: [], meldingen: [] };
+      syncGezinContext();
+      return true;
+    }
+    async function refreshState(){
+      try { return applyState((await API.call('/api/state')).state); } catch(e){ return false; }
+    }
+    return { API, applyState, refreshState, verwerpOudeState, aanvaardSessie };
   }
 /* de trainingsmelding: een proef is een toestand, geen terugval na een storing */
   /* TRAINING IS VAN MAGNAAT, NIET VAN RTG. Alleen de afgeschermde Magnaat-kopie
@@ -518,8 +547,7 @@ var RTG_BOUW = 'ddf4fb56';
           if (data.tweedeFactorNodig) return data;
           if (data.aanmeldkanaalVraag) aanmeldkanaalVraag = data.aanmeldkanaalVraag;
           if (!data.token || !data.state) throw new Error('De server heeft nog geen geldige sessie bevestigd.');
-          API.token = data.token;
-          applyState(data.state);           // user = het echte account
+          aanvaardSessie(data);             // token en echt account samen aannemen
           tier = user.tier;
           if(cred.register&&cred.personalOS){
             try{await API.call('/personalos/complete',cred.personalOS);}catch(personalFout){
@@ -571,8 +599,7 @@ var RTG_BOUW = 'ddf4fb56';
       if (API.enabled){
         try {
           const data = await API.call('/login', {tier, pasApp: vastePas || undefined});
-          API.token = data.token;
-          applyState(data.state);
+          aanvaardSessie(data);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
       } else if (magnaatKopie) {
         user = {...PERSONAS[tier]}; laadMagnaatData();
@@ -604,7 +631,7 @@ var RTG_BOUW = 'ddf4fb56';
 /* inloggen en de staat binnenhalen: token, pas en het eerste scherm */
     API.token = t;
     try {
-      applyState((await API.call('/state')).state);
+      if (!applyState((await API.call('/state')).state)) return;
       if (wervingscode) {
         try {
           await API.call('/werving/verbind', { kassacode: wervingscode });
@@ -634,6 +661,7 @@ var RTG_BOUW = 'ddf4fb56';
       loadSocial();
       checkOnboarding(); laadAgendaLid();
     } catch(e){
+      if (API.token !== t) return; // een oude restore mag een nieuwe login niet afmelden
       API.token = null;
       // A lost connection is not a revoked session. Keep the stored token for
       // an explicit retry, while the existing gate keeps the workspace closed.
@@ -7880,8 +7908,11 @@ var RTG_BOUW = 'ddf4fb56';
         '<button class="go" data-goto="salon">'+T('app.tosalon','Naar De Salon')+' →</button>';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
-    const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
-    const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
+    if (user.account && ((rtf.gekoppeld || []).length || (rtf.meldingen || []).length)) renderFoundation();
+    else {
+      const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
+      const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
+    }
     // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten
 /* de betaalgeschiedenis van de gratis gebruiker */
     if (user.account) loadSocial(); else { const c = $('#homeContacts'); if (c) c.style.display='none'; }
@@ -7919,8 +7950,25 @@ var RTG_BOUW = 'ddf4fb56';
   }
 
   /* ---------- RTFoundation: eigen gezinsruimte voor gekoppelde oppas/opa/oma ---------- */
+  let grtInit=false, grtActief=null, grtContext='', grtEpoch=0, grtChatLaad=0, grtInfoLaad=0, grtThreadLaad=0;
+  function gezinSleutel(){
+    const g=rtf.gekoppeld||[];
+    return user && user.account && API.token && g.length ? JSON.stringify([user.id,API.token,g.map(x=>[x.code,x.profielId])]) : '';
+  }
+  function syncGezinContext(){
+    const g=user && user.account && API.token ? (rtf.gekoppeld||[]) : [];
+    rtf.gekoppeld=g; rtf.meldingen=(rtf.meldingen||[]).filter(x=>g.some(y=>y.code===x.code));
+    const sleutel=gezinSleutel(); if(sleutel===grtContext) return;
+    grtContext=sleutel; grtEpoch++; verwerpOudeState(); grtInit=false; grtActief=null;
+    if(window.GezinRT) GezinRT.stop();
+    for(const id of ['homeFoundation','gezinFamilies','gezinFeed','gezinInfo','gezinChat']){ const el=$('#'+id); if(el) el.replaceChildren(); }
+    const chat=$('#gezinChat'); if(chat) chat.style.display='none';
+    for(const id of ['tabGezin','tabGezinDot']){ const el=$('#'+id); if(el) el.classList.add('h-weg'); }
+  }
+  function gezinGeldig(epoch){ return !!grtContext && epoch===grtEpoch && grtContext===gezinSleutel(); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function renderFoundation(){
+    syncGezinContext();
     const homeEl = $('#homeFoundation'), tab = $('#tabGezin'), dot = $('#tabGezinDot');
     if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.classList.add('h-weg'); return; }
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
@@ -7952,6 +8000,7 @@ var RTG_BOUW = 'ddf4fb56';
       '<div class="s-1qms1gn">'+esc(x.tekst)+'</div></div>';
   }
   function renderGezin(){
+    syncGezinContext();
     const fam = $('#gezinFamilies'), feed = $('#gezinFeed'); if (!fam || !feed) return;
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     $('#gezinSub').textContent = g.length ? 'De RTFoundation-gezinnen die je als oppas of familie volgt.' : 'Je volgt nog geen gezin.';
@@ -7961,23 +8010,25 @@ var RTG_BOUW = 'ddf4fb56';
     feed.innerHTML = '<div class="label">Meldingen van het gezin</div>'+
       (m.length ? m.slice(0,30).map(rtfBerichtHtml).join('') : '<div class="meta">Nog geen meldingen. Zodra het gezin iets deelt, zie je het hier en op je telefoon.</div>')+
       (g.length ? '<div style="display:flex;gap:.5rem;margin-top:.8rem;"><input id="rtfReplyIn" placeholder="Antwoord het gezin..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;color:var(--txt);"><button class="go" id="rtfReplyBtn">Stuur</button></div>' : '');
-    fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', async ()=>{ const [code,pid]=b.dataset.los.split('|'); if(!confirm('Dit gezin niet meer volgen?')) return; try{ await API.call('/api/rtf/ontkoppel',{code,profielId:pid}); toast('Ontkoppeld.'); await refreshState(); renderFoundation(); if(!(rtf.gekoppeld||[]).length) openTab('home'); }catch(e){ toast(e.message); } }));
+    fam.querySelectorAll('[data-los]').forEach(b=> b.addEventListener('click', ()=> rtfOntkoppel(b.dataset.los)));
     const kb=$('#rtfKoppelBtn2'); if(kb) kb.addEventListener('click', rtfKoppelStart);
     const pb=$('#rtfPushBtn'); if(pb) pb.addEventListener('click', ()=> ensurePush(true));
     const rb=$('#rtfReplyBtn'); if(rb) rb.addEventListener('click', rtfReply);
     const ri=$('#rtfReplyIn'); if(ri) ri.addEventListener('keydown', e=>{ if(e.key==='Enter') rtfReply(); });
     if (m.filter(x=>!x.gelezen).length) API.call('/api/rtf/meldingen/gelezen').catch(()=>{});
-    if (g.length){ laadGezinInfo(); laadGezinChat(); } else { const gc=$('#gezinChat'); if(gc) gc.style.display='none'; }
+    if (g.length){ laadGezinInfo(); laadGezinChat(); }
   }
-  let grtInit=false, grtActief=null;
   async function laadGezinChat(){
     const box=$('#gezinChat'); if(!box) return;
-    const g=(rtf.gekoppeld||[]); if(!g.length){ box.style.display='none'; return; }
+    const epoch=grtEpoch, nummer=++grtChatLaad, geldig=()=>gezinGeldig(epoch)&&nummer===grtChatLaad;
+    const g=(rtf.gekoppeld||[]); if(!geldig()) return;
     box.style.display='';
-    let kan; try{ kan=await API.call('/api/rtf/kanaal',{ code:g[0].code }); }catch(e){ box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
-    if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:onGrtChat }); grtInit=true; }
+    let kan; try{ kan=await API.call('/api/rtf/kanaal',{ code:g[0].code }); }catch(e){ if(geldig()) box.innerHTML='<div class="meta">Chat is nu niet beschikbaar.</div>'; return; }
+    if(!geldig() || kan.code!==g[0].code || kan.profielId!==g[0].profielId) return;
+    if (!grtInit && window.GezinRT){ GezinRT.init({ base:'/api/foundation', code:kan.code, token:kan.token, mijnId:kan.profielId, mijnNaam:'ik', leden:kan.leden, onChat:m=>{if(gezinGeldig(epoch)) onGrtChat(m);} }); grtInit=true; }
     else if (window.GezinRT){ GezinRT.setLeden(kan.leden); if (GezinRT.setToken) GezinRT.setToken(kan.token); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
+    if(!geldig()) return;
     const byId={}; chats.forEach(c=> byId[c.id]=c);
 /* het gezinsblok: chatten en bellen met het gezin */
     box.innerHTML='<div class="label">Chat en bellen</div>'+
@@ -7991,8 +8042,11 @@ var RTG_BOUW = 'ddf4fb56';
   function grtMsgHtml(m){ var mij=m.vanMij; var inner = mij ? esc(m.tekst) : '<span class="xlate">'+esc(m.tekst)+'</span>'; return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:80%;padding:.4rem .7rem;border-radius:0;'+(mij?'background:var(--gold);color:#1a1710;':'background:var(--card2,#1B1817);border:1px solid var(--line);')+'white-space:pre-wrap;">'+inner+'</div>'; }
   function scrollGrt(){ var m=$('#grtMsgs'); if(m) m.scrollTop=m.scrollHeight; }
   async function openGrtThread(id, lid){
+    const epoch=grtEpoch, nummer=++grtThreadLaad;
+    if(!gezinGeldig(epoch)) return;
     grtActief=id; var t=$('#grtThread'); t.style.display='';
     var d={berichten:[]}; try{ d=await GezinRT.thread(id); }catch(e){}
+    if(!gezinGeldig(epoch) || nummer!==grtThreadLaad || t!==$('#grtThread')) return;
     t.innerHTML='<div class="s-gl2mqk">Gesprek met '+esc(lid?lid.naam:'')+'</div>'+
       '<div id="grtMsgs" style="max-height:14rem;overflow:auto;display:flex;flex-direction:column;gap:.3rem;">'+(d.berichten||[]).map(grtMsgHtml).join('')+'</div>'+
       '<div style="display:flex;gap:.5rem;margin-top:.5rem;"><input id="grtIn" placeholder="Bericht..." style="flex:1;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.5rem .7rem;color:var(--txt);"><button class="go" id="grtStuur">Stuur</button></div>';
@@ -8000,14 +8054,17 @@ var RTG_BOUW = 'ddf4fb56';
     vertaalBubbels($('#grtMsgs'));
     scrollGrt();
   }
-  async function grtStuur(){ var inp=$('#grtIn'); if(!inp) return; var t=(inp.value||'').trim(); if(!t||!grtActief) return; inp.value=''; try{ var r=await GezinRT.stuur(grtActief,t); var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:r.bericht.tekst,vanMij:true})); scrollGrt(); } }catch(e){ toast(e.message); } }
+  async function grtStuur(){ var inp=$('#grtIn'); if(!inp) return; const epoch=grtEpoch,id=grtActief; var t=(inp.value||'').trim(); if(!t||!id||!gezinGeldig(epoch)) return; inp.value=''; try{ var r=await GezinRT.stuur(id,t); if(!gezinGeldig(epoch)||id!==grtActief) return; var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:r.bericht.tekst,vanMij:true})); scrollGrt(); } }catch(e){ if(gezinGeldig(epoch)) toast(e.message); } }
   function onGrtChat(m){ if(grtActief && m.van===grtActief){ var el=$('#grtMsgs'); if(el){ el.insertAdjacentHTML('beforeend', grtMsgHtml({tekst:m.tekst,vanMij:false})); vertaalBubbels(el); scrollGrt(); } } }
   const telHref = t => 'tel:' + String(t||'').replace(/[^0-9+]/g,'');
   function geleden(iso){ const s=Math.floor((Date.now()-new Date(iso).getTime())/1000); if(s<60)return 'net nu'; if(s<3600)return Math.floor(s/60)+' min geleden'; if(s<86400)return Math.floor(s/3600)+' uur geleden'; return Math.floor(s/86400)+' dag(en) geleden'; }
   function datumKort(d){ try{ const dt=new Date(d+'T00:00:00'); const vd=new Date(); vd.setHours(0,0,0,0); const mo=new Date(vd); mo.setDate(mo.getDate()+1); if(dt.getTime()===vd.getTime())return 'Vandaag'; if(dt.getTime()===mo.getTime())return 'Morgen'; return dt.toLocaleDateString(lang(),{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
   async function laadGezinInfo(){
     const box = $('#gezinInfo'); if(!box) return;
-    let d; try{ d = await API.call('/api/rtf/overzicht'); }catch(e){ box.innerHTML=''; return; }
+    const epoch=grtEpoch,nummer=++grtInfoLaad,geldig=()=>gezinGeldig(epoch)&&nummer===grtInfoLaad;
+    if(!geldig()) return;
+    let d; try{ d = await API.call('/api/rtf/overzicht'); }catch(e){ if(geldig()) box.innerHTML=''; return; }
+    if(!geldig()) return;
     box.innerHTML = (d.gezinnen||[]).map(gz=>{
       const o = gz.oppasinfo||{};
       const meerdan1 = (d.gezinnen||[]).length>1;
@@ -8037,11 +8094,23 @@ var RTG_BOUW = 'ddf4fb56';
   function infoRij(titel, tekst){ return tekst ? '<div class="h-mt50"><div class="meta s-aekzga">'+esc(titel)+'</div><div class="s-yztz7f">'+esc(tekst)+'</div></div>' : ''; }
   async function rtfReply(){
     const inp=$('#rtfReplyIn'); if(!inp) return; const t=(inp.value||'').trim(); if(!t) return;
-    const g=(rtf.gekoppeld||[]); if(!g.length) return;
+    const g=(rtf.gekoppeld||[]),epoch=grtEpoch; if(!gezinGeldig(epoch)) return;
     // een sleutel per geschreven bericht: een tweede tik of een herhaling is hetzelfde bericht
     if(inp.dataset.idemTekst!==t){ inp.dataset.idem=RTGId('gezin-bericht'); inp.dataset.idemTekst=t; }
-    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
-    catch(e){ toast(e.message); }
+    try{ await API.call('/api/rtf/bericht',{ code:g[0].code, tekst:t, idem:inp.dataset.idem }); if(!gezinGeldig(epoch)) return; inp.value=''; delete inp.dataset.idem; delete inp.dataset.idemTekst; toast('Verstuurd naar '+g[0].gezinNaam+'.'); }
+    catch(e){ if(gezinGeldig(epoch)) toast(e.message); }
+  }
+  async function rtfOntkoppel(keuze){
+    const [code,profielId]=keuze.split('|'),epoch=grtEpoch,token=API.token;
+    if(!gezinGeldig(epoch)||!confirm('Dit gezin niet meer volgen?')) return;
+    try{
+      await API.call('/api/rtf/ontkoppel',{code,profielId}); if(!gezinGeldig(epoch)) return;
+      rtf.gekoppeld=rtf.gekoppeld.filter(x=>x.code!==code||x.profielId!==profielId);
+      syncGezinContext(); renderFoundation(); toast('Ontkoppeld.');
+      if(!rtf.gekoppeld.length) openTab('home');
+      const na=grtEpoch,r=await API.call('/api/state'); if(token!==API.token||na!==grtEpoch) return;
+      applyState(r.state); renderFoundation();
+    }catch(e){ if(token===API.token) toast(e.message); }
   }
   async function rtfKoppelStart(){
     const uitnodiging = prompt('Plak de persoonlijke uitnodigingslink of code die je van het gezin kreeg:');

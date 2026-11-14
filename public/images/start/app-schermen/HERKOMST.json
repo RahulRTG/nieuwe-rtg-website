@@ -1,8 +1,8 @@
 {
   "kind": "Schermafbeeldingen uit de echte RTG-app in een lokale wegwerpomgeving",
   "browser": {
-    "versie": "153.0.8010.0",
-    "infrastructuur": "/tmp/chromium"
+    "versie": "156.0.8078.4",
+    "infrastructuur": "de gepinde Playwright-build"
   },
   "viewport": {
     "width": 390,
@@ -30,8 +30,8 @@
       "route": "/apps/app.html",
       "file": "gebruiker.png",
       "weergave": "Standaard Home, zonder extra bediening",
-      "sourceHash": "00405b59ae641e9e4c021c46dbe12d4cefa3d537a87d9bfa2050bf4baa56f3ca",
-      "imageHash": "5cfc5a6458313a7cb97a87d49874e3775e9cfa39aa26693f34019f3aed7d8056"
+      "sourceHash": "d4d07c813a9ddf9e40337caefdc8c83b0b729d72b19bb1fce7e8babcbecdc464",
+      "imageHash": "a59544156e3226553ecdc2856181080e1c4249daf9ba1badcbb5b62eb96887c9"
     }
   ]
 }

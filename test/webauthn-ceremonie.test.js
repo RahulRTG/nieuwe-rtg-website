@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
 let srv, base, lid, lidEmail;
@@ -48,10 +48,11 @@ test.before(async () => {
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
   assert.ok(lid, 'het proeflid staat er');
+  assert.equal(reg.body.state.user.tier, 'guest', 'registratie koopt geen pas');
 });
-test.after(() => {
-  stop(srv && srv.child);
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+test.after(async () => {
+  await stopHard(srv && srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
 });
 
 test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', async () => {
@@ -140,7 +141,7 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
       antwoord: auth.loginAntwoord(lOpties.body.opties.challenge, origin, 3), pasApp: 'rtg' });
   assert.equal(sessie.status, 200, 'de handtekening wordt aanvaard: ' + JSON.stringify(sessie.body).slice(0, 200));
   assert.ok(sessie.body.token, 'en er komt een echte sessie uit, net als bij een wachtwoord');
-  assert.equal(sessie.body.state.user.tier, 'rtg', 'op de pas van het lid zelf');
+  assert.equal(sessie.body.state.user.tier, 'guest', 'passkey-login verandert de gratis accountrechten niet, ook niet met pasApp rtg');
 
   /* De RTG PIN gebruikt diezelfde passkey voor een action-bound step-up. Een
      gestolen open sessie mag een noodslot wel AAN zetten (veilig), maar niet

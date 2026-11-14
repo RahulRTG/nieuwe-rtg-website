@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, keurLidGoed } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, keurLidGoed } = require('./helper');
 const { maakPaspoortdeur } = require('../server/kern/onvervreemdbaar');
 
 function api(base, pad, body, token) {
@@ -40,21 +40,22 @@ const DEUREN = ['/api/gemeente/afspraak', '/api/overheid/aangifte', '/api/care/i
 const DICHT = new Set([401, 403]);
 
 let srv, base, seq = 0;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-paspoortdeur-'));
 
 async function registreer(tier) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const r = await api(base, '/api/auth/register', { name: 'Proef Genoot', email: 'pd' + u + '@voorbeeld.nl',
     phone: '06' + u, password: 'geheim12345', geboortedatum: '1988-04-04', tier });
   assert.ok(r.body.token, 'registreren als ' + tier + ' leverde geen token: ' + JSON.stringify(r.body).slice(0, 120));
-  return { token: r.body.token, codenaam: r.body.state.user.codename, tier: r.body.state.user.tier };
+  assert.equal(r.body.state.user.tier, 'guest', 'het meegegeven tier koopt geen pas');
+  return { token: r.body.token, codenaam: r.body.state.user.codename, tier: r.body.state.user.tier, email: 'pd' + u + '@voorbeeld.nl' };
 }
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-paspoortdeur-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_ENC_KEY: 'test-encryptiesleutel-1234567890' } });
   base = srv.base;
 });
-test.after(() => stop(srv && srv.child));
+test.after(async () => { await stopHard(srv && srv.child); fs.rmSync(TMP, { recursive: true, force: true }); });
 
 test('1. zonder idGeverifieerd weigert de deur te bestaan', () => {
   assert.throws(() => maakPaspoortdeur({}), /idGeverifieerd ontbreekt/);
@@ -86,7 +87,7 @@ test('3. na de paspoortcontrole gaat de deur open voor een gratis account, zonde
 
 test('4. een bezoeker zonder account blijft buiten', async () => {
   const r0 = await api(base, '/api/login', { tier: 'guest' });
-  if (!r0.body.token) return;   // zonder demo-inlog bestaat deze bezoeker niet
+  assert.ok(r0.body.token, 'deze proefomgeving heeft een accountloze bezoeker nodig');
   for (const pad of DEUREN) {
     const r = await api(base, pad, {}, r0.body.token);
     assert.equal(r.status, 403, pad + ' liet een bezoeker zonder account binnen');
@@ -96,7 +97,9 @@ test('4. een bezoeker zonder account blijft buiten', async () => {
 
 test('5. een betaalde pas merkt niets: geen nieuwe eis voor wie al binnenkwam', async () => {
   const p = await registreer('rtg');
-  assert.equal(p.tier, 'rtg');
+  assert.equal(p.tier, 'guest');
+  maakBetaaldRtgTestaccount(TMP, p.email);
+  assert.equal((await api(base, '/api/state', {}, p.token)).body.state.user.tier, 'rtg', 'de betaalde pas is expliciete testdata');
   for (const pad of DEUREN) {
     const r = await api(base, pad, {}, p.token);
     assert.ok(!DICHT.has(r.status), pad + ' weigert nu een RTG Pass zonder paspoortcontrole: ' + r.status);

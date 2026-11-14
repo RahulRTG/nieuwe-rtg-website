@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -18,17 +18,20 @@ function api(base, pad, body, token) {
 }
 
 let srv, base, winkel, lid, codename;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dp-'));
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dp-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'MAISON' } });
   base = srv.base;
   winkel = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
   const u = Date.now().toString().slice(-8);
   lid = (await api(base, '/api/auth/register', { name: 'Betaal Lid', email: 'p' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01' })).body.token;
+  assert.equal((await api(base, '/api/state', {}, lid)).body.state.user.tier, 'guest', 'registratie koopt geen pas');
+  maakBetaaldRtgTestaccount(TMP, 'p' + u + '@x.nl');
+  assert.equal((await api(base, '/api/state', {}, lid)).body.state.user.tier, 'rtg', 'de betaalproef heeft expliciete RTG-rechten, geen Business-bevoegdheid');
 });
-test.after(() => stop(srv && srv.child));
+test.after(async () => { await stopHard(srv && srv.child); fs.rmSync(TMP, { recursive: true, force: true }); });
 
 test('1. het lid betaalt een leverancier rechtstreeks; de ontvangst-teller loopt op', async () => {
   const r = await api(base, '/api/betaal/direct', { supplierCode: 'MAISON', bedrag: 45, omschrijving: 'Styling-advies', bron: 'salon' }, lid);
@@ -126,7 +129,10 @@ test('7. tempolimiet: hooguit 12 betaalpogingen per minuut, maar een idempotente
   // een vers lid, zodat de teller op nul begint
   const u = (Date.now() + 7).toString().slice(-8);
   const vers = (await api(base, '/api/auth/register', { name: 'Tempo Lid', email: 't' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01' })).body.token;
+  assert.equal((await api(base, '/api/state', {}, vers)).body.state.user.tier, 'guest');
+  maakBetaaldRtgTestaccount(TMP, 't' + u + '@x.nl');
+  assert.equal((await api(base, '/api/state', {}, vers)).body.state.user.tier, 'rtg');
   // eerste betaling met een vaste idem-sleutel (telt als poging 1)
   const eerste = await api(base, '/api/betaal/direct', { supplierCode: 'MAISON', bedrag: 5, idem: 'vast' }, vers);
   assert.equal(eerste.status, 200);

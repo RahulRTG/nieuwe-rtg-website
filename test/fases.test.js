@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-fases-'));
 let srv, base, office, lid;
@@ -28,10 +28,13 @@ test.before(async () => {
   lid = (await api('/api/auth/register', { name: 'Faselid', email: 'fa' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
   assert.ok(office && lid, 'backoffice en lid ingelogd');
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'guest', 'registratie koopt geen pas');
+  maakBetaaldRtgTestaccount(TMP, 'fa' + u + '@x.nl');
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'rtg', 'de uitrolproef gebruikt een bestaand betaald lid');
 });
-test.after(() => {
-  stop(srv && srv.child);
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+test.after(async () => {
+  await stopHard(srv && srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
 });
 
 test('1. de fases staan op het bord, met naam en omvang', async () => {

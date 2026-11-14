@@ -11,9 +11,13 @@
    Draai los: node --experimental-sqlite --test test/kosten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, kantoorAlsPersoon, elevateTier } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, kantoorAlsPersoon, elevateTier } = require('./helper');
 
 let srv, base, kantoor;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kosten-'));
 
 const api = (pad, body, token) => fetch(base + pad, {
   method: 'POST',
@@ -32,6 +36,10 @@ async function versLid() {
     password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg'
   });
   assert.ok(r.body.token, 'registratie gaf geen token: ' + JSON.stringify(r.body).slice(0, 200));
+  assert.equal(r.body.state.user.tier, 'guest', 'registratie koopt geen pas');
+  maakBetaaldRtgTestaccount(TMP, 'kosten-' + t + '@toets.example');
+  assert.equal((await api('/api/state', {}, r.body.token)).body.state.user.tier, 'rtg',
+    'de proef van het RTG-kostenbeleid gebruikt expliciete RTG-rechten');
   return r.body.token;
 }
 
@@ -65,11 +73,11 @@ async function verzoektarief(millicentenPer1000) {
 }
 
 test.before(async () => {
-  srv = await startServer(); base = srv.base;
+  srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }); base = srv.base;
   kantoor = await kantoorAlsPersoon(base);
   assert.ok(kantoor, 'geen boardroom-sessie; zonder eigenaar valt hier niets te toetsen');
 });
-test.after(() => stop(srv));
+test.after(async () => { await stopHard(srv && srv.child); fs.rmSync(TMP, { recursive: true, force: true }); });
 
 /* MUTATIE: in tarieven.js de bron-eis (`b.length < 4`) weggehaald -- deze toets
    zakt dan op de eerste helft, want dan wordt een tarief zonder herkomst

@@ -48,6 +48,7 @@ const VOORVOEGSELS = [
   { pad: '/api/webauthn/',      gemeten: 4, waarom: 'een passkey hangt aan een account en niet aan een pas' },
   { pad: '/api/pin/',           gemeten: 4, waarom: 'de algemene pin hoort bij een echt RTG-account' },
   { pad: '/api/sleutelwoorden/', gemeten: 3, waarom: 'sleutelwoorden horen bij een echt RTG-account; alle drie weigeren erop' },
+  { pad: '/api/plaats/',        gemeten: 5, waarom: 'vijf inhoudsproeven weigeren de demo; alle zes plaatsroutes delen dezelfde eigen-accountpoort, ook voor gratis werknemers' },
   /* /api/vonk STOND HIER, en dat was fout zodra ./signatureroutes.js bestond.
      Vonk deelt de ontmoetpoort met Rendez-vous en vraagt drie dingen tegelijk:
      een pas, een geverifieerd account en 18 jaar. Een gewoon gratis account is
@@ -63,6 +64,7 @@ const VOORVOEGSELS = [
 const PADEN = [
   '/api/auth/aanmeldkanaal', '/api/auth/password', '/api/auth/resend',
   '/api/chat/send',
+  '/api/gast/eten/beoordeel', '/api/inzagekaart',
   '/api/member/dossier', '/api/member/identiteit/verzoeken', '/api/member/loonstroken',
   '/api/podium/kanaal/aanmeld', '/api/podium/kanalen',
   '/api/rtf/bericht', '/api/rtf/kanaal', '/api/rtf/koppel', '/api/rtf/meldingen/gelezen',

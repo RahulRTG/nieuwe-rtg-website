@@ -49,6 +49,7 @@
    heeft aangeroepen; de rest houdt zijn profiel en zijn op-stempel.
 
    Draai:  node scripts/inhoudskaart.js
+   Hermeet ook bestaande waarneembare profielen: voeg --hermeet-kaart toe.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -57,7 +58,8 @@ const { start } = require('./lib/wegwerpserver');
 const { alleRoutes, rolVan } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
-const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
+const { haalSleutels, meldSleutels } = require('./lib/proefsleutels');
+const { accountRolVoor } = require('./lib/accountroutes');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INHOUDSKAART.json');
@@ -100,25 +102,59 @@ function grondVan(status, profiel) {
   return null;
 }
 
-module.exports = { profielVan, onwaarneembaar, grondVan };
+/* Hermeten verandert geen OUTPUTPROEF-oordeel: het ververst alleen het echte
+   antwoordprofiel. Ook oude kaartregels moeten nog in de huidige bron staan. */
+function kiesMeetdoel(output, kaart, inventaris, deuren, hermeetKaart = false) {
+  const kandidaten = new Set(Object.entries(output)
+    .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist').map(([k]) => k));
+  if (hermeetKaart) {
+    for (const [k, p] of Object.entries(kaart)) if (!p.onwaarneembaar) kandidaten.add(k);
+  }
+  const dicht = deuren.split(',').filter(Boolean);
+  return new Set(inventaris.filter(r => r.pad.startsWith('/api/') &&
+    !dicht.some(d => r.pad === d || r.pad.startsWith(d)) && kandidaten.has(r.methode + ' ' + r.pad))
+    .map(r => r.methode + ' ' + r.pad));
+}
+
+function eisMeetsleutels(routes, tokens) {
+  const missen = [...new Set(routes.map(r => r.rol))]
+    .filter(rol => rol !== 'publiek' && !tokens[rol]);
+  if (missen.length) throw new Error('De inhoudskaart mist sleutels voor ' + missen.join(', ') +
+    '; geen terugval naar een demo-pas of anonieme meting.');
+}
+
+async function ruimMeetserverOp({ kind, klaar }) {
+  // klaar() verwijdert de map direct; wacht eerst tot het eigen kind niet meer kan schrijven.
+  if (kind.exitCode === null && kind.signalCode === null) {
+    await new Promise((resolve, reject) => {
+      kind.once('exit', resolve);
+      try {
+        if (!kind.kill('SIGKILL')) throw new Error('De inhoudskaart kon de meetserver niet stoppen.');
+      } catch (e) { kind.removeListener('exit', resolve); reject(e); }
+    });
+  }
+  await klaar();
+}
+
+module.exports = { profielVan, onwaarneembaar, grondVan, kiesMeetdoel, eisMeetsleutels, ruimMeetserverOp };
 if (require.main !== module) return;
 
 (async () => {
   let reg;
   try { reg = JSON.parse(fs.readFileSync(OUTPUT, 'utf8')); }
   catch (e) { console.error('geen OUTPUTPROEF.json; zonder blindenlijst valt er niets in kaart te brengen'); process.exit(2); }
+  let oud = {};
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; }
+  catch (e) { if (!e || e.code !== 'ENOENT') throw e; }
   /* Blind EN onbeslist: allebei zijn het routes zonder toerekenbare
      inhoudstoets, en voor allebei is een vormcontract de sluitweg. DEUREN
      doen niet mee: die worden in elke lie-run gespaard (RTG_LIEG_NIET), dus
      een contract erop kan nooit tot een gerichte meting leiden. */
   const { DEUREN } = require('./mutatie');
-  const isDeur = (pad) => DEUREN.split(',').some(d => pad === d || pad.startsWith(d));
-  const doel = new Set(Object.entries(reg.perRoute || {})
-    .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist')
-    .filter(([k]) => !isDeur(k.split(' ')[1]))
-    .filter(([k]) => k.split(' ')[1].startsWith('/api/'))
-    .map(([k]) => k));
-  if (!doel.size) { console.log('geen blinde of onbesliste routes; de kaart heeft niets te doen'); return; }
+  const inventaris = alleRoutes();
+  const hermeetKaart = process.argv.includes('--hermeet-kaart');
+  const doel = kiesMeetdoel(reg.perRoute || {}, oud, inventaris, DEUREN, hermeetKaart);
+  if (!doel.size) { console.log('geen te meten routes binnen de huidige bron en selectie'); return; }
 
   /* De rolverdeling, met de PUBLIEKE routes erbij: rolVan() geeft daar niets
      terug en verdeelOpRol zou ze wegleggen, maar een route zonder poort is
@@ -134,78 +170,82 @@ if (require.main !== module) return;
   const KENT = new Set(['member', 'office', 'supplier', 'kantoor-op-naam']);
   const routes = [];
   let zonderSleutel = 0;
-  for (const r of alleRoutes()) {
+  for (const r of inventaris) {
     const s = r.methode + ' ' + r.pad;
     if (!doel.has(s)) continue;
     const rol = rolVan(r.bewakers);
     if (!rol) routes.push({ methode: r.methode, pad: r.pad, rol: 'publiek' });
-    else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad, rol });
+    else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad,
+      rol: accountRolVoor(rol, r.pad).rol || rol });
     else zonderSleutel++;
   }
   const verdeling = { metRol: routes, zonderRol: { length: zonderSleutel } };
   console.log('\n=== DE INHOUDSKAART ===\n');
-  console.log('  blinde + onbesliste routes (geen deur): ' + doel.size);
+  console.log('  geselecteerde bronroutes (geen deur) : ' + doel.size +
+    (hermeetKaart ? ' (inclusief bestaande waarneembare kaart)' : ' (blind/onbeslist)'));
   console.log('  bereikbaar (publiek of bekende rol)   : ' + verdeling.metRol.length);
 
   const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
-  const { basis, klaar } = server;
-  const doe = async (methode, pad, lijf, tok) => {
-    try {
-      const r = await fetch(basis + pad, { method: methode,
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
-        body: methode === 'GET' || methode === 'HEAD' ? undefined : JSON.stringify(lijf || {}) });
-      let data = null; try { data = await r.json(); } catch (e) {}
-      return { status: r.status, data };
-    } catch (e) { return { status: 0, data: null }; }
-  };
-  /* De sleutelbos: ./lib/proefsleutels.js. `doe` heeft de methode vooraan, dus
-     de bos krijgt hier een post() die daarop aansluit -- geen tweede kopie. */
-  const bos = await haalSleutels({ post: (pad, lijf, tok) => doe('POST', pad, lijf, tok) });
-  const { tokens } = bos;
-  meldSleutels(bos);
-
-  /* Vaste volgorde: de wacht roept straks in dezelfde volgorde aan, zodat de
-     opgebouwde toestand (route A maakte iets dat route B ziet) gelijk loopt. */
-  const rij = verdeling.metRol.slice().sort((a, b) =>
-    (a.methode + ' ' + a.pad).localeCompare(b.methode + ' ' + b.pad));
-
+  const { basis } = server;
   const nuOp = new Date().toISOString();
   const vers = {};
   let waarneembaar = 0, kaal = 0, dood = 0;
-  for (const r of rij) {
-    const uit = await doe(r.methode, r.pad, plausibelLijf(r.pad), tokens[r.rol]);
-    const sleutel = r.methode + ' ' + r.pad;
-    if (!uit.status) { dood++; continue; }
-    const profiel = profielVan(uit.data);
-    /* Geen JSON (een bundel, een CSV-export): daar valt met sleutels niets te
-       bewaken, en een leeg profiel in de kaart zou een wacht zijn die niets
-       wacht. Eerlijk onwaarneembaar, met de vorm als reden. */
-    const grond = grondVan(uit.status, profiel);
-    if (grond === 'geen-json') {
-      kaal++;
+  try {
+    const doe = async (methode, pad, lijf, tok) => {
+      try {
+        const r = await fetch(basis + pad, { method: methode,
+          headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+          body: methode === 'GET' || methode === 'HEAD' ? undefined : JSON.stringify(lijf || {}) });
+        let data = null; try { data = await r.json(); } catch (e) {}
+        return { status: r.status, data };
+      } catch (e) { return { status: 0, data: null }; }
+    };
+    /* De sleutelbos: ./lib/proefsleutels.js. `doe` heeft de methode vooraan, dus
+       de bos krijgt hier een post() die daarop aansluit -- geen tweede kopie. */
+    const bos = await haalSleutels({ post: (pad, lijf, tok) => doe('POST', pad, lijf, tok) });
+    const { tokens } = bos;
+    meldSleutels(bos);
+    eisMeetsleutels(routes, tokens);
+
+    /* Vaste volgorde: de wacht roept straks in dezelfde volgorde aan, zodat de
+       opgebouwde toestand (route A maakte iets dat route B ziet) gelijk loopt. */
+    const rij = verdeling.metRol.slice().sort((a, b) =>
+      (a.methode + ' ' + a.pad).localeCompare(b.methode + ' ' + b.pad));
+
+    for (const r of rij) {
+      const uit = await doe(r.methode, r.pad, plausibelLijf(r.pad), tokens[r.rol]);
+      const sleutel = r.methode + ' ' + r.pad;
+      if (!uit.status) { dood++; continue; }
+      const profiel = profielVan(uit.data);
+      /* Geen JSON (een bundel, een CSV-export): daar valt met sleutels niets te
+         bewaken, en een leeg profiel in de kaart zou een wacht zijn die niets
+         wacht. Eerlijk onwaarneembaar, met de vorm als reden. */
+      const grond = grondVan(uit.status, profiel);
+      if (grond === 'geen-json') {
+        kaal++;
+        vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
+          onwaarneembaar: true, grond: 'geen-json', op: nuOp,
+          reden: 'het antwoord is geen JSON-object (vorm: ' + profiel.vorm + '); een vormcontract ' +
+            'op sleutels kan hier niets bewaken' };
+        continue;
+      }
+      if (grond === 'gelijk-aan-leugen') {
+        kaal++;
+        vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
+          onwaarneembaar: true, grond: 'gelijk-aan-leugen', op: nuOp,
+          reden: 'het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); ' +
+            'hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan' };
+        continue;
+      }
+      waarneembaar++;
       vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-        onwaarneembaar: true, grond: 'geen-json', op: nuOp,
-        reden: 'het antwoord is geen JSON-object (vorm: ' + profiel.vorm + '); een vormcontract ' +
-          'op sleutels kan hier niets bewaken' };
-      continue;
+        sleutels: profiel.sleutels, dragend: profiel.dragend, op: nuOp };
     }
-    if (grond === 'gelijk-aan-leugen') {
-      kaal++;
-      vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-        onwaarneembaar: true, grond: 'gelijk-aan-leugen', op: nuOp,
-        reden: 'het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); ' +
-          'hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan' };
-      continue;
-    }
-    waarneembaar++;
-    vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-      sleutels: profiel.sleutels, dragend: profiel.dragend, op: nuOp };
+  } finally {
+    await ruimMeetserverOp(server);
   }
-  klaar();
 
   /* Stapelen: vers wint, de rest blijft. */
-  let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   /* Snoeien bij het stapelen: geen niet-/api/-paden (buiten bereik van de
      liegpoort) en geen waarneembaar profiel zonder sleutels -- dat zou een
      wacht zijn die niets wacht. */

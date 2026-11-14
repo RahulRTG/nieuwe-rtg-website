@@ -48,6 +48,7 @@ const fs = require('fs');
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 const { start } = require('./lib/wegwerpserver');
+const { maakBetaaldRtgTestaccount, stopHard } = require('../test/helper');
 const { stempel, eisSchoneBoom } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
@@ -104,7 +105,8 @@ function leesOpslag(datamap) {
 }
 
 async function doorloop() {
-  const srv = await start({ naam: 'positieproef', env: { RTG_DEMO: '1', RTG_ENC_KEY: '' } });
+  const srv = await start({ naam: 'positieproef', env: { RTG_DEMO: '1', RTG_ENC_KEY: '',
+    RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '', REDIS_URL: '' } });
   const post = async (pad, body, token) => {
     const r = await fetch(srv.basis + pad, { method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
@@ -118,9 +120,26 @@ async function doorloop() {
     return r;
   };
   try {
-    const login = await post('/api/login', { tier: 'rtg' });
+    /* Een plaatsvenster moet aan een echte houder hangen, geen accountloze
+       demosessie. De gecombineerde doorloop gebruikt ook betaalde navigatie:
+       daarom EEN geregistreerde persoon met een expliciete RTG-testpas in de
+       eigen wegwerpdatamap, zonder KYC, kantoorrol of tweede actor. Dit bewijst
+       geen checkout; de pasfixture is uitsluitend de meetopstelling. */
+    const email = 'positieproef@example.test';
+    const login = await post('/api/auth/register', { name: 'Positieproef', email,
+      phone: '0612345678', password: 'Positieproef123!', geboortedatum: '1990-01-01' });
     const lid = login.data && login.data.token;
-    if (!lid) throw new Error('geen ledensessie (status ' + login.status + ') -- dan meet deze proef niets');
+    if (login.status !== 200 || !lid)
+      throw new Error('geen eigen account (status ' + login.status + ') -- dan meet deze proef niets');
+    const voor = await post('/api/state', {}, lid);
+    const persoon = voor.data && voor.data.state && voor.data.state.user;
+    if (voor.status !== 200 || !persoon || persoon.tier !== 'guest' || !persoon.codename)
+      throw new Error('de registratie leverde geen aantoonbaar gratis eigen account');
+    maakBetaaldRtgTestaccount(srv.datamap, email);
+    const na = await post('/api/state', {}, lid);
+    const betaald = na.data && na.data.state && na.data.state.user;
+    if (na.status !== 200 || !betaald || betaald.tier !== 'rtg' || betaald.codename !== persoon.codename)
+      throw new Error('de betaalde navigatiefixture is niet dezelfde eigen account');
 
     // 1. navigeren: de positie hoort het antwoord niet te overleven
     await stap('route', '/api/nav/route', { van: MERK.routeVan, naar: MERK.routeNaar, modus: 'auto' }, lid);
@@ -172,6 +191,7 @@ async function doorloop() {
     }
     return { stappen, opslag, aankomstGesteld, anderHek: ander, zaakPlek: !!zaakPlek };
   } finally {
+    await stopHard(srv.kind);
     srv.klaar();
   }
 }

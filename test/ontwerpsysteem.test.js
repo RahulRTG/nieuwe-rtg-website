@@ -221,7 +221,7 @@ test('rtg-ds.css laadt elk bestand van het systeem precies één keer', () => {
     }
   })(DS, '');
   assert.deepEqual(geladen, bestaand.filter(n => !zelfstandigeIngangen.includes(n)).sort());
-  assert.deepEqual(zelfstandigeIngangen, ['taalkeuze-standalone.css', 'uurwerk.css']);
+  assert.deepEqual(zelfstandigeIngangen, ['brand-lockup.css', 'taalkeuze-standalone.css', 'uurwerk.css']);
   for (const naam of zelfstandigeIngangen) {
     assert.ok(fs.existsSync(path.join(DS, naam)), 'contractingang ontbreekt: ' + naam);
     assert.ok(!geladen.includes(naam), 'zelfstandige ingang mag niet ook via rtg-ds.css laden: ' + naam);

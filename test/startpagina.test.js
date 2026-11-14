@@ -47,7 +47,7 @@ test('de nieuwe voordeur draagt het RTG-merk en niet het vervangen scherm', () =
 });
 
 test('de reisvoordeur begint bij mensen en houdt de drie platformkanten bereikbaar', () => {
-  assert.match(HTML, /<title>Rahul Travel Group \| Reizen\. Verbinden\. Leven\./);
+  assert.match(HTML, /<title>Rahul Travel Group \| Sociaal technologiebedrijf rondom mensen<\/title>/);
   assert.ok(HTML.indexOf('id="magazineHome"') < HTML.indexOf('id="inhoud"'));
   assert.match(HTML, /id="hoofdtitel"[^>]*>Het begint bij een reis\.<br><em>En bij de mensen\.<\/em>/,
     'het verhaal begint bij reizen en mensen; het platform ondersteunt dat verhaal');

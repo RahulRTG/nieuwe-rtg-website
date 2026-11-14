@@ -122,6 +122,15 @@ test('3. zegt het lid ja, dan ligt de toestemming er en hoeft er niets meer gevr
   assert.ok(na.venster, 'de toestemming ligt er');
   assert.equal(na.venster.bron, 'dienst bij ' + ZAAK, 'met de reden erbij, na te vertellen');
   assert.ok(new Date(na.venster.sluit).getTime() > Date.now(), 'en met een einde');
+  const eigenDienst = await api('/api/plaats/dienst', {}, lidToken);
+  assert.equal(eigenDienst.status, 200);
+  assert.equal(eigenDienst.body.diensten.length, 1, 'de eigenaar heeft daadwerkelijk een dienst');
+  const eigenHekken = await api('/api/plaats/hekken', { doel: 'dienst' }, lidToken);
+  assert.equal(eigenHekken.status, 200);
+  assert.ok(eigenHekken.body.hekken.some(h => h.id === 'leverancier:' + ZAAK));
+  const eigenStand = await api('/api/plaats/stand', {}, lidToken);
+  assert.equal(eigenStand.status, 200);
+  assert.equal(eigenStand.body.vensters.length, 1, 'het afgeschermde venster bestaat echt');
   const vals = { key: 'user-' + lidId, codenaam: lidCode, account: lidId, doel: 'dienst' };
   const andereDienst = await api('/api/plaats/dienst', vals, anderToken);
   assert.equal(andereDienst.status, 200);

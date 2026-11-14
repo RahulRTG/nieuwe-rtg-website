@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -25,6 +25,8 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Protest', email: 'p' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, 'de positieve vakwerkpersona is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 'p' + u + '@x.nl');
   lid = { token: reg.body.token };
   const roster = await api(base, '/api/supplier/roster', { code: 'CASTELL' });
   const mgr = (roster.body.staff || []).find(x => x.role === 'manager');

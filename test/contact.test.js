@@ -133,6 +133,9 @@ test('6. de Salon van een klant is alleen te zien met een echte lijn bij deze za
 });
 
 test('7. een andere gratis klant kan de lijn niet lezen, overnemen of via history aanleggen', async () => {
+  const eigen = await api(base, '/api/partner/chat/history', { supplierCode: 'MAISON' }, lid);
+  assert.equal(eigen.status, 200);
+  assert.ok(eigen.body.messages.length >= 1, 'de echte lijn bevat berichten die de vreemde niet mag lezen');
   const key = await vindChatKey();
   assert.equal(key, 'gast:MAISON|user-' + lidProfiel.id + '|Team', 'de aanval verwijst naar de echte lijn van de andere klant');
   const body = { supplierCode: 'MAISON', key, customerKey: 'user-' + lidProfiel.id, accountId: lidProfiel.id };
@@ -146,6 +149,9 @@ test('7. een andere gratis klant kan de lijn niet lezen, overnemen of via histor
 });
 
 test('8. een vreemde zaak kan de eigen nazorglijn niet lezen of namens haar antwoorden', async () => {
+  const eigen = await api(base, '/api/partner/chat/history', { supplierCode: 'MAISON' }, lid);
+  assert.equal(eigen.status, 200);
+  assert.ok(eigen.body.messages.length >= 1, 'de echte lijn bevat berichten die de vreemde niet mag lezen');
   const key = await vindChatKey();
   assert.ok(key);
   for (const pad of ['/api/supplier/chat/history', '/api/supplier/klant/salon', '/api/supplier/chat/send']) {
@@ -159,6 +165,9 @@ test('8. een vreemde zaak kan de eigen nazorglijn niet lezen of namens haar antw
 });
 
 test('9. een anonieme demo-gast krijgt geen gratis-accountrecht door geschiedenis te lezen', async () => {
+  const eigen = await api(base, '/api/partner/chat/history', { supplierCode: 'MAISON' }, lid);
+  assert.equal(eigen.status, 200);
+  assert.ok(eigen.body.messages.length >= 1, 'de echte lijn bevat berichten die de vreemde niet mag lezen');
   const gast = await api(base, '/api/login', { tier: 'guest' });
   assert.equal(gast.status, 200);
   const hist = await api(base, '/api/partner/chat/history', { supplierCode: 'MAISON' }, gast.body.token);

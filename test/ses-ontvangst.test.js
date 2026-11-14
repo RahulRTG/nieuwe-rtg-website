@@ -8,7 +8,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
-const { startServer }=require('./helper');
+const { startServer, maakBetaaldRtgTestaccount }=require('./helper');
 // de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
 const { GEHEIM, zetKop } = require('./mailpoort');
 zetKop();
@@ -56,6 +56,8 @@ test.before(async () => {
   const r=await json('/api/auth/register', { name:'Ada Lovelace', email:'ada-ses@example.test',
     phone:'0612345698', password:'geheim123', geboortedatum:'1990-01-01', tier:'rtg', pasApp:'rtg' });
   token=r.body.token;
+  assert.equal(r.status,200,'de positieve mailpersona is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP,'ada-ses@example.test');
   const adres=await json('/api/member/rtmail/adres', {}, token);
   publiek=adres.body.publiekAdres;
   assert.equal(publiek, 'ada.lovelace@rtgpass.rahultravelgroup.com');

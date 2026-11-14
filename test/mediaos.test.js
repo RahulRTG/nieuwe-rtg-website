@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, maker, kijker, kale, office;
 let clipId, trackId, uitgaveId, videoId, kanaalId, makerNaam, kijkerNaam;
@@ -26,8 +26,11 @@ function api(pad, body, token) {
 let seq = 0;
 async function lid(naam) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  return (await api('/api/auth/register', { name: naam, email: 'mos' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = await api('/api/auth/register', { name: naam, email: 'mos' + u + '@x.nl', phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, 'de positieve mediapersona is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 'mos' + u + '@x.nl');
+  return reg.body.token;
 }
 const codenaamVan = async (token) => ((await api('/api/state', {}, token)).body.state || {}).user.codename;
 
@@ -73,7 +76,7 @@ test('1. de deur: zonder inlog niets, en een gast komt er niet in', async () => 
   assert.ok(gast, 'er is een gasttoken');
   const r = await api('/api/mediaos/wereld', {}, gast);
   assert.equal(r.status, 403, 'een gast krijgt 403');
-  assert.match(r.body.error, /voor leden/);
+  assert.match(r.body.error, /voor accounts/);
 });
 
 test('2. één catalogus, drie standen: elke vorm komt in zijn eigen stand terug', async () => {

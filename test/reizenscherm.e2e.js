@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, browserOpties, geenBrowser, laadPlaywright } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, browserOpties, geenBrowser, laadPlaywright } = require('./helper');
 
 const pw = laadPlaywright();
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
@@ -40,9 +40,10 @@ test('het reisscherm groepeert per reis, en de kop zegt hetzelfde als de regels 
   try {
     const u = Date.now().toString().slice(-8);
     const reg = await post('/api/auth/register', { name: 'Reiziger', email: 'rs' + u + '@x.nl',
-      phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+      phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     const lid = reg.body.token;
     assert.ok(lid, 'het lid staat ingeschreven');
+    maakBetaaldRtgTestaccount(TMP, 'rs' + u + '@x.nl');
 
     /* DRIE ECHTE BOEKINGEN DIE TWEE REIZEN HOREN TE WORDEN: een samengestelde
        reis naar Ibiza en een verblijf in dezelfde plaats in hetzelfde venster
@@ -125,7 +126,7 @@ test('het reisscherm groepeert per reis, en de kop zegt hetzelfde als de regels 
     assert.deepEqual(fouten, [], 'geen scriptfouten op het scherm');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    stop(srv && srv.child);
+    await stopHard(srv && srv.child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

@@ -34,6 +34,7 @@ test('RTG Leven opent op de levenslijn uit de cockpit, toont echte zaken en laat
         geboortedatum: '1994-05-05', tier: 'rtg' })
     })).json();
     assert.ok(reg.token, 'registreren hoort een token te geven');
+    require('./helper').maakBetaaldRtgTestaccount(TMP, 'le' + t + '@e.test');
 
     /* Het contract onder het paneel: de lijn als controleerbare fasenlijst. */
     const lijnReactie = await fetch(base + '/api/leven/lijn', {

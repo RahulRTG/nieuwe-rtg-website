@@ -10,7 +10,7 @@ test('echte leveranciers-sync behoudt concept en mutatieslot, maar wist bij inge
   const srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   let browser, vrij = () => {}, staatVrij = () => {};
   try {
-    const x = await maakReisketenFixture(srv.base);
+    const x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] });
     let reis = goed(await x.api('/api/reisbureau/keten/start', { titel: 'Onopgeslagen liveconcept', bestemming: 'Ibiza',
       supplierCode: x.bureau.code, idem: 'liveconcept-start' }, x.reiziger.token), 'reis').reis;
     reis = goed(await x.api('/api/supplier/reisbureau/keten/offerte', x.offerte(reis), x.bureau.token), 'offerte').reis;
@@ -106,5 +106,5 @@ test('echte leveranciers-sync behoudt concept en mutatieslot, maar wist bij inge
     assert.equal(await form.count(), 0, 'ook zonder renderStation verdwijnt het concept');
     assert.equal((await host.innerText()).includes(reis.titel), false);
     assert.deepEqual(fouten, []); await ctx.close();
-  } finally { vrij(); staatVrij(); if (browser) await browser.close(); await h.stop(srv); fs.rmSync(map, { recursive: true, force: true }); }
+  } finally { vrij(); staatVrij(); if (browser) await browser.close(); await h.stopHard(srv.child); fs.rmSync(map, { recursive: true, force: true }); }
 });

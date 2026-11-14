@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const pw = require('playwright');
-const { startServer, stop, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 test('van interne redactie via review naar Saloon, met een zichtbare correctie', { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-redactielus-'));
   let srv, browser;
@@ -19,6 +19,7 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     const lid = await api('/api/auth/register', { name: 'Redactieproef', email: 'redactieproef@example.test', phone: '0612345678',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
     assert.ok(zaak.token && lid.token);
+    require('./helper').maakBetaaldRtgTestaccount(tmp, 'redactieproef@example.test');
     await api('/api/wereld/modus', { modus: 'alles', saloon: { bronnen: ['nieuws'] } }, lid.token);
     browser = await pw.chromium.launch(browserOpties(pw, { headless: true }));
     const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
@@ -71,5 +72,5 @@ test('van interne redactie via review naar Saloon, met een zichtbare correctie',
     await lees.getByText('Correcties en actualiseringen', { exact: true }).click();
     await lees.locator('article').getByText('Correctie: de opening is op dinsdag.', { exact: true }).waitFor();
     assert.deepEqual(fouten, []);
-  } finally { if (browser) await browser.close(); stop(srv?.child); fs.rmSync(tmp, { recursive: true, force: true }); }
+  } finally { if (browser) await browser.close(); await stopHard(srv?.child); fs.rmSync(tmp, { recursive: true, force: true }); }
 });

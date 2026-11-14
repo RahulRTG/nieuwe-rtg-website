@@ -14,11 +14,11 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { maakWereld } = require('../scripts/lib/voltooiwereld');
+const { maakWereld, nieuwLid } = require('../scripts/lib/voltooiwereld');
 const { metScherm } = require('../scripts/lib/voltooischerm');
 const scenario = require('../scripts/lib/voltooi/videobellen');
 const bel = require('../scripts/lib/voltooibellen');
-const { laadScherm, geenBrowser, wachtTot } = require('./helper');
+const { laadScherm, geenBrowser, wachtTot, maakBetaaldRtgTestaccount } = require('./helper');
 
 const pw = laadScherm();
 
@@ -97,9 +97,18 @@ test('videobellen: wie niet verbonden is, belt niet, en bij de ander gaat niets 
    het beeld rechtstreeks over het datakanaal. Bij RTG staan titel en duur. */
 test('clips: een kijker ziet de clip van de maker, rechtstreeks van diens toestel',
   { skip: geenBrowser(pw), timeout: 180000 }, async () => {
-  await wereld('echte-clips', async ({ ctx, p, observeer, nieuwToestel, base, post, verslag }) => {
-    const M = await bel.lid(post, 'clm');
-    const V = await bel.lid(post, 'clv');
+  await wereld('echte-clips', async ({ ctx, p, observeer, nieuwToestel, base, post, verslag, w }) => {
+    const M = await nieuwLid(w, 'clm');
+    const V = await nieuwLid(w, 'clv');
+    // Deze clipproef heeft twee betaalde RTG-leden; de belproeven blijven gratis.
+    for (const lid of [M, V]) {
+      const begin = await post('/api/state', {}, lid.token);
+      assert.equal(begin.status, 200, 'de clipaccountstand is bereikbaar');
+      assert.equal(begin.data.state.user.tier, 'guest', 'registratie verleent nog geen betaalrechten');
+      maakBetaaldRtgTestaccount(w.datamap, lid.email);
+      const toegang = await post('/api/clips/feed', {}, lid.token);
+      assert.equal(toegang.status, 200, 'de bedoelde RTG-cliptoegang is voorbereid: ' + JSON.stringify(toegang.data));
+    }
     const m = await bel.bereidToestel({ ctx, p, observeer }, base, M.token, '/apps/clips.html');
     await m.p.waitForSelector('#studioOpen', { timeout: 20000 });
     await m.p.evaluate(() => document.querySelector('#studioOpen').click());
@@ -121,7 +130,9 @@ test('clips: een kijker ziet de clip van de maker, rechtstreeks van diens toeste
     await m.p.waitForFunction(() => /staat in uw archief/.test((document.querySelector('#melding') || {}).textContent || ''),
       null, { timeout: 15000 });
 
-    const kaart = (await post('/api/clips/feed', {}, V.token)).data || {};
+    const feed = await post('/api/clips/feed', {}, V.token);
+    assert.equal(feed.status, 200, 'de kijker kan de clipfeed lezen: ' + JSON.stringify(feed.data));
+    const kaart = feed.data || {};
     assert.ok(JSON.stringify(kaart).includes('Mist over de gracht'), 'de kaart staat niet in de feed van de kijker');
 
     const v = await bel.nieuwMediaToestel(nieuwToestel, base, V.token, '/apps/clips.html');

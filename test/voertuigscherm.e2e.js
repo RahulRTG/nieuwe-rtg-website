@@ -18,7 +18,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer, stopNet, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopNet, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const pw = laadPlaywright();
 const koppel = require('../server/kern/wereld/koppel');
 
@@ -110,9 +110,12 @@ test('5. het ritscherm toont de ledendeur, verbergt vreemde refs en verzint geen
     }
     const tokens = [];
     for (const id of ['eigenaar', 'bezoeker']) {
-      const lid = await post('/api/auth/register', { name: id, email: id + Date.now() + '@rit.test',
+      const email = id + Date.now() + '@rit.test';
+      const lid = await post('/api/auth/register', { name: id, email,
         phone: '0612345678', password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg' });
       assert.ok(lid.token); tokens.push(lid.token);
+      // Ook de bezoeker is lid: de tegenproef moet eigendom toetsen, niet het abonnement.
+      maakBetaaldRtgTestaccount(TMP, email);
     }
     const rit = await post('/api/mob/vraag', { ritsoort: 'direct', categorie: 'taxi',
       van: { lat: 38.908, lng: 1.432, label: 'Vertrek' },

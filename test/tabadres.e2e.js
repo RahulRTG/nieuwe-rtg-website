@@ -49,6 +49,7 @@ test('#tab=<stand> opent de stand ook als het account laat binnenkomt, en nooit 
         geboortedatum: '1990-03-03', tier: 'rtg' })
     })).json();
     assert.ok(reg.token, 'registreren hoort een token te geven');
+    require('./helper').maakBetaaldRtgTestaccount(TMP, 'ta' + t + '@e.test');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 932 } });

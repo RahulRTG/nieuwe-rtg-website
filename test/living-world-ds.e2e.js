@@ -15,11 +15,12 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { alleenDs, edgeLabels, edgeActies, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
-let srv, browser, token;
+let srv, browser, token, tmp;
 
 async function post(url, data, auth) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -40,13 +41,15 @@ async function open(breedte, hoogte, taal = 'nl', adres = '/apps/living-world.ht
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_BETALEN_UIT: '1' } });
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-living-world-ds-'));
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_BETALEN_UIT: '1', RTG_DATA_DIR: tmp } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const n = String(Date.now());
   token = (await post('/api/auth/register', { name: 'Wereld Maker', email: 'lw-ds-' + n + '@e.test', phone: '06' + n.slice(-8),
     password: 'VeiligWachtwoord123!', geboortedatum: '1990-01-01', tier: 'rtg' })).token;
+  maakBetaaldRtgTestaccount(tmp, 'lw-ds-' + n + '@e.test');
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (tmp) fs.rmSync(tmp, { recursive: true, force: true }); });
 
 test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);

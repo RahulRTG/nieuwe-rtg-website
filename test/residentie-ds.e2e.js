@@ -17,11 +17,12 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { alleenDs, edgeLabels, edgeActies, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
-let srv, browser, token;
+let srv, browser, token, tmp;
 
 async function post(url, data, auth = token) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -42,13 +43,15 @@ async function open(breedte, hoogte, taal = 'nl') {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-residentie-ds-'));
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: tmp } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
   token = (await post('/api/auth/register', { name: 'Residence Lid', email: 'res-' + now + '@e.test',
     phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  maakBetaaldRtgTestaccount(tmp, 'res-' + now + '@e.test');
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (tmp) fs.rmSync(tmp, { recursive: true, force: true }); });
 
 test('alleen het Design System, de Edge staat en de diensten staan onder Acties', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);

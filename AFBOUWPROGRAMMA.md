@@ -171,8 +171,33 @@ werk-/privacy-/UI-fouten. Gedeelde fixtures mogen geen betaalrecht aan gratis
 medewerkers, kijkers of negatieve persona's geven. Schermproeven draaien pas
 na bevriezing van hun tranche, centraal en met begrensde paralleliteit.
 
-Nog open: overige browserfixtures en echte werk-/privacy-/UI-fouten,
-een verse volledige vierdelige suite, PostgreSQL/Redis, schermproeven en
+De daaropvolgende browsertranche corrigeert 66 browserbestanden en de bestaande
+reisketenhelper met expliciete persona's; de helper geeft standaard niemand
+een betaalde pas. De leden-/KYC-/Experience-groep slaagt 88/88. De media- en
+Office-groep gaf eerst 21/25; de vier herstelde bestanden slagen vervolgens
+6/6. Negen bestanden wachten nu op serverexit vóór het opruimen van hun eigen
+datamap; de volledige betrokken herproef slaagt 26/26. De aanvraagjourney is
+ook met een echte browser op haar eigen PostgreSQL-database geslaagd, inclusief
+de server-side uitschakeling en het behoud van resultaatbewijs. Dit is geen
+externe betaalrail: het historische factuur-/settlementscenario gebruikt de
+lokale Magnaat-testprovider en zaait geen betaald bewijs.
+
+De productreparaties zijn afzonderlijk vastgelegd. Eigen werkbewijzen en
+locatietoestemming blijven voor gratis werknemers bereikbaar (`0d27d17e9`):
+46/46 gerichte proeven en 8/8 browserproeven. Een werkelijk aanvaarde
+gezinsbinding blijft zichtbaar voor het eigen gratis account (`d7157aeb1`),
+zonder nieuwe bevoegdheid of Foundation-vrijgave: 26/26 inclusief de
+productiepoort. Rahul blijft een globale laag, buiten beide classifiers voor
+scherminhoud (`59fac4ea5`); 35/35 met werkelijk openen/sluiten/heropenen op
+desktop en mobiel. Werkgeversritten volgen dezelfde actuele account-,
+personeels- en centrale contractpoort in route én kern (`4d4313c53`); privéritten,
+menselijke goedkeuring en objectgebonden nazorg behouden hun grenzen. De
+reisbrowsergroep gaf eerst 83/85; beide gratis werkgeversscenario's slagen
+na deze oorzaakreparatie in de gezamenlijke mobiliteitsgroep van 64/64.
+Iedere oorzaak is eerst rood gereproduceerd. Deze deelruns zijn niet op te
+tellen tot een actuele integrale kwalificatie of Deep Green.
+
+Nog open: een verse volledige vierdelige suite, PostgreSQL/Redis, schermproeven en
 beschermde remote checks. De uit #725 overgenomen Direct-/Service-start is
 nog niet bewezen tegen een verloren antwoord met herhaling; dat herstelpunt
 blijft zichtbaar en wordt niet als idempotent afgevinkt. De systeemvervanging

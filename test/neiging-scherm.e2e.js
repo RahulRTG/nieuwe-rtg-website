@@ -37,6 +37,8 @@ async function metLid(fn, breedte = 390, hoogte = 844) {
         phone: '0612345799', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }) });
     const reg = await r.json();
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    assert.equal(reg.state.user.tier, 'guest');
+    await require('./helper').keurLidGoed(base, reg.token, reg.state.user.codename, '1990-01-01');
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: breedte, height: hoogte } });
     await ctx.addInitScript((t) => {

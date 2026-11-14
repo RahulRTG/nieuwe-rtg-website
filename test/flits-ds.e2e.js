@@ -17,7 +17,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { alleenDs, edgeLabels, edgeActies, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
@@ -25,7 +26,7 @@ const pw = laadPlaywright(), skip = geenBrowser(pw);
    demonstratienet. Een plek een eind van de seed vandaan houdt de lijst leeg
    tot deze toets er zelf iets in zet. */
 const PLEK = { latitude: 38.95, longitude: 1.30 };
-let srv, browser, token;
+let srv, browser, token, tmp;
 
 async function post(url, data, auth = token) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -47,13 +48,15 @@ async function open(breedte, hoogte, taal = 'nl', lid = token) {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-flits-ds-'));
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: tmp } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
   token = (await post('/api/auth/register', { name: 'Flits Lid', email: 'flits-' + now + '@e.test',
     phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  maakBetaaldRtgTestaccount(tmp, 'flits-' + now + '@e.test');
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (tmp) fs.rmSync(tmp, { recursive: true, force: true }); });
 
 test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);

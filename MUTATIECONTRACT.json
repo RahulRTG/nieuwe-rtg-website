@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-11-14T04:28:43.995Z",
-  "commit": "74e9ff92c",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-11-14T11:02:32.074Z",
+  "commit": "01319f65b",
+  "boomVuil": true,
+  "boomAnders": 27,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v26.13.1"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5446,
-  "geclassificeerd": 5446,
+  "totaal": 5449,
+  "geclassificeerd": 5449,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3163,
-   "NOT_APPLICABLE": 1309,
+   "NOT_APPLICABLE": 1310,
    "PROTECTED": 748,
-   "INTENTIONALLY_NON_IDEMPOTENT": 226
+   "INTENTIONALLY_NON_IDEMPOTENT": 228
   },
-  "vastgesteldDoorMens": 2335,
+  "vastgesteldDoorMens": 2338,
   "afgeleidDoorScript": 3111,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4532,
+   "AUTHENTICATED": 4535,
    "PUBLIC": 85,
    "OBJECT_SCOPED": 788,
    "(niet af te leiden -- vraagt een verklaring)": 25,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 299
+   "niet gemeten": 302
   },
   "voorstellen": {},
   "metingVan": "2026-09-29T18:39:11.935Z"
@@ -394,6 +394,24 @@
   },
   {
    "route": "POST /api/office/service/patronen",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/rahul/advies",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/rahul/concept",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/rahul/controle",
    "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -73586,6 +73604,72 @@
     "grond": null,
     "hindernis": null
    },
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.rahul.advies",
+   "route": "POST /api/office/service/rahul/advies",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.rahul.concept",
+   "route": "POST /api/office/service/rahul/concept",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.rahul.controle",
+   "route": "POST /api/office/service/rahul/controle",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
    "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,

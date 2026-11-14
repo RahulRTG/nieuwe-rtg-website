@@ -109,8 +109,8 @@
 <script src="/shared/meelezen.js"></script>
 <script src="/shared/meeluister.js"></script>
 <script src="/shared/servicebel.js"></script>
-<!-- De kantoordeur van het huis: hij probeert eerst het RTG-account dat op
-     dit toestel is ingelogd en vraagt pas om de kantoorcode als dat niet gaat. -->
+<!-- De kantoordeur van het huis gebruikt het gewone RTG-account dat op dit
+     toestel is ingelogd. Een gedeelde kantoorcode is geen terugvalroute. -->
 <script src="/shared/kantoorgesprek.js"></script>
 <script>
 /* ============================================================================
@@ -332,16 +332,19 @@ function actieBlok(z) {
     + 'Kan hij niet bij zijn app, dan leest hij zes cijfers voor.</p>'
     + '<div class="rij"><input class="veld breed" id="hCode" placeholder="Bevestigingscode van het lid" maxlength="20" inputmode="numeric">'
     + '<button class="knop" id="hCodeOk">Code invoeren</button></div>'
-    /* DE AI ERBIJ HALEN. Dezelfde weg, andere aanvrager: het lid ziet "RTG AI"
+    /* RAHUL AI ERBIJ HALEN. Dezelfde weg, andere aanvrager: het lid ziet "Rahul AI"
        en dat het geen medewerker is. Een mens zet het in gang -- een machine die
        bij elke zaak zelf om toegang vraagt, maakt van de bevestigingsknop binnen
        een maand een reflex, en dan is die knop niets meer waard. */
     + '<div class="rij"><select class="veld" id="aiCap">'
     + capsVoor(z.team).map(c => '<option>' + esc(c) + '</option>').join('') + '</select>'
     + '<input class="veld breed" id="aiReden" placeholder="Wat moet de AI uitzoeken? (het lid leest dit)" maxlength="300">'
-    + '<button class="knop doe" id="aiVraag">De AI laten vragen</button></div>'
-    + '<p class="stil">De AI opent hiermee niets: het lid krijgt hetzelfde verzoek, met een machine '
+    + '<button class="knop doe" id="aiVraag">Rahul AI laten vragen</button></div>'
+    + '<p class="stil">Rahul AI opent hiermee niets: het lid krijgt hetzelfde verzoek, met een machine '
     + 'als aanvrager. Zwaar werk gaat nooit naar de AI &mdash; dat vraagt een tweede mens.</p>'
+    + '<div class="rij"><button class="knop" id="rahulAdvies">Advies en samenvatting</button>'
+    + '<button class="knop" id="rahulConcept">Maak antwoordconcept</button></div>'
+    + '<div class="waarom" id="rahulUit" hidden></div>'
     + '</div>';
 }
 /* WAT JE AAN HET LID KUNT VRAGEN, en dat is minder dan wat het team mag: alles
@@ -364,6 +367,17 @@ function bindZaak(z) {
   $('#aiVraag').onclick = () => doe(() => api('ai/vraag',
     { id: z.id, capabilities: [$('#aiCap').value], reden: $('#aiReden').value }),
     'Gevraagd namens de AI. Het lid beslist.');
+  const toonRahul = async (soort) => {
+    try {
+      const r = await api('rahul/' + soort, { id: z.id });
+      const u = $('#rahulUit'); u.hidden = false;
+      u.innerHTML = '<b>Rahul AI</b><p>' + esc(r.samenvatting) + '</p>'
+        + (r.concept ? '<p><b>Concept:</b> ' + esc(r.concept) + '</p>' : '')
+        + '<p><b>Volgende stap:</b> ' + esc(r.volgendeStap) + '</p><p class="stil">' + esc(r.grens) + '</p>';
+    } catch (e) { meld(e.message); }
+  };
+  $('#rahulAdvies').onclick = () => toonRahul('advies');
+  $('#rahulConcept').onclick = () => toonRahul('concept');
 }
 
 /* -------------------------------------------------------------- patronen -- */
@@ -527,7 +541,8 @@ async function belrij() {
     + '<div class="kaart"><h2>Wie er belt</h2>'
     + ((d.gesprekken || []).length
       ? '<table><thead><tr><th>Oproep</th><th>Zaak</th><th>Stand</th><th></th></tr></thead><tbody>'
-        + d.gesprekken.map(g => '<tr><td>' + esc(g.id) + (g.video ? ' <span class="pil">video</span>' : '') + '</td>'
+        + d.gesprekken.map(g => '<tr><td>' + esc(g.id) + (g.video ? ' <span class="pil">video</span>' : '')
+          + (g.ondersteuning ? ' <span class="pil">meekijken</span>' : '') + '</td>'
           + '<td>' + esc(g.zaak) + '</td><td>' + esc(g.status) + '</td>'
           + '<td>' + (g.status === 'rinkelt' ? '<button class="knop doe" data-neem="' + esc(g.id) + '">Opnemen</button>'
             : '<span class="stil">' + esc(g.mens || '') + '</span>') + '</td></tr>').join('')
@@ -547,7 +562,8 @@ async function neemOp(id) {
   $('#belblad').innerHTML = '<div class="kaart"><h2>Gesprek ' + esc(r.gesprek.id) + '</h2>'
     + '<p class="sub" id="belStand">Verbinden&hellip;</p>'
     + '<div class="rij"><video id="bLokaal" muted autoplay playsinline hidden></video>'
-    + '<video id="bExtern" autoplay playsinline hidden></video></div>'
+    + '<video id="bExtern" autoplay playsinline' + (r.gesprek.ondersteuning ? '' : ' hidden') + '></video></div>'
+    + (r.gesprek.ondersteuning ? '<p class="stil">De gebruiker kiest zelf een scherm. U ziet pas beeld nadat de browsertoestemming is gegeven. Opname is niet beschikbaar.</p>' : '')
     + '<div id="belMeelees"></div>'
     + '<div class="rij"><button class="knop" id="bOpen">Open de zaak</button>'
     + '<button class="knop" id="bStop">Ophangen</button></div></div>';
@@ -587,10 +603,10 @@ kop('#ververs', el => { el.onclick = () => poging(() => (STAND.blad === 'zaak' &
    "Meld u eerst aan bij het kantoor met uw eigen RTG-account" stond er, en dat
    was ook precies goed -- RTG Service vraagt een zetel op naam. Alleen: er was
    geen weg naartoe, dus wie hier belandde las een opdracht zonder deur. De
-   gedeelde kantoordeur (shared/kantoorgesprek.js) probeert nu eerst juist dat
-   RTG-account; de gedeelde code is er de terugval en geen eerste vraag. */
+   kantoordeur (shared/kantoorgesprek.js) gebruikt daarom het gewone
+   RTG-account en de zetel die daaraan is gekoppeld. */
 function inlog() {
-  $('#main').innerHTML = '<div class="kaart"><p class="sub">RTG Service vraagt een zetel op naam; de gedeelde kantoorcode opent wel de ruimte maar wijst niemand aan.</p></div><div id="kgDeur"></div>';
+  $('#main').innerHTML = '<div class="kaart"><p class="sub">RTG Service vraagt een zetel op naam. Meld u aan met uw gewone RTG-account; er is geen aparte gedeelde kantoorcode nodig.</p></div><div id="kgDeur"></div>';
   window.RTGKantoorGesprek.toon(document.getElementById('kgDeur'), (token) => {
     TOKEN = token; try { localStorage.setItem('rtg_office_token', TOKEN); } catch (e) {}
     start();

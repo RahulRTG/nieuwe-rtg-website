@@ -126,8 +126,11 @@ function maakLid(deps) {
       if (sess.account) {
         state.foundation = { gekoppeld: rtf.gekoppeldeGezinnen(sess.account.id), meldingen: md.foundationMeldingen || [] };
       }
-      // leeftijd uit het paspoort: het lid ziet de eigen groep; partners nooit
-      // (geborenVan las member_state hier een tweede keer; `md` heeft het al)
+    }
+    if (sess.account || sess.tier !== 'guest') {
+      // Ook een gratis account ziet de eigen leeftijd en groep. De opgeslagen
+      // datum kan nog zelf opgegeven zijn: dit is geen verificatie of toegangsrecht.
+      // Betaalde demo-persona's behouden hun bestaande geboortedatumbron.
       const lft = leeftijdVan(sess.account ? (md.geboren || null) : geborenVan(sess));
       if (lft != null) { state.user.leeftijd = lft; state.user.leeftijdsgroep = leeftijdsgroepVan(lft); }
     }

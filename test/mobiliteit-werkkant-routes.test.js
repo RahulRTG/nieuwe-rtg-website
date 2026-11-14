@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mobwerk-'));
 const OFFICE_CODE = 'KANTOOR-MOBWERK-1';
@@ -49,6 +49,7 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await api('/api/auth/register', { name: 'Mob Werkkant', email: 'mw' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'mw' + u + '@x.nl');
 
   const roster = await api('/api/supplier/roster', { code: ZAAK });
   const mg = (roster.body.staff || []).find(x => x.role === 'manager');

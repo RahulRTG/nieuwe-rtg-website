@@ -339,7 +339,7 @@ test('de AI-onderzoeker kan alleen de ene actieve bevestigingscapability vragen'
       { id: z.id, capabilities: ['organisatie.stand', 'bank.gegevens', 'lid.dossier'], reden: 'om te zien waar de werkruimte vastloopt' }, o.balie);
     assert.equal(vraag.status, 200, JSON.stringify(vraag.body).slice(0, 200));
     assert.equal(vraag.body.machine, true, 'de aanvraag noemt zichzelf geen machine');
-    assert.equal(vraag.body.aanvrager, 'RTG AI (onderzoeker)');
+    assert.equal(vraag.body.aanvrager, 'Rahul AI (onderzoeker)');
     assert.deepEqual(vraag.body.bevestiging.capabilities, ['organisatie.stand'], 'er werd meer gevraagd dan de AI mag');
     assert.equal(vraag.body.bevestiging.machtiging, null, 'er ontstond een machtiging voordat het lid drukte');
     assert.equal(vraag.body.nietGevraagd.length, 2, 'wat niet gevraagd werd, wordt niet gemeld');
@@ -350,7 +350,7 @@ test('de AI-onderzoeker kan alleen de ene actieve bevestigingscapability vragen'
     const wacht = await o.p('/api/service/bevestigingen', {}, o.lid);
     assert.equal(wacht.body.verzoeken.length, 1, 'er stond niets klaar in de app van het lid');
     assert.equal(wacht.body.verzoeken[0].machine, true, 'het lid ziet niet dat er een machine vraagt');
-    assert.match(wacht.body.verzoeken[0].reden, /RTG AI/);
+    assert.match(wacht.body.verzoeken[0].reden, /Rahul AI/);
 
     /* Twee keer vragen is een verzoek. */
     const nog = await o.p('/api/office/service/ai/vraag',

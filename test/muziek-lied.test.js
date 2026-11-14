@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 const LIED = require('../server/kern/muziek-lied');
 const I = require('../server/kern/muziek-instrumenten');
 
@@ -31,6 +31,7 @@ test.before(async () => {
   maker = (await api('/api/auth/register', { name: 'Liedschrijver', email: 'li' + u + '@u.test',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-03-03', tier: 'rtg' })).body.token;
   assert.ok(maker, 'een lid dat een lied wil maken');
+  maakBetaaldRtgTestaccount(TMP, 'li' + u + '@u.test');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

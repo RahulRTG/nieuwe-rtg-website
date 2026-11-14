@@ -116,10 +116,13 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
 
     // het lid past het concept op het scherm aan, zonder iets tegen Rahul te zeggen
     await kaart.locator('input[name="reizigers"]').fill('8');
-    await kaart.locator('input[name="reizigers"]').press('Tab');
+    /* De component bewaart op `change`. Expliciet vervagen is dezelfde
+       browserhandeling als uit het veld tabben, maar laat de uitkomst niet
+       afhangen van welk volgend element onder CI op dat moment focus krijgt. */
+    await kaart.locator('input[name="reizigers"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk').getAttribute('data-versie') === '2', null, { timeout: 10000 });
     await kaart.locator('input[name="dagen"]').fill('5');
-    await kaart.locator('input[name="dagen"]').press('Tab');
+    await kaart.locator('input[name="dagen"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk').getAttribute('data-versie') === '3', null, { timeout: 10000 });
     assert.match(await kaart.locator('.afgeleid').textContent(), /Groepsbudget: maximaal € 6\.400/);
     assert.equal(await kaart.locator('.rahul').textContent(),
@@ -137,7 +140,7 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
 
     // een ongeldige waarde: geweigerd bij het veld, met de reden, en de versie blijft
     await kaart.locator('input[name="reizigers"]').fill('40');
-    await kaart.locator('input[name="reizigers"]').press('Tab');
+    await kaart.locator('input[name="reizigers"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk input[name="reizigers"]').getAttribute('aria-invalid') === 'true', null, { timeout: 10000 });
     assert.match(await kaart.locator('#cw-' + obj[0].id + '-reizigers').textContent(), /van 1 tot en met 30/);
     assert.equal(await kaart.getAttribute('data-versie'), '3');

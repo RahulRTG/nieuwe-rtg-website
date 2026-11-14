@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -16,14 +16,16 @@ function api(base, pad, body, token) {
 function overNdagen(n) { return new Date(Date.now() + n * 86400000).toISOString().slice(0, 10); }
 
 let srv, base, lid, gem, partner;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gemeente-'));
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gemeente-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Inwoner', email: 'i' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
+  // Deze keten begint met een bestaande RTG-pas, niet met een betaalproef.
+  maakBetaaldRtgTestaccount(TMP, 'i' + u + '@x.nl');
   // gemeente-medewerker: log in als de gemeente-partner (manager, PIN 1234)
   const roster = await api(base, '/api/supplier/roster', { code: 'GEMEENTE' });
   const man = roster.body.staff.find(m => m.role === 'manager');
@@ -217,6 +219,7 @@ test('mijn afspraken: eigen afspraken met hun status, van niemand anders', async
   const u = Date.now().toString().slice(-8);
   const ander = (await api(base, '/api/auth/register', { name: 'Buurman', email: 'b' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'b' + u + '@x.nl');
   const vanAnder = await api(base, '/api/gemeente/afspraken/mijn', {}, ander);
   assert.equal(vanAnder.status, 200);
   assert.ok(!vanAnder.body.afspraken.some(x => x.ref === a.body.afspraak.ref), 'een andere inwoner ziet deze afspraken niet');

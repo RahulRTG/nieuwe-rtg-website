@@ -1893,6 +1893,7 @@
       "servicePatronen",
       "servicePersoonlijk",
       "servicePost",
+      "serviceRahul",
       "serviceZaken",
       "spraaktekst",
       "supplierAuth"
@@ -1910,7 +1911,10 @@
       "serviceZaken"
     ],
     "service-kantoor-ai": [
-      "serviceOnderzoeker"
+      "serviceLoop",
+      "serviceOnderzoeker",
+      "serviceRahul",
+      "serviceZaken"
     ],
     "service-kantoor-borden": [
       "balieAuth",

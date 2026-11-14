@@ -14,24 +14,24 @@
       "route": "/apps/werk.html",
       "file": "organisatie.png",
       "weergave": "Bestaande ingelogde werkplek met proefgegevens",
-      "sourceHash": "fe9d606907d5317db72a794b001ce312a1601e3295d198539eade6aa9f94a808",
-      "imageHash": "373bf5679d7c4a91f20d2cfc0ee3972fd7ef762ed07c116b46f5e0420520d89a"
+      "sourceHash": "1b4398ff90135c1933f2e0b25a0d64c9a7666cb1d04a321fb3bc1305a0e3d57b",
+      "imageHash": "d7d2d4719095e8a7daee5c1fa8c0dda97874bce7463ea5ad39daed5e0748f730"
     },
     {
       "id": "partner",
       "route": "/apps/leverancier.html",
       "file": "partner.png",
       "weergave": "Bestaande ingelogde werkplek met proefgegevens",
-      "sourceHash": "67ac7c93203db6d525ebe34a90b6648a2b5bc6ee64e81e6576154fa1b106a481",
-      "imageHash": "eb0a1b4c6dd032664c093de356aebec7448b8f0010399b1936a0ffff1fd7144a"
+      "sourceHash": "5e2cd97ed0cc5c822cbb5d2bf211aa93a40131522e5a315df116f0252fc97f45",
+      "imageHash": "557c74621f01254892b8bde78e9c2d793180bda5212a8621c1f312240692522a"
     },
     {
       "id": "gebruiker",
       "route": "/apps/app.html",
       "file": "gebruiker.png",
       "weergave": "Standaard Home, zonder extra bediening",
-      "sourceHash": "a1ccac0a5ac6b1d20326667268f4231b21b223de390c9ea410aafadda1a03ff8",
-      "imageHash": "a59544156e3226553ecdc2856181080e1c4249daf9ba1badcbb5b62eb96887c9"
+      "sourceHash": "5e84f001b1c069b6869d3c57b985e3ec250c26f07add554709beee3dcda545fd",
+      "imageHash": "7e96c2834fca46b727e58c823e159b27aa9740ecbec4f17ad08c1e82fb86ed07"
     }
   ]
 }

@@ -124,6 +124,39 @@ De resterende testfouten, verplichte PostgreSQL/Redis-runs, beschermde remote
 checks en samenvoeging zijn nog open. De inventaris/migratiematrix volgt pas
 na de geverifieerde consolidatie; er wordt nog geen schermmigratie gestart.
 
+**Integratietranche 14 november, na PR #725.** De main-commit
+`fdb376b90fe7b9e6ffe2f9579d9f532ee3a6e151` is lokaal in de werkbranch
+geïntegreerd, met behoud van de Direct-/Service-overdracht en de eigen
+chatmodus. Dit is geen samenvoeging van #727 naar main. De bestaande
+generatoren hebben conflicterende bundels, route-/functieafleidingen en echte
+website-schermafbeeldingen opnieuw opgebouwd. De taalproeven slagen 27/27;
+Experience blijft eerlijk `NOT_TESTED` en de inventarisverschillen blijven
+voor Poort 1 open.
+
+De eerste CI-scherf is per oorzaak hersteld: expliciete betaalpersona's voor
+betaalde functies (29 bestanden), echte identiteitskeuring waar vereist en
+een gratis account dat eigen leeftijd en veilige hersteluitleg behoudt. De
+gerichte fixture-/accountgroep slaagt 224/224; de aanvullende
+identiteits-/reisherkomstgroep 32/32 en de profiel-/communicatiegroep 29/29.
+De contactreparatie is nadrukkelijk productiegedrag, geen verborgen testfix:
+gratis accounts kunnen over hun eigen aankoop communiceren, geschiedenis
+opvragen schept geen klantrelatie, herhaalde orders gebruiken de oorspronkelijke
+zaak en oude archieven herstellen geen ingetrokken deelnemers. Onderbroken
+historie-import hervat zonder dubbele berichten of veranderde tijdstempels;
+een gebleven lid behoudt zijn eigen historische gegevensuitvoer. De gerichte
+contact-/identiteitsgroep slaagt 61/61; de twee nieuwe migratieregressies
+zijn ook tegen hun foutvariant gezien. De afleidings-/communicatiekernproeven
+slagen 75/75. Al deze aantallen zijn lokale deelruns op Node 26, zonder skips
+of todos, geen opgeteld platformtotaal of kandidaatkwalificatie.
+
+Nog open: resterende persona's en echte productfouten uit scherven 2 en 3,
+een verse volledige vierdelige suite, PostgreSQL/Redis, schermproeven en
+beschermde remote checks. De uit #725 overgenomen Direct-/Service-start is
+nog niet bewezen tegen een verloren antwoord met herhaling; dat herstelpunt
+blijft zichtbaar en wordt niet als idempotent afgevinkt. De systeemvervanging
+van Node 24 wacht apart op macOS-beheerdersgoedkeuring; dit blokkeert de
+repo-proeven met de geverifieerde tijdelijke Node 26 niet.
+
 *Eigenaarsbesluit van 11 oktober 2026. Dit document legt het besluit vast, de
 grenzen die eruit volgen, de vier werkstromen die het uitvoeren, en de
 inventaris die zegt wat er binnen de scope valt. Het is LEIDEND voor de verdere

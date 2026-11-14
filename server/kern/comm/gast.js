@@ -80,16 +80,19 @@ function maakCommGast({ db, save, comm }) {
   function gesprek(code, lidKey, dept, opties) {
     const o = opties || {};
     const c = codeVan(code);
-    const g = comm.gesprekMaak({
+    // Een oude import of herlezing herstelt nooit verwijderde deelnemers.
+    const sleutel = 'gast:' + lijnSleutel(c, lidKey, dept);
+    const g = comm.gesprekMetSleutel(sleutel) || comm.gesprekMaak({
       soort: 'order', deelnemers: [String(lidKey), zaakVan(c)], door: String(lidKey),
       titel: o.zaakNaam || null,
-      meta: { sleutel: 'gast:' + lijnSleutel(c, lidKey, dept), zaak: c,
+      meta: { sleutel, zaak: c,
         dept: dept || 'Team', bron: 'Zaak', codename: o.codename || null,
         /* De pas van het lid reist mee omdat de zaak-route er een melding op
            adresseert. Hij hoort bij de LIJN en niet bij een los record in een
            tweede voorraad -- anders is er weer een plek die dit weet. */
         tier: o.tier || null }
     });
+    if (!comm.magErin(g, String(lidKey)) || !comm.magErin(g, zaakVan(c))) return g;
     if (o.codename && g.meta.codename !== o.codename) g.meta.codename = o.codename;
     if (o.tier && g.meta.tier !== o.tier) g.meta.tier = o.tier;
     return verhuizing.importeer(g, c, String(lidKey), dept);
@@ -103,14 +106,20 @@ function maakCommGast({ db, save, comm }) {
      lid op te vragen.
 
      Een lijn die alleen nog in de OUDE voorraad staat, telt wel als bestaand
-     -- die is er immers echt; hij is alleen nog niet verhuisd. Daarom eerst
-     daar kijken, en pas dan in de kern. */
+     -- die is er immers echt; hij is alleen nog niet verhuisd. Een bestaande
+     kernlijn blijft leidend, ook als een deelnemer inmiddels verwijderd is. */
   function bestaand(code, lidKey, dept) {
     const c = codeVan(code);
+    const kernlijn = comm.gesprekMetSleutel('gast:' + lijnSleutel(c, lidKey, dept));
+    if (kernlijn) {
+      // Hervat een afgebroken import, maar nooit over een ingetrokken relatie.
+      return comm.magErin(kernlijn, String(lidKey)) && comm.magErin(kernlijn, zaakVan(c))
+        ? verhuizing.importeer(kernlijn, c, String(lidKey), dept) : kernlijn;
+    }
     let oud = null;
     try { oud = (db.data.guestChats || {})[lijnSleutel(c, lidKey, dept)]; } catch (e) {}
     if (oud) return gesprek(c, lidKey, dept);
-    return comm.gesprekMetSleutel('gast:' + lijnSleutel(c, lidKey, dept));
+    return null;
   }
 
   /* Sturen, per kant. Twee functies en geen vlag: wie stuurt bepaalt de
@@ -148,7 +157,10 @@ function maakCommGast({ db, save, comm }) {
   }
 
   function berichten(code, lidKey, dept, hoeveel, kijker) {
-    const g = gesprek(code, lidKey, dept);
+    // Geschiedenis lezen opent geen lijn. Anders wordt een lege leesvraag
+    // ongemerkt een relatie waarop een zaak klantinzage kan baseren.
+    const g = bestaand(code, lidKey, dept);
+    if (!g || !comm.magErin(g, String(lidKey)) || !comm.magErin(g, zaakVan(codeVan(code)))) return [];
     const lijst = comm.berichtenVan(g.id).filter((m) => !m.weg);
     return lijst.slice(-(hoeveel || 120)).map((m) => oudeVorm(m, String(lidKey), kijker));
   }

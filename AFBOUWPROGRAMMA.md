@@ -1,5 +1,69 @@
 # Het afbouwprogramma — wat RTG heeft toegezegd, afbouwen en bewijzen
 
+## Actuele uitvoeringsvolgorde — 14 november 2026
+
+Het definitieve eigenaarsplan van 14 november vervangt de losse
+vervolgopdrachten. De eigenaar staat een efficiëntere volgorde toe, zonder
+de Definition of Done te verlagen. Oudere voortgangsmetingen hieronder zijn
+historie en geen bewijs voor de huidige kandidaat.
+
+1. **Eerst Poort 0:** PR #725 en #727 beschermd afhandelen, mergeboom en
+   uitrolstatus verifiëren. Daarna één finale integratielijn vanaf die main.
+   Geen schermmigratie in #727 en geen productie-uitrol door deze integratie.
+2. **Daarna Poort 1:** één canonieke inventaris met stabiele screenIds,
+   eigenaars, launchstatus en migratiematrix. Alle bestaande meetlagen
+   consumeren diezelfde inventaris. Geen tweede voortgangsregister en geen
+   ontwerp/migratie zolang noemerdrift of eigenaarconflicten bestaan.
+3. **Na die basis: verticale tranches per schermfamilie.** Eerst het gedeelde
+   component- en contextcontract vastleggen en op een representatieve
+   kritieke journey beproeven. Daarna binnen iedere tranche UX-contract,
+   DS-migratie, Edge, functionele proeven, toegankelijkheid en Experience
+   samen afronden. Poorten 2 t/m 6 behouden hun volledige eindvoorwaarden;
+   een groene tranche betekent niet dat een hele poort gereed is. Geen
+   afzonderlijke herontwerpronde langs alle schermen, gevolgd door meerdere
+   nieuwe rondes voor styling, Edge en herstel. Tijdelijke werkverdeling
+   heeft exclusieve bestanden en één integrator; geen autonome varianten.
+4. **Externe doorlooptijd vroeg zichtbaar maken.** Eigenaars, benodigde
+   besluiten, configuratie en acceptatieproeven uit Poort 7 voorbereiden
+   naast de technische tranches. Dit autoriseert geen externe opdracht,
+   betaling of livegang. Kandidaatgebonden eindbewijs ontstaat pas op de
+   uiteindelijke configuratie en artefactbytes.
+5. **Bron bevriezen vóór eindkwalificatie.** Pas bij stabiele bron de
+   afgeleide bewijsbestanden verversen, vervolgens alle verplichte checks
+   en twee onafhankelijke integrale runs op dezelfde immutable kandidaat.
+   Een latere codewijziging maakt nieuw toepasselijk bewijs noodzakelijk.
+   Beschermde main en een afzonderlijk getekend GO/NO-GO blijven verplicht.
+
+### Minder dubbel werk tijdens Poort 0
+
+- Eén volledige foutinventaris per gekozen testselectie; reparaties bundelen
+  per aangetoonde oorzaak in plaats van telkens stoppen bij de eerste fout.
+- Tijdens reparaties de getroffen tests en hun grenzen gericht uitvoeren.
+  De bestaande eindselectie, skips/todos-verboden en normen blijven intact.
+- Testpersona's hergebruiken. Openbare registratie geeft geen betaalde pas;
+  een fixture voor een al betalend lid is geen bewijs van contractsluiting,
+  betaling of menselijke Business/Lifestyle-goedkeuring.
+- Kleine verklaarde commits behouden; remote CI en afgeleide rapporten niet
+  na iedere losse fixture opnieuw starten. Push per gecontroleerde tranche.
+- Een diagnostische run waarin de werkboom veranderde geldt uitsluitend als
+  foutinventaris, nooit als commitgebonden kwalificatiebewijs.
+
+**Actuele open poort: 0; integrator is eigenaar.** De lokale reparatie van
+het contractleespad voorkomt dat `/api/state` lege aanmeldings-/betaallijsten
+aanmaakt zonder opslagbevestiging. De gerichte contractgroep slaagt 24/24;
+de echte PostgreSQL-ledengidsproef slaagt op een schone testdatabase.
+Negen verdere fixturebestanden slagen gericht met 57/57, nul skips/todos.
+De volledige diagnostische selectie `test:deel -- --deel=4/4
+--zonder-ijkingen --zonder-zware` is afgelopen: 38 bestanden met fouten;
+de negen hierboven zijn daarna gericht groen, 29 bestanden zijn nog te
+behandelen. Dit is uitsluitend scherf 4, niet de totale platformachterstand.
+De machineleesbare foutinventaris staat in `.release/unit-test-fouten.json`
+(14 november, 09:34:46 UTC); de werkboom veranderde tijdens deze diagnose.
+Dit is deelbewijs, geen groene volledige scherf, APPWERKT of Deep Green.
+De resterende testfouten, verplichte PostgreSQL/Redis-runs, beschermde remote
+checks en samenvoeging zijn nog open. De inventaris/migratiematrix volgt pas
+na de geverifieerde consolidatie; er wordt nog geen schermmigratie gestart.
+
 *Eigenaarsbesluit van 11 oktober 2026. Dit document legt het besluit vast, de
 grenzen die eruit volgen, de vier werkstromen die het uitvoeren, en de
 inventaris die zegt wat er binnen de scope valt. Het is LEIDEND voor de verdere

@@ -52,6 +52,53 @@ function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
   return uit.sort();
 }
 
+/* Alleen bij een navigatiefout: onderscheid ontbrekende bytes van een vastgelopen
+   document zonder de browser, service worker of wachtvoorwaarde te veranderen.
+   Alleen bestaande publieke bestandspaden worden getoond; query, fragment,
+   credentials en dynamische/API-paden blijven buiten het verslag. */
+function volgCensusNavigatie(page, base) {
+  const origin = new URL(base).origin;
+  const open = new Map(), mislukt = [], antwoorden = [], paginafouten = [];
+  let domcontentloaded = false, gecrasht = false, documentAntwoord = null;
+  function adres(raw) {
+    try {
+      const u = new URL(raw);
+      if (u.origin !== origin) return '[andere herkomst]';
+      const bestand = path.resolve(PUB, '.' + u.pathname);
+      if (bestand.startsWith(PUB + path.sep) && fs.existsSync(bestand) && fs.statSync(bestand).isFile()) {
+        return u.pathname.slice(0, 160);
+      }
+      return u.pathname.startsWith('/api/') ? '/api/[afgeschermd]' : '[dynamisch pad]';
+    } catch (_) { return '[onbekend adres]'; }
+  }
+  function bewaar(lijst, waarde) { lijst.push(waarde); if (lijst.length > 12) lijst.shift(); }
+  const luisteraars = {
+    request: (r) => open.set(r, { pad: adres(r.url()), soort: r.resourceType() }),
+    requestfinished: (r) => open.delete(r),
+    requestfailed: (r) => {
+      const reden = String((r.failure() || {}).errorText || '').match(/\bnet::[A-Z0-9_]+\b/);
+      bewaar(mislukt, { pad: adres(r.url()), reden: reden ? reden[0] : '[request mislukt]' });
+      open.delete(r);
+    },
+    response: (r) => {
+      const antwoord = { pad: adres(r.url()), status: r.status() };
+      bewaar(antwoorden, antwoord);
+      if (r.request().isNavigationRequest() && r.request().frame() === page.mainFrame()) documentAntwoord = antwoord;
+    },
+    /* Een foutbericht kan accountgegevens of een serverantwoord bevatten.
+       De standaard foutklasse is genoeg om een scriptfout te signaleren. */
+    pageerror: (e) => bewaar(paginafouten, /^(?:Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|URIError)$/.test(e.name) ? e.name : 'Error'),
+    crash: () => { gecrasht = true; },
+    domcontentloaded: () => { domcontentloaded = true; }
+  };
+  for (const [naam, fn] of Object.entries(luisteraars)) page.on(naam, fn);
+  return {
+    stand: () => ({ domcontentloaded, gecrasht, documentAntwoord, openAantal: open.size,
+      open: [...open.values()].slice(0, 12), mislukt, antwoorden, paginafouten }),
+    sluit: () => { for (const [naam, fn] of Object.entries(luisteraars)) page.off(naam, fn); }
+  };
+}
+
 async function api(base, pad, body) {
   const r = await fetch(base + pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
@@ -300,7 +347,13 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
         const page = await ctx.newPage();
         await volgVerzoeken(page);
         try {
-          await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
+          const navigatie = volgCensusNavigatie(page, base);
+          try {
+            await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
+          } catch (e) {
+            t.diagnostic('census-navigatie ' + JSON.stringify(navigatie.stand()));
+            throw e;
+          } finally { navigatie.sluit(); }
           /* Deze census bewijst de systeemdeur, niet dat ieder achtergronddeel
              van ieder scherm klaar is. `wachtOpRust` koppelde hem toch aan alle
              fetches van een pagina. Na ruim 250 routes kon daardoor een traag

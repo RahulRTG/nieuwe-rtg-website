@@ -97,7 +97,11 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid,
      (./aanmeldingen/lidabonnement.js en -opzeg.js). Ze draaien op dezelfde
      contracten en hetzelfde betaalschema als het kantoor -- er komt geen tweede
      motor naast, alleen een tweede deur ervoor. */
-  const lidAbonnementLezer = require('./aanmeldingen/lidabonnement')({ A, B, contracten, PASSEN, eur });
+  // De ledenpoort leest dit ook bij een leeg account. Alleen kijken: een
+  // ontbrekende lijst aanmaken is in PostgreSQL al een onbevestigde mutatie.
+  // A/B blijven de schrijftoegangen voor aanvraag en betaalschema.
+  const lidAbonnementLezer = require('./aanmeldingen/lidabonnement')({
+    A: () => eigen.kijk('aanmeldingen'), B: () => eigen.kijk('lidmaatschapBetalingen'), contracten, PASSEN, eur });
   const lidAbonnementOpzeg = require('./aanmeldingen/lidabonnement-opzeg')({
     contracten, zegOpLidmaatschap, lezer: lidAbonnementLezer });
   // naar gast: ./aanmeldingen/naargast.js (besluit C5)

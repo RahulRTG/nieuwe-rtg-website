@@ -6,11 +6,36 @@ const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
 
-function maak() {
-  const db = { data: {} };
-  const geldPasprijzen = () => ({ passen: { rtg: { maandCenten: 6500 }, lifestyle: { maandCenten: 2000000 } } });
+function maak({ db = { data: {} }, geldPasprijzen = () => ({ passen: { rtg: { maandCenten: 6500 }, lifestyle: { maandCenten: 2000000 } } }) } = {}) {
   return require('../server/kern/aanmeldingen')({ db, save: () => {}, crypto, schoon, geldPasprijzen }).aanmeldingen;
 }
+
+test('de ledenpoort schept geen lege collecties; aanvragen blijven in de eigen collecties schrijven', () => {
+  const db = { data: {} };
+  const a = maak({ db });
+  const voor = structuredClone(db.data);
+  assert.equal(a.lidAbonnement.stand(42), null);
+  assert.equal(a.lidAbonnement.mijn(42).abonnement, null);
+  assert.deepEqual(db.data, voor, 'geen opslagmutatie bij een nieuw account');
+
+  db.data.aanmeldingen = [{ id: 'zonder-schema', accountId: 42, status: 'geaccepteerd' }];
+  const zonderSchema = structuredClone(db.data);
+  assert.equal(a.lidAbonnement.stand(42), null);
+  assert.deepEqual(db.data, zonderSchema, 'ook een ontbrekend betaalschema blijft afwezig');
+
+  // Tegenproef: de fix mag schrijftoegangen niet in vluchtige lijsten veranderen.
+  delete db.data.aanmeldingen;
+  const r = a.aanvraag({ pas: 'rtg', naam: 'Leestoets' });
+  assert.equal(r.ok, true);
+  const rij = db.data.aanmeldingen.find(x => x.id === r.aanmelding.id);
+  assert.ok(rij, 'de aanvraag staat in de echte collectie');
+  rij.accountId = 42;
+  assert.equal(a.beslis(rij.id, 'geaccepteerd', '').ok, true);
+  assert.ok(db.data.lidmaatschapBetalingen.length, 'ook het betaalschema is bewaard');
+  const c = a.lidAbonnement.stand(42);
+  assert.ok(c && c.id, 'dezelfde lezer vindt nu de echte overeenkomst');
+  assert.equal(a.lidAbonnement.mijn(42).abonnement.contractId, c.id);
+});
 
 test('een aanmelding krijgt automatisch uitleg, geen uitgevoerd akkoord of betaling', () => {
   const a = maak();
@@ -190,15 +215,20 @@ test('maand 13 ontstaat door te verlengen, en verdwijnt door op te zeggen', () =
 /* DE PRIJS-LOCK. Besluit van 20 augustus 2026: een prijswijziging in de
    boardroom raakt nooit een lopend contract. */
 test('een prijswijziging raakt een lopend lidmaatschap niet', () => {
-  const a = maak({ pasprijzen: { rtg: 6500 } });
+  let maandCenten = 6500;
+  const a = maak({ geldPasprijzen: () => ({ passen: { rtg: { maandCenten } } }) });
   const lid = a.aanvraag({ pas: 'rtg', naam: 'Voor de verhoging' }).aanmelding;
   a.beslis(lid.id, 'geaccepteerd', 'Beoordelaar');
   const eerst = a.betalingen({ aanmeldingId: lid.id }).lidmaatschappen[0].termijnen[0].bedrag;
   assert.equal(eerst, 65);
 
   // de boardroom verhoogt naar 99 euro
-  a.zetPasprijs && a.zetPasprijs('rtg', 9900);
+  maandCenten = 9900;
   const na = a.betalingen({ aanmeldingId: lid.id }).lidmaatschappen[0].termijnen;
   assert.ok(na.every(t => t.bedrag === 65),
     'wat dit lid tekende, betaalt dit lid -- de termijnen dragen de momentopname van het contract');
+  const nieuw = a.aanvraag({ pas: 'rtg', naam: 'Na de verhoging' }).aanmelding;
+  a.beslis(nieuw.id, 'geaccepteerd', 'Beoordelaar');
+  assert.equal(a.betalingen({ aanmeldingId: nieuw.id }).lidmaatschappen[0].termijnen[0].bedrag, 99,
+    'de nieuwe prijs wordt werkelijk gebruikt voor nieuwe afspraken');
 });

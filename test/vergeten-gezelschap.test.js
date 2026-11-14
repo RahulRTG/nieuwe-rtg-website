@@ -108,7 +108,7 @@ test('vergetelheid werkt voor elke pas, niet alleen voor een RTG-lid', async () 
     assert.ok(office.token, 'het kantoor kan binnen');
 
     // het publiek zonder het genre-deel: we verwijderen er drie, geen zeventig
-    const g = await bouwGezelschap(base, { genres: false });
+    const g = await bouwGezelschap(base, { genres: false, dataDir: TMP });
     const post = g.post;
 
     /* Elk lid laat eerst sporen na. Niet uitputtend -- dat kan niet met ruim

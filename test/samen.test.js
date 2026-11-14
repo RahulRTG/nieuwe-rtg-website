@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stroomAdres } = require('./helper');
+const { startServer, stop, stroomAdres, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -17,12 +17,18 @@ function api(base, pad, body, token) {
 }
 
 let srv, base, A, B;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-samen-'));
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-samen-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  const reg = (n) => api(base, '/api/auth/register', { name: 'Samen ' + n, email: 'samen' + n + '@x.nl', phone: '061234567' + n,
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  const reg = async (n) => {
+    const email = 'samen' + n + '@x.nl';
+    const r = await api(base, '/api/auth/register', { name: 'Samen ' + n, email, phone: '061234567' + n,
+      password: 'geheim123', geboortedatum: '1990-01-01' });
+    assert.equal(r.status, 200);
+    maakBetaaldRtgTestaccount(TMP, email); // Samen toetst reeds betalende leden, niet de pasverkoop.
+    return r;
+  };
   A = (await reg(1)).body.token;
   B = (await reg(2)).body.token;
 });
@@ -140,7 +146,9 @@ test('4. de kamer-chat werkt en is begrensd; buitenstaanders komen er niet in', 
   const staat = await api(base, '/api/samen/staat', { id: kamerId }, A);
   assert.ok(staat.body.kamer.chat.some(c => c.tekst === 'Kijk deze etage!'));
   // een derde lid dat NIET meedoet mag niets
-  const reg3 = await api(base, '/api/auth/register', { name: 'Pottenkijker', email: 'samen3@x.nl', phone: '0612345673', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  const reg3 = await api(base, '/api/auth/register', { name: 'Pottenkijker', email: 'samen3@x.nl', phone: '0612345673', password: 'geheim123', geboortedatum: '1990-01-01' });
+  assert.equal(reg3.status, 200);
+  maakBetaaldRtgTestaccount(TMP, 'samen3@x.nl'); // De 404 bewijst kamerbezit, niet een ontbrekende pas.
   const C = reg3.body.token;
   assert.equal((await api(base, '/api/samen/staat', { id: kamerId }, C)).status, 404);
   assert.equal((await api(base, '/api/samen/chat', { id: kamerId, tekst: 'ik gluur' }, C)).status, 404);

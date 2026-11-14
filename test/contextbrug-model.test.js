@@ -52,7 +52,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-contextbrug-'));
 const MERK = 'GEHEIMNOTITIE' + Math.random().toString(36).slice(2, 8);
@@ -112,6 +112,7 @@ test.before(async () => {
     const reg = await api('/api/auth/register', { name: 'Proef ' + naam.toUpperCase(), email, password: 'geheim-' + naam + '-123',
       geboortedatum: '1988-04-04', phone: tel, pasApp: 'rtg' });
     assert.equal(reg.status, 200, 'aanmelden ' + naam);
+    maakBetaaldRtgTestaccount(TMP, email); // De contextproef gebruikt betaalde reizigers met ieder een eigen aanvraag.
     leden[naam] = { token: reg.body.token, email, tel, wachtwoord: 'geheim-' + naam + '-123' };
   }
   const reizen = (await api('/api/reisbureau', {}, leden.a.token)).body.reizen;

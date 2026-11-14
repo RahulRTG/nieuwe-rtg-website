@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lid, zaak;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-webplatform-'));
@@ -49,6 +49,7 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Web Lid', email: 'weblid@voorbeeld.test',
     password: 'webgeheim12', geboortedatum: '1992-02-02', tier: 'rtg', pasApp: 'rtg' });
   assert.equal(reg.status, 200, 'lid registreren: ' + JSON.stringify(reg.body));
+  maakBetaaldRtgTestaccount(TMP, 'weblid@voorbeeld.test');
   lid = reg.body.token;
   const roster = await api('/api/supplier/roster', { code: 'ESVEDRA' });
   const man = (roster.body.staff || []).find(x => x.role === 'manager');
@@ -180,6 +181,7 @@ test('6. het formulier op de bedrijfssite landt als klus bij de zaak, op codenaa
 test('10. de persoonlijke site: op codenaam, en het formulier wordt een gesprek -- alleen tussen verbonden leden', async () => {
   const reg = await api('/api/auth/register', { name: 'Persoon Twee', email: 'persoon2@voorbeeld.test',
     password: 'webgeheim34', geboortedatum: '1993-03-03', tier: 'rtg', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'persoon2@voorbeeld.test');
   const lid2 = reg.body.token;
 
   const g = await api('/api/site/persoonlijk', {}, lid2);
@@ -316,6 +318,8 @@ test('11. de versiegeschiedenis: een weg terug, zonder het adres mee te slepen',
   // en de geschiedenis is van de eigenaar: een ander komt er niet in
   const buur = await api('/api/auth/register', { name: 'Buur Web', email: 'buurweb@voorbeeld.test',
     password: 'webgeheim56', geboortedatum: '1994-04-04', tier: 'rtg', pasApp: 'rtg' });
+  // De eigendomsgrens wordt ook voor een betalend ander lid afgedwongen.
+  maakBetaaldRtgTestaccount(TMP, 'buurweb@voorbeeld.test');
   const vreemd = await api('/api/site/versies', { id }, buur.body.token);
   assert.equal(vreemd.status, 404);
   assert.equal((await api('/api/site/herstel', { id, i: 0 }, buur.body.token)).status, 404);
@@ -823,6 +827,7 @@ let domeinLid = null;
 test('26. een eigen domein staat STANDAARD UIT, en uit betekent echt uit', async () => {
   const reg = await api('/api/auth/register', { name: 'Domein Lid', email: 'domeinlid@voorbeeld.test',
     password: 'webgeheim99', geboortedatum: '1991-01-01', tier: 'rtg', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'domeinlid@voorbeeld.test');
   domeinLid = reg.body.token;
   const mk = await api('/api/site/bewaar', { design: { titel: 'Hotel Azur',
     blokken: [{ type: 'kop', tekst: 'Welkom bij Hotel Azur' }] } }, domeinLid);
@@ -964,6 +969,7 @@ test('28. dezelfde handelingen aan de zaak-kant: de sleutel komt uit de inlog', 
      zaak niet. Zou de route de eigenaar uit het verzoek halen, dan las een
      bedrijf hier de geschiedenis en de cijfers van een lid. */
   // een VERS lid: het lid uit de eerdere scenario's zit al aan de twaalf sites
+  maakBetaaldRtgTestaccount(TMP, 'zaakkijker@voorbeeld.test');
   const vanLid = await api('/api/site/bewaar', { design: { titel: 'Van een lid',
     blokken: [{ type: 'kop', tekst: 'Niet van de zaak' }] } }, kijker);
   assert.equal(vanLid.status, 200, JSON.stringify(vanLid.body));

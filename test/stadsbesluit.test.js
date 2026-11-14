@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, base, office, lid;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-besluit-'));
@@ -219,8 +219,12 @@ test('raadpleging: kijken mag altijd, reageren vraagt een profiel, en het gebied
   assert.equal(uitZone.body.jouwReactie.uitGebied, true);
   const buur = await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: 'Buur', email: 'raad' + Date.now() + '@x.nl', phone: '0612349999',
-      password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' }) })).json();
+      password: 'geheim123', geboortedatum: '1990-05-05' }) })).json();
+  assert.ok(buur.token);
+  assert.equal(buur.state.user.tier, 'guest');
+  await keurLidGoed(base, buur.token, buur.state.user.codename, '1990-05-05'); // Inspraak vraagt identiteit, geen abonnement.
   const buiten = await api('stad/raadpleging/reageer', { id: r.body.raadpleging.id, keuze: 'nee', zone: 'Centrum' }, buur.token);
+  assert.equal(buiten.status, 200);
   assert.equal(buiten.body.jouwReactie.uitGebied, false, 'wie in Centrum woont, telt niet mee in de gebiedstelling van Marina');
 
   const beeld = (await api('stad/raadplegingen', {}, lid)).body.raadplegingen.find(x => x.id === r.body.raadpleging.id);
